@@ -1,4 +1,4 @@
-use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
+use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use crate::{
     mandos_system::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},

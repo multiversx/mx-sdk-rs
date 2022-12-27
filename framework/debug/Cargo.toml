@@ -44,6 +44,6 @@ features = ["alloc", "num-bigint", "promises", "big-float"]
 version = "=0.38.0"
 path = "../meta"
 
-[dependencies.mandos]
+[dependencies.mx-chain-scenario-format]
 version = "0.18.0"
-path = "../mandos"
+path = "../scenario-format"

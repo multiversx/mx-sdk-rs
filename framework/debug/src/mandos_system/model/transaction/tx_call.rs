@@ -1,10 +1,10 @@
 use crate::{
     mandos_system::model::{AddressValue, BigUintValue, BytesValue, U64Value},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::TxCallRaw,
+    },
     DebugApi,
-};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::TxCallRaw,
 };
 use mx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
 

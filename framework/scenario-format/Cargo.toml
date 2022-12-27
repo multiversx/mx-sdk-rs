@@ -1,5 +1,5 @@
 [package]
-name = "mandos"
+name = "mx-chain-scenario-format"
 version = "0.18.0"
 edition = "2021"
 
@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.elrond.com/"
-description = "Parser/writer of the Mandos test format"
+description = "Parser/writer of the MultiversX transaction scenario format"
 keywords = ["multiversx", "blockchain", "contract"]
 categories = ["cryptography::cryptocurrencies", "development-tools"]
 

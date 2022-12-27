@@ -11,8 +11,8 @@ use mx_sc::{
     types::{Address, CodeMetadata},
 };
 use mx_sc_debug::{
-    mandos::interpret_trait::{InterpretableFrom, InterpreterContext},
     mandos_system::model::*,
+    scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
     BlockchainMock, ContractInfo, DebugApi,
 };
 use num_bigint::BigUint;

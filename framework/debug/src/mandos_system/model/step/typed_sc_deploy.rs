@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use mandos::interpret_trait::{InterpretableFrom, InterpreterContext};
+use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 use mx_sc::{
     codec::{CodecFrom, TopEncodeMulti},
     types::{Address, CodeMetadata},

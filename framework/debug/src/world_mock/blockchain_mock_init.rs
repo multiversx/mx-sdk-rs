@@ -1,6 +1,8 @@
 use std::path::{Path, PathBuf};
 
-use mandos::{interpret_trait::InterpreterContext, value_interpreter::interpret_string};
+use crate::scenario_format::{
+    interpret_trait::InterpreterContext, value_interpreter::interpret_string,
+};
 use mx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider};
 
 use crate::DebugApi;

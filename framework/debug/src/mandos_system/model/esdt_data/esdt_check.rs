@@ -1,8 +1,10 @@
 use super::{CheckEsdtData, CheckEsdtInstance, CheckEsdtInstances};
-use crate::mandos_system::model::{BigUintValue, CheckValue, U64Value};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::{CheckEsdtRaw, ValueSubTree},
+use crate::{
+    mandos_system::model::{BigUintValue, CheckValue, U64Value},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::{CheckEsdtRaw, ValueSubTree},
+    },
 };
 use num_bigint::BigUint;
 

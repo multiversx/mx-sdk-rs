@@ -1,7 +1,9 @@
-use crate::mandos_system::model::BigUintValue;
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext},
-    serde_raw::ValueSubTree,
+use crate::{
+    mandos_system::model::BigUintValue,
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext},
+        serde_raw::ValueSubTree,
+    },
 };
 
 pub fn interpret_egld_value(

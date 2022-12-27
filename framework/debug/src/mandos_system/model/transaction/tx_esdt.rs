@@ -1,7 +1,9 @@
-use crate::mandos_system::model::{BigUintValue, BytesValue, U64Value};
-use mandos::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::{TxESDTRaw, ValueSubTree},
+use crate::{
+    mandos_system::model::{BigUintValue, BytesValue, U64Value},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::{TxESDTRaw, ValueSubTree},
+    },
 };
 
 #[derive(Debug, Clone)]

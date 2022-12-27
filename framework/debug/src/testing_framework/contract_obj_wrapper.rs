@@ -239,9 +239,11 @@ impl BlockchainStateWrapper {
         let path_str = path_diff.to_str().unwrap();
 
         let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
-        let contract_bytes = mandos::value_interpreter::interpret_string(
+        let contract_bytes = crate::scenario_format::value_interpreter::interpret_string(
             &wasm_full_path_as_expr,
-            &mandos::interpret_trait::InterpreterContext::new(std::path::PathBuf::new()),
+            &crate::scenario_format::interpret_trait::InterpreterContext::new(
+                std::path::PathBuf::new(),
+            ),
         );
 
         let wasm_relative_path_expr = "file:".to_owned() + path_str;
