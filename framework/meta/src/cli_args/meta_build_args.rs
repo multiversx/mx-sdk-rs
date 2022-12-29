@@ -7,6 +7,10 @@ pub struct BuildArgs {
     pub wat: bool,
     pub extract_imports: bool,
     pub target_dir: Option<String>,
+    pub twiggy_top: bool,
+    pub twiggy_paths: bool,
+    pub twiggy_monos: bool,
+    pub twiggy_dominators: bool,
 }
 
 impl Default for BuildArgs {
@@ -19,23 +23,18 @@ impl Default for BuildArgs {
             wat: false,
             extract_imports: true,
             target_dir: None,
+            twiggy_top: false,
+            twiggy_paths: false,
+            twiggy_monos: false,
+            twiggy_dominators: false,
         }
     }
 }
 
 impl BuildArgs {
-    pub fn default_dbg() -> Self {
-        BuildArgs {
-            debug_symbols: true,
-            wasm_name_override: None,
-            wasm_name_suffix: Some("dbg".to_string()),
-            wasm_opt: false,
-            wat: true,
-            extract_imports: false,
-            target_dir: None,
-        }
-    }
-
+    /// Parses all arguments and sets them in a given BuildArgs object.
+    ///
+    /// Configuring a pre-existing object allows different defaults to be set.
     fn iter_parse(args: &[String], result: &mut BuildArgs) {
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
@@ -71,6 +70,18 @@ impl BuildArgs {
                         .expect("argument `--target-dir` must be followed by argument");
                     result.target_dir = Some(arg.clone());
                 },
+                "--twiggy-top" => {
+                    result.twiggy_top = true;
+                },
+                "--twiggy-paths" => {
+                    result.twiggy_paths = true;
+                },
+                "--twiggy-monos" => {
+                    result.twiggy_monos = true;
+                },
+                "--twiggy-dominators" => {
+                    result.twiggy_dominators = true;
+                },
                 _ => {},
             }
         }
@@ -82,9 +93,45 @@ impl BuildArgs {
         result
     }
 
+    pub fn default_dbg() -> Self {
+        BuildArgs {
+            debug_symbols: true,
+            wasm_name_override: None,
+            wasm_name_suffix: Some("dbg".to_string()),
+            wasm_opt: false,
+            wat: true,
+            extract_imports: false,
+            target_dir: None,
+            twiggy_top: false,
+            twiggy_paths: false,
+            twiggy_monos: false,
+            twiggy_dominators: false,
+        }
+    }
+
     pub fn parse_dbg(args: &[String]) -> BuildArgs {
         let mut result = BuildArgs::default_dbg();
         BuildArgs::iter_parse(args, &mut result);
         result
+    }
+
+    pub fn default_twiggy() -> Self {
+        BuildArgs {
+            twiggy_top: true,
+            twiggy_paths: true,
+            twiggy_monos: true,
+            twiggy_dominators: true,
+            ..BuildArgs::default_dbg()
+        }
+    }
+
+    pub fn parse_twiggy(args: &[String]) -> BuildArgs {
+        let mut result = BuildArgs::default_twiggy();
+        BuildArgs::iter_parse(args, &mut result);
+        result
+    }
+
+    pub fn has_twiggy_call(&self) -> bool {
+        self.twiggy_top || self.twiggy_paths || self.twiggy_monos || self.twiggy_dominators
     }
 }

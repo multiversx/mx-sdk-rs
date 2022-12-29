@@ -1,10 +1,11 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 use crate::cli_args::BuildArgs;
 
 const WASM_OPT_NAME: &str = "wasm-opt";
 const WASM2WAT_NAME: &str = "wasm2wat";
 const WASM_OBJDUMP_NAME: &str = "wasm-objdump";
+const TWIGGY_NAME: &str = "twiggy";
 
 pub(crate) fn check_tools_installed(build_args: &mut BuildArgs) {
     if build_args.wasm_opt && !is_wasm_opt_installed() {
@@ -18,6 +19,13 @@ pub(crate) fn check_tools_installed(build_args: &mut BuildArgs) {
     if build_args.extract_imports && !is_wasm_objdump_installed() {
         println!("Warning: {WASM_OBJDUMP_NAME} not installed");
         build_args.extract_imports = false;
+    }
+    if build_args.extract_imports && !is_twiggy_installed() {
+        println!("Warning: {TWIGGY_NAME} not installed");
+        build_args.twiggy_top = false;
+        build_args.twiggy_paths = false;
+        build_args.twiggy_monos = false;
+        build_args.twiggy_dominators = false;
     }
 }
 
@@ -37,6 +45,13 @@ fn is_wasm2wat_installed() -> bool {
 
 fn is_wasm_objdump_installed() -> bool {
     Command::new(WASM_OBJDUMP_NAME)
+        .args(["--version"])
+        .output()
+        .is_ok()
+}
+
+fn is_twiggy_installed() -> bool {
+    Command::new(TWIGGY_NAME)
         .args(["--version"])
         .output()
         .is_ok()
@@ -83,4 +98,35 @@ pub(crate) fn parse_imports(result: &str) -> Vec<String> {
         }
     }
     import_names
+}
+
+fn run_with_stdout_file<I, S>(stdout_file_name: &str, args: I)
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<std::ffi::OsStr>,
+{
+    let stdout_file = std::fs::File::create(stdout_file_name).unwrap();
+    let _ = Command::new(TWIGGY_NAME)
+        .args(args)
+        .stdout(Stdio::from(stdout_file))
+        .spawn()
+        .expect("failed to spawn twiggy process")
+        .wait()
+        .expect("twiggy was not running");
+}
+
+pub(crate) fn run_twiggy_top(output_wasm_path: &str, output_wt_path: &str) {
+    run_with_stdout_file(output_wt_path, ["top", "-n", "1000", output_wasm_path]);
+}
+
+pub(crate) fn run_twiggy_paths(output_wasm_path: &str, output_wt_path: &str) {
+    run_with_stdout_file(output_wt_path, ["paths", output_wasm_path]);
+}
+
+pub(crate) fn run_twiggy_monos(output_wasm_path: &str, output_wt_path: &str) {
+    run_with_stdout_file(output_wt_path, ["monos", output_wasm_path]);
+}
+
+pub(crate) fn run_twiggy_dominators(output_wasm_path: &str, output_wt_path: &str) {
+    run_with_stdout_file(output_wt_path, ["dominators", output_wasm_path]);
 }

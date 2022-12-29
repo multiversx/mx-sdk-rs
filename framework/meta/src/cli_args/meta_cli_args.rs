@@ -1,5 +1,6 @@
 use super::BuildArgs;
 
+/// Parsed arguments of the meta crate CLI.
 #[derive(Default)]
 pub struct CliArgs {
     pub action: CliAction,
@@ -38,6 +39,7 @@ impl CliAction {
         match args[1].as_str() {
             "build" => CliAction::Build(BuildArgs::parse(&args[2..])),
             "build-dbg" => CliAction::Build(BuildArgs::parse_dbg(&args[2..])),
+            "twiggy" => CliAction::Build(BuildArgs::parse_twiggy(&args[2..])),
             "clean" => CliAction::Clean,
             "snippets" => CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(&args[2..])),
             _ => CliAction::Nothing,
