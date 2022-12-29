@@ -32,7 +32,7 @@ impl MetaConfig {
     }
 
     fn git_describe(&self) -> String {
-        if !self.build_args.abi_git_version {
+        if !self.load_abi_git_version {
             return String::new();
         }
 

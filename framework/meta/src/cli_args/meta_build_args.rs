@@ -7,7 +7,6 @@ pub struct BuildArgs {
     pub wat: bool,
     pub extract_imports: bool,
     pub target_dir: Option<String>,
-    pub abi_git_version: bool,
 }
 
 impl Default for BuildArgs {
@@ -20,14 +19,24 @@ impl Default for BuildArgs {
             wat: false,
             extract_imports: true,
             target_dir: None,
-            abi_git_version: true,
         }
     }
 }
 
 impl BuildArgs {
-    pub fn process(args: &[String]) -> BuildArgs {
-        let mut result = BuildArgs::default();
+    pub fn default_dbg() -> Self {
+        BuildArgs {
+            debug_symbols: true,
+            wasm_name_override: None,
+            wasm_name_suffix: Some("dbg".to_string()),
+            wasm_opt: false,
+            wat: true,
+            extract_imports: false,
+            target_dir: None,
+        }
+    }
+
+    fn iter_parse(args: &[String], result: &mut BuildArgs) {
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
             match arg.as_str() {
@@ -62,13 +71,20 @@ impl BuildArgs {
                         .expect("argument `--target-dir` must be followed by argument");
                     result.target_dir = Some(arg.clone());
                 },
-                "--no-abi-git-version" => {
-                    result.abi_git_version = false;
-                },
                 _ => {},
             }
         }
+    }
 
+    pub fn parse(args: &[String]) -> BuildArgs {
+        let mut result = BuildArgs::default();
+        BuildArgs::iter_parse(args, &mut result);
+        result
+    }
+
+    pub fn parse_dbg(args: &[String]) -> BuildArgs {
+        let mut result = BuildArgs::default_dbg();
+        BuildArgs::iter_parse(args, &mut result);
         result
     }
 }
