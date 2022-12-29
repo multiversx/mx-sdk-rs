@@ -2,6 +2,8 @@ use std::fs;
 
 use mx_sc::abi::ContractAbi;
 
+use crate::meta_wasm_tools::check_tools_installed;
+
 use super::{
     cli_args::BuildArgs,
     output_contract::{CargoTomlContents, OutputContractConfig},
@@ -74,7 +76,7 @@ impl MetaConfig {
     }
 
     pub fn build(&mut self, mut build_args: BuildArgs) {
-        self.check_tools_installed(&mut build_args);
+        check_tools_installed(&mut build_args);
 
         for output_contract in &self.output_contracts.contracts {
             output_contract.build_contract(&build_args, self.output_dir.as_str());

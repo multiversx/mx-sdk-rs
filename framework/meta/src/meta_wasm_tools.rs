@@ -2,26 +2,22 @@ use std::process::Command;
 
 use crate::cli_args::BuildArgs;
 
-use super::meta_config::MetaConfig;
-
 const WASM_OPT_NAME: &str = "wasm-opt";
 const WASM2WAT_NAME: &str = "wasm2wat";
 const WASM_OBJDUMP_NAME: &str = "wasm-objdump";
 
-impl MetaConfig {
-    pub(crate) fn check_tools_installed(&mut self, build_args: &mut BuildArgs) {
-        if build_args.wasm_opt && !is_wasm_opt_installed() {
-            println!("Warning: {WASM_OPT_NAME} not installed");
-            build_args.wasm_opt = false;
-        }
-        if build_args.wat && !is_wasm2wat_installed() {
-            println!("Warning: {WASM2WAT_NAME} not installed");
-            build_args.wat = false;
-        }
-        if build_args.extract_imports && !is_wasm_objdump_installed() {
-            println!("Warning: {WASM_OBJDUMP_NAME} not installed");
-            build_args.extract_imports = false;
-        }
+pub(crate) fn check_tools_installed(build_args: &mut BuildArgs) {
+    if build_args.wasm_opt && !is_wasm_opt_installed() {
+        println!("Warning: {WASM_OPT_NAME} not installed");
+        build_args.wasm_opt = false;
+    }
+    if build_args.wat && !is_wasm2wat_installed() {
+        println!("Warning: {WASM2WAT_NAME} not installed");
+        build_args.wat = false;
+    }
+    if build_args.extract_imports && !is_wasm_objdump_installed() {
+        println!("Warning: {WASM_OBJDUMP_NAME} not installed");
+        build_args.extract_imports = false;
     }
 }
 
