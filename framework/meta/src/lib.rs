@@ -1,5 +1,5 @@
 pub mod abi_json;
-mod cli_args;
+pub mod cli_args;
 mod generate_snippets;
 mod meta_abi;
 mod meta_config;

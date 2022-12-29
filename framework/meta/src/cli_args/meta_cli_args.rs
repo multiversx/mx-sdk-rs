@@ -1,15 +1,20 @@
 use super::BuildArgs;
 
 /// Parsed arguments of the meta crate CLI.
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq, Debug)]
 pub struct CliArgs {
     pub action: CliAction,
     pub load_abi_git_version: bool,
 }
 
 impl CliArgs {
-    pub fn parse(args: &[String]) -> Self {
-        let no_abi_git_version = args.iter().any(|arg| arg == "--no-abi-git-version");
+    pub fn parse<S>(args: &[S]) -> Self
+    where
+        S: AsRef<str>,
+    {
+        let no_abi_git_version = args
+            .iter()
+            .any(|arg| arg.as_ref() == "--no-abi-git-version");
         CliArgs {
             action: CliAction::parse(args),
             load_abi_git_version: !no_abi_git_version,
@@ -17,6 +22,7 @@ impl CliArgs {
     }
 }
 
+#[derive(PartialEq, Eq, Debug)]
 pub enum CliAction {
     Build(BuildArgs),
     Clean,
@@ -31,12 +37,15 @@ impl Default for CliAction {
 }
 
 impl CliAction {
-    pub fn parse(args: &[String]) -> Self {
+    pub fn parse<S>(args: &[S]) -> Self
+    where
+        S: AsRef<str>,
+    {
         if args.len() < 2 {
             return CliAction::Nothing;
         }
 
-        match args[1].as_str() {
+        match args[1].as_ref() {
             "build" => CliAction::Build(BuildArgs::parse(&args[2..])),
             "build-dbg" => CliAction::Build(BuildArgs::parse_dbg(&args[2..])),
             "twiggy" => CliAction::Build(BuildArgs::parse_twiggy(&args[2..])),
@@ -47,15 +56,18 @@ impl CliAction {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq, Debug)]
 pub struct GenerateSnippetsArgs {
     pub overwrite: bool,
 }
 
 impl GenerateSnippetsArgs {
-    pub fn parse(args: &[String]) -> Self {
-        let overwrite = match args.get(2) {
-            Some(arg) => arg.as_str() == "--overwrite",
+    pub fn parse<S>(args: &[S]) -> Self
+    where
+        S: AsRef<str>,
+    {
+        let overwrite = match args.get(0) {
+            Some(arg) => arg.as_ref() == "--overwrite",
             None => false,
         };
         GenerateSnippetsArgs { overwrite }

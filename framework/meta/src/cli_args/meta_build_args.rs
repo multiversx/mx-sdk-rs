@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(PartialEq, Eq, Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
     pub wasm_name_override: Option<String>,
@@ -35,10 +35,13 @@ impl BuildArgs {
     /// Parses all arguments and sets them in a given BuildArgs object.
     ///
     /// Configuring a pre-existing object allows different defaults to be set.
-    fn iter_parse(args: &[String], result: &mut BuildArgs) {
+    fn iter_parse<S>(args: &[S], result: &mut BuildArgs)
+    where
+        S: AsRef<str>,
+    {
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
-            match arg.as_str() {
+            match arg.as_ref() {
                 "--wasm-symbols" => {
                     result.debug_symbols = true;
                 },
@@ -46,13 +49,13 @@ impl BuildArgs {
                     let name = iter
                         .next()
                         .expect("argument `--wasm-name` must be followed by the desired name");
-                    result.wasm_name_override = Some(name.clone());
+                    result.wasm_name_override = Some(name.as_ref().to_string());
                 },
                 "--wasm-suffix" => {
                     let suffix = iter
                         .next()
                         .expect("argument `--wasm-suffix` must be followed by the desired suffix");
-                    result.wasm_name_suffix = Some(suffix.clone());
+                    result.wasm_name_suffix = Some(suffix.as_ref().to_string());
                 },
                 "--no-wasm-opt" => {
                     result.wasm_opt = false;
@@ -68,7 +71,7 @@ impl BuildArgs {
                     let arg = iter
                         .next()
                         .expect("argument `--target-dir` must be followed by argument");
-                    result.target_dir = Some(arg.clone());
+                    result.target_dir = Some(arg.as_ref().to_string());
                 },
                 "--twiggy-top" => {
                     result.twiggy_top = true;
@@ -87,7 +90,10 @@ impl BuildArgs {
         }
     }
 
-    pub fn parse(args: &[String]) -> BuildArgs {
+    pub fn parse<S>(args: &[S]) -> BuildArgs
+    where
+        S: AsRef<str>,
+    {
         let mut result = BuildArgs::default();
         BuildArgs::iter_parse(args, &mut result);
         result
@@ -109,7 +115,10 @@ impl BuildArgs {
         }
     }
 
-    pub fn parse_dbg(args: &[String]) -> BuildArgs {
+    pub fn parse_dbg<S>(args: &[S]) -> BuildArgs
+    where
+        S: AsRef<str>,
+    {
         let mut result = BuildArgs::default_dbg();
         BuildArgs::iter_parse(args, &mut result);
         result
@@ -125,7 +134,10 @@ impl BuildArgs {
         }
     }
 
-    pub fn parse_twiggy(args: &[String]) -> BuildArgs {
+    pub fn parse_twiggy<S>(args: &[S]) -> BuildArgs
+    where
+        S: AsRef<str>,
+    {
         let mut result = BuildArgs::default_twiggy();
         BuildArgs::iter_parse(args, &mut result);
         result
