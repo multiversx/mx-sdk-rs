@@ -47,8 +47,11 @@ impl EsdtInstances {
             balance: BigUint::zero(),
             metadata: metadata.clone(),
         });
+        if instance.balance.is_zero() {
+            instance.metadata = metadata;
+        }
+
         instance.balance += value;
-        instance.metadata = metadata;
     }
 
     pub fn set_balance(&mut self, nonce: u64, value: &BigUint, metadata: EsdtInstanceMetadata) {
