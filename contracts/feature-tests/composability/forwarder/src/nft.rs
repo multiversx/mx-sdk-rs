@@ -4,11 +4,11 @@ mx_sc::derive_imports!();
 use super::storage;
 
 // used as mock attributes for NFTs
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[derive(TopEncode, TopDecode, TypeAbi, Clone, Copy, PartialEq, Debug)]
 pub struct Color {
-    r: u8,
-    g: u8,
-    b: u8,
+    pub r: u8,
+    pub g: u8,
+    pub b: u8,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone)]

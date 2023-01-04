@@ -1,0 +1,28 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {}
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "txId": "",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:output/rust-testing-framework-tester.wasm",
+                "arguments": [],
+                "gasLimit": "5,000,000",
+                "gasPrice": ""
+            }
+        }
+    ]
+}

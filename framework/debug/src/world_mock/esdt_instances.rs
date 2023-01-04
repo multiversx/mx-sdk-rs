@@ -45,9 +45,10 @@ impl EsdtInstances {
         let instance = self.0.entry(nonce).or_insert_with(|| EsdtInstance {
             nonce,
             balance: BigUint::zero(),
-            metadata,
+            metadata: metadata.clone(),
         });
         instance.balance += value;
+        instance.metadata = metadata;
     }
 
     pub fn set_balance(&mut self, nonce: u64, value: &BigUint, metadata: EsdtInstanceMetadata) {
