@@ -1,3 +1,5 @@
+use super::CliArgsParseError;
+
 #[derive(Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
@@ -24,7 +26,13 @@ impl Default for BuildArgs {
 }
 
 impl BuildArgs {
-    pub fn default_dbg() -> Self {
+    /// Base config when calling `cargo run build`, with no additional configs.
+    pub fn build_base_config() -> Self {
+        Self::default()
+    }
+
+    /// Base config when calling `cargo run build-dbg`, with no additional configs.
+    pub fn build_dbg_base_config() -> Self {
         BuildArgs {
             debug_symbols: true,
             wasm_name_override: None,
@@ -36,7 +44,7 @@ impl BuildArgs {
         }
     }
 
-    fn iter_parse(args: &[String], result: &mut BuildArgs) {
+    fn iter_parse(args: &[String], result: &mut BuildArgs) -> Result<(), CliArgsParseError> {
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
             match arg.as_str() {
@@ -71,20 +79,22 @@ impl BuildArgs {
                         .expect("argument `--target-dir` must be followed by argument");
                     result.target_dir = Some(arg.clone());
                 },
-                _ => {},
+                other => return Err(format!("unknown build argument: {other}")),
             }
         }
+
+        Ok(())
     }
 
-    pub fn parse(args: &[String]) -> BuildArgs {
-        let mut result = BuildArgs::default();
-        BuildArgs::iter_parse(args, &mut result);
-        result
+    pub fn parse(args: &[String]) -> Result<Self, CliArgsParseError> {
+        let mut result = BuildArgs::build_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
     }
 
-    pub fn parse_dbg(args: &[String]) -> BuildArgs {
-        let mut result = BuildArgs::default_dbg();
-        BuildArgs::iter_parse(args, &mut result);
-        result
+    pub fn parse_dbg(args: &[String]) -> Result<Self, CliArgsParseError> {
+        let mut result = BuildArgs::build_dbg_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
     }
 }
