@@ -1,3 +1,10 @@
+use super::CliArgsParseError;
+
+/// `erdpy` still sends unnecessary arguments when building.
+///
+/// Set to true when the issue has been resolved.
+const PARSE_BUILD_ARGS_STRICT: bool = false;
+
 #[derive(Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
@@ -7,7 +14,6 @@ pub struct BuildArgs {
     pub wat: bool,
     pub extract_imports: bool,
     pub target_dir: Option<String>,
-    pub abi_git_version: bool,
 }
 
 impl Default for BuildArgs {
@@ -20,14 +26,30 @@ impl Default for BuildArgs {
             wat: false,
             extract_imports: true,
             target_dir: None,
-            abi_git_version: true,
         }
     }
 }
 
 impl BuildArgs {
-    pub fn process(args: &[String]) -> BuildArgs {
-        let mut result = BuildArgs::default();
+    /// Base config when calling `cargo run build`, with no additional configs.
+    pub fn build_base_config() -> Self {
+        Self::default()
+    }
+
+    /// Base config when calling `cargo run build-dbg`, with no additional configs.
+    pub fn build_dbg_base_config() -> Self {
+        BuildArgs {
+            debug_symbols: true,
+            wasm_name_override: None,
+            wasm_name_suffix: Some("dbg".to_string()),
+            wasm_opt: false,
+            wat: true,
+            extract_imports: false,
+            target_dir: None,
+        }
+    }
+
+    fn iter_parse(args: &[String], result: &mut BuildArgs) -> Result<(), CliArgsParseError> {
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
             match arg.as_str() {
@@ -62,13 +84,25 @@ impl BuildArgs {
                         .expect("argument `--target-dir` must be followed by argument");
                     result.target_dir = Some(arg.clone());
                 },
-                "--no-abi-git-version" => {
-                    result.abi_git_version = false;
+                other if PARSE_BUILD_ARGS_STRICT => {
+                    return Err(format!("unknown build argument: {other}"))
                 },
                 _ => {},
             }
         }
 
-        result
+        Ok(())
+    }
+
+    pub fn parse(args: &[String]) -> Result<Self, CliArgsParseError> {
+        let mut result = BuildArgs::build_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
+    }
+
+    pub fn parse_dbg(args: &[String]) -> Result<Self, CliArgsParseError> {
+        let mut result = BuildArgs::build_dbg_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
     }
 }

@@ -1,7 +1,7 @@
 pub mod abi_json;
+mod cli_args;
 mod generate_snippets;
 mod meta_abi;
-mod meta_build_args;
 mod meta_config;
 mod meta_main;
 mod meta_validate_abi;
