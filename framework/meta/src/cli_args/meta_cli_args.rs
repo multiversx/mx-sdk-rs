@@ -14,11 +14,17 @@ impl CliArgs {
     where
         S: AsRef<str>,
     {
-        let no_abi_git_version = args
-            .iter()
-            .any(|arg| arg.as_ref() == "--no-abi-git-version");
+        let mut no_abi_git_version = false;
+        let mut remaining_args = Vec::<&S>::new();
+        for arg in args {
+            if arg.as_ref() == "--no-abi-git-version" {
+                no_abi_git_version = true;
+            } else {
+                remaining_args.push(arg);
+            }
+        }
         Ok(CliArgs {
-            action: CliAction::parse(args)?,
+            action: CliAction::parse(remaining_args.as_slice())?,
             load_abi_git_version: !no_abi_git_version,
         })
     }
@@ -48,7 +54,13 @@ impl CliAction {
             "build" => Ok(CliAction::Build(BuildArgs::parse(additional_args)?)),
             "build-dbg" => Ok(CliAction::Build(BuildArgs::parse_dbg(additional_args)?)),
             "twiggy" => Ok(CliAction::Build(BuildArgs::parse_twiggy(additional_args)?)),
-            "clean" => Ok(CliAction::Clean),
+            "clean" => {
+                if additional_args.is_empty() {
+                    Ok(CliAction::Clean)
+                } else {
+                    Err(format!("clean accepts no arguments"))
+                }
+            },
             "snippets" => Ok(CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(
                 additional_args,
             )?)),

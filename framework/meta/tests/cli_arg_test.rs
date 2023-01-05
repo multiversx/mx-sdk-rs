@@ -3,7 +3,7 @@ use mx_sc_meta::cli_args::{BuildArgs, CliAction, CliArgs, GenerateSnippetsArgs};
 #[test]
 fn test_parse_args_nothing() {
     assert_eq!(
-        CliArgs::parse(&[""]),
+        CliArgs::parse(&[""]).unwrap(),
         CliArgs {
             action: CliAction::Nothing,
             load_abi_git_version: true
@@ -11,7 +11,7 @@ fn test_parse_args_nothing() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "--no-abi-git-version"]),
+        CliArgs::parse(&["", "--no-abi-git-version"]).unwrap(),
         CliArgs {
             action: CliAction::Nothing,
             load_abi_git_version: false,
@@ -22,7 +22,7 @@ fn test_parse_args_nothing() {
 #[test]
 fn test_parse_args_build() {
     assert_eq!(
-        CliArgs::parse(&["", "build"]),
+        CliArgs::parse(&["", "build"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs::default()),
             load_abi_git_version: true,
@@ -30,7 +30,7 @@ fn test_parse_args_build() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--no-abi-git-version"]),
+        CliArgs::parse(&["", "build", "--no-abi-git-version"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs::default()),
             load_abi_git_version: false,
@@ -38,7 +38,7 @@ fn test_parse_args_build() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--wasm-symbols"]),
+        CliArgs::parse(&["", "build", "--wasm-symbols"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 debug_symbols: true,
@@ -49,7 +49,7 @@ fn test_parse_args_build() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--wasm-name", "custom-name", "--no-imports"]),
+        CliArgs::parse(&["", "build", "--wasm-name", "custom-name", "--no-imports"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 wasm_name_override: Some("custom-name".to_string()),
@@ -64,7 +64,7 @@ fn test_parse_args_build() {
 #[test]
 fn test_parse_args_build_dbg() {
     assert_eq!(
-        CliArgs::parse(&["", "build-dbg"]),
+        CliArgs::parse(&["", "build-dbg"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 debug_symbols: true,
@@ -87,7 +87,7 @@ fn test_parse_args_build_dbg() {
 #[test]
 fn test_parse_args_twiggy() {
     assert_eq!(
-        CliArgs::parse(&["", "twiggy"]),
+        CliArgs::parse(&["", "twiggy"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 debug_symbols: true,
@@ -107,7 +107,7 @@ fn test_parse_args_twiggy() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--twiggy-top"]),
+        CliArgs::parse(&["", "build", "--twiggy-top"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 twiggy_top: true,
@@ -118,7 +118,7 @@ fn test_parse_args_twiggy() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--twiggy-paths"]),
+        CliArgs::parse(&["", "build", "--twiggy-paths"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 twiggy_paths: true,
@@ -129,7 +129,7 @@ fn test_parse_args_twiggy() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--twiggy-monos"]),
+        CliArgs::parse(&["", "build", "--twiggy-monos"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 twiggy_monos: true,
@@ -140,7 +140,7 @@ fn test_parse_args_twiggy() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "build", "--twiggy-dominators"]),
+        CliArgs::parse(&["", "build", "--twiggy-dominators"]).unwrap(),
         CliArgs {
             action: CliAction::Build(BuildArgs {
                 twiggy_dominators: true,
@@ -154,10 +154,18 @@ fn test_parse_args_twiggy() {
 #[test]
 fn test_parse_args_clean() {
     assert_eq!(
-        CliArgs::parse(&["", "clean"]),
+        CliArgs::parse(&["", "clean"]).unwrap(),
         CliArgs {
             action: CliAction::Clean,
             load_abi_git_version: true,
+        }
+    );
+
+    assert_eq!(
+        CliArgs::parse(&["", "clean", "--no-abi-git-version"]).unwrap(),
+        CliArgs {
+            action: CliAction::Clean,
+            load_abi_git_version: false,
         }
     );
 }
@@ -165,7 +173,7 @@ fn test_parse_args_clean() {
 #[test]
 fn test_parse_args_generate_snippets() {
     assert_eq!(
-        CliArgs::parse(&["", "snippets"]),
+        CliArgs::parse(&["", "snippets"]).unwrap(),
         CliArgs {
             action: CliAction::GenerateSnippets(GenerateSnippetsArgs { overwrite: false }),
             load_abi_git_version: true,
@@ -173,10 +181,28 @@ fn test_parse_args_generate_snippets() {
     );
 
     assert_eq!(
-        CliArgs::parse(&["", "snippets", "--overwrite"]),
+        CliArgs::parse(&["", "snippets", "--overwrite"]).unwrap(),
         CliArgs {
             action: CliAction::GenerateSnippets(GenerateSnippetsArgs { overwrite: true }),
             load_abi_git_version: true,
         }
+    );
+}
+
+#[test]
+fn test_parse_args_error() {
+    assert_eq!(
+        CliArgs::parse(&["", "no-command"]),
+        Err("unknown command: no-command".to_string())
+    );
+
+    assert_eq!(
+        CliArgs::parse(&["", "clean", "--extra"]),
+        Err("clean accepts no arguments".to_string())
+    );
+
+    assert_eq!(
+        CliArgs::parse(&["", "snippets", "--unknown"]),
+        Err("unknown snippets argument: --unknown".to_string())
     );
 }
