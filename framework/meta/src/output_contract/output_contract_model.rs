@@ -162,6 +162,25 @@ impl OutputContract {
         format!("{}.imports.json", self.output_name_base(build_args))
     }
 
+    pub fn twiggy_top_name(&self, build_args: &BuildArgs) -> String {
+        format!("twiggy-top-{}.txt", self.output_name_base(build_args))
+    }
+
+    pub fn twiggy_paths_name(&self, build_args: &BuildArgs) -> String {
+        format!("twiggy-paths-{}.txt", self.output_name_base(build_args))
+    }
+
+    pub fn twiggy_monos_name(&self, build_args: &BuildArgs) -> String {
+        format!("twiggy-monos-{}.txt", self.output_name_base(build_args))
+    }
+
+    pub fn twiggy_dominators_name(&self, build_args: &BuildArgs) -> String {
+        format!(
+            "twiggy-dominators-{}.txt",
+            self.output_name_base(build_args)
+        )
+    }
+
     pub fn endpoint_names(&self) -> Vec<String> {
         self.abi
             .endpoints

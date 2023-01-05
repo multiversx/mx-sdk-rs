@@ -2,23 +2,35 @@ use super::BuildArgs;
 
 pub type CliArgsParseError = String;
 
-#[derive(Default)]
+/// Parsed arguments of the meta crate CLI.
+#[derive(Default, PartialEq, Eq, Debug)]
 pub struct CliArgs {
     pub action: CliAction,
     pub load_abi_git_version: bool,
 }
 
 impl CliArgs {
-    pub fn parse(args: &[String]) -> Result<Self, CliArgsParseError> {
-        let no_abi_git_version = args.iter().any(|arg| arg == "--no-abi-git-version");
+    pub fn parse<S>(args: &[S]) -> Result<Self, CliArgsParseError>
+    where
+        S: AsRef<str>,
+    {
+        let mut no_abi_git_version = false;
+        let mut remaining_args = Vec::<&S>::new();
+        for arg in args {
+            if arg.as_ref() == "--no-abi-git-version" {
+                no_abi_git_version = true;
+            } else {
+                remaining_args.push(arg);
+            }
+        }
         Ok(CliArgs {
-            action: CliAction::parse(args)?,
+            action: CliAction::parse(remaining_args.as_slice())?,
             load_abi_git_version: !no_abi_git_version,
         })
     }
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq, Debug)]
 pub enum CliAction {
     #[default]
     Nothing,
@@ -28,17 +40,27 @@ pub enum CliAction {
 }
 
 impl CliAction {
-    pub fn parse(args: &[String]) -> Result<Self, CliArgsParseError> {
+    pub fn parse<S>(args: &[S]) -> Result<Self, CliArgsParseError>
+    where
+        S: AsRef<str>,
+    {
         if args.len() < 2 {
             return Ok(CliAction::Nothing);
         }
 
-        let command = args[1].as_str();
+        let command = args[1].as_ref();
         let additional_args = &args[2..];
         match command {
             "build" => Ok(CliAction::Build(BuildArgs::parse(additional_args)?)),
             "build-dbg" => Ok(CliAction::Build(BuildArgs::parse_dbg(additional_args)?)),
-            "clean" => Ok(CliAction::Clean),
+            "twiggy" => Ok(CliAction::Build(BuildArgs::parse_twiggy(additional_args)?)),
+            "clean" => {
+                if additional_args.is_empty() {
+                    Ok(CliAction::Clean)
+                } else {
+                    Err(format!("clean accepts no arguments"))
+                }
+            },
             "snippets" => Ok(CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(
                 additional_args,
             )?)),
@@ -47,18 +69,21 @@ impl CliAction {
     }
 }
 
-#[derive(Default)]
+#[derive(Default, PartialEq, Eq, Debug)]
 pub struct GenerateSnippetsArgs {
     pub overwrite: bool,
 }
 
 impl GenerateSnippetsArgs {
     #[allow(clippy::while_let_on_iterator)]
-    pub fn parse(args: &[String]) -> Result<Self, CliArgsParseError> {
+    pub fn parse<S>(args: &[S]) -> Result<Self, CliArgsParseError>
+    where
+        S: AsRef<str>,
+    {
         let mut result = GenerateSnippetsArgs::default();
         let mut iter = args.iter();
         while let Some(arg) = iter.next() {
-            match arg.as_str() {
+            match arg.as_ref() {
                 "--overwrite" => {
                     result.overwrite = true;
                 },

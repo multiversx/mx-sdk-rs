@@ -31,6 +31,7 @@ impl OutputContract {
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
         self.extract_imports(build_args, output_path);
+        self.run_twiggy(build_args, output_path);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -79,4 +80,44 @@ impl OutputContract {
 fn write_imports_output(dest_path: &str, import_names: &[String]) {
     let json = serde_json::to_string_pretty(import_names).unwrap();
     fs::write(dest_path, json).expect("failed to write imports json file");
+}
+
+impl OutputContract {
+    fn run_twiggy(&self, build_args: &BuildArgs, output_path: &str) {
+        if build_args.has_twiggy_call() {
+            let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
+
+            if build_args.twiggy_top {
+                let output_wat_path = format!("{output_path}/{}", self.twiggy_top_name(build_args));
+                meta_wasm_tools::run_twiggy_top(
+                    output_wasm_path.as_str(),
+                    output_wat_path.as_str(),
+                );
+            }
+            if build_args.twiggy_paths {
+                let output_wat_path =
+                    format!("{output_path}/{}", self.twiggy_paths_name(build_args));
+                meta_wasm_tools::run_twiggy_paths(
+                    output_wasm_path.as_str(),
+                    output_wat_path.as_str(),
+                );
+            }
+            if build_args.twiggy_monos {
+                let output_wat_path =
+                    format!("{output_path}/{}", self.twiggy_monos_name(build_args));
+                meta_wasm_tools::run_twiggy_monos(
+                    output_wasm_path.as_str(),
+                    output_wat_path.as_str(),
+                );
+            }
+            if build_args.twiggy_dominators {
+                let output_wat_path =
+                    format!("{output_path}/{}", self.twiggy_dominators_name(build_args));
+                meta_wasm_tools::run_twiggy_dominators(
+                    output_wasm_path.as_str(),
+                    output_wat_path.as_str(),
+                );
+            }
+        }
+    }
 }
