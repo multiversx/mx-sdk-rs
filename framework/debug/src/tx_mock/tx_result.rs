@@ -69,10 +69,13 @@ impl TxResult {
         Self::from_panic_string("")
     }
 
-    pub fn from_vm_error(result_message: String) -> Self {
+    pub fn from_vm_error<S>(result_message: S) -> Self
+    where
+        S: Into<String>,
+    {
         TxResult {
             result_status: 10,
-            result_message,
+            result_message: result_message.into(),
             ..Default::default()
         }
     }

@@ -16,7 +16,7 @@ impl BuiltinFunction for ClaimDeveloperRewards {
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
         if !tx_input.args.is_empty() {
             return (
-                TxResult::from_vm_error("ClaimDeveloperRewards expects no arguments".to_string()),
+                TxResult::from_vm_error("ClaimDeveloperRewards expects no arguments"),
                 BlockchainUpdate::empty(),
             );
         }
@@ -37,7 +37,7 @@ impl BuiltinFunction for ClaimDeveloperRewards {
             (TxResult::empty(), tx_cache.into_blockchain_updates())
         } else {
             (
-                TxResult::from_vm_error("operation in account not permitted".to_string()),
+                TxResult::from_vm_error("operation in account not permitted"),
                 BlockchainUpdate::empty(),
             )
         }

@@ -14,8 +14,7 @@ impl BuiltinFunction for ESDTLocalBurn {
 
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() != 2 {
-            let err_result =
-                TxResult::from_vm_error("ESDTLocalBurn expects 2 arguments".to_string());
+            let err_result = TxResult::from_vm_error("ESDTLocalBurn expects 2 arguments");
             return (err_result, BlockchainUpdate::empty());
         }
 

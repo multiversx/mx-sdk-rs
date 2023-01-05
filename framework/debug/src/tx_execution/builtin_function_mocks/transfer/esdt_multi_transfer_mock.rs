@@ -34,7 +34,7 @@ impl BuiltinFunction for ESDTMultiTransfer {
                 execute_transfer_builtin_func(parsed_tx, self.name(), tx_input, tx_cache)
             },
             Err(message) => {
-                let err_result = TxResult::from_vm_error(message.to_string());
+                let err_result = TxResult::from_vm_error(message);
                 (err_result, BlockchainUpdate::empty())
             },
         }

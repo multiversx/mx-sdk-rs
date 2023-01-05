@@ -17,7 +17,7 @@ impl BuiltinFunction for ESDTNftBurn {
 
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() != 3 {
-            let err_result = TxResult::from_vm_error("ESDTNFTBurn expects 3 arguments".to_string());
+            let err_result = TxResult::from_vm_error("ESDTNFTBurn expects 3 arguments");
             return (err_result, BlockchainUpdate::empty());
         }
 

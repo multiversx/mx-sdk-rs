@@ -17,7 +17,7 @@ impl BuiltinFunction for UpgradeContract {
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() < 2 {
             return (
-                TxResult::from_vm_error("upgradeContract expects at least 2 arguments".to_string()),
+                TxResult::from_vm_error("upgradeContract expects at least 2 arguments"),
                 BlockchainUpdate::empty(),
             );
         }
