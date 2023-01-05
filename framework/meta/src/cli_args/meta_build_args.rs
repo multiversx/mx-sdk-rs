@@ -1,3 +1,10 @@
+use super::CliArgsParseError;
+
+/// `erdpy` still sends unnecessary arguments when building.
+///
+/// Set to true when the issue has been resolved.
+const PARSE_BUILD_ARGS_STRICT: bool = false;
+
 #[derive(PartialEq, Eq, Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
@@ -32,10 +39,15 @@ impl Default for BuildArgs {
 }
 
 impl BuildArgs {
+    /// Base config when calling `cargo run build`, with no additional configs.
+    pub fn build_base_config() -> Self {
+        Self::default()
+    }
+
     /// Parses all arguments and sets them in a given BuildArgs object.
     ///
     /// Configuring a pre-existing object allows different defaults to be set.
-    fn iter_parse<S>(args: &[S], result: &mut BuildArgs)
+    fn iter_parse<S>(args: &[S], result: &mut BuildArgs) -> Result<(), CliArgsParseError>
     where
         S: AsRef<str>,
     {
@@ -85,21 +97,27 @@ impl BuildArgs {
                 "--twiggy-dominators" => {
                     result.twiggy_dominators = true;
                 },
+                other if PARSE_BUILD_ARGS_STRICT => {
+                    return Err(format!("unknown build argument: {other}"))
+                },
                 _ => {},
             }
         }
+
+        Ok(())
     }
 
-    pub fn parse<S>(args: &[S]) -> BuildArgs
+    pub fn parse<S>(args: &[S]) -> Result<Self, CliArgsParseError>
     where
         S: AsRef<str>,
     {
-        let mut result = BuildArgs::default();
-        BuildArgs::iter_parse(args, &mut result);
-        result
+        let mut result = BuildArgs::build_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
     }
 
-    pub fn default_dbg() -> Self {
+    /// Base config when calling `cargo run build-dbg`, with no additional configs.
+    pub fn build_dbg_base_config() -> Self {
         BuildArgs {
             debug_symbols: true,
             wasm_name_override: None,
@@ -115,32 +133,32 @@ impl BuildArgs {
         }
     }
 
-    pub fn parse_dbg<S>(args: &[S]) -> BuildArgs
+    pub fn parse_dbg<S>(args: &[S]) -> Result<Self, CliArgsParseError>
     where
         S: AsRef<str>,
     {
-        let mut result = BuildArgs::default_dbg();
-        BuildArgs::iter_parse(args, &mut result);
-        result
+        let mut result = BuildArgs::build_dbg_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
     }
 
-    pub fn default_twiggy() -> Self {
+    pub fn twiggy_base_config() -> Self {
         BuildArgs {
             twiggy_top: true,
             twiggy_paths: true,
             twiggy_monos: true,
             twiggy_dominators: true,
-            ..BuildArgs::default_dbg()
+            ..BuildArgs::build_dbg_base_config()
         }
     }
 
-    pub fn parse_twiggy<S>(args: &[S]) -> BuildArgs
+    pub fn parse_twiggy<S>(args: &[S]) -> Result<Self, CliArgsParseError>
     where
         S: AsRef<str>,
     {
-        let mut result = BuildArgs::default_twiggy();
-        BuildArgs::iter_parse(args, &mut result);
-        result
+        let mut result = BuildArgs::twiggy_base_config();
+        BuildArgs::iter_parse(args, &mut result)?;
+        Ok(result)
     }
 
     pub fn has_twiggy_call(&self) -> bool {

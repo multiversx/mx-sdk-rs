@@ -10,7 +10,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
     super::meta_validate_abi::validate_abi(&original_contract_abi).unwrap();
 
     let args: Vec<String> = env::args().collect();
-    let cli_args = CliArgs::parse(args.as_slice());
+    let cli_args = CliArgs::parse(args.as_slice()).expect("Error processing CLI arguments: ");
     let mut meta_config = MetaConfig::create(original_contract_abi, cli_args.load_abi_git_version);
 
     meta_config.write_abi();
@@ -18,10 +18,10 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
     meta_config.generate_wasm_crates();
 
     match cli_args.action {
+        CliAction::Nothing => {},
         CliAction::Build(build_args) => meta_config.build(build_args),
         CliAction::Clean => meta_config.clean(),
         CliAction::GenerateSnippets(gs_args) => meta_config.generate_rust_snippets(&gs_args),
-        CliAction::Nothing => {},
     }
 }
 

@@ -45,8 +45,12 @@ impl EsdtInstances {
         let instance = self.0.entry(nonce).or_insert_with(|| EsdtInstance {
             nonce,
             balance: BigUint::zero(),
-            metadata,
+            metadata: metadata.clone(),
         });
+        if instance.balance.is_zero() {
+            instance.metadata = metadata;
+        }
+
         instance.balance += value;
     }
 
