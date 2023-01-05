@@ -2,8 +2,10 @@ use std::fs;
 
 use mx_sc::abi::ContractAbi;
 
+use crate::meta_wasm_tools::check_tools_installed;
+
 use super::{
-    meta_build_args::BuildArgs,
+    cli_args::BuildArgs,
     output_contract::{CargoTomlContents, OutputContractConfig},
 };
 
@@ -15,7 +17,7 @@ const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
 const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
 
 pub struct MetaConfig {
-    pub build_args: BuildArgs,
+    pub load_abi_git_version: bool,
     pub output_dir: String,
     pub snippets_dir: String,
     pub original_contract_abi: ContractAbi,
@@ -23,14 +25,14 @@ pub struct MetaConfig {
 }
 
 impl MetaConfig {
-    pub fn create(original_contract_abi: ContractAbi, build_args: BuildArgs) -> MetaConfig {
+    pub fn create(original_contract_abi: ContractAbi, load_abi_git_version: bool) -> MetaConfig {
         let output_contracts = OutputContractConfig::load_from_file_or_default(
             MULTI_CONTRACT_CONFIG_RELATIVE_PATH,
             &original_contract_abi,
         );
 
         MetaConfig {
-            build_args,
+            load_abi_git_version,
             output_dir: OUTPUT_RELATIVE_PATH.to_string(),
             snippets_dir: SNIPPETS_RELATIVE_PATH.to_string(),
             original_contract_abi,
@@ -73,22 +75,12 @@ impl MetaConfig {
         }
     }
 
-    pub fn build(&mut self) {
-        self.check_tools_installed();
+    pub fn build(&mut self, mut build_args: BuildArgs) {
+        check_tools_installed(&mut build_args);
 
         for output_contract in &self.output_contracts.contracts {
-            output_contract.build_contract(&self.build_args, self.output_dir.as_str());
+            output_contract.build_contract(&build_args, self.output_dir.as_str());
         }
-    }
-
-    /// Convenience functionality, to get all flags right for the debug build.
-    pub fn build_dbg(&mut self) {
-        self.build_args.wasm_name_suffix = Some("dbg".to_string());
-        self.build_args.wasm_opt = false;
-        self.build_args.debug_symbols = true;
-        self.build_args.wat = true;
-        self.build_args.extract_imports = false;
-        self.build();
     }
 
     /// Cleans the wasm crates and all other outputs.

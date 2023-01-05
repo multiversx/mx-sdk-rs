@@ -2,7 +2,7 @@ use std::fs::File;
 
 use mx_sc::abi::ContractAbi;
 
-use crate::meta_config::MetaConfig;
+use crate::{cli_args::GenerateSnippetsArgs, meta_config::MetaConfig};
 
 use super::{
     snippet_crate_gen::{
@@ -17,14 +17,13 @@ use super::{
 };
 
 impl MetaConfig {
-    // TODO: Handle overwrite flag
-    pub fn generate_rust_snippets(&self, overwrite: bool) {
+    pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
         let name = &self
             .output_contracts
             .main_contract()
             .public_name_snake_case();
         let wasm_output_file_path_expr = format!("\"file:../output/{name}.wasm\"");
-        let file = create_snippets_crate_and_get_lib_file(&self.snippets_dir, name, overwrite);
+        let file = create_snippets_crate_and_get_lib_file(&self.snippets_dir, name, args.overwrite);
         write_snippets_to_file(
             file,
             &self.original_contract_abi,
