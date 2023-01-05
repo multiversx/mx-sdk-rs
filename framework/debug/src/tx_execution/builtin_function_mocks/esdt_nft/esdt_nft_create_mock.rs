@@ -20,7 +20,7 @@ impl BuiltinFunction for ESDTNftCreate {
 
     fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() < 7 {
-            let err_result = TxResult::from_vm_error("ESDTNFTCreate too few arguments".to_string());
+            let err_result = TxResult::from_vm_error("ESDTNFTCreate too few arguments");
             return (err_result, BlockchainUpdate::empty());
         }
         assert!(

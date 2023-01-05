@@ -31,7 +31,7 @@ impl BuiltinFunction for BuiltinFunctionRoleCheckWrapper {
             self.builtin_function.execute(tx_input, tx_cache)
         } else {
             (
-                TxResult::from_vm_error("action is not allowed".to_string()),
+                TxResult::from_vm_error("action is not allowed"),
                 BlockchainUpdate::empty(),
             )
         }
