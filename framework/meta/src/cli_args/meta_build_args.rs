@@ -1,5 +1,10 @@
 use super::CliArgsParseError;
 
+/// `erdpy` still sends unnecessary arguments when building.
+///
+/// Set to true when the issue has been resolved.
+const PARSE_BUILD_ARGS_STRICT: bool = false;
+
 #[derive(Debug)]
 pub struct BuildArgs {
     pub debug_symbols: bool,
@@ -79,7 +84,10 @@ impl BuildArgs {
                         .expect("argument `--target-dir` must be followed by argument");
                     result.target_dir = Some(arg.clone());
                 },
-                other => return Err(format!("unknown build argument: {other}")),
+                other if PARSE_BUILD_ARGS_STRICT => {
+                    return Err(format!("unknown build argument: {other}"))
+                },
+                _ => {},
             }
         }
 

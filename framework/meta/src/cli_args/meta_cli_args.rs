@@ -39,7 +39,9 @@ impl CliAction {
             "build" => Ok(CliAction::Build(BuildArgs::parse(additional_args)?)),
             "build-dbg" => Ok(CliAction::Build(BuildArgs::parse_dbg(additional_args)?)),
             "clean" => Ok(CliAction::Clean),
-            "snippets" => Ok(CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(additional_args)?)),
+            "snippets" => Ok(CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(
+                additional_args,
+            )?)),
             other => Err(format!("unknown command: {other}")),
         }
     }
@@ -51,6 +53,7 @@ pub struct GenerateSnippetsArgs {
 }
 
 impl GenerateSnippetsArgs {
+    #[allow(clippy::while_let_on_iterator)]
     pub fn parse(args: &[String]) -> Result<Self, CliArgsParseError> {
         let mut result = GenerateSnippetsArgs::default();
         let mut iter = args.iter();
