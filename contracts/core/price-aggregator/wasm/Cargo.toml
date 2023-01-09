@@ -1,5 +1,5 @@
 [package]
-name = "elrond-sc-price-aggregator-wasm"
+name = "mx-price-aggregator-sc-wasm"
 version = "0.0.0"
 authors = [ "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",]
 edition = "2021"
@@ -15,7 +15,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.elrond-sc-price-aggregator]
+[dependencies.mx-price-aggregator-sc]
 path = ".."
 
 [dependencies.mx-sc-wasm-adapter]

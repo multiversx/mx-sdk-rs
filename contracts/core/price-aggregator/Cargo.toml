@@ -1,5 +1,5 @@
 [package]
-name = "elrond-sc-price-aggregator"
+name = "mx-price-aggregator-sc"
 version = "0.38.0"
 authors = [
     "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",
