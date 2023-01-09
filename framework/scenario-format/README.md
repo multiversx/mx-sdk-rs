@@ -1,11 +1,7 @@
-# mandos
+# MultiversX blockchain transaction scenarios
 
-Rust implementation of the Mandos smart contract test file format.
+The blockchain scenario format can model transaction, as they happen on the real blockchain, or a model of it.
 
-It is composed of 2 parts:
-- the mandos serde representation
-- the standard mandos value interpreter
+Both of them are detailed under this specification: https://docs.multiversx.com/developers/developer-reference/mandos-tests
 
-Both of them are detailed under this specification: https://docs.elrond.com/developers/developer-reference/mandos-tests
-
-This crate only deals with the format, not with its semantics or execution. For the execution engine, see `elrond-wasm-debug/mandos`. This also means that this crate does not and should not depend on any `elrond-*` crate, it is the base format and nothing else.
+This crate only deals with the format, not with its semantics or execution. It should not depend on any other of the framework crates.

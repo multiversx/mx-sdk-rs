@@ -1,6 +1,6 @@
-# elrond-codec
+# Smart contract standard codec
 
-Lightweight binary serializer/deserializer, written especially for Elrond smart contracts.
+Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts.
 
 Designed to:
 - produce minimal WASM bytecode
@@ -9,8 +9,12 @@ Designed to:
 
 Largely inspired by the Parity SCALE codec, but a completely different format and implementation.
 
-For more info about the serialization format, see [the developer reference](https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/).
+For more info about the serialization format, see [the developer reference](https://docs.multiversx.com/developers/developer-reference/elrond-serialization-format/).
 
 # no-std
 
-Being designed for elrond-wasm smart contracts, it needs to be able to run in a no-std environment.
+Being designed for MultiversX smart contracts, it needs to be able to run in a no-std environment.
+
+It is also safe to run in a regular std environment.
+
+The types provided by default all work without an allocator. To use an allocator, pass feature flag "alloc".

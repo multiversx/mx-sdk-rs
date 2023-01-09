@@ -1,5 +1,5 @@
-# elrond-wasm-node
+# Smart contract WASM adapter
 
-Contains the actual calls to the Arwen VM API, and their wrapper.
+Contains the actual calls to the MultiversX VM API, and their wrapper.
 
-Can be build both for wasm or for debug mode, but will only be used in the wasm output.
+Note that it is the only part of the framework that "knows" about WASM and the VM environment interface.

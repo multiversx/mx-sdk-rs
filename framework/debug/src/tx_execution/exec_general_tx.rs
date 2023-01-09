@@ -20,7 +20,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         &tx_context.tx_input_box.egld_value,
     );
 
-    // skip for transactions coming directly from mandos, which should all be coming from user wallets
+    // skip for transactions coming directly from scenario json, which should all be coming from user wallets
     // TODO: reorg context logic
     let add_transfer_log = is_smart_contract_address(&tx_context.tx_input_box.from)
         && !tx_context.tx_input_box.egld_value.is_zero();

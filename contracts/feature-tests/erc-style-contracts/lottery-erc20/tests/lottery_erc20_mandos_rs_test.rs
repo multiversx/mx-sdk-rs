@@ -103,7 +103,7 @@ fn determine_winner_same_ticket_holder_rs() {
     );
 }
 
-// TODO: uncomment after rust-mandos supports chaining async calls
+// TODO: uncomment after the scenario runner supports chaining async calls
 // #[test]
 // fn determine_winner_split_prize_pool_rs() {
 // 	mx_sc_debug::scenario_rs(
