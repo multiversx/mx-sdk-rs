@@ -16,7 +16,7 @@ mx_sc_wasm_adapter::allocator!();
 mx_sc_wasm_adapter::panic_handler!();
 
 mx_sc_wasm_adapter::endpoints! {
-    elrond_sc_wegld_swap
+    mx_wegld_swap_sc
     (
         wrapEgld
         unwrapEgld

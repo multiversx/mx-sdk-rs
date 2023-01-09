@@ -1,5 +1,5 @@
 [package]
-name = "elrond-sc-wegld-swap-wasm"
+name = "mx-wegld-swap-sc-wasm"
 version = "0.0.0"
 authors = [ "Dorin Iancu <dorin.iancu@multiversx.com>",]
 edition = "2021"
@@ -20,7 +20,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.elrond-sc-wegld-swap]
+[dependencies.mx-wegld-swap-sc]
 path = ".."
 
 [dependencies.mx-sc-wasm-adapter]

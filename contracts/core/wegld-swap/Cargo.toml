@@ -1,5 +1,5 @@
 [package]
-name = "elrond-sc-wegld-swap"
+name = "mx-wegld-swap-sc"
 version = "0.38.0"
 
 authors = [
