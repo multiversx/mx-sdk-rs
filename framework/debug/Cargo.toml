@@ -9,7 +9,7 @@ authors = [
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
-repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
 description = "MultiversX smart contract API debugging mocks and utils"
