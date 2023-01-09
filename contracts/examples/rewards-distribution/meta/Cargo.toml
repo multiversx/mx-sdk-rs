@@ -3,7 +3,7 @@ name = "rewards-distribution-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
-authors = ["Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>"]
+authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
 
 [dev-dependencies]
 

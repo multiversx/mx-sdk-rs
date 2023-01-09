@@ -1,7 +1,7 @@
 [package]
 name = "esdt-system-sc-mock-meta"
 version = "0.0.0"
-authors = ["Dorin Marian Iancu <dorin.iancu@elrond.com>"]
+authors = ["Dorin Marian Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 

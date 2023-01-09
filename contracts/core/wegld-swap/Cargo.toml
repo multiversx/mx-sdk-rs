@@ -3,7 +3,7 @@ name = "elrond-sc-wegld-swap"
 version = "0.38.0"
 
 authors = [
-    "Dorin Iancu <dorin.iancu@elrond.com>",
+    "Dorin Iancu <dorin.iancu@multiversx.com>",
     "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"

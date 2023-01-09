@@ -2,7 +2,7 @@
 name = "elrond-sc-price-aggregator"
 version = "0.38.0"
 authors = [
-    "Claudiu-Marcel Bruda <claudiu.bruda@elrond.com>",
+    "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",
     "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"

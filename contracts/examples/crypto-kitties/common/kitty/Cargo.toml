@@ -1,7 +1,7 @@
 [package]
 name = "kitty"
 version = "0.0.0"
-authors = [ "dorin-iancu <dorin.iancu@elrond.com>",]
+authors = [ "dorin-iancu <dorin.iancu@multiversx.com>",]
 edition = "2021"
 publish = false
 
