@@ -8,7 +8,7 @@ impl OutputContract {
         let mut command = Command::new("cargo");
         command
             .args(["build", "--target=wasm32-unknown-unknown", "--release"])
-            .current_dir(&self.wasm_crate_path());
+            .current_dir(self.wasm_crate_path());
         if let Some(target_dir) = &build_args.target_dir {
             command.args(["--target-dir", target_dir]);
         }

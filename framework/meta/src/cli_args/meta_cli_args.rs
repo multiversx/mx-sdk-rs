@@ -58,7 +58,7 @@ impl CliAction {
                 if additional_args.is_empty() {
                     Ok(CliAction::Clean)
                 } else {
-                    Err(format!("clean accepts no arguments"))
+                    Err("clean accepts no arguments".to_string())
                 }
             },
             "snippets" => Ok(CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(
