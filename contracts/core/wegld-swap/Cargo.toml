@@ -1,16 +1,16 @@
 [package]
-name = "elrond-sc-wegld-swap"
+name = "mx-wegld-swap-sc"
 version = "0.38.0"
 
 authors = [
-    "Dorin Iancu <dorin.iancu@elrond.com>",
+    "Dorin Iancu <dorin.iancu@multiversx.com>",
     "MultiversX <contact@multiversx.com>",
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
-repository = "https://github.com/ElrondNetwork/elrond-wasm-rs"
+repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
-documentation = "https://docs.elrond.com/"
+documentation = "https://docs.multiversx.com/"
 description = "Elrond Price aggregator Smart Contract"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]

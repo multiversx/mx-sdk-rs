@@ -1,6 +1,6 @@
-# elrond-codec-derive
+# Smart contract standard codec derive functionality
 
-Crate that contains all macro code generation the elrond-codec serializer.
+Crate that contains all macro code generation the `mx-sc-codec` serializer.
 
 There are 4 derive macros currently provided:
 * NestedEncode
@@ -8,4 +8,4 @@ There are 4 derive macros currently provided:
 * TopEncode
 * TopDecode
 
-For more info about the serialization format, see [the developer reference](https://docs.elrond.com/developers/developer-reference/elrond-serialization-format/).
+For more info about the serialization format, see [the developer reference](https://docs.multiversx.com/developers/developer-reference/elrond-serialization-format/).

@@ -1,7 +1,7 @@
-# elrond-wasm-debug
+# Smart contract testing and debugging
 
-The crate is necessary for smart contract debug projects.
+The crate helps writing smart contract tests. Debugging can be performed by running these tests in debug mode.
 
-It provides mocks for the entire blockchain infrastructure, so no call to the VM is necessary. In debug mode the VM is merely simulated.
+It provides mocks for the entire blockchain infrastructure, so no call to the actual VM is necessary.
 
-For convenience, elrond-wasm-debug and subsequently all debug crates that use it are not #[no-std].
+For convenience, the debug crate is not `#[no-std]`.

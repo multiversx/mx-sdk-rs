@@ -1,4 +1,4 @@
-use elrond_sc_price_aggregator::{staking::StakingModule, PriceAggregator};
+use mx_price_aggregator_sc::{staking::StakingModule, PriceAggregator};
 use mx_sc::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
 use mx_sc_debug::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
@@ -20,18 +20,18 @@ pub const SLASH_QUORUM: usize = 2;
 
 pub struct PriceAggSetup<PriceAggObjBuilder>
 where
-    PriceAggObjBuilder: 'static + Copy + Fn() -> elrond_sc_price_aggregator::ContractObj<DebugApi>,
+    PriceAggObjBuilder: 'static + Copy + Fn() -> mx_price_aggregator_sc::ContractObj<DebugApi>,
 {
     pub b_mock: BlockchainStateWrapper,
     pub owner: Address,
     pub oracles: Vec<Address>,
     pub price_agg:
-        ContractObjWrapper<elrond_sc_price_aggregator::ContractObj<DebugApi>, PriceAggObjBuilder>,
+        ContractObjWrapper<mx_price_aggregator_sc::ContractObj<DebugApi>, PriceAggObjBuilder>,
 }
 
 impl<PriceAggObjBuilder> PriceAggSetup<PriceAggObjBuilder>
 where
-    PriceAggObjBuilder: 'static + Copy + Fn() -> elrond_sc_price_aggregator::ContractObj<DebugApi>,
+    PriceAggObjBuilder: 'static + Copy + Fn() -> mx_price_aggregator_sc::ContractObj<DebugApi>,
 {
     pub fn new(builder: PriceAggObjBuilder) -> Self {
         let rust_zero = rust_biguint!(0);

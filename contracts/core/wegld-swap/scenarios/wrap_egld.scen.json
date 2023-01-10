@@ -29,7 +29,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
+                    "code": "file:../output/mx-wegld-swap-sc.wasm"
                 }
             }
         },
@@ -86,7 +86,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/elrond-sc-wegld-swap.wasm"
+                    "code": "file:../output/mx-wegld-swap-sc.wasm"
                 }
             }
         }

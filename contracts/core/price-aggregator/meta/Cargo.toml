@@ -1,10 +1,10 @@
 [package]
-name = "elrond-sc-price-aggregator-meta"
+name = "mx-price-aggregator-sc-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
-[dependencies.elrond-sc-price-aggregator]
+[dependencies.mx-price-aggregator-sc]
 path = ".."
 
 [dependencies.mx-sc]

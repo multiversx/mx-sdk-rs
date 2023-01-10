@@ -1,5 +1,3 @@
-# elrond-wasm-derive
+# Smart contract derive functionality
 
-Crate that contains all macro code generation for Elrond smart contracts.
-
-Note: slightly different code is generated in debug and release mode.
+Crate that contains all macro code generation for MultiversX smart contracts.
