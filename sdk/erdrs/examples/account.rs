@@ -1,5 +1,5 @@
 use mx_sdk_erdrs::{
-    blockchain::{ElrondProxy, DEVNET_GATEWAY},
+    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::address::Address,
 };
 
@@ -10,7 +10,7 @@ async fn main() {
     )
     .unwrap();
 
-    let blockchain = ElrondProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
     let account = blockchain.get_account(&addr).await.unwrap();
 
     println!("account: {:#?}", account);

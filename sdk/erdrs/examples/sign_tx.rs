@@ -1,5 +1,5 @@
 use mx_sdk_erdrs::{
-    blockchain::{ElrondProxy, DEVNET_GATEWAY},
+    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::transaction::Transaction,
     wallet::Wallet,
 };
@@ -11,7 +11,7 @@ async fn main() {
     )
     .unwrap();
     let addr = wl.address();
-    let blockchain = ElrondProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
     let network_config = blockchain.get_network_config().await.unwrap();
 
     let arg = blockchain

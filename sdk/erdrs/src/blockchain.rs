@@ -39,12 +39,12 @@ const WITH_RESULTS_QUERY_PARAM: &str = "?withResults=true";
 const VM_VALUES_ENDPOINT: &str = "vm-values/query";
 
 #[derive(Clone, Debug)]
-pub struct ElrondProxy {
+pub struct CommunicationProxy {
     proxy_url: String,
     client: Client,
 }
 
-impl ElrondProxy {
+impl CommunicationProxy {
     pub fn new(proxy_url: String) -> Self {
         Self {
             proxy_url,

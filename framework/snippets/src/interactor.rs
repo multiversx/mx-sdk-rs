@@ -1,6 +1,6 @@
 use mx_sc_scenario::{mandos_system::model::AddressValue, mx_sc::types::Address};
 use mx_sdk_erdrs::{
-    blockchain::ElrondProxy,
+    blockchain::CommunicationProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     wallet::Wallet,
 };
@@ -9,7 +9,7 @@ use std::{collections::HashMap, time::Duration};
 use crate::Sender;
 
 pub struct Interactor {
-    pub proxy: ElrondProxy,
+    pub proxy: CommunicationProxy,
     pub network_config: NetworkConfig,
     pub sender_map: HashMap<Address, Sender>,
 
@@ -18,7 +18,7 @@ pub struct Interactor {
 
 impl Interactor {
     pub async fn new(gateway_url: &str) -> Self {
-        let proxy = ElrondProxy::new(gateway_url.to_string());
+        let proxy = CommunicationProxy::new(gateway_url.to_string());
         let network_config = proxy.get_network_config().await.unwrap();
         Self {
             proxy,

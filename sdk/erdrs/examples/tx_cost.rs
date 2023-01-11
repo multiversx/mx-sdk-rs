@@ -1,5 +1,5 @@
 use mx_sdk_erdrs::{
-    blockchain::{ElrondProxy, DEVNET_GATEWAY},
+    blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
 };
 
@@ -25,7 +25,7 @@ async fn main() {
         signature: None,
     };
 
-    let blockchain = ElrondProxy::new(DEVNET_GATEWAY.to_string());
+    let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
     let cost = blockchain.request_transaction_cost(&tx).await.unwrap();
 
     println!("tx cost: {:#?}", cost);
