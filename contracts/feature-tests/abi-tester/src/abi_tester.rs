@@ -1,6 +1,6 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 mod abi_enum;
 mod abi_test_type;
@@ -15,7 +15,7 @@ use only_nested::*;
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]

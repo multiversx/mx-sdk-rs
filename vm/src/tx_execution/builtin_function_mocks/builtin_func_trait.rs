@@ -1,4 +1,4 @@
-use mx_sc::types::Address;
+use multiversx_sc::types::Address;
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer};
 

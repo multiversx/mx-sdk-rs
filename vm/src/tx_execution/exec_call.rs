@@ -1,6 +1,6 @@
 use std::{collections::HashMap, rc::Rc};
 
-use mx_sc::types::Address;
+use multiversx_sc::types::Address;
 use num_bigint::BigUint;
 use num_traits::Zero;
 

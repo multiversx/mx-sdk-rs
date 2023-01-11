@@ -1,16 +1,16 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 mod deposit_info;
 use deposit_info::DepositInfo;
 
 pub const SECONDS_PER_ROUND: u64 = 6;
-pub use mx_sc::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
+pub use multiversx_sc::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait DigitalCash {
     #[init]
     fn init(&self) {}

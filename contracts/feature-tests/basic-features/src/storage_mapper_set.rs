@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Storage mapper test.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait SetMapperFeatures {
     #[view]
     #[storage_mapper("set_mapper")]

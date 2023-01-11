@@ -1,8 +1,8 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Crypto functions that use the allocator.
 /// Move to basic-features when they get upgraded.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait CryptoFeaturesAlloc {
     #[endpoint]
     fn compute_sha256_legacy_alloc(&self, input: Vec<u8>) -> H256 {

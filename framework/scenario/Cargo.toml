@@ -1,5 +1,5 @@
 [package]
-name = "mx-sc-scenario"
+name = "multiversx-sc-scenario"
 version = "0.38.0"
 edition = "2021"
 
@@ -35,6 +35,6 @@ bech32 = "0.9.0"
 [features]
 run-go-tests = []
 
-[dependencies.mx-chain-vm]
+[dependencies.multiversx-chain-vm]
 version = "=0.38.0"
 path = "../../vm"

@@ -1,8 +1,8 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait NftStoragePrepay {
     #[init]
     fn init(&self, cost_per_byte: BigUint) {

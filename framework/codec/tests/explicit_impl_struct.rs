@@ -1,4 +1,4 @@
-use mx_sc_codec as codec;
+use multiversx_sc_codec as codec;
 
 // Some structures with explicit encode/decode, for testing.
 use codec::{

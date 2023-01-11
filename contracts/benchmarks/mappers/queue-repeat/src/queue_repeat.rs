@@ -2,9 +2,9 @@
 
 use benchmark_common::ExampleStruct;
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait QueueRepeat: benchmark_common::BenchmarkCommon {
     #[init]
     fn init(&self) {}

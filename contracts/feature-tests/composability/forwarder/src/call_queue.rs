@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub enum QueuedCallType {
@@ -20,7 +20,7 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 /// Testing multiple calls per transaction, cascading on.
 ///
 /// TODO: write actual tests with these.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait ForwarderQueuedCallModule {
     #[proxy]
     fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;

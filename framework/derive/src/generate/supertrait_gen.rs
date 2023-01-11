@@ -49,7 +49,7 @@ fn impl_auto_impl(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
         impl<A> #module_path AutoImpl for ContractObj<A>
         where
-            A: mx_sc::api::VMApi,
+            A: multiversx_sc::api::VMApi,
         {
         }
     }
@@ -84,7 +84,7 @@ fn impl_endpoint_wrappers(module_path: &ModulePath) -> proc_macro2::TokenStream 
     quote! {
         impl<A> #module_path EndpointWrappers for ContractObj<A>
         where
-            A: mx_sc::api::VMApi,
+            A: multiversx_sc::api::VMApi,
         {
         }
     }
@@ -134,7 +134,7 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 
 fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl<A> #module_path ProxyTrait for Proxy<A> where A: mx_sc::api::VMApi {}
+        impl<A> #module_path ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
     }
 }
 

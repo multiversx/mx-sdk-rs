@@ -5,7 +5,7 @@ use crate::{
     DebugApi,
 };
 
-use mx_sc::types::{CodeMetadata, ContractDeploy};
+use multiversx_sc::types::{CodeMetadata, ContractDeploy};
 
 use super::convert_call_args;
 

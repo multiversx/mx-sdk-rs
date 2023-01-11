@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Tests event logs.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait EventFeatures {
     #[event("event_a")]
     fn event_a(&self, data: u32);

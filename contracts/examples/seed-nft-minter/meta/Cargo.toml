@@ -10,6 +10,6 @@ authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
 [dependencies.seed-nft-minter]
 path = ".."
 
-[dependencies.mx-sc-meta]
+[dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../../framework/meta"

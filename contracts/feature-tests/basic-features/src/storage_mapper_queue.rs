@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Storage mapper test.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait QueueMapperFeatures {
     #[view]
     #[storage_mapper("queue_mapper")]

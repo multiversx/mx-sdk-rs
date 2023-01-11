@@ -3,7 +3,7 @@ use crate::{
     types::{BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
 };
 
-use crate as mx_sc; // needed by the codec and TypeAbi generated code
+use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
 use crate::{
     codec::{
         self,

@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     api::{LogApi, LogApiImpl},
     types::{
         heap::ArgBuffer, managed_vec_of_buffers_to_arg_buffer, ManagedBuffer, ManagedType,

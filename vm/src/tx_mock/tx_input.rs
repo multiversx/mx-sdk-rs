@@ -1,6 +1,6 @@
 use crate::{display_util::*, num_bigint::BigUint};
 use alloc::vec::Vec;
-use mx_sc::types::heap::{Address, H256};
+use multiversx_sc::types::heap::{Address, H256};
 use num_traits::Zero;
 use std::fmt;
 

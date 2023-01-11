@@ -10,18 +10,18 @@ pub mod user_role;
 use action::ActionFullInfo;
 use user_role::UserRole;
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Multi-signature smart contract implementation.
 /// Acts like a wallet that needs multiple signers for any action performed.
 /// See the readme file for more detailed documentation.
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait Multisig:
     multisig_state::MultisigStateModule
     + multisig_propose::MultisigProposeModule
     + multisig_perform::MultisigPerformModule
     + multisig_events::MultisigEventsModule
-    + mx_sc_modules::dns::DnsModule
+    + multiversx_sc_modules::dns::DnsModule
 {
     #[init]
     fn init(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {

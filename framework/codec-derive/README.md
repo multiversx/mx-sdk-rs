@@ -1,6 +1,6 @@
 # Smart contract standard codec derive functionality
 
-Crate that contains all macro code generation the `mx-sc-codec` serializer.
+Crate that contains all macro code generation the `multiversx-sc-codec` serializer.
 
 There are 4 derive macros currently provided:
 * NestedEncode

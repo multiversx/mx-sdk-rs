@@ -1,5 +1,5 @@
 use crate::api::VmApiImpl;
-use mx_sc::{
+use multiversx_sc::{
     api::{PrintApi, PrintApiImpl},
     formatter::FormatBufferIgnore,
 };

@@ -8,19 +8,19 @@ publish = false
 [lib]
 path = "src/use_module.rs"
 
-[dependencies.mx-sc-modules]
+[dependencies.multiversx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 features = [ "alloc" ]
 
-[dev-dependencies.mx-sc-scenario]
+[dev-dependencies.multiversx-sc-scenario]
 version = "0.38.0"
 path = "../../../framework/scenario"
 
-[dev-dependencies.mx-sc-meta]
+[dev-dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../framework/meta"

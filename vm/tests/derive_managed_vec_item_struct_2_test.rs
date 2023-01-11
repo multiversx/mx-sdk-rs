@@ -1,6 +1,6 @@
-use mx_chain_vm::DebugApi;
+use multiversx_chain_vm::DebugApi;
 
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 // to test, run the following command in the crate folder:
 // cargo expand --test derive_managed_vec_item_struct_2_test > expanded.rs
@@ -20,8 +20,11 @@ pub struct Struct2 {
 #[test]
 #[allow(clippy::assertions_on_constants)]
 fn struct_2_static() {
-    assert_eq!(<Struct2 as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE, 18);
-    assert!(!<Struct2 as mx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert_eq!(
+        <Struct2 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE,
+        18
+    );
+    assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
 }
 
 #[test]
@@ -45,7 +48,7 @@ fn struct_to_bytes_writer() {
         /* opt  */ 0x01, 0x05,
 	];
 
-    <Struct2 as mx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
+    <Struct2 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
         assert_eq!(bytes, &expected_payload[..]);
     });
 }
@@ -72,8 +75,9 @@ fn struct_2_from_bytes_reader() {
         /* opt  */ 0x01, 0x05,
 	];
 
-    let struct_from_bytes = <Struct2 as mx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-        bytes.copy_from_slice(&payload[..]);
-    });
+    let struct_from_bytes =
+        <Struct2 as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
+            bytes.copy_from_slice(&payload[..]);
+        });
     assert_eq!(expected_struct, struct_from_bytes);
 }

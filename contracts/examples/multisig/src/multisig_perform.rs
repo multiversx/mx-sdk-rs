@@ -3,7 +3,7 @@ use crate::{
     user_role::UserRole,
 };
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Gas required to finish transaction after transfer-execute.
 const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;
@@ -13,7 +13,7 @@ fn usize_add_isize(value: &mut usize, delta: isize) {
 }
 
 /// Contains all events that can be emitted by the contract.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait MultisigPerformModule:
     crate::multisig_state::MultisigStateModule + crate::multisig_events::MultisigEventsModule
 {

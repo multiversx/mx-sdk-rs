@@ -1,5 +1,5 @@
 use crate::num_bigint::BigInt;
-use mx_sc::api::{const_handles, use_raw_handle, HandleConstraints, RawHandle};
+use multiversx_sc::api::{const_handles, use_raw_handle, HandleConstraints, RawHandle};
 use std::collections::HashMap;
 
 type ManagedBufferImpl = Vec<u8>;

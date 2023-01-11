@@ -1,5 +1,5 @@
 [package]
-name = "mx-sdk"
+name = "multiversx-sdk"
 version = "0.2.1"
 edition = "2021"
 

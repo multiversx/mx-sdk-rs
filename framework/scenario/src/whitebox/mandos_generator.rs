@@ -4,7 +4,7 @@ use crate::scenario_format::serde_raw::{ScenarioRaw, StepRaw};
 use serde::Serialize;
 
 use super::{raw_converter::*, ScCallMandos, ScQueryMandos, TxExpectMandos};
-use mx_chain_vm::world_mock::{AccountData, BlockInfo};
+use multiversx_chain_vm::world_mock::{AccountData, BlockInfo};
 
 pub(crate) struct MandosGenerator {
     scenario: ScenarioRaw,

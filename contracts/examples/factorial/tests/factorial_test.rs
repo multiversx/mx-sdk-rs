@@ -1,6 +1,6 @@
 use factorial::*;
-use mx_sc::types::BigUint;
-use mx_sc_scenario::DebugApi;
+use multiversx_sc::types::BigUint;
+use multiversx_sc_scenario::DebugApi;
 
 #[test]
 fn test_factorial() {

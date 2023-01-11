@@ -9,20 +9,20 @@ publish = false
 path = "src/recursive_caller.rs"
 
 [features]
-ei-unmanaged = ["mx-sc/ei-unmanaged"]
+ei-unmanaged = ["multiversx-sc/ei-unmanaged"]
 
 [dependencies.vault]
 path = "../vault"
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dependencies.mx-sc-wasm-adapter]
+[dependencies.multiversx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
-[dev-dependencies.mx-sc-scenario]
+[dev-dependencies.multiversx-sc-scenario]
 version = "0.38.0"
 path = "../../../../framework/scenario"

@@ -7,7 +7,7 @@ use crate::{
     },
     DebugApi,
 };
-use mx_sc::{
+use multiversx_sc::{
     api::{
         BlockchainApiImpl, HandleConstraints, ManagedTypeApi, SendApi, SendApiImpl,
         ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,

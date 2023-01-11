@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     codec::{test_util::check_top_encode, TopDecode, TopEncode},
     contract_base::ManagedSerializer,
     types::{heap::BoxedBytes, ManagedBuffer},

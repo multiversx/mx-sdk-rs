@@ -1,5 +1,5 @@
 use crate::{api::unsafe_buffer, error_hook};
-use mx_sc::{
+use multiversx_sc::{
     api::{InvalidSliceError, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,

@@ -14,4 +14,4 @@ It does **not** contain:
 - file read/write logic,
 - the value interpreter.
 
-These features are the scope of the `mx-chain-scenario-format` crate.
+These features are the scope of the `multiversx-chain-scenario-format` crate.

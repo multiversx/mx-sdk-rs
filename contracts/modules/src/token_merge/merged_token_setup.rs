@@ -1,4 +1,4 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 use super::{
     custom_merged_token_attributes::MergedTokenAttributesCreator,
@@ -8,7 +8,7 @@ use super::{
 const NFT_AMOUNT: u64 = 1;
 pub static DIFFERENT_CREATOR_ERR_MSG: &[u8] = b"All merged tokens must have the same creator";
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait MergedTokenSetupModule {
     #[only_owner]
     #[payable("EGLD")]

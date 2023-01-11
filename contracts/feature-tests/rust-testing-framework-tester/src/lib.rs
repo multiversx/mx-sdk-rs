@@ -1,7 +1,7 @@
 #![no_std]
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 pub mod dummy_module;
 
@@ -16,7 +16,7 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
     pub buffer: ManagedBuffer<M>,
 }
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
     fn init(&self) -> ManagedBuffer {

@@ -1,6 +1,6 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait TokenIdentifierFeatures {
     #[endpoint]
     fn token_identifier_egld(&self) -> EgldOrEsdtTokenIdentifier {

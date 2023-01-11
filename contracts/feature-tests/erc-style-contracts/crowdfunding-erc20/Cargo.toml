@@ -11,11 +11,11 @@ path = "src/crowdfunding_erc20.rs"
 [dependencies.erc20]
 path = "../erc20"
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dev-dependencies.mx-sc-scenario]
+[dev-dependencies.multiversx-sc-scenario]
 version = "0.38.0"
 path = "../../../../framework/scenario"
 

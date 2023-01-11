@@ -5,7 +5,7 @@ use core::{
 };
 use std::convert::TryInto;
 
-use mx_sc::{
+use multiversx_sc::{
     api::{BigFloatApi, BigIntApi, ErrorApiImpl, HandleTypeInfo, Sign},
     codec::num_bigint::BigInt,
     err_msg,
@@ -156,11 +156,11 @@ impl BigFloatApi for DebugApi {
         }
 
         if bf.is_sign_positive() {
-            return mx_sc::api::Sign::Plus;
+            return multiversx_sc::api::Sign::Plus;
         } else if bf.is_sign_negative() {
-            return mx_sc::api::Sign::Minus;
+            return multiversx_sc::api::Sign::Minus;
         }
-        mx_sc::api::Sign::NoSign
+        multiversx_sc::api::Sign::NoSign
     }
 
     fn bf_clone(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {

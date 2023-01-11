@@ -1,6 +1,6 @@
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
-use mx_sc::{
+use multiversx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, ManagedAddress},
 };

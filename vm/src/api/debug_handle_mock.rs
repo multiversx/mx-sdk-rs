@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use mx_sc::{
+use multiversx_sc::{
     api::{use_raw_handle, HandleConstraints, RawHandle},
     codec::TryStaticCast,
     types::ManagedVecItem,
@@ -34,7 +34,7 @@ impl core::fmt::Debug for DebugHandle {
 }
 
 impl HandleConstraints for DebugHandle {
-    fn new(handle: mx_sc::api::RawHandle) -> Self {
+    fn new(handle: multiversx_sc::api::RawHandle) -> Self {
         Self {
             context: TxContextStack::static_peek(),
             raw_handle: handle,

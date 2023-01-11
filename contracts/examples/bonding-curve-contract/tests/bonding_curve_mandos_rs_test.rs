@@ -1,4 +1,4 @@
-use mx_sc_scenario::*;
+use multiversx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -11,35 +11,35 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn deploy_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deploy.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deploy.scen.json", world());
 }
 
 #[test]
 fn deposit_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deposit.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deposit.scen.json", world());
 }
 
 #[test]
 fn set_bonding_curve_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/set_bonding_curve.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/set_bonding_curve.scen.json", world());
 }
 
 #[test]
 fn buy_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/buy.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/buy.scen.json", world());
 }
 
 #[test]
 fn sell_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/sell.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/sell.scen.json", world());
 }
 
 #[test]
 fn deposit_more_view_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deposit_more_view.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deposit_more_view.scen.json", world());
 }
 
 #[test]
 fn claim_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/claim.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/claim.scen.json", world());
 }

@@ -1,12 +1,12 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-use mx_sc_modules::default_issue_callbacks;
+use multiversx_sc_modules::default_issue_callbacks;
 mod fractional_uri_info;
 use fractional_uri_info::FractionalUriInfo;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     #[init]
     fn init(&self) {}
@@ -144,9 +144,9 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
 }
 
 mod nft_marketplace_proxy {
-    mx_sc::imports!();
+    multiversx_sc::imports!();
 
-    #[mx_sc::proxy]
+    #[multiversx_sc::proxy]
     pub trait NftMarketplace {
         #[endpoint(claimTokens)]
         fn claim_tokens(

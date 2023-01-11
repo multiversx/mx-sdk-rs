@@ -1,8 +1,8 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 use core::marker::PhantomData;
 
-use mx_sc::codec::Empty;
+use multiversx_sc::codec::Empty;
 
 use super::merged_token_instances::MergedTokenInstances;
 

@@ -1,8 +1,8 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait ProxyTestSecond {
     #[storage_set("last_payment")]
     fn set_last_payment(&self, last_payment: &BigUint);

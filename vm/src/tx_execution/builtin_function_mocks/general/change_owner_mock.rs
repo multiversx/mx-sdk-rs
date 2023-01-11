@@ -1,4 +1,4 @@
-use mx_sc::{api::CHANGE_OWNER_BUILTIN_FUNC_NAME, codec::TopDecode, types::heap::Address};
+use multiversx_sc::{api::CHANGE_OWNER_BUILTIN_FUNC_NAME, codec::TopDecode, types::heap::Address};
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 

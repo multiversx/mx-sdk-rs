@@ -1,11 +1,11 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 // Base cost for standalone + estimate cost of actual sc call
 const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait Parent {
     #[proxy]
     fn child_proxy(&self, to: ManagedAddress) -> child::Proxy<Self::Api>;

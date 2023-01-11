@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// All crypto functions provided by Arwen exposed here.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait CryptoFeatures {
     #[endpoint]
     #[allow(deprecated)]

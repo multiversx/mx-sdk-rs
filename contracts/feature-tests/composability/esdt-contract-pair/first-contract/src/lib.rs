@@ -1,12 +1,12 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
 const SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT: &[u8] = b"acceptEsdtPayment";
 const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &[u8] = b"rejectEsdtPayment";
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait FirstContract {
     #[init]
     fn init(

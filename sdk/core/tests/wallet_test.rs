@@ -1,6 +1,6 @@
 use bip39::Mnemonic;
 
-use mx_sdk::{crypto::public_key::PublicKey, data::address::Address, wallet::Wallet};
+use multiversx_sdk::{crypto::public_key::PublicKey, data::address::Address, wallet::Wallet};
 
 #[test]
 fn test_private_key_from_mnemonic() {

@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write};
 
-use mx_sc::abi::ContractAbi;
+use multiversx_sc::abi::ContractAbi;
 
 use super::snippet_gen_common::write_newline;
 
@@ -10,12 +10,12 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
         "#[allow(non_snake_case)]
 
 use {contract_crate_name}::ProxyTrait as _;
-use mx_sc_snippets::{{
-    mx_sc::{{
+use multiversx_sc_snippets::{{
+    multiversx_sc::{{
         codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},
-    mx_chain_vm::{{
+    multiversx_chain_vm::{{
         bech32, scenario_format::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
         DebugApi,
     }},
@@ -34,7 +34,7 @@ use std::{{
 }
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
-    writeln!(file, "const GATEWAY: &str = mx_sc_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
+    writeln!(file, "const GATEWAY: &str = multiversx_sc_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
 const PEM: &str = \"alice.pem\";
 const SC_ADDRESS: &str = \"\";
 

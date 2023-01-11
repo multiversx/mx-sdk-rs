@@ -1,10 +1,10 @@
-use mx_sc::types::{
+use multiversx_sc::types::{
     BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
     TokenIdentifier,
 };
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     managed_egld_token_id, managed_token_id, managed_token_id_wrapped,
-    mx_chain_vm::check_managed_top_encode_decode, mx_sc, DebugApi,
+    multiversx_chain_vm::check_managed_top_encode_decode, multiversx_sc, DebugApi,
 };
 
 #[test]

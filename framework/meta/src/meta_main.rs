@@ -1,4 +1,4 @@
-use mx_sc::contract_base::ContractAbiProvider;
+use multiversx_sc::contract_base::ContractAbiProvider;
 use std::env;
 
 use crate::cli_args::{CliAction, CliArgs};

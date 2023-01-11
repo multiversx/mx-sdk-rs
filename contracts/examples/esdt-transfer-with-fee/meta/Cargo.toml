@@ -7,6 +7,6 @@ publish = false
 [dependencies.esdt-transfer-with-fee]
 path = ".."
 
-[dependencies.mx-sc-meta]
+[dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../../framework/meta"

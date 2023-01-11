@@ -34,10 +34,10 @@ pub fn generate_endpoints_mod(
         quote! {
             pub fn callBack<A>()
             where
-                A: mx_sc::api::VMApi ,
+                A: multiversx_sc::api::VMApi ,
             {
                 super::EndpointWrappers::callback(
-                    &mx_sc::contract_base::UniversalContractObj::<A>::new(),
+                    &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
                 );
             }
         }
@@ -89,10 +89,10 @@ fn generate_wasm_endpoint(
     quote! {
         pub fn #endpoint_ident<A>()
         where
-            A: mx_sc::api::VMApi,
+            A: multiversx_sc::api::VMApi,
         {
             super::EndpointWrappers::#call_method_ident(
-                &mx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
             );
         }
     }

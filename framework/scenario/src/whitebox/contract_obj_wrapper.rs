@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
-use crate::mx_sc::{
+use crate::multiversx_sc::{
     codec::{TopDecode, TopEncode},
     contract_base::{CallableContract, ContractBase},
     types::{
@@ -11,7 +11,7 @@ use crate::mx_sc::{
 use num_traits::Zero;
 
 use crate::testing_framework::raw_converter::bytes_to_hex;
-use mx_chain_vm::{
+use multiversx_chain_vm::{
     num_bigint,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
     tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult},
@@ -27,7 +27,7 @@ use super::{
     AddressFactory, MandosGenerator, ScQueryMandos,
 };
 
-pub use mx_chain_vm::tx_mock::TxTokenTransfer;
+pub use multiversx_chain_vm::tx_mock::TxTokenTransfer;
 
 #[derive(Clone)]
 pub struct ContractObjWrapper<

@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
@@ -11,7 +11,7 @@ pub struct PriceTag<M: ManagedTypeApi> {
     pub amount: BigUint<M>,
 }
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait NftModule {
     // endpoints - owner-only
 

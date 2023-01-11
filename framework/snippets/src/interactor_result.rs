@@ -1,14 +1,14 @@
 use std::marker::PhantomData;
 
 use log::info;
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     bech32,
-    mx_sc::{
+    multiversx_sc::{
         codec::{PanicErrorHandler, TopDecodeMulti},
         types::Address,
     },
 };
-use mx_sdk::data::transaction::{
+use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 

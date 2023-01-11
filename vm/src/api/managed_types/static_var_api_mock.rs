@@ -1,5 +1,5 @@
 use crate::DebugApi;
-use mx_sc::{
+use multiversx_sc::{
     api::{use_raw_handle, HandleConstraints, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };

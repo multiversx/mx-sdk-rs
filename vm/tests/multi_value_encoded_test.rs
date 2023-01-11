@@ -1,5 +1,5 @@
-use mx_chain_vm::DebugApi;
-use mx_sc::{
+use multiversx_chain_vm::DebugApi;
+use multiversx_sc::{
     codec::multi_types::MultiValue5,
     types::{BigUint, MultiValueEncoded},
 };

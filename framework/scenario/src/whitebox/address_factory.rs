@@ -1,4 +1,4 @@
-use crate::mx_sc::types::heap::Address;
+use crate::multiversx_sc::types::heap::Address;
 use sha2::{Digest, Sha256};
 
 const ADDRESS_LEN: usize = 32;

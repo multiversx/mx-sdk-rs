@@ -1,9 +1,9 @@
-use mx_sc_codec as codec;
-use mx_sc_codec_derive::*;
+use multiversx_sc_codec as codec;
+use multiversx_sc_codec_derive::*;
 
 use codec::test_util::{check_top_decode, check_top_encode_decode};
 
-// to test, run the following command in mx-sc-codec folder:
+// to test, run the following command in the crate folder:
 // cargo expand --test enum_or_default_derive_test > expanded.rs
 
 /// This is a good example of an enum with a useful default.

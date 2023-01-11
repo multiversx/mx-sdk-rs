@@ -1,4 +1,4 @@
-use mx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
+use multiversx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
 
 const FLAG_PREFIX: &str = "--";
 const HEX_PREFIX: &str = "0x";

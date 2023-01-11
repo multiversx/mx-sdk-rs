@@ -1,6 +1,6 @@
 use std::fmt;
 
-use mx_sc::types::Address;
+use multiversx_sc::types::Address;
 
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},

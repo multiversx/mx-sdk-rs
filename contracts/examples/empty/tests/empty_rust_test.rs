@@ -1,6 +1,6 @@
 use empty::*;
-use mx_sc::types::Address;
-use mx_sc_scenario::{rust_biguint, testing_framework::*, DebugApi};
+use multiversx_sc::types::Address;
+use multiversx_sc_scenario::{rust_biguint, testing_framework::*, DebugApi};
 
 const WASM_PATH: &str = "output/empty.wasm";
 

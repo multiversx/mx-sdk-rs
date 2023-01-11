@@ -2,8 +2,8 @@
 macro_rules! allocator {
     () => {
         #[global_allocator]
-        static ALLOC: mx_sc_wasm_adapter::wasm_deps::WeeAlloc =
-            mx_sc_wasm_adapter::wasm_deps::WeeAlloc::INIT;
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::WeeAlloc =
+            multiversx_sc_wasm_adapter::wasm_deps::WeeAlloc::INIT;
     };
 }
 
@@ -11,13 +11,13 @@ macro_rules! allocator {
 macro_rules! panic_handler {
     () => {
         #[alloc_error_handler]
-        fn alloc_error_handler(layout: mx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
-            mx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
+        fn alloc_error_handler(layout: multiversx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
+            multiversx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
         }
 
         #[panic_handler]
-        fn panic_fmt(panic_info: &mx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
-            mx_sc_wasm_adapter::wasm_deps::panic_fmt(panic_info)
+        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
+            multiversx_sc_wasm_adapter::wasm_deps::panic_fmt(panic_info)
         }
 
         #[lang = "eh_personality"]
@@ -29,13 +29,13 @@ macro_rules! panic_handler {
 macro_rules! panic_handler_with_message {
     () => {
         #[alloc_error_handler]
-        fn alloc_error_handler(layout: mx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
-            mx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
+        fn alloc_error_handler(layout: multiversx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
+            multiversx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
         }
 
         #[panic_handler]
-        fn panic_fmt(panic_info: &mx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
-            mx_sc_wasm_adapter::wasm_deps::panic_fmt_with_message(panic_info)
+        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
+            multiversx_sc_wasm_adapter::wasm_deps::panic_fmt_with_message(panic_info)
         }
 
         #[lang = "eh_personality"]
@@ -48,14 +48,14 @@ macro_rules! endpoints {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
         #[no_mangle]
         fn init() {
-            $mod_name::endpoints::init::<mx_sc_wasm_adapter::api::VmApiImpl>();
+            $mod_name::endpoints::init::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
         }
 
         $(
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$endpoint_name::<mx_sc_wasm_adapter::api::VmApiImpl>();
+                $mod_name::endpoints::$endpoint_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
             }
         )*
     };
@@ -66,14 +66,14 @@ macro_rules! external_view_endpoints {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
         #[no_mangle]
         fn init() {
-            mx_sc_wasm_adapter::mx_sc::external_view_contract::external_view_contract_constructor::<mx_sc_wasm_adapter::api::VmApiImpl>();
+            multiversx_sc_wasm_adapter::multiversx_sc::external_view_contract::external_view_contract_constructor::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
         }
 
         $(
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$endpoint_name::<mx_sc_wasm_adapter::mx_sc::api::ExternalViewApi<mx_sc_wasm_adapter::api::VmApiImpl>>();
+                $mod_name::endpoints::$endpoint_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
             }
         )*
     };

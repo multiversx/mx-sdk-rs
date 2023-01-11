@@ -1,13 +1,13 @@
 use crate::{address_h256_to_erdrs, Interactor};
 use log::info;
-use mx_sc_scenario::{
-    mx_sc::{
+use multiversx_sc_scenario::{
+    multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
     },
     DebugApi,
 };
-use mx_sdk::data::vm::VmValueRequest;
+use multiversx_sdk::data::vm::VmValueRequest;
 
 impl Interactor {
     pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult

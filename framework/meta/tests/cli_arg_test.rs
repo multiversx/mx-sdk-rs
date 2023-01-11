@@ -1,4 +1,4 @@
-use mx_sc_meta::cli_args::{BuildArgs, CliAction, CliArgs, GenerateSnippetsArgs};
+use multiversx_sc_meta::cli_args::{BuildArgs, CliAction, CliArgs, GenerateSnippetsArgs};
 
 #[test]
 fn test_parse_args_nothing() {

@@ -1,9 +1,9 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 use core::marker::PhantomData;
 
-use mx_sc_modules::token_merge::{
+use multiversx_sc_modules::token_merge::{
     custom_merged_token_attributes::{
         AllMergeScTraits, DefaultMergedAttributesWrapper, MergedTokenAttributesCreator,
     },
@@ -16,12 +16,12 @@ pub struct CustomAttributes {
     pub second: u64,
 }
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait TokenMergeModImpl:
-    mx_sc_modules::pause::PauseModule
-    + mx_sc_modules::token_merge::TokenMergeModule
-    + mx_sc_modules::token_merge::merged_token_setup::MergedTokenSetupModule
-    + mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    multiversx_sc_modules::pause::PauseModule
+    + multiversx_sc_modules::token_merge::TokenMergeModule
+    + multiversx_sc_modules::token_merge::merged_token_setup::MergedTokenSetupModule
+    + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[payable("*")]
     #[endpoint(mergeTokens)]

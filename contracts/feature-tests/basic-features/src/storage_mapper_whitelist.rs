@@ -1,6 +1,6 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait StorageMapperWhitelistFeatures {
     #[endpoint]
     fn add_to_whitelist(&self, item: ManagedBuffer) {

@@ -1,6 +1,6 @@
-use mx_sc::{api::ManagedTypeApi, types::BigUint};
+use multiversx_sc::{api::ManagedTypeApi, types::BigUint};
 
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, TypeAbi, Clone)]
 pub enum UnlockType<M: ManagedTypeApi> {

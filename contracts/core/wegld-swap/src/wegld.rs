@@ -1,9 +1,9 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::contract]
-pub trait EgldEsdtSwap: mx_sc_modules::pause::PauseModule {
+#[multiversx_sc::contract]
+pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
     #[init]
     fn init(&self, wrapped_egld_token_id: TokenIdentifier) {
         self.wrapped_egld_token_id().set(&wrapped_egld_token_id);

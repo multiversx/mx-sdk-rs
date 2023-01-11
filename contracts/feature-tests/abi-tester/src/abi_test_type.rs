@@ -1,9 +1,9 @@
 use crate::only_nested::*;
-use mx_sc::{
+use multiversx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, Box, ManagedBuffer},
 };
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 /// Its only purpose is to test that the ABI generator works fine.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

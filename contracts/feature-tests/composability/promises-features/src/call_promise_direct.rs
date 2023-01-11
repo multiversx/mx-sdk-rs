@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Test contract for investigating the new async call framework.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait CallPromisesDirectModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;

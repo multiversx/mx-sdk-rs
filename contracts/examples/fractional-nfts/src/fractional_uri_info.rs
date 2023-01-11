@@ -1,7 +1,7 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
-use mx_sc::contract_base::ManagedSerializer;
+use multiversx_sc::contract_base::ManagedSerializer;
 
 #[derive(TopEncode, TopDecode)]
 pub struct FractionalUriInfo<M: ManagedTypeApi> {

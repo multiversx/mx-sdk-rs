@@ -7,7 +7,7 @@ pub fn alloc_error_handler(_layout: Layout) -> ! {
 }
 
 pub fn panic_fmt(_: &PanicInfo) -> ! {
-    crate::error_hook::signal_error(mx_sc::err_msg::PANIC_OCCURRED.as_bytes())
+    crate::error_hook::signal_error(multiversx_sc::err_msg::PANIC_OCCURRED.as_bytes())
 }
 
 pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {

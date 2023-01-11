@@ -1,4 +1,4 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 pub const FEATURE_NOT_SET: u8 = 0;
 pub const FEATURE_ON: u8 = 1;
@@ -11,7 +11,7 @@ pub const FEATURE_OFF: u8 = 2;
 /// * a method to check if feature is on or not
 /// * a macro to make calling this method even more compact
 ///
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait FeaturesModule {
     #[storage_mapper("feat:")]
     fn feature_flag(&self, feature_name: &FeatureName<Self::Api>) -> SingleValueMapper<u8>;
@@ -35,14 +35,14 @@ pub trait FeaturesModule {
     }
 }
 
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TopEncode)]
 pub struct FeatureName<M>(ManagedBuffer<M>)
 where
     M: ManagedTypeApi;
 
-use mx_sc::codec::*;
+use multiversx_sc::codec::*;
 impl<M> NestedEncode for FeatureName<M>
 where
     M: ManagedTypeApi,

@@ -1,4 +1,4 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Standard smart contract module for managing a single ESDT.
 ///
@@ -11,7 +11,7 @@ mx_sc::imports!();
 /// * setting local roles
 /// * minting/burning
 ///
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait EsdtModule {
     /*
         EsdtTokenType is an enum (u8):

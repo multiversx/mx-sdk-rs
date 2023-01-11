@@ -5,7 +5,7 @@ use crate::{
     DebugApi,
 };
 
-use mx_sc::{
+use multiversx_sc::{
     codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::{ContractCall, ManagedArgBuffer},
 };

@@ -1,6 +1,6 @@
 #![no_std]
 
-use mx_sc::{api::ManagedTypeApi, types::ManagedByteArray};
+use multiversx_sc::{api::ManagedTypeApi, types::ManagedByteArray};
 
 const SEED_SIZE: usize = 48;
 const SALT_SIZE: usize = 32;

@@ -1,6 +1,6 @@
 use std::fs;
 
-use mx_sc::abi::ContractAbi;
+use multiversx_sc::abi::ContractAbi;
 
 use crate::meta_wasm_tools::check_tools_installed;
 

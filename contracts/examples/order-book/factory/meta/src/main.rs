@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::cli_main::<order_book_factory::AbiProvider>();
+    multiversx_sc_meta::cli_main::<order_book_factory::AbiProvider>();
 }

@@ -8,16 +8,16 @@ publish = false
 [lib]
 path = "src/big_float_main.rs"
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 features = ["big-float"]
 
-[dev-dependencies.mx-sc-scenario]
+[dev-dependencies.multiversx-sc-scenario]
 version = "0.38.0"
 path = "../../../framework/scenario"
 
-[dependencies.mx-sc-modules]
+[dependencies.multiversx-sc-modules]
 version = "0.38.0"
 path = "../../../contracts/modules"
 

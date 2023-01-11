@@ -1,5 +1,5 @@
 [package]
-name = "mx-wegld-swap-sc-wasm"
+name = "multiversx-wegld-swap-sc-wasm"
 version = "0.0.0"
 authors = [ "Dorin Iancu <dorin.iancu@multiversx.com>",]
 edition = "2021"
@@ -20,9 +20,9 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.mx-wegld-swap-sc]
+[dependencies.multiversx-wegld-swap-sc]
 path = ".."
 
-[dependencies.mx-sc-wasm-adapter]
+[dependencies.multiversx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"

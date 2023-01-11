@@ -1,5 +1,5 @@
 use crate::DebugApi;
-use mx_sc::{
+use multiversx_sc::{
     api::{HandleTypeInfo, InvalidSliceError, ManagedBufferApi},
     types::heap::BoxedBytes,
 };

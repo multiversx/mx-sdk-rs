@@ -1,5 +1,5 @@
 use bech32::{FromBase32, ToBase32, Variant};
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 pub fn decode(bech32_address: &str) -> Address {
     let (_, dest_address_bytes_u5, _) = bech32::decode(bech32_address).unwrap();

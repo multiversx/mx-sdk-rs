@@ -4,7 +4,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use mx_sc::types::{heap::Address, LockableStaticBuffer};
+use multiversx_sc::types::{heap::Address, LockableStaticBuffer};
 use num_traits::Zero;
 use std::{
     cell::{Ref, RefMut},

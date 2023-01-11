@@ -1,5 +1,5 @@
-use mx_chain_vm::DebugApi;
-use mx_sc::storage::{
+use multiversx_chain_vm::DebugApi;
+use multiversx_sc::storage::{
     mappers::{QueueMapper, StorageClearable, StorageMapper},
     StorageKey,
 };

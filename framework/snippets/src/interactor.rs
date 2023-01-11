@@ -1,5 +1,5 @@
-use mx_sc_scenario::{mandos_system::model::AddressValue, mx_sc::types::Address};
-use mx_sdk::{
+use multiversx_sc_scenario::{mandos_system::model::AddressValue, multiversx_sc::types::Address};
+use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     wallet::Wallet,

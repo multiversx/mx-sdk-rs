@@ -1,4 +1,4 @@
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 use super::color::*;
 use random::*;

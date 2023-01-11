@@ -1,16 +1,16 @@
 [package]
-name = "mx-price-aggregator-sc-meta"
+name = "multiversx-price-aggregator-sc-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
 
-[dependencies.mx-price-aggregator-sc]
+[dependencies.multiversx-price-aggregator-sc]
 path = ".."
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dependencies.mx-sc-meta]
+[dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../../framework/meta"

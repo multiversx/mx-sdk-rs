@@ -9,7 +9,7 @@ use crate::{
     types::{BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-use crate as mx_sc; // needed by the TypeAbi generated code
+use crate as multiversx_sc; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;
 
 const DECODE_ATTRIBUTE_ERROR_PREFIX: &[u8] = b"error decoding ESDT attributes: ";

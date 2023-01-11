@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use alloc::boxed::Box;
-use mx_sc::err_msg;
+use multiversx_sc::err_msg;
 
 use crate::{
     address_hex,

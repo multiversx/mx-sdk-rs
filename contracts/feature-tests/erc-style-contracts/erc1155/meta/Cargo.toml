@@ -8,6 +8,6 @@ publish = false
 [dependencies.erc1155]
 path = ".."
 
-[dependencies.mx-sc-meta]
+[dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../../../framework/meta"

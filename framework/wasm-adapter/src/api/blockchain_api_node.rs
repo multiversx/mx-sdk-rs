@@ -4,7 +4,7 @@ use crate::api::{
     },
     VmApiImpl,
 };
-use mx_sc::{
+use multiversx_sc::{
     api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApi, ManagedTypeApi},
     types::{
         heap::{Address, Box, H256},
@@ -391,7 +391,7 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use mx_sc::{api::BigIntApi, types::heap::BoxedBytes};
+        use multiversx_sc::{api::BigIntApi, types::heap::BoxedBytes};
 
         let address = m_address.to_address();
         let token_bytes = token.to_boxed_bytes();
@@ -482,7 +482,7 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use mx_sc::api::BigIntApi;
+        use multiversx_sc::api::BigIntApi;
 
         let managed_token_id = token.as_managed_buffer();
 
@@ -562,11 +562,11 @@ impl BlockchainApiImpl for VmApiImpl {
     fn load_esdt_local_roles(
         &self,
         token_id_handle: Self::ManagedBufferHandle,
-    ) -> mx_sc::types::EsdtLocalRoleFlags {
+    ) -> multiversx_sc::types::EsdtLocalRoleFlags {
         unsafe {
-            mx_sc::types::EsdtLocalRoleFlags::from_bits_unchecked(
-                getESDTLocalRoles(token_id_handle) as u64,
-            )
+            multiversx_sc::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
+                token_id_handle,
+            ) as u64)
         }
     }
 }

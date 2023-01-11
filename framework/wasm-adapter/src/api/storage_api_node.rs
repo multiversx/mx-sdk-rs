@@ -1,5 +1,5 @@
 use super::VmApiImpl;
-use mx_sc::{
+use multiversx_sc::{
     api::{
         const_handles, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
     },

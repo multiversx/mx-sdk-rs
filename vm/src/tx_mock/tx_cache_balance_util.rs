@@ -1,5 +1,5 @@
 use crate::num_bigint::BigUint;
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
 

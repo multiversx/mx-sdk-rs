@@ -1,6 +1,6 @@
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
-/// Copied from mx-sc serialization tests.
+/// Copied from multiversx-sc serialization tests.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub enum ExampleEnumSimple {
     /// Variant 0 doc comment.

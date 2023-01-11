@@ -1,5 +1,5 @@
 [package]
-name = "mx-sc-modules"
+name = "multiversx-sc-modules"
 version = "0.38.0"
 edition = "2021"
 
@@ -14,8 +14,8 @@ keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
 [features]
-alloc = ["mx-sc/alloc"]
+alloc = ["multiversx-sc/alloc"]
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../framework/base"

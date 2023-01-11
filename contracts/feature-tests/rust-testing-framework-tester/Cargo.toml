@@ -5,7 +5,7 @@ authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../framework/base"
 features = [ "alloc" ]
@@ -16,7 +16,7 @@ path = "../../examples/adder"
 [dependencies.basic-features]
 path = "../../feature-tests/basic-features"
 
-[dev-dependencies.mx-sc-scenario]
+[dev-dependencies.multiversx-sc-scenario]
 version = "0.38.0"
 path = "../../../framework/scenario"
 

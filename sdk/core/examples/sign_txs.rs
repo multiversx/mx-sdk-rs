@@ -1,4 +1,4 @@
-use mx_sdk::{
+use multiversx_sdk::{
     blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::transaction::Transaction,
     wallet::Wallet,

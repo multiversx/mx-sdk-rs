@@ -3,7 +3,7 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use mx_sc::{
+use multiversx_sc::{
     api::{BigIntApi, ErrorApiImpl, HandleTypeInfo, ManagedBufferApi},
     err_msg,
     types::heap::BoxedBytes,
@@ -166,12 +166,12 @@ impl BigIntApi for DebugApi {
     unary_op_method! {bi_abs, abs}
     unary_op_method! {bi_neg, neg}
 
-    fn bi_sign(&self, x: Self::BigIntHandle) -> mx_sc::api::Sign {
+    fn bi_sign(&self, x: Self::BigIntHandle) -> multiversx_sc::api::Sign {
         let bi = self.bi_get(x);
         match bi.sign() {
-            num_bigint::Sign::Minus => mx_sc::api::Sign::Minus,
-            num_bigint::Sign::NoSign => mx_sc::api::Sign::NoSign,
-            num_bigint::Sign::Plus => mx_sc::api::Sign::Plus,
+            num_bigint::Sign::Minus => multiversx_sc::api::Sign::Minus,
+            num_bigint::Sign::NoSign => multiversx_sc::api::Sign::NoSign,
+            num_bigint::Sign::Plus => multiversx_sc::api::Sign::Plus,
         }
     }
 

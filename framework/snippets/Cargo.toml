@@ -1,5 +1,5 @@
 [package]
-name = "mx-sc-snippets"
+name = "multiversx-sc-snippets"
 version = "0.38.0"
 edition = "2021"
 
@@ -17,17 +17,16 @@ categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
 tokio = { version = "1.12.0", features = ["full"] }
-elrond-sdk-erdrs = "0.2.0"
 hex = "0.4"
 base64 = "0.13.0"
 log = "0.4.17"
 env_logger = "0.8.4"
 
-[dependencies.mx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "=0.38.0"
 path = "../scenario"
 
-[dependencies.mx-sdk]
+[dependencies.multiversx-sdk]
 version = "=0.2.1"
 path = "../../sdk/core"
 

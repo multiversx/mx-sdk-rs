@@ -1,14 +1,14 @@
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, InteractorResult};
 use log::info;
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
-    mx_sc::{
+    multiversx_sc::{
         codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,
     },
     DebugApi,
 };
-use mx_sdk::data::transaction::Transaction;
+use multiversx_sdk::data::transaction::Transaction;
 
 fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
     let mut result = String::from_utf8(

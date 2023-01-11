@@ -2,7 +2,7 @@ use crate::{
     tx_execution::BuiltinFunctionMap,
     tx_mock::{TxInput, TxResult},
 };
-use mx_sc::{
+use multiversx_sc::{
     codec::*,
     types::heap::{Address, H256},
 };

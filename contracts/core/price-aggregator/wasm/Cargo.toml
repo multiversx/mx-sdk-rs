@@ -1,5 +1,5 @@
 [package]
-name = "mx-price-aggregator-sc-wasm"
+name = "multiversx-price-aggregator-sc-wasm"
 version = "0.0.0"
 authors = [ "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",]
 edition = "2021"
@@ -15,10 +15,10 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.mx-price-aggregator-sc]
+[dependencies.multiversx-price-aggregator-sc]
 path = ".."
 
-[dependencies.mx-sc-wasm-adapter]
+[dependencies.multiversx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"
 

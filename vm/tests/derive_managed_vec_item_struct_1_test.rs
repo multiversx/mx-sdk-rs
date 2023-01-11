@@ -1,7 +1,7 @@
-use mx_chain_vm::DebugApi;
-use mx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
+use multiversx_chain_vm::DebugApi;
+use multiversx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 // to test, run the following command in the crate folder:
 // cargo expand --test derive_managed_vec_item_struct_1_test > expanded.rs
@@ -20,8 +20,11 @@ pub struct Struct1 {
 #[test]
 #[allow(clippy::assertions_on_constants)]
 fn struct_1_static() {
-    assert_eq!(<Struct1 as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE, 16);
-    assert!(<Struct1 as mx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
+    assert_eq!(
+        <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE,
+        16
+    );
+    assert!(<Struct1 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
 }
 
 /// The reason we are including a codec test here is that because of the SKIPS_RESERIALIZATION flag,
@@ -58,10 +61,11 @@ fn struct_1_to_bytes_writer() {
         u_64: 4u64,
         bool_field: true,
     };
-    let mut arr: [u8; 16] = [0u8; <Struct1 as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
+    let mut arr: [u8; 16] = [0u8; <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
 
-    <Struct1 as mx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
-        arr[0..<Struct1 as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE].copy_from_slice(bytes);
+    <Struct1 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
+        arr[0..<Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE]
+            .copy_from_slice(bytes);
         assert_eq!(
             arr,
             [
@@ -87,8 +91,11 @@ fn struct_1_from_bytes_reader() {
         0x00,
     ];
 
-    let struct_from_bytes = <Struct1 as mx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
-        bytes.copy_from_slice(&arr[0..<Struct1 as mx_sc::types::ManagedVecItem>::PAYLOAD_SIZE]);
-    });
+    let struct_from_bytes =
+        <Struct1 as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
+            bytes.copy_from_slice(
+                &arr[0..<Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE],
+            );
+        });
     assert_eq!(s, struct_from_bytes);
 }

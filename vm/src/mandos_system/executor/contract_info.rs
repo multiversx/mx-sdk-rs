@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-use mx_sc::{
+use multiversx_sc::{
     api::ManagedTypeApi,
     codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
     contract_base::ProxyObjBase,

@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use mx_sc::types::Address;
+use multiversx_sc::types::Address;
 
 use crate::{
     tx_mock::{TxCache, TxInput, TxResult},

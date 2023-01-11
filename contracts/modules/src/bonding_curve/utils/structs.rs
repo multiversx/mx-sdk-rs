@@ -1,7 +1,7 @@
 use crate::bonding_curve::curves::curve_function::CurveFunction;
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct CurveArguments<M: ManagedTypeApi> {

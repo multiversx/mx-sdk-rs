@@ -7,10 +7,10 @@ publish = false
 [dependencies.parent]
 path = ".."
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../../../../framework/base"
 
-[dependencies.mx-sc-meta]
+[dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../../../../framework/meta"

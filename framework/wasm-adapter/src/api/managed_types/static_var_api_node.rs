@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     api::{const_handles, use_raw_handle, HandleConstraints, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };

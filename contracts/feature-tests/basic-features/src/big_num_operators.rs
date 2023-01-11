@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Checks that BigUint/BigInt operators work as expected.
-#[mx_sc::module]
+#[multiversx_sc::module]
 #[allow(clippy::redundant_clone)]
 pub trait BigIntOperators {
     #[endpoint]

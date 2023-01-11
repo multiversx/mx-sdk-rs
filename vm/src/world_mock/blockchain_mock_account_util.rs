@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 use std::{collections::HashMap, fmt::Write};
 

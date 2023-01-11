@@ -1,6 +1,6 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait BigFloatMethods {
     #[endpoint]
     fn new_from_parts_big_float(

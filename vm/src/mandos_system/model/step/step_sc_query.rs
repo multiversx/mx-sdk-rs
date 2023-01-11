@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     codec::{CodecFrom, TopEncodeMulti},
     types::ContractCall,
 };
