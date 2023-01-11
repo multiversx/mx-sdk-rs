@@ -5,9 +5,8 @@ edition = "2021"
 
 authors = [
     "MultiversX <contact@multiversx.com>",
-    "Royce <hieutrunglephan@gmail.com>",
 ]
-license = "GPL-3.0-only"
+license = "MIT"
 readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"

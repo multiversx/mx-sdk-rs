@@ -2,6 +2,8 @@
 
 [![Crates.io](https://img.shields.io/crates/v/mx-sdk)](https://crates.io/crates/mx-sdk)
 
+General purpose collection of tools & SDKs to interact with the MultiversX blockchain from Rust projects.
+
 ## Example
 
 ```rust
@@ -17,3 +19,7 @@ async fn get_network_config() {
 ```
 
 More examples in `./examples`.
+
+## Acknowledgements
+
+Project originally started by [Bicarus labs](https://github.com/bicarus-labs/elrond-sdk-erdrs), later integrated into the MultiversX official codebase.
