@@ -127,20 +127,26 @@ fn forw_raw_sync_egld_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_egld.scen.json", world());
 }
 
-// #[test]
-// fn forw_raw_sync_readonly_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_readonly.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn forw_raw_sync_readonly_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_readonly.scen.json", world());
+}
 
-// #[test]
-// fn forw_raw_sync_same_context_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_same_context.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn forw_raw_sync_same_context_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_same_context.scen.json", world());
+}
 
-// #[test]
-// fn forw_raw_sync_same_context_egld_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_same_context_egld.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn forw_raw_sync_same_context_egld_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/forw_raw_sync_same_context_egld.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn forw_raw_transf_exec_accept_egld_rs() {
@@ -506,15 +512,17 @@ fn forwarder_send_esdt_multi_transfer_rs() {
     );
 }
 
-// #[test]
-// fn forwarder_send_twice_egld_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/forwarder_send_twice_egld.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn forwarder_send_twice_egld_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forwarder_send_twice_egld.scen.json", world());
+}
 
-// #[test]
-// fn forwarder_send_twice_esdt_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/forwarder_send_twice_esdt.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn forwarder_send_twice_esdt_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forwarder_send_twice_esdt.scen.json", world());
+}
 
 #[test]
 fn forwarder_sync_echo_rs() {
@@ -545,10 +553,14 @@ fn promises_multi_transfer_rs() {
     );
 }
 
-// #[test]
-// fn promises_single_transfer_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios-promises/promises_single_transfer.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn promises_single_transfer_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios-promises/promises_single_transfer.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn proxy_test_init_rs() {

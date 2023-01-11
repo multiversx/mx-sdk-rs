@@ -103,14 +103,15 @@ fn determine_winner_same_ticket_holder_rs() {
     );
 }
 
-// TODO: uncomment after the scenario runner supports chaining async calls
-// #[test]
-// fn determine_winner_split_prize_pool_rs() {
-// 	multiversx_sc_scenario::run_rs(
-// 		"scenarios/determine-winner-split-prize-pool.scen.json",
-// 		world(),
-// 	);
-// }
+// TODO: un-ignore after the scenario runner supports chaining async calls
+#[ignore]
+#[test]
+fn determine_winner_split_prize_pool_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/determine-winner-split-prize-pool.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn lottery_init_rs() {

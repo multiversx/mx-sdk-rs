@@ -8,10 +8,11 @@ fn call_other_shard_2_go() {
     multiversx_sc_scenario::run_go("scenarios/call_other_shard-2.scen.json");
 }
 
-// #[test]
-// fn call_other_shard_insufficient_gas_go() {
-//     multiversx_sc_scenario::run_go("scenarios/call_other_shard-insufficient-gas.scen.json");
-// }
+#[ignore]
+#[test]
+fn call_other_shard_insufficient_gas_go() {
+    multiversx_sc_scenario::run_go("scenarios/call_other_shard-insufficient-gas.scen.json");
+}
 
 #[test]
 fn changeboard_go() {
@@ -59,10 +60,11 @@ fn remove_everyone_go() {
 }
 
 // TODO: investigate gas issue
-// #[test]
-// fn sendesdt_go() {
-//     multiversx_sc_scenario::run_go("scenarios/sendEsdt.scen.json");
-// }
+#[ignore]
+#[test]
+fn sendesdt_go() {
+    multiversx_sc_scenario::run_go("scenarios/sendEsdt.scen.json");
+}
 
 #[test]
 fn upgrade_go() {

@@ -66,10 +66,11 @@ fn count_ones_rs() {
     multiversx_sc_scenario::run_rs("scenarios/count_ones.scen.json", world());
 }
 
-// #[test]
-// fn crypto_elliptic_curves_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_elliptic_curves.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_elliptic_curves_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_elliptic_curves.scen.json", world());
+}
 
 #[test]
 fn crypto_keccak256_rs() {
@@ -84,10 +85,11 @@ fn crypto_keccak256_legacy_managed_rs() {
     );
 }
 
-// #[test]
-// fn crypto_ripemd160_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_ripemd160_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160.scen.json", world());
+}
 
 #[test]
 fn crypto_sha256_rs() {
@@ -99,20 +101,22 @@ fn crypto_sha256_legacy_managed_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_sha256_legacy_managed.scen.json", world());
 }
 
-// #[test]
-// fn crypto_verify_bls_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_bls.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_verify_bls_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_verify_bls.scen.json", world());
+}
 
 #[test]
 fn crypto_verify_ed25519_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_ed25519.scen.json", world());
 }
 
-// #[test]
-// fn crypto_verify_secp256k1_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_secp256k1.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_verify_secp256k1_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_verify_secp256k1.scen.json", world());
+}
 
 #[test]
 fn echo_array_u8_rs() {
@@ -258,10 +262,11 @@ fn managed_buffer_eq_rs() {
     multiversx_sc_scenario::run_rs("scenarios/managed_buffer_eq.scen.json", world());
 }
 
-// #[test]
-// fn managed_buffer_set_random_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/managed_buffer_set_random.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn managed_buffer_set_random_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/managed_buffer_set_random.scen.json", world());
+}
 
 #[test]
 fn managed_vec_address_push_rs() {
@@ -289,10 +294,11 @@ fn only_user_account_rs() {
 }
 
 // Will never run in scenarios-rs.
-// #[test]
-// fn out_of_gas_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/out_of_gas.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn out_of_gas_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/out_of_gas.scen.json", world());
+}
 
 #[test]
 fn panic_rs() {
@@ -369,10 +375,11 @@ fn storage_map3_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_map3.scen.json", world());
 }
 
-// #[test]
-// fn storage_mapper_fungible_token_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/storage_mapper_fungible_token.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn storage_mapper_fungible_token_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_fungible_token.scen.json", world());
+}
 
 #[test]
 fn storage_mapper_linked_list_rs() {
@@ -389,13 +396,14 @@ fn storage_mapper_map_storage_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_mapper_map_storage.scen.json", world());
 }
 
-// #[test]
-// fn storage_mapper_non_fungible_token_rs() {
-//     multiversx_sc_scenario::run_rs(
-//         "scenarios/storage_mapper_non_fungible_token.scen.json",
-//         world(),
-//     );
-// }
+#[ignore]
+#[test]
+fn storage_mapper_non_fungible_token_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/storage_mapper_non_fungible_token.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn storage_mapper_queue_rs() {

@@ -11,17 +11,17 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-// verify_ed25519 not implemented
-// #[test]
-// fn claim_egld_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/claim-egld.scen.json", world());
-// }
+#[ignore] // verify_ed25519 not implemented
+#[test]
+fn claim_egld_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/claim-egld.scen.json", world());
+}
 
-// verify_ed25519 not implemented
-// #[test]
-// fn claim_esdt_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/claim-esdt.scen.json", world());
-// }
+#[ignore] // verify_ed25519 not implemented
+#[test]
+fn claim_esdt_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/claim-esdt.scen.json", world());
+}
 
 #[test]
 fn fund_egld_and_esdt_rs() {

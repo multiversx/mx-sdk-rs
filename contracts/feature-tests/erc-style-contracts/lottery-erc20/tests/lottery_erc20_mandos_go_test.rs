@@ -75,10 +75,11 @@ fn determine_winner_same_ticket_holder_go() {
     multiversx_sc_scenario::run_go("scenarios/determine-winner-same-ticket-holder.scen.json");
 }
 
-// #[test]
-// fn determine_winner_split_prize_pool_go() {
-// 	multiversx_sc_scenario::run_go("scenarios/determine-winner-split-prize-pool.scen.json");
-// }
+#[ignore]
+#[test]
+fn determine_winner_split_prize_pool_go() {
+    multiversx_sc_scenario::run_go("scenarios/determine-winner-split-prize-pool.scen.json");
+}
 
 #[test]
 fn lottery_init_go() {
