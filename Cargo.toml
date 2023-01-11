@@ -157,6 +157,7 @@ members = [
   "contracts/modules",
 
   "tools/test-gen",
+  "tools/replacer",
   "tools/erdpy-snippet-generator",
 ]
 

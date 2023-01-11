@@ -1,0 +1,31 @@
+[package]
+name = "replacer"
+version = "0.0.0"
+authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
+edition = "2021"
+
+[[bin]]
+name = "replacer"
+path = "src/main.rs"
+
+[dependencies.mx-sc]
+version = "0.38.0"
+path = "../../framework/base"
+
+[dependencies.mx-chain-vm]
+version = "0.38.0"
+path = "../../vm"
+
+[dependencies]
+anyhow = "1.0.32"
+atty = "0.2.14"
+clap = { version = "4.0.0-rc.2", features = ["derive"] }
+colored = "2.0"
+ignore = "0.4"
+Inflector = "0.11"
+regex = "1.5.5"
+
+[dev-dependencies]
+tempfile = "3.2"
+
+[features]
