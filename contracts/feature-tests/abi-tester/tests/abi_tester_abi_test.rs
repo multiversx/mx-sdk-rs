@@ -1,7 +1,7 @@
 use std::{fs, fs::File, io::Write};
 
-use mx_sc_debug::BlockchainMock;
 use mx_sc_meta::abi_json;
+use mx_sc_scenario::BlockchainMock;
 
 #[test]
 fn abi_tester_abi_generated_ok() {

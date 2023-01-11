@@ -1,12 +1,11 @@
 use mx_price_aggregator_sc::{staking::StakingModule, PriceAggregator};
 use mx_sc::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
-use mx_sc_debug::{
+use mx_sc_modules::pause::PauseModule;
+use mx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, rust_biguint,
-    testing_framework::{BlockchainStateWrapper, ContractObjWrapper},
-    tx_mock::TxResult,
+    testing_framework::{BlockchainStateWrapper, ContractObjWrapper, TxResult},
     DebugApi,
 };
-use mx_sc_modules::pause::PauseModule;
 
 pub const NR_ORACLES: usize = 4;
 pub const SUBMISSION_COUNT: usize = 3;

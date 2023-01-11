@@ -4,4 +4,4 @@ Provides basic functionality for interacting with smart contracts directly from 
 
 It a base on top of which little interaction programs (or snippets) can be written.
 
-It is largely a wrapper around `elrond-sdk-erdrs` and `mx-sc-debug`.
+It is largely a wrapper around `elrond-sdk-erdrs` and `mx-chain-vm`.

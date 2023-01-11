@@ -26,9 +26,9 @@ path = "../../../framework/base"
 version = "0.38.0"
 path = "../../../contracts/modules"
 
-[dev-dependencies.mx-sc-debug]
+[dev-dependencies.mx-sc-scenario]
 version = "0.38.0"
-path = "../../../framework/debug"
+path = "../../../framework/scenario"
 
 [dependencies]
 arrayvec = { version = "0.7.1", default-features = false }

@@ -1,5 +1,5 @@
 use mx_sc::types::SparseArray;
-use mx_sc_debug::DebugApi;
+use mx_sc_scenario::DebugApi;
 
 #[test]
 fn sparse_array_test() {

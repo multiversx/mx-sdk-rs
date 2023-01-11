@@ -16,9 +16,9 @@ path = "../../examples/adder"
 [dependencies.basic-features]
 path = "../../feature-tests/basic-features"
 
-[dev-dependencies.mx-sc-debug]
+[dev-dependencies.mx-sc-scenario]
 version = "0.38.0"
-path = "../../../framework/debug"
+path = "../../../framework/scenario"
 
 [dev-dependencies]
 num-bigint = "0.4.2"

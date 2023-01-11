@@ -1,7 +1,7 @@
 use crate::{mandos_to_erdrs_address, Interactor, InteractorResult};
 use elrond_sdk_erdrs::data::{address::Address as ErdrsAddress, transaction::Transaction};
 use log::info;
-use mx_sc_debug::{
+use mx_sc_scenario::{
     mandos_system::model::{ScDeployStep, TypedScDeploy},
     mx_sc::codec::{CodecFrom, TopEncodeMulti},
 };

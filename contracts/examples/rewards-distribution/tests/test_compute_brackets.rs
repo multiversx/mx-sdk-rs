@@ -1,6 +1,6 @@
 use core::iter::zip;
 
-use mx_sc_debug::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};
+use mx_sc_scenario::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};
 use rewards_distribution::{RewardsDistribution, DIVISION_SAFETY_CONSTANT};
 
 mod utils;

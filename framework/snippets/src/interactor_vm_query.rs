@@ -1,7 +1,7 @@
 use crate::{address_h256_to_erdrs, Interactor};
 use elrond_sdk_erdrs::data::vm::VmValueRequest;
 use log::info;
-use mx_sc_debug::{
+use mx_sc_scenario::{
     mx_sc::{
         codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,

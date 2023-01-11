@@ -24,7 +24,7 @@ base64 = "0.13.0"
 log = "0.4.17"
 env_logger = "0.8.4"
 
-[dependencies.mx-sc-debug]
+[dependencies.mx-sc-scenario]
 version = "=0.38.0"
-path = "../debug"
+path = "../scenario"
 

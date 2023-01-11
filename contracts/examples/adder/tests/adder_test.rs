@@ -1,6 +1,6 @@
 use adder::*;
 use mx_sc::types::BigUint;
-use mx_sc_debug::DebugApi;
+use mx_sc_scenario::DebugApi;
 
 #[test]
 fn test_add() {

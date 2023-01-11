@@ -1,5 +1,5 @@
 use formatted_message_features::*;
-use mx_sc_debug::DebugApi;
+use mx_sc_scenario::DebugApi;
 
 fn check_printed_and_clear(expected: &str) {
     let printed = DebugApi::new_from_static().printed_messages();

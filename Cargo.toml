@@ -5,12 +5,15 @@ members = [
   "framework/base",
   "framework/codec",
   "framework/codec-derive",
-  "framework/debug",
   "framework/derive",
   "framework/meta",
-  "framework/scenario-format",
+  "framework/scenario",
   "framework/snippets",
   "framework/wasm-adapter",
+
+  "sdk/scenario-format",
+
+  "vm",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",

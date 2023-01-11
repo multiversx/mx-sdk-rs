@@ -1,6 +1,6 @@
 use adder::*;
 use mx_sc::storage::mappers::SingleValue;
-use mx_sc_debug::{mandos_system::model::*, num_bigint::BigUint, *}; // TODO: clean up imports
+use mx_sc_scenario::{mandos_system::model::*, num_bigint::BigUint, *}; // TODO: clean up imports
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();

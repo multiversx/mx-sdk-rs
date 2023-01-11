@@ -56,7 +56,7 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 
 #[cfg(test)]
 mod test {
-    use mx_sc_debug::DebugApi;
+    use mx_sc_scenario::DebugApi;
 
     use super::Action;
 

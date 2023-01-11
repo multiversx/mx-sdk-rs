@@ -1,5 +1,5 @@
 use mx_sc::types::ManagedVec;
-use mx_sc_debug::DebugApi;
+use mx_sc_scenario::DebugApi;
 use rewards_distribution::Bracket;
 
 pub fn to_brackets(brackets_vec: &[(u64, u64)]) -> ManagedVec<DebugApi, Bracket> {

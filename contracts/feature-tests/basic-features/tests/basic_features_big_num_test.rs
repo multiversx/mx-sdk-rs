@@ -1,5 +1,5 @@
 use mx_sc::types::{BigInt, BigUint, ManagedBuffer};
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 use basic_features::big_num_methods::BigIntMethods;
 

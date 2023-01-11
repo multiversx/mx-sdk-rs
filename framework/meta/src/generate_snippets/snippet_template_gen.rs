@@ -15,7 +15,7 @@ use mx_sc_snippets::{{
         codec::multi_types::*,
         types::{{Address, CodeMetadata}},
     }},
-    mx_sc_debug::{{
+    mx_chain_vm::{{
         bech32, scenario_format::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
         DebugApi,
     }},

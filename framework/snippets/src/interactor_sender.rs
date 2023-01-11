@@ -1,6 +1,6 @@
 use elrond_sdk_erdrs::{data::transaction::Transaction, interactors::wallet::Wallet};
 use log::debug;
-use mx_sc_debug::mx_sc::types::Address;
+use mx_sc_scenario::mx_sc::types::Address;
 
 use crate::{address_h256_to_erdrs, Interactor};
 

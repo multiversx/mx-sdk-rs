@@ -1,11 +1,11 @@
 use mx_sc::types::{
     Address, EsdtLocalRole, EsdtTokenPayment, ManagedArgBuffer, ManagedVec, MultiValueEncoded,
 };
-use mx_sc_debug::{
+use mx_sc_modules::transfer_role_proxy::TransferRoleProxyModule;
+use mx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper,
 };
-use mx_sc_modules::transfer_role_proxy::TransferRoleProxyModule;
 use transfer_role_features::TransferRoleFeatures;
 
 static TRANSFER_TOKEN_ID: &[u8] = b"TRANSFER-123456";
