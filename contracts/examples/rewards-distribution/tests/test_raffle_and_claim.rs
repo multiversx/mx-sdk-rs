@@ -2,9 +2,10 @@ use mx_sc::{
     codec::multi_types::MultiValue2,
     types::{BigUint, EgldOrEsdtTokenIdentifier, MultiValueEncoded, OperationCompletionStatus},
 };
-use mx_sc_debug::{
-    managed_token_id, rust_biguint, testing_framework::BlockchainStateWrapper,
-    tx_mock::TxTokenTransfer, DebugApi,
+use mx_sc_scenario::{
+    managed_token_id, rust_biguint,
+    testing_framework::{BlockchainStateWrapper, TxTokenTransfer},
+    DebugApi,
 };
 use rewards_distribution::RewardsDistribution as _;
 mod mock_seed_nft_minter;

@@ -1,4 +1,4 @@
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -15,5 +15,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn panic_message_rs() {
-    mx_sc_debug::scenario_rs("scenarios/panic-message.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/panic-message.scen.json", world());
 }

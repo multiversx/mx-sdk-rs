@@ -12,9 +12,9 @@ path = "src/erdpy_snippet_generator.rs"
 version = "0.38.0"
 path = "../../framework/base"
 
-[dependencies.mx-sc-debug]
+[dependencies.mx-chain-vm]
 version = "0.38.0"
-path = "../../framework/debug"
+path = "../../vm"
 
 [dependencies]
 bech32 = "0.8.1"

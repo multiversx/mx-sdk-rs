@@ -15,5 +15,5 @@ pub use interactor_dns::*;
 pub use interactor_result::*;
 pub use interactor_sender::*;
 pub use log;
-pub use mx_sc_debug::{self, mx_sc};
+pub use mx_sc_scenario::{self, mx_sc};
 pub use tokio;

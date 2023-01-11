@@ -10,7 +10,7 @@ use mx_sc::{
     storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };
-use mx_sc_debug::{
+use mx_sc_scenario::{
     mandos_system::model::*,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
     BlockchainMock, ContractInfo, DebugApi,

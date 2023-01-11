@@ -1,5 +1,5 @@
 use mx_sc::types::{ManagedAddress, ManagedBuffer};
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 use basic_features::managed_buffer_features::ManagedBufferFeatures;
 

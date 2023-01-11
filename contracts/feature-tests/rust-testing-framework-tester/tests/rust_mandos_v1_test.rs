@@ -7,9 +7,9 @@ use mx_sc::{
     codec::Empty,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
-use mx_sc_debug::{
+use mx_sc_scenario::{
     assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
-    rust_biguint, testing_framework::*, tx_mock::TxTokenTransfer, DebugApi,
+    rust_biguint, testing_framework::*, DebugApi,
 };
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 

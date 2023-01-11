@@ -1,5 +1,5 @@
 use mx_sc::types::{BoxedBytes, ManagedAddress, ManagedBuffer};
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 use alloc_features::managed_buffer_features_alloc::ManagedBufferFeatures;
 

@@ -1,4 +1,4 @@
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -11,10 +11,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn generate_kitty_genes_rs() {
-    mx_sc_debug::scenario_rs("scenarios/generate-kitty-genes.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/generate-kitty-genes.scen.json", world());
 }
 
 #[test]
 fn init_rs() {
-    mx_sc_debug::scenario_rs("scenarios/init.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/init.scen.json", world());
 }

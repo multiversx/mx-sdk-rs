@@ -4,7 +4,7 @@ use elrond_sdk_erdrs::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 use log::info;
-use mx_sc_debug::{
+use mx_sc_scenario::{
     bech32,
     mx_sc::{
         codec::{PanicErrorHandler, TopDecodeMulti},

@@ -1,4 +1,4 @@
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -18,12 +18,12 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn deploy_erc20_and_crowdfunding_rs() {
-    mx_sc_debug::scenario_rs("scenarios/deploy_erc20_and_crowdfunding.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/deploy_erc20_and_crowdfunding.scen.json", world());
 }
 
 #[test]
 fn fund_with_insufficient_allowance_rs() {
-    mx_sc_debug::scenario_rs(
+    mx_sc_scenario::scenario_rs(
         "scenarios/fund_with_insufficient_allowance.scen.json",
         world(),
     );
@@ -31,7 +31,7 @@ fn fund_with_insufficient_allowance_rs() {
 
 #[test]
 fn fund_with_sufficient_allowance_rs() {
-    mx_sc_debug::scenario_rs(
+    mx_sc_scenario::scenario_rs(
         "scenarios/fund_with_sufficient_allowance.scen.json",
         world(),
     );
@@ -39,5 +39,5 @@ fn fund_with_sufficient_allowance_rs() {
 
 #[test]
 fn fund_without_allowance_rs() {
-    mx_sc_debug::scenario_rs("scenarios/fund_without_allowance.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/fund_without_allowance.scen.json", world());
 }

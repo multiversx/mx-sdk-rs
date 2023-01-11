@@ -1,5 +1,5 @@
 use mx_sc::types::{BigUint, ManagedVec};
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 use basic_features::managed_vec_features::ManagedVecFeatures;
 

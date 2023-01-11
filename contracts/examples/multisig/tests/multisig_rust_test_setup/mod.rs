@@ -7,9 +7,7 @@ use mx_sc::{
     codec::multi_types::OptionalValue,
     types::{Address, BigUint, BoxedBytes, CodeMetadata, ManagedBuffer, ManagedVec},
 };
-use mx_sc_debug::{
-    managed_address, rust_biguint, testing_framework::*, tx_mock::TxResult, DebugApi,
-};
+use mx_sc_scenario::{managed_address, rust_biguint, testing_framework::*, DebugApi};
 
 const MULTISIG_WASM_PATH: &str = "multisig/output/multisig.wasm";
 const QUORUM_SIZE: usize = 1;

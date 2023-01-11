@@ -1,5 +1,5 @@
-use mx_sc_debug::*;
 use mx_sc_meta::abi_json;
+use mx_sc_scenario::*;
 
 use std::{fs, fs::File, io::Write};
 

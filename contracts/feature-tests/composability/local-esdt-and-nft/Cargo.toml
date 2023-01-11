@@ -13,6 +13,6 @@ path = "src/lib.rs"
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dev-dependencies.mx-sc-debug]
+[dev-dependencies.mx-sc-scenario]
 version = "0.38.0"
-path = "../../../../framework/debug"
+path = "../../../../framework/scenario"

@@ -1,4 +1,4 @@
-use mx_sc_debug::*;
+use mx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -10,10 +10,10 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn set_repeat_struct_rs() {
-    mx_sc_debug::scenario_rs("scenarios/set_repeat_struct.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/set_repeat_struct.scen.json", world());
 }
 
 #[test]
 fn set_repeat_rs() {
-    mx_sc_debug::scenario_rs("scenarios/set_repeat.scen.json", world());
+    mx_sc_scenario::scenario_rs("scenarios/set_repeat.scen.json", world());
 }

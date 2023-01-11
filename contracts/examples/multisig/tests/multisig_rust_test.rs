@@ -3,7 +3,7 @@ use std::borrow::Borrow;
 use multisig::user_role::UserRole;
 use multisig_rust_test_setup::{CallActionDataRaw, MultisigSetup};
 use mx_sc::types::{BoxedBytes, CodeMetadata, ManagedAddress};
-use mx_sc_debug::{managed_address, managed_biguint, rust_biguint, DebugApi};
+use mx_sc_scenario::{managed_address, managed_biguint, rust_biguint, DebugApi};
 
 mod multisig_rust_test_setup;
 use adder::Adder;

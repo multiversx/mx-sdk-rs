@@ -12,7 +12,7 @@ use mx_sc_snippets::{
         storage::mappers::SingleValue,
         types::{Address, CodeMetadata},
     },
-    mx_sc_debug::{
+    mx_sc_scenario::{
         bech32, mandos_system::model::*, scenario_format::interpret_trait::InterpreterContext,
         ContractInfo, DebugApi,
     },

@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import struct
 
-DEBUG_API_TYPE = "mx_sc_debug::tx_mock::tx_context_ref::TxContextRef"
+DEBUG_API_TYPE = "mx_chain_vm::tx_mock::tx_context_ref::TxContextRef"
 ANY_NUMBER = "[0-9]+"
 ANY_TYPE = ".*"
 SOME_OR_NONE = "(Some|None)"
