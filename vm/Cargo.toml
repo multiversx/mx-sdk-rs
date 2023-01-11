@@ -43,7 +43,7 @@ path = "../framework/meta"
 
 [dependencies.mx-chain-scenario-format]
 version = "0.18.0"
-path = "../framework/scenario-format"
+path = "../sdk/scenario-format"
 
 [dev-dependencies.mx-sc-meta] # only used in the sample_adder test
 version = "=0.38.0"

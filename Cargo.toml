@@ -7,10 +7,11 @@ members = [
   "framework/codec-derive",
   "framework/derive",
   "framework/meta",
-  "framework/scenario-format",
   "framework/scenario",
   "framework/snippets",
   "framework/wasm-adapter",
+
+  "sdk/scenario-format",
 
   "vm",
 
