@@ -6,7 +6,7 @@ use multisig::{
 use mx_sc_modules::dns::ProxyTrait as _;
 use mx_sc_snippets::{
     dns_address_for_name, env_logger,
-    erdrs::interactors::wallet::Wallet,
+    erdrs::wallet::Wallet,
     mx_sc::{
         codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
@@ -23,7 +23,7 @@ use std::{
     io::{Read, Write},
 };
 
-const GATEWAY: &str = mx_sc_snippets::erdrs::blockchain::rpc::TESTNET_GATEWAY;
+const GATEWAY: &str = mx_sc_snippets::erdrs::blockchain::TESTNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";

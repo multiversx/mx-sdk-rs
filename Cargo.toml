@@ -11,6 +11,7 @@ members = [
   "framework/snippets",
   "framework/wasm-adapter",
 
+  "sdk/core",
   "sdk/scenario-format",
 
   "vm",

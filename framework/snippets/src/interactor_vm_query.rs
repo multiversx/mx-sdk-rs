@@ -1,5 +1,4 @@
 use crate::{address_h256_to_erdrs, Interactor};
-use elrond_sdk_erdrs::data::vm::VmValueRequest;
 use log::info;
 use mx_sc_scenario::{
     mx_sc::{
@@ -8,6 +7,7 @@ use mx_sc_scenario::{
     },
     DebugApi,
 };
+use mx_sdk::data::vm::VmValueRequest;
 
 impl Interactor {
     pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
