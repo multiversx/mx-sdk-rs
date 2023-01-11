@@ -28,13 +28,6 @@ pub struct Wallet {
 }
 
 impl Wallet {
-    pub fn new() -> Self {
-        let mut rng = rand::thread_rng();
-        Self {
-            priv_key: PrivateKey::generate(&mut rng),
-        }
-    }
-
     // GenerateMnemonic will generate a new mnemonic value using the bip39 implementation
     pub fn generate_mnemonic() -> Mnemonic {
         let mut rng = rand::thread_rng();
@@ -73,12 +66,7 @@ impl Wallet {
         let mut digest =
             HmacSha521::new_from_slice(b"ed25519 seed").expect("HMAC can take key of any size");
         digest.update(&seed);
-        let intermediary: Vec<u8> = digest
-            .finalize()
-            .into_bytes()
-            .into_iter()
-            .map(|x| x)
-            .collect();
+        let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
         let mut key = intermediary[..serialized_key_len].to_vec();
         let mut chain_code = intermediary[serialized_key_len..].to_vec();
 
@@ -98,12 +86,7 @@ impl Wallet {
             digest =
                 HmacSha521::new_from_slice(&chain_code).expect("HMAC can take key of any size");
             digest.update(&buff);
-            let intermediary: Vec<u8> = digest
-                .finalize()
-                .into_bytes()
-                .into_iter()
-                .map(|x| x)
-                .collect();
+            let intermediary: Vec<u8> = digest.finalize().into_bytes().into_iter().collect();
             key = intermediary[..serialized_key_len].to_vec();
             chain_code = intermediary[serialized_key_len..].to_vec();
         }
@@ -112,7 +95,7 @@ impl Wallet {
     }
 
     pub fn from_private_key(priv_key: &str) -> Result<Self> {
-        let pri_key = PrivateKey::from_str(priv_key)?;
+        let pri_key = PrivateKey::from_hex_str(priv_key)?;
         Ok(Self { priv_key: pri_key })
     }
 
@@ -120,7 +103,7 @@ impl Wallet {
         let x = pem::parse(std::fs::read_to_string(file_path).unwrap())?;
         let x = x.contents[..PRIVATE_KEY_LENGTH].to_vec();
         let priv_key_str = std::str::from_utf8(x.as_slice())?;
-        let pri_key = PrivateKey::from_str(priv_key_str)?;
+        let pri_key = PrivateKey::from_hex_str(priv_key_str)?;
         Ok(Self { priv_key: pri_key })
     }
 

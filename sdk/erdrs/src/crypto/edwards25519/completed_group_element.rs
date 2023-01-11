@@ -4,22 +4,12 @@ use super::{
     projective_group_element::ProjectiveGroupElement,
 };
 
+#[derive(Default)]
 pub struct CompletedGroupElement {
     pub x: FieldElement,
     pub y: FieldElement,
     pub z: FieldElement,
     pub t: FieldElement,
-}
-
-impl Default for CompletedGroupElement {
-    fn default() -> Self {
-        Self {
-            x: Default::default(),
-            y: Default::default(),
-            z: Default::default(),
-            t: Default::default(),
-        }
-    }
 }
 
 impl CompletedGroupElement {

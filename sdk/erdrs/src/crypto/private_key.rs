@@ -39,7 +39,6 @@ impl PrivateKey {
                 let merge: Vec<u8> = [bytes.to_vec(), public_key_bytes.to_vec()]
                     .concat()
                     .into_iter()
-                    .map(|b| b)
                     .collect();
                 let mut bits: [u8; 64] = [0u8; 64];
                 bits.copy_from_slice(&merge[..64]);
@@ -56,7 +55,7 @@ impl PrivateKey {
         }
     }
 
-    pub fn from_str(pk: &str) -> Result<Self> {
+    pub fn from_hex_str(pk: &str) -> Result<Self> {
         let bytes = hex::decode(pk)?;
         PrivateKey::from_bytes(bytes.as_slice())
     }
@@ -76,7 +75,7 @@ impl PrivateKey {
         self.0
     }
 
-    pub fn as_bytes<'a>(&'a self) -> &'a [u8; PRIVATE_KEY_LENGTH] {
+    pub fn as_bytes(&self) -> &[u8; PRIVATE_KEY_LENGTH] {
         &self.0
     }
 
@@ -105,7 +104,7 @@ impl PrivateKey {
 
         let encoded_r = r.to_bytes();
 
-        h.update(&encoded_r);
+        h.update(encoded_r);
         h.update(&self.0[32..]);
         h.update(&message);
         hram_digest.copy_from_slice(h.finalize_reset().as_slice());
@@ -129,7 +128,7 @@ impl PrivateKey {
 
 impl ToString for PrivateKey {
     fn to_string(&self) -> String {
-        hex::encode(self.0[..32].to_vec())
+        hex::encode(&self.0[..32])
     }
 }
 
@@ -148,6 +147,6 @@ impl<'de> Deserialize<'de> for PrivateKey {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Ok(Self::from_str(s.as_str()).unwrap())
+        Ok(Self::from_hex_str(s.as_str()).unwrap())
     }
 }

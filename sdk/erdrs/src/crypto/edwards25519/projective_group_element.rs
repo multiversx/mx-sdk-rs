@@ -1,19 +1,10 @@
 use super::{completed_group_element::CompletedGroupElement, field_element::FieldElement};
 
+#[derive(Default)]
 pub struct ProjectiveGroupElement {
     pub x: FieldElement,
     pub y: FieldElement,
     pub z: FieldElement,
-}
-
-impl Default for ProjectiveGroupElement {
-    fn default() -> Self {
-        Self {
-            x: Default::default(),
-            y: Default::default(),
-            z: Default::default(),
-        }
-    }
 }
 
 impl ProjectiveGroupElement {

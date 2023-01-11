@@ -1,15 +1,9 @@
 use std::marker::Copy;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 pub struct FieldElement(pub [i32; 10]);
 
 const ZERO: FieldElement = FieldElement([0; 10]);
-
-impl Default for FieldElement {
-    fn default() -> Self {
-        Self([0; 10])
-    }
-}
 
 impl FieldElement {
     pub fn fe_zero(&mut self) {
@@ -157,6 +151,7 @@ impl FieldElement {
         self.0[9] = -f.0[9];
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn fe_combine(
         &mut self,
         h0: i64,
@@ -544,7 +539,7 @@ impl FieldElement {
     //
     //   Have q+2^(-255)x = 2^(-255)(h + 19 2^(-25) h9 + 2^(-1))
     //   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
-    pub fn to_bytes(&mut self) -> [u8; 32] {
+    pub fn to_bytes(mut self) -> [u8; 32] {
         let mut carry = [0i32; 10];
 
         let mut q = (19 * self.0[9] + (1 << 24)) >> 25;
@@ -637,6 +632,6 @@ impl FieldElement {
 
     pub fn fe_is_negative(&mut self) -> u8 {
         let s = self.to_bytes();
-        return s[0] & 1;
+        s[0] & 1
     }
 }

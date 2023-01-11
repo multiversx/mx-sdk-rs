@@ -4,7 +4,7 @@ use super::{
     projective_group_element::ProjectiveGroupElement,
 };
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 pub struct ExtendedGroupElement {
     pub x: FieldElement,
     pub y: FieldElement,
@@ -12,19 +12,8 @@ pub struct ExtendedGroupElement {
     pub t: FieldElement,
 }
 
-impl Default for ExtendedGroupElement {
-    fn default() -> Self {
-        Self {
-            x: Default::default(),
-            y: Default::default(),
-            z: Default::default(),
-            t: Default::default(),
-        }
-    }
-}
-
 impl ExtendedGroupElement {
-    pub fn to_projective(&self, r: &mut ProjectiveGroupElement) {
+    pub fn to_projective(self, r: &mut ProjectiveGroupElement) {
         r.x.fe_copy(&self.x);
         r.y.fe_copy(&self.y);
         r.z.fe_copy(&self.z);
@@ -60,10 +49,10 @@ impl ExtendedGroupElement {
         // each e[i] is between 0 and 15 and e[63] is between 0 and 7.
 
         let mut carry: i8 = 0;
-        for i in 0..63 {
-            e[i] += carry;
-            carry = (e[i] + 8) >> 4;
-            e[i] -= carry << 4;
+        for elem in &mut e {
+            *elem += carry;
+            carry = (*elem + 8) >> 4;
+            *elem -= carry << 4;
         }
 
         e[63] += carry;
@@ -96,7 +85,7 @@ impl ExtendedGroupElement {
         }
     }
 
-    pub fn to_bytes(&self) -> [u8; 32] {
+    pub fn to_bytes(self) -> [u8; 32] {
         let mut recip = FieldElement::default();
         let mut x = FieldElement::default();
         let mut y = FieldElement::default();

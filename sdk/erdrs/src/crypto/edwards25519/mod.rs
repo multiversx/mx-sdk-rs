@@ -1,3 +1,5 @@
+#![allow(clippy::identity_op)]
+
 pub mod completed_group_element;
 pub mod constant;
 pub mod extended_group_element;
@@ -17,7 +19,7 @@ fn load4(input: Vec<u8>) -> i64 {
     r |= (input[1] as i64) << 8;
     r |= (input[2] as i64) << 16;
     r |= (input[3] as i64) << 24;
-    return r;
+    r
 }
 
 // The scalars are GF(2^252 + 27742317777372353535851937790883648493).

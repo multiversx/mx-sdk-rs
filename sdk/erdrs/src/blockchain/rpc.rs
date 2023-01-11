@@ -123,7 +123,7 @@ impl ElrondProxy {
         let mut endpoint = GET_NETWORK_STATUS_ENDPOINT.to_string();
 
         if with_metachain {
-            endpoint = format!("{}/{}", GET_NETWORK_STATUS_ENDPOINT, METACHAIN_SHARD_ID);
+            endpoint = format!("{GET_NETWORK_STATUS_ENDPOINT}/{METACHAIN_SHARD_ID}");
         }
 
         let endpoint = self.get_endpoint(endpoint.as_str());
@@ -248,7 +248,7 @@ impl ElrondProxy {
 
     // get_transaction_status retrieves a transaction's status from the network
     pub async fn get_transaction_status(&self, hash: &str) -> Result<String> {
-        let endpoint = format!("transaction/{}/status", hash);
+        let endpoint = format!("transaction/{hash}/status");
         let endpoint = self.get_endpoint(endpoint.as_str());
 
         let resp = self
@@ -325,7 +325,7 @@ impl ElrondProxy {
                     tx_hashs.push(b.txs_hashes[key].clone());
                 }
 
-                return Ok(tx_hashs);
+                Ok(tx_hashs)
             },
         }
     }

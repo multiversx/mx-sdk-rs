@@ -1,21 +1,11 @@
 use super::{constant::BASE, field_element::FieldElement};
 use std::marker::Copy;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Default, Copy, Clone, Debug)]
 pub struct PreComputedGroupElement {
     pub y_plus_x: FieldElement,
     pub y_minus_x: FieldElement,
     pub xy2d: FieldElement,
-}
-
-impl Default for PreComputedGroupElement {
-    fn default() -> Self {
-        Self {
-            y_plus_x: Default::default(),
-            y_minus_x: Default::default(),
-            xy2d: Default::default(),
-        }
-    }
 }
 
 impl PreComputedGroupElement {

@@ -16,7 +16,7 @@ impl PublicKey {
         self.0
     }
 
-    pub fn as_bytes<'a>(&'a self) -> &'a [u8; PUBLIC_KEY_LENGTH] {
+    pub fn as_bytes(&self) -> &[u8; PUBLIC_KEY_LENGTH] {
         &self.0
     }
 
@@ -25,7 +25,7 @@ impl PublicKey {
         Ok(address)
     }
 
-    pub fn from_str(pk: &str) -> Result<Self> {
+    pub fn from_hex_str(pk: &str) -> Result<Self> {
         let bytes = hex::decode(pk)?;
         let mut bits: [u8; 32] = [0u8; 32];
         bits.copy_from_slice(&bytes[32..]);
@@ -65,6 +65,6 @@ impl<'de> Deserialize<'de> for PublicKey {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        Ok(Self::from_str(s.as_str()).unwrap())
+        Ok(Self::from_hex_str(s.as_str()).unwrap())
     }
 }

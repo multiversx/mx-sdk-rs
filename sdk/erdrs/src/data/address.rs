@@ -17,7 +17,7 @@ impl Address {
     }
 
     pub fn to_bytes(&self) -> [u8; 32] {
-        self.0.clone()
+        self.0
     }
 
     pub fn from_bech32_string(bech32: &str) -> Result<Self> {
