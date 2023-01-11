@@ -1,9 +1,9 @@
-use elrond_sdk_erdrs::{
+use mx_sc_scenario::{mandos_system::model::AddressValue, mx_sc::types::Address};
+use mx_sdk_erdrs::{
     blockchain::rpc::ElrondProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     interactors::wallet::Wallet,
 };
-use mx_sc_scenario::{mandos_system::model::AddressValue, mx_sc::types::Address};
 use std::{collections::HashMap, time::Duration};
 
 use crate::Sender;

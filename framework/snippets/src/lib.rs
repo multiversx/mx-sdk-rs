@@ -7,7 +7,6 @@ mod interactor_sc_deploy;
 mod interactor_sender;
 mod interactor_vm_query;
 
-pub use elrond_sdk_erdrs as erdrs;
 pub use env_logger;
 pub use hex;
 pub use interactor::*;
@@ -16,4 +15,5 @@ pub use interactor_result::*;
 pub use interactor_sender::*;
 pub use log;
 pub use mx_sc_scenario::{self, mx_sc};
+pub use mx_sdk_erdrs as erdrs;
 pub use tokio;

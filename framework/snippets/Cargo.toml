@@ -4,8 +4,8 @@ version = "0.38.0"
 edition = "2021"
 
 authors = [
-    "Andrei Marinica <andrei.marinica@multiversx.com>",
     "MultiversX <contact@multiversx.com>",
+    
 ]
 license = "GPL-3.0-only"
 readme = "README.md"
@@ -27,4 +27,8 @@ env_logger = "0.8.4"
 [dependencies.mx-sc-scenario]
 version = "=0.38.0"
 path = "../scenario"
+
+[dependencies.mx-sdk-erdrs]
+version = "=0.2.1"
+path = "../../sdk/erdrs"
 

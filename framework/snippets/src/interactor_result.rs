@@ -1,8 +1,5 @@
 use std::marker::PhantomData;
 
-use elrond_sdk_erdrs::data::transaction::{
-    ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
-};
 use log::info;
 use mx_sc_scenario::{
     bech32,
@@ -10,6 +7,9 @@ use mx_sc_scenario::{
         codec::{PanicErrorHandler, TopDecodeMulti},
         types::Address,
     },
+};
+use mx_sdk_erdrs::data::transaction::{
+    ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";

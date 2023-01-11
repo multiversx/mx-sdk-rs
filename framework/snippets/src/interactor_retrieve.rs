@@ -1,6 +1,6 @@
 use crate::Interactor;
-use elrond_sdk_erdrs::data::transaction::TransactionOnNetwork;
 use log::info;
+use mx_sdk_erdrs::data::transaction::TransactionOnNetwork;
 use std::time::Duration;
 
 const TX_GET_RESULTS_NUM_RETRIES: usize = 8;
