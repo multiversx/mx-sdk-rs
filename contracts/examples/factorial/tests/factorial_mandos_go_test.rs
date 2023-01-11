@@ -1,4 +1,4 @@
 #[test]
 fn factorial_go() {
-    multiversx_sc_scenario::scenario_go("scenarios/factorial.scen.json");
+    multiversx_sc_scenario::run_go("scenarios/factorial.scen.json");
 }

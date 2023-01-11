@@ -3,8 +3,8 @@ use rust_testing_framework_tester::*; // TODO: clean up imports
 
 const WASM_PATH_EXPR: &str = "file:output/rust-testing-framework-tester.wasm";
 
-fn world() -> BlockchainMock {
-    let mut blockchain = BlockchainMock::new();
+fn world() -> ScenarioWorld {
+    let mut blockchain = ScenarioWorld::new();
     blockchain
         .set_current_dir_from_workspace("contracts/feature_tests/rust-testing-framework-tester");
 

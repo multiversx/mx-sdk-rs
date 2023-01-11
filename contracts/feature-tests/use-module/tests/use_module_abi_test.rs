@@ -5,7 +5,7 @@ use std::{fs, fs::File, io::Write};
 
 #[test]
 fn use_module_abi_generated_ok() {
-    let mut blockchain = BlockchainMock::new();
+    let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/use-module");
 
     // generate ABI

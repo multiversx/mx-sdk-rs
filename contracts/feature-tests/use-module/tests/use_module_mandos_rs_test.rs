@@ -31,8 +31,8 @@ mod dns_mock {
 
 use multiversx_sc_scenario::*;
 
-fn world() -> BlockchainMock {
-    let mut blockchain = BlockchainMock::new();
+fn world() -> ScenarioWorld {
+    let mut blockchain = ScenarioWorld::new();
     blockchain.register_contract("file:output/use-module.wasm", use_module::ContractBuilder);
 
     blockchain.register_contract(
@@ -45,7 +45,7 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn use_module_claim_developer_rewards_rs() {
-    multiversx_sc_scenario::scenario_rs(
+    multiversx_sc_scenario::run_rs(
         "scenarios/use_module_claim_developer_rewards.scen.json",
         world(),
     );
@@ -53,44 +53,44 @@ fn use_module_claim_developer_rewards_rs() {
 
 #[test]
 fn use_module_dns_register_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_dns_register.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_dns_register.scen.json", world());
 }
 
 #[test]
 fn use_module_features_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_features.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_features.scen.json", world());
 }
 
 #[test]
 fn use_module_internal_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_internal.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_internal.scen.json", world());
 }
 
 #[test]
 fn use_module_only_owner_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_only_owner.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_only_owner.scen.json", world());
 }
 
 #[test]
 fn use_module_only_admin_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_only_admin.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_only_admin.scen.json", world());
 }
 
 #[test]
 fn use_module_no_endpoint_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_no_endpoint.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_no_endpoint.scen.json", world());
 }
 
 #[test]
 fn use_module_pause_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/use_module_pause.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/use_module_pause.scen.json", world());
 }
 
 /// Will not work in scenarios-rs, since there is no gas usage
 #[test]
 #[ignore]
 fn use_module_ongoing_operation_rs() {
-    multiversx_sc_scenario::scenario_rs(
+    multiversx_sc_scenario::run_rs(
         "scenarios/use_module_ongoing_operation_example.scen.json",
         world(),
     );
