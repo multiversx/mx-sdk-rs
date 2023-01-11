@@ -49,7 +49,7 @@ impl Console {
 
     /// Print the replacement as two lines (red then green)
     /// ```
-    /// use ruplacer::{Console, Query, replace};
+    /// use replacer::{Console, Query, replace};
     /// let input = "let foo_bar = FooBar::new();";
     /// let query = Query::subvert("foo_bar", "spam_eggs");
     /// let replacement = replace(input, &query).unwrap();

@@ -1,9 +1,6 @@
-use inflector::cases::camelcase::*;
-use inflector::cases::kebabcase::*;
-use inflector::cases::pascalcase::*;
-use inflector::cases::screamingsnakecase::*;
-use inflector::cases::snakecase::*;
-use inflector::cases::traincase::*;
+use inflector::cases::{
+    camelcase::*, kebabcase::*, pascalcase::*, screamingsnakecase::*, snakecase::*, traincase::*,
+};
 
 /// A replacement Query
 pub enum Query {

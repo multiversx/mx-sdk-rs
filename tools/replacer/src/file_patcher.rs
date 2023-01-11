@@ -1,17 +1,17 @@
 use anyhow::{Context, Result};
-use std::fs::File;
-use std::io::{self, BufRead, BufReader};
-use std::path::{Path, PathBuf};
+use std::{
+    fs::File,
+    io::{self, BufRead, BufReader},
+    path::{Path, PathBuf},
+};
 
-use crate::query::Query;
-use crate::replace;
-use crate::Console;
+use crate::{query::Query, replace, Console};
 
 /// Run replacement query on a given file
 ///
 /// Example, assuming the `data.txt` file contains 'This is my old car'
 /// ```rust
-/// use ruplacer::{Console, FilePatcher, Query};
+/// use replacer::{Console, FilePatcher, Query};
 /// use std::path::PathBuf;
 ///
 /// # std::fs::write("data.txt", "This is my old car.").unwrap();
@@ -59,7 +59,7 @@ impl FilePatcher {
                     console.print_replacement(&prefix, &replacement);
                     let new_line = replacement.output();
                     new_contents.push_str(new_line);
-                }
+                },
             }
         }
         Ok(Some(FilePatcher {
@@ -121,7 +121,7 @@ mod tests {
 
     fn temp_dir() -> TempDir {
         tempfile::Builder::new()
-            .prefix("test-ruplacer")
+            .prefix("test-replacer")
             .tempdir()
             .unwrap()
     }

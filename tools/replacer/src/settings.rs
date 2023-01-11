@@ -3,7 +3,7 @@ use crate::console::Verbosity;
 #[derive(Debug, Default)]
 /// Settings applied for a DirectoryPatcher run
 pub struct Settings {
-    /// Control verbosity of ruplacer's console output
+    /// Control verbosity of replacer's console output
     pub verbosity: Verbosity,
     /// If true, do not write changes to the file system (default: false)
     pub dry_run: bool,

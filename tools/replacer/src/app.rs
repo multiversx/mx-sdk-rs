@@ -1,10 +1,12 @@
 use anyhow::{anyhow, Error, Result};
 use clap::Parser;
 use colored::*;
-use std::io::prelude::*;
-use std::path::{Path, PathBuf};
-use std::process;
-use std::str::FromStr;
+use std::{
+    io::prelude::*,
+    path::{Path, PathBuf},
+    process,
+    str::FromStr,
+};
 
 use crate::{console::Verbosity, replace, Console, DirectoryPatcher, Query, Settings};
 
@@ -30,23 +32,23 @@ impl std::str::FromStr for ColorWhen {
 
 #[derive(Debug, Parser)]
 #[command(
-    name = "ruplacer",
+    name = "replacer",
     version,
     after_help = "
 Examples:
     Replace 'foo' with 'bar'
-    $ ruplacer foo bar
+    $ replacer foo bar
 
     Replace 'LastName, FirstName' with 'FirstName LastName'
-    $ ruplacer '(\\w+), (\\w+)' '$2 $1'
+    $ replacer '(\\w+), (\\w+)' '$2 $1'
 
     Replace '--foo-bar' with '--spam-eggs':
     Note the use of '--' because the pattern and the replacement
     start with two dashes:
-    $ ruplacer -- --foo-bar --spam-eggs
+    $ replacer -- --foo-bar --spam-eggs
 
     Replace 'FooBar' with 'SpamEggs', 'foo_bar' with 'spam_eggs', ...
-    $ ruplacer --subvert FooBar SpamEggs
+    $ replacer --subvert FooBar SpamEggs
 "
 )]
 struct Options {
@@ -149,7 +151,7 @@ fn configure_color(when: &ColorWhen) {
             } else {
                 std::env::set_var("CLICOLOR", "0")
             }
-        }
+        },
     }
 }
 
@@ -170,7 +172,7 @@ pub fn run() -> Result<()> {
     //
     // So we cach the ErrorKind::MissingRequiredArgument error
     // to handle the exception, rather than having the usage
-    // looking like `ruplacer [OPTIONS]`
+    // looking like `replacer [OPTIONS]`
     let mut args = std::env::args();
     let parsed = Options::try_parse();
     let opt = match parsed {
@@ -183,7 +185,7 @@ pub fn run() -> Result<()> {
             } else {
                 e.exit();
             }
-        }
+        },
     };
     let Options {
         color_when,
@@ -281,7 +283,7 @@ fn run_on_directory(
     console.print_message(&format!("{stats}\n"));
 
     if dry_run {
-        console.print_message("Re-run ruplacer with --go to write these changes to the filesystem");
+        console.print_message("Re-run replacer with --go to write these changes to the filesystem");
     }
     Ok(())
 }

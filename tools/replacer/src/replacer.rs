@@ -8,7 +8,7 @@ use regex::Regex;
 /// Example
 ///
 /// ```
-/// use ruplacer::{Query, replace};
+/// use replacer::{Query, replace};
 ///
 /// let input = "this is some old text";
 /// let query = Query::substring("old", "new");
@@ -222,15 +222,15 @@ fn get_fragments(input: &str, query: &Query) -> Fragments {
         Query::Substring(pattern, replacement) => {
             let finder = SubstringReplacer::new(pattern, replacement);
             get_fragments_with_finder(input, finder)
-        }
+        },
         Query::Regex(regex, replacement) => {
             let finder = RegexReplacer::new(regex, replacement);
             get_fragments_with_finder(input, finder)
-        }
+        },
         Query::Subvert(items) => {
             let finder = SubvertReplacer::new(items);
             get_fragments_with_finder(input, finder)
-        }
+        },
     }
 }
 
@@ -315,7 +315,7 @@ mod tests {
     #[test]
     fn test_display_patch() {
         // Note: no assertion there. The test is here so it's easy
-        // to tweak ruplacer's output running `cargo test -- --nocapture`
+        // to tweak replacer's output running `cargo test -- --nocapture`
         let input = "Top: old is nice";
         let pattern = "old";
         let replacement = "new";
