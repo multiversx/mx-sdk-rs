@@ -6,9 +6,9 @@ use crate::{
 use std::path::{Path, PathBuf};
 
 /// A facade for contracts tests.
-/// 
+///
 /// Contains all the context needed to execute scenarios involving contracts.
-/// 
+///
 /// Currently defers most of the operations to the blockchain mock object directly,
 /// but that one will be refactored and broken up into smaller pieces.
 #[derive(Default, Debug)]

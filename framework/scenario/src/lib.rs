@@ -1,7 +1,6 @@
+mod facade;
 mod scenario_go_runner;
 mod scenario_rs_runner;
-mod scenario_world;
-mod scenario_world_steps;
 pub mod whitebox;
 
 /// Keeping this for backwards compatibility.
@@ -12,9 +11,9 @@ pub use multiversx_chain_vm::{bech32, mandos_system, num_bigint, ContractInfo, D
 
 pub use multiversx_chain_vm::{self, multiversx_sc, scenario_format};
 
+pub use facade::ScenarioWorld;
 pub use scenario_go_runner::scenario_go;
 pub use scenario_rs_runner::scenario_rs;
-pub use scenario_world::ScenarioWorld;
 
 #[deprecated(
     since = "0.39.0",
