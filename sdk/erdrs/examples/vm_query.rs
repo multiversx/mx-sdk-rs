@@ -23,5 +23,5 @@ async fn main() {
         value: "0".to_string(),
     };
     let result = blockchain.execute_vmquery(&req).await;
-    println!("{:#?}", result);
+    println!("{result:#?}");
 }

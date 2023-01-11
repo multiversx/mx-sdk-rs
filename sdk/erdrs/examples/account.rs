@@ -13,5 +13,5 @@ async fn main() {
     let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
     let account = blockchain.get_account(&addr).await.unwrap();
 
-    println!("account: {:#?}", account);
+    println!("account: {account:#?}");
 }

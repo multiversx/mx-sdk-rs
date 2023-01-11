@@ -17,5 +17,5 @@ async fn main() {
         .await
         .unwrap();
 
-    println!("default tx arg: {:#?}", arg);
+    println!("default tx arg: {arg:#?}");
 }

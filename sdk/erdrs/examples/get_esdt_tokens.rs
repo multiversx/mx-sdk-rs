@@ -13,5 +13,5 @@ async fn main() {
     let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
     let balances = blockchain.get_account_esdt_tokens(&addr).await.unwrap();
 
-    println!("{:#?}", balances);
+    println!("{balances:#?}");
 }

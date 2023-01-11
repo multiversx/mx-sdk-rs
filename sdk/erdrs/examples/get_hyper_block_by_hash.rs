@@ -7,5 +7,5 @@ async fn main() {
         .get_hyper_block_by_hash("20b14ba0e68c465810c5ded091f220e51dad41629d7ccd87dab572206185e419")
         .await;
 
-    println!("block by hash result: {:?}", result)
+    println!("block by hash result: {result:?}");
 }

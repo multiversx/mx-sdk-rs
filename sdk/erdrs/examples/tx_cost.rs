@@ -28,7 +28,7 @@ async fn main() {
     let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
     let cost = blockchain.request_transaction_cost(&tx).await.unwrap();
 
-    println!("tx cost: {:#?}", cost);
+    println!("tx cost: {cost:#?}");
 
     assert_eq!(
         cost.tx_gas_units, 57500,

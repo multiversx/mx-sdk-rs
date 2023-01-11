@@ -6,11 +6,11 @@ async fn main() {
     let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
 
     let status = blockchain.get_transaction_status(tx_hash).await;
-    println!("tx status: {:?}", status);
+    println!("tx status: {status:?}");
 
     let tx = blockchain.get_transaction_info(tx_hash).await;
-    println!("tx: {:#?}", tx);
+    println!("tx: {tx:#?}");
 
     let tx = blockchain.get_transaction_info_with_results(tx_hash).await;
-    println!("tx with results: {:#?}", tx);
+    println!("tx with results: {tx:#?}");
 }
