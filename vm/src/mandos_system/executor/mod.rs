@@ -1,3 +1,4 @@
+mod all_steps;
 mod check_state;
 pub mod contract_info;
 pub mod sc_call;
@@ -7,5 +8,6 @@ mod set_state;
 mod transfer;
 mod tx_output_check;
 
+pub use all_steps::parse_execute_mandos_steps;
 pub use contract_info::*;
 use tx_output_check::*;

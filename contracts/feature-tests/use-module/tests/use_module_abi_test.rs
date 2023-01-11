@@ -11,7 +11,7 @@ fn use_module_abi_generated_ok() {
     // generate ABI
     let multi_contract_config = multiversx_sc_meta::multi_contract_config::<use_module::AbiProvider>(
         blockchain
-            .current_dir
+            .current_dir()
             .join("multicontract.toml")
             .to_str()
             .unwrap(),

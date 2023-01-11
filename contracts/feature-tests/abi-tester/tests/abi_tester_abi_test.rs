@@ -11,7 +11,7 @@ fn abi_tester_abi_generated_ok() {
     // generate ABI
     let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
         blockchain
-            .current_dir
+            .current_dir()
             .join("multicontract.toml")
             .to_str()
             .unwrap(),
@@ -53,7 +53,7 @@ fn check_multi_contract_config() {
 
     let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
         blockchain
-            .current_dir
+            .current_dir()
             .join("multicontract.toml")
             .to_str()
             .unwrap(),
