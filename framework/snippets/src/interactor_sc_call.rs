@@ -8,7 +8,7 @@ use mx_sc_scenario::{
     },
     DebugApi,
 };
-use mx_sdk_erdrs::data::transaction::Transaction;
+use mx_sdk::data::transaction::Transaction;
 
 fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
     let mut result = String::from_utf8(

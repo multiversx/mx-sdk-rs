@@ -1,4 +1,4 @@
-use mx_sdk_erdrs::{
+use mx_sdk::{
     blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
 };

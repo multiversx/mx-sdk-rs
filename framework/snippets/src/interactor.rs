@@ -1,5 +1,5 @@
 use mx_sc_scenario::{mandos_system::model::AddressValue, mx_sc::types::Address};
-use mx_sdk_erdrs::{
+use mx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     wallet::Wallet,

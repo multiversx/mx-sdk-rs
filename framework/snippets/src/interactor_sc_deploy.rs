@@ -4,7 +4,7 @@ use mx_sc_scenario::{
     mandos_system::model::{ScDeployStep, TypedScDeploy},
     mx_sc::codec::{CodecFrom, TopEncodeMulti},
 };
-use mx_sdk_erdrs::data::{address::Address as ErdrsAddress, transaction::Transaction};
+use mx_sdk::data::{address::Address as ErdrsAddress, transaction::Transaction};
 
 const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];
 impl Interactor {

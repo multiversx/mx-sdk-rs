@@ -28,7 +28,7 @@ env_logger = "0.8.4"
 version = "=0.38.0"
 path = "../scenario"
 
-[dependencies.mx-sdk-erdrs]
+[dependencies.mx-sdk]
 version = "=0.2.1"
-path = "../../sdk/erdrs"
+path = "../../sdk/core"
 

@@ -1,4 +1,4 @@
-use mx_sdk_erdrs::{
+use mx_sdk::{
     blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::address::Address,
 };
@@ -6,12 +6,12 @@ use mx_sdk_erdrs::{
 #[tokio::main]
 async fn main() {
     let addr = Address::from_bech32_string(
-        "erd1qqqqqqqqqqqqqpgqfzydqmdw7m2vazsp6u5p95yxz76t2p9rd8ss0zp9ts",
+        "erd1pdv0h3ddqyzlraek02y5rhmjnwwapjyhqm983kfcdfzmr6axqhdsfg4akx",
     )
     .unwrap();
 
     let blockchain = CommunicationProxy::new(DEVNET_GATEWAY.to_string());
-    let account = blockchain.get_account(&addr).await.unwrap();
+    let balances = blockchain.get_account_esdt_tokens(&addr).await.unwrap();
 
-    println!("account: {account:#?}");
+    println!("{balances:#?}");
 }

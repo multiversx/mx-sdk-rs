@@ -15,5 +15,5 @@ pub use interactor_result::*;
 pub use interactor_sender::*;
 pub use log;
 pub use mx_sc_scenario::{self, mx_sc};
-pub use mx_sdk_erdrs as erdrs;
+pub use mx_sdk as erdrs;
 pub use tokio;

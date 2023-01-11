@@ -8,7 +8,7 @@ use mx_sc_scenario::{
         types::Address,
     },
 };
-use mx_sdk_erdrs::data::transaction::{
+use mx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 

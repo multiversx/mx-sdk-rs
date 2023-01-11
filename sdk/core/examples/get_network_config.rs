@@ -1,4 +1,4 @@
-use mx_sdk_erdrs::blockchain::{CommunicationProxy, DEVNET_GATEWAY};
+use mx_sdk::blockchain::{CommunicationProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {

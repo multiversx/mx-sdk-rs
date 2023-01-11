@@ -1,11 +1,11 @@
 # MultiversX SDK for Rust
 
-[![Crates.io](https://img.shields.io/crates/v/mx-sdk-erdrs)](https://crates.io/crates/mx-sdk-erdrs)
+[![Crates.io](https://img.shields.io/crates/v/mx-sdk)](https://crates.io/crates/mx-sdk)
 
 ## Example
 
 ```rust
-use mx_sdk_erdrs::blockchain::rpc::{CommunicationProxy, DEVNET_GATEWAY};
+use mx_sdk::blockchain::rpc::{CommunicationProxy, DEVNET_GATEWAY};
 
 #[tokio::test]
 async fn get_network_config() {
