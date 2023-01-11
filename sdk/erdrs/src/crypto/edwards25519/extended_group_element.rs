@@ -39,6 +39,7 @@ impl ExtendedGroupElement {
     //
     // Preconditions:
     //   a[31] <= 127
+    #[allow(clippy::needless_range_loop)]
     pub fn ge_scalar_mult_base(&mut self, a: [u8; 32]) {
         let mut e = [0i8; 64];
         for (i, v) in a.iter().enumerate() {
@@ -49,10 +50,10 @@ impl ExtendedGroupElement {
         // each e[i] is between 0 and 15 and e[63] is between 0 and 7.
 
         let mut carry: i8 = 0;
-        for elem in &mut e {
-            *elem += carry;
-            carry = (*elem + 8) >> 4;
-            *elem -= carry << 4;
+        for i in 0..63 {
+            e[i] += carry;
+            carry = (e[i] + 8) >> 4;
+            e[i] -= carry << 4;
         }
 
         e[63] += carry;

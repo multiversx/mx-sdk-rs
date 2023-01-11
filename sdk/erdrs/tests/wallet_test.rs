@@ -32,11 +32,11 @@ fn test_private_key_from_mnemonic() {
         private_key.to_string()
     );
     assert_eq!(
-        "0ef8c4e4906e724d067c09466c3794b3c5add9842abd215efbdc306b3db9b5ac",
+        "af8fef070a581873912ccbafb6a78bb9eb4e003085ac43dbbdfa3e20eb93cede",
         public_key.to_string()
     );
     assert_eq!(
-        "erd1pmuvfeysdeey6pnup9rxcdu5k0z6mkvy927jzhhmmscxk0dekkkq3wupvu",
+        "erd147877pc2tqv88yfvewhmdfuth845uqpsskky8kaalglzp6unem0qpwh982",
         address.to_string()
     );
 }
