@@ -81,3 +81,21 @@ impl<'de> Deserialize<'de> for Address {
         Ok(Self::from_bech32_string(s.as_str()).unwrap())
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    #[test]
+    fn test_decode_address() {
+        let addr = Address::from_bech32_string(
+            "erd1qqqqqqqqqqqqqpgqyfjjn43spw7teklwtpz4x5waygq2mluyj9ts0mdwn6",
+        )
+        .unwrap();
+        let encode = hex::encode(addr.to_bytes());
+        assert_eq!(
+            encode,
+            "00000000000000000500226529d6300bbcbcdbee58455351dd2200adff849157"
+        );
+    }
+}
