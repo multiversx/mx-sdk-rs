@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::storage::{
     mappers::{StorageClearable, StorageMapper, UnorderedSetMapper},
     StorageKey,
 };
-use mx_chain_vm::DebugApi;
 
 fn create_set() -> UnorderedSetMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

@@ -1,5 +1,6 @@
 #![feature(exhaustive_patterns)]
 
+use mx_chain_vm::DebugApi;
 use mx_sc::{
     codec::{
         multi_types::{MultiValue2, MultiValueVec, OptionalValue},
@@ -8,7 +9,6 @@ use mx_sc::{
     types::{AsyncCallResult, BigUint},
     HexCallDataDeserializer,
 };
-use mx_chain_vm::DebugApi;
 
 #[test]
 fn test_simple_args() {

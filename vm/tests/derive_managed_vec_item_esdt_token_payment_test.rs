@@ -1,3 +1,4 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::{
     api::{HandleConstraints, ManagedTypeApi},
     codec,
@@ -5,7 +6,6 @@ use mx_sc::{
     derive::ManagedVecItem,
     types::{BigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, TokenIdentifier},
 };
-use mx_chain_vm::DebugApi;
 
 // to test, run the following command in the crate folder:
 // cargo expand --test derive_managed_vec_item_esdt_token_payment_test > expanded.rs

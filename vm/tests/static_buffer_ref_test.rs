@@ -1,5 +1,5 @@
-use mx_sc::types::{LockableStaticBuffer, StaticBufferRef};
 use mx_chain_vm::DebugApi;
+use mx_sc::types::{LockableStaticBuffer, StaticBufferRef};
 
 #[test]
 fn test_try_extend_from_slice() {

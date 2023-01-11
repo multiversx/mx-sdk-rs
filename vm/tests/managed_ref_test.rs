@@ -1,4 +1,5 @@
 use core::fmt::Debug;
+use mx_chain_vm::DebugApi;
 use mx_sc::{
     api::ManagedTypeApi,
     types::{
@@ -6,7 +7,6 @@ use mx_sc::{
         TokenIdentifier,
     },
 };
-use mx_chain_vm::DebugApi;
 
 fn test_managed_ref_for_type<M, T>(obj: T)
 where

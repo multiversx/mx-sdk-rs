@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
-use mx_sc::types::{BigUint, ManagedVec};
 use mx_chain_vm::DebugApi;
+use mx_sc::types::{BigUint, ManagedVec};
 
 #[test]
 fn test_managed_vec_iter_rev() {

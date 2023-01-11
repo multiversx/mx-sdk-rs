@@ -1,3 +1,4 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::{
     hex_literal::hex,
     types::{
@@ -5,7 +6,6 @@ use mx_sc::{
         ManagedByteArray, ManagedVec, TokenIdentifier,
     },
 };
-use mx_chain_vm::DebugApi;
 
 #[test]
 fn test_big_uint_format() {

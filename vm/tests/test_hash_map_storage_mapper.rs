@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::storage::{
     mappers::{MapMapper, MapStorageMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use mx_chain_vm::DebugApi;
 
 fn create_map_storage() -> MapStorageMapper<DebugApi, u64, MapMapper<DebugApi, u64, u64>> {
     let _ = DebugApi::dummy();

@@ -1,5 +1,5 @@
-use mx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 use mx_chain_vm::DebugApi;
+use mx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
 mx_sc::derive_imports!();
 

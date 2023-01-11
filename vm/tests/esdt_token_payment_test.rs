@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::{
     codec::{self, DefaultErrorHandler, TopEncode},
     types::{BigUint, EsdtTokenPayment, TokenIdentifier},
 };
-use mx_chain_vm::DebugApi;
 
 /// Helper top-decode that doesn't rely on the `esdt-token-payment-legacy-decode` feature flag.
 fn esdt_token_payment_backwards_compatible_top_decode_or_handle_err<I, H>(

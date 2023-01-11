@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::{
     codec::multi_types::MultiValue5,
     types::{BigUint, MultiValueEncoded},
 };
-use mx_chain_vm::DebugApi;
 
 #[test]
 fn test_multi_value_encoded_1() {

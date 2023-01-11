@@ -1,5 +1,5 @@
-use mx_sc::types::BigUint;
 use mx_chain_vm::{BigUintPrinter, DebugApi};
+use mx_sc::types::BigUint;
 
 #[test]
 fn test_print_api() {

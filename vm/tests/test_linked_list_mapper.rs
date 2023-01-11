@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::storage::{
     mappers::{LinkedListMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use mx_chain_vm::DebugApi;
 
 fn create_list() -> LinkedListMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

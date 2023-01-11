@@ -3,8 +3,8 @@ use mx_sc::types::{
     TokenIdentifier,
 };
 use mx_sc_scenario::{
-    managed_egld_token_id, managed_token_id, managed_token_id_wrapped, mx_sc,
-    mx_chain_vm::check_managed_top_encode_decode, DebugApi,
+    managed_egld_token_id, managed_token_id, managed_token_id_wrapped,
+    mx_chain_vm::check_managed_top_encode_decode, mx_sc, DebugApi,
 };
 
 #[test]

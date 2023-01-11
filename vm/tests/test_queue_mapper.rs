@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::storage::{
     mappers::{QueueMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use mx_chain_vm::DebugApi;
 
 fn create_queue() -> QueueMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

@@ -1,5 +1,5 @@
-use mx_sc::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedVec};
 use mx_chain_vm::{check_managed_top_encode_decode, DebugApi};
+use mx_sc::types::{BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedVec};
 
 #[test]
 fn test_big_uint_serialization() {

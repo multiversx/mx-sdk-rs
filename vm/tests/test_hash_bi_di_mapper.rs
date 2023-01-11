@@ -1,8 +1,8 @@
+use mx_chain_vm::DebugApi;
 use mx_sc::storage::{
     mappers::{BiDiMapper, StorageMapper},
     StorageKey,
 };
-use mx_chain_vm::DebugApi;
 
 fn create_set_1() -> BiDiMapper<DebugApi, u64, u32> {
     let _ = DebugApi::dummy();
