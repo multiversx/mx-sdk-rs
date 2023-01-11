@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::scenario_format::{
     interpret_trait::InterpreterContext, value_interpreter::interpret_string,
 };
-use mx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider};
+use multiversx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider};
 
 use crate::DebugApi;
 
@@ -85,7 +85,7 @@ impl BlockchainMock {
         Abi: ContractAbiProvider,
         B: CallableContractBuilder,
     {
-        let multi_contract_config = mx_sc_meta::multi_contract_config::<Abi>(
+        let multi_contract_config = multiversx_sc_meta::multi_contract_config::<Abi>(
             self.current_dir
                 .join("multicontract.toml")
                 .to_str()
@@ -93,7 +93,7 @@ impl BlockchainMock {
         );
         let sub_contract = multi_contract_config.find_contract(sub_contract_name);
         let contract_obj = if sub_contract.settings.external_view {
-            contract_builder.new_contract_obj::<mx_sc::api::ExternalViewApi<DebugApi>>()
+            contract_builder.new_contract_obj::<multiversx_sc::api::ExternalViewApi<DebugApi>>()
         } else {
             contract_builder.new_contract_obj::<DebugApi>()
         };

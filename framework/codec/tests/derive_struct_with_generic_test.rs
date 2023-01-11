@@ -1,12 +1,12 @@
-use mx_sc_codec as codec;
-use mx_sc_codec_derive::*;
+use multiversx_sc_codec as codec;
+use multiversx_sc_codec_derive::*;
 
 use codec::{
     test_util::{check_dep_encode_decode, check_top_encode_decode},
     *,
 };
 
-// to test, run the following command in mx-sc-codec folder:
+// to test, run the following command in the crate folder:
 // cargo expand --test struct_with_generic_derive_test > expanded.rs
 
 trait SimpleTrait {

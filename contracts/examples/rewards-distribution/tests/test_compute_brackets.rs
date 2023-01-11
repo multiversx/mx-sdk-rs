@@ -1,11 +1,11 @@
 use core::iter::zip;
 
-use mx_sc_scenario::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};
+use multiversx_sc_scenario::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};
 use rewards_distribution::{RewardsDistribution, DIVISION_SAFETY_CONSTANT};
 
 mod utils;
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 #[test]
 fn test_compute_brackets() {

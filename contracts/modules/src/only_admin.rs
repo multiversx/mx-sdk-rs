@@ -1,6 +1,6 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait OnlyAdminModule {
     #[view(isAdmin)]
     fn is_admin(&self, address: ManagedAddress) -> bool {

@@ -1,12 +1,12 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 use crate::types::*;
 
 // String is not part of the standard imports because we want to discourage its use
-use mx_sc::types::String;
+use multiversx_sc::types::String;
 
 /// Test serialization for heap-allocated types.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait EchoAllocTypes {
     #[endpoint]
     fn echo_h256(&self, h: H256) -> H256 {

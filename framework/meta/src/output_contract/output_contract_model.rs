@@ -1,4 +1,4 @@
-use mx_sc::abi::ContractAbi;
+use multiversx_sc::abi::ContractAbi;
 
 use crate::cli_args::BuildArgs;
 

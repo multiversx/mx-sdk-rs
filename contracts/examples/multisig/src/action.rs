@@ -1,9 +1,9 @@
-use mx_sc::{
+use multiversx_sc::{
     api::ManagedTypeApi,
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {
@@ -56,7 +56,7 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 
 #[cfg(test)]
 mod test {
-    use mx_sc_scenario::DebugApi;
+    use multiversx_sc_scenario::DebugApi;
 
     use super::Action;
 

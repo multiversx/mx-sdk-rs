@@ -8,11 +8,11 @@ edition = "2021"
 name = "erdpy-snippet-generator"
 path = "src/erdpy_snippet_generator.rs"
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../framework/base"
 
-[dependencies.mx-chain-vm]
+[dependencies.multiversx-chain-vm]
 version = "0.38.0"
 path = "../../vm"
 

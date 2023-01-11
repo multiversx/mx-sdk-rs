@@ -1,5 +1,5 @@
 use crate::mandos_system::model::{SetStateStep, Step};
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 use crate::world_mock::{
     is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,

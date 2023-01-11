@@ -6,7 +6,7 @@ use crate::{
     },
     DebugApi,
 };
-use mx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
+use multiversx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment};
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 

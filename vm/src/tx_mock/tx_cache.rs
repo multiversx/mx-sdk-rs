@@ -5,7 +5,7 @@ use std::{
     rc::Rc,
 };
 
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 use crate::{
     address_hex,

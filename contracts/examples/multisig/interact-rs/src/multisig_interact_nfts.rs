@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use mx_sc_snippets::mx_sc::codec::test_util::top_encode_to_vec_u8_or_panic;
+use multiversx_sc_snippets::multiversx_sc::codec::test_util::top_encode_to_vec_u8_or_panic;
 
 use super::*;
 

@@ -20,6 +20,6 @@ panic = "abort"
 [dependencies.ping-pong-egld]
 path = ".."
 
-[dependencies.mx-sc-wasm-adapter]
+[dependencies.multiversx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../framework/wasm-adapter"

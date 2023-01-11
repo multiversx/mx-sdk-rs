@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Storage mapper test.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait SingleValueMapperFeatures {
     #[view]
     #[storage_mapper("my_single_value_mapper")]

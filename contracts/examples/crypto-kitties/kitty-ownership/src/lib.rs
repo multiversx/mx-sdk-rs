@@ -1,14 +1,14 @@
 #![no_std]
 #![allow(clippy::suspicious_operation_groupings)]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 use core::cmp::max;
 
 use kitty::{kitty_genes::*, Kitty};
 use random::*;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait KittyOwnership {
     #[init]
     fn init(

@@ -1,4 +1,4 @@
-mx_sc::derive_imports!();
+multiversx_sc::derive_imports!();
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

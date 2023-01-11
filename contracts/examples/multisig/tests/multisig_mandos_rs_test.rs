@@ -1,4 +1,4 @@
-use mx_sc_scenario::*;
+use multiversx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -28,71 +28,71 @@ fn world() -> BlockchainMock {
 #[ignore]
 #[test]
 fn call_other_shard_1_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/call_other_shard-1.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/call_other_shard-1.scen.json", world());
 }
 
 #[ignore]
 #[test]
 fn call_other_shard_2_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/call_other_shard-2.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/call_other_shard-2.scen.json", world());
 }
 
 #[test]
 fn changeboard_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/changeBoard.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/changeBoard.scen.json", world());
 }
 
 #[test]
 fn changequorum_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/changeQuorum.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/changeQuorum.scen.json", world());
 }
 
 #[test]
 fn changequorum_toobig_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/changeQuorum_tooBig.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/changeQuorum_tooBig.scen.json", world());
 }
 
 #[test]
 fn deployadder_err_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deployAdder_err.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deployAdder_err.scen.json", world());
 }
 
 #[test]
 fn deployadder_then_call_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deployAdder_then_call.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deployAdder_then_call.scen.json", world());
 }
 
 #[test]
 fn deployfactorial_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deployFactorial.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deployFactorial.scen.json", world());
 }
 
 #[test]
 fn deployothermultisig_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deployOtherMultisig.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deployOtherMultisig.scen.json", world());
 }
 
 #[test]
 fn deploy_duplicate_bm_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/deploy_duplicate_bm.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/deploy_duplicate_bm.scen.json", world());
 }
 
 #[test]
 fn remove_everyone_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/remove_everyone.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/remove_everyone.scen.json", world());
 }
 
 #[test]
 fn sendesdt_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/sendEsdt.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/sendEsdt.scen.json", world());
 }
 
 #[test]
 fn upgrade_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/upgrade.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/upgrade.scen.json", world());
 }
 
 #[test]
 fn upgrade_from_source_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/upgrade_from_source.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/upgrade_from_source.scen.json", world());
 }

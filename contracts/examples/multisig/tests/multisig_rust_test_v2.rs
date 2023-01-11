@@ -5,12 +5,12 @@ use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _, ProxyTrait as _,
 };
 
-use mx_sc::{
+use multiversx_sc::{
     codec::multi_types::{MultiValueVec, OptionalValue},
     storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     mandos_system::model::*,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
     BlockchainMock, ContractInfo, DebugApi,

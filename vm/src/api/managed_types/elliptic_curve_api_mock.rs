@@ -1,4 +1,4 @@
-use mx_sc::{api::EllipticCurveApi, types::heap::BoxedBytes};
+use multiversx_sc::{api::EllipticCurveApi, types::heap::BoxedBytes};
 
 use crate::DebugApi;
 

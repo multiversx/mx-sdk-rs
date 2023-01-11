@@ -1,4 +1,4 @@
-use mx_sc::api::CLAIM_DEVELOPER_REWARDS_FUNC_NAME;
+use multiversx_sc::api::CLAIM_DEVELOPER_REWARDS_FUNC_NAME;
 use num_bigint::BigUint;
 use num_traits::Zero;
 

@@ -18,7 +18,7 @@ panic = "abort"
 [dependencies.proxy-test-first]
 path = ".."
 
-[dependencies.mx-sc-wasm-adapter]
+[dependencies.multiversx-sc-wasm-adapter]
 version = "0.38.0"
 path = "../../../../../framework/wasm-adapter"
 

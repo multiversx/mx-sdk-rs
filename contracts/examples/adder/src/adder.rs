@@ -1,10 +1,10 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// One of the simplest smart contracts possible,
 /// it holds a single variable in storage, which anyone can increment.
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]

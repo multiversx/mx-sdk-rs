@@ -66,7 +66,7 @@ path = "src/lib.rs"
 [dependencies.{contract_crate_name}]
 path = ".."
 
-[dependencies.mx-sc-snippets]
+[dependencies.multiversx-sc-snippets]
 version = "0.38.0"
 
 [workspace]

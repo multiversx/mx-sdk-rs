@@ -1,4 +1,4 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 pub mod governance_configurable;
 pub mod governance_events;
@@ -12,7 +12,7 @@ pub const ALREADY_VOTED_ERR_MSG: &[u8] = b"Already voted for this proposal";
 pub const MIN_FEES_REACHED: &[u8] = b"Propose already reached min threshold for fees";
 pub const MIN_AMOUNT_NOT_REACHED: &[u8] = b"Minimum amount not reached";
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait GovernanceModule:
     governance_configurable::GovernanceConfigurablePropertiesModule
     + governance_events::GovernanceEventsModule

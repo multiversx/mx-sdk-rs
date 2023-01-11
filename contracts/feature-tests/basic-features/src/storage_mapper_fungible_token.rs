@@ -1,8 +1,8 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait FungibleTokenMapperFeatures:
-    mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[payable("EGLD")]
     #[endpoint]

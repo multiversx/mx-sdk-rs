@@ -5,7 +5,7 @@ use crate::{
         serde_raw::TxDeployRaw,
     },
 };
-use mx_sc::types::CodeMetadata;
+use multiversx_sc::types::CodeMetadata;
 
 use super::tx_interpret_util::interpret_egld_value;
 

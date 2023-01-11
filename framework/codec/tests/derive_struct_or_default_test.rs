@@ -1,5 +1,5 @@
-use mx_sc_codec as codec;
-use mx_sc_codec_derive::*;
+use multiversx_sc_codec as codec;
+use multiversx_sc_codec_derive::*;
 
 use codec::test_util::check_top_encode_decode;
 

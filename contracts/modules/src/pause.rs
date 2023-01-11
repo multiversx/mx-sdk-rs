@@ -1,4 +1,4 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Standard smart contract module that, when added to a smart contract, offers pausability.
 ///
@@ -9,7 +9,7 @@ mx_sc::imports!();
 /// * an endpoint where the owner can pause/unpause contract
 /// * a method to check if contract is paused or not
 ///
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait PauseModule {
     #[inline]
     fn is_paused(&self) -> bool {

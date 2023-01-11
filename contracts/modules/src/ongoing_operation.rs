@@ -1,4 +1,4 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 pub const DEFAULT_MIN_GAS_TO_SAVE_PROGRESS: u64 = 1_000_000;
 
@@ -6,7 +6,7 @@ pub type LoopOp = bool;
 pub const CONTINUE_OP: bool = true;
 pub const STOP_OP: bool = false;
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait OngoingOperationModule {
     /// Run the given lambda function until it's either completed or it runs out of gas.
     /// min_gas_to_save_progress should be a reasonable value to save gas.
@@ -14,11 +14,11 @@ pub trait OngoingOperationModule {
     ///
     /// # Usage example: Counting to 100
     /// ```
-    /// # use mx_sc::types::OperationCompletionStatus;
-    /// # use mx_sc_modules::ongoing_operation::{
+    /// # use multiversx_sc::types::OperationCompletionStatus;
+    /// # use multiversx_sc_modules::ongoing_operation::{
     /// #     self, CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
     /// # };
-    /// # pub trait ExampleContract: mx_sc::contract_base::ContractBase + ongoing_operation::OngoingOperationModule
+    /// # pub trait ExampleContract: multiversx_sc::contract_base::ContractBase + ongoing_operation::OngoingOperationModule
     /// # {
     /// fn count_to_100(&self) -> OperationCompletionStatus {
     ///     let mut current_number = self.load_operation::<usize>();

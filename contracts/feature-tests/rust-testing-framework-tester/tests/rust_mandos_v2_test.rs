@@ -1,4 +1,4 @@
-use mx_sc_scenario::{mandos_system::model::*, *};
+use multiversx_sc_scenario::{mandos_system::model::*, *};
 use rust_testing_framework_tester::*; // TODO: clean up imports
 
 const WASM_PATH_EXPR: &str = "file:output/rust-testing-framework-tester.wasm";

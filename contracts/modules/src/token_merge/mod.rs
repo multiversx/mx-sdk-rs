@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 pub mod custom_merged_token_attributes;
 pub mod merged_token_instances;
@@ -13,7 +13,7 @@ static SC_DOES_NOT_OWN_NFT_PARTS_ERR_MSG: &[u8] = b"NFT parts belong to another 
 
 const MIN_MERGE_PAYMENTS: usize = 2;
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait TokenMergeModule:
     merged_token_setup::MergedTokenSetupModule
     + crate::default_issue_callbacks::DefaultIssueCallbacksModule

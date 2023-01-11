@@ -1,4 +1,4 @@
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 /// Holds the data for a Elrond standard digital token transaction
 #[derive(Clone, Default, Debug)]

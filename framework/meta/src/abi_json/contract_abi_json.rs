@@ -1,5 +1,5 @@
 use super::*;
-use mx_sc::abi::*;
+use multiversx_sc::abi::*;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 

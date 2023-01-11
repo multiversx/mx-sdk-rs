@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 use crate::num_bigint::{BigInt, Sign};
-use mx_sc::api::{BigIntApi, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl};
+use multiversx_sc::api::{BigIntApi, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl};
 
 use crate::DebugApi;
 

@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     codec::multi_types::OptionalValue,
     esdt::ESDTSystemSmartContractProxy,
     types::{
@@ -7,7 +7,7 @@ use mx_sc::{
         ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use mx_chain_vm::{
+use multiversx_chain_vm::{
     api::DebugHandle,
     num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
     DebugApi,

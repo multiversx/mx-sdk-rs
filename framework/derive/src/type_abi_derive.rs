@@ -11,7 +11,7 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
     };
     let field_ty = &field.ty;
     quote! {
-        field_descriptions.push(mx_sc::abi::StructFieldDescription {
+        field_descriptions.push(multiversx_sc::abi::StructFieldDescription {
             docs: &[ #(#field_docs),* ],
             name: #field_name_str,
             field_type: <#field_ty>::type_name(),
@@ -44,18 +44,18 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
         syn::Data::Struct(data_struct) => {
             let struct_field_snippets = fields_snippets(&data_struct.fields);
             quote! {
-                fn provide_type_descriptions<TDC: mx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+                fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
                     let type_name = Self::type_name();
                     if !accumulator.contains_type(&type_name) {
                         accumulator.reserve_type_name(type_name.clone());
-                        let mut field_descriptions = mx_sc::types::heap::Vec::new();
+                        let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#struct_field_snippets)*
                         accumulator.insert(
                             type_name.clone(),
-                            mx_sc::abi::TypeDescription {
+                            multiversx_sc::abi::TypeDescription {
                                 docs: &[ #(#type_docs),* ],
                                 name: type_name,
-                                contents: mx_sc::abi::TypeContents::Struct(field_descriptions),
+                                contents: multiversx_sc::abi::TypeContents::Struct(field_descriptions),
                             },
                         );
                     }
@@ -72,9 +72,9 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     let variant_name_str = variant.ident.to_string();
                     let variant_field_snippets = fields_snippets(&variant.fields);
                     quote! {
-                        let mut field_descriptions = mx_sc::types::heap::Vec::new();
+                        let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#variant_field_snippets)*
-                        variant_descriptions.push(mx_sc::abi::EnumVariantDescription {
+                        variant_descriptions.push(multiversx_sc::abi::EnumVariantDescription {
                             docs: &[ #(#variant_docs),* ],
                             discriminant: #variant_index,
                             name: #variant_name_str,
@@ -84,18 +84,18 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                 })
                 .collect();
             quote! {
-                fn provide_type_descriptions<TDC: mx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
+                fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
                     let type_name = Self::type_name();
                     if !accumulator.contains_type(&type_name) {
                         accumulator.reserve_type_name(type_name.clone());
-                        let mut variant_descriptions = mx_sc::types::heap::Vec::new();
+                        let mut variant_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#enum_variant_snippets)*
                         accumulator.insert(
                             type_name.clone(),
-                            mx_sc::abi::TypeDescription {
+                            multiversx_sc::abi::TypeDescription {
                                 docs: &[ #(#type_docs),* ],
                                 name: type_name,
-                                contents: mx_sc::abi::TypeContents::Enum(variant_descriptions),
+                                contents: multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
                             },
                         );
                     }
@@ -109,8 +109,8 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let type_abi_impl = quote! {
-        impl #impl_generics mx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
-            fn type_name() -> mx_sc::abi::TypeName {
+        impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
+            fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
             }
 

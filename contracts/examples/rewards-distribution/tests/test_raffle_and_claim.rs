@@ -1,8 +1,8 @@
-use mx_sc::{
+use multiversx_sc::{
     codec::multi_types::MultiValue2,
     types::{BigUint, EgldOrEsdtTokenIdentifier, MultiValueEncoded, OperationCompletionStatus},
 };
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     managed_token_id, rust_biguint,
     testing_framework::{BlockchainStateWrapper, TxTokenTransfer},
     DebugApi,

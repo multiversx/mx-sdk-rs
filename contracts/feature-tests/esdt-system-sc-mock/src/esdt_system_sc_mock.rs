@@ -1,12 +1,12 @@
 #![no_std]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 const ZERO_ASCII: u8 = b'0';
 const DASH: u8 = b'-';
 const RAND_CHARS_LEN: usize = 6;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait PayableFeatures {
     #[init]
     fn init(&self) {}

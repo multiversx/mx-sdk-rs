@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use mx_sc::codec::{CodecFrom, TopEncodeMulti};
+use multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::mandos_system::model::{AddressValue, BytesValue, TxExpect, TxQuery};
 

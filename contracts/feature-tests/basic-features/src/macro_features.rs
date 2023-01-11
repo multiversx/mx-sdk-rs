@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-/// Various macros provided by mx-sc.
-#[mx_sc::module]
+/// Various macros provided by multiversx-sc.
+#[multiversx_sc::module]
 pub trait Macros {
     #[only_owner]
     #[endpoint]

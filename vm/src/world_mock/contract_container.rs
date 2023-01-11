@@ -1,5 +1,5 @@
 use alloc::vec::Vec;
-use mx_sc::contract_base::CallableContract;
+use multiversx_sc::contract_base::CallableContract;
 
 use crate::tx_mock::TxFunctionName;
 

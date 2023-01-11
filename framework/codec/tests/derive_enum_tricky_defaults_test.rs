@@ -1,9 +1,9 @@
-use mx_sc_codec as codec;
-use mx_sc_codec_derive::*;
+use multiversx_sc_codec as codec;
+use multiversx_sc_codec_derive::*;
 
 use codec::test_util::{check_top_decode, check_top_encode, check_top_encode_decode};
 
-// to test, run the following command in mx-sc-codec folder:
+// to test, run the following command in the crate folder:
 // cargo expand --test derive_enum_tricky_defaults_test > enum_expanded.rs
 
 /// Enum with default that is not the first variant.

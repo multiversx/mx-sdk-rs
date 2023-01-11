@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Storage mapper test.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait MapStorageMapperFeatures {
     #[storage_mapper("map_storage_mapper")]
     fn map_storage_mapper(&self) -> MapStorageMapper<u32, MapMapper<u32, u32>>;

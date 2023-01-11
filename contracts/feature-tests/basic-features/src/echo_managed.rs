@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Test endpoint argument and result serialization.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_big_uint(&self, bi: BigUint) -> BigUint {

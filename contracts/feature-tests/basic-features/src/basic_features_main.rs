@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(never_type)]
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 pub mod big_num_methods;
 pub mod big_num_operators;
@@ -37,7 +37,7 @@ pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod types;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait BasicFeatures:
     big_num_methods::BigIntMethods
     + big_num_operators::BigIntOperators
@@ -71,7 +71,7 @@ pub trait BasicFeatures:
     + struct_eq::StructEquals
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
-    + mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[init]
     fn init(&self) {}

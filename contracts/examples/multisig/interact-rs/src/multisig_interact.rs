@@ -3,16 +3,16 @@ use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
     multisig_state::ProxyTrait as _, ProxyTrait as _,
 };
-use mx_sc_modules::dns::ProxyTrait as _;
-use mx_sc_snippets::{
+use multiversx_sc_modules::dns::ProxyTrait as _;
+use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
     erdrs::wallet::Wallet,
-    mx_sc::{
+    multiversx_sc::{
         codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
         types::{Address, CodeMetadata},
     },
-    mx_sc_scenario::{
+    multiversx_sc_scenario::{
         bech32, mandos_system::model::*, scenario_format::interpret_trait::InterpreterContext,
         ContractInfo, DebugApi,
     },
@@ -23,7 +23,7 @@ use std::{
     io::{Read, Write},
 };
 
-const GATEWAY: &str = mx_sc_snippets::erdrs::blockchain::TESTNET_GATEWAY;
+const GATEWAY: &str = multiversx_sc_snippets::erdrs::blockchain::TESTNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
@@ -81,7 +81,7 @@ impl State {
     }
 
     async fn deploy(&mut self) {
-        let deploy_result: mx_sc_snippets::InteractorResult<()> = self
+        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
                 self.multisig

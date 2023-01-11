@@ -1,3 +1,3 @@
 fn main() {
-    mx_sc_meta::cli_main::<fractional_nfts::AbiProvider>();
+    multiversx_sc_meta::cli_main::<fractional_nfts::AbiProvider>();
 }

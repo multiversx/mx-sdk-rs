@@ -1,12 +1,12 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 pub mod erc1155_user_proxy;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait Erc1155 {
     #[init]
     fn init(&self) {}

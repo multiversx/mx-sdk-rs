@@ -5,9 +5,11 @@ pub mod whitebox;
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
 pub use whitebox as testing_framework;
 
-pub use mx_chain_vm::{bech32, mandos_system, num_bigint, BlockchainMock, ContractInfo, DebugApi};
+pub use multiversx_chain_vm::{
+    bech32, mandos_system, num_bigint, BlockchainMock, ContractInfo, DebugApi,
+};
 
-pub use mx_chain_vm::{self, mx_sc, scenario_format};
+pub use multiversx_chain_vm::{self, multiversx_sc, scenario_format};
 
-pub use mx_chain_vm::mandos_system::scenario_rs_runner::scenario_rs;
+pub use multiversx_chain_vm::mandos_system::scenario_rs_runner::scenario_rs;
 pub use scenario_go_runner::scenario_go;

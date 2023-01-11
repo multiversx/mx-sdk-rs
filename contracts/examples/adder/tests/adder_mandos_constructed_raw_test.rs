@@ -1,4 +1,4 @@
-use mx_sc_scenario::{mandos_system::model::*, *};
+use multiversx_sc_scenario::{mandos_system::model::*, *};
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();

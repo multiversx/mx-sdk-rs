@@ -1,4 +1,4 @@
-use mx_sc::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
+use multiversx_sc::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
 
 use crate::DebugApi;
 

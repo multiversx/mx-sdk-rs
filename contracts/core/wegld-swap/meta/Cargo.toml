@@ -1,5 +1,5 @@
 [package]
-name = "mx-wegld-swap-sc-meta"
+name = "multiversx-wegld-swap-sc-meta"
 version = "0.0.0"
 authors = [ "Dorin Iancu <dorin.iancu@multiversx.com>",]
 edition = "2021"
@@ -7,13 +7,13 @@ publish = false
 
 [dev-dependencies]
 
-[dependencies.mx-wegld-swap-sc]
+[dependencies.multiversx-wegld-swap-sc]
 path = ".."
 
-[dependencies.mx-sc]
+[dependencies.multiversx-sc]
 version = "0.38.0"
 path = "../../../../framework/base"
 
-[dependencies.mx-sc-meta]
+[dependencies.multiversx-sc-meta]
 version = "0.38.0"
 path = "../../../../framework/meta"

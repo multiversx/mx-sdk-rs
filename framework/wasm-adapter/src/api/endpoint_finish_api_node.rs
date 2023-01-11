@@ -1,5 +1,5 @@
 use super::VmApiImpl;
-use mx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
+use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
 
 extern "C" {
     fn finish(dataOffset: *const u8, length: i32);

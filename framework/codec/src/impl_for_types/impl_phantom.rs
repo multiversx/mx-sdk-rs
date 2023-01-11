@@ -62,7 +62,7 @@ pub mod tests {
     use crate as codec;
     use crate::test_util::{check_dep_encode_decode, check_top_encode_decode};
     use core::marker::PhantomData;
-    use mx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
+    use multiversx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
     #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
     pub struct TestStructWithPhantom<M> {

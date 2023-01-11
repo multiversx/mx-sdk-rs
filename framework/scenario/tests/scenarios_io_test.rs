@@ -1,6 +1,6 @@
 use std::{fs, fs::File, io::Write};
 
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     mandos_system::model::Scenario,
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},

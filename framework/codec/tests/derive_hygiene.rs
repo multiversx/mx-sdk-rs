@@ -1,11 +1,11 @@
 #![allow(dead_code)]
 
-use mx_sc_codec as codec;
-use mx_sc_codec_derive::*;
+use multiversx_sc_codec as codec;
+use multiversx_sc_codec_derive::*;
 
 // This test doesn't run any code, the fact that it compiles is the actual testing.
 // It checks that the derive macro generation is immune to type shadowing,
-// i.e. any types that are in scope and happen to have the same name as mx-sc-codec types do not break the build.
+// i.e. any types that are in scope and happen to have the same name as multiversx-sc-codec types do not break the build.
 // The derive macro must generate fully qualified type names everywhere to avoid this hurdle.
 
 // All exported traits:
@@ -31,7 +31,7 @@ enum Result {
 #[allow(unused_imports)]
 use crate::Result::{Err, Ok};
 
-// Also adding all public functions exposed by mx-sc-codec.
+// Also adding all public functions exposed by multiversx-sc-codec.
 // They are not used in the derive, but just to make sure:
 fn top_encode_number() {}
 fn universal_decode_number() {}

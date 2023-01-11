@@ -2,7 +2,7 @@ use crate::{
     mandos_system::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor},
     tx_mock::TxFunctionName,
 };
-use mx_sc::{
+use multiversx_sc::{
     codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     types::heap::Address,
 };

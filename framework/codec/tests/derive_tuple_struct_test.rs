@@ -1,12 +1,12 @@
-use mx_sc_codec as codec;
-use mx_sc_codec_derive::*;
+use multiversx_sc_codec as codec;
+use multiversx_sc_codec_derive::*;
 
 use codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
 struct TupleStruct(u8, u16, u32);
 
-// to test, run the following command in mx-sc-codec folder:
+// to test, run the following command in the crate folder:
 // cargo expand --test tuple_struct_derive_test > expanded.rs
 
 #[test]

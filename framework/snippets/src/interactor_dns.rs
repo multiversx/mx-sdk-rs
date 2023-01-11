@@ -1,7 +1,9 @@
-use mx_sc_scenario::{mx_sc::types::Address, scenario_format::value_interpreter::keccak256};
+use multiversx_sc_scenario::{
+    multiversx_sc::types::Address, scenario_format::value_interpreter::keccak256,
+};
 
 #[cfg(test)]
-use mx_sc_scenario::bech32;
+use multiversx_sc_scenario::bech32;
 
 fn get_initial_dns_address() -> Address {
     Address::from_slice(&[1u8; 32])

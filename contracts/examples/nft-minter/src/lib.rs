@@ -1,7 +1,7 @@
 #![no_std]
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 mod nft_module;
 
@@ -10,7 +10,7 @@ pub struct ExampleAttributes {
     pub creation_timestamp: u64,
 }
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait NftMinter: nft_module::NftModule {
     #[init]
     fn init(&self) {}
@@ -86,9 +86,9 @@ pub trait NftMinter: nft_module::NftModule {
 }
 
 mod nft_marketplace_proxy {
-    mx_sc::imports!();
+    multiversx_sc::imports!();
 
-    #[mx_sc::proxy]
+    #[multiversx_sc::proxy]
     pub trait NftMarketplace {
         #[endpoint(claimTokens)]
         fn claim_tokens(

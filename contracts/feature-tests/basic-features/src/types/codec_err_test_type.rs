@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     codec::{
         DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,

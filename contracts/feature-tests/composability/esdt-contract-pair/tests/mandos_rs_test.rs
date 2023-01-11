@@ -1,4 +1,4 @@
-use mx_sc_scenario::*;
+use multiversx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -16,22 +16,22 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn init_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/init.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/init.scen.json", world());
 }
 
 #[test]
 fn simple_transfer_full_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/simple_transfer_full.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/simple_transfer_full.scen.json", world());
 }
 
 #[test]
 fn simple_transfer_half_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/simple_transfer_half.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/simple_transfer_half.scen.json", world());
 }
 
 #[test]
 fn simple_transfer_full_wrong_token_rs() {
-    mx_sc_scenario::scenario_rs(
+    multiversx_sc_scenario::scenario_rs(
         "scenarios/simple_transfer_full_wrong_token.scen.json",
         world(),
     );
@@ -40,5 +40,5 @@ fn simple_transfer_full_wrong_token_rs() {
 // TODO: implement ESDTTransfer + async call
 // #[test]
 // fn rejected_transfer_rs() {
-// 	mx_sc_scenario::scenario_rs("scenarios/reject_transfer.scen.json", world());
+// 	multiversx_sc_scenario::scenario_rs("scenarios/reject_transfer.scen.json", world());
 // }

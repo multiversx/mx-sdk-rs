@@ -1,8 +1,8 @@
 use crate::ExampleStruct;
 
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait BenchmarkCommon {
     fn append_index(&self, base: &ManagedBuffer, index: usize) -> ManagedBuffer {
         let mut concatenated = base.clone();

@@ -5,7 +5,7 @@ use crate::{
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
 };
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};
 

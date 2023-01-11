@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use mx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
+use multiversx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
 use num_traits::Zero;
 
 mod cmd_builder;

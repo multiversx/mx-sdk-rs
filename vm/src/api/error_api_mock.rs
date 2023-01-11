@@ -1,5 +1,5 @@
 use crate::{tx_mock::TxPanic, DebugApi};
-use mx_sc::api::{ErrorApi, ErrorApiImpl, ManagedBufferApi};
+use multiversx_sc::api::{ErrorApi, ErrorApiImpl, ManagedBufferApi};
 
 impl ErrorApi for DebugApi {
     type ErrorApiImpl = DebugApi;

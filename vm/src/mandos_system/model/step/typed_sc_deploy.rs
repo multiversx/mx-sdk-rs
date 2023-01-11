@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
-use mx_sc::{
+use multiversx_sc::{
     codec::{CodecFrom, TopEncodeMulti},
     types::{Address, CodeMetadata},
 };

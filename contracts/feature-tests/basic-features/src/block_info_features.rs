@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Block info getters.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait BlockInfoFeatures {
     #[view]
     fn get_block_timestamp(&self) -> u64 {

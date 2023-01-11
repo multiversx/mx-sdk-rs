@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 /// Serialization of managed types, mixed with the heap allocator.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait EchoManagedTypesWithAlloc {
     /// This tests that nested serialization of managed buffers within unmanaged types works.
     #[endpoint]

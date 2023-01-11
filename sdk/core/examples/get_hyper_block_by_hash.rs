@@ -1,4 +1,4 @@
-use mx_sdk::blockchain::{CommunicationProxy, DEVNET_GATEWAY};
+use multiversx_sdk::blockchain::{CommunicationProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {

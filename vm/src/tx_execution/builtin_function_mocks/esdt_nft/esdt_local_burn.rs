@@ -1,5 +1,5 @@
 use crate::num_bigint::BigUint;
-use mx_sc::api::ESDT_LOCAL_BURN_FUNC_NAME;
+use multiversx_sc::api::ESDT_LOCAL_BURN_FUNC_NAME;
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};
 

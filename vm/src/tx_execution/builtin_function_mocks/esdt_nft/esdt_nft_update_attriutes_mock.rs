@@ -1,4 +1,4 @@
-use mx_sc::{
+use multiversx_sc::{
     api::ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     codec::{top_encode_to_vec_u8, TopDecode},
 };

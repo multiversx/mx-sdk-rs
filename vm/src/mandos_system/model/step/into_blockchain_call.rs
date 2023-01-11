@@ -1,4 +1,4 @@
-use mx_sc::types::{ContractCall, ContractDeploy};
+use multiversx_sc::types::{ContractCall, ContractDeploy};
 
 use crate::DebugApi;
 

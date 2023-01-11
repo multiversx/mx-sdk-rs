@@ -1,5 +1,5 @@
-use mx_sc::types::{SCResult, StaticSCError};
-use mx_sc_scenario::*;
+use multiversx_sc::types::{SCResult, StaticSCError};
+use multiversx_sc_scenario::*;
 
 use alloc_features::macro_features_legacy::MacroFeaturesLegacy;
 

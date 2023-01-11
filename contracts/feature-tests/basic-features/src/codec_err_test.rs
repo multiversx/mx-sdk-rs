@@ -1,11 +1,11 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 use crate::types::CodecErrorTestType;
 
 mod encode_err_proxy {
-    mx_sc::imports!();
+    multiversx_sc::imports!();
     use crate::types::CodecErrorTestType;
 
-    #[mx_sc::proxy]
+    #[multiversx_sc::proxy]
     pub trait EncodeErrorProxy {
         #[init]
         fn init(&self, error_arg: CodecErrorTestType);
@@ -16,7 +16,7 @@ mod encode_err_proxy {
 }
 
 /// Test various serialization errors.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait CodecErrorTest {
     #[endpoint]
     fn codec_err_finish(&self) -> CodecErrorTestType {

@@ -1,4 +1,4 @@
-use mx_sc::api::ESDT_TRANSFER_FUNC_NAME;
+use multiversx_sc::api::ESDT_TRANSFER_FUNC_NAME;
 
 use crate::{
     tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,

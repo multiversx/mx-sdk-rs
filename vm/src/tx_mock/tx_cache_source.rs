@@ -1,4 +1,4 @@
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 use crate::world_mock::{AccountData, BlockchainMock};
 

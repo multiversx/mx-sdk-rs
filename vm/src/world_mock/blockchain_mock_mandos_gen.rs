@@ -3,7 +3,7 @@ use crate::{
     scenario_format::{interpret_trait::IntoRaw, serde_raw::ValueSubTree},
     BlockchainMock,
 };
-use mx_sc::types::Address;
+use multiversx_sc::types::Address;
 use std::{collections::HashMap, path::Path};
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;

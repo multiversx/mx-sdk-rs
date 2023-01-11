@@ -1,7 +1,7 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
-use mx_sc::contract_base::ManagedSerializer;
+use multiversx_sc::contract_base::ManagedSerializer;
 
 use crate::bonding_curve::{
     curves::curve_function::CurveFunction,
@@ -13,7 +13,7 @@ use crate::bonding_curve::{
 
 use super::structs::CurveArguments;
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     #[endpoint(setLocalRoles)]
     fn set_local_roles(

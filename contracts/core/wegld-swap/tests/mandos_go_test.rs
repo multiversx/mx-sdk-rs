@@ -1,9 +1,9 @@
 #[test]
 fn unwrap_egld_go() {
-    mx_sc_scenario::scenario_go("scenarios/unwrap_egld.scen.json");
+    multiversx_sc_scenario::scenario_go("scenarios/unwrap_egld.scen.json");
 }
 
 #[test]
 fn wrap_egld_go() {
-    mx_sc_scenario::scenario_go("scenarios/wrap_egld.scen.json");
+    multiversx_sc_scenario::scenario_go("scenarios/wrap_egld.scen.json");
 }

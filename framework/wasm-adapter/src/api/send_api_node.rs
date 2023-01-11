@@ -1,6 +1,6 @@
 use crate::api::{managed_types::big_int_api_node::unsafe_buffer_load_be_pad_right, VmApiImpl};
 use alloc::vec::Vec;
-use mx_sc::{
+use multiversx_sc::{
     api::{const_handles, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
     types::{
         heap::{Address, ArgBuffer, BoxedBytes},

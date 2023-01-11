@@ -1,4 +1,4 @@
-use mx_sc_scenario::*;
+use multiversx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -18,27 +18,27 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn big_float_new_from_big_int_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_new_from_big_int.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_new_from_big_int.scen.json", world());
 }
 
 #[test]
 fn big_float_new_from_big_uint_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_new_from_big_uint.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_new_from_big_uint.scen.json", world());
 }
 
 #[test]
 fn big_float_new_from_frac_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_new_from_frac.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_new_from_frac.scen.json", world());
 }
 
 #[test]
 fn big_float_new_from_int_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_new_from_int.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_new_from_int.scen.json", world());
 }
 
 // #[test]
 // fn big_float_new_from_managed_buffer_rs() {
-//     mx_sc_scenario::scenario_rs(
+//     multiversx_sc_scenario::scenario_rs(
 //         "scenarios/big_float_new_from_managed_buffer.scen.json",
 //         world(),
 //     );
@@ -46,20 +46,20 @@ fn big_float_new_from_int_rs() {
 
 #[test]
 fn big_float_new_from_parts_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_new_from_parts.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_new_from_parts.scen.json", world());
 }
 
 #[test]
 fn big_float_new_from_sci_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_new_from_sci.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_new_from_sci.scen.json", world());
 }
 
 #[test]
 fn big_float_operators_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/big_float_operators.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/big_float_operators.scen.json", world());
 }
 
 // #[test]
 // fn big_float_operator_checks_rs() {
-//     mx_sc_scenario::scenario_rs("scenarios/big_float_operator_checks.scen.json", world());
+//     multiversx_sc_scenario::scenario_rs("scenarios/big_float_operator_checks.scen.json", world());
 // }

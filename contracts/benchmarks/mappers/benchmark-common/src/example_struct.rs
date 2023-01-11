@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 pub type Nonce = u64;
 

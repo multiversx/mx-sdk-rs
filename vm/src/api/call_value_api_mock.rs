@@ -1,5 +1,5 @@
 use crate::{num_bigint, tx_mock::TxPanic, DebugApi};
-use mx_sc::{
+use multiversx_sc::{
     api::{CallValueApi, CallValueApiImpl},
     err_msg,
     types::EsdtTokenType,

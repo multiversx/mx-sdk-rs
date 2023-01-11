@@ -1,6 +1,6 @@
-use mx_sc::types::{EgldOrEsdtTokenIdentifier, ManagedVec};
-use mx_sc_modules::staking::StakingModule;
-use mx_sc_scenario::{
+use multiversx_sc::types::{EgldOrEsdtTokenIdentifier, ManagedVec};
+use multiversx_sc_modules::staking::StakingModule;
+use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::BlockchainStateWrapper,
 };

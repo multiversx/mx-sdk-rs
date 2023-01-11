@@ -1,6 +1,6 @@
 use crate::mandos_system::model::Checkable;
 use alloc::vec::Vec;
-use mx_sc::types::heap::Address;
+use multiversx_sc::types::heap::Address;
 
 use super::TxFunctionName;
 

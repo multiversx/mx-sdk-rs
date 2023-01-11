@@ -1,7 +1,7 @@
 #![no_std]
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 mod common;
 mod events;
@@ -11,7 +11,7 @@ mod validation;
 
 use common::OrderInputParams;
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait Pair:
     global::GlobalOperationModule
     + orders::OrdersModule

@@ -1,5 +1,5 @@
 use crate::api::VmApiImpl;
-use mx_sc::api::{ManagedTypeApi, ManagedTypeApiImpl};
+use multiversx_sc::api::{ManagedTypeApi, ManagedTypeApiImpl};
 
 extern "C" {
     fn mBufferToBigIntUnsigned(mBufferHandle: i32, bigIntHandle: i32) -> i32;

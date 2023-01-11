@@ -1,6 +1,6 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait DeployContractModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;

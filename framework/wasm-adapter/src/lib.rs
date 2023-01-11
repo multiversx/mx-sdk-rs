@@ -5,7 +5,7 @@
 // TODO: get rid of the legacy API and also of this.
 extern crate alloc;
 
-pub use mx_sc;
+pub use multiversx_sc;
 
 pub mod api;
 pub mod error_hook;

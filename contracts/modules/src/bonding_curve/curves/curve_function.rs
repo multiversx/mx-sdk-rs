@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 use crate::bonding_curve::utils::structs::CurveArguments;
 pub trait CurveFunction<M: ManagedTypeApi> {

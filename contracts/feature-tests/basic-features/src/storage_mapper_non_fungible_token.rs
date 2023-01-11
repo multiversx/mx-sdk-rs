@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
 pub struct RgbColor {
@@ -8,9 +8,9 @@ pub struct RgbColor {
     b: u8,
 }
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait NonFungibleTokenMapperFeatures:
-    mx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[payable("EGLD")]
     #[endpoint]

@@ -1,6 +1,6 @@
 use core::fmt::Debug;
-use mx_chain_vm::DebugApi;
-use mx_sc::{
+use multiversx_chain_vm::DebugApi;
+use multiversx_sc::{
     api::ManagedTypeApi,
     types::{
         BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedOption,

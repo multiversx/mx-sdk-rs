@@ -1,9 +1,9 @@
-use mx_sc::types::{Address, ManagedVec, MultiValueEncoded};
-use mx_sc_modules::governance::{
+use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
+use multiversx_sc_modules::governance::{
     governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
     GovernanceModule,
 };
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper, TxResult},
     DebugApi,

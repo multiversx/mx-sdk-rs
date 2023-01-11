@@ -4,7 +4,7 @@ use crate::{
     DebugApi,
 };
 use alloc::vec::Vec;
-use mx_sc::api::{
+use multiversx_sc::api::{
     BigIntApi, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
     StorageWriteApiImpl,
 };
@@ -57,7 +57,7 @@ impl StorageReadApiImpl for DebugApi {
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
-        let address = mx_sc::types::heap::Address::from_slice(
+        let address = multiversx_sc::types::heap::Address::from_slice(
             self.mb_to_boxed_bytes(address_handle).as_slice(),
         );
         let key_bytes = self.mb_to_boxed_bytes(key_handle);

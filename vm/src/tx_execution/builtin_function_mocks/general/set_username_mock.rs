@@ -1,4 +1,4 @@
-use mx_sc::api::SET_USERNAME_FUNC_NAME;
+use multiversx_sc::api::SET_USERNAME_FUNC_NAME;
 
 use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
 

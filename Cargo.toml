@@ -160,6 +160,3 @@ members = [
   "tools/erdpy-snippet-generator",
 ]
 
-exclude = [
-  "mx-sc-wasm-output",
-]

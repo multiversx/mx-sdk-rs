@@ -1,4 +1,4 @@
-use mx_sc_scenario::*;
+use multiversx_sc_scenario::*;
 
 fn world() -> BlockchainMock {
     let mut blockchain = BlockchainMock::new();
@@ -12,5 +12,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn issue_rs() {
-    mx_sc_scenario::scenario_rs("scenarios/esdt_system_sc.scen.json", world());
+    multiversx_sc_scenario::scenario_rs("scenarios/esdt_system_sc.scen.json", world());
 }

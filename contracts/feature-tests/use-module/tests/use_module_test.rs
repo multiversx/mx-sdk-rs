@@ -1,5 +1,5 @@
-use mx_sc::contract_base::CallableContract;
-use mx_sc_scenario::*;
+use multiversx_sc::contract_base::CallableContract;
+use multiversx_sc_scenario::*;
 
 #[test]
 fn test_function_selector() {

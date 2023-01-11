@@ -1,7 +1,7 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
 // Always keep in sync with the token-related storage mappers. Only modify if really necessary.
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait DefaultIssueCallbacksModule {
     #[callback]
     fn default_issue_cb(

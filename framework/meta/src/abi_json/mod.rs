@@ -8,7 +8,7 @@ pub use build_info_abi_json::{BuildInfoAbiJson, RustcAbiJson};
 pub use contract_abi_json::*;
 pub use endpoint_abi_json::*;
 pub use event_abi_json::*;
-use mx_sc::{abi::ContractAbi, contract_base::ContractAbiProvider};
+use multiversx_sc::{abi::ContractAbi, contract_base::ContractAbiProvider};
 pub use type_abi_json::*;
 
 /// Function provided for convenience.

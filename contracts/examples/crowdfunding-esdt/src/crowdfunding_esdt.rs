@@ -1,7 +1,7 @@
 #![no_std]
 
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
@@ -10,7 +10,7 @@ pub enum Status {
     Failed,
 }
 
-#[mx_sc::contract]
+#[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
     fn init(&self, target: BigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {

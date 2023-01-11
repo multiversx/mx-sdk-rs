@@ -1,4 +1,4 @@
-use mx_sc::abi::{ContractAbi, EndpointAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     fs,
@@ -38,8 +38,9 @@ impl OutputContractBuilder {
         let external_view = cms.external_view.unwrap_or_default();
         let mut constructors = Vec::new();
         if external_view {
-            constructors
-                .push(mx_sc::external_view_contract::external_view_contract_constructor_abi())
+            constructors.push(
+                multiversx_sc::external_view_contract::external_view_contract_constructor_abi(),
+            )
         }
         (
             contract_id.clone(),

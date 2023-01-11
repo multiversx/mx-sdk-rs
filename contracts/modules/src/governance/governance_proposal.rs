@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 pub const MAX_GOVERNANCE_PROPOSAL_ACTIONS: usize = 4;
 pub type ProposalId = usize;

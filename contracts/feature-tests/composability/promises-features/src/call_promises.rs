@@ -1,5 +1,5 @@
-mx_sc::imports!();
-mx_sc::derive_imports!();
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct CallbackData<M: ManagedTypeApi> {
@@ -10,7 +10,7 @@ pub struct CallbackData<M: ManagedTypeApi> {
     args: ManagedVec<M, ManagedBuffer<M>>,
 }
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait CallPromisesModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;

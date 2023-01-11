@@ -1,4 +1,4 @@
-use mx_sc_codec as codec;
+use multiversx_sc_codec as codec;
 
 use codec::{
     test_util::check_top_encode_decode, top_decode_from_nested_or_handle_err, DecodeErrorHandler,

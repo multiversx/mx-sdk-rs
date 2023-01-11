@@ -1,6 +1,6 @@
-mx_sc::imports!();
+multiversx_sc::imports!();
 
-#[mx_sc::module]
+#[multiversx_sc::module]
 pub trait StorageRawApiFeatures {
     #[endpoint]
     fn storage_read_raw(&self, storage_key: ManagedBuffer) -> ManagedBuffer {

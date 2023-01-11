@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use mx_sc::api::{BigFloatApi, Sign};
+use multiversx_sc::api::{BigFloatApi, Sign};
 
 extern "C" {
     fn bigFloatNewFromParts(integralPart: i32, fractionalPart: i32, exponent: i32) -> i32;

@@ -1,14 +1,14 @@
-use mx_sc::{
+use multiversx_sc::{
     arrayvec::ArrayVec,
     codec::Empty,
     contract_base::ContractBase,
     storage::mappers::StorageTokenWrapper,
     types::{EsdtLocalRole, EsdtTokenPayment, ManagedVec},
 };
-use mx_sc_modules::token_merge::{
+use multiversx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
 };
-use mx_sc_scenario::{
+use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     testing_framework::{BlockchainStateWrapper, TxTokenTransfer},
 };

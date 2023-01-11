@@ -1,4 +1,4 @@
-use mx_chain_scenario_format::{
+use multiversx_chain_scenario_format::{
     interpret_trait::InterpreterContext, value_interpreter::interpret_string,
 };
 
