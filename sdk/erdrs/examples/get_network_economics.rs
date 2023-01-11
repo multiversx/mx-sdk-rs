@@ -1,4 +1,4 @@
-use mx_sdk_erdrs::blockchain::rpc::{ElrondProxy, DEVNET_GATEWAY};
+use mx_sdk_erdrs::blockchain::{ElrondProxy, DEVNET_GATEWAY};
 
 #[tokio::main]
 async fn main() {

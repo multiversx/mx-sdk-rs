@@ -1,5 +1,5 @@
 use mx_sdk_erdrs::{
-    blockchain::rpc::{ElrondProxy, DEVNET_GATEWAY},
+    blockchain::{ElrondProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
 };
 

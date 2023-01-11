@@ -1,7 +1,7 @@
 use mx_sdk_erdrs::{
-    blockchain::rpc::{ElrondProxy, DEVNET_GATEWAY},
+    blockchain::{ElrondProxy, DEVNET_GATEWAY},
     data::{address::Address, vm::VmValueRequest},
-    interactors::wallet::Wallet,
+    wallet::Wallet,
 };
 
 #[tokio::main]

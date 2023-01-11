@@ -1,7 +1,7 @@
 use bip39::Mnemonic;
 
 use mx_sdk_erdrs::{
-    crypto::public_key::PublicKey, data::address::Address, interactors::wallet::Wallet,
+    crypto::public_key::PublicKey, data::address::Address, wallet::Wallet,
 };
 
 #[test]

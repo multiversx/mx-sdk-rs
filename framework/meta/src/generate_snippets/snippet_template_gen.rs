@@ -20,7 +20,7 @@ use mx_sc_snippets::{{
         DebugApi,
     }},
     env_logger,
-    erdrs::interactors::wallet::Wallet,
+    erdrs::wallet::Wallet,
     tokio, Interactor,
 }};
 use std::{{

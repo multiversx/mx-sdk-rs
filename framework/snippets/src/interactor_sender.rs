@@ -1,6 +1,6 @@
 use log::debug;
 use mx_sc_scenario::mx_sc::types::Address;
-use mx_sdk_erdrs::{data::transaction::Transaction, interactors::wallet::Wallet};
+use mx_sdk_erdrs::{data::transaction::Transaction, wallet::Wallet};
 
 use crate::{address_h256_to_erdrs, Interactor};
 

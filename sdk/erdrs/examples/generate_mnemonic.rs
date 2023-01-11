@@ -1,4 +1,4 @@
-use mx_sdk_erdrs::interactors::wallet::Wallet;
+use mx_sdk_erdrs::wallet::Wallet;
 
 fn main() {
     let mnemonic = Wallet::generate_mnemonic();

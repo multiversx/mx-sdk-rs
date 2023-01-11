@@ -1,8 +1,8 @@
 use mx_sc_scenario::{mandos_system::model::AddressValue, mx_sc::types::Address};
 use mx_sdk_erdrs::{
-    blockchain::rpc::ElrondProxy,
+    blockchain::ElrondProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
-    interactors::wallet::Wallet,
+    wallet::Wallet,
 };
 use std::{collections::HashMap, time::Duration};
 
