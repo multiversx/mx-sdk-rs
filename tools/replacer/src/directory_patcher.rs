@@ -1,16 +1,14 @@
 use anyhow::{Context, Result};
 use std::path::Path;
 
-use crate::console::Console;
-use crate::file_patcher::FilePatcher;
-use crate::query::Query;
-use crate::settings::Settings;
-use crate::stats::Stats;
+use crate::{
+    console::Console, file_patcher::FilePatcher, query::Query, settings::Settings, stats::Stats,
+};
 
 #[derive(Debug)]
 /// Used to run replacement query on every text file present in a given path
 /// ```rust
-/// use ruplacer::{Console, DirectoryPatcher, Query, Settings, Stats};
+/// use replacer::{Console, DirectoryPatcher, Query, Settings, Stats};
 /// use std::path::PathBuf;
 ///
 /// let settings = Settings{
