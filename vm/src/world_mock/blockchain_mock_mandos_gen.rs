@@ -13,15 +13,15 @@ static SC_ADDR_PREFIX: &str = "sc:";
 static HEX_PREFIX: &str = "0x";
 
 impl BlockchainMock {
-    pub fn write_mandos_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        self.mandos_trace_prettify();
+    pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
+        self.scenario_trace_prettify();
 
         let mandos_trace = core::mem::take(&mut self.mandos_trace);
         let mandos_trace_raw = mandos_trace.into_raw();
         mandos_trace_raw.save_to_file(file_path);
     }
 
-    fn mandos_trace_prettify(&mut self) {
+    fn scenario_trace_prettify(&mut self) {
         for step in &mut self.mandos_trace.steps {
             match step {
                 Step::ExternalSteps(_) => {},

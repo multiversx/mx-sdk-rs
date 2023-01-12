@@ -90,8 +90,17 @@ impl ScenarioWorld {
         );
     }
 
+    /// Exports current scenario to a JSON file, as created.
+    pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
+        self.blockchain_mock.write_scenario_trace(file_path);
+    }
+
+    #[deprecated(
+        since = "0.39.0",
+        note = "Renamed, use `write_scenario_trace` instead."
+    )]
     pub fn write_mandos_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        self.blockchain_mock.write_mandos_trace(file_path);
+        self.write_scenario_trace(file_path);
     }
 }
 
