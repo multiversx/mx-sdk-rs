@@ -1,6 +1,6 @@
 use crowdfunding_esdt::*;
 use multiversx_sc::types::EgldOrEsdtTokenIdentifier;
-use multiversx_sc_scenario::{mandos_system::model::*, *};
+use multiversx_sc_scenario::{scenario_model::*, *};
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

@@ -1,8 +1,8 @@
 use crate::{mandos_to_erdrs_address, Interactor, InteractorResult};
 use log::info;
 use multiversx_sc_scenario::{
-    mandos_system::model::{ScDeployStep, TypedScDeploy},
     multiversx_sc::codec::{CodecFrom, TopEncodeMulti},
+    scenario_model::{ScDeployStep, TypedScDeploy},
 };
 use multiversx_sdk::data::{address::Address as ErdrsAddress, transaction::Transaction};
 

@@ -1,6 +1,6 @@
 use crate::{
-    mandos_system::model::Scenario,
     num_bigint::BigUint,
+    scenario::model::Scenario,
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,

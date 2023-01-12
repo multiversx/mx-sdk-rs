@@ -9,9 +9,16 @@ use std::path::Path;
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
 pub use whitebox as testing_framework;
 
-pub use multiversx_chain_vm::{bech32, mandos_system, num_bigint, ContractInfo, DebugApi};
+pub use multiversx_chain_vm::{
+    self, bech32, multiversx_sc, num_bigint, scenario_format, ContractInfo, DebugApi,
+};
 
-pub use multiversx_chain_vm::{self, multiversx_sc, scenario_format};
+/// Exposing the scenario model. Might be moved in the future,
+/// but the export will hopefully remain the same.
+pub use multiversx_chain_vm::scenario::model as scenario_model;
+
+/// For backwards compatibility, will be removed.
+pub use multiversx_chain_vm::scenario as mandos_system;
 
 pub use facade::ScenarioWorld;
 pub use scenario_go_runner::run_go;

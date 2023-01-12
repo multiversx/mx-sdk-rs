@@ -1,11 +1,11 @@
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, InteractorResult};
 use log::info;
 use multiversx_sc_scenario::{
-    mandos_system::model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     multiversx_sc::{
         codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,
     },
+    scenario_model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;

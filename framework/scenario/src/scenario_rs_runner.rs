@@ -1,6 +1,4 @@
-use crate::{
-    multiversx_chain_vm::mandos_system::executor::parse_execute_mandos_steps, ScenarioWorld,
-};
+use crate::{multiversx_chain_vm::scenario::executor::parse_execute_mandos_steps, ScenarioWorld};
 use std::path::Path;
 
 /// Runs scenario test using the Rust infrastructure and the debug mode.

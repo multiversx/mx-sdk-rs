@@ -11,8 +11,8 @@ use multiversx_sc::{
     types::{Address, CodeMetadata},
 };
 use multiversx_sc_scenario::{
-    mandos_system::model::*,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
+    scenario_model::*,
     ContractInfo, DebugApi, ScenarioWorld,
 };
 use num_bigint::BigUint;

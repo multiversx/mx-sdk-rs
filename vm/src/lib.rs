@@ -5,12 +5,12 @@ pub mod api;
 pub mod bech32;
 mod display_util;
 mod managed_test_util;
-pub mod mandos_system;
+pub mod scenario;
 pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 
-pub use crate::mandos_system::executor::*;
+pub use crate::scenario::executor::*;
 pub use display_util::*;
 pub use managed_test_util::*;
 

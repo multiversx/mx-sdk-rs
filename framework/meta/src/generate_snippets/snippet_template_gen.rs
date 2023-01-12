@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{{
         types::{{Address, CodeMetadata}},
     }},
     multiversx_chain_vm::{{
-        bech32, scenario_format::interpret_trait::InterpreterContext, mandos_system::model::*, ContractInfo,
+        bech32, scenario_format::interpret_trait::InterpreterContext, scenario_model::*, ContractInfo,
         DebugApi,
     }},
     env_logger,

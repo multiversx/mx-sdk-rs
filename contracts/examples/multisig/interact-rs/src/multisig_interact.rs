@@ -13,7 +13,7 @@ use multiversx_sc_snippets::{
         types::{Address, CodeMetadata},
     },
     multiversx_sc_scenario::{
-        bech32, mandos_system::model::*, scenario_format::interpret_trait::InterpreterContext,
+        bech32, scenario_format::interpret_trait::InterpreterContext, scenario_model::*,
         ContractInfo, DebugApi,
     },
     tokio, Interactor,
