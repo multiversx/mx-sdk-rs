@@ -8,50 +8,46 @@ use crate::{
 use multiversx_chain_vm::mandos_system::model::*;
 
 impl StepHandler for ScenarioWorld {
-    fn mandos_set_state(&mut self, set_state_step: SetStateStep) -> &mut Self {
-        self.blockchain_mock.mandos_set_state(set_state_step);
+    fn set_state_step(&mut self, step: SetStateStep) -> &mut Self {
+        self.blockchain_mock.set_state_step(step);
         self
     }
 
     /// Adds a SC call step, as specified in the `sc_call_step` argument, then executes it.
-    fn mandos_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
-        self.blockchain_mock.mandos_sc_call(sc_call_step);
+    fn sc_call_step(&mut self, step: ScCallStep) -> &mut Self {
+        self.blockchain_mock.sc_call_step(step);
         self
     }
 
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
-    fn mandos_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
-        self.blockchain_mock.mandos_sc_query(sc_query_step);
+    fn sc_query_step(&mut self, step: ScQueryStep) -> &mut Self {
+        self.blockchain_mock.sc_query_step(step);
         self
     }
 
     /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
-    fn mandos_sc_deploy(&mut self, sc_deploy_step: ScDeployStep) -> &mut Self {
-        self.blockchain_mock.mandos_sc_deploy(sc_deploy_step);
+    fn sc_deploy_step(&mut self, step: ScDeployStep) -> &mut Self {
+        self.blockchain_mock.sc_deploy_step(step);
         self
     }
 
-    fn mandos_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
-        self.blockchain_mock.mandos_transfer(transfer_step);
+    fn transfer_step(&mut self, step: TransferStep) -> &mut Self {
+        self.blockchain_mock.transfer_step(step);
         self
     }
 
-    fn mandos_validator_reward(
-        &mut self,
-        validator_rewards_step: ValidatorRewardStep,
-    ) -> &mut Self {
-        self.blockchain_mock
-            .mandos_validator_reward(validator_rewards_step);
+    fn validator_reward_step(&mut self, step: ValidatorRewardStep) -> &mut Self {
+        self.blockchain_mock.validator_reward_step(step);
         self
     }
 
-    fn mandos_check_state(&mut self, check_state_step: CheckStateStep) -> &mut Self {
-        self.blockchain_mock.mandos_check_state(check_state_step);
+    fn check_state_step(&mut self, step: CheckStateStep) -> &mut Self {
+        self.blockchain_mock.check_state_step(step);
         self
     }
 
-    fn mandos_dump_state(&mut self) -> &mut Self {
-        self.blockchain_mock.mandos_dump_state();
+    fn dump_state_step(&mut self) -> &mut Self {
+        self.blockchain_mock.dump_state_step();
         self
     }
 }
