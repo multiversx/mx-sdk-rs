@@ -32,12 +32,12 @@ pub trait StepHandler: TypedScCallExecutor + TypedScDeployExecutor + TypedScQuer
     /// Adds a dump state step, then executes it.
     fn dump_state_step(&mut self) -> &mut Self;
 
-    #[deprecated(since = "0.39.0", note = "Renamed, use `mandos_set_state` instead.")]
+    #[deprecated(since = "0.39.0", note = "Renamed, use `set_state_step` instead.")]
     fn mandos_set_state(&mut self, step: SetStateStep) -> &mut Self {
         self.set_state_step(step)
     }
 
-    #[deprecated(since = "0.39.0", note = "Renamed, use `run_go` instead.")]
+    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_call_step` instead.")]
     fn mandos_sc_call(&mut self, step: ScCallStep) -> &mut Self {
         self.sc_call_step(step)
     }
