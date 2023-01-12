@@ -3,10 +3,11 @@ fn init_go() {
     multiversx_sc_scenario::run_go("scenarios/init.scen.json");
 }
 
-// #[test]
-// fn reject_transfer_go() {
-// 	multiversx_sc_scenario::run_go("scenarios/reject_transfer.scen.json");
-// }
+#[ignore]
+#[test]
+fn reject_transfer_go() {
+    multiversx_sc_scenario::run_go("scenarios/reject_transfer.scen.json");
+}
 
 #[test]
 fn simple_transfer_full_go() {

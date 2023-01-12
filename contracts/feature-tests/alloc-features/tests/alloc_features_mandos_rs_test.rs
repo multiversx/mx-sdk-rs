@@ -16,40 +16,47 @@ fn boxed_bytes_zeros_rs() {
     multiversx_sc_scenario::run_rs("scenarios/boxed_bytes_zeros.scen.json", world());
 }
 
-// #[test]
-// fn crypto_elliptic_curves_legacy_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_elliptic_curves_legacy.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_elliptic_curves_legacy_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_elliptic_curves_legacy.scen.json", world());
+}
 
 #[test]
 fn crypto_keccak256_legacy_alloc_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_keccak256_legacy_alloc.scen.json", world());
 }
 
-// #[test]
-// fn crypto_ripemd160_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_ripemd160_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160.scen.json", world());
+}
 
 #[test]
 fn crypto_sha256_legacy_alloc_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_sha256_legacy_alloc.scen.json", world());
 }
 
-// #[test]
-// fn crypto_verify_bls_legacy_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_bls_legacy.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_verify_bls_legacy_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_verify_bls_legacy.scen.json", world());
+}
 
 #[test]
 fn crypto_verify_ed25519_legacy_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_ed25519_legacy.scen.json", world());
 }
 
-// #[test]
-// fn crypto_verify_secp256k1_legacy_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_secp256k1_legacy.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn crypto_verify_secp256k1_legacy_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/crypto_verify_secp256k1_legacy.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn echo_async_result_empty_rs() {

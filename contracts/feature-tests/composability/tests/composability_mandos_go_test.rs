@@ -388,15 +388,17 @@ fn forwarder_validate_token_identifier_go() {
     multiversx_sc_scenario::run_go("scenarios/forwarder_validate_token_identifier.scen.json");
 }
 
-// #[test]
-// fn promises_multi_transfer_go() {
-//     multiversx_sc_scenario::run_go("scenarios-promises/promises_multi_transfer.scen.json");
-// }
+#[ignore]
+#[test]
+fn promises_multi_transfer_go() {
+    multiversx_sc_scenario::run_go("scenarios-promises/promises_multi_transfer.scen.json");
+}
 
-// #[test]
-// fn promises_single_transfer_go() {
-//     multiversx_sc_scenario::run_go("scenarios-promises/promises_single_transfer.scen.json");
-// }
+#[ignore]
+#[test]
+fn promises_single_transfer_go() {
+    multiversx_sc_scenario::run_go("scenarios-promises/promises_single_transfer.scen.json");
+}
 
 #[test]
 fn proxy_test_init_go() {

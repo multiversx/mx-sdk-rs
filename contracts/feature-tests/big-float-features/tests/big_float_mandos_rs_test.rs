@@ -36,13 +36,14 @@ fn big_float_new_from_int_rs() {
     multiversx_sc_scenario::run_rs("scenarios/big_float_new_from_int.scen.json", world());
 }
 
-// #[test]
-// fn big_float_new_from_managed_buffer_rs() {
-//     multiversx_sc_scenario::run_rs(
-//         "scenarios/big_float_new_from_managed_buffer.scen.json",
-//         world(),
-//     );
-// }
+#[ignore]
+#[test]
+fn big_float_new_from_managed_buffer_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/big_float_new_from_managed_buffer.scen.json",
+        world(),
+    );
+}
 
 #[test]
 fn big_float_new_from_parts_rs() {
@@ -59,7 +60,8 @@ fn big_float_operators_rs() {
     multiversx_sc_scenario::run_rs("scenarios/big_float_operators.scen.json", world());
 }
 
-// #[test]
-// fn big_float_operator_checks_rs() {
-//     multiversx_sc_scenario::run_rs("scenarios/big_float_operator_checks.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn big_float_operator_checks_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/big_float_operator_checks.scen.json", world());
+}

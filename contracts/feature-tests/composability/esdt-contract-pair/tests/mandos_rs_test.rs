@@ -38,7 +38,8 @@ fn simple_transfer_full_wrong_token_rs() {
 }
 
 // TODO: implement ESDTTransfer + async call
-// #[test]
-// fn rejected_transfer_rs() {
-// 	multiversx_sc_scenario::run_rs("scenarios/reject_transfer.scen.json", world());
-// }
+#[ignore]
+#[test]
+fn rejected_transfer_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/reject_transfer.scen.json", world());
+}
