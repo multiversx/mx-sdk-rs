@@ -9,13 +9,13 @@ use crate::{
 };
 
 impl BlockchainMock {
-    pub fn mandos_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
+    pub fn perform_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
         self.with_borrowed(|state| ((), execute(state, &transfer_step.tx)));
         self.mandos_trace.steps.push(Step::Transfer(transfer_step));
         self
     }
 
-    pub fn mandos_validator_reward(
+    pub fn perform_validator_reward(
         &mut self,
         validator_rewards_step: ValidatorRewardStep,
     ) -> &mut Self {

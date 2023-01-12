@@ -19,7 +19,7 @@ fn adder_mandos_constructed() {
     let owner_address = "address:owner";
     let mut adder_contract = ContractInfo::<adder::Proxy<DebugApi>>::new("sc:adder");
 
-    world.mandos_set_state(
+    world.set_state_step(
         SetStateStep::new()
             .put_account(owner_address, Account::new().nonce(1))
             .new_address(owner_address, 1, &adder_contract),
@@ -48,7 +48,7 @@ fn adder_mandos_constructed() {
         .expect(TxExpect::ok().no_result())
         .execute(&mut world);
 
-    world.mandos_check_state(
+    world.check_state_step(
         CheckStateStep::new()
             .put_account(owner_address, CheckAccount::new())
             .put_account(
@@ -57,5 +57,5 @@ fn adder_mandos_constructed() {
             ),
     );
 
-    world.write_mandos_trace("trace2.scen.json");
+    world.write_scenario_trace("trace2.scen.json");
 }
