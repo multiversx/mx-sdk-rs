@@ -9,11 +9,11 @@ name = "format-tests"
 path = "src/format_tests.rs"
 
 [dependencies.multiversx-sc]
-version = "0.38.0"
+version = "0.39.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-chain-vm]
-version = "0.38.0"
+version = "0.1.0"
 path = "../../../vm"
 
 [dev-dependencies]

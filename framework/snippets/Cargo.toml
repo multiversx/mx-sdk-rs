@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.38.0"
+version = "0.39.0"
 edition = "2021"
 
 authors = [
@@ -23,10 +23,10 @@ log = "0.4.17"
 env_logger = "0.8.4"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.38.0"
+version = "=0.39.0"
 path = "../scenario"
 
 [dependencies.multiversx-sdk]
-version = "=0.2.1"
+version = "=0.1.0"
 path = "../../sdk/core"
 

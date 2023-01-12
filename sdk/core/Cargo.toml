@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.2.1"
+version = "0.1.0"
 edition = "2021"
 
 authors = [
@@ -13,7 +13,7 @@ homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
 description = "SDK for interacting with the MultiversX blockchain"
 categories = ["cryptography::cryptocurrencies", "api-bindings"]
-keywords = ["multiversx", "blockchain", "sdk", "api", "rpc", "tokio"]
+keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [dependencies]
 tokio = { version = "1.12.0", features = ["full"] }
