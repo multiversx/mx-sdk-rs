@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::*;
 
-fn world() -> BlockchainMock {
-    let mut blockchain = BlockchainMock::new();
+fn world() -> ScenarioWorld {
+    let mut blockchain = ScenarioWorld::new();
     blockchain.register_contract(
         "file:output/send-tx-repeat.wasm",
         send_tx_repeat::ContractBuilder,
@@ -11,5 +11,5 @@ fn world() -> BlockchainMock {
 
 #[test]
 fn send_tx_repeat_mandos_rs() {
-    multiversx_sc_scenario::scenario_rs("scenarios/send_tx_repeat.scen.json", world());
+    multiversx_sc_scenario::run_rs("scenarios/send_tx_repeat.scen.json", world());
 }

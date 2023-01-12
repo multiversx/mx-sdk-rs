@@ -448,8 +448,8 @@ fn test_add() {
     let _ = multiversx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-fn world() -> multiversx_sc_scenario::BlockchainMock {
-    let mut blockchain = multiversx_sc_scenario::BlockchainMock::new();
+fn world() -> multiversx_sc_scenario::ScenarioWorld {
+    let mut blockchain = multiversx_sc_scenario::ScenarioWorld::new();
     blockchain.register_contract(
         "file:../contracts/examples/adder/output/adder.wasm",
         sample_adder::ContractBuilder,
@@ -459,7 +459,7 @@ fn world() -> multiversx_sc_scenario::BlockchainMock {
 
 #[test]
 fn test_mandos() {
-    multiversx_sc_scenario::scenario_rs(
+    multiversx_sc_scenario::run_rs(
         "../contracts/examples/adder/scenarios/adder.scen.json",
         world(),
     );

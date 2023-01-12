@@ -13,12 +13,12 @@ use multiversx_sc::{
 use multiversx_sc_scenario::{
     mandos_system::model::*,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-    BlockchainMock, ContractInfo, DebugApi,
+    ContractInfo, DebugApi, ScenarioWorld,
 };
 use num_bigint::BigUint;
 
-fn world() -> BlockchainMock {
-    let mut blockchain = BlockchainMock::new();
+fn world() -> ScenarioWorld {
+    let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_contract("file:test-contracts/adder.wasm", adder::ContractBuilder);
@@ -80,7 +80,7 @@ type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 type AdderContract = ContractInfo<adder::Proxy<DebugApi>>;
 
 struct MultisigTestState {
-    world: BlockchainMock,
+    world: ScenarioWorld,
     owner: AddressValue,
     alice: AddressValue,
     bob: AddressValue,

@@ -33,24 +33,8 @@ pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
 
 #[deprecated(
     since = "0.39.0",
-    note = "The old scenario testing method. Rename to `run_go`."
-)]
-pub fn scenario_go<P: AsRef<Path>>(relative_path: P) {
-    run_go(relative_path);
-}
-
-#[deprecated(
-    since = "0.39.0",
     note = "The old scenario testing method. Rename to `run_rs`."
 )]
 pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
-    run_rs(relative_path, world);
-}
-
-#[deprecated(
-    since = "0.39.0",
-    note = "The old scenario testing method. Rename to `run_rs`."
-)]
-pub fn scenario_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
     run_rs(relative_path, world);
 }
