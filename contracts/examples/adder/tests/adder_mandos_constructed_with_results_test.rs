@@ -1,6 +1,6 @@
 use adder::*;
 use multiversx_sc::storage::mappers::SingleValue;
-use multiversx_sc_scenario::{mandos_system::model::*, num_bigint::BigUint, *}; // TODO: clean up imports
+use multiversx_sc_scenario::{num_bigint::BigUint, scenario_model::*, *}; // TODO: clean up imports
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
