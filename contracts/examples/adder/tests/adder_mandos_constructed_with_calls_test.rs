@@ -11,7 +11,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_mandos_constructed_raw() {
+fn adder_scenario_constructed_raw() {
     let _ = DebugApi::dummy();
     let mut world = world();
     let ic = world.interpreter_context();

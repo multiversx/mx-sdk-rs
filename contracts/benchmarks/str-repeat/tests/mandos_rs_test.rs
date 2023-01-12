@@ -7,6 +7,6 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn test_str_repeat_mandos_rs() {
+fn test_str_repeat_rs() {
     multiversx_sc_scenario::run_rs("scenarios/str_repeat.scen.json", world());
 }
