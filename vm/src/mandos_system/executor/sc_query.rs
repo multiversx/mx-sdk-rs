@@ -15,7 +15,7 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
-    pub fn mandos_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
+    pub fn perform_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
         let _ = self.with_borrowed(|state| execute_and_check(state, &sc_query_step));
         self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
         self
@@ -26,7 +26,7 @@ impl BlockchainMock {
     /// It also sets in the trace the expected result to be the actual returned result.
     ///
     /// It is the duty of the test developer to check that the result is actually correct after the call.
-    pub fn mandos_sc_query_expect_result<OriginalResult, RequestedResult>(
+    pub fn perform_sc_query_expect_result<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_query: TypedScQuery<OriginalResult>,
     ) -> RequestedResult
@@ -59,7 +59,7 @@ impl TypedScQueryExecutor for BlockchainMock {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.mandos_sc_query_expect_result(typed_sc_call)
+        self.perform_sc_query_expect_result(typed_sc_call)
     }
 }
 

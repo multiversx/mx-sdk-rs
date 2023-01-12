@@ -17,7 +17,7 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
-    pub fn mandos_sc_deploy(&mut self, sc_deploy_step: ScDeployStep) -> &mut Self {
+    pub fn perform_sc_deploy(&mut self, sc_deploy_step: ScDeployStep) -> &mut Self {
         self.with_borrowed(|state| {
             let (_, _, state) = execute_and_check(state, &sc_deploy_step);
             ((), state)
