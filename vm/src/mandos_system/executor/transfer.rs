@@ -4,14 +4,16 @@ use crate::{
 };
 
 use crate::{
-    sc_call::tx_esdt_transfers_from_mandos, tx_execution::execute_sc_call, tx_mock::TxInput,
+    sc_call::tx_esdt_transfers_from_scenario, tx_execution::execute_sc_call, tx_mock::TxInput,
     world_mock::BlockchainMock,
 };
 
 impl BlockchainMock {
     pub fn perform_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
         self.with_borrowed(|state| ((), execute(state, &transfer_step.tx)));
-        self.mandos_trace.steps.push(Step::Transfer(transfer_step));
+        self.scenario_trace
+            .steps
+            .push(Step::Transfer(transfer_step));
         self
     }
 
@@ -23,7 +25,7 @@ impl BlockchainMock {
             &validator_rewards_step.tx.to.to_address(),
             &validator_rewards_step.tx.egld_value.value,
         );
-        self.mandos_trace
+        self.scenario_trace
             .steps
             .push(Step::ValidatorReward(validator_rewards_step));
         self
@@ -35,7 +37,7 @@ fn execute(mut state: BlockchainMock, tx_transfer: &TxTransfer) -> BlockchainMoc
         from: tx_transfer.from.value.clone(),
         to: tx_transfer.to.value.clone(),
         egld_value: tx_transfer.egld_value.value.clone(),
-        esdt_values: tx_esdt_transfers_from_mandos(tx_transfer.esdt_value.as_slice()),
+        esdt_values: tx_esdt_transfers_from_scenario(tx_transfer.esdt_value.as_slice()),
         func_name: TxFunctionName::EMPTY,
         args: Vec::new(),
         gas_limit: tx_transfer.gas_limit.value,

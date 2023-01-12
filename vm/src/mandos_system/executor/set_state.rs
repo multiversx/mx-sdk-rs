@@ -9,7 +9,9 @@ use crate::world_mock::{
 impl BlockchainMock {
     pub fn perform_set_state(&mut self, set_state_step: SetStateStep) -> &mut Self {
         execute(self, &set_state_step);
-        self.mandos_trace.steps.push(Step::SetState(set_state_step));
+        self.scenario_trace
+            .steps
+            .push(Step::SetState(set_state_step));
         self
     }
 }
@@ -97,7 +99,7 @@ fn convert_mandos_esdt_to_world_mock(mandos_esdt: &crate::mandos_system::model::
                     .iter()
                     .map(|mandos_instance| {
                         let mock_instance =
-                            convert_mandos_esdt_instance_to_world_mock(mandos_instance);
+                            convert_scenario_esdt_instance_to_world_mock(mandos_instance);
                         (mock_instance.nonce, mock_instance)
                     })
                     .collect(),
@@ -123,38 +125,38 @@ fn convert_mandos_esdt_to_world_mock(mandos_esdt: &crate::mandos_system::model::
     }
 }
 
-fn convert_mandos_esdt_instance_to_world_mock(
-    mandos_esdt: &crate::mandos_system::model::EsdtInstance,
+fn convert_scenario_esdt_instance_to_world_mock(
+    scenario_esdt: &crate::mandos_system::model::EsdtInstance,
 ) -> EsdtInstance {
     EsdtInstance {
-        nonce: mandos_esdt
+        nonce: scenario_esdt
             .nonce
             .as_ref()
             .map(|nonce| nonce.value)
             .unwrap_or_default(),
-        balance: mandos_esdt
+        balance: scenario_esdt
             .balance
             .as_ref()
             .map(|value| value.value.clone())
             .unwrap_or_default(),
         metadata: EsdtInstanceMetadata {
             name: Vec::new(),
-            creator: mandos_esdt
+            creator: scenario_esdt
                 .creator
                 .as_ref()
                 .map(|creator| Address::from_slice(creator.value.as_slice())),
-            royalties: mandos_esdt
+            royalties: scenario_esdt
                 .royalties
                 .as_ref()
                 .map(|royalties| royalties.value)
                 .unwrap_or_default(),
-            hash: mandos_esdt.hash.as_ref().map(|hash| hash.value.clone()),
-            uri: mandos_esdt
+            hash: scenario_esdt.hash.as_ref().map(|hash| hash.value.clone()),
+            uri: scenario_esdt
                 .uri
                 .iter()
                 .map(|uri| uri.value.clone())
                 .collect(),
-            attributes: mandos_esdt
+            attributes: scenario_esdt
                 .attributes
                 .as_ref()
                 .map(|attributes| attributes.value.clone())
@@ -165,21 +167,21 @@ fn convert_mandos_esdt_instance_to_world_mock(
 
 fn update_block_info(
     block_info: &mut CrateBlockInfo,
-    mandos_block_info: &crate::mandos_system::model::BlockInfo,
+    scenario_block_info: &crate::mandos_system::model::BlockInfo,
 ) {
-    if let Some(u64_value) = &mandos_block_info.block_timestamp {
+    if let Some(u64_value) = &scenario_block_info.block_timestamp {
         block_info.block_timestamp = u64_value.value;
     }
-    if let Some(u64_value) = &mandos_block_info.block_nonce {
+    if let Some(u64_value) = &scenario_block_info.block_nonce {
         block_info.block_nonce = u64_value.value;
     }
-    if let Some(u64_value) = &mandos_block_info.block_epoch {
+    if let Some(u64_value) = &scenario_block_info.block_epoch {
         block_info.block_epoch = u64_value.value;
     }
-    if let Some(u64_value) = &mandos_block_info.block_round {
+    if let Some(u64_value) = &scenario_block_info.block_round {
         block_info.block_round = u64_value.value;
     }
-    if let Some(bytes_value) = &mandos_block_info.block_random_seed {
+    if let Some(bytes_value) = &scenario_block_info.block_random_seed {
         const SEED_LEN: usize = 48;
         let val = &bytes_value.value;
 

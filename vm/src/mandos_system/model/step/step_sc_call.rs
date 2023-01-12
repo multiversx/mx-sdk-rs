@@ -105,10 +105,10 @@ impl ScCallStep {
     where
         CC: ContractCall<DebugApi>,
     {
-        let (to_str, function, mandos_args) = process_contract_call(contract_call);
+        let (to_str, function, scenario_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
-        for arg in mandos_args {
+        for arg in scenario_args {
             self = self.argument(arg.as_str());
         }
         self
@@ -151,8 +151,8 @@ where
     );
     let function =
         String::from_utf8(full_cc.basic.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
-    let mandos_args = convert_call_args(&full_cc.basic.arg_buffer);
-    (to_str, function, mandos_args)
+    let scenario_args = convert_call_args(&full_cc.basic.arg_buffer);
+    (to_str, function, scenario_args)
 }
 
 pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String> {

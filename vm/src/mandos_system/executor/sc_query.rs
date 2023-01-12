@@ -17,7 +17,7 @@ impl BlockchainMock {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
     pub fn perform_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
         let _ = self.with_borrowed(|state| execute_and_check(state, &sc_query_step));
-        self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
+        self.scenario_trace.steps.push(Step::ScQuery(sc_query_step));
         self
     }
 
@@ -43,7 +43,7 @@ impl BlockchainMock {
             tx_expect = tx_expect.result(result_hex_string.as_str());
         }
         sc_query_step = sc_query_step.expect(tx_expect);
-        self.mandos_trace.steps.push(Step::ScQuery(sc_query_step));
+        self.scenario_trace.steps.push(Step::ScQuery(sc_query_step));
 
         let mut raw_results = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_results, PanicErrorHandler).unwrap()

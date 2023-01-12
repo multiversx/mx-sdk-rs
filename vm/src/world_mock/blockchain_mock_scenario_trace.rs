@@ -16,13 +16,13 @@ impl BlockchainMock {
     pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
         self.scenario_trace_prettify();
 
-        let mandos_trace = core::mem::take(&mut self.mandos_trace);
+        let mandos_trace = core::mem::take(&mut self.scenario_trace);
         let mandos_trace_raw = mandos_trace.into_raw();
         mandos_trace_raw.save_to_file(file_path);
     }
 
     fn scenario_trace_prettify(&mut self) {
-        for step in &mut self.mandos_trace.steps {
+        for step in &mut self.scenario_trace.steps {
             match step {
                 Step::ExternalSteps(_) => {},
                 Step::SetState(set_state_step) => {
@@ -40,39 +40,39 @@ impl BlockchainMock {
 
                     for (addr_key, acc) in acc_map_keys.into_iter().zip(accounts.into_iter()) {
                         let pretty_addr_key =
-                            addr_key_to_pretty(&self.addr_to_mandos_string_map, addr_key);
+                            addr_key_to_pretty(&self.addr_to_pretty_string_map, addr_key);
                         set_state_step.accounts.insert(pretty_addr_key, acc);
                     }
                 },
                 Step::ScCall(sc_call_step) => {
                     sc_call_step.tx.from = addr_value_to_pretty(
-                        &self.addr_to_mandos_string_map,
+                        &self.addr_to_pretty_string_map,
                         sc_call_step.tx.from.clone(),
                     );
                     sc_call_step.tx.to = addr_value_to_pretty(
-                        &self.addr_to_mandos_string_map,
+                        &self.addr_to_pretty_string_map,
                         sc_call_step.tx.to.clone(),
                     );
                 },
                 Step::ScQuery(sc_query_step) => {
                     sc_query_step.tx.to = addr_value_to_pretty(
-                        &self.addr_to_mandos_string_map,
+                        &self.addr_to_pretty_string_map,
                         sc_query_step.tx.to.clone(),
                     );
                 },
                 Step::ScDeploy(sc_deploy_step) => {
                     sc_deploy_step.tx.from = addr_value_to_pretty(
-                        &self.addr_to_mandos_string_map,
+                        &self.addr_to_pretty_string_map,
                         sc_deploy_step.tx.from.clone(),
                     );
                 },
                 Step::Transfer(transfer_step) => {
                     transfer_step.tx.from = addr_value_to_pretty(
-                        &self.addr_to_mandos_string_map,
+                        &self.addr_to_pretty_string_map,
                         transfer_step.tx.from.clone(),
                     );
                     transfer_step.tx.to = addr_value_to_pretty(
-                        &self.addr_to_mandos_string_map,
+                        &self.addr_to_pretty_string_map,
                         transfer_step.tx.to.clone(),
                     );
                 },
@@ -94,7 +94,7 @@ impl BlockchainMock {
                     for (addr_key, acc) in acc_map_keys.into_iter().zip(check_accounts.into_iter())
                     {
                         let pretty_addr_key =
-                            addr_key_to_pretty(&self.addr_to_mandos_string_map, addr_key);
+                            addr_key_to_pretty(&self.addr_to_pretty_string_map, addr_key);
                         check_state_step
                             .accounts
                             .accounts
@@ -133,7 +133,7 @@ fn addr_value_to_pretty(
     }
 }
 
-pub fn address_as_mandos_string(address: &Address) -> String {
+pub fn address_as_scenario_string(address: &Address) -> String {
     let addr_bytes = address.as_array();
     let (string_start_index, prefix) = if super::is_smart_contract_address(address) {
         (SC_ADDRESS_NUM_LEADING_ZEROS as usize, SC_ADDR_PREFIX)

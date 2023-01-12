@@ -13,7 +13,7 @@ pub struct TxLog {
 }
 
 impl TxLog {
-    pub fn mandos_check(&self, check_log: &crate::mandos_system::model::CheckLog) -> bool {
+    pub fn scenario_check(&self, check_log: &crate::mandos_system::model::CheckLog) -> bool {
         check_log.address.check(self.address.as_bytes())
             && check_log.endpoint.check(&self.endpoint)
             && check_log.topics.check(self.topics.as_slice())

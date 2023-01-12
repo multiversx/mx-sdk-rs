@@ -30,7 +30,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     let mut all_esdt_raw = BTreeMap::new();
     for (token_id, esdt_data) in acc.esdt.iter() {
-        let token_id_raw = bytes_to_mandos_string_or_hex(token_id);
+        let token_id_raw = bytes_to_scenario_string_or_hex(token_id);
         let esdt_raw = esdt_data_as_raw(esdt_data);
 
         let _ = all_esdt_raw.insert(token_id_raw, esdt_raw);
@@ -38,7 +38,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     let mut storage_raw = BTreeMap::new();
     for (key, value) in acc.storage.iter() {
-        let key_raw = bytes_to_mandos_string_or_hex(key);
+        let key_raw = bytes_to_scenario_string_or_hex(key);
         let value_raw = bytes_as_raw(value);
 
         let _ = storage_raw.insert(key_raw, value_raw);
@@ -108,7 +108,7 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
     let mut all_esdt_raw = Vec::with_capacity(tx_call.esdt.len());
     for esdt in tx_call.esdt.iter() {
         let esdt_raw = TxESDTRaw {
-            token_identifier: Some(ValueSubTree::Str(bytes_to_mandos_string_or_hex(
+            token_identifier: Some(ValueSubTree::Str(bytes_to_scenario_string_or_hex(
                 &esdt.token_identifier,
             ))),
             nonce: Some(u64_as_raw(esdt.nonce)),
@@ -166,8 +166,8 @@ pub(crate) fn tx_expect_as_raw(tx_expect: &TxExpectMandos) -> TxExpectRaw {
     let msg_raw = if tx_expect.message == STAR_STR {
         CheckBytesValueRaw::Star
     } else {
-        let mandos_formatted_str = "str:".to_owned() + &tx_expect.message;
-        CheckBytesValueRaw::Equal(ValueSubTree::Str(mandos_formatted_str))
+        let scenario_formatted_str = "str:".to_owned() + &tx_expect.message;
+        CheckBytesValueRaw::Equal(ValueSubTree::Str(scenario_formatted_str))
     };
 
     TxExpectRaw {
@@ -226,13 +226,13 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             roles: roles_as_str,
         };
 
-        let token_id_str = bytes_to_mandos_string_or_hex(token_id);
+        let token_id_str = bytes_to_scenario_string_or_hex(token_id);
         all_check_esdt_raw.insert(token_id_str, CheckEsdtRaw::Full(esdt_check_raw));
     }
 
     let mut raw_storage = BTreeMap::new();
     for (key, value) in acc.storage.iter() {
-        let key_as_str = bytes_to_mandos_string_or_hex(key);
+        let key_as_str = bytes_to_scenario_string_or_hex(key);
         let check_val_raw = CheckBytesValueRaw::Equal(bytes_as_raw(value));
 
         raw_storage.insert(key_as_str, check_val_raw);
@@ -277,7 +277,7 @@ pub(crate) fn opt_raw_value_to_check_raw(raw_value: &Option<ValueSubTree>) -> Ch
     }
 }
 
-pub(crate) fn bytes_to_mandos_string_or_hex(bytes: &[u8]) -> String {
+pub(crate) fn bytes_to_scenario_string_or_hex(bytes: &[u8]) -> String {
     let conversion_result = String::from_utf8(bytes.to_vec());
     match conversion_result {
         core::result::Result::Ok(bytes_as_str) => format!("str:{bytes_as_str}"),

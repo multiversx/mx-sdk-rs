@@ -213,7 +213,7 @@ impl MultisigTestState {
 
     fn multisig_propose_adder_deploy(&mut self, caller: &Address) -> usize {
         self.world.set_state_step(SetStateStep::new().new_address(
-            &self.multisig.mandos_address_expr,
+            &self.multisig.scenario_address_expr,
             0,
             &self.adder_multisig,
         ));
