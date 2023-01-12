@@ -14,7 +14,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn crowdfunding_mandos_rust_test() {
+fn crowdfunding_scenario_rust_test() {
     let _ = DebugApi::dummy();
     let mut world = world();
     let ctx = world.interpreter_context();

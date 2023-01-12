@@ -22,7 +22,9 @@ impl BlockchainMock {
             let (_, _, state) = execute_and_check(state, &sc_deploy_step);
             ((), state)
         });
-        self.mandos_trace.steps.push(Step::ScDeploy(sc_deploy_step));
+        self.scenario_trace
+            .steps
+            .push(Step::ScDeploy(sc_deploy_step));
         self
     }
 
@@ -32,7 +34,7 @@ impl BlockchainMock {
     ///
     /// It takes the `contract_call` argument separately from the SC call step,
     /// so we can benefit from type inference in the result.
-    pub fn mandos_sc_deploy_get_result<OriginalResult, RequestedResult>(
+    pub fn perform_sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_deploy: TypedScDeploy<OriginalResult>,
     ) -> (Address, RequestedResult)
@@ -45,7 +47,9 @@ impl BlockchainMock {
             let (tx_result, new_address, state) = execute(state, &sc_deploy_step);
             ((tx_result, new_address), state)
         });
-        self.mandos_trace.steps.push(Step::ScDeploy(sc_deploy_step));
+        self.scenario_trace
+            .steps
+            .push(Step::ScDeploy(sc_deploy_step));
 
         let mut raw_result = tx_result.result_values;
         let deser_result =
@@ -65,7 +69,7 @@ impl TypedScDeployExecutor for BlockchainMock {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.mandos_sc_deploy_get_result(typed_sc_call)
+        self.perform_sc_deploy_get_result(typed_sc_call)
     }
 }
 

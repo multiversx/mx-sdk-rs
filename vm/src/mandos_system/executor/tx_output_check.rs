@@ -44,7 +44,7 @@ pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) 
                 if i < expected_logs.list.len() {
                     let expected_log = &expected_logs.list[i];
                     assert!(
-                        actual_log.mandos_check(expected_log),
+                        actual_log.scenario_check(expected_log),
                         "Logs do not match. Tx id: '{}'. Index: {}.\nWant: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}\nHave: Address: {}, Endpoint: {}, Topics: {:?}, Data: {}",
                         tx_id,
                         i,

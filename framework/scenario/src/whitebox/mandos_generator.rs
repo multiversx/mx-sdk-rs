@@ -43,12 +43,12 @@ impl MandosGenerator {
         self.scenario.steps.push(step);
     }
 
-    pub fn set_account(&mut self, acc: &AccountData, sc_mandos_path_expr: Option<Vec<u8>>) {
+    pub fn set_account(&mut self, acc: &AccountData, sc_scenario_path_expr: Option<Vec<u8>>) {
         let mut accounts_raw = BTreeMap::new();
 
         let addr_as_str = bytes_to_hex(acc.address.as_bytes());
         let mut acc_clone = acc.clone();
-        acc_clone.contract_path = sc_mandos_path_expr;
+        acc_clone.contract_path = sc_scenario_path_expr;
 
         let acc_raw = account_as_raw(&acc_clone);
         accounts_raw.insert(addr_as_str, acc_raw);

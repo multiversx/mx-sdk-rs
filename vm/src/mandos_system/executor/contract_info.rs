@@ -12,7 +12,7 @@ use crate::mandos_system::model::{AddressKey, AddressValue};
 /// Bundles a representation of a contract with the contract proxy,
 /// so that it can be easily called in the context of a blockchain mock.
 pub struct ContractInfo<P: ProxyObjBase> {
-    pub mandos_address_expr: AddressKey,
+    pub scenario_address_expr: AddressKey,
     proxy_inst: P,
 }
 
@@ -24,37 +24,37 @@ impl<P: ProxyObjBase> ContractInfo<P> {
         let mandos_address_expr = AddressKey::from(address_expr);
         let proxy_inst = P::new_proxy_obj().contract(mandos_address_expr.value.clone().into());
         ContractInfo {
-            mandos_address_expr,
+            scenario_address_expr: mandos_address_expr,
             proxy_inst,
         }
     }
 
     pub fn to_address(&self) -> Address {
-        self.mandos_address_expr.to_address()
+        self.scenario_address_expr.to_address()
     }
 }
 
 impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressKey {
     fn from(from: &ContractInfo<P>) -> Self {
-        from.mandos_address_expr.clone()
+        from.scenario_address_expr.clone()
     }
 }
 
 impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressKey {
     fn from(from: ContractInfo<P>) -> Self {
-        from.mandos_address_expr
+        from.scenario_address_expr
     }
 }
 
 impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressValue {
     fn from(from: &ContractInfo<P>) -> Self {
-        AddressValue::from(&from.mandos_address_expr)
+        AddressValue::from(&from.scenario_address_expr)
     }
 }
 
 impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressValue {
     fn from(from: ContractInfo<P>) -> Self {
-        AddressValue::from(&from.mandos_address_expr)
+        AddressValue::from(&from.scenario_address_expr)
     }
 }
 
@@ -68,7 +68,7 @@ impl<P: ProxyObjBase> Deref for ContractInfo<P> {
 impl<P: ProxyObjBase> DerefMut for ContractInfo<P> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         let proxy_inst = core::mem::replace(&mut self.proxy_inst, P::new_proxy_obj());
-        let proxy_inst = proxy_inst.contract(self.mandos_address_expr.value.clone().into());
+        let proxy_inst = proxy_inst.contract(self.scenario_address_expr.value.clone().into());
         let _ = core::mem::replace(&mut self.proxy_inst, proxy_inst);
         &mut self.proxy_inst
     }
@@ -80,7 +80,7 @@ impl<P: ProxyObjBase> TopEncode for ContractInfo<P> {
         O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        self.mandos_address_expr
+        self.scenario_address_expr
             .value
             .top_encode_or_handle_err(output, h)
     }

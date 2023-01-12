@@ -12,7 +12,7 @@ use crate::{
 impl BlockchainMock {
     pub fn perform_check_state(&mut self, check_state_step: CheckStateStep) -> &mut Self {
         execute(self, &check_state_step.accounts);
-        self.mandos_trace
+        self.scenario_trace
             .steps
             .push(Step::CheckState(check_state_step));
         self

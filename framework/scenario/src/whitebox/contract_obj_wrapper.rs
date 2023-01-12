@@ -59,7 +59,7 @@ pub struct BlockchainStateWrapper {
     address_factory: AddressFactory,
     rc_b_mock: Rc<BlockchainMock>,
     address_to_code_path: HashMap<Address, Vec<u8>>,
-    mandos_generator: MandosGenerator,
+    scenario_generator: MandosGenerator,
     workspace_path: PathBuf,
 }
 
@@ -73,7 +73,7 @@ impl BlockchainStateWrapper {
             address_factory: AddressFactory::new(),
             rc_b_mock: Rc::new(BlockchainMock::new()),
             address_to_code_path: HashMap::new(),
-            mandos_generator: MandosGenerator::new(),
+            scenario_generator: MandosGenerator::new(),
             workspace_path: current_dir,
         }
     }
@@ -86,7 +86,7 @@ impl BlockchainStateWrapper {
         let mut full_path = self.workspace_path;
         full_path.push(file_name);
 
-        self.mandos_generator
+        self.scenario_generator
             .write_mandos_output(full_path.to_str().unwrap());
     }
 
@@ -296,7 +296,7 @@ impl BlockchainStateWrapper {
             contract_owner: owner.cloned(),
             developer_rewards: num_bigint::BigUint::zero(),
         };
-        self.mandos_generator
+        self.scenario_generator
             .set_account(&acc_data, sc_mandos_path_expr);
 
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
@@ -489,7 +489,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.current_block_info.block_epoch = block_epoch;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -499,7 +499,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.current_block_info.block_nonce = block_nonce;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -509,7 +509,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.current_block_info.block_random_seed = block_random_seed;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -519,7 +519,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.current_block_info.block_round = block_round;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -529,7 +529,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.current_block_info.block_timestamp = block_timestamp;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -539,7 +539,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.previous_block_info.block_epoch = block_epoch;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -549,7 +549,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.previous_block_info.block_nonce = block_nonce;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -559,7 +559,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.previous_block_info.block_random_seed = block_random_seed;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -569,7 +569,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.previous_block_info.block_round = block_round;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -579,7 +579,7 @@ impl BlockchainStateWrapper {
         let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         b_mock_ref.previous_block_info.block_timestamp = block_timestamp;
 
-        self.mandos_generator.set_block_info(
+        self.scenario_generator.set_block_info(
             &self.rc_b_mock.current_block_info,
             &self.rc_b_mock.previous_block_info,
         );
@@ -590,7 +590,7 @@ impl BlockchainStateWrapper {
         sc_call: ScCallMandos,
         opt_expect: Option<TxExpectMandos>,
     ) {
-        self.mandos_generator
+        self.scenario_generator
             .create_tx(&sc_call, opt_expect.as_ref());
     }
 
@@ -599,21 +599,21 @@ impl BlockchainStateWrapper {
         sc_query: ScQueryMandos,
         opt_expect: Option<TxExpectMandos>,
     ) {
-        self.mandos_generator
+        self.scenario_generator
             .create_query(&sc_query, opt_expect.as_ref());
     }
 
     pub fn add_mandos_set_account(&mut self, address: &Address) {
         if let Some(acc) = self.rc_b_mock.accounts.get(address) {
             let opt_contract_path = self.address_to_code_path.get(address);
-            self.mandos_generator
+            self.scenario_generator
                 .set_account(acc, opt_contract_path.cloned());
         }
     }
 
     pub fn add_mandos_check_account(&mut self, address: &Address) {
         if let Some(acc) = self.rc_b_mock.accounts.get(address) {
-            self.mandos_generator.check_account(acc);
+            self.scenario_generator.check_account(acc);
         }
     }
 }
