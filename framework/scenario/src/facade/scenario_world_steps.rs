@@ -5,7 +5,7 @@ use crate::{
     },
     ScenarioWorld,
 };
-use multiversx_chain_vm::mandos_system::model::*;
+use multiversx_chain_vm::scenario::model::*;
 
 impl StepHandler for ScenarioWorld {
     fn set_state_step(&mut self, step: SetStateStep) -> &mut Self {

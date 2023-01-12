@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{mandos_system::model::AddressValue, multiversx_sc::types::Address};
+use multiversx_sc_scenario::{multiversx_sc::types::Address, scenario_model::AddressValue};
 use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},

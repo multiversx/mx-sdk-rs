@@ -1,5 +1,5 @@
 use crate::{
-    mandos_system::model::{AddressKey, AddressValue, Step},
+    scenario::model::{AddressKey, AddressValue, Step},
     scenario_format::{interpret_trait::IntoRaw, serde_raw::ValueSubTree},
     BlockchainMock,
 };

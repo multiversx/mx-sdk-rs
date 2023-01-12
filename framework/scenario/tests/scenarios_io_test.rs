@@ -1,11 +1,11 @@
 use std::{fs, fs::File, io::Write};
 
 use multiversx_sc_scenario::{
-    mandos_system::model::Scenario,
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::ScenarioRaw,
     },
+    scenario_model::Scenario,
 };
 
 #[test]
