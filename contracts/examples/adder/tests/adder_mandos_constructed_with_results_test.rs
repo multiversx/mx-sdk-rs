@@ -57,5 +57,5 @@ fn adder_mandos_constructed() {
             ),
     );
 
-    world.write_mandos_trace("trace2.scen.json");
+    world.write_scenario_trace("trace2.scen.json");
 }

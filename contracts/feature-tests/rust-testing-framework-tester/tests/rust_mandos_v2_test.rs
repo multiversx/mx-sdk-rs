@@ -42,5 +42,5 @@ fn tester_deploy_test() {
     assert_eq!(new_address, adder_contract.to_address());
     assert_eq!(result, "constructor-result");
 
-    world.write_mandos_trace("scenarios/trace-deploy.scen.json");
+    world.write_scenario_trace("scenarios/trace-deploy.scen.json");
 }

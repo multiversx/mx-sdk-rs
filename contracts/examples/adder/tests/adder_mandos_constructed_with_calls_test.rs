@@ -52,5 +52,5 @@ fn adder_mandos_constructed_raw() {
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         )
-        .write_mandos_trace("trace1.scen.json");
+        .write_scenario_trace("trace1.scen.json");
 }
