@@ -13,12 +13,12 @@ fn adder_mandos_constructed_raw() {
     let mut world = world();
     let ic = world.interpreter_context();
     world
-        .mandos_set_state(
+        .set_state_step(
             SetStateStep::new()
                 .put_account("address:owner", Account::new().nonce(1))
                 .new_address("address:owner", 1, "sc:adder"),
         )
-        .mandos_sc_deploy(
+        .sc_deploy_step(
             ScDeployStep::new()
                 .from("address:owner")
                 .contract_code("file:output/adder.wasm", &ic)
@@ -26,13 +26,13 @@ fn adder_mandos_constructed_raw() {
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_sc_query(
+        .sc_query_step(
             ScQueryStep::new()
                 .to("sc:adder")
                 .function("getSum")
                 .expect(TxExpect::ok().result("5")),
         )
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from("address:owner")
                 .to("sc:adder")
@@ -40,7 +40,7 @@ fn adder_mandos_constructed_raw() {
                 .argument("3")
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account("address:owner", CheckAccount::new())
                 .put_account(

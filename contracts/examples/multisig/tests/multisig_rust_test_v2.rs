@@ -106,7 +106,7 @@ impl MultisigTestState {
             adder_multisig: AdderContract::new("sc:adder-multisig"),
         };
 
-        state.world.mandos_set_state(
+        state.world.set_state_step(
             SetStateStep::new()
                 .put_account(&state.owner, Account::new().nonce(1))
                 .put_account(&state.alice, Account::new().nonce(1))
@@ -118,7 +118,7 @@ impl MultisigTestState {
     }
 
     fn multisig_deploy(&mut self) -> &mut Self {
-        self.world.mandos_set_state(
+        self.world.set_state_step(
             SetStateStep::new()
                 .put_account(&self.owner, Account::new().nonce(1))
                 .new_address(&self.owner, 1, &self.multisig),
@@ -147,7 +147,7 @@ impl MultisigTestState {
 
     fn adder_deploy(&mut self) -> &mut Self {
         let ic = &self.world.interpreter_context();
-        self.world.mandos_set_state(
+        self.world.set_state_step(
             SetStateStep::new()
                 .put_account(&self.owner, Account::new().nonce(1))
                 .new_address(&self.owner, 1, &self.adder),
@@ -212,7 +212,7 @@ impl MultisigTestState {
     }
 
     fn multisig_propose_adder_deploy(&mut self, caller: &Address) -> usize {
-        self.world.mandos_set_state(SetStateStep::new().new_address(
+        self.world.set_state_step(SetStateStep::new().new_address(
             &self.multisig.mandos_address_expr,
             0,
             &self.adder_multisig,

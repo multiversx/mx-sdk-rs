@@ -25,7 +25,7 @@ fn tester_deploy_test() {
     let mut adder_contract =
         ContractInfo::<rust_testing_framework_tester::Proxy<DebugApi>>::new("sc:contract");
 
-    world.mandos_set_state(
+    world.set_state_step(
         SetStateStep::new()
             .put_account(owner_address, Account::new())
             .new_address(owner_address, 0, &adder_contract),

@@ -19,12 +19,12 @@ fn adder_mandos_constructed_raw() {
     let mut adder_contract = ContractInfo::<adder::Proxy<DebugApi>>::new("sc:adder");
 
     world
-        .mandos_set_state(
+        .set_state_step(
             SetStateStep::new()
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .mandos_sc_deploy(
+        .sc_deploy_step(
             ScDeployStep::new()
                 .from(owner_address)
                 .contract_code("file:output/adder.wasm", &ic)
@@ -32,19 +32,19 @@ fn adder_mandos_constructed_raw() {
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_sc_query(
+        .sc_query_step(
             ScQueryStep::new()
                 .to(&adder_contract)
                 .call_expect(adder_contract.sum(), SingleValue::from(BigUint::from(5u32))),
         )
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(owner_address)
                 .to(&adder_contract)
                 .call(adder_contract.add(3u32))
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(owner_address, CheckAccount::new())
                 .put_account(

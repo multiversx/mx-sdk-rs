@@ -29,7 +29,7 @@ fn crowdfunding_mandos_rust_test() {
     let mut cf_sc = ContractInfo::<crowdfunding_esdt::Proxy<DebugApi>>::new("sc:crowdfunding");
 
     // setup owner and crowdfunding SC
-    world.mandos_set_state(
+    world.set_state_step(
         SetStateStep::new()
             .put_account(owner_addr, Account::new())
             .new_address(owner_addr, 0, &cf_sc),
@@ -49,18 +49,18 @@ fn crowdfunding_mandos_rust_test() {
 
     // setup user accounts
     world
-        .mandos_set_state(SetStateStep::new().put_account(
+        .set_state_step(SetStateStep::new().put_account(
             first_user_addr,
             Account::new().esdt_balance(cf_token_id, 1_000u64),
         ))
-        .mandos_set_state(SetStateStep::new().put_account(
+        .set_state_step(SetStateStep::new().put_account(
             second_user_addr,
             Account::new().esdt_balance(cf_token_id, 1_000u64),
         ));
 
     // first user deposit
     world
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(first_user_addr)
                 .to(&cf_sc)
@@ -68,7 +68,7 @@ fn crowdfunding_mandos_rust_test() {
                 .call(cf_sc.fund())
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(
                     first_user_addr,
@@ -82,7 +82,7 @@ fn crowdfunding_mandos_rust_test() {
 
     // second user deposit
     world
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(second_user_addr)
                 .to(&cf_sc)
@@ -90,7 +90,7 @@ fn crowdfunding_mandos_rust_test() {
                 .call(cf_sc.fund())
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(
                     second_user_addr,
@@ -111,7 +111,7 @@ fn crowdfunding_mandos_rust_test() {
     assert_eq!(status, Status::FundingPeriod);
 
     // deadline passed
-    world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
+    world.set_state_step(SetStateStep::new().block_timestamp(deadline));
 
     // get status after deadline
     let status: Status = cf_sc
@@ -125,14 +125,14 @@ fn crowdfunding_mandos_rust_test() {
 
     // owner claim - failed campaign - nothing is transferred
     world
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(owner_addr)
                 .to(&cf_sc)
                 .call(cf_sc.claim())
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(
                     owner_addr,
@@ -146,14 +146,14 @@ fn crowdfunding_mandos_rust_test() {
 
     // first user claim - failed campaign
     world
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(first_user_addr)
                 .to(&cf_sc)
                 .call(cf_sc.claim())
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(
                     first_user_addr,
@@ -167,14 +167,14 @@ fn crowdfunding_mandos_rust_test() {
 
     // second user claim - failed campaign
     world
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(second_user_addr)
                 .to(&cf_sc)
                 .call(cf_sc.claim())
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(
                     second_user_addr,
@@ -185,10 +185,10 @@ fn crowdfunding_mandos_rust_test() {
 
     // test successful campaign
 
-    world.mandos_set_state(SetStateStep::new().block_timestamp(deadline / 2));
+    world.set_state_step(SetStateStep::new().block_timestamp(deadline / 2));
 
     // first user deposit
-    world.mandos_sc_call(
+    world.sc_call_step(
         ScCallStep::new()
             .from(first_user_addr)
             .to(&cf_sc)
@@ -198,7 +198,7 @@ fn crowdfunding_mandos_rust_test() {
     );
 
     // second user deposit
-    world.mandos_sc_call(
+    world.sc_call_step(
         ScCallStep::new()
             .from(second_user_addr)
             .to(&cf_sc)
@@ -214,7 +214,7 @@ fn crowdfunding_mandos_rust_test() {
         .execute(&mut world);
     assert_eq!(status, Status::FundingPeriod);
 
-    world.mandos_set_state(SetStateStep::new().block_timestamp(deadline));
+    world.set_state_step(SetStateStep::new().block_timestamp(deadline));
 
     let status: Status = cf_sc
         .status()
@@ -224,7 +224,7 @@ fn crowdfunding_mandos_rust_test() {
     assert_eq!(status, Status::Successful);
 
     // first user try claim - successful campaign
-    world.mandos_sc_call(
+    world.sc_call_step(
         ScCallStep::new()
             .from(first_user_addr)
             .to(&cf_sc)
@@ -237,14 +237,14 @@ fn crowdfunding_mandos_rust_test() {
 
     // owner claim successful campaign
     world
-        .mandos_sc_call(
+        .sc_call_step(
             ScCallStep::new()
                 .from(owner_addr)
                 .to(&cf_sc)
                 .call(cf_sc.claim())
                 .expect(TxExpect::ok().no_result()),
         )
-        .mandos_check_state(
+        .check_state_step(
             CheckStateStep::new()
                 .put_account(
                     owner_addr,
