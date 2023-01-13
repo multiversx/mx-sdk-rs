@@ -16,6 +16,10 @@ description = "MultiversX smart contract meta-programming tools and build system
 keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
+[[bin]]
+name = "sc-meta"
+path = "src/meta_main.rs"
+
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"

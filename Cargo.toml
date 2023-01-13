@@ -14,7 +14,18 @@ members = [
   "sdk/core",
   "sdk/scenario-format",
 
+  "tools/test-gen",
+  "tools/erdpy-snippet-generator",
+  "tools/sc-upgrade",
+
   "vm",
+
+  "contracts/modules",
+
+  "contracts/core/price-aggregator",
+  "contracts/core/price-aggregator/meta",
+  "contracts/core/wegld-swap",
+  "contracts/core/wegld-swap/meta",
 
   "contracts/benchmarks/mappers/benchmark-common",
   "contracts/benchmarks/mappers/linked-list-repeat",
@@ -33,11 +44,6 @@ members = [
   "contracts/benchmarks/str-repeat/meta",
   "contracts/benchmarks/send-tx-repeat",
   "contracts/benchmarks/send-tx-repeat/meta",
-
-  "contracts/core/price-aggregator",
-  "contracts/core/price-aggregator/meta",
-  "contracts/core/wegld-swap",
-  "contracts/core/wegld-swap/meta",
 
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
@@ -153,10 +159,5 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
-
-  "contracts/modules",
-
-  "tools/test-gen",
-  "tools/erdpy-snippet-generator",
 ]
 
