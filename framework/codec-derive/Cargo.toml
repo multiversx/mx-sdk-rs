@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-codec-derive"
-version = "0.16.0"
+version = "0.17.0"
 edition = "2021"
 
 authors = ["dorin.iancu <dorin.iancu@multiversx.com>", "Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]

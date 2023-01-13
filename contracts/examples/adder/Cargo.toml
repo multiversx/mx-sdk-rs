@@ -9,9 +9,9 @@ publish = false
 path = "src/adder.rs"
 
 [dependencies.multiversx-sc]
-version = "0.38.0"
+version = "0.39.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.38.0"
+version = "0.39.0"
 path = "../../../framework/scenario"

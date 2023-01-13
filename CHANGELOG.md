@@ -1,8 +1,41 @@
 # Change Log
 
-There are several crates in this repo, this changelog will keep track of all of them.
+This file contains a centralizes a trace of all published crate versions, with their changes in short.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## Versioning the crates
+
+The `mx-sdk-rs` repo contains many crates, grouped into several families. Crates in these families always have the same version with one another.
+
+For brevity, the changelog will only mention a short version of their name.
+
+They are:
+- `multiversx-sc`, in short `sc`, the smart contract framework, 6 crates + 3 for contracts/modules:
+	- `multiversx-sc`
+    - `multiversx-sc-derive`
+    - `multiversx-sc-meta`
+    - `multiversx-sc-scenario`
+    - `multiversx-sc-snippets`
+    - `multiversx-sc-wasm-adapter`
+    - `multiversx-sc-modules` - *standard contract modules*
+	- `multiversx-price-aggregator-sc` - *core contract*
+	- `multiversx-wegld-swap-sc` - *core contract*
+- `multiversx-sc-codec`, in short `codec`, the serializer/deserializer, 2 crates:
+	- `multiversx-sc-codec`
+	- `multiversx-sc-codec-derive`
+- `multiversx-chain-vm`, in short `vm`, a Rust VM implementation, 1 crate.
+- `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
+- `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
+
+## [sc 0.39.0, codec 0.17.0, vm 0.1.0, scenario-format 0.19.0, sdk 0.1.0] - 2023-01-12
+- All crates were renamed, in line with the MultiversX brand.
+- New crate: `multiversx-chain-vm`, extracted from the old debug crate.
+- New crate: `multiversx-sdk`, adapted from a solution proposed by the community.
+- A `ScenarioWorld` facade, for contract tests.
+- The multi-contract build system.
+- The meta crate supports `twiggy` post-processing, this is a tool to analyze contract size and investigate bloat in the binaries.
+- Dropped crate: `elrond-wasm-output`. There is no equivalent crate, its job was passed to the individual `wasm` crates.
+- `ManagedVec` supports sorting and deduplication.
+- `migrateUserName` builtin function mock.
 
 ## [elrond-wasm 0.38.0, elrond-codec 0.16.0, mandos 0.18.0] - 2022-12-15
 - `ContractCall` refactor. Building a contract call comes with harder compile-time constraints. This also reduces compiled code size.

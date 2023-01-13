@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-scenario-format"
-version = "0.18.0"
+version = "0.19.0"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]

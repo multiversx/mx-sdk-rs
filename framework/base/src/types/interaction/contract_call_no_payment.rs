@@ -101,7 +101,7 @@ where
     }
 
     #[deprecated(
-        since = "0.38.0",
+        since = "0.39.0",
         note = "Replace by `contract_call.with_esdt_transfer((payment_token, payment_nonce, payment_amount))`. 
         The tuple argument will get automatically converted to EsdtTokenPayment."
     )]
@@ -138,7 +138,7 @@ where
     }
 
     #[deprecated(
-        since = "0.38.0",
+        since = "0.39.0",
         note = "Replace by `contract_call.with_egld_or_single_esdt_transfer((payment_token, payment_nonce, payment_amount))`. "
     )]
     pub fn with_egld_or_single_esdt_token_transfer(
