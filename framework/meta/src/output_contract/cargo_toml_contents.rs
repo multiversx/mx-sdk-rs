@@ -1,5 +1,7 @@
 use std::{fs, io::Write, path::Path};
 
+use toml::value::Table;
+
 /// Contains an in-memory representation of a Cargo.toml file.
 ///
 /// Implementation notes:
@@ -39,5 +41,21 @@ impl CargoTomlContents {
             .as_table_mut()
             .expect("malformed package in Cargo.toml")
             .insert("name".to_string(), toml::Value::String(new_package_name));
+    }
+
+    pub fn dependencies(&self) -> &Table {
+        self.toml_value
+            .get("dependencies")
+            .expect("no depdencies found in crate Cargo.toml")
+            .as_table()
+            .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn dependencies_mut(&mut self) -> &mut Table {
+        self.toml_value
+            .get_mut("dependencies")
+            .expect("no depdencies found in crate Cargo.toml")
+            .as_table_mut()
+            .expect("malformed crate Cargo.toml")
     }
 }
