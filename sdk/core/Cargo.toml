@@ -16,7 +16,7 @@ categories = ["cryptography::cryptocurrencies", "api-bindings"]
 keywords = ["multiversx", "blockchain", "sdk", "api"]
 
 [dependencies]
-tokio = { version = "1.12.0", features = ["full"] }
+tokio = { version = "1.24", features = ["full"] }
 reqwest = { version = "0.11.4", features = ["blocking", "json"] }
 serde = { version = "1.0.130", features = ["derive"] }
 serde_json = { version = "1.0.68", features = ["preserve_order"] }
@@ -32,6 +32,6 @@ base64 = "0.13.0"
 ed25519 = "1.2.0"
 pbkdf2 = { version = "0.9.0", default-features = false }
 zeroize = "1.4.2"
-bech32 = "0.8.1"
+bech32 = "0.9"
 itertools = "0.10.1"
 pem = "1.0.1"
