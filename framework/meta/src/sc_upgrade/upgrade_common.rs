@@ -21,6 +21,37 @@ pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &
     }
 }
 
+/// Regex was not needed yet, add if it becomes necessary.
+pub(crate) fn rename_files(path: &Path, patterns: &[(&str, &str)]) {
+    if path.is_file() {
+        if let Some(file_name) = path.file_name() {
+            if let Some(file_name_str) = file_name.to_str() {
+                for &(replace_pattern, replace_with) in patterns {
+                    if file_name_str.contains(replace_pattern) {
+                        let replaced_file_name =
+                            file_name_str.replace(replace_pattern, replace_with);
+                        let replaced_path = path.parent().unwrap().join(replaced_file_name);
+                        println!(
+                            "Renaming {} -> {}",
+                            path.display().to_string().red().strikethrough(),
+                            replaced_path.as_path().display().to_string().green(),
+                        );
+                        fs::rename(path, replaced_path).expect("failed to rename file");
+                    }
+                }
+            }
+        }
+    }
+
+    if path.is_dir() {
+        let read_dir = fs::read_dir(path).expect("error reading directory");
+        for child_result in read_dir {
+            let child = child_result.unwrap();
+            rename_files(child.path().as_path(), patterns);
+        }
+    }
+}
+
 /// Uses `CargoTomlContents`. Will only replace versions of framework crates.
 pub fn version_bump_in_cargo_toml(path: &Path, from_version: &str, to_version: &str) {
     if path.is_file() {
