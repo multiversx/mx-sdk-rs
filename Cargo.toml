@@ -16,7 +16,6 @@ members = [
 
   "tools/test-gen",
   "tools/erdpy-snippet-generator",
-  "tools/sc-upgrade",
 
   "vm",
 
