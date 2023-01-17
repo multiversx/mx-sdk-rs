@@ -18,13 +18,16 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [[bin]]
 name = "sc-meta"
-path = "src/meta_main.rs"
+path = "src/main.rs"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rustc_version = "0.4"
 toml = { version = "0.5.8", features = ["preserve_order"] }
+ruplacer = "0.8.1"
+clap = { version = "4.1.0", features = ["derive", "cargo"] }
+colored = "2.0"
 
 [dependencies.multiversx-sc]
 version = "=0.39.0"

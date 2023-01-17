@@ -1,6 +1,10 @@
-use std::{fs, io::Write, path::Path};
+use std::{
+    fs,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
-use toml::value::Table;
+use toml::{value::Table, Value};
 
 /// Contains an in-memory representation of a Cargo.toml file.
 ///
@@ -10,18 +14,23 @@ use toml::value::Table;
 /// - It keeps an ordered representation, thanks to the `toml` `preserve_order` feature.
 #[derive(Clone, Debug)]
 pub struct CargoTomlContents {
-    toml_value: toml::Value,
+    pub path: PathBuf,
+    pub toml_value: toml::Value,
 }
 
 impl CargoTomlContents {
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Self {
-        let cargo_toml_content = fs::read(path).expect("failed to open Cargo.toml file");
+        let path_ref = path.as_ref();
+        let cargo_toml_content = fs::read(path_ref).expect("failed to open Cargo.toml file");
         let cargo_toml_content_str =
             String::from_utf8(cargo_toml_content).expect("error decoding Cargo.toml utf-8");
         let toml_value = cargo_toml_content_str
             .parse::<toml::Value>()
             .expect("failed to parse Cargo.toml toml format");
-        CargoTomlContents { toml_value }
+        CargoTomlContents {
+            path: path_ref.to_owned(),
+            toml_value,
+        }
     }
 
     pub fn save_to_file<P: AsRef<Path>>(&self, path: P) {
@@ -46,15 +55,24 @@ impl CargoTomlContents {
     pub fn dependencies(&self) -> &Table {
         self.toml_value
             .get("dependencies")
-            .expect("no depdencies found in crate Cargo.toml")
+            .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table()
             .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn dependency(&self, dep_name: &str) -> Option<&Value> {
+        if let Some(deps) = self.toml_value.get("dependencies") {
+            if let Some(deps_map) = deps.as_table() {
+                return deps_map.get(dep_name);
+            }
+        }
+        None
     }
 
     pub fn dependencies_mut(&mut self) -> &mut Table {
         self.toml_value
             .get_mut("dependencies")
-            .expect("no depdencies found in crate Cargo.toml")
+            .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")
     }

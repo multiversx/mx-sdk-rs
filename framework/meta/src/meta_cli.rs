@@ -1,12 +1,15 @@
 use super::{meta_config::MetaConfig, output_contract::OutputContractConfig};
-use crate::cli_args::{CliAction, CliArgs};
+use crate::{
+    cli_args::{CliAction, CliArgs},
+    sc_upgrade::upgrade_sc,
+};
 use multiversx_sc::{
     abi::ContractAbi, api::uncallable::UncallableApi, contract_base::ContractAbiProvider,
 };
 use std::env;
 
 /// The ABI provider set when
-pub struct NoAbiProvider;
+struct NoAbiProvider;
 
 impl NoAbiProvider {
     pub const NAME: &str = "no-abi";
@@ -36,6 +39,10 @@ fn process_abi<AbiObj: ContractAbiProvider>(cli_args: &CliArgs) -> Option<MetaCo
     Some(meta_config)
 }
 
+pub fn cli_main_standalone() {
+    cli_main::<NoAbiProvider>();
+}
+
 pub fn cli_main<AbiObj: ContractAbiProvider>() {
     let args: Vec<String> = env::args().collect();
     let cli_args = CliArgs::parse(args.as_slice()).expect("Error processing CLI arguments: ");
@@ -45,14 +52,17 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
     match cli_args.action {
         CliAction::Nothing => {},
         CliAction::Build(build_args) => meta_config_opt
-            .expect("cannot call build in the general meta tool")
+            .expect("cannot call build in the standalone meta tool")
             .build(build_args),
         CliAction::Clean => meta_config_opt
-            .expect("cannot call clean in the general meta tool")
+            .expect("cannot call clean in the standalone meta tool")
             .clean(),
         CliAction::GenerateSnippets(gs_args) => meta_config_opt
-            .expect("cannot call snippets in the general meta tool")
+            .expect("cannot call snippets in the standalone meta tool")
             .generate_rust_snippets(&gs_args),
+        CliAction::Upgrade(args) => {
+            upgrade_sc(&args);
+        },
     }
 }
 

@@ -1,16 +1,18 @@
 use std::path::Path;
 
-use multiversx_sc_meta::output_contract::CargoTomlContents;
+use crate::CargoTomlContents;
 use ruplacer::Query;
 use toml::{value::Table, Value};
 
-use crate::upgrade_common::replace_in_files;
+use super::{upgrade_common::{replace_in_files, upgrade_version}, folder_structure::{DirectoryToUpdate, DirectoryType}};
 
-pub(crate) fn upgrade_39(sc_crate_path: &Path) {
-    println!("Upgrading from 0.38.0 to 0.39.0");
-    v_0_39_prepare_meta(sc_crate_path);
-    v_0_39_prepare_wasm(sc_crate_path);
-    v_0_39_replace_in_files(sc_crate_path);
+pub(crate) fn upgrade_39(dir: &DirectoryToUpdate) {
+    if dir.dir_type == DirectoryType::Contract {
+        v_0_39_prepare_meta(&dir.path);
+        v_0_39_prepare_wasm(&dir.path);
+    }
+    v_0_39_replace_in_files(&dir.path);
+    upgrade_version(&dir.path, "0.38.0", "0.39.0");
 }
 
 fn v_0_39_prepare_meta(sc_crate_path: &Path) {
@@ -59,7 +61,6 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
             Query::substring("elrond-wasm-modules", "multiversx-sc-modules"),
             Query::substring("elrond-wasm-node", "multiversx-sc-wasm-adapter"),
             Query::substring("elrond-wasm", "multiversx-sc"),
-            Query::substring("\"0.38.0\"", "\"0.39.0\""),
         ][..],
     );
 
@@ -67,6 +68,10 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
         sc_crate_path,
         "*rs",
         &[
+            Query::substring(
+                "elrond_codec",
+                "codec",
+            ),
             Query::substring(
                 "elrond_wasm_debug::meta::perform",
                 "multiversx_sc_meta::cli_main",
@@ -83,7 +88,18 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
             Query::substring("elrond_wasm_modules", "multiversx_sc_modules"),
             Query::substring("elrond_wasm_node", "multiversx_sc_wasm_adapter"),
             Query::substring("elrond_wasm", "multiversx_sc"),
-            Query::substring("\"0.38.0\"", "\"0.39.0\""),
+            Query::substring(
+                "BlockchainMock",
+                "ScenarioWorld",
+            ),
+            Query::substring(
+                "testing_framework",
+                "whitebox",
+            ),
+            Query::substring(
+                "tx_mock",
+                "whitebox",
+            ),
         ][..],
     );
 }

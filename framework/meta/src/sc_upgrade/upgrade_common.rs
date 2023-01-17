@@ -1,7 +1,17 @@
-
 use std::path::Path;
 
-use ruplacer::{Query, Console, Settings, DirectoryPatcher};
+use ruplacer::{Console, DirectoryPatcher, Query, Settings};
+
+pub fn upgrade_version(sc_crate_path: &Path, from: &str, to: &str) {
+    replace_in_files(
+        sc_crate_path,
+        "*Cargo.toml",
+        &[
+            Query::Substring(format!("\"{from}\""), format!("\"{to}\"")),
+            Query::Substring(format!("\"={from}\""), format!("\"={to}\"")),
+        ][..],
+    );
+}
 
 pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &[Query]) {
     let console = Console::default();

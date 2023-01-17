@@ -37,6 +37,7 @@ pub enum CliAction {
     Build(BuildArgs),
     Clean,
     GenerateSnippets(GenerateSnippetsArgs),
+    Upgrade(UpgradeArgs),
 }
 
 impl CliAction {
@@ -64,6 +65,7 @@ impl CliAction {
             "snippets" => Ok(CliAction::GenerateSnippets(GenerateSnippetsArgs::parse(
                 additional_args,
             )?)),
+            "upgrade" => Ok(CliAction::Upgrade(UpgradeArgs::default())),
             other => Err(format!("unknown command: {other}")),
         }
     }
@@ -92,4 +94,9 @@ impl GenerateSnippetsArgs {
         }
         Ok(result)
     }
+}
+
+#[derive(Default, PartialEq, Eq, Debug)]
+pub struct UpgradeArgs {
+    pub path: Option<String>,
 }
