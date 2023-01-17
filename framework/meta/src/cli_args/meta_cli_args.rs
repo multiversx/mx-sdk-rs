@@ -4,7 +4,20 @@ use super::BuildArgs;
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
-#[command(version, about, after_help = "MultiversX Smart Contract Meta Crate")]
+#[command(
+    version,
+    about,
+    after_help = "
+The MultiversX smart contract Meta crate can be used in two ways:
+    A. Import it into a contract's specific meta-crate. 
+       There it will receive access to the contract ABI generator. 
+       Based on that it is able to build the contract and apply various tools.
+       This part also contains the multi-contract config infrastructure.
+
+    B. Use it as a standalone tool.
+       It can be used to automatically upgrade contracts from one version to the next.
+"
+)]
 #[command(propagate_version = true)]
 pub struct CliArgs {
     #[command(subcommand)]
