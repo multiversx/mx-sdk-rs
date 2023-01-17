@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 pub mod abi_json;
 mod cargo_toml_contents;
 pub mod cli_args;
