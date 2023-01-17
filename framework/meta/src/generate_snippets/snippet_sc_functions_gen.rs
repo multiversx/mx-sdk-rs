@@ -153,7 +153,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
         "\n            .egld_value(egld_amount)\n"
     } else {
-        "\n            .esdt_transfer(token_id, token_nonce, token_amount)\n"
+        "\n            .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)\n"
     };
 
     writeln!(
