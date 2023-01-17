@@ -7,7 +7,7 @@ use super::snippet_gen_common::write_newline;
 pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) {
     writeln!(
         file,
-        "#[allow(non_snake_case)]
+        "#![allow(non_snake_case)]
 
 use {contract_crate_name}::ProxyTrait as _;
 use multiversx_sc_snippets::{{
