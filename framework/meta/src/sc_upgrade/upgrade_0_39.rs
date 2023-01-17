@@ -9,6 +9,7 @@ use super::{
     upgrade_common::replace_in_files,
 };
 
+/// All `0.38.0` to `0.39.0` transformations other than the version bump.
 pub(crate) fn upgrade_39(dir: &DirectoryToUpdate) {
     if dir.dir_type == DirectoryType::Contract {
         v_0_39_prepare_meta(&dir.path);
@@ -18,7 +19,7 @@ pub(crate) fn upgrade_39(dir: &DirectoryToUpdate) {
 }
 
 fn v_0_39_prepare_meta(sc_crate_path: &Path) {
-    let cargo_toml_path = sc_crate_path.clone().join("meta/Cargo.toml");
+    let cargo_toml_path = sc_crate_path.join("meta/Cargo.toml");
     assert!(
         cargo_toml_path.exists(),
         "SC crate Cargo.toml not found: {}",
@@ -39,7 +40,7 @@ fn v_0_39_prepare_meta(sc_crate_path: &Path) {
 }
 
 fn v_0_39_prepare_wasm(sc_crate_path: &Path) {
-    let cargo_toml_path = sc_crate_path.clone().join("wasm/Cargo.toml");
+    let cargo_toml_path = sc_crate_path.join("wasm/Cargo.toml");
     assert!(
         cargo_toml_path.exists(),
         "SC crate Cargo.toml not found: {}",

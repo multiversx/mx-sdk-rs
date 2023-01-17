@@ -1,7 +1,7 @@
 use super::{
     folder_structure::{populate_directories, DirectoryToUpdate},
     upgrade_0_39::upgrade_39,
-    upgrade_common::upgrade_cargo_toml_version,
+    upgrade_common::version_bump_in_cargo_toml,
     upgrade_versions::{iter_from_version, LAST_VERSION},
 };
 use crate::{cli_args::UpgradeArgs, sc_upgrade::folder_structure::count_contract_crates};
@@ -30,30 +30,29 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
     for dir in &dirs {
         if dir.version.semver == last_version {
             print_not_upgrading_ok(dir);
-        } else {
-            if let Some(iterator) =
-                iter_from_version(dir.version.semver.as_str(), Some(last_version.clone()))
-            {
-                for (from_version, to_version) in iterator {
-                    print_upgrading(dir, from_version, to_version);
-                    upgrade_function_selector(dir, from_version, to_version);
-                }
-            } else {
-                print_not_upgrading_unsupported(dir);
+        } else if let Some(iterator) =
+            iter_from_version(dir.version.semver.as_str(), Some(last_version.clone()))
+        {
+            for (from_version, to_version) in iterator {
+                print_upgrading(dir, from_version, to_version);
+                upgrade_function_selector(dir, from_version, to_version);
             }
+        } else {
+            print_not_upgrading_unsupported(dir);
         }
     }
 }
 
+#[allow(clippy::single_match)] // there will be more than one
 fn upgrade_function_selector(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
     match dir.version.semver.as_str() {
         "0.38.0" => {
-            upgrade_39(&dir);
+            upgrade_39(dir);
         },
         _ => {},
     }
 
-    upgrade_cargo_toml_version(&dir.path, from_version, to_version);
+    version_bump_in_cargo_toml(&dir.path, from_version, to_version);
 }
 
 fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {

@@ -15,24 +15,29 @@ pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &
         selected_file_types: vec![file_type.to_string()],
         ..Default::default()
     };
-    let mut directory_patcher = DirectoryPatcher::new(&console, &sc_crate_path, &settings);
+    let mut directory_patcher = DirectoryPatcher::new(&console, sc_crate_path, &settings);
     for query in queries {
-        directory_patcher.run(&query).expect("replace failed");
+        directory_patcher.run(query).expect("replace failed");
     }
 }
 
-/// Uses `CargoTomlContents`.
-pub fn upgrade_cargo_toml_version(path: &Path, from: &str, to: &str) {
+/// Uses `CargoTomlContents`. Will only replace versions of framework crates.
+pub fn version_bump_in_cargo_toml(path: &Path, from_version: &str, to_version: &str) {
     if path.is_file() {
         if let Some(file_name) = path.file_name() {
             if file_name == "Cargo.toml" {
                 let mut cargo_toml_contents = CargoTomlContents::load_from_file(path);
-                upgrade_dependencies_version(&mut cargo_toml_contents, "dependencies", from, to);
+                upgrade_dependencies_version(
+                    &mut cargo_toml_contents,
+                    "dependencies",
+                    from_version,
+                    to_version,
+                );
                 upgrade_dependencies_version(
                     &mut cargo_toml_contents,
                     "dev-dependencies",
-                    from,
-                    to,
+                    from_version,
+                    to_version,
                 );
                 cargo_toml_contents.save_to_file(path);
                 return;
@@ -44,7 +49,7 @@ pub fn upgrade_cargo_toml_version(path: &Path, from: &str, to: &str) {
         let read_dir = fs::read_dir(path).expect("error reading directory");
         for child_result in read_dir {
             let child = child_result.unwrap();
-            upgrade_cargo_toml_version(child.path().as_path(), from, to);
+            version_bump_in_cargo_toml(child.path().as_path(), from_version, to_version);
         }
     }
 }
@@ -52,8 +57,8 @@ pub fn upgrade_cargo_toml_version(path: &Path, from: &str, to: &str) {
 fn upgrade_dependencies_version(
     cargo_toml_contents: &mut CargoTomlContents,
     deps_name: &str,
-    from: &str,
-    to: &str,
+    from_version: &str,
+    to_version: &str,
 ) {
     if let Some(deps) = cargo_toml_contents.toml_value.get_mut(deps_name) {
         for &framework_crate_name in FRAMEWORK_CRATE_NAMES {
@@ -62,8 +67,8 @@ fn upgrade_dependencies_version(
                     Value::String(version_string) => {
                         change_version_string(
                             version_string,
-                            from,
-                            to,
+                            from_version,
+                            to_version,
                             &cargo_toml_contents.path,
                             deps_name,
                             framework_crate_name,
@@ -73,8 +78,8 @@ fn upgrade_dependencies_version(
                         if let Some(Value::String(version_string)) = t.get_mut("version") {
                             change_version_string(
                                 version_string,
-                                from,
-                                to,
+                                from_version,
+                                to_version,
                                 &cargo_toml_contents.path,
                                 deps_name,
                                 framework_crate_name,
@@ -90,16 +95,16 @@ fn upgrade_dependencies_version(
 
 fn change_version_string(
     version_string: &mut String,
-    from: &str,
-    to: &str,
+    from_version: &str,
+    to_version: &str,
     path: &Path,
     deps_name: &str,
     framework_crate_name: &str,
 ) {
     let version_string_before = version_string.clone();
     let mut version_spec = VersionReq::from_string(std::mem::take(version_string));
-    if version_spec.semver == from {
-        version_spec.semver = to.to_string();
+    if version_spec.semver == from_version {
+        version_spec.semver = to_version.to_string();
     }
     *version_string = version_spec.into_string();
 

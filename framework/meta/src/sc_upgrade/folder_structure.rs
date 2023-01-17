@@ -57,7 +57,7 @@ fn continue_recursion(dir_entry: &DirEntry) -> bool {
     }
 
     if let Some(dir_name_str) = dir_entry.file_name().to_str() {
-        // not hidden
+        // do not explore hidden folders
         !dir_name_str.starts_with('.')
     } else {
         false
