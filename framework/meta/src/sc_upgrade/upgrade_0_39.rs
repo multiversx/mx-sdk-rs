@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use crate::CargoTomlContents;
+use colored::Colorize;
 use ruplacer::Query;
 use toml::{value::Table, Value};
 
@@ -28,10 +29,25 @@ fn v_0_39_prepare_meta(sc_crate_path: &Path) {
     let mut meta_cargo_toml = CargoTomlContents::load_from_file(&cargo_toml_path);
     let deps = meta_cargo_toml.dependencies_mut();
 
-    println!("Fixing meta crate");
+    println!(
+        "{}/dependencies/{}",
+        cargo_toml_path.as_path().display(),
+        "elrond-wasm".red().strikethrough(),
+    );
     deps.remove("elrond-wasm");
+
+    println!(
+        "{}/dependencies/{}",
+        cargo_toml_path.as_path().display(),
+        "elrond-wasm-debug".red().strikethrough(),
+    );
     deps.remove("elrond-wasm-debug");
 
+    println!(
+        "{}/dependencies/{}",
+        cargo_toml_path.as_path().display(),
+        "multiversx-sc-meta".green(),
+    );
     let mut meta_dep = Table::new();
     meta_dep.insert("version".to_string(), Value::String("0.39.0".to_string()));
     deps.insert("multiversx-sc-meta".to_string(), Value::Table(meta_dep));
@@ -49,7 +65,11 @@ fn v_0_39_prepare_wasm(sc_crate_path: &Path) {
     let mut meta_cargo_toml = CargoTomlContents::load_from_file(&cargo_toml_path);
     let deps = meta_cargo_toml.dependencies_mut();
 
-    println!("Removing elrond-wasm-output");
+    println!(
+        "{}/dependencies/{}",
+        cargo_toml_path.as_path().display(),
+        "elrond-wasm-output".red().strikethrough(),
+    );
     deps.remove("elrond-wasm-output");
 
     meta_cargo_toml.save_to_file(&cargo_toml_path);

@@ -7,7 +7,6 @@ use clap::Parser;
 use multiversx_sc::{
     abi::ContractAbi, api::uncallable::UncallableApi, contract_base::ContractAbiProvider,
 };
-use std::env;
 
 /// The ABI provider set when
 struct NoAbiProvider;

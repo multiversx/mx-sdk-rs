@@ -65,7 +65,6 @@ fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str
             to_version
         )
         .purple()
-        .underline()
     );
 }
 
