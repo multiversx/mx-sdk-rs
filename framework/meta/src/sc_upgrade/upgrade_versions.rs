@@ -11,6 +11,9 @@ pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
     "elrond-interact-snippets",
 ];
 
+/// Not necessarily the last entry in `VERSIONS`.
+///
+/// Indicates where to stop with the upgrades.
 pub const LAST_VERSION: &str = "0.39.0";
 
 #[rustfmt::skip]

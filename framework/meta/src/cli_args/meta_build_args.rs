@@ -1,29 +1,80 @@
-use super::CliArgsParseError;
+use clap::{ArgAction, Args};
 
-/// `erdpy` still sends unnecessary arguments when building.
-///
-/// Set to true when the issue has been resolved.
-const PARSE_BUILD_ARGS_STRICT: bool = false;
-
-#[derive(PartialEq, Eq, Debug)]
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct BuildArgs {
-    pub debug_symbols: bool,
+    /// Adds debug symbols in the resulting WASM binary. Adds bloat, but helps with debugging. Do not use in production.
+    #[arg(long = "wasm-symbols", verbatim_doc_comment)]
+    pub wasm_symbols: bool,
+
+    /// Overrides the main contract output name.
+    #[arg(long = "wasm-name", verbatim_doc_comment)]
     pub wasm_name_override: Option<String>,
+
+    /// Adds given suffix to all built contracts.
+    #[arg(long = "wasm-suffix", verbatim_doc_comment)]
     pub wasm_name_suffix: Option<String>,
+
+    /// True if wasm-opt should be used.
+    #[arg(
+        long = "no-wasm-opt",
+        help = "Skips applying the wasm-opt tool after building the contracts.",
+        action = ArgAction::SetFalse,
+    )]
     pub wasm_opt: bool,
+
+    /// Also generate a WAT file when building.
+    #[arg(long = "wat", verbatim_doc_comment)]
     pub wat: bool,
+
+    #[arg(
+        long = "no-imports",
+        help = "Skips extracting the EI imports after building the contracts.",
+        action = ArgAction::SetFalse,
+    )]
     pub extract_imports: bool,
+
+    /// Allows specifying the target directory where the Rust compiler will build the intermediary files.
+    /// Sharing the same target directory can speed up building multiple contract crates at once.
+    #[arg(long = "target-dir", verbatim_doc_comment)]
     pub target_dir: Option<String>,
+
+    /// Generate a twiggy top report after building.
+    #[arg(long = "twiggy-top", verbatim_doc_comment)]
     pub twiggy_top: bool,
+
+    /// Generate a twiggy paths report after building.
+    #[arg(long = "twiggy-paths", verbatim_doc_comment)]
     pub twiggy_paths: bool,
+
+    /// Generate a twiggy monos report after building.
+    #[arg(long = "twiggy-monos", verbatim_doc_comment)]
     pub twiggy_monos: bool,
+
+    /// Generate a twiggy dominators report after building.
+    #[arg(long = "twiggy-dominators", verbatim_doc_comment)]
     pub twiggy_dominators: bool,
+
+    /// Backwards compatibility with mxpy, delete when github actions are fixed.
+    #[deprecated]
+    #[arg(long = "target", verbatim_doc_comment)]
+    pub target: Option<String>,
+
+    /// Backwards compatibility with mxpy, delete when github actions are fixed.
+    #[deprecated]
+    #[arg(long, verbatim_doc_comment)]
+    pub release: bool,
+
+    /// Backwards compatibility with mxpy, delete when github actions are fixed.
+    #[deprecated]
+    #[arg(long = "out-dir", verbatim_doc_comment)]
+    pub out_dir: Option<String>,
 }
 
 impl Default for BuildArgs {
+    #[allow(deprecated)]
     fn default() -> Self {
         BuildArgs {
-            debug_symbols: false,
+            wasm_symbols: false,
             wasm_name_override: None,
             wasm_name_suffix: None,
             wasm_opt: true,
@@ -34,131 +85,35 @@ impl Default for BuildArgs {
             twiggy_paths: false,
             twiggy_monos: false,
             twiggy_dominators: false,
+            target: None,
+            release: false,
+            out_dir: None,
         }
     }
 }
 
 impl BuildArgs {
-    /// Base config when calling `cargo run build`, with no additional configs.
-    pub fn build_base_config() -> Self {
-        Self::default()
-    }
-
-    /// Parses all arguments and sets them in a given BuildArgs object.
-    ///
-    /// Configuring a pre-existing object allows different defaults to be set.
-    fn iter_parse<S>(args: &[S], result: &mut BuildArgs) -> Result<(), CliArgsParseError>
-    where
-        S: AsRef<str>,
-    {
-        let mut iter = args.iter();
-        while let Some(arg) = iter.next() {
-            match arg.as_ref() {
-                "--wasm-symbols" => {
-                    result.debug_symbols = true;
-                },
-                "--wasm-name" => {
-                    let name = iter
-                        .next()
-                        .expect("argument `--wasm-name` must be followed by the desired name");
-                    result.wasm_name_override = Some(name.as_ref().to_string());
-                },
-                "--wasm-suffix" => {
-                    let suffix = iter
-                        .next()
-                        .expect("argument `--wasm-suffix` must be followed by the desired suffix");
-                    result.wasm_name_suffix = Some(suffix.as_ref().to_string());
-                },
-                "--no-wasm-opt" => {
-                    result.wasm_opt = false;
-                },
-                "--wat" => {
-                    result.wat = true;
-                    result.extract_imports = true;
-                },
-                "--no-imports" => {
-                    result.extract_imports = false;
-                },
-                "--target-dir" => {
-                    let arg = iter
-                        .next()
-                        .expect("argument `--target-dir` must be followed by argument");
-                    result.target_dir = Some(arg.as_ref().to_string());
-                },
-                "--twiggy-top" => {
-                    result.twiggy_top = true;
-                },
-                "--twiggy-paths" => {
-                    result.twiggy_paths = true;
-                },
-                "--twiggy-monos" => {
-                    result.twiggy_monos = true;
-                },
-                "--twiggy-dominators" => {
-                    result.twiggy_dominators = true;
-                },
-                other if PARSE_BUILD_ARGS_STRICT => {
-                    return Err(format!("unknown build argument: {other}"))
-                },
-                _ => {},
-            }
-        }
-
-        Ok(())
-    }
-
-    pub fn parse<S>(args: &[S]) -> Result<Self, CliArgsParseError>
-    where
-        S: AsRef<str>,
-    {
-        let mut result = BuildArgs::build_base_config();
-        BuildArgs::iter_parse(args, &mut result)?;
-        Ok(result)
-    }
-
     /// Base config when calling `cargo run build-dbg`, with no additional configs.
-    pub fn build_dbg_base_config() -> Self {
+    pub fn into_dbg(self) -> Self {
         BuildArgs {
-            debug_symbols: true,
-            wasm_name_override: None,
+            wasm_symbols: true,
             wasm_name_suffix: Some("dbg".to_string()),
             wasm_opt: false,
             wat: true,
             extract_imports: false,
-            target_dir: None,
-            twiggy_top: false,
-            twiggy_paths: false,
-            twiggy_monos: false,
-            twiggy_dominators: false,
+            ..self
         }
     }
 
-    pub fn parse_dbg<S>(args: &[S]) -> Result<Self, CliArgsParseError>
-    where
-        S: AsRef<str>,
-    {
-        let mut result = BuildArgs::build_dbg_base_config();
-        BuildArgs::iter_parse(args, &mut result)?;
-        Ok(result)
-    }
-
-    pub fn twiggy_base_config() -> Self {
+    /// Base config when calling `cargo run build-dbg`, with no additional configs.
+    pub fn into_twiggy(self) -> Self {
         BuildArgs {
             twiggy_top: true,
             twiggy_paths: true,
             twiggy_monos: true,
             twiggy_dominators: true,
-            ..BuildArgs::build_dbg_base_config()
+            ..self.into_dbg()
         }
-    }
-
-    pub fn parse_twiggy<S>(args: &[S]) -> Result<Self, CliArgsParseError>
-    where
-        S: AsRef<str>,
-    {
-        let mut result = BuildArgs::twiggy_base_config();
-        BuildArgs::iter_parse(args, &mut result)?;
-        Ok(result)
     }
 
     pub fn has_twiggy_call(&self) -> bool {

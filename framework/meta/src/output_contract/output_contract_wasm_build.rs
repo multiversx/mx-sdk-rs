@@ -12,7 +12,7 @@ impl OutputContract {
         if let Some(target_dir) = &build_args.target_dir {
             command.args(["--target-dir", target_dir]);
         }
-        if !build_args.debug_symbols {
+        if !build_args.wasm_symbols {
             command.env("RUSTFLAGS", "-C link-arg=-s");
         }
         let exit_status = command

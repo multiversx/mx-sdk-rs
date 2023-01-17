@@ -3,6 +3,7 @@ use crate::{
     cli_args::{CliAction, CliArgs},
     sc_upgrade::upgrade_sc,
 };
+use clap::Parser;
 use multiversx_sc::{
     abi::ContractAbi, api::uncallable::UncallableApi, contract_base::ContractAbiProvider,
 };
@@ -44,25 +45,31 @@ pub fn cli_main_standalone() {
 }
 
 pub fn cli_main<AbiObj: ContractAbiProvider>() {
-    let args: Vec<String> = env::args().collect();
-    let cli_args = CliArgs::parse(args.as_slice()).expect("Error processing CLI arguments: ");
+    let cli_args = CliArgs::parse();
 
     let meta_config_opt = process_abi::<AbiObj>(&cli_args);
 
-    match cli_args.action {
-        CliAction::Nothing => {},
-        CliAction::Build(build_args) => meta_config_opt
-            .expect("cannot call build in the standalone meta tool")
-            .build(build_args),
-        CliAction::Clean => meta_config_opt
-            .expect("cannot call clean in the standalone meta tool")
-            .clean(),
-        CliAction::GenerateSnippets(gs_args) => meta_config_opt
-            .expect("cannot call snippets in the standalone meta tool")
-            .generate_rust_snippets(&gs_args),
-        CliAction::Upgrade(args) => {
-            upgrade_sc(&args);
-        },
+    if let Some(command) = cli_args.command {
+        match command {
+            CliAction::Build(build_args) => meta_config_opt
+                .expect("cannot call `build` in the standalone meta tool")
+                .build(build_args),
+            CliAction::BuildDbg(build_args) => meta_config_opt
+                .expect("cannot call `build-dbg` in the standalone meta tool")
+                .build(build_args.into_dbg()),
+            CliAction::Twiggy(build_args) => meta_config_opt
+                .expect("cannot call `twiggy` in the standalone meta tool")
+                .build(build_args.into_twiggy()),
+            CliAction::Clean => meta_config_opt
+                .expect("cannot call `clean` in the standalone meta tool")
+                .clean(),
+            CliAction::GenerateSnippets(gs_args) => meta_config_opt
+                .expect("cannot call snippets in the standalone meta tool")
+                .generate_rust_snippets(&gs_args),
+            CliAction::Upgrade(args) => {
+                upgrade_sc(&args);
+            },
+        }
     }
 }
 
