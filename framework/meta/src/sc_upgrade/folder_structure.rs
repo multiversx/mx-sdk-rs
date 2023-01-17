@@ -13,8 +13,9 @@ pub enum DirectoryType {
     Lib,
 }
 
+/// TODO: replace with semver::VersionReq at some point.
 #[derive(Debug, Clone)]
-pub struct VersionSpecification {
+pub struct VersionReq {
     pub semver: String,
     pub is_strict: bool,
 }
@@ -22,7 +23,7 @@ pub struct VersionSpecification {
 #[derive(Debug, Clone)]
 pub struct DirectoryToUpdate {
     pub path: PathBuf,
-    pub version: VersionSpecification,
+    pub version: VersionReq,
     pub dir_type: DirectoryType,
 }
 
@@ -33,8 +34,6 @@ pub(crate) fn populate_directories(path: &Path, result: &mut Vec<DirectoryToUpda
         let read_dir = fs::read_dir(path).expect("error reading directory");
         for child_result in read_dir {
             let child = child_result.unwrap();
-            // println!("{}", child.path().display());
-
             if continue_recursion(&child) {
                 populate_directories(child.path().as_path(), result);
             }
@@ -84,28 +83,36 @@ fn find_framework_version_string(cargo_toml_contents: &CargoTomlContents) -> Opt
     None
 }
 
-impl VersionSpecification {
-    fn from_string(raw: String) -> Self {
+impl VersionReq {
+    pub fn from_string(raw: String) -> Self {
         if let Some(stripped_version) = raw.strip_prefix('=') {
-            VersionSpecification {
+            VersionReq {
                 semver: stripped_version.to_string(),
                 is_strict: true,
             }
         } else {
-            VersionSpecification {
+            VersionReq {
                 semver: raw,
-                is_strict: true,
+                is_strict: false,
             }
+        }
+    }
+
+    pub fn into_string(self) -> String {
+        if self.is_strict {
+            format!("={}", self.semver)
+        } else {
+            self.semver
         }
     }
 }
 
-fn find_framework_version(dir_path: &Path) -> Option<VersionSpecification> {
+fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
     let cargo_toml_path = dir_path.join("Cargo.toml");
     if cargo_toml_path.is_file() {
         let cargo_toml_contents = CargoTomlContents::load_from_file(cargo_toml_path);
         if let Some(version) = find_framework_version_string(&cargo_toml_contents) {
-            return Some(VersionSpecification::from_string(version));
+            return Some(VersionReq::from_string(version));
         }
     }
 

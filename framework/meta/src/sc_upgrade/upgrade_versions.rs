@@ -1,7 +1,7 @@
 /// Used for retrieving crate versions.
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
     "multiversx-sc",
-    "multiversx-sc-scenarios",
+    "multiversx-sc-scenario",
     "multiversx-sc-meta",
     "multiversx-sc-modules",
     "elrond-wasm",

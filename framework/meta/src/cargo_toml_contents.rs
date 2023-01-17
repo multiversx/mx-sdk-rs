@@ -52,14 +52,6 @@ impl CargoTomlContents {
             .insert("name".to_string(), toml::Value::String(new_package_name));
     }
 
-    pub fn dependencies(&self) -> &Table {
-        self.toml_value
-            .get("dependencies")
-            .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
-            .as_table()
-            .expect("malformed crate Cargo.toml")
-    }
-
     pub fn dependency(&self, dep_name: &str) -> Option<&Value> {
         if let Some(deps) = self.toml_value.get("dependencies") {
             if let Some(deps_map) = deps.as_table() {
