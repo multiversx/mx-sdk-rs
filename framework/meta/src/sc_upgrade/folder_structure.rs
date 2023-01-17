@@ -5,18 +5,7 @@ use std::{
 };
 use toml::Value;
 
-/// Used for retrieving  crate versions.
-const FRAMEWORK_CRATE_NAMES: &[&str] = &[
-    "multiversx-sc",
-    "multiversx-sc-scenarios",
-    "multiversx-sc-meta",
-    "multiversx-sc-modules",
-    "elrond-wasm",
-    "elrond-wasm-debug",
-    "elrond-wasm-modules",
-    "elrond-wasm-node",
-    "elrond-interact-snippets",
-];
+use super::upgrade_versions::FRAMEWORK_CRATE_NAMES;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectoryType {

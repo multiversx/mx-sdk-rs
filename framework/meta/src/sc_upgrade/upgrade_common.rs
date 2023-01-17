@@ -2,7 +2,7 @@ use std::path::Path;
 
 use ruplacer::{Console, DirectoryPatcher, Query, Settings};
 
-pub fn upgrade_version(sc_crate_path: &Path, from: &str, to: &str) {
+pub fn upgrade_cargo_toml_version(sc_crate_path: &Path, from: &str, to: &str) {
     replace_in_files(
         sc_crate_path,
         "*Cargo.toml",

@@ -1,4 +1,9 @@
-use super::{folder_structure::populate_directories, upgrade_0_39::upgrade_39};
+use super::{
+    folder_structure::{populate_directories, DirectoryToUpdate},
+    upgrade_0_39::upgrade_39,
+    upgrade_common::upgrade_cargo_toml_version,
+    upgrade_versions::{iter_from_version, LAST_VERSION},
+};
 use crate::cli_args::UpgradeArgs;
 use colored::*;
 
@@ -15,46 +20,70 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
     populate_directories(path.as_ref(), &mut dirs);
 
     for dir in &dirs {
-        match dir.version.semver.as_str() {
-            "0.38.0" => {
-                println!(
-                    "{}",
-                    format!("Upgrading {} from 0.38.0 to 0.39.0", dir.path.display())
-                        .purple()
-                        .underline()
-                );
-                println!();
-                upgrade_39(&dir);
-            },
-            _ => {
-                println!(
-                    "{}",
-                    format!(
-                        "Not upgrading {}, version {} unsupported.",
-                        dir.path.display(),
-                        &dir.version.semver
-                    )
-                    .red()
-                );
-                println!();
-            },
+        if dir.version.semver == LAST_VERSION {
+            print_not_upgrading_ok(dir);
+            println!();
+        } else {
+            if let Some(iterator) = iter_from_version(dir.version.semver.as_str()) {
+                for (from_version, to_version) in iterator {
+                    print_upgrading(dir, from_version, to_version);
+                    upgrade_function_selector(dir, from_version, to_version);
+                }
+            } else {
+                print_not_upgrading_unsupported(dir);
+            }
         }
     }
+}
 
-    // let contract_paths = find_contract_paths(sc_crate_path.as_ref());
-    // for contract_path in contract_paths {
-    //     println!("Upgrading: {}", contract_path.display());
+fn upgrade_function_selector(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
+    match dir.version.semver.as_str() {
+        "0.38.0" => {
+            upgrade_39(&dir);
+        },
+        _ => {},
+    }
 
-    //     let version = find_framework_version(contract_path.as_ref());
-    //     println!("Current version: {}", version);
+    upgrade_cargo_toml_version(&dir.path, from_version, to_version);
+}
 
-    //     match version.as_str() {
-    //         "0.38.0" | "=0.38.0" => {
-    //             upgrade_39(contract_path.as_ref());
-    //         },
-    //         _ => {
-    //             println!("Unsupported version.");
-    //         },
-    //     }
-    // }
+fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
+    println!(
+        "{}",
+        format!(
+            "Upgrading {} from {} to {}",
+            dir.path.display(),
+            from_version,
+            to_version
+        )
+        .purple()
+        .underline()
+    );
+    println!();
+}
+
+fn print_not_upgrading_ok(dir: &DirectoryToUpdate) {
+    println!(
+        "{}",
+        format!(
+            "Not upgrading {}, version {} OK.",
+            dir.path.display(),
+            &dir.version.semver
+        )
+        .green()
+    );
+    println!();
+}
+
+fn print_not_upgrading_unsupported(dir: &DirectoryToUpdate) {
+    println!(
+        "{}",
+        format!(
+            "Not upgrading {}, version {} unsupported.",
+            dir.path.display(),
+            &dir.version.semver
+        )
+        .red()
+    );
+    println!();
 }
