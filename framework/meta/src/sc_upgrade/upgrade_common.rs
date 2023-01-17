@@ -6,7 +6,7 @@ use toml::Value;
 
 use crate::CargoTomlContents;
 
-use super::{folder_structure::VersionReq, upgrade_versions::FRAMEWORK_CRATE_NAMES};
+use super::{upgrade_versions::FRAMEWORK_CRATE_NAMES, version_req::VersionReq};
 
 /// Uses ruplacer.
 pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &[Query]) {

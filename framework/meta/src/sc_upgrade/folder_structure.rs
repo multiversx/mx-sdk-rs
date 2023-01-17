@@ -5,19 +5,12 @@ use std::{
 };
 use toml::Value;
 
-use super::upgrade_versions::FRAMEWORK_CRATE_NAMES;
+use super::{upgrade_versions::FRAMEWORK_CRATE_NAMES, version_req::VersionReq};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectoryType {
     Contract,
     Lib,
-}
-
-/// TODO: replace with semver::VersionReq at some point.
-#[derive(Debug, Clone)]
-pub struct VersionReq {
-    pub semver: String,
-    pub is_strict: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -83,30 +76,6 @@ fn find_framework_version_string(cargo_toml_contents: &CargoTomlContents) -> Opt
     None
 }
 
-impl VersionReq {
-    pub fn from_string(raw: String) -> Self {
-        if let Some(stripped_version) = raw.strip_prefix('=') {
-            VersionReq {
-                semver: stripped_version.to_string(),
-                is_strict: true,
-            }
-        } else {
-            VersionReq {
-                semver: raw,
-                is_strict: false,
-            }
-        }
-    }
-
-    pub fn into_string(self) -> String {
-        if self.is_strict {
-            format!("={}", self.semver)
-        } else {
-            self.semver
-        }
-    }
-}
-
 fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
     let cargo_toml_path = dir_path.join("Cargo.toml");
     if cargo_toml_path.is_file() {
@@ -117,4 +86,10 @@ fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
     }
 
     None
+}
+
+pub(crate) fn count_contract_crates(dirs: &[DirectoryToUpdate]) -> usize {
+    dirs.iter()
+        .filter(|dir| dir.dir_type == DirectoryType::Contract)
+        .count()
 }

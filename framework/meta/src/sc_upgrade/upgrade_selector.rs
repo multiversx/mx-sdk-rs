@@ -4,27 +4,36 @@ use super::{
     upgrade_common::upgrade_cargo_toml_version,
     upgrade_versions::{iter_from_version, LAST_VERSION},
 };
-use crate::cli_args::UpgradeArgs;
+use crate::{cli_args::UpgradeArgs, sc_upgrade::folder_structure::count_contract_crates};
 use colored::*;
 
 pub fn upgrade_sc(args: &UpgradeArgs) {
     let path = if let Some(some_path) = &args.path {
         some_path.as_str()
     } else {
-        "/home/andreim/elrond/smartcontract/sc-dex-rs"
-        // ""
-        // "/home/andreim/elrond/smartcontract/sc-nft-marketplace/esdt-nft-marketplace"
+        "./"
     };
+
+    let last_version = args
+        .override_target_version
+        .clone()
+        .unwrap_or_else(|| LAST_VERSION.to_string());
 
     let mut dirs = Vec::new();
     populate_directories(path.as_ref(), &mut dirs);
+    println!(
+        "Found {} directories to upgrade, out of which {} are contract crates.\n",
+        dirs.len(),
+        count_contract_crates(dirs.as_slice())
+    );
 
     for dir in &dirs {
-        if dir.version.semver == LAST_VERSION {
+        if dir.version.semver == last_version {
             print_not_upgrading_ok(dir);
-            println!();
         } else {
-            if let Some(iterator) = iter_from_version(dir.version.semver.as_str()) {
+            if let Some(iterator) =
+                iter_from_version(dir.version.semver.as_str(), Some(last_version.clone()))
+            {
                 for (from_version, to_version) in iterator {
                     print_upgrading(dir, from_version, to_version);
                     upgrade_function_selector(dir, from_version, to_version);
@@ -51,7 +60,7 @@ fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str
     println!(
         "{}",
         format!(
-            "Upgrading {} from {} to {}",
+            "Upgrading {} from {} to {}.\n",
             dir.path.display(),
             from_version,
             to_version
@@ -59,31 +68,28 @@ fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str
         .purple()
         .underline()
     );
-    println!();
 }
 
 fn print_not_upgrading_ok(dir: &DirectoryToUpdate) {
     println!(
         "{}",
         format!(
-            "Not upgrading {}, version {} OK.",
+            "Not upgrading {}, version {} OK.\n",
             dir.path.display(),
             &dir.version.semver
         )
         .green()
     );
-    println!();
 }
 
 fn print_not_upgrading_unsupported(dir: &DirectoryToUpdate) {
     println!(
         "{}",
         format!(
-            "Not upgrading {}, version {} unsupported.",
+            "Not upgrading {}, version {} unsupported.\n",
             dir.path.display(),
             &dir.version.semver
         )
         .red()
     );
-    println!();
 }

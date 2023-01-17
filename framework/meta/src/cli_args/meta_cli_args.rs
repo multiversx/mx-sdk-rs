@@ -63,4 +63,8 @@ pub struct UpgradeArgs {
     /// Target directory where to upgrade contracts. Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub path: Option<String>,
+
+    /// Overrides the version to upgrade to. By default it will be the last version out.
+    #[arg(long = "to", verbatim_doc_comment)]
+    pub override_target_version: Option<String>,
 }
