@@ -3,17 +3,18 @@ name = "erdpy-snippet-generator"
 version = "0.0.0"
 authors = ["Dorin Marian Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
+publish = false
 
 [[bin]]
 name = "erdpy-snippet-generator"
 path = "src/erdpy_snippet_generator.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.0"
+version = "0.39.1"
 path = "../../framework/base"
 
 [dependencies.multiversx-chain-vm]
-version = "0.1.0"
+version = "0.1.1"
 path = "../../vm"
 
 [dependencies]

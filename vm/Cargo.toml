@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-vm"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 authors = [
@@ -33,18 +33,18 @@ itertools = "0.10.3"
 bech32 = "0.9"
 
 [dependencies.multiversx-sc]
-version = "=0.39.0"
+version = "=0.39.1"
 path = "../framework/base"
 features = ["alloc", "num-bigint", "promises", "big-float"]
 
 [dependencies.multiversx-sc-meta]
-version = "=0.39.0"
+version = "=0.39.1"
 path = "../framework/meta"
 
 [dependencies.multiversx-chain-scenario-format]
-version = "0.19.0"
+version = "0.19.1"
 path = "../sdk/scenario-format"
 
 [dev-dependencies.multiversx-sc-meta] # only used in the sample_adder test
-version = "=0.39.0"
+version = "=0.39.1"
 path = "../framework/meta"
