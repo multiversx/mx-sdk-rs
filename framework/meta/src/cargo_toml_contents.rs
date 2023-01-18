@@ -6,6 +6,9 @@ use std::{
 
 use toml::{value::Table, Value};
 
+pub const CARGO_TOML_DEPENDENCIES: &str = "dependencies";
+pub const CARGO_TOML_DEV_DEPENDENCIES: &str = "dev-dependencies";
+
 /// Contains an in-memory representation of a Cargo.toml file.
 ///
 /// Implementation notes:
@@ -53,7 +56,7 @@ impl CargoTomlContents {
     }
 
     pub fn dependency(&self, dep_name: &str) -> Option<&Value> {
-        if let Some(deps) = self.toml_value.get("dependencies") {
+        if let Some(deps) = self.toml_value.get(CARGO_TOML_DEPENDENCIES) {
             if let Some(deps_map) = deps.as_table() {
                 return deps_map.get(dep_name);
             }
@@ -63,7 +66,7 @@ impl CargoTomlContents {
 
     pub fn dependencies_mut(&mut self) -> &mut Table {
         self.toml_value
-            .get_mut("dependencies")
+            .get_mut(CARGO_TOML_DEPENDENCIES)
             .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")

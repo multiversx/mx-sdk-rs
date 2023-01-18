@@ -57,7 +57,7 @@ fn upgrade_function_selector(dir: &DirectoryToUpdate, from_version: &str, to_ver
 
 fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
     println!(
-        "{}",
+        "\n{}",
         format!(
             "Upgrading {} from {} to {}.\n",
             dir.path.display(),

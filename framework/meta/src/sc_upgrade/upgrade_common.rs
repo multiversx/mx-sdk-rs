@@ -4,9 +4,14 @@ use colored::Colorize;
 use ruplacer::{Console, DirectoryPatcher, Query, Settings};
 use toml::Value;
 
-use crate::CargoTomlContents;
+use crate::{
+    cargo_toml_contents::{CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES},
+    CargoTomlContents,
+};
 
 use super::{upgrade_versions::FRAMEWORK_CRATE_NAMES, version_req::VersionReq};
+
+const CARGO_TOML_FILE_NAME: &str = "Cargo.toml";
 
 /// Uses ruplacer.
 pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &[Query]) {
@@ -23,23 +28,11 @@ pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &
 
 /// Regex was not needed yet, add if it becomes necessary.
 pub(crate) fn rename_files(path: &Path, patterns: &[(&str, &str)]) {
-    if path.is_file() {
-        if let Some(file_name) = path.file_name() {
-            if let Some(file_name_str) = file_name.to_str() {
-                for &(replace_pattern, replace_with) in patterns {
-                    if file_name_str.contains(replace_pattern) {
-                        let replaced_file_name =
-                            file_name_str.replace(replace_pattern, replace_with);
-                        let replaced_path = path.parent().unwrap().join(replaced_file_name);
-                        println!(
-                            "Renaming {} -> {}",
-                            path.display().to_string().red().strikethrough(),
-                            replaced_path.as_path().display().to_string().green(),
-                        );
-                        fs::rename(path, replaced_path).expect("failed to rename file");
-                    }
-                }
-            }
+    if let Some(file_name_str) = try_get_file_name_str(path) {
+        if let Some(replaced_file_name) = try_replace_file_name(file_name_str, patterns) {
+            let replaced_path = path.parent().unwrap().join(replaced_file_name);
+            print_rename(path, replaced_path.as_path());
+            fs::rename(path, replaced_path).expect("failed to rename file");
         }
     }
 
@@ -52,28 +45,53 @@ pub(crate) fn rename_files(path: &Path, patterns: &[(&str, &str)]) {
     }
 }
 
+fn try_get_file_name_str(path: &Path) -> Option<&str> {
+    if !path.is_file() {
+        return None;
+    }
+    if let Some(file_name) = path.file_name() {
+        if let Some(file_name_str) = file_name.to_str() {
+            return Some(file_name_str);
+        }
+    }
+    None
+}
+
+fn try_replace_file_name(file_name_str: &str, patterns: &[(&str, &str)]) -> Option<String> {
+    for &(replace_pattern, replace_with) in patterns {
+        if file_name_str.contains(replace_pattern) {
+            return Some(file_name_str.replace(replace_pattern, replace_with));
+        }
+    }
+    None
+}
+
+fn print_rename(old_path: &Path, new_path: &Path) {
+    println!(
+        "Renaming {} -> {}",
+        old_path.display().to_string().red().strikethrough(),
+        new_path.display().to_string().green(),
+    );
+}
+
 /// Uses `CargoTomlContents`. Will only replace versions of framework crates.
 pub fn version_bump_in_cargo_toml(path: &Path, from_version: &str, to_version: &str) {
-    if path.is_file() {
-        if let Some(file_name) = path.file_name() {
-            if file_name == "Cargo.toml" {
-                let mut cargo_toml_contents = CargoTomlContents::load_from_file(path);
-                upgrade_dependencies_version(
-                    &mut cargo_toml_contents,
-                    "dependencies",
-                    from_version,
-                    to_version,
-                );
-                upgrade_dependencies_version(
-                    &mut cargo_toml_contents,
-                    "dev-dependencies",
-                    from_version,
-                    to_version,
-                );
-                cargo_toml_contents.save_to_file(path);
-                return;
-            }
-        }
+    if is_cargo_toml_file(path) {
+        let mut cargo_toml_contents = CargoTomlContents::load_from_file(path);
+        upgrade_dependencies_version(
+            &mut cargo_toml_contents,
+            CARGO_TOML_DEPENDENCIES,
+            from_version,
+            to_version,
+        );
+        upgrade_dependencies_version(
+            &mut cargo_toml_contents,
+            CARGO_TOML_DEV_DEPENDENCIES,
+            from_version,
+            to_version,
+        );
+        cargo_toml_contents.save_to_file(path);
+        return;
     }
 
     if path.is_dir() {
@@ -82,6 +100,14 @@ pub fn version_bump_in_cargo_toml(path: &Path, from_version: &str, to_version: &
             let child = child_result.unwrap();
             version_bump_in_cargo_toml(child.path().as_path(), from_version, to_version);
         }
+    }
+}
+
+fn is_cargo_toml_file(path: &Path) -> bool {
+    if let Some(file_name_str) = try_get_file_name_str(path) {
+        file_name_str == CARGO_TOML_FILE_NAME
+    } else {
+        false
     }
 }
 
@@ -152,15 +178,15 @@ fn print_version_change(
     path: &Path,
     deps_name: &str,
     framework_crate_name: &str,
-    from: &str,
-    to: &str,
+    from_version: &str,
+    to_version: &str,
 ) {
     println!(
         "{}/{}/{}: {} -> {}",
         path.display(),
         deps_name,
         framework_crate_name.underline(),
-        format!("\"{from}\"").red().strikethrough(),
-        format!("\"{to}\"").green()
+        format!("\"{from_version}\"").red().strikethrough(),
+        format!("\"{to_version}\"").green()
     )
 }

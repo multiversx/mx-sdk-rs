@@ -27,7 +27,7 @@ pub(crate) fn populate_directories(path: &Path, result: &mut Vec<DirectoryToUpda
         let read_dir = fs::read_dir(path).expect("error reading directory");
         for child_result in read_dir {
             let child = child_result.unwrap();
-            if continue_recursion(&child) {
+            if can_continue_recursion(&child) {
                 populate_directories(child.path().as_path(), result);
             }
         }
@@ -51,7 +51,7 @@ fn is_marked_contract_crate_dir(path: &Path) -> bool {
     path.join("multiversx.json").is_file() || path.join("elrond.json").is_file()
 }
 
-fn continue_recursion(dir_entry: &DirEntry) -> bool {
+fn can_continue_recursion(dir_entry: &DirEntry) -> bool {
     if !dir_entry.file_type().unwrap().is_dir() {
         return false;
     }
