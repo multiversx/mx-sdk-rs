@@ -4,7 +4,10 @@ use super::{
     upgrade_common::version_bump_in_cargo_toml,
     upgrade_versions::{iter_from_version, LAST_VERSION},
 };
-use crate::{cli_args::UpgradeArgs, sc_upgrade::folder_structure::count_contract_crates};
+use crate::{
+    cli_args::UpgradeArgs,
+    sc_upgrade::{folder_structure::count_contract_crates, upgrade_versions::VERSIONS},
+};
 use colored::*;
 
 pub fn upgrade_sc(args: &UpgradeArgs) {
@@ -18,6 +21,11 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         .override_target_version
         .clone()
         .unwrap_or_else(|| LAST_VERSION.to_string());
+
+    assert!(
+        VERSIONS.contains(&last_version.as_str()),
+        "Invalid requested version: {last_version}",
+    );
 
     let mut dirs = Vec::new();
     populate_directories(path.as_ref(), &mut dirs);
