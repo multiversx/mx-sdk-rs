@@ -1,5 +1,7 @@
 # Smart contract base crate
 
+[![crates.io](https://img.shields.io/crates/v/multiversx-sc.svg)](https://crates.io/crates/multiversx-sc) 
+
 This is the main crate for building smart contracts for the MultiversX blockchain.
 
 It contains the interface that the smart contract sees and can use. No implementation details are available from this crate alone.

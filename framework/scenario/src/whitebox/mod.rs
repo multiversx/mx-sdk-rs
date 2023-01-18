@@ -11,4 +11,4 @@ pub use helper_macros::*;
 use mandos_generator::*;
 pub use tx_mandos::*;
 
-pub use multiversx_chain_vm::tx_mock::TxResult;
+pub use multiversx_chain_vm::tx_mock::{TxContextStack, TxResult, TxTokenTransfer};

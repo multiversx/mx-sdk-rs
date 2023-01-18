@@ -20,7 +20,7 @@ pub(crate) fn check_tools_installed(build_args: &mut BuildArgs) {
         println!("Warning: {WASM_OBJDUMP_NAME} not installed");
         build_args.extract_imports = false;
     }
-    if build_args.extract_imports && !is_twiggy_installed() {
+    if build_args.has_twiggy_call() && !is_twiggy_installed() {
         println!("Warning: {TWIGGY_NAME} not installed");
         build_args.twiggy_top = false;
         build_args.twiggy_paths = false;

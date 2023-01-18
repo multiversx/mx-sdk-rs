@@ -1,5 +1,7 @@
 # Smart contract standard codec
 
+[![crates.io](https://img.shields.io/crates/v/multiversx-sc-codec.svg)](https://crates.io/crates/multiversx-sc-codec) 
+
 Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts.
 
 Designed to:

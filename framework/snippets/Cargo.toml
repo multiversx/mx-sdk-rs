@@ -16,7 +16,7 @@ keywords = ["multiversx", "blockchain", "contract", "snippets"]
 categories = ["cryptography::cryptocurrencies"]
 
 [dependencies]
-tokio = { version = "1.12.0", features = ["full"] }
+tokio = { version = "1.24", features = ["full"] }
 hex = "0.4"
 base64 = "0.13.0"
 log = "0.4.17"
