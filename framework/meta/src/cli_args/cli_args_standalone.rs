@@ -1,6 +1,4 @@
-use clap::{ArgAction, Args, Parser, Subcommand};
-
-use super::BuildArgs;
+use clap::{Args, Parser, Subcommand};
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -16,59 +14,22 @@ The MultiversX smart contract Meta crate can be used in two ways:
 
     B. Use it as a standalone tool.
        It can be used to automatically upgrade contracts from one version to the next.
+
+You are currently using the standalone tool (B).
 "
 )]
 #[command(propagate_version = true)]
-pub struct CliArgs {
+pub struct StandaloneCliArgs {
     #[command(subcommand)]
-    pub command: Option<CliAction>,
-
-    #[arg(
-        long = "no-abi-git-version",
-        help = "Skips loading the Git version into the ABI",
-        action = ArgAction::SetFalse
-    )]
-    #[clap(global = true)]
-    pub load_abi_git_version: bool,
+    pub command: Option<StandaloneCliAction>,
 }
 
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
-pub enum CliAction {
-    #[command(
-        name = "build",
-        about = "Builds contract(s) for deploy on the blockchain."
-    )]
-    Build(BuildArgs),
-
-    #[command(name = "build-dbg", about = "Builds contract(s) with symbols and WAT.")]
-    BuildDbg(BuildArgs),
-
-    #[command(
-        name = "twiggy",
-        about = "Builds contract(s) and generate twiggy reports."
-    )]
-    Twiggy(BuildArgs),
-
-    #[command(about = "Clean the Rust project and the output folder.")]
-    Clean,
-
-    #[command(
-        name = "snippets",
-        about = "Generates a snippets project, based on the contract ABI."
-    )]
-    GenerateSnippets(GenerateSnippetsArgs),
-
+pub enum StandaloneCliAction {
     #[command(
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
     )]
     Upgrade(UpgradeArgs),
-}
-
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct GenerateSnippetsArgs {
-    /// Override snippets project if it already exists.
-    #[arg(long, verbatim_doc_comment)]
-    pub overwrite: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
