@@ -78,13 +78,13 @@ fn print_rename(old_path: &Path, new_path: &Path) {
 pub fn version_bump_in_cargo_toml(path: &Path, from_version: &str, to_version: &str) {
     if is_cargo_toml_file(path) {
         let mut cargo_toml_contents = CargoTomlContents::load_from_file(path);
-        upgrade_dependencies_version(
+        upgrade_all_dependency_versions(
             &mut cargo_toml_contents,
             CARGO_TOML_DEPENDENCIES,
             from_version,
             to_version,
         );
-        upgrade_dependencies_version(
+        upgrade_all_dependency_versions(
             &mut cargo_toml_contents,
             CARGO_TOML_DEV_DEPENDENCIES,
             from_version,
@@ -111,42 +111,58 @@ fn is_cargo_toml_file(path: &Path) -> bool {
     }
 }
 
-fn upgrade_dependencies_version(
+fn upgrade_all_dependency_versions(
     cargo_toml_contents: &mut CargoTomlContents,
     deps_name: &str,
     from_version: &str,
     to_version: &str,
 ) {
-    if let Some(deps) = cargo_toml_contents.toml_value.get_mut(deps_name) {
+    if let Some(dependencies) = cargo_toml_contents.toml_value.get_mut(deps_name) {
         for &framework_crate_name in FRAMEWORK_CRATE_NAMES {
-            if let Some(dep) = deps.get_mut(framework_crate_name) {
-                match dep {
-                    Value::String(version_string) => {
-                        change_version_string(
-                            version_string,
-                            from_version,
-                            to_version,
-                            &cargo_toml_contents.path,
-                            deps_name,
-                            framework_crate_name,
-                        );
-                    },
-                    Value::Table(t) => {
-                        if let Some(Value::String(version_string)) = t.get_mut("version") {
-                            change_version_string(
-                                version_string,
-                                from_version,
-                                to_version,
-                                &cargo_toml_contents.path,
-                                deps_name,
-                                framework_crate_name,
-                            );
-                        }
-                    },
-                    _ => {},
-                }
-            }
+            upgrade_dependency_version(
+                &cargo_toml_contents.path,
+                deps_name,
+                dependencies,
+                framework_crate_name,
+                from_version,
+                to_version,
+            );
         }
+    }
+}
+
+fn upgrade_dependency_version(
+    cargo_toml_path: &Path,
+    deps_name: &str,
+    dependencies: &mut Value,
+    framework_crate_name: &str,
+    from_version: &str,
+    to_version: &str,
+) {
+    match dependencies.get_mut(framework_crate_name) {
+        Some(Value::String(version_string)) => {
+            change_version_string(
+                version_string,
+                from_version,
+                to_version,
+                cargo_toml_path,
+                deps_name,
+                framework_crate_name,
+            );
+        },
+        Some(Value::Table(t)) => {
+            if let Some(Value::String(version_string)) = t.get_mut("version") {
+                change_version_string(
+                    version_string,
+                    from_version,
+                    to_version,
+                    cargo_toml_path,
+                    deps_name,
+                    framework_crate_name,
+                );
+            }
+        },
+        _ => {},
     }
 }
 

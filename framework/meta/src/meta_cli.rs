@@ -38,7 +38,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
 
 fn process_abi<AbiObj: ContractAbiProvider>(cli_args: &ContractCliArgs) -> MetaConfig {
     let input_abi = <AbiObj as ContractAbiProvider>::abi();
-    validate_abi(&input_abi).unwrap();
+    validate_abi(&input_abi).expect("Invalid contract structure");
     let mut meta_config = MetaConfig::create(input_abi, cli_args.load_abi_git_version);
     meta_config.write_abi();
     meta_config.generate_wasm_crates();
@@ -49,7 +49,7 @@ pub fn multi_contract_config<AbiObj: ContractAbiProvider>(
     multi_contract_config_toml_path: &str,
 ) -> OutputContractConfig {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
-    validate_abi(&original_contract_abi).unwrap();
+    validate_abi(&original_contract_abi).expect("Invalid contract structure");
 
     OutputContractConfig::load_from_file(multi_contract_config_toml_path, &original_contract_abi)
         .unwrap_or_else(|| panic!("could not find file {multi_contract_config_toml_path}"))
