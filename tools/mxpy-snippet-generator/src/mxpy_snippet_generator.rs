@@ -13,12 +13,12 @@ use helper_types::*;
 
 #[derive(PartialEq, Eq)]
 pub enum PrintOption {
-    ErdpySnippet,
+    MxpySnippet,
     TxData,
     Both,
 }
 
-pub struct ErdpySnippetGenerator {
+pub struct MxpySnippetGenerator {
     wallet_type: WalletType,
     sender_nonce: Option<u64>,
     tx: TransactionType,
@@ -29,7 +29,7 @@ pub struct ErdpySnippetGenerator {
     chain_id: String,
 }
 
-impl ErdpySnippetGenerator {
+impl MxpySnippetGenerator {
     pub fn new_sc_deploy(
         chain_config: ChainConfig,
         wallet_type: WalletType,
@@ -40,7 +40,7 @@ impl ErdpySnippetGenerator {
         let bounded_gas_limit = core::cmp::min(gas_limit, MAX_GAS_LIMIT);
         let (proxy, chain_id) = chain_config.to_strings();
 
-        ErdpySnippetGenerator {
+        MxpySnippetGenerator {
             wallet_type,
             sender_nonce: None,
             tx: TransactionType::Deploy {
@@ -66,7 +66,7 @@ impl ErdpySnippetGenerator {
         let bounded_gas_limit = core::cmp::min(gas_limit, MAX_GAS_LIMIT);
         let (proxy, chain_id) = chain_config.to_strings();
 
-        ErdpySnippetGenerator {
+        MxpySnippetGenerator {
             wallet_type,
             sender_nonce: None,
             tx: TransactionType::Upgrade {
@@ -93,7 +93,7 @@ impl ErdpySnippetGenerator {
         let bounded_gas_limit = core::cmp::min(gas_limit, MAX_GAS_LIMIT);
         let (proxy, chain_id) = chain_config.to_strings();
 
-        ErdpySnippetGenerator {
+        MxpySnippetGenerator {
             wallet_type,
             sender_nonce: None,
             tx: TransactionType::Call {
@@ -117,7 +117,7 @@ impl ErdpySnippetGenerator {
     ) -> Self {
         let (proxy, chain_id) = chain_config.to_strings();
 
-        ErdpySnippetGenerator {
+        MxpySnippetGenerator {
             wallet_type: WalletType::PemPath(String::new()),
             sender_nonce: None,
             tx: TransactionType::Query {
@@ -159,7 +159,7 @@ impl ErdpySnippetGenerator {
     }
 
     pub fn print(mut self, print_option: PrintOption) {
-        let mut cmd_builder = CmdBuilder::new(ERDPY_PROGRAM_NAME);
+        let mut cmd_builder = CmdBuilder::new(MXPY_PROGRAM_NAME);
         cmd_builder.add_flag(VERBOSE_FLAG);
         cmd_builder.add_command(CONTRACT_COMMAND_NAME);
 
@@ -287,7 +287,7 @@ impl ErdpySnippetGenerator {
         cmd_builder.add_flag(SEND_FLAG);
 
         match print_option {
-            PrintOption::ErdpySnippet => cmd_builder.print(),
+            PrintOption::MxpySnippet => cmd_builder.print(),
             PrintOption::TxData => Self::print_tx_data(function_name, &self.arguments),
             PrintOption::Both => {
                 Self::print_tx_data(function_name, &self.arguments);
@@ -449,7 +449,7 @@ impl ErdpySnippetGenerator {
 
 fn main() {
     // sc deploy
-    let mut generator = ErdpySnippetGenerator::new_sc_deploy(
+    let mut generator = MxpySnippetGenerator::new_sc_deploy(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         DeployType::WasmFilePath("../path_to_wasm/file.wasm".to_owned()),
@@ -464,12 +464,12 @@ fn main() {
     generator.add_argument(&other_arg);
 
     println!("SC Deploy:");
-    generator.print(PrintOption::ErdpySnippet);
+    generator.print(PrintOption::MxpySnippet);
     println!();
     println!();
 
     // sc upgrade
-    generator = ErdpySnippetGenerator::new_sc_upgrade(
+    generator = MxpySnippetGenerator::new_sc_upgrade(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         "erd1qqqqqqqqqqqqqpgqju6muu3kj2uqpqwz798g2jeepyn8jwn5rkqsgwvu0x".to_owned(),
@@ -481,12 +481,12 @@ fn main() {
     generator.add_argument(&other_arg);
 
     println!("SC Upgrade:");
-    generator.print(PrintOption::ErdpySnippet);
+    generator.print(PrintOption::MxpySnippet);
     println!();
     println!();
 
     // sc call
-    generator = ErdpySnippetGenerator::new_sc_call(
+    generator = MxpySnippetGenerator::new_sc_call(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
@@ -504,7 +504,7 @@ fn main() {
 
     // sc call with EGLD
 
-    generator = ErdpySnippetGenerator::new_sc_call(
+    generator = MxpySnippetGenerator::new_sc_call(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
@@ -524,7 +524,7 @@ fn main() {
 
     // sc call with one ESDT transfer
 
-    generator = ErdpySnippetGenerator::new_sc_call(
+    generator = MxpySnippetGenerator::new_sc_call(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
@@ -545,7 +545,7 @@ fn main() {
 
     // sc call with one NFT transfer
 
-    generator = ErdpySnippetGenerator::new_sc_call(
+    generator = MxpySnippetGenerator::new_sc_call(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
@@ -566,7 +566,7 @@ fn main() {
 
     // sc call with multiple ESDT transfers
 
-    generator = ErdpySnippetGenerator::new_sc_call(
+    generator = MxpySnippetGenerator::new_sc_call(
         ChainConfig::Devnet,
         WalletType::PemPath("../some_path/my_file.pem".to_owned()),
         "erd1dyxrt6ky32hpvqh9w9kgt262z4c6su65myzy33styw47m9nkrplqrtnc5r".to_owned(),
@@ -589,7 +589,7 @@ fn main() {
 
     // SC Query
 
-    generator = ErdpySnippetGenerator::new_sc_query(
+    generator = MxpySnippetGenerator::new_sc_query(
         ChainConfig::Devnet,
         "erd1qqqqqqqqqqqqqpgqju6muu3kj2uqpqwz798g2jeepyn8jwn5rkqsgwvu0x".to_owned(),
         "someEndpointName".to_owned(),

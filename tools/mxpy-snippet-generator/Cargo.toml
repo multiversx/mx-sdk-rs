@@ -1,13 +1,13 @@
 [package]
-name = "erdpy-snippet-generator"
+name = "mxpy-snippet-generator"
 version = "0.0.0"
 authors = ["Dorin Marian Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 
 [[bin]]
-name = "erdpy-snippet-generator"
-path = "src/erdpy_snippet_generator.rs"
+name = "mxpy-snippet-generator"
+path = "src/mxpy.rs"
 
 [dependencies.multiversx-sc]
 version = "0.39.1"

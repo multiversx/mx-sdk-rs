@@ -15,14 +15,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Install erdpy
+      - name: Install mxpy
         run: |
           source .github/workflows/env
-          pip3 install erdpy
+          pip3 install multiversx-sdk-cli
       - name: Install wasm-opt
         run: |
-          erdpy deps install nodejs
-          erdpy deps install wasm-opt
+          mxpy deps install nodejs
+          mxpy deps install wasm-opt
       - name: Build project example outputs
         run: |
           ./zip-example-wasm.sh

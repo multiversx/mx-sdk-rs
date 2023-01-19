@@ -1,4 +1,4 @@
-pub const ERDPY_PROGRAM_NAME: &str = "erdpy";
+pub const MXPY_PROGRAM_NAME: &str = "mxpy";
 pub const CONTRACT_COMMAND_NAME: &str = "contract";
 pub const MAX_GAS_LIMIT: u64 = 500_000_000;
 
