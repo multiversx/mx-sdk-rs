@@ -1,6 +1,6 @@
-ALICE="/home/elrond/elrond-sdk/erdpy/testnet/wallets/users/alice.pem"
-ADDRESS=$(erdpy data load --key=address-testnet)
-DEPLOY_TRANSACTION=$(erdpy data load --key=deployTransaction-testnet)
+ALICE="/home/elrond/multiversx-sdk/testwallets/latest/users/alice.pem"
+ADDRESS=$(mxpy data load --key=address-testnet)
+DEPLOY_TRANSACTION=$(mxpy data load --key=deployTransaction-testnet)
 PROXY=http://localhost:7950
 CHAIN_ID=local-testnet
 
@@ -12,28 +12,28 @@ TOKEN_TICKER=0x5745474c44  # "WEGLD"
 INITIAL_SUPPLY=0x03e8 # 1000
 
 deployParent() {
-    erdpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=${CHAIN_ID} || return
+    mxpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --outfile="deploy-testnet.interaction.json" --send --proxy=${PROXY} --chain=${CHAIN_ID} || return
 
-    TRANSACTION=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['emittedTransactionHash']")
-    ADDRESS=$(erdpy data parse --file="deploy-testnet.interaction.json" --expression="data['contractAddress']")
+    TRANSACTION=$(mxpy data parse --file="deploy-testnet.interaction.json" --expression="data['emittedTransactionHash']")
+    ADDRESS=$(mxpy data parse --file="deploy-testnet.interaction.json" --expression="data['contractAddress']")
 
-    erdpy data store --key=address-testnet --value=${ADDRESS}
-    erdpy data store --key=deployTransaction-testnet --value=${TRANSACTION}
+    mxpy data store --key=address-testnet --value=${ADDRESS}
+    mxpy data store --key=deployTransaction-testnet --value=${TRANSACTION}
 
     echo ""
     echo "Smart contract address: ${ADDRESS}"
 }
 
 deployChildThroughParent() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=400000000 --function="deployChildContract" --arguments ${CHILD_CODE} --send --outfile="deploy-child-sc-spam.json" --proxy=${PROXY} --chain=${CHAIN_ID}
+    mxpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=400000000 --function="deployChildContract" --arguments ${CHILD_CODE} --send --outfile="deploy-child-sc-spam.json" --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 executeOnDestIssueToken() {
-    erdpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=200000000 --value=${ESDT_ISSUE_COST} --function="executeOnDestIssueToken" --arguments ${TOKEN_DISPLAY_NAME} ${TOKEN_TICKER} ${INITIAL_SUPPLY} --send --proxy=${PROXY} --chain=${CHAIN_ID}
+    mxpy --verbose contract call ${ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=200000000 --value=${ESDT_ISSUE_COST} --function="executeOnDestIssueToken" --arguments ${TOKEN_DISPLAY_NAME} ${TOKEN_TICKER} ${INITIAL_SUPPLY} --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 getChildContractAddress() {
-    local QUERY_OUTPUT=$(erdpy --verbose contract query ${ADDRESS} --function="getChildContractAddress" --proxy=${PROXY})
+    local QUERY_OUTPUT=$(mxpy --verbose contract query ${ADDRESS} --function="getChildContractAddress" --proxy=${PROXY})
     parseQueryOutput
     parsedAddressToBech32
 
@@ -43,7 +43,7 @@ getChildContractAddress() {
 
 getWrappedEgldTokenIdentifier() {
     getChildContractAddress
-    erdpy --verbose contract call ${CHILD_ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --function="getWrappedEgldTokenIdentifier" --send --proxy=${PROXY} --chain=${CHAIN_ID}
+    mxpy --verbose contract call ${CHILD_ADDRESS} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --function="getWrappedEgldTokenIdentifier" --send --proxy=${PROXY} --chain=${CHAIN_ID}
 }
 
 # helpers
@@ -53,5 +53,5 @@ parseQueryOutput() {
 }
 
 parsedAddressToBech32() {
-    ADDRESS_BECH32=$(erdpy wallet bech32 --encode ${PARSED})
+    ADDRESS_BECH32=$(mxpy wallet bech32 --encode ${PARSED})
 }

@@ -5,7 +5,7 @@ PROXY_ARGUMENT="--proxy=https://devnet-api.elrond.com"
 CHAIN_ARGUMENT="--chain=D"
 
 build_ping_pong() {
-    (set -x; erdpy --verbose contract build "$PING_PONG_CONTRACT")
+    (set -x; mxpy --verbose contract build "$PING_PONG_CONTRACT")
 }
 
 deploy_ping_pong() {
@@ -20,15 +20,15 @@ deploy_ping_pong() {
     fi
     
     local OUTFILE="out.json"
-    (set -x; erdpy contract deploy --bytecode="$PING_PONG_CONTRACT/output/ping-pong-egld.wasm" \
+    (set -x; mxpy contract deploy --bytecode="$PING_PONG_CONTRACT/output/ping-pong-egld.wasm" \
         --pem="$PEM_FILE" \
         $PROXY_ARGUMENT $CHAIN_ARGUMENT \
         --outfile="$OUTFILE" --recall-nonce --gas-limit=60000000 \
         --arguments $FIXED_SUM $DURATION $BEGINNING $MAX_FUNDS --send \
         || return)
 
-    local RESULT_ADDRESS=$(erdpy data parse --file="$OUTFILE" --expression="data['contractAddress']")
-    local RESULT_TRANSACTION=$(erdpy data parse --file="$OUTFILE" --expression="data['emittedTransactionHash']")
+    local RESULT_ADDRESS=$(mxpy data parse --file="$OUTFILE" --expression="data['contractAddress']")
+    local RESULT_TRANSACTION=$(mxpy data parse --file="$OUTFILE" --expression="data['emittedTransactionHash']")
 
     echo ""
     echo "Deployed contract with:"

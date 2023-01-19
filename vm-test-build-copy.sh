@@ -10,7 +10,7 @@ build_and_copy() {
    contract_name=${contract_path##*/}
    vm_contract_path=$2
 
-   # erdpy --verbose contract build --skip-eei-checks $contract_path || return 1
+   # mxpy --verbose contract build --skip-eei-checks $contract_path || return 1
    mkdir -p $vm_contract_path/output
    rm -rf $vm_contract_path/mandos
    cp $contract_path/output/*.wasm \
@@ -43,7 +43,7 @@ build_and_copy_composability() {
    contract_with_underscores="${contract//-/_}"
 
    # with managed-ei
-   erdpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/$contract || return 1
+   mxpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/$contract || return 1
    cp -R contracts/feature-tests/composability/$contract/output/${contract}.wasm \
       $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.wasm
 
@@ -68,7 +68,7 @@ build_and_copy_composability proxy-test-first
 build_and_copy_composability proxy-test-second
 build_and_copy_composability recursive-caller
 build_and_copy_composability promises-features
-erdpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/vault || return 1
+mxpy --verbose contract build --skip-eei-checks ./contracts/feature-tests/composability/vault || return 1
 cp -R contracts/feature-tests/composability/vault/output/vault.wasm \
    $VM_REPO_PATH/test/features/composability/vault/output/vault.wasm
 

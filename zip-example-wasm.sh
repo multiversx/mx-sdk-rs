@@ -16,7 +16,7 @@ do
     echo ""
     # build example wasm + ABI
     rm -rf $smart_contract_folder/output
-    (set -x; erdpy --verbose contract build $smart_contract_folder)
+    (set -x; mxpy --verbose contract build $smart_contract_folder)
 
     # add to zip
     zip -ur --junk-paths $ZIP_OUTPUT $smart_contract_folder/output

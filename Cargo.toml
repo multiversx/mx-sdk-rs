@@ -15,7 +15,7 @@ members = [
   "sdk/scenario-format",
 
   "tools/test-gen",
-  "tools/erdpy-snippet-generator",
+  "tools/mxpy-snippet-generator",
 
   "vm",
 

@@ -20,7 +20,7 @@ To issue the NFT (i.e. create the NFT "brand"), you need to use the `issueToken`
 fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer)
 ```
 
-The endpoint needs a 0.05 EGLD payment for the token issue (note: if you use erdpy directly, you need to pass 0.05 * 10^18 as --value, i.e. 50000000000000000).  
+The endpoint needs a 0.05 EGLD payment for the token issue (note: if you use mxpy directly, you need to pass 0.05 * 10^18 as --value, i.e. 50000000000000000).  
 
 `token_name` is the disply name that will be shown on the explorer in the user's balance, while `token_ticker` is the prefix of the token identifier that will be created. The token identifier is the token ticker + a dash (`-`) and 6 random hex characters. This is done to be able to differentiate between tokens with the same ticker. More information can be found here: https://docs.multiversx.com/developers/esdt-tokens/#parameters-format  
 
@@ -46,7 +46,7 @@ fn create_nft(
 
 `name` is the display name that will be shown on the explorer and on NFT marketplaces and such. This is not the same as the collection name, it's the NFTs name.  
 `royalties` is a percentage of the selling price that will be taken as royalties from any sale on marketplaces. The percentage is represented as a BigUint with 2 decimals, between 0 (0%) and 10_000 (100%). For example, if you wanted 54.30% royalties, you would use 5_430 as value.  
-`uri` is the URI for any external image/video/audio for the NFT. If your NFT has none, you can pass an empty argument here (i.e. `0x` in erdpy, or `@@` if you're using the webwallet and such).  
+`uri` is the URI for any external image/video/audio for the NFT. If your NFT has none, you can pass an empty argument here (i.e. `0x` in mxpy, or `@@` if you're using the webwallet and such).  
 `selling_price` is the selling price for the NFT. Keep in mind you have to take decimals into account. So, for example, if you wanted to sell the NFT for 2 EGLD, you can't simply pass "2". You need to pass 2 * 10^18 (since EGLD has 18 decimals), which would be 2000000000000000000.  
 
 Then, we have some optional arguments. First one is the token ID, which you only need to pass if you want to use a different token besides EGLD. The other one is a token nonce, which you only use if you want to receive a specific SFT/NFT as payment. Keep in mind you can NOT use an SFT token ID with nonce 0 to accept any nonce. This can be of course modified to work like that, but the current code-base will just reject the payment.  

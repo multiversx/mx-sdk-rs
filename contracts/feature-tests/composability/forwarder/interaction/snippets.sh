@@ -2,10 +2,10 @@ FIRST_USER_PEM=""
 SECOND_USER_PEM=""
 
 FORWARDER_ADDRESS_BECH32=
-FORWARDER_ADDRESS_HEX="0x$(erdpy wallet bech32 --decode ${FORWARDER_ADDRESS_BECH32})"
+FORWARDER_ADDRESS_HEX="0x$(mxpy wallet bech32 --decode ${FORWARDER_ADDRESS_BECH32})"
 
 VAULT_ADDRESS_BECH32=
-VAULT_ADDRESS_HEX="0x$(erdpy wallet bech32 --decode ${VAULT_ADDRESS_BECH32})"
+VAULT_ADDRESS_HEX="0x$(mxpy wallet bech32 --decode ${VAULT_ADDRESS_BECH32})"
 
 ECHO_ARGS_FUNC_NAME=echo_args_async
 
@@ -13,7 +13,7 @@ PROXY=https://testnet-api.elrond.com
 CHAIN_ID=T
 
 deployForwarder() {
-    erdpy --verbose contract deploy \
+    mxpy --verbose contract deploy \
         --proxy=${PROXY} \
         --chain=${CHAIN_ID} \
         --recall-nonce \
@@ -26,7 +26,7 @@ deployForwarder() {
 }
 
 deployVault() {
-    erdpy --verbose contract deploy \
+    mxpy --verbose contract deploy \
         --proxy=${PROXY} \
         --chain=${CHAIN_ID} \
         --recall-nonce \
@@ -39,7 +39,7 @@ deployVault() {
 }
 
 echoNoArgs() {
-    erdpy --verbose contract call ${FORWARDER_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${FORWARDER_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${FIRST_USER_PEM} \
     --gas-limit=50000000 \
@@ -48,7 +48,7 @@ echoNoArgs() {
 }
 
 echoOneArgument() {
-    erdpy --verbose contract call ${FORWARDER_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${FORWARDER_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${FIRST_USER_PEM} \
     --gas-limit=25000000 \

@@ -8,7 +8,7 @@ for smart_contract_json in $SMART_CONTRACT_JSONS
 do
     smart_contract_folder=$(dirname $smart_contract_json)
     echo ""
-    (set -x; erdpy --verbose contract clean $smart_contract_folder)
+    (set -x; mxpy --verbose contract clean $smart_contract_folder)
 done
 
 # not wasm, but worth cleaning from time to time
