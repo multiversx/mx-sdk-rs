@@ -1,4 +1,6 @@
-use clap::{Args, Parser, Subcommand};
+use clap::{ArgAction, Args, Parser, Subcommand};
+
+use super::{CliArgsToRaw, ContractCliAction};
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -27,18 +29,55 @@ pub struct StandaloneCliArgs {
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum StandaloneCliAction {
     #[command(
+        about = "Calls the meta crates for all contracts under given path with the given arguments."
+    )]
+    All(AllArgs),
+
+    #[command(
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
     )]
     Upgrade(UpgradeArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct AllArgs {
+    #[command(subcommand)]
+    pub command: ContractCliAction,
+
+    /// Target directory where to call all contract meta crates.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub path: Option<String>,
+
+    #[arg(
+        long = "no-abi-git-version",
+        help = "Skips loading the Git version into the ABI",
+        action = ArgAction::SetFalse
+    )]
+    #[clap(global = true)]
+    pub load_abi_git_version: bool,
+}
+
+impl CliArgsToRaw for AllArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = self.command.to_raw();
+        if !self.load_abi_git_version {
+            raw.push("--no-abi-git-version".to_string());
+        }
+        raw
+    }
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct UpgradeArgs {
-    /// Target directory where to upgrade contracts. Will be current directory if not specified.
+    /// Target directory where to upgrade contracts.
+    /// Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub path: Option<String>,
 
-    /// Overrides the version to upgrade to. By default it will be the last version out.
+    /// Overrides the version to upgrade to.
+    /// By default it will be the last version out.
     #[arg(long = "to", verbatim_doc_comment)]
     pub override_target_version: Option<String>,
 }

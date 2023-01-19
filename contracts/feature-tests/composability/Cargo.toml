@@ -5,30 +5,26 @@ authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
 publish = false
 
-[dependencies.forwarder]
+[dev-dependencies.forwarder]
 path = "forwarder"
 
-[dependencies.forwarder-raw]
+[dev-dependencies.forwarder-raw]
 path = "forwarder-raw"
 
-[dependencies.promises-features]
+[dev-dependencies.promises-features]
 path = "promises-features"
 
-[dependencies.proxy-test-first]
+[dev-dependencies.proxy-test-first]
 path = "proxy-test-first"
 
-[dependencies.proxy-test-second]
+[dev-dependencies.proxy-test-second]
 path = "proxy-test-second"
 
-[dependencies.recursive-caller]
+[dev-dependencies.recursive-caller]
 path = "recursive-caller"
 
-[dependencies.vault]
+[dev-dependencies.vault]
 path = "vault"
-
-[dependencies.multiversx-sc]
-version = "0.39.1"
-path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.39.1"

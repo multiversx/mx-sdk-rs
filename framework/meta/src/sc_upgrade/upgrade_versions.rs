@@ -1,40 +1,24 @@
-/// Used for retrieving crate versions.
-pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
-    "multiversx-sc",
-    "multiversx-sc-scenario",
-    "multiversx-sc-meta",
-    "multiversx-sc-modules",
-    "elrond-wasm",
-    "elrond-wasm-debug",
-    "elrond-wasm-modules",
-    "elrond-wasm-node",
-    "elrond-interact-snippets",
-];
-
 /// Not necessarily the last entry in `VERSIONS`.
 ///
 /// Indicates where to stop with the upgrades.
-pub const LAST_VERSION: &str = "0.39.0";
+pub const DEFAULT_LAST_VERSION: &str = "0.39.2";
 
 #[rustfmt::skip]
 pub const VERSIONS: &[&str] = &[
     "0.38.0",
     "0.39.0",
     "0.39.1",
+    "0.39.2",
 ];
 
 pub struct VersionIterator {
     next_version: usize,
-    last_version: Option<String>,
+    last_version: String,
 }
 
 impl VersionIterator {
     fn is_last_version(&self, version: &str) -> bool {
-        if let Some(last_version) = &self.last_version {
-            last_version == version
-        } else {
-            false
-        }
+        self.last_version == version
     }
 }
 
@@ -59,18 +43,9 @@ impl Iterator for VersionIterator {
     }
 }
 
-pub fn iter_from_version(
-    from_version: &str,
-    last_version: Option<String>,
-) -> Option<VersionIterator> {
-    for (version_index, &version) in VERSIONS.iter().enumerate() {
-        if version == from_version {
-            return Some(VersionIterator {
-                next_version: version_index + 1,
-                last_version,
-            });
-        }
+pub fn versions_iter(last_version: String) -> VersionIterator {
+    VersionIterator {
+        next_version: 1,
+        last_version,
     }
-
-    None
 }

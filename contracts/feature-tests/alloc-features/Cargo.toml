@@ -17,9 +17,5 @@ features = ["alloc"]
 version = "0.39.1"
 path = "../../../framework/scenario"
 
-[dependencies.multiversx-sc-modules]
-version = "0.39.1"
-path = "../../../contracts/modules"
-
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"

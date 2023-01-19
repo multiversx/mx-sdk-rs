@@ -10,10 +10,10 @@ version = "0.39.1"
 path = "../../../framework/base"
 features = [ "alloc" ]
 
-[dependencies.adder]
+[dev-dependencies.adder]
 path = "../../examples/adder"
 
-[dependencies.basic-features]
+[dev-dependencies.basic-features]
 path = "../../feature-tests/basic-features"
 
 [dev-dependencies.multiversx-sc-scenario]

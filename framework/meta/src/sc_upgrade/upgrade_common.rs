@@ -1,15 +1,15 @@
-use std::{fs, path::Path};
-
-use colored::Colorize;
 use ruplacer::{Console, DirectoryPatcher, Query, Settings};
+use std::{fs, path::Path};
 use toml::Value;
 
 use crate::{
     cargo_toml_contents::{CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES},
+    folder_structure::{DirectoryType, RelevantDirectory, VersionReq, FRAMEWORK_CRATE_NAMES},
+    meta_all::call_contract_meta,
     CargoTomlContents,
 };
 
-use super::{upgrade_versions::FRAMEWORK_CRATE_NAMES, version_req::VersionReq};
+use super::upgrade_print::*;
 
 const CARGO_TOML_FILE_NAME: &str = "Cargo.toml";
 
@@ -64,14 +64,6 @@ fn try_replace_file_name(file_name_str: &str, patterns: &[(&str, &str)]) -> Opti
         }
     }
     None
-}
-
-fn print_rename(old_path: &Path, new_path: &Path) {
-    println!(
-        "Renaming {} -> {}",
-        old_path.display().to_string().red().strikethrough(),
-        new_path.display().to_string().green(),
-    );
 }
 
 /// Uses `CargoTomlContents`. Will only replace versions of framework crates.
@@ -190,19 +182,12 @@ fn change_version_string(
     );
 }
 
-fn print_version_change(
-    path: &Path,
-    deps_name: &str,
-    framework_crate_name: &str,
-    from_version: &str,
-    to_version: &str,
-) {
-    println!(
-        "{}/{}/{}: {} -> {}",
-        path.display(),
-        deps_name,
-        framework_crate_name.underline(),
-        format!("\"{from_version}\"").red().strikethrough(),
-        format!("\"{to_version}\"").green()
-    )
+pub fn re_generate_wasm_crate(dir: &RelevantDirectory) {
+    if dir.dir_type != DirectoryType::Contract {
+        return;
+    }
+    call_contract_meta(
+        &dir.path,
+        &["abi".to_string(), "--no-abi-git-version".to_string()],
+    );
 }

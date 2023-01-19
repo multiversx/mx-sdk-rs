@@ -1,5 +1,7 @@
 use clap::{ArgAction, Args};
 
+use super::CliArgsToRaw;
+
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct BuildArgs {
     /// Adds debug symbols in the resulting WASM binary. Adds bloat, but helps with debugging. Do not use in production.
@@ -93,30 +95,149 @@ impl Default for BuildArgs {
 }
 
 impl BuildArgs {
+    pub fn has_twiggy_call(&self) -> bool {
+        self.twiggy_top || self.twiggy_paths || self.twiggy_monos || self.twiggy_dominators
+    }
+}
+
+impl CliArgsToRaw for BuildArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.wasm_symbols {
+            raw.push("--wasm-symbols".to_string());
+        }
+        if let Some(wasm_name_override) = &self.wasm_name_override {
+            raw.push("--wasm-name".to_string());
+            raw.push(wasm_name_override.clone())
+        }
+        if let Some(wasm_name_suffix) = &self.wasm_name_suffix {
+            raw.push("--wasm-suffix".to_string());
+            raw.push(wasm_name_suffix.clone())
+        }
+        if !self.wasm_opt {
+            raw.push("--no-wasm-opt".to_string());
+        }
+        if self.wat {
+            raw.push("--wat".to_string());
+        }
+        if !self.extract_imports {
+            raw.push("--no-imports".to_string());
+        }
+        if let Some(target_dir) = &self.target_dir {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir.clone());
+        }
+        if self.twiggy_top {
+            raw.push("--twiggy-top".to_string());
+        }
+        if self.twiggy_paths {
+            raw.push("--twiggy-paths".to_string());
+        }
+        if self.twiggy_monos {
+            raw.push("--twiggy-monos".to_string());
+        }
+        if self.twiggy_dominators {
+            raw.push("--twiggy-dominators".to_string());
+        }
+        raw
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct BuildDbgArgs {
+    /// Allows specifying the target directory where the Rust compiler will build the intermediary files.
+    /// Sharing the same target directory can speed up building multiple contract crates at once.
+    #[arg(long = "target-dir", verbatim_doc_comment)]
+    pub target_dir: Option<String>,
+
+    /// Generate a twiggy top report after building.
+    #[arg(long = "twiggy-top", verbatim_doc_comment)]
+    pub twiggy_top: bool,
+
+    /// Generate a twiggy paths report after building.
+    #[arg(long = "twiggy-paths", verbatim_doc_comment)]
+    pub twiggy_paths: bool,
+
+    /// Generate a twiggy monos report after building.
+    #[arg(long = "twiggy-monos", verbatim_doc_comment)]
+    pub twiggy_monos: bool,
+
+    /// Generate a twiggy dominators report after building.
+    #[arg(long = "twiggy-dominators", verbatim_doc_comment)]
+    pub twiggy_dominators: bool,
+}
+
+impl BuildDbgArgs {
     /// Base config when calling `cargo run build-dbg`, with no additional configs.
-    pub fn into_dbg(self) -> Self {
+    pub fn into_build_args(self) -> BuildArgs {
         BuildArgs {
             wasm_symbols: true,
+            wasm_name_override: None,
             wasm_name_suffix: Some("dbg".to_string()),
             wasm_opt: false,
             wat: true,
             extract_imports: false,
-            ..self
+            target_dir: self.target_dir,
+            twiggy_top: self.twiggy_top,
+            twiggy_paths: self.twiggy_paths,
+            twiggy_monos: self.twiggy_monos,
+            twiggy_dominators: self.twiggy_dominators,
+            ..BuildArgs::default()
         }
     }
+}
 
-    /// Base config when calling `cargo run build-dbg`, with no additional configs.
-    pub fn into_twiggy(self) -> Self {
-        BuildArgs {
+impl CliArgsToRaw for BuildDbgArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if let Some(target_dir) = &self.target_dir {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir.clone());
+        }
+        if self.twiggy_top {
+            raw.push("--twiggy-top".to_string());
+        }
+        if self.twiggy_paths {
+            raw.push("--twiggy-paths".to_string());
+        }
+        if self.twiggy_monos {
+            raw.push("--twiggy-monos".to_string());
+        }
+        if self.twiggy_dominators {
+            raw.push("--twiggy-dominators".to_string());
+        }
+        raw
+    }
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Args)]
+pub struct TwiggyArgs {
+    /// Allows specifying the target directory where the Rust compiler will build the intermediary files.
+    /// Sharing the same target directory can speed up building multiple contract crates at once.
+    #[arg(long = "target-dir", verbatim_doc_comment)]
+    pub target_dir: Option<String>,
+}
+
+impl TwiggyArgs {
+    pub fn into_build_args(self) -> BuildArgs {
+        BuildDbgArgs {
+            target_dir: self.target_dir,
             twiggy_top: true,
             twiggy_paths: true,
             twiggy_monos: true,
             twiggy_dominators: true,
-            ..self.into_dbg()
         }
+        .into_build_args()
     }
+}
 
-    pub fn has_twiggy_call(&self) -> bool {
-        self.twiggy_top || self.twiggy_paths || self.twiggy_monos || self.twiggy_dominators
+impl CliArgsToRaw for TwiggyArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if let Some(target_dir) = &self.target_dir {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir.clone());
+        }
+        raw
     }
 }
