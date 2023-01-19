@@ -1,7 +1,7 @@
 /// Not necessarily the last entry in `VERSIONS`.
 ///
 /// Indicates where to stop with the upgrades.
-pub const LAST_VERSION: &str = "0.39.2";
+pub const DEFAULT_LAST_VERSION: &str = "0.39.2";
 
 #[rustfmt::skip]
 pub const VERSIONS: &[&str] = &[
@@ -13,16 +13,12 @@ pub const VERSIONS: &[&str] = &[
 
 pub struct VersionIterator {
     next_version: usize,
-    last_version: Option<String>,
+    last_version: String,
 }
 
 impl VersionIterator {
     fn is_last_version(&self, version: &str) -> bool {
-        if let Some(last_version) = &self.last_version {
-            last_version == version
-        } else {
-            false
-        }
+        self.last_version == version
     }
 }
 
@@ -47,7 +43,7 @@ impl Iterator for VersionIterator {
     }
 }
 
-pub fn versions_iter(last_version: Option<String>) -> VersionIterator {
+pub fn versions_iter(last_version: String) -> VersionIterator {
     VersionIterator {
         next_version: 1,
         last_version,

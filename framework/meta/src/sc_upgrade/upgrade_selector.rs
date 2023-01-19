@@ -1,14 +1,11 @@
-use super::{
-    upgrade_0_39::{postprocessing_after_39_1, upgrade_to_39_0},
-    upgrade_common::version_bump_in_cargo_toml,
-    upgrade_versions::LAST_VERSION,
-};
 use crate::{
     cli_args::UpgradeArgs,
     folder_structure::{RelevantDirectories, RelevantDirectory},
     sc_upgrade::{
+        upgrade_0_39::{postprocessing_after_39_1, upgrade_to_39_0},
+        upgrade_common::version_bump_in_cargo_toml,
         upgrade_print::*,
-        upgrade_versions::{versions_iter, VERSIONS},
+        upgrade_versions::{versions_iter, DEFAULT_LAST_VERSION, VERSIONS},
     },
 };
 
@@ -22,7 +19,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
     let last_version = args
         .override_target_version
         .clone()
-        .unwrap_or_else(|| LAST_VERSION.to_string());
+        .unwrap_or_else(|| DEFAULT_LAST_VERSION.to_string());
 
     assert!(
         VERSIONS.contains(&last_version.as_str()),
@@ -36,7 +33,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         dirs.iter_contract_crates().count(),
     );
 
-    for (from_version, to_version) in versions_iter(Some(last_version)) {
+    for (from_version, to_version) in versions_iter(last_version) {
         if dirs.count_for_version(from_version) == 0 {
             continue;
         }
