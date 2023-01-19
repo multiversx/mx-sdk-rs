@@ -22,7 +22,7 @@ fn issue_token(&self, token_name: ManagedBuffer, token_ticker: ManagedBuffer)
 
 The endpoint needs a 0.05 EGLD payment for the token issue (note: if you use mxpy directly, you need to pass 0.05 * 10^18 as --value, i.e. 50000000000000000).  
 
-`token_name` is the disply name that will be shown on the explorer in the user's balance, while `token_ticker` is the prefix of the token identifier that will be created. The token identifier is the token ticker + a dash (`-`) and 6 random hex characters. This is done to be able to differentiate between tokens with the same ticker. More information can be found here: https://docs.multiversx.com/developers/esdt-tokens/#parameters-format  
+`token_name` is the disply name that will be shown on the explorer in the user's balance, while `token_ticker` is the prefix of the token identifier that will be created. The token identifier is the token ticker + a dash (`-`) and 6 random hex characters. This is done to be able to differentiate between tokens with the same ticker. More information can be found here: https://docs.multiversx.com/tokens/esdt-tokens
 
 Once the issue is complete, you have to set the NFTCreate local role, which can be done through the `setLocalRoles` endpoint. No arguments and no payment required.  
 
