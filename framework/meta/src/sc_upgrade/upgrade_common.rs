@@ -6,10 +6,9 @@ use toml::Value;
 
 use crate::{
     cargo_toml_contents::{CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES},
+    folder_structure::{VersionReq, FRAMEWORK_CRATE_NAMES},
     CargoTomlContents,
 };
-
-use super::{upgrade_versions::FRAMEWORK_CRATE_NAMES, version_req::VersionReq};
 
 const CARGO_TOML_FILE_NAME: &str = "Cargo.toml";
 

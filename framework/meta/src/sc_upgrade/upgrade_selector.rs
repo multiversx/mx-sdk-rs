@@ -1,12 +1,12 @@
 use super::{
-    folder_structure::{populate_directories, DirectoryToUpdate},
     upgrade_0_39::upgrade_39,
     upgrade_common::version_bump_in_cargo_toml,
     upgrade_versions::{iter_from_version, LAST_VERSION},
 };
 use crate::{
     cli_args::UpgradeArgs,
-    sc_upgrade::{folder_structure::count_contract_crates, upgrade_versions::VERSIONS},
+    folder_structure::{RelevantDirectories, RelevantDirectory},
+    sc_upgrade::upgrade_versions::VERSIONS,
 };
 use colored::*;
 
@@ -27,15 +27,14 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         "Invalid requested version: {last_version}",
     );
 
-    let mut dirs = Vec::new();
-    populate_directories(path.as_ref(), &mut dirs);
+    let dirs = RelevantDirectories::find_all(path);
     println!(
         "Found {} directories to upgrade, out of which {} are contract crates.\n",
         dirs.len(),
-        count_contract_crates(dirs.as_slice())
+        dirs.count_contract_crates(),
     );
 
-    for dir in &dirs {
+    for dir in dirs.iter() {
         if dir.version.semver == last_version {
             print_not_upgrading_ok(dir);
         } else if let Some(iterator) =
@@ -52,7 +51,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
 }
 
 #[allow(clippy::single_match)] // there will be more than one
-fn upgrade_function_selector(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
+fn upgrade_function_selector(dir: &RelevantDirectory, from_version: &str, to_version: &str) {
     match dir.version.semver.as_str() {
         "0.38.0" => {
             upgrade_39(dir);
@@ -63,7 +62,7 @@ fn upgrade_function_selector(dir: &DirectoryToUpdate, from_version: &str, to_ver
     version_bump_in_cargo_toml(&dir.path, from_version, to_version);
 }
 
-fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
+fn print_upgrading(dir: &RelevantDirectory, from_version: &str, to_version: &str) {
     println!(
         "\n{}",
         format!(
@@ -76,7 +75,7 @@ fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str
     );
 }
 
-fn print_not_upgrading_ok(dir: &DirectoryToUpdate) {
+fn print_not_upgrading_ok(dir: &RelevantDirectory) {
     println!(
         "{}",
         format!(
@@ -88,7 +87,7 @@ fn print_not_upgrading_ok(dir: &DirectoryToUpdate) {
     );
 }
 
-fn print_not_upgrading_unsupported(dir: &DirectoryToUpdate) {
+fn print_not_upgrading_unsupported(dir: &RelevantDirectory) {
     println!(
         "{}",
         format!(

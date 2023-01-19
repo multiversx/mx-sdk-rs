@@ -1,14 +1,13 @@
 use std::path::Path;
 
-use crate::CargoTomlContents;
+use super::upgrade_common::{rename_files, replace_in_files};
+use crate::{
+    folder_structure::{DirectoryType, RelevantDirectory},
+    CargoTomlContents,
+};
 use colored::Colorize;
 use ruplacer::Query;
 use toml::{value::Table, Value};
-
-use super::{
-    folder_structure::{DirectoryToUpdate, DirectoryType},
-    upgrade_common::{rename_files, replace_in_files},
-};
 
 #[rustfmt::skip]
 pub const SCENARIO_FILE_PATTERNS: &[(&str, &str)] = &[
@@ -17,7 +16,7 @@ pub const SCENARIO_FILE_PATTERNS: &[(&str, &str)] = &[
 ];
 
 /// All `0.38.0` to `0.39.0` transformations other than the version bump.
-pub(crate) fn upgrade_39(dir: &DirectoryToUpdate) {
+pub(crate) fn upgrade_39(dir: &RelevantDirectory) {
     if dir.dir_type == DirectoryType::Contract {
         v_0_39_prepare_meta(&dir.path);
         v_0_39_prepare_wasm(&dir.path);

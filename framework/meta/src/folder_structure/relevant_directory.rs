@@ -5,7 +5,20 @@ use std::{
 };
 use toml::Value;
 
-use super::{upgrade_versions::FRAMEWORK_CRATE_NAMES, version_req::VersionReq};
+use super::version_req::VersionReq;
+
+/// Used for retrieving crate versions.
+pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
+    "multiversx-sc",
+    "multiversx-sc-scenario",
+    "multiversx-sc-meta",
+    "multiversx-sc-modules",
+    "elrond-wasm",
+    "elrond-wasm-debug",
+    "elrond-wasm-modules",
+    "elrond-wasm-node",
+    "elrond-interact-snippets",
+];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectoryType {
@@ -14,13 +27,46 @@ pub enum DirectoryType {
 }
 
 #[derive(Debug, Clone)]
-pub struct DirectoryToUpdate {
+pub struct RelevantDirectory {
     pub path: PathBuf,
     pub version: VersionReq,
     pub dir_type: DirectoryType,
 }
 
-pub(crate) fn populate_directories(path: &Path, result: &mut Vec<DirectoryToUpdate>) {
+pub struct RelevantDirectories(Vec<RelevantDirectory>);
+
+impl RelevantDirectories {
+    pub fn find_all(path: impl AsRef<Path>) -> Self {
+        let canonicalized = fs::canonicalize(path).expect("error canonicalizing input path");
+        let mut dirs = Vec::new();
+        populate_directories(canonicalized.as_path(), &mut dirs);
+        RelevantDirectories(dirs)
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &RelevantDirectory> {
+        self.0.iter()
+    }
+
+    pub fn iter_contract_crates(&self) -> impl Iterator<Item = &RelevantDirectory> {
+        self.0
+            .iter()
+            .filter(|dir| dir.dir_type == DirectoryType::Contract)
+    }
+
+    pub fn count_contract_crates(&self) -> usize {
+        self.iter_contract_crates().count()
+    }
+}
+
+fn populate_directories(path: &Path, result: &mut Vec<RelevantDirectory>) {
     let is_contract = is_marked_contract_crate_dir(path);
 
     if !is_contract && path.is_dir() {
@@ -39,7 +85,7 @@ pub(crate) fn populate_directories(path: &Path, result: &mut Vec<DirectoryToUpda
         } else {
             DirectoryType::Lib
         };
-        result.push(DirectoryToUpdate {
+        result.push(RelevantDirectory {
             path: path.to_owned(),
             version,
             dir_type,
@@ -86,10 +132,4 @@ fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
     }
 
     None
-}
-
-pub(crate) fn count_contract_crates(dirs: &[DirectoryToUpdate]) -> usize {
-    dirs.iter()
-        .filter(|dir| dir.dir_type == DirectoryType::Contract)
-        .count()
 }

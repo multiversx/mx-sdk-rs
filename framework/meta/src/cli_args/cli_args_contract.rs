@@ -1,6 +1,6 @@
 use clap::{ArgAction, Args, Parser, Subcommand};
 
-use super::BuildArgs;
+use super::{BuildArgs, BuildDbgArgs, CliArgsToRaw, TwiggyArgs};
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -47,13 +47,13 @@ pub enum ContractCliAction {
     Build(BuildArgs),
 
     #[command(name = "build-dbg", about = "Builds contract(s) with symbols and WAT.")]
-    BuildDbg(BuildArgs),
+    BuildDbg(BuildDbgArgs),
 
     #[command(
         name = "twiggy",
         about = "Builds contract(s) and generate twiggy reports."
     )]
-    Twiggy(BuildArgs),
+    Twiggy(TwiggyArgs),
 
     #[command(about = "Clean the Rust project and the output folder.")]
     Clean,
@@ -65,9 +65,50 @@ pub enum ContractCliAction {
     GenerateSnippets(GenerateSnippetsArgs),
 }
 
+impl CliArgsToRaw for ContractCliAction {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        match self {
+            ContractCliAction::Abi => {
+                raw.push("abi".to_string());
+            },
+            ContractCliAction::Build(args) => {
+                raw.push("build".to_string());
+                raw.append(&mut args.to_raw());
+            },
+            ContractCliAction::BuildDbg(args) => {
+                raw.push("build-dbg".to_string());
+                raw.append(&mut args.to_raw());
+            },
+            ContractCliAction::Twiggy(args) => {
+                raw.push("twiggy".to_string());
+                raw.append(&mut args.to_raw());
+            },
+            ContractCliAction::Clean => {
+                raw.push("clean".to_string());
+            },
+            ContractCliAction::GenerateSnippets(args) => {
+                raw.push("snippets".to_string());
+                raw.append(&mut args.to_raw());
+            },
+        }
+        raw
+    }
+}
+
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct GenerateSnippetsArgs {
     /// Override snippets project if it already exists.
     #[arg(long, verbatim_doc_comment)]
     pub overwrite: bool,
+}
+
+impl CliArgsToRaw for GenerateSnippetsArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.overwrite {
+            raw.push("--overwrite".to_string());
+        }
+        raw
+    }
 }

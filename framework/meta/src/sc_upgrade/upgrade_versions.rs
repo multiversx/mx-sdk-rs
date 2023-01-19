@@ -1,16 +1,3 @@
-/// Used for retrieving crate versions.
-pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
-    "multiversx-sc",
-    "multiversx-sc-scenario",
-    "multiversx-sc-meta",
-    "multiversx-sc-modules",
-    "elrond-wasm",
-    "elrond-wasm-debug",
-    "elrond-wasm-modules",
-    "elrond-wasm-node",
-    "elrond-interact-snippets",
-];
-
 /// Not necessarily the last entry in `VERSIONS`.
 ///
 /// Indicates where to stop with the upgrades.
