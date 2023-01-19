@@ -7,7 +7,7 @@ publish = false
 
 [[bin]]
 name = "mxpy-snippet-generator"
-path = "src/mxpy_snippets_generator.rs"
+path = "src/mxpy_snippet_generator.rs"
 
 [dependencies.multiversx-sc]
 version = "0.39.1"
