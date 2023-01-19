@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.39.0"
+version = "0.39.1"
 edition = "2021"
 
 authors = [
@@ -20,21 +20,21 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
-sha2 = "0.9.2"
-sha3 = "0.9.1"
+sha2 = "0.10.6"
+sha3 = "0.10.6"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rand = "0.8.4"
-rand_pcg = "0.2.1"
+rand = "0.8.5"
+rand_pcg = "0.3.1"
 rand_seeder = "0.2.2"
 pathdiff = "0.2.1"
 ed25519-dalek = "1.0.1"
 itertools = "0.10.3"
-bech32 = "0.9.0"
+bech32 = "0.9"
 
 [features]
 run-go-tests = []
 
 [dependencies.multiversx-chain-vm]
-version = "=0.1.0"
+version = "=0.1.1"
 path = "../../vm"

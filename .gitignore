@@ -31,7 +31,7 @@ tags
 **/node_modules
 **/output/**
 **/testnet/**
-**/erdpy.data-storage.json
+**/mxpy.data-storage.json
 **/*.interaction.json
 
 # Python scripts

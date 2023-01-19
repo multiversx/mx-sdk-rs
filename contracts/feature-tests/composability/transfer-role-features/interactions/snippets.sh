@@ -1,9 +1,9 @@
 USER_PEM=""
 USER_ADDRESS_BECH32=
-USER_ADDDRESS_HEX="0x$(erdpy wallet bech32 --decode ${USER_ADDRESS_BECH32})"
+USER_ADDDRESS_HEX="0x$(mxpy wallet bech32 --decode ${USER_ADDRESS_BECH32})"
 
 RECEIVER_ADDRESS_BECH32=
-RECEIVER_ADDRESS_HEX="0x$(erdpy wallet bech32 --decode ${RECEIVER_ADDRESS_BECH32})"
+RECEIVER_ADDRESS_HEX="0x$(mxpy wallet bech32 --decode ${RECEIVER_ADDRESS_BECH32})"
 
 TOKEN_ID=""
 TOKEN_ID_HEX="0x$(echo -n ${TOKEN_ID} | xxd -p -u | tr -d '\n')"
@@ -13,10 +13,10 @@ PROXY="https://testnet-gateway.elrond.com"
 CHAIN_ID="T"
 
 SC_WITH_ROLE_ADDRESS_BECH32=
-SC_WITH_ROLE_ADDRESS_HEX="0x$(erdpy wallet bech32 --decode ${SC_WITH_ROLE_ADDRESS_BECH32})"
+SC_WITH_ROLE_ADDRESS_HEX="0x$(mxpy wallet bech32 --decode ${SC_WITH_ROLE_ADDRESS_BECH32})"
 
 SC_DEST_ADDRESS_BECH32=
-SC_DEST_ADDRESS_HEX="0x$(erdpy wallet bech32 --decode ${SC_DEST_ADDRESS_BECH32})"
+SC_DEST_ADDRESS_HEX="0x$(mxpy wallet bech32 --decode ${SC_DEST_ADDRESS_BECH32})"
 
 ESDT_SYSTEM_SC_ADDRESS=erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u
 ESDT_TRANSFER_FUNC_NAME="ESDTTransfer"
@@ -29,7 +29,7 @@ ACCEPT_FUNDS_FUNC_NAME_ASCII="depositTokensForAction"
 ACCEPT_FUNDS_FUNC_NAME_HEX=0x6465706F736974546F6B656E73466F72416374696F6E
 
 deployTransferSc() {
-    erdpy --verbose contract deploy --project=${PROJECT} \
+    mxpy --verbose contract deploy --project=${PROJECT} \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
     --send --outfile="deploy-testnet.interaction.json" \
@@ -37,7 +37,7 @@ deployTransferSc() {
 }
 
 deployVault() {
-    erdpy --verbose contract deploy --bytecode="../../vault/output/vault.wasm" \
+    mxpy --verbose contract deploy --bytecode="../../vault/output/vault.wasm" \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
     --send --outfile="deploy-testnet.interaction.json" \
@@ -45,7 +45,7 @@ deployVault() {
 }
 
 setSpecialRoleForSc() {
-    erdpy --verbose contract call ${ESDT_SYSTEM_SC_ADDRESS} \
+    mxpy --verbose contract call ${ESDT_SYSTEM_SC_ADDRESS} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -54,7 +54,7 @@ setSpecialRoleForSc() {
 }
 
 transferSingleToUser() {
-    erdpy --verbose contract call ${SC_WITH_ROLE_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${SC_WITH_ROLE_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -64,7 +64,7 @@ transferSingleToUser() {
 }
 
 transferMultipleToUser() {
-    erdpy --verbose contract call ${USER_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${USER_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -76,7 +76,7 @@ transferMultipleToUser() {
 }
 
 transferSingleToSmartContractSuccess() {
-    erdpy --verbose contract call ${SC_WITH_ROLE_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${SC_WITH_ROLE_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -87,7 +87,7 @@ transferSingleToSmartContractSuccess() {
 }
 
 transferSingleToSmartContractFail() {
-    erdpy --verbose contract call ${SC_WITH_ROLE_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${SC_WITH_ROLE_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -98,7 +98,7 @@ transferSingleToSmartContractFail() {
 }
 
 transferToWalletDirectlyError() {
-    erdpy --verbose contract call ${RECEIVER_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${RECEIVER_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -107,7 +107,7 @@ transferToWalletDirectlyError() {
 }
 
 transferMultiToScSuccess() {
-    erdpy --verbose contract call ${USER_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${USER_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \
@@ -119,7 +119,7 @@ transferMultiToScSuccess() {
 }
 
 transferMultiToScFail() {
-    erdpy --verbose contract call ${USER_ADDRESS_BECH32} \
+    mxpy --verbose contract call ${USER_ADDRESS_BECH32} \
     --proxy=${PROXY} --chain=${CHAIN_ID} --send \
     --recall-nonce --pem=${USER_PEM} \
     --gas-limit=100000000 \

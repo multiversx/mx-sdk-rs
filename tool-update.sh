@@ -5,13 +5,13 @@
 VM_TAG="v1.5.1"
 
 echo "Before:"
-erdpy config dump
-erdpy config set dependencies.vmtools.tag $VM_TAG
+mxpy config dump
+mxpy config set dependencies.vmtools.tag $VM_TAG
 echo "After:"
-erdpy config dump
+mxpy config dump
 
-erdpy deps install vmtools --overwrite
+mxpy deps install vmtools --overwrite
 
 # Also update the Rust version
 
-erdpy deps install rust --tag="nightly" --overwrite
+mxpy deps install rust --tag="nightly" --overwrite
