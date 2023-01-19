@@ -8,12 +8,12 @@ publish = false
 [lib]
 path = "src/erc1155.rs"
 
-[dependencies.erc1155-user-mock]
-path="../erc1155-user-mock"
-
 [dependencies.multiversx-sc]
 version = "0.39.1"
 path = "../../../../framework/base"
+
+[dev-dependencies.erc1155-user-mock]
+path="../erc1155-user-mock"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.39.1"

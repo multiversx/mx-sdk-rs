@@ -5,17 +5,13 @@ authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 
-[lib]
-path = "src/lib.rs"
-
-
-[dependencies.first-contract]
+[dev-dependencies.first-contract]
 path = "first-contract"
 
-[dependencies.second-contract]
+[dev-dependencies.second-contract]
 path = "second-contract"
 
-[dependencies.multiversx-sc]
+[dev-dependencies.multiversx-sc]
 version = "0.39.1"
 path = "../../../../framework/base"
 

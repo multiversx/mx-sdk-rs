@@ -12,10 +12,6 @@ path = "src/proxy_pause.rs"
 version = "0.39.1"
 path = "../../../framework/base"
 
-[dependencies.multiversx-sc-modules]
-version = "0.39.1"
-path = "../../../contracts/modules"
-
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.39.1"
 path = "../../../framework/scenario"

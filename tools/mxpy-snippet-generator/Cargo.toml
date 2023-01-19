@@ -13,10 +13,6 @@ path = "src/mxpy_snippet_generator.rs"
 version = "0.39.1"
 path = "../../framework/base"
 
-[dependencies.multiversx-chain-vm]
-version = "0.1.1"
-path = "../../vm"
-
 [dependencies]
 bech32 = "0.9"
 num-bigint = "0.4.2"
