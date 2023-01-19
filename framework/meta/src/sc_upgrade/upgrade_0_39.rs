@@ -1,6 +1,11 @@
 use std::path::Path;
 
-use super::upgrade_common::{rename_files, replace_in_files};
+use super::{
+    upgrade_common::{
+        re_generate_wasm_crate, rename_files, replace_in_files, version_bump_in_cargo_toml,
+    },
+    upgrade_print::*,
+};
 use crate::{
     folder_structure::{DirectoryType, RelevantDirectory},
     CargoTomlContents,
@@ -15,14 +20,24 @@ pub const SCENARIO_FILE_PATTERNS: &[(&str, &str)] = &[
     ("mandos_rs", "scenario_rs"),
 ];
 
-/// All `0.38.0` to `0.39.0` transformations other than the version bump.
-pub(crate) fn upgrade_39(dir: &RelevantDirectory) {
+/// Migrate `0.38.0` to `0.39.0`, including the version bump.
+pub fn upgrade_to_39_0(dir: &RelevantDirectory) {
     if dir.dir_type == DirectoryType::Contract {
         v_0_39_prepare_meta(&dir.path);
         v_0_39_prepare_wasm(&dir.path);
     }
     v_0_39_replace_in_files(&dir.path);
     rename_files(dir.path.as_ref(), SCENARIO_FILE_PATTERNS);
+    version_bump_in_cargo_toml(&dir.path, "0.38.0", "0.39.0");
+}
+
+/// Post-processing: re-generate the wasm crates.
+pub fn postprocessing_after_39_1(dir: &RelevantDirectory) {
+    if dir.dir_type != DirectoryType::Contract {
+        return;
+    }
+    print_postprocessing_after_39_1(dir.path.as_path());
+    re_generate_wasm_crate(dir);
 }
 
 fn v_0_39_prepare_meta(sc_crate_path: &Path) {

@@ -10,8 +10,9 @@ use super::version_req::VersionReq;
 /// Used for retrieving crate versions.
 pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
     "multiversx-sc",
-    "multiversx-sc-scenario",
     "multiversx-sc-meta",
+    "multiversx-sc-scenario",
+    "multiversx-sc-wasm-adapter",
     "multiversx-sc-modules",
     "elrond-wasm",
     "elrond-wasm-debug",
@@ -51,6 +52,7 @@ impl RelevantDirectories {
         self.0.is_empty()
     }
 
+    #[allow(dead_code)]
     pub fn iter(&self) -> impl Iterator<Item = &RelevantDirectory> {
         self.0.iter()
     }
@@ -61,8 +63,29 @@ impl RelevantDirectories {
             .filter(|dir| dir.dir_type == DirectoryType::Contract)
     }
 
-    pub fn count_contract_crates(&self) -> usize {
-        self.iter_contract_crates().count()
+    pub fn count_for_version(&self, version: &str) -> usize {
+        self.0
+            .iter()
+            .filter(|dir| dir.version.semver == version)
+            .count()
+    }
+
+    pub fn iter_version(
+        &mut self,
+        version: &'static str,
+    ) -> impl Iterator<Item = &RelevantDirectory> {
+        self.0
+            .iter()
+            .filter(move |dir| dir.version.semver == version)
+    }
+
+    /// Operates no changes on the disk. Only changes this structure in memory.
+    pub fn update_versions_in_memory(&mut self, from_version: &str, to_version: &str) {
+        for dir in self.0.iter_mut() {
+            if dir.version.semver == from_version {
+                dir.version.semver = to_version.to_string();
+            }
+        }
     }
 }
 

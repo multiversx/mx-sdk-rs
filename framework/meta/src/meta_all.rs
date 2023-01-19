@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::{path::Path, process::Command};
 
 use colored::Colorize;
 
@@ -14,31 +14,39 @@ pub fn call_all_meta(args: &AllArgs) {
         "./"
     };
 
+    perform_call_all_meta(path, args.to_raw());
+}
+
+fn perform_call_all_meta(path: impl AsRef<Path>, raw_args: Vec<String>) {
     let dirs = RelevantDirectories::find_all(path);
-    println!("Found {} contract crates.\n", dirs.count_contract_crates(),);
+    println!(
+        "Found {} contract crates.\n",
+        dirs.iter_contract_crates().count(),
+    );
     if dirs.is_empty() {
         return;
     }
 
-    let mut cargo_run_args = vec!["run".to_string()];
-    cargo_run_args.append(&mut args.to_raw());
-
     for contract_crate in dirs.iter_contract_crates() {
-        let meta_path = contract_crate.path.join("meta");
-
-        println!(
-            "\n{} `cargo {}` in {}",
-            "Calling".green(),
-            cargo_run_args.join(" "),
-            meta_path.as_path().display(),
-        );
-
-        let _ = Command::new("cargo")
-            .current_dir(&meta_path)
-            .args(cargo_run_args.as_slice())
-            .spawn()
-            .expect("failed to spawn cargo run process in meta crate")
-            .wait()
-            .expect("cargo run process in meta crate was not running");
+        call_contract_meta(contract_crate.path.as_path(), raw_args.as_slice());
     }
+}
+
+pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String]) {
+    let meta_path = contract_crate_path.join("meta");
+
+    println!(
+        "\n{} `cargo run {}` in {}",
+        "Calling".green(),
+        cargo_run_args.join(" "),
+        meta_path.as_path().display(),
+    );
+
+    let _ = Command::new("cargo")
+        .current_dir(&meta_path)
+        .args(std::iter::once(&"run".to_string()).chain(cargo_run_args.iter()))
+        .spawn()
+        .expect("failed to spawn cargo run process in meta crate")
+        .wait()
+        .expect("cargo run process in meta crate was not running");
 }
