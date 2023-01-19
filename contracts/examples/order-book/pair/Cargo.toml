@@ -8,6 +8,6 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.1"
+version = "0.39.2"
 path = "../../../../framework/base"
 features = ["alloc"]

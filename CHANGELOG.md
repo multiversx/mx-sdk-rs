@@ -26,6 +26,12 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.39.2, vm 0.1.2] - 2023-01-19
+- `multiversx-sc-meta` improvements:
+	- `all` command that allows calling all contract meta crates in a folder;
+	- `upgrade` also re-generates wasm crates after reaching 0.39.1.
+- Cleaned up dependencies.
+
 ## [sc 0.39.1, codec 0.17.1, vm 0.1.1, scenario-format 0.19.1, sdk 0.1.1] - 2023-01-18
 - `multiversx-sc-meta` can be installed as a standalone tool (`sc-meta`), and used to automatically upgrade contracts.
 - Many depedencies updates across the repo.
