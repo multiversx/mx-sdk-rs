@@ -30,8 +30,8 @@ The framework is designed to be easiest to use with the Elrond IDE VSCode extens
 
 # Building contracts
 
-A comprehensive build guide can be found here: https://docs.multiversx.com/developers/developer-reference/smart-contract-build-reference/
+A comprehensive build guide can be found here: https://docs.multiversx.com/developers/developer-reference/sc-build-reference/
 
 # Debugging contracts
 
-The debugger guide: https://docs.multiversx.com/developers/developer-reference/rust-smart-contract-debugging/
+The debugger guide: https://docs.multiversx.com/developers/developer-reference/sc-debugging/

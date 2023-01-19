@@ -3,6 +3,7 @@ use super::{
 };
 use crate::{
     cli_args::{ContractCliAction, ContractCliArgs, StandaloneCliAction, StandaloneCliArgs},
+    meta_all::call_all_meta,
     sc_upgrade::upgrade_sc,
 };
 use clap::Parser;
@@ -11,10 +12,10 @@ use multiversx_sc::contract_base::ContractAbiProvider;
 /// Entry point in the program when calling it as a standalone tool.
 pub fn cli_main_standalone() {
     let cli_args = StandaloneCliArgs::parse();
-    #[allow(clippy::single_match)]
-    match cli_args.command {
+    match &cli_args.command {
+        Some(StandaloneCliAction::All(args)) => call_all_meta(args),
         Some(StandaloneCliAction::Upgrade(args)) => {
-            upgrade_sc(&args);
+            upgrade_sc(args);
         },
         None => {},
     }
@@ -27,8 +28,12 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
     match cli_args.command {
         ContractCliAction::Abi => {},
         ContractCliAction::Build(build_args) => meta_config_opt.build(build_args),
-        ContractCliAction::BuildDbg(build_args) => meta_config_opt.build(build_args.into_dbg()),
-        ContractCliAction::Twiggy(build_args) => meta_config_opt.build(build_args.into_twiggy()),
+        ContractCliAction::BuildDbg(build_args) => {
+            meta_config_opt.build(build_args.into_build_args())
+        },
+        ContractCliAction::Twiggy(build_args) => {
+            meta_config_opt.build(build_args.into_build_args())
+        },
         ContractCliAction::Clean => meta_config_opt.clean(),
         ContractCliAction::GenerateSnippets(gs_args) => {
             meta_config_opt.generate_rust_snippets(&gs_args)

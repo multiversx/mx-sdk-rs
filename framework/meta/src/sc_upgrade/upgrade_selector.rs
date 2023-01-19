@@ -1,14 +1,13 @@
-use super::{
-    folder_structure::{populate_directories, DirectoryToUpdate},
-    upgrade_0_39::upgrade_39,
-    upgrade_common::version_bump_in_cargo_toml,
-    upgrade_versions::{iter_from_version, LAST_VERSION},
-};
 use crate::{
     cli_args::UpgradeArgs,
-    sc_upgrade::{folder_structure::count_contract_crates, upgrade_versions::VERSIONS},
+    folder_structure::{RelevantDirectories, RelevantDirectory},
+    sc_upgrade::{
+        upgrade_0_39::{postprocessing_after_39_1, upgrade_to_39_0},
+        upgrade_common::version_bump_in_cargo_toml,
+        upgrade_print::*,
+        upgrade_versions::{versions_iter, DEFAULT_LAST_VERSION, VERSIONS},
+    },
 };
-use colored::*;
 
 pub fn upgrade_sc(args: &UpgradeArgs) {
     let path = if let Some(some_path) = &args.path {
@@ -20,82 +19,58 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
     let last_version = args
         .override_target_version
         .clone()
-        .unwrap_or_else(|| LAST_VERSION.to_string());
+        .unwrap_or_else(|| DEFAULT_LAST_VERSION.to_string());
 
     assert!(
         VERSIONS.contains(&last_version.as_str()),
         "Invalid requested version: {last_version}",
     );
 
-    let mut dirs = Vec::new();
-    populate_directories(path.as_ref(), &mut dirs);
+    let mut dirs = RelevantDirectories::find_all(path);
     println!(
         "Found {} directories to upgrade, out of which {} are contract crates.\n",
         dirs.len(),
-        count_contract_crates(dirs.as_slice())
+        dirs.iter_contract_crates().count(),
     );
 
-    for dir in &dirs {
-        if dir.version.semver == last_version {
-            print_not_upgrading_ok(dir);
-        } else if let Some(iterator) =
-            iter_from_version(dir.version.semver.as_str(), Some(last_version.clone()))
-        {
-            for (from_version, to_version) in iterator {
-                print_upgrading(dir, from_version, to_version);
-                upgrade_function_selector(dir, from_version, to_version);
-            }
-        } else {
-            print_not_upgrading_unsupported(dir);
+    for (from_version, to_version) in versions_iter(last_version) {
+        if dirs.count_for_version(from_version) == 0 {
+            continue;
         }
+
+        print_upgrading_all(from_version, to_version);
+        for dir in dirs.iter_version(from_version) {
+            print_upgrading(dir, from_version, to_version);
+            upgrade_function_selector(dir, from_version, to_version);
+        }
+
+        for dir in dirs.iter_version(from_version) {
+            upgrade_post_processing(dir);
+        }
+
+        // change the version in memory for the next iteration (dirs is not reloaded from disk)
+        dirs.update_versions_in_memory(from_version, to_version);
     }
 }
 
-#[allow(clippy::single_match)] // there will be more than one
-fn upgrade_function_selector(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
+fn upgrade_function_selector(dir: &RelevantDirectory, from_version: &str, to_version: &str) {
+    #[allow(clippy::single_match)]
     match dir.version.semver.as_str() {
         "0.38.0" => {
-            upgrade_39(dir);
+            upgrade_to_39_0(dir);
+        },
+        _ => {
+            version_bump_in_cargo_toml(&dir.path, from_version, to_version);
+        },
+    }
+}
+
+fn upgrade_post_processing(dir: &RelevantDirectory) {
+    #[allow(clippy::single_match)]
+    match dir.version.semver.as_str() {
+        "0.39.0" => {
+            postprocessing_after_39_1(dir);
         },
         _ => {},
     }
-
-    version_bump_in_cargo_toml(&dir.path, from_version, to_version);
-}
-
-fn print_upgrading(dir: &DirectoryToUpdate, from_version: &str, to_version: &str) {
-    println!(
-        "\n{}",
-        format!(
-            "Upgrading {} from {} to {}.\n",
-            dir.path.display(),
-            from_version,
-            to_version
-        )
-        .purple()
-    );
-}
-
-fn print_not_upgrading_ok(dir: &DirectoryToUpdate) {
-    println!(
-        "{}",
-        format!(
-            "Not upgrading {}, version {} OK.\n",
-            dir.path.display(),
-            &dir.version.semver
-        )
-        .green()
-    );
-}
-
-fn print_not_upgrading_unsupported(dir: &DirectoryToUpdate) {
-    println!(
-        "{}",
-        format!(
-            "Not upgrading {}, version {} unsupported.\n",
-            dir.path.display(),
-            &dir.version.semver
-        )
-        .red()
-    );
 }

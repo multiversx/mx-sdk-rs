@@ -1,8 +1,10 @@
 pub mod abi_json;
 mod cargo_toml_contents;
 pub mod cli_args;
+mod folder_structure;
 mod generate_snippets;
 mod meta_abi;
+mod meta_all;
 mod meta_cli;
 mod meta_config;
 mod meta_validate_abi;
