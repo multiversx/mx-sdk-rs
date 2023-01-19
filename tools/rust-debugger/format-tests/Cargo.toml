@@ -1,7 +1,8 @@
 [package]
 name = "format-tests"
-version = "0.1.0"
+version = "0.0.0"
 edition = "2021"
+publish = false
 
 
 [[bin]]
@@ -9,11 +10,11 @@ name = "format-tests"
 path = "src/format_tests.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.0"
+version = "0.39.1"
 path = "../../../framework/base"
 
 [dependencies.multiversx-chain-vm]
-version = "0.1.0"
+version = "0.1.1"
 path = "../../../vm"
 
 [dev-dependencies]
