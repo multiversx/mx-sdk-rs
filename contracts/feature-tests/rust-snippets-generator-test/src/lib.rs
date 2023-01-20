@@ -11,6 +11,23 @@ multiversx_sc::derive_imports!();
 // cargo run snippets
 // Add --overwrite if you want to overwrite existing snippets
 
+// Additionally, we also have to update the interact-rs snippets manually to add relative paths:
+// [dependencies.multiversx-sc-snippets]
+// version = "0.39.2"
+// path = "../../../../framework/snippets"
+
+// [dependencies.multiversx-sc-scenario]
+// version = "0.39.2"
+// path = "../../../../framework/scenario"
+
+// [dependencies.multiversx-chain-vm]
+// version = "0.1.2"
+// path = "../../../../vm"
+
+// [dependencies.multiversx-sdk]
+// version = "0.1.1"
+// path = "../../../../sdk/core"
+
 #[derive(
     TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone,
 )]
@@ -22,8 +39,6 @@ pub struct MyCoolStruct<M: ManagedTypeApi> {
 pub trait PayableFeatures {
     #[init]
     fn init(&self) {}
-
-    // basic types
 
     #[endpoint]
     fn no_arg_no_result_endpoint(&self) {}
