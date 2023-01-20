@@ -2,10 +2,7 @@ use std::{fs::File, io::Write};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
 
-use super::{
-    snippet_gen_common::write_newline,
-    snippet_type_map::{map_abi_type_to_rust_type, PLACEHOLDER_INPUT_TYPE_NAME},
-};
+use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
 
 pub(crate) fn write_state_struct_impl(
     file: &mut File,
@@ -227,11 +224,6 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
 
 fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
     writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
-}
-
-fn map_input_type_to_default_value_expr(input_type: String) -> String {
-    let rust_type = map_abi_type_to_rust_type(input_type);
-    rust_type.get_default_value_expr().to_string()
 }
 
 fn map_output_type_to_rust_type(input_type: String) -> String {

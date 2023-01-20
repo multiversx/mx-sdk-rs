@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 const INNER_TYPE_SEPARATOR: char = '<';
+const INNER_TYPE_END: char = '>';
 pub static DEBUG_API_SUFFIX: &str = "<DebugApi>";
 pub static PLACEHOLDER_INPUT_TYPE_NAME: &str = "PlaceholderInput";
 // pub static PLACEHOLDER_OUTPUT_TYPE_NAME: &str = "PlaceholderOutput";
@@ -105,10 +106,10 @@ lazy_static! {
         );
 
         m.insert(
-            "EsdtTokenIdentifier",
+            "EsdtTokenPayment",
             RustTypeString {
-                type_name: "EsdtTokenIdentifier".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "EsdtTokenIdentifier::new(
+                type_name: "EsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
+                default_value_expr: "EsdtTokenPayment::new(
                 TokenIdentifier::from_esdt_bytes(b\"\"),
                 0u64,
                 BigUint::from(0u64)
@@ -146,36 +147,44 @@ enum AbiType {
     Option(String),
 }
 
-fn get_abi_type(abi_type: &str) -> AbiType {
-    let opt_inner_type_start = abi_type.find(INNER_TYPE_SEPARATOR);
+/// MultiValueEncoded<BigUint>
+
+fn get_abi_type(abi_type_str: &str) -> AbiType {
+    let opt_inner_type_start = abi_type_str.find(INNER_TYPE_SEPARATOR);
     if opt_inner_type_start.is_none() {
-        let opt_basic_type = ABI_TYPES_TO_RUST_TYPES_MAP.get(abi_type);
+        let separated_str: Vec<&str> = abi_type_str.split(INNER_TYPE_END).collect();
+        let type_name = separated_str[0];
+        let opt_basic_type = ABI_TYPES_TO_RUST_TYPES_MAP.get(type_name);
         return match opt_basic_type {
             Some(basic_type) => AbiType::Basic(basic_type.clone()),
-            None => AbiType::UserDefined(abi_type.to_string()),
+            None => AbiType::UserDefined(type_name.to_string()),
         };
     }
 
     let inner_type_start = unsafe { opt_inner_type_start.unwrap_unchecked() };
-    let (complex_type_name, inner_types) = abi_type.split_at(inner_type_start);
+    let (complex_type_name, inner_types) = abi_type_str.split_at(inner_type_start);
+
+    // skip the '<' character
+    let inner_type_str = inner_types[1..].to_string();
     if complex_type_name.starts_with("array") {
         let array_type_name_len = "array".len();
         let (_, array_size_str) = complex_type_name.split_at(array_type_name_len);
-        return AbiType::Array(array_size_str.to_string(), inner_types.to_string());
+
+        return AbiType::Array(array_size_str.to_string(), inner_type_str);
     }
 
     match complex_type_name {
-        "variadic" => AbiType::Variadic(inner_types.to_string()),
-        "optional" => AbiType::Optional(inner_types.to_string()),
-        "Option" => AbiType::Option(inner_types.to_string()),
-        "multi" => AbiType::Multi(inner_types.to_string()),
-        "List" => AbiType::List(inner_types.to_string()),
-        _ => AbiType::UserDefined(inner_types.to_string()),
+        "variadic" => AbiType::Variadic(inner_type_str),
+        "optional" => AbiType::Optional(inner_type_str),
+        "Option" => AbiType::Option(inner_type_str),
+        "multi" => AbiType::Multi(inner_type_str),
+        "List" => AbiType::List(inner_type_str),
+        _ => AbiType::UserDefined(inner_type_str),
     }
 }
 
-fn handle_abi_type(type_string: &mut RustTypeString, abi_type: String) {
-    let abi_type = get_abi_type(&abi_type);
+fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
+    let abi_type = get_abi_type(&abi_type_str);
     match abi_type {
         AbiType::UserDefined(user_type) => {
             // most user-defined types contain managed types

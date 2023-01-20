@@ -69,6 +69,8 @@ path = ".."
 [dependencies.multiversx-sc-snippets]
 version = "0.39.0"
 
+[workspace]
+
 "#
     )
     .unwrap();
