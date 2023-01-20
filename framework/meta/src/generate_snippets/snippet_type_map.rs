@@ -1,11 +1,29 @@
 use std::collections::HashMap;
 
 const INNER_TYPE_SEPARATOR: char = '<';
+pub static DEBUG_API_SUFFIX: &str = "<DebugApi>";
+pub static PLACEHOLDER_INPUT_TYPE_NAME: &str = "PlaceholderInput";
+// pub static PLACEHOLDER_OUTPUT_TYPE_NAME: &str = "PlaceholderOutput";
 
 #[derive(Clone, Default)]
 pub struct RustTypeString {
-    pub type_name: String,          // used for return types
-    pub default_value_expr: String, // used for arguments
+    type_name: String,          // used for return types
+    default_value_expr: String, // used for arguments
+    contains_custom_types: bool,
+}
+
+impl RustTypeString {
+    pub fn get_type_name(&self) -> &str {
+        &self.type_name
+    }
+
+    pub fn get_default_value_expr(&self) -> &str {
+        if !self.contains_custom_types {
+            &self.default_value_expr
+        } else {
+            PLACEHOLDER_INPUT_TYPE_NAME
+        }
+    }
 }
 
 lazy_static! {
@@ -17,6 +35,7 @@ lazy_static! {
             RustTypeString {
                 type_name: "u8".to_string(),
                 default_value_expr: "0u8".to_string(),
+                contains_custom_types: false,
             },
         );
         m.insert(
@@ -24,6 +43,7 @@ lazy_static! {
             RustTypeString {
                 type_name: "u16".to_string(),
                 default_value_expr: "0u16".to_string(),
+                contains_custom_types: false,
             },
         );
         m.insert(
@@ -31,6 +51,7 @@ lazy_static! {
             RustTypeString {
                 type_name: "u32".to_string(),
                 default_value_expr: "0u32".to_string(),
+                contains_custom_types: false,
             },
         );
         m.insert(
@@ -38,48 +59,75 @@ lazy_static! {
             RustTypeString {
                 type_name: "u64".to_string(),
                 default_value_expr: "0u64".to_string(),
+                contains_custom_types: false,
             },
         );
 
         m.insert(
             "Address",
             RustTypeString {
-                type_name: "ManagedAddress<DebugApi>".to_string(),
+                type_name: "ManagedAddress".to_string() + DEBUG_API_SUFFIX,
                 default_value_expr: "bech32::decode(\"\")".to_string(),
+                contains_custom_types: false,
             },
         );
         m.insert(
             "BigUint",
             RustTypeString {
-                type_name: "BigUint<DebugApi>".to_string(),
+                type_name: "BigUint".to_string() + DEBUG_API_SUFFIX,
                 default_value_expr: "BigUint::from(0u64)".to_string(),
+                contains_custom_types: false,
+            },
+        );
+        m.insert(
+            "bytes",
+            RustTypeString {
+                type_name: "ManagedBuffer".to_string() + DEBUG_API_SUFFIX,
+                default_value_expr: "ManagedBuffer::new_from_bytes(b\"\")".to_string(),
+                contains_custom_types: false,
             },
         );
         m.insert(
             "TokenIdentifier",
             RustTypeString {
-                type_name: "TokenIdentifier<DebugApi>".to_string(),
+                type_name: "TokenIdentifier".to_string() + DEBUG_API_SUFFIX,
                 default_value_expr: "TokenIdentifier::from_esdt_bytes(b\"\")".to_string(),
+                contains_custom_types: false,
             },
         );
         m.insert(
-            "EsdtTokenPayment",
+            "EgldOrEsdtTokenIdentifier",
             RustTypeString {
-                type_name: "EsdtTokenPayment<DebugApi>".to_string(),
-                default_value_expr: "EsdtTokenPayment::new(
+                type_name: "EgldOrEsdtTokenIdentifier".to_string() + DEBUG_API_SUFFIX,
+                default_value_expr: "EgldOrEsdtTokenIdentifier::esdt(b\"\")".to_string(),
+                contains_custom_types: false,
+            },
+        );
+
+        m.insert(
+            "EsdtTokenIdentifier",
+            RustTypeString {
+                type_name: "EsdtTokenIdentifier".to_string() + DEBUG_API_SUFFIX,
+                default_value_expr: "EsdtTokenIdentifier::new(
                 TokenIdentifier::from_esdt_bytes(b\"\"),
                 0u64,
                 BigUint::from(0u64)
             )"
                 .to_string(),
+                contains_custom_types: false,
             },
         );
-
         m.insert(
-            "bytes",
+            "EgldOrEsdtTokenPayment",
             RustTypeString {
-                type_name: "ManagedBuffer<DebugApi>".to_string(),
-                default_value_expr: "ManagedBuffer::new_from_bytes(b\"\")".to_string(),
+                type_name: "EgldOrEsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
+                default_value_expr: "EgldOrEsdtTokenPayment::new(
+                EgldOrEsdtTokenIdentifier::esdt(b\"\"),
+                0u64,
+                BigUint::from(0u64)
+            )"
+                .to_string(),
+                contains_custom_types: false,
             },
         );
 
@@ -88,7 +136,7 @@ lazy_static! {
 }
 
 enum AbiType {
-    UserDefined,
+    UserDefined(String),
     Basic(RustTypeString),
     Variadic(String),
     Optional(String),
@@ -104,7 +152,7 @@ fn get_abi_type(abi_type: &str) -> AbiType {
         let opt_basic_type = ABI_TYPES_TO_RUST_TYPES_MAP.get(abi_type);
         return match opt_basic_type {
             Some(basic_type) => AbiType::Basic(basic_type.clone()),
-            None => AbiType::UserDefined,
+            None => AbiType::UserDefined(abi_type.to_string()),
         };
     }
 
@@ -122,19 +170,21 @@ fn get_abi_type(abi_type: &str) -> AbiType {
         "Option" => AbiType::Option(inner_types.to_string()),
         "multi" => AbiType::Multi(inner_types.to_string()),
         "List" => AbiType::List(inner_types.to_string()),
-        _ => AbiType::UserDefined,
+        _ => AbiType::UserDefined(inner_types.to_string()),
     }
 }
 
-fn handle_abi_type(type_string: &mut RustTypeString, abi_type: String) -> Result<(), ()> {
+fn handle_abi_type(type_string: &mut RustTypeString, abi_type: String) {
     let abi_type = get_abi_type(&abi_type);
     match abi_type {
-        AbiType::UserDefined => Result::Err(()),
+        AbiType::UserDefined(user_type) => {
+            // most user-defined types contain managed types
+            type_string.type_name += &(user_type + DEBUG_API_SUFFIX);
+            type_string.contains_custom_types = true;
+        },
         AbiType::Basic(basic_type) => {
             type_string.type_name += &basic_type.type_name;
             type_string.default_value_expr += &basic_type.default_value_expr;
-
-            Result::Ok(())
         },
         AbiType::Variadic(inner_types) => handle_variadic_type(type_string, inner_types),
         AbiType::Optional(inner_types) => handle_optional_type(type_string, inner_types),
@@ -147,55 +197,45 @@ fn handle_abi_type(type_string: &mut RustTypeString, abi_type: String) -> Result
     }
 }
 
-fn handle_variadic_type(type_string: &mut RustTypeString, inner_types: String) -> Result<(), ()> {
+fn handle_variadic_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "MultiValueVec<";
     type_string.default_value_expr += "MultiValueVec::from(vec![";
 
-    handle_abi_type(type_string, inner_types)?;
+    handle_abi_type(type_string, inner_types);
 
     type_string.type_name += ">";
     type_string.default_value_expr += "])";
-
-    Result::Ok(())
 }
 
-fn handle_optional_type(type_string: &mut RustTypeString, inner_types: String) -> Result<(), ()> {
+fn handle_optional_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "OptionalValue<";
     type_string.default_value_expr += "OptionalValue::Some(";
 
-    handle_abi_type(type_string, inner_types)?;
+    handle_abi_type(type_string, inner_types);
 
     type_string.type_name += ">";
     type_string.default_value_expr += ")";
-
-    Result::Ok(())
 }
 
-fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) -> Result<(), ()> {
-    todo!();
-}
+// TODO: Think about how to fix this
+// maybe count number of commas between <>
+fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {}
 
-fn handle_list_type(type_string: &mut RustTypeString, inner_types: String) -> Result<(), ()> {
+fn handle_list_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "ManagedVec<DebugApi, ";
     type_string.default_value_expr += "ManagedVec::from_single_item(";
 
-    handle_abi_type(type_string, inner_types)?;
+    handle_abi_type(type_string, inner_types);
 
     type_string.type_name += ">";
-    type_string.default_value_expr += "])";
-
-    Result::Ok(())
+    type_string.default_value_expr += ")";
 }
 
-fn handle_array_type(
-    type_string: &mut RustTypeString,
-    array_size: String,
-    inner_types: String,
-) -> Result<(), ()> {
+fn handle_array_type(type_string: &mut RustTypeString, array_size: String, inner_types: String) {
     type_string.type_name += "[";
     type_string.default_value_expr += "[";
 
-    handle_abi_type(type_string, inner_types)?;
+    handle_abi_type(type_string, inner_types);
 
     type_string.type_name += ";";
     type_string.type_name += &array_size;
@@ -204,27 +244,20 @@ fn handle_array_type(
     type_string.default_value_expr += ";";
     type_string.default_value_expr += &array_size;
     type_string.default_value_expr += "]";
-
-    Result::Ok(())
 }
 
-fn handle_option_type(type_string: &mut RustTypeString, inner_types: String) -> Result<(), ()> {
+fn handle_option_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "Option<";
     type_string.default_value_expr += "Option::Some(";
 
-    handle_abi_type(type_string, inner_types)?;
+    handle_abi_type(type_string, inner_types);
 
     type_string.type_name += ">";
     type_string.default_value_expr += ")";
-
-    Result::Ok(())
 }
 
-pub(crate) fn map_abi_type_to_rust_type(abi_type: String) -> Option<RustTypeString> {
+pub(crate) fn map_abi_type_to_rust_type(abi_type: String) -> RustTypeString {
     let mut type_string = RustTypeString::default();
-    let handle_result = handle_abi_type(&mut type_string, abi_type);
-    match handle_result {
-        Ok(()) => Some(type_string),
-        Err(()) => None,
-    }
+    handle_abi_type(&mut type_string, abi_type);
+    type_string
 }
