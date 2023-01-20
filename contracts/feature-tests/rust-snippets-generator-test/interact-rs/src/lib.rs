@@ -1,25 +1,23 @@
 #![allow(non_snake_case)]
 
 use rust_snippets_generator_test::ProxyTrait as _;
+use rust_snippets_generator_test::*;
 use multiversx_sc_snippets::{
     multiversx_sc::{
         codec::multi_types::*,
-        types::{Address, CodeMetadata},
-    },
-    multiversx_chain_vm::{
-        bech32, scenario_format::interpret_trait::InterpreterContext, scenario_model::*, ContractInfo,
-        DebugApi,
+        types::*,
     },
     env_logger,
     erdrs::wallet::Wallet,
     tokio, Interactor,
 };
-use std::{
-    env::Args,
-    io::{Read, Write},
+use multiversx_sc_scenario::scenario_model::*;
+use multiversx_chain_vm::{
+    bech32, scenario_format::interpret_trait::InterpreterContext, ContractInfo, DebugApi,
 };
 
-const GATEWAY: &str = multiversx_sc_snippets::erdrs::blockchain::rpc::DEVNET_GATEWAY;
+
+const GATEWAY: &str = multiversx_sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const SC_ADDRESS: &str = "";
 
@@ -91,7 +89,7 @@ impl State {
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
-                    .contract_code("file:../output/rust_snippets_generator_test.wasm", &InterpreterContext::default())
+                    .contract_code("file:../output/rust-snippets-generator-test.wasm", &InterpreterContext::default())
                     .gas_limit(DEFAULT_GAS_LIMIT),
             )
             .await;
@@ -177,7 +175,7 @@ impl State {
     }
 
     async fn multi_result(&mut self) {
-        let _arg = TokenIdentifier::from_esdt_bytes(b"");
+        let _arg = TokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result: multiversx_sc_snippets::InteractorResult<MultiValueVec<BigUint<DebugApi>>> = self
             .interactor
@@ -196,7 +194,7 @@ impl State {
     }
 
     async fn nested_result(&mut self) {
-        let _arg = TokenIdentifier::from_esdt_bytes(b"");
+        let _arg = TokenIdentifier::from_esdt_bytes(&b""[..]);
 
         let result: multiversx_sc_snippets::InteractorResult<ManagedVec<DebugApi, ManagedVec<DebugApi, BigUint<DebugApi>>>> = self
             .interactor
@@ -253,7 +251,7 @@ impl State {
     }
 
     async fn option_type(&mut self) {
-        let _arg = Option::Some(ManagedVec::from_single_item(TokenIdentifier::from_esdt_bytes(b"")));
+        let _arg = Option::Some(ManagedVec::from_single_item(TokenIdentifier::from_esdt_bytes(&b""[..])));
 
         let result: multiversx_sc_snippets::InteractorResult<Option<u64>> = self
             .interactor
@@ -273,7 +271,7 @@ impl State {
 
     async fn esdt_token_payment(&mut self) {
         let _arg = OptionalValue::Some(EsdtTokenPayment::new(
-                TokenIdentifier::from_esdt_bytes(b""),
+                TokenIdentifier::from_esdt_bytes(&b""[..]),
                 0u64,
                 BigUint::from(0u64)
             ));
@@ -296,7 +294,7 @@ impl State {
 
     async fn egld_or_esdt_payment(&mut self) {
         let arg = EgldOrEsdtTokenPayment::new(
-                EgldOrEsdtTokenIdentifier::esdt(b""),
+                EgldOrEsdtTokenIdentifier::esdt(&b""[..]),
                 0u64,
                 BigUint::from(0u64)
             );
@@ -341,7 +339,7 @@ impl State {
     }
 
     async fn managed_buffer(&mut self) {
-        let _arg = Option::Some(ManagedBuffer::new_from_bytes(b""));
+        let _arg = Option::Some(ManagedBuffer::new_from_bytes(&b""[..]));
 
         let result: multiversx_sc_snippets::InteractorResult<MultiValueVec<ManagedVec<DebugApi, MyCoolStruct<DebugApi>>>> = self
             .interactor

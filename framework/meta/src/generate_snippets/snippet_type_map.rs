@@ -84,7 +84,7 @@ lazy_static! {
             "bytes",
             RustTypeString {
                 type_name: "ManagedBuffer".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "ManagedBuffer::new_from_bytes(b\"\")".to_string(),
+                default_value_expr: "ManagedBuffer::new_from_bytes(&b\"\"[..])".to_string(),
                 contains_custom_types: false,
             },
         );
@@ -92,7 +92,7 @@ lazy_static! {
             "TokenIdentifier",
             RustTypeString {
                 type_name: "TokenIdentifier".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "TokenIdentifier::from_esdt_bytes(b\"\")".to_string(),
+                default_value_expr: "TokenIdentifier::from_esdt_bytes(&b\"\"[..])".to_string(),
                 contains_custom_types: false,
             },
         );
@@ -100,7 +100,7 @@ lazy_static! {
             "EgldOrEsdtTokenIdentifier",
             RustTypeString {
                 type_name: "EgldOrEsdtTokenIdentifier".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "EgldOrEsdtTokenIdentifier::esdt(b\"\")".to_string(),
+                default_value_expr: "EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..])".to_string(),
                 contains_custom_types: false,
             },
         );
@@ -110,7 +110,7 @@ lazy_static! {
             RustTypeString {
                 type_name: "EsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
                 default_value_expr: "EsdtTokenPayment::new(
-                TokenIdentifier::from_esdt_bytes(b\"\"),
+                TokenIdentifier::from_esdt_bytes(&b\"\"[..]),
                 0u64,
                 BigUint::from(0u64)
             )"
@@ -123,7 +123,7 @@ lazy_static! {
             RustTypeString {
                 type_name: "EgldOrEsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
                 default_value_expr: "EgldOrEsdtTokenPayment::new(
-                EgldOrEsdtTokenIdentifier::esdt(b\"\"),
+                EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..]),
                 0u64,
                 BigUint::from(0u64)
             )"
