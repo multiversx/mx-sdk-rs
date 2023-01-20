@@ -232,7 +232,7 @@ impl State {
     }
 
     async fn optional_type(&mut self) {
-        let _arg = OptionalValue::Some(BigUint::from(0u64));
+        let _arg = OptionalValue::Some(BigUint::<DebugApi>::from(0u64));
 
         let result: multiversx_sc_snippets::InteractorResult<OptionalValue<TokenIdentifier<DebugApi>>> = self
             .interactor
@@ -273,7 +273,7 @@ impl State {
         let _arg = OptionalValue::Some(EsdtTokenPayment::new(
                 TokenIdentifier::from_esdt_bytes(&b""[..]),
                 0u64,
-                BigUint::from(0u64)
+                BigUint::<DebugApi>::from(0u64)
             ));
 
         let result: multiversx_sc_snippets::InteractorResult<EsdtTokenPayment<DebugApi>> = self
@@ -296,7 +296,7 @@ impl State {
         let arg = EgldOrEsdtTokenPayment::new(
                 EgldOrEsdtTokenIdentifier::esdt(&b""[..]),
                 0u64,
-                BigUint::from(0u64)
+                BigUint::<DebugApi>::from(0u64)
             );
 
         let result: multiversx_sc_snippets::InteractorResult<EgldOrEsdtTokenIdentifier<DebugApi>> = self
@@ -318,7 +318,7 @@ impl State {
     async fn payable_endpoint(&mut self) {
         let token_id = b"";
         let token_nonce = 0u64;
-        let token_amount = BigUint::from(0u64);
+        let token_amount = BigUint::<DebugApi>::from(0u64);
 
         let result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor

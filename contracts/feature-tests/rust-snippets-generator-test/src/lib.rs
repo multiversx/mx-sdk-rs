@@ -11,7 +11,9 @@ multiversx_sc::derive_imports!();
 // cargo run snippets
 // Add --overwrite if you want to overwrite existing snippets
 
-#[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug)]
+#[derive(
+    TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone,
+)]
 pub struct MyCoolStruct<M: ManagedTypeApi> {
     pub awesome: BigUint<M>,
 }
