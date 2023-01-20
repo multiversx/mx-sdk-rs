@@ -27,30 +27,34 @@
 # 5. Commit changes. The name of the commit should be the released crates and versions, same as the changelog title,
 # e.g. `sc 0.39.0, codec 0.17.0, chain-vm 0.1.0, chain-scenario-format 0.19.0, sdk 0.1.0`.
 # The branch doesn't need to be published for the following steps to work.
+#
+# 6. Make sure that the contract upgrade tool is still sound.
+# At the very least add the new version to `VERSIONS` and change `DEFAULT_LAST_VERSION` in 
+# `/home/andreim/multiversx/rs/mx-sdk-rs/framework/meta/src/sc_upgrade/upgrade_versions.rs`
 # 
-# 5. Run this script, `./publish.sh`.
+# 7. Run this script, `./publish.sh`.
 # You can comment out the crates you are not publishing. The script will stop otherwise when it cannot publish them.
 # 
-# 6. Search for `multiversx` on `crates.io` and check that the new versions appear for all crates.
+# 8. Search for `multiversx` on `crates.io` and check that the new versions appear for all crates.
 # If any of the crates was not published, check what went wrong and try again.
 #
-# 7. Create tag.
+# 9. Create tag.
 # `git tag -s -a vX.X.X -m 'very short description of the release'`
 # `git push origin vX.X.X`
 #
-# 8. Go to https://github.com/multiversx/mx-sdk-rs/tags
+# 10. Go to https://github.com/multiversx/mx-sdk-rs/tags
 # Click on the new tag.
 # Click `Create release from tag`.
 # The title should be the released crates and versions, same as in the changelog and the commit message.
 # The description should be copied from CHANGELOG.md, as is.
 #
-# 9. Create pull request on GitHub. The faster it gets merged in master, the better.
+# 11. Create pull request on GitHub. The faster it gets merged in master, the better.
 #
-# 10. (optional) Test the new framework on one of the contracts that are not in the same repo, e.g. DNS, DEX, etc.
+# 12. (optional) Test the new framework on one of the contracts that are not in the same repo, e.g. DNS, DEX, etc.
 #
-# 11. Post in Slack to `release-announcements`.
+# 13. Post in Slack to `release-announcements`.
 #
-# 12. Write a release announcement in Confluence.
+# 14. Write a release announcement in Confluence.
 #
 
 cd sdk/core

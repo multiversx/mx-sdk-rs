@@ -4,11 +4,11 @@ version = 3
 
 [[package]]
 name = "ahash"
-version = "0.7.4"
+version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43bb833f0bf979d8475d38fbf09ed3b8a55e1885fe93ad3f93239fc6a4f17b98"
+checksum = "bf6ccdb167abbf410dcb915cabd428929d7f6a04980b54a11f26a39f1c7f7107"
 dependencies = [
- "getrandom",
+ "cfg-if 1.0.0",
  "once_cell",
  "version_check",
 ]
@@ -50,21 +50,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
 
 [[package]]
-name = "getrandom"
-version = "0.2.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fcd999463524c52659517fe2cea98493cfe485d10565e7b0fb07dbba7ad2753"
-dependencies = [
- "cfg-if 1.0.0",
- "libc",
- "wasi",
-]
-
-[[package]]
 name = "hashbrown"
-version = "0.11.2"
+version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
+checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
 dependencies = [
  "ahash",
 ]
@@ -85,7 +74,7 @@ checksum = "5af1f635ef1bc545d78392b136bfe1c9809e029023c84a3638a864a10b8819c8"
 name = "kitty"
 version = "0.0.0"
 dependencies = [
- "mx-sc",
+ "multiversx-sc",
  "random",
 ]
 
@@ -94,7 +83,7 @@ name = "kitty-genetic-alg"
 version = "0.0.0"
 dependencies = [
  "kitty",
- "mx-sc",
+ "multiversx-sc",
  "random",
 ]
 
@@ -104,7 +93,7 @@ version = "0.0.0"
 dependencies = [
  "kitty",
  "kitty-genetic-alg",
- "mx-sc",
+ "multiversx-sc",
  "random",
 ]
 
@@ -113,7 +102,7 @@ name = "kitty-ownership-wasm"
 version = "0.0.0"
 dependencies = [
  "kitty-ownership",
- "mx-sc-wasm-adapter",
+ "multiversx-sc-wasm-adapter",
 ]
 
 [[package]]
@@ -129,30 +118,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
 
 [[package]]
-name = "mx-sc"
-version = "0.38.0"
+name = "multiversx-sc"
+version = "0.39.2"
 dependencies = [
  "bitflags",
  "hashbrown",
  "hex-literal",
- "mx-sc-codec",
- "mx-sc-derive",
+ "multiversx-sc-codec",
+ "multiversx-sc-derive",
  "num-traits",
- "wee_alloc",
 ]
 
 [[package]]
-name = "mx-sc-codec"
-version = "0.16.0"
+name = "multiversx-sc-codec"
+version = "0.17.1"
 dependencies = [
  "arrayvec",
- "mx-sc-codec-derive",
- "wee_alloc",
+ "multiversx-sc-codec-derive",
 ]
 
 [[package]]
-name = "mx-sc-codec-derive"
-version = "0.16.0"
+name = "multiversx-sc-codec-derive"
+version = "0.17.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -161,8 +148,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "mx-sc-derive"
-version = "0.38.0"
+name = "multiversx-sc-derive"
+version = "0.39.2"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -172,18 +159,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "mx-sc-wasm-adapter"
-version = "0.38.0"
+name = "multiversx-sc-wasm-adapter"
+version = "0.39.2"
 dependencies = [
- "mx-sc",
+ "multiversx-sc",
  "wee_alloc",
 ]
 
 [[package]]
 name = "nibble_vec"
-version = "0.0.4"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c8d77f3db4bce033f4d04db08079b2ef1c3d02b44e86f25d08886fafa7756ffa"
+checksum = "77a5d83df9f36fe23f0c3648c6bbb8b0298bb5f1939c8f2704431371f4b84d43"
+dependencies = [
+ "smallvec",
+]
 
 [[package]]
 name = "num-traits"
@@ -196,9 +186,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.8.0"
+version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "692fcb63b64b1758029e0a96ee63e049ce8c5948587f2f7208df04625e5f6b56"
+checksum = "6f61fba1741ea2b3d6a1e3178721804bb716a68a6aeba1149b5d52e3d464ea66"
 
 [[package]]
 name = "proc-macro2"
@@ -220,9 +210,9 @@ dependencies = [
 
 [[package]]
 name = "radix_trie"
-version = "0.1.6"
+version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d3681b28cd95acfb0560ea9441f82d6a4504fa3b15b97bd7b6e952131820e95"
+checksum = "c069c179fcdc6a2fe24d8d18305cf085fdbd4f922c041943e203685d6a1c58fd"
 dependencies = [
  "endian-type",
  "nibble_vec",
@@ -232,8 +222,14 @@ dependencies = [
 name = "random"
 version = "0.0.0"
 dependencies = [
- "mx-sc",
+ "multiversx-sc",
 ]
+
+[[package]]
+name = "smallvec"
+version = "1.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 
 [[package]]
 name = "syn"
@@ -254,15 +250,9 @@ checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
 
 [[package]]
 name = "version_check"
-version = "0.9.3"
+version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5fecdca9a5291cc2b8dcf7dc02453fee791a280f3743cb0905f8822ae463b3fe"
-
-[[package]]
-name = "wasi"
-version = "0.10.2+wasi-snapshot-preview1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd6fbd9a79829dd1ad0cc20627bf1ed606756a7f77edff7b66b7064f9cb327c6"
+checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 
 [[package]]
 name = "wee_alloc"

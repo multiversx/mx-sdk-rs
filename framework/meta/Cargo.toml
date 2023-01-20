@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.39.1"
+version = "0.39.2"
 edition = "2021"
 
 authors = [
@@ -31,7 +31,7 @@ colored = "2.0"
 lazy_static = "1.4.0"
 
 [dependencies.multiversx-sc]
-version = "=0.39.1"
+version = "=0.39.2"
 path = "../base"
 features = ["alloc", "num-bigint", "promises", "big-float"]
 
