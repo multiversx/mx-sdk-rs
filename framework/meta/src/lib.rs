@@ -11,6 +11,7 @@ mod meta_validate_abi;
 mod meta_wasm_tools;
 pub mod output_contract;
 mod sc_upgrade;
+mod meta_info;
 
 pub use cargo_toml_contents::CargoTomlContents;
 pub use meta_cli::{cli_main, cli_main_standalone, multi_contract_config};

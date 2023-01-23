@@ -29,6 +29,11 @@ pub struct StandaloneCliArgs {
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum StandaloneCliAction {
     #[command(
+        about = "General info about the contract an libraries residing in the targetted directory.."
+    )]
+    Info(InfoArgs),
+
+    #[command(
         about = "Calls the meta crates for all contracts under given path with the given arguments."
     )]
     All(AllArgs),
@@ -37,6 +42,19 @@ pub enum StandaloneCliAction {
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
     )]
     Upgrade(UpgradeArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InfoArgs {
+    /// Target directory to retrieve info from.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
