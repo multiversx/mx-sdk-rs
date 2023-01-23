@@ -31,6 +31,7 @@ pub enum DirectoryType {
 pub struct RelevantDirectory {
     pub path: PathBuf,
     pub version: VersionReq,
+    pub upgrade_in_progress: Option<(&'static str, &'static str)>,
     pub dir_type: DirectoryType,
 }
 
@@ -86,11 +87,22 @@ impl RelevantDirectories {
             .filter(move |dir| dir.version.semver == version)
     }
 
-    /// Operates no changes on the disk. Only changes this structure in memory.
-    pub fn update_versions_in_memory(&mut self, from_version: &str, to_version: &str) {
+    /// Marks all appropriate directories as ready for upgrade.
+    pub fn start_upgrade(&mut self, from_version: &'static str, to_version: &'static str) {
         for dir in self.0.iter_mut() {
             if dir.version.semver == from_version {
+                dir.upgrade_in_progress = Some((from_version, to_version));
+            }
+        }
+    }
+
+    /// Updates the versions of all directories being upgraded (in memory)
+    /// and resets upgrade status.
+    pub fn finish_upgrade(&mut self) {
+        for dir in self.0.iter_mut() {
+            if let Some((_, to_version)) = &dir.upgrade_in_progress {
                 dir.version.semver = to_version.to_string();
+                dir.upgrade_in_progress = None;
             }
         }
     }
@@ -118,6 +130,7 @@ fn populate_directories(path: &Path, ignore: &[String], result: &mut Vec<Relevan
         result.push(RelevantDirectory {
             path: path.to_owned(),
             version,
+            upgrade_in_progress: None,
             dir_type,
         });
     }

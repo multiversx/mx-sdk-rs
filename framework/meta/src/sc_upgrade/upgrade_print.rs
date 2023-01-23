@@ -5,15 +5,30 @@ use crate::folder_structure::{
 use colored::Colorize;
 use std::path::Path;
 
-pub fn print_upgrading(dir: &RelevantDirectory, from_version: &str, to_version: &str) {
-    println!(
-        "\n{}",
-        format!(
-            "Upgrading from {from_version} to {to_version} in {}\n",
-            dir.path.display(),
-        )
-        .purple()
-    );
+pub fn print_upgrading(dir: &RelevantDirectory) {
+    if let Some((from_version, to_version)) = dir.upgrade_in_progress {
+        println!(
+            "\n{}",
+            format!(
+                "Upgrading from {from_version} to {to_version} in {}\n",
+                dir.path.display(),
+            )
+            .purple()
+        );
+    }
+}
+
+pub fn print_post_processing(dir: &RelevantDirectory) {
+    if let Some((from_version, to_version)) = dir.upgrade_in_progress {
+        println!(
+            "\n{}",
+            format!(
+                "Post-processing after upgrade from {from_version} to {to_version} in {}\n",
+                dir.path.display(),
+            )
+            .purple()
+        );
+    }
 }
 
 pub fn print_upgrading_all(from_version: &str, to_version: &str) {
@@ -68,4 +83,39 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &str) {
     } else {
         print!(" {}", version_string.red());
     };
+}
+
+pub fn print_cargo_dep_remove(path: &Path, dep_name: &str) {
+    println!(
+        "{}/dependencies/{}",
+        path.display(),
+        dep_name.red().strikethrough(),
+    );
+}
+
+pub fn print_cargo_dep_add(path: &Path, dep_name: &str) {
+    println!(
+        "{}/dependencies/{}",
+        path.display(),
+        dep_name.red().strikethrough(),
+    );
+}
+
+pub fn print_cargo_check(dir: &RelevantDirectory) {
+    println!(
+        "\n{}",
+        format!(
+            "Running cargo check after upgrading to version {} in {}\n",
+            dir.version.semver,
+            dir.path.display(),
+        )
+        .purple()
+    );
+}
+
+pub fn print_cargo_check_fail() {
+    let message =
+        "Automatic upgrade failed to fix all issues. Fix them manually, make `cargo check` pass, then continue automatic upgrade!"
+        .red();
+    println!("\n{message}");
 }

@@ -1,7 +1,7 @@
-use crate::folder_structure::dir_pretty_print;
-use crate::sc_upgrade::DEFAULT_LAST_VERSION;
 use crate::{
-    cli_args::InfoArgs, folder_structure::RelevantDirectories, sc_upgrade::print_tree_dir_metadata,
+    cli_args::InfoArgs,
+    folder_structure::{dir_pretty_print, RelevantDirectories},
+    sc_upgrade::{print_tree_dir_metadata, DEFAULT_LAST_VERSION},
 };
 
 pub fn call_info(args: &InfoArgs) {
