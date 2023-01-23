@@ -50,6 +50,11 @@ pub struct AllArgs {
     #[clap(global = true)]
     pub path: Option<String>,
 
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
     #[arg(
         long = "no-abi-git-version",
         help = "Skips loading the Git version into the ABI",
@@ -75,6 +80,11 @@ pub struct UpgradeArgs {
     /// Will be current directory if not specified.
     #[arg(long, verbatim_doc_comment)]
     pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
 
     /// Overrides the version to upgrade to.
     /// By default it will be the last version out.

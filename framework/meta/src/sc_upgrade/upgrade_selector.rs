@@ -26,7 +26,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         "Invalid requested version: {last_version}",
     );
 
-    let mut dirs = RelevantDirectories::find_all(path);
+    let mut dirs = RelevantDirectories::find_all(path, args.ignore.as_slice());
     println!(
         "Found {} directories to upgrade, out of which {} are contract crates.\n",
         dirs.len(),

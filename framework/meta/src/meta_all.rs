@@ -14,11 +14,11 @@ pub fn call_all_meta(args: &AllArgs) {
         "./"
     };
 
-    perform_call_all_meta(path, args.to_raw());
+    perform_call_all_meta(path, args.ignore.as_slice(), args.to_raw());
 }
 
-fn perform_call_all_meta(path: impl AsRef<Path>, raw_args: Vec<String>) {
-    let dirs = RelevantDirectories::find_all(path);
+fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
+    let dirs = RelevantDirectories::find_all(path, ignore);
     println!(
         "Found {} contract crates.\n",
         dirs.iter_contract_crates().count(),
@@ -34,6 +34,11 @@ fn perform_call_all_meta(path: impl AsRef<Path>, raw_args: Vec<String>) {
 
 pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String]) {
     let meta_path = contract_crate_path.join("meta");
+    assert!(
+        meta_path.exists(),
+        "Contract meta crate not found at {}",
+        meta_path.as_path().display()
+    );
 
     println!(
         "\n{} `cargo run {}` in {}",
