@@ -226,9 +226,33 @@ fn handle_optional_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.default_value_expr += ")";
 }
 
-// TODO: Think about how to fix this
-// maybe count number of commas between <>
-fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {}
+fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {
+    let multi_type_end_index = inner_types.find(INNER_TYPE_END).unwrap();
+    let mut inner_multi_types: Vec<&str> = inner_types[..multi_type_end_index].split(',').collect();
+    let inner_multi_types_len = inner_multi_types.len();
+
+    type_string.type_name += "MultiValue";
+    type_string.type_name += &inner_multi_types_len.to_string();
+    type_string.type_name += "<";
+
+    // "MultiValueN::from((x, y, z))"
+    type_string.default_value_expr += "MultiValue";
+    type_string.default_value_expr += &inner_multi_types_len.to_string();
+    type_string.default_value_expr += "::from((";
+
+    for (i, multi_type) in inner_multi_types.iter_mut().enumerate() {
+        let trimmed = multi_type.trim();
+        handle_abi_type(type_string, trimmed.to_string());
+
+        if i < inner_multi_types_len - 1 {
+            type_string.type_name += ", ";
+            type_string.default_value_expr += ", ";
+        }
+    }
+
+    type_string.type_name += ">";
+    type_string.default_value_expr += "))";
+}
 
 fn handle_list_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.type_name += "ManagedVec<DebugApi, ";

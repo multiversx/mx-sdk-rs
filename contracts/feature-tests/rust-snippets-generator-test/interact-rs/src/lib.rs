@@ -52,6 +52,9 @@ async fn main() {
         "egld_or_esdt_payment" => state.egld_or_esdt_payment().await,
         "payable_endpoint" => state.payable_endpoint().await,
         "managed_buffer" => state.managed_buffer().await,
+        "multi_value_2" => state.multi_value_2().await,
+        "multi_value_4" => state.multi_value_4().await,
+        "complex_multi_values" => state.complex_multi_values().await,
         _ => panic!("unknown command: {}", &cmd),
     }
 }
@@ -273,7 +276,7 @@ impl State {
         let _arg = OptionalValue::Some(EsdtTokenPayment::new(
                 TokenIdentifier::from_esdt_bytes(&b""[..]),
                 0u64,
-                BigUint::<DebugApi>::from(0u64)
+                BigUint::from(0u64)
             ));
 
         let result: multiversx_sc_snippets::InteractorResult<EsdtTokenPayment<DebugApi>> = self
@@ -296,7 +299,7 @@ impl State {
         let arg = EgldOrEsdtTokenPayment::new(
                 EgldOrEsdtTokenIdentifier::esdt(&b""[..]),
                 0u64,
-                BigUint::<DebugApi>::from(0u64)
+                BigUint::from(0u64)
             );
 
         let result: multiversx_sc_snippets::InteractorResult<EgldOrEsdtTokenIdentifier<DebugApi>> = self
@@ -346,6 +349,63 @@ impl State {
             .sc_call_get_result(
                 self.contract
                     .managed_buffer(_arg)
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit(DEFAULT_GAS_LIMIT)
+                    .into(),
+            )
+            .await;
+        let result_value = result.value();
+
+        println!("Result: {:?}", result_value);
+    }
+
+    async fn multi_value_2(&mut self) {
+        let arg = MultiValue2::from((0u64, BigUint::<DebugApi>::from(0u64)));
+
+        let result: multiversx_sc_snippets::InteractorResult<MultiValue2<u64, BigUint<DebugApi>>> = self
+            .interactor
+            .sc_call_get_result(
+                self.contract
+                    .multi_value_2(arg)
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit(DEFAULT_GAS_LIMIT)
+                    .into(),
+            )
+            .await;
+        let result_value = result.value();
+
+        println!("Result: {:?}", result_value);
+    }
+
+    async fn multi_value_4(&mut self) {
+        let arg = PlaceholderInput;
+
+        let result: multiversx_sc_snippets::InteractorResult<MultiValue4<u64, BigUint<DebugApi>, MyCoolStruct<DebugApi>, TokenIdentifier<DebugApi>>> = self
+            .interactor
+            .sc_call_get_result(
+                self.contract
+                    .multi_value_4(arg)
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit(DEFAULT_GAS_LIMIT)
+                    .into(),
+            )
+            .await;
+        let result_value = result.value();
+
+        println!("Result: {:?}", result_value);
+    }
+
+    async fn complex_multi_values(&mut self) {
+        let arg = MultiValueVec::from(vec![MultiValue3::from((TokenIdentifier::from_esdt_bytes(&b""[..]), 0u64, BigUint::<DebugApi>::from(0u64)))]);
+
+        let result: multiversx_sc_snippets::InteractorResult<MultiValueVec<MultiValue3<TokenIdentifier<DebugApi>, u64, BigUint<DebugApi>>>> = self
+            .interactor
+            .sc_call_get_result(
+                self.contract
+                    .complex_multi_values(arg)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .gas_limit(DEFAULT_GAS_LIMIT)

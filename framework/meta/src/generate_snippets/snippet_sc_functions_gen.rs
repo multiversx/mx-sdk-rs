@@ -49,11 +49,7 @@ fn write_deploy_method_impl(
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
 
-    let default_value_snippet = match init_abi.outputs.get(0) {
-        Some(output_abi) => map_output_type_to_rust_type(output_abi.type_name.clone()),
-        None => "()".to_string(),
-    };
-
+    let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
         r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
@@ -74,7 +70,7 @@ fn write_deploy_method_impl(
         println!("new address: {{}}", new_address_bech32);
         let result_value = result.value();
 "#,
-        default_value_snippet,
+        output_type,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
         wasm_output_file_path_expr
@@ -176,10 +172,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
         "\n            .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)\n"
     };
 
-    let output_type = match endpoint_abi.outputs.get(0) {
-        Some(output_abi) => map_output_type_to_rust_type(output_abi.type_name.clone()),
-        None => "()".to_string(),
-    };
+    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
         r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
@@ -204,10 +197,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
 }
 
 fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
-    let output_type = match endpoint_abi.outputs.get(0) {
-        Some(output_abi) => map_output_type_to_rust_type(output_abi.type_name.clone()),
-        None => "()".to_string(),
-    };
+    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
         r#"        let result_value: {} = self
@@ -226,7 +216,32 @@ fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
     writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
 }
 
-fn map_output_type_to_rust_type(input_type: String) -> String {
-    let output_rust_type = map_abi_type_to_rust_type(input_type);
+fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
+    let results_len = outputs.len();
+    if results_len == 0 {
+        return "()".to_string();
+    }
+
+    // format to be the same as when multi-value is an argument
+    // for results, each type is a different array entry
+    let mut input_str = String::new();
+    if results_len > 1 {
+        input_str += "multi";
+        input_str += "<";
+    }
+
+    for (i, output) in outputs.iter().enumerate() {
+        input_str += &output.type_name;
+
+        if i < results_len - 1 {
+            input_str += ",";
+        }
+    }
+
+    if results_len > 1 {
+        input_str += ">";
+    }
+
+    let output_rust_type = map_abi_type_to_rust_type(input_str);
     output_rust_type.get_type_name().to_string()
 }

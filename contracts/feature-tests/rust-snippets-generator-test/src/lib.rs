@@ -108,4 +108,25 @@ pub trait PayableFeatures {
     ) -> MultiValueEncoded<ManagedVec<MyCoolStruct<Self::Api>>> {
         MultiValueEncoded::new()
     }
+
+    #[endpoint]
+    fn multi_value_2(&self, arg: MultiValue2<u64, BigUint>) -> MultiValue2<u64, BigUint> {
+        arg
+    }
+
+    #[endpoint]
+    fn multi_value_4(
+        &self,
+        arg: MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, TokenIdentifier>,
+    ) -> MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, TokenIdentifier> {
+        arg
+    }
+
+    #[endpoint]
+    fn complex_multi_values(
+        &self,
+        arg: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
+        arg
+    }
 }
