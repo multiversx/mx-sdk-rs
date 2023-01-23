@@ -62,6 +62,22 @@
                 "status": "4",
                 "message": "str:cast to i64 error"
             }
+        },
+        {
+            "step": "scQuery",
+            "id": "4",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "biguint_from_u128",
+                "arguments": []
+            },
+            "expect": {
+                "out": [
+                    "0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
+                ],
+                "status": "0",
+                "message": ""
+            }
         }
     ]
 }

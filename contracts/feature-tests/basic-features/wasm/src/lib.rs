@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          339
+// Endpoints:                          340
 // Async Callback:                       1
-// Total number of exported functions: 341
+// Total number of exported functions: 342
 
 #![no_std]
 #![feature(alloc_error_handler, lang_items)]
@@ -34,6 +34,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         big_uint_zero
         big_uint_from_u64_1
         big_uint_from_u64_2
+        biguint_from_u128
         big_uint_from_managed_buffer
         big_uint_from_managed_buffer_ref
         big_int_zero
