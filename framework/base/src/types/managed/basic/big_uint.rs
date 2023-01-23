@@ -38,6 +38,12 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<u128> for BigUint<M> {
+    fn from(value: u128) -> Self {
+        BigUint::from_bytes_be(&value.to_be_bytes()[..])
+    }
+}
+
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
     #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {

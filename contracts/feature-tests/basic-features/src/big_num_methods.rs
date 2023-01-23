@@ -69,6 +69,11 @@ pub trait BigIntMethods {
     }
 
     #[endpoint]
+    fn biguint_from_u128(&self) -> BigUint {
+        BigUint::from(u128::MAX)
+    }
+
+    #[endpoint]
     fn big_uint_from_managed_buffer(&self, mb: ManagedBuffer) -> BigUint {
         BigUint::from(mb)
     }
