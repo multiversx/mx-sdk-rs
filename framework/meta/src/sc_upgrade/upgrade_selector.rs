@@ -1,6 +1,6 @@
 use crate::{
     cli_args::UpgradeArgs,
-    folder_structure::{RelevantDirectories, RelevantDirectory},
+    folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
     sc_upgrade::{
         upgrade_0_39::{postprocessing_after_39_1, upgrade_to_39_0},
         upgrade_common::version_bump_in_cargo_toml,
@@ -32,6 +32,9 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         dirs.len(),
         dirs.iter_contract_crates().count(),
     );
+    dir_pretty_print(dirs.iter(), "", &|dir| {
+        print_tree_dir_metadata(dir, last_version.as_str())
+    });
 
     for (from_version, to_version) in versions_iter(last_version) {
         if dirs.count_for_version(from_version) == 0 {

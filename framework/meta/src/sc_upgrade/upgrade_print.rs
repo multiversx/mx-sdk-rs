@@ -1,8 +1,9 @@
-use std::path::Path;
-
+use crate::folder_structure::{
+    DirectoryType::{Contract, Lib},
+    RelevantDirectory,
+};
 use colored::Colorize;
-
-use crate::folder_structure::RelevantDirectory;
+use std::path::Path;
 
 pub fn print_upgrading(dir: &RelevantDirectory, from_version: &str, to_version: &str) {
     println!(
@@ -53,4 +54,18 @@ pub fn print_postprocessing_after_39_1(path: &Path) {
         format!("Post-processing after 0.39.1 in {} ...", path.display()).green(),
         "Re-generating wasm crate ...".green(),
     );
+}
+
+pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &str) {
+    match dir.dir_type {
+        Contract => print!(" {}", "[contract]".blue()),
+        Lib => print!(" {}", "[lib]".magenta()),
+    }
+
+    let version_string = format!("[{}]", &dir.version.semver);
+    if dir.version.semver == last_version {
+        print!(" {}", version_string.green());
+    } else {
+        print!(" {}", version_string.red());
+    };
 }

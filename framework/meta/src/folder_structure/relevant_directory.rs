@@ -34,7 +34,7 @@ pub struct RelevantDirectory {
     pub dir_type: DirectoryType,
 }
 
-pub struct RelevantDirectories(Vec<RelevantDirectory>);
+pub struct RelevantDirectories(pub(crate) Vec<RelevantDirectory>);
 
 impl RelevantDirectories {
     pub fn find_all(path: impl AsRef<Path>, ignore: &[String]) -> Self {

@@ -4,7 +4,7 @@ use colored::Colorize;
 
 use crate::{
     cli_args::{AllArgs, CliArgsToRaw},
-    folder_structure::RelevantDirectories,
+    folder_structure::{dir_pretty_print, RelevantDirectories},
 };
 
 pub fn call_all_meta(args: &AllArgs) {
@@ -19,6 +19,8 @@ pub fn call_all_meta(args: &AllArgs) {
 
 fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
     let dirs = RelevantDirectories::find_all(path, ignore);
+    dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
+
     println!(
         "Found {} contract crates.\n",
         dirs.iter_contract_crates().count(),
