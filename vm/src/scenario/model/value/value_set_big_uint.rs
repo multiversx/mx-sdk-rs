@@ -68,6 +68,15 @@ impl From<u64> for BigUintValue {
     }
 }
 
+impl From<u128> for BigUintValue {
+    fn from(from: u128) -> Self {
+        BigUintValue {
+            value: from.into(),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
 impl<M: ManagedTypeApi> From<multiversx_sc::types::BigUint<M>> for BigUintValue {
     fn from(from: multiversx_sc::types::BigUint<M>) -> Self {
         let value = BigUint::from_bytes_be(from.to_bytes_be().as_slice());

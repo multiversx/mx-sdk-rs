@@ -76,7 +76,7 @@ lazy_static! {
             "BigUint",
             RustTypeString {
                 type_name: "BigUint".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "BigUint::<DebugApi>::from(0u64)".to_string(),
+                default_value_expr: "BigUint::<DebugApi>::from(0u128)".to_string(),
                 contains_custom_types: false,
             },
         );
@@ -112,7 +112,7 @@ lazy_static! {
                 default_value_expr: "EsdtTokenPayment::new(
                 TokenIdentifier::from_esdt_bytes(&b\"\"[..]),
                 0u64,
-                BigUint::from(0u64)
+                BigUint::from(0u128)
             )"
                 .to_string(),
                 contains_custom_types: false,
@@ -125,7 +125,7 @@ lazy_static! {
                 default_value_expr: "EgldOrEsdtTokenPayment::new(
                 EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..]),
                 0u64,
-                BigUint::from(0u64)
+                BigUint::from(0u128)
             )"
                 .to_string(),
                 contains_custom_types: false,
