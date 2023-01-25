@@ -1,7 +1,9 @@
 use std::{fs, process::Command};
 
 use super::OutputContract;
-use crate::{cli_args::BuildArgs, meta_wasm_tools};
+use crate::{
+    cli_args::BuildArgs, meta_wasm_tools, output_contract::print_util::print_build_command,
+};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -12,9 +14,13 @@ impl OutputContract {
         if let Some(target_dir) = &build_args.target_dir {
             command.args(["--target-dir", target_dir]);
         }
-        if !build_args.wasm_symbols {
-            command.env("RUSTFLAGS", "-C link-arg=-s");
+        let rustflags = compose_rustflags(build_args);
+        if !rustflags.is_empty() {
+            command.env("RUSTFLAGS", rustflags);
         }
+
+        print_build_command(self.wasm_output_name(build_args), &command);
+
         let exit_status = command
             .spawn()
             .expect("failed to spawn contract build process")
@@ -25,7 +31,23 @@ impl OutputContract {
 
         self.finalize_build(build_args, output_path);
     }
+}
 
+fn compose_rustflags(build_args: &BuildArgs) -> String {
+    let mut rustflags = String::new();
+    if !build_args.wasm_symbols {
+        rustflags.push_str("-C link-arg=-s");
+    }
+    if build_args.emit_mir {
+        if !rustflags.is_empty() {
+            rustflags.push(' ');
+        }
+        rustflags.push_str("--emit=mir");
+    }
+    rustflags
+}
+
+impl OutputContract {
     fn finalize_build(&self, build_args: &BuildArgs, output_path: &str) {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
