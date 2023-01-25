@@ -28,6 +28,10 @@ pub struct BuildArgs {
     #[arg(long = "wat", verbatim_doc_comment)]
     pub wat: bool,
 
+    /// Also emit MIR files when building.
+    #[arg(long = "mir", verbatim_doc_comment)]
+    pub emit_mir: bool,
+
     #[arg(
         long = "no-imports",
         help = "Skips extracting the EI imports after building the contracts.",
@@ -81,6 +85,7 @@ impl Default for BuildArgs {
             wasm_name_suffix: None,
             wasm_opt: true,
             wat: false,
+            emit_mir: false,
             extract_imports: true,
             target_dir: None,
             twiggy_top: false,
