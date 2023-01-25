@@ -31,16 +31,24 @@ pub enum DirectoryType {
 pub struct RelevantDirectory {
     pub path: PathBuf,
     pub version: VersionReq,
+    pub upgrade_in_progress: Option<(&'static str, &'static str)>,
     pub dir_type: DirectoryType,
 }
 
-pub struct RelevantDirectories(Vec<RelevantDirectory>);
+pub struct RelevantDirectories(pub(crate) Vec<RelevantDirectory>);
 
 impl RelevantDirectories {
-    pub fn find_all(path: impl AsRef<Path>) -> Self {
-        let canonicalized = fs::canonicalize(path).expect("error canonicalizing input path");
+    pub fn find_all(path: impl AsRef<Path>, ignore: &[String]) -> Self {
+        let path_ref = path.as_ref();
+        let canonicalized = fs::canonicalize(path_ref).unwrap_or_else(|err| {
+            panic!(
+                "error canonicalizing input path {}: {}",
+                path_ref.display(),
+                err,
+            )
+        });
         let mut dirs = Vec::new();
-        populate_directories(canonicalized.as_path(), &mut dirs);
+        populate_directories(canonicalized.as_path(), ignore, &mut dirs);
         RelevantDirectories(dirs)
     }
 
@@ -79,25 +87,36 @@ impl RelevantDirectories {
             .filter(move |dir| dir.version.semver == version)
     }
 
-    /// Operates no changes on the disk. Only changes this structure in memory.
-    pub fn update_versions_in_memory(&mut self, from_version: &str, to_version: &str) {
+    /// Marks all appropriate directories as ready for upgrade.
+    pub fn start_upgrade(&mut self, from_version: &'static str, to_version: &'static str) {
         for dir in self.0.iter_mut() {
             if dir.version.semver == from_version {
+                dir.upgrade_in_progress = Some((from_version, to_version));
+            }
+        }
+    }
+
+    /// Updates the versions of all directories being upgraded (in memory)
+    /// and resets upgrade status.
+    pub fn finish_upgrade(&mut self) {
+        for dir in self.0.iter_mut() {
+            if let Some((_, to_version)) = &dir.upgrade_in_progress {
                 dir.version.semver = to_version.to_string();
+                dir.upgrade_in_progress = None;
             }
         }
     }
 }
 
-fn populate_directories(path: &Path, result: &mut Vec<RelevantDirectory>) {
+fn populate_directories(path: &Path, ignore: &[String], result: &mut Vec<RelevantDirectory>) {
     let is_contract = is_marked_contract_crate_dir(path);
 
     if !is_contract && path.is_dir() {
         let read_dir = fs::read_dir(path).expect("error reading directory");
         for child_result in read_dir {
             let child = child_result.unwrap();
-            if can_continue_recursion(&child) {
-                populate_directories(child.path().as_path(), result);
+            if can_continue_recursion(&child, ignore) {
+                populate_directories(child.path().as_path(), ignore, result);
             }
         }
     }
@@ -111,6 +130,7 @@ fn populate_directories(path: &Path, result: &mut Vec<RelevantDirectory>) {
         result.push(RelevantDirectory {
             path: path.to_owned(),
             version,
+            upgrade_in_progress: None,
             dir_type,
         });
     }
@@ -120,12 +140,16 @@ fn is_marked_contract_crate_dir(path: &Path) -> bool {
     path.join("multiversx.json").is_file() || path.join("elrond.json").is_file()
 }
 
-fn can_continue_recursion(dir_entry: &DirEntry) -> bool {
+fn can_continue_recursion(dir_entry: &DirEntry, blacklist: &[String]) -> bool {
     if !dir_entry.file_type().unwrap().is_dir() {
         return false;
     }
 
     if let Some(dir_name_str) = dir_entry.file_name().to_str() {
+        if blacklist.iter().any(|ignored| ignored == dir_name_str) {
+            return false;
+        }
+
         // do not explore hidden folders
         !dir_name_str.starts_with('.')
     } else {

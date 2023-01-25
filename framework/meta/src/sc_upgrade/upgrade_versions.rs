@@ -3,8 +3,25 @@
 /// Indicates where to stop with the upgrades.
 pub const DEFAULT_LAST_VERSION: &str = "0.39.2";
 
+/// Known version for the upgrader.
 #[rustfmt::skip]
 pub const VERSIONS: &[&str] = &[
+    "0.28.0",
+    "0.29.0",
+    "0.29.2",
+    "0.29.3",
+    "0.30.0",
+    "0.31.0",
+    "0.31.1",
+    "0.32.0",
+    "0.33.0",
+    "0.33.1",
+    "0.34.0",
+    "0.34.1",
+    "0.35.0",
+    "0.36.0",
+    "0.36.1",
+    "0.37.0",
     "0.38.0",
     "0.39.0",
     "0.39.1",
