@@ -92,6 +92,13 @@ impl MetaConfig {
         }
     }
 
+    /// Updates the Cargo.lock on all wasm crates.
+    pub fn update(&self) {
+        for output_contract in &self.output_contracts.contracts {
+            output_contract.cargo_update();
+        }
+    }
+
     fn remove_output_dir(&self) {
         fs::remove_dir_all(&self.output_dir).expect("failed to remove output directory");
     }
