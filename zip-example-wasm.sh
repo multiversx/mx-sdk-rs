@@ -9,7 +9,7 @@ ZIP_OUTPUT="examples-wasm.zip"
 rm -f $ZIP_OUTPUT
 
 set -e
-SMART_CONTRACT_JSONS=$(find contracts/examples -name "elrond.json")
+SMART_CONTRACT_JSONS=$(find contracts/examples -name "multiversx.json")
 for smart_contract_json in $SMART_CONTRACT_JSONS
 do
     smart_contract_folder=$(dirname $smart_contract_json)
