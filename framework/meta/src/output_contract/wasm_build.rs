@@ -118,7 +118,8 @@ impl OutputContract {
             let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
 
             if build_args.twiggy_top {
-                let output_twiggy_top_path = format!("{output_path}/{}", self.twiggy_top_name(build_args));
+                let output_twiggy_top_path =
+                    format!("{output_path}/{}", self.twiggy_top_name(build_args));
                 meta_wasm_tools::run_twiggy_top(
                     output_wasm_path.as_str(),
                     output_twiggy_top_path.as_str(),

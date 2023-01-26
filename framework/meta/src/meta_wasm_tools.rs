@@ -64,7 +64,7 @@ pub(crate) fn run_wasm_opt(output_wasm_path: &str) {
         .expect("failed to spawn wasm-opt process")
         .wait()
         .expect("wasm-opt was not running");
-    
+
     assert!(exit_status.success(), "wasm-opt process failed");
 }
 
@@ -75,7 +75,7 @@ pub(crate) fn run_wasm2wat(output_wasm_path: &str, output_wat_path: &str) {
         .expect("failed to spawn wasm2wat process")
         .wait()
         .expect("wasm2wat was not running");
-    
+
     assert!(exit_status.success(), "wasm2wat process failed");
 }
 
@@ -120,7 +120,10 @@ where
 }
 
 pub(crate) fn run_twiggy_top(output_wasm_path: &str, output_twiggy_top_path: &str) {
-    run_with_stdout_file(output_twiggy_top_path, ["top", "-n", "1000", output_wasm_path]);
+    run_with_stdout_file(
+        output_twiggy_top_path,
+        ["top", "-n", "1000", output_wasm_path],
+    );
 }
 
 pub(crate) fn run_twiggy_paths(output_wasm_path: &str, output_twiggy_paths_path: &str) {
@@ -132,5 +135,8 @@ pub(crate) fn run_twiggy_monos(output_wasm_path: &str, output_twiggy_monos_path:
 }
 
 pub(crate) fn run_twiggy_dominators(output_wasm_path: &str, output_twiggy_dominators_path: &str) {
-    run_with_stdout_file(output_twiggy_dominators_path, ["dominators", output_wasm_path]);
+    run_with_stdout_file(
+        output_twiggy_dominators_path,
+        ["dominators", output_wasm_path],
+    );
 }
