@@ -10,7 +10,7 @@ pub fn run_go<P: AsRef<Path>>(relative_path: P) {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(relative_path);
 
-    let output = Command::new("mandos-test")
+    let output = Command::new("run-scenarios")
         .arg(absolute_path)
         .output()
         .expect("failed to execute process");
