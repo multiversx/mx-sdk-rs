@@ -12,15 +12,15 @@ path = "src/lottery.rs"
 path = "../erc20"
 
 [dependencies.multiversx-sc]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../../framework/base"
 features = ["alloc"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../../framework/scenario"

@@ -26,6 +26,15 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.39.3, vm 0.1.3] - 2023-01-26
+- `multiversx-sc-meta` improvements:
+	- `upgrade` can handle crates as early as `0.28.0`;
+	- `--ignore` flag for the `all` command: will ignore folders with given names, by default set to `target`;
+	- `info` command, shows contracts and contract library crates with their respective framework versions;
+	- `--mir` flag when building, also emits MIR files;
+	- printing to console the build command.
+- `BigUint` from `u128` conversion.
+
 ## [sc 0.39.2, vm 0.1.2] - 2023-01-19
 - `multiversx-sc-meta` improvements:
 	- `all` command that allows calling all contract meta crates in a folder;

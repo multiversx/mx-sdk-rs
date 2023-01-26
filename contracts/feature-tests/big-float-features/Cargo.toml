@@ -9,12 +9,12 @@ publish = false
 path = "src/big_float_main.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../framework/base"
 features = ["big-float"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../framework/scenario"
 
 [dev-dependencies.esdt-system-sc-mock]

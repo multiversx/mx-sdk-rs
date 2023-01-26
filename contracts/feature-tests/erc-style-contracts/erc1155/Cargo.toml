@@ -12,9 +12,9 @@ path = "src/erc1155.rs"
 path="../erc1155-user-mock"
 
 [dependencies.multiversx-sc]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.2"
+version = "0.39.3"
 path = "../../../../framework/scenario"
