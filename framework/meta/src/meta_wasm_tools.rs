@@ -119,18 +119,18 @@ where
         .expect("twiggy was not running");
 }
 
-pub(crate) fn run_twiggy_top(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["top", "-n", "1000", output_wasm_path]);
+pub(crate) fn run_twiggy_top(output_wasm_path: &str, output_twiggy_top_path: &str) {
+    run_with_stdout_file(output_twiggy_top_path, ["top", "-n", "1000", output_wasm_path]);
 }
 
-pub(crate) fn run_twiggy_paths(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["paths", output_wasm_path]);
+pub(crate) fn run_twiggy_paths(output_wasm_path: &str, output_twiggy_paths_path: &str) {
+    run_with_stdout_file(output_twiggy_paths_path, ["paths", output_wasm_path]);
 }
 
-pub(crate) fn run_twiggy_monos(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["monos", output_wasm_path]);
+pub(crate) fn run_twiggy_monos(output_wasm_path: &str, output_twiggy_monos_path: &str) {
+    run_with_stdout_file(output_twiggy_monos_path, ["monos", output_wasm_path]);
 }
 
-pub(crate) fn run_twiggy_dominators(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["dominators", output_wasm_path]);
+pub(crate) fn run_twiggy_dominators(output_wasm_path: &str, output_twiggy_dominators_path: &str) {
+    run_with_stdout_file(output_twiggy_dominators_path, ["dominators", output_wasm_path]);
 }
