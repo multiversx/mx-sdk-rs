@@ -37,6 +37,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
             meta_config_opt.build(build_args.into_build_args())
         },
         ContractCliAction::Clean => meta_config_opt.clean(),
+        ContractCliAction::Update => meta_config_opt.update(),
         ContractCliAction::GenerateSnippets(gs_args) => {
             meta_config_opt.generate_rust_snippets(&gs_args)
         },

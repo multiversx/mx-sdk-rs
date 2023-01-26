@@ -7,17 +7,7 @@ use crate::{
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
-        let mut command = Command::new("cargo");
-        command
-            .args(["build", "--target=wasm32-unknown-unknown", "--release"])
-            .current_dir(self.wasm_crate_path());
-        if let Some(target_dir) = &build_args.target_dir {
-            command.args(["--target-dir", target_dir]);
-        }
-        let rustflags = compose_rustflags(build_args);
-        if !rustflags.is_empty() {
-            command.env("RUSTFLAGS", rustflags);
-        }
+        let mut command = self.compose_build_command(build_args);
 
         print_build_command(self.wasm_output_name(build_args), &command);
 
@@ -30,6 +20,24 @@ impl OutputContract {
         assert!(exit_status.success(), "contract build process failed");
 
         self.finalize_build(build_args, output_path);
+    }
+
+    fn compose_build_command(&self, build_args: &BuildArgs) -> Command {
+        let mut command = Command::new("cargo");
+        command
+            .args(["build", "--target=wasm32-unknown-unknown", "--release"])
+            .current_dir(self.wasm_crate_path());
+        if build_args.locked {
+            command.arg("--locked");
+        }
+        if let Some(target_dir) = &build_args.target_dir {
+            command.args(["--target-dir", target_dir]);
+        }
+        let rustflags = compose_rustflags(build_args);
+        if !rustflags.is_empty() {
+            command.env("RUSTFLAGS", rustflags);
+        }
+        command
     }
 }
 
