@@ -24,6 +24,7 @@ serde = "1.0"
 serde_json = "1.0"
 pathdiff = "0.2.1"
 itertools = "0.10.3"
+colored = "2.0"
 
 [features]
 run-go-tests = []

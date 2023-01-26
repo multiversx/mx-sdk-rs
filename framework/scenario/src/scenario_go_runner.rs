@@ -1,4 +1,11 @@
+use colored::Colorize;
 use std::{io::ErrorKind, path::Path, process::Command};
+
+const RUNNER_TOOL_NAME: &str = "run-scenarios";
+const RUNNER_TOOL_NAME_LEGACY: &str = "mandos-test";
+
+/// Just marks that the tool was not found.
+struct ToolNotFound;
 
 /// Runs the Arwen executable,
 /// which reads parses and executes one or more mandos tests.
@@ -10,23 +17,30 @@ pub fn run_go<P: AsRef<Path>>(relative_path: P) {
     let mut absolute_path = std::env::current_dir().unwrap();
     absolute_path.push(relative_path);
 
-    let run_scenarios_result = Command::new("run-scenarios")
-        .arg(absolute_path.clone())
-        .output();
+    if run_scenario_tool(RUNNER_TOOL_NAME, absolute_path.as_path()).is_ok() {
+        return;
+    }
 
-    let not_found = if let Err(error) = &run_scenarios_result {
-        error.kind() == ErrorKind::NotFound
-    } else {
-        false
-    };
+    // fallback - use the old binary
+    println!(
+        "{}",
+        format!("Warning: `{RUNNER_TOOL_NAME}` not found. Using `{RUNNER_TOOL_NAME_LEGACY}` as fallback.").yellow(),
+    );
+    if run_scenario_tool(RUNNER_TOOL_NAME_LEGACY, absolute_path.as_path()).is_ok() {
+        return;
+    }
 
-    let result = if not_found {
-        // fallback - use the old binary
-        println!("Warning: `run-scenarios` not found. Using `mandos-test` as fallback.");
-        Command::new("mandos-test").arg(absolute_path).output()
-    } else {
-        run_scenarios_result
-    };
+    panic!("Could not find `{RUNNER_TOOL_NAME_LEGACY}`, aborting.");
+}
+
+fn run_scenario_tool(tool_name: &str, path: &Path) -> Result<(), ToolNotFound> {
+    let result = Command::new(tool_name).arg(path).output();
+
+    if let Err(error) = &result {
+        if error.kind() == ErrorKind::NotFound {
+            return Err(ToolNotFound);
+        }
+    }
 
     let output = result.expect("failed to execute process");
 
@@ -34,9 +48,12 @@ pub fn run_go<P: AsRef<Path>>(relative_path: P) {
         println!("{}", String::from_utf8_lossy(output.stdout.as_slice()));
     } else {
         panic!(
-            "Mandos-go output:\n{}\n{}",
+            "{} output:\n{}\n{}",
+            tool_name,
             String::from_utf8_lossy(output.stdout.as_slice()),
             String::from_utf8_lossy(output.stderr.as_slice())
         );
     }
+
+    Ok(())
 }
