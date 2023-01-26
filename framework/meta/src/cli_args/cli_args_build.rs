@@ -4,6 +4,10 @@ use super::CliArgsToRaw;
 
 #[derive(Clone, PartialEq, Eq, Debug, Args)]
 pub struct BuildArgs {
+    /// Require that the Cargo.lock in the wasm crates is up to date.
+    #[arg(long = "locked", verbatim_doc_comment)]
+    pub locked: bool,
+
     /// Adds debug symbols in the resulting WASM binary. Adds bloat, but helps with debugging. Do not use in production.
     #[arg(long = "wasm-symbols", verbatim_doc_comment)]
     pub wasm_symbols: bool,
@@ -80,6 +84,7 @@ impl Default for BuildArgs {
     #[allow(deprecated)]
     fn default() -> Self {
         BuildArgs {
+            locked: false,
             wasm_symbols: false,
             wasm_name_override: None,
             wasm_name_suffix: None,
