@@ -58,6 +58,9 @@ pub enum ContractCliAction {
     #[command(about = "Clean the Rust project and the output folder.")]
     Clean,
 
+    #[command(about = "Update the Cargo.lock files in all wasm crates.")]
+    Update,
+
     #[command(
         name = "snippets",
         about = "Generates a snippets project, based on the contract ABI."
@@ -86,6 +89,9 @@ impl CliArgsToRaw for ContractCliAction {
             },
             ContractCliAction::Clean => {
                 raw.push("clean".to_string());
+            },
+            ContractCliAction::Update => {
+                raw.push("update".to_string());
             },
             ContractCliAction::GenerateSnippets(args) => {
                 raw.push("snippets".to_string());

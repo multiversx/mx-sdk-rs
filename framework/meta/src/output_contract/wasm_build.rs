@@ -8,7 +8,7 @@ use crate::{
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
         let mut command = self.compose_build_command(build_args);
-    
+
         print_build_command(self.wasm_output_name(build_args), &command);
 
         let exit_status = command
