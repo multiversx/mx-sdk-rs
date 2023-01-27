@@ -49,11 +49,13 @@ pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String])
         meta_path.as_path().display(),
     );
 
-    let _ = Command::new("cargo")
+    let exit_status = Command::new("cargo")
         .current_dir(&meta_path)
         .args(std::iter::once(&"run".to_string()).chain(cargo_run_args.iter()))
         .spawn()
         .expect("failed to spawn cargo run process in meta crate")
         .wait()
         .expect("cargo run process in meta crate was not running");
+
+    assert!(exit_status.success(), "contract meta process failed");
 }

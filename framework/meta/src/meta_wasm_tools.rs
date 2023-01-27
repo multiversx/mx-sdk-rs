@@ -58,21 +58,25 @@ fn is_twiggy_installed() -> bool {
 }
 
 pub(crate) fn run_wasm_opt(output_wasm_path: &str) {
-    let _ = Command::new(WASM_OPT_NAME)
+    let exit_status = Command::new(WASM_OPT_NAME)
         .args([output_wasm_path, "-Oz", "--output", output_wasm_path])
         .spawn()
-        .expect("failed to spawn wasm-out process")
+        .expect("failed to spawn wasm-opt process")
         .wait()
-        .expect("wasm-out was not running");
+        .expect("wasm-opt was not running");
+
+    assert!(exit_status.success(), "wasm-opt process failed");
 }
 
 pub(crate) fn run_wasm2wat(output_wasm_path: &str, output_wat_path: &str) {
-    let _ = Command::new(WASM2WAT_NAME)
+    let exit_status = Command::new(WASM2WAT_NAME)
         .args([output_wasm_path, "--output", output_wat_path])
         .spawn()
         .expect("failed to spawn wasm2wat process")
         .wait()
         .expect("wasm2wat was not running");
+
+    assert!(exit_status.success(), "wasm2wat process failed");
 }
 
 pub(crate) fn run_wasm_objdump(output_wasm_path: &str) -> String {
@@ -115,18 +119,24 @@ where
         .expect("twiggy was not running");
 }
 
-pub(crate) fn run_twiggy_top(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["top", "-n", "1000", output_wasm_path]);
+pub(crate) fn run_twiggy_top(output_wasm_path: &str, output_twiggy_top_path: &str) {
+    run_with_stdout_file(
+        output_twiggy_top_path,
+        ["top", "-n", "1000", output_wasm_path],
+    );
 }
 
-pub(crate) fn run_twiggy_paths(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["paths", output_wasm_path]);
+pub(crate) fn run_twiggy_paths(output_wasm_path: &str, output_twiggy_paths_path: &str) {
+    run_with_stdout_file(output_twiggy_paths_path, ["paths", output_wasm_path]);
 }
 
-pub(crate) fn run_twiggy_monos(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["monos", output_wasm_path]);
+pub(crate) fn run_twiggy_monos(output_wasm_path: &str, output_twiggy_monos_path: &str) {
+    run_with_stdout_file(output_twiggy_monos_path, ["monos", output_wasm_path]);
 }
 
-pub(crate) fn run_twiggy_dominators(output_wasm_path: &str, output_wt_path: &str) {
-    run_with_stdout_file(output_wt_path, ["dominators", output_wasm_path]);
+pub(crate) fn run_twiggy_dominators(output_wasm_path: &str, output_twiggy_dominators_path: &str) {
+    run_with_stdout_file(
+        output_twiggy_dominators_path,
+        ["dominators", output_wasm_path],
+    );
 }
