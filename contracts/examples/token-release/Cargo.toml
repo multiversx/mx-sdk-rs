@@ -9,10 +9,10 @@ publish = false
 path = "src/token_release.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.3"
+version = "0.39.4"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.3"
+version = "0.39.4"
 path = "../../../framework/scenario"
 
