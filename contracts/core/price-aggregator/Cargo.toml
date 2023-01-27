@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-price-aggregator-sc"
-version = "0.39.3"
+version = "0.39.4"
 authors = [
     "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",
     "MultiversX <contact@multiversx.com>",
@@ -19,15 +19,15 @@ edition = "2021"
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.3"
+version = "0.39.4"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.39.3"
+version = "0.39.4"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.3"
+version = "0.39.4"
 path = "../../../framework/scenario"
 
 [dependencies]
