@@ -38,6 +38,9 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
         ContractCliAction::GenerateSnippets(gs_args) => {
             meta_config_opt.generate_rust_snippets(&gs_args)
         },
+        ContractCliAction::GenerateRustTestSetup(grts_args) => {
+            meta_config_opt.generate_rust_tests_setup(&grts_args)
+        },
     }
 }
 

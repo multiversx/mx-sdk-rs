@@ -95,11 +95,11 @@ pub(crate) fn create_src_folder(snippets_folder_path: &str) {
 pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: bool) -> File {
     let lib_path = format!("{snippets_folder_path}/src/lib.rs");
     if overwrite {
-        File::create(&lib_path).unwrap()
-    } else {
-        match File::options().create_new(true).write(true).open(&lib_path) {
-            Ok(f) => f,
-            Err(_) => panic!("lib.rs file already exists, --overwrite option was not provided"),
-        }
+        return File::create(&lib_path).unwrap();
+    }
+
+    match File::options().create_new(true).write(true).open(&lib_path) {
+        Ok(f) => f,
+        Err(_) => panic!("lib.rs file already exists, --overwrite option was not provided"),
     }
 }

@@ -73,6 +73,16 @@ pub struct TxTokenTransfer {
     pub value: BigUint,
 }
 
+impl TxTokenTransfer {
+    pub fn new(token_id: &[u8], nonce: u64, value: BigUint) -> Self {
+        Self {
+            token_identifier: token_id.to_vec(),
+            nonce,
+            value,
+        }
+    }
+}
+
 /// Signals to the callback that funds have been returned to it, without performing any transfer.
 #[derive(Default, Clone, Debug)]
 pub struct CallbackPayments {
