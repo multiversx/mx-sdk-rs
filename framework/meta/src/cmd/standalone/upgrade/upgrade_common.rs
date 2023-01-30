@@ -8,8 +8,8 @@ use toml::Value;
 
 use crate::{
     cargo_toml_contents::{CARGO_TOML_DEPENDENCIES, CARGO_TOML_DEV_DEPENDENCIES},
+    cmd::standalone::all::call_contract_meta,
     folder_structure::{DirectoryType, RelevantDirectory, VersionReq, FRAMEWORK_CRATE_NAMES},
-    meta_all::call_contract_meta,
     CargoTomlContents,
 };
 

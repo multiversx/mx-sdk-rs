@@ -1,27 +1,9 @@
 use super::{
-    meta_config::MetaConfig, meta_validate_abi::validate_abi, output_contract::OutputContractConfig,
+    meta_config::MetaConfig, output_contract::OutputContractConfig, validate_abi::validate_abi,
 };
-use crate::{
-    cli_args::{ContractCliAction, ContractCliArgs, StandaloneCliAction, StandaloneCliArgs},
-    meta_all::call_all_meta,
-    meta_info::call_info,
-    sc_upgrade::upgrade_sc,
-};
+use crate::cli_args::{ContractCliAction, ContractCliArgs};
 use clap::Parser;
 use multiversx_sc::contract_base::ContractAbiProvider;
-
-/// Entry point in the program when calling it as a standalone tool.
-pub fn cli_main_standalone() {
-    let cli_args = StandaloneCliArgs::parse();
-    match &cli_args.command {
-        Some(StandaloneCliAction::Info(args)) => call_info(args),
-        Some(StandaloneCliAction::All(args)) => call_all_meta(args),
-        Some(StandaloneCliAction::Upgrade(args)) => {
-            upgrade_sc(args);
-        },
-        None => {},
-    }
-}
 
 /// Entry point in the program from the contract meta crates.
 pub fn cli_main<AbiObj: ContractAbiProvider>() {

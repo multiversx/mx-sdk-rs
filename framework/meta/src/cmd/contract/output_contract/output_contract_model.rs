@@ -2,8 +2,6 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::cli_args::BuildArgs;
 
-pub const DEFAULT_LABEL: &str = "default";
-
 #[derive(Debug)]
 pub struct OutputContractConfig {
     pub default_contract_config_name: String,
