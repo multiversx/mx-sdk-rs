@@ -7,7 +7,11 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{cli_args::GenerateRustTestSetupArgs, meta_config::MetaConfig};
 
-use super::test_base_struct_gen::{write_test_setup_imports, write_test_setup_struct_declaration};
+use super::{
+    test_base_struct_gen::{write_test_setup_imports, write_test_setup_struct_declaration},
+    test_gen_common::{capitalize_first_letter, to_camel_case},
+    test_setup_wrapper_functions_gen::write_struct_constructor,
+};
 
 pub(crate) fn create_test_folders(tests_folder_path: &str, contract_name: &str) {
     // returns error if folder already exists, so we ignore the result
@@ -63,6 +67,20 @@ fn write_rust_tests_setup_to_file(
     contract_crate_name: &str,
     snake_case_name: &str,
 ) {
+    let mut base_name = to_camel_case(contract_crate_name.to_string());
+    capitalize_first_letter(&mut base_name);
+
+    let struct_name = base_name.clone() + "Setup";
+    let builder_func_name = base_name.clone() + "ObjBuilder";
+
     write_test_setup_imports(file, snake_case_name);
-    write_test_setup_struct_declaration(file, contract_crate_name);
+    write_test_setup_struct_declaration(file, snake_case_name, &struct_name, &builder_func_name);
+    write_struct_constructor(
+        file,
+        contract_crate_name,
+        &builder_func_name,
+        &abi.constructors[0],
+    );
+
+    writeln!(file, "}}").unwrap();
 }

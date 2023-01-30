@@ -54,3 +54,7 @@ pub(crate) fn capitalize_first_letter(string: &mut String) {
         first_letter_slice.make_ascii_uppercase();
     }
 }
+
+pub(crate) fn is_last_element<T>(array: &[T], index: usize) -> bool {
+    index == array.len() - 1
+}
