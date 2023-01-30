@@ -1,7 +1,7 @@
 use std::{fs, process::Command};
 
 use super::{print_util::print_build_command, OutputContract};
-use crate::{cli_args::BuildArgs, meta_wasm_tools};
+use crate::{cli_args::BuildArgs, tools::post_build};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -75,7 +75,7 @@ impl OutputContract {
         }
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
-        meta_wasm_tools::run_wasm_opt(output_wasm_path.as_str());
+        post_build::run_wasm_opt(output_wasm_path.as_str());
     }
 
     fn run_wasm2wat(&self, build_args: &BuildArgs, output_path: &str) {
@@ -85,7 +85,7 @@ impl OutputContract {
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_wat_path = format!("{output_path}/{}", self.wat_output_name(build_args));
-        meta_wasm_tools::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
+        post_build::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
 
     fn extract_imports(&self, build_args: &BuildArgs, output_path: &str) {
@@ -99,8 +99,8 @@ impl OutputContract {
             output_path,
             self.imports_json_output_name(build_args)
         );
-        let result = meta_wasm_tools::run_wasm_objdump(output_wasm_path.as_str());
-        let import_names = meta_wasm_tools::parse_imports(result.as_str());
+        let result = post_build::run_wasm_objdump(output_wasm_path.as_str());
+        let import_names = post_build::parse_imports(result.as_str());
         write_imports_output(output_imports_json_path.as_str(), import_names.as_slice());
     }
 }
@@ -118,7 +118,7 @@ impl OutputContract {
             if build_args.twiggy_top {
                 let output_twiggy_top_path =
                     format!("{output_path}/{}", self.twiggy_top_name(build_args));
-                meta_wasm_tools::run_twiggy_top(
+                post_build::run_twiggy_top(
                     output_wasm_path.as_str(),
                     output_twiggy_top_path.as_str(),
                 );
@@ -126,7 +126,7 @@ impl OutputContract {
             if build_args.twiggy_paths {
                 let output_twiggy_paths_path =
                     format!("{output_path}/{}", self.twiggy_paths_name(build_args));
-                meta_wasm_tools::run_twiggy_paths(
+                post_build::run_twiggy_paths(
                     output_wasm_path.as_str(),
                     output_twiggy_paths_path.as_str(),
                 );
@@ -134,7 +134,7 @@ impl OutputContract {
             if build_args.twiggy_monos {
                 let output_twiggy_monos_path =
                     format!("{output_path}/{}", self.twiggy_monos_name(build_args));
-                meta_wasm_tools::run_twiggy_monos(
+                post_build::run_twiggy_monos(
                     output_wasm_path.as_str(),
                     output_twiggy_monos_path.as_str(),
                 );
@@ -142,7 +142,7 @@ impl OutputContract {
             if build_args.twiggy_dominators {
                 let output_twiggy_dominators_path =
                     format!("{output_path}/{}", self.twiggy_dominators_name(build_args));
-                meta_wasm_tools::run_twiggy_dominators(
+                post_build::run_twiggy_dominators(
                     output_wasm_path.as_str(),
                     output_twiggy_dominators_path.as_str(),
                 );

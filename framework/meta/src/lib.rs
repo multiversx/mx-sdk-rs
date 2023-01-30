@@ -3,7 +3,7 @@ mod cargo_toml_contents;
 pub mod cli_args;
 mod cmd;
 mod folder_structure;
-mod meta_wasm_tools;
+mod tools;
 
 pub use cargo_toml_contents::CargoTomlContents;
 pub use cmd::{
