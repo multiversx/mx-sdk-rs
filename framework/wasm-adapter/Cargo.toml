@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-wasm-adapter"
-version = "0.39.2"
+version = "0.39.4"
 edition = "2021"
 
 authors = [
@@ -30,5 +30,5 @@ ei-unmanaged-node = []
 wee_alloc = "0.4" 
 
 [dependencies.multiversx-sc]
-version = "=0.39.2"
+version = "=0.39.4"
 path = "../base"

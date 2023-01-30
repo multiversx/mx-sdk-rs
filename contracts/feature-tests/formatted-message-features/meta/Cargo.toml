@@ -11,5 +11,5 @@ authors = [ "you",]
 path = ".."
 
 [dependencies.multiversx-sc-meta]
-version = "0.39.2"
+version = "0.39.4"
 path = "../../../../framework/meta"

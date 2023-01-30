@@ -10,7 +10,7 @@ name = "mxpy-snippet-generator"
 path = "src/mxpy_snippet_generator.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.2"
+version = "0.39.4"
 path = "../../framework/base"
 
 [dependencies]
