@@ -1,6 +1,6 @@
 use std::{fs::File, io::Write};
 
-use multiversx_sc::abi::{ContractAbi, EndpointAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi};
 
 use crate::generate_snippets::{
     snippet_gen_common::write_newline,
@@ -76,7 +76,7 @@ pub(crate) fn write_struct_constructor(
     }}
 ",
         get_wrapper_func_declaration_args(&init_abi, PayableType::NotPayable),
-        get_wrapper_func_internal_call_args(&init_abi)
+        get_lambda_endpoint_args_snippet(&init_abi.inputs)
     )
     .unwrap();
 }
@@ -94,13 +94,17 @@ fn write_endpoint_wrapper(file: &mut File, endpoint_abi: &EndpointAbi) {
 
     writeln!(
         file,
-        "pub fn {fn_name}(&self, {}) -> TxResult {{
-            self.b_mock.borrow_mut()
-                .{}({})
-        }}",
+        "    pub fn {fn_name}(&self, {}) -> TxResult {{
+        self.b_mock
+            .borrow_mut()
+            .{}({}, |sc| {{
+                sc.{fn_name}({});
+            }})
+    }}",
         get_wrapper_func_declaration_args(&endpoint_abi, fn_type.get_payable_type()),
         get_executor_function_to_call(fn_type),
-        get_wrapper_func_internal_call_args(endpoint_abi)
+        get_wrapper_func_internal_call_args(endpoint_abi, fn_type),
+        get_lambda_endpoint_args_snippet(&endpoint_abi.inputs)
     )
     .unwrap();
 }
@@ -140,23 +144,31 @@ fn get_wrapper_func_declaration_args(
     result
 }
 
-fn get_wrapper_func_internal_call_args(endpoint_abi: &EndpointAbi) -> String {
+fn get_wrapper_func_internal_call_args(
+    endpoint_abi: &EndpointAbi,
+    fn_type: FunctionType,
+) -> String {
     let mut result = get_caller_arg_for_wrapper_fn(endpoint_abi);
     if !result.is_empty() {
         result += ", ";
     }
 
-    result += &format!("&{SC_WRAPPER_FIELD_NAME}");
+    result += &format!("&self.{SC_WRAPPER_FIELD_NAME}");
 
-    let inputs = &endpoint_abi.inputs;
-    if inputs.is_empty() {
-        return result;
+    let payment_snippet = get_executor_payment_arg_snippet(fn_type);
+    if !payment_snippet.is_empty() {
+        result += ", ";
+        result += &payment_snippet;
     }
 
-    result += ", ";
+    result
+}
 
+fn get_lambda_endpoint_args_snippet(inputs: &[InputAbi]) -> String {
+    let mut result = String::new();
     for (i, input) in inputs.iter().enumerate() {
-        result += input.arg_name;
+        let arg_name = input.arg_name;
+        result += &format!("{arg_name}.into()");
 
         if !is_last_element(inputs, i) {
             result += ", ";
@@ -199,7 +211,18 @@ fn get_caller_arg_for_wrapper_fn(endpoint_abi: &EndpointAbi) -> String {
 fn get_required_wrapper_func_payment_args(payable_type: PayableType) -> String {
     match payable_type {
         PayableType::NotPayable => String::new(),
-        PayableType::Egld => format!("{EGLD_VALUE_ARG_NAME}: RustBigUint"),
-        PayableType::Any => format!("{ESDT_TRANSFERS_ARG_NAME}: Vec<TxTokenTransfer>"),
+        PayableType::Egld => format!("{EGLD_VALUE_ARG_NAME}: &RustBigUint"),
+        PayableType::Any => format!("{ESDT_TRANSFERS_ARG_NAME}: &[TxTokenTransfer]"),
+    }
+}
+
+fn get_executor_payment_arg_snippet(fn_type: FunctionType) -> String {
+    match fn_type {
+        FunctionType::View => String::new(),
+        FunctionType::Endpoint(payable_type) => match payable_type {
+            PayableType::NotPayable => "&rust_biguint!(0)".to_string(),
+            PayableType::Egld => format!("{EGLD_VALUE_ARG_NAME}"),
+            PayableType::Any => format!("{ESDT_TRANSFERS_ARG_NAME}"),
+        },
     }
 }

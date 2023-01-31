@@ -57,8 +57,8 @@ lazy_static! {
         );
 
         let bytes_type = RustTypeString {
-            type_name: "&[u8]".to_string(),
-            default_value_expr: "b\"\"".to_string(),
+            type_name: "ManagedBuffer<DebugApi>".to_string(),
+            default_value_expr: "ManagedBuffer::new_from_bytes(&[])".to_string(),
             contains_custom_types: false,
         };
 

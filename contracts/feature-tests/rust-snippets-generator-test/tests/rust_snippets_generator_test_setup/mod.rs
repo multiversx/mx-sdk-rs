@@ -35,7 +35,7 @@ where
         b_mock
             .borrow_mut()
             .execute_tx(&owner, &sc_wrapper, &rust_biguint!(0), |sc| {
-                sc.init(caller, &sc_wrapper);
+                sc.init();
             })
             .assert_ok();
             
@@ -46,89 +46,140 @@ where
         }
     }
 
-pub fn no_arg_no_result_endpoint(&self, caller: &Address, ) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper)
-        }
+    pub fn no_arg_no_result_endpoint(&self, caller: &Address, ) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.no_arg_no_result_endpoint();
+            })
+    }
 
-pub fn no_arg_one_result_endpoint(&self, caller: &Address, ) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper)
-        }
+    pub fn no_arg_one_result_endpoint(&self, caller: &Address, ) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.no_arg_one_result_endpoint();
+            })
+    }
 
-pub fn one_arg_no_result_endpoint(&self, caller: &Address, _arg: u64) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn one_arg_no_result_endpoint(&self, caller: &Address, _arg: u64) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.one_arg_no_result_endpoint(_arg.into());
+            })
+    }
 
-pub fn one_arg_one_result_endpoint(&self, caller: &Address, _arg: u64) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn one_arg_one_result_endpoint(&self, caller: &Address, _arg: u64) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.one_arg_one_result_endpoint(_arg.into());
+            })
+    }
 
-pub fn multi_result(&self, caller: &Address, _arg: &[u8]) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn multi_result(&self, caller: &Address, _arg: ManagedBuffer<DebugApi>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.multi_result(_arg.into());
+            })
+    }
 
-pub fn nested_result(&self, caller: &Address, _arg: &[u8]) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn nested_result(&self, caller: &Address, _arg: ManagedBuffer<DebugApi>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.nested_result(_arg.into());
+            })
+    }
 
-pub fn custom_struct(&self, caller: &Address, _arg: MyCoolStruct<DebugApi>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn custom_struct(&self, caller: &Address, _arg: MyCoolStruct<DebugApi>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.custom_struct(_arg.into());
+            })
+    }
 
-pub fn optional_type(&self, caller: &Address, _arg: OptionalValue<RustBigUint>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn optional_type(&self, caller: &Address, _arg: OptionalValue<RustBigUint>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.optional_type(_arg.into());
+            })
+    }
 
-pub fn option_type(&self, caller: &Address, _arg: Option<ManagedVec<DebugApi, &[u8]>>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn option_type(&self, caller: &Address, _arg: Option<ManagedVec<DebugApi, ManagedBuffer<DebugApi>>>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.option_type(_arg.into());
+            })
+    }
 
-pub fn esdt_token_payment(&self, caller: &Address, _arg: OptionalValue<TxTokenTransfer>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn esdt_token_payment(&self, caller: &Address, _arg: OptionalValue<TxTokenTransfer>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.esdt_token_payment(_arg.into());
+            })
+    }
 
-pub fn egld_or_esdt_payment(&self, caller: &Address, arg: TxTokenTransfer) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, arg)
-        }
+    pub fn egld_or_esdt_payment(&self, caller: &Address, arg: TxTokenTransfer) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.egld_or_esdt_payment(arg.into());
+            })
+    }
 
-pub fn egld_only_endpoint(&self, caller: &Address, egld_value: RustBigUint) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper)
-        }
+    pub fn egld_only_endpoint(&self, caller: &Address, egld_value: &RustBigUint) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, egld_value, |sc| {
+                sc.egld_only_endpoint();
+            })
+    }
 
-pub fn payable_endpoint(&self, caller: &Address, esdt_transfers: Vec<TxTokenTransfer>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_esdt_multi_transfer(caller, &sc_wrapper)
-        }
+    pub fn payable_endpoint(&self, caller: &Address, esdt_transfers: &[TxTokenTransfer]) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_esdt_multi_transfer(caller, &self.sc_wrapper, esdt_transfers, |sc| {
+                sc.payable_endpoint();
+            })
+    }
 
-pub fn managed_buffer(&self, caller: &Address, _arg: Option<&[u8]>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, _arg)
-        }
+    pub fn managed_buffer(&self, caller: &Address, _arg: Option<ManagedBuffer<DebugApi>>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.managed_buffer(_arg.into());
+            })
+    }
 
-pub fn multi_value_2(&self, caller: &Address, arg: MultiValue2<u64, RustBigUint>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, arg)
-        }
+    pub fn multi_value_2(&self, caller: &Address, arg: MultiValue2<u64, RustBigUint>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.multi_value_2(arg.into());
+            })
+    }
 
-pub fn multi_value_4(&self, caller: &Address, arg: MultiValue4<u64, RustBigUint, MyCoolStruct<DebugApi>, &[u8]>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, arg)
-        }
+    pub fn multi_value_4(&self, caller: &Address, arg: MultiValue4<u64, RustBigUint, MyCoolStruct<DebugApi>, ManagedBuffer<DebugApi>>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.multi_value_4(arg.into());
+            })
+    }
 
-pub fn complex_multi_values(&self, caller: &Address, arg: MultiValueVec<MultiValue3<&[u8], u64, RustBigUint>>) -> TxResult {
-            self.b_mock.borrow_mut()
-                .execute_tx(caller, &sc_wrapper, arg)
-        }
+    pub fn complex_multi_values(&self, caller: &Address, arg: MultiValueVec<MultiValue3<ManagedBuffer<DebugApi>, u64, RustBigUint>>) -> TxResult {
+        self.b_mock
+            .borrow_mut()
+            .execute_tx(caller, &self.sc_wrapper, &rust_biguint!(0), |sc| {
+                sc.complex_multi_values(arg.into());
+            })
+    }
 
 }

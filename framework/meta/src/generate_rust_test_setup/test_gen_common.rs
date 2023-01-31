@@ -1,24 +1,6 @@
 const UNDERSCORE: char = '_';
 const MINUS: char = '-';
 
-pub(crate) fn to_snake_case(input: String) -> String {
-    let mut output = String::new();
-    for character in input.chars() {
-        if character == UNDERSCORE || character == MINUS {
-            output.push(UNDERSCORE);
-        } else if character.is_ascii_lowercase() {
-            output.push(character);
-        } else if character.is_ascii_uppercase() {
-            output.push(UNDERSCORE);
-            output.push(character.to_ascii_lowercase());
-        }
-
-        // ignore special characters
-    }
-
-    output
-}
-
 pub(crate) fn to_camel_case(input: String) -> String {
     let mut output = String::new();
     let mut iterator = input.chars().peekable();
