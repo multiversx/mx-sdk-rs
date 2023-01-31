@@ -4,11 +4,12 @@ use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi};
 
 use crate::generate_snippets::{
     snippet_gen_common::write_newline,
-    snippet_sc_functions_gen::{get_payable_type, PayableType},
+    snippet_sc_functions_gen::{get_payable_type, map_output_types_to_rust_types, PayableType},
+    snippet_type_map::map_abi_type_to_rust_type,
 };
 
 use super::{
-    test_gen_common::is_last_element, test_setup_type_map::map_abi_type_to_unmanaged_rust_type,
+    test_gen_common::is_last_element, test_setup_type_map::ABI_TYPES_TO_RUST_TEST_TYPES_MAP,
 };
 
 static EGLD_VALUE_ARG_NAME: &str = "egld_value";
@@ -91,15 +92,21 @@ pub(crate) fn write_endpoint_wrapper_functions(file: &mut File, abi: &ContractAb
 fn write_endpoint_wrapper(file: &mut File, endpoint_abi: &EndpointAbi) {
     let fn_name = endpoint_abi.rust_method_name;
     let fn_type = get_function_type(&endpoint_abi);
+    let result_type =
+        map_output_types_to_rust_types(&endpoint_abi.outputs, &ABI_TYPES_TO_RUST_TEST_TYPES_MAP);
 
     writeln!(
         file,
-        "    pub fn {fn_name}(&self, {}) -> TxResult {{
-        self.b_mock
+        "    pub fn {fn_name}(&self, {}) -> WrappedTxResult<{result_type}> {{
+        let mut opt_endpoint_result = Option::None;
+        let tx_result = self.b_mock
             .borrow_mut()
             .{}({}, |sc| {{
-                let _ = sc.{fn_name}({});
-            }})
+                let res = sc.{fn_name}({});
+                opt_endpoint_result = Some(res);
+            }});
+
+        WrappedTxResult::new(tx_result, opt_endpoint_result)
     }}",
         get_wrapper_func_declaration_args(&endpoint_abi, fn_type.get_payable_type()),
         get_executor_function_to_call(fn_type),
@@ -132,7 +139,10 @@ fn get_wrapper_func_declaration_args(
 
     for (i, input) in inputs.iter().enumerate() {
         let arg_name = input.arg_name;
-        let rust_type = map_abi_type_to_unmanaged_rust_type(input.type_name.to_string());
+        let rust_type = map_abi_type_to_rust_type(
+            input.type_name.to_string(),
+            &ABI_TYPES_TO_RUST_TEST_TYPES_MAP,
+        );
         let rust_type_name = rust_type.get_type_name();
         result += &format!("{arg_name}: {rust_type_name}");
 

@@ -2,7 +2,10 @@ use std::{fs::File, io::Write};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
 
-use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
+use super::{
+    snippet_gen_common::write_newline,
+    snippet_type_map::{map_abi_type_to_rust_type, TypesMap, ABI_TYPES_TO_RUST_TYPES_MAP},
+};
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 pub(crate) enum PayableType {
@@ -69,7 +72,8 @@ fn write_deploy_method_impl(
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
 
-    let output_type = map_output_types_to_rust_types(&init_abi.outputs);
+    let output_type =
+        map_output_types_to_rust_types(&init_abi.outputs, &ABI_TYPES_TO_RUST_TYPES_MAP);
     writeln!(
         file,
         r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
@@ -131,7 +135,8 @@ fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {
     }
 
     // only handle EGLD and "any" case, as they're the most common
-    let biguint_default = map_abi_type_to_rust_type("BigUint".to_string());
+    let biguint_default =
+        map_abi_type_to_rust_type("BigUint".to_string(), &ABI_TYPES_TO_RUST_TYPES_MAP);
     if payable_type == PayableType::Egld {
         writeln!(
             file,
@@ -159,7 +164,8 @@ fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
     }
 
     for input in inputs {
-        let rust_type = map_abi_type_to_rust_type(input.type_name.clone());
+        let rust_type =
+            map_abi_type_to_rust_type(input.type_name.clone(), &ABI_TYPES_TO_RUST_TYPES_MAP);
         writeln!(
             file,
             "        let {} = {};",
@@ -192,7 +198,8 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
         "\n            .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)\n"
     };
 
-    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
+    let output_type =
+        map_output_types_to_rust_types(&endpoint_abi.outputs, &ABI_TYPES_TO_RUST_TYPES_MAP);
     writeln!(
         file,
         r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
@@ -217,7 +224,8 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
 }
 
 fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
-    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
+    let output_type =
+        map_output_types_to_rust_types(&endpoint_abi.outputs, &ABI_TYPES_TO_RUST_TYPES_MAP);
     writeln!(
         file,
         r#"        let result_value: {} = self
@@ -236,7 +244,7 @@ fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
     writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
 }
 
-fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
+pub(crate) fn map_output_types_to_rust_types(outputs: &[OutputAbi], type_map: &TypesMap) -> String {
     let results_len = outputs.len();
     if results_len == 0 {
         return "()".to_string();
@@ -262,6 +270,6 @@ fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
         input_str += ">";
     }
 
-    let output_rust_type = map_abi_type_to_rust_type(input_str);
+    let output_rust_type = map_abi_type_to_rust_type(input_str, type_map);
     output_rust_type.get_type_name().to_string()
 }

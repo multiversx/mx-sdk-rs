@@ -152,3 +152,30 @@ impl TxResult {
         )
     }
 }
+
+#[derive(Clone, Debug)]
+#[must_use]
+pub struct WrappedTxResult<T> {
+    tx_result: TxResult,
+    opt_typed_result: Option<T>,
+}
+
+impl<T> WrappedTxResult<T> {
+    #[inline]
+    pub fn new<U: Into<T>>(tx_result: TxResult, opt_typed_result: Option<U>) -> Self {
+        WrappedTxResult {
+            tx_result,
+            opt_typed_result: opt_typed_result.map(|typed_result| typed_result.into()),
+        }
+    }
+
+    pub fn unwrap(self) -> T {
+        self.tx_result.assert_ok();
+        self.opt_typed_result.unwrap()
+    }
+
+    #[inline]
+    pub fn assert_user_error(&self, expected_message: &str) {
+        self.tx_result.assert_user_error(expected_message);
+    }
+}

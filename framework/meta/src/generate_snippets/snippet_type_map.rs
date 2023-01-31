@@ -30,7 +30,7 @@ impl RustTypeString {
 pub(crate) type TypesMap = HashMap<&'static str, RustTypeString>;
 
 lazy_static! {
-    static ref ABI_TYPES_TO_RUST_TYPES_MAP: TypesMap = {
+    pub(crate) static ref ABI_TYPES_TO_RUST_TYPES_MAP: TypesMap = {
         let mut m = HashMap::new();
 
         m.insert(
@@ -306,8 +306,8 @@ fn handle_option_type(type_string: &mut RustTypeString, inner_types: String, typ
     type_string.default_value_expr += ")";
 }
 
-pub(crate) fn map_abi_type_to_rust_type(abi_type: String) -> RustTypeString {
+pub(crate) fn map_abi_type_to_rust_type(abi_type: String, type_map: &TypesMap) -> RustTypeString {
     let mut type_string = RustTypeString::default();
-    handle_abi_type(&mut type_string, abi_type, &ABI_TYPES_TO_RUST_TYPES_MAP);
+    handle_abi_type(&mut type_string, abi_type, type_map);
     type_string
 }

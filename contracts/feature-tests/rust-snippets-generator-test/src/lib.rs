@@ -133,4 +133,16 @@ pub trait PayableFeatures {
     ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
         arg
     }
+
+    #[view]
+    fn view_func(&self) -> u64 {
+        0
+    }
+
+    #[view]
+    fn view_custom_type(&self) -> MyCoolStruct<Self::Api> {
+        MyCoolStruct {
+            awesome: BigUint::from(420u32),
+        }
+    }
 }

@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use crate::generate_snippets::snippet_type_map::{handle_abi_type, RustTypeString};
+use crate::generate_snippets::snippet_type_map::RustTypeString;
 
 // default_value_expr not used here
 lazy_static! {
-    static ref ABI_TYPES_TO_RUST_TEST_TYPES_MAP: HashMap<&'static str, RustTypeString> = {
+    pub(crate) static ref ABI_TYPES_TO_RUST_TEST_TYPES_MAP: HashMap<&'static str, RustTypeString> = {
         let mut m = HashMap::new();
 
         m.insert(
@@ -101,14 +101,4 @@ lazy_static! {
 
         m
     };
-}
-
-pub(crate) fn map_abi_type_to_unmanaged_rust_type(abi_type: String) -> RustTypeString {
-    let mut type_string = RustTypeString::default();
-    handle_abi_type(
-        &mut type_string,
-        abi_type,
-        &ABI_TYPES_TO_RUST_TEST_TYPES_MAP,
-    );
-    type_string
 }
