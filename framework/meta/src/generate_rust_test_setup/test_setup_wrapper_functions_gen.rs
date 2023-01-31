@@ -1,10 +1,45 @@
 use std::{fs::File, io::Write};
 
-use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi};
+
+use crate::generate_snippets::{
+    snippet_gen_common::write_newline,
+    snippet_sc_functions_gen::{get_payable_type, PayableType},
+};
 
 use super::{
     test_gen_common::is_last_element, test_setup_type_map::map_abi_type_to_unmanaged_rust_type,
 };
+
+static EGLD_VALUE_ARG_NAME: &str = "egld_value";
+static ESDT_TRANSFERS_ARG_NAME: &str = "esdt_transfers";
+
+static OWNER_FIELD_NAME: &str = "owner";
+static SC_WRAPPER_FIELD_NAME: &str = "sc_wrapper";
+
+#[derive(PartialEq, Clone, Copy, Debug)]
+enum FunctionType {
+    View,
+    Endpoint(PayableType),
+}
+
+impl FunctionType {
+    fn get_payable_type(&self) -> PayableType {
+        match *self {
+            FunctionType::View => PayableType::NotPayable,
+            FunctionType::Endpoint(payable_type) => payable_type,
+        }
+    }
+}
+
+fn get_function_type(endpoint_abi: &EndpointAbi) -> FunctionType {
+    if endpoint_abi.mutability.is_view() {
+        return FunctionType::View;
+    }
+
+    let payable_type = get_payable_type(endpoint_abi.payable_in_tokens);
+    FunctionType::Endpoint(payable_type)
+}
 
 pub(crate) fn write_struct_constructor(
     file: &mut File,
@@ -21,32 +56,76 @@ pub(crate) fn write_struct_constructor(
         builder: {builder_fn_name},
         {}
     ) -> Self {{
-        let owner = b_mock.borrow_mut().create_user_account(&rust_biguint!(0));
-        let sc_wrapper = b_mock
+        let {OWNER_FIELD_NAME} = b_mock.borrow_mut().create_user_account(&rust_biguint!(0));
+        let {SC_WRAPPER_FIELD_NAME} = b_mock
             .borrow_mut()
-            .create_sc_account(&rust_biguint!(0), Some(&owner), builder, \"{crate_name}.wasm\");
+            .create_sc_account(&rust_biguint!(0), Some(&{OWNER_FIELD_NAME}), builder, \"{crate_name}.wasm\");
             
         b_mock
             .borrow_mut()
-            .execute_tx(&owner, &sc_wrapper, &rust_biguint!(0), |sc| {{
+            .execute_tx(&{OWNER_FIELD_NAME}, &{SC_WRAPPER_FIELD_NAME}, &rust_biguint!(0), |sc| {{
                 sc.{init_fn_name}({});
             }})
             .assert_ok();
             
         Self {{
             b_mock,
-            owner,
-            sc_wrapper
+            {OWNER_FIELD_NAME},
+            {SC_WRAPPER_FIELD_NAME}
         }}
-    }}",
-        get_wrapper_func_declaration_args(&init_abi.inputs),
-        get_wrapper_func_internal_call_args(&init_abi.inputs)
+    }}
+",
+        get_wrapper_func_declaration_args(&init_abi, PayableType::NotPayable),
+        get_wrapper_func_internal_call_args(&init_abi)
     )
     .unwrap();
 }
 
-fn get_wrapper_func_declaration_args(inputs: &[InputAbi]) -> String {
-    let mut result = String::new();
+pub(crate) fn write_endpoint_wrapper_functions(file: &mut File, abi: &ContractAbi) {
+    for endpoint_abi in &abi.endpoints {
+        write_endpoint_wrapper(file, endpoint_abi);
+        write_newline(file);
+    }
+}
+
+fn write_endpoint_wrapper(file: &mut File, endpoint_abi: &EndpointAbi) {
+    let fn_name = endpoint_abi.rust_method_name;
+    let fn_type = get_function_type(&endpoint_abi);
+
+    writeln!(
+        file,
+        "pub fn {fn_name}(&self, {}) -> TxResult {{
+            self.b_mock.borrow_mut()
+                .{}({})
+        }}",
+        get_wrapper_func_declaration_args(&endpoint_abi, fn_type.get_payable_type()),
+        get_executor_function_to_call(fn_type),
+        get_wrapper_func_internal_call_args(endpoint_abi)
+    )
+    .unwrap();
+}
+
+fn get_wrapper_func_declaration_args(
+    endpoint_abi: &EndpointAbi,
+    payable_type: PayableType,
+) -> String {
+    let mut result = get_caller_arg_snippet(endpoint_abi);
+    if !result.is_empty() {
+        result += ", ";
+    }
+
+    let payment_snippet = get_required_wrapper_func_payment_args(payable_type);
+    result += &payment_snippet;
+
+    let inputs = &endpoint_abi.inputs;
+    if inputs.is_empty() {
+        return result;
+    }
+
+    if !payment_snippet.is_empty() {
+        result += ", ";
+    }
+
     for (i, input) in inputs.iter().enumerate() {
         let arg_name = input.arg_name;
         let rust_type = map_abi_type_to_unmanaged_rust_type(input.type_name.to_string());
@@ -61,8 +140,21 @@ fn get_wrapper_func_declaration_args(inputs: &[InputAbi]) -> String {
     result
 }
 
-fn get_wrapper_func_internal_call_args(inputs: &[InputAbi]) -> String {
-    let mut result = String::new();
+fn get_wrapper_func_internal_call_args(endpoint_abi: &EndpointAbi) -> String {
+    let mut result = get_caller_arg_for_wrapper_fn(endpoint_abi);
+    if !result.is_empty() {
+        result += ", ";
+    }
+
+    result += &format!("&{SC_WRAPPER_FIELD_NAME}");
+
+    let inputs = &endpoint_abi.inputs;
+    if inputs.is_empty() {
+        return result;
+    }
+
+    result += ", ";
+
     for (i, input) in inputs.iter().enumerate() {
         result += input.arg_name;
 
@@ -72,4 +164,42 @@ fn get_wrapper_func_internal_call_args(inputs: &[InputAbi]) -> String {
     }
 
     result
+}
+
+fn get_executor_function_to_call(fn_type: FunctionType) -> String {
+    match fn_type {
+        FunctionType::View => "execute_query".to_string(),
+        FunctionType::Endpoint(payable_type) => match payable_type {
+            PayableType::NotPayable | PayableType::Egld => "execute_tx".to_string(),
+            PayableType::Any => "execute_esdt_multi_transfer".to_string(),
+        },
+    }
+}
+
+fn get_caller_arg_snippet(endpoint_abi: &EndpointAbi) -> String {
+    if endpoint_abi.only_owner || endpoint_abi.mutability.is_view() {
+        String::new()
+    } else {
+        "caller: &Address".to_string()
+    }
+}
+
+fn get_caller_arg_for_wrapper_fn(endpoint_abi: &EndpointAbi) -> String {
+    if endpoint_abi.only_owner {
+        return format!("&self.{OWNER_FIELD_NAME}");
+    }
+
+    if endpoint_abi.mutability.is_view() {
+        String::new()
+    } else {
+        "caller".to_string() // arg is already a reference
+    }
+}
+
+fn get_required_wrapper_func_payment_args(payable_type: PayableType) -> String {
+    match payable_type {
+        PayableType::NotPayable => String::new(),
+        PayableType::Egld => format!("{EGLD_VALUE_ARG_NAME}: RustBigUint"),
+        PayableType::Any => format!("{ESDT_TRANSFERS_ARG_NAME}: Vec<TxTokenTransfer>"),
+    }
 }

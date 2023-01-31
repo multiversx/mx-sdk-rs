@@ -10,7 +10,9 @@ use crate::{cli_args::GenerateRustTestSetupArgs, meta_config::MetaConfig};
 use super::{
     test_base_struct_gen::{write_test_setup_imports, write_test_setup_struct_declaration},
     test_gen_common::{capitalize_first_letter, to_camel_case},
-    test_setup_wrapper_functions_gen::write_struct_constructor,
+    test_setup_wrapper_functions_gen::{
+        write_endpoint_wrapper_functions, write_struct_constructor,
+    },
 };
 
 pub(crate) fn create_test_folders(tests_folder_path: &str, contract_name: &str) {
@@ -27,7 +29,6 @@ pub(crate) fn create_test_folders(tests_folder_path: &str, contract_name: &str) 
 #[must_use]
 pub(crate) fn create_and_get_test_setup_mod_file(setup_folder_path: &str, overwrite: bool) -> File {
     let file_path = format!("{setup_folder_path}mod.rs");
-    println!("File path: {file_path}");
     if overwrite {
         return File::create(&file_path).unwrap();
     }
@@ -81,6 +82,7 @@ fn write_rust_tests_setup_to_file(
         &builder_func_name,
         &abi.constructors[0],
     );
+    write_endpoint_wrapper_functions(file, abi);
 
     writeln!(file, "}}").unwrap();
 }

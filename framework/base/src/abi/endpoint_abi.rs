@@ -26,6 +26,15 @@ pub enum EndpointMutabilityAbi {
     Pure,
 }
 
+impl EndpointMutabilityAbi {
+    pub fn is_view(&self) -> bool {
+        match *self {
+            EndpointMutabilityAbi::Mutable => false,
+            EndpointMutabilityAbi::Readonly | EndpointMutabilityAbi::Pure => true,
+        }
+    }
+}
+
 #[derive(Clone, Default, Debug)]
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],

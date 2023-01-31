@@ -1,9 +1,5 @@
 use std::{fs::File, io::Write};
 
-use crate::generate_snippets::snippet_gen_common::write_newline;
-
-use super::test_gen_common::{capitalize_first_letter, to_camel_case};
-
 pub(crate) fn write_test_setup_imports(file: &mut File, contract_module_name: &str) {
     writeln!(
         file,

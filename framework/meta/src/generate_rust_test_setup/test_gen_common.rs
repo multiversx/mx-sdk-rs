@@ -26,7 +26,8 @@ pub(crate) fn to_camel_case(input: String) -> String {
         if character.is_ascii_lowercase() || character.is_ascii_uppercase() {
             output.push(character);
             continue;
-        } else if character != UNDERSCORE && character != MINUS {
+        }
+        if character != UNDERSCORE && character != MINUS {
             continue;
         }
 
@@ -40,7 +41,7 @@ pub(crate) fn to_camel_case(input: String) -> String {
             continue;
         }
 
-        output.push(character.to_ascii_uppercase());
+        output.push(next_character.to_ascii_uppercase());
         let _ = iterator.advance_by(1); // will never fail, as we've already peeked
 
         // ignore special characters

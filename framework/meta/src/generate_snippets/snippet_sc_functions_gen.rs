@@ -4,6 +4,26 @@ use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputA
 
 use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
 
+#[derive(PartialEq, Clone, Copy, Debug)]
+pub(crate) enum PayableType {
+    NotPayable,
+    Egld,
+    Any,
+}
+
+pub(crate) fn get_payable_type(accepted_tokens: &[&str]) -> PayableType {
+    if accepted_tokens.is_empty() {
+        return PayableType::NotPayable;
+    }
+
+    let first_accepted = accepted_tokens[0];
+    if first_accepted == "EGLD" {
+        PayableType::Egld
+    } else {
+        PayableType::Any
+    }
+}
+
 pub(crate) fn write_state_struct_impl(
     file: &mut File,
     abi: &ContractAbi,
@@ -105,14 +125,14 @@ fn write_method_declaration(file: &mut File, endpoint_name: &str) {
 }
 
 fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {
-    if accepted_tokens.is_empty() {
+    let payable_type = get_payable_type(accepted_tokens);
+    if payable_type == PayableType::NotPayable {
         return;
     }
 
     // only handle EGLD and "any" case, as they're the most common
     let biguint_default = map_abi_type_to_rust_type("BigUint".to_string());
-    let first_accepted = accepted_tokens[0];
-    if first_accepted == "EGLD" {
+    if payable_type == PayableType::Egld {
         writeln!(
             file,
             "        let egld_amount = {};",

@@ -97,6 +97,10 @@ pub trait PayableFeatures {
         arg.token_identifier
     }
 
+    #[payable("EGLD")]
+    #[endpoint]
+    fn egld_only_endpoint(&self) {}
+
     #[payable("*")]
     #[endpoint]
     fn payable_endpoint(&self) {}
