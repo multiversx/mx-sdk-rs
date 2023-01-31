@@ -73,7 +73,7 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
         Some((_, "0.32.0")) => {
             upgrade_to_32_0(dir);
         },
-        Some((_, "0.38.0")) => {
+        Some((_, "0.39.0")) => {
             upgrade_to_39_0(dir);
         },
         Some((from_version, to_version)) => {
