@@ -56,7 +56,7 @@ pub(crate) fn write_struct_constructor(
         builder: {builder_fn_name},
         {}
     ) -> Self {{
-        let {OWNER_FIELD_NAME} = b_mock.borrow_mut().create_user_account(&rust_biguint!(0));
+        let {OWNER_FIELD_NAME} = caller.clone();
         let {SC_WRAPPER_FIELD_NAME} = b_mock
             .borrow_mut()
             .create_sc_account(&rust_biguint!(0), Some(&{OWNER_FIELD_NAME}), builder, \"{crate_name}.wasm\");
@@ -64,7 +64,7 @@ pub(crate) fn write_struct_constructor(
         b_mock
             .borrow_mut()
             .execute_tx(&{OWNER_FIELD_NAME}, &{SC_WRAPPER_FIELD_NAME}, &rust_biguint!(0), |sc| {{
-                sc.{init_fn_name}({});
+                let _ = sc.{init_fn_name}({});
             }})
             .assert_ok();
             
@@ -98,7 +98,7 @@ fn write_endpoint_wrapper(file: &mut File, endpoint_abi: &EndpointAbi) {
         self.b_mock
             .borrow_mut()
             .{}({}, |sc| {{
-                sc.{fn_name}({});
+                let _ = sc.{fn_name}({});
             }})
     }}",
         get_wrapper_func_declaration_args(&endpoint_abi, fn_type.get_payable_type()),

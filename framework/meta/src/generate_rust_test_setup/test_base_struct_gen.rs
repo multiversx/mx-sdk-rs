@@ -3,7 +3,9 @@ use std::{fs::File, io::Write};
 pub(crate) fn write_test_setup_imports(file: &mut File, contract_module_name: &str) {
     writeln!(
         file,
-        "use std::{{cell::RefCell, rc::Rc}};
+        "#![allow(dead_code, unused_imports)]
+
+use std::{{cell::RefCell, rc::Rc}};
 
 use {contract_module_name}::ProxyTrait as _;
 use {contract_module_name}::*;

@@ -106,6 +106,21 @@ where
     }
 }
 
+impl<M, T> From<MultiValueVec<T>> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+{
+    #[inline]
+    fn from(v: MultiValueVec<T>) -> Self {
+        let mut result = MultiValueEncoded::new();
+        for item in v.into_vec() {
+            result.push(item);
+        }
+        result
+    }
+}
+
 impl<M, T> MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
