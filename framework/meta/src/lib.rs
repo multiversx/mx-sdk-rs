@@ -1,7 +1,7 @@
 pub mod abi_json;
 mod cargo_toml_contents;
 pub mod cli_args;
-mod cmd;
+pub mod cmd;
 mod folder_structure;
 mod tools;
 
