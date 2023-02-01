@@ -4,7 +4,6 @@ const INNER_TYPE_SEPARATOR: char = '<';
 const INNER_TYPE_END: char = '>';
 pub static DEBUG_API_SUFFIX: &str = "<DebugApi>";
 pub static PLACEHOLDER_INPUT_TYPE_NAME: &str = "PlaceholderInput";
-// pub static PLACEHOLDER_OUTPUT_TYPE_NAME: &str = "PlaceholderOutput";
 
 #[derive(Clone, Default)]
 pub struct RustTypeString {
@@ -28,112 +27,115 @@ impl RustTypeString {
 }
 
 lazy_static! {
-    static ref ABI_TYPES_TO_RUST_TYPES_MAP: HashMap<&'static str, RustTypeString> = {
-        let mut m = HashMap::new();
+    static ref ABI_TYPES_TO_RUST_TYPES_MAP: HashMap<&'static str, RustTypeString> =
+        init_rust_types_map();
+}
 
-        m.insert(
-            "u8",
-            RustTypeString {
-                type_name: "u8".to_string(),
-                default_value_expr: "0u8".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "u16",
-            RustTypeString {
-                type_name: "u16".to_string(),
-                default_value_expr: "0u16".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "u32",
-            RustTypeString {
-                type_name: "u32".to_string(),
-                default_value_expr: "0u32".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "u64",
-            RustTypeString {
-                type_name: "u64".to_string(),
-                default_value_expr: "0u64".to_string(),
-                contains_custom_types: false,
-            },
-        );
+fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
+    let mut m = HashMap::new();
 
-        m.insert(
-            "Address",
-            RustTypeString {
-                type_name: "ManagedAddress".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "bech32::decode(\"\")".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "BigUint",
-            RustTypeString {
-                type_name: "BigUint".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "BigUint::<DebugApi>::from(0u128)".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "bytes",
-            RustTypeString {
-                type_name: "ManagedBuffer".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "ManagedBuffer::new_from_bytes(&b\"\"[..])".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "TokenIdentifier",
-            RustTypeString {
-                type_name: "TokenIdentifier".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "TokenIdentifier::from_esdt_bytes(&b\"\"[..])".to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "EgldOrEsdtTokenIdentifier",
-            RustTypeString {
-                type_name: "EgldOrEsdtTokenIdentifier".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..])".to_string(),
-                contains_custom_types: false,
-            },
-        );
+    m.insert(
+        "u8",
+        RustTypeString {
+            type_name: "u8".to_string(),
+            default_value_expr: "0u8".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "u16",
+        RustTypeString {
+            type_name: "u16".to_string(),
+            default_value_expr: "0u16".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "u32",
+        RustTypeString {
+            type_name: "u32".to_string(),
+            default_value_expr: "0u32".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "u64",
+        RustTypeString {
+            type_name: "u64".to_string(),
+            default_value_expr: "0u64".to_string(),
+            contains_custom_types: false,
+        },
+    );
 
-        m.insert(
-            "EsdtTokenPayment",
-            RustTypeString {
-                type_name: "EsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "EsdtTokenPayment::new(
-                TokenIdentifier::from_esdt_bytes(&b\"\"[..]),
-                0u64,
-                BigUint::from(0u128)
-            )"
-                .to_string(),
-                contains_custom_types: false,
-            },
-        );
-        m.insert(
-            "EgldOrEsdtTokenPayment",
-            RustTypeString {
-                type_name: "EgldOrEsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
-                default_value_expr: "EgldOrEsdtTokenPayment::new(
-                EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..]),
-                0u64,
-                BigUint::from(0u128)
-            )"
-                .to_string(),
-                contains_custom_types: false,
-            },
-        );
+    m.insert(
+        "Address",
+        RustTypeString {
+            type_name: "ManagedAddress".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "bech32::decode(\"\")".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "BigUint",
+        RustTypeString {
+            type_name: "BigUint".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "BigUint::<DebugApi>::from(0u128)".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "bytes",
+        RustTypeString {
+            type_name: "ManagedBuffer".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "ManagedBuffer::new_from_bytes(&b\"\"[..])".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "TokenIdentifier",
+        RustTypeString {
+            type_name: "TokenIdentifier".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "TokenIdentifier::from_esdt_bytes(&b\"\"[..])".to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "EgldOrEsdtTokenIdentifier",
+        RustTypeString {
+            type_name: "EgldOrEsdtTokenIdentifier".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..])".to_string(),
+            contains_custom_types: false,
+        },
+    );
 
-        m
-    };
+    m.insert(
+        "EsdtTokenPayment",
+        RustTypeString {
+            type_name: "EsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "EsdtTokenPayment::new(
+            TokenIdentifier::from_esdt_bytes(&b\"\"[..]),
+            0u64,
+            BigUint::from(0u128)
+        )"
+            .to_string(),
+            contains_custom_types: false,
+        },
+    );
+    m.insert(
+        "EgldOrEsdtTokenPayment",
+        RustTypeString {
+            type_name: "EgldOrEsdtTokenPayment".to_string() + DEBUG_API_SUFFIX,
+            default_value_expr: "EgldOrEsdtTokenPayment::new(
+            EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..]),
+            0u64,
+            BigUint::from(0u128)
+        )"
+            .to_string(),
+            contains_custom_types: false,
+        },
+    );
+
+    m
 }
 
 enum AbiType {
@@ -146,8 +148,6 @@ enum AbiType {
     Array(String, String),
     Option(String),
 }
-
-/// MultiValueEncoded<BigUint>
 
 fn get_abi_type(abi_type_str: &str) -> AbiType {
     let opt_inner_type_start = abi_type_str.find(INNER_TYPE_SEPARATOR);
