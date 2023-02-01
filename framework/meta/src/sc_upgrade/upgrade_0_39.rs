@@ -10,7 +10,6 @@ use crate::{
     folder_structure::{DirectoryType, RelevantDirectory},
     CargoTomlContents,
 };
-use colored::Colorize;
 use ruplacer::Query;
 use toml::{value::Table, Value};
 
@@ -28,11 +27,13 @@ pub fn upgrade_to_39_0(dir: &RelevantDirectory) {
     }
     v_0_39_replace_in_files(&dir.path);
     rename_files(dir.path.as_ref(), SCENARIO_FILE_PATTERNS);
-    version_bump_in_cargo_toml(&dir.path, "0.38.0", "0.39.0");
+
+    let (from_version, to_version) = dir.upgrade_in_progress.unwrap();
+    version_bump_in_cargo_toml(&dir.path, from_version, to_version);
 }
 
 /// Post-processing: re-generate the wasm crates.
-pub fn postprocessing_after_39_1(dir: &RelevantDirectory) {
+pub fn postprocessing_after_39_0(dir: &RelevantDirectory) {
     if dir.dir_type != DirectoryType::Contract {
         return;
     }
@@ -50,25 +51,13 @@ fn v_0_39_prepare_meta(sc_crate_path: &Path) {
     let mut meta_cargo_toml = CargoTomlContents::load_from_file(&cargo_toml_path);
     let deps = meta_cargo_toml.dependencies_mut();
 
-    println!(
-        "{}/dependencies/{}",
-        cargo_toml_path.as_path().display(),
-        "elrond-wasm".red().strikethrough(),
-    );
+    print_cargo_dep_remove(cargo_toml_path.as_path(), "elrond-wasm");
     deps.remove("elrond-wasm");
 
-    println!(
-        "{}/dependencies/{}",
-        cargo_toml_path.as_path().display(),
-        "elrond-wasm-debug".red().strikethrough(),
-    );
+    print_cargo_dep_remove(cargo_toml_path.as_path(), "elrond-wasm-debug");
     deps.remove("elrond-wasm-debug");
 
-    println!(
-        "{}/dependencies/{}",
-        cargo_toml_path.as_path().display(),
-        "multiversx-sc-meta".green(),
-    );
+    print_cargo_dep_add(cargo_toml_path.as_path(), "multiversx-sc-meta");
     let mut meta_dep = Table::new();
     meta_dep.insert("version".to_string(), Value::String("0.39.0".to_string()));
     deps.insert("multiversx-sc-meta".to_string(), Value::Table(meta_dep));
@@ -86,11 +75,7 @@ fn v_0_39_prepare_wasm(sc_crate_path: &Path) {
     let mut meta_cargo_toml = CargoTomlContents::load_from_file(&cargo_toml_path);
     let deps = meta_cargo_toml.dependencies_mut();
 
-    println!(
-        "{}/dependencies/{}",
-        cargo_toml_path.as_path().display(),
-        "elrond-wasm-output".red().strikethrough(),
-    );
+    print_cargo_dep_remove(cargo_toml_path.as_path(), "elrond-wasm-output");
     deps.remove("elrond-wasm-output");
 
     meta_cargo_toml.save_to_file(&cargo_toml_path);
@@ -132,6 +117,7 @@ fn v_0_39_replace_in_files(sc_crate_path: &Path) {
             Query::substring("BlockchainMock", "ScenarioWorld"),
             Query::substring("testing_framework", "whitebox"),
             Query::substring("tx_mock", "whitebox"),
+            Query::substring("register_contract_builder", "register_contract"),
         ][..],
     );
 }

@@ -1,5 +1,9 @@
 use ruplacer::{Console, DirectoryPatcher, Query, Settings};
-use std::{fs, path::Path};
+use std::{
+    fs,
+    path::Path,
+    process::{self, Command},
+};
 use toml::Value;
 
 use crate::{
@@ -190,4 +194,21 @@ pub fn re_generate_wasm_crate(dir: &RelevantDirectory) {
         &dir.path,
         &["abi".to_string(), "--no-abi-git-version".to_string()],
     );
+}
+
+pub fn cargo_check(dir: &RelevantDirectory) {
+    print_cargo_check(dir);
+
+    let result = Command::new("cargo")
+        .current_dir(&dir.path)
+        .args(["check", "--tests"])
+        .spawn()
+        .expect("failed to spawn cargo check process")
+        .wait()
+        .expect("cargo check was not running");
+
+    if !result.success() {
+        print_cargo_check_fail();
+        process::exit(1);
+    }
 }

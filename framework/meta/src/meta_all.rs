@@ -4,7 +4,7 @@ use colored::Colorize;
 
 use crate::{
     cli_args::{AllArgs, CliArgsToRaw},
-    folder_structure::RelevantDirectories,
+    folder_structure::{dir_pretty_print, RelevantDirectories},
 };
 
 pub fn call_all_meta(args: &AllArgs) {
@@ -14,11 +14,13 @@ pub fn call_all_meta(args: &AllArgs) {
         "./"
     };
 
-    perform_call_all_meta(path, args.to_raw());
+    perform_call_all_meta(path, args.ignore.as_slice(), args.to_raw());
 }
 
-fn perform_call_all_meta(path: impl AsRef<Path>, raw_args: Vec<String>) {
-    let dirs = RelevantDirectories::find_all(path);
+fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
+    let dirs = RelevantDirectories::find_all(path, ignore);
+    dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
+
     println!(
         "Found {} contract crates.\n",
         dirs.iter_contract_crates().count(),
@@ -34,6 +36,11 @@ fn perform_call_all_meta(path: impl AsRef<Path>, raw_args: Vec<String>) {
 
 pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String]) {
     let meta_path = contract_crate_path.join("meta");
+    assert!(
+        meta_path.exists(),
+        "Contract meta crate not found at {}",
+        meta_path.as_path().display()
+    );
 
     println!(
         "\n{} `cargo run {}` in {}",
@@ -42,11 +49,13 @@ pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String])
         meta_path.as_path().display(),
     );
 
-    let _ = Command::new("cargo")
+    let exit_status = Command::new("cargo")
         .current_dir(&meta_path)
         .args(std::iter::once(&"run".to_string()).chain(cargo_run_args.iter()))
         .spawn()
         .expect("failed to spawn cargo run process in meta crate")
         .wait()
         .expect("cargo run process in meta crate was not running");
+
+    assert!(exit_status.success(), "contract meta process failed");
 }

@@ -4,6 +4,7 @@ use super::{
 use crate::{
     cli_args::{ContractCliAction, ContractCliArgs, StandaloneCliAction, StandaloneCliArgs},
     meta_all::call_all_meta,
+    meta_info::call_info,
     sc_upgrade::upgrade_sc,
 };
 use clap::Parser;
@@ -13,6 +14,7 @@ use multiversx_sc::contract_base::ContractAbiProvider;
 pub fn cli_main_standalone() {
     let cli_args = StandaloneCliArgs::parse();
     match &cli_args.command {
+        Some(StandaloneCliAction::Info(args)) => call_info(args),
         Some(StandaloneCliAction::All(args)) => call_all_meta(args),
         Some(StandaloneCliAction::Upgrade(args)) => {
             upgrade_sc(args);
@@ -35,6 +37,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
             meta_config_opt.build(build_args.into_build_args())
         },
         ContractCliAction::Clean => meta_config_opt.clean(),
+        ContractCliAction::Update => meta_config_opt.update(),
         ContractCliAction::GenerateSnippets(gs_args) => {
             meta_config_opt.generate_rust_snippets(&gs_args)
         },

@@ -9,15 +9,15 @@ publish = false
 path = "src/multisig.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.2"
+version = "0.39.4"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.39.2"
+version = "0.39.4"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.2"
+version = "0.39.4"
 path = "../../../framework/scenario"
 
 [dev-dependencies.adder]
