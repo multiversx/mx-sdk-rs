@@ -18,16 +18,16 @@ use super::{
 
 impl MetaConfig {
     pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
-        let name = &self
-            .output_contracts
-            .main_contract()
-            .public_name_snake_case();
-        let wasm_output_file_path_expr = format!("\"file:../output/{name}.wasm\"");
-        let file = create_snippets_crate_and_get_lib_file(&self.snippets_dir, name, args.overwrite);
+        let main_contract = self.output_contracts.main_contract();
+        let crate_name = &main_contract.contract_name;
+        let snake_case_name = &main_contract.public_name_snake_case();
+        let wasm_output_file_path_expr = format!("\"file:../output/{crate_name}.wasm\"");
+        let file =
+            create_snippets_crate_and_get_lib_file(&self.snippets_dir, crate_name, args.overwrite);
         write_snippets_to_file(
             file,
             &self.original_contract_abi,
-            name,
+            snake_case_name,
             &wasm_output_file_path_expr,
         );
     }
@@ -49,12 +49,12 @@ fn create_snippets_crate_and_get_lib_file(
 fn write_snippets_to_file(
     mut file: File,
     abi: &ContractAbi,
-    contract_crate_name: &str,
+    snake_case_name: &str,
     wasm_output_file_path_expr: &str,
 ) {
-    write_snippet_imports(&mut file, contract_crate_name);
+    write_snippet_imports(&mut file, snake_case_name);
     write_snippet_constants(&mut file);
-    write_contract_type_alias(&mut file, contract_crate_name);
+    write_contract_type_alias(&mut file, snake_case_name);
     write_snippet_main_function(&mut file, abi);
     write_state_struct_declaration(&mut file);
     write_state_struct_impl(&mut file, abi, wasm_output_file_path_expr);

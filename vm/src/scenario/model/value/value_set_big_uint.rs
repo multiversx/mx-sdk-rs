@@ -4,6 +4,7 @@ use crate::scenario_format::{
     value_interpreter::{interpret_string, interpret_subtree},
 };
 
+use multiversx_sc::api::ManagedTypeApi;
 use num_bigint::BigUint;
 use std::fmt;
 
@@ -63,6 +64,25 @@ impl From<u64> for BigUintValue {
         BigUintValue {
             value: from.into(),
             original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
+impl From<u128> for BigUintValue {
+    fn from(from: u128) -> Self {
+        BigUintValue {
+            value: from.into(),
+            original: ValueSubTree::Str(from.to_string()),
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> From<multiversx_sc::types::BigUint<M>> for BigUintValue {
+    fn from(from: multiversx_sc::types::BigUint<M>) -> Self {
+        let value = BigUint::from_bytes_be(from.to_bytes_be().as_slice());
+        BigUintValue {
+            original: ValueSubTree::Str(value.to_string()),
+            value,
         }
     }
 }
