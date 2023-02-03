@@ -2,7 +2,7 @@ use std::{fs::File, io::Write};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
 
-use super::snippet_gen_common::write_newline;
+use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
 
 pub(crate) fn write_state_struct_impl(
     file: &mut File,
@@ -49,9 +49,10 @@ fn write_deploy_method_impl(
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
 
+    let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-        r#"        let result: multiversx_sc_snippets::InteractorResult<PlaceholderOutput> = self
+        r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
             .interactor
             .sc_deploy(
                 self.contract
@@ -69,6 +70,7 @@ fn write_deploy_method_impl(
         println!("new address: {{}}", new_address_bech32);
         let result_value = result.value();
 "#,
+        output_type,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
         wasm_output_file_path_expr
@@ -108,15 +110,22 @@ fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {
     }
 
     // only handle EGLD and "any" case, as they're the most common
+    let biguint_default = map_abi_type_to_rust_type("BigUint".to_string());
     let first_accepted = accepted_tokens[0];
     if first_accepted == "EGLD" {
-        writeln!(file, "        let egld_amount = 0u64;").unwrap();
+        writeln!(
+            file,
+            "        let egld_amount = {};",
+            biguint_default.get_default_value_expr()
+        )
+        .unwrap();
     } else {
         writeln!(
             file,
             "        let token_id = b\"\";
         let token_nonce = 0u64;
-        let token_amount = 0u64;"
+        let token_amount = {};",
+            biguint_default.get_default_value_expr()
         )
         .unwrap();
     }
@@ -130,7 +139,14 @@ fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
     }
 
     for input in inputs {
-        writeln!(file, "        let {} = PlaceholderInput;", input.arg_name).unwrap();
+        let rust_type = map_abi_type_to_rust_type(input.type_name.clone());
+        writeln!(
+            file,
+            "        let {} = {};",
+            input.arg_name,
+            rust_type.get_default_value_expr()
+        )
+        .unwrap();
     }
 
     write_newline(file);
@@ -153,12 +169,13 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
         "\n            .egld_value(egld_amount)\n"
     } else {
-        "\n            .esdt_transfer(token_id, token_nonce, token_amount)\n"
+        "\n            .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)\n"
     };
 
+    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"        let result: multiversx_sc_snippets::InteractorResult<PlaceholderOutput> = self
+        r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
             .interactor
             .sc_call_get_result(
                 self.contract
@@ -171,6 +188,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
             .await;
         let result_value = result.value();
 "#,
+        output_type,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
         payment_snippet,
@@ -179,13 +197,15 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
 }
 
 fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
+    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"        let result_value: PlaceholderOutput = self
+        r#"        let result_value: {} = self
             .interactor
             .vm_query(self.contract.{}({}))
             .await;
 "#,
+        output_type,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
     )
@@ -194,4 +214,34 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
 
 fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
     writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
+}
+
+fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
+    let results_len = outputs.len();
+    if results_len == 0 {
+        return "()".to_string();
+    }
+
+    // format to be the same as when multi-value is an argument
+    // for results, each type is a different array entry
+    let mut input_str = String::new();
+    if results_len > 1 {
+        input_str += "multi";
+        input_str += "<";
+    }
+
+    for (i, output) in outputs.iter().enumerate() {
+        input_str += &output.type_name;
+
+        if i < results_len - 1 {
+            input_str += ",";
+        }
+    }
+
+    if results_len > 1 {
+        input_str += ">";
+    }
+
+    let output_rust_type = map_abi_type_to_rust_type(input_str);
+    output_rust_type.get_type_name().to_string()
 }

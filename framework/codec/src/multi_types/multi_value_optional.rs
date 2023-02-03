@@ -1,3 +1,5 @@
+use core::fmt::Debug;
+
 use crate::{
     CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
     TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
@@ -93,4 +95,16 @@ where
     T: TopEncodeMulti + TopDecodeMulti,
     U: CodecFrom<T> + CodecFromSelf + TopEncodeMulti + TopDecodeMulti,
 {
+}
+
+impl<T> Debug for OptionalValue<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Self::Some(arg0) => f.debug_tuple("Some").field(arg0).finish(),
+            Self::None => write!(f, "None"),
+        }
+    }
 }

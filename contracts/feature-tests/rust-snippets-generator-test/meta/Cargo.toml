@@ -1,0 +1,13 @@
+[package]
+name = "rust-snippets-generator-test-meta"
+version = "0.0.0"
+authors = ["Dorin Marian Iancu <dorin.iancu@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[dependencies.rust-snippets-generator-test]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.39.4"
+path = "../../../../framework/meta"

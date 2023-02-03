@@ -16,3 +16,6 @@ mod sc_upgrade;
 
 pub use cargo_toml_contents::CargoTomlContents;
 pub use meta_cli::{cli_main, cli_main_standalone, multi_contract_config};
+
+#[macro_use]
+extern crate lazy_static;

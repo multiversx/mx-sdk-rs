@@ -67,7 +67,16 @@ path = "src/lib.rs"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.39.0"
+version = "0.39.2"
+
+[dependencies.multiversx-sc-scenario]
+version = "0.39.2"
+
+[dependencies.multiversx-chain-vm]
+version = "0.1.2"
+
+[dependencies.multiversx-sdk]
+version = "0.1.1"
 
 [workspace]
 
