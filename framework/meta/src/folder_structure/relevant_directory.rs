@@ -181,6 +181,7 @@ fn load_cargo_toml_contents(dir_path: &Path) -> Option<CargoTomlContents> {
 }
 
 impl RelevantDirectory {
+    #[allow(unused)]
     pub fn cargo_toml_contents(&self) -> Option<CargoTomlContents> {
         load_cargo_toml_contents(self.path.as_path())
     }
