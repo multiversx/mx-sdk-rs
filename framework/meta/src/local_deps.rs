@@ -8,7 +8,7 @@ use crate::{
 use common_path::common_path_all;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::{HashMap, LinkedList},
+    collections::{BTreeMap, LinkedList},
     fs::File,
     io::Write,
     path::{Path, PathBuf},
@@ -54,7 +54,7 @@ fn perform_local_deps(path: impl AsRef<Path>, ignore: &[String]) {
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
     for contract_dir in dirs.iter_contract_crates() {
-        let mut dep_map = HashMap::new();
+        let mut dep_map = BTreeMap::new();
 
         let output_dir_path = contract_dir.path.join("output");
         std::fs::create_dir_all(&output_dir_path).unwrap();
@@ -76,7 +76,11 @@ fn perform_local_deps(path: impl AsRef<Path>, ignore: &[String]) {
     }
 }
 
-fn expand_deps(root_path: &Path, starting_path: PathBuf, dep_map: &mut HashMap<PathBuf, LocalDep>) {
+fn expand_deps(
+    root_path: &Path,
+    starting_path: PathBuf,
+    dep_map: &mut BTreeMap<PathBuf, LocalDep>,
+) {
     let mut queue: LinkedList<PathBuf> = LinkedList::new();
     queue.push_back(starting_path);
     while let Some(parent) = queue.pop_front() {
@@ -86,11 +90,12 @@ fn expand_deps(root_path: &Path, starting_path: PathBuf, dep_map: &mut HashMap<P
         for child in &local_paths {
             let full_path = parent.join(child).canonicalize().unwrap();
             let child_path = pathdiff::diff_paths(&full_path, root_path).unwrap();
-            let child_depth = if let Some(parent_dep) = dep_map.get(&parent) {
-                parent_dep.depth + 1
+            let parent_depth = if let Some(parent_dep) = dep_map.get(&parent) {
+                parent_dep.depth
             } else {
                 0
             };
+            let child_depth = parent_depth + 1;
             if let Some(local_dep) = dep_map.get_mut(&full_path) {
                 if child_depth < local_dep.depth {
                     local_dep.depth = child_depth;
