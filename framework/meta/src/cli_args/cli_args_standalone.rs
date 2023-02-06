@@ -45,7 +45,7 @@ pub enum StandaloneCliAction {
 
     #[command(
         name = "local-deps",
-        about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
+        about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
 }
