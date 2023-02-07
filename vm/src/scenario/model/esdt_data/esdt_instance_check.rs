@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CheckEsdtInstance {
     pub nonce: U64Value,
     pub balance: CheckValue<BigUintValue>,

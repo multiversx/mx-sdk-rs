@@ -8,7 +8,7 @@ use crate::{
 
 use super::CheckEsdtInstances;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CheckEsdtData {
     pub instances: CheckEsdtInstances,
     pub last_nonce: CheckValue<U64Value>,

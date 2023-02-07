@@ -9,7 +9,7 @@ use multiversx_sc::types::CodeMetadata;
 
 use super::tx_interpret_util::interpret_egld_value;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TxDeploy {
     pub from: AddressValue,
     pub egld_value: BigUintValue,

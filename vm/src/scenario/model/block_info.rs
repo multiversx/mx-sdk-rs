@@ -5,7 +5,7 @@ use crate::scenario_format::{
 
 use super::{BytesValue, U64Value};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct BlockInfo {
     pub block_timestamp: Option<U64Value>,
     pub block_nonce: Option<U64Value>,

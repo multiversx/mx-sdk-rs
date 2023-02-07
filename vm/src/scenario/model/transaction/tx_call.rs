@@ -10,7 +10,7 @@ use multiversx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment}
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TxCall {
     pub from: AddressValue,
     pub to: AddressValue,

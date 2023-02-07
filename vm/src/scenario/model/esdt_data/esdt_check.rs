@@ -8,7 +8,7 @@ use crate::{
 };
 use num_bigint::BigUint;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CheckEsdt {
     Short(BigUintValue),
     Full(CheckEsdtData),

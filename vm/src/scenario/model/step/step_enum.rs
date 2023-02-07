@@ -13,7 +13,7 @@ use super::{
     TransferStep, ValidatorRewardStep,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExternalStepsStep {
     pub comment: Option<String>,
     pub path: String,

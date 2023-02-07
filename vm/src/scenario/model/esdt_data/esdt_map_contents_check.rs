@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 
 use super::CheckEsdt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CheckEsdtMapContents {
     pub contents: BTreeMap<BytesKey, CheckEsdt>,
     pub other_esdts_allowed: bool,

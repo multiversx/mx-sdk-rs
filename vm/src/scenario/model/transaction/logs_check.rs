@@ -5,7 +5,7 @@ use crate::scenario_format::{
 
 use super::CheckLog;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CheckLogList {
     pub list: Vec<CheckLog>,
     pub more_allowed_at_end: bool,
@@ -33,7 +33,7 @@ impl IntoRaw<CheckLogListRaw> for CheckLogList {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CheckLogs {
     Star,
     List(CheckLogList),

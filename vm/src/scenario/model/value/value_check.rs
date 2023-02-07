@@ -7,7 +7,7 @@ use std::{fmt, fmt::Write};
 
 use super::BytesValue;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CheckValue<T: Default> {
     Star,
     Equal(T),

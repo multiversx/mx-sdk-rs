@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CheckLog {
     pub address: CheckValue<BytesValue>,
     pub endpoint: CheckValue<BytesValue>,

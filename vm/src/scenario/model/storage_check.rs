@@ -5,7 +5,7 @@ use crate::scenario_format::{
 
 use super::CheckStorageDetails;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CheckStorage {
     Star,
     Equal(CheckStorageDetails),

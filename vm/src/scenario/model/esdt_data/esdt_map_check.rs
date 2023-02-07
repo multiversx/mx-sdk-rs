@@ -5,7 +5,7 @@ use crate::scenario_format::{
 
 use super::CheckEsdtMapContents;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CheckEsdtMap {
     Unspecified,
     Star,

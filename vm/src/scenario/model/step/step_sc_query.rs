@@ -10,7 +10,7 @@ use crate::{
 
 use super::{format_expect, process_contract_call};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ScQueryStep {
     pub id: String,
     pub tx_id: Option<String>,

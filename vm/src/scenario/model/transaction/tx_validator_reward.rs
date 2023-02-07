@@ -8,7 +8,7 @@ use crate::{
 
 use super::tx_interpret_util::interpret_egld_value;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TxValidatorReward {
     pub to: AddressValue,
     pub egld_value: BigUintValue,

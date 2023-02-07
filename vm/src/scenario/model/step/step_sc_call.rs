@@ -8,7 +8,7 @@ use multiversx_sc::{
     types::{ContractCall, ManagedArgBuffer},
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ScCallStep {
     pub id: String,
     pub tx_id: Option<String>,
