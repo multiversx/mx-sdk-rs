@@ -130,6 +130,9 @@ impl CliArgsToRaw for BuildArgs {
         if self.wat {
             raw.push("--wat".to_string());
         }
+        if self.emit_mir {
+            raw.push("--mir".to_string());
+        }
         if !self.extract_imports {
             raw.push("--no-imports".to_string());
         }
