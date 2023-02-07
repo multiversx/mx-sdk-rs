@@ -64,7 +64,6 @@ They are:
 - New crate: `multiversx-chain-vm`, extracted from the old debug crate.
 - New crate: `multiversx-sdk`, adapted from a solution proposed by the community.
 - A `ScenarioWorld` facade, for contract tests.
-- The multi-contract build system.
 - The meta crate supports `twiggy` post-processing, this is a tool to analyze contract size and investigate bloat in the binaries.
 - Dropped crate: `elrond-wasm-output`. There is no equivalent crate, its job was passed to the individual `wasm` crates.
 - `ManagedVec` supports sorting and deduplication.
