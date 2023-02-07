@@ -33,6 +33,8 @@ tags
 **/testnet/**
 **/mxpy.data-storage.json
 **/*.interaction.json
+**/multiversx.json
+multiversx.workspace.json
 
 # Python scripts
 **/__pycache__/**
