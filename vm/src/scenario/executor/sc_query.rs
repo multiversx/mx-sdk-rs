@@ -1,13 +1,13 @@
 use crate::{
     num_bigint::BigUint,
-    scenario::model::{ScQueryStep, Step, TxExpect, TypedScQuery, TypedScQueryExecutor},
+    scenario::model::ScQueryStep,
     tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
     DebugApi,
 };
 use multiversx_sc::{
-    codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    codec::{CodecFrom, PanicErrorHandler},
     types::ContractCall,
 };
 

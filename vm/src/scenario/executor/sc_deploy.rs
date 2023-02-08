@@ -1,5 +1,5 @@
 use crate::{
-    scenario::model::{ScDeployStep, Step, TypedScDeploy, TypedScDeployExecutor},
+    scenario::model::{ScDeployStep, TypedScDeploy},
     tx_mock::TxFunctionName,
 };
 use multiversx_sc::{

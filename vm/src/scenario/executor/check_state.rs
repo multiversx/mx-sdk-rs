@@ -1,6 +1,6 @@
 use crate::scenario::model::{
     AddressKey, BytesValue, CheckAccounts, CheckEsdt, CheckEsdtData, CheckEsdtInstance,
-    CheckEsdtInstances, CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable, Step,
+    CheckEsdtInstances, CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable,
 };
 use num_traits::Zero;
 

@@ -1,4 +1,4 @@
-use crate::scenario::model::{ScCallStep, Step, TxESDT, TypedScCall, TypedScCallExecutor};
+use crate::scenario::model::{ScCallStep, TxESDT, TypedScCall, TypedScCallExecutor};
 use multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti};
 
 use crate::{

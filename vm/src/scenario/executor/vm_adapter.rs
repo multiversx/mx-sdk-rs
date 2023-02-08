@@ -1,8 +1,5 @@
 use crate::{
-    scenario::{
-        handler::{StepHandler, StepRunner},
-        model::*,
-    },
+    scenario::{handler::StepRunner, model::*},
     BlockchainMock,
 };
 

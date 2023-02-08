@@ -1,4 +1,4 @@
-use crate::scenario::model::{SetStateStep, Step};
+use crate::scenario::model::SetStateStep;
 use multiversx_sc::types::heap::Address;
 
 use crate::world_mock::{

@@ -1,13 +1,11 @@
 use crate::{
     num_bigint::BigUint,
-    scenario::model::Scenario,
-    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
 };
 use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
-use std::{collections::HashMap, path::PathBuf, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
 use super::{AccountData, BlockInfo, ContractContainer, ContractMap};
 

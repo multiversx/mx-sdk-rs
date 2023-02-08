@@ -1,6 +1,6 @@
 use super::sc_call::tx_esdt_transfers_from_scenario;
 use crate::{
-    scenario::model::{Step, TransferStep, TxTransfer, ValidatorRewardStep},
+    scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep},
     tx_execution::execute_sc_call,
     tx_mock::{TxFunctionName, TxInput},
     world_mock::BlockchainMock,
