@@ -7,20 +7,15 @@ use crate::{
 };
 
 impl BlockchainMock {
-    pub fn perform_transfer(&mut self, transfer_step: &TransferStep) -> &mut Self {
+    pub fn perform_transfer(&mut self, transfer_step: &TransferStep) {
         self.with_borrowed(|state| ((), execute(state, &transfer_step.tx)));
-        self
     }
 
-    pub fn perform_validator_reward(
-        &mut self,
-        validator_rewards_step: &ValidatorRewardStep,
-    ) -> &mut Self {
+    pub fn perform_validator_reward(&mut self, validator_rewards_step: &ValidatorRewardStep) {
         self.increase_validator_reward(
             &validator_rewards_step.tx.to.to_address(),
             &validator_rewards_step.tx.egld_value.value,
         );
-        self
     }
 }
 
