@@ -417,7 +417,7 @@ mod sample_adder {
 }
 
 #[test]
-fn test_add() {
+fn contract_without_macros_basic() {
     use multiversx_chain_vm::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
@@ -450,21 +450,19 @@ fn test_add() {
     let _ = multiversx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();
 }
 
-// TODO: re-enable after reorganizing project
-//
-// fn world() -> multiversx_sc_scenario::ScenarioWorld {
-//     let mut blockchain = multiversx_sc_scenario::ScenarioWorld::new();
-//     blockchain.register_contract(
-//         "file:../contracts/examples/adder/output/adder.wasm",
-//         sample_adder::ContractBuilder,
-//     );
-//     blockchain
-// }
+fn world() -> multiversx_sc_scenario::ScenarioWorld {
+    let mut blockchain = multiversx_sc_scenario::ScenarioWorld::new();
+    blockchain.register_contract(
+        "file:../../contracts/examples/adder/output/adder.wasm",
+        sample_adder::ContractBuilder,
+    );
+    blockchain
+}
 
-// #[test]
-// fn test_mandos() {
-//     multiversx_sc_scenario::run_rs(
-//         "../contracts/examples/adder/scenarios/adder.scen.json",
-//         world(),
-//     );
-// }
+#[test]
+fn contract_without_macros_scenario() {
+    multiversx_sc_scenario::run_rs(
+        "../../contracts/examples/adder/scenarios/adder.scen.json",
+        world(),
+    );
+}

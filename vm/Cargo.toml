@@ -34,7 +34,3 @@ bech32 = "0.9"
 version = "=0.39.5"
 path = "../framework/base"
 features = ["alloc", "num-bigint", "promises", "big-float"]
-
-[dev-dependencies.multiversx-sc-meta] # only used in the sample_adder test
-version = "=0.39.5"
-path = "../framework/meta"
