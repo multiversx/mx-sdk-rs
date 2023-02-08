@@ -3,13 +3,12 @@
 
 pub mod api;
 pub mod bech32;
-mod display_util;
+pub mod display_util;
 mod managed_test_util;
 pub mod tx_execution;
 pub mod tx_mock;
 pub mod world_mock;
 
-pub use display_util::*;
 pub use managed_test_util::*;
 
 pub use tx_mock::DebugApi;

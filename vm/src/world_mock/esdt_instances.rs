@@ -1,13 +1,10 @@
-use crate::num_bigint::BigUint;
+use super::{EsdtInstance, EsdtInstanceMetadata};
+use crate::{display_util::verbose_hex_list, num_bigint::BigUint};
 use num_traits::Zero;
 use std::{
     collections::BTreeMap,
     fmt::{self, Write},
 };
-
-use crate::verbose_hex_list;
-
-use super::{EsdtInstance, EsdtInstanceMetadata};
 
 #[derive(Clone, Debug, Default)]
 pub struct EsdtInstances(BTreeMap<u64, EsdtInstance>);

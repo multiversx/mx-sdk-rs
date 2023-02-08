@@ -5,7 +5,7 @@ use crate::scenario::model::{
 use num_traits::Zero;
 
 use multiversx_chain_vm::{
-    bytes_to_string, verbose_hex, verbose_hex_list,
+    display_util::{bytes_to_string, verbose_hex, verbose_hex_list},
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 

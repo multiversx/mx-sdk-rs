@@ -3,7 +3,7 @@ use multiversx_sc::types::heap::Address;
 
 use std::{collections::HashMap, fmt::Write};
 
-use crate::address_hex;
+use crate::display_util::address_hex;
 
 use super::{AccountData, BlockchainMock};
 

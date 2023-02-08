@@ -13,9 +13,7 @@ pub use whitebox as testing_framework;
 
 pub use scenario::run_vm::ContractInfo;
 
-pub use multiversx_chain_vm::{
-    self, address_hex, bech32, bytes_to_string, num_bigint, verbose_hex, verbose_hex_list, DebugApi,
-};
+pub use multiversx_chain_vm::{self, bech32, num_bigint, DebugApi};
 
 pub use multiversx_sc;
 

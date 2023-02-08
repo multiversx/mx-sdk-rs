@@ -1,9 +1,8 @@
 use crate::scenario::model::{CheckLogs, Checkable, TxExpect};
 
 use multiversx_chain_vm::{
-    address_hex,
+    display_util::{address_hex, verbose_hex, verbose_hex_list},
     tx_mock::{TxLog, TxResult},
-    verbose_hex, verbose_hex_list,
 };
 
 pub fn check_tx_output(tx_id: &str, tx_expect: &TxExpect, tx_result: &TxResult) {
