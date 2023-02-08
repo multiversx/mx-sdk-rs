@@ -8,7 +8,6 @@ mod transfer;
 mod tx_output_check;
 mod vm_adapter;
 
-// pub use all_steps::parse_execute_mandos_steps;
 pub use contract_info::*;
 use tx_output_check::*;
 pub use vm_adapter::VmAdapter;

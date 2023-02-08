@@ -23,10 +23,6 @@ impl BlockchainMock {
     }
 
     pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
-        // for addr in accounts.keys() {
-        //     self.add_addr_scenario_string(addr.clone());
-        // }
-
         self.accounts.extend(accounts.into_iter());
     }
 

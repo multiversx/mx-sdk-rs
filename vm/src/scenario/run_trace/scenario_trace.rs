@@ -19,6 +19,28 @@ impl ScenarioTrace {
         let mandos_trace_raw = mandos_trace.into_raw();
         mandos_trace_raw.save_to_file(file_path);
     }
+
+    fn process_address_key(&mut self, address_key: &AddressKey) {
+        if !self
+            .addr_to_pretty_string_map
+            .contains_key(&address_key.value)
+        {
+            self.addr_to_pretty_string_map
+                .insert(address_key.value.clone(), address_key.original.clone());
+        }
+    }
+
+    fn process_address_value(&mut self, address_value: &AddressValue) {
+        if !self
+            .addr_to_pretty_string_map
+            .contains_key(&address_value.value)
+        {
+            self.addr_to_pretty_string_map.insert(
+                address_value.value.clone(),
+                address_value.original.to_concatenated_string(),
+            );
+        }
+    }
 }
 
 impl StepRunner for ScenarioTrace {
@@ -29,22 +51,34 @@ impl StepRunner for ScenarioTrace {
     }
 
     fn run_set_state_step(&mut self, step: &SetStateStep) {
+        for address_key in step.accounts.keys() {
+            self.process_address_key(address_key);
+        }
+        for new_address in &step.new_addresses {
+            self.process_address_value(&new_address.new_address);
+        }
         self.scenario_trace.steps.push(Step::SetState(step.clone()));
     }
 
     fn run_sc_call_step(&mut self, step: &ScCallStep) {
+        self.process_address_value(&step.tx.from);
+        self.process_address_value(&step.tx.to);
         self.scenario_trace.steps.push(Step::ScCall(step.clone()));
     }
 
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {
+        self.process_address_value(&step.tx.to);
         self.scenario_trace.steps.push(Step::ScQuery(step.clone()));
     }
 
     fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
+        self.process_address_value(&step.tx.from);
         self.scenario_trace.steps.push(Step::ScDeploy(step.clone()));
     }
 
     fn run_transfer_step(&mut self, step: &TransferStep) {
+        self.process_address_value(&step.tx.from);
+        self.process_address_value(&step.tx.to);
         self.scenario_trace.steps.push(Step::Transfer(step.clone()));
     }
 
@@ -55,6 +89,9 @@ impl StepRunner for ScenarioTrace {
     }
 
     fn run_check_state_step(&mut self, step: &CheckStateStep) {
+        for address_key in step.accounts.accounts.keys() {
+            self.process_address_key(address_key);
+        }
         self.scenario_trace
             .steps
             .push(Step::CheckState(step.clone()));
