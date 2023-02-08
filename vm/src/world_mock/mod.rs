@@ -2,7 +2,6 @@ mod account_data;
 mod block_info;
 mod blockchain_mock;
 mod blockchain_mock_account_util;
-mod blockchain_mock_init;
 mod blockchain_tx_info;
 mod contract_container;
 mod contract_map;

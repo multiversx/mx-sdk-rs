@@ -9,7 +9,7 @@ use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
 use std::{collections::HashMap, path::PathBuf, rc::Rc};
 
-use super::{AccountData, BlockInfo, ContractMap};
+use super::{AccountData, BlockInfo, ContractContainer, ContractMap};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
@@ -49,13 +49,17 @@ impl BlockchainMock {
         self.accounts.contains_key(address)
     }
 
-    pub fn contains_contract(&self, contract_path_expr: &str) -> bool {
-        let contract_bytes = interpret_string(
-            contract_path_expr,
-            &InterpreterContext::new(self.current_dir.clone()),
-        );
+    pub fn register_contract_container(
+        &mut self,
+        contract_bytes: Vec<u8>,
+        contract_container: ContractContainer,
+    ) {
+        self.contract_map
+            .register_contract(contract_bytes, contract_container);
+    }
 
-        self.contract_map.contains_contract(&contract_bytes)
+    pub fn contains_contract(&self, contract_bytes: &[u8]) -> bool {
+        self.contract_map.contains_contract(contract_bytes)
     }
 
     pub fn commit_updates(&mut self, updates: BlockchainUpdate) {

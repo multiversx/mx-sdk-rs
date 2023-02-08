@@ -1,4 +1,9 @@
-use multiversx_chain_vm::scenario::{executor::VmAdapter, run_trace::ScenarioTrace};
+use multiversx_chain_vm::{
+    multiversx_sc::api,
+    scenario::{executor::VmAdapter, run_trace::ScenarioTrace},
+    scenario_format::value_interpreter::interpret_string,
+    DebugApi,
+};
 
 use crate::{
     multiversx_chain_vm::world_mock::ContractContainer,
@@ -57,9 +62,10 @@ impl ScenarioWorld {
         expression: &str,
         contract_container: ContractContainer,
     ) {
+        let contract_bytes = interpret_string(expression, &self.interpreter_context());
         self.vm_runner
             .blockchain_mock
-            .register_contract_container(expression, contract_container);
+            .register_contract_container(contract_bytes, contract_container);
     }
 
     /// Links a contract path in a test to a contract implementation.
@@ -68,9 +74,10 @@ impl ScenarioWorld {
         expression: &str,
         contract_builder: B,
     ) {
-        self.vm_runner
-            .blockchain_mock
-            .register_contract(expression, contract_builder);
+        self.register_contract_container(
+            expression,
+            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None, false),
+        )
     }
 
     #[deprecated(
@@ -97,9 +104,27 @@ impl ScenarioWorld {
         Abi: ContractAbiProvider,
         B: CallableContractBuilder,
     {
-        self.vm_runner
-            .blockchain_mock
-            .register_partial_contract::<Abi, B>(expression, contract_builder, sub_contract_name);
+        let multi_contract_config = multiversx_sc_meta::multi_contract_config::<Abi>(
+            self.current_dir
+                .join("multicontract.toml")
+                .to_str()
+                .unwrap(),
+        );
+        let sub_contract = multi_contract_config.find_contract(sub_contract_name);
+        let contract_obj = if sub_contract.settings.external_view {
+            contract_builder.new_contract_obj::<api::ExternalViewApi<DebugApi>>()
+        } else {
+            contract_builder.new_contract_obj::<DebugApi>()
+        };
+
+        self.register_contract_container(
+            expression,
+            ContractContainer::new(
+                contract_obj,
+                Some(sub_contract.all_exported_function_names()),
+                sub_contract.settings.panic_message,
+            ),
+        );
     }
 
     /// Exports current scenario to a JSON file, as created.
