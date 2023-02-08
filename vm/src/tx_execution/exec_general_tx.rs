@@ -1,9 +1,8 @@
 use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
 
-use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult},
-    world_mock::is_smart_contract_address,
+use crate::tx_mock::{
+    BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult,
 };
 
 use super::execute_tx_context;
@@ -22,7 +21,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
 
     // skip for transactions coming directly from scenario json, which should all be coming from user wallets
     // TODO: reorg context logic
-    let add_transfer_log = is_smart_contract_address(&tx_context.tx_input_box.from)
+    let add_transfer_log = tx_context.tx_input_box.from.is_smart_contract_address()
         && !tx_context.tx_input_box.egld_value.is_zero();
     let transfer_value_log = if add_transfer_log {
         Some(TxLog {
@@ -50,7 +49,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         );
     }
 
-    let mut tx_result = if !is_smart_contract_address(&tx_context.tx_input_box.to)
+    let mut tx_result = if !tx_context.tx_input_box.to.is_smart_contract_address()
         || tx_context.tx_input_box.func_name.is_empty()
     {
         // direct EGLD transfer

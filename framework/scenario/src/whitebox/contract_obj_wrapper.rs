@@ -15,10 +15,7 @@ use multiversx_chain_vm::{
     num_bigint,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
     tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult},
-    world_mock::{
-        is_smart_contract_address, AccountData, AccountEsdt, ContractContainer,
-        EsdtInstanceMetadata,
-    },
+    world_mock::{AccountData, AccountEsdt, ContractContainer, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
@@ -227,7 +224,7 @@ impl BlockchainStateWrapper {
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
-        if !is_smart_contract_address(address) {
+        if !address.is_smart_contract_address() {
             panic!("Invalid SC Address: {:?}", address_to_hex(address))
         }
 

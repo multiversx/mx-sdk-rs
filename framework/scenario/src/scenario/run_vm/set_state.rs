@@ -1,8 +1,8 @@
 use crate::{multiversx_sc::types::heap::Address, scenario::model::SetStateStep};
 
 use multiversx_chain_vm::world_mock::{
-    is_smart_contract_address, AccountData, AccountEsdt, BlockInfo as CrateBlockInfo,
-    BlockchainMock, EsdtData, EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
+    AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainMock, EsdtData, EsdtInstance,
+    EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
 use super::VmAdapter;
@@ -64,7 +64,7 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
     }
     for new_address in set_state_step.new_addresses.iter() {
         assert!(
-            is_smart_contract_address(&new_address.new_address.value),
+            new_address.new_address.value.is_smart_contract_address(),
             "field should have SC format"
         );
         state.put_new_address(

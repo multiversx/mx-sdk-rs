@@ -14,7 +14,6 @@ mod esdt_roles;
 pub use account_data::*;
 pub use block_info::*;
 pub use blockchain_mock::*;
-pub use blockchain_mock_account_util::is_smart_contract_address;
 pub use blockchain_tx_info::*;
 pub use contract_container::*;
 pub use contract_map::*;

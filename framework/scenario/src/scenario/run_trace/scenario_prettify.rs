@@ -2,7 +2,6 @@ use super::ScenarioTrace;
 use crate::{
     multiversx_sc::types::Address, scenario::model::*, scenario_format::serde_raw::ValueSubTree,
 };
-use multiversx_chain_vm::world_mock::is_smart_contract_address;
 use std::collections::HashMap;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
@@ -135,7 +134,7 @@ fn addr_value_to_pretty(
 
 pub fn address_as_scenario_string(address: &Address) -> String {
     let addr_bytes = address.as_array();
-    let (string_start_index, prefix) = if is_smart_contract_address(address) {
+    let (string_start_index, prefix) = if address.is_smart_contract_address() {
         (SC_ADDRESS_NUM_LEADING_ZEROS as usize, SC_ADDR_PREFIX)
     } else {
         (0, ADDR_PREFIX)

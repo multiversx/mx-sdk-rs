@@ -5,11 +5,7 @@ use std::{collections::HashMap, fmt::Write};
 
 use crate::address_hex;
 
-use super::AccountData;
-
-const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
-
-use super::BlockchainMock;
+use super::{AccountData, BlockchainMock};
 
 impl BlockchainMock {
     pub fn add_account(&mut self, acct: AccountData) {
@@ -51,7 +47,7 @@ impl BlockchainMock {
     }
 
     pub fn validate_account(&self, account: &AccountData) {
-        let is_sc = is_smart_contract_address(&account.address);
+        let is_sc = account.address.is_smart_contract_address();
         let has_code = self.check_account_has_code(account);
 
         assert!(
@@ -72,12 +68,4 @@ impl BlockchainMock {
             .unwrap_or(&Vec::<u8>::new())
             .is_empty()
     }
-}
-
-pub fn is_smart_contract_address(address: &Address) -> bool {
-    address
-        .as_bytes()
-        .iter()
-        .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
-        .all(|item| item == &0u8)
 }

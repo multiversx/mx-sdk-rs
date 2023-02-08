@@ -1,12 +1,12 @@
-use crate::multiversx_sc::types::{
-    ContractCallNoPayment, ContractCallWithEgld, ContractCallWithEgldOrSingleEsdt,
-    ContractCallWithMultiEsdt, ContractDeploy,
+use crate::multiversx_sc::{
+    codec::TopEncodeMulti,
+    types::{
+        ContractCall, ContractCallNoPayment, ContractCallWithEgld,
+        ContractCallWithEgldOrSingleEsdt, ContractCallWithMultiEsdt, ContractDeploy,
+    },
 };
 
-use multiversx_chain_vm::{
-    multiversx_sc::{codec::TopEncodeMulti, types::ContractCall},
-    DebugApi,
-};
+use multiversx_chain_vm::DebugApi;
 
 use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
 

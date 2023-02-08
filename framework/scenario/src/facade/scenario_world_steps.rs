@@ -1,7 +1,7 @@
 use crate::{
     multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
-        types::Address,
+        codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+        types::{Address, ContractCall},
     },
     scenario::{
         handler::{StepHandler, StepRunner},
@@ -9,10 +9,7 @@ use crate::{
     },
     ScenarioWorld,
 };
-use multiversx_chain_vm::{
-    multiversx_sc::{codec::PanicErrorHandler, types::ContractCall},
-    DebugApi,
-};
+use multiversx_chain_vm::DebugApi;
 
 impl StepHandler for ScenarioWorld {
     fn external_steps(&mut self, step: ExternalStepsStep) -> &mut Self {

@@ -30,6 +30,10 @@ colored = "2.0"
 [features]
 run-go-tests = []
 
+[dependencies.multiversx-sc]
+version = "=0.39.5"
+path = "../base"
+
 [dependencies.multiversx-sc-meta]
 version = "=0.39.5"
 path = "../meta"
