@@ -8,7 +8,7 @@ use crate::world_mock::{
 
 impl BlockchainMock {
     pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) -> &mut Self {
-        execute(self, &set_state_step);
+        execute(self, set_state_step);
         self
     }
 }

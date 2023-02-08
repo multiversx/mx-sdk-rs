@@ -12,7 +12,7 @@ use super::check_tx_output;
 impl BlockchainMock {
     /// Adds a SC call step, as specified in the `sc_call_step` argument, then executes it.
     pub fn perform_sc_call(&mut self, sc_call_step: &ScCallStep) -> &mut Self {
-        let _ = self.with_borrowed(|state| execute_and_check(state, &sc_call_step));
+        let _ = self.with_borrowed(|state| execute_and_check(state, sc_call_step));
         self
     }
 

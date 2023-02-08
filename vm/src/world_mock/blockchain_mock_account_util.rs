@@ -14,7 +14,7 @@ use super::BlockchainMock;
 impl BlockchainMock {
     pub fn add_account(&mut self, acct: AccountData) {
         let address = acct.address.clone();
-        self.accounts.insert(address.clone(), acct);
+        self.accounts.insert(address, acct);
     }
 
     pub fn validate_and_add_account(&mut self, acct: AccountData) {

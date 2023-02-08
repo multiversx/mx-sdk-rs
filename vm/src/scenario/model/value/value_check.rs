@@ -7,8 +7,9 @@ use std::{fmt, fmt::Write};
 
 use super::BytesValue;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub enum CheckValue<T: Default> {
+    #[default]
     Star,
     Equal(T),
 }
@@ -19,15 +20,6 @@ where
 {
     pub fn is_star(&self) -> bool {
         matches!(self, CheckValue::Star)
-    }
-}
-
-impl<T> Default for CheckValue<T>
-where
-    T: Default,
-{
-    fn default() -> Self {
-        CheckValue::Star
     }
 }
 
