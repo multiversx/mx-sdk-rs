@@ -3,14 +3,14 @@ use crate::{
         codec::{CodecFrom, TopEncodeMulti},
         types::Address,
     },
-    ScenarioWorld,
-};
-use multiversx_chain_vm::{
-    multiversx_sc::{codec::PanicErrorHandler, types::ContractCall},
     scenario::{
         handler::{StepHandler, StepRunner},
         model::*,
     },
+    ScenarioWorld,
+};
+use multiversx_chain_vm::{
+    multiversx_sc::{codec::PanicErrorHandler, types::ContractCall},
     DebugApi,
 };
 
@@ -70,9 +70,7 @@ impl TypedScCallExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.vm_runner
-            .blockchain_mock
-            .execute_typed_sc_call(typed_sc_call)
+        self.vm_runner.perform_sc_call_get_result(typed_sc_call)
     }
 }
 
@@ -85,9 +83,7 @@ impl TypedScDeployExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.vm_runner
-            .blockchain_mock
-            .perform_sc_deploy_get_result(typed_sc_call)
+        self.vm_runner.perform_sc_deploy_get_result(typed_sc_call)
     }
 }
 
@@ -106,10 +102,7 @@ impl TypedScQueryExecutor for ScenarioWorld {
         RequestedResult: CodecFrom<OriginalResult>,
     {
         let mut sc_query_step: ScQueryStep = typed_sc_query.into();
-        let tx_result = self
-            .vm_runner
-            .blockchain_mock
-            .perform_sc_query(&sc_query_step);
+        let tx_result = self.vm_runner.perform_sc_query(&sc_query_step);
 
         let mut tx_expect = TxExpect::ok();
         for raw_result in &tx_result.result_values {
@@ -138,10 +131,7 @@ impl ScenarioWorld {
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let sc_query_step = ScQueryStep::new().call(contract_call);
-        let tx_result = self
-            .vm_runner
-            .blockchain_mock
-            .perform_sc_query(&sc_query_step);
+        let tx_result = self.vm_runner.perform_sc_query(&sc_query_step);
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }

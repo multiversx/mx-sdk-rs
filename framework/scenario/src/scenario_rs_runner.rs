@@ -1,4 +1,4 @@
-use multiversx_chain_vm::scenario::{self, handler::StepRunner, model::*};
+use crate::scenario::{self, handler::StepRunner, model::*};
 
 use crate::ScenarioWorld;
 use std::path::Path;
