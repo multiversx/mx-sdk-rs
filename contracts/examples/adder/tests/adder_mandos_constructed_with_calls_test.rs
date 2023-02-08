@@ -19,6 +19,7 @@ fn adder_scenario_constructed_raw() {
     let mut adder_contract = ContractInfo::<adder::Proxy<DebugApi>>::new("sc:adder");
 
     world
+        .start_trace()
         .set_state_step(
             SetStateStep::new()
                 .put_account(owner_address, Account::new().nonce(1))

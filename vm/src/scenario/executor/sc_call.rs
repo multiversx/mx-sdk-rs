@@ -11,9 +11,8 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     /// Adds a SC call step, as specified in the `sc_call_step` argument, then executes it.
-    pub fn perform_sc_call(&mut self, sc_call_step: ScCallStep) -> &mut Self {
+    pub fn perform_sc_call(&mut self, sc_call_step: &ScCallStep) -> &mut Self {
         let _ = self.with_borrowed(|state| execute_and_check(state, &sc_call_step));
-        self.scenario_trace.steps.push(Step::ScCall(sc_call_step));
         self
     }
 
@@ -33,7 +32,6 @@ impl BlockchainMock {
     {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_result = self.with_borrowed(|state| execute_and_check(state, &sc_call_step));
-        self.scenario_trace.steps.push(Step::ScCall(sc_call_step));
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }

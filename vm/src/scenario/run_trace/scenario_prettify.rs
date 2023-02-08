@@ -1,10 +1,10 @@
+use super::ScenarioTrace;
 use crate::{
-    scenario::model::{AddressKey, AddressValue, Step},
-    scenario_format::{interpret_trait::IntoRaw, serde_raw::ValueSubTree},
-    BlockchainMock,
+    scenario::model::*, scenario_format::serde_raw::ValueSubTree,
+    world_mock::is_smart_contract_address,
 };
 use multiversx_sc::types::Address;
-use std::{collections::HashMap, path::Path};
+use std::collections::HashMap;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 const UNDERSCORE: u8 = b'_';
@@ -12,16 +12,17 @@ static ADDR_PREFIX: &str = "address:";
 static SC_ADDR_PREFIX: &str = "sc:";
 static HEX_PREFIX: &str = "0x";
 
-impl BlockchainMock {
-    pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        self.scenario_trace_prettify();
+impl ScenarioTrace {
+    pub fn add_addr_scenario_string(&mut self, address: Address) {
+        if self.addr_to_pretty_string_map.contains_key(&address) {
+            return;
+        }
 
-        let mandos_trace = core::mem::take(&mut self.scenario_trace);
-        let mandos_trace_raw = mandos_trace.into_raw();
-        mandos_trace_raw.save_to_file(file_path);
+        let addr_pretty = address_as_scenario_string(&address);
+        self.addr_to_pretty_string_map.insert(address, addr_pretty);
     }
 
-    fn scenario_trace_prettify(&mut self) {
+    pub(super) fn scenario_trace_prettify(&mut self) {
         for step in &mut self.scenario_trace.steps {
             match step {
                 Step::ExternalSteps(_) => {},
@@ -135,7 +136,7 @@ fn addr_value_to_pretty(
 
 pub fn address_as_scenario_string(address: &Address) -> String {
     let addr_bytes = address.as_array();
-    let (string_start_index, prefix) = if super::is_smart_contract_address(address) {
+    let (string_start_index, prefix) = if is_smart_contract_address(address) {
         (SC_ADDRESS_NUM_LEADING_ZEROS as usize, SC_ADDR_PREFIX)
     } else {
         (0, ADDR_PREFIX)

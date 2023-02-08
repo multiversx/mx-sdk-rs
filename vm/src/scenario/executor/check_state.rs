@@ -10,11 +10,8 @@ use crate::{
 };
 
 impl BlockchainMock {
-    pub fn perform_check_state(&mut self, check_state_step: CheckStateStep) -> &mut Self {
+    pub fn perform_check_state(&mut self, check_state_step: &CheckStateStep) -> &mut Self {
         execute(self, &check_state_step.accounts);
-        self.scenario_trace
-            .steps
-            .push(Step::CheckState(check_state_step));
         self
     }
 

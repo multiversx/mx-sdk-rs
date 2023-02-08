@@ -17,14 +17,11 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
-    pub fn perform_sc_deploy(&mut self, sc_deploy_step: ScDeployStep) -> &mut Self {
+    pub fn perform_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) -> &mut Self {
         self.with_borrowed(|state| {
             let (_, _, state) = execute_and_check(state, &sc_deploy_step);
             ((), state)
         });
-        self.scenario_trace
-            .steps
-            .push(Step::ScDeploy(sc_deploy_step));
         self
     }
 
@@ -47,9 +44,6 @@ impl BlockchainMock {
             let (tx_result, new_address, state) = execute(state, &sc_deploy_step);
             ((tx_result, new_address), state)
         });
-        self.scenario_trace
-            .steps
-            .push(Step::ScDeploy(sc_deploy_step));
 
         let mut raw_result = tx_result.result_values;
         let deser_result =
@@ -57,19 +51,6 @@ impl BlockchainMock {
                 .unwrap();
 
         (new_address, deser_result)
-    }
-}
-
-impl TypedScDeployExecutor for BlockchainMock {
-    fn execute_typed_sc_deploy<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_call: TypedScDeploy<OriginalResult>,
-    ) -> (Address, RequestedResult)
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
-    {
-        self.perform_sc_deploy_get_result(typed_sc_call)
     }
 }
 

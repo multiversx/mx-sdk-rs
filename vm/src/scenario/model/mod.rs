@@ -4,7 +4,6 @@ mod esdt_data;
 mod new_address;
 mod scenario;
 mod step;
-mod step_handler;
 mod storage_check;
 mod storage_details_check;
 mod transaction;
@@ -16,8 +15,10 @@ pub use esdt_data::*;
 pub use new_address::*;
 pub use scenario::*;
 pub use step::*;
-pub use step_handler::*;
 pub use storage_check::*;
 pub use storage_details_check::*;
 pub use transaction::*;
 pub use value::*;
+
+// TODO: temporary, will get reorganized
+pub use super::handler::StepHandler;

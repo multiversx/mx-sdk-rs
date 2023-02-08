@@ -15,51 +15,8 @@ use super::check_tx_output;
 
 impl BlockchainMock {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
-    pub fn perform_sc_query(&mut self, sc_query_step: ScQueryStep) -> &mut Self {
-        let _ = self.with_borrowed(|state| execute_and_check(state, &sc_query_step));
-        self.scenario_trace.steps.push(Step::ScQuery(sc_query_step));
-        self
-    }
-
-    /// Adds a SC query step, but sets the contract call data and returns the result.
-    ///
-    /// It also sets in the trace the expected result to be the actual returned result.
-    ///
-    /// It is the duty of the test developer to check that the result is actually correct after the call.
-    pub fn perform_sc_query_expect_result<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_query: TypedScQuery<OriginalResult>,
-    ) -> RequestedResult
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
-    {
-        let mut sc_query_step: ScQueryStep = typed_sc_query.into();
-        let tx_result = self.with_borrowed(|state| execute_and_check(state, &sc_query_step));
-
-        let mut tx_expect = TxExpect::ok();
-        for raw_result in &tx_result.result_values {
-            let result_hex_string = format!("0x{}", hex::encode(raw_result));
-            tx_expect = tx_expect.result(result_hex_string.as_str());
-        }
-        sc_query_step = sc_query_step.expect(tx_expect);
-        self.scenario_trace.steps.push(Step::ScQuery(sc_query_step));
-
-        let mut raw_results = tx_result.result_values;
-        RequestedResult::multi_decode_or_handle_err(&mut raw_results, PanicErrorHandler).unwrap()
-    }
-}
-
-impl TypedScQueryExecutor for BlockchainMock {
-    fn execute_typed_sc_query<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_call: TypedScQuery<OriginalResult>,
-    ) -> RequestedResult
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
-    {
-        self.perform_sc_query_expect_result(typed_sc_call)
+    pub fn perform_sc_query(&mut self, sc_query_step: &ScQueryStep) -> TxResult {
+        self.with_borrowed(|state| execute_and_check(state, sc_query_step))
     }
 }
 

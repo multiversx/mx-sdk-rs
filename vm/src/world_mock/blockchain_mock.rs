@@ -17,13 +17,11 @@ const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
     pub builtin_functions: Rc<BuiltinFunctionMap>,
-    pub addr_to_pretty_string_map: HashMap<Address, String>,
     pub new_addresses: HashMap<(Address, u64), Address>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_map: ContractMap,
     pub current_dir: PathBuf,
-    pub scenario_trace: Scenario,
 }
 
 impl BlockchainMock {
@@ -31,13 +29,11 @@ impl BlockchainMock {
         BlockchainMock {
             accounts: HashMap::new(),
             builtin_functions: Rc::new(init_builtin_functions()),
-            addr_to_pretty_string_map: HashMap::new(),
             new_addresses: HashMap::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
             contract_map: ContractMap::default(),
             current_dir: std::env::current_dir().unwrap(),
-            scenario_trace: Scenario::default(),
         }
     }
 }

@@ -29,7 +29,7 @@ fn crowdfunding_scenario_rust_test() {
     let mut cf_sc = ContractInfo::<crowdfunding_esdt::Proxy<DebugApi>>::new("sc:crowdfunding");
 
     // setup owner and crowdfunding SC
-    world.set_state_step(
+    world.start_trace().set_state_step(
         SetStateStep::new()
             .put_account(owner_addr, Account::new())
             .new_address(owner_addr, 0, &cf_sc),

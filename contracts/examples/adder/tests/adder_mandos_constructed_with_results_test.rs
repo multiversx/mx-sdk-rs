@@ -19,7 +19,7 @@ fn adder_mandos_constructed() {
     let owner_address = "address:owner";
     let mut adder_contract = ContractInfo::<adder::Proxy<DebugApi>>::new("sc:adder");
 
-    world.set_state_step(
+    world.start_trace().set_state_step(
         SetStateStep::new()
             .put_account(owner_address, Account::new().nonce(1))
             .new_address(owner_address, 1, &adder_contract),
