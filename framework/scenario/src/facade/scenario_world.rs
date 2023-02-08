@@ -44,7 +44,6 @@ impl ScenarioWorld {
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
         let mut path = find_workspace();
         path.push(relative_path);
-        self.vm_runner.blockchain_mock.current_dir = path.clone(); // TODO: TEMP
         self.current_dir = path;
         self
     }
