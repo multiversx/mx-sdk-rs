@@ -7,6 +7,7 @@ use crate::{
     meta_all::call_all_meta,
     meta_info::call_info,
     sc_upgrade::upgrade_sc,
+    meta_real_data_scenarios::call_real_data_scenario_builder,
 };
 use clap::Parser;
 use multiversx_sc::contract_base::ContractAbiProvider;
@@ -22,6 +23,9 @@ pub fn cli_main_standalone() {
         },
         Some(StandaloneCliAction::LocalDeps(args)) => {
             local_deps(args);
+        },
+        Some(StandaloneCliAction::RealDataScenario(args)) => {
+            call_real_data_scenario_builder(args);
         },
         None => {},
     }
