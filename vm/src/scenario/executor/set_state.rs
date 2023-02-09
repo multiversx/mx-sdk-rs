@@ -1,4 +1,4 @@
-use crate::scenario::model::{SetStateStep, Step};
+use crate::scenario::model::SetStateStep;
 use multiversx_sc::types::heap::Address;
 
 use crate::world_mock::{
@@ -7,12 +7,8 @@ use crate::world_mock::{
 };
 
 impl BlockchainMock {
-    pub fn perform_set_state(&mut self, set_state_step: SetStateStep) -> &mut Self {
-        execute(self, &set_state_step);
-        self.scenario_trace
-            .steps
-            .push(Step::SetState(set_state_step));
-        self
+    pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) {
+        execute(self, set_state_step);
     }
 }
 

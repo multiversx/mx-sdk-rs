@@ -256,16 +256,16 @@ impl BlockchainStateWrapper {
             address,
             egld_balance,
             owner,
-            Some(contract_bytes),
+            Some(contract_bytes.clone()),
             Some(wasm_relative_path_expr_bytes),
         );
 
-        if !self.rc_b_mock.contains_contract(&wasm_full_path_as_expr) {
+        if !self.rc_b_mock.contains_contract(contract_bytes.as_slice()) {
             let contract_obj = create_contract_obj_box(obj_builder);
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
             b_mock_ref.register_contract_container(
-                &wasm_full_path_as_expr,
+                contract_bytes,
                 ContractContainer::new(contract_obj, None, false),
             );
         }

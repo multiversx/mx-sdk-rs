@@ -8,7 +8,7 @@ use crate::{
 
 use super::{tx_interpret_util::interpret_egld_value, TxCall, TxESDT};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TxTransfer {
     pub from: AddressValue,
     pub to: AddressValue,

@@ -1,34 +1,21 @@
+use super::sc_call::tx_esdt_transfers_from_scenario;
 use crate::{
-    scenario::model::{Step, TransferStep, TxTransfer, ValidatorRewardStep},
-    tx_mock::TxFunctionName,
-};
-
-use crate::{
-    sc_call::tx_esdt_transfers_from_scenario, tx_execution::execute_sc_call, tx_mock::TxInput,
+    scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep},
+    tx_execution::execute_sc_call,
+    tx_mock::{TxFunctionName, TxInput},
     world_mock::BlockchainMock,
 };
 
 impl BlockchainMock {
-    pub fn perform_transfer(&mut self, transfer_step: TransferStep) -> &mut Self {
+    pub fn perform_transfer(&mut self, transfer_step: &TransferStep) {
         self.with_borrowed(|state| ((), execute(state, &transfer_step.tx)));
-        self.scenario_trace
-            .steps
-            .push(Step::Transfer(transfer_step));
-        self
     }
 
-    pub fn perform_validator_reward(
-        &mut self,
-        validator_rewards_step: ValidatorRewardStep,
-    ) -> &mut Self {
+    pub fn perform_validator_reward(&mut self, validator_rewards_step: &ValidatorRewardStep) {
         self.increase_validator_reward(
             &validator_rewards_step.tx.to.to_address(),
             &validator_rewards_step.tx.egld_value.value,
         );
-        self.scenario_trace
-            .steps
-            .push(Step::ValidatorReward(validator_rewards_step));
-        self
     }
 }
 

@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TxQuery {
     pub to: AddressValue,
     pub function: String,

@@ -6,7 +6,7 @@ use crate::scenario_format::{
 use super::{EsdtInstance, EsdtObject};
 use crate::scenario::model::{BigUintValue, BytesValue, U64Value};
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Esdt {
     Short(BigUintValue),
     Full(EsdtObject),

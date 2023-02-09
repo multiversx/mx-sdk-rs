@@ -10,7 +10,8 @@ use std::path::Path;
 pub use whitebox as testing_framework;
 
 pub use multiversx_chain_vm::{
-    self, bech32, multiversx_sc, num_bigint, scenario_format, ContractInfo, DebugApi,
+    self, bech32, multiversx_sc, num_bigint, scenario::executor::ContractInfo, scenario_format,
+    DebugApi,
 };
 
 /// Exposing the scenario model. Might be moved in the future,

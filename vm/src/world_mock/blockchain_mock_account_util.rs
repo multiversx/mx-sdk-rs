@@ -14,17 +14,7 @@ use super::BlockchainMock;
 impl BlockchainMock {
     pub fn add_account(&mut self, acct: AccountData) {
         let address = acct.address.clone();
-        self.accounts.insert(address.clone(), acct);
-        self.add_addr_scenario_string(address);
-    }
-
-    pub fn add_addr_scenario_string(&mut self, address: Address) {
-        if self.addr_to_pretty_string_map.contains_key(&address) {
-            return;
-        }
-
-        let addr_pretty = super::address_as_scenario_string(&address);
-        self.addr_to_pretty_string_map.insert(address, addr_pretty);
+        self.accounts.insert(address, acct);
     }
 
     pub fn validate_and_add_account(&mut self, acct: AccountData) {
@@ -33,10 +23,6 @@ impl BlockchainMock {
     }
 
     pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
-        for addr in accounts.keys() {
-            self.add_addr_scenario_string(addr.clone());
-        }
-
         self.accounts.extend(accounts.into_iter());
     }
 

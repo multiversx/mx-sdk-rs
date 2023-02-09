@@ -9,7 +9,7 @@ use crate::scenario::model::AddressKey;
 
 use super::CheckAccount;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CheckAccounts {
     pub other_accounts_allowed: bool,
     pub accounts: BTreeMap<AddressKey, CheckAccount>,

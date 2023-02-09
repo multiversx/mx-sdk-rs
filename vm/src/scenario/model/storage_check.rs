@@ -5,16 +5,11 @@ use crate::scenario_format::{
 
 use super::CheckStorageDetails;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Default)]
 pub enum CheckStorage {
+    #[default]
     Star,
     Equal(CheckStorageDetails),
-}
-
-impl Default for CheckStorage {
-    fn default() -> Self {
-        CheckStorage::Star
-    }
 }
 
 impl CheckStorage {

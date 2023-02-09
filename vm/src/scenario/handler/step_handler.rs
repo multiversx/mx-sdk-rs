@@ -1,4 +1,4 @@
-use super::*;
+use super::super::model::*;
 
 /// Allows caller to construct a scenario and do something with it on the fly.
 ///
@@ -8,6 +8,9 @@ use super::*;
 /// - collecting/exporting the scenario,
 /// - something else.
 pub trait StepHandler: TypedScCallExecutor + TypedScDeployExecutor + TypedScQueryExecutor {
+    /// Imports and processes steps from an external scenario file.
+    fn external_steps(&mut self, step: ExternalStepsStep) -> &mut Self;
+
     /// Adds a SC call step, then executes it.
     fn set_state_step(&mut self, step: SetStateStep) -> &mut Self;
 
@@ -31,6 +34,41 @@ pub trait StepHandler: TypedScCallExecutor + TypedScDeployExecutor + TypedScQuer
 
     /// Adds a dump state step, then executes it.
     fn dump_state_step(&mut self) -> &mut Self;
+
+    fn run_scenario(&mut self, scenario: Scenario) -> &mut Self {
+        for step in scenario.steps.into_iter() {
+            match step {
+                Step::ExternalSteps(external_steps_step) => {
+                    self.external_steps(external_steps_step);
+                },
+                Step::SetState(set_state_step) => {
+                    self.set_state_step(set_state_step);
+                },
+                Step::ScCall(sc_call_step) => {
+                    self.sc_call_step(sc_call_step);
+                },
+                Step::ScQuery(sc_query_step) => {
+                    self.sc_query_step(sc_query_step);
+                },
+                Step::ScDeploy(sc_deploy_step) => {
+                    self.sc_deploy_step(sc_deploy_step);
+                },
+                Step::Transfer(transfer_step) => {
+                    self.transfer_step(transfer_step);
+                },
+                Step::ValidatorReward(validator_reward_step) => {
+                    self.validator_reward_step(validator_reward_step);
+                },
+                Step::CheckState(check_state_step) => {
+                    self.check_state_step(check_state_step);
+                },
+                Step::DumpState(_) => {
+                    self.dump_state_step();
+                },
+            }
+        }
+        self
+    }
 
     #[deprecated(since = "0.39.0", note = "Renamed, use `set_state_step` instead.")]
     fn mandos_set_state(&mut self, step: SetStateStep) -> &mut Self {

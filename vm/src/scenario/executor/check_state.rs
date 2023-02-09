@@ -1,6 +1,6 @@
 use crate::scenario::model::{
     AddressKey, BytesValue, CheckAccounts, CheckEsdt, CheckEsdtData, CheckEsdtInstance,
-    CheckEsdtInstances, CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable, Step,
+    CheckEsdtInstances, CheckEsdtMap, CheckStateStep, CheckStorage, CheckValue, Checkable,
 };
 use num_traits::Zero;
 
@@ -10,17 +10,12 @@ use crate::{
 };
 
 impl BlockchainMock {
-    pub fn perform_check_state(&mut self, check_state_step: CheckStateStep) -> &mut Self {
+    pub fn perform_check_state(&mut self, check_state_step: &CheckStateStep) {
         execute(self, &check_state_step.accounts);
-        self.scenario_trace
-            .steps
-            .push(Step::CheckState(check_state_step));
-        self
     }
 
-    pub fn perform_dump_state(&mut self) -> &mut Self {
+    pub fn perform_dump_state(&mut self) {
         self.print_accounts();
-        self
     }
 }
 

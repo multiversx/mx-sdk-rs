@@ -10,7 +10,7 @@ use crate::{
 
 use std::collections::BTreeMap;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Account {
     pub comment: Option<String>,
     pub nonce: Option<U64Value>,

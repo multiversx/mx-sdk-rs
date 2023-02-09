@@ -9,7 +9,7 @@ use multiversx_sc::types::{CodeMetadata, ContractDeploy};
 
 use super::convert_call_args;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ScDeployStep {
     pub id: String,
     pub tx_id: Option<String>,

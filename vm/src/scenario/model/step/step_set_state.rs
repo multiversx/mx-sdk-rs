@@ -4,7 +4,7 @@ use crate::scenario::model::{
     Account, AddressKey, AddressValue, BlockInfo, BytesValue, NewAddress, U64Value,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SetStateStep {
     pub comment: Option<String>,
     pub accounts: BTreeMap<AddressKey, Account>,

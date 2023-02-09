@@ -5,7 +5,7 @@ use crate::scenario_format::{
 
 use super::CheckEsdtInstance;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum CheckEsdtInstances {
     Star,
     Equal(Vec<CheckEsdtInstance>),

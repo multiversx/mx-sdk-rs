@@ -1,6 +1,6 @@
 use crate::scenario::model::{AddressKey, CheckAccount, CheckAccounts};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct CheckStateStep {
     pub comment: Option<String>,
     pub accounts: CheckAccounts,

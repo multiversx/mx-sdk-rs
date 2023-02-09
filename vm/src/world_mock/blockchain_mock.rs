@@ -1,15 +1,13 @@
 use crate::{
     num_bigint::BigUint,
-    scenario::model::Scenario,
-    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
 };
 use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
-use std::{collections::HashMap, path::PathBuf, rc::Rc};
+use std::{collections::HashMap, rc::Rc};
 
-use super::{AccountData, BlockInfo, ContractMap};
+use super::{AccountData, BlockInfo, ContractContainer, ContractMap};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
@@ -17,13 +15,10 @@ const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 pub struct BlockchainMock {
     pub accounts: HashMap<Address, AccountData>,
     pub builtin_functions: Rc<BuiltinFunctionMap>,
-    pub addr_to_pretty_string_map: HashMap<Address, String>,
     pub new_addresses: HashMap<(Address, u64), Address>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub contract_map: ContractMap,
-    pub current_dir: PathBuf,
-    pub scenario_trace: Scenario,
 }
 
 impl BlockchainMock {
@@ -31,13 +26,10 @@ impl BlockchainMock {
         BlockchainMock {
             accounts: HashMap::new(),
             builtin_functions: Rc::new(init_builtin_functions()),
-            addr_to_pretty_string_map: HashMap::new(),
             new_addresses: HashMap::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
             contract_map: ContractMap::default(),
-            current_dir: std::env::current_dir().unwrap(),
-            scenario_trace: Scenario::default(),
         }
     }
 }
@@ -53,13 +45,17 @@ impl BlockchainMock {
         self.accounts.contains_key(address)
     }
 
-    pub fn contains_contract(&self, contract_path_expr: &str) -> bool {
-        let contract_bytes = interpret_string(
-            contract_path_expr,
-            &InterpreterContext::new(self.current_dir.clone()),
-        );
+    pub fn register_contract_container(
+        &mut self,
+        contract_bytes: Vec<u8>,
+        contract_container: ContractContainer,
+    ) {
+        self.contract_map
+            .register_contract(contract_bytes, contract_container);
+    }
 
-        self.contract_map.contains_contract(&contract_bytes)
+    pub fn contains_contract(&self, contract_bytes: &[u8]) -> bool {
+        self.contract_map.contains_contract(contract_bytes)
     }
 
     pub fn commit_updates(&mut self, updates: BlockchainUpdate) {

@@ -2,7 +2,7 @@ use crate::scenario::model::{
     AddressValue, BigUintValue, BytesValue, TxESDT, TxTransfer, TxValidatorReward, U64Value,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TransferStep {
     pub id: String,
     pub tx_id: Option<String>,
@@ -10,7 +10,7 @@ pub struct TransferStep {
     pub tx: Box<TxTransfer>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ValidatorRewardStep {
     pub id: String,
     pub tx_id: Option<String>,

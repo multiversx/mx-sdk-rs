@@ -1,7 +1,7 @@
 use super::EsdtInstance;
 use crate::scenario::model::{BigUintValue, BytesValue, U64Value};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct EsdtObject {
     pub token_identifier: Option<BytesValue>,
     pub instances: Vec<EsdtInstance>,

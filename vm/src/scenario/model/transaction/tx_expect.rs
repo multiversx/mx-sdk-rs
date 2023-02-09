@@ -6,7 +6,7 @@ use crate::{
     },
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TxExpect {
     pub out: CheckValueList,
     pub status: CheckValue<U64Value>,
