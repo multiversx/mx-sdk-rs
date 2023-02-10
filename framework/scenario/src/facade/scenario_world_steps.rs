@@ -1,10 +1,10 @@
 use crate::{
+    facade::ScenarioWorld,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
         types::{Address, ContractCall},
     },
     scenario::{model::*, ScenarioRunner},
-    ScenarioWorld,
 };
 use multiversx_chain_vm::DebugApi;
 

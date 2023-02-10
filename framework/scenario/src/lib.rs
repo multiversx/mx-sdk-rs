@@ -11,8 +11,6 @@ pub mod whitebox;
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
 pub use whitebox as testing_framework;
 
-pub use scenario::run_vm::ContractInfo;
-
 pub use multiversx_chain_vm::{self, bech32, num_bigint, DebugApi};
 
 pub use multiversx_sc;
@@ -27,7 +25,7 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::ScenarioWorld;
+pub use facade::{ContractInfo, ScenarioWorld};
 pub use scenario_go_runner::run_go;
 pub use scenario_rs_runner::run_rs;
 

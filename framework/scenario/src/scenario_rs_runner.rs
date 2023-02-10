@@ -1,6 +1,7 @@
-use crate::scenario::{self, model::*, ScenarioRunner};
-
-use crate::ScenarioWorld;
+use crate::{
+    facade::ScenarioWorld,
+    scenario::{self, model::*, ScenarioRunner},
+};
 use std::path::Path;
 
 /// Runs scenario test using the Rust infrastructure and the debug mode.
