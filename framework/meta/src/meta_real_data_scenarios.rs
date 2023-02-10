@@ -12,10 +12,6 @@ pub fn call_real_data_scenario_builder(args: &RealDataScenarioArgs) {
     let api = args.api.to_string();
 
     let blockchain = CommunicationProxy::new(api);
-    // let future_res = async move {
-    //     blockchain.get_account_storage_keys(&addr).await.unwrap()
-    // };
-
     let account = Runtime::new().unwrap().block_on(blockchain.get_account(&addr)).unwrap();
     let account_esdt = Runtime::new().unwrap().block_on(blockchain.get_account_esdt_tokens(&addr)).unwrap();
     let account_storage = Runtime::new().unwrap().block_on(blockchain.get_account_storage_keys(&addr));
