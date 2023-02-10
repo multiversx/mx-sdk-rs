@@ -1,4 +1,4 @@
-use crate::scenario::{self, handler::ScenarioRunner, model::*};
+use crate::scenario::{self, model::*, ScenarioRunner};
 
 use crate::ScenarioWorld;
 use std::path::Path;

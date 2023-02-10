@@ -1,6 +1,6 @@
-use super::super::model::*;
+use super::model::*;
 
-/// Allows caller to process a single scenario step, not matter what this means concretely.
+/// Allows caller to process a single scenario step, no matter what this means concretely.
 ///
 /// Abstracts away implementation, can be
 /// - a simulation using any executor,
@@ -26,6 +26,7 @@ pub trait ScenarioRunner {
 
     fn run_dump_state_step(&mut self);
 
+    /// Utility method for running all steps in a scenario.
     fn run_scenario(&mut self, scenario: Scenario) {
         for step in &scenario.steps {
             match step {

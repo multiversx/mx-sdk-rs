@@ -1,6 +1,6 @@
 use crate::{
     multiversx_chain_vm::BlockchainMock,
-    scenario::{handler::ScenarioRunner, model::*},
+    scenario::{model::*, ScenarioRunner},
 };
 
 /// Wraps calls to the blockchain mock,

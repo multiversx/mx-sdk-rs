@@ -1,5 +1,5 @@
 use crate::{
-    scenario::{handler::ScenarioRunner, model::*},
+    scenario::{model::*, ScenarioRunner},
     ScenarioWorld,
 };
 

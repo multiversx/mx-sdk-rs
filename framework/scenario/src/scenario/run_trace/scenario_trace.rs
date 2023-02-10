@@ -1,6 +1,6 @@
 use crate::{
     multiversx_sc::types::Address,
-    scenario::{handler::ScenarioRunner, model::*},
+    scenario::{model::*, ScenarioRunner},
     scenario_format::interpret_trait::IntoRaw,
 };
 use std::{collections::HashMap, path::Path};

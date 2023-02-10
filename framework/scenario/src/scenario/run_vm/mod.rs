@@ -6,8 +6,8 @@ pub mod sc_query;
 mod set_state;
 mod transfer;
 mod tx_output_check;
-mod vm_adapter;
+mod vm_runner;
 
 pub use contract_info::*;
 use tx_output_check::*;
-pub use vm_adapter::ScenarioVMRunner;
+pub use vm_runner::ScenarioVMRunner;
