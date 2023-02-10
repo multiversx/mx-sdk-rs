@@ -1,6 +1,6 @@
 use crate::{
     multiversx_sc::types::Address,
-    scenario::{handler::StepRunner, model::*},
+    scenario::{handler::ScenarioRunner, model::*},
     scenario_format::interpret_trait::IntoRaw,
 };
 use std::{collections::HashMap, path::Path};
@@ -43,7 +43,7 @@ impl ScenarioTrace {
     }
 }
 
-impl StepRunner for ScenarioTrace {
+impl ScenarioRunner for ScenarioTrace {
     fn run_external_steps(&mut self, step: &ExternalStepsStep) {
         self.scenario_trace
             .steps

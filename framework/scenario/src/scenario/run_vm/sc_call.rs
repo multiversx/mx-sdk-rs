@@ -8,9 +8,9 @@ use multiversx_chain_vm::{
     world_mock::BlockchainMock,
 };
 
-use super::{check_tx_output, VmAdapter};
+use super::{check_tx_output, ScenarioVMRunner};
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     /// Adds a SC call step, as specified in the `sc_call_step` argument, then executes it.
     pub fn perform_sc_call(&mut self, sc_call_step: &ScCallStep) {
         let _ = self

@@ -1,4 +1,4 @@
-use super::{sc_call::tx_esdt_transfers_from_scenario, VmAdapter};
+use super::{sc_call::tx_esdt_transfers_from_scenario, ScenarioVMRunner};
 use crate::scenario::model::{TransferStep, TxTransfer, ValidatorRewardStep};
 use multiversx_chain_vm::{
     tx_execution::execute_sc_call,
@@ -6,7 +6,7 @@ use multiversx_chain_vm::{
     world_mock::BlockchainMock,
 };
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     pub fn perform_transfer(&mut self, transfer_step: &TransferStep) {
         self.blockchain_mock
             .with_borrowed(|state| ((), execute(state, &transfer_step.tx)));

@@ -3,7 +3,7 @@ use crate::{
         codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
         types::{Address, ContractCall},
     },
-    scenario::{handler::StepRunner, model::*},
+    scenario::{handler::ScenarioRunner, model::*},
     ScenarioWorld,
 };
 use multiversx_chain_vm::DebugApi;

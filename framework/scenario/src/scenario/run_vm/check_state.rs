@@ -9,9 +9,9 @@ use multiversx_chain_vm::{
     world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
 };
 
-use super::VmAdapter;
+use super::ScenarioVMRunner;
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     pub fn perform_check_state(&mut self, check_state_step: &CheckStateStep) {
         execute(&self.blockchain_mock, &check_state_step.accounts);
     }

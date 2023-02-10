@@ -10,4 +10,4 @@ mod vm_adapter;
 
 pub use contract_info::*;
 use tx_output_check::*;
-pub use vm_adapter::VmAdapter;
+pub use vm_adapter::ScenarioVMRunner;

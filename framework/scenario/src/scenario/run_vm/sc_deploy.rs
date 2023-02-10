@@ -12,9 +12,9 @@ use multiversx_chain_vm::{
     world_mock::BlockchainMock,
 };
 
-use super::{check_tx_output, VmAdapter};
+use super::{check_tx_output, ScenarioVMRunner};
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
     pub fn perform_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) {
         self.blockchain_mock.with_borrowed(|state| {
