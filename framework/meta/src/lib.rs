@@ -7,6 +7,7 @@ mod local_deps;
 mod meta_abi;
 mod meta_all;
 mod meta_cli;
+mod meta_real_data_scenarios;
 mod meta_config;
 mod meta_info;
 mod meta_validate_abi;
