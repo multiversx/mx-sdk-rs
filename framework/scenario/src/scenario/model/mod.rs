@@ -19,6 +19,3 @@ pub use storage_check::*;
 pub use storage_details_check::*;
 pub use transaction::*;
 pub use value::*;
-
-// TODO: temporary, will get reorganized
-pub use super::handler::StepHandler;
