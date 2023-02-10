@@ -1,58 +1,80 @@
 use crate::{
+    facade::ScenarioWorld,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
         types::{Address, ContractCall},
     },
-    scenario::{
-        handler::{StepHandler, StepRunner},
-        model::*,
-    },
-    ScenarioWorld,
+    scenario::{model::*, ScenarioRunner},
 };
 use multiversx_chain_vm::DebugApi;
 
-impl StepHandler for ScenarioWorld {
-    fn external_steps(&mut self, step: ExternalStepsStep) -> &mut Self {
+impl ScenarioWorld {
+    /// Imports and processes steps from an external scenario file.
+    pub fn external_steps(&mut self, step: ExternalStepsStep) -> &mut Self {
         self.run_external_steps(&step);
         self
     }
 
-    fn set_state_step(&mut self, step: SetStateStep) -> &mut Self {
+    /// Adds a SC call step, then executes it.
+    pub fn set_state_step(&mut self, step: SetStateStep) -> &mut Self {
         self.run_set_state_step(&step);
         self
     }
 
-    fn sc_call_step(&mut self, step: ScCallStep) -> &mut Self {
+    /// Adds a SC call step, then executes it.
+    pub fn sc_call_step(&mut self, step: ScCallStep) -> &mut Self {
         self.run_sc_call_step(&step);
         self
     }
 
-    fn sc_query_step(&mut self, step: ScQueryStep) -> &mut Self {
+    /// Adds a SC query step, then executes it.
+    pub fn sc_query_step(&mut self, step: ScQueryStep) -> &mut Self {
         self.run_sc_query_step(&step);
         self
     }
 
-    fn sc_deploy_step(&mut self, step: ScDeployStep) -> &mut Self {
+    /// Performs a SC query to a contract, leaves no scenario trace behind.
+    ///
+    /// Meant to be used for the test to investigate the state of the contract.
+    ///
+    /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
+    pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
+    where
+        CC: ContractCall<DebugApi>,
+        RequestedResult: CodecFrom<CC::OriginalResult>,
+    {
+        let sc_query_step = ScQueryStep::new().call(contract_call);
+        let tx_result = self.vm_runner.perform_sc_query(&sc_query_step);
+        let mut raw_result = tx_result.result_values;
+        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
+    }
+
+    /// Adds a SC deploy step, then executes it.
+    pub fn sc_deploy_step(&mut self, step: ScDeployStep) -> &mut Self {
         self.run_sc_deploy_step(&step);
         self
     }
 
-    fn transfer_step(&mut self, step: TransferStep) -> &mut Self {
+    /// Adds a simple transfer step, then executes it.
+    pub fn transfer_step(&mut self, step: TransferStep) -> &mut Self {
         self.run_transfer_step(&step);
         self
     }
 
-    fn validator_reward_step(&mut self, step: ValidatorRewardStep) -> &mut Self {
+    /// Adds a validator reward step, then executes it.
+    pub fn validator_reward_step(&mut self, step: ValidatorRewardStep) -> &mut Self {
         self.run_validator_reward_step(&step);
         self
     }
 
-    fn check_state_step(&mut self, step: CheckStateStep) -> &mut Self {
+    /// Adds a check state step, then executes it.
+    pub fn check_state_step(&mut self, step: CheckStateStep) -> &mut Self {
         self.run_check_state_step(&step);
         self
     }
 
-    fn dump_state_step(&mut self) -> &mut Self {
+    /// Adds a dump state step, then executes it.
+    pub fn dump_state_step(&mut self) -> &mut Self {
         self.run_dump_state_step();
         self
     }
@@ -117,19 +139,46 @@ impl TypedScQueryExecutor for ScenarioWorld {
 }
 
 impl ScenarioWorld {
-    /// Performs a SC query to a contract, leaves no scenario trace behind.
-    ///
-    /// Meant to be used for the test to investigate the state of the contract.
-    ///
-    /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
-    pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
-    where
-        CC: ContractCall<DebugApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
-    {
-        let sc_query_step = ScQueryStep::new().call(contract_call);
-        let tx_result = self.vm_runner.perform_sc_query(&sc_query_step);
-        let mut raw_result = tx_result.result_values;
-        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
+    #[deprecated(since = "0.39.0", note = "Renamed, use `set_state_step` instead.")]
+    pub fn mandos_set_state(&mut self, step: SetStateStep) -> &mut Self {
+        self.set_state_step(step)
+    }
+
+    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_call_step` instead.")]
+    pub fn mandos_sc_call(&mut self, step: ScCallStep) -> &mut Self {
+        self.sc_call_step(step)
+    }
+
+    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_query_step` instead.")]
+    pub fn mandos_sc_query(&mut self, step: ScQueryStep) -> &mut Self {
+        self.sc_query_step(step)
+    }
+
+    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_deploy_step` instead.")]
+    pub fn mandos_sc_deploy(&mut self, step: ScDeployStep) -> &mut Self {
+        self.sc_deploy_step(step)
+    }
+
+    #[deprecated(since = "0.39.0", note = "Renamed, use `transfer_step` instead.")]
+    pub fn mandos_transfer(&mut self, step: TransferStep) -> &mut Self {
+        self.transfer_step(step)
+    }
+
+    #[deprecated(
+        since = "0.39.0",
+        note = "Renamed, use `validator_reward_step` instead."
+    )]
+    pub fn mandos_validator_reward(&mut self, step: ValidatorRewardStep) -> &mut Self {
+        self.validator_reward_step(step)
+    }
+
+    #[deprecated(since = "0.39.0", note = "Renamed, use `check_state_step` instead.")]
+    pub fn mandos_check_state(&mut self, step: CheckStateStep) -> &mut Self {
+        self.check_state_step(step)
+    }
+
+    #[deprecated(since = "0.39.0", note = "Renamed, use `dump_state_step` instead.")]
+    pub fn mandos_dump_state(&mut self) -> &mut Self {
+        self.dump_state_step()
     }
 }

@@ -6,7 +6,7 @@ use crate::{
         api,
         contract_base::{CallableContractBuilder, ContractAbiProvider},
     },
-    scenario::{run_trace::ScenarioTrace, run_vm::VmAdapter},
+    scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
 };
 use std::path::{Path, PathBuf};
@@ -20,7 +20,7 @@ use std::path::{Path, PathBuf};
 #[derive(Default, Debug)]
 pub struct ScenarioWorld {
     pub current_dir: PathBuf,
-    pub vm_runner: VmAdapter, // TODO: convert to option at some point
+    pub vm_runner: ScenarioVMRunner, // TODO: convert to option at some point
     pub trace: Option<ScenarioTrace>,
 }
 
@@ -28,7 +28,7 @@ impl ScenarioWorld {
     pub fn new() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
-            vm_runner: VmAdapter::new(),
+            vm_runner: ScenarioVMRunner::new(),
             trace: None,
         }
     }

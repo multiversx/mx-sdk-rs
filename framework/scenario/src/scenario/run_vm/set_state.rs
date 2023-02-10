@@ -5,9 +5,9 @@ use multiversx_chain_vm::world_mock::{
     EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
 };
 
-use super::VmAdapter;
+use super::ScenarioVMRunner;
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) {
         execute(&mut self.blockchain_mock, set_state_step);
     }

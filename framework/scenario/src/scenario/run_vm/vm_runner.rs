@@ -1,24 +1,24 @@
 use crate::{
     multiversx_chain_vm::BlockchainMock,
-    scenario::{handler::StepRunner, model::*},
+    scenario::{model::*, ScenarioRunner},
 };
 
 /// Wraps calls to the blockchain mock,
 /// while implementing the StepRunner interface.
 #[derive(Default, Debug)]
-pub struct VmAdapter {
+pub struct ScenarioVMRunner {
     pub blockchain_mock: BlockchainMock,
 }
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     pub fn new() -> Self {
-        VmAdapter {
+        ScenarioVMRunner {
             blockchain_mock: BlockchainMock::new(),
         }
     }
 }
 
-impl StepRunner for VmAdapter {
+impl ScenarioRunner for ScenarioVMRunner {
     fn run_external_steps(&mut self, _step: &ExternalStepsStep) {
         panic!("cannot call directly as such")
     }

@@ -13,9 +13,9 @@ use multiversx_chain_vm::{
     DebugApi,
 };
 
-use super::{check_tx_output, VmAdapter};
+use super::{check_tx_output, ScenarioVMRunner};
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
     pub fn perform_sc_query(&mut self, sc_query_step: &ScQueryStep) -> TxResult {
         self.blockchain_mock
@@ -23,7 +23,7 @@ impl VmAdapter {
     }
 }
 
-impl VmAdapter {
+impl ScenarioVMRunner {
     /// Performs a SC query to a contract, leaves no scenario trace behind.
     ///
     /// Meant to be used for the test to investigate the state of the contract.

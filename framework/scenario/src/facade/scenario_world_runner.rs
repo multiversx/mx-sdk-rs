@@ -1,10 +1,10 @@
 use crate::{
-    scenario::{handler::StepRunner, model::*},
-    ScenarioWorld,
+    facade::ScenarioWorld,
+    scenario::{model::*, ScenarioRunner},
 };
 
 impl ScenarioWorld {
-    pub fn for_each_runner_mut<F: FnMut(&mut dyn StepRunner)>(&mut self, mut f: F) {
+    pub fn for_each_runner_mut<F: FnMut(&mut dyn ScenarioRunner)>(&mut self, mut f: F) {
         f(&mut self.vm_runner);
         if let Some(trace) = &mut self.trace {
             f(trace);
@@ -12,7 +12,7 @@ impl ScenarioWorld {
     }
 }
 
-impl StepRunner for ScenarioWorld {
+impl ScenarioRunner for ScenarioWorld {
     fn run_external_steps(&mut self, step: &ExternalStepsStep) {
         self.for_each_runner_mut(|runner| runner.run_external_steps(step));
     }
