@@ -1,14 +1,13 @@
-use multiversx_chain_vm::{
-    multiversx_sc::api,
-    scenario::{executor::VmAdapter, run_trace::ScenarioTrace},
-    scenario_format::value_interpreter::interpret_string,
-    DebugApi,
-};
+use multiversx_chain_vm::DebugApi;
 
 use crate::{
     multiversx_chain_vm::world_mock::ContractContainer,
-    multiversx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider},
-    scenario_format::interpret_trait::InterpreterContext,
+    multiversx_sc::{
+        api,
+        contract_base::{CallableContractBuilder, ContractAbiProvider},
+    },
+    scenario::{run_trace::ScenarioTrace, run_vm::VmAdapter},
+    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
 };
 use std::path::{Path, PathBuf};
 

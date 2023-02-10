@@ -1,6 +1,6 @@
 use crate::{
     num_bigint,
-    world_mock::{is_smart_contract_address, EsdtData, EsdtInstance},
+    world_mock::{EsdtData, EsdtInstance},
     DebugApi,
 };
 use multiversx_sc::{
@@ -43,7 +43,7 @@ impl BlockchainApiImpl for DebugApi {
     }
 
     fn is_smart_contract_legacy(&self, address: &Address) -> bool {
-        is_smart_contract_address(address)
+        address.is_smart_contract_address()
     }
 
     fn load_balance_legacy(&self, dest: Self::BigIntHandle, address: &Address) {

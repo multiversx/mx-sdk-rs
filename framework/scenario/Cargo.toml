@@ -17,6 +17,7 @@ keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
+num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
 sha2 = "0.10.6"
@@ -29,9 +30,17 @@ colored = "2.0"
 [features]
 run-go-tests = []
 
+[dependencies.multiversx-sc]
+version = "=0.39.5"
+path = "../base"
+
 [dependencies.multiversx-sc-meta]
 version = "=0.39.5"
 path = "../meta"
+
+[dependencies.multiversx-chain-scenario-format]
+version = "0.19.1"
+path = "../../sdk/scenario-format"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.1.5"

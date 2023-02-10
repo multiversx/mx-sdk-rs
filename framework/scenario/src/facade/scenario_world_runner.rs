@@ -1,5 +1,7 @@
-use crate::ScenarioWorld;
-use multiversx_chain_vm::scenario::{handler::StepRunner, model::*};
+use crate::{
+    scenario::{handler::StepRunner, model::*},
+    ScenarioWorld,
+};
 
 impl ScenarioWorld {
     pub fn for_each_runner_mut<F: FnMut(&mut dyn StepRunner)>(&mut self, mut f: F) {
