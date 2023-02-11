@@ -36,11 +36,3 @@ lazy_static = "1.4.0"
 version = "=0.39.5"
 path = "../base"
 features = ["alloc", "num-bigint", "promises", "big-float"]
-
-[dependencies.multiversx-chain-scenario-format]
-version = "0.19.1"
-path = "../../sdk/scenario-format"
-
-[dependencies.multiversx-sdk]
-version = "=0.1.1"
-path = "../../sdk/core"
