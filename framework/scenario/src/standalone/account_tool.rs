@@ -43,7 +43,7 @@ pub async fn retrieve_account_as_scenario_set_state(api: String, args: &AccountA
         gas_schedule: None,
         name: None,
         steps: vec![StepRaw::SetState {
-            accounts: accounts,
+            accounts,
             block_hashes: Vec::new(),
             new_addresses: Vec::new(),
             comment: None,
@@ -58,7 +58,7 @@ pub async fn retrieve_account_as_scenario_set_state(api: String, args: &AccountA
 fn convert_storage(account_storage: HashMap<String, String>) -> BTreeMap<String, ValueSubTree> {
     account_storage
         .into_iter()
-        .map(|(k, v)| (format!("0x{}", k), ValueSubTree::Str(format!("0x{}", v))))
+        .map(|(k, v)| (format!("0x{k}"), ValueSubTree::Str(format!("0x{v}"))))
         .collect()
 }
 
@@ -89,6 +89,6 @@ fn split_token_identifer_nonce(full_identifier: String) -> (String, u64) {
             format!("{}-{}", tokens[0], tokens[1]),
             u64::from_str_radix(tokens[2], 16).unwrap(),
         ),
-        _ => panic!("could not process token identifier: {}", full_identifier),
+        _ => panic!("could not process token identifier: {full_identifier}"),
     }
 }

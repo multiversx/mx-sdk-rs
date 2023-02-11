@@ -128,5 +128,3 @@ pub struct LocalDepsArgs {
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
 }
-
-

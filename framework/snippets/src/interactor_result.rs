@@ -63,7 +63,9 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
 
     pub fn issue_non_fungible_new_token_identifier(&self) -> String {
         let second_scr = self
-            .scrs.iter().find(|scr| scr.data.starts_with("@00@"))
+            .scrs
+            .iter()
+            .find(|scr| scr.data.starts_with("@00@"))
             .expect("no token identifier SCR found");
 
         // TODO: error handling
