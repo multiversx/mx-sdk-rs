@@ -48,11 +48,6 @@ pub enum StandaloneCliAction {
         about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
-
-    #[command(
-        about = "Generates a scenario test initialized with real data fetch from the blockchain."
-    )]
-    RealDataScenario(RealDataScenarioArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -134,13 +129,4 @@ pub struct LocalDepsArgs {
     pub ignore: Vec<String>,
 }
 
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct RealDataScenarioArgs {
-    /// Provide the target API you want the real data to come from
-    #[arg(long = "api", verbatim_doc_comment)]
-    pub api: String,
 
-    /// Provide the address you want to retrieve data from
-    #[arg(long = "address", verbatim_doc_comment)]
-    pub address: String,
-}
