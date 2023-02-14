@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-wegld-swap-sc"
-version = "0.39.4"
+version = "0.39.5"
 
 authors = [
     "Dorin Iancu <dorin.iancu@multiversx.com>",
@@ -20,13 +20,13 @@ edition = "2021"
 path = "src/wegld.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.4"
+version = "0.39.5"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.39.4"
+version = "0.39.5"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.4"
+version = "0.39.5"
 path = "../../../framework/scenario"

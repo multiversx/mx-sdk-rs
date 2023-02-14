@@ -4,7 +4,7 @@
 */target/
 
 # The mxpy output
-output*
+/output*/
 
 # Mandos test trace
 trace*.scen.json

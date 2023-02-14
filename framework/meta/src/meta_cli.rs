@@ -3,6 +3,7 @@ use super::{
 };
 use crate::{
     cli_args::{ContractCliAction, ContractCliArgs, StandaloneCliAction, StandaloneCliArgs},
+    local_deps::local_deps,
     meta_all::call_all_meta,
     meta_info::call_info,
     sc_upgrade::upgrade_sc,
@@ -18,6 +19,9 @@ pub fn cli_main_standalone() {
         Some(StandaloneCliAction::All(args)) => call_all_meta(args),
         Some(StandaloneCliAction::Upgrade(args)) => {
             upgrade_sc(args);
+        },
+        Some(StandaloneCliAction::LocalDeps(args)) => {
+            local_deps(args);
         },
         None => {},
     }

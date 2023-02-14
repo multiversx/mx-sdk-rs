@@ -42,6 +42,12 @@ pub enum StandaloneCliAction {
         about = "Upgrades a contract to the latest version. Multiple contract crates are allowed."
     )]
     Upgrade(UpgradeArgs),
+
+    #[command(
+        name = "local-deps",
+        about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
+    )]
+    LocalDeps(LocalDepsArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -108,4 +114,17 @@ pub struct UpgradeArgs {
     /// By default it will be the last version out.
     #[arg(long = "to", verbatim_doc_comment)]
     pub override_target_version: Option<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct LocalDepsArgs {
+    /// Target directory where to generate local deps reports.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
 }

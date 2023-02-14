@@ -21,6 +21,8 @@ pub const FRAMEWORK_CRATE_NAMES: &[&str] = &[
     "elrond-interact-snippets",
 ];
 
+pub const CARGO_TOML_FILE_NAME: &str = "Cargo.toml";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DirectoryType {
     Contract,
@@ -169,10 +171,24 @@ fn find_framework_version_string(cargo_toml_contents: &CargoTomlContents) -> Opt
     None
 }
 
-fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
-    let cargo_toml_path = dir_path.join("Cargo.toml");
+fn load_cargo_toml_contents(dir_path: &Path) -> Option<CargoTomlContents> {
+    let cargo_toml_path = dir_path.join(CARGO_TOML_FILE_NAME);
     if cargo_toml_path.is_file() {
-        let cargo_toml_contents = CargoTomlContents::load_from_file(cargo_toml_path);
+        Some(CargoTomlContents::load_from_file(cargo_toml_path))
+    } else {
+        None
+    }
+}
+
+impl RelevantDirectory {
+    #[allow(unused)]
+    pub fn cargo_toml_contents(&self) -> Option<CargoTomlContents> {
+        load_cargo_toml_contents(self.path.as_path())
+    }
+}
+
+fn find_framework_version(dir_path: &Path) -> Option<VersionReq> {
+    if let Some(cargo_toml_contents) = load_cargo_toml_contents(dir_path) {
         if let Some(version) = find_framework_version_string(&cargo_toml_contents) {
             return Some(VersionReq::from_string(version));
         }

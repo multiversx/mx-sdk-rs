@@ -26,11 +26,19 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.39.5, vm 0.1.5] - 2023-02-06
+- `multiversx-sc-meta` improvements:
+	- Rust snippet generator fixes. The generator creates compilable code with appropriate argument types.
+	- `local-deps` command: generates a report on the local depedencies of contract crates. Will explore indirect depdencies too.
+	- Upgrade tool minor fix.
+
 ## [sc 0.39.4, vm 0.1.4] - 2023-01-26
 - `multiversx-sc-meta` improvements:
 	- `--locked` flag get passed to the build command, preserves dependencies in Cargo.lock.
 	- `update` command updates Cargo.lock files without building the contracts.
 - Backwards compatibility for running scenarios using the VM Go infrastructure.
+
 ## [sc 0.39.3, vm 0.1.3] - 2023-01-26
 - `multiversx-sc-meta` improvements:
 	- `upgrade` can handle crates as early as `0.28.0`;
@@ -56,7 +64,6 @@ They are:
 - New crate: `multiversx-chain-vm`, extracted from the old debug crate.
 - New crate: `multiversx-sdk`, adapted from a solution proposed by the community.
 - A `ScenarioWorld` facade, for contract tests.
-- The multi-contract build system.
 - The meta crate supports `twiggy` post-processing, this is a tool to analyze contract size and investigate bloat in the binaries.
 - Dropped crate: `elrond-wasm-output`. There is no equivalent crate, its job was passed to the individual `wasm` crates.
 - `ManagedVec` supports sorting and deduplication.
