@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            5
+// Endpoints:                            2
 // Async Callback (empty):               1
-// Total number of exported functions:   7
+// Total number of exported functions:   4
 
 #![no_std]
 #![feature(alloc_error_handler, lang_items)]
@@ -18,11 +18,8 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     adder
     (
-        generate_random_dna
-        create_random_zombie
-        dna_digits
-        dna_modulus
-        zombies
+        getSum
+        add
     )
 }
 
