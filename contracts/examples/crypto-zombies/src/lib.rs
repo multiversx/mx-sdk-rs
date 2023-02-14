@@ -16,7 +16,7 @@ pub trait CryptoZombies:
     + zombie_feeding::ZombieFeeding
     + storage::Storage
     + zombie_helper::ZombieHelper
-    + zombieattack::ZombieAttack
+    + zombie_attack::ZombieAttack
 {
     #[init]
     fn init(&self) {
