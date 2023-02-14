@@ -1,7 +1,7 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-use crate::{storage, zombiefactory, zombiehelper};
+use crate::{storage, zombie_factory, zombie_helper};
 use crypto_kitties_proxy::Kitty;
 
 mod crypto_kitties_proxy {
@@ -31,7 +31,7 @@ mod crypto_kitties_proxy {
 
 #[multiversx_sc::module]
 pub trait ZombieFeeding:
-    storage::Storage + zombiefactory::ZombieFactory + zombiehelper::ZombieHelper
+    storage::Storage + zombie_factory::ZombieFactory + zombie_helper::ZombieHelper
 {
     fn feed_and_multiply(&self, zombie_id: usize, target_dna: u64, species: ManagedBuffer) {
         let caller = self.blockchain().get_caller();

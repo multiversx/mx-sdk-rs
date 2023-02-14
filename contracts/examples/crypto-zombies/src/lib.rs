@@ -5,17 +5,17 @@ multiversx_sc::derive_imports!();
 
 mod storage;
 mod zombie;
-mod zombieattack;
-mod zombiefactory;
-mod zombiefeeding;
-mod zombiehelper;
+mod zombie_attack;
+mod zombie_factory;
+mod zombie_feeding;
+mod zombie_helper;
 
 #[multiversx_sc::contract]
 pub trait CryptoZombies:
-    zombiefactory::ZombieFactory
-    + zombiefeeding::ZombieFeeding
+    zombie_factory::ZombieFactory
+    + zombie_feeding::ZombieFeeding
     + storage::Storage
-    + zombiehelper::ZombieHelper
+    + zombie_helper::ZombieHelper
     + zombieattack::ZombieAttack
 {
     #[init]
