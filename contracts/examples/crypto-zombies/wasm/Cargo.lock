@@ -3,21 +3,6 @@
 version = 3
 
 [[package]]
-name = "adder"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
-]
-
-[[package]]
-name = "adder-wasm"
-version = "0.0.0"
-dependencies = [
- "adder",
- "multiversx-sc-wasm-adapter",
-]
-
-[[package]]
 name = "ahash"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -57,6 +42,13 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
+
+[[package]]
+name = "cryptozombies"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+]
 
 [[package]]
 name = "endian-type"
@@ -260,3 +252,11 @@ name = "winapi-x86_64-pc-windows-gnu"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
+
+[[package]]
+name = "zombiescontract-wasm"
+version = "0.0.0"
+dependencies = [
+ "cryptozombies",
+ "multiversx-sc-wasm-adapter",
+]
