@@ -55,13 +55,20 @@ impl CargoTomlContents {
             .insert("name".to_string(), toml::Value::String(new_package_name));
     }
 
-    pub fn dependency(&self, dep_name: &str) -> Option<&Value> {
+    pub fn dependencies_table(&self) -> Option<&Table> {
         if let Some(deps) = self.toml_value.get(CARGO_TOML_DEPENDENCIES) {
-            if let Some(deps_map) = deps.as_table() {
-                return deps_map.get(dep_name);
-            }
+            deps.as_table()
+        } else {
+            None
         }
-        None
+    }
+
+    pub fn dependency(&self, dep_name: &str) -> Option<&Value> {
+        if let Some(deps_map) = self.dependencies_table() {
+            deps_map.get(dep_name)
+        } else {
+            None
+        }
     }
 
     pub fn dependencies_mut(&mut self) -> &mut Table {
@@ -70,5 +77,21 @@ impl CargoTomlContents {
             .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn local_dependency_paths(&self, ignore_deps: &[&str]) -> Vec<String> {
+        let mut result = Vec::new();
+        if let Some(deps_map) = self.dependencies_table() {
+            for (key, value) in deps_map {
+                if ignore_deps.contains(&key.as_str()) {
+                    continue;
+                }
+
+                if let Some(path) = value.get("path") {
+                    result.push(path.as_str().expect("path is not a string").to_string());
+                }
+            }
+        }
+        result
     }
 }

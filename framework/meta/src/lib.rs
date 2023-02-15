@@ -6,6 +6,7 @@ pub mod cli_args;
 mod folder_structure;
 mod generate_rust_test_setup;
 mod generate_snippets;
+mod local_deps;
 mod meta_abi;
 mod meta_all;
 mod meta_cli;

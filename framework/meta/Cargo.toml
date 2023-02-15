@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.39.4"
+version = "0.39.5"
 edition = "2021"
 
 authors = [
@@ -28,10 +28,12 @@ toml = { version = "0.5.8", features = ["preserve_order"] }
 ruplacer = "0.8.1"
 clap = { version = "4.1.0", features = ["derive", "cargo"] }
 colored = "2.0"
+pathdiff = "0.2.1"
+common-path = "1.0.0"
 lazy_static = "1.4.0"
 
 [dependencies.multiversx-sc]
-version = "=0.39.4"
+version = "=0.39.5"
 path = "../base"
 features = ["alloc", "num-bigint", "promises", "big-float"]
 

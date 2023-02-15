@@ -13,9 +13,9 @@ path = "src/multisig_interact.rs"
 path = ".."
 
 [dependencies.multiversx-sc-modules]
-version = "0.39.4"
+version = "0.39.5"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.39.4"
+version = "0.39.5"
 path = "../../../../framework/snippets"
