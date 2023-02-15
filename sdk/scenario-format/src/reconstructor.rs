@@ -139,7 +139,7 @@ fn address_pretty(value: &[u8]) -> String {
         let shard_id = value[SC_ADDRESS_LENGTH - 1];
         let address_expr = format!("address:{}#{:02x}", address_str, shard_id);
         if !can_interpret_as_string(&[value[SC_ADDRESS_LENGTH - 1]]) {
-            return format!("0x{} ({})", hex::encode(value), address_expr);
+            format!("address:{address_str}#{shard_id:02x}");
         }
         address_expr
     }
@@ -149,7 +149,7 @@ fn can_interpret_as_string(bytes: &[u8]) -> bool {
     if bytes.is_empty() {
         return false;
     }
-    return bytes.iter().find(|&&b| b < 32 || b > 126).is_none();
+    return !bytes.iter().any(|&b| !(32..=126).contains(&b));
 }
 
 fn code_pretty(bytes: &[u8]) -> String {
@@ -162,5 +162,5 @@ fn code_pretty(bytes: &[u8]) -> String {
         return format!("0x{}...", &encoded[..SC_CODE_LENGTH]);
     }
 
-    format!("0x{}", encoded)
+    format!("0x{encoded}")
 }
