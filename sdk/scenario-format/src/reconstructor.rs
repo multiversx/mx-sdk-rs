@@ -1,23 +1,23 @@
 use num_bigint::BigUint;
 
-use crate::serde_raw::ValueSubTree;
+use crate::{reconstruct_trait::ReconstructorContext, serde_raw::ValueSubTree};
 
-type ExprReconstructorHint = u64;
+pub enum ExprReconstructorHint {
+    // NoHint indicates that the type if not known
+    NoHint,
 
-// NoHint indicates that the type if not known
-const NO_HINT: ExprReconstructorHint = 0;
+    // NumberHint hints that value should be a number
+    UnsignedNumberHint,
 
-// NumberHint hints that value should be a number
-const UNSIGNED_NUMBER_HINT: ExprReconstructorHint = 1;
+    // AddressHint hints that value should be an address
+    AddressHint,
 
-// AddressHint hints that value should be an address
-const ADDRESS_HINT: ExprReconstructorHint = 2;
+    // StrHint hints that value should be a string expression, e.g. a username, "str:..."
+    StrHint,
 
-// StrHint hints that value should be a string expression, e.g. a username, "str:..."
-const STR_HINT: ExprReconstructorHint = 3;
-
-// CodeHint hints that value should be a smart contract code, normally loaded from a file
-const CODE_HINT: ExprReconstructorHint = 4;
+    // CodeHint hints that value should be a smart contract code, normally loaded from a file
+    CodeHint,
+}
 
 const MAX_BYTES_INTERPRETED_AS_NUMBER: usize = 15;
 const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
@@ -25,29 +25,45 @@ const SC_ADDRESS_RESERVED_PREFIX_LENGTH: usize = SC_ADDRESS_NUM_LEADING_ZEROS + 
 const SC_ADDRESS_LENGTH: usize = 32;
 const SC_CODE_LENGTH: usize = 20;
 
-fn reconstruct(value: &[u8], hint: ExprReconstructorHint) -> ValueSubTree {
+pub fn reconstruct(
+    value: &[u8],
+    hint: &ExprReconstructorHint,
+    _context: &ReconstructorContext,
+) -> ValueSubTree {
     let str: String = match hint {
-        UNSIGNED_NUMBER_HINT => BigUint::from_bytes_be(value).to_string(),
-        STR_HINT => String::from_utf8_lossy(value).to_string(),
-        ADDRESS_HINT => address_pretty(value),
-        CODE_HINT => code_pretty(value),
+        ExprReconstructorHint::UnsignedNumberHint => BigUint::from_bytes_be(value).to_string(),
+        ExprReconstructorHint::StrHint => format!("str:{}", String::from_utf8_lossy(value)),
+        ExprReconstructorHint::AddressHint => address_pretty(value),
+        ExprReconstructorHint::CodeHint => code_pretty(value),
         _ => unknown_byte_array_pretty(value),
     };
     ValueSubTree::Str(str)
 }
 
-fn reconstruct_from_biguint(value: BigUint) -> ValueSubTree {
-    reconstruct(&value.to_bytes_be(), UNSIGNED_NUMBER_HINT)
+pub fn reconstruct_from_biguint(value: BigUint, context: &ReconstructorContext) -> ValueSubTree {
+    reconstruct(
+        &value.to_bytes_be(),
+        &ExprReconstructorHint::UnsignedNumberHint,
+        context,
+    )
 }
 
-fn reconstruct_from_u64(value: u64) -> ValueSubTree {
-    reconstruct(&BigUint::from(value).to_bytes_be(), UNSIGNED_NUMBER_HINT)
+pub fn reconstruct_from_u64(value: u64, context: &ReconstructorContext) -> ValueSubTree {
+    reconstruct(
+        &BigUint::from(value).to_bytes_be(),
+        &ExprReconstructorHint::UnsignedNumberHint,
+        context,
+    )
 }
 
-fn reconstruction_list(values: &[&[u8]], hint: ExprReconstructorHint) -> ValueSubTree {
+pub fn reconstruction_list(
+    values: &[&[u8]],
+    hint: &ExprReconstructorHint,
+    context: &ReconstructorContext,
+) -> ValueSubTree {
     let mut strings: Vec<ValueSubTree> = Vec::new();
     for value in values.iter() {
-        strings.push(reconstruct(value, hint));
+        strings.push(reconstruct(value, hint, context));
     }
     ValueSubTree::List(strings)
 }
@@ -86,10 +102,7 @@ fn address_pretty(value: &[u8]) -> String {
     }
 
     // smart contract address
-    if value[..SC_ADDRESS_NUM_LEADING_ZEROS]
-        .partial_cmp(&[0; 8])
-        .is_some()
-    {
+    if value[..SC_ADDRESS_NUM_LEADING_ZEROS] == [0; 8] {
         if value[SC_ADDRESS_LENGTH - 1] == b'_' {
             let address_str =
                 String::from_utf8_lossy(&value[SC_ADDRESS_RESERVED_PREFIX_LENGTH..]).to_string();
@@ -119,7 +132,7 @@ fn address_pretty(value: &[u8]) -> String {
         address_str = address_str.trim_end_matches('_').to_owned();
         let shard_id = value[SC_ADDRESS_LENGTH - 1];
         let address_expr = format!("address:{}{:#02x}", address_str, shard_id);
-        if !can_interpret_as_string(&value[SC_ADDRESS_LENGTH - 1..SC_ADDRESS_LENGTH - 1]) {
+        if !can_interpret_as_string(&[value[SC_ADDRESS_LENGTH - 1]]) {
             return format!("0x{} ({})", hex::encode(value), address_expr);
         }
         address_expr
