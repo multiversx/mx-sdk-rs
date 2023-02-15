@@ -5,6 +5,7 @@ mod facade;
 pub mod scenario;
 mod scenario_go_runner;
 mod scenario_rs_runner;
+pub mod standalone;
 pub mod whitebox;
 
 /// Keeping this for backwards compatibility.
