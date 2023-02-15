@@ -8,6 +8,7 @@ use crate::multiversx_sc::{
         EsdtLocalRole,
     },
 };
+use multiversx_chain_scenario_format::value_interpreter::VMIdentifier;
 use num_traits::Zero;
 
 use crate::testing_framework::raw_converter::bytes_to_hex;
@@ -240,6 +241,7 @@ impl BlockchainStateWrapper {
             &wasm_full_path_as_expr,
             &crate::scenario_format::interpret_trait::InterpreterContext::new(
                 std::path::PathBuf::new(),
+                VMIdentifier::default(),
             ),
         );
 

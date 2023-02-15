@@ -1,7 +1,12 @@
 use num_bigint::BigUint;
 
-use crate::{reconstruct_trait::ReconstructorContext, serde_raw::ValueSubTree};
-
+use crate::{
+    reconstruct_trait::ReconstructorContext,
+    serde_raw::ValueSubTree,
+    value_interpreter::functions::{
+        SC_ADDRESS_NUM_LEADING_ZEROS, SC_ADDRESS_RESERVED_PREFIX_LENGTH,
+    },
+};
 pub enum ExprReconstructorHint {
     // NoHint indicates that the type if not known
     NoHint,
@@ -21,13 +26,6 @@ pub enum ExprReconstructorHint {
 
 const MAX_BYTES_INTERPRETED_AS_NUMBER: usize = 15;
 
-// SC_ADDRESS_NUM_LEADING_ZEROS is the number of zero bytes every smart contract address begins with.
-const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
-
-// SC_ADDRESS_RESERVED_PREFIX_LENGTH is the number of zero bytes every smart contract address begins with.
-// Its value is 10.
-// 10 = 8 zeros for all SC addresses + 2 zeros as placeholder for the VM type.
-const SC_ADDRESS_RESERVED_PREFIX_LENGTH: usize = SC_ADDRESS_NUM_LEADING_ZEROS + 2;
 const SC_ADDRESS_LENGTH: usize = 32;
 const SC_CODE_LENGTH: usize = 20;
 

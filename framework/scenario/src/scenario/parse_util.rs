@@ -1,3 +1,5 @@
+use multiversx_chain_scenario_format::value_interpreter::VMIdentifier;
+
 use crate::{
     scenario::model::Scenario,
     scenario_format::{
@@ -16,7 +18,8 @@ pub fn parse_scenario_raw<P: AsRef<Path>>(path: P) -> ScenarioRaw {
 
 pub fn parse_scenario<P: AsRef<Path>>(path: P) -> Scenario {
     let scenario_parent = path.as_ref().parent().unwrap();
-    let interpreter_context = InterpreterContext::new(scenario_parent.into());
+    let interpreter_context =
+        InterpreterContext::new(scenario_parent.into(), VMIdentifier::default());
     let raw = parse_scenario_raw(path);
     Scenario::interpret_from(raw, &interpreter_context)
 }

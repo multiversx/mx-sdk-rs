@@ -276,9 +276,9 @@ fn test_scaddress() {
     let interpreter_context = &InterpreterContext::default();
     let reconstructor_context = &ReconstructorContext::default();
 
-    let mut interpreted = interpret_string("sc:abcdef", interpreter_context);
+    let mut interpreted = interpret_string("sc:a", interpreter_context);
     assert_eq!(
-        ValueSubTree::Str("sc:abcdef".to_string()),
+        ValueSubTree::Str("sc:a".to_string()),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,

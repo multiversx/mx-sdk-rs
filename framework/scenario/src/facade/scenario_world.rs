@@ -1,3 +1,4 @@
+use multiversx_chain_scenario_format::value_interpreter::VMIdentifier;
 use multiversx_chain_vm::DebugApi;
 
 use crate::{
@@ -52,7 +53,7 @@ impl ScenarioWorld {
     }
 
     pub fn interpreter_context(&self) -> InterpreterContext {
-        InterpreterContext::new(self.current_dir.clone())
+        InterpreterContext::new(self.current_dir.clone(), VMIdentifier::default())
     }
 
     pub fn register_contract_container(

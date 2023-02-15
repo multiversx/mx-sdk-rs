@@ -93,16 +93,16 @@ fn test_sc_address() {
     let context = &InterpreterContext::default();
 
     assert_eq!(
-        b"\x00\x00\x00\x00\x00\x00\x00\x00a_______________________".to_vec(),
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00a_____________________".to_vec(),
         interpret_string("sc:a", context)
     );
     assert_eq!(
-        b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120s".to_vec(),
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x001234567890123456789012".to_vec(),
         interpret_string("sc:12345678901234567890120s", context)
     );
     // trims excess
     assert_eq!(
-        b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120s".to_vec(),
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x001234567890123456789012".to_vec(),
         interpret_string("sc:12345678901234567890120sx", context)
     );
 }
@@ -112,16 +112,16 @@ fn test_sc_address_with_shard_id() {
     let context = &InterpreterContext::default();
 
     assert_eq!(
-        b"\x00\x00\x00\x00\x00\x00\x00\x00a______________________\x44".to_vec(),
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00a____________________\x44".to_vec(),
         interpret_string("sc:a#44", context)
     );
     assert_eq!(
-        b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120\x88".to_vec(),
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00123456789012345678901\x88".to_vec(),
         interpret_string("sc:12345678901234567890120#88", context)
     );
     // trims excess
     assert_eq!(
-        b"\x00\x00\x00\x00\x00\x00\x00\x0012345678901234567890120\x88".to_vec(),
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00123456789012345678901\x88".to_vec(),
         interpret_string("sc:12345678901234567890120x#88", context)
     );
 }
