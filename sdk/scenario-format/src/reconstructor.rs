@@ -137,9 +137,9 @@ fn address_pretty(value: &[u8]) -> String {
         let mut address_str = String::from_utf8_lossy(&value[..SC_ADDRESS_LENGTH - 1]).to_string();
         address_str = address_str.trim_end_matches('_').to_owned();
         let shard_id = value[SC_ADDRESS_LENGTH - 1];
-        let address_expr = format!("address:{}#{:02x}", address_str, shard_id);
+        let address_expr = format!("address:{address_str}#{shard_id:02x}");
         if !can_interpret_as_string(&[value[SC_ADDRESS_LENGTH - 1]]) {
-            format!("address:{address_str}#{shard_id:02x}");
+            return format!("0x{} ({})", hex::encode(value), address_expr);
         }
         address_expr
     }
