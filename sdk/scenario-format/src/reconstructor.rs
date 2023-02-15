@@ -53,7 +53,7 @@ fn reconstruction_list(values: &[&[u8]], hint: ExprReconstructorHint) -> ValueSu
 }
 
 fn unknown_byte_array_pretty(bytes: &[u8]) -> String {
-    if bytes.len() == 0 {
+    if bytes.is_empty() {
         return String::new();
     }
 
@@ -62,7 +62,7 @@ fn unknown_byte_array_pretty(bytes: &[u8]) -> String {
         return format!(
             "0x{} (str:{})",
             hex::encode(bytes),
-            String::from_utf8_lossy(bytes).to_string()
+            String::from_utf8_lossy(bytes)
         );
     }
 
@@ -73,11 +73,11 @@ fn unknown_byte_array_pretty(bytes: &[u8]) -> String {
     }
 
     // default interpret as string with escaped bytes
-    return format!(
+    format!(
         "0x{} (str:{:?})",
         hex::encode(bytes),
         String::from_utf8_lossy(bytes).to_string(),
-    );
+    )
 }
 
 fn address_pretty(value: &[u8]) -> String {
@@ -87,7 +87,7 @@ fn address_pretty(value: &[u8]) -> String {
 
     // smart contract address
     if value[..SC_ADDRESS_NUM_LEADING_ZEROS]
-        .partial_cmp(&vec![0; 8])
+        .partial_cmp(&[0; 8])
         .is_some()
     {
         if value[SC_ADDRESS_LENGTH - 1] == b'_' {
@@ -112,8 +112,8 @@ fn address_pretty(value: &[u8]) -> String {
 
     // regular addresses
     if value[SC_ADDRESS_LENGTH - 1] == b'_' {
-        let address_str = String::from_utf8_lossy(&value).to_string();
-        return format!("address:{}", address_str.trim_end_matches('_').to_owned());
+        let address_str = String::from_utf8_lossy(value).to_string();
+        format!("address:{}", address_str.trim_end_matches('_').to_owned())
     } else {
         let mut address_str = String::from_utf8_lossy(&value[..SC_ADDRESS_LENGTH - 1]).to_string();
         address_str = address_str.trim_end_matches('_').to_owned();
@@ -127,14 +127,14 @@ fn address_pretty(value: &[u8]) -> String {
 }
 
 fn can_interpret_as_string(bytes: &[u8]) -> bool {
-    if bytes.len() == 0 {
+    if bytes.is_empty() {
         return false;
     }
     return bytes.iter().find(|&&b| b < 32 || b > 126).is_none();
 }
 
 fn code_pretty(bytes: &[u8]) -> String {
-    if bytes.len() == 0 {
+    if bytes.is_empty() {
         return String::new();
     }
     let encoded = hex::encode(bytes);
