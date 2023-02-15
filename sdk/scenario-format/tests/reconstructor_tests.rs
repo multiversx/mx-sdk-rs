@@ -179,7 +179,7 @@ fn test_address() {
         interpreter_context,
     );
     assert_eq!(
-        ValueSubTree::Str("address:1234567890123456789012345678901#01".to_string()),
+        ValueSubTree::Str("0x3132333435363738393031323334353637383930313233343536373839303101 (address:1234567890123456789012345678901#01)".to_string()),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,
@@ -193,7 +193,7 @@ fn test_address() {
         interpreter_context,
     );
     assert_eq!(
-        ValueSubTree::Str("address:1234567890123456789012345678901#01".to_string()),
+        ValueSubTree::Str("0x3132333435363738393031323334353637383930313233343536373839303101 (address:1234567890123456789012345678901#01)".to_string()),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,
@@ -209,7 +209,10 @@ fn test_address_with_shard_id() {
 
     let mut interpreted = interpret_string("address:#05", interpreter_context);
     assert_eq!(
-        ValueSubTree::Str("address:#05".to_string()),
+        ValueSubTree::Str(
+            "0x5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f05 (address:#05)"
+                .to_string()
+        ),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,
@@ -219,7 +222,10 @@ fn test_address_with_shard_id() {
 
     interpreted = interpret_string("address:a#bb", interpreter_context);
     assert_eq!(
-        ValueSubTree::Str("address:a#bb".to_string()),
+        ValueSubTree::Str(
+            "0x615f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5fbb (address:a#bb)"
+                .to_string()
+        ),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,
@@ -229,7 +235,7 @@ fn test_address_with_shard_id() {
 
     interpreted = interpret_string("address:an_address#99", interpreter_context);
     assert_eq!(
-        ValueSubTree::Str("address:an_address#99".to_string()),
+        ValueSubTree::Str("0x616e5f616464726573735f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f99 (address:an_address#99)".to_string()),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,
@@ -270,9 +276,9 @@ fn test_scaddress() {
     let interpreter_context = &InterpreterContext::default();
     let reconstructor_context = &ReconstructorContext::default();
 
-    let mut interpreted = interpret_string("sc:a", interpreter_context);
+    let mut interpreted = interpret_string("sc:abcdef", interpreter_context);
     assert_eq!(
-        ValueSubTree::Str("sc:a".to_string()),
+        ValueSubTree::Str("sc:abcdef".to_string()),
         reconstruct(
             &interpreted,
             &ExprReconstructorHint::AddressHint,

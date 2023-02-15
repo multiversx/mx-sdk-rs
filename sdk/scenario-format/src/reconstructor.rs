@@ -20,7 +20,13 @@ pub enum ExprReconstructorHint {
 }
 
 const MAX_BYTES_INTERPRETED_AS_NUMBER: usize = 15;
+
+// SC_ADDRESS_NUM_LEADING_ZEROS is the number of zero bytes every smart contract address begins with.
 const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
+
+// SC_ADDRESS_RESERVED_PREFIX_LENGTH is the number of zero bytes every smart contract address begins with.
+// Its value is 10.
+// 10 = 8 zeros for all SC addresses + 2 zeros as placeholder for the VM type.
 const SC_ADDRESS_RESERVED_PREFIX_LENGTH: usize = SC_ADDRESS_NUM_LEADING_ZEROS + 2;
 const SC_ADDRESS_LENGTH: usize = 32;
 const SC_CODE_LENGTH: usize = 20;
@@ -116,7 +122,7 @@ fn address_pretty(value: &[u8]) -> String {
             .to_string();
             let shard_id = value[SC_ADDRESS_LENGTH - 1];
             return format!(
-                "sc:{}{:#x}",
+                "sc:{}#{:x}",
                 address_str.trim_end_matches('_').to_owned(),
                 shard_id
             );
@@ -131,7 +137,7 @@ fn address_pretty(value: &[u8]) -> String {
         let mut address_str = String::from_utf8_lossy(&value[..SC_ADDRESS_LENGTH - 1]).to_string();
         address_str = address_str.trim_end_matches('_').to_owned();
         let shard_id = value[SC_ADDRESS_LENGTH - 1];
-        let address_expr = format!("address:{}{:#02x}", address_str, shard_id);
+        let address_expr = format!("address:{}#{:02x}", address_str, shard_id);
         if !can_interpret_as_string(&[value[SC_ADDRESS_LENGTH - 1]]) {
             return format!("0x{} ({})", hex::encode(value), address_expr);
         }
