@@ -29,7 +29,7 @@ const MAX_BYTES_INTERPRETED_AS_NUMBER: usize = 15;
 const SC_ADDRESS_LENGTH: usize = 32;
 const SC_CODE_LENGTH: usize = 20;
 
-pub fn reconstruct(
+pub(crate) fn reconstruct(
     value: &[u8],
     hint: &ExprReconstructorHint,
     _context: &ReconstructorContext,
@@ -44,7 +44,10 @@ pub fn reconstruct(
     ValueSubTree::Str(str)
 }
 
-pub fn reconstruct_from_biguint(value: BigUint, context: &ReconstructorContext) -> ValueSubTree {
+pub(crate) fn reconstruct_from_biguint(
+    value: BigUint,
+    context: &ReconstructorContext,
+) -> ValueSubTree {
     reconstruct(
         &value.to_bytes_be(),
         &ExprReconstructorHint::UnsignedNumberHint,
@@ -52,7 +55,7 @@ pub fn reconstruct_from_biguint(value: BigUint, context: &ReconstructorContext) 
     )
 }
 
-pub fn reconstruct_from_u64(value: u64, context: &ReconstructorContext) -> ValueSubTree {
+pub(crate) fn reconstruct_from_u64(value: u64, context: &ReconstructorContext) -> ValueSubTree {
     reconstruct(
         &BigUint::from(value).to_bytes_be(),
         &ExprReconstructorHint::UnsignedNumberHint,
@@ -60,7 +63,7 @@ pub fn reconstruct_from_u64(value: u64, context: &ReconstructorContext) -> Value
     )
 }
 
-pub fn reconstruction_list(
+pub(crate) fn reconstruction_list(
     values: &[&[u8]],
     hint: &ExprReconstructorHint,
     context: &ReconstructorContext,
