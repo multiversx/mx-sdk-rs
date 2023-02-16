@@ -7,7 +7,7 @@ use crate::{
         contract_base::{CallableContractBuilder, ContractAbiProvider},
     },
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
-    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
+    scenario_format::interpret_trait::InterpreterContext,
 };
 use std::path::{Path, PathBuf};
 
@@ -60,7 +60,10 @@ impl ScenarioWorld {
         expression: &str,
         contract_container: ContractContainer,
     ) {
-        let contract_bytes = interpret_string(expression, &self.interpreter_context());
+        let contract_bytes = self
+            .interpreter_context()
+            .as_builder()
+            .interpret_string(expression);
         self.vm_runner
             .blockchain_mock
             .register_contract_container(contract_bytes, contract_container);

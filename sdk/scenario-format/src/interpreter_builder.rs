@@ -34,23 +34,3 @@ impl InterpreterBuilder {
         interpret_string(s, &self.context)
     }
 }
-
-pub trait InterpretableFrom<T> {
-    fn interpret_from(from: T, buider: &InterpreterBuilder) -> Self;
-}
-
-impl<T> InterpretableFrom<T> for T {
-    fn interpret_from(from: T, _buider: &InterpreterBuilder) -> Self {
-        from
-    }
-}
-
-impl<T: Clone> InterpretableFrom<&T> for T {
-    fn interpret_from(from: &T, _buider: &InterpreterBuilder) -> Self {
-        from.clone()
-    }
-}
-
-pub trait IntoRaw<R> {
-    fn into_raw(self) -> R;
-}

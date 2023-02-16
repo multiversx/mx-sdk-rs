@@ -1,5 +1,5 @@
 pub mod interpret_trait;
-pub mod interpretter_builder;
+pub mod interpreter_builder;
 pub mod reconstruct_trait;
 pub mod reconstructor_builder;
 pub mod serde_raw;

@@ -1,7 +1,4 @@
-use crate::scenario_format::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    value_interpreter::interpret_string,
-};
+use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw};
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
@@ -39,7 +36,7 @@ impl Ord for U64Key {
 
 impl InterpretableFrom<&str> for U64Key {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(from, context);
+        let bytes = context.as_builder().interpret_string(from);
         let bu = BigUint::from_bytes_be(&bytes);
         U64Key {
             value: bu.to_u64().unwrap(),

@@ -1,7 +1,6 @@
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
-    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use crate::multiversx_sc::api::ManagedTypeApi;
@@ -16,7 +15,7 @@ pub struct BigUintValue {
 
 impl InterpretableFrom<ValueSubTree> for BigUintValue {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
-        let bytes = interpret_subtree(&from, context);
+        let bytes = context.as_builder().interpret_subtree(&from);
         BigUintValue {
             value: BigUint::from_bytes_be(&bytes),
             original: from,
@@ -26,7 +25,7 @@ impl InterpretableFrom<ValueSubTree> for BigUintValue {
 
 impl InterpretableFrom<&str> for BigUintValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = interpret_string(from, context);
+        let bytes = context.as_builder().interpret_string(from);
         BigUintValue {
             value: BigUint::from_bytes_be(&bytes),
             original: ValueSubTree::Str(from.to_string()),
