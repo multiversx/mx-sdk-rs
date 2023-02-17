@@ -1,7 +1,10 @@
 use super::{value_from_slice, AddressValue};
 use crate::{
     multiversx_sc::types::Address,
-    scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        value_interpreter::interpret_string,
+    },
 };
 use std::{cmp::Ordering, fmt};
 
@@ -52,7 +55,7 @@ impl fmt::Display for AddressKey {
 
 impl InterpretableFrom<&str> for AddressKey {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_string(from);
+        let bytes = interpret_string(from, context);
         AddressKey {
             value: value_from_slice(bytes.as_slice()),
             original: from.to_string(),

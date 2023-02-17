@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::{interpreter_builder::InterpreterBuilder, value_interpreter::VMIdentifier};
+use crate::value_interpreter::VMIdentifier;
 
 #[derive(Default, Clone)]
 pub struct InterpreterContext {
@@ -13,15 +13,6 @@ impl InterpreterContext {
         InterpreterContext {
             context_path,
             vm_type,
-        }
-    }
-
-    pub fn builder() -> InterpreterBuilder {
-        InterpreterBuilder::default()
-    }
-    pub fn as_builder(&self) -> InterpreterBuilder {
-        InterpreterBuilder {
-            context: self.clone(),
         }
     }
 }

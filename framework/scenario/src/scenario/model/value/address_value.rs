@@ -5,6 +5,7 @@ use crate::multiversx_sc::types::Address;
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
+    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use super::AddressKey;
@@ -48,7 +49,7 @@ pub(crate) fn value_from_slice(slice: &[u8]) -> Address {
 
 impl InterpretableFrom<ValueSubTree> for AddressValue {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_subtree(&from);
+        let bytes = interpret_subtree(&from, context);
         AddressValue {
             value: value_from_slice(bytes.as_slice()),
             original: from,
@@ -58,7 +59,7 @@ impl InterpretableFrom<ValueSubTree> for AddressValue {
 
 impl InterpretableFrom<&str> for AddressValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_string(from);
+        let bytes = interpret_string(from, context);
         AddressValue {
             value: value_from_slice(bytes.as_slice()),
             original: ValueSubTree::Str(from.to_string()),

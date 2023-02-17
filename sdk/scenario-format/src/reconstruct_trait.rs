@@ -1,7 +1,5 @@
 use std::path::PathBuf;
 
-use crate::reconstructor_builder::ReconstructorBuilder;
-
 #[derive(Default)]
 pub struct ReconstructorContext {
     pub context_path: PathBuf,
@@ -10,9 +8,6 @@ pub struct ReconstructorContext {
 impl ReconstructorContext {
     pub fn new(context_path: PathBuf) -> Self {
         ReconstructorContext { context_path }
-    }
-    pub fn builder() -> ReconstructorBuilder {
-        ReconstructorBuilder::default()
     }
 }
 

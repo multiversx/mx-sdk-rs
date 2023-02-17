@@ -2,7 +2,7 @@ use crate::{interpret_trait::InterpreterContext, serde_raw::ValueSubTree};
 
 use super::{file_loader::load_file, functions::*, parse_num::*, prefixes::*};
 
-pub(crate) fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Vec<u8> {
+pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Vec<u8> {
     match vst {
         ValueSubTree::Str(s) => interpret_string(s, context),
         ValueSubTree::List(l) => {
@@ -22,7 +22,7 @@ pub(crate) fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext
     }
 }
 
-pub(crate) fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
+pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
     if s.is_empty() {
         return Vec::new();
     }

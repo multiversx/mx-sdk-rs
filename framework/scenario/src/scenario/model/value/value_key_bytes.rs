@@ -1,4 +1,7 @@
-use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw};
+use crate::scenario_format::{
+    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+    value_interpreter::interpret_string,
+};
 
 use std::{
     cmp::{Ord, Ordering},
@@ -48,7 +51,7 @@ impl Ord for BytesKey {
 
 impl InterpretableFrom<&str> for BytesKey {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_string(from);
+        let bytes = interpret_string(from, context);
         BytesKey {
             value: bytes,
             original: from.to_string(),
@@ -58,7 +61,7 @@ impl InterpretableFrom<&str> for BytesKey {
 
 impl InterpretableFrom<String> for BytesKey {
     fn interpret_from(from: String, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_string(&from);
+        let bytes = interpret_string(&from, context);
         BytesKey {
             value: bytes,
             original: from,

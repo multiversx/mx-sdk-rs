@@ -1,6 +1,7 @@
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
+    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use std::fmt;
@@ -25,7 +26,7 @@ impl BytesValue {
 impl InterpretableFrom<ValueSubTree> for BytesValue {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
         BytesValue {
-            value: context.as_builder().interpret_subtree(&from),
+            value: interpret_subtree(&from, context),
             original: from,
         }
     }
@@ -40,7 +41,7 @@ impl IntoRaw<ValueSubTree> for BytesValue {
 impl InterpretableFrom<&str> for BytesValue {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
         BytesValue {
-            value: context.as_builder().interpret_string(from),
+            value: interpret_string(from, context),
             original: ValueSubTree::Str(from.to_string()),
         }
     }
@@ -49,7 +50,7 @@ impl InterpretableFrom<&str> for BytesValue {
 impl InterpretableFrom<String> for BytesValue {
     fn interpret_from(from: String, context: &InterpreterContext) -> Self {
         BytesValue {
-            value: context.as_builder().interpret_string(from.as_str()),
+            value: interpret_string(from.as_str(), context),
             original: ValueSubTree::Str(from),
         }
     }

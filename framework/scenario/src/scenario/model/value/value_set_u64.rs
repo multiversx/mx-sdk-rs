@@ -1,6 +1,7 @@
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
+    value_interpreter::{interpret_string, interpret_subtree},
 };
 
 use num_bigint::BigUint;
@@ -37,7 +38,7 @@ impl Default for U64Value {
 
 impl InterpretableFrom<ValueSubTree> for U64Value {
     fn interpret_from(from: ValueSubTree, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_subtree(&from);
+        let bytes = interpret_subtree(&from, context);
         let bu = BigUint::from_bytes_be(&bytes);
         U64Value {
             value: bu.to_u64().unwrap(),
@@ -48,7 +49,7 @@ impl InterpretableFrom<ValueSubTree> for U64Value {
 
 impl InterpretableFrom<&str> for U64Value {
     fn interpret_from(from: &str, context: &InterpreterContext) -> Self {
-        let bytes = context.as_builder().interpret_string(from);
+        let bytes = interpret_string(from, context);
         let bu = BigUint::from_bytes_be(&bytes);
         U64Value {
             value: bu.to_u64().unwrap(),
