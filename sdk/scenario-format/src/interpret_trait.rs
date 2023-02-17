@@ -25,17 +25,17 @@ impl InterpreterContext {
 }
 
 pub trait InterpretableFrom<T> {
-    fn interpret_from(from: T, buider: &InterpreterContext) -> Self;
+    fn interpret_from(from: T, context: &InterpreterContext) -> Self;
 }
 
 impl<T> InterpretableFrom<T> for T {
-    fn interpret_from(from: T, _buider: &InterpreterContext) -> Self {
+    fn interpret_from(from: T, _context: &InterpreterContext) -> Self {
         from
     }
 }
 
 impl<T: Clone> InterpretableFrom<&T> for T {
-    fn interpret_from(from: &T, _buider: &InterpreterContext) -> Self {
+    fn interpret_from(from: &T, _context: &InterpreterContext) -> Self {
         from.clone()
     }
 }
