@@ -15,6 +15,13 @@ impl InterpreterContext {
             vm_type,
         }
     }
+
+    pub fn with_dir(self, context_path: PathBuf) -> Self {
+        InterpreterContext {
+            context_path,
+            ..self
+        }
+    }
 }
 
 pub trait InterpretableFrom<T> {
