@@ -9,11 +9,8 @@ pub struct InterpreterContext {
 }
 
 impl InterpreterContext {
-    pub fn new(context_path: PathBuf, vm_type: VMIdentifier) -> Self {
-        InterpreterContext {
-            context_path,
-            vm_type,
-        }
+    pub fn new() -> Self {
+        InterpreterContext::default()
     }
 
     pub fn with_dir(self, context_path: PathBuf) -> Self {

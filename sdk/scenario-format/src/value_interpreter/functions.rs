@@ -2,10 +2,9 @@ use crate::value_interpreter::*;
 use bech32::FromBase32;
 use sha3::{Digest, Keccak256};
 
-// SC_ADDRESS_NUM_LEADING_ZEROS is the number of zero bytes every smart contract address begins with.
 pub const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
 
-// SC_ADDRESS_RESERVED_PREFIX_LENGTH is the number of zero bytes every smart contract address begins with.
+// Represents the number of zero bytes every smart contract address begins with.
 // Its value is 10.
 // 10 = 8 zeros for all SC addresses + 2 zeros as placeholder for the VM type.
 pub const SC_ADDRESS_RESERVED_PREFIX_LENGTH: usize = SC_ADDRESS_NUM_LEADING_ZEROS + VM_TYPE_LENGTH;
