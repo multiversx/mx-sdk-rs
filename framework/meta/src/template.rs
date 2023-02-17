@@ -4,7 +4,7 @@ use reqwest::Client;
 use serde::{Deserialize, Serialize};
 
 const TEMPLATE_REPO_ROOT: &str =
-    "https://github.com/multiversx/mx-sdk-rs/tree/master/contracts/examples";
+    "https://github.com/multiversx/mx-sdk-rs/tree/master/contracts/examples/";
 
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -26,13 +26,6 @@ pub enum TemplateCliAction {
     Template(TemplateArgs),
 }
 
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct TemplateArgs {
-    /// Provide the name of the template you want to clone
-    #[arg(long = "name", verbatim_doc_comment)]
-    pub name: String,
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Template {}
 
@@ -44,11 +37,11 @@ pub struct TemplateResponse {
 }
 
 /// Entry point in the program when calling it as a standalone tool.
-pub async fn cli_main() {
+pub async fn cli_template() {
     let cli_args = TemplateCliArgs::parse();
     match &cli_args.command {
         Some(TemplateCliAction::Template(args)) => {
-            download_contract_template(args).await;
+            download_contract_template(args);
         },
         None => {},
     }
