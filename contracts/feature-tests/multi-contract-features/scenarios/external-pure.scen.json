@@ -3,12 +3,12 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:multi-contract-features": {
+                "sc:mcf": {
                     "nonce": "0",
                     "balance": "0",
                     "code": "file:../output/multi-contract-features.wasm"
                 },
-                "sc:multi-contract-features-view": {
+                "sc:mcf-view": {
                     "nonce": "0",
                     "balance": "0",
                     "code": "file:../output/multi-contract-features-view.wasm"
@@ -23,7 +23,7 @@
             "step": "scQuery",
             "id": "external-function-in-external-view",
             "tx": {
-                "to": "sc:multi-contract-features-view",
+                "to": "sc:mcf-view",
                 "function": "external_pure",
                 "arguments": []
             },
@@ -39,7 +39,7 @@
             "step": "scQuery",
             "id": "external-function-not-in-main",
             "tx": {
-                "to": "sc:multi-contract-features",
+                "to": "sc:mcf",
                 "function": "external_pure",
                 "arguments": []
             },
