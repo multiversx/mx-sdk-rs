@@ -8,7 +8,6 @@ use crate::multiversx_sc::{
         EsdtLocalRole,
     },
 };
-use multiversx_chain_scenario_format::value_interpreter::VMIdentifier;
 use num_traits::Zero;
 
 use crate::testing_framework::raw_converter::bytes_to_hex;

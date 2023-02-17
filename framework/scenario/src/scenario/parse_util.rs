@@ -1,5 +1,3 @@
-use multiversx_chain_scenario_format::value_interpreter::VMIdentifier;
-
 use crate::{
     scenario::model::Scenario,
     scenario_format::{
