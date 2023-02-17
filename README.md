@@ -35,4 +35,3 @@ A comprehensive build guide can be found here: https://docs.multiversx.com/devel
 # Debugging contracts
 
 The debugger guide: https://docs.multiversx.com/developers/developer-reference/sc-debugging/
-
