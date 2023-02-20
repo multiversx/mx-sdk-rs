@@ -7,12 +7,13 @@ use crate::{
     meta_all::call_all_meta,
     meta_info::call_info,
     sc_upgrade::upgrade_sc,
+    template::download_contract_template,
 };
 use clap::Parser;
 use multiversx_sc::contract_base::ContractAbiProvider;
 
 /// Entry point in the program when calling it as a standalone tool.
-pub fn cli_main_standalone() {
+pub async fn cli_main_standalone() {
     let cli_args = StandaloneCliArgs::parse();
     match &cli_args.command {
         Some(StandaloneCliAction::Info(args)) => call_info(args),
@@ -22,6 +23,9 @@ pub fn cli_main_standalone() {
         },
         Some(StandaloneCliAction::LocalDeps(args)) => {
             local_deps(args);
+        },
+        Some(StandaloneCliAction::Template(args)) => {
+            let _ = download_contract_template(args).await;
         },
         None => {},
     }

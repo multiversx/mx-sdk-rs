@@ -50,6 +50,12 @@ pub enum StandaloneCliAction {
         about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "template",
+        about = "Creates a contract by a pre-existing template"
+    )]
+    Template(TemplateArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -129,4 +135,17 @@ pub struct LocalDepsArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TemplateArgs {
+    /// Provide the name of the template you want to clone
+    #[arg(long = "name", verbatim_doc_comment)]
+    pub name: String,
+}
+
+impl CliArgsToRaw for TemplateArgs {
+    fn to_raw(&self) -> Vec<String> {
+        Vec::new()
+    }
 }
