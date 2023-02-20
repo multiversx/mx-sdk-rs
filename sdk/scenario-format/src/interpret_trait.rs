@@ -1,13 +1,23 @@
 use std::path::PathBuf;
 
-#[derive(Default)]
+use crate::value_interpreter::VMIdentifier;
+
+#[derive(Default, Clone)]
 pub struct InterpreterContext {
     pub context_path: PathBuf,
+    pub vm_type: VMIdentifier,
 }
 
 impl InterpreterContext {
-    pub fn new(context_path: PathBuf) -> Self {
-        InterpreterContext { context_path }
+    pub fn new() -> Self {
+        InterpreterContext::default()
+    }
+
+    pub fn with_dir(self, context_path: PathBuf) -> Self {
+        InterpreterContext {
+            context_path,
+            ..self
+        }
     }
 }
 

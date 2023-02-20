@@ -1,5 +1,3 @@
-use multiversx_chain_vm::DebugApi;
-
 use crate::{
     multiversx_chain_vm::world_mock::ContractContainer,
     multiversx_sc::{
@@ -9,6 +7,7 @@ use crate::{
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
 };
+use multiversx_chain_vm::DebugApi;
 use std::path::{Path, PathBuf};
 
 /// A facade for contracts tests.
@@ -52,7 +51,7 @@ impl ScenarioWorld {
     }
 
     pub fn interpreter_context(&self) -> InterpreterContext {
-        InterpreterContext::new(self.current_dir.clone())
+        InterpreterContext::default().with_dir(self.current_dir.clone())
     }
 
     pub fn register_contract_container(
