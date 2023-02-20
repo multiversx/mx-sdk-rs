@@ -14,3 +14,5 @@ jobs:
       attach_to_existing_release: false
       project_path: ./contracts/examples
       contract_name: multisig
+      # Workaround, since some test contracts do not have a "Cargo.lock"
+      skip_preliminary_checks: true
