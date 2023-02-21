@@ -21,8 +21,7 @@ pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwe
     download_binaries().await?;
     unzip_binaries();
 
-    let current_dir = env::current_dir().unwrap();
-    let local_path = Path::new(&current_dir).join("/").join(&args.name);
+    let local_path = Path::new("/").join(&args.name);
     copy_template_to_location(&args.name, &local_path);
     Ok(())
 }
@@ -53,5 +52,5 @@ pub fn copy_template_to_location(template: &str, location: &Path) {
     let contract_path = Path::new(&env::temp_dir())
         .join("mx-sdk-rs-master/contracts/examples/")
         .join(template);
-    copy_dir(&contract_path, location);
+    let _ = copy_dir(&contract_path, location);
 }
