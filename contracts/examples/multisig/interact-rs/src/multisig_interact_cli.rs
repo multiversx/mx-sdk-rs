@@ -1,33 +1,40 @@
-use clap::{Parser, Subcommand};
+use clap::{Args, Parser, Subcommand};
 
-/// TODO: Add docs
+/// Multisig Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
 #[command(version, about)]
 #[command(propagate_version = true)]
-pub struct InteractCliArgs {
+pub struct InteractCli {
     #[command(subcommand)]
-    pub command: Option<InteractCliAction>,
+    pub command: Option<InteractCliCommand>,
 }
 
-/// TODO: Add docs
+/// Multisig Interact CLI Commands
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
-pub enum InteractCliAction {
-    #[command(name = "board", about = "placeholder text for board")]
+pub enum InteractCliCommand {
+    #[command(name = "board", about = "Print board")]
     Board,
-    #[command(name = "deploy", about = "placeholder text for deploy")]
+    #[command(name = "deploy", about = "Deploy contract")]
     Deploy,
-    #[command(name = "dns-register", about = "placeholder text for dns-register")]
-    DnsRegister,
-    #[command(name = "feed", about = "placeholder text for feed")]
+    #[command(name = "dns-register", about = "Register DNS")]
+    DnsRegister(DnsRegisterArgs),
+    #[command(name = "feed", about = "Feed contract EGLD")]
     Feed,
-    #[command(name = "nft-full", about = "placeholder text for nft-full")]
+    #[command(name = "nft-full", about = "Issue multisig and collection")]
     NftFull,
-    #[command(name = "nft-issue", about = "placeholder text for nft-issue")]
+    #[command(name = "nft-issue", about = "Issue collection")]
     NftIssue,
-    #[command(name = "nft-items", about = "placeholder text for nft-items")]
+    #[command(name = "nft-items", about = "Create items")]
     NftItems,
-    #[command(name = "nft-special", about = "placeholder text for nft-special")]
+    #[command(name = "nft-special", about = "Set special role")]
     NftSpecial,
-    #[command(name = "quorum", about = "placeholder text for quorum")]
+    #[command(name = "quorum", about = "Print quorum")]
     Quorum,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct DnsRegisterArgs {
+    /// The name used for the registration (herotag)
+    #[arg(short = 'n', long = "name", verbatim_doc_comment)]
+    pub name: String,
 }

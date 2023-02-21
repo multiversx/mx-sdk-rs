@@ -28,6 +28,7 @@ const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+const SAVED_ADDRESS_FILE_NAME: &str = "multisig_address.txt";
 
 type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
@@ -38,34 +39,34 @@ async fn main() {
 
     let mut state = State::init().await;
 
-    let cli_args = multisig_interact_cli::InteractCliArgs::parse();
-    match &cli_args.command {
-        Some(multisig_interact_cli::InteractCliAction::Deploy) => {
-            state.deploy().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::Feed) => {
-            state.feed_contract_egld().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::NftFull) => {
-            state.issue_multisig_and_collection_full().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::NftIssue) => {
-            state.issue_collection().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::NftSpecial) => {
-            state.set_special_role().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::NftItems) => {
-            state.create_items().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::Quorum) => {
-            state.print_quorum().await;
-        },
-        Some(multisig_interact_cli::InteractCliAction::Board) => {
+    let cli = multisig_interact_cli::InteractCli::parse();
+    match &cli.command {
+        Some(multisig_interact_cli::InteractCliCommand::Board) => {
             state.print_board().await;
         },
-        Some(multisig_interact_cli::InteractCliAction::DnsRegister) => {
-            state.dns_register().await;
+        Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
+            state.deploy().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
+            state.dns_register(&args.name).await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Feed) => {
+            state.feed_contract_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
+            state.issue_multisig_and_collection_full().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
+            state.issue_collection().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftItems) => {
+            state.create_items().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftSpecial) => {
+            state.set_special_role().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
+            state.print_quorum().await;
         },
         None => {},
     }
@@ -169,9 +170,8 @@ impl State {
         }
     }
 
-    async fn dns_register(&mut self) {
-        let name = "placeholder";
-        let dns_address = dns_address_for_name(&name);
+    async fn dns_register(&mut self, name: &str) {
+        let dns_address = dns_address_for_name(name);
         let dns_register_call: ScCallStep = self
             .multisig
             .dns_register(dns_address, name)
@@ -182,8 +182,6 @@ impl State {
         self.interactor.sc_call(dns_register_call).await;
     }
 }
-
-const SAVED_ADDRESS_FILE_NAME: &str = "multisig_address.txt";
 
 fn load_address_expr() -> String {
     match std::fs::File::open(SAVED_ADDRESS_FILE_NAME) {
