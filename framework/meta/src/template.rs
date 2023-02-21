@@ -23,8 +23,13 @@ pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwe
     download_binaries().await?;
     unzip_binaries();
 
-    let local_path = Path::new("/").join(&args.name);
-    copy_template_to_location(&args.name, &local_path);
+    let local_path = Path::new(".")
+        .canonicalize()
+        .unwrap_or_else(|err| {
+            panic!("error canonicalizing input path: {err}",);
+        })
+        .join(&args.name);
+    copy_template_to_location(&args.name, Path::new(&local_path));
     Ok(())
 }
 
