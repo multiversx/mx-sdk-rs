@@ -35,7 +35,7 @@ pub async fn download_binaries() -> Result<(), reqwest::Error> {
     let path = tmp_dir.join(ZIP_NAME);
 
     let mut file = match File::create(Path::new(&path)) {
-        Err(why) => panic!("couldn't create {}", why),
+        Err(why) => panic!("couldn't create {why}"),
         Ok(file) => file,
     };
     file.write_all(&response).unwrap();
@@ -54,5 +54,5 @@ pub fn copy_template_to_location(template: &str, location: &Path) {
     let contract_path = Path::new(&env::temp_dir())
         .join(TEMPLATES_SUBDIRECTORY)
         .join(template);
-    let _ = copy_dir(&contract_path, location);
+    let _ = copy_dir(contract_path, location);
 }
