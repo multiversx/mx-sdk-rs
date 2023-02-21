@@ -22,7 +22,7 @@ pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwe
     unzip_binaries();
 
     let current_dir = env::current_dir().unwrap();
-    let local_path = Path::new(&current_dir);
+    let local_path = Path::new(&current_dir).join("/").join(&args.name);
     copy_template_to_location(&args.name, &local_path);
     Ok(())
 }
@@ -49,7 +49,9 @@ pub fn unzip_binaries() {
     zip.extract(Path::new(&tmp_dir)).unwrap();
 }
 
-pub fn copy_template_to_location(_template: &str, location: &Path) {
-    let contract_path = Path::new(&env::temp_dir()).join("./mx-sdk-rs-master/contracts/examples/");
-    let _ = copy_dir(&contract_path, location);
+pub fn copy_template_to_location(template: &str, location: &Path) {
+    let contract_path = Path::new(&env::temp_dir())
+        .join("mx-sdk-rs-master/contracts/examples/")
+        .join(template);
+    copy_dir(&contract_path, location);
 }
