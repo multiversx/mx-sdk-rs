@@ -1,23 +1,10 @@
-use std::{env, fs::File, io::Write, path::Path};
-
-use copy_dir::*;
-use serde::{Deserialize, Serialize};
-
 use crate::cli_args::TemplateArgs;
+use copy_dir::*;
+use std::{env, fs::File, io::Write, path::Path};
 
 const REPOSITORY: &str = "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip";
 const TEMPLATES_SUBDIRECTORY: &str = "mx-sdk-rs-master/contracts/examples/";
 const ZIP_NAME: &str = "./master.zip";
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Template {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TemplateResponse {
-    pub error: String,
-    pub code: String,
-    pub data: Option<Template>,
-}
 
 pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwest::Error> {
     download_binaries().await?;
