@@ -1,39 +1,50 @@
-use anyhow::{anyhow, Result};
-use reqwest::Client;
-use serde::{Deserialize, Serialize};
-
 use crate::cli_args::TemplateArgs;
+use copy_dir::*;
+use std::{env, fs::File, io::Write, path::Path};
 
-const TEMPLATE_REPO_ROOT: &str =
-    "https://github.com/multiversx/mx-sdk-rs/tree/master/contracts/examples/";
+const REPOSITORY: &str = "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip";
+const TEMPLATES_SUBDIRECTORY: &str = "mx-sdk-rs-master/contracts/examples/";
+const ZIP_NAME: &str = "./master.zip";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Template {}
+pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwest::Error> {
+    download_binaries().await?;
+    unzip_binaries();
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct TemplateResponse {
-    pub error: String,
-    pub code: String,
-    pub data: Option<Template>,
+    let local_path = Path::new(".")
+        .canonicalize()
+        .unwrap_or_else(|err| {
+            panic!("error canonicalizing input path: {err}",);
+        })
+        .join(&args.name);
+    copy_template_to_location(&args.name, Path::new(&local_path));
+    Ok(())
 }
 
-pub async fn download_contract_template(args: &TemplateArgs) -> Result<Template> {
-    let client = Client::new();
-    let resp = client
-        .get(get_template_location(args))
-        .send()
-        .await?
-        .json::<TemplateResponse>()
-        .await?;
+pub async fn download_binaries() -> Result<(), reqwest::Error> {
+    let response = reqwest::get(REPOSITORY).await?.bytes().await?;
 
-    match resp.data {
-        None => Err(anyhow!("{}", resp.error)),
-        Some(b) => Ok(b),
-    }
+    let tmp_dir = env::temp_dir();
+    let path = tmp_dir.join(ZIP_NAME);
+
+    let mut file = match File::create(Path::new(&path)) {
+        Err(why) => panic!("couldn't create {why}"),
+        Ok(file) => file,
+    };
+    file.write_all(&response).unwrap();
+    Ok(())
 }
 
-fn get_template_location(args: &TemplateArgs) -> String {
-    let mut location = TEMPLATE_REPO_ROOT.to_string();
-    location.push_str(&args.name);
-    location
+pub fn unzip_binaries() {
+    let tmp_dir = env::temp_dir();
+    let path = tmp_dir.join(ZIP_NAME);
+    let file = File::open(Path::new(&path)).unwrap();
+    let mut zip = zip::ZipArchive::new(file).unwrap();
+    zip.extract(Path::new(&tmp_dir)).unwrap();
+}
+
+pub fn copy_template_to_location(template: &str, location: &Path) {
+    let contract_path = Path::new(&env::temp_dir())
+        .join(TEMPLATES_SUBDIRECTORY)
+        .join(template);
+    let _ = copy_dir(contract_path, location);
 }
