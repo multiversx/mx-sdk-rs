@@ -1,11 +1,15 @@
 mod multisig_interact_cli;
+mod multisig_interact_config;
 mod multisig_interact_nfts;
+mod multisig_interact_state;
 
 use clap::Parser;
 use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
     multisig_state::ProxyTrait as _, ProxyTrait as _,
 };
+use multisig_interact_config::Config;
+use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
@@ -21,69 +25,46 @@ use multiversx_sc_snippets::{
     },
     tokio, Interactor,
 };
-use serde::{Deserialize, Serialize};
-use std::io::{Read, Write};
 
-const CONFIG_FILE_NAME: &str = "config.toml";
-const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-const STATE_FILE_NAME: &str = "state.toml";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-
-type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
 #[tokio::main]
 async fn main() {
     DebugApi::dummy();
     env_logger::init();
 
-    let mut msi = MultisigInteract::init().await;
+    let mut multisig_interact = MultisigInteract::init().await;
 
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(multisig_interact_cli::InteractCliCommand::Board) => {
-            msi.print_board().await;
+            multisig_interact.print_board().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
-            msi.deploy().await;
+            multisig_interact.deploy().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
-            msi.dns_register(&args.name).await;
+            multisig_interact.dns_register(&args.name).await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Feed) => {
-            msi.feed_contract_egld().await;
+            multisig_interact.feed_contract_egld().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
-            msi.issue_multisig_and_collection_full().await;
+            multisig_interact.issue_multisig_and_collection_full().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
-            msi.issue_collection().await;
+            multisig_interact.issue_collection().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftItems) => {
-            msi.create_items().await;
+            multisig_interact.create_items().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftSpecial) => {
-            msi.set_special_role().await;
+            multisig_interact.set_special_role().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
-            msi.print_quorum().await;
+            multisig_interact.print_quorum().await;
         },
         None => {},
-    }
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Config {
-    gateway: String,
-    pem: String,
-}
-
-impl Config {
-    fn load_config() -> Self {
-        let mut file = std::fs::File::open(CONFIG_FILE_NAME).unwrap();
-        let mut content = String::new();
-        file.read_to_string(&mut content).unwrap();
-        toml::from_str(&content).unwrap()
     }
 }
 
@@ -95,46 +76,12 @@ struct MultisigInteract {
     state: State,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct State {
-    multisig_address: Option<String>,
-}
-
-impl State {
-    fn load_state() -> Self {
-        let mut file = std::fs::File::open(STATE_FILE_NAME)
-            .unwrap_or(std::fs::File::create(STATE_FILE_NAME).unwrap());
-        let mut content = String::new();
-        file.read_to_string(&mut content).unwrap();
-        toml::from_str(&content).unwrap()
-    }
-
-    fn set_multisig_address(&mut self, address: &str) {
-        self.multisig_address = Some(String::from(address));
-    }
-
-    fn multisig(&self) -> MultisigContract {
-        match &self.multisig_address {
-            Some(address) => MultisigContract::new(address.clone()),
-            None => MultisigContract::new(DEFAULT_MULTISIG_ADDRESS_EXPR),
-        }
-    }
-}
-
-impl Drop for State {
-    fn drop(&mut self) {
-        let mut file = std::fs::File::create(STATE_FILE_NAME).unwrap();
-        file.write_all(toml::to_string(self).unwrap().as_bytes())
-            .unwrap();
-    }
-}
-
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(&config.gateway).await;
+        let mut interactor = Interactor::new(config.gateway()).await;
         let wallet_address =
-            interactor.register_wallet(Wallet::from_pem_file(&config.pem).unwrap());
+            interactor.register_wallet(Wallet::from_pem_file(config.pem()).unwrap());
         MultisigInteract {
             interactor,
             wallet_address,
