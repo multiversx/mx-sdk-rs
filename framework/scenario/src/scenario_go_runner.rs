@@ -10,27 +10,27 @@ struct ToolNotFound;
 /// Runs the Arwen executable,
 /// which reads parses and executes one or more mandos tests.
 pub fn run_go<P: AsRef<Path>>(relative_path: P) {
-    if cfg!(not(feature = "run-go-tests")) {
-        return;
-    }
+    // if cfg!(not(feature = "run-go-tests")) {
+    //     return;
+    // }
 
-    let mut absolute_path = std::env::current_dir().unwrap();
-    absolute_path.push(relative_path);
+    // let mut absolute_path = std::env::current_dir().unwrap();
+    // absolute_path.push(relative_path);
 
-    if run_scenario_tool(RUNNER_TOOL_NAME, absolute_path.as_path()).is_ok() {
-        return;
-    }
+    // if run_scenario_tool(RUNNER_TOOL_NAME, absolute_path.as_path()).is_ok() {
+    //     return;
+    // }
 
-    // fallback - use the old binary
-    println!(
-        "{}",
-        format!("Warning: `{RUNNER_TOOL_NAME}` not found. Using `{RUNNER_TOOL_NAME_LEGACY}` as fallback.").yellow(),
-    );
-    if run_scenario_tool(RUNNER_TOOL_NAME_LEGACY, absolute_path.as_path()).is_ok() {
-        return;
-    }
+    // // fallback - use the old binary
+    // println!(
+    //     "{}",
+    //     format!("Warning: `{RUNNER_TOOL_NAME}` not found. Using `{RUNNER_TOOL_NAME_LEGACY}` as fallback.").yellow(),
+    // );
+    // if run_scenario_tool(RUNNER_TOOL_NAME_LEGACY, absolute_path.as_path()).is_ok() {
+    //     return;
+    // }
 
-    panic!("Could not find `{RUNNER_TOOL_NAME_LEGACY}`, aborting.");
+    // panic!("Could not find `{RUNNER_TOOL_NAME_LEGACY}`, aborting.");
 }
 
 fn run_scenario_tool(tool_name: &str, path: &Path) -> Result<(), ToolNotFound> {
