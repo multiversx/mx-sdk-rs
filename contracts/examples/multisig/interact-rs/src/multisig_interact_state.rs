@@ -1,32 +1,36 @@
 use crate::{ContractInfo, DebugApi};
-use std::io::{Read, Write};
-
 use serde::{Deserialize, Serialize};
+use std::{
+    io::{Read, Write},
+    path::Path,
+};
 
-/// Default multisig address expr if None is set
-const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
+/// Default multisig address
+const DEFAULT_MULTISIG_ADDRESS: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
+pub type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
 /// Multisig Interact state
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
     multisig_address: Option<String>,
 }
 
 impl State {
-    // Loads state from file and deserializes it
-    // Creates file if it doesn't exist
+    // Deserealizes state from file
     pub fn load_state() -> Self {
-        let mut file =
-            std::fs::File::open(STATE_FILE).unwrap_or(std::fs::File::create(STATE_FILE).unwrap());
-        let mut content = String::new();
-        file.read_to_string(&mut content).unwrap();
-        toml::from_str(&content).unwrap()
+        if Path::new(STATE_FILE).exists() {
+            let mut file = std::fs::File::open(STATE_FILE).unwrap();
+            let mut content = String::new();
+            file.read_to_string(&mut content).unwrap();
+            toml::from_str(&content).unwrap()
+        } else {
+            Self::default()
+        }
     }
 
     /// Sets the multisig address
@@ -36,15 +40,17 @@ impl State {
 
     /// Returns the multisig contract
     pub fn multisig(&self) -> MultisigContract {
-        match &self.multisig_address {
-            Some(address) => MultisigContract::new(address.clone()),
-            None => MultisigContract::new(DEFAULT_MULTISIG_ADDRESS_EXPR),
-        }
+        MultisigContract::new(self.multisig_address.clone().unwrap())
+    }
+
+    /// Returns the multisig contract with default address
+    pub fn default_multisig(&self) -> MultisigContract {
+        MultisigContract::new(DEFAULT_MULTISIG_ADDRESS)
     }
 }
 
 impl Drop for State {
-    // Serializes state to file on drop
+    // Serializes state to file
     fn drop(&mut self) {
         let mut file = std::fs::File::create(STATE_FILE).unwrap();
         file.write_all(toml::to_string(self).unwrap().as_bytes())

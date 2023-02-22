@@ -1,8 +1,7 @@
+use serde::Deserialize;
 use std::io::Read;
 
-use serde::Deserialize;
-
-/// Configuration file
+/// Config file
 const CONFIG_FILE: &str = "config.toml";
 
 /// Multisig Interact configuration
@@ -13,7 +12,7 @@ pub struct Config {
 }
 
 impl Config {
-    // Loads configuration from file and deserializes it
+    // Deserealizes config from file
     pub fn load_config() -> Self {
         let mut file = std::fs::File::open(CONFIG_FILE).unwrap();
         let mut content = String::new();

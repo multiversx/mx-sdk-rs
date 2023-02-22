@@ -97,7 +97,7 @@ impl MultisigInteract {
             .interactor
             .sc_deploy(
                 self.state
-                    .multisig()
+                    .default_multisig()
                     .init(0usize, MultiValueVec::from([self.wallet_address.clone()]))
                     .into_blockchain_call()
                     .from(&self.wallet_address)
