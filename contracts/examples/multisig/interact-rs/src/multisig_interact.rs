@@ -1,4 +1,7 @@
+mod multisig_interact_cli;
 mod multisig_interact_nfts;
+
+use clap::Parser;
 use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
     multisig_state::ProxyTrait as _, ProxyTrait as _,
@@ -18,39 +21,54 @@ use multiversx_sc_snippets::{
     },
     tokio, Interactor,
 };
-use std::{
-    env::Args,
-    io::{Read, Write},
-};
+use std::io::{Read, Write};
 
 const GATEWAY: &str = multiversx_sc_snippets::erdrs::blockchain::TESTNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+const SAVED_ADDRESS_FILE_NAME: &str = "multisig_address.txt";
 
 type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
 #[tokio::main]
 async fn main() {
+    DebugApi::dummy();
     env_logger::init();
-    let _ = DebugApi::dummy();
 
-    let mut args = std::env::args();
-    let _ = args.next();
-    let cmd = args.next().expect("at least one argument required");
-    let mut state = State::init(args).await;
-    match cmd.as_str() {
-        "deploy" => state.deploy().await,
-        "feed" => state.feed_contract_egld().await,
-        "nft-full" => state.issue_multisig_and_collection_full().await,
-        "nft-issue" => state.issue_collection().await,
-        "nft-special" => state.set_special_role().await,
-        "nft-items" => state.create_items().await,
-        "quorum" => state.print_quorum().await,
-        "board" => state.print_board().await,
-        "dns-register" => state.dns_register().await,
-        _ => panic!("unknown command: {}", &cmd),
+    let mut state = State::init().await;
+
+    let cli = multisig_interact_cli::InteractCli::parse();
+    match &cli.command {
+        Some(multisig_interact_cli::InteractCliCommand::Board) => {
+            state.print_board().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
+            state.deploy().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
+            state.dns_register(&args.name).await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Feed) => {
+            state.feed_contract_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
+            state.issue_multisig_and_collection_full().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
+            state.issue_collection().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftItems) => {
+            state.create_items().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftSpecial) => {
+            state.set_special_role().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
+            state.print_quorum().await;
+        },
+        None => {},
     }
 }
 
@@ -60,12 +78,10 @@ struct State {
     multisig: MultisigContract,
     system_sc_address: Address,
     collection_token_identifier: String,
-    #[allow(dead_code)]
-    args: Args,
 }
 
 impl State {
-    async fn init(args: Args) -> Self {
+    async fn init() -> Self {
         let mut interactor = Interactor::new(GATEWAY).await;
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
         let multisig = MultisigContract::new(load_address_expr());
@@ -76,7 +92,6 @@ impl State {
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
             collection_token_identifier: multisig_interact_nfts::COLLECTION_TOKEN_IDENTIFIER
                 .to_string(),
-            args,
         }
     }
 
@@ -155,9 +170,8 @@ impl State {
         }
     }
 
-    async fn dns_register(&mut self) {
-        let name = self.args.next().expect("name argument missing");
-        let dns_address = dns_address_for_name(&name);
+    async fn dns_register(&mut self, name: &str) {
+        let dns_address = dns_address_for_name(name);
         let dns_register_call: ScCallStep = self
             .multisig
             .dns_register(dns_address, name)
@@ -168,8 +182,6 @@ impl State {
         self.interactor.sc_call(dns_register_call).await;
     }
 }
-
-const SAVED_ADDRESS_FILE_NAME: &str = "multisig_address.txt";
 
 fn load_address_expr() -> String {
     match std::fs::File::open(SAVED_ADDRESS_FILE_NAME) {
