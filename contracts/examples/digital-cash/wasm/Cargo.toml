@@ -15,7 +15,7 @@ members = [ ".",]
 
 [profile.release]
 codegen-units = 1
-opt-level = "z"
+opt-level = 3
 lto = true
 debug = false
 panic = "abort"
