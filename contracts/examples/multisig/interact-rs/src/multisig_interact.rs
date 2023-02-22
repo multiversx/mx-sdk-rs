@@ -21,6 +21,7 @@ use multiversx_sc_snippets::{
     },
     tokio, Interactor,
 };
+use serde::{Deserialize, Serialize};
 use std::io::{Read, Write};
 
 const GATEWAY: &str = multiversx_sc_snippets::erdrs::blockchain::TESTNET_GATEWAY;
@@ -28,7 +29,7 @@ const PEM: &str = "alice.pem";
 const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-const SAVED_ADDRESS_FILE_NAME: &str = "multisig_address.txt";
+const CONFIG_FILE_NAME: &str = "config.toml";
 
 type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
 
@@ -72,6 +73,39 @@ async fn main() {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct Config {
+    pub multisig_address: String,
+}
+
+impl Config {
+    fn new() -> Self {
+        Config {
+            multisig_address: DEFAULT_MULTISIG_ADDRESS_EXPR.to_string(),
+        }
+    }
+
+    fn load_config() -> Self {
+        let file = std::fs::File::open(CONFIG_FILE_NAME);
+        match file {
+            Ok(mut file) => {
+                let mut content = String::new();
+                file.read_to_string(&mut content).unwrap();
+                let config: Config = toml::from_str(&content).unwrap();
+                println!("config: {:#?}", config);
+                config
+            },
+            Err(_) => Self::new(),
+        }
+    }
+
+    fn save_config(config: &Self) {
+        let mut file = std::fs::File::create(CONFIG_FILE_NAME).unwrap();
+        file.write_all(toml::to_string(config).unwrap().as_bytes())
+            .unwrap();
+    }
+}
+
 struct State {
     interactor: Interactor,
     wallet_address: Address,
@@ -82,9 +116,10 @@ struct State {
 
 impl State {
     async fn init() -> Self {
+        let config = Config::load_config();
         let mut interactor = Interactor::new(GATEWAY).await;
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
-        let multisig = MultisigContract::new(load_address_expr());
+        let multisig = MultisigContract::new(config.multisig_address.clone());
         State {
             interactor,
             wallet_address,
@@ -116,8 +151,11 @@ impl State {
         let new_address_bech32 = bech32::encode(&new_address);
         println!("new address: {new_address_bech32}");
         let new_address_expr = format!("bech32:{new_address_bech32}");
-        save_address_expr(new_address_expr.as_str());
-        self.multisig = MultisigContract::new(new_address_expr);
+        self.multisig = MultisigContract::new(new_address_expr.clone());
+
+        let mut config = Config::load_config();
+        config.multisig_address = new_address_expr.clone();
+        Config::save_config(&config);
     }
 
     async fn feed_contract_egld(&mut self) {
@@ -181,20 +219,4 @@ impl State {
             .into();
         self.interactor.sc_call(dns_register_call).await;
     }
-}
-
-fn load_address_expr() -> String {
-    match std::fs::File::open(SAVED_ADDRESS_FILE_NAME) {
-        Ok(mut file) => {
-            let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
-            contents
-        },
-        Err(_) => DEFAULT_MULTISIG_ADDRESS_EXPR.to_string(),
-    }
-}
-
-fn save_address_expr(address_expr: &str) {
-    let mut file = std::fs::File::create(SAVED_ADDRESS_FILE_NAME).unwrap();
-    file.write_all(address_expr.as_bytes()).unwrap();
 }
