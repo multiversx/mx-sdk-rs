@@ -21,7 +21,7 @@ pub struct State {
 }
 
 impl State {
-    // Deserealizes state from file
+    // Deserializes state from file
     pub fn load_state() -> Self {
         if Path::new(STATE_FILE).exists() {
             let mut file = std::fs::File::open(STATE_FILE).unwrap();
