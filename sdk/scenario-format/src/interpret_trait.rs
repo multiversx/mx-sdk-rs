@@ -6,6 +6,7 @@ use crate::value_interpreter::VMIdentifier;
 pub struct InterpreterContext {
     pub context_path: PathBuf,
     pub vm_type: VMIdentifier,
+    pub allow_missing_files: bool,
 }
 
 impl InterpreterContext {
@@ -16,6 +17,13 @@ impl InterpreterContext {
     pub fn with_dir(self, context_path: PathBuf) -> Self {
         InterpreterContext {
             context_path,
+            ..self
+        }
+    }
+
+    pub fn with_allowed_missing_files(self) -> Self {
+        InterpreterContext {
+            allow_missing_files: true,
             ..self
         }
     }
