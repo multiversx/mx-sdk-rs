@@ -54,7 +54,6 @@ struct State {
     vault: VaultContract,
     forwarder_raw: ForwarderRawContract,
     promises: PromisesContract,
-    system_sc_address: Address,
 }
 
 impl State {
@@ -71,7 +70,6 @@ impl State {
             vault,
             forwarder_raw,
             promises,
-            system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
         }
     }
 
