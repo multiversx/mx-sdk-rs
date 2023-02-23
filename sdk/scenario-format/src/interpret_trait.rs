@@ -21,9 +21,9 @@ impl InterpreterContext {
         }
     }
 
-    pub fn with_missing_files(self, allow_missing_files: bool) -> Self {
+    pub fn with_allow_missing_files(self) -> Self {
         InterpreterContext {
-            allow_missing_files,
+            allow_missing_files: true,
             ..self
         }
     }
