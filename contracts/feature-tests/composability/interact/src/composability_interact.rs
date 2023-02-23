@@ -4,7 +4,7 @@ use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
     erdrs::wallet::Wallet,
-    multiversx_sc::{codec::multi_types::{OptionalValue}, types::{Address, CodeMetadata}},
+    multiversx_sc::{codec::multi_types::{OptionalValue}, types::{Address, CodeMetadata, BoxedBytes}},
     multiversx_sc_scenario::{bech32, ContractInfo, DebugApi, scenario_model::{TxExpect, IntoBlockchainCall}, scenario_format::interpret_trait::InterpreterContext},
     tokio, Interactor,
 };
@@ -55,7 +55,6 @@ struct State {
     forwarder_raw: ForwarderRawContract,
     promises: PromisesContract,
     system_sc_address: Address,
-    collection_token_identifier: String,
 }
 
 impl State {
@@ -73,16 +72,15 @@ impl State {
             forwarder_raw,
             promises,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
-            collection_token_identifier: "".to_owned(),
         }
     }
 
     async fn deploy_vault(&mut self) {
-        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
+        let deploy_result: multiversx_sc_snippets::InteractorResult<OptionalValue<BoxedBytes>> = self
             .interactor
             .sc_deploy(
                 self.vault
-                    .init(OptionalValue::None)
+                    .init(OptionalValue::<BoxedBytes>::None)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
@@ -124,7 +122,7 @@ impl State {
         println!("Forwarder Raw address: {new_address_bech32}");
         let new_address_expr = format!("bech32:{new_address_bech32}");
         save_address_expr(new_address_expr.as_str());
-        self.vault = VaultContract::new(new_address_expr);
+        self.forwarder_raw = ForwarderRawContract::new(new_address_expr);
     }
 
     async fn deploy_promises(&mut self) {
@@ -149,7 +147,7 @@ impl State {
         println!("Promises address: {new_address_bech32}");
         let new_address_expr = format!("bech32:{new_address_bech32}");
         save_address_expr(new_address_expr.as_str());
-        self.vault = VaultContract::new(new_address_expr);
+        self.promises = PromisesContract::new(new_address_expr);
     }
 
 }
