@@ -28,7 +28,7 @@ fn test_scenario_low_to_high_ser_de() {
     let scenario_raw = ScenarioRaw::from_json_str(example_raw.as_str());
     let scenario = Scenario::interpret_from(
         scenario_raw,
-        &InterpreterContext::default().with_allow_missing_files(),
+        &InterpreterContext::default().with_allowed_missing_files(),
     );
 
     let scenario_raw_re = scenario.into_raw();
@@ -46,7 +46,7 @@ fn test_scenario_high_to_high_ser_de() {
     let scenario_raw = ScenarioRaw::from_json_str(example_normalized.as_str());
     let scenario = Scenario::interpret_from(
         scenario_raw,
-        &InterpreterContext::default().with_allow_missing_files(),
+        &InterpreterContext::default().with_allowed_missing_files(),
     );
 
     let scenario_raw_re = scenario.into_raw();

@@ -239,7 +239,7 @@ impl BlockchainStateWrapper {
         let contract_bytes = crate::scenario_format::value_interpreter::interpret_string(
             &wasm_full_path_as_expr,
             &crate::scenario_format::interpret_trait::InterpreterContext::default()
-                .with_allow_missing_files(),
+                .with_allowed_missing_files(),
         );
 
         let wasm_relative_path_expr = "file:".to_owned() + path_str;
