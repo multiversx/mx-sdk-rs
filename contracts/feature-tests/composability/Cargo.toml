@@ -26,6 +26,9 @@ path = "recursive-caller"
 [dev-dependencies.vault]
 path = "vault"
 
+[dev-dependencies.interact]
+path = "interact"
+
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.39.5"
 path = "../../../framework/scenario"
