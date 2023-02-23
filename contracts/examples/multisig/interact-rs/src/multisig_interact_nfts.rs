@@ -13,7 +13,7 @@ const NUM_ITEMS: usize = 3;
 const ROYALTIES: usize = 3000;
 const METADATA: &str = "tags:test,rust-interactor";
 
-impl State {
+impl MultisigInteract {
     pub async fn issue_multisig_and_collection_full(&mut self) {
         self.deploy().await;
         self.feed_contract_egld().await;
@@ -28,7 +28,8 @@ impl State {
         let result = self
             .interactor
             .sc_call_get_result(
-                self.multisig
+                self.state
+                    .multisig()
                     .propose_async_call(
                         system_sc_address,
                         ISSUE_COST,
@@ -60,11 +61,12 @@ impl State {
     }
 
     pub async fn propose_set_special_role(&mut self) -> usize {
-        let multisig_address = self.multisig.to_address();
+        let multisig_address = self.state.multisig().to_address();
         let result = self
             .interactor
             .sc_call_get_result(
-                self.multisig
+                self.state
+                    .multisig()
                     .propose_async_call(
                         &self.system_sc_address,
                         0u64,
@@ -92,7 +94,7 @@ impl State {
 
     pub async fn create_items(&mut self) {
         let mut last_index = self.get_action_last_index().await;
-        let multisig_address = self.multisig.to_address();
+        let multisig_address = self.state.multisig().to_address();
 
         let mut steps = Vec::<ScCallStep>::new();
         for item_index in 0..NUM_ITEMS {
@@ -102,7 +104,8 @@ impl State {
             );
 
             steps.push(
-                self.multisig
+                self.state
+                    .multisig()
                     .propose_async_call(
                         &multisig_address,
                         0u64,
