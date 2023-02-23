@@ -13,7 +13,7 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
         if context.allow_missing_files {
             missing_file_value(&path_buf)
         } else {
-            panic!("not found: {:?}", path_buf)
+            panic!("not found: {path_buf:#?}")
         }
     })
 }
