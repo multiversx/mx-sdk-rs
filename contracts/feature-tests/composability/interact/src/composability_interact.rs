@@ -1,7 +1,6 @@
 mod composability_interact_cli;
 
 use clap::Parser;
-use forwarder_raw::ProxyTrait;
 use multiversx_sc_snippets::{
     env_logger,
     erdrs::wallet::Wallet,
@@ -9,7 +8,8 @@ use multiversx_sc_snippets::{
     multiversx_sc_scenario::{bech32, ContractInfo, DebugApi, scenario_model::{TxExpect, IntoBlockchainCall}, scenario_format::interpret_trait::InterpreterContext},
     tokio, Interactor,
 };
-use vault::ProxyTrait;
+use forwarder_raw::ProxyTrait as ForwarderRawProxyTrait;
+use vault::ProxyTrait as VaultProxyTrait;
 
 
 use std::io::{Read, Write};
