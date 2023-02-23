@@ -1,3 +1,2 @@
-testnet-gateway = 'https://testnet-gateway.multiversx.com'
-devnet-gateway = 'https://devnet-gateway.multiversx.com'
+gateway = 'https://testnet-gateway.multiversx.com'
 pem = "alice.pem"
