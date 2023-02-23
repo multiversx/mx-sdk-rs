@@ -9,6 +9,7 @@ use multiversx_sc_snippets::{
     tokio, Interactor,
 };
 use forwarder_raw::ProxyTrait as ForwarderRawProxyTrait;
+use promises_features::ProxyTrait as PromisesProxyTrait;
 use vault::ProxyTrait as VaultProxyTrait;
 
 
@@ -23,6 +24,7 @@ const SAVED_ADDRESS_FILE_NAME: &str = "composability_address.txt";
 
 type VaultContract = ContractInfo<vault::Proxy<DebugApi>>;
 type ForwarderRawContract = ContractInfo<forwarder_raw::Proxy<DebugApi>>;
+type PromisesContract = ContractInfo<promises_features::Proxy<DebugApi>>;
 
 #[tokio::main]
 async fn main() {
@@ -39,6 +41,9 @@ async fn main() {
         Some(composability_interact_cli::InteractCliCommand::DeployForwarderRaw) => {
             state.deploy_forwarder_raw().await;
         },
+        Some(composability_interact_cli::InteractCliCommand::DeployPromises) => {
+            state.deploy_promises().await;
+        },
         None => {},
     }
 }
@@ -48,6 +53,7 @@ struct State {
     wallet_address: Address,
     vault: VaultContract,
     forwarder_raw: ForwarderRawContract,
+    promises: PromisesContract,
     system_sc_address: Address,
     collection_token_identifier: String,
 }
@@ -58,11 +64,14 @@ impl State {
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
         let vault = VaultContract::new(load_address_expr());
         let forwarder_raw = ForwarderRawContract::new(load_address_expr());
+        let promises = PromisesContract::new(load_address_expr());
+
         State {
             interactor,
             wallet_address,
             vault,
             forwarder_raw,
+            promises,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
             collection_token_identifier: "".to_owned(),
         }
@@ -113,6 +122,31 @@ impl State {
         let new_address = deploy_result.new_deployed_address();
         let new_address_bech32 = bech32::encode(&new_address);
         println!("Forwarder Raw address: {new_address_bech32}");
+        let new_address_expr = format!("bech32:{new_address_bech32}");
+        save_address_expr(new_address_expr.as_str());
+        self.vault = VaultContract::new(new_address_expr);
+    }
+
+    async fn deploy_promises(&mut self) {
+        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
+            .interactor
+            .sc_deploy(
+                self.promises
+                    .init()
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .code_metadata(CodeMetadata::all())
+                    .contract_code(
+                        "file:../../promises/output/promises.wasm",
+                        &InterpreterContext::default(),
+                    )
+                    .gas_limit("70,000,000")
+                    .expect(TxExpect::ok()),
+            )
+            .await;
+        let new_address = deploy_result.new_deployed_address();
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!("Promises address: {new_address_bech32}");
         let new_address_expr = format!("bech32:{new_address_bech32}");
         save_address_expr(new_address_expr.as_str());
         self.vault = VaultContract::new(new_address_expr);

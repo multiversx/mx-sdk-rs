@@ -16,4 +16,6 @@ pub enum InteractCliCommand {
     DeployVault,
     #[command(name = "deploy-forwarder-raw", about = "Deploy ForwarderRaw contract")]
     DeployForwarderRaw,
+    #[command(name = "deploy-promises", about = "Deploy Promises contract")]
+    DeployPromises,
 }
