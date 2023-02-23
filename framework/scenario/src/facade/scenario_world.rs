@@ -51,7 +51,9 @@ impl ScenarioWorld {
     }
 
     pub fn interpreter_context(&self) -> InterpreterContext {
-        InterpreterContext::default().with_dir(self.current_dir.clone())
+        InterpreterContext::default()
+            .with_dir(self.current_dir.clone())
+            .with_missing_files(true)
     }
 
     pub fn register_contract_container(
