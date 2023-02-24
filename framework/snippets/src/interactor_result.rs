@@ -44,6 +44,8 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
     }
 
     pub fn value(&self) -> Result<T, TxError> {
+        self.handle_signal_error_event()?;
+
         let first_scr = self.scrs.get(0);
         if first_scr.is_none() {
             return Err(TxError {
