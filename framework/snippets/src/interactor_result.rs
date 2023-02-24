@@ -52,9 +52,9 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
 
     // Returns the address of the newly deployed smart contract.
     pub fn new_deployed_address(&self) -> Address {
-        self.handle_signal_error();
+        self.handle_signal_error_event();
 
-        let topics = self.sc_deploy_topics();
+        let topics = self.handle_sc_deploy_event();
         let address_raw = base64::decode(topics.get(0).unwrap()).unwrap();
         let address = Address::from_slice(address_raw.as_slice());
 
@@ -64,13 +64,13 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
 
     // Returns the token identifier of the newly issued non-fungible token.
     pub fn issue_non_fungible_new_token_identifier(&self) -> String {
-        self.handle_signal_error();
+        self.handle_signal_error_event();
 
         let second_scr = self
             .scrs
             .iter()
             .find(|scr| scr.data.starts_with("@00@"))
-            .expect("no token identifier SCR found");
+            .unwrap_or_else(|| panic!("no token identifier SCR found"));
         let encoded_tid = second_scr
             .data
             .split('@')
@@ -81,9 +81,12 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
     }
 
     // Handles a signalError event, if present.
-    fn handle_signal_error(&self) {
+    fn handle_signal_error_event(&self) {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
-            let topics = event.topics.as_ref().expect("missing topics");
+            let topics = event
+                .topics
+                .as_ref()
+                .unwrap_or_else(|| panic!("missing topics"));
             assert_eq!(
                 topics.len(),
                 2,
@@ -95,11 +98,15 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         }
     }
 
-    fn sc_deploy_topics(&self) -> &Vec<String> {
+    // Handles a scDeploy event, if present and returns topics.
+    fn handle_sc_deploy_event(&self) -> &Vec<String> {
         let event = self
             .find_log(LOG_IDENTIFIER_SC_DEPLOY)
-            .expect(format!("`{LOG_IDENTIFIER_SC_DEPLOY}` event log not found").as_str());
-        let topics = event.topics.as_ref().expect("missing topics");
+            .unwrap_or_else(|| panic!("`{LOG_IDENTIFIER_SC_DEPLOY}` event log not found"));
+        let topics = event
+            .topics
+            .as_ref()
+            .unwrap_or_else(|| panic!("missing topics"));
         assert_eq!(
             topics.len(),
             2,
