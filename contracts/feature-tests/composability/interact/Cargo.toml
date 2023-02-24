@@ -11,6 +11,8 @@ path = "src/composability_interact.rs"
 
 [dependencies]
 clap = { version = "4.1.0", features = ["derive", "cargo"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.7.2"
 
 [dependencies.vault]
 path = "../vault"
