@@ -119,6 +119,19 @@ where
     }
 }
 
+impl<'a, E, const CAPACITY: usize> IntoIterator for &'a SparseArray<E, CAPACITY>
+where
+    E: ErrorApi,
+{
+    type Item = <Self::IntoIter as Iterator>::Item;
+
+    type IntoIter = SparseArrayIterator<'a, E, CAPACITY>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 pub struct SparseArrayIterator<'a, E, const CAPACITY: usize>
 where
     E: ErrorApi,
