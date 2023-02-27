@@ -142,7 +142,7 @@ impl ComposabilityInteract {
     }
 
     // SYNC CALL
-    #[warn(dead_code)]
+    #[allow(dead_code)]
     async fn echo_caller(&mut self, gas_expr: &str) {
         let echo_caller_call: ScCallStep = self
             .state
@@ -157,7 +157,7 @@ impl ComposabilityInteract {
     }
 
     // ASYNC CALL
-    #[warn(dead_code)]
+    #[allow(dead_code)]
     pub async fn forward_payment(&mut self, to: Address) {
         let tx_hash = self
             .interactor

@@ -9,7 +9,6 @@ const CONFIG_FILE: &str = "config.toml";
 pub struct Config {
     gateway: String,
     alice_pem: String,
-    bob_pem: String,
 }
 
 impl Config {
@@ -29,10 +28,5 @@ impl Config {
     // Returns Alice's pem
     pub fn alice_pem(&self) -> &str {
         &self.alice_pem
-    }
-
-    // Returns Bob's pem
-    pub fn bob_pem(&self) -> &str {
-        &self.bob_pem
     }
 }
