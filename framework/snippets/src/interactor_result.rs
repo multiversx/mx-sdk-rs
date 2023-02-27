@@ -36,7 +36,7 @@ pub struct InteractorResult<T: TopDecodeMulti> {
 
 impl<T: TopDecodeMulti> InteractorResult<T> {
     pub fn new(tx: TransactionOnNetwork) -> Self {
-        println!("tx: {:#?}", tx);
+        println!("tx: {tx:#?}");
         Self {
             logs: tx.logs,
             scrs: tx.smart_contract_results.unwrap_or_default(),
