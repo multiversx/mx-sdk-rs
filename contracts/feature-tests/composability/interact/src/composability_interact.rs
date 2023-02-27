@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
     multiversx_sc_scenario::{
         bech32,
         scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::{IntoBlockchainCall, TxExpect},
+        scenario_model::{IntoBlockchainCall, ScCallStep, TxExpect},
         ContractInfo, DebugApi,
     },
     tokio, Interactor,
@@ -57,7 +57,7 @@ impl ComposabilityInteract {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway()).await;
         let wallet_address =
-            interactor.register_wallet(Wallet::from_pem_file(config.pem()).unwrap());
+            interactor.register_wallet(Wallet::from_pem_file(config.alice_pem()).unwrap());
 
         ComposabilityInteract {
             interactor,
@@ -140,4 +140,41 @@ impl ComposabilityInteract {
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_promises_address(&new_address_expr);
     }
+
+    // SYNC CALL
+    #[warn(dead_code)]
+    async fn echo_caller_step(&mut self, gas_expr: &str) {
+        let echo_caller_call: ScCallStep = self
+            .state
+            .vault()
+            .echo_caller()
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit(gas_expr)
+            .into();
+
+        self.interactor.sc_call(echo_caller_call).await;
+    }
+
+    // ASYNC CALL
+    #[warn(dead_code)]
+    pub async fn forward_payment(&mut self, to: Address) {
+        let tx_hash = self
+            .interactor
+            .sc_call(
+                self.state
+                    .forwarder_raw()
+                    .forward_payment(to)
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit("10,000,000")
+                    .expect(TxExpect::ok()),
+            )
+            .await;
+
+        println!("forward payment tx hash: {}", tx_hash);
+    }
+
+    // SYNC CALLS
+    //echo_caller
 }

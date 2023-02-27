@@ -51,12 +51,12 @@ impl State {
     }
 
     /// Returns the vault contract
-    pub fn _vault(&self) -> VaultContract {
+    pub fn vault(&self) -> VaultContract {
         VaultContract::new(self.vault_address.clone().unwrap())
     }
 
     /// Returns the forwarder-raw contract
-    pub fn _forwarder_raw(&self) -> ForwarderRawContract {
+    pub fn forwarder_raw(&self) -> ForwarderRawContract {
         ForwarderRawContract::new(self.forwarder_raw_address.clone().unwrap())
     }
 
