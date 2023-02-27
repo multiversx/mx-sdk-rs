@@ -2,6 +2,7 @@ mod multisig_interact_cli;
 mod multisig_interact_config;
 mod multisig_interact_nfts;
 mod multisig_interact_state;
+mod multisig_interact_wegld;
 
 use clap::Parser;
 use multisig::{
@@ -63,6 +64,9 @@ async fn main() {
         },
         Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
             multisig_interact.print_quorum().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
+            multisig_interact.wrap_egld().await;
         },
         None => {},
     }
