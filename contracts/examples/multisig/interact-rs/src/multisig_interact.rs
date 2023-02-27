@@ -110,9 +110,16 @@ impl MultisigInteract {
                     .expect(TxExpect::ok()),
             )
             .await;
-        let new_address = deploy_result.new_deployed_address();
-        let new_address_bech32 = bech32::encode(&new_address);
+
+        let result = deploy_result.new_deployed_address();
+        if result.is_err() {
+            println!("deploy failed: {}", result.err().unwrap());
+            return;
+        }
+
+        let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("new address: {new_address_bech32}");
+
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_multisig_address(&new_address_expr);
     }

@@ -23,7 +23,7 @@ impl MultisigInteract {
         self.create_items().await;
     }
 
-    pub async fn propose_issue_collection(&mut self) -> usize {
+    pub async fn propose_issue_collection(&mut self) -> Option<usize> {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let result = self
             .interactor
@@ -45,22 +45,40 @@ impl MultisigInteract {
                     .expect(TxExpect::ok()),
             )
             .await;
-        result.value()
+
+        let result = result.value();
+        if result.is_err() {
+            println!("propose issue collection failed: {}", result.err().unwrap());
+            return None;
+        }
+        Some(result.unwrap())
     }
 
     pub async fn issue_collection(&mut self) {
         let action_id = self.propose_issue_collection().await;
+        if action_id.is_none() {
+            return;
+        }
+
+        let action_id = action_id.unwrap();
         println!("propose issue collection: {action_id}");
+
         let step = self.perform_action_step(action_id, "80,000,000");
         let raw_result = self.interactor.sc_call_get_raw_result(step).await;
-        self.collection_token_identifier = raw_result.issue_non_fungible_new_token_identifier();
+        let result = raw_result.issue_non_fungible_new_token_identifier();
+        if result.is_err() {
+            println!("perform issue collection failed: {}", result.err().unwrap());
+            return;
+        }
+
+        self.collection_token_identifier = result.unwrap();
         println!(
             "perform issue collection: {}; collection token identifier: {}",
             action_id, self.collection_token_identifier
         );
     }
 
-    pub async fn propose_set_special_role(&mut self) -> usize {
+    pub async fn propose_set_special_role(&mut self) -> Option<usize> {
         let multisig_address = self.state.multisig().to_address();
         let result = self
             .interactor
@@ -82,12 +100,24 @@ impl MultisigInteract {
                     .gas_limit("10,000,000"),
             )
             .await;
-        result.value()
+
+        let result = result.value();
+        if result.is_err() {
+            println!("propose set special role failed: {}", result.err().unwrap());
+            return None;
+        }
+        Some(result.unwrap())
     }
 
     pub async fn set_special_role(&mut self) {
         let action_id = self.propose_set_special_role().await;
+        if action_id.is_none() {
+            return;
+        }
+
+        let action_id = action_id.unwrap();
         println!("propose set special role: {action_id}");
+
         self.perform_action(action_id, "80,000,000").await;
         println!("perform set special role: {action_id}");
     }
