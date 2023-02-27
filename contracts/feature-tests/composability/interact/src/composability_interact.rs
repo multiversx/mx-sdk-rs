@@ -143,7 +143,7 @@ impl ComposabilityInteract {
 
     // SYNC CALL
     #[warn(dead_code)]
-    async fn echo_caller_step(&mut self, gas_expr: &str) {
+    async fn echo_caller(&mut self, gas_expr: &str) {
         let echo_caller_call: ScCallStep = self
             .state
             .vault()
