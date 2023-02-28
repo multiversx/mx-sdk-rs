@@ -48,33 +48,43 @@ impl MultisigInteract {
 
         let result = result.value();
         if result.is_err() {
-            println!("propose issue collection failed: {}", result.err().unwrap());
+            println!(
+                "propose issue collection failed with: {}",
+                result.err().unwrap()
+            );
             return None;
         }
-        Some(result.unwrap())
+
+        let action_id = result.unwrap();
+        println!("successfully proposed issue colllection action `{action_id}`");
+        Some(action_id)
     }
 
     pub async fn issue_collection(&mut self) {
+        println!("proposing issue collection...");
         let action_id = self.propose_issue_collection().await;
         if action_id.is_none() {
             return;
         }
 
         let action_id = action_id.unwrap();
-        println!("propose issue collection: {action_id}");
+        println!("perfoming issue collection action `{action_id}`...");
 
         let step = self.perform_action_step(action_id, "80,000,000");
         let raw_result = self.interactor.sc_call_get_raw_result(step).await;
         let result = raw_result.issue_non_fungible_new_token_identifier();
         if result.is_err() {
-            println!("perform issue collection failed: {}", result.err().unwrap());
+            println!(
+                "perform issue collection failed with: {}",
+                result.err().unwrap()
+            );
             return;
         }
 
         self.collection_token_identifier = result.unwrap();
         println!(
-            "perform issue collection: {}; collection token identifier: {}",
-            action_id, self.collection_token_identifier
+            "collection token identifier: {}",
+            self.collection_token_identifier
         );
     }
 
@@ -103,23 +113,28 @@ impl MultisigInteract {
 
         let result = result.value();
         if result.is_err() {
-            println!("propose set special role failed: {}", result.err().unwrap());
+            println!(
+                "propose set special role failed with: {}",
+                result.err().unwrap()
+            );
             return None;
         }
-        Some(result.unwrap())
+
+        let action_id = result.unwrap();
+        println!("successfully proposed set special role with action `{action_id}`");
+        Some(action_id)
     }
 
     pub async fn set_special_role(&mut self) {
+        println!("proposing set special role...");
         let action_id = self.propose_set_special_role().await;
         if action_id.is_none() {
             return;
         }
 
         let action_id = action_id.unwrap();
-        println!("propose set special role: {action_id}");
-
+        println!("performing set special role action `{action_id}`...");
         self.perform_action(action_id, "80,000,000").await;
-        println!("perform set special role: {action_id}");
     }
 
     pub async fn create_items(&mut self) {

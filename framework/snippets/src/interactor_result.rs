@@ -36,7 +36,6 @@ pub struct InteractorResult<T: TopDecodeMulti> {
 
 impl<T: TopDecodeMulti> InteractorResult<T> {
     pub fn new(tx: TransactionOnNetwork) -> Self {
-        println!("tx: {tx:#?}");
         Self {
             logs: tx.logs,
             scrs: tx.smart_contract_results.unwrap_or_default(),
@@ -96,33 +95,8 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
     }
 
-    // Handles the topics of an event and returns them.
-    fn handle_event_topics<'a, 'b: 'a>(
-        &'a self,
-        event: &'b Events,
-        log_identifier: &str,
-    ) -> Result<&Vec<String>, TxError> {
-        let option = event.topics.as_ref();
-        if option.is_none() {
-            return Err(TxError {
-                message: "missing topics".to_string(),
-            });
-        }
-
-        let topics = option.unwrap();
-        if topics.len() != 2 {
-            return Err(TxError {
-                message: format!(
-                    "`{log_identifier}` is expected to have 2 topics, found {}",
-                    topics.len()
-                ),
-            });
-        }
-        Ok(topics)
-    }
-
     // Handles a signalError event
-    fn handle_signal_error_event(&self) -> Result<(), TxError> {
+    pub fn handle_signal_error_event(&self) -> Result<(), TxError> {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
             let topics = self.handle_event_topics(event, LOG_IDENTIFIER_SIGNAL_ERROR)?;
             let error_raw = base64::decode(topics.get(1).unwrap()).unwrap();
@@ -147,6 +121,31 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
 
         info!("new address: {}", bech32::encode(&address));
         Ok(address)
+    }
+
+    // Handles the topics of an event and returns them.
+    fn handle_event_topics<'a, 'b: 'a>(
+        &'a self,
+        event: &'b Events,
+        log_identifier: &str,
+    ) -> Result<&Vec<String>, TxError> {
+        let option = event.topics.as_ref();
+        if option.is_none() {
+            return Err(TxError {
+                message: "missing topics".to_string(),
+            });
+        }
+
+        let topics = option.unwrap();
+        if topics.len() != 2 {
+            return Err(TxError {
+                message: format!(
+                    "`{log_identifier}` is expected to have 2 topics, found {}",
+                    topics.len()
+                ),
+            });
+        }
+        Ok(topics)
     }
 }
 

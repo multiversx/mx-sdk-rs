@@ -152,7 +152,16 @@ impl MultisigInteract {
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
-        let _ = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+        let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+        let result = raw_result.handle_signal_error_event();
+        if result.is_err() {
+            println!(
+                "perform action `{action_id}` failed with: {}",
+                result.err().unwrap()
+            );
+            return;
+        }
+        println!("successfully performed action `{action_id}`");
     }
 
     async fn print_quorum(&mut self) {

@@ -13,8 +13,8 @@ impl MultisigInteract {
         }
 
         let action_id = action_id.unwrap();
-        println!("perfoming wrap egld...");
-        self.perform_action(action_id, "10,000,000").await;
+        println!("perfoming wrap egld action `{action_id}`...");
+        self.perform_action(action_id, "15,000,000").await;
     }
 
     async fn propose_wrap_egld(&mut self) -> Option<usize> {
@@ -37,9 +37,12 @@ impl MultisigInteract {
 
         let result = result.value();
         if result.is_err() {
-            println!("propose wrap egld failed: {}", result.err().unwrap());
+            println!("propose wrap egld failed with: {}", result.err().unwrap());
             return None;
         }
-        Some(result.unwrap())
+
+        let action_id = result.unwrap();
+        println!("successfully proposed wrap egld action `{action_id}`");
+        Some(action_id)
     }
 }
