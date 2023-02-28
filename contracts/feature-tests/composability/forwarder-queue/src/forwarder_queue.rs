@@ -20,8 +20,8 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 /// Testing multiple calls per transaction, cascading on.
 ///
 /// TODO: write actual tests with these.
-#[multiversx_sc::module]
-pub trait ForwarderQueuedCallModule {
+#[multiversx_sc::contract]
+pub trait ForwarderQueue {
     #[proxy]
     fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
 
