@@ -172,9 +172,6 @@ impl ComposabilityInteract {
             )
             .await;
 
-        println!("forward payment tx hash: {}", tx_hash);
+        println!("forward payment tx hash: {tx_hash}");
     }
-
-    // SYNC CALLS
-    //echo_caller
 }

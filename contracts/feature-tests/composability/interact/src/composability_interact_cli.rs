@@ -11,6 +11,7 @@ pub struct InteractCli {
 
 /// Composability Interact CLI Commands
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+#[allow(clippy::enum_variant_names)]
 pub enum InteractCliCommand {
     #[command(name = "deploy-vault", about = "Deploy Vault contract")]
     DeployVault,
