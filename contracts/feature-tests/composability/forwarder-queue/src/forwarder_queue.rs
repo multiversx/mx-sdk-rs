@@ -22,6 +22,9 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 /// TODO: write actual tests with these.
 #[multiversx_sc::contract]
 pub trait ForwarderQueue {
+    #[init]
+    fn init(&self) {}
+
     #[proxy]
     fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
 
