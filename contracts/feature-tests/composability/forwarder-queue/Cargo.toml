@@ -1,7 +1,7 @@
 [package]
 name = "forwarder-queue"
 version = "0.0.0"
-authors = ["Andrei Marinica <costin.carabas@multiversx.com>"]
+authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
 edition = "2021"
 publish = false
 
