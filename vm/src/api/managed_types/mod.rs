@@ -5,3 +5,4 @@ mod managed_buffer_api_mock;
 mod managed_type_api_mock;
 mod managed_type_util;
 mod static_var_api_mock;
+mod managed_map_api_mock;

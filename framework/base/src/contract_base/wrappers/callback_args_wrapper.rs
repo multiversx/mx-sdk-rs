@@ -34,6 +34,8 @@ where
     type BigFloatHandle = <A as HandleTypeInfo>::BigFloatHandle;
 
     type EllipticCurveHandle = <A as HandleTypeInfo>::EllipticCurveHandle;
+
+    type ManagedMapHandle = <A as HandleTypeInfo>::ManagedMapHandle;
 }
 
 impl<A: VMApi> ErrorApi for CallbackArgApiWrapper<A> {
