@@ -136,9 +136,7 @@ impl MultisigInteract {
     fn init_board(&mut self) -> MultiValueVec<Address> {
         let config = Config::load_config();
         let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
-        let board =
-            MultiValueVec::from([self.wallet_address.clone(), bob.address().to_bytes().into()]);
-        board
+        MultiValueVec::from([self.wallet_address.clone(), bob.address().to_bytes().into()])
     }
 
     async fn feed_contract_egld(&mut self) {
