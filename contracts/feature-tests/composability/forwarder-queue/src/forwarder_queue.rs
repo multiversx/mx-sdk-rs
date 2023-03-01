@@ -1,3 +1,7 @@
+#![no_std]
+#![allow(clippy::type_complexity)]
+
+
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
