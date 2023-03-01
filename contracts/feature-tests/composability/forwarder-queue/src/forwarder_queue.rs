@@ -1,3 +1,7 @@
+#![no_std]
+#![allow(clippy::type_complexity)]
+
+
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
@@ -20,8 +24,11 @@ pub struct QueuedCall<M: ManagedTypeApi> {
 /// Testing multiple calls per transaction, cascading on.
 ///
 /// TODO: write actual tests with these.
-#[multiversx_sc::module]
-pub trait ForwarderQueuedCallModule {
+#[multiversx_sc::contract]
+pub trait ForwarderQueue {
+    #[init]
+    fn init(&self) {}
+
     #[proxy]
     fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
 
