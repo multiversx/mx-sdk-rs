@@ -164,7 +164,6 @@ impl MultisigInteract {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
-        // siignature
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
         let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
         let result = raw_result.handle_signal_error_event();
@@ -201,15 +200,16 @@ impl MultisigInteract {
 
         println!("board: {}", board.into());
 
-        let board_members: MultiValueVec<Address> = self
-            .interactor
-            .vm_query(self.state.multisig().get_all_board_members())
-            .await;
+        // TODO: fix this
+        // let board_members: MultiValueVec<Address> = self
+        //     .interactor
+        //     .vm_query(self.state.multisig().get_all_board_members())
+        //     .await;
 
-        println!("board members:");
-        for board_member in board_members.iter() {
-            println!("    {}", bech32::encode(board_member));
-        }
+        // println!("board members:");
+        // for board_member in board_members.iter() {
+        //     println!("    {}", bech32::encode(board_member));
+        // }
     }
 
     async fn dns_register(&mut self, name: &str) {
