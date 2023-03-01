@@ -85,7 +85,7 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         }
 
         let second_scr = second_scr.unwrap();
-        let encoded_tid = second_scr.data.split('@').nth(3);
+        let encoded_tid = second_scr.data.split('@').nth(2);
         if encoded_tid.is_none() {
             return Err(TxError {
                 message: format!("bad issue token SCR data: {}", second_scr.data),
@@ -93,6 +93,34 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         }
 
         Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
+    }
+
+    // Handles a signalError event
+    pub fn handle_signal_error_event(&self) -> Result<(), TxError> {
+        if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
+            let topics = self.handle_event_topics(event, LOG_IDENTIFIER_SIGNAL_ERROR)?;
+            let error_raw = base64::decode(topics.get(1).unwrap()).unwrap();
+            let error = String::from_utf8(error_raw).unwrap();
+
+            return Err(TxError { message: error });
+        }
+        Ok(())
+    }
+
+    // Handles a scDeploy event
+    fn handle_sc_deploy_event(&self) -> Result<Address, TxError> {
+        let event = self.find_log(LOG_IDENTIFIER_SC_DEPLOY);
+        if event.is_none() {
+            return Err(TxError {
+                message: format!("`{LOG_IDENTIFIER_SC_DEPLOY}` event not found"),
+            });
+        }
+        let topics = self.handle_event_topics(event.unwrap(), LOG_IDENTIFIER_SC_DEPLOY)?;
+        let address_raw = base64::decode(topics.get(0).unwrap()).unwrap();
+        let address = Address::from_slice(address_raw.as_slice());
+
+        info!("new address: {}", bech32::encode(&address));
+        Ok(address)
     }
 
     // Handles the topics of an event and returns them.
@@ -118,34 +146,6 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
             });
         }
         Ok(topics)
-    }
-
-    // Handles a signalError event
-    fn handle_signal_error_event(&self) -> Result<(), TxError> {
-        if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
-            let topics = self.handle_event_topics(event, LOG_IDENTIFIER_SIGNAL_ERROR)?;
-            let error_raw = base64::decode(topics.get(1).unwrap()).unwrap();
-            let error = String::from_utf8(error_raw).unwrap();
-
-            return Err(TxError { message: error });
-        }
-        Ok(())
-    }
-
-    // Handles a scDeploy event
-    fn handle_sc_deploy_event(&self) -> Result<Address, TxError> {
-        let event = self.find_log(LOG_IDENTIFIER_SC_DEPLOY);
-        if event.is_none() {
-            return Err(TxError {
-                message: format!("`{LOG_IDENTIFIER_SC_DEPLOY}` event not found"),
-            });
-        }
-        let topics = self.handle_event_topics(event.unwrap(), LOG_IDENTIFIER_SC_DEPLOY)?;
-        let address_raw = base64::decode(topics.get(0).unwrap()).unwrap();
-        let address = Address::from_slice(address_raw.as_slice());
-
-        info!("new address: {}", bech32::encode(&address));
-        Ok(address)
     }
 }
 

@@ -2,6 +2,7 @@ mod multisig_interact_cli;
 mod multisig_interact_config;
 mod multisig_interact_nfts;
 mod multisig_interact_state;
+mod multisig_interact_wegld;
 
 use clap::Parser;
 use multisig::{
@@ -64,6 +65,12 @@ async fn main() {
         Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
             multisig_interact.print_quorum().await;
         },
+        Some(multisig_interact_cli::InteractCliCommand::UnwrapEgld) => {
+            multisig_interact.unwrap_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
+            multisig_interact.wrap_egld().await;
+        },
         None => {},
     }
 }
@@ -79,10 +86,11 @@ struct MultisigInteract {
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
+        let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
         let mut interactor = Interactor::new(config.gateway()).await;
-        let wallet_address =
-            interactor.register_wallet(Wallet::from_pem_file(config.pem()).unwrap());
-        MultisigInteract {
+        let wallet_address = interactor.register_wallet(alice);
+
+        Self {
             interactor,
             wallet_address,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
@@ -93,12 +101,13 @@ impl MultisigInteract {
     }
 
     async fn deploy(&mut self) {
+        let board = self.init_board();
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
                 self.state
                     .default_multisig()
-                    .init(0usize, MultiValueVec::from([self.wallet_address.clone()]))
+                    .init(0usize, board)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
@@ -122,6 +131,12 @@ impl MultisigInteract {
 
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_multisig_address(&new_address_expr);
+    }
+
+    fn init_board(&mut self) -> MultiValueVec<Address> {
+        let config = Config::load_config();
+        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
+        MultiValueVec::from([self.wallet_address.clone(), bob.address().to_bytes().into()])
     }
 
     async fn feed_contract_egld(&mut self) {
@@ -148,7 +163,16 @@ impl MultisigInteract {
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
-        let _ = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+        let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+        let result = raw_result.handle_signal_error_event();
+        if result.is_err() {
+            println!(
+                "perform action `{action_id}` failed with: {}",
+                result.err().unwrap()
+            );
+            return;
+        }
+        println!("successfully performed action `{action_id}`");
     }
 
     async fn print_quorum(&mut self) {
@@ -167,15 +191,23 @@ impl MultisigInteract {
     }
 
     async fn print_board(&mut self) {
-        let board_members: MultiValueVec<Address> = self
+        let board: SingleValue<usize> = self
             .interactor
-            .vm_query(self.state.multisig().get_all_board_members())
+            .vm_query(self.state.multisig().num_board_members())
             .await;
 
-        println!("board members:");
-        for board_member in board_members.iter() {
-            println!("    {}", bech32::encode(board_member));
-        }
+        println!("board: {}", board.into());
+
+        // TODO: fix this
+        // let board_members: MultiValueVec<Address> = self
+        //     .interactor
+        //     .vm_query(self.state.multisig().get_all_board_members())
+        //     .await;
+
+        // println!("board members:");
+        // for board_member in board_members.iter() {
+        //     println!("    {}", bech32::encode(board_member));
+        // }
     }
 
     async fn dns_register(&mut self, name: &str) {

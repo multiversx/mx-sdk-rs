@@ -30,6 +30,10 @@ pub enum InteractCliCommand {
     NftSpecial,
     #[command(name = "quorum", about = "Print quorum")]
     Quorum,
+    #[command(name = "unwrap-egld", about = "Unwrap EGLD")]
+    UnwrapEgld,
+    #[command(name = "wrap-egld", about = "Wrap EGLD")]
+    WrapEgld,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
