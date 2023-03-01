@@ -85,7 +85,7 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         }
 
         let second_scr = second_scr.unwrap();
-        let encoded_tid = second_scr.data.split('@').nth(3);
+        let encoded_tid = second_scr.data.split('@').nth(2);
         if encoded_tid.is_none() {
             return Err(TxError {
                 message: format!("bad issue token SCR data: {}", second_scr.data),

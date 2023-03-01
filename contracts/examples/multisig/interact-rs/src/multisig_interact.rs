@@ -65,6 +65,9 @@ async fn main() {
         Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
             multisig_interact.print_quorum().await;
         },
+        Some(multisig_interact_cli::InteractCliCommand::UnwrapEgld) => {
+            multisig_interact.unwrap_egld().await;
+        },
         Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
             multisig_interact.wrap_egld().await;
         },
@@ -83,10 +86,11 @@ struct MultisigInteract {
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
+        let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
         let mut interactor = Interactor::new(config.gateway()).await;
-        let wallet_address =
-            interactor.register_wallet(Wallet::from_pem_file(config.pem()).unwrap());
-        MultisigInteract {
+        let wallet_address = interactor.register_wallet(alice);
+
+        Self {
             interactor,
             wallet_address,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
@@ -97,12 +101,13 @@ impl MultisigInteract {
     }
 
     async fn deploy(&mut self) {
+        let board = self.init_board();
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
                 self.state
                     .default_multisig()
-                    .init(0usize, MultiValueVec::from([self.wallet_address.clone()]))
+                    .init(0usize, board)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
@@ -128,6 +133,14 @@ impl MultisigInteract {
         self.state.set_multisig_address(&new_address_expr);
     }
 
+    fn init_board(&mut self) -> MultiValueVec<Address> {
+        let config = Config::load_config();
+        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
+        let board =
+            MultiValueVec::from([self.wallet_address.clone(), bob.address().to_bytes().into()]);
+        board
+    }
+
     async fn feed_contract_egld(&mut self) {
         let _ = self
             .interactor
@@ -151,6 +164,7 @@ impl MultisigInteract {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
+        // siignature
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
         let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
         let result = raw_result.handle_signal_error_event();
@@ -180,6 +194,13 @@ impl MultisigInteract {
     }
 
     async fn print_board(&mut self) {
+        let board: SingleValue<usize> = self
+            .interactor
+            .vm_query(self.state.multisig().num_board_members())
+            .await;
+
+        println!("board: {}", board.into());
+
         let board_members: MultiValueVec<Address> = self
             .interactor
             .vm_query(self.state.multisig().get_all_board_members())

@@ -8,7 +8,8 @@ const CONFIG_FILE: &str = "config.toml";
 #[derive(Debug, Deserialize)]
 pub struct Config {
     gateway: String,
-    pem: String,
+    alice_pem: String,
+    bob_pem: String,
 }
 
 impl Config {
@@ -25,8 +26,13 @@ impl Config {
         &self.gateway
     }
 
-    // Returns the pem
-    pub fn pem(&self) -> &str {
-        &self.pem
+    // Returns alice's pem
+    pub fn alice_pem(&self) -> &str {
+        &self.alice_pem
+    }
+
+    // Returns bob's pem
+    pub fn bob_pem(&self) -> &str {
+        &self.bob_pem
     }
 }
