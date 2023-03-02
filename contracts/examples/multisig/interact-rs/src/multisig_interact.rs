@@ -165,10 +165,12 @@ impl MultisigInteract {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
-        let ok = self.sign(action_id).await;
-        if !ok {
-            return;
+        if !self.quorum_reached(action_id).await {
+            if !self.sign(action_id).await {
+                return;
+            }
         }
+        println!("quorum reached for action `{action_id}`");
 
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
         let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
@@ -183,9 +185,29 @@ impl MultisigInteract {
         println!("successfully performed action `{action_id}`");
     }
 
+    async fn quorum_reached(&mut self, action_id: usize) -> bool {
+        self.interactor
+            .vm_query(self.state.multisig().quorum_reached(action_id))
+            .await
+    }
+
+    async fn signed(&mut self, signer: &Address, action_id: usize) -> bool {
+        self.interactor
+            .vm_query(self.state.multisig().signed(signer, action_id))
+            .await
+    }
+
     async fn sign(&mut self, action_id: usize) -> bool {
         println!("signing action `{action_id}`...");
         for signer in self.init_board().iter() {
+            if self.signed(signer, action_id).await {
+                println!(
+                    "{} already signed action `{action_id}`",
+                    bech32::encode(signer)
+                );
+                continue;
+            }
+
             let sc_call_step: ScCallStep = self
                 .state
                 .multisig()
@@ -204,8 +226,11 @@ impl MultisigInteract {
                 );
                 return false;
             }
-            let address = bech32::encode(signer);
-            println!("{address} - successfully signed action `{action_id}`");
+
+            println!(
+                "{} - successfully signed action `{action_id}`",
+                bech32::encode(signer)
+            );
         }
 
         println!("successfully performed sign action `{action_id}`");
