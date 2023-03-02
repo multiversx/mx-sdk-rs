@@ -165,10 +165,8 @@ impl MultisigInteract {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
-        if !self.quorum_reached(action_id).await {
-            if !self.sign(action_id).await {
-                return;
-            }
+        if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
+            return;
         }
         println!("quorum reached for action `{action_id}`");
 
