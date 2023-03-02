@@ -87,8 +87,11 @@ impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
         let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
+        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
+
         let mut interactor = Interactor::new(config.gateway()).await;
         let wallet_address = interactor.register_wallet(alice);
+        interactor.register_wallet(bob);
 
         Self {
             interactor,
@@ -107,7 +110,7 @@ impl MultisigInteract {
             .sc_deploy(
                 self.state
                     .default_multisig()
-                    .init(0usize, board)
+                    .init(Config::load_config().quorum(), board)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
@@ -162,6 +165,11 @@ impl MultisigInteract {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
+        let ok = self.sign(action_id).await;
+        if !ok {
+            return;
+        }
+
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
         let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
         let result = raw_result.handle_signal_error_event();
@@ -173,6 +181,35 @@ impl MultisigInteract {
             return;
         }
         println!("successfully performed action `{action_id}`");
+    }
+
+    async fn sign(&mut self, action_id: usize) -> bool {
+        println!("signing action `{action_id}`...");
+        for signer in self.init_board().iter() {
+            let sc_call_step: ScCallStep = self
+                .state
+                .multisig()
+                .sign(action_id)
+                .into_blockchain_call()
+                .from(signer)
+                .gas_limit("15,000,000")
+                .into();
+
+            let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+            let result = raw_result.handle_signal_error_event();
+            if result.is_err() {
+                println!(
+                    "perform sign `{action_id}` failed with: {}",
+                    result.err().unwrap()
+                );
+                return false;
+            }
+            let address = bech32::encode(signer);
+            println!("{address} - successfully signed action `{action_id}`");
+        }
+
+        println!("successfully performed sign action `{action_id}`");
+        true
     }
 
     async fn print_quorum(&mut self) {

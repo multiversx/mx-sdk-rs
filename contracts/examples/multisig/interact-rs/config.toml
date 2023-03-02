@@ -1,3 +1,4 @@
 gateway = 'https://testnet-gateway.multiversx.com'
 alice_pem = "alice.pem"
 bob_pem = "bob.pem"
+quorum = 2

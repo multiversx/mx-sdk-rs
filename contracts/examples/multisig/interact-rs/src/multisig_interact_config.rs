@@ -10,6 +10,7 @@ pub struct Config {
     gateway: String,
     alice_pem: String,
     bob_pem: String,
+    quorum: usize,
 }
 
 impl Config {
@@ -34,5 +35,10 @@ impl Config {
     // Returns bob's pem
     pub fn bob_pem(&self) -> &str {
         &self.bob_pem
+    }
+
+    // Returns the quorum
+    pub fn quorum(&self) -> usize {
+        self.quorum
     }
 }
