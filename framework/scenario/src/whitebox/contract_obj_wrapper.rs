@@ -400,7 +400,7 @@ impl BlockchainStateWrapper {
         );
     }
 
-    pub fn set_developer_rewards<T: TopEncode>(
+    pub fn set_developer_rewards(
         &mut self,
         address: &Address,
         developer_rewards: num_bigint::BigUint,

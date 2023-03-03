@@ -33,7 +33,16 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
         let new_handle = M::managed_type_impl().mm_new();
         ManagedMap::from_handle(new_handle)
     }
+}
 
+impl<M: ManagedTypeApi> Default for ManagedMap<M> {
+    #[inline]
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedMap<M> {
     pub fn get(&self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
         M::managed_type_impl().mm_get(self.handle.clone(), key.handle.clone(), new_handle.clone());
