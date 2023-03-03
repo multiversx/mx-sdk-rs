@@ -41,7 +41,7 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
     }
 
     pub fn put(&mut self, key: &ManagedBuffer<M>, value: &ManagedBuffer<M>) {
-        M::managed_type_impl().mm_get(
+        M::managed_type_impl().mm_put(
             self.handle.clone(),
             key.handle.clone(),
             value.handle.clone(),

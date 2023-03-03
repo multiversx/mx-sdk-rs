@@ -29,4 +29,21 @@ pub trait ManagedMapFeatures {
     fn mm_get(&self, key: &ManagedBuffer) -> ManagedBuffer {
         self.create_map().get(key)
     }
+
+    #[view]
+    fn mm_contains(&self, key: &ManagedBuffer) -> bool {
+        self.create_map().contains(key)
+    }
+
+    #[view]
+    fn mm_remove_get(
+        &self,
+        remove_key: &ManagedBuffer,
+        get_key: &ManagedBuffer,
+    ) -> MultiValue2<ManagedBuffer, ManagedBuffer> {
+        let mut map = self.create_map();
+        let removed_value = map.remove(remove_key);
+        let get_value = map.get(get_key);
+        (removed_value, get_value).into()
+    }
 }
