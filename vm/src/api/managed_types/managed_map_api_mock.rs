@@ -94,7 +94,7 @@ impl ManagedMapApi for DebugApi {
         if let Some(value) = mmap.get(&key) {
             !value.is_empty()
         } else {
-            true
+            false
         }
     }
 }

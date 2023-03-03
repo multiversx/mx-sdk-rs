@@ -97,6 +97,44 @@
                     "false"
                 ]
             }
+        },
+        {
+            "step": "scCall",
+            "id": "get unknown",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:mmap-features",
+                "function": "mm_get",
+                "arguments": [
+                    "str:unknown"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    ""
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "contains unknown",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:mmap-features",
+                "function": "mm_contains",
+                "arguments": [
+                    "str:unknown"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "false"
+                ]
+            }
         }
     ]
 }
