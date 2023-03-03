@@ -11,6 +11,9 @@ path = "src/forwarder_queue.rs"
 [features]
 ei-unmanaged = ["multiversx-sc/ei-unmanaged"]
 
+[dependencies.vault]
+path = "../vault"
+
 [dependencies.multiversx-sc]
 version = "0.39.5"
 path = "../../../../framework/base"
