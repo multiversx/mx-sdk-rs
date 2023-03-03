@@ -1,7 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
@@ -16,6 +15,7 @@ pub enum QueuedCallType {
 pub struct QueuedCall<M: ManagedTypeApi> {
     call_type: QueuedCallType,
     to: ManagedAddress<M>,
+    endpoint_name: ManagedBuffer<M>,
     payment_token: EgldOrEsdtTokenIdentifier<M>,
     payment_nonce: u64,
     payment_amount: BigUint<M>,
@@ -32,6 +32,9 @@ pub trait ForwarderQueue {
     #[proxy]
     fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
 
+    #[proxy]
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+
     #[view]
     #[storage_mapper("queued_calls")]
     fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
@@ -41,6 +44,7 @@ pub trait ForwarderQueue {
         &self,
         call_type: QueuedCallType,
         to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
         payment_token: EgldOrEsdtTokenIdentifier,
         payment_nonce: u64,
         payment_amount: BigUint,
@@ -48,6 +52,7 @@ pub trait ForwarderQueue {
         self.queued_calls().push_back(QueuedCall {
             call_type,
             to,
+            endpoint_name,
             payment_token,
             payment_nonce,
             payment_amount,
@@ -64,30 +69,54 @@ pub trait ForwarderQueue {
             &esdt_transfers_multi.into_multi_value(),
         );
 
+        // Should not reach here
         if max_call_depth == 0 {
             return;
         }
 
         while let Some(node) = self.queued_calls().pop_front() {
-            let call = node.into_value();
-            let contract_call = self
-                .self_proxy(call.to)
-                .forward_queued_calls(max_call_depth - 1)
-                .with_egld_or_single_esdt_transfer((
-                    call.payment_token,
+            let call = node.clone().into_value();
+
+            // Got to the leaf -> call Vault
+            if max_call_depth == 1 {
+                let contract_call = ContractCallWithEgldOrSingleEsdt::<Self::Api, ()>::new(
+                    call.to.clone(),
+                    call.endpoint_name.clone(),
+                    call.payment_token.clone(),
                     call.payment_nonce,
-                    call.payment_amount,
-                ));
-            match call.call_type {
-                QueuedCallType::Sync => {
-                    contract_call.execute_on_dest_context::<()>();
-                },
-                QueuedCallType::LegacyAsync => {
-                    contract_call.async_call().call_and_exit();
-                },
-                QueuedCallType::TransferExecute => {
-                    contract_call.transfer_execute();
-                },
+                    call.payment_amount.clone(),
+                );
+                match call.call_type {
+                    QueuedCallType::Sync => {
+                        contract_call.execute_on_dest_context::<()>();
+                    },
+                    QueuedCallType::LegacyAsync => {
+                        contract_call.async_call().call_and_exit();
+                    },
+                    QueuedCallType::TransferExecute => {
+                        contract_call.transfer_execute();
+                    },
+                }
+            } else {
+                let contract_call = self
+                    .self_proxy(call.to)
+                    .forward_queued_calls(max_call_depth - 1)
+                    .with_egld_or_single_esdt_transfer((
+                        call.payment_token,
+                        call.payment_nonce,
+                        call.payment_amount,
+                    ));
+                match call.call_type {
+                    QueuedCallType::Sync => {
+                        contract_call.execute_on_dest_context::<()>();
+                    },
+                    QueuedCallType::LegacyAsync => {
+                        contract_call.async_call().call_and_exit();
+                    },
+                    QueuedCallType::TransferExecute => {
+                        contract_call.transfer_execute();
+                    },
+                }
             }
         }
     }
