@@ -17,11 +17,6 @@
                     "nonce": "0",
                     "balance": "0",
                     "code": "file:../output/forwarder-queue.wasm"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "code": "file:../../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         },
@@ -35,7 +30,8 @@
                 "function": "add_queued_call",
                 "arguments": [
                     "0x01",
-                    "sc:forwarder",
+                    "sc:vault",
+                    "str:accept_funds",
                     "str:EGLD",
                     "0",
                     "1000"
@@ -53,10 +49,43 @@
                 "egldValue": "1000",
                 "function": "forward_queued_calls",
                 "arguments": [
-                    "2"
+                    "1"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder-queue",
+                        "endpoint": "str:forward_queued_calls",
+                        "topics": [
+                            "str:forward_queued_calls",
+                            "0x01",
+                            "0x03e8"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "sc:forwarder-queue",
+                            "sc:vault",
+                            "0x03e8"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
+                            "0x03e8"
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
             }
         },
         {
@@ -70,7 +99,7 @@
                 },
                 "sc:vault": {
                     "nonce": "0",
-                    "balance": "0",
+                    "balance": "1000",
                     "storage": {
                         "str:call_counts|nested:str:accept_funds": "1"
                     },
@@ -79,26 +108,8 @@
                 "sc:forwarder-queue": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {
-                        "str:callback_args.len": "1",
-                        "str:callback_args.item|u32:1": [
-                            "nested:0x00"
-                        ]
-                    },
                     "code": "file:../output/forwarder-queue.wasm"
-                },
-                "sc:forwarder": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "storage": {
-                        "str:callback_args.len": "1",
-                        "str:callback_args.item|u32:1": [
-                            "nested:0x00"
-                        ]
-                    },
-                    "code": "file:../../forwarder-raw/output/forwarder-raw.wasm"
                 }
-
             }
         }
     ]
