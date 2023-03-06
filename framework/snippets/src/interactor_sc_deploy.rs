@@ -8,7 +8,6 @@ use multiversx_sc_scenario::{
 use multiversx_sdk::data::{address::Address as ErdrsAddress, transaction::Transaction};
 
 const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];
-pub const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 impl Interactor {
     fn sc_deploy_to_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
@@ -27,9 +26,9 @@ impl Interactor {
         }
     }
 
-    pub async fn send_sc_deploy(&mut self, sc_call_step: ScDeployStep) -> String {
+    pub async fn send_sc_deploy(&mut self, sc_call_step: &ScDeployStep) -> String {
         let sender_address = &sc_call_step.tx.from.value;
-        let mut transaction = self.sc_deploy_to_tx(&sc_call_step);
+        let mut transaction = self.sc_deploy_to_tx(sc_call_step);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
         self.proxy.send_transaction(&transaction).await.unwrap()
@@ -44,16 +43,15 @@ impl Interactor {
         RequestedResult: CodecFrom<OriginalResult>,
     {
         let sc_deploy_step: ScDeployStep = typed_sc_call.into();
-        if self.tracer.is_some() {
-            let tracer = self.tracer.as_mut().unwrap();
-            tracer.run_sc_deploy_step(&sc_deploy_step);
-            tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
-        }
+        self.pre_runners.run_sc_deploy_step(&sc_deploy_step);
 
-        let tx_hash = self.send_sc_deploy(sc_deploy_step).await;
+        let tx_hash = self.send_sc_deploy(&sc_deploy_step).await;
         println!("deploy tx hash: {tx_hash}");
         info!("deploy tx hash: {}", tx_hash);
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+
+        self.post_runners.run_sc_deploy_step(&sc_deploy_step);
+
         InteractorResult::new(tx)
     }
 }

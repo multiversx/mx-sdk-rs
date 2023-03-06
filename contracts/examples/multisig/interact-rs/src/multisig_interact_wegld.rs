@@ -8,7 +8,7 @@ use multiversx_sc_snippets::{
     multiversx_sc::types::{ContractCall, ContractCallNoPayment},
     multiversx_sc_scenario::{
         scenario_format::interpret_trait::InterpretableFrom,
-        standalone::retrieve_account_as_scenario_set_state,
+        standalone::retrieve_account_as_scenario_set_state, mandos_system::ScenarioRunner,
     },
 };
 
@@ -18,7 +18,6 @@ const WEGLD_SWAP_SC_BECH32: &str = "erd1qqqqqqqqqqqqqpgqcy2wua5cq59y6sxqj2ka3sca
 const WEGLD_TOKEN_IDENTIFIER: &str = "WEGLD-6cf38e";
 const WRAP_AMOUNT: u64 = 50000000000000000; // 0.05 EGLD
 const UNWRAP_AMOUNT: u64 = 25000000000000000; // 0.025 WEGLD
-const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 impl MultisigInteract {
     pub async fn wegld_swap_full(&mut self) {
@@ -54,7 +53,7 @@ impl MultisigInteract {
     }
 
     pub async fn wegld_swap_set_state(&mut self) {
-        if self.interactor.tracer.is_none() {
+        if self.interactor.pre_runners.is_empty() && self.interactor.post_runners.is_empty() {
             return;
         }
 
@@ -66,11 +65,9 @@ impl MultisigInteract {
         .await;
 
         let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-        let tracer = self.interactor.tracer.as_mut().unwrap();
 
-        tracer.load_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
-        tracer.scenario_trace.steps.extend(scenario.steps);
-        tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+        self.interactor.pre_runners.run_scenario(&scenario);
+        self.interactor.post_runners.run_scenario(&scenario);
     }
 
     async fn propose_wrap_egld(&mut self) -> Option<usize> {

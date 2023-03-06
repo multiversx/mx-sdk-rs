@@ -28,6 +28,7 @@ use multiversx_sc_snippets::{
 };
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
@@ -92,7 +93,10 @@ impl MultisigInteract {
         let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
         let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
 
-        let mut interactor = Interactor::new(config.gateway()).await.with_tracer().await;
+        let mut interactor = Interactor::new(config.gateway())
+            .await
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
         let wallet_address = interactor.register_wallet(alice);
         interactor.register_wallet(bob);
 

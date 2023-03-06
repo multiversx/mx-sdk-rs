@@ -27,7 +27,7 @@ pub trait ScenarioRunner {
     fn run_dump_state_step(&mut self);
 
     /// Utility method for running all steps in a scenario.
-    fn run_scenario(&mut self, scenario: Scenario) {
+    fn run_scenario(&mut self, scenario: &Scenario) {
         for step in &scenario.steps {
             match step {
                 Step::ExternalSteps(external_steps_step) => {
