@@ -1,3 +1,8 @@
+use multiversx_chain_scenario_format::{
+    interpret_trait::{InterpretableFrom, InterpreterContext},
+    serde_raw::ScenarioRaw,
+};
+
 use crate::{
     multiversx_sc::types::Address,
     scenario::{model::*, ScenarioRunner},
@@ -18,6 +23,13 @@ impl ScenarioTrace {
         let mandos_trace = core::mem::take(&mut self.scenario_trace);
         let mandos_trace_raw = mandos_trace.into_raw();
         mandos_trace_raw.save_to_file(file_path);
+    }
+
+    pub fn load_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
+        let mandos_trace_raw = ScenarioRaw::load_from_file(file_path);
+        let mandos_trace =
+            Scenario::interpret_from(mandos_trace_raw, &InterpreterContext::default());
+        self.scenario_trace = mandos_trace;
     }
 
     fn process_address_key(&mut self, address_key: &AddressKey) {

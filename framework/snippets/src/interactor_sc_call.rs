@@ -1,10 +1,14 @@
-use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, InteractorResult};
+use crate::{
+    address_h256_to_erdrs, interactor_sc_deploy::INTERACTOR_SCENARIO_TRACE_PATH,
+    mandos_to_erdrs_address, Interactor, InteractorResult,
+};
 use log::info;
 use multiversx_sc_scenario::{
     multiversx_sc::{
         codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,
     },
+    scenario::ScenarioRunner,
     scenario_model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     DebugApi,
 };
@@ -56,6 +60,13 @@ impl Interactor {
         ScCallStep: From<S>,
     {
         let sc_call_step: ScCallStep = sc_call_step.into();
+        if self.tracer.is_some() {
+            let tracer = self.tracer.as_mut().unwrap();
+            tracer.load_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+            tracer.run_sc_call_step(&sc_call_step);
+            tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+        }
+
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
@@ -95,6 +106,14 @@ impl Interactor {
                 &sc_call_step.tx.from.value, sender_address,
                 "all calls are expected to have the same sender"
             );
+            // TODO: optimise here, so that we don't load and write the scenario trace for each call
+            if self.tracer.is_some() {
+                let tracer = self.tracer.as_mut().unwrap();
+                tracer.load_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+                tracer.run_sc_call_step(&sc_call_step);
+                tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+            }
+
             let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
             self.set_nonce_and_sign_tx(sender_address, &mut transaction)
                 .await;
@@ -103,6 +122,13 @@ impl Interactor {
     }
 
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
+        if self.tracer.is_some() {
+            let tracer = self.tracer.as_mut().unwrap();
+            tracer.load_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+            tracer.run_transfer_step(&transfer_step);
+            tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+        }
+
         let sender_address = &transfer_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)

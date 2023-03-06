@@ -89,7 +89,7 @@ impl MultisigInteract {
         let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
         let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
 
-        let mut interactor = Interactor::new(config.gateway()).await;
+        let mut interactor = Interactor::new(config.gateway()).await.with_tracer().await;
         let wallet_address = interactor.register_wallet(alice);
         interactor.register_wallet(bob);
 

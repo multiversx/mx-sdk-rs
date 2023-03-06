@@ -1,4 +1,7 @@
-use multiversx_sc_scenario::{multiversx_sc::types::Address, scenario_model::AddressValue};
+use multiversx_sc_scenario::{
+    mandos_system::run_trace::ScenarioTrace, multiversx_sc::types::Address,
+    scenario_model::AddressValue,
+};
 use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
@@ -14,6 +17,7 @@ pub struct Interactor {
     pub sender_map: HashMap<Address, Sender>,
 
     pub(crate) waiting_time_ms: u64,
+    pub tracer: Option<ScenarioTrace>,
 }
 
 impl Interactor {
@@ -25,6 +29,7 @@ impl Interactor {
             network_config,
             sender_map: HashMap::new(),
             waiting_time_ms: 0,
+            tracer: None,
         }
     }
 
@@ -44,6 +49,13 @@ impl Interactor {
     pub async fn sleep(&mut self, duration: Duration) {
         self.waiting_time_ms += duration.as_millis() as u64;
         tokio::time::sleep(duration).await;
+    }
+
+    pub async fn with_tracer(self) -> Self {
+        Self {
+            tracer: Some(ScenarioTrace::default()),
+            ..self
+        }
     }
 }
 
