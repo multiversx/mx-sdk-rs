@@ -1,7 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
@@ -16,6 +15,7 @@ pub enum QueuedCallType {
 pub struct QueuedCall<M: ManagedTypeApi> {
     call_type: QueuedCallType,
     to: ManagedAddress<M>,
+    endpoint_name: ManagedBuffer<M>,
     payment_token: EgldOrEsdtTokenIdentifier<M>,
     payment_nonce: u64,
     payment_amount: BigUint<M>,
@@ -29,9 +29,6 @@ pub trait ForwarderQueue {
     #[init]
     fn init(&self) {}
 
-    #[proxy]
-    fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
-
     #[view]
     #[storage_mapper("queued_calls")]
     fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
@@ -41,6 +38,7 @@ pub trait ForwarderQueue {
         &self,
         call_type: QueuedCallType,
         to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
         payment_token: EgldOrEsdtTokenIdentifier,
         payment_nonce: u64,
         payment_amount: BigUint,
@@ -48,6 +46,7 @@ pub trait ForwarderQueue {
         self.queued_calls().push_back(QueuedCall {
             call_type,
             to,
+            endpoint_name,
             payment_token,
             payment_nonce,
             payment_amount,
@@ -56,28 +55,23 @@ pub trait ForwarderQueue {
 
     #[endpoint]
     #[payable("*")]
-    fn forward_queued_calls(&self, max_call_depth: usize) {
+    fn forward_queued_calls(&self) {
         let esdt_transfers_multi = self.call_value().all_esdt_transfers();
         self.forward_queued_calls_event(
-            max_call_depth,
             &self.call_value().egld_value(),
             &esdt_transfers_multi.into_multi_value(),
         );
 
-        if max_call_depth == 0 {
-            return;
-        }
-
         while let Some(node) = self.queued_calls().pop_front() {
-            let call = node.into_value();
-            let contract_call = self
-                .self_proxy(call.to)
-                .forward_queued_calls(max_call_depth - 1)
-                .with_egld_or_single_esdt_transfer((
-                    call.payment_token,
-                    call.payment_nonce,
-                    call.payment_amount,
-                ));
+            let call = node.clone().into_value();
+
+            let contract_call = ContractCallWithEgldOrSingleEsdt::<Self::Api, ()>::new(
+                call.to.clone(),
+                call.endpoint_name.clone(),
+                call.payment_token.clone(),
+                call.payment_nonce,
+                call.payment_amount.clone(),
+            );
             match call.call_type {
                 QueuedCallType::Sync => {
                     contract_call.execute_on_dest_context::<()>();
@@ -95,7 +89,6 @@ pub trait ForwarderQueue {
     #[event("forward_queued_calls")]
     fn forward_queued_calls_event(
         &self,
-        #[indexed] max_call_depth: usize,
         #[indexed] egld_value: &BigUint,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );

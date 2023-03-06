@@ -5,6 +5,10 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
+        "file:forwarder-queue/output/forwarder-queue.wasm",
+        forwarder_queue::ContractBuilder,
+    );
+    blockchain.register_contract(
         "file:forwarder/output/forwarder.wasm",
         forwarder::ContractBuilder,
     );
@@ -30,6 +34,11 @@ fn world() -> ScenarioWorld {
     );
     blockchain.register_contract("file:vault/output/vault.wasm", vault::ContractBuilder);
     blockchain
+}
+
+#[test]
+fn forw_queue_async_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forw_queue_async.scen.json", world());
 }
 
 #[test]
