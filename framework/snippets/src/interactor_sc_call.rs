@@ -110,7 +110,7 @@ impl Interactor {
             if self.tracer.is_some() {
                 let tracer = self.tracer.as_mut().unwrap();
                 tracer.load_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
-                tracer.run_sc_call_step(&sc_call_step);
+                tracer.run_sc_call_step(sc_call_step);
                 tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
             }
 
