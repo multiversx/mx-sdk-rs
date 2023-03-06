@@ -32,6 +32,11 @@ pub enum InteractCliCommand {
     Quorum,
     #[command(name = "unwrap-egld", about = "Unwrap EGLD")]
     UnwrapEgld,
+    #[command(
+        name = "wegld-swap-full",
+        about = "Deploy and swap WEGLD with multisig"
+    )]
+    WEgldSwapFull,
     #[command(name = "wrap-egld", about = "Wrap EGLD")]
     WrapEgld,
 }

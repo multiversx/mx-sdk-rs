@@ -39,7 +39,7 @@ async fn main() {
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(multisig_interact_cli::InteractCliCommand::Board) => {
-            multisig_interact.wegld_swap_full().await;
+            multisig_interact.print_board().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
             multisig_interact.deploy().await;
@@ -67,6 +67,9 @@ async fn main() {
         },
         Some(multisig_interact_cli::InteractCliCommand::UnwrapEgld) => {
             multisig_interact.unwrap_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::WEgldSwapFull) => {
+            multisig_interact.wegld_swap_full().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
             multisig_interact.wrap_egld().await;
@@ -202,7 +205,7 @@ impl MultisigInteract {
         for signer in self.init_board().iter() {
             if self.signed(signer, action_id).await {
                 println!(
-                    "{} already signed action `{action_id}`",
+                    "{} - already signed action `{action_id}`",
                     bech32::encode(signer)
                 );
                 continue;
@@ -252,7 +255,7 @@ impl MultisigInteract {
             .await
     }
 
-    async fn _print_board(&mut self) {
+    async fn print_board(&mut self) {
         let board: SingleValue<usize> = self
             .interactor
             .vm_query(self.state.multisig().num_board_members())
