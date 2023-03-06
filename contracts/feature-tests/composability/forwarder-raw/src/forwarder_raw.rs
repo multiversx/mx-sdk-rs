@@ -406,7 +406,7 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
-    fn upgrade(
+    fn call_upgrade(
         &self,
         child_sc_address: &ManagedAddress,
         new_code: &ManagedBuffer,
@@ -423,7 +423,7 @@ pub trait ForwarderRaw {
     }
 
     #[endpoint]
-    fn upgrade_from_source(
+    fn call_upgrade_from_source(
         &self,
         sc_address: ManagedAddress,
         source_contract_address: ManagedAddress,

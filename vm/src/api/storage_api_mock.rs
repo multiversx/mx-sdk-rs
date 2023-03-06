@@ -9,6 +9,8 @@ use multiversx_sc::api::{
     StorageWriteApiImpl,
 };
 
+const RESERVED_KEY_PREFIX: &[u8] = b"\x45\x4C\x52\x4F\x4E\x44";
+
 impl StorageReadApi for DebugApi {
     type StorageReadApiImpl = DebugApi;
 
@@ -81,10 +83,10 @@ impl StorageWriteApi for DebugApi {
 impl StorageWriteApiImpl for DebugApi {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         // TODO: extract magic strings somewhere
-        if key.starts_with(&b"ELROND"[..]) {
+        if key.starts_with(RESERVED_KEY_PREFIX) {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: "cannot write to storage under Elrond reserved key".to_string(),
+                message: "cannot write to storage under reserved key".to_string(),
             });
         }
 

@@ -43,9 +43,7 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "str:TICKER-000000"
-                ],
+                "out": [],
                 "status": "",
                 "logs": "*",
                 "gas": "*",

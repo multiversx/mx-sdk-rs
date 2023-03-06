@@ -4,15 +4,16 @@
 # expects 1 argument: the path to the Arwen repo root
 
 VM_REPO_PATH=${1:?"Missing VM repo path!"}
+TARGET_DIR=$PWD/target
 
 build_and_copy() {
    contract_path=$1
    contract_name=${contract_path##*/}
    vm_contract_path=$2
 
-   # mxpy --verbose contract build --skip-eei-checks $contract_path || return 1
+   sc-meta all build --path $contract_path --target-dir $TARGET_DIR
    mkdir -p $vm_contract_path/output
-   rm -rf $vm_contract_path/mandos
+   rm -rf $vm_contract_path/scenarios
    cp $contract_path/output/*.wasm \
       $vm_contract_path/output
    cp -R $contract_path/scenarios \
@@ -33,6 +34,7 @@ build_and_copy ./contracts/examples/multisig $VM_REPO_PATH/test/multisig
 build_and_copy ./contracts/feature-tests/alloc-features $VM_REPO_PATH/test/features/alloc-features
 build_and_copy ./contracts/feature-tests/basic-features $VM_REPO_PATH/test/features/basic-features
 build_and_copy ./contracts/feature-tests/big-float-features $VM_REPO_PATH/test/features/big-float-features
+build_and_copy ./contracts/feature-tests/managed-map-features $VM_REPO_PATH/test/features/managed-map-features
 build_and_copy ./contracts/feature-tests/erc-style-contracts/erc20 $VM_REPO_PATH/test/erc20-rust
 build_and_copy ./contracts/feature-tests/formatted-message-features $VM_REPO_PATH/test/features/formatted-message-features
 build_and_copy ./contracts/feature-tests/payable-features $VM_REPO_PATH/test/features/payable-features

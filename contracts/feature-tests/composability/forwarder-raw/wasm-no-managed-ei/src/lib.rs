@@ -41,8 +41,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         call_execute_on_dest_context_readonly
         deploy_contract
         deploy_from_source
-        upgrade
-        upgrade_from_source
+        call_upgrade
+        call_upgrade_from_source
         callBack
     )
 }
