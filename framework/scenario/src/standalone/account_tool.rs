@@ -8,18 +8,33 @@ use multiversx_sdk::{
 };
 use std::collections::{BTreeMap, HashMap};
 
-pub async fn retrieve_account_as_scenario_set_state(api: String, args: &AccountArgs) {
-    let address = Address::from_bech32_string(&args.address).unwrap();
+pub async fn print_account_as_scenario_set_state(api: String, args: &AccountArgs) {
+    let scenario_raw =
+        retrieve_account_as_scenario_set_state(api, args.address.clone(), None).await;
+    println!("{}", scenario_raw.to_json_string());
+}
+
+pub async fn retrieve_account_as_scenario_set_state(
+    api: String,
+    addr: String,
+    custom_format: Option<String>,
+) -> ScenarioRaw {
+    let address = Address::from_bech32_string(&addr).unwrap();
     let blockchain = CommunicationProxy::new(api);
     let account = blockchain.get_account(&address).await.unwrap();
     let account_esdt = blockchain.get_account_esdt_tokens(&address).await.unwrap();
     let account_storage = blockchain.get_account_storage_keys(&address).await.unwrap();
 
-    let addr_pretty = if account.code.is_empty() {
-        format!("address:{}", args.address)
+    let addr_pretty: String;
+    if custom_format.is_none() {
+        addr_pretty = if account.code.is_empty() {
+            format!("address:{}", addr)
+        } else {
+            format!("sc:{}", addr)
+        };
     } else {
-        format!("sc:{}", args.address)
-    };
+        addr_pretty = format!("{}:{}", custom_format.unwrap(), addr);
+    }
 
     let mut accounts = BTreeMap::new();
     accounts.insert(
@@ -37,7 +52,7 @@ pub async fn retrieve_account_as_scenario_set_state(api: String, args: &AccountA
         },
     );
 
-    let real_data_scenario = ScenarioRaw {
+    ScenarioRaw {
         check_gas: None,
         comment: None,
         gas_schedule: None,
@@ -50,9 +65,7 @@ pub async fn retrieve_account_as_scenario_set_state(api: String, args: &AccountA
             current_block_info: None,
             previous_block_info: None,
         }],
-    };
-
-    println!("{}", real_data_scenario.to_json_string());
+    }
 }
 
 fn convert_storage(account_storage: HashMap<String, String>) -> BTreeMap<String, ValueSubTree> {

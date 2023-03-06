@@ -1,16 +1,34 @@
-use multiversx_sc_snippets::multiversx_sc::types::{ContractCall, ContractCallNoPayment};
+use std::time::Duration;
+
 #[allow(unused_imports)]
 use multiversx_sc_snippets::multiversx_sc::types::{
     EsdtTokenPayment, MultiValueEncoded, TokenIdentifier,
+};
+use multiversx_sc_snippets::{
+    multiversx_sc::types::{ContractCall, ContractCallNoPayment},
+    multiversx_sc_scenario::{
+        scenario_format::interpret_trait::InterpretableFrom,
+        standalone::retrieve_account_as_scenario_set_state,
+    },
 };
 
 use super::*;
 
 const WEGLD_SWAP_SC_BECH32: &str = "erd1qqqqqqqqqqqqqpgqcy2wua5cq59y6sxqj2ka3scayh5e5ms7cthqht8xtp";
 const WEGLD_TOKEN_IDENTIFIER: &str = "WEGLD-6cf38e";
-const AMOUNT: u64 = 50000000000000000; // 0.05 EGLD | 0.05 WEGLD
+const WRAP_AMOUNT: u64 = 50000000000000000; // 0.05 EGLD
+const UNWRAP_AMOUNT: u64 = 25000000000000000; // 0.025 WEGLD
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 impl MultisigInteract {
+    pub async fn wegld_swap_full(&mut self) {
+        self.deploy().await;
+        self.feed_contract_egld().await;
+        self.wrap_egld().await;
+        self.interactor.sleep(Duration::from_secs(15)).await;
+        self.unwrap_egld().await;
+    }
+
     pub async fn wrap_egld(&mut self) {
         println!("proposing wrap egld...");
         let action_id = self.propose_wrap_egld().await;
@@ -35,6 +53,26 @@ impl MultisigInteract {
         self.perform_action(action_id, "15,000,000").await;
     }
 
+    pub async fn wegld_swap_set_state(&mut self) {
+        if self.interactor.tracer.is_none() {
+            return;
+        }
+
+        let scenario_raw = retrieve_account_as_scenario_set_state(
+            Config::load_config().gateway().to_string(),
+            WEGLD_SWAP_SC_BECH32.to_string(),
+            Some("bech32".to_string()),
+        )
+        .await;
+
+        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+        let tracer = self.interactor.tracer.as_mut().unwrap();
+
+        tracer.load_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+        tracer.scenario_trace.steps.extend(scenario.steps);
+        tracer.write_scenario_trace(INTERACTOR_SCENARIO_TRACE_PATH);
+    }
+
     async fn propose_wrap_egld(&mut self) -> Option<usize> {
         let result = self
             .interactor
@@ -43,7 +81,7 @@ impl MultisigInteract {
                     .multisig()
                     .propose_async_call(
                         bech32::decode(WEGLD_SWAP_SC_BECH32),
-                        AMOUNT,
+                        WRAP_AMOUNT,
                         "wrapEgld".to_string(),
                         MultiValueEncoded::new(),
                     )
@@ -72,7 +110,7 @@ impl MultisigInteract {
         .with_esdt_transfer(EsdtTokenPayment::new(
             TokenIdentifier::from(WEGLD_TOKEN_IDENTIFIER),
             0u64,
-            AMOUNT.into(),
+            UNWRAP_AMOUNT.into(),
         ))
         .into_normalized();
 

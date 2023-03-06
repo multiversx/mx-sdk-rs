@@ -39,7 +39,7 @@ async fn main() {
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
         Some(multisig_interact_cli::InteractCliCommand::Board) => {
-            multisig_interact.print_board().await;
+            multisig_interact.wegld_swap_full().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
             multisig_interact.deploy().await;
@@ -128,6 +128,8 @@ impl MultisigInteract {
             println!("deploy failed: {}", result.err().unwrap());
             return;
         }
+
+        self.wegld_swap_set_state().await;
 
         let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("new address: {new_address_bech32}");
@@ -250,7 +252,7 @@ impl MultisigInteract {
             .await
     }
 
-    async fn print_board(&mut self) {
+    async fn _print_board(&mut self) {
         let board: SingleValue<usize> = self
             .interactor
             .vm_query(self.state.multisig().num_board_members())

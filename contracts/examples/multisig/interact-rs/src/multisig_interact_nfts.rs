@@ -70,6 +70,11 @@ impl MultisigInteract {
         let action_id = action_id.unwrap();
         println!("perfoming issue collection action `{action_id}`...");
 
+        if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
+            return;
+        }
+        println!("quorum reached for action `{action_id}`");
+
         let step = self.perform_action_step(action_id, "80,000,000");
         let raw_result = self.interactor.sc_call_get_raw_result(step).await;
         let result = raw_result.issue_non_fungible_new_token_identifier();
@@ -138,6 +143,7 @@ impl MultisigInteract {
     }
 
     pub async fn create_items(&mut self) {
+        println!("creating items...");
         let mut last_index = self.get_action_last_index().await;
         let multisig_address = self.state.multisig().to_address();
 
@@ -172,11 +178,13 @@ impl MultisigInteract {
             );
         }
 
-        for _ in 0..NUM_ITEMS {
-            last_index += 1;
-            steps.push(self.perform_action_step(last_index, "30,000,000"));
-        }
-
         self.interactor.multiple_sc_calls(steps.as_slice()).await;
+        self.interactor.sleep(Duration::from_secs(15)).await;
+
+        for i in 0..NUM_ITEMS {
+            last_index += 1;
+            println!("creating item #{i} with action `{last_index}`...");
+            self.perform_action(last_index, "30,000,000").await;
+        }
     }
 }
