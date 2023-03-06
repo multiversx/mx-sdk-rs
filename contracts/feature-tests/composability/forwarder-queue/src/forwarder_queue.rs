@@ -29,12 +29,6 @@ pub trait ForwarderQueue {
     #[init]
     fn init(&self) {}
 
-    #[proxy]
-    fn self_proxy(&self, to: ManagedAddress) -> crate::Proxy<Self::Api>;
-
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[view]
     #[storage_mapper("queued_calls")]
     fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
@@ -61,62 +55,33 @@ pub trait ForwarderQueue {
 
     #[endpoint]
     #[payable("*")]
-    fn forward_queued_calls(&self, max_call_depth: usize) {
+    fn forward_queued_calls(&self) {
         let esdt_transfers_multi = self.call_value().all_esdt_transfers();
         self.forward_queued_calls_event(
-            max_call_depth,
             &self.call_value().egld_value(),
             &esdt_transfers_multi.into_multi_value(),
         );
 
-        // Should not reach here
-        if max_call_depth == 0 {
-            return;
-        }
-
         while let Some(node) = self.queued_calls().pop_front() {
             let call = node.clone().into_value();
 
-            // Got to the leaf -> call Vault
-            if max_call_depth == 1 {
-                let contract_call = ContractCallWithEgldOrSingleEsdt::<Self::Api, ()>::new(
-                    call.to.clone(),
-                    call.endpoint_name.clone(),
-                    call.payment_token.clone(),
-                    call.payment_nonce,
-                    call.payment_amount.clone(),
-                );
-                match call.call_type {
-                    QueuedCallType::Sync => {
-                        contract_call.execute_on_dest_context::<()>();
-                    },
-                    QueuedCallType::LegacyAsync => {
-                        contract_call.async_call().call_and_exit();
-                    },
-                    QueuedCallType::TransferExecute => {
-                        contract_call.transfer_execute();
-                    },
-                }
-            } else {
-                let contract_call = self
-                    .self_proxy(call.to)
-                    .forward_queued_calls(max_call_depth - 1)
-                    .with_egld_or_single_esdt_transfer((
-                        call.payment_token,
-                        call.payment_nonce,
-                        call.payment_amount,
-                    ));
-                match call.call_type {
-                    QueuedCallType::Sync => {
-                        contract_call.execute_on_dest_context::<()>();
-                    },
-                    QueuedCallType::LegacyAsync => {
-                        contract_call.async_call().call_and_exit();
-                    },
-                    QueuedCallType::TransferExecute => {
-                        contract_call.transfer_execute();
-                    },
-                }
+            let contract_call = ContractCallWithEgldOrSingleEsdt::<Self::Api, ()>::new(
+                call.to.clone(),
+                call.endpoint_name.clone(),
+                call.payment_token.clone(),
+                call.payment_nonce,
+                call.payment_amount.clone(),
+            );
+            match call.call_type {
+                QueuedCallType::Sync => {
+                    contract_call.execute_on_dest_context::<()>();
+                },
+                QueuedCallType::LegacyAsync => {
+                    contract_call.async_call().call_and_exit();
+                },
+                QueuedCallType::TransferExecute => {
+                    contract_call.transfer_execute();
+                },
             }
         }
     }
@@ -124,7 +89,6 @@ pub trait ForwarderQueue {
     #[event("forward_queued_calls")]
     fn forward_queued_calls_event(
         &self,
-        #[indexed] max_call_depth: usize,
         #[indexed] egld_value: &BigUint,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
