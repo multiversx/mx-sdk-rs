@@ -183,7 +183,7 @@ impl MultisigInteract {
 
         for i in 0..NUM_ITEMS {
             last_index += 1;
-            println!("creating item #{i} with action `{last_index}`...");
+            println!("creating item `{}` with action `{last_index}`...", i + 1);
             self.perform_action(last_index, "30,000,000").await;
         }
     }
