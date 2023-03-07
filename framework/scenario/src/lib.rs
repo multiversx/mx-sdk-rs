@@ -7,6 +7,7 @@ mod scenario_go_runner;
 mod scenario_rs_runner;
 pub mod standalone;
 pub mod whitebox;
+pub mod test_wallets;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
