@@ -1,8 +1,4 @@
-use std::{
-    borrow::Borrow,
-    cell::{RefCell, RefMut},
-    rc::Rc,
-};
+use std::{borrow::Borrow, cell::RefCell, rc::Rc};
 
 use multiversx_sc_snippets::multiversx_sc::types::Address;
 

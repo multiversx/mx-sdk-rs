@@ -12,12 +12,12 @@ pub struct InteractCli {
 /// Composability Interact CLI Commands
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum InteractCliCommand {
-    #[command(name = "deploy-vault", about = "Deploy Vault contract")]
-    DeployVault,
-    #[command(name = "deploy-forwarder-raw", about = "Deploy ForwarderRaw contract")]
-    DeployForwarderRaw,
-    #[command(name = "deploy-promises", about = "Deploy Promises contract")]
-    DeployPromises,
+    // #[command(name = "deploy-vault", about = "Deploy Vault contract")]
+    // DeployVault,
+    // #[command(name = "deploy-forwarder-raw", about = "Deploy ForwarderRaw contract")]
+    // DeployForwarderRaw,
+    // #[command(name = "deploy-promises", about = "Deploy Promises contract")]
+    // DeployPromises,
     #[command(name = "full", about = "Full scenario, whatever that means")]
     Full,
 }
