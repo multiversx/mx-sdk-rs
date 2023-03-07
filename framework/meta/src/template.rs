@@ -1,10 +1,13 @@
-use crate::cli_args::TemplateArgs;
+use crate::{cargo_toml_contents::CargoTomlContents, cli_args::TemplateArgs};
 use copy_dir::*;
 use std::{env, fs::File, io::Write, path::Path};
 
 const REPOSITORY: &str = "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip";
 const TEMPLATES_SUBDIRECTORY: &str = "mx-sdk-rs-master/contracts/examples/";
 const ZIP_NAME: &str = "./master.zip";
+const ROOT_CARGO_TOML: &str = "./Cargo.toml";
+const META_CARGO_TOML: &str = "./meta/Cargo.toml";
+const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
 
 pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwest::Error> {
     download_binaries().await?;
@@ -17,6 +20,7 @@ pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwe
         })
         .join(&args.name);
     copy_template_to_location(&args.name, Path::new(&local_path));
+    update_dependencies(&args.name);
     Ok(())
 }
 
@@ -47,4 +51,24 @@ pub fn copy_template_to_location(template: &str, location: &Path) {
         .join(TEMPLATES_SUBDIRECTORY)
         .join(template);
     let _ = copy_dir(contract_path, location);
+}
+
+pub fn update_dependencies(template: &str) {
+    let path_buf = Path::new(template)
+        .join(ROOT_CARGO_TOML)
+        .canonicalize()
+        .unwrap_or_else(|err| {
+            panic!("error canonicalizing input path: {err}",);
+        });
+    let root_cargo_toml_path = Path::new(&path_buf);
+    let mut toml = CargoTomlContents::load_from_file(root_cargo_toml_path);
+
+    toml.dev_dependencies_mut().clear();
+
+    let deps_map = toml.dependencies_mut();
+    for (_key, value) in deps_map {
+        value.as_table_mut().unwrap().remove("path");
+    }
+
+    toml.save_to_file(root_cargo_toml_path);
 }
