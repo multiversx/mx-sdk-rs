@@ -18,4 +18,6 @@ pub enum InteractCliCommand {
     DeployForwarderRaw,
     #[command(name = "deploy-promises", about = "Deploy Promises contract")]
     DeployPromises,
+    #[command(name = "full", about = "Full scenario, whatever that means")]
+    Full,
 }

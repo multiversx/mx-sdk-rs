@@ -1,7 +1,9 @@
 mod composability_interact_cli;
 mod composability_interact_config;
 mod composability_interact_state;
+mod call_tree;
 
+use call_tree::CallState;
 use clap::Parser;
 use composability_interact_config::Config;
 use composability_interact_state::State;
@@ -41,6 +43,10 @@ async fn main() {
         },
         Some(composability_interact_cli::InteractCliCommand::DeployPromises) => {
             composability_interact.deploy_promises().await;
+        },
+        Some(composability_interact_cli::InteractCliCommand::Full) => {
+            let call_state = CallState::simple_example_2();
+            call_state.print();
         },
         None => {},
     }
