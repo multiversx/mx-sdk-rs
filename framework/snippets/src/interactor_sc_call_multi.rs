@@ -29,7 +29,7 @@ impl Interactor {
                 .await
                 .expect("failed to send transaction");
 
-            println!("process tx: {} with nonce: {}", tx_hash, tx.nonce);
+            println!("process tx: {tx_hash} with nonce: {}",tx.nonce);
             futures.push(self.retrieve_tx_on_network(tx_hash.clone()));
         }
 
@@ -45,7 +45,7 @@ impl Interactor {
                 .expect("sender not registered");
 
             sender.current_nonce = Some(nonce);
-            println!("sender's recalled nonce: {}", nonce);
+            println!("sender's recalled nonce: {nonce}");
         }
     }
 

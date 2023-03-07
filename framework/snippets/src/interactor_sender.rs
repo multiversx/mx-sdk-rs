@@ -46,7 +46,7 @@ impl Interactor {
 
         // recall if necessary
         let nonce = self.get_sender_nonce(sender).await;
-        println!("nonce: {}", nonce);
+        println!("nonce: {nonce}");
 
         // update
         let sender = self
