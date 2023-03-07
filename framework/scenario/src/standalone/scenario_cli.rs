@@ -37,7 +37,7 @@ pub async fn cli_main() {
     let api = cli_args.api.expect("API needs tp be specified");
     match &cli_args.command {
         Some(ScenarioCliAction::Account(args)) => {
-            account_tool::retrieve_account_as_scenario_set_state(api, args).await;
+            account_tool::print_account_as_scenario_set_state(api, args).await;
         },
         None => {},
     }

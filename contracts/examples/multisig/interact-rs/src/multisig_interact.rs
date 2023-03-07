@@ -28,6 +28,7 @@ use multiversx_sc_snippets::{
 };
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
@@ -68,6 +69,9 @@ async fn main() {
         Some(multisig_interact_cli::InteractCliCommand::UnwrapEgld) => {
             multisig_interact.unwrap_egld().await;
         },
+        Some(multisig_interact_cli::InteractCliCommand::WEgldSwapFull) => {
+            multisig_interact.wegld_swap_full().await;
+        },
         Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
             multisig_interact.wrap_egld().await;
         },
@@ -89,7 +93,10 @@ impl MultisigInteract {
         let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
         let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
 
-        let mut interactor = Interactor::new(config.gateway()).await;
+        let mut interactor = Interactor::new(config.gateway())
+            .await
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
         let wallet_address = interactor.register_wallet(alice);
         interactor.register_wallet(bob);
 
@@ -128,6 +135,8 @@ impl MultisigInteract {
             println!("deploy failed: {}", result.err().unwrap());
             return;
         }
+
+        self.wegld_swap_set_state().await;
 
         let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("new address: {new_address_bech32}");
@@ -200,7 +209,7 @@ impl MultisigInteract {
         for signer in self.init_board().iter() {
             if self.signed(signer, action_id).await {
                 println!(
-                    "{} already signed action `{action_id}`",
+                    "{} - already signed action `{action_id}`",
                     bech32::encode(signer)
                 );
                 continue;

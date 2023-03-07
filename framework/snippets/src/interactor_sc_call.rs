@@ -5,6 +5,7 @@ use multiversx_sc_scenario::{
         codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
         types::ContractCallWithEgld,
     },
+    scenario::ScenarioRunner,
     scenario_model::{ScCallStep, TransferStep, TxCall, TypedScCall},
     DebugApi,
 };
@@ -56,6 +57,12 @@ impl Interactor {
         ScCallStep: From<S>,
     {
         let sc_call_step: ScCallStep = sc_call_step.into();
+        self.launch_sc_call(&sc_call_step).await
+    }
+
+    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> String {
+        self.pre_runners.run_sc_call_step(sc_call_step);
+
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
@@ -63,6 +70,7 @@ impl Interactor {
         let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
         println!("sc call tx hash: {tx_hash}");
         info!("sc call tx hash: {}", tx_hash);
+
         tx_hash
     }
 
@@ -74,8 +82,12 @@ impl Interactor {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let tx_hash = self.sc_call(typed_sc_call).await;
+        let sc_call_step: ScCallStep = typed_sc_call.into();
+        let tx_hash = self.launch_sc_call(&sc_call_step).await;
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+
+        self.post_runners.run_sc_call_step(&sc_call_step);
+
         InteractorResult::new(tx)
     }
 
@@ -83,8 +95,11 @@ impl Interactor {
         &mut self,
         sc_call_step: ScCallStep,
     ) -> InteractorResult<IgnoreValue> {
-        let tx_hash = self.sc_call(sc_call_step).await;
+        let tx_hash = self.sc_call(sc_call_step.clone()).await;
         let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+
+        self.post_runners.run_sc_call_step(&sc_call_step);
+
         InteractorResult::new(tx)
     }
 
@@ -95,14 +110,21 @@ impl Interactor {
                 &sc_call_step.tx.from.value, sender_address,
                 "all calls are expected to have the same sender"
             );
+            // TODO: optimise here, so that we don't load and write the scenario trace for each call
+            self.pre_runners.run_sc_call_step(sc_call_step);
+
             let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
             self.set_nonce_and_sign_tx(sender_address, &mut transaction)
                 .await;
             let _ = self.proxy.send_transaction(&transaction).await.unwrap();
+
+            self.post_runners.run_sc_call_step(sc_call_step);
         }
     }
 
     pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
+        self.pre_runners.run_transfer_step(&transfer_step);
+
         let sender_address = &transfer_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
@@ -110,6 +132,9 @@ impl Interactor {
         let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
         println!("transfer tx hash: {tx_hash}");
         info!("transfer tx hash: {}", tx_hash);
+
+        self.post_runners.run_transfer_step(&transfer_step);
+
         tx_hash
     }
 
