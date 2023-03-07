@@ -506,7 +506,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = LinkedListNode<T>;
 
     type IntoIter = Iter<'a, SA, T>;
 

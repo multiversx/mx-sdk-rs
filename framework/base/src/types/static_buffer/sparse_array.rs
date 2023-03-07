@@ -123,7 +123,7 @@ impl<'a, E, const CAPACITY: usize> IntoIterator for &'a SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = usize;
 
     type IntoIter = SparseArrayIterator<'a, E, CAPACITY>;
 

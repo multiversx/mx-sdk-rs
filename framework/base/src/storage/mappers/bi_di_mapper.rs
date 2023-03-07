@@ -186,7 +186,7 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = (K, V);
 
     type IntoIter = Iter<'a, SA, K, V>;
 

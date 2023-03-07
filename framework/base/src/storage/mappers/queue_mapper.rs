@@ -410,7 +410,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = T;
 
     type IntoIter = Iter<'a, SA, T>;
 

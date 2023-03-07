@@ -168,7 +168,7 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = (K, V);
 
     type IntoIter = Iter<'a, SA, K, V>;
 

@@ -137,7 +137,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = T::Ref<'a>;
 
     type IntoIter = ManagedVecRefIterator<'a, M, T>;
 

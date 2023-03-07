@@ -118,7 +118,7 @@ impl<'a, SA> IntoIterator for &'a UniqueIdMapper<SA>
 where
     SA: StorageMapperApi,
 {
-    type Item = <Self::IntoIter as Iterator>::Item;
+    type Item = usize;
 
     type IntoIter = Iter<'a, SA>;
 
