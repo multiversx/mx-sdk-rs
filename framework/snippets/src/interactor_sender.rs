@@ -11,6 +11,9 @@ pub struct Sender {
     pub current_nonce: Option<u64>,
 }
 
+// unsafe impl Sync for Interactor {}
+// unsafe impl Send for Interactor {}
+
 impl Interactor {
     pub async fn recall_nonce(&self, address: &Address) -> u64 {
         let erdrs_address = address_h256_to_erdrs(address);
@@ -43,6 +46,7 @@ impl Interactor {
 
         // recall if necessary
         let nonce = self.get_sender_nonce(sender).await;
+        println!("nonce: {}", nonce);
 
         // update
         let sender = self
@@ -53,6 +57,7 @@ impl Interactor {
 
         // set tx nonce
         transaction.nonce = nonce;
+        println!("tx nonce: {}", transaction.nonce);
 
         // sign
         let signature = sender.wallet.sign_tx(transaction);

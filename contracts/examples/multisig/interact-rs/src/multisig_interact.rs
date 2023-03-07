@@ -92,6 +92,9 @@ impl MultisigInteract {
         let config = Config::load_config();
         let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
         let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
+        let carol = Wallet::from_pem_file("carol.pem").unwrap();
+        let dan = Wallet::from_pem_file("dan.pem").unwrap();
+        let eve = Wallet::from_pem_file("eve.pem").unwrap();
 
         let mut interactor = Interactor::new(config.gateway())
             .await
@@ -99,6 +102,9 @@ impl MultisigInteract {
             .await;
         let wallet_address = interactor.register_wallet(alice);
         interactor.register_wallet(bob);
+        interactor.register_wallet(carol);
+        interactor.register_wallet(dan);
+        interactor.register_wallet(eve);
 
         Self {
             interactor,
@@ -148,7 +154,17 @@ impl MultisigInteract {
     fn init_board(&mut self) -> MultiValueVec<Address> {
         let config = Config::load_config();
         let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
-        MultiValueVec::from([self.wallet_address.clone(), bob.address().to_bytes().into()])
+        let carol = Wallet::from_pem_file("carol.pem").unwrap();
+        let dan = Wallet::from_pem_file("dan.pem").unwrap();
+        let eve = Wallet::from_pem_file("eve.pem").unwrap();
+
+        MultiValueVec::from([
+            self.wallet_address.clone(),
+            bob.address().to_bytes().into(),
+            carol.address().to_bytes().into(),
+            dan.address().to_bytes().into(),
+            eve.address().to_bytes().into(),
+        ])
     }
 
     async fn feed_contract_egld(&mut self) {
@@ -206,6 +222,7 @@ impl MultisigInteract {
 
     async fn sign(&mut self, action_id: usize) -> bool {
         println!("signing action `{action_id}`...");
+        let mut steps = Vec::new();
         for signer in self.init_board().iter() {
             if self.signed(signer, action_id).await {
                 println!(
@@ -224,21 +241,25 @@ impl MultisigInteract {
                 .gas_limit("15,000,000")
                 .into();
 
-            let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
-            let result = raw_result.handle_signal_error_event();
-            if result.is_err() {
-                println!(
-                    "perform sign `{action_id}` failed with: {}",
-                    result.err().unwrap()
-                );
-                return false;
-            }
+            steps.push(sc_call_step);
 
-            println!(
-                "{} - successfully signed action `{action_id}`",
-                bech32::encode(signer)
-            );
+            // let result = raw_result.handle_signal_error_event();
+            // if result.is_err() {
+            //     println!(
+            //         "perform sign `{action_id}` failed with: {}",
+            //         result.err().unwrap()
+            //     );
+            //     return false;
+            // }
+
+            // println!(
+            //     "{} - successfully signed action `{action_id}`",
+            //     bech32::encode(signer)
+            // );
         }
+
+        // TODO: error handling
+        self.interactor.multiple_sc_calls_parallel(&steps).await;
 
         println!("successfully performed sign action `{action_id}`");
         true
