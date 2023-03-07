@@ -61,7 +61,7 @@ impl Interactor {
     }
 
     async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> String {
-        self.pre_runners.run_sc_call_step(&sc_call_step);
+        self.pre_runners.run_sc_call_step(sc_call_step);
 
         let sender_address = &sc_call_step.tx.from.value;
         let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
@@ -111,14 +111,14 @@ impl Interactor {
                 "all calls are expected to have the same sender"
             );
             // TODO: optimise here, so that we don't load and write the scenario trace for each call
-            self.pre_runners.run_sc_call_step(&sc_call_step);
+            self.pre_runners.run_sc_call_step(sc_call_step);
 
             let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
             self.set_nonce_and_sign_tx(sender_address, &mut transaction)
                 .await;
             let _ = self.proxy.send_transaction(&transaction).await.unwrap();
 
-            self.post_runners.run_sc_call_step(&sc_call_step);
+            self.post_runners.run_sc_call_step(sc_call_step);
         }
     }
 
