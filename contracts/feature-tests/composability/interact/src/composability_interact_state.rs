@@ -13,15 +13,20 @@ const DEFAULT_CONTRACT_ADDRESS: &str =
 const STATE_FILE: &str = "state.toml";
 
 pub type VaultContract = ContractInfo<vault::Proxy<DebugApi>>;
-pub type ForwarderRawContract = ContractInfo<forwarder_raw::Proxy<DebugApi>>;
+pub type ForwarderRawContract = ContractInfo<forwarder_queue::Proxy<DebugApi>>;
 pub type PromisesContract = ContractInfo<promises_features::Proxy<DebugApi>>;
+
+/// Composability Interact Contract
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct InteractionContract {
+    pub own_address: Option<String>,
+    pub child_contracts: Vec<InteractionContract>,
+}
 
 /// Composability Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
-    vault_address: Option<String>,
-    forwarder_raw_address: Option<String>,
-    promises_address: Option<String>,
+    pub root_contract: InteractionContract,
 }
 
 impl State {
@@ -37,32 +42,27 @@ impl State {
         }
     }
 
-    /// Sets the vault address
-    pub fn set_vault_address(&mut self, address: &str) {
-        self.vault_address = Some(String::from(address));
-    }
-    /// Sets the forwarder-raw address
-    pub fn set_forwarder_raw_address(&mut self, address: &str) {
-        self.forwarder_raw_address = Some(String::from(address));
-    }
-    /// Sets the promises address
-    pub fn set_promises_address(&mut self, address: &str) {
-        self.promises_address = Some(String::from(address));
+    // /// Sets the forwarder-queue address
+    // pub fn set_root_contract_address(&mut self, address: &str) {
+    //     self.root_contract.own_address = Some(String::from(address));
+    // }
+
+    // /// Sets the forwarder-queue address
+    // pub fn get_root_contract(&mut self) -> InteractionContract {
+    //     self.root_contract
+    // }
+
+    /// Sets the forwarder-queue address
+    pub fn get_child_contracts(
+        &mut self,
+        contract: InteractionContract,
+    ) -> Vec<InteractionContract> {
+        contract.child_contracts
     }
 
-    /// Returns the vault contract
-    pub fn _vault(&self) -> VaultContract {
-        VaultContract::new(self.vault_address.clone().unwrap())
-    }
-
-    /// Returns the forwarder-raw contract
-    pub fn _forwarder_raw(&self) -> ForwarderRawContract {
-        ForwarderRawContract::new(self.forwarder_raw_address.clone().unwrap())
-    }
-
-    /// Returns the promises contract
-    pub fn _promises(&self) -> PromisesContract {
-        PromisesContract::new(self.promises_address.clone().unwrap())
+    /// Sets the forwarder-queue address
+    pub fn get_own_address(&mut self, contract: InteractionContract) -> String {
+        contract.own_address.unwrap()
     }
 
     /// Returns the vault contract with default address
@@ -70,8 +70,8 @@ impl State {
         VaultContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 
-    /// Returns the forwarder-raw contract with default address
-    pub fn default_forwarder_raw_address(&self) -> ForwarderRawContract {
+    /// Returns the forwarder-queue contract with default address
+    pub fn default_forwarder_queue_address(&self) -> ForwarderRawContract {
         ForwarderRawContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 
@@ -87,5 +87,11 @@ impl Drop for State {
         let mut file = std::fs::File::create(STATE_FILE).unwrap();
         file.write_all(toml::to_string(self).unwrap().as_bytes())
             .unwrap();
+    }
+}
+
+impl InteractionContract {
+    pub fn new() -> Self {
+
     }
 }

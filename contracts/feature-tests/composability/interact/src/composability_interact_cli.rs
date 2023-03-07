@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, Args};
 
 /// Composability Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
@@ -14,8 +14,16 @@ pub struct InteractCli {
 pub enum InteractCliCommand {
     #[command(name = "deploy-vault", about = "Deploy Vault contract")]
     DeployVault,
-    #[command(name = "deploy-forwarder-raw", about = "Deploy ForwarderRaw contract")]
-    DeployForwarderRaw,
     #[command(name = "deploy-promises", about = "Deploy Promises contract")]
     DeployPromises,
+    #[command(name = "deploy-stresser", about = "Deploy Stresser")]
+    DeployStresser(StresserArgs),
 }
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct StresserArgs {
+    /// The number of contracts deployed used by the stresser
+    #[arg(short = 'n', long = "number", verbatim_doc_comment)]
+    pub contracts_number: String,
+}
+

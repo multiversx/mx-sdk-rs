@@ -17,8 +17,8 @@ toml = "0.7.2"
 [dependencies.vault]
 path = "../vault"
 
-[dependencies.forwarder-raw]
-path = "../forwarder-raw"
+[dependencies.forwarder-queue]
+path = "../forwarder-queue"
 
 [dependencies.promises-features]
 path = "../promises-features"
