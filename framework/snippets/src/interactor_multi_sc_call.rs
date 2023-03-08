@@ -25,10 +25,7 @@ impl Interactor {
 
         self.post_runners.run_multi_sc_call_step(sc_call_steps);
 
-        results
-            .into_iter()
-            .map(|result| InteractorResult::new(result))
-            .collect()
+        results.into_iter().map(InteractorResult::new).collect()
     }
 
     async fn process_txs(&mut self, txs: Vec<Transaction>) -> Vec<TransactionOnNetwork> {
