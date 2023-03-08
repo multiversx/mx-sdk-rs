@@ -13,14 +13,14 @@ const DEFAULT_CONTRACT_ADDRESS: &str =
 const STATE_FILE: &str = "state.toml";
 
 pub type VaultContract = ContractInfo<vault::Proxy<DebugApi>>;
-pub type ForwarderRawContract = ContractInfo<forwarder_raw::Proxy<DebugApi>>;
+pub type ForwarderQueueContract = ContractInfo<forwarder_queue::Proxy<DebugApi>>;
 pub type PromisesContract = ContractInfo<promises_features::Proxy<DebugApi>>;
 
 /// Composability Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
     vault_address: Option<String>,
-    forwarder_raw_address: Option<String>,
+    forwarder_queue_address: Option<String>,
     promises_address: Option<String>,
 }
 
@@ -41,9 +41,9 @@ impl State {
     pub fn set_vault_address(&mut self, address: &str) {
         self.vault_address = Some(String::from(address));
     }
-    /// Sets the forwarder-raw address
-    pub fn set_forwarder_raw_address(&mut self, address: &str) {
-        self.forwarder_raw_address = Some(String::from(address));
+    /// Sets the forwarder-queue address
+    pub fn set_forwarder_queue_address(&mut self, address: &str) {
+        self.forwarder_queue_address = Some(String::from(address));
     }
     /// Sets the promises address
     pub fn set_promises_address(&mut self, address: &str) {
@@ -51,13 +51,13 @@ impl State {
     }
 
     /// Returns the vault contract
-    pub fn _vault(&self) -> VaultContract {
-        VaultContract::new(self.vault_address.clone().unwrap())
+    pub fn vault_from_address(&self, address: &str) -> VaultContract {
+        VaultContract::new(address)
     }
 
-    /// Returns the forwarder-raw contract
-    pub fn _forwarder_raw(&self) -> ForwarderRawContract {
-        ForwarderRawContract::new(self.forwarder_raw_address.clone().unwrap())
+    /// Returns the forwarder-queue contract
+    pub fn forwarder_queue_from_addr(&self, address: &str) -> ForwarderQueueContract {
+        ForwarderQueueContract::new(address)
     }
 
     /// Returns the promises contract
@@ -70,9 +70,9 @@ impl State {
         VaultContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 
-    /// Returns the forwarder-raw contract with default address
-    pub fn default_forwarder_raw_address(&self) -> ForwarderRawContract {
-        ForwarderRawContract::new(DEFAULT_CONTRACT_ADDRESS)
+    /// Returns the forwarder-queue contract with default address
+    pub fn default_forwarder_queue_address(&self) -> ForwarderQueueContract {
+        ForwarderQueueContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 
     /// Returns the promises contract with default address

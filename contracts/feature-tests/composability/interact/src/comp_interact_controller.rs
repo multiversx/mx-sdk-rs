@@ -1,6 +1,7 @@
 use crate::{call_tree::CallState, comp_interact_config::Config, comp_interact_state::State};
 
-use multiversx_sc_snippets::{erdrs::wallet::Wallet, multiversx_sc::types::Address, Interactor};
+use forwarder_queue::QueuedCallType;
+use multiversx_sc_snippets::{erdrs::wallet::Wallet, multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier}, Interactor, multiversx_sc_scenario::DebugApi};
 
 pub struct ComposabilityInteract {
     pub interactor: Interactor,
@@ -22,10 +23,27 @@ impl ComposabilityInteract {
         }
     }
 
-    pub async fn full_scenario(&mut self) {
+    pub async fn full_scenario(
+        &mut self,
+        call_type: QueuedCallType,
+        endpoint_name: &str,
+        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_nonce: u64,
+        payment_amount: u64,
+    ) {
         let call_state = CallState::simple_example_2();
         call_state.print();
 
         self.deploy_call_tree_contracts(&call_state).await;
+
+        self.add_calls_to_all_fwds(
+            &call_state,
+            call_type,
+            endpoint_name,
+            payment_token,
+            payment_nonce,
+            payment_amount,
+        )
+        .await;
     }
 }

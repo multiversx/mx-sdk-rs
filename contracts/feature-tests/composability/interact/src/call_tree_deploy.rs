@@ -1,24 +1,27 @@
 use std::{cell::RefCell, rc::Rc};
 
 use crate::{
-    call_tree::{CallState, ForwarderQueueTarget, VaultTarget},
+    call_tree::{CallNode, CallState, ForwarderQueueTarget, VaultTarget},
     comp_interact_controller::ComposabilityInteract,
 };
 
-use forwarder_raw::ProxyTrait as _;
+use forwarder_queue::{ProxyTrait as _, QueuedCallType};
 use multiversx_sc_snippets::{
     multiversx_sc::{
         codec::multi_types::OptionalValue,
-        types::{BoxedBytes, CodeMetadata},
+        types::{Address, BoxedBytes, CodeMetadata, EgldOrEsdtTokenIdentifier},
     },
     multiversx_sc_scenario::{
         bech32,
         scenario_format::interpret_trait::InterpreterContext,
         scenario_model::{IntoBlockchainCall, TxExpect},
+        DebugApi,
     },
 };
 use promises_features::ProxyTrait as _;
 use vault::ProxyTrait as _;
+
+const ADD_QUEUED_CALL_ENDPOINT: &str = "add_queued_call";
 
 impl ComposabilityInteract {
     pub async fn deploy_call_tree_contracts(&mut self, call_state: &CallState) {
@@ -64,7 +67,7 @@ impl ComposabilityInteract {
             .interactor
             .sc_deploy(
                 self.state
-                    .default_forwarder_raw_address()
+                    .default_forwarder_queue_address()
                     .init()
                     .into_blockchain_call()
                     .from(&self.wallet_address)
@@ -116,5 +119,108 @@ impl ComposabilityInteract {
 
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_promises_address(&new_address_expr);
+    }
+
+    pub async fn add_queued_call(
+        &mut self,
+        fwd_rc: Rc<RefCell<ForwarderQueueTarget>>,
+        call_type: QueuedCallType,
+        to: Address,
+        endpoint_name: &str,
+        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_nonce: u64,
+        payment_amount: u64,
+    ) {
+        let fwd = fwd_rc.borrow_mut();
+        let fwd_addr = fwd.address.clone().unwrap();
+
+        let _ = self
+            .interactor
+            .sc_call(
+                self.state
+                    .forwarder_queue_from_addr(&bech32::encode(&fwd_addr))
+                    .add_queued_call(
+                        call_type,
+                        to,
+                        endpoint_name,
+                        payment_token,
+                        payment_nonce,
+                        payment_amount,
+                    )
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit("70,000,000")
+                    .expect(TxExpect::ok()),
+            )
+            .await;
+    }
+
+    pub async fn add_queued_calls_to_children(
+        &mut self,
+        fwd_rc: Rc<RefCell<ForwarderQueueTarget>>,
+        call_type: QueuedCallType,
+        endpoint_name: &str,
+        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_nonce: u64,
+        payment_amount: u64,
+    ) {
+        let fwd = fwd_rc.borrow();
+        for child in &fwd.children {
+            match child {
+                CallNode::ForwarderQueue(child_fwd_rc) => {
+                    // forward_queued_calls to ForwarderQueue's children
+                    let child_fwd = (*child_fwd_rc).borrow();
+                    let child_fwd_addr = child_fwd.address.clone().unwrap();
+
+                    self.add_queued_call(
+                        fwd_rc.clone(),
+                        call_type.clone(),
+                        child_fwd_addr,
+                        ADD_QUEUED_CALL_ENDPOINT,
+                        payment_token.clone(),
+                        payment_nonce,
+                        payment_amount,
+                    )
+                    .await;
+                },
+                CallNode::Vault(vault_rc) => {
+                    // Call Vault
+                    let vault = (*vault_rc).borrow_mut();
+                    let vault_addr = vault.address.clone().unwrap();
+                    self.add_queued_call(
+                        fwd_rc.clone(),
+                        call_type.clone(),
+                        vault_addr,
+                        endpoint_name,
+                        payment_token.clone(),
+                        payment_nonce,
+                        payment_amount,
+                    )
+                    .await;
+                },
+            }
+        }
+    }
+
+    pub async fn add_calls_to_all_fwds(
+        &mut self,
+        call_state: &CallState,
+        call_type: QueuedCallType,
+        endpoint_name: &str,
+        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_nonce: u64,
+        payment_amount: u64,
+    ) {
+        for fwd_rc in &call_state.forwarders {
+            self.add_queued_calls_to_children(
+                fwd_rc.clone(),
+                call_type.clone(),
+                endpoint_name,
+                payment_token.clone(),
+                payment_nonce,
+                payment_amount,
+            )
+            .await;
+        }
     }
 }

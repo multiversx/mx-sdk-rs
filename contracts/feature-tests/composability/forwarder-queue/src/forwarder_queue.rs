@@ -13,12 +13,12 @@ pub enum QueuedCallType {
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct QueuedCall<M: ManagedTypeApi> {
-    call_type: QueuedCallType,
-    to: ManagedAddress<M>,
-    endpoint_name: ManagedBuffer<M>,
-    payment_token: EgldOrEsdtTokenIdentifier<M>,
-    payment_nonce: u64,
-    payment_amount: BigUint<M>,
+    pub call_type: QueuedCallType,
+    pub to: ManagedAddress<M>,
+    pub endpoint_name: ManagedBuffer<M>,
+    pub payment_token: EgldOrEsdtTokenIdentifier<M>,
+    pub payment_nonce: u64,
+    pub payment_amount: BigUint<M>,
 }
 
 /// Testing multiple calls per transaction, cascading on.

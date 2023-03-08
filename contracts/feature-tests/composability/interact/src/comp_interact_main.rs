@@ -5,13 +5,16 @@ mod comp_interact_config;
 mod comp_interact_controller;
 mod comp_interact_state;
 
+use std::env::args;
+
 use clap::Parser;
 
 use comp_interact_controller::ComposabilityInteract;
 
-use forwarder_raw::ProxyTrait as ForwarderRawProxyTrait;
+use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     env_logger,
+    multiversx_sc::types::{EgldOrEsdtTokenIdentifier, TokenIdentifier},
     multiversx_sc_scenario::{ContractInfo, DebugApi},
     tokio,
 };
@@ -34,8 +37,27 @@ async fn main() {
         // Some(comp_interact_cli::InteractCliCommand::DeployPromises) => {
         //     composability_interact.deploy_promises().await;
         // },
-        Some(comp_interact_cli::InteractCliCommand::Full) => {
-            composability_interact.full_scenario().await;
+        Some(comp_interact_cli::InteractCliCommand::Full(args)) => {
+            let token_payment = match args.payment_token.as_str() {
+                "EGLD" => EgldOrEsdtTokenIdentifier::egld(),
+                _ => EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from(&*args.payment_token)),
+            };
+            let call_type_string = match args.call_type.as_str() {
+                "Sync" => QueuedCallType::Sync,
+                "LegacyAsync" => QueuedCallType::LegacyAsync,
+                "TransferExecute" => QueuedCallType::TransferExecute,
+                &_ => todo!()
+            };
+
+            composability_interact
+                .full_scenario(
+                    call_type_string,
+                    &args.endpoint_name,
+                    token_payment,
+                    args.payment_nonce,
+                    args.payment_amount,
+                )
+                .await;
         },
         None => {},
     }
