@@ -243,24 +243,19 @@ impl MultisigInteract {
                 .into();
 
             steps.push(sc_call_step);
-
-            // let result = raw_result.handle_signal_error_event();
-            // if result.is_err() {
-            //     println!(
-            //         "perform sign `{action_id}` failed with: {}",
-            //         result.err().unwrap()
-            //     );
-            //     return false;
-            // }
-
-            // println!(
-            //     "{} - successfully signed action `{action_id}`",
-            //     bech32::encode(signer)
-            // );
         }
 
-        // TODO: error handling
-        self.interactor.multiple_sc_calls_parallel(&steps).await;
+        let results = self.interactor.multiple_sc_calls_raw_results(&steps).await;
+        for result in results {
+            let result = result.handle_signal_error_event();
+            if result.is_err() {
+                println!(
+                    "perform sign `{action_id}` failed with: {}",
+                    result.err().unwrap()
+                );
+                return false;
+            }
+        }
 
         println!("successfully performed sign action `{action_id}`");
         true
@@ -288,17 +283,6 @@ impl MultisigInteract {
             .await;
 
         println!("board: {}", board.into());
-
-        // TODO: fix this
-        // let board_members: MultiValueVec<Address> = self
-        //     .interactor
-        //     .vm_query(self.state.multisig().get_all_board_members())
-        //     .await;
-
-        // println!("board members:");
-        // for board_member in board_members.iter() {
-        //     println!("    {}", bech32::encode(board_member));
-        // }
     }
 
     async fn dns_register(&mut self, name: &str) {

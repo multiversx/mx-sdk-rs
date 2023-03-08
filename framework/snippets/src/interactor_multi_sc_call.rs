@@ -1,6 +1,8 @@
-use crate::{multiversx_sc::types::Address, Interactor, Sender};
+use crate::{multiversx_sc::types::Address, Interactor, InteractorResult, Sender};
 use futures::future::join_all;
-use multiversx_sc_scenario::scenario_model::ScCallStep;
+use multiversx_sc_scenario::{
+    multiversx_sc::codec::multi_types::IgnoreValue, scenario_model::ScCallStep,
+};
 use multiversx_sdk::data::transaction::{Transaction, TransactionOnNetwork};
 use std::collections::HashSet;
 
@@ -8,15 +10,20 @@ type Txs = Vec<Transaction>;
 type SenderSet = HashSet<Address>;
 
 impl Interactor {
-    pub async fn multiple_sc_calls_parallel(
+    pub async fn multiple_sc_calls_raw_results(
         &mut self,
         sc_call_steps: &[ScCallStep],
-    ) -> Vec<TransactionOnNetwork> {
+    ) -> Vec<InteractorResult<IgnoreValue>> {
         let senders = retrieve_senders(sc_call_steps);
         self.recall_senders_nonce(senders).await;
 
         let txs = self.retrieve_txs(sc_call_steps);
-        self.process_txs(txs).await
+        let results = self.process_txs(txs).await;
+
+        results
+            .into_iter()
+            .map(|result| InteractorResult::new(result))
+            .collect()
     }
 
     async fn process_txs(&mut self, txs: Vec<Transaction>) -> Vec<TransactionOnNetwork> {
@@ -29,7 +36,7 @@ impl Interactor {
                 .await
                 .expect("failed to send transaction");
 
-            println!("process tx: {tx_hash} with nonce: {}",tx.nonce);
+            println!("process tx: {tx_hash} with nonce: {}", tx.nonce);
             futures.push(self.retrieve_tx_on_network(tx_hash.clone()));
         }
 
