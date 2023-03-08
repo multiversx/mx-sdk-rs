@@ -78,6 +78,14 @@ impl ScenarioRunner for ScenarioTrace {
         self.scenario_trace.steps.push(Step::ScCall(step.clone()));
     }
 
+    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+        for step in steps {
+            self.process_address_value(&step.tx.from);
+            self.process_address_value(&step.tx.to);
+            self.scenario_trace.steps.push(Step::ScCall(step.clone()));
+        }
+    }
+
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {
         self.process_address_value(&step.tx.to);
         self.scenario_trace.steps.push(Step::ScQuery(step.clone()));

@@ -31,6 +31,12 @@ impl ScenarioRunner for ScenarioVMRunner {
         self.perform_sc_call(step);
     }
 
+    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+        for step in steps {
+            self.perform_sc_call(step);
+        }
+    }
+
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {
         let _ = self.perform_sc_query(step);
     }

@@ -41,6 +41,10 @@ impl ScenarioRunner for ScenarioTraceFile {
         self.with_tracer(|tracer| tracer.run_sc_call_step(step));
     }
 
+    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+        self.with_tracer(|tracer| tracer.run_multi_sc_call_step(steps));
+    }
+
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {
         self.with_tracer(|tracer| tracer.run_sc_query_step(step));
     }

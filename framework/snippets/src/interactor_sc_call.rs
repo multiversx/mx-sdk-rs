@@ -110,7 +110,7 @@ impl Interactor {
                 &sc_call_step.tx.from.value, sender_address,
                 "all calls are expected to have the same sender"
             );
-            // TODO: optimise here, so that we don't load and write the scenario trace for each call
+
             self.pre_runners.run_sc_call_step(sc_call_step);
 
             let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
