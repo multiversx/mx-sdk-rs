@@ -8,9 +8,7 @@ const TX_GET_RESULTS_NUM_RETRIES: usize = 8;
 impl Interactor {
     pub(crate) async fn retrieve_tx_on_network(&self, tx_hash: String) -> TransactionOnNetwork {
         let mut waiting_time_ms = 0;
-        let duration = Duration::from_secs(25);
-
-        sleep(&mut waiting_time_ms, duration).await;
+        sleep(&mut waiting_time_ms, Duration::from_secs(25)).await;
 
         let mut retries = TX_GET_RESULTS_NUM_RETRIES;
         let mut wait = 1000u64;

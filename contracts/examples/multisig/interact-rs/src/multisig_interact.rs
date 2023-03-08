@@ -12,9 +12,9 @@ use multisig::{
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
+use multiversx_sc_scenario::test_wallets::*;
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
-    erdrs::wallet::Wallet,
     multiversx_sc::{
         codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
@@ -36,6 +36,7 @@ async fn main() {
     env_logger::init();
 
     let mut multisig_interact = MultisigInteract::init().await;
+    multisig_interact.register_wallets();
 
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -90,21 +91,11 @@ struct MultisigInteract {
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
-        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
-        let carol = Wallet::from_pem_file("carol.pem").unwrap();
-        let dan = Wallet::from_pem_file("dan.pem").unwrap();
-        let eve = Wallet::from_pem_file("eve.pem").unwrap();
-
         let mut interactor = Interactor::new(config.gateway())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(alice);
-        interactor.register_wallet(bob);
-        interactor.register_wallet(carol);
-        interactor.register_wallet(dan);
-        interactor.register_wallet(eve);
+        let wallet_address = interactor.register_wallet(alice());
 
         Self {
             interactor,
@@ -116,8 +107,19 @@ impl MultisigInteract {
         }
     }
 
+    fn register_wallets(&mut self) {
+        let bob = bob();
+        let carol = carol();
+        let dan = dan();
+        let eve = eve();
+
+        for wallet in vec![bob, carol, dan, eve] {
+            self.interactor.register_wallet(wallet);
+        }
+    }
+
     async fn deploy(&mut self) {
-        let board = self.init_board();
+        let board = self.board();
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
@@ -151,12 +153,11 @@ impl MultisigInteract {
         self.state.set_multisig_address(&new_address_expr);
     }
 
-    fn init_board(&mut self) -> MultiValueVec<Address> {
-        let config = Config::load_config();
-        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
-        let carol = Wallet::from_pem_file("carol.pem").unwrap();
-        let dan = Wallet::from_pem_file("dan.pem").unwrap();
-        let eve = Wallet::from_pem_file("eve.pem").unwrap();
+    fn board(&mut self) -> MultiValueVec<Address> {
+        let bob = bob();
+        let carol = carol();
+        let dan = dan();
+        let eve = eve();
 
         MultiValueVec::from([
             self.wallet_address.clone(),
@@ -223,7 +224,7 @@ impl MultisigInteract {
     async fn sign(&mut self, action_id: usize) -> bool {
         println!("signing action `{action_id}`...");
         let mut steps = Vec::new();
-        for signer in self.init_board().iter() {
+        for signer in self.board().iter() {
             if self.signed(signer, action_id).await {
                 println!(
                     "{} - already signed action `{action_id}`",
