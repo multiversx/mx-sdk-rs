@@ -79,6 +79,14 @@ impl CargoTomlContents {
             .expect("malformed crate Cargo.toml")
     }
 
+    pub fn dev_dependencies_mut(&mut self) -> &mut Table {
+        self.toml_value
+            .get_mut(CARGO_TOML_DEV_DEPENDENCIES)
+            .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
+            .as_table_mut()
+            .expect("malformed crate Cargo.toml")
+    }
+
     pub fn local_dependency_paths(&self, ignore_deps: &[&str]) -> Vec<String> {
         let mut result = Vec::new();
         if let Some(deps_map) = self.dependencies_table() {
