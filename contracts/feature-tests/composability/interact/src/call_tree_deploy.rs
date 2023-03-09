@@ -131,14 +131,17 @@ impl ComposabilityInteract {
         payment_nonce: u64,
         payment_amount: u64,
     ) {
-        let fwd = fwd_rc.borrow_mut();
+        let fwd = fwd_rc.borrow();
         let fwd_addr = fwd.address.clone().unwrap();
+
+        let fwd_addr_bech32 = bech32::encode(&fwd_addr);
+        let fwd_addr_expr = format!("bech32:{fwd_addr_bech32}");
 
         let _ = self
             .interactor
             .sc_call(
                 self.state
-                    .forwarder_queue_from_addr(&bech32::encode(&fwd_addr))
+                    .forwarder_queue_from_addr(&fwd_addr_expr)
                     .add_queued_call(
                         call_type,
                         to,
@@ -172,6 +175,8 @@ impl ComposabilityInteract {
                     let child_fwd = (*child_fwd_rc).borrow();
                     let child_fwd_addr = child_fwd.address.clone().unwrap();
 
+                    println!("child_name: {}, parent_name: {}", child_fwd.name, fwd.name);
+
                     self.add_queued_call(
                         fwd_rc.clone(),
                         call_type.clone(),
@@ -187,6 +192,9 @@ impl ComposabilityInteract {
                     // Call Vault
                     let vault = (*vault_rc).borrow_mut();
                     let vault_addr = vault.address.clone().unwrap();
+
+                    println!("child_name: {}, parent_name: {}", vault.name, fwd.name);
+
                     self.add_queued_call(
                         fwd_rc.clone(),
                         call_type.clone(),
@@ -222,5 +230,25 @@ impl ComposabilityInteract {
             )
             .await;
         }
+    }
+
+    pub async fn call_root(&mut self, call_state: &CallState) {
+        let root_addr_ref = call_state.root.borrow_mut();
+        let root_addr = root_addr_ref.address.clone().unwrap();
+        let root_addr_bech32 = bech32::encode(&root_addr);
+        let root_addr_expr = format!("bech32:{root_addr_bech32}");
+
+        let _ = self
+            .interactor
+            .sc_call(
+                self.state
+                    .forwarder_queue_from_addr(&root_addr_expr)
+                    .forward_queued_calls()
+                    .into_blockchain_call()
+                    .from(&self.wallet_address)
+                    .gas_limit("70,000,000")
+                    .expect(TxExpect::ok()),
+            )
+            .await;
     }
 }
