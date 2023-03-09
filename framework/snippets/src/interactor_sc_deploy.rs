@@ -48,7 +48,7 @@ impl Interactor {
         let tx_hash = self.send_sc_deploy(&sc_deploy_step).await;
         println!("deploy tx hash: {tx_hash}");
         info!("deploy tx hash: {}", tx_hash);
-        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
         self.post_runners.run_sc_deploy_step(&sc_deploy_step);
 

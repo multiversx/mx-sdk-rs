@@ -24,3 +24,7 @@ path = "../../../../contracts/modules"
 [dependencies.multiversx-sc-snippets]
 version = "0.39.5"
 path = "../../../../framework/snippets"
+
+[dependencies.multiversx-sc-scenario]
+version = "=0.39.5"
+path = "../../../../framework/scenario"

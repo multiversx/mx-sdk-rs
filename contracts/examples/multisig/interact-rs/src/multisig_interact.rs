@@ -12,9 +12,9 @@ use multisig::{
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
+use multiversx_sc_scenario::test_wallets::*;
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
-    erdrs::wallet::Wallet,
     multiversx_sc::{
         codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
@@ -36,6 +36,7 @@ async fn main() {
     env_logger::init();
 
     let mut multisig_interact = MultisigInteract::init().await;
+    multisig_interact.register_wallets();
 
     let cli = multisig_interact_cli::InteractCli::parse();
     match &cli.command {
@@ -90,15 +91,11 @@ struct MultisigInteract {
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let alice = Wallet::from_pem_file(config.alice_pem()).unwrap();
-        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
-
         let mut interactor = Interactor::new(config.gateway())
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(alice);
-        interactor.register_wallet(bob);
+        let wallet_address = interactor.register_wallet(alice());
 
         Self {
             interactor,
@@ -110,8 +107,19 @@ impl MultisigInteract {
         }
     }
 
+    fn register_wallets(&mut self) {
+        let bob = bob();
+        let carol = carol();
+        let dan = dan();
+        let eve = eve();
+
+        for wallet in vec![bob, carol, dan, eve] {
+            self.interactor.register_wallet(wallet);
+        }
+    }
+
     async fn deploy(&mut self) {
-        let board = self.init_board();
+        let board = self.board();
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
@@ -145,10 +153,19 @@ impl MultisigInteract {
         self.state.set_multisig_address(&new_address_expr);
     }
 
-    fn init_board(&mut self) -> MultiValueVec<Address> {
-        let config = Config::load_config();
-        let bob = Wallet::from_pem_file(config.bob_pem()).unwrap();
-        MultiValueVec::from([self.wallet_address.clone(), bob.address().to_bytes().into()])
+    fn board(&mut self) -> MultiValueVec<Address> {
+        let bob = bob();
+        let carol = carol();
+        let dan = dan();
+        let eve = eve();
+
+        MultiValueVec::from([
+            self.wallet_address.clone(),
+            bob.address().to_bytes().into(),
+            carol.address().to_bytes().into(),
+            dan.address().to_bytes().into(),
+            eve.address().to_bytes().into(),
+        ])
     }
 
     async fn feed_contract_egld(&mut self) {
@@ -206,7 +223,8 @@ impl MultisigInteract {
 
     async fn sign(&mut self, action_id: usize) -> bool {
         println!("signing action `{action_id}`...");
-        for signer in self.init_board().iter() {
+        let mut steps = Vec::new();
+        for signer in self.board().iter() {
             if self.signed(signer, action_id).await {
                 println!(
                     "{} - already signed action `{action_id}`",
@@ -224,8 +242,12 @@ impl MultisigInteract {
                 .gas_limit("15,000,000")
                 .into();
 
-            let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
-            let result = raw_result.handle_signal_error_event();
+            steps.push(sc_call_step);
+        }
+
+        let results = self.interactor.multiple_sc_calls_raw_results(&steps).await;
+        for result in results {
+            let result = result.handle_signal_error_event();
             if result.is_err() {
                 println!(
                     "perform sign `{action_id}` failed with: {}",
@@ -233,11 +255,6 @@ impl MultisigInteract {
                 );
                 return false;
             }
-
-            println!(
-                "{} - successfully signed action `{action_id}`",
-                bech32::encode(signer)
-            );
         }
 
         println!("successfully performed sign action `{action_id}`");
@@ -266,17 +283,6 @@ impl MultisigInteract {
             .await;
 
         println!("board: {}", board.into());
-
-        // TODO: fix this
-        // let board_members: MultiValueVec<Address> = self
-        //     .interactor
-        //     .vm_query(self.state.multisig().get_all_board_members())
-        //     .await;
-
-        // println!("board members:");
-        // for board_member in board_members.iter() {
-        //     println!("    {}", bech32::encode(board_member));
-        // }
     }
 
     async fn dns_register(&mut self, name: &str) {

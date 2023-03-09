@@ -14,6 +14,8 @@ pub trait ScenarioRunner {
 
     fn run_sc_call_step(&mut self, step: &ScCallStep);
 
+    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]);
+
     fn run_sc_query_step(&mut self, step: &ScQueryStep);
 
     fn run_sc_deploy_step(&mut self, step: &ScDeployStep);

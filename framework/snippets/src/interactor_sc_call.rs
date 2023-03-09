@@ -28,7 +28,7 @@ fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) 
 }
 
 impl Interactor {
-    fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
+    pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
         let contract_call = tx_call.to_contract_call();
         let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
         let data = if contract_call_tx_data.is_empty() {
@@ -84,7 +84,7 @@ impl Interactor {
     {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_hash = self.launch_sc_call(&sc_call_step).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
         self.post_runners.run_sc_call_step(&sc_call_step);
 
@@ -96,7 +96,7 @@ impl Interactor {
         sc_call_step: ScCallStep,
     ) -> InteractorResult<IgnoreValue> {
         let tx_hash = self.sc_call(sc_call_step.clone()).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
         self.post_runners.run_sc_call_step(&sc_call_step);
 
@@ -110,7 +110,7 @@ impl Interactor {
                 &sc_call_step.tx.from.value, sender_address,
                 "all calls are expected to have the same sender"
             );
-            // TODO: optimise here, so that we don't load and write the scenario trace for each call
+
             self.pre_runners.run_sc_call_step(sc_call_step);
 
             let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
@@ -143,7 +143,7 @@ impl Interactor {
         transfer_step: TransferStep,
     ) -> InteractorResult<IgnoreValue> {
         let tx_hash = self.transfer(transfer_step).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
         InteractorResult::new(tx)
     }
 }
