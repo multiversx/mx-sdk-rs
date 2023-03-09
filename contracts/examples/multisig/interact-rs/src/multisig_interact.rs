@@ -12,7 +12,7 @@ use multisig::{
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
-use multiversx_sc_scenario::test_wallets::*;
+use multiversx_sc_scenario::test_wallets;
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
     multiversx_sc::{
@@ -95,7 +95,7 @@ impl MultisigInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(alice());
+        let wallet_address = interactor.register_wallet(test_wallets::mike());
 
         Self {
             interactor,
@@ -108,10 +108,10 @@ impl MultisigInteract {
     }
 
     fn register_wallets(&mut self) {
-        let bob = bob();
-        let carol = carol();
-        let dan = dan();
-        let eve = eve();
+        let bob = test_wallets::bob();
+        let carol = test_wallets::carol();
+        let dan = test_wallets::dan();
+        let eve = test_wallets::eve();
 
         for wallet in vec![bob, carol, dan, eve] {
             self.interactor.register_wallet(wallet);
@@ -154,10 +154,10 @@ impl MultisigInteract {
     }
 
     fn board(&mut self) -> MultiValueVec<Address> {
-        let bob = bob();
-        let carol = carol();
-        let dan = dan();
-        let eve = eve();
+        let bob = test_wallets::bob();
+        let carol = test_wallets::carol();
+        let dan = test_wallets::dan();
+        let eve = test_wallets::eve();
 
         MultiValueVec::from([
             self.wallet_address.clone(),
@@ -295,6 +295,6 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .gas_limit("30,000,000")
             .into();
-        self.interactor.sc_call(dns_register_call).await;
+        self.interactor.sc_call_and_forget(dns_register_call).await;
     }
 }

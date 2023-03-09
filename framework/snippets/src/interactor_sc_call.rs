@@ -52,7 +52,7 @@ impl Interactor {
         }
     }
 
-    pub async fn sc_call<S>(&mut self, sc_call_step: S) -> String
+    pub async fn sc_call_and_forget<S>(&mut self, sc_call_step: S) -> String
     where
         ScCallStep: From<S>,
     {
@@ -95,7 +95,7 @@ impl Interactor {
         &mut self,
         sc_call_step: ScCallStep,
     ) -> InteractorResult<IgnoreValue> {
-        let tx_hash = self.sc_call(sc_call_step.clone()).await;
+        let tx_hash = self.sc_call_and_forget(sc_call_step.clone()).await;
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
         self.post_runners.run_sc_call_step(&sc_call_step);
