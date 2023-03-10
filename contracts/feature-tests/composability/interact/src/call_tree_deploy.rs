@@ -21,7 +21,7 @@ use multiversx_sc_snippets::{
 use promises_features::ProxyTrait as _;
 use vault::ProxyTrait as _;
 
-const ADD_QUEUED_CALL_ENDPOINT: &str = "add_queued_call";
+const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
 
 impl ComposabilityInteract {
     pub async fn deploy_call_tree_contracts(&mut self, call_state: &CallState) {
@@ -181,7 +181,7 @@ impl ComposabilityInteract {
                         fwd_rc.clone(),
                         call_type.clone(),
                         child_fwd_addr,
-                        ADD_QUEUED_CALL_ENDPOINT,
+                        FORWARD_QUEUED_CALLS_ENDPOINT,
                         payment_token.clone(),
                         payment_nonce,
                         payment_amount,
