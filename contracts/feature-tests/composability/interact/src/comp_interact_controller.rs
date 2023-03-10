@@ -1,7 +1,11 @@
 use crate::{call_tree::CallState, comp_interact_config::Config, comp_interact_state::State};
 
 use forwarder_queue::QueuedCallType;
-use multiversx_sc_snippets::{multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier}, Interactor, multiversx_sc_scenario::{DebugApi, test_wallets::judy}};
+use multiversx_sc_snippets::{
+    multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier},
+    multiversx_sc_scenario::{test_wallets::judy, DebugApi},
+    Interactor,
+};
 
 pub struct ComposabilityInteract {
     pub interactor: Interactor,
@@ -13,8 +17,7 @@ impl ComposabilityInteract {
     pub async fn init() -> Self {
         let config = Config::load_config();
         let mut interactor = Interactor::new(config.gateway()).await;
-        let wallet_address =
-            interactor.register_wallet(judy());
+        let wallet_address = interactor.register_wallet(judy());
 
         ComposabilityInteract {
             interactor,
@@ -47,6 +50,5 @@ impl ComposabilityInteract {
         .await;
 
         self.call_root(&call_state).await;
-        
     }
 }

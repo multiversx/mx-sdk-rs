@@ -89,6 +89,7 @@ impl ComposabilityInteract {
         fwd.address = Some(new_address);
     }
 
+    #[allow(dead_code)]
     pub async fn deploy_promises(&mut self) {
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
@@ -117,8 +118,7 @@ impl ComposabilityInteract {
         let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("Promises address: {new_address_bech32}");
 
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_promises_address(&new_address_expr);
+        // self.state.set_promises_address(&new_address_expr);
     }
 
     pub async fn add_queued_call(
@@ -190,7 +190,7 @@ impl ComposabilityInteract {
                 },
                 CallNode::Vault(vault_rc) => {
                     // Call Vault
-                    let vault = (*vault_rc).borrow_mut();
+                    let vault = (*vault_rc).borrow();
                     let vault_addr = vault.address.clone().unwrap();
 
                     println!("child_name: {}, parent_name: {}", vault.name, fwd.name);
@@ -233,7 +233,7 @@ impl ComposabilityInteract {
     }
 
     pub async fn call_root(&mut self, call_state: &CallState) {
-        let root_addr_ref = call_state.root.borrow_mut();
+        let root_addr_ref = call_state.root.borrow();
         let root_addr = root_addr_ref.address.clone().unwrap();
         let root_addr_bech32 = bech32::encode(&root_addr);
         let root_addr_expr = format!("bech32:{root_addr_bech32}");

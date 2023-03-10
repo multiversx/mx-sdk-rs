@@ -44,7 +44,7 @@ async fn main() {
                 "Sync" => QueuedCallType::Sync,
                 "LegacyAsync" => QueuedCallType::LegacyAsync,
                 "TransferExecute" => QueuedCallType::TransferExecute,
-                &_ => todo!()
+                &_ => todo!(),
             };
 
             composability_interact
