@@ -73,6 +73,7 @@ impl CallState {
         }
     }
 
+    #[allow(dead_code)]
     pub fn simple_example_1() -> CallState {
         let mut state = Self::create_root();
         let root_rc = state.root.clone();

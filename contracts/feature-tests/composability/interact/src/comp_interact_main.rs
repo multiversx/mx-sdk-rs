@@ -5,8 +5,6 @@ mod comp_interact_config;
 mod comp_interact_controller;
 mod comp_interact_state;
 
-use std::env::args;
-
 use clap::Parser;
 
 use comp_interact_controller::ComposabilityInteract;

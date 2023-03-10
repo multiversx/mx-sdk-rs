@@ -37,24 +37,6 @@ impl State {
         }
     }
 
-    /// Sets the vault address
-    pub fn set_vault_address(&mut self, address: &str) {
-        self.vault_address = Some(String::from(address));
-    }
-    /// Sets the forwarder-queue address
-    pub fn set_forwarder_queue_address(&mut self, address: &str) {
-        self.forwarder_queue_address = Some(String::from(address));
-    }
-    /// Sets the promises address
-    pub fn set_promises_address(&mut self, address: &str) {
-        self.promises_address = Some(String::from(address));
-    }
-
-    /// Returns the vault contract
-    pub fn vault_from_address(&self, address: &str) -> VaultContract {
-        VaultContract::new(address)
-    }
-
     /// Returns the forwarder-queue contract
     pub fn forwarder_queue_from_addr(&self, address: &str) -> ForwarderQueueContract {
         ForwarderQueueContract::new(address)
