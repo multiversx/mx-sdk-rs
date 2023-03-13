@@ -43,12 +43,13 @@ impl ComposabilityInteract {
             &call_state,
             call_type,
             endpoint_name,
-            payment_token,
+            payment_token.clone(),
             payment_nonce,
             payment_amount,
         )
         .await;
 
-        self.call_root(&call_state).await;
+        self.call_root(&call_state, payment_token, payment_nonce, payment_amount)
+            .await;
     }
 }

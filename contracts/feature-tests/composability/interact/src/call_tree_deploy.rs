@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         scenario_format::interpret_trait::InterpreterContext,
         scenario_model::{IntoBlockchainCall, TxExpect},
         DebugApi,
-    },
+    }
 };
 use promises_features::ProxyTrait as _;
 use vault::ProxyTrait as _;
@@ -232,23 +232,39 @@ impl ComposabilityInteract {
         }
     }
 
-    pub async fn call_root(&mut self, call_state: &CallState) {
+    pub async fn call_root(
+        &mut self,
+        call_state: &CallState,
+        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_nonce: u64,
+        payment_amount: u64,
+    ) {
         let root_addr_ref = call_state.root.borrow();
         let root_addr = root_addr_ref.address.clone().unwrap();
         let root_addr_bech32 = bech32::encode(&root_addr);
         let root_addr_expr = format!("bech32:{root_addr_bech32}");
 
-        let _ = self
-            .interactor
-            .sc_call(
-                self.state
-                    .forwarder_queue_from_addr(&root_addr_expr)
-                    .forward_queued_calls()
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok()),
-            )
-            .await;
+        let sc_call_root_step = self
+            .state
+            .forwarder_queue_from_addr(&root_addr_expr)
+            .forward_queued_calls()
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
+
+        if payment_token.is_esdt() {
+            let token_id_hex= payment_token.unwrap_esdt().to_string();
+            let token_id = format!("str:{token_id_hex}");
+
+            print!("token_id = {}", token_id);
+            self.interactor
+                .sc_call(sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount))
+                .await;
+        } else {
+            self.interactor
+                .sc_call(sc_call_root_step.egld_value(payment_amount))
+                .await;
+        }
     }
 }
