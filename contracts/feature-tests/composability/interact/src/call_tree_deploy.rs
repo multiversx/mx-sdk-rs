@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         scenario_format::interpret_trait::InterpreterContext,
         scenario_model::{IntoBlockchainCall, TxExpect},
         DebugApi,
-    }
+    },
 };
 use promises_features::ProxyTrait as _;
 use vault::ProxyTrait as _;
@@ -34,7 +34,6 @@ impl ComposabilityInteract {
     }
 
     pub async fn deploy_vault(&mut self, vault_rc: Rc<RefCell<VaultTarget>>) {
-        let mut vault = vault_rc.borrow_mut();
         let deploy_result: multiversx_sc_snippets::InteractorResult<OptionalValue<BoxedBytes>> =
             self.interactor
                 .sc_deploy(
@@ -56,13 +55,13 @@ impl ComposabilityInteract {
         let result = deploy_result.new_deployed_address();
         let new_address = result.expect("deploy failed");
         let new_address_bech32 = bech32::encode(&new_address);
-        println!("{} address: {new_address_bech32}", &vault.name);
 
+        let mut vault = vault_rc.borrow_mut();
+        println!("{} address: {new_address_bech32}", &vault.name);
         vault.address = Some(new_address);
     }
 
     pub async fn deploy_forwarder_queue(&mut self, fwd_rc: Rc<RefCell<ForwarderQueueTarget>>) {
-        let mut fwd = fwd_rc.borrow_mut();
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
@@ -84,8 +83,9 @@ impl ComposabilityInteract {
         let result = deploy_result.new_deployed_address();
         let new_address = result.expect("deploy failed");
         let new_address_bech32 = bech32::encode(&new_address);
-        println!("{} address: {new_address_bech32}", &fwd.name);
 
+        let mut fwd = fwd_rc.borrow_mut();
+        println!("{} address: {new_address_bech32}", &fwd.name);
         fwd.address = Some(new_address);
     }
 
@@ -131,8 +131,10 @@ impl ComposabilityInteract {
         payment_nonce: u64,
         payment_amount: u64,
     ) {
-        let fwd = fwd_rc.borrow();
-        let fwd_addr = fwd.address.clone().unwrap();
+        let fwd_addr = {
+            let fwd = fwd_rc.borrow();
+            fwd.address.clone().unwrap()
+        };
 
         let fwd_addr_bech32 = bech32::encode(&fwd_addr);
         let fwd_addr_expr = format!("bech32:{fwd_addr_bech32}");
@@ -167,15 +169,20 @@ impl ComposabilityInteract {
         payment_nonce: u64,
         payment_amount: u64,
     ) {
-        let fwd = fwd_rc.borrow();
-        for child in &fwd.children {
+        let (fwd_name, fwd_children) = {
+            let fwd = fwd_rc.borrow();
+            (fwd.name.clone(), fwd.children.clone())
+        };
+
+        for child in &fwd_children {
             match child {
                 CallNode::ForwarderQueue(child_fwd_rc) => {
                     // forward_queued_calls to ForwarderQueue's children
-                    let child_fwd = (*child_fwd_rc).borrow();
-                    let child_fwd_addr = child_fwd.address.clone().unwrap();
-
-                    println!("child_name: {}, parent_name: {}", child_fwd.name, fwd.name);
+                    let child_fwd_addr = {
+                        let child_fwd = (*child_fwd_rc).borrow();
+                        println!("child_name: {}, parent_name: {}", child_fwd.name, &fwd_name);
+                        child_fwd.address.clone().unwrap()
+                    };
 
                     self.add_queued_call(
                         fwd_rc.clone(),
@@ -190,10 +197,11 @@ impl ComposabilityInteract {
                 },
                 CallNode::Vault(vault_rc) => {
                     // Call Vault
-                    let vault = (*vault_rc).borrow();
-                    let vault_addr = vault.address.clone().unwrap();
-
-                    println!("child_name: {}, parent_name: {}", vault.name, fwd.name);
+                    let vault_addr = {
+                        let vault = (*vault_rc).borrow();
+                        println!("child_name: {}, parent_name: {}", vault.name, &fwd_name);
+                        vault.address.clone().unwrap()
+                    };
 
                     self.add_queued_call(
                         fwd_rc.clone(),
@@ -239,8 +247,10 @@ impl ComposabilityInteract {
         payment_nonce: u64,
         payment_amount: u64,
     ) {
-        let root_addr_ref = call_state.root.borrow();
-        let root_addr = root_addr_ref.address.clone().unwrap();
+        let root_addr = {
+            let root_addr_ref = call_state.root.borrow();
+            root_addr_ref.address.clone().unwrap()
+        };
         let root_addr_bech32 = bech32::encode(&root_addr);
         let root_addr_expr = format!("bech32:{root_addr_bech32}");
 
@@ -254,7 +264,7 @@ impl ComposabilityInteract {
             .expect(TxExpect::ok());
 
         if payment_token.is_esdt() {
-            let token_id_hex= payment_token.unwrap_esdt().to_string();
+            let token_id_hex = payment_token.unwrap_esdt().to_string();
             let token_id = format!("str:{token_id_hex}");
 
             print!("token_id = {}", token_id);

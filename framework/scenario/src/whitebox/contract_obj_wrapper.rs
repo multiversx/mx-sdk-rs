@@ -396,6 +396,7 @@ impl BlockchainStateWrapper {
         );
     }
 
+    #[allow(clippy::extra_unused_type_parameters)]
     pub fn set_developer_rewards<T: TopEncode>(
         &mut self,
         address: &Address,

@@ -118,6 +118,5 @@ pub trait ForwarderQueue {
         #[indexed] payment_token: &EgldOrEsdtTokenIdentifier,
         #[indexed] payment_nonce: &u64,
         #[indexed] payment_amount: &BigUint,
-
     );
 }
