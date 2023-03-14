@@ -127,9 +127,6 @@ impl ComposabilityInteract {
         call_type: QueuedCallType,
         to: Address,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
     ) {
         let fwd_addr = {
             let fwd = fwd_rc.borrow();
@@ -144,14 +141,7 @@ impl ComposabilityInteract {
             .sc_call(
                 self.state
                     .forwarder_queue_from_addr(&fwd_addr_expr)
-                    .add_queued_call(
-                        call_type,
-                        to,
-                        endpoint_name,
-                        payment_token,
-                        payment_nonce,
-                        payment_amount,
-                    )
+                    .add_queued_call(call_type, to, endpoint_name)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .gas_limit("70,000,000")
@@ -165,9 +155,6 @@ impl ComposabilityInteract {
         fwd_rc: Rc<RefCell<ForwarderQueueTarget>>,
         call_type: QueuedCallType,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
     ) {
         let (fwd_name, fwd_children) = {
             let fwd = fwd_rc.borrow();
@@ -189,9 +176,6 @@ impl ComposabilityInteract {
                         call_type.clone(),
                         child_fwd_addr,
                         FORWARD_QUEUED_CALLS_ENDPOINT,
-                        payment_token.clone(),
-                        payment_nonce,
-                        payment_amount,
                     )
                     .await;
                 },
@@ -208,9 +192,6 @@ impl ComposabilityInteract {
                         call_type.clone(),
                         vault_addr,
                         endpoint_name,
-                        payment_token.clone(),
-                        payment_nonce,
-                        payment_amount,
                     )
                     .await;
                 },
@@ -223,20 +204,10 @@ impl ComposabilityInteract {
         call_state: &CallState,
         call_type: QueuedCallType,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
     ) {
         for fwd_rc in &call_state.forwarders {
-            self.add_queued_calls_to_children(
-                fwd_rc.clone(),
-                call_type.clone(),
-                endpoint_name,
-                payment_token.clone(),
-                payment_nonce,
-                payment_amount,
-            )
-            .await;
+            self.add_queued_calls_to_children(fwd_rc.clone(), call_type.clone(), endpoint_name)
+                .await;
         }
     }
 
