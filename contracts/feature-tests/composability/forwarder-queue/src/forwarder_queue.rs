@@ -13,12 +13,12 @@ pub enum QueuedCallType {
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct QueuedCall<M: ManagedTypeApi> {
-    call_type: QueuedCallType,
-    to: ManagedAddress<M>,
-    endpoint_name: ManagedBuffer<M>,
-    payment_token: EgldOrEsdtTokenIdentifier<M>,
-    payment_nonce: u64,
-    payment_amount: BigUint<M>,
+    pub call_type: QueuedCallType,
+    pub to: ManagedAddress<M>,
+    pub endpoint_name: ManagedBuffer<M>,
+    pub payment_token: EgldOrEsdtTokenIdentifier<M>,
+    pub payment_nonce: u64,
+    pub payment_amount: BigUint<M>,
 }
 
 /// Testing multiple calls per transaction, cascading on.
@@ -43,6 +43,15 @@ pub trait ForwarderQueue {
         payment_nonce: u64,
         payment_amount: BigUint,
     ) {
+        self.add_queued_call_event(
+            &call_type,
+            &to,
+            &endpoint_name,
+            &payment_token,
+            &payment_nonce,
+            &payment_amount,
+        );
+
         self.queued_calls().push_back(QueuedCall {
             call_type,
             to,
@@ -57,13 +66,17 @@ pub trait ForwarderQueue {
     #[payable("*")]
     fn forward_queued_calls(&self) {
         let esdt_transfers_multi = self.call_value().all_esdt_transfers();
-        self.forward_queued_calls_event(
-            &self.call_value().egld_value(),
-            &esdt_transfers_multi.into_multi_value(),
-        );
 
         while let Some(node) = self.queued_calls().pop_front() {
             let call = node.clone().into_value();
+
+            self.forward_queued_calls_event(
+                &call.call_type,
+                &call.to,
+                &call.endpoint_name,
+                &self.call_value().egld_value(),
+                &esdt_transfers_multi.clone().into_multi_value(),
+            );
 
             let contract_call = ContractCallWithEgldOrSingleEsdt::<Self::Api, ()>::new(
                 call.to.clone(),
@@ -89,7 +102,21 @@ pub trait ForwarderQueue {
     #[event("forward_queued_calls")]
     fn forward_queued_calls_event(
         &self,
+        #[indexed] call_type: &QueuedCallType,
+        #[indexed] to: &ManagedAddress,
+        #[indexed] endpoint_name: &ManagedBuffer,
         #[indexed] egld_value: &BigUint,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+    );
+
+    #[event("add_queued_call")]
+    fn add_queued_call_event(
+        &self,
+        #[indexed] call_type: &QueuedCallType,
+        #[indexed] to: &ManagedAddress,
+        #[indexed] endpoint_name: &ManagedBuffer,
+        #[indexed] payment_token: &EgldOrEsdtTokenIdentifier,
+        #[indexed] payment_nonce: &u64,
+        #[indexed] payment_amount: &BigUint,
     );
 }

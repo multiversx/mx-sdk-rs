@@ -3,7 +3,7 @@ use crate::scenario_model::*;
 use super::ScenarioRunner;
 
 /// Aggregates several scenario runners into one, and calls them in order.
-/// 
+///
 /// The empty object can act as a placeholder, in case we want to provide a `ScenarioRunner` that does nothing.
 #[derive(Default)]
 pub struct ScenarioRunnerList {
