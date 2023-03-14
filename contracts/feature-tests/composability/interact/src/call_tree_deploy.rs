@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         scenario_format::interpret_trait::InterpreterContext,
         scenario_model::{IntoBlockchainCall, TxExpect},
         DebugApi,
-    }
+    },
 };
 use promises_features::ProxyTrait as _;
 use vault::ProxyTrait as _;
@@ -127,9 +127,6 @@ impl ComposabilityInteract {
         call_type: QueuedCallType,
         to: Address,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
     ) {
         let fwd = fwd_rc.borrow();
         let fwd_addr = fwd.address.clone().unwrap();
@@ -142,14 +139,7 @@ impl ComposabilityInteract {
             .sc_call(
                 self.state
                     .forwarder_queue_from_addr(&fwd_addr_expr)
-                    .add_queued_call(
-                        call_type,
-                        to,
-                        endpoint_name,
-                        payment_token,
-                        payment_nonce,
-                        payment_amount,
-                    )
+                    .add_queued_call(call_type, to, endpoint_name)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .gas_limit("70,000,000")
@@ -163,9 +153,6 @@ impl ComposabilityInteract {
         fwd_rc: Rc<RefCell<ForwarderQueueTarget>>,
         call_type: QueuedCallType,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
     ) {
         let fwd = fwd_rc.borrow();
         for child in &fwd.children {
@@ -182,9 +169,6 @@ impl ComposabilityInteract {
                         call_type.clone(),
                         child_fwd_addr,
                         FORWARD_QUEUED_CALLS_ENDPOINT,
-                        payment_token.clone(),
-                        payment_nonce,
-                        payment_amount,
                     )
                     .await;
                 },
@@ -200,9 +184,6 @@ impl ComposabilityInteract {
                         call_type.clone(),
                         vault_addr,
                         endpoint_name,
-                        payment_token.clone(),
-                        payment_nonce,
-                        payment_amount,
                     )
                     .await;
                 },
@@ -215,18 +196,12 @@ impl ComposabilityInteract {
         call_state: &CallState,
         call_type: QueuedCallType,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
     ) {
         for fwd_rc in &call_state.forwarders {
             self.add_queued_calls_to_children(
                 fwd_rc.clone(),
                 call_type.clone(),
                 endpoint_name,
-                payment_token.clone(),
-                payment_nonce,
-                payment_amount,
             )
             .await;
         }
@@ -254,7 +229,7 @@ impl ComposabilityInteract {
             .expect(TxExpect::ok());
 
         if payment_token.is_esdt() {
-            let token_id_hex= payment_token.unwrap_esdt().to_string();
+            let token_id_hex = payment_token.unwrap_esdt().to_string();
             let token_id = format!("str:{token_id_hex}");
 
             print!("token_id = {}", token_id);

@@ -16,9 +16,6 @@ pub struct QueuedCall<M: ManagedTypeApi> {
     pub call_type: QueuedCallType,
     pub to: ManagedAddress<M>,
     pub endpoint_name: ManagedBuffer<M>,
-    pub payment_token: EgldOrEsdtTokenIdentifier<M>,
-    pub payment_nonce: u64,
-    pub payment_amount: BigUint<M>,
 }
 
 /// Testing multiple calls per transaction, cascading on.
@@ -39,33 +36,24 @@ pub trait ForwarderQueue {
         call_type: QueuedCallType,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
-        payment_token: EgldOrEsdtTokenIdentifier,
-        payment_nonce: u64,
-        payment_amount: BigUint,
     ) {
         self.add_queued_call_event(
             &call_type,
             &to,
             &endpoint_name,
-            &payment_token,
-            &payment_nonce,
-            &payment_amount,
         );
 
         self.queued_calls().push_back(QueuedCall {
             call_type,
             to,
             endpoint_name,
-            payment_token,
-            payment_nonce,
-            payment_amount,
         });
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_queued_calls(&self) {
-        let esdt_transfers_multi = self.call_value().all_esdt_transfers();
+        let egld_or_esdt_transfer = self.call_value().egld_or_single_esdt();
 
         while let Some(node) = self.queued_calls().pop_front() {
             let call = node.clone().into_value();
@@ -75,15 +63,15 @@ pub trait ForwarderQueue {
                 &call.to,
                 &call.endpoint_name,
                 &self.call_value().egld_value(),
-                &esdt_transfers_multi.clone().into_multi_value(),
+                &egld_or_esdt_transfer,
             );
 
             let contract_call = ContractCallWithEgldOrSingleEsdt::<Self::Api, ()>::new(
                 call.to.clone(),
                 call.endpoint_name.clone(),
-                call.payment_token.clone(),
-                call.payment_nonce,
-                call.payment_amount.clone(),
+                egld_or_esdt_transfer.token_identifier.clone(),
+                egld_or_esdt_transfer.token_nonce,
+                egld_or_esdt_transfer.amount.clone(),
             );
             match call.call_type {
                 QueuedCallType::Sync => {
@@ -106,7 +94,7 @@ pub trait ForwarderQueue {
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
         #[indexed] egld_value: &BigUint,
-        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
+        #[indexed] egld_or_esdt: &EgldOrEsdtTokenPayment
     );
 
     #[event("add_queued_call")]
@@ -115,9 +103,5 @@ pub trait ForwarderQueue {
         #[indexed] call_type: &QueuedCallType,
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] payment_token: &EgldOrEsdtTokenIdentifier,
-        #[indexed] payment_nonce: &u64,
-        #[indexed] payment_amount: &BigUint,
-
     );
 }
