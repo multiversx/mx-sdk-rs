@@ -49,11 +49,14 @@ pub enum StandaloneCliAction {
     )]
     LocalDeps(LocalDepsArgs),
 
+    #[command(name = "new", about = "Creates a contract by a pre-existing template")]
+    Template(TemplateArgs),
+
     #[command(
-        name = "template",
+        name = "templates",
         about = "Creates a contract by a pre-existing template"
     )]
-    Template(TemplateArgs),
+    TemplateList,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -137,9 +140,13 @@ pub struct LocalDepsArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TemplateArgs {
-    /// Provide the name of the template you want to clone
+    /// Provide the he template you want to clone
     #[arg(long = "name", verbatim_doc_comment)]
     pub name: String,
+
+    /// Provide the he template you want to clone
+    #[arg(long = "template", verbatim_doc_comment)]
+    pub template: String,
 }
 
 impl CliArgsToRaw for TemplateArgs {
