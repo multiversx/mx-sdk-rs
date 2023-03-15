@@ -26,15 +26,12 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder-queue",
-                "egldValue": "0",
+                "egldValue": "1000",
                 "function": "add_queued_call",
                 "arguments": [
                     "0x01",
                     "sc:vault",
-                    "str:accept_funds",
-                    "str:EGLD",
-                    "0",
-                    "1000"
+                    "str:accept_funds"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -46,7 +43,6 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder-queue",
-                "egldValue": "1000",
                 "function": "forward_queued_calls",
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -58,7 +54,7 @@
                         "address": "sc:forwarder-queue",
                         "endpoint": "str:forward_queued_calls",
                         "topics": [
-                            "str:forward_queued_calls",
+                            "str:forward_queued_call_egld",
                             "1",
                             "sc:vault",
                             "str:accept_funds",
