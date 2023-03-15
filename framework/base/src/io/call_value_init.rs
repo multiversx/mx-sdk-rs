@@ -17,7 +17,6 @@ where
 }
 
 /// Called initially in the generated code whenever `#[payable("*")]` annotation is provided.
-#[allow(clippy::extra_unused_type_parameters)]
 pub fn payable_any<A>()
 where
     A: CallValueApi,

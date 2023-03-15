@@ -238,7 +238,7 @@ impl ComposabilityInteract {
             let token_id_hex = payment_token.unwrap_esdt().to_string();
             let token_id = format!("str:{token_id_hex}");
 
-            print!("token_id = {}", token_id);
+            print!("token_id = {token_id}");
             self.interactor
                 .sc_call(sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount))
                 .await;
