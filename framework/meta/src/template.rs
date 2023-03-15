@@ -29,13 +29,18 @@ pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwe
     update_dependencies(&args.name);
     Ok(())
 }
+pub async fn list_templates() -> Result<(), reqwest::Error> {
+    download_binaries().await?;
+    unzip_binaries();
+
+    Ok(())
+}
 
 pub async fn download_binaries() -> Result<(), reqwest::Error> {
     let response = reqwest::get(REPOSITORY).await?.bytes().await?;
 
     let tmp_dir = env::temp_dir();
     let path = tmp_dir.join(ZIP_NAME);
-
     let mut file = match File::create(Path::new(&path)) {
         Err(why) => panic!("couldn't create {why}"),
         Ok(file) => file,
@@ -75,6 +80,7 @@ pub fn update_dependencies_root(template: &str) {
 
     let dev_deps_map = toml.dev_dependencies_mut();
     remove_paths_from_dependencies(dev_deps_map, &[]);
+    toml.insert_default_workspace();
 
     toml.save_to_file(cargo_toml_path);
 }

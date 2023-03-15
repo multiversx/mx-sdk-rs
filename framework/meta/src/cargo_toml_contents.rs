@@ -87,6 +87,19 @@ impl CargoTomlContents {
             .expect("malformed crate Cargo.toml")
     }
 
+    pub fn insert_default_workspace(&mut self) {
+        let members = toml::Value::String(".".to_string());
+        let mut workspace = toml::Value::Table(Table::new());
+        workspace
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml")
+            .insert("members".to_string(), members);
+        self.toml_value
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml")
+            .insert("workspace".to_string(), workspace);
+    }
+
     pub fn local_dependency_paths(&self, ignore_deps: &[&str]) -> Vec<String> {
         let mut result = Vec::new();
         if let Some(deps_map) = self.dependencies_table() {
