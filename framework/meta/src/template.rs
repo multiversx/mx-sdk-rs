@@ -1,4 +1,8 @@
-use crate::{cargo_toml_contents::CargoTomlContents, cli_args::TemplateArgs};
+use crate::{
+    cargo_toml_contents::CargoTomlContents,
+    cli_args::TemplateArgs,
+    folder_structure::{dir_pretty_print, RelevantDirectories},
+};
 use copy_dir::*;
 use std::{
     env,
@@ -33,6 +37,13 @@ pub async fn list_templates() -> Result<(), reqwest::Error> {
     download_binaries().await?;
     unzip_binaries();
 
+    let contracts_path = Path::new(&env::temp_dir()).join(TEMPLATES_SUBDIRECTORY);
+
+    let dirs = RelevantDirectories::find_all(
+        contracts_path,
+        &["crypto-kitties".to_owned(), "order-book".to_owned()],
+    );
+    dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
     Ok(())
 }
 
