@@ -16,6 +16,7 @@ pub struct QueuedCall<M: ManagedTypeApi> {
     pub call_type: QueuedCallType,
     pub to: ManagedAddress<M>,
     pub endpoint_name: ManagedBuffer<M>,
+    pub args: ManagedArgBuffer<M>,
     pub payments: EgldOrMultiEsdtPayment<M>,
 }
 
@@ -36,6 +37,7 @@ pub trait ForwarderQueue {
         call_type: QueuedCallType,
         to: ManagedAddress,
         endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
     ) {
         let payments = self.call_value().any_payment();
 
@@ -57,6 +59,7 @@ pub trait ForwarderQueue {
             call_type,
             to,
             endpoint_name,
+            args: args.to_arg_buffer(),
             payments,
         });
     }
@@ -80,6 +83,7 @@ pub trait ForwarderQueue {
                         call.endpoint_name.clone(),
                         egld_value,
                     )
+                    .with_raw_arguments(call.args)
                 },
                 EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
                     self.forward_queued_call_esdt_event(
@@ -94,6 +98,7 @@ pub trait ForwarderQueue {
                         call.endpoint_name.clone(),
                         esdt_payments,
                     )
+                    .with_raw_arguments(call.args)
                     .into_normalized()
                 },
             };

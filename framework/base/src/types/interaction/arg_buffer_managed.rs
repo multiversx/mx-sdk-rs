@@ -1,4 +1,5 @@
 use crate::{
+    abi::{TypeAbi, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -14,7 +15,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 #[repr(transparent)]
 pub struct ManagedArgBuffer<M>
 where
@@ -281,5 +282,15 @@ where
             let Ok(item) = ManagedBuffer::dep_decode_or_handle_err(&mut nested_de_input, h);
             self.push_arg_raw(item);
         }
+    }
+}
+
+impl<M> TypeAbi for ManagedArgBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    /// It is semantically equivalent to any list of `T`.
+    fn type_name() -> TypeName {
+        <&[ManagedBuffer<M>] as TypeAbi>::type_name()
     }
 }
