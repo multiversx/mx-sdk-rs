@@ -1,5 +1,5 @@
 [package]
-name = "multi-contract-features-wasm"
+name = "multi-contract-features-custom-cargo-toml-name"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"

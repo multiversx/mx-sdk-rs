@@ -43,6 +43,17 @@ impl CargoTomlContents {
             .expect("failed to write Cargo.toml contents to file");
     }
 
+    pub fn package_name(&self) -> String {
+        self.toml_value
+            .get("package")
+            .expect("missing package in Cargo.toml")
+            .get("name")
+            .expect("missing package name in Cargo.toml")
+            .as_str()
+            .expect("package name not a string value")
+            .to_string()
+    }
+
     /// Assumes that a package section already exists.
     pub fn change_package_name(&mut self, new_package_name: String) {
         let package = self

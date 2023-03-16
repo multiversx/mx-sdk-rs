@@ -183,13 +183,19 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
     }
 }
 
+fn default_wasm_crate_name(contract_name: &str) -> String {
+    format!("{}-wasm", contract_name)
+}
+
 fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) -> OutputContract {
-    let name = builder.wasm_name().clone();
+    let contract_name = builder.wasm_name().clone();
+    let wasm_crate_name = default_wasm_crate_name(&contract_name);
     OutputContract {
         main: false,
         settings: builder.settings.clone(),
         contract_id: builder.contract_id.clone(),
-        contract_name: name,
+        contract_name,
+        wasm_crate_name,
         abi: build_contract_abi(builder, original_abi),
     }
 }
@@ -249,6 +255,7 @@ impl OutputContractConfig {
     /// The default configuration contains a single main contract, with all endpoints.
     pub fn default_config(original_abi: &ContractAbi) -> Self {
         let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
+        let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
         OutputContractConfig {
             default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![OutputContract {
@@ -256,6 +263,7 @@ impl OutputContractConfig {
                 settings: OutputContractSettings::default(),
                 contract_id: default_contract_config_name.clone(),
                 contract_name: default_contract_config_name,
+                wasm_crate_name,
                 abi: original_abi.clone(),
             }],
         }
