@@ -1,6 +1,8 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+use multiversx_sc::api::VMApi;
+
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
@@ -9,6 +11,7 @@ pub enum QueuedCallType {
     Sync,
     LegacyAsync,
     TransferExecute,
+    Promise,
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
@@ -113,6 +116,9 @@ pub trait ForwarderQueue {
                 QueuedCallType::TransferExecute => {
                     contract_call.transfer_execute();
                 },
+                QueuedCallType::Promise => {
+                    call_promise(contract_call);
+                }
             }
         }
     }
@@ -153,3 +159,12 @@ pub trait ForwarderQueue {
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 }
+
+
+#[cfg(feature = "promises")]
+fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>) {
+    contract_call.async_call_promise().register_promise();
+}
+
+#[cfg(not(feature = "promises"))]
+fn call_promise<A: VMApi>(_contract_call: ContractCallWithEgld<A, ()>) {}

@@ -9,7 +9,7 @@ use forwarder_queue::{ProxyTrait as _, QueuedCallType};
 use multiversx_sc_snippets::{
     multiversx_sc::{
         codec::multi_types::OptionalValue,
-        types::{Address, BoxedBytes, CodeMetadata, EgldOrEsdtTokenIdentifier},
+        types::{Address, BoxedBytes, CodeMetadata, EgldOrEsdtTokenIdentifier, MultiValueEncoded},
     },
     multiversx_sc_scenario::{
         bech32,
@@ -141,7 +141,12 @@ impl ComposabilityInteract {
             .sc_call(
                 self.state
                     .forwarder_queue_from_addr(&fwd_addr_expr)
-                    .add_queued_call(call_type, to, endpoint_name)
+                    .add_queued_call(
+                        call_type,
+                        to,
+                        endpoint_name,
+                        MultiValueEncoded::<DebugApi, _>::new(),
+                    )
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .gas_limit("70,000,000")
