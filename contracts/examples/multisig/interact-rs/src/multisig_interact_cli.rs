@@ -20,6 +20,8 @@ pub enum InteractCliCommand {
     DnsRegister(DnsRegisterArgs),
     #[command(name = "feed", about = "Feed contract EGLD")]
     Feed,
+    #[command(name = "multi-deploy", about = "Multiple deploy contracts")]
+    MultiDeploy(MultiDeployArgs),
     #[command(name = "nft-full", about = "Issue multisig and collection")]
     NftFull,
     #[command(name = "nft-issue", about = "Issue collection")]
@@ -46,4 +48,11 @@ pub struct DnsRegisterArgs {
     /// The name used for the registration (herotag)
     #[arg(short = 'n', long = "name", verbatim_doc_comment)]
     pub name: String,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct MultiDeployArgs {
+    /// The number of contracts to deploy
+    #[arg(short = 'c', long = "count", verbatim_doc_comment)]
+    pub count: u8,
 }

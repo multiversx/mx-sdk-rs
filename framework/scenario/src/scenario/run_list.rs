@@ -54,6 +54,14 @@ impl ScenarioRunner for ScenarioRunnerList {
         }
     }
 
+    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+        for runner in self.list.iter_mut() {
+            for step in steps {
+                runner.run_sc_deploy_step(step);
+            }
+        }
+    }
+
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {
         for runner in self.list.iter_mut() {
             runner.run_sc_query_step(step);

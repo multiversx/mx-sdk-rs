@@ -10,7 +10,7 @@ use multiversx_sdk::data::{address::Address as ErdrsAddress, transaction::Transa
 const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];
 
 impl Interactor {
-    fn sc_deploy_to_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
+    pub(crate) fn sc_deploy_to_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
