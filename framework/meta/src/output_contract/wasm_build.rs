@@ -1,9 +1,10 @@
 use std::{fs, process::Command};
 
-use super::OutputContract;
-use crate::{
-    cli_args::BuildArgs, meta_wasm_tools, output_contract::print_util::print_build_command,
+use super::{
+    print_util::{print_build_command, print_copy_contract},
+    OutputContract,
 };
+use crate::{cli_args::BuildArgs, meta_wasm_tools};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -67,6 +68,7 @@ impl OutputContract {
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
         let source_wasm_path = self.wasm_compilation_output_path(&build_args.target_dir);
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
+        print_copy_contract(source_wasm_path.as_str(), output_wasm_path.as_str());
         fs::copy(source_wasm_path, output_wasm_path)
             .expect("failed to copy compiled contract to output directory");
     }
