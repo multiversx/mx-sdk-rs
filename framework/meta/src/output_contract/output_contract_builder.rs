@@ -184,7 +184,7 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
 }
 
 fn default_wasm_crate_name(contract_name: &str) -> String {
-    format!("{}-wasm", contract_name)
+    format!("{contract_name}-wasm")
 }
 
 fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) -> OutputContract {
