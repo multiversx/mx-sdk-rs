@@ -15,8 +15,8 @@ lto = true
 debug = false
 panic = "abort"
 
-#[dependencies.forwarder-queue]
-#path = ".."
+[dependencies.forwarder-queue]
+path = ".."
 #features = ["promises"]
 
 [dependencies.multiversx-sc-wasm-adapter]
