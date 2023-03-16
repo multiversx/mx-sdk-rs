@@ -289,7 +289,10 @@ impl MultisigInteract {
             steps.push(sc_call_step);
         }
 
-        let results = self.interactor.multiple_sc_calls_raw_results(&steps).await;
+        let results = self
+            .interactor
+            .multiple_sc_calls_raw_results(&mut steps)
+            .await;
         for result in results {
             let result = result.handle_signal_error_event();
             if result.is_err() {

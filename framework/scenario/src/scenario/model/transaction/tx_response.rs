@@ -4,7 +4,7 @@ use crate::scenario_model::{BytesValue, U64Value};
 
 use super::Log;
 
-#[derive(Default, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct TxResponse {
     pub out: Vec<BytesValue>,
     pub status: U64Value,

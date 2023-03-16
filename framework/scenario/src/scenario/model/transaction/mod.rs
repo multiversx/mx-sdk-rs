@@ -1,3 +1,4 @@
+mod log;
 mod log_check;
 mod logs_check;
 mod tx_call;
@@ -9,8 +10,8 @@ mod tx_query;
 mod tx_response;
 mod tx_transfer;
 mod tx_validator_reward;
-mod log;
 
+pub use log::*;
 pub use log_check::*;
 pub use logs_check::*;
 pub use tx_call::*;
@@ -21,4 +22,3 @@ pub use tx_query::*;
 pub use tx_response::*;
 pub use tx_transfer::*;
 pub use tx_validator_reward::*;
-pub use log::*;

@@ -6,7 +6,7 @@ use multiversx_sc_scenario::{
         types::ContractCallWithEgld,
     },
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, TransferStep, TxCall, TypedScCall},
+    scenario_model::{ScCallStep, TransferStep, TxCall, TxResponse, TypedScCall},
     DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;
@@ -74,7 +74,16 @@ impl Interactor {
         tx_hash
     }
 
-    pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
+    pub async fn sc_call_get_result(&mut self, sc_call_step: &mut ScCallStep) {
+        let tx_hash = self.launch_sc_call(sc_call_step).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
+
+        sc_call_step.response = Some(TxResponse::new(tx));
+
+        self.post_runners.run_sc_call_step(sc_call_step);
+    }
+
+    pub async fn sc_call_get_result_typed<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_call: TypedScCall<OriginalResult>,
     ) -> InteractorResult<RequestedResult>

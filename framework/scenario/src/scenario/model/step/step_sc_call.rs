@@ -1,5 +1,6 @@
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
+    scenario_model::TxResponse,
     DebugApi,
 };
 
@@ -15,6 +16,7 @@ pub struct ScCallStep {
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
+    pub response: Option<TxResponse>,
 }
 
 impl ScCallStep {

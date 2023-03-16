@@ -1,17 +1,17 @@
-use crate::{interactor_multi_sc_process::{update_nonces_and_sign_tx, Txs, SenderSet}, Interactor, InteractorResult};
+use crate::{
+    interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs},
+    Interactor,
+};
 
 use multiversx_sc_scenario::{
-    mandos_system::ScenarioRunner, multiversx_sc::codec::multi_types::IgnoreValue,
-    scenario_model::ScCallStep,
+    mandos_system::ScenarioRunner,
+    scenario_model::{ScCallStep, TxResponse},
 };
 use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
-    pub async fn multiple_sc_calls_raw_results(
-        &mut self,
-        sc_call_steps: &[ScCallStep],
-    ) -> Vec<InteractorResult<IgnoreValue>> {
-        self.pre_runners.run_multi_sc_call_step(sc_call_steps);
+    pub async fn multiple_sc_calls_raw_results(&mut self, sc_call_steps: &mut [ScCallStep]) {
+        self.pre_runners.run_multi_sc_call_step(&sc_call_steps);
 
         let senders = retrieve_senders(sc_call_steps);
         self.recall_senders_nonce(senders).await;
@@ -19,9 +19,11 @@ impl Interactor {
         let txs = self.retrieve_txs(sc_call_steps);
         let results = self.process_txs(txs).await;
 
-        self.post_runners.run_multi_sc_call_step(sc_call_steps);
+        for (i, sc_call_step) in sc_call_steps.iter_mut().enumerate() {
+            sc_call_step.response = Some(TxResponse::new(results.get(i).unwrap().clone()));
+        }
 
-        results.into_iter().map(InteractorResult::new).collect()
+        self.post_runners.run_multi_sc_call_step(&sc_call_steps);
     }
 
     fn retrieve_txs(&mut self, sc_call_steps: &[ScCallStep]) -> Vec<Transaction> {

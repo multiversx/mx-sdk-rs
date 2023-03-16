@@ -84,6 +84,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxCall::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
+                response: None,
             }),
             StepRaw::ScQuery {
                 id,

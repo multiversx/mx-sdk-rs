@@ -40,6 +40,7 @@ impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
             comment: typed.comment,
             tx: typed.tx,
             expect: typed.expect,
+            response: None,
         }
     }
 }
