@@ -28,7 +28,7 @@ impl Interactor {
         let mut txs = Txs::new();
 
         for sc_deploy_step in sc_deploy_steps {
-            let mut transaction = self.sc_deploy_to_tx(&sc_deploy_step);
+            let mut transaction = self.sc_deploy_to_tx(sc_deploy_step);
             let sender_address = &sc_deploy_step.tx.from.value;
             let sender = self
                 .sender_map
