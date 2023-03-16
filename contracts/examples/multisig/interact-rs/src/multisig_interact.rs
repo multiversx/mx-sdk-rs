@@ -12,7 +12,7 @@ use multisig::{
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
-use multiversx_sc_scenario::test_wallets::*;
+use multiversx_sc_scenario::test_wallets;
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
     multiversx_sc::{
@@ -44,14 +44,16 @@ async fn main() {
             multisig_interact.print_board().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
-            // multisig_interact.deploy().await;
-            multisig_interact.multi_deploy().await;
+            multisig_interact.deploy().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
             multisig_interact.dns_register(&args.name).await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Feed) => {
             multisig_interact.feed_contract_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
+            multisig_interact.multi_deploy(&args.count).await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
             multisig_interact.issue_multisig_and_collection_full().await;
@@ -96,7 +98,7 @@ impl MultisigInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(alice());
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
 
         Self {
             interactor,
@@ -109,10 +111,10 @@ impl MultisigInteract {
     }
 
     fn register_wallets(&mut self) {
-        let bob = bob();
-        let carol = carol();
-        let dan = dan();
-        let eve = eve();
+        let bob = test_wallets::bob();
+        let carol = test_wallets::carol();
+        let dan = test_wallets::dan();
+        let eve = test_wallets::eve();
 
         for wallet in vec![bob, carol, dan, eve] {
             self.interactor.register_wallet(wallet);
@@ -154,10 +156,16 @@ impl MultisigInteract {
         self.state.set_multisig_address(&new_address_expr);
     }
 
-    async fn multi_deploy(&mut self) {
+    async fn multi_deploy(&mut self, count: &u8) {
+        if *count == 0 {
+            println!("count must be greater than 0");
+            return;
+        }
+        println!("deploying {count} contracts...");
+
         let board = self.board();
         let mut steps = Vec::new();
-        for _i in 0..3 {
+        for _ in 0..*count {
             let sc_deploy_step: ScDeployStep = self
                 .state
                 .default_multisig()
@@ -190,10 +198,10 @@ impl MultisigInteract {
     }
 
     fn board(&mut self) -> MultiValueVec<Address> {
-        let bob = bob();
-        let carol = carol();
-        let dan = dan();
-        let eve = eve();
+        let bob = test_wallets::bob();
+        let carol = test_wallets::carol();
+        let dan = test_wallets::dan();
+        let eve = test_wallets::eve();
 
         MultiValueVec::from([
             self.wallet_address.clone(),
