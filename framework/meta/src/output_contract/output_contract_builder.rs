@@ -54,6 +54,7 @@ impl OutputContractBuilder {
                 settings: OutputContractSettings {
                     external_view: cms.external_view.unwrap_or_default(),
                     panic_message: cms.panic_message.unwrap_or_default(),
+                    features: cms.features.clone(),
                 },
                 ..Default::default()
             },
@@ -225,6 +226,17 @@ fn set_main_contract_flag(
     }
 }
 
+fn validate_output_contracts(contracts: &[OutputContract]) {
+    for contract in contracts {
+        if contract.main {
+            assert!(
+                contract.settings.features.is_empty(),
+                "features not supported for main contract"
+            );
+        }
+    }
+}
+
 impl OutputContractConfig {
     /// Assembles an `OutputContractConfig` from a raw config object that was loaded via Serde.
     ///
@@ -244,6 +256,7 @@ impl OutputContractConfig {
             .map(|builder| build_contract(builder, original_abi))
             .collect();
         set_main_contract_flag(&mut contracts, &config.settings.main);
+        validate_output_contracts(&contracts);
         OutputContractConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
             contracts,

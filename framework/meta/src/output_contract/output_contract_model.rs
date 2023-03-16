@@ -74,6 +74,9 @@ pub struct OutputContractSettings {
     /// Panic messages add a lot of bloat to the final bytecode,
     /// so they should only be used for debugging purposes.
     pub panic_message: bool,
+
+    /// Features that are activated on the contract crate, from wasm.
+    pub features: Vec<String>,
 }
 
 /// Represents a contract created by the framework when building.
