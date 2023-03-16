@@ -59,7 +59,10 @@
                         "endpoint": "str:forward_queued_calls",
                         "topics": [
                             "str:forward_queued_calls",
-                            "0x03e8"
+                            "1",
+                            "sc:vault",
+                            "str:accept_funds",
+                            "1000"
                         ],
                         "data": ""
                     },
@@ -69,7 +72,7 @@
                         "topics": [
                             "sc:forwarder-queue",
                             "sc:vault",
-                            "0x03e8"
+                            "1000"
                         ],
                         "data": ""
                     },

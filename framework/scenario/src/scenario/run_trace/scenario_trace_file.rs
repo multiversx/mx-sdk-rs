@@ -22,7 +22,7 @@ impl ScenarioTraceFile {
         if self.full_path.is_file() {
             tracer.load_scenario_trace(&self.full_path);
         }
-        
+
         f(&mut tracer);
         tracer.write_scenario_trace(&self.full_path);
     }
