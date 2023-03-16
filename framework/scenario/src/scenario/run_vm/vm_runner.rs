@@ -37,6 +37,12 @@ impl ScenarioRunner for ScenarioVMRunner {
         }
     }
 
+    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+        for step in steps {
+            self.perform_sc_deploy(step);
+        }
+    }
+
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {
         let _ = self.perform_sc_query(step);
     }

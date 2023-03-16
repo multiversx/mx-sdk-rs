@@ -52,6 +52,9 @@ async fn main() {
         Some(multisig_interact_cli::InteractCliCommand::Feed) => {
             multisig_interact.feed_contract_egld().await;
         },
+        Some(multisig_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
+            multisig_interact.multi_deploy(&args.count).await;
+        },
         Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
             multisig_interact.issue_multisig_and_collection_full().await;
         },
@@ -151,6 +154,47 @@ impl MultisigInteract {
 
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_multisig_address(&new_address_expr);
+    }
+
+    async fn multi_deploy(&mut self, count: &u8) {
+        if *count == 0 {
+            println!("count must be greater than 0");
+            return;
+        }
+        println!("deploying {count} contracts...");
+
+        let board = self.board();
+        let mut steps = Vec::new();
+        for _ in 0..*count {
+            let sc_deploy_step: ScDeployStep = self
+                .state
+                .default_multisig()
+                .init(Config::load_config().quorum(), board.clone())
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .code_metadata(CodeMetadata::all())
+                .contract_code(
+                    "file:../output/multisig.wasm",
+                    &InterpreterContext::default(),
+                )
+                .gas_limit("70,000,000")
+                .expect(TxExpect::ok())
+                .into();
+
+            steps.push(sc_deploy_step);
+        }
+
+        let results = self.interactor.multiple_sc_deploy_results(&steps).await;
+        for result in results {
+            let result = result.new_deployed_address();
+            if result.is_err() {
+                println!("deploy failed: {}", result.err().unwrap());
+                return;
+            }
+
+            let new_address_bech32 = bech32::encode(&result.unwrap());
+            println!("new address: {new_address_bech32}");
+        }
     }
 
     fn board(&mut self) -> MultiValueVec<Address> {

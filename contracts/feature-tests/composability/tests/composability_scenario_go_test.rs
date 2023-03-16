@@ -1,4 +1,3 @@
-
 #[test]
 fn forw_queue_async_go() {
     multiversx_sc_scenario::run_go("scenarios/forw_queue_async.scen.json");

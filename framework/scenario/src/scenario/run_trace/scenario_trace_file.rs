@@ -22,7 +22,7 @@ impl ScenarioTraceFile {
         if self.full_path.is_file() {
             tracer.load_scenario_trace(&self.full_path);
         }
-        
+
         f(&mut tracer);
         tracer.write_scenario_trace(&self.full_path);
     }
@@ -43,6 +43,10 @@ impl ScenarioRunner for ScenarioTraceFile {
 
     fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
         self.with_tracer(|tracer| tracer.run_multi_sc_call_step(steps));
+    }
+
+    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+        self.with_tracer(|tracer| tracer.run_multi_sc_deploy_step(steps));
     }
 
     fn run_sc_query_step(&mut self, step: &ScQueryStep) {

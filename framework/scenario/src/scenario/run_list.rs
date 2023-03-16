@@ -3,7 +3,7 @@ use crate::scenario_model::*;
 use super::ScenarioRunner;
 
 /// Aggregates several scenario runners into one, and calls them in order.
-/// 
+///
 /// The empty object can act as a placeholder, in case we want to provide a `ScenarioRunner` that does nothing.
 #[derive(Default)]
 pub struct ScenarioRunnerList {
@@ -50,6 +50,14 @@ impl ScenarioRunner for ScenarioRunnerList {
         for runner in self.list.iter_mut() {
             for step in steps {
                 runner.run_sc_call_step(step);
+            }
+        }
+    }
+
+    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+        for runner in self.list.iter_mut() {
+            for step in steps {
+                runner.run_sc_deploy_step(step);
             }
         }
     }
