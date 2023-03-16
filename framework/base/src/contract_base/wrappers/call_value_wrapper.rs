@@ -7,8 +7,8 @@ use crate::{
     },
     err_msg,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedType,
-        ManagedVec, TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
+        EsdtTokenPayment, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -133,5 +133,17 @@ where
         }
 
         (payment.token_identifier, payment.amount)
+    }
+
+    /// Accepts any sort of patyment, which is either:
+    /// - EGLD (can be zero in case of no payment whatsoever);
+    /// - Multi-ESDT (one or more ESDT transfers).
+    pub fn any_payment(&self) -> EgldOrMultiEsdtPayment<A> {
+        let esdt_transfers = self.all_esdt_transfers();
+        if esdt_transfers.is_empty() {
+            EgldOrMultiEsdtPayment::Egld(self.egld_value())
+        } else {
+            EgldOrMultiEsdtPayment::MultiEsdt(esdt_transfers)
+        }
     }
 }

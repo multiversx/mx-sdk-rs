@@ -9,7 +9,7 @@ publish = false
 path = "src/forwarder_queue.rs"
 
 [features]
-ei-unmanaged = ["multiversx-sc/ei-unmanaged"]
+promises = ["multiversx-sc/promises"]
 
 [dependencies.vault]
 path = "../vault"

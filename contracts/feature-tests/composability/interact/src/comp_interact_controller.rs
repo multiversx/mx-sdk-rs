@@ -7,6 +7,8 @@ use multiversx_sc_snippets::{
     Interactor,
 };
 
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "comp_interact_trace.scen.json";
+
 pub struct ComposabilityInteract {
     pub interactor: Interactor,
     pub wallet_address: Address,
@@ -16,7 +18,10 @@ pub struct ComposabilityInteract {
 impl ComposabilityInteract {
     pub async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway()).await;
+        let mut interactor = Interactor::new(config.gateway())
+            .await
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
         let wallet_address = interactor.register_wallet(judy());
 
         ComposabilityInteract {
@@ -39,15 +44,8 @@ impl ComposabilityInteract {
 
         self.deploy_call_tree_contracts(&call_state).await;
 
-        self.add_calls_to_all_fwds(
-            &call_state,
-            call_type,
-            endpoint_name,
-            payment_token.clone(),
-            payment_nonce,
-            payment_amount,
-        )
-        .await;
+        self.add_calls_to_all_fwds(&call_state, call_type, endpoint_name)
+            .await;
 
         self.call_root(&call_state, payment_token, payment_nonce, payment_amount)
             .await;
