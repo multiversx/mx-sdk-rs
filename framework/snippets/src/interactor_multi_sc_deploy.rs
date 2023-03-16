@@ -3,7 +3,7 @@ use crate::{
     Interactor, InteractorResult,
 };
 
-use multiversx_sc_scenario::scenario_model::ScDeployStep;
+use multiversx_sc_scenario::{mandos_system::ScenarioRunner, scenario_model::ScDeployStep};
 use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
@@ -11,11 +11,15 @@ impl Interactor {
         &mut self,
         sc_deploy_steps: &[ScDeployStep],
     ) -> Vec<InteractorResult<()>> {
+        self.pre_runners.run_multi_sc_deploy_step(sc_deploy_steps);
+
         let senders = retrieve_senders_deploy(sc_deploy_steps);
         self.recall_senders_nonce(senders).await;
 
         let txs = self.retrieve_txs_deploy(sc_deploy_steps);
         let results = self.process_txs(txs).await;
+
+        self.post_runners.run_multi_sc_deploy_step(sc_deploy_steps);
 
         results.into_iter().map(InteractorResult::new).collect()
     }
