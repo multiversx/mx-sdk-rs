@@ -90,7 +90,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "multi-contract-features-wasm"
+name = "multi-contract-features-custom-cargo-toml-name"
 version = "0.0.0"
 dependencies = [
  "multi-contract-features",

@@ -55,13 +55,16 @@ impl MetaConfig {
     /// Cargo.toml files for secondary contracts are generated from the main contract Cargo.toml,
     /// by changing the package name.
     pub fn generate_cargo_toml_for_secondary_contracts(&mut self) {
-        let main_contract = self.output_contracts.main_contract();
+        let main_contract = self.output_contracts.main_contract_mut();
 
-        // using the same local structure for all contracts is enough for now
-        let mut cargo_toml_contents =
+        let main_cargo_toml_contents =
             CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
+        main_contract.wasm_crate_name = main_cargo_toml_contents.package_name();
+
+        // we are reusing the object, repeatedly updating and saving
+        let mut cargo_toml_contents = main_cargo_toml_contents;
         for secondary_contract in self.output_contracts.secondary_contracts() {
-            cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name());
+            cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name.clone());
             cargo_toml_contents.save_to_file(secondary_contract.cargo_toml_path());
         }
     }
