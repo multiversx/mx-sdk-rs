@@ -44,7 +44,8 @@ async fn main() {
             multisig_interact.print_board().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
-            multisig_interact.deploy().await;
+            // multisig_interact.deploy().await;
+            multisig_interact.multi_deploy().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
             multisig_interact.dns_register(&args.name).await;
@@ -151,6 +152,41 @@ impl MultisigInteract {
 
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_multisig_address(&new_address_expr);
+    }
+
+    async fn multi_deploy(&mut self) {
+        let board = self.board();
+        let mut steps = Vec::new();
+        for _i in 0..3 {
+            let sc_deploy_step: ScDeployStep = self
+                .state
+                .default_multisig()
+                .init(Config::load_config().quorum(), board.clone())
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .code_metadata(CodeMetadata::all())
+                .contract_code(
+                    "file:../output/multisig.wasm",
+                    &InterpreterContext::default(),
+                )
+                .gas_limit("70,000,000")
+                .expect(TxExpect::ok())
+                .into();
+
+            steps.push(sc_deploy_step);
+        }
+
+        let results = self.interactor.multiple_sc_deploy_results(&steps).await;
+        for result in results {
+            let result = result.new_deployed_address();
+            if result.is_err() {
+                println!("deploy failed: {}", result.err().unwrap());
+                return;
+            }
+
+            let new_address_bech32 = bech32::encode(&result.unwrap());
+            println!("new address: {new_address_bech32}");
+        }
     }
 
     fn board(&mut self) -> MultiValueVec<Address> {
