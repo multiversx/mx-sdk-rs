@@ -2,7 +2,9 @@ use std::fs;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::{meta_wasm_tools::check_tools_installed, CargoTomlContents};
+use crate::{
+    meta_wasm_tools::check_tools_installed, output_contract::OutputContract, CargoTomlContents,
+};
 
 use super::{cli_args::BuildArgs, output_contract::OutputContractConfig};
 
@@ -61,14 +63,27 @@ impl MetaConfig {
             CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
         main_contract.wasm_crate_name = main_cargo_toml_contents.package_name();
 
-        // we are reusing the object, repeatedly updating and saving
-        let mut cargo_toml_contents = main_cargo_toml_contents;
         for secondary_contract in self.output_contracts.secondary_contracts() {
-            cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name.clone());
-            cargo_toml_contents.save_to_file(secondary_contract.cargo_toml_path());
+            secondary_contract_cargo_toml(secondary_contract, &main_cargo_toml_contents)
+                .save_to_file(secondary_contract.cargo_toml_path());
         }
     }
+}
 
+fn secondary_contract_cargo_toml(
+    secondary_contract: &OutputContract,
+    main_cargo_toml_contents: &CargoTomlContents,
+) -> CargoTomlContents {
+    let mut cargo_toml_contents = main_cargo_toml_contents.clone();
+    cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name.clone());
+    if !secondary_contract.settings.features.is_empty() {
+        cargo_toml_contents
+            .change_features_for_parent_crate_dep(secondary_contract.settings.features.as_slice());
+    }
+    cargo_toml_contents
+}
+
+impl MetaConfig {
     fn generate_wasm_src_lib(&self) {
         for output_contract in &self.output_contracts.contracts {
             output_contract.generate_wasm_src_lib_file();
