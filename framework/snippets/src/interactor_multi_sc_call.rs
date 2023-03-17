@@ -1,4 +1,7 @@
-use crate::{interactor_multi_sc_process::{update_nonces_and_sign_tx, Txs, SenderSet}, Interactor, InteractorResult};
+use crate::{
+    interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs},
+    Interactor, InteractorResult,
+};
 
 use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner, multiversx_sc::codec::multi_types::IgnoreValue,
