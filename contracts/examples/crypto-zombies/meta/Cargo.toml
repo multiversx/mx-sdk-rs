@@ -1,0 +1,12 @@
+[package]
+name = "cryptozombies-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.cryptozombies]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.39.4"
+path = "../../../../framework/meta"

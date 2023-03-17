@@ -9,14 +9,14 @@ publish = false
 path = "src/bonding_curve_contract.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.5"
+version = "0.39.6"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.39.5"
+version = "0.39.6"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.5"
+version = "0.39.6"
 path = "../../../framework/scenario"
 

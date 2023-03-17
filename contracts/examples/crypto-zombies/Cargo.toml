@@ -1,0 +1,17 @@
+[package]
+name = "cryptozombies"
+version = "0.0.0"
+authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies.multiversx-sc]
+version = "0.39.4"
+path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.39.4"
+path = "../../../framework/scenario"
