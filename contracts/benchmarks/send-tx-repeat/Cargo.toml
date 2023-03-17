@@ -9,10 +9,10 @@ publish = false
 path = "src/send_tx_repeat.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.5"
+version = "0.39.6"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.5"
+version = "0.39.6"
 path = "../../../framework/scenario"
