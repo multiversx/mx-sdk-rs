@@ -64,6 +64,12 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     pub fn is_valid_esdt_identifier(&self) -> bool {
         M::managed_type_impl().validate_token_identifier(self.buffer.handle.clone())
     }
+
+    pub fn ticker(&self) -> ManagedBuffer<M> {
+        let token_id_len = self.buffer.len();
+        let ticker_len = M::managed_type_impl().get_token_ticker_len(token_id_len);
+        self.buffer.copy_slice(0, ticker_len).unwrap()
+    }
 }
 
 impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for TokenIdentifier<M> {
