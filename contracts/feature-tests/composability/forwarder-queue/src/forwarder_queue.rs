@@ -18,6 +18,7 @@ pub enum QueuedCallType {
 pub struct QueuedCall<M: ManagedTypeApi> {
     pub call_type: QueuedCallType,
     pub to: ManagedAddress<M>,
+    pub gas_limit: u64,
     pub endpoint_name: ManagedBuffer<M>,
     pub args: ManagedArgBuffer<M>,
     pub payments: EgldOrMultiEsdtPayment<M>,
@@ -35,10 +36,63 @@ pub trait ForwarderQueue {
 
     #[endpoint]
     #[payable("*")]
+    fn add_queued_call_sync(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        self.add_queued_call(QueuedCallType::Sync, to, 0, endpoint_name, args);
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn add_queued_call_legacy_async(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        self.add_queued_call(QueuedCallType::LegacyAsync, to, 0, endpoint_name, args);
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn add_queued_call_transfer_execute(
+        &self,
+        to: ManagedAddress,
+        gas_limit: u64,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        self.add_queued_call(
+            QueuedCallType::TransferExecute,
+            to,
+            gas_limit,
+            endpoint_name,
+            args,
+        );
+    }
+
+    #[endpoint]
+    #[payable("*")]
+    fn add_queued_call_promise(
+        &self,
+        to: ManagedAddress,
+        gas_limit: u64,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        self.add_queued_call(QueuedCallType::Promise, to, gas_limit, endpoint_name, args);
+    }
+
+    #[endpoint]
+    #[payable("*")]
     fn add_queued_call(
         &self,
         call_type: QueuedCallType,
         to: ManagedAddress,
+        gas_limit: u64,
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
@@ -61,6 +115,7 @@ pub trait ForwarderQueue {
         self.queued_calls().push_back(QueuedCall {
             call_type,
             to,
+            gas_limit,
             endpoint_name,
             args: args.to_arg_buffer(),
             payments,
@@ -114,11 +169,13 @@ pub trait ForwarderQueue {
                     contract_call.async_call().call_and_exit();
                 },
                 QueuedCallType::TransferExecute => {
-                    contract_call.transfer_execute();
+                    contract_call
+                        .with_gas_limit(call.gas_limit)
+                        .transfer_execute();
                 },
                 QueuedCallType::Promise => {
-                    call_promise(contract_call);
-                }
+                    call_promise(contract_call.with_gas_limit(call.gas_limit));
+                },
             }
         }
     }
@@ -159,7 +216,6 @@ pub trait ForwarderQueue {
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 }
-
 
 #[cfg(feature = "promises")]
 fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>) {

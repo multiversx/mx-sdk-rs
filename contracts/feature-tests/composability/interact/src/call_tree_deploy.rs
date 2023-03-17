@@ -22,6 +22,7 @@ use promises_features::ProxyTrait as _;
 use vault::ProxyTrait as _;
 
 const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
+const DEFAULT_GAS_LIMIT: u64 = 10_000_000;
 
 impl ComposabilityInteract {
     pub async fn deploy_call_tree_contracts(&mut self, call_state: &CallState) {
@@ -144,6 +145,7 @@ impl ComposabilityInteract {
                     .add_queued_call(
                         call_type,
                         to,
+                        DEFAULT_GAS_LIMIT,
                         endpoint_name,
                         MultiValueEncoded::<DebugApi, _>::new(),
                     )

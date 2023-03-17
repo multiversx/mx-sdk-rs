@@ -27,14 +27,16 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder-queue",
                 "egldValue": "1000",
-                "function": "add_queued_call",
+                "function": "add_queued_call_legacy_async",
                 "arguments": [
-                    "0x01",
                     "sc:vault",
                     "str:accept_funds"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0"
             }
         },
         {
