@@ -274,6 +274,14 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         M::managed_type_impl().mb_append_bytes(self.handle.clone(), &item.to_be_bytes()[..]);
     }
 
+    /// Concatenates 2 managed buffers. Consumes both arguments in the process.
+    #[inline]
+    #[must_use]
+    pub fn concat(mut self, other: ManagedBuffer<M>) -> Self {
+        self.append(&other);
+        self
+    }
+
     /// Convenience method for quickly getting a top-decoded u64 from the managed buffer.
     ///
     /// TODO: remove this method once TopDecodeInput is implemented for ManagedBuffer reference.
