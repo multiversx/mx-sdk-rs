@@ -8,7 +8,14 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
+/// Test!
+#[ignore]
 #[test]
 fn adder_rs() {
     multiversx_sc_scenario::run_rs("scenarios/adder.scen.json", world());
+}
+
+#[test]
+fn adder2_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/adder_____________________________________________________.scen.json", world());
 }
