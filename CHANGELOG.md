@@ -27,6 +27,10 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.39.7, vm 0.1.7] - 2023-03-18
+ - `TokenIdentifier` `ticker` method.
+ - `ManagedBuffer` `concat` method.
+
 ## [sc 0.39.6, vm 0.1.6] - 2023-03-16
 - `multiversx-sc-meta` improvements:
 	- Bugfix: custom names in the main contract no longer crash the multi-contract build.
