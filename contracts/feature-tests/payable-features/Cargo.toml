@@ -9,9 +9,9 @@ publish = false
 path = "src/payable_features.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.6"
+version = "0.39.7"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.6"
+version = "0.39.7"
 path = "../../../framework/scenario"
