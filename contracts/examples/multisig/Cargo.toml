@@ -20,12 +20,6 @@ path = "../../../contracts/modules"
 version = "0.39.7"
 path = "../../../framework/scenario"
 
-[dev-dependencies.adder]
-path = "../adder"
-
-[dev-dependencies.factorial]
-path = "../factorial"
-
 [dev-dependencies]
 num-bigint = "0.4.2"
 num-traits = "0.2"
