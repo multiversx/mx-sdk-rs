@@ -12,11 +12,11 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn single_value_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/single_value_repeat_struct.scen.json", world());
+fn single_value_repeat_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/single_value_repeat.scen.json", world());
 }
 
 #[test]
-fn single_value_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/single_value_repeat.scen.json", world());
+fn single_value_repeat_struct_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/single_value_repeat_struct.scen.json", world());
 }

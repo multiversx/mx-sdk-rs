@@ -17,12 +17,12 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn big_int_from_i64_rs() {
+fn big_int_from_i_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/big_int_from_i64.scen.json", world());
 }
 
 #[test]
-fn big_int_to_i64_rs() {
+fn big_int_to_i_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/big_int_to_i64.scen.json", world());
 }
 
@@ -32,8 +32,13 @@ fn big_num_conversions_rs() {
 }
 
 #[test]
-fn big_uint_eq_u64_rs() {
+fn big_uint_eq_u_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/big_uint_eq_u64.scen.json", world());
+}
+
+#[test]
+fn big_uint_from_u_64_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/big_uint_from_u64.scen.json", world());
 }
 
 #[test]
@@ -42,12 +47,7 @@ fn big_uint_sqrt_rs() {
 }
 
 #[test]
-fn big_uint_from_u64_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/big_uint_from_u64.scen.json", world());
-}
-
-#[test]
-fn big_uint_to_u64_rs() {
+fn big_uint_to_u_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/big_uint_to_u64.scen.json", world());
 }
 
@@ -66,60 +66,57 @@ fn count_ones_rs() {
     multiversx_sc_scenario::run_rs("scenarios/count_ones.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn crypto_elliptic_curves_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_elliptic_curves.scen.json", world());
 }
 
 #[test]
-fn crypto_keccak256_rs() {
+fn crypto_keccak_256_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_keccak256.scen.json", world());
 }
 
 #[test]
-fn crypto_keccak256_legacy_managed_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/crypto_keccak256_legacy_managed.scen.json",
-        world(),
-    );
+fn crypto_keccak_256_legacy_managed_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_keccak256_legacy_managed.scen.json", world());
 }
 
-#[ignore]
 #[test]
-fn crypto_ripemd160_rs() {
+#[ignore]
+fn crypto_ripemd_160_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160.scen.json", world());
 }
 
 #[test]
-fn crypto_sha256_rs() {
+fn crypto_sha_256_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_sha256.scen.json", world());
 }
 
 #[test]
-fn crypto_sha256_legacy_managed_rs() {
+fn crypto_sha_256_legacy_managed_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_sha256_legacy_managed.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn crypto_verify_bls_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_bls.scen.json", world());
 }
 
 #[test]
-fn crypto_verify_ed25519_rs() {
+fn crypto_verify_ed_25519_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_ed25519.scen.json", world());
 }
 
-#[ignore]
 #[test]
-fn crypto_verify_secp256k1_rs() {
+#[ignore]
+fn crypto_verify_secp_256_k_1_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_secp256k1.scen.json", world());
 }
 
 #[test]
-fn echo_array_u8_rs() {
+fn echo_array_u_8_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_array_u8.scen.json", world());
 }
 
@@ -144,12 +141,12 @@ fn echo_big_uint_rs() {
 }
 
 #[test]
-fn echo_i32_rs() {
+fn echo_i_32_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_i32.scen.json", world());
 }
 
 #[test]
-fn echo_i64_rs() {
+fn echo_i_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_i64.scen.json", world());
 }
 
@@ -160,10 +157,7 @@ fn echo_ignore_rs() {
 
 #[test]
 fn echo_managed_async_result_empty_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/echo_managed_async_result_empty.scen.json",
-        world(),
-    );
+    multiversx_sc_scenario::run_rs("scenarios/echo_managed_async_result_empty.scen.json", world());
 }
 
 #[test]
@@ -192,7 +186,7 @@ fn echo_tuple_into_multiresult_rs() {
 }
 
 #[test]
-fn echo_u64_rs() {
+fn echo_u_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_u64.scen.json", world());
 }
 
@@ -212,7 +206,7 @@ fn echo_varargs_managed_sum_rs() {
 }
 
 #[test]
-fn echo_varargs_u32_rs() {
+fn echo_varargs_u_32_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_varargs_u32.scen.json", world());
 }
 
@@ -228,10 +222,7 @@ fn get_caller_rs() {
 
 #[test]
 fn get_cumulated_validator_rewards_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/get_cumulated_validator_rewards.scen.json",
-        world(),
-    );
+    multiversx_sc_scenario::run_rs("scenarios/get_cumulated_validator_rewards.scen.json", world());
 }
 
 #[test]
@@ -241,10 +232,7 @@ fn managed_address_array_rs() {
 
 #[test]
 fn managed_address_managed_buffer_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/managed_address_managed_buffer.scen.json",
-        world(),
-    );
+    multiversx_sc_scenario::run_rs("scenarios/managed_address_managed_buffer.scen.json", world());
 }
 
 #[test]
@@ -262,8 +250,8 @@ fn managed_buffer_eq_rs() {
     multiversx_sc_scenario::run_rs("scenarios/managed_buffer_eq.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn managed_buffer_set_random_rs() {
     multiversx_sc_scenario::run_rs("scenarios/managed_buffer_set_random.scen.json", world());
 }
@@ -274,13 +262,13 @@ fn managed_vec_address_push_rs() {
 }
 
 #[test]
-fn managed_vec_biguint_push_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/managed_vec_biguint_push.scen.json", world());
+fn managed_vec_array_push_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/managed_vec_array_push.scen.json", world());
 }
 
 #[test]
-fn managed_vec_array_push_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/managed_vec_array_push.scen.json", world());
+fn managed_vec_biguint_push_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/managed_vec_biguint_push.scen.json", world());
 }
 
 #[test]
@@ -294,8 +282,8 @@ fn only_user_account_rs() {
 }
 
 // Will never run in scenarios-rs.
-#[ignore]
 #[test]
+#[ignore]
 fn out_of_gas_rs() {
     multiversx_sc_scenario::run_rs("scenarios/out_of_gas.scen.json", world());
 }
@@ -313,11 +301,6 @@ fn return_codes_rs() {
 #[test]
 fn sc_properties_rs() {
     multiversx_sc_scenario::run_rs("scenarios/sc_properties.scen.json", world());
-}
-
-#[test]
-fn storage_raw_api_features_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/storage_raw_api_features.scen.json", world());
 }
 
 #[test]
@@ -341,12 +324,12 @@ fn storage_clear_rs() {
 }
 
 #[test]
-fn storage_i64_rs() {
+fn storage_i_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_i64.scen.json", world());
 }
 
 #[test]
-fn storage_i64_bad_rs() {
+fn storage_i_64_bad_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_i64_bad.scen.json", world());
 }
 
@@ -361,22 +344,22 @@ fn storage_managed_address_rs() {
 }
 
 #[test]
-fn storage_map1_rs() {
+fn storage_map_1_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_map1.scen.json", world());
 }
 
 #[test]
-fn storage_map2_rs() {
+fn storage_map_2_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_map2.scen.json", world());
 }
 
 #[test]
-fn storage_map3_rs() {
+fn storage_map_3_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_map3.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn storage_mapper_fungible_token_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_mapper_fungible_token.scen.json", world());
 }
@@ -396,13 +379,10 @@ fn storage_mapper_map_storage_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_mapper_map_storage.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn storage_mapper_non_fungible_token_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/storage_mapper_non_fungible_token.scen.json",
-        world(),
-    );
+    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_non_fungible_token.scen.json", world());
 }
 
 #[test]
@@ -422,10 +402,12 @@ fn storage_mapper_single_value_rs() {
 
 #[test]
 fn storage_mapper_token_attributes_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/storage_mapper_token_attributes.scen.json",
-        world(),
-    );
+    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_token_attributes.scen.json", world());
+}
+
+#[test]
+fn storage_mapper_unique_id_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_unique_id.scen.json", world());
 }
 
 #[test]
@@ -444,17 +426,22 @@ fn storage_opt_managed_addr_rs() {
 }
 
 #[test]
+fn storage_raw_api_features_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/storage_raw_api_features.scen.json", world());
+}
+
+#[test]
 fn storage_reserved_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_reserved.scen.json", world());
 }
 
 #[test]
-fn storage_u64_rs() {
+fn storage_u_64_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_u64.scen.json", world());
 }
 
 #[test]
-fn storage_u64_bad_rs() {
+fn storage_u_64_bad_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_u64_bad.scen.json", world());
 }
 
@@ -471,9 +458,4 @@ fn storage_usize_bad_rs() {
 #[test]
 fn struct_eq_rs() {
     multiversx_sc_scenario::run_rs("scenarios/struct_eq.scen.json", world());
-}
-
-#[test]
-fn storage_mapper_unique_id_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_unique_id.scen.json", world());
 }

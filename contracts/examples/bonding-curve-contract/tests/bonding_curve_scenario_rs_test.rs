@@ -10,6 +10,16 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+fn buy_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/buy.scen.json", world());
+}
+
+#[test]
+fn claim_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/claim.scen.json", world());
+}
+
+#[test]
 fn deploy_rs() {
     multiversx_sc_scenario::run_rs("scenarios/deploy.scen.json", world());
 }
@@ -20,13 +30,8 @@ fn deposit_rs() {
 }
 
 #[test]
-fn set_bonding_curve_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/set_bonding_curve.scen.json", world());
-}
-
-#[test]
-fn buy_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/buy.scen.json", world());
+fn deposit_more_view_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/deposit_more_view.scen.json", world());
 }
 
 #[test]
@@ -35,11 +40,6 @@ fn sell_rs() {
 }
 
 #[test]
-fn deposit_more_view_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deposit_more_view.scen.json", world());
-}
-
-#[test]
-fn claim_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/claim.scen.json", world());
+fn set_bonding_curve_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/set_bonding_curve.scen.json", world());
 }

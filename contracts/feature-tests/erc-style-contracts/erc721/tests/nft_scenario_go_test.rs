@@ -24,7 +24,7 @@ fn nft_mint_more_tokens_caller_not_owner_go() {
 }
 
 #[test]
-fn nft_mint_more_tokens_receiver_acc1_go() {
+fn nft_mint_more_tokens_receiver_acc_1_go() {
     multiversx_sc_scenario::run_go("scenarios/nft-mint-more-tokens-receiver-acc1.scen.json");
 }
 
@@ -70,16 +70,12 @@ fn nft_transfer_token_after_revoked_go() {
 
 #[test]
 fn nft_transfer_token_not_owner_no_approval_to_caller_go() {
-    multiversx_sc_scenario::run_go(
-        "scenarios/nft-transfer-token-not-owner-no-approval-to-caller.scen.json",
-    );
+    multiversx_sc_scenario::run_go("scenarios/nft-transfer-token-not-owner-no-approval-to-caller.scen.json");
 }
 
 #[test]
 fn nft_transfer_token_not_owner_no_approval_to_other_go() {
-    multiversx_sc_scenario::run_go(
-        "scenarios/nft-transfer-token-not-owner-no-approval-to-other.scen.json",
-    );
+    multiversx_sc_scenario::run_go("scenarios/nft-transfer-token-not-owner-no-approval-to-other.scen.json");
 }
 
 #[test]
