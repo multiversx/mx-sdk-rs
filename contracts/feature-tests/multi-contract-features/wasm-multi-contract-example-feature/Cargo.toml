@@ -1,0 +1,25 @@
+[package]
+name = "multi-contract-example-feature-wasm"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+[dependencies.multi-contract-features]
+path = ".."
+features = ["example_feature"]
+
+[dependencies.multiversx-sc-wasm-adapter]
+version = "0.39.7"
+path = "../../../../framework/wasm-adapter"
+
+[workspace]
+members = ["."]

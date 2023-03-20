@@ -8,10 +8,13 @@ publish = false
 [lib]
 path = "src/multi_contract_features.rs"
 
+[features]
+example_feature = []
+
 [dependencies.multiversx-sc]
-version = "0.39.5"
+version = "0.39.7"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.5"
+version = "0.39.7"
 path = "../../../framework/scenario"

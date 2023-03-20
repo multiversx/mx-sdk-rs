@@ -32,3 +32,10 @@ pub fn print_build_command(contract_name: String, command: &Command) {
         format_command(command).green(),
     );
 }
+
+pub fn print_copy_contract(source_wasm_path: &str, output_wasm_path: &str) {
+    println!(
+        "{}",
+        format!("Copying {source_wasm_path} to {output_wasm_path} ...").green(),
+    );
+}

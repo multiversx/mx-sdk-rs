@@ -10,9 +10,9 @@ path = "src/lib.rs"
 
 
 [dependencies.multiversx-sc]
-version = "0.39.5"
+version = "0.39.7"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.5"
+version = "0.39.7"
 path = "../../../../framework/scenario"

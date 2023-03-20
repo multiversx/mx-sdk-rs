@@ -1,6 +1,6 @@
 use multiversx_sc::types::{
     BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
-    TokenIdentifier,
+    TokenIdentifier, ManagedBuffer,
 };
 use multiversx_sc_scenario::{
     managed_egld_token_id, managed_token_id, managed_token_id_wrapped,
@@ -67,6 +67,72 @@ fn test_is_valid_esdt_identifier() {
 
     // ticker too long
     assert!(!TokenIdentifier::<DebugApi>::from("ALCCCCCCCCC-6258d2").is_valid_esdt_identifier());
+}
+
+#[test]
+#[rustfmt::skip]
+fn test_ticker() {
+    let _ = DebugApi::dummy();
+
+    // valid identifier
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ALC-6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("ALC"),
+    );
+
+    // valid identifier with numbers in ticker
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ALC123-6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("ALC123"),
+    );
+
+    // valid ticker only numbers
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("12345-6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("12345"),
+    );
+
+    // missing dash
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ALC6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("AL"),
+    );
+
+    // wrong dash position
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("AL-C6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("AL-"),
+    );
+
+    // lowercase ticker
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("alc-6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("alc"),
+    );
+
+    // uppercase random chars
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ALC-6258D2").ticker(),
+        ManagedBuffer::<DebugApi>::from("ALC"),
+    );
+
+    // too many random chars
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ALC-6258d2ff").ticker(),
+        ManagedBuffer::<DebugApi>::from("ALC-6"),
+    );
+
+    // ticker too short
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("AL-6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("AL"),
+    );
+
+    // ticker too long
+    assert_eq!(
+        TokenIdentifier::<DebugApi>::from("ALCCCCCCCCC-6258d2").ticker(),
+        ManagedBuffer::<DebugApi>::from("ALCCCCCCCCC"),
+    );
 }
 
 #[test]
