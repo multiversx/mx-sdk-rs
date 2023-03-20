@@ -53,6 +53,12 @@ fn compose_rustflags(build_args: &BuildArgs) -> String {
         }
         rustflags.push_str("--emit=mir");
     }
+    if build_args.emit_llvm_ir {
+        if !rustflags.is_empty() {
+            rustflags.push(' ');
+        }
+        rustflags.push_str("--emit=llvm-ir");
+    }
     rustflags
 }
 
