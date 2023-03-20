@@ -146,4 +146,8 @@ pub struct TestGenArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+
+    /// Creates test files if they don't exist.
+    #[arg(long, verbatim_doc_comment)]
+    pub create: bool,
 }

@@ -14,7 +14,7 @@ pub fn test_gen_tool(args: &TestGenArgs) {
         "./"
     };
 
-    stg_main::perform_test_gen_all(path, args.ignore.as_slice());
+    stg_main::perform_test_gen_all(path, args.ignore.as_slice(), args.create);
 }
 
 // Good for testing.

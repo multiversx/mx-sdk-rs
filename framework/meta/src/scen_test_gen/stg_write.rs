@@ -4,6 +4,13 @@ use super::stg_section::ScenarioTestFn;
 
 pub type WriteTestFn = fn(&str) -> String;
 
+pub const DEFAULT_TEST_GO: &str = "";
+pub const DEFAULT_TEST_RS: &str = "use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    todo!()
+}";
+
 pub fn format_test_fn_rs(scenario_file_name: &str) -> String {
     format!(
         "

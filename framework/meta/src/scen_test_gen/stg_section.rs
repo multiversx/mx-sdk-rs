@@ -32,11 +32,9 @@ impl Section {
     }
 
     pub fn scenario_name(&self) -> Option<String> {
-        if let Some(test_fn) = &self.test_fn {
-            Some(test_fn.scenario_file_name.clone())
-        } else {
-            None
-        }
+        self.test_fn
+            .as_ref()
+            .map(|test_fn| test_fn.scenario_file_name.clone())
     }
 }
 
@@ -44,6 +42,10 @@ pub fn split_sections(s: &str) -> Vec<Section> {
     let mut result = Vec::new();
     let mut is_within_section = true;
     let mut current_section = Section::default();
+
+    if s.is_empty() {
+        return result;
+    }
 
     for line in s.lines() {
         if is_within_section {
@@ -53,15 +55,13 @@ pub fn split_sections(s: &str) -> Vec<Section> {
             } else {
                 current_section.raw.push('\n');
             }
+        } else if str_is_whitespace(line) {
+            current_section.num_empty_lines_after += 1;
         } else {
-            if str_is_whitespace(line) {
-                current_section.num_empty_lines_after += 1;
-            } else {
-                result.push(std::mem::take(&mut current_section));
-                is_within_section = true;
-                current_section.raw.push_str(line);
-                current_section.raw.push('\n');
-            }
+            result.push(std::mem::take(&mut current_section));
+            is_within_section = true;
+            current_section.raw.push_str(line);
+            current_section.raw.push('\n');
         }
     }
     current_section.num_empty_lines_after += 1;

@@ -1,22 +1,10 @@
-use std::{
-    collections::{BTreeSet, HashMap},
-    fs::{self, File},
-    io::Write,
-    path::Path,
-};
+use std::collections::{BTreeSet, HashMap};
 
 use super::{
     stg_parse::parse_section,
     stg_section::{concat_sections, split_sections, Section},
     stg_write::{format_section, WriteTestFn},
 };
-
-pub fn process_file(path: &Path, scenario_names: &BTreeSet<String>, write_test_fn: WriteTestFn) {
-    let raw_code = fs::read_to_string(path).expect("could not read test file");
-    let new_code = process_code(&raw_code, scenario_names, write_test_fn);
-    let mut file = File::create(path).unwrap();
-    write!(file, "{}", new_code).unwrap();
-}
 
 pub fn process_code(
     raw_code: &str,
