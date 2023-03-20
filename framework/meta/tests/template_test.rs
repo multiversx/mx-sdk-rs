@@ -21,12 +21,12 @@ async fn test_serialize_multi_contract() {
 
 pub fn cargo_build(contract_location: PathBuf) {
     let exit_status = Command::new("cargo")
-        .args(["build"])
+        .args(["test"])
         .current_dir(contract_location)
         .spawn()
         .expect("failed to spawn contract clean process")
         .wait()
-        .expect("contract clean process was not running");
+        .expect("contract test process was not running");
 
-    assert!(exit_status.success(), "contract build process failed");
+    assert!(exit_status.success(), "contract test process failed");
 }
