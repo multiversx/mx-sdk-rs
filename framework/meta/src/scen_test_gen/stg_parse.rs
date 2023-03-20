@@ -1,38 +1,10 @@
-use super::stg_model::{ScenarioTestFn, Section};
+use super::stg_section::ScenarioTestFn;
 
 pub const TEST_ANNOTATION: &str = "#[test]";
 pub const IGNORE_ANNOTATION: &str = "#[ignore]";
 pub const IGNORE_ANNOTATION_PREFIX: &str = "#[ignore";
 pub const SCEN_PATTERN_PREFIX: &str = "\"scenarios/";
 pub const SCEN_PATTERN_SUFFIX: &str = ".scen.json\"";
-
-pub fn split_sections(s: &str) -> Vec<Section> {
-    let mut result = Vec::new();
-    let mut is_within_section = true;
-    let mut current_section = Section::default();
-
-    for line in s.lines() {
-        if is_within_section {
-            current_section.raw.push_str(line);
-            if line == "}" {
-                is_within_section = false;
-            } else {
-                current_section.raw.push('\n');
-            }
-        } else {
-            if line.is_empty() {
-                current_section.num_empty_lines_after += 1;
-            } else {
-                result.push(std::mem::take(&mut current_section));
-                is_within_section = true;
-                current_section.raw.push_str(line);
-                current_section.raw.push('\n');
-            }
-        }
-    }
-    result.push(current_section);
-    result
-}
 
 pub fn parse_section(section_str: &str) -> Option<ScenarioTestFn> {
     let mut docs = String::new();

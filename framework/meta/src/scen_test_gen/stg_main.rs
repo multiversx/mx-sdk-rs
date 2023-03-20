@@ -5,7 +5,7 @@ use crate::{
     scen_test_gen::stg_write::{format_test_fn_go, format_test_fn_rs},
 };
 
-use super::{stg_print::print_no_folder, stg_process_file::process_file};
+use super::{stg_print::print_no_folder, stg_process_code::process_file};
 
 const TESTS_DIR_NAME: &str = "tests";
 const SCENARIOS_DIR_NAME: &str = "scenarios";

@@ -6,14 +6,24 @@ use std::{
 };
 
 use super::{
-    stg_model::Section,
-    stg_parse::{parse_section, split_sections},
+    stg_parse::parse_section,
+    stg_section::{concat_sections, split_sections, Section},
     stg_write::{format_section, WriteTestFn},
 };
 
 pub fn process_file(path: &Path, scenario_names: &BTreeSet<String>, write_test_fn: WriteTestFn) {
     let raw_code = fs::read_to_string(path).expect("could not read test file");
-    let input_sections = split_sections(&raw_code);
+    let new_code = process_code(&raw_code, scenario_names, write_test_fn);
+    let mut file = File::create(path).unwrap();
+    write!(file, "{}", new_code).unwrap();
+}
+
+pub fn process_code(
+    raw_code: &str,
+    scenario_names: &BTreeSet<String>,
+    write_test_fn: WriteTestFn,
+) -> String {
+    let input_sections = split_sections(raw_code);
 
     let mut result_sections = Vec::new();
     let mut scenario_sections = HashMap::new();
@@ -34,15 +44,11 @@ pub fn process_file(path: &Path, scenario_names: &BTreeSet<String>, write_test_f
         result_sections.push(section);
     }
 
-    let mut file = File::create(path).unwrap();
-    for section in &result_sections {
+    for section in &mut result_sections {
         if let Some(test_fn) = &section.test_fn {
-            write!(file, "{}", format_section(test_fn, write_test_fn)).unwrap();
-        } else {
-            writeln!(file, "{}", &section.raw).unwrap();
-        }
-        for _ in 0..section.num_empty_lines_after {
-            writeln!(file).unwrap();
+            section.raw = format_section(test_fn, write_test_fn);
         }
     }
+
+    concat_sections(result_sections.as_slice())
 }
