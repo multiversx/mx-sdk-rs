@@ -1,7 +1,4 @@
-use std::{
-    path::{Path, PathBuf},
-    process::Command,
-};
+use std::{env, path::PathBuf, process::Command};
 
 use multiversx_sc_meta::{cli_args::TemplateArgs, template::TemplateCreator};
 
@@ -12,12 +9,7 @@ async fn test_serialize_multi_contract() {
         template: "adder".to_string(),
     };
 
-    let test_path = Path::new(".")
-        .canonicalize()
-        .unwrap_or_else(|err| {
-            panic!("error canonicalizing input path: {err}",);
-        })
-        .join("tests");
+    let test_path = env::temp_dir();
 
     let build_dir = test_path.join("adder");
 
