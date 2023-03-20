@@ -19,19 +19,34 @@ const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
 
-pub async fn download_contract_template(args: &TemplateArgs) -> Result<(), reqwest::Error> {
-    download_binaries().await?;
-    unzip_binaries();
-
-    let local_path = Path::new(".")
-        .canonicalize()
-        .unwrap_or_else(|err| {
+pub struct TemplateCreator {
+    pub path: PathBuf,
+}
+impl Default for TemplateCreator {
+    fn default() -> Self {
+        let local_path = Path::new(".").canonicalize().unwrap_or_else(|err| {
             panic!("error canonicalizing input path: {err}",);
-        })
-        .join(&args.name);
-    copy_template_to_location(&args.name, Path::new(&local_path));
-    update_dependencies(&args.name);
-    Ok(())
+        });
+        TemplateCreator { path: local_path }
+    }
+}
+
+impl TemplateCreator {
+    pub fn with_path(path: PathBuf) -> Self {
+        TemplateCreator { path }
+    }
+    pub async fn download_contract_template(
+        &self,
+        args: &TemplateArgs,
+    ) -> Result<(), reqwest::Error> {
+        download_binaries().await?;
+        unzip_binaries();
+
+        let local_path = self.path.join(&args.name);
+        copy_template_to_location(&args.name, Path::new(&local_path));
+        update_dependencies(&self.path, &args.name);
+        Ok(())
+    }
 }
 pub async fn list_templates() -> Result<(), reqwest::Error> {
     download_binaries().await?;
@@ -75,14 +90,14 @@ pub fn copy_template_to_location(template: &str, location: &Path) {
     let _ = copy_dir(contract_path, location);
 }
 
-pub fn update_dependencies(template: &str) {
-    update_dependencies_root(template);
-    update_dependencies_wasm(template);
-    update_dependencies_meta(template);
+pub fn update_dependencies(path: &Path, template: &str) {
+    update_dependencies_root(path, template);
+    update_dependencies_wasm(path, template);
+    update_dependencies_meta(path, template);
 }
 
-pub fn update_dependencies_root(template: &str) {
-    let path_buf = get_canonicalized_path(template, ROOT_CARGO_TOML);
+pub fn update_dependencies_root(path: &Path, template: &str) {
+    let path_buf = get_canonicalized_path(path, template, ROOT_CARGO_TOML);
     let cargo_toml_path = Path::new(&path_buf);
     let mut toml = CargoTomlContents::load_from_file(cargo_toml_path);
 
@@ -96,8 +111,8 @@ pub fn update_dependencies_root(template: &str) {
     toml.save_to_file(cargo_toml_path);
 }
 
-pub fn update_dependencies_meta(template: &str) {
-    let path_buf = get_canonicalized_path(template, META_CARGO_TOML);
+pub fn update_dependencies_meta(path: &Path, template: &str) {
+    let path_buf = get_canonicalized_path(path, template, META_CARGO_TOML);
     let cargo_toml_path = Path::new(&path_buf);
     let mut toml = CargoTomlContents::load_from_file(cargo_toml_path);
 
@@ -107,8 +122,8 @@ pub fn update_dependencies_meta(template: &str) {
     toml.save_to_file(cargo_toml_path);
 }
 
-pub fn update_dependencies_wasm(template: &str) {
-    let path_buf = get_canonicalized_path(template, WASM_CARGO_TOML);
+pub fn update_dependencies_wasm(path: &Path, template: &str) {
+    let path_buf = get_canonicalized_path(path, template, WASM_CARGO_TOML);
     let cargo_toml_path = Path::new(&path_buf);
     let mut toml = CargoTomlContents::load_from_file(cargo_toml_path);
 
@@ -118,8 +133,9 @@ pub fn update_dependencies_wasm(template: &str) {
     toml.save_to_file(cargo_toml_path);
 }
 
-pub fn get_canonicalized_path(template: &str, toml: &str) -> PathBuf {
-    Path::new(template)
+pub fn get_canonicalized_path(local_path: &Path, template: &str, toml: &str) -> PathBuf {
+    local_path
+        .join(template)
         .join(toml)
         .canonicalize()
         .unwrap_or_else(|err| {
