@@ -99,8 +99,7 @@ impl CargoTomlContents {
     }
 
     pub fn insert_default_workspace(&mut self) {
-        let mut array = Vec::new();
-        array.push(toml::Value::String(".".to_string()));
+        let array = vec![toml::Value::String(".".to_string())];
         let members = toml::Value::Array(array);
         let mut workspace = toml::Value::Table(Table::new());
         workspace

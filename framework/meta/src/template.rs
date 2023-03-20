@@ -90,13 +90,13 @@ pub fn copy_template_to_location(template: &str, location: &Path) {
     let _ = copy_dir(contract_path, location);
 }
 
-pub fn update_dependencies(path: &PathBuf, template: &str) {
+pub fn update_dependencies(path: &Path, template: &str) {
     update_dependencies_root(path, template);
     update_dependencies_wasm(path, template);
     update_dependencies_meta(path, template);
 }
 
-pub fn update_dependencies_root(path: &PathBuf, template: &str) {
+pub fn update_dependencies_root(path: &Path, template: &str) {
     let path_buf = get_canonicalized_path(path, template, ROOT_CARGO_TOML);
     let cargo_toml_path = Path::new(&path_buf);
     let mut toml = CargoTomlContents::load_from_file(cargo_toml_path);
@@ -111,7 +111,7 @@ pub fn update_dependencies_root(path: &PathBuf, template: &str) {
     toml.save_to_file(cargo_toml_path);
 }
 
-pub fn update_dependencies_meta(path: &PathBuf, template: &str) {
+pub fn update_dependencies_meta(path: &Path, template: &str) {
     let path_buf = get_canonicalized_path(path, template, META_CARGO_TOML);
     let cargo_toml_path = Path::new(&path_buf);
     let mut toml = CargoTomlContents::load_from_file(cargo_toml_path);
@@ -122,7 +122,7 @@ pub fn update_dependencies_meta(path: &PathBuf, template: &str) {
     toml.save_to_file(cargo_toml_path);
 }
 
-pub fn update_dependencies_wasm(path: &PathBuf, template: &str) {
+pub fn update_dependencies_wasm(path: &Path, template: &str) {
     let path_buf = get_canonicalized_path(path, template, WASM_CARGO_TOML);
     let cargo_toml_path = Path::new(&path_buf);
     let mut toml = CargoTomlContents::load_from_file(cargo_toml_path);
@@ -133,7 +133,7 @@ pub fn update_dependencies_wasm(path: &PathBuf, template: &str) {
     toml.save_to_file(cargo_toml_path);
 }
 
-pub fn get_canonicalized_path(local_path: &PathBuf, template: &str, toml: &str) -> PathBuf {
+pub fn get_canonicalized_path(local_path: &Path, template: &str, toml: &str) -> PathBuf {
     local_path
         .join(template)
         .join(toml)
