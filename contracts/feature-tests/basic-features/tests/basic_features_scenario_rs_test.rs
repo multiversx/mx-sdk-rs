@@ -79,7 +79,10 @@ fn crypto_keccak_256_rs() {
 
 #[test]
 fn crypto_keccak_256_legacy_managed_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/crypto_keccak256_legacy_managed.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/crypto_keccak256_legacy_managed.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -157,7 +160,10 @@ fn echo_ignore_rs() {
 
 #[test]
 fn echo_managed_async_result_empty_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/echo_managed_async_result_empty.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/echo_managed_async_result_empty.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -222,7 +228,10 @@ fn get_caller_rs() {
 
 #[test]
 fn get_cumulated_validator_rewards_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/get_cumulated_validator_rewards.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/get_cumulated_validator_rewards.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -232,7 +241,10 @@ fn managed_address_array_rs() {
 
 #[test]
 fn managed_address_managed_buffer_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/managed_address_managed_buffer.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/managed_address_managed_buffer.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -382,7 +394,10 @@ fn storage_mapper_map_storage_rs() {
 #[test]
 #[ignore]
 fn storage_mapper_non_fungible_token_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_non_fungible_token.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/storage_mapper_non_fungible_token.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -402,7 +417,10 @@ fn storage_mapper_single_value_rs() {
 
 #[test]
 fn storage_mapper_token_attributes_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/storage_mapper_token_attributes.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/storage_mapper_token_attributes.scen.json",
+        world(),
+    );
 }
 
 #[test]

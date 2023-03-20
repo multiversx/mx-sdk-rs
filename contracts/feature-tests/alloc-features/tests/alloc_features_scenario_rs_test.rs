@@ -52,7 +52,10 @@ fn crypto_verify_ed_25519_legacy_rs() {
 #[test]
 #[ignore = "mock not implemented"]
 fn crypto_verify_secp_256_k_1_legacy_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/crypto_verify_secp256k1_legacy.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/crypto_verify_secp256k1_legacy.scen.json",
+        world(),
+    );
 }
 
 #[test]

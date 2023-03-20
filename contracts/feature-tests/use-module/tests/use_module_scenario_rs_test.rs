@@ -45,7 +45,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn use_module_claim_developer_rewards_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/use_module_claim_developer_rewards.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/use_module_claim_developer_rewards.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -72,7 +75,10 @@ fn use_module_no_endpoint_rs() {
 #[test]
 #[ignore]
 fn use_module_ongoing_operation_example_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/use_module_ongoing_operation_example.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/use_module_ongoing_operation_example.scen.json",
+        world(),
+    );
 }
 
 #[test]

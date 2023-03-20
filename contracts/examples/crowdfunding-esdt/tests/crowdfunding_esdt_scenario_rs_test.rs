@@ -63,17 +63,26 @@ fn crowdfunding_init_rs() {
 
 #[test]
 fn egld_crowdfunding_claim_failed_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/egld-crowdfunding-claim-failed.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/egld-crowdfunding-claim-failed.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn egld_crowdfunding_claim_successful_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/egld-crowdfunding-claim-successful.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/egld-crowdfunding-claim-successful.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn egld_crowdfunding_claim_too_early_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/egld-crowdfunding-claim-too-early.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/egld-crowdfunding-claim-too-early.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -83,7 +92,10 @@ fn egld_crowdfunding_fund_rs() {
 
 #[test]
 fn egld_crowdfunding_fund_too_late_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/egld-crowdfunding-fund-too-late.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/egld-crowdfunding-fund-too-late.scen.json",
+        world(),
+    );
 }
 
 #[test]

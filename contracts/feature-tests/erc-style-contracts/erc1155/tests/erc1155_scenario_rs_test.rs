@@ -18,7 +18,10 @@ fn batch_transfer_both_types_rs() {
 
 #[test]
 fn batch_transfer_both_types_to_sc_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/batch_transfer_both_types_to_sc.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/batch_transfer_both_types_to_sc.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -38,7 +41,10 @@ fn batch_transfer_non_fungible_rs() {
 
 #[test]
 fn batch_transfer_non_fungible_to_sc_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/batch_transfer_non_fungible_to_sc.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/batch_transfer_non_fungible_to_sc.scen.json",
+        world(),
+    );
 }
 
 // burn tests
@@ -54,7 +60,10 @@ fn burn_non_fungible_rs() {
 
 #[test]
 fn create_one_fungible_one_non_fungible_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_one_fungible_one_non_fungible.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/create_one_fungible_one_non_fungible.scen.json",
+        world(),
+    );
 }
 
 // Create token tests
@@ -70,17 +79,26 @@ fn create_token_non_fungible_rs() {
 
 #[test]
 fn create_two_tokens_both_fungible_different_creator_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_two_tokens_both_fungible_different_creator.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/create_two_tokens_both_fungible_different_creator.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn create_two_tokens_both_fungible_same_creator_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_two_tokens_both_fungible_same_creator.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/create_two_tokens_both_fungible_same_creator.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn create_two_tokens_both_non_fungible_same_creator_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_two_tokens_both_non_fungible_same_creator.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/create_two_tokens_both_non_fungible_same_creator.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -106,7 +124,10 @@ fn mint_not_creator_rs() {
 
 #[test]
 fn transfer_fungible_not_enough_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_fungible_not_enough_balance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_fungible_not_enough_balance.scen.json",
+        world(),
+    );
 }
 
 // transfer tests -  to account
@@ -127,5 +148,8 @@ fn transfer_non_fungible_ok_rs() {
 
 #[test]
 fn transfer_non_fungible_ok_to_sc_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_non_fungible_ok_to_sc.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_non_fungible_ok_to_sc.scen.json",
+        world(),
+    );
 }

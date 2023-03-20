@@ -39,7 +39,10 @@ fn big_float_new_from_int_rs() {
 #[test]
 #[ignore]
 fn big_float_new_from_managed_buffer_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/big_float_new_from_managed_buffer.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/big_float_new_from_managed_buffer.scen.json",
+        world(),
+    );
 }
 
 #[test]

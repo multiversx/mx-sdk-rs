@@ -23,12 +23,18 @@ fn deploy_erc_20_and_crowdfunding_rs() {
 
 #[test]
 fn fund_with_insufficient_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/fund_with_insufficient_allowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/fund_with_insufficient_allowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn fund_with_sufficient_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/fund_with_sufficient_allowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/fund_with_sufficient_allowance.scen.json",
+        world(),
+    );
 }
 
 #[test]

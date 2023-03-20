@@ -41,7 +41,10 @@ fn bid_siring_auction_rs() {
 
 #[test]
 fn create_and_auction_gen_zero_kitty_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_and_auction_gen_zero_kitty.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/create_and_auction_gen_zero_kitty.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -56,7 +59,10 @@ fn create_sale_auction_ok_rs() {
 
 #[test]
 fn create_siring_auction_not_owner_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_siring_auction_not_owner.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/create_siring_auction_not_owner.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -71,17 +77,26 @@ fn end_auction_no_bids_rs() {
 
 #[test]
 fn end_auction_second_bid_max_early_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/end_auction_second_bid_max_early.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/end_auction_second_bid_max_early.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn end_auction_second_bid_ok_early_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/end_auction_second_bid_ok_early.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/end_auction_second_bid_ok_early.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn end_auction_second_bid_ok_late_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/end_auction_second_bid_ok_late.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/end_auction_second_bid_ok_late.scen.json",
+        world(),
+    );
 }
 
 #[test]

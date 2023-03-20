@@ -55,17 +55,23 @@ fn create_token_non_fungible_go() {
 
 #[test]
 fn create_two_tokens_both_fungible_different_creator_go() {
-    multiversx_sc_scenario::run_go("scenarios/create_two_tokens_both_fungible_different_creator.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/create_two_tokens_both_fungible_different_creator.scen.json",
+    );
 }
 
 #[test]
 fn create_two_tokens_both_fungible_same_creator_go() {
-    multiversx_sc_scenario::run_go("scenarios/create_two_tokens_both_fungible_same_creator.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/create_two_tokens_both_fungible_same_creator.scen.json",
+    );
 }
 
 #[test]
 fn create_two_tokens_both_non_fungible_same_creator_go() {
-    multiversx_sc_scenario::run_go("scenarios/create_two_tokens_both_non_fungible_same_creator.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/create_two_tokens_both_non_fungible_same_creator.scen.json",
+    );
 }
 
 #[test]

@@ -65,7 +65,9 @@ fn complex_prize_distribution_go() {
 
 #[test]
 fn determine_winner_different_ticket_holders_winner_acc_1_go() {
-    multiversx_sc_scenario::run_go("scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json",
+    );
 }
 
 #[test]
@@ -125,12 +127,16 @@ fn start_limited_tickets_and_fixed_deadline_go() {
 
 #[test]
 fn start_limited_tickets_and_fixed_deadline_invalid_deadline_go() {
-    multiversx_sc_scenario::run_go("scenarios/start-limited-tickets-and-fixed-deadline-invalid-deadline.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/start-limited-tickets-and-fixed-deadline-invalid-deadline.scen.json",
+    );
 }
 
 #[test]
 fn start_limited_tickets_and_fixed_deadline_invalid_ticket_price_arg_go() {
-    multiversx_sc_scenario::run_go("scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json",
+    );
 }
 
 #[test]

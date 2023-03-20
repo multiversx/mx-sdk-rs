@@ -90,142 +90,226 @@ fn total_supply_zero_rs() {
 
 #[test]
 fn transfer_from_all_distinct_balance_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-BalanceEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-BalanceEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_balance_n_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-BalanceNEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-BalanceNEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_entire_allowance_more_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-EntireAllowanceMoreThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-EntireAllowanceMoreThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_entire_balance_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-EntireBalanceEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-EntireBalanceEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_entire_balance_more_than_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-EntireBalanceMoreThanAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-EntireBalanceMoreThanAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_more_than_allowance_less_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-MoreThanAllowanceLessThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-MoreThanAllowanceLessThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_more_than_balance_less_than_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-MoreThanBalanceLessThanAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-MoreThanBalanceLessThanAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_no_overflow_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-NoOverflow.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-NoOverflow.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_distinct_still_no_overflow_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllDistinct-StillNoOverflow.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllDistinct-StillNoOverflow.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_equal_allowance_relevant_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllEqual-AllowanceRelevant.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllEqual-AllowanceRelevant.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_all_equal_entire_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_AllEqual-EntireBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_AllEqual-EntireBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_caller_eq_from_allowance_relevant_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_CallerEqFrom-AllowanceRelevant.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_CallerEqFrom-AllowanceRelevant.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_caller_eq_from_entire_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_CallerEqFrom-EntireBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_CallerEqFrom-EntireBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_caller_eq_from_more_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_CallerEqFrom-MoreThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_CallerEqFrom-MoreThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_caller_eq_to_balance_n_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_CallerEqTo-BalanceNEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_CallerEqTo-BalanceNEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_caller_eq_to_more_than_allowance_less_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_CallerEqTo-MoreThanAllowanceLessThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_CallerEqTo-MoreThanAllowanceLessThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_caller_eq_to_more_than_balance_less_than_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_CallerEqTo-MoreThanBalanceLessThanAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_CallerEqTo-MoreThanBalanceLessThanAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_exploratory_multiple_transfers_succeed_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_Exploratory-MultipleTransfersSucceed.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_Exploratory-MultipleTransfersSucceed.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_exploratory_multiple_transfers_throw_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_Exploratory-MultipleTransfersThrow.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_Exploratory-MultipleTransfersThrow.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_balance_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-BalanceEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-BalanceEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_balance_n_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-BalanceNEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-BalanceNEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_entire_allowance_more_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-EntireAllowanceMoreThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-EntireAllowanceMoreThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_entire_balance_eq_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-EntireBalanceEqAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-EntireBalanceEqAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_entire_balance_more_than_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-EntireBalanceMoreThanAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-EntireBalanceMoreThanAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_more_than_allowance_less_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-MoreThanAllowanceLessThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-MoreThanAllowanceLessThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_more_than_balance_less_than_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-MoreThanBalanceLessThanAllowance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-MoreThanBalanceLessThanAllowance.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_from_from_eq_to_no_overflow_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transferFrom_FromEqTo-NoOverflow.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transferFrom_FromEqTo-NoOverflow.scen.json",
+        world(),
+    );
 }
 
 #[test]
 fn transfer_caller_allowance_irrelevant_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_Caller-AllowanceIrrelevant.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_Caller-AllowanceIrrelevant.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -235,7 +319,10 @@ fn transfer_caller_entire_balance_rs() {
 
 #[test]
 fn transfer_caller_more_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_Caller-MoreThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_Caller-MoreThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -250,7 +337,10 @@ fn transfer_caller_positive_rs() {
 
 #[test]
 fn transfer_caller_still_no_overflow_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_Caller-StillNoOverflow.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_Caller-StillNoOverflow.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -260,7 +350,10 @@ fn transfer_caller_zero_rs() {
 
 #[test]
 fn transfer_other_allowance_irrelevant_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_Other-AllowanceIrrelevant.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_Other-AllowanceIrrelevant.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -270,7 +363,10 @@ fn transfer_other_entire_balance_rs() {
 
 #[test]
 fn transfer_other_more_than_balance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_Other-MoreThanBalance.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_Other-MoreThanBalance.scen.json",
+        world(),
+    );
 }
 
 #[test]
@@ -285,7 +381,10 @@ fn transfer_other_positive_rs() {
 
 #[test]
 fn transfer_other_still_no_overflow_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_Other-StillNoOverflow.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/transfer_Other-StillNoOverflow.scen.json",
+        world(),
+    );
 }
 
 #[test]
