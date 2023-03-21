@@ -12,3 +12,4 @@ fn world() -> ScenarioWorld {
 fn adder_rs() {
     multiversx_sc_scenario::run_rs("scenarios/adder.scen.json", world());
 }
+
