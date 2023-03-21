@@ -73,7 +73,7 @@ impl MultisigInteract {
     async fn propose_wrap_egld(&mut self) -> Option<usize> {
         let result = self
             .interactor
-            .sc_call_get_result(
+            .sc_call_get_result_typed(
                 self.state
                     .multisig()
                     .propose_async_call(
@@ -113,7 +113,7 @@ impl MultisigInteract {
 
         let result = self
             .interactor
-            .sc_call_get_result(
+            .sc_call_get_result_typed(
                 self.state
                     .multisig()
                     .propose_async_call(

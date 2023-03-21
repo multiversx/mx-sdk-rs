@@ -11,7 +11,7 @@ mod tx_response;
 mod tx_transfer;
 mod tx_validator_reward;
 
-pub use log::*;
+pub use self::log::*;
 pub use log_check::*;
 pub use logs_check::*;
 pub use tx_call::*;

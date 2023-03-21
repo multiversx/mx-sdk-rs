@@ -1,3 +1,5 @@
+use multiversx_sc::codec::multi_types::IgnoreValue;
+
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
     scenario_model::TxResponse,
@@ -16,7 +18,7 @@ pub struct ScCallStep {
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
-    pub response: Option<TxResponse>,
+    pub response: Option<TxResponse<IgnoreValue>>,
 }
 
 impl ScCallStep {

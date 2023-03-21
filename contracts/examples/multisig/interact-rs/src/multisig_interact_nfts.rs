@@ -27,7 +27,7 @@ impl MultisigInteract {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let result = self
             .interactor
-            .sc_call_get_result(
+            .sc_call_get_result_typed(
                 self.state
                     .multisig()
                     .propose_async_call(
@@ -97,7 +97,7 @@ impl MultisigInteract {
         let multisig_address = self.state.multisig().to_address();
         let result = self
             .interactor
-            .sc_call_get_result(
+            .sc_call_get_result_typed(
                 self.state
                     .multisig()
                     .propose_async_call(
