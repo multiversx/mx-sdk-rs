@@ -8,17 +8,12 @@ pub trait Factorial {
     fn init(&self) {}
 
     #[endpoint]
-    fn factorial(&self, value: BigUint) -> BigUint {
+    fn factorial(&self, mut value: BigUint) -> BigUint {
         let one = BigUint::from(1u32);
-        if value == 0 {
-            return one;
-        }
-
         let mut result = BigUint::from(1u32);
-        let mut x = BigUint::from(1u32);
-        while x <= value {
-            result *= &x;
-            x += &one;
+        while value > 0 {
+            result *= &value;
+            value -= &one;
         }
 
         result
