@@ -64,7 +64,7 @@ fn complex_prize_distribution_go() {
 }
 
 #[test]
-fn determine_winner_different_ticket_holders_winner_acc1_go() {
+fn determine_winner_different_ticket_holders_winner_acc_1_go() {
     multiversx_sc_scenario::run_go(
         "scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json",
     );

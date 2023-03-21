@@ -11,3 +11,7 @@ path = "src/lib.rs"
 version = "0.39.7"
 path = "../../../../framework/base"
 features = ["alloc"]
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.39.7"
+path = "../../../../framework/scenario"

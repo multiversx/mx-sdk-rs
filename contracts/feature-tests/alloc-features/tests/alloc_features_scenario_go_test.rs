@@ -9,17 +9,17 @@ fn crypto_elliptic_curves_legacy_go() {
 }
 
 #[test]
-fn crypto_keccak256_legacy_alloc_go() {
+fn crypto_keccak_256_legacy_alloc_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_keccak256_legacy_alloc.scen.json");
 }
 
 #[test]
-fn crypto_ripemd160_legacy_go() {
+fn crypto_ripemd_160_legacy_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_ripemd160_legacy.scen.json");
 }
 
 #[test]
-fn crypto_sha256_legacy_alloc_go() {
+fn crypto_sha_256_legacy_alloc_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_sha256_legacy_alloc.scen.json");
 }
 
@@ -29,12 +29,12 @@ fn crypto_verify_bls_legacy_go() {
 }
 
 #[test]
-fn crypto_verify_ed25519_legacy_go() {
+fn crypto_verify_ed_25519_legacy_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_verify_ed25519_legacy.scen.json");
 }
 
 #[test]
-fn crypto_verify_secp256k1_legacy_go() {
+fn crypto_verify_secp_256_k_1_legacy_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_verify_secp256k1_legacy.scen.json");
 }
 
@@ -64,7 +64,7 @@ fn echo_ser_ex_1_go() {
 }
 
 #[test]
-fn echo_slice_u8_go() {
+fn echo_slice_u_8_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_slice_u8.scen.json");
 }
 
@@ -84,12 +84,12 @@ fn echo_string_go() {
 }
 
 #[test]
-fn echo_varargs_u32_alloc_go() {
+fn echo_varargs_u_32_alloc_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_varargs_u32_alloc.scen.json");
 }
 
 #[test]
-fn echo_vec_u8_go() {
+fn echo_vec_u_8_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_vec_u8.scen.json");
 }
 
@@ -139,6 +139,6 @@ fn storage_opt_address_go() {
 }
 
 #[test]
-fn storage_vec_u8_go() {
+fn storage_vec_u_8_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_vec_u8.scen.json");
 }
