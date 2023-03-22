@@ -124,7 +124,7 @@ pub trait ForwarderQueue {
 
     #[callback]
     fn callback_function(&self) {
-        sc_print!("Forwarder queue callback {}", 0);
+        self.forward_queued_callback_event();
     }
 
     #[endpoint]
@@ -190,6 +190,11 @@ pub trait ForwarderQueue {
             }
         }
     }
+
+    #[event("forward_queued_callback")]
+    fn forward_queued_callback_event(
+        &self,
+    );
 
     #[event("forward_queued_call_egld")]
     fn forward_queued_call_egld_event(
