@@ -122,6 +122,11 @@ pub trait ForwarderQueue {
         });
     }
 
+    #[callback]
+    fn callback_function(&self) {
+        sc_print!("Forwarder queue callback {}", 0);
+    }
+
     #[endpoint]
     fn forward_queued_calls(&self) {
         while let Some(node) = self.queued_calls().pop_front() {
@@ -174,7 +179,13 @@ pub trait ForwarderQueue {
                         .transfer_execute();
                 },
                 QueuedCallType::Promise => {
+                    #[cfg(feature = "promises")]
+                    call_promise(contract_call.with_gas_limit(call.gas_limit), self.callbacks().callback_function());
+
+                    #[cfg(not(feature = "promises"))]
                     call_promise(contract_call.with_gas_limit(call.gas_limit));
+
+
                 },
             }
         }
@@ -218,8 +229,8 @@ pub trait ForwarderQueue {
 }
 
 #[cfg(feature = "promises")]
-fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>) {
-    contract_call.async_call_promise().register_promise();
+fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>, callback_function: CallbackClosure<A>) {
+    contract_call.async_call_promise().with_callback(callback_function).register_promise();
 }
 
 #[cfg(not(feature = "promises"))]
