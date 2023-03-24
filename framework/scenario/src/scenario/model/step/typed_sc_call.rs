@@ -1,35 +1,21 @@
-use std::marker::PhantomData;
-
 use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
-use crate::scenario::model::{
-    AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value,
+use crate::{
+    scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
+    scenario_model::TypedTxResponse,
 };
 
 use super::ScCallStep;
 
 /// `SCCallStep` with explicit return type.
-#[derive(Debug)]
+#[derive(Default, Debug)]
 pub struct TypedScCall<OriginalResult> {
     pub id: String,
     pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
-    _return_type: PhantomData<OriginalResult>,
-}
-
-impl<OriginalResult> Default for TypedScCall<OriginalResult> {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            tx_id: Default::default(),
-            comment: Default::default(),
-            tx: Default::default(),
-            expect: Default::default(),
-            _return_type: PhantomData,
-        }
-    }
+    pub response: Option<TypedTxResponse<OriginalResult>>,
 }
 
 impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
@@ -53,7 +39,7 @@ impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
             comment: untyped.comment,
             tx: untyped.tx,
             expect: untyped.expect,
-            _return_type: PhantomData,
+            response: None,
         }
     }
 }

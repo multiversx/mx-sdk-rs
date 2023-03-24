@@ -1,11 +1,8 @@
-use std::{error::Error, marker::PhantomData};
+use std::error::Error;
 
 use crate::{
     bech32,
-    multiversx_sc::{
-        codec::{PanicErrorHandler, TopDecodeMulti},
-        types::Address,
-    },
+    multiversx_sc::types::Address,
     scenario_model::{BytesValue, U64Value},
 };
 use log::info;
@@ -32,31 +29,27 @@ impl std::fmt::Display for TxError {
 impl Error for TxError {}
 
 #[derive(Debug, Default, Clone)]
-pub struct TxResponse<T: TopDecodeMulti> {
+pub struct TxResponse {
     pub out: Vec<BytesValue>,
     pub status: U64Value,
     pub message: BytesValue,
     pub logs: Vec<Log>,
     pub gas: U64Value,
     pub refund: U64Value,
-    api_scrs: Vec<ApiSmartContractResult>,
-    api_logs: Option<ApiLogs>,
-    _phatom: PhantomData<T>,
+    pub api_scrs: Vec<ApiSmartContractResult>,
+    pub api_logs: Option<ApiLogs>,
 }
 
-impl<T: TopDecodeMulti + std::default::Default> TxResponse<T> {
+impl TxResponse {
     pub fn new(tx: TransactionOnNetwork) -> Self {
         Self {
             api_scrs: tx.smart_contract_results.unwrap_or_default(),
             api_logs: tx.logs,
-            _phatom: PhantomData,
             ..Default::default()
         }
     }
 
-    pub fn action_id(&self) -> Result<T, TxError> {
-        self.handle_signal_error_event()?;
-
+    pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
         let first_scr = self.api_scrs.get(0);
         if first_scr.is_none() {
             return Err(TxError {
@@ -64,8 +57,7 @@ impl<T: TopDecodeMulti + std::default::Default> TxResponse<T> {
             });
         }
 
-        let mut raw_result = decode_scr_data_or_panic(first_scr.unwrap().data.as_str());
-        Ok(T::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap())
+        Ok(decode_scr_data_or_panic(first_scr.unwrap().data.as_str()))
     }
 
     pub fn find_log(&self, log_identifier: &str) -> Option<&Events> {
@@ -77,8 +69,6 @@ impl<T: TopDecodeMulti + std::default::Default> TxResponse<T> {
             None
         }
     }
-
-    // Returns the address of the newly deployed smart contract.
     pub fn new_deployed_address(&self) -> Result<Address, TxError> {
         self.handle_signal_error_event()?;
         self.handle_sc_deploy_event()
