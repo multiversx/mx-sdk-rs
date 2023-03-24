@@ -8,7 +8,7 @@ use crate::multiversx_sc::{
 
 use multiversx_chain_vm::DebugApi;
 
-use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
+use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCallOld, TypedScDeploy, TypedScQuery};
 
 /// Converts a `ContractCall` or `ContractDeploy` into a scenario object that additonally
 /// contains gas costs and transaction-related data.
@@ -26,7 +26,7 @@ macro_rules! impl_into_blockchain_call_cc {
         where
             OriginalResult: TopEncodeMulti,
         {
-            type BlockchainCall = TypedScCall<OriginalResult>;
+            type BlockchainCall = TypedScCallOld<OriginalResult>;
 
             fn into_blockchain_call(self) -> Self::BlockchainCall {
                 ScCallStep::new().call(self).into()

@@ -6,7 +6,7 @@ use multiversx_sc_scenario::{
         types::ContractCallWithEgld,
     },
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, TransferStep, TxCall, TxResponse, TypedScCall},
+    scenario_model::{ScCallStep, TransferStep, TxCall, TxResponse, TypedScCallOld},
     DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;
@@ -85,7 +85,7 @@ impl Interactor {
 
     pub async fn sc_call_get_result_typed<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCall<OriginalResult>,
+        typed_sc_call: TypedScCallOld<OriginalResult>,
     ) -> InteractorResult<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,

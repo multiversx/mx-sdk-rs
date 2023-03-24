@@ -1,15 +1,17 @@
+use multiversx_sc::codec::PanicErrorHandler;
+
 use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
-    scenario_model::TypedTxResponse,
+    scenario_model::{TxError, TypedTxResponse},
 };
 
 use super::ScCallStep;
 
 /// `SCCallStep` with explicit return type.
 #[derive(Default, Debug)]
-pub struct TypedScCall<OriginalResult> {
+pub struct TypedScCallOld<OriginalResult> {
     pub id: String,
     pub tx_id: Option<String>,
     pub comment: Option<String>,
@@ -17,9 +19,35 @@ pub struct TypedScCall<OriginalResult> {
     pub expect: Option<TxExpect>,
     pub response: Option<TypedTxResponse<OriginalResult>>,
 }
+/// `SCCallStep` with explicit return type.
+#[derive(Default, Debug)]
+pub struct TypedScCallStep<OriginalResult> {
+    pub sc_call_step: ScCallStep,
+    pub response: Option<TypedTxResponse<OriginalResult>>,
+}
 
-impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
-    fn from(typed: TypedScCall<OriginalResult>) -> Self {
+impl<OriginalResult> TypedScCallStep<OriginalResult> {
+    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxError>
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        let mut raw_result = self.sc_call_step.response.as_ref().unwrap().raw_result()?;
+        Ok(
+            RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
+                .unwrap(),
+        )
+    }
+}
+
+impl<OriginalResult> AsMut<ScCallStep> for TypedScCallStep<OriginalResult> {
+    fn as_mut(&mut self) -> &mut ScCallStep {
+        &mut self.sc_call_step
+    }
+}
+
+impl<OriginalResult> From<TypedScCallOld<OriginalResult>> for ScCallStep {
+    fn from(typed: TypedScCallOld<OriginalResult>) -> Self {
         ScCallStep {
             id: typed.id,
             tx_id: typed.tx_id,
@@ -31,7 +59,7 @@ impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
     }
 }
 
-impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
+impl<OriginalResult> From<ScCallStep> for TypedScCallOld<OriginalResult> {
     fn from(untyped: ScCallStep) -> Self {
         Self {
             id: untyped.id,
@@ -44,7 +72,7 @@ impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
     }
 }
 
-impl<OriginalResult> TypedScCall<OriginalResult> {
+impl<OriginalResult> TypedScCallOld<OriginalResult> {
     pub fn from<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,
@@ -125,14 +153,14 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
 pub trait TypedScCallExecutor {
     fn execute_typed_sc_call<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCall<OriginalResult>,
+        typed_sc_call: TypedScCallOld<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>;
 }
 
-impl<OriginalResult> TypedScCall<OriginalResult>
+impl<OriginalResult> TypedScCallOld<OriginalResult>
 where
     OriginalResult: TopEncodeMulti,
 {

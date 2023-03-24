@@ -1,6 +1,6 @@
 use crate::{
     multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-    scenario::model::{ScCallStep, TxESDT, TypedScCall},
+    scenario::model::{ScCallStep, TxESDT, TypedScCallOld},
 };
 use multiversx_chain_vm::{
     tx_execution::sc_call_with_async_and_callback,
@@ -26,7 +26,7 @@ impl ScenarioVMRunner {
     /// so we can benefit from type inference in the result.
     pub fn perform_sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCall<OriginalResult>,
+        typed_sc_call: TypedScCallOld<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
