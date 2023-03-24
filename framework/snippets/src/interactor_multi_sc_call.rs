@@ -11,7 +11,7 @@ use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
     pub async fn multiple_sc_calls_raw_results(&mut self, sc_call_steps: &mut [ScCallStep]) {
-        self.pre_runners.run_multi_sc_call_step(&sc_call_steps);
+        self.pre_runners.run_multi_sc_call_step(sc_call_steps);
 
         let senders = retrieve_senders(sc_call_steps);
         self.recall_senders_nonce(senders).await;
@@ -23,7 +23,7 @@ impl Interactor {
             sc_call_step.response = Some(TxResponse::new(results.get(i).unwrap().clone()));
         }
 
-        self.post_runners.run_multi_sc_call_step(&sc_call_steps);
+        self.post_runners.run_multi_sc_call_step(sc_call_steps);
     }
 
     fn retrieve_txs(&mut self, sc_call_steps: &[ScCallStep]) -> Vec<Transaction> {

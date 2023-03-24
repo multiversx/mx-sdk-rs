@@ -5,7 +5,7 @@ use crate::{
 
 /// Structure that allows taking a variable number of arguments,
 /// but does nothing with them, not even deserialization.
-#[derive(Debug, Default, Clone)]
+#[derive(Default, Clone)]
 pub struct IgnoreValue;
 
 impl TopEncodeMulti for IgnoreValue {

@@ -138,7 +138,7 @@ impl ComposabilityInteract {
 
         let _ = self
             .interactor
-            .sc_call(
+            .sc_call_and_forget(
                 self.state
                     .forwarder_queue_from_addr(&fwd_addr_expr)
                     .add_queued_call(
@@ -245,11 +245,11 @@ impl ComposabilityInteract {
 
             print!("token_id = {token_id}");
             self.interactor
-                .sc_call(sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount))
+                .sc_call_and_forget(sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount))
                 .await;
         } else {
             self.interactor
-                .sc_call(sc_call_root_step.egld_value(payment_amount))
+                .sc_call_and_forget(sc_call_root_step.egld_value(payment_amount))
                 .await;
         }
     }
