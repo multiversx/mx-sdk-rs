@@ -23,7 +23,6 @@ impl<OriginalResult> TypedTxResponse<OriginalResult> {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.response.handle_signal_error_event()?;
         let mut raw_result = self.response.raw_result()?;
         Ok(
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)

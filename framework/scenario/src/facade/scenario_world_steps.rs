@@ -83,7 +83,7 @@ impl ScenarioWorld {
 impl TypedScCallExecutor for ScenarioWorld {
     fn execute_typed_sc_call<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCallOld<OriginalResult>,
+        typed_sc_call: TypedScCall<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,

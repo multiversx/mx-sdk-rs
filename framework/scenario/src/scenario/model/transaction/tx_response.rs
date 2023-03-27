@@ -50,6 +50,8 @@ impl TxResponse {
     }
 
     pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
+        self.handle_signal_error_event()?;
+
         let first_scr = self.api_scrs.get(0);
         if first_scr.is_none() {
             return Err(TxError {

@@ -35,9 +35,9 @@ impl MultisigInteract {
             return;
         }
 
-        let action_id = action_id.unwrap();
-        println!("perfoming wrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        // let action_id = action_id.unwrap();
+        // println!("perfoming wrap egld action `{action_id}`...");
+        // self.perform_action(action_id, "15,000,000").await;
     }
 
     pub async fn unwrap_egld(&mut self) {
@@ -71,24 +71,24 @@ impl MultisigInteract {
     }
 
     async fn propose_wrap_egld(&mut self) -> Option<usize> {
-        let result = self
-            .interactor
-            .sc_call_get_result_typed(
-                self.state
-                    .multisig()
-                    .propose_async_call(
-                        bech32::decode(WEGLD_SWAP_SC_BECH32),
-                        WRAP_AMOUNT,
-                        "wrapEgld".to_string(),
-                        MultiValueEncoded::new(),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+        let mut typed_sc_call_step = self
+            .state
+            .multisig()
+            .propose_async_call(
+                bech32::decode(WEGLD_SWAP_SC_BECH32),
+                WRAP_AMOUNT,
+                "wrapEgld".to_string(),
+                MultiValueEncoded::new(),
             )
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("10,000,000");
+
+        self.interactor
+            .sc_call_get_result(&mut typed_sc_call_step)
             .await;
 
-        let result = result.value();
+        let result = typed_sc_call_step.result();
         if result.is_err() {
             println!("propose wrap egld failed with: {}", result.err().unwrap());
             return None;
@@ -111,31 +111,32 @@ impl MultisigInteract {
         ))
         .into_normalized();
 
-        let result = self
-            .interactor
-            .sc_call_get_result_typed(
-                self.state
-                    .multisig()
-                    .propose_async_call(
-                        contract_call.basic.to,
-                        0u64,
-                        contract_call.basic.endpoint_name,
-                        contract_call.basic.arg_buffer.into_multi_value_encoded(),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
-            )
-            .await;
+        // let result = self
+        //     .interactor
+        //     .sc_call_get_result_typed(
+        //         self.state
+        //             .multisig()
+        //             .propose_async_call(
+        //                 contract_call.basic.to,
+        //                 0u64,
+        //                 contract_call.basic.endpoint_name,
+        //                 contract_call.basic.arg_buffer.into_multi_value_encoded(),
+        //             )
+        //             .into_blockchain_call()
+        //             .from(&self.wallet_address)
+        //             .gas_limit("10,000,000"),
+        //     )
+        //     .await;
 
-        let result = result.value();
-        if result.is_err() {
-            println!("propose unwrap egld failed with: {}", result.err().unwrap());
-            return None;
-        }
+        // let result = result.value();
+        // if result.is_err() {
+        //     println!("propose unwrap egld failed with: {}", result.err().unwrap());
+        //     return None;
+        // }
 
-        let action_id = result.unwrap();
-        println!("successfully proposed unwrap egld action `{action_id}`");
-        Some(action_id)
+        // let action_id = result.unwrap();
+        // println!("successfully proposed unwrap egld action `{action_id}`");
+        // Some(action_id)
+        None
     }
 }

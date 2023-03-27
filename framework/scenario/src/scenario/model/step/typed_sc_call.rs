@@ -1,32 +1,24 @@
+use std::marker::PhantomData;
+
 use multiversx_sc::codec::PanicErrorHandler;
 
 use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
-    scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
-    scenario_model::{TxError, TypedTxResponse},
+    scenario::model::{AddressValue, U64Value},
+    scenario_model::{BigUintValue, BytesValue, TxError, TxExpect},
 };
 
 use super::ScCallStep;
 
 /// `SCCallStep` with explicit return type.
 #[derive(Default, Debug)]
-pub struct TypedScCallOld<OriginalResult> {
-    pub id: String,
-    pub tx_id: Option<String>,
-    pub comment: Option<String>,
-    pub tx: Box<TxCall>,
-    pub expect: Option<TxExpect>,
-    pub response: Option<TypedTxResponse<OriginalResult>>,
-}
-/// `SCCallStep` with explicit return type.
-#[derive(Default, Debug)]
-pub struct TypedScCallStep<OriginalResult> {
+pub struct TypedScCall<OriginalResult> {
     pub sc_call_step: ScCallStep,
-    pub response: Option<TypedTxResponse<OriginalResult>>,
+    _phantom: PhantomData<OriginalResult>,
 }
 
-impl<OriginalResult> TypedScCallStep<OriginalResult> {
+impl<OriginalResult> TypedScCall<OriginalResult> {
     pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxError>
     where
         OriginalResult: TopEncodeMulti,
@@ -38,46 +30,12 @@ impl<OriginalResult> TypedScCallStep<OriginalResult> {
                 .unwrap(),
         )
     }
-}
 
-impl<OriginalResult> AsMut<ScCallStep> for TypedScCallStep<OriginalResult> {
-    fn as_mut(&mut self) -> &mut ScCallStep {
-        &mut self.sc_call_step
-    }
-}
-
-impl<OriginalResult> From<TypedScCallOld<OriginalResult>> for ScCallStep {
-    fn from(typed: TypedScCallOld<OriginalResult>) -> Self {
-        ScCallStep {
-            id: typed.id,
-            tx_id: typed.tx_id,
-            comment: typed.comment,
-            tx: typed.tx,
-            expect: typed.expect,
-            response: None,
-        }
-    }
-}
-
-impl<OriginalResult> From<ScCallStep> for TypedScCallOld<OriginalResult> {
-    fn from(untyped: ScCallStep) -> Self {
-        Self {
-            id: untyped.id,
-            tx_id: untyped.tx_id,
-            comment: untyped.comment,
-            tx: untyped.tx,
-            expect: untyped.expect,
-            response: None,
-        }
-    }
-}
-
-impl<OriginalResult> TypedScCallOld<OriginalResult> {
     pub fn from<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,
     {
-        self.tx.from = AddressValue::from(address);
+        self.sc_call_step = self.sc_call_step.from(address);
         self
     }
 
@@ -85,20 +43,7 @@ impl<OriginalResult> TypedScCallOld<OriginalResult> {
     where
         AddressValue: From<A>,
     {
-        self.tx.to = AddressValue::from(address);
-        self
-    }
-
-    pub fn function(mut self, expr: &str) -> Self {
-        self.tx.function = expr.to_string();
-        self
-    }
-
-    pub fn argument<A>(mut self, expr: A) -> Self
-    where
-        BytesValue: From<A>,
-    {
-        self.tx.arguments.push(BytesValue::from(expr));
+        self.sc_call_step = self.sc_call_step.to(address);
         self
     }
 
@@ -106,11 +51,7 @@ impl<OriginalResult> TypedScCallOld<OriginalResult> {
     where
         BigUintValue: From<A>,
     {
-        if !self.tx.esdt_value.is_empty() {
-            panic!("Cannot transfer both EGLD and ESDT");
-        }
-
-        self.tx.egld_value = BigUintValue::from(amount);
+        self.sc_call_step = self.sc_call_step.egld_value(amount);
         self
     }
 
@@ -120,16 +61,23 @@ impl<OriginalResult> TypedScCallOld<OriginalResult> {
         U64Value: From<N>,
         BigUintValue: From<A>,
     {
-        if self.tx.egld_value.value > 0u32.into() {
-            panic!("Cannot transfer both EGLD and ESDT");
-        }
+        self.sc_call_step = self
+            .sc_call_step
+            .esdt_transfer(token_id, token_nonce, amount);
 
-        self.tx.esdt_value.push(TxESDT {
-            esdt_token_identifier: BytesValue::from(token_id),
-            nonce: U64Value::from(token_nonce),
-            esdt_value: BigUintValue::from(amount),
-        });
+        self
+    }
 
+    pub fn function(mut self, expr: &str) -> Self {
+        self.sc_call_step = self.sc_call_step.function(expr);
+        self
+    }
+
+    pub fn argument<A>(mut self, expr: A) -> Self
+    where
+        BytesValue: From<A>,
+    {
+        self.sc_call_step = self.sc_call_step.argument(expr);
         self
     }
 
@@ -137,13 +85,36 @@ impl<OriginalResult> TypedScCallOld<OriginalResult> {
     where
         U64Value: From<V>,
     {
-        self.tx.gas_limit = U64Value::from(value);
+        self.sc_call_step = self.sc_call_step.gas_limit(value);
         self
     }
 
     pub fn expect(mut self, expect: TxExpect) -> Self {
-        self.expect = Some(expect);
+        self.sc_call_step = self.sc_call_step.expect(expect);
         self
+    }
+}
+
+impl<OriginalResult> AsMut<ScCallStep> for TypedScCall<OriginalResult> {
+    fn as_mut(&mut self) -> &mut ScCallStep {
+        &mut self.sc_call_step
+    }
+}
+
+impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
+    fn from(typed: TypedScCall<OriginalResult>) -> Self {
+        Self {
+            ..typed.sc_call_step
+        }
+    }
+}
+
+impl<OriginalResult> From<ScCallStep> for TypedScCall<OriginalResult> {
+    fn from(untyped: ScCallStep) -> Self {
+        Self {
+            sc_call_step: untyped,
+            _phantom: PhantomData,
+        }
     }
 }
 
@@ -153,14 +124,14 @@ impl<OriginalResult> TypedScCallOld<OriginalResult> {
 pub trait TypedScCallExecutor {
     fn execute_typed_sc_call<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCallOld<OriginalResult>,
+        typed_sc_call: TypedScCall<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>;
 }
 
-impl<OriginalResult> TypedScCallOld<OriginalResult>
+impl<OriginalResult> TypedScCall<OriginalResult>
 where
     OriginalResult: TopEncodeMulti,
 {
