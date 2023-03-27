@@ -245,7 +245,11 @@ impl ComposabilityInteract {
 
             print!("token_id = {token_id}");
             self.interactor
-                .sc_call_and_forget(sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount))
+                .sc_call_and_forget(sc_call_root_step.esdt_transfer(
+                    token_id,
+                    payment_nonce,
+                    payment_amount,
+                ))
                 .await;
         } else {
             self.interactor

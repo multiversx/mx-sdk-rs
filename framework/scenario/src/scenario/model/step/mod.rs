@@ -1,4 +1,5 @@
 mod into_blockchain_call;
+mod step_buffer;
 mod step_check_state;
 mod step_dump;
 mod step_enum;
@@ -12,6 +13,7 @@ mod typed_sc_deploy;
 mod typed_sc_query;
 
 pub use into_blockchain_call::*;
+pub use step_buffer::*;
 pub use step_check_state::*;
 pub use step_dump::*;
 pub use step_enum::*;

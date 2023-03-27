@@ -292,7 +292,7 @@ impl MultisigInteract {
         }
 
         self.interactor
-            .multiple_sc_calls_raw_results(&mut steps)
+            .multiple_sc_calls_raw_results(ScCallStepBuffer::from_vec(&mut steps))
             .await;
 
         for step in steps.iter() {

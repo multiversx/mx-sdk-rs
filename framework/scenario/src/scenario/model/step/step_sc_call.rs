@@ -19,6 +19,12 @@ pub struct ScCallStep {
     pub response: Option<TxResponse>,
 }
 
+impl AsMut<ScCallStep> for ScCallStep {
+    fn as_mut(&mut self) -> &mut ScCallStep {
+        self
+    }
+}
+
 impl ScCallStep {
     pub fn new() -> Self {
         Self::default()
