@@ -88,7 +88,7 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "withdraw",
                 "arguments": [
-                    "0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a"
+                    "0x558fd9b0dd9fed2d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"

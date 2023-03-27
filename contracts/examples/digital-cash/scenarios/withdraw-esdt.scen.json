@@ -148,7 +148,7 @@
                         "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.node_links|u32:1": "u32:0|u32:0",
                         "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.value|u32:1": "nested:str:EGLD|u64:0",
                         "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.node_id|nested:str:EGLD|u64:0": "1",
-                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },

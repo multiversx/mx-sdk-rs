@@ -57,16 +57,15 @@ pub trait DigitalCash {
         let mut transfer_occured = false;
         for (key, deposit) in self.deposit(&address).iter() {
             if deposit.expiration_round < block_round {
-                continue;
+                self.send().direct(
+                    &deposit.depositor_address,
+                    &deposit.payment.token_identifier,
+                    deposit.payment.token_nonce,
+                    &deposit.payment.amount,
+                );
+                transfer_occured = true;
+                withdrawed_tokens.push(key);
             }
-            self.send().direct(
-                &deposit.depositor_address,
-                &deposit.payment.token_identifier,
-                deposit.payment.token_nonce,
-                &deposit.payment.amount,
-            );
-            transfer_occured = true;
-            withdrawed_tokens.push(key);
         }
 
         require!(transfer_occured, "withdrawal has not been available yet");
@@ -87,27 +86,33 @@ pub trait DigitalCash {
         let caller_address = self.blockchain().get_caller();
 
         let addr = address.as_managed_byte_array();
-
         let message = caller_address.as_managed_buffer();
 
+        let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
+        let mut transfer_occured = false;
         let block_round = self.blockchain().get_block_round();
         for (key, deposit) in self.deposit(&address).iter() {
             if deposit.expiration_round >= block_round {
-                continue;
-            }
-            require!(
-                self.crypto()
-                    .verify_ed25519_legacy_managed::<32>(addr, message, &signature),
-                "invalid signature"
-            );
+                require!(
+                    self.crypto()
+                        .verify_ed25519_legacy_managed::<32>(addr, message, &signature),
+                    "invalid signature"
+                );
 
-            self.send().direct(
-                &caller_address,
-                &deposit.payment.token_identifier,
-                deposit.payment.token_nonce,
-                &deposit.payment.amount,
-            );
-            self.deposit(&address).remove(&key);
+                self.send().direct(
+                    &caller_address,
+                    &deposit.payment.token_identifier,
+                    deposit.payment.token_nonce,
+                    &deposit.payment.amount,
+                );
+                transfer_occured = true;
+                withdrawed_tokens.push(key);
+            }
+        }
+        require!(transfer_occured, "deposit expired");
+
+        for token in withdrawed_tokens.iter() {
+            self.deposit(&address).remove(&token);
         }
     }
 
