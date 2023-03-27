@@ -1,41 +1,41 @@
 use crate::{
     interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs},
-    Interactor,
+    Interactor, TransactionSpec, StepBuffer,
 };
 
 use multiversx_sc_scenario::{
-    mandos_system::ScenarioRunner,
-    scenario_model::{ScCallStep, ScCallStepBuffer, TxResponse},
+    scenario_model::{TxResponse},
 };
 use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
-    pub async fn multiple_sc_calls_raw_results(&mut self, mut buffer: ScCallStepBuffer<'_>) {
+    pub async fn multiple_exec(&mut self, mut buffer: StepBuffer<'_>) {
         for step in &buffer.refs {
-            self.pre_runners.run_sc_call_step(&**step);
+            step.run_step(&mut self.pre_runners);
         }
 
         let senders = retrieve_senders(buffer.refs.as_slice());
         self.recall_senders_nonce(senders).await;
 
-        let txs = self.retrieve_txs(buffer.refs.as_slice());
+        let txs = self.retrieve_txs(&mut buffer);
         let results = self.process_txs(txs).await;
 
         for (i, sc_call_step) in buffer.refs.iter_mut().enumerate() {
-            sc_call_step.response = Some(TxResponse::new(results.get(i).unwrap().clone()));
+            sc_call_step.set_response(TxResponse::new(results.get(i).unwrap().clone()));
         }
 
+
         for step in &buffer.refs {
-            self.post_runners.run_sc_call_step(&**step);
+            step.run_step(&mut self.post_runners);
         }
     }
 
-    fn retrieve_txs(&mut self, sc_call_steps: &[&mut ScCallStep]) -> Vec<Transaction> {
+    fn retrieve_txs(&mut self, buffer: &mut StepBuffer<'_>) -> Vec<Transaction> {
         let mut txs = Txs::new();
 
-        for sc_call_step in sc_call_steps {
-            let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-            let sender_address = &sc_call_step.tx.from.value;
+        for sc_call_step in &mut buffer.refs {
+            let mut transaction = sc_call_step.into_transaction(&self);
+            let sender_address = &sc_call_step.from_address().value;
             let sender = self
                 .sender_map
                 .get_mut(sender_address)
@@ -48,11 +48,11 @@ impl Interactor {
     }
 }
 
-fn retrieve_senders(sc_call_steps: &[&mut ScCallStep]) -> SenderSet {
+fn retrieve_senders(sc_call_steps: &[&mut dyn TransactionSpec]) -> SenderSet {
     let mut senders = SenderSet::new();
 
     for sc_call_step in sc_call_steps {
-        let sender_address = &sc_call_step.tx.from.value;
+        let sender_address = &sc_call_step.from_address().value;
         senders.insert(sender_address.clone());
     }
     senders

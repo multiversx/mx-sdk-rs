@@ -24,7 +24,7 @@ use multiversx_sc_snippets::{
         bech32, scenario_format::interpret_trait::InterpreterContext, scenario_model::*,
         ContractInfo, DebugApi,
     },
-    tokio, Interactor,
+    tokio, Interactor, StepBuffer,
 };
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
@@ -292,7 +292,7 @@ impl MultisigInteract {
         }
 
         self.interactor
-            .multiple_sc_calls_raw_results(ScCallStepBuffer::from_vec(&mut steps))
+            .multiple_exec(StepBuffer::from_vec(&mut steps))
             .await;
 
         for step in steps.iter() {

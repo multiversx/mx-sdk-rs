@@ -1,16 +1,18 @@
-use super::ScCallStep;
+use multiversx_sc_scenario::scenario_model::ScCallStep;
+
+use crate::TransactionSpec;
 
 #[derive(Default)]
-pub struct ScCallStepBuffer<'a> {
-    pub refs: Vec<&'a mut ScCallStep>,
+pub struct StepBuffer<'a> {
+    pub refs: Vec<&'a mut dyn TransactionSpec>,
 }
 
-impl<'a> ScCallStepBuffer<'a> {
+impl<'a> StepBuffer<'a> {
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn add<'b, S>(&'a mut self, step: &'b mut S)
+    pub fn add_sc_call<'b, S>(&'a mut self, step: &'b mut S)
     where
         'b: 'a,
         S: AsMut<ScCallStep>,
@@ -40,7 +42,7 @@ impl<'a> ScCallStepBuffer<'a> {
         buffer
     }
 
-    pub fn as_ref_vec(&'a self) -> Vec<&'a ScCallStep> {
+    pub fn as_ref_vec(&'a self) -> Vec<&'a dyn TransactionSpec> {
         self.refs.iter().map(|r| &**r).collect()
     }
 }
