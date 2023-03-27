@@ -28,7 +28,7 @@ pub trait DigitalCash {
         );
         let fund_type = FundType {
             token: payment.token_identifier.clone(),
-            nonce: payment.token_nonce.clone(),
+            nonce: payment.token_nonce,
         };
 
         let mut deposit = DepositInfo {
