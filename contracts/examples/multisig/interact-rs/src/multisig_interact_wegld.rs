@@ -71,7 +71,7 @@ impl MultisigInteract {
     }
 
     async fn propose_wrap_egld(&mut self) -> Option<usize> {
-        let mut typed_sc_call_step = self
+        let mut typed_sc_call = self
             .state
             .multisig()
             .propose_async_call(
@@ -84,11 +84,9 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .gas_limit("10,000,000");
 
-        self.interactor
-            .sc_call_get_result(&mut typed_sc_call_step)
-            .await;
+        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
 
-        let result = typed_sc_call_step.result();
+        let result = typed_sc_call.result();
         if result.is_err() {
             println!("propose wrap egld failed with: {}", result.err().unwrap());
             return None;
@@ -111,32 +109,29 @@ impl MultisigInteract {
         ))
         .into_normalized();
 
-        // let result = self
-        //     .interactor
-        //     .sc_call_get_result_typed(
-        //         self.state
-        //             .multisig()
-        //             .propose_async_call(
-        //                 contract_call.basic.to,
-        //                 0u64,
-        //                 contract_call.basic.endpoint_name,
-        //                 contract_call.basic.arg_buffer.into_multi_value_encoded(),
-        //             )
-        //             .into_blockchain_call()
-        //             .from(&self.wallet_address)
-        //             .gas_limit("10,000,000"),
-        //     )
-        //     .await;
+        let mut typed_sc_call = self
+            .state
+            .multisig()
+            .propose_async_call(
+                contract_call.basic.to,
+                0u64,
+                contract_call.basic.endpoint_name,
+                contract_call.basic.arg_buffer.into_multi_value_encoded(),
+            )
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("10,000,000");
 
-        // let result = result.value();
-        // if result.is_err() {
-        //     println!("propose unwrap egld failed with: {}", result.err().unwrap());
-        //     return None;
-        // }
+        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
 
-        // let action_id = result.unwrap();
-        // println!("successfully proposed unwrap egld action `{action_id}`");
-        // Some(action_id)
-        None
+        let result = typed_sc_call.result();
+        if result.is_err() {
+            println!("propose unwrap egld failed with: {}", result.err().unwrap());
+            return None;
+        }
+
+        let action_id = result.unwrap();
+        println!("successfully proposed unwrap egld action `{action_id}`");
+        Some(action_id)
     }
 }
