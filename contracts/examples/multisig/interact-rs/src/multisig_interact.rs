@@ -59,13 +59,13 @@ async fn main() {
             multisig_interact.issue_multisig_and_collection_full().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
-            // multisig_interact.issue_collection().await;
+            multisig_interact.issue_collection().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftItems) => {
-            // multisig_interact.create_items().await;
+            multisig_interact.create_items().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftSpecial) => {
-            // multisig_interact.set_special_role().await;
+            multisig_interact.set_special_role().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
             multisig_interact.print_quorum().await;
