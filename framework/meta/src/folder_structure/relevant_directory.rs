@@ -37,6 +37,16 @@ pub struct RelevantDirectory {
     pub dir_type: DirectoryType,
 }
 
+impl RelevantDirectory {
+    pub fn dir_name(&self) -> String {
+        self.path.file_name().unwrap().to_str().unwrap().to_string()
+    }
+
+    pub fn dir_name_underscores(&self) -> String {
+        self.dir_name().replace('-', "_")
+    }
+}
+
 pub struct RelevantDirectories(pub(crate) Vec<RelevantDirectory>);
 
 impl RelevantDirectories {

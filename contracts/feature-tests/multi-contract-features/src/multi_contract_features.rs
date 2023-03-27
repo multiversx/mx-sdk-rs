@@ -32,4 +32,19 @@ pub trait MultiContractFeatures {
     fn sample_value_external_set(&self, sample_value: BigUint) {
         self.sample_value().set(sample_value);
     }
+
+    #[view]
+    fn example_feature_message(&self) -> &'static str {
+        example_feature_message()
+    }
+}
+
+#[cfg(feature = "example_feature")]
+fn example_feature_message() -> &'static str {
+    "example-feature on"
+}
+
+#[cfg(not(feature = "example_feature"))]
+fn example_feature_message() -> &'static str {
+    "example-feature off"
 }

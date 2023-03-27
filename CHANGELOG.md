@@ -27,6 +27,16 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.39.7, vm 0.1.7] - 2023-03-18
+ - `TokenIdentifier` `ticker` method.
+ - `ManagedBuffer` `concat` method.
+
+## [sc 0.39.6, vm 0.1.6] - 2023-03-16
+- `multiversx-sc-meta` improvements:
+	- Bugfix: custom names in the main contract no longer crash the multi-contract build.
+	- Bugfix: the `--mir` flag works correctly in `sc-meta all build`;
+	- Multi-contract configs can now specify separate cargo features for individual contracts, for conditional compilation.
+
 ## [sc 0.39.5, vm 0.1.5] - 2023-02-06
 - `multiversx-sc-meta` improvements:
 	- Rust snippet generator fixes. The generator creates compilable code with appropriate argument types.

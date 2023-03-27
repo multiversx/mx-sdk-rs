@@ -36,6 +36,10 @@ pub struct BuildArgs {
     #[arg(long = "mir", verbatim_doc_comment)]
     pub emit_mir: bool,
 
+    /// Also emit LL (LLVM) files when building.
+    #[arg(long = "llvm-ir", verbatim_doc_comment)]
+    pub emit_llvm_ir: bool,
+
     #[arg(
         long = "no-imports",
         help = "Skips extracting the EI imports after building the contracts.",
@@ -91,6 +95,7 @@ impl Default for BuildArgs {
             wasm_opt: true,
             wat: false,
             emit_mir: false,
+            emit_llvm_ir: false,
             extract_imports: true,
             target_dir: None,
             twiggy_top: false,
@@ -132,6 +137,9 @@ impl CliArgsToRaw for BuildArgs {
         }
         if self.emit_mir {
             raw.push("--mir".to_string());
+        }
+        if self.emit_llvm_ir {
+            raw.push("--llvm-ir".to_string());
         }
         if !self.extract_imports {
             raw.push("--no-imports".to_string());

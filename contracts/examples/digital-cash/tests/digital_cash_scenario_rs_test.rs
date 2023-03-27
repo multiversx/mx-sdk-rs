@@ -11,14 +11,14 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-#[ignore] // verify_ed25519 not implemented
 #[test]
+#[ignore] // verify_ed25519 not implemented
 fn claim_egld_rs() {
     multiversx_sc_scenario::run_rs("scenarios/claim-egld.scen.json", world());
 }
 
-#[ignore] // verify_ed25519 not implemented
 #[test]
+#[ignore] // verify_ed25519 not implemented
 fn claim_esdt_rs() {
     multiversx_sc_scenario::run_rs("scenarios/claim-esdt.scen.json", world());
 }
