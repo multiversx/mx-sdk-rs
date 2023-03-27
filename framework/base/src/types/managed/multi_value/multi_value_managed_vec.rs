@@ -132,6 +132,20 @@ where
     }
 }
 
+impl<'a, M, T> IntoIterator for &'a MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+    type Item = T::Ref<'a>;
+
+    type IntoIter = ManagedVecRefIterator<'a, M, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 impl<M, T, I> From<Vec<I>> for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
