@@ -31,32 +31,48 @@ pub trait DigitalCash {
             nonce: payment.token_nonce,
         };
 
+        let depositor_address = self.blockchain().get_caller();
         let mut deposit = DepositInfo {
+            depositor_address,
             payment,
             expiration_round: self.get_expiration_round(valability),
         };
 
-        self.deposit(&address).entry(fund_type).and_modify(|fund| {
-            deposit.payment.amount += fund.payment.amount.clone();
-            deposit.expiration_round = deposit.expiration_round.max(fund.expiration_round);
-        });
+        if self.deposit(&address).contains_key(&fund_type) {
+            self.deposit(&address).entry(fund_type).and_modify(|fund| {
+                deposit.payment.amount += fund.payment.amount.clone();
+                deposit.expiration_round = deposit.expiration_round.max(fund.expiration_round);
+            });
+        } else {
+            self.deposit(&address).insert(fund_type, deposit);
+        }
     }
 
     #[endpoint]
     fn withdraw(&self, address: ManagedAddress) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
+        let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
+        let block_round = self.blockchain().get_block_round();
+        let mut transfer_occured = false;
         for (key, deposit) in self.deposit(&address).iter() {
-            if deposit.expiration_round < self.blockchain().get_block_round() {
+            if deposit.expiration_round < block_round {
                 continue;
             }
             self.send().direct(
-                &address,
+                &deposit.depositor_address,
                 &deposit.payment.token_identifier,
                 deposit.payment.token_nonce,
                 &deposit.payment.amount,
             );
-            self.deposit(&address).remove(&key);
+            transfer_occured = true;
+            withdrawed_tokens.push(key);
+        }
+
+        require!(transfer_occured, "withdrawal has not been available yet");
+
+        for token in withdrawed_tokens.iter() {
+            self.deposit(&address).remove(&token);
         }
     }
 
@@ -74,8 +90,9 @@ pub trait DigitalCash {
 
         let message = caller_address.as_managed_buffer();
 
+        let block_round = self.blockchain().get_block_round();
         for (key, deposit) in self.deposit(&address).iter() {
-            if deposit.expiration_round >= self.blockchain().get_block_round() {
+            if deposit.expiration_round >= block_round {
                 continue;
             }
             require!(
@@ -92,6 +109,21 @@ pub trait DigitalCash {
             );
             self.deposit(&address).remove(&key);
         }
+    }
+
+    #[endpoint]
+    fn forward(&self, address: ManagedAddress) {
+        let caller = self.blockchain().get_caller();
+
+        for (key, fund) in self.deposit(&caller).iter() {
+            let forwarded_fund = DepositInfo {
+                depositor_address: address.clone(),
+                payment: fund.payment,
+                expiration_round: fund.expiration_round,
+            };
+            self.deposit(&address).insert(key, forwarded_fund);
+        }
+        self.deposit(&caller).clear();
     }
 
     //views
