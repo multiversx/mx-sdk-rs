@@ -55,13 +55,11 @@
                     "nonce": "0",
                     "balance": "5",
                     "storage": {
-                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91": {
-                            "1-amount": "biguint:5",
-                            "2-depositor_address": "address:acc1",
-                            "3-expiration_round": "u64:655",
-                            "4-token_name": "nested:str:EGLD",
-                            "5-nonce": "u64:0"
-                        }
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91|str:.mapped|nested:str:EGLD|u64:0": "address:acc1|nested:str:EGLD|u64:0|biguint:5|u64:655",
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91|str:.value|u32:1": "nested:str:EGLD|u64:0",
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91|str:.node_id|nested:str:EGLD|u64:0": "1",
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d91|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
