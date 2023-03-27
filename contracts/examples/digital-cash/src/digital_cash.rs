@@ -117,12 +117,16 @@ pub trait DigitalCash {
     }
 
     #[endpoint]
-    fn forward(&self, address: ManagedAddress) {
+    fn forward(&self, address: ManagedAddress, forward_address: ManagedAddress) {
         let caller = self.blockchain().get_caller();
 
-        for (key, fund) in self.deposit(&caller).iter() {
+        for (key, fund) in self.deposit(&address).iter() {
+            require!(
+                fund.depositor_address == caller,
+                "only depositor can forward"
+            );
             let forwarded_fund = DepositInfo {
-                depositor_address: address.clone(),
+                depositor_address: forward_address.clone(),
                 payment: fund.payment,
                 expiration_round: fund.expiration_round,
             };
