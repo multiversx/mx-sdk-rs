@@ -280,6 +280,20 @@ where
     }
 }
 
+impl<'a, SA, T> IntoIterator for &'a VecMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + 'static,
+{
+    type Item = T;
+
+    type IntoIter = Iter<'a, SA, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 /// An iterator over the elements of a `VecMapper`.
 ///
 /// This `struct` is created by [`VecMapper::iter()`]. See its
