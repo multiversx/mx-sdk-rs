@@ -180,21 +180,21 @@ pub trait ForwarderQueue {
                 },
                 QueuedCallType::Promise => {
                     #[cfg(feature = "promises")]
-                    call_promise(contract_call.with_gas_limit(call.gas_limit), self.callbacks().callback_function());
+                    contract_call
+                        .with_gas_limit(call.gas_limit)
+                        .async_call_promise()
+                        .with_callback(self.callbacks().callback_function())
+                        .register_promise();
 
                     #[cfg(not(feature = "promises"))]
                     call_promise(contract_call.with_gas_limit(call.gas_limit));
-
-
                 },
             }
         }
     }
 
     #[event("forward_queued_callback")]
-    fn forward_queued_callback_event(
-        &self,
-    );
+    fn forward_queued_callback_event(&self);
 
     #[event("forward_queued_call_egld")]
     fn forward_queued_call_egld_event(
@@ -234,8 +234,14 @@ pub trait ForwarderQueue {
 }
 
 #[cfg(feature = "promises")]
-fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>, callback_function: CallbackClosure<A>) {
-    contract_call.async_call_promise().with_callback(callback_function).register_promise();
+fn call_promise<A: VMApi>(
+    contract_call: ContractCallWithEgld<A, ()>,
+    callback_function: CallbackClosure<A>,
+) {
+    contract_call
+        .async_call_promise()
+        .with_callback(callback_function)
+        .register_promise();
 }
 
 #[cfg(not(feature = "promises"))]
