@@ -162,8 +162,8 @@ where
         }
         let value1 = self.get_by_index(index1);
         let value2 = self.get_by_index(index2);
-        self.set_index(&value1, index2);
-        self.set_index(&value2, index1);
+        self.vec_mapper.set(index2, &value1);
+        self.vec_mapper.set(index1, &value2);
         true
     }
 
