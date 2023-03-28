@@ -23,8 +23,15 @@ fn test_swap_indexes() {
     set.insert(43);
     set.insert(44);
     set.insert(45);
+    assert_eq!(set.get_by_index(1), 42);
+    assert_eq!(set.get_by_index(2), 43);
+    assert_eq!(set.get_by_index(3), 44);
+    assert_eq!(set.get_by_index(4), 45);
     set.swap_indexes(1, 3);
-    check_set(&set, vec![42, 45, 44, 43]);
+    assert_eq!(set.get_by_index(1), 44);
+    assert_eq!(set.get_by_index(2), 43);
+    assert_eq!(set.get_by_index(3), 42);
+    assert_eq!(set.get_by_index(4), 45);
 }
 
 #[test]
