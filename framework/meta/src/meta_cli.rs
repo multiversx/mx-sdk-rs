@@ -30,7 +30,7 @@ pub async fn cli_main_standalone() {
                 .await;
         },
         Some(StandaloneCliAction::TemplateList) => {
-            let _ = list_templates().await;
+            list_templates().await;
         },
         None => {},
     }

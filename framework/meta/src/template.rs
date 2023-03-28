@@ -1,8 +1,9 @@
-use crate::{
-    cargo_toml_contents::CargoTomlContents,
-    cli_args::TemplateArgs,
-    folder_structure::{dir_pretty_print, RelevantDirectories},
-};
+mod repo_temp_download;
+mod template_list;
+mod template_metadata;
+mod template_metadata_load;
+
+use crate::{cargo_toml_contents::CargoTomlContents, cli_args::TemplateArgs};
 use copy_dir::*;
 use std::{
     env,
@@ -19,22 +20,28 @@ const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
 
+pub use repo_temp_download::{RepoSource, RepoTempDownload};
+pub use template_list::{list_templates, template_names};
+
 pub struct TemplateCreator {
-    pub path: PathBuf,
+    pub target_path: PathBuf,
 }
 impl Default for TemplateCreator {
     fn default() -> Self {
         let local_path = Path::new(".").canonicalize().unwrap_or_else(|err| {
             panic!("error canonicalizing input path: {err}",);
         });
-        TemplateCreator { path: local_path }
+        TemplateCreator {
+            target_path: local_path,
+        }
     }
 }
 
 impl TemplateCreator {
     pub fn with_path(path: PathBuf) -> Self {
-        TemplateCreator { path }
+        TemplateCreator { target_path: path }
     }
+
     pub async fn download_contract_template(
         &self,
         args: &TemplateArgs,
@@ -42,25 +49,26 @@ impl TemplateCreator {
         download_binaries().await?;
         unzip_binaries();
 
-        let local_path = self.path.join(&args.name);
+        let local_path = self.target_path.join(&args.name);
         copy_template_to_location(&args.name, Path::new(&local_path));
-        update_dependencies(&self.path, &args.name);
+        update_dependencies(&self.target_path, &args.name);
         Ok(())
     }
 }
-pub async fn list_templates() -> Result<(), reqwest::Error> {
-    download_binaries().await?;
-    unzip_binaries();
 
-    let contracts_path = Path::new(&env::temp_dir()).join(TEMPLATES_SUBDIRECTORY);
+// pub async fn list_templates() -> Result<(), reqwest::Error> {
+//     download_binaries().await?;
+//     unzip_binaries();
 
-    let dirs = RelevantDirectories::find_all(
-        contracts_path,
-        &["crypto-kitties".to_owned(), "order-book".to_owned()],
-    );
-    dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
-    Ok(())
-}
+//     let contracts_path = Path::new(&env::temp_dir()).join(TEMPLATES_SUBDIRECTORY);
+
+//     let dirs = RelevantDirectories::find_all(
+//         contracts_path,
+//         &["crypto-kitties".to_owned(), "order-book".to_owned()],
+//     );
+//     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
+//     Ok(())
+// }
 
 pub async fn download_binaries() -> Result<(), reqwest::Error> {
     let response = reqwest::get(REPOSITORY).await?.bytes().await?;
