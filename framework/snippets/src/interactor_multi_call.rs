@@ -1,11 +1,9 @@
 use crate::{
     interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs},
-    Interactor, TransactionSpec, StepBuffer,
+    Interactor, StepBuffer, TransactionSpec,
 };
 
-use multiversx_sc_scenario::{
-    scenario_model::{TxResponse},
-};
+use multiversx_sc_scenario::scenario_model::TxResponse;
 use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
@@ -24,18 +22,17 @@ impl Interactor {
             sc_call_step.set_response(TxResponse::new(results.get(i).unwrap().clone()));
         }
 
-
         for step in &buffer.refs {
             step.run_step(&mut self.post_runners);
         }
     }
 
-    fn retrieve_txs(&mut self, buffer: &mut StepBuffer<'_>) -> Vec<Transaction> {
+    fn retrieve_txs(&mut self, buffer: &mut StepBuffer) -> Vec<Transaction> {
         let mut txs = Txs::new();
 
         for sc_call_step in &mut buffer.refs {
-            let mut transaction = sc_call_step.into_transaction(&self);
-            let sender_address = &sc_call_step.from_address().value;
+            let mut transaction = sc_call_step.to_transaction(self);
+            let sender_address = &sc_call_step.to_address().value;
             let sender = self
                 .sender_map
                 .get_mut(sender_address)
@@ -52,7 +49,7 @@ fn retrieve_senders(sc_call_steps: &[&mut dyn TransactionSpec]) -> SenderSet {
     let mut senders = SenderSet::new();
 
     for sc_call_step in sc_call_steps {
-        let sender_address = &sc_call_step.from_address().value;
+        let sender_address = &sc_call_step.to_address().value;
         senders.insert(sender_address.clone());
     }
     senders
