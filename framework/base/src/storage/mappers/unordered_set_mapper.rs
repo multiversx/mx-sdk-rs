@@ -154,6 +154,19 @@ where
         true
     }
 
+    /// Removes a value from the set. Returns whether the value was
+    /// present in the set.
+    pub fn swap_indexes(&mut self, index1: usize, index2: usize) -> bool {
+        if index1 == NULL_ENTRY || index2 == NULL_ENTRY {
+            return false;
+        }
+        let value1 = self.get_by_index(index1);
+        let value2 = self.get_by_index(index2);
+        self.set_index(&value1, index2);
+        self.set_index(&value2, index1);
+        true
+    }
+
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
     pub fn iter(&self) -> Iter<SA, T> {

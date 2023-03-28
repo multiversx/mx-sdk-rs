@@ -17,6 +17,17 @@ fn check_set(set: &UnorderedSetMapper<DebugApi, u64>, expected: Vec<u64>) {
 }
 
 #[test]
+fn test_swap_indexes() {
+    let mut set = create_set();
+    set.insert(42);
+    set.insert(43);
+    set.insert(44);
+    set.insert(45);
+    set.swap_indexes(1, 3);
+    check_set(&set, vec![42, 45, 44, 43]);
+}
+
+#[test]
 fn test_hash_set_simple() {
     let mut set = create_set();
     check_set(&set, vec![]);
