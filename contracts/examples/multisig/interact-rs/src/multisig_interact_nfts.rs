@@ -39,7 +39,7 @@ impl MultisigInteract {
             .gas_limit("10,000,000")
             .expect(TxExpect::ok());
 
-        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+        self.interactor.sc_call(&mut typed_sc_call).await;
 
         let result = typed_sc_call.result();
         if result.is_err() {
@@ -78,7 +78,7 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .gas_limit("80,000,000");
 
-        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+        self.interactor.sc_call(&mut typed_sc_call).await;
 
         let result = typed_sc_call
             .response()
@@ -117,7 +117,7 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .gas_limit("10,000,000");
 
-        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+        self.interactor.sc_call(&mut typed_sc_call).await;
 
         let result = typed_sc_call.result();
         if result.is_err() {
@@ -149,6 +149,7 @@ impl MultisigInteract {
         println!("creating items...");
 
         let mut action_last_index = self.get_action_last_index().await;
+        println!("action last index: {}", action_last_index);
         let multisig_address = self.state.multisig().to_address();
 
         let mut steps = Vec::new();

@@ -30,7 +30,7 @@ impl Interactor {
                 .await
                 .expect("failed to send transaction");
 
-            println!("process tx: {tx_hash} with nonce: {}", tx.nonce);
+            println!("process tx hash: {tx_hash} with nonce: {}", tx.nonce);
             futures.push(self.retrieve_tx_on_network(tx_hash.clone()));
         }
 

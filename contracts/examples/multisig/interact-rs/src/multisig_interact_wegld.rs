@@ -84,7 +84,7 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .gas_limit("10,000,000");
 
-        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+        self.interactor.sc_call(&mut typed_sc_call).await;
 
         let result = typed_sc_call.result();
         if result.is_err() {
@@ -122,7 +122,7 @@ impl MultisigInteract {
             .from(&self.wallet_address)
             .gas_limit("10,000,000");
 
-        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+        self.interactor.sc_call(&mut typed_sc_call).await;
 
         let result = typed_sc_call.result();
         if result.is_err() {

@@ -8,7 +8,7 @@ use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
     pub async fn multi_sc_exec(&mut self, mut buffer: StepBuffer<'_>) {
-        for step in &buffer.refs {
+        for step in buffer.refs.iter() {
             step.run_step(&mut self.pre_runners);
         }
 
@@ -22,12 +22,12 @@ impl Interactor {
             sc_call_step.set_response(TxResponse::new(results.get(i).unwrap().clone()));
         }
 
-        for step in &buffer.refs {
+        for step in buffer.refs.iter() {
             step.run_step(&mut self.post_runners);
         }
     }
 
-    fn retrieve_txs(&mut self, buffer: &mut StepBuffer) -> Vec<Transaction> {
+    fn retrieve_txs(&mut self, buffer: &mut StepBuffer<'_>) -> Vec<Transaction> {
         let mut txs = Txs::new();
 
         for sc_call_step in &mut buffer.refs {

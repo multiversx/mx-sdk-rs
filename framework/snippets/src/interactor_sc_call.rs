@@ -1,12 +1,9 @@
-use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor, InteractorResult};
+use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
-    multiversx_sc::{
-        codec::{multi_types::IgnoreValue, CodecFrom, TopEncodeMulti},
-        types::ContractCallWithEgld,
-    },
+    multiversx_sc::types::ContractCallWithEgld,
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, TransferStep, TxCall, TxResponse, TypedScCall},
+    scenario_model::{ScCallStep, TransferStep, TxCall, TxResponse},
     DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;
@@ -28,14 +25,6 @@ fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) 
 }
 
 impl Interactor {
-    pub async fn sc_call_and_forget<S>(&mut self, sc_call_step: S) -> String
-    where
-        ScCallStep: From<S>,
-    {
-        let sc_call_step: ScCallStep = sc_call_step.into();
-        self.launch_sc_call(&sc_call_step).await
-    }
-
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
     where
         S: AsMut<ScCallStep>,
@@ -74,6 +63,8 @@ impl Interactor {
         println!("transfer tx hash: {tx_hash}");
         info!("transfer tx hash: {}", tx_hash);
 
+        self.retrieve_tx_on_network(tx_hash.clone()).await;
+
         self.post_runners.run_transfer_step(&transfer_step);
 
         tx_hash
@@ -101,80 +92,5 @@ impl Interactor {
             version: self.network_config.min_transaction_version,
             options: 0,
         }
-    }
-
-    // TODO: remove
-    pub async fn sc_call_get_result<S>(&mut self, mut sc_call_step: S)
-    where
-        S: AsMut<ScCallStep>,
-    {
-        let sc_call_step = sc_call_step.as_mut();
-        let tx_hash = self.launch_sc_call(sc_call_step).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
-
-        sc_call_step.response = Some(TxResponse::new(tx));
-
-        self.post_runners.run_sc_call_step(sc_call_step);
-    }
-
-    // TODO: remove
-    pub async fn sc_call_get_result_typed<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_call: TypedScCall<OriginalResult>,
-    ) -> InteractorResult<RequestedResult>
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
-    {
-        let sc_call_step: ScCallStep = typed_sc_call.into();
-        let tx_hash = self.launch_sc_call(&sc_call_step).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
-
-        self.post_runners.run_sc_call_step(&sc_call_step);
-
-        InteractorResult::new(tx)
-    }
-
-    // TODO: remove
-    pub async fn sc_call_get_raw_result(
-        &mut self,
-        sc_call_step: ScCallStep,
-    ) -> InteractorResult<IgnoreValue> {
-        let tx_hash = self.sc_call_and_forget(sc_call_step.clone()).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
-
-        self.post_runners.run_sc_call_step(&sc_call_step);
-
-        InteractorResult::new(tx)
-    }
-
-    // TODO: remove
-    pub async fn multiple_sc_calls(&mut self, sc_call_steps: &[ScCallStep]) {
-        let sender_address = &sc_call_steps.get(0).unwrap().tx.from.value;
-        for sc_call_step in sc_call_steps {
-            assert_eq!(
-                &sc_call_step.tx.from.value, sender_address,
-                "all calls are expected to have the same sender"
-            );
-
-            self.pre_runners.run_sc_call_step(sc_call_step);
-
-            let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-            self.set_nonce_and_sign_tx(sender_address, &mut transaction)
-                .await;
-            let _ = self.proxy.send_transaction(&transaction).await.unwrap();
-
-            self.post_runners.run_sc_call_step(sc_call_step);
-        }
-    }
-
-    // TODO: remove
-    pub async fn transfer_get_raw_result(
-        &mut self,
-        transfer_step: TransferStep,
-    ) -> InteractorResult<IgnoreValue> {
-        let tx_hash = self.transfer(transfer_step).await;
-        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
-        InteractorResult::new(tx)
     }
 }
