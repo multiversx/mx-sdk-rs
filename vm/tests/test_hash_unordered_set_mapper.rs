@@ -27,11 +27,19 @@ fn test_swap_indexes() {
     assert_eq!(set.get_by_index(2), 43);
     assert_eq!(set.get_by_index(3), 44);
     assert_eq!(set.get_by_index(4), 45);
+    assert_eq!(set.get_index(&42), 1);
+    assert_eq!(set.get_index(&43), 2);
+    assert_eq!(set.get_index(&44), 3);
+    assert_eq!(set.get_index(&45), 4);
     set.swap_indexes(1, 3);
     assert_eq!(set.get_by_index(1), 44);
     assert_eq!(set.get_by_index(2), 43);
     assert_eq!(set.get_by_index(3), 42);
     assert_eq!(set.get_by_index(4), 45);
+    assert_eq!(set.get_index(&42), 3);
+    assert_eq!(set.get_index(&43), 2);
+    assert_eq!(set.get_index(&44), 1);
+    assert_eq!(set.get_index(&45), 4);
 }
 
 #[test]
