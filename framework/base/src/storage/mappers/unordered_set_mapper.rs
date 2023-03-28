@@ -154,8 +154,8 @@ where
         true
     }
 
-    /// Removes a value from the set. Returns whether the value was
-    /// present in the set.
+    /// Exchanges the indexes of two values. Returns whether the operation was
+    /// successful.
     pub fn swap_indexes(&mut self, index1: usize, index2: usize) -> bool {
         if index1 == NULL_ENTRY || index2 == NULL_ENTRY {
             return false;
