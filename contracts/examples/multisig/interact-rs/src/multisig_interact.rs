@@ -251,6 +251,42 @@ impl MultisigInteract {
         println!("successfully performed action `{action_id}`");
     }
 
+    async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: &str) {
+        let mut steps = Vec::new();
+        for action_id in actions.iter() {
+            if !self.quorum_reached(*action_id).await && !self.sign(*action_id).await {
+                continue;
+            }
+            println!("quorum reached for action `{action_id}`");
+
+            let typed_sc_call = self
+                .state
+                .multisig()
+                .perform_action_endpoint(action_id)
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .gas_limit(gas_expr);
+
+            steps.push(typed_sc_call);
+        }
+
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
+            .await;
+
+        for (i, action_id) in actions.iter().enumerate() {
+            let result = steps[i].response().handle_signal_error_event();
+            if result.is_err() {
+                println!(
+                    "perform action `{action_id}` failed with: {}",
+                    result.err().unwrap()
+                );
+                continue;
+            }
+            println!("successfully performed action `{action_id}`");
+        }
+    }
+
     async fn quorum_reached(&mut self, action_id: usize) -> bool {
         self.interactor
             .vm_query(self.state.multisig().quorum_reached(action_id))
@@ -343,11 +379,5 @@ impl MultisigInteract {
             .await;
 
         println!("board: {}", board.into());
-    }
-
-    async fn get_action_last_index(&mut self) -> usize {
-        self.interactor
-            .vm_query(self.state.multisig().get_action_last_index())
-            .await
     }
 }

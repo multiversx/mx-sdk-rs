@@ -148,18 +148,16 @@ impl MultisigInteract {
     pub async fn create_items(&mut self) {
         println!("creating items...");
 
-        let mut action_last_index = self.get_action_last_index().await;
-        println!("action last index: {}", action_last_index);
         let multisig_address = self.state.multisig().to_address();
-
         let mut steps = Vec::new();
+
         for item_index in 0..NUM_ITEMS {
             let item_name = format!("Test collection item #{item_index}");
             let image_cid = format!(
                 "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.jpeg"
             );
 
-            let sc_call_step: ScCallStep = self
+            let typed_sc_call = self
                 .state
                 .multisig()
                 .propose_async_call(
@@ -178,23 +176,31 @@ impl MultisigInteract {
                 )
                 .into_blockchain_call()
                 .from(&self.wallet_address)
-                .gas_limit("10,000,000")
-                .into();
+                .gas_limit("10,000,000");
 
-            steps.push(sc_call_step);
+            steps.push(typed_sc_call);
         }
 
         self.interactor
             .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
             .await;
 
-        for i in 0..NUM_ITEMS {
-            action_last_index += 1;
-            println!(
-                "creating item `{}` with action `{action_last_index}`...",
-                i + 1
-            );
-            self.perform_action(action_last_index, "30,000,000").await;
+        let mut actions = Vec::new();
+        for step in steps.iter() {
+            let result = step.result();
+            if result.is_err() {
+                println!(
+                    "propose ESDTNFTCreate failed with: {}",
+                    result.err().unwrap()
+                );
+                return;
+            }
+
+            let action_id = result.unwrap();
+            println!("successfully proposed ESDTNFTCreate action `{action_id}`");
+            actions.push(action_id);
         }
+
+        self.perform_actions(actions, "30,000,000").await;
     }
 }
