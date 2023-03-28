@@ -91,14 +91,14 @@ pub trait DigitalCash {
         let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
         let mut transfer_occured = false;
         let block_round = self.blockchain().get_block_round();
+        require!(
+            self.crypto()
+                .verify_ed25519_legacy_managed::<32>(addr, message, &signature),
+            "invalid signature"
+        );
+
         for (key, deposit) in self.deposit(&address).iter() {
             if deposit.expiration_round >= block_round {
-                require!(
-                    self.crypto()
-                        .verify_ed25519_legacy_managed::<32>(addr, message, &signature),
-                    "invalid signature"
-                );
-
                 self.send().direct(
                     &caller_address,
                     &deposit.payment.token_identifier,
