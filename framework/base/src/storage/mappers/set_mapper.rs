@@ -150,6 +150,20 @@ where
     }
 }
 
+impl<'a, SA, T> IntoIterator for &'a SetMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+    type Item = T;
+
+    type IntoIter = Iter<'a, SA, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 impl<SA, T> Extend<T> for SetMapper<SA, T>
 where
     SA: StorageMapperApi,
