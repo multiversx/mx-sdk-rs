@@ -7,7 +7,7 @@ use multiversx_sc_scenario::scenario_model::TxResponse;
 use multiversx_sdk::data::transaction::Transaction;
 
 impl Interactor {
-    pub async fn multiple_exec(&mut self, mut buffer: StepBuffer<'_>) {
+    pub async fn multi_sc_exec(&mut self, mut buffer: StepBuffer<'_>) {
         for step in &buffer.refs {
             step.run_step(&mut self.pre_runners);
         }

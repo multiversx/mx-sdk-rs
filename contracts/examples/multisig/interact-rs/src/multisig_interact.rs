@@ -240,11 +240,7 @@ impl MultisigInteract {
 
         self.interactor.sc_call_get_result(&mut typed_sc_call).await;
 
-        let result = typed_sc_call
-            .sc_call_step
-            .response
-            .unwrap()
-            .handle_signal_error_event();
+        let result = typed_sc_call.response().handle_signal_error_event();
         if result.is_err() {
             println!(
                 "perform action `{action_id}` failed with: {}",
@@ -292,12 +288,11 @@ impl MultisigInteract {
         }
 
         self.interactor
-            .multiple_exec(StepBuffer::from_vec(&mut steps))
+            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
             .await;
 
         for step in steps.iter() {
-            let response = step.response.clone().unwrap();
-            let result = response.handle_signal_error_event();
+            let result = step.response().handle_signal_error_event();
             if result.is_err() {
                 println!(
                     "perform sign `{action_id}` failed with: {}",
@@ -311,6 +306,27 @@ impl MultisigInteract {
         true
     }
 
+    async fn dns_register(&mut self, name: &str) {
+        let dns_address = dns_address_for_name(name);
+        let mut typed_sc_call = self
+            .state
+            .multisig()
+            .dns_register(dns_address, name)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("30,000,000");
+
+        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+
+        let result = typed_sc_call.response().handle_signal_error_event();
+        if result.is_err() {
+            println!("dns register failed with: {}", result.err().unwrap());
+            return;
+        }
+
+        println!("successfully registered dns");
+    }
+
     async fn print_quorum(&mut self) {
         let quorum: SingleValue<usize> = self
             .interactor
@@ -318,12 +334,6 @@ impl MultisigInteract {
             .await;
 
         println!("quorum: {}", quorum.into());
-    }
-
-    async fn get_action_last_index(&mut self) -> usize {
-        self.interactor
-            .vm_query(self.state.multisig().get_action_last_index())
-            .await
     }
 
     async fn print_board(&mut self) {
@@ -335,16 +345,9 @@ impl MultisigInteract {
         println!("board: {}", board.into());
     }
 
-    async fn dns_register(&mut self, name: &str) {
-        let dns_address = dns_address_for_name(name);
-        let dns_register_call: ScCallStep = self
-            .state
-            .multisig()
-            .dns_register(dns_address, name)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("30,000,000")
-            .into();
-        self.interactor.sc_call_and_forget(dns_register_call).await;
+    async fn get_action_last_index(&mut self) -> usize {
+        self.interactor
+            .vm_query(self.state.multisig().get_action_last_index())
+            .await
     }
 }

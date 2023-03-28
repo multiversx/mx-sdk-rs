@@ -30,6 +30,10 @@ impl ScCallStep {
         Self::default()
     }
 
+    pub fn response(&self) -> &TxResponse {
+        self.response.as_ref().unwrap()
+    }
+
     pub fn from<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,

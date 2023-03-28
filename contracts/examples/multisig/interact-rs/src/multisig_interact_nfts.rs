@@ -25,28 +25,23 @@ impl MultisigInteract {
 
     pub async fn propose_issue_collection(&mut self) -> Option<usize> {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
-        let result = self
-            .interactor
-            .sc_call_get_result_typed(
-                self.state
-                    .multisig()
-                    .propose_async_call(
-                        system_sc_address,
-                        ISSUE_COST,
-                        "issueNonFungible".to_string(),
-                        MultiValueVec::from([
-                            COLLECTION_NAME.to_string(),
-                            COLLECTION_TICKER.to_string(),
-                        ]),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000")
-                    .expect(TxExpect::ok()),
+        let mut typed_sc_call = self
+            .state
+            .multisig()
+            .propose_async_call(
+                system_sc_address,
+                ISSUE_COST,
+                "issueNonFungible".to_string(),
+                MultiValueVec::from([COLLECTION_NAME.to_string(), COLLECTION_TICKER.to_string()]),
             )
-            .await;
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("10,000,000")
+            .expect(TxExpect::ok());
 
-        let result = result.value();
+        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+
+        let result = typed_sc_call.result();
         if result.is_err() {
             println!(
                 "propose issue collection failed with: {}",
@@ -75,16 +70,19 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let step = self
+        let mut typed_sc_call = self
             .state
             .multisig()
             .perform_action_endpoint(action_id)
             .into_blockchain_call()
             .from(&self.wallet_address)
-            .gas_limit("80,000,000")
-            .into();
-        let raw_result = self.interactor.sc_call_get_raw_result(step).await;
-        let result = raw_result.issue_non_fungible_new_token_identifier();
+            .gas_limit("80,000,000");
+
+        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+
+        let result = typed_sc_call
+            .response()
+            .issue_non_fungible_new_token_identifier();
         if result.is_err() {
             println!(
                 "perform issue collection failed with: {}",
@@ -102,28 +100,26 @@ impl MultisigInteract {
 
     pub async fn propose_set_special_role(&mut self) -> Option<usize> {
         let multisig_address = self.state.multisig().to_address();
-        let result = self
-            .interactor
-            .sc_call_get_result_typed(
-                self.state
-                    .multisig()
-                    .propose_async_call(
-                        &self.system_sc_address,
-                        0u64,
-                        "setSpecialRole".to_string(),
-                        MultiValueVec::from([
-                            self.collection_token_identifier.as_bytes(),
-                            multisig_address.as_bytes(),
-                            "ESDTRoleNFTCreate".as_bytes(),
-                        ]),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+        let mut typed_sc_call = self
+            .state
+            .multisig()
+            .propose_async_call(
+                &self.system_sc_address,
+                0u64,
+                "setSpecialRole".to_string(),
+                MultiValueVec::from([
+                    self.collection_token_identifier.as_bytes(),
+                    multisig_address.as_bytes(),
+                    "ESDTRoleNFTCreate".as_bytes(),
+                ]),
             )
-            .await;
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("10,000,000");
 
-        let result = result.value();
+        self.interactor.sc_call_get_result(&mut typed_sc_call).await;
+
+        let result = typed_sc_call.result();
         if result.is_err() {
             println!(
                 "propose set special role failed with: {}",
@@ -151,47 +147,53 @@ impl MultisigInteract {
 
     pub async fn create_items(&mut self) {
         println!("creating items...");
-        let mut last_index = self.get_action_last_index().await;
+
+        let mut action_last_index = self.get_action_last_index().await;
         let multisig_address = self.state.multisig().to_address();
 
-        let mut steps = Vec::<ScCallStep>::new();
+        let mut steps = Vec::new();
         for item_index in 0..NUM_ITEMS {
             let item_name = format!("Test collection item #{item_index}");
             let image_cid = format!(
                 "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.jpeg"
             );
 
-            steps.push(
-                self.state
-                    .multisig()
-                    .propose_async_call(
-                        &multisig_address,
-                        0u64,
-                        "ESDTNFTCreate".to_string(),
-                        MultiValueVec::from([
-                            self.collection_token_identifier.as_bytes(),
-                            top_encode_to_vec_u8_or_panic(&1u32).as_slice(),
-                            item_name.as_bytes(),
-                            top_encode_to_vec_u8_or_panic(&ROYALTIES).as_slice(),
-                            &[][..],
-                            METADATA.as_bytes(),
-                            image_cid.as_bytes(),
-                        ]),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000")
-                    .into(),
-            );
+            let sc_call_step: ScCallStep = self
+                .state
+                .multisig()
+                .propose_async_call(
+                    &multisig_address,
+                    0u64,
+                    "ESDTNFTCreate".to_string(),
+                    MultiValueVec::from([
+                        self.collection_token_identifier.as_bytes(),
+                        top_encode_to_vec_u8_or_panic(&1u32).as_slice(),
+                        item_name.as_bytes(),
+                        top_encode_to_vec_u8_or_panic(&ROYALTIES).as_slice(),
+                        &[][..],
+                        METADATA.as_bytes(),
+                        image_cid.as_bytes(),
+                    ]),
+                )
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .gas_limit("10,000,000")
+                .into();
+
+            steps.push(sc_call_step);
         }
 
-        self.interactor.multiple_sc_calls(steps.as_slice()).await;
-        self.interactor.sleep(Duration::from_secs(15)).await;
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
+            .await;
 
         for i in 0..NUM_ITEMS {
-            last_index += 1;
-            println!("creating item `{}` with action `{last_index}`...", i + 1);
-            self.perform_action(last_index, "30,000,000").await;
+            action_last_index += 1;
+            println!(
+                "creating item `{}` with action `{action_last_index}`...",
+                i + 1
+            );
+            self.perform_action(action_last_index, "30,000,000").await;
         }
     }
 }

@@ -20,7 +20,7 @@ impl<'a> StepBuffer<'a> {
         self.refs.push(step.as_mut());
     }
 
-    pub fn add_vec<'b, S>(&'a mut self, steps: &'b mut Vec<S>)
+    pub fn add_sc_call_vec<'b, S>(&'a mut self, steps: &'b mut Vec<S>)
     where
         'b: 'a,
         S: AsMut<ScCallStep>,
@@ -30,7 +30,7 @@ impl<'a> StepBuffer<'a> {
         }
     }
 
-    pub fn from_vec<'b, S>(steps: &'b mut Vec<S>) -> Self
+    pub fn from_sc_call_vec<'b, S>(steps: &'b mut Vec<S>) -> Self
     where
         'b: 'a,
         S: AsMut<ScCallStep>,
@@ -42,7 +42,7 @@ impl<'a> StepBuffer<'a> {
         buffer
     }
 
-    pub fn as_ref_vec(&'a self) -> Vec<&'a dyn TransactionSpec> {
+    pub fn to_refs_vec(&'a self) -> Vec<&'a dyn TransactionSpec> {
         self.refs.iter().map(|r| &**r).collect()
     }
 }

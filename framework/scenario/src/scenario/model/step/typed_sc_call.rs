@@ -6,7 +6,7 @@ use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     scenario::model::{AddressValue, U64Value},
-    scenario_model::{BigUintValue, BytesValue, TxError, TxExpect},
+    scenario_model::{BigUintValue, BytesValue, TxError, TxExpect, TxResponse},
 };
 
 use super::ScCallStep;
@@ -24,11 +24,15 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let mut raw_result = self.sc_call_step.response.as_ref().unwrap().raw_result()?;
+        let mut raw_result = self.response().raw_result()?;
         Ok(
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap(),
         )
+    }
+
+    pub fn response(&self) -> &TxResponse {
+        self.sc_call_step.response.as_ref().unwrap()
     }
 
     pub fn from<A>(mut self, address: A) -> Self

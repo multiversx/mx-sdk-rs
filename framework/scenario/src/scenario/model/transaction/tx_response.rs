@@ -62,15 +62,6 @@ impl TxResponse {
         Ok(decode_scr_data_or_panic(first_scr.unwrap().data.as_str()))
     }
 
-    pub fn find_log(&self, log_identifier: &str) -> Option<&Events> {
-        if let Some(logs) = &self.api_logs {
-            logs.events
-                .iter()
-                .find(|event| event.identifier == log_identifier)
-        } else {
-            None
-        }
-    }
     pub fn new_deployed_address(&self) -> Result<Address, TxError> {
         self.handle_signal_error_event()?;
         self.handle_sc_deploy_event()
@@ -99,6 +90,17 @@ impl TxResponse {
         }
 
         Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
+    }
+
+    // Finds api logs matching the given log identifier.
+    pub fn find_log(&self, log_identifier: &str) -> Option<&Events> {
+        if let Some(logs) = &self.api_logs {
+            logs.events
+                .iter()
+                .find(|event| event.identifier == log_identifier)
+        } else {
+            None
+        }
     }
 
     // Handles a signalError event

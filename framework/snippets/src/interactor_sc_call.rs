@@ -28,6 +28,57 @@ fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) 
 }
 
 impl Interactor {
+    pub async fn sc_call_and_forget<S>(&mut self, sc_call_step: S) -> String
+    where
+        ScCallStep: From<S>,
+    {
+        let sc_call_step: ScCallStep = sc_call_step.into();
+        self.launch_sc_call(&sc_call_step).await
+    }
+
+    pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
+    where
+        S: AsMut<ScCallStep>,
+    {
+        let sc_call_step = sc_call_step.as_mut();
+        let tx_hash = self.launch_sc_call(sc_call_step).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
+
+        sc_call_step.response = Some(TxResponse::new(tx));
+
+        self.post_runners.run_sc_call_step(sc_call_step);
+    }
+
+    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> String {
+        self.pre_runners.run_sc_call_step(sc_call_step);
+
+        let sender_address = &sc_call_step.tx.from.value;
+        let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
+        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+            .await;
+        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        println!("sc call tx hash: {tx_hash}");
+        info!("sc call tx hash: {}", tx_hash);
+
+        tx_hash
+    }
+
+    pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
+        self.pre_runners.run_transfer_step(&transfer_step);
+
+        let sender_address = &transfer_step.tx.from.value;
+        let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
+        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
+            .await;
+        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        println!("transfer tx hash: {tx_hash}");
+        info!("transfer tx hash: {}", tx_hash);
+
+        self.post_runners.run_transfer_step(&transfer_step);
+
+        tx_hash
+    }
+
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
         let contract_call = tx_call.to_contract_call();
         let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
@@ -52,28 +103,7 @@ impl Interactor {
         }
     }
 
-    pub async fn sc_call_and_forget<S>(&mut self, sc_call_step: S) -> String
-    where
-        ScCallStep: From<S>,
-    {
-        let sc_call_step: ScCallStep = sc_call_step.into();
-        self.launch_sc_call(&sc_call_step).await
-    }
-
-    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> String {
-        self.pre_runners.run_sc_call_step(sc_call_step);
-
-        let sender_address = &sc_call_step.tx.from.value;
-        let mut transaction = self.tx_call_to_blockchain_tx(&sc_call_step.tx);
-        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
-            .await;
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        println!("sc call tx hash: {tx_hash}");
-        info!("sc call tx hash: {}", tx_hash);
-
-        tx_hash
-    }
-
+    // TODO: remove
     pub async fn sc_call_get_result<S>(&mut self, mut sc_call_step: S)
     where
         S: AsMut<ScCallStep>,
@@ -87,6 +117,7 @@ impl Interactor {
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
+    // TODO: remove
     pub async fn sc_call_get_result_typed<OriginalResult, RequestedResult>(
         &mut self,
         typed_sc_call: TypedScCall<OriginalResult>,
@@ -104,6 +135,7 @@ impl Interactor {
         InteractorResult::new(tx)
     }
 
+    // TODO: remove
     pub async fn sc_call_get_raw_result(
         &mut self,
         sc_call_step: ScCallStep,
@@ -116,6 +148,7 @@ impl Interactor {
         InteractorResult::new(tx)
     }
 
+    // TODO: remove
     pub async fn multiple_sc_calls(&mut self, sc_call_steps: &[ScCallStep]) {
         let sender_address = &sc_call_steps.get(0).unwrap().tx.from.value;
         for sc_call_step in sc_call_steps {
@@ -135,22 +168,7 @@ impl Interactor {
         }
     }
 
-    pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
-        self.pre_runners.run_transfer_step(&transfer_step);
-
-        let sender_address = &transfer_step.tx.from.value;
-        let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
-        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
-            .await;
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        println!("transfer tx hash: {tx_hash}");
-        info!("transfer tx hash: {}", tx_hash);
-
-        self.post_runners.run_transfer_step(&transfer_step);
-
-        tx_hash
-    }
-
+    // TODO: remove
     pub async fn transfer_get_raw_result(
         &mut self,
         transfer_step: TransferStep,
