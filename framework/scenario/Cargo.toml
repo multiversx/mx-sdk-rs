@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.39.7"
+version = "0.39.8"
 edition = "2021"
 
 authors = [
@@ -30,5 +30,5 @@ colored = "2.0"
 run-go-tests = []
 
 [dependencies.multiversx-chain-vm]
-version = "=0.1.7"
+version = "=0.1.8"
 path = "../../vm"
