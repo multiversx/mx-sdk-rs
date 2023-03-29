@@ -30,4 +30,6 @@ jobs:
           default: true
           toolchain: nightly-2022-12-08
       - name: Run template tool test
-        run: cargo test test_template_download --features template-test
+        run: |
+          cd framework/meta
+          cargo test test_template_download --features template-test
