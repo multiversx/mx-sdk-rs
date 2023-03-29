@@ -7,7 +7,7 @@ use crate::{
     meta_all::call_all_meta,
     meta_info::call_info,
     sc_upgrade::upgrade_sc,
-    template::{download_contract_template, list_templates},
+    template::{print_template_names, template_download},
 };
 use clap::Parser;
 use multiversx_sc::contract_base::ContractAbiProvider;
@@ -25,10 +25,10 @@ pub async fn cli_main_standalone() {
             local_deps(args);
         },
         Some(StandaloneCliAction::Template(args)) => {
-            let _ = download_contract_template(args).await;
+            template_download(args).await;
         },
         Some(StandaloneCliAction::TemplateList) => {
-            let _ = list_templates().await;
+            print_template_names().await;
         },
         None => {},
     }

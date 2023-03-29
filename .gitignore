@@ -14,13 +14,11 @@ Cargo.lock
 # VSCode config
 .vscode
 
-# Tutorial book output
-tutorial/book
-
 # Others
 my-vm-tests.sh
 quick.sh
 twiggy*
+template-test
 
 # Zip output with example wasm binaries
 examples-wasm.zip
