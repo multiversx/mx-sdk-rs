@@ -48,13 +48,15 @@
 # The title should be the released crates and versions, same as in the changelog and the commit message.
 # The description should be copied from CHANGELOG.md, as is.
 #
-# 11. Create pull request on GitHub. The faster it gets merged in master, the better.
+# 11. Run `sc-meta all update`. This will update the `Cargo.lock` files.
 #
-# 12. (optional) Test the new framework on one of the contracts that are not in the same repo, e.g. DNS, DEX, etc.
+# 12. Create pull request on GitHub. The faster it gets merged in master, the better.
 #
-# 13. Post in Slack to `release-announcements`.
+# 13. (optional) Test the new framework on one of the contracts that are not in the same repo, e.g. DNS, DEX, etc.
 #
-# 14. Write a release announcement in Confluence.
+# 14. Post in Slack to `release-announcements`.
+#
+# 15. Write a release announcement in Confluence.
 #
 
 cd sdk/core
