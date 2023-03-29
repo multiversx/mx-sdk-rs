@@ -10,7 +10,7 @@ const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
 #[test]
 fn test_template_list() {
     let workspace_path = find_workspace();
-    let repo_source = RepoSource::from_local_path(&workspace_path);
+    let repo_source = RepoSource::from_local_path(workspace_path);
     let template_names = template_names_from_repo(&repo_source);
     assert_eq!(template_names.len(), 2);
 }
@@ -19,7 +19,7 @@ fn test_template_list() {
 // #[ignore]
 async fn test_template_download() {
     let workspace_path = find_workspace();
-    let repo_source = RepoSource::from_local_path(&workspace_path);
+    let repo_source = RepoSource::from_local_path(workspace_path);
 
     let template_temp_path = find_workspace().join(TEMPLATE_TEMP_DIR_NAME);
     if template_temp_path.exists() {
