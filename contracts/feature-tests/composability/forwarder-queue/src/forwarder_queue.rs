@@ -1,6 +1,7 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+#[cfg(not(feature = "promises"))]
 use multiversx_sc::api::VMApi;
 
 multiversx_sc::imports!();
@@ -160,7 +161,7 @@ pub trait ForwarderQueue {
                     .into_normalized()
                 },
             };
-
+            self.callback_count().get();
             match call.call_type {
                 QueuedCallType::Sync => {
                     contract_call.execute_on_dest_context::<()>();
@@ -174,11 +175,32 @@ pub trait ForwarderQueue {
                         .transfer_execute();
                 },
                 QueuedCallType::Promise => {
+                    #[cfg(feature = "promises")]
+                    contract_call
+                        .with_gas_limit(call.gas_limit)
+                        .async_call_promise()
+                        .with_callback(self.callbacks().callback_function())
+                        .register_promise();
+
+                    #[cfg(not(feature = "promises"))]
                     call_promise(contract_call.with_gas_limit(call.gas_limit));
                 },
             }
         }
     }
+
+    #[callback]
+    fn callback_function(&self) {
+        self.callback_count().update(|c| *c += 1);
+    }
+
+    #[view]
+    #[storage_mapper("callback_count")]
+    fn callback_count(&self) -> SingleValueMapper<usize>;
+
+
+    #[event("forward_queued_callback")]
+    fn forward_queued_callback_event(&self);
 
     #[event("forward_queued_call_egld")]
     fn forward_queued_call_egld_event(
@@ -215,11 +237,6 @@ pub trait ForwarderQueue {
         #[indexed] endpoint_name: &ManagedBuffer,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
-}
-
-#[cfg(feature = "promises")]
-fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>) {
-    contract_call.async_call_promise().register_promise();
 }
 
 #[cfg(not(feature = "promises"))]
