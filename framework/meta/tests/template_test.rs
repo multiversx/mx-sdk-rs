@@ -1,7 +1,4 @@
-use multiversx_sc_meta::{
-    cli_args::TemplateArgs,
-    template::{template_names, RepoSource, TemplateCreator},
-};
+use multiversx_sc_meta::template::{template_names_from_repo, RepoSource, TemplateDownloader};
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -14,27 +11,34 @@ const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
 fn test_template_list() {
     let workspace_path = find_workspace();
     let repo_source = RepoSource::from_local_path(&workspace_path);
-    let template_names = template_names(&repo_source);
-    assert_eq!(template_names.len(), 1);
+    let template_names = template_names_from_repo(&repo_source);
+    assert_eq!(template_names.len(), 2);
 }
 
 #[tokio::test]
-#[ignore]
-async fn test_serialize_multi_contract() {
-    let args = TemplateArgs {
-        name: "adder".to_string(),
-        template: "adder".to_string(),
-    };
+// #[ignore]
+async fn test_template_download() {
+    let workspace_path = find_workspace();
+    let repo_source = RepoSource::from_local_path(&workspace_path);
 
     let template_temp_path = find_workspace().join(TEMPLATE_TEMP_DIR_NAME);
-    fs::remove_dir_all(&template_temp_path).unwrap();
+    if template_temp_path.exists() {
+        fs::remove_dir_all(&template_temp_path).unwrap();
+    }
     fs::create_dir_all(&template_temp_path).unwrap();
 
-    let build_dir = template_temp_path.join("new-adder");
+    let target_dir = template_temp_path.join("new-adder");
 
-    let _ = TemplateCreator::with_path(template_temp_path)
-        .download_contract_template(&args)
-        .await;
+    // let args = TemplateArgs {
+    //     name: target_dir.clone(),
+    //     template: "adder".to_string(),
+    // };
+    let downloader = TemplateDownloader::new(&repo_source, "adder".to_string(), target_dir);
+    downloader.template_download();
+
+    // let _ = TemplateCreator::with_path(template_temp_path)
+    //     .download_contract_template(&args)
+    //     .await;
 
     // cargo_test(build_dir);
 }

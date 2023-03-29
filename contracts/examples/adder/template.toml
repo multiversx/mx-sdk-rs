@@ -1,4 +1,4 @@
-name = "contract-name"
+name = "adder"
 
 rename_pairs = [
     [

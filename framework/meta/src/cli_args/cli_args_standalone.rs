@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{ArgAction, Args, Parser, Subcommand};
 
 use super::{CliArgsToRaw, ContractCliAction};
@@ -140,9 +142,9 @@ pub struct LocalDepsArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TemplateArgs {
-    /// Provide the he template you want to clone
+    /// Provide the template you want to clone
     #[arg(long = "name", verbatim_doc_comment)]
-    pub name: String,
+    pub name: PathBuf,
 
     /// Provide the he template you want to clone
     #[arg(long = "template", verbatim_doc_comment)]
