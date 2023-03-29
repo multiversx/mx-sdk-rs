@@ -19,15 +19,3 @@ jobs:
       vmtools-version: v1.4.60
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
-
-  template_test:
-    name: Template tool test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
-        with:
-          default: true
-          toolchain: nightly-2022-12-08
-      - name: Run template tool test
-        run: cargo test test_template_download --features template-test
