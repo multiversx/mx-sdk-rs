@@ -16,7 +16,7 @@ fn test_template_list() {
 }
 
 #[tokio::test]
-// #[ignore]
+#[cfg_attr(not(feature = "template-test"), ignore)]
 async fn test_template_download() {
     let workspace_path = find_workspace();
     let repo_source = RepoSource::from_local_path(workspace_path);
