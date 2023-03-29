@@ -42,3 +42,8 @@ fn withdraw_egld_rs() {
 fn withdraw_esdt_rs() {
     multiversx_sc_scenario::run_rs("scenarios/withdraw-esdt.scen.json", world());
 }
+
+#[test]
+fn forward_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forward.scen.json", world());
+}
