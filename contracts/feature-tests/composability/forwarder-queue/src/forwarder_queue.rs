@@ -1,9 +1,6 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-#[cfg(not(feature = "promises"))]
-use multiversx_sc::api::VMApi;
-
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
@@ -128,21 +125,14 @@ pub trait ForwarderQueue {
         while let Some(node) = self.queued_calls().pop_front() {
             let call = node.clone().into_value();
 
-            let contract_call = match call.payments {
+            match &call.payments {
                 EgldOrMultiEsdtPayment::Egld(egld_value) => {
                     self.forward_queued_call_egld_event(
                         &call.call_type,
                         &call.to,
                         &call.endpoint_name,
-                        &egld_value,
-                    );
-
-                    ContractCallWithEgld::<Self::Api, ()>::new(
-                        call.to.clone(),
-                        call.endpoint_name.clone(),
                         egld_value,
-                    )
-                    .with_raw_arguments(call.args)
+                    );
                 },
                 EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
                     self.forward_queued_call_esdt_event(
@@ -151,17 +141,14 @@ pub trait ForwarderQueue {
                         &call.endpoint_name,
                         &esdt_payments.clone().into_multi_value(),
                     );
-
-                    ContractCallWithMultiEsdt::<Self::Api, ()>::new(
-                        call.to.clone(),
-                        call.endpoint_name.clone(),
-                        esdt_payments,
-                    )
-                    .with_raw_arguments(call.args)
-                    .into_normalized()
                 },
             };
-            self.callback_count().get();
+
+            let contract_call = ContractCallWithAnyPayment::<_, ()>::new(
+                call.to,
+                call.endpoint_name,
+                call.payments,
+            );
             match call.call_type {
                 QueuedCallType::Sync => {
                     contract_call.execute_on_dest_context::<()>();
@@ -179,25 +166,21 @@ pub trait ForwarderQueue {
                     contract_call
                         .with_gas_limit(call.gas_limit)
                         .async_call_promise()
-                        .with_callback(self.callbacks().callback_function())
+                        .with_callback(self.callbacks().promises_callback_method())
                         .register_promise();
-
-                    #[cfg(not(feature = "promises"))]
-                    call_promise(contract_call.with_gas_limit(call.gas_limit));
                 },
             }
         }
     }
 
-    #[callback]
-    fn callback_function(&self) {
+    #[promises_callback]
+    fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
     }
 
     #[view]
     #[storage_mapper("callback_count")]
     fn callback_count(&self) -> SingleValueMapper<usize>;
-
 
     #[event("forward_queued_callback")]
     fn forward_queued_callback_event(&self);
@@ -238,6 +221,3 @@ pub trait ForwarderQueue {
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 }
-
-#[cfg(not(feature = "promises"))]
-fn call_promise<A: VMApi>(_contract_call: ContractCallWithEgld<A, ()>) {}

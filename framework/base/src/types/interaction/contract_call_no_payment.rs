@@ -5,15 +5,15 @@ use crate::codec::TopEncodeMulti;
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
-        ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
+        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
     },
 };
 
 use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
-    ContractCallWithEgldOrSingleEsdt, ManagedArgBuffer,
+    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, ManagedArgBuffer,
 };
 
 /// Holds metadata for calling another contract, without payments.
@@ -123,6 +123,18 @@ where
         ContractCallWithMultiEsdt {
             basic: self,
             esdt_payments: payments,
+        }
+    }
+
+    /// Sets payment to be a (potentially) multi-token transfer.
+    #[inline]
+    pub fn with_any_payment(
+        self,
+        payment: EgldOrMultiEsdtPayment<SA>,
+    ) -> ContractCallWithAnyPayment<SA, OriginalResult> {
+        ContractCallWithAnyPayment {
+            basic: self,
+            payment,
         }
     }
 
