@@ -48,4 +48,11 @@ impl ContractAbi {
             ..Default::default()
         }
     }
+
+    pub fn iter_all_functions(&self) -> impl Iterator<Item = &EndpointAbi> {
+        self.constructors
+            .iter()
+            .chain(self.endpoints.iter())
+            .chain(self.promise_callbacks.iter())
+    }
 }
