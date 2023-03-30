@@ -19,6 +19,7 @@ alloc = ["multiversx-sc-codec/alloc"]
 ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
+managed-map = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]

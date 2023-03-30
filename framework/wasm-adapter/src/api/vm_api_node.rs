@@ -35,4 +35,6 @@ impl HandleTypeInfo for VmApiImpl {
     type BigFloatHandle = i32;
 
     type EllipticCurveHandle = i32;
+
+    type ManagedMapHandle = i32;
 }
