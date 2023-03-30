@@ -17,6 +17,58 @@ fn check_set(set: &UnorderedSetMapper<DebugApi, u64>, expected: Vec<u64>) {
 }
 
 #[test]
+fn test_swap_indexes() {
+    let mut set = create_set();
+    set.insert(42);
+    set.insert(43);
+    set.insert(44);
+    set.insert(45);
+    assert_eq!(set.get_by_index(1), 42);
+    assert_eq!(set.get_by_index(2), 43);
+    assert_eq!(set.get_by_index(3), 44);
+    assert_eq!(set.get_by_index(4), 45);
+    assert_eq!(set.get_index(&42), 1);
+    assert_eq!(set.get_index(&43), 2);
+    assert_eq!(set.get_index(&44), 3);
+    assert_eq!(set.get_index(&45), 4);
+    set.swap_indexes(1, 3);
+    assert_eq!(set.get_by_index(1), 44);
+    assert_eq!(set.get_by_index(2), 43);
+    assert_eq!(set.get_by_index(3), 42);
+    assert_eq!(set.get_by_index(4), 45);
+    assert_eq!(set.get_index(&42), 3);
+    assert_eq!(set.get_index(&43), 2);
+    assert_eq!(set.get_index(&44), 1);
+    assert_eq!(set.get_index(&45), 4);
+}
+
+#[test]
+fn test_swap_indexes_equal() {
+    let mut set = create_set();
+    set.insert(42);
+    set.insert(43);
+    set.insert(44);
+    set.insert(45);
+    assert_eq!(set.get_by_index(1), 42);
+    assert_eq!(set.get_by_index(2), 43);
+    assert_eq!(set.get_by_index(3), 44);
+    assert_eq!(set.get_by_index(4), 45);
+    assert_eq!(set.get_index(&42), 1);
+    assert_eq!(set.get_index(&43), 2);
+    assert_eq!(set.get_index(&44), 3);
+    assert_eq!(set.get_index(&45), 4);
+    set.swap_indexes(3, 3);
+    assert_eq!(set.get_by_index(1), 42);
+    assert_eq!(set.get_by_index(2), 43);
+    assert_eq!(set.get_by_index(3), 44);
+    assert_eq!(set.get_by_index(4), 45);
+    assert_eq!(set.get_index(&42), 1);
+    assert_eq!(set.get_index(&43), 2);
+    assert_eq!(set.get_index(&44), 3);
+    assert_eq!(set.get_index(&45), 4);
+}
+
+#[test]
 fn test_hash_set_simple() {
     let mut set = create_set();
     check_set(&set, vec![]);

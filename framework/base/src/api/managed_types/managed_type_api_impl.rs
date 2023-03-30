@@ -56,4 +56,8 @@ pub trait ManagedTypeApiImpl:
 
         super::token_identifier_util::validate_token_identifier(static_buffer_slice)
     }
+
+    fn get_token_ticker_len(&self, token_id_len: usize) -> usize {
+        super::token_identifier_util::get_token_ticker_len(token_id_len)
+    }
 }

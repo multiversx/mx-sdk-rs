@@ -16,11 +16,6 @@ fn call_value_check_rs() {
 }
 
 #[test]
-fn payable_multiple_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/payable_multiple.scen.json", world());
-}
-
-#[test]
 fn payable_any_1_rs() {
     multiversx_sc_scenario::run_rs("scenarios/payable_any_1.scen.json", world());
 }
@@ -63,6 +58,11 @@ fn payable_egld_4_rs() {
 #[test]
 fn payable_multi_array_rs() {
     multiversx_sc_scenario::run_rs("scenarios/payable_multi_array.scen.json", world());
+}
+
+#[test]
+fn payable_multiple_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/payable_multiple.scen.json", world());
 }
 
 #[test]

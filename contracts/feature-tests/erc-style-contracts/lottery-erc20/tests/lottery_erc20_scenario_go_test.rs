@@ -59,7 +59,7 @@ fn buy_ticket_wrong_fee_go() {
 }
 
 #[test]
-fn determine_winner_different_ticket_holders_winner_acc1_go() {
+fn determine_winner_different_ticket_holders_winner_acc_1_go() {
     multiversx_sc_scenario::run_go(
         "scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json",
     );
@@ -75,8 +75,8 @@ fn determine_winner_same_ticket_holder_go() {
     multiversx_sc_scenario::run_go("scenarios/determine-winner-same-ticket-holder.scen.json");
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn determine_winner_split_prize_pool_go() {
     multiversx_sc_scenario::run_go("scenarios/determine-winner-split-prize-pool.scen.json");
 }
