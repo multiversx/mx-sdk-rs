@@ -14,8 +14,9 @@ fn check_single_constructor(abi: &ContractAbi) -> Result<(), String> {
     }
 }
 
+/// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.
 fn validate_contract_var_args(abi: &ContractAbi) -> Result<(), String> {
-    for endpoint_abi in abi.iter_all_exports() {
+    for endpoint_abi in abi.constructors.iter().chain(abi.endpoints.iter()) {
         validate_endpoint_var_args(endpoint_abi)?;
     }
     Ok(())
