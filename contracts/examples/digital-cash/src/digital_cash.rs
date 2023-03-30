@@ -5,7 +5,8 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 mod deposit_info;
-use deposit_info::DepositInfo;
+
+use deposit_info::{DepositInfo, FundType};
 
 pub const SECONDS_PER_ROUND: u64 = 6;
 pub use multiversx_sc::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
@@ -25,37 +26,53 @@ pub trait DigitalCash {
             payment.amount > BigUint::zero(),
             "amount must be greater than 0"
         );
-        require!(self.deposit(&address).is_empty(), "key already used");
-
-        let deposit = DepositInfo {
-            amount: payment.amount,
-            depositor_address: self.blockchain().get_caller(),
-            expiration_round: self.get_expiration_round(valability),
-            token_name: payment.token_identifier,
+        let fund_type = FundType {
+            token: payment.token_identifier.clone(),
             nonce: payment.token_nonce,
         };
 
-        self.deposit(&address).set(&deposit);
+        let depositor_address = self.blockchain().get_caller();
+        let mut deposit = DepositInfo {
+            depositor_address,
+            payment,
+            expiration_round: self.get_expiration_round(valability),
+        };
+
+        if self.deposit(&address).contains_key(&fund_type) {
+            self.deposit(&address).entry(fund_type).and_modify(|fund| {
+                deposit.payment.amount += fund.payment.amount.clone();
+                deposit.expiration_round = deposit.expiration_round.max(fund.expiration_round);
+            });
+        } else {
+            self.deposit(&address).insert(fund_type, deposit);
+        }
     }
 
     #[endpoint]
     fn withdraw(&self, address: ManagedAddress) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
-        let deposit = self.deposit(&address).get();
+        let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
+        let block_round = self.blockchain().get_block_round();
+        let mut transfer_occured = false;
+        for (key, deposit) in self.deposit(&address).iter() {
+            if deposit.expiration_round < block_round {
+                self.send().direct(
+                    &deposit.depositor_address,
+                    &deposit.payment.token_identifier,
+                    deposit.payment.token_nonce,
+                    &deposit.payment.amount,
+                );
+                transfer_occured = true;
+                withdrawed_tokens.push(key);
+            }
+        }
 
-        require!(
-            deposit.expiration_round < self.blockchain().get_block_round(),
-            "withdrawal has not been available yet"
-        );
-        self.send().direct(
-            &deposit.depositor_address,
-            &deposit.token_name,
-            deposit.nonce,
-            &deposit.amount,
-        );
+        require!(transfer_occured, "withdrawal has not been available yet");
 
-        self.deposit(&address).clear();
+        for token in withdrawed_tokens.iter() {
+            self.deposit(&address).remove(&token);
+        }
     }
 
     #[endpoint]
@@ -66,39 +83,77 @@ pub trait DigitalCash {
     ) {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
-        let deposit = self.deposit(&address).get();
         let caller_address = self.blockchain().get_caller();
 
-        require!(
-            deposit.expiration_round >= self.blockchain().get_block_round(),
-            "deposit expired"
-        );
-
-        let key = address.as_managed_byte_array();
+        let addr = address.as_managed_byte_array();
         let message = caller_address.as_managed_buffer();
+
+        let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
+        let mut transfer_occured = false;
+        let block_round = self.blockchain().get_block_round();
         require!(
             self.crypto()
-                .verify_ed25519_legacy_managed::<32>(key, message, &signature),
+                .verify_ed25519_legacy_managed::<32>(addr, message, &signature),
             "invalid signature"
         );
 
-        self.send().direct(
-            &caller_address,
-            &deposit.token_name,
-            deposit.nonce,
-            &deposit.amount,
-        );
-        self.deposit(&address).clear();
+        for (key, deposit) in self.deposit(&address).iter() {
+            if deposit.expiration_round >= block_round {
+                self.send().direct(
+                    &caller_address,
+                    &deposit.payment.token_identifier,
+                    deposit.payment.token_nonce,
+                    &deposit.payment.amount,
+                );
+                transfer_occured = true;
+                withdrawed_tokens.push(key);
+            }
+        }
+        require!(transfer_occured, "deposit expired");
+
+        for token in withdrawed_tokens.iter() {
+            self.deposit(&address).remove(&token);
+        }
+    }
+
+    #[endpoint]
+    fn forward(&self, address: ManagedAddress, forward_address: ManagedAddress) {
+        let caller = self.blockchain().get_caller();
+
+        for (key, fund) in self.deposit(&address).iter() {
+            require!(
+                fund.depositor_address == caller,
+                "only depositor can forward"
+            );
+            let forwarded_fund = DepositInfo {
+                depositor_address: forward_address.clone(),
+                payment: fund.payment,
+                expiration_round: fund.expiration_round,
+            };
+            self.deposit(&address).insert(key, forwarded_fund);
+        }
+        self.deposit(&caller).clear();
     }
 
     //views
 
     #[view(amount)]
-    fn get_amount(&self, address: ManagedAddress) -> BigUint {
+    fn get_amount(
+        &self,
+        address: ManagedAddress,
+        token: EgldOrEsdtTokenIdentifier,
+        nonce: u64,
+    ) -> BigUint {
         require!(!self.deposit(&address).is_empty(), "non-existent key");
 
-        let data = self.deposit(&address).get();
-        data.amount
+        let data = self.deposit(&address).get(&FundType { token, nonce });
+        let mut amount = BigUint::zero();
+        if let Some(fund) = data {
+            amount = fund.payment.amount;
+        } else {
+            require!(!self.deposit(&address).is_empty(), "non-existent key");
+        }
+        amount
     }
 
     //private functions
@@ -112,5 +167,8 @@ pub trait DigitalCash {
 
     #[view]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
+    fn deposit(
+        &self,
+        donor: &ManagedAddress,
+    ) -> MapMapper<FundType<Self::Api>, DepositInfo<Self::Api>>;
 }

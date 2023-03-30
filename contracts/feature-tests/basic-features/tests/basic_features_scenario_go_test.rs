@@ -1,10 +1,10 @@
 #[test]
-fn big_int_from_i64_go() {
+fn big_int_from_i_64_go() {
     multiversx_sc_scenario::run_go("scenarios/big_int_from_i64.scen.json");
 }
 
 #[test]
-fn big_int_to_i64_go() {
+fn big_int_to_i_64_go() {
     multiversx_sc_scenario::run_go("scenarios/big_int_to_i64.scen.json");
 }
 
@@ -14,8 +14,13 @@ fn big_num_conversions_go() {
 }
 
 #[test]
-fn big_uint_eq_u64_go() {
+fn big_uint_eq_u_64_go() {
     multiversx_sc_scenario::run_go("scenarios/big_uint_eq_u64.scen.json");
+}
+
+#[test]
+fn big_uint_from_u_64_go() {
+    multiversx_sc_scenario::run_go("scenarios/big_uint_from_u64.scen.json");
 }
 
 #[test]
@@ -24,12 +29,7 @@ fn big_uint_sqrt_go() {
 }
 
 #[test]
-fn big_uint_from_u64_go() {
-    multiversx_sc_scenario::run_go("scenarios/big_uint_from_u64.scen.json");
-}
-
-#[test]
-fn big_uint_to_u64_go() {
+fn big_uint_to_u_64_go() {
     multiversx_sc_scenario::run_go("scenarios/big_uint_to_u64.scen.json");
 }
 
@@ -54,23 +54,28 @@ fn crypto_elliptic_curves_go() {
 }
 
 #[test]
-fn crypto_keccak256_go() {
+fn crypto_keccak_256_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_keccak256.scen.json");
 }
 
 #[test]
-fn crypto_keccak256_legacy_managed_go() {
+fn crypto_keccak_256_legacy_managed_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_keccak256_legacy_managed.scen.json");
 }
 
 #[test]
-fn crypto_ripemd160_go() {
+fn crypto_ripemd_160_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_ripemd160.scen.json");
 }
 
 #[test]
-fn crypto_sha256_go() {
+fn crypto_sha_256_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_sha256.scen.json");
+}
+
+#[test]
+fn crypto_sha_256_legacy_managed_go() {
+    multiversx_sc_scenario::run_go("scenarios/crypto_sha256_legacy_managed.scen.json");
 }
 
 #[test]
@@ -79,17 +84,17 @@ fn crypto_verify_bls_go() {
 }
 
 #[test]
-fn crypto_verify_ed25519_go() {
+fn crypto_verify_ed_25519_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_verify_ed25519.scen.json");
 }
 
 #[test]
-fn crypto_verify_secp256k1_go() {
+fn crypto_verify_secp_256_k_1_go() {
     multiversx_sc_scenario::run_go("scenarios/crypto_verify_secp256k1.scen.json");
 }
 
 #[test]
-fn echo_array_u8_go() {
+fn echo_array_u_8_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_array_u8.scen.json");
 }
 
@@ -114,12 +119,12 @@ fn echo_big_uint_go() {
 }
 
 #[test]
-fn echo_i32_go() {
+fn echo_i_32_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_i32.scen.json");
 }
 
 #[test]
-fn echo_i64_go() {
+fn echo_i_64_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_i64.scen.json");
 }
 
@@ -159,7 +164,7 @@ fn echo_tuple_into_multiresult_go() {
 }
 
 #[test]
-fn echo_u64_go() {
+fn echo_u_64_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_u64.scen.json");
 }
 
@@ -179,7 +184,7 @@ fn echo_varargs_managed_sum_go() {
 }
 
 #[test]
-fn echo_varargs_u32_go() {
+fn echo_varargs_u_32_go() {
     multiversx_sc_scenario::run_go("scenarios/echo_varargs_u32.scen.json");
 }
 
@@ -234,13 +239,13 @@ fn managed_vec_address_push_go() {
 }
 
 #[test]
-fn managed_vec_biguint_push_go() {
-    multiversx_sc_scenario::run_go("scenarios/managed_vec_biguint_push.scen.json");
+fn managed_vec_array_push_go() {
+    multiversx_sc_scenario::run_go("scenarios/managed_vec_array_push.scen.json");
 }
 
 #[test]
-fn managed_vec_array_push_go() {
-    multiversx_sc_scenario::run_go("scenarios/managed_vec_array_push.scen.json");
+fn managed_vec_biguint_push_go() {
+    multiversx_sc_scenario::run_go("scenarios/managed_vec_biguint_push.scen.json");
 }
 
 #[test]
@@ -274,11 +279,6 @@ fn sc_properties_go() {
 }
 
 #[test]
-fn storage_raw_api_features_go() {
-    multiversx_sc_scenario::run_go("scenarios/storage_raw_api_features.scen.json");
-}
-
-#[test]
 fn storage_big_int_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_big_int.scen.json");
 }
@@ -299,12 +299,12 @@ fn storage_clear_go() {
 }
 
 #[test]
-fn storage_i64_go() {
+fn storage_i_64_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_i64.scen.json");
 }
 
 #[test]
-fn storage_i64_bad_go() {
+fn storage_i_64_bad_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_i64_bad.scen.json");
 }
 
@@ -319,17 +319,17 @@ fn storage_managed_address_go() {
 }
 
 #[test]
-fn storage_map1_go() {
+fn storage_map_1_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_map1.scen.json");
 }
 
 #[test]
-fn storage_map2_go() {
+fn storage_map_2_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_map2.scen.json");
 }
 
 #[test]
-fn storage_map3_go() {
+fn storage_map_3_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_map3.scen.json");
 }
 
@@ -379,6 +379,11 @@ fn storage_mapper_token_attributes_go() {
 }
 
 #[test]
+fn storage_mapper_unique_id_go() {
+    multiversx_sc_scenario::run_go("scenarios/storage_mapper_unique_id.scen.json");
+}
+
+#[test]
 fn storage_mapper_vec_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_mapper_vec.scen.json");
 }
@@ -394,17 +399,22 @@ fn storage_opt_managed_addr_go() {
 }
 
 #[test]
+fn storage_raw_api_features_go() {
+    multiversx_sc_scenario::run_go("scenarios/storage_raw_api_features.scen.json");
+}
+
+#[test]
 fn storage_reserved_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_reserved.scen.json");
 }
 
 #[test]
-fn storage_u64_go() {
+fn storage_u_64_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_u64.scen.json");
 }
 
 #[test]
-fn storage_u64_bad_go() {
+fn storage_u_64_bad_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_u64_bad.scen.json");
 }
 
@@ -421,9 +431,4 @@ fn storage_usize_bad_go() {
 #[test]
 fn struct_eq_go() {
     multiversx_sc_scenario::run_go("scenarios/struct_eq.scen.json");
-}
-
-#[test]
-fn storage_mapper_unique_id_go() {
-    multiversx_sc_scenario::run_go("scenarios/storage_mapper_unique_id.scen.json");
 }
