@@ -1,0 +1,112 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:mmap-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/managed-map-features.wasm",
+                    "storage": {
+                        "str:num_entries": "4",
+                        "str:key|u32:0": "str:key0",
+                        "str:value|u32:0": "str:value0",
+                        "str:key|u32:1": "str:key1",
+                        "str:value|u32:1": "",
+                        "str:key|u32:2": "",
+                        "str:value|u32:2": "str:value2",
+                        "str:key|u32:3": "str:key3",
+                        "str:value|u32:3": "str:value3"
+                    }
+                },
+                "address:an-account": {
+                    "nonce": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove/get 0",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:mmap-features",
+                "function": "mm_remove_get",
+                "arguments": [
+                    "str:key0",
+                    "str:key0"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:value0",
+                    ""
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove/get 1",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:mmap-features",
+                "function": "mm_remove_get",
+                "arguments": [
+                    "str:key1",
+                    "str:key1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "",
+                    ""
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove/get 2",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:mmap-features",
+                "function": "mm_remove_get",
+                "arguments": [
+                    "",
+                    ""
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:value2",
+                    ""
+                ]
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove/get unaffected",
+            "tx": {
+                "from": "address:an-account",
+                "to": "sc:mmap-features",
+                "function": "mm_remove_get",
+                "arguments": [
+                    "str:key0",
+                    "str:key3"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:value0",
+                    "str:value3"
+                ]
+            }
+        }
+    ]
+}

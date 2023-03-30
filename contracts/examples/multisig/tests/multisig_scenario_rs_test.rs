@@ -25,50 +25,50 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn call_other_shard_1_rs() {
     multiversx_sc_scenario::run_rs("scenarios/call_other_shard-1.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn call_other_shard_2_rs() {
     multiversx_sc_scenario::run_rs("scenarios/call_other_shard-2.scen.json", world());
 }
 
 #[test]
-fn changeboard_rs() {
+fn change_board_rs() {
     multiversx_sc_scenario::run_rs("scenarios/changeBoard.scen.json", world());
 }
 
 #[test]
-fn changequorum_rs() {
+fn change_quorum_rs() {
     multiversx_sc_scenario::run_rs("scenarios/changeQuorum.scen.json", world());
 }
 
 #[test]
-fn changequorum_toobig_rs() {
+fn change_quorum_too_big_rs() {
     multiversx_sc_scenario::run_rs("scenarios/changeQuorum_tooBig.scen.json", world());
 }
 
 #[test]
-fn deployadder_err_rs() {
+fn deploy_adder_err_rs() {
     multiversx_sc_scenario::run_rs("scenarios/deployAdder_err.scen.json", world());
 }
 
 #[test]
-fn deployadder_then_call_rs() {
+fn deploy_adder_then_call_rs() {
     multiversx_sc_scenario::run_rs("scenarios/deployAdder_then_call.scen.json", world());
 }
 
 #[test]
-fn deployfactorial_rs() {
+fn deploy_factorial_rs() {
     multiversx_sc_scenario::run_rs("scenarios/deployFactorial.scen.json", world());
 }
 
 #[test]
-fn deployothermultisig_rs() {
+fn deploy_other_multisig_rs() {
     multiversx_sc_scenario::run_rs("scenarios/deployOtherMultisig.scen.json", world());
 }
 
@@ -83,7 +83,7 @@ fn remove_everyone_rs() {
 }
 
 #[test]
-fn sendesdt_rs() {
+fn send_esdt_rs() {
     multiversx_sc_scenario::run_rs("scenarios/sendEsdt.scen.json", world());
 }
 

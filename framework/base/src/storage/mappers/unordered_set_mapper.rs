@@ -154,10 +154,39 @@ where
         true
     }
 
+    /// Exchanges the indexes of two values. Returns whether the operation was
+    /// successful.
+    pub fn swap_indexes(&mut self, index1: usize, index2: usize) -> bool {
+        if index1 == NULL_ENTRY || index2 == NULL_ENTRY {
+            return false;
+        }
+        let value1 = self.get_by_index(index1);
+        let value2 = self.get_by_index(index2);
+        self.vec_mapper.set(index2, &value1);
+        self.vec_mapper.set(index1, &value2);
+        self.set_index(&value1, index2);
+        self.set_index(&value2, index1);
+        true
+    }
+
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
     pub fn iter(&self) -> Iter<SA, T> {
         self.vec_mapper.iter()
+    }
+}
+
+impl<'a, SA, T> IntoIterator for &'a UnorderedSetMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+    type Item = T;
+
+    type IntoIter = Iter<'a, SA, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

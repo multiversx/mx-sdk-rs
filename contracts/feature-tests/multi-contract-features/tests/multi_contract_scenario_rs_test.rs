@@ -25,11 +25,11 @@ fn mcf_example_feature_rs() {
 }
 
 #[test]
-fn mcf_external_pure_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-external-pure.scen.json", world());
+fn mcf_external_get_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/mcf-external-get.scen.json", world());
 }
 
 #[test]
-fn mcf_external_get_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-external-get.scen.json", world());
+fn mcf_external_pure_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/mcf-external-pure.scen.json", world());
 }
