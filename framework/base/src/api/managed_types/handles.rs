@@ -5,6 +5,7 @@ pub trait HandleTypeInfo {
     type BigIntHandle: HandleConstraints;
     type BigFloatHandle: HandleConstraints;
     type EllipticCurveHandle: HandleConstraints;
+    type ManagedMapHandle: HandleConstraints;
 }
 
 use crate::codec::TryStaticCast;

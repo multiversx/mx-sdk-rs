@@ -9,6 +9,7 @@ pub trait ManagedTypeApi: HandleTypeInfo + StaticVarApi + ErrorApi + Clone + 'st
             BigIntHandle = Self::BigIntHandle,
             BigFloatHandle = Self::BigFloatHandle,
             EllipticCurveHandle = Self::EllipticCurveHandle,
+            ManagedMapHandle = Self::ManagedMapHandle,
         >;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl;

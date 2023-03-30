@@ -2,11 +2,11 @@ use crate::api::ErrorApi;
 
 use super::{
     token_identifier_util::IDENTIFIER_MAX_LENGTH, BigFloatApi, BigIntApi, EllipticCurveApi,
-    ManagedBufferApi,
+    ManagedBufferApi, ManagedMapApi,
 };
 
 pub trait ManagedTypeApiImpl:
-    BigIntApi + BigFloatApi + EllipticCurveApi + ManagedBufferApi + ErrorApi
+    BigIntApi + BigFloatApi + EllipticCurveApi + ManagedBufferApi + ManagedMapApi + ErrorApi
 {
     fn mb_to_big_int_unsigned(
         &self,

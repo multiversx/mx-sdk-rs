@@ -2,7 +2,8 @@ use crate::num_bigint::BigInt;
 use multiversx_sc::api::{const_handles, use_raw_handle, HandleConstraints, RawHandle};
 use std::collections::HashMap;
 
-type ManagedBufferImpl = Vec<u8>;
+pub(crate) type ManagedBufferImpl = Vec<u8>;
+pub(crate) type ManagedMapImpl = HashMap<Vec<u8>, Vec<u8>>;
 
 #[derive(Debug)]
 pub struct HandleMap<V> {
@@ -57,6 +58,7 @@ pub struct TxManagedTypes {
     pub(crate) big_int_map: HandleMap<BigInt>,
     pub(crate) big_float_map: HandleMap<f64>,
     pub(crate) managed_buffer_map: HandleMap<ManagedBufferImpl>,
+    pub(crate) managed_map_map: HandleMap<ManagedMapImpl>,
 }
 
 impl TxManagedTypes {
@@ -65,6 +67,7 @@ impl TxManagedTypes {
             big_int_map: HandleMap::new(),
             big_float_map: HandleMap::new(),
             managed_buffer_map: HandleMap::new(),
+            managed_map_map: HandleMap::new(),
         }
     }
 }
