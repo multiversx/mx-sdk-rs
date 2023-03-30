@@ -49,7 +49,8 @@ impl ContractAbi {
         }
     }
 
-    pub fn iter_all_functions(&self) -> impl Iterator<Item = &EndpointAbi> {
+    /// All exported functions: init, endpoints, promises callbacks.
+    pub fn iter_all_exports(&self) -> impl Iterator<Item = &EndpointAbi> {
         self.constructors
             .iter()
             .chain(self.endpoints.iter())
