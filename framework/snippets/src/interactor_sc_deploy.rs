@@ -1,14 +1,16 @@
 use crate::{mandos_to_erdrs_address, Interactor, InteractorResult};
 use log::info;
 use multiversx_sc_scenario::{
+    mandos_system::ScenarioRunner,
     multiversx_sc::codec::{CodecFrom, TopEncodeMulti},
     scenario_model::{ScDeployStep, TypedScDeploy},
 };
 use multiversx_sdk::data::{address::Address as ErdrsAddress, transaction::Transaction};
 
 const DEPLOY_RECEIVER: [u8; 32] = [0u8; 32];
+
 impl Interactor {
-    fn sc_deploy_to_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
+    pub(crate) fn sc_deploy_to_tx(&self, sc_deploy_step: &ScDeployStep) -> Transaction {
         Transaction {
             nonce: 0,
             value: sc_deploy_step.tx.egld_value.value.to_string(),
@@ -24,9 +26,9 @@ impl Interactor {
         }
     }
 
-    pub async fn send_sc_deploy(&mut self, sc_call_step: ScDeployStep) -> String {
+    pub async fn send_sc_deploy(&mut self, sc_call_step: &ScDeployStep) -> String {
         let sender_address = &sc_call_step.tx.from.value;
-        let mut transaction = self.sc_deploy_to_tx(&sc_call_step);
+        let mut transaction = self.sc_deploy_to_tx(sc_call_step);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
         self.proxy.send_transaction(&transaction).await.unwrap()
@@ -40,11 +42,16 @@ impl Interactor {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let sc_call_step: ScDeployStep = typed_sc_call.into();
-        let tx_hash = self.send_sc_deploy(sc_call_step).await;
+        let sc_deploy_step: ScDeployStep = typed_sc_call.into();
+        self.pre_runners.run_sc_deploy_step(&sc_deploy_step);
+
+        let tx_hash = self.send_sc_deploy(&sc_deploy_step).await;
         println!("deploy tx hash: {tx_hash}");
         info!("deploy tx hash: {}", tx_hash);
-        let tx = self.retrieve_tx_on_network(tx_hash.as_str()).await;
+        let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
+
+        self.post_runners.run_sc_deploy_step(&sc_deploy_step);
+
         InteractorResult::new(tx)
     }
 }

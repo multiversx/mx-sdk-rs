@@ -15,10 +15,7 @@ use multiversx_chain_vm::{
     num_bigint,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
     tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult},
-    world_mock::{
-        is_smart_contract_address, AccountData, AccountEsdt, ContractContainer,
-        EsdtInstanceMetadata,
-    },
+    world_mock::{AccountData, AccountEsdt, ContractContainer, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
 
@@ -227,7 +224,7 @@ impl BlockchainStateWrapper {
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
-        if !is_smart_contract_address(address) {
+        if !address.is_smart_contract_address() {
             panic!("Invalid SC Address: {:?}", address_to_hex(address))
         }
 
@@ -241,9 +238,8 @@ impl BlockchainStateWrapper {
         let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
         let contract_bytes = crate::scenario_format::value_interpreter::interpret_string(
             &wasm_full_path_as_expr,
-            &crate::scenario_format::interpret_trait::InterpreterContext::new(
-                std::path::PathBuf::new(),
-            ),
+            &crate::scenario_format::interpret_trait::InterpreterContext::default()
+                .with_allowed_missing_files(),
         );
 
         let wasm_relative_path_expr = "file:".to_owned() + path_str;
@@ -256,16 +252,16 @@ impl BlockchainStateWrapper {
             address,
             egld_balance,
             owner,
-            Some(contract_bytes),
+            Some(contract_bytes.clone()),
             Some(wasm_relative_path_expr_bytes),
         );
 
-        if !self.rc_b_mock.contains_contract(&wasm_full_path_as_expr) {
+        if !self.rc_b_mock.contains_contract(contract_bytes.as_slice()) {
             let contract_obj = create_contract_obj_box(obj_builder);
 
             let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
             b_mock_ref.register_contract_container(
-                &wasm_full_path_as_expr,
+                contract_bytes,
                 ContractContainer::new(contract_obj, None, false),
             );
         }

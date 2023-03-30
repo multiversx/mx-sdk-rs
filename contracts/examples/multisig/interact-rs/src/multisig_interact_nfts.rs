@@ -13,7 +13,7 @@ const NUM_ITEMS: usize = 3;
 const ROYALTIES: usize = 3000;
 const METADATA: &str = "tags:test,rust-interactor";
 
-impl State {
+impl MultisigInteract {
     pub async fn issue_multisig_and_collection_full(&mut self) {
         self.deploy().await;
         self.feed_contract_egld().await;
@@ -23,12 +23,13 @@ impl State {
         self.create_items().await;
     }
 
-    pub async fn propose_issue_collection(&mut self) -> usize {
+    pub async fn propose_issue_collection(&mut self) -> Option<usize> {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let result = self
             .interactor
             .sc_call_get_result(
-                self.multisig
+                self.state
+                    .multisig()
                     .propose_async_call(
                         system_sc_address,
                         ISSUE_COST,
@@ -44,27 +45,61 @@ impl State {
                     .expect(TxExpect::ok()),
             )
             .await;
-        result.value()
+
+        let result = result.value();
+        if result.is_err() {
+            println!(
+                "propose issue collection failed with: {}",
+                result.err().unwrap()
+            );
+            return None;
+        }
+
+        let action_id = result.unwrap();
+        println!("successfully proposed issue colllection action `{action_id}`");
+        Some(action_id)
     }
 
     pub async fn issue_collection(&mut self) {
+        println!("proposing issue collection...");
         let action_id = self.propose_issue_collection().await;
-        println!("propose issue collection: {action_id}");
+        if action_id.is_none() {
+            return;
+        }
+
+        let action_id = action_id.unwrap();
+        println!("perfoming issue collection action `{action_id}`...");
+
+        if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
+            return;
+        }
+        println!("quorum reached for action `{action_id}`");
+
         let step = self.perform_action_step(action_id, "80,000,000");
         let raw_result = self.interactor.sc_call_get_raw_result(step).await;
-        self.collection_token_identifier = raw_result.issue_non_fungible_new_token_identifier();
+        let result = raw_result.issue_non_fungible_new_token_identifier();
+        if result.is_err() {
+            println!(
+                "perform issue collection failed with: {}",
+                result.err().unwrap()
+            );
+            return;
+        }
+
+        self.collection_token_identifier = result.unwrap();
         println!(
-            "perform issue collection: {}; collection token identifier: {}",
-            action_id, self.collection_token_identifier
+            "collection token identifier: {}",
+            self.collection_token_identifier
         );
     }
 
-    pub async fn propose_set_special_role(&mut self) -> usize {
-        let multisig_address = self.multisig.to_address();
+    pub async fn propose_set_special_role(&mut self) -> Option<usize> {
+        let multisig_address = self.state.multisig().to_address();
         let result = self
             .interactor
             .sc_call_get_result(
-                self.multisig
+                self.state
+                    .multisig()
                     .propose_async_call(
                         &self.system_sc_address,
                         0u64,
@@ -80,19 +115,37 @@ impl State {
                     .gas_limit("10,000,000"),
             )
             .await;
-        result.value()
+
+        let result = result.value();
+        if result.is_err() {
+            println!(
+                "propose set special role failed with: {}",
+                result.err().unwrap()
+            );
+            return None;
+        }
+
+        let action_id = result.unwrap();
+        println!("successfully proposed set special role with action `{action_id}`");
+        Some(action_id)
     }
 
     pub async fn set_special_role(&mut self) {
+        println!("proposing set special role...");
         let action_id = self.propose_set_special_role().await;
-        println!("propose set special role: {action_id}");
+        if action_id.is_none() {
+            return;
+        }
+
+        let action_id = action_id.unwrap();
+        println!("performing set special role action `{action_id}`...");
         self.perform_action(action_id, "80,000,000").await;
-        println!("perform set special role: {action_id}");
     }
 
     pub async fn create_items(&mut self) {
+        println!("creating items...");
         let mut last_index = self.get_action_last_index().await;
-        let multisig_address = self.multisig.to_address();
+        let multisig_address = self.state.multisig().to_address();
 
         let mut steps = Vec::<ScCallStep>::new();
         for item_index in 0..NUM_ITEMS {
@@ -102,7 +155,8 @@ impl State {
             );
 
             steps.push(
-                self.multisig
+                self.state
+                    .multisig()
                     .propose_async_call(
                         &multisig_address,
                         0u64,
@@ -124,11 +178,13 @@ impl State {
             );
         }
 
-        for _ in 0..NUM_ITEMS {
-            last_index += 1;
-            steps.push(self.perform_action_step(last_index, "30,000,000"));
-        }
-
         self.interactor.multiple_sc_calls(steps.as_slice()).await;
+        self.interactor.sleep(Duration::from_secs(15)).await;
+
+        for i in 0..NUM_ITEMS {
+            last_index += 1;
+            println!("creating item `{}` with action `{last_index}`...", i + 1);
+            self.perform_action(last_index, "30,000,000").await;
+        }
     }
 }

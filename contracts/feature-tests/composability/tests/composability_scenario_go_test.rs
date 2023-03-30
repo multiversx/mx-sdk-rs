@@ -1,4 +1,9 @@
 #[test]
+fn forw_queue_async_go() {
+    multiversx_sc_scenario::run_go("scenarios/forw_queue_async.scen.json");
+}
+
+#[test]
 fn forw_raw_async_accept_egld_go() {
     multiversx_sc_scenario::run_go("scenarios/forw_raw_async_accept_egld.scen.json");
 }

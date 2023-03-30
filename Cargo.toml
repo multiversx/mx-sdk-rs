@@ -114,6 +114,8 @@ members = [
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child/meta",
   "contracts/feature-tests/composability/forwarder",
   "contracts/feature-tests/composability/forwarder/meta",
+  "contracts/feature-tests/composability/forwarder-queue",
+  "contracts/feature-tests/composability/forwarder-queue/meta",
   "contracts/feature-tests/composability/forwarder-raw",
   "contracts/feature-tests/composability/forwarder-raw/meta",
   "contracts/feature-tests/composability/local-esdt-and-nft",

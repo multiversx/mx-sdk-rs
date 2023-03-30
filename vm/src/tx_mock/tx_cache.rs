@@ -8,7 +8,7 @@ use std::{
 use multiversx_sc::types::heap::Address;
 
 use crate::{
-    address_hex,
+    display_util::address_hex,
     world_mock::{AccountData, BlockchainMock},
 };
 

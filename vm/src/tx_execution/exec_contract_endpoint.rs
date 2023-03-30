@@ -4,7 +4,7 @@ use alloc::boxed::Box;
 use multiversx_sc::err_msg;
 
 use crate::{
-    address_hex,
+    display_util::address_hex,
     tx_mock::{TxContext, TxContextStack, TxFunctionName, TxPanic, TxResult},
     world_mock::ContractContainer,
     DebugApi,

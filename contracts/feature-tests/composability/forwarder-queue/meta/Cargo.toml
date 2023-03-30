@@ -1,0 +1,12 @@
+[package]
+name = "forwarder-queue-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.forwarder-queue]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.39.8"
+path = "../../../../../framework/meta"

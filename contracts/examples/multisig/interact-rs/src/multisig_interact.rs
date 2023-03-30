@@ -1,12 +1,20 @@
+mod multisig_interact_cli;
+mod multisig_interact_config;
 mod multisig_interact_nfts;
+mod multisig_interact_state;
+mod multisig_interact_wegld;
+
+use clap::Parser;
 use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _,
     multisig_state::ProxyTrait as _, ProxyTrait as _,
 };
+use multisig_interact_config::Config;
+use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
+use multiversx_sc_scenario::test_wallets;
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
-    erdrs::wallet::Wallet,
     multiversx_sc::{
         codec::multi_types::MultiValueVec,
         storage::mappers::SingleValue,
@@ -18,74 +26,109 @@ use multiversx_sc_snippets::{
     },
     tokio, Interactor,
 };
-use std::{
-    env::Args,
-    io::{Read, Write},
-};
 
-const GATEWAY: &str = multiversx_sc_snippets::erdrs::blockchain::TESTNET_GATEWAY;
-const PEM: &str = "alice.pem";
-const DEFAULT_MULTISIG_ADDRESS_EXPR: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-
-type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
+    DebugApi::dummy();
     env_logger::init();
-    let _ = DebugApi::dummy();
 
-    let mut args = std::env::args();
-    let _ = args.next();
-    let cmd = args.next().expect("at least one argument required");
-    let mut state = State::init(args).await;
-    match cmd.as_str() {
-        "deploy" => state.deploy().await,
-        "feed" => state.feed_contract_egld().await,
-        "nft-full" => state.issue_multisig_and_collection_full().await,
-        "nft-issue" => state.issue_collection().await,
-        "nft-special" => state.set_special_role().await,
-        "nft-items" => state.create_items().await,
-        "quorum" => state.print_quorum().await,
-        "board" => state.print_board().await,
-        "dns-register" => state.dns_register().await,
-        _ => panic!("unknown command: {}", &cmd),
+    let mut multisig_interact = MultisigInteract::init().await;
+    multisig_interact.register_wallets();
+
+    let cli = multisig_interact_cli::InteractCli::parse();
+    match &cli.command {
+        Some(multisig_interact_cli::InteractCliCommand::Board) => {
+            multisig_interact.print_board().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Deploy) => {
+            multisig_interact.deploy().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::DnsRegister(args)) => {
+            multisig_interact.dns_register(&args.name).await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Feed) => {
+            multisig_interact.feed_contract_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
+            multisig_interact.multi_deploy(&args.count).await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
+            multisig_interact.issue_multisig_and_collection_full().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
+            multisig_interact.issue_collection().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftItems) => {
+            multisig_interact.create_items().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftSpecial) => {
+            multisig_interact.set_special_role().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::Quorum) => {
+            multisig_interact.print_quorum().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::UnwrapEgld) => {
+            multisig_interact.unwrap_egld().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::WEgldSwapFull) => {
+            multisig_interact.wegld_swap_full().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::WrapEgld) => {
+            multisig_interact.wrap_egld().await;
+        },
+        None => {},
     }
 }
 
-struct State {
+struct MultisigInteract {
     interactor: Interactor,
     wallet_address: Address,
-    multisig: MultisigContract,
     system_sc_address: Address,
     collection_token_identifier: String,
-    #[allow(dead_code)]
-    args: Args,
+    state: State,
 }
 
-impl State {
-    async fn init(args: Args) -> Self {
-        let mut interactor = Interactor::new(GATEWAY).await;
-        let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
-        let multisig = MultisigContract::new(load_address_expr());
-        State {
+impl MultisigInteract {
+    async fn init() -> Self {
+        let config = Config::load_config();
+        let mut interactor = Interactor::new(config.gateway())
+            .await
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
+
+        Self {
             interactor,
             wallet_address,
-            multisig,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
             collection_token_identifier: multisig_interact_nfts::COLLECTION_TOKEN_IDENTIFIER
                 .to_string(),
-            args,
+            state: State::load_state(),
+        }
+    }
+
+    fn register_wallets(&mut self) {
+        let bob = test_wallets::bob();
+        let carol = test_wallets::carol();
+        let dan = test_wallets::dan();
+        let eve = test_wallets::eve();
+
+        for wallet in vec![bob, carol, dan, eve] {
+            self.interactor.register_wallet(wallet);
         }
     }
 
     async fn deploy(&mut self) {
+        let board = self.board();
         let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
             .interactor
             .sc_deploy(
-                self.multisig
-                    .init(0usize, MultiValueVec::from([self.wallet_address.clone()]))
+                self.state
+                    .default_multisig()
+                    .init(Config::load_config().quorum(), board)
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
@@ -97,12 +140,76 @@ impl State {
                     .expect(TxExpect::ok()),
             )
             .await;
-        let new_address = deploy_result.new_deployed_address();
-        let new_address_bech32 = bech32::encode(&new_address);
+
+        let result = deploy_result.new_deployed_address();
+        if result.is_err() {
+            println!("deploy failed: {}", result.err().unwrap());
+            return;
+        }
+
+        self.wegld_swap_set_state().await;
+
+        let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("new address: {new_address_bech32}");
+
         let new_address_expr = format!("bech32:{new_address_bech32}");
-        save_address_expr(new_address_expr.as_str());
-        self.multisig = MultisigContract::new(new_address_expr);
+        self.state.set_multisig_address(&new_address_expr);
+    }
+
+    async fn multi_deploy(&mut self, count: &u8) {
+        if *count == 0 {
+            println!("count must be greater than 0");
+            return;
+        }
+        println!("deploying {count} contracts...");
+
+        let board = self.board();
+        let mut steps = Vec::new();
+        for _ in 0..*count {
+            let sc_deploy_step: ScDeployStep = self
+                .state
+                .default_multisig()
+                .init(Config::load_config().quorum(), board.clone())
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .code_metadata(CodeMetadata::all())
+                .contract_code(
+                    "file:../output/multisig.wasm",
+                    &InterpreterContext::default(),
+                )
+                .gas_limit("70,000,000")
+                .expect(TxExpect::ok())
+                .into();
+
+            steps.push(sc_deploy_step);
+        }
+
+        let results = self.interactor.multiple_sc_deploy_results(&steps).await;
+        for result in results {
+            let result = result.new_deployed_address();
+            if result.is_err() {
+                println!("deploy failed: {}", result.err().unwrap());
+                return;
+            }
+
+            let new_address_bech32 = bech32::encode(&result.unwrap());
+            println!("new address: {new_address_bech32}");
+        }
+    }
+
+    fn board(&mut self) -> MultiValueVec<Address> {
+        let bob = test_wallets::bob();
+        let carol = test_wallets::carol();
+        let dan = test_wallets::dan();
+        let eve = test_wallets::eve();
+
+        MultiValueVec::from([
+            self.wallet_address.clone(),
+            bob.address().to_bytes().into(),
+            carol.address().to_bytes().into(),
+            dan.address().to_bytes().into(),
+            eve.address().to_bytes().into(),
+        ])
     }
 
     async fn feed_contract_egld(&mut self) {
@@ -111,14 +218,15 @@ impl State {
             .transfer(
                 TransferStep::new()
                     .from(&self.wallet_address)
-                    .to(&self.multisig)
+                    .to(self.state.multisig())
                     .egld_value("0,050000000000000000"),
             )
             .await;
     }
 
     fn perform_action_step(&mut self, action_id: usize, gas_expr: &str) -> ScCallStep {
-        self.multisig
+        self.state
+            .multisig()
             .perform_action_endpoint(action_id)
             .into_blockchain_call()
             .from(&self.wallet_address)
@@ -127,39 +235,105 @@ impl State {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
+        if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
+            return;
+        }
+        println!("quorum reached for action `{action_id}`");
+
         let sc_call_step = self.perform_action_step(action_id, gas_expr);
-        let _ = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+        let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
+        let result = raw_result.handle_signal_error_event();
+        if result.is_err() {
+            println!(
+                "perform action `{action_id}` failed with: {}",
+                result.err().unwrap()
+            );
+            return;
+        }
+        println!("successfully performed action `{action_id}`");
+    }
+
+    async fn quorum_reached(&mut self, action_id: usize) -> bool {
+        self.interactor
+            .vm_query(self.state.multisig().quorum_reached(action_id))
+            .await
+    }
+
+    async fn signed(&mut self, signer: &Address, action_id: usize) -> bool {
+        self.interactor
+            .vm_query(self.state.multisig().signed(signer, action_id))
+            .await
+    }
+
+    async fn sign(&mut self, action_id: usize) -> bool {
+        println!("signing action `{action_id}`...");
+        let mut steps = Vec::new();
+        for signer in self.board().iter() {
+            if self.signed(signer, action_id).await {
+                println!(
+                    "{} - already signed action `{action_id}`",
+                    bech32::encode(signer)
+                );
+                continue;
+            }
+
+            let sc_call_step: ScCallStep = self
+                .state
+                .multisig()
+                .sign(action_id)
+                .into_blockchain_call()
+                .from(signer)
+                .gas_limit("15,000,000")
+                .into();
+
+            steps.push(sc_call_step);
+        }
+
+        let results = self.interactor.multiple_sc_calls_raw_results(&steps).await;
+        for result in results {
+            let result = result.handle_signal_error_event();
+            if result.is_err() {
+                println!(
+                    "perform sign `{action_id}` failed with: {}",
+                    result.err().unwrap()
+                );
+                return false;
+            }
+        }
+
+        println!("successfully performed sign action `{action_id}`");
+        true
     }
 
     async fn print_quorum(&mut self) {
-        let quorum: SingleValue<usize> = self.interactor.vm_query(self.multisig.quorum()).await;
+        let quorum: SingleValue<usize> = self
+            .interactor
+            .vm_query(self.state.multisig().quorum())
+            .await;
 
         println!("quorum: {}", quorum.into());
     }
 
     async fn get_action_last_index(&mut self) -> usize {
         self.interactor
-            .vm_query(self.multisig.get_action_last_index())
+            .vm_query(self.state.multisig().get_action_last_index())
             .await
     }
 
     async fn print_board(&mut self) {
-        let board_members: MultiValueVec<Address> = self
+        let board: SingleValue<usize> = self
             .interactor
-            .vm_query(self.multisig.get_all_board_members())
+            .vm_query(self.state.multisig().num_board_members())
             .await;
 
-        println!("board members:");
-        for board_member in board_members.iter() {
-            println!("    {}", bech32::encode(board_member));
-        }
+        println!("board: {}", board.into());
     }
 
-    async fn dns_register(&mut self) {
-        let name = self.args.next().expect("name argument missing");
-        let dns_address = dns_address_for_name(&name);
+    async fn dns_register(&mut self, name: &str) {
+        let dns_address = dns_address_for_name(name);
         let dns_register_call: ScCallStep = self
-            .multisig
+            .state
+            .multisig()
             .dns_register(dns_address, name)
             .into_blockchain_call()
             .from(&self.wallet_address)
@@ -167,22 +341,4 @@ impl State {
             .into();
         self.interactor.sc_call(dns_register_call).await;
     }
-}
-
-const SAVED_ADDRESS_FILE_NAME: &str = "multisig_address.txt";
-
-fn load_address_expr() -> String {
-    match std::fs::File::open(SAVED_ADDRESS_FILE_NAME) {
-        Ok(mut file) => {
-            let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
-            contents
-        },
-        Err(_) => DEFAULT_MULTISIG_ADDRESS_EXPR.to_string(),
-    }
-}
-
-fn save_address_expr(address_expr: &str) {
-    let mut file = std::fs::File::create(SAVED_ADDRESS_FILE_NAME).unwrap();
-    file.write_all(address_expr.as_bytes()).unwrap();
 }

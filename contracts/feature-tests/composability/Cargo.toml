@@ -8,6 +8,9 @@ publish = false
 [dev-dependencies.forwarder]
 path = "forwarder"
 
+[dev-dependencies.forwarder-queue]
+path = "forwarder-queue"
+
 [dev-dependencies.forwarder-raw]
 path = "forwarder-raw"
 
@@ -25,6 +28,9 @@ path = "recursive-caller"
 
 [dev-dependencies.vault]
 path = "vault"
+
+[dev-dependencies.interact]
+path = "interact"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.39.8"

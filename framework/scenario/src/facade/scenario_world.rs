@@ -1,8 +1,13 @@
 use crate::{
-    multiversx_chain_vm::{world_mock::ContractContainer, BlockchainMock},
-    multiversx_sc::contract_base::{CallableContractBuilder, ContractAbiProvider},
-    scenario_format::interpret_trait::InterpreterContext,
+    multiversx_chain_vm::world_mock::ContractContainer,
+    multiversx_sc::{
+        api,
+        contract_base::{CallableContractBuilder, ContractAbiProvider},
+    },
+    scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
+    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
 };
+use multiversx_chain_vm::DebugApi;
 use std::path::{Path, PathBuf};
 
 /// A facade for contracts tests.
@@ -13,14 +18,23 @@ use std::path::{Path, PathBuf};
 /// but that one will be refactored and broken up into smaller pieces.
 #[derive(Default, Debug)]
 pub struct ScenarioWorld {
-    pub blockchain_mock: BlockchainMock,
+    pub current_dir: PathBuf,
+    pub vm_runner: ScenarioVMRunner, // TODO: convert to option at some point
+    pub trace: Option<ScenarioTrace>,
 }
 
 impl ScenarioWorld {
     pub fn new() -> Self {
         ScenarioWorld {
-            blockchain_mock: BlockchainMock::new(),
+            current_dir: std::env::current_dir().unwrap(),
+            vm_runner: ScenarioVMRunner::new(),
+            trace: None,
         }
+    }
+
+    pub fn start_trace(&mut self) -> &mut Self {
+        self.trace = Some(ScenarioTrace::default());
+        self
     }
 
     /// Tells the tests where the crate lies relative to the workspace.
@@ -28,16 +42,18 @@ impl ScenarioWorld {
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
         let mut path = find_workspace();
         path.push(relative_path);
-        self.blockchain_mock.current_dir = path;
+        self.current_dir = path;
         self
     }
 
     pub fn current_dir(&self) -> &PathBuf {
-        &self.blockchain_mock.current_dir
+        &self.current_dir
     }
 
     pub fn interpreter_context(&self) -> InterpreterContext {
-        self.blockchain_mock.interpreter_context()
+        InterpreterContext::default()
+            .with_dir(self.current_dir.clone())
+            .with_allowed_missing_files()
     }
 
     pub fn register_contract_container(
@@ -45,8 +61,10 @@ impl ScenarioWorld {
         expression: &str,
         contract_container: ContractContainer,
     ) {
-        self.blockchain_mock
-            .register_contract_container(expression, contract_container);
+        let contract_bytes = interpret_string(expression, &self.interpreter_context());
+        self.vm_runner
+            .blockchain_mock
+            .register_contract_container(contract_bytes, contract_container);
     }
 
     /// Links a contract path in a test to a contract implementation.
@@ -55,8 +73,10 @@ impl ScenarioWorld {
         expression: &str,
         contract_builder: B,
     ) {
-        self.blockchain_mock
-            .register_contract(expression, contract_builder);
+        self.register_contract_container(
+            expression,
+            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None, false),
+        )
     }
 
     #[deprecated(
@@ -83,16 +103,36 @@ impl ScenarioWorld {
         Abi: ContractAbiProvider,
         B: CallableContractBuilder,
     {
-        self.blockchain_mock.register_partial_contract::<Abi, B>(
+        let multi_contract_config = multiversx_sc_meta::multi_contract_config::<Abi>(
+            self.current_dir
+                .join("multicontract.toml")
+                .to_str()
+                .unwrap(),
+        );
+        let sub_contract = multi_contract_config.find_contract(sub_contract_name);
+        let contract_obj = if sub_contract.settings.external_view {
+            contract_builder.new_contract_obj::<api::ExternalViewApi<DebugApi>>()
+        } else {
+            contract_builder.new_contract_obj::<DebugApi>()
+        };
+
+        self.register_contract_container(
             expression,
-            contract_builder,
-            sub_contract_name,
+            ContractContainer::new(
+                contract_obj,
+                Some(sub_contract.all_exported_function_names()),
+                sub_contract.settings.panic_message,
+            ),
         );
     }
 
     /// Exports current scenario to a JSON file, as created.
     pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        self.blockchain_mock.write_scenario_trace(file_path);
+        if let Some(trace) = &mut self.trace {
+            trace.write_scenario_trace(file_path);
+        } else {
+            panic!("scenario trace no initialized")
+        }
     }
 
     #[deprecated(

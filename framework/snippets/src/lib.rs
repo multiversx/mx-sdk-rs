@@ -1,5 +1,8 @@
 mod interactor;
 mod interactor_dns;
+mod interactor_multi_sc_call;
+mod interactor_multi_sc_deploy;
+mod interactor_multi_sc_process;
 mod interactor_result;
 mod interactor_retrieve;
 mod interactor_sc_call;

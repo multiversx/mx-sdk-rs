@@ -3,28 +3,14 @@ use multiversx_sc::types::heap::Address;
 
 use std::{collections::HashMap, fmt::Write};
 
-use crate::address_hex;
+use crate::display_util::address_hex;
 
-use super::AccountData;
-
-const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
-
-use super::BlockchainMock;
+use super::{AccountData, BlockchainMock};
 
 impl BlockchainMock {
     pub fn add_account(&mut self, acct: AccountData) {
         let address = acct.address.clone();
-        self.accounts.insert(address.clone(), acct);
-        self.add_addr_scenario_string(address);
-    }
-
-    pub fn add_addr_scenario_string(&mut self, address: Address) {
-        if self.addr_to_pretty_string_map.contains_key(&address) {
-            return;
-        }
-
-        let addr_pretty = super::address_as_scenario_string(&address);
-        self.addr_to_pretty_string_map.insert(address, addr_pretty);
+        self.accounts.insert(address, acct);
     }
 
     pub fn validate_and_add_account(&mut self, acct: AccountData) {
@@ -33,10 +19,6 @@ impl BlockchainMock {
     }
 
     pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
-        for addr in accounts.keys() {
-            self.add_addr_scenario_string(addr.clone());
-        }
-
         self.accounts.extend(accounts.into_iter());
     }
 
@@ -65,7 +47,7 @@ impl BlockchainMock {
     }
 
     pub fn validate_account(&self, account: &AccountData) {
-        let is_sc = is_smart_contract_address(&account.address);
+        let is_sc = account.address.is_smart_contract_address();
         let has_code = self.check_account_has_code(account);
 
         assert!(
@@ -86,12 +68,4 @@ impl BlockchainMock {
             .unwrap_or(&Vec::<u8>::new())
             .is_empty()
     }
-}
-
-pub fn is_smart_contract_address(address: &Address) -> bool {
-    address
-        .as_bytes()
-        .iter()
-        .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
-        .all(|item| item == &0u8)
 }

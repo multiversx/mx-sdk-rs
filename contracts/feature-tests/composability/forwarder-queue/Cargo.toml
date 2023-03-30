@@ -1,0 +1,28 @@
+[package]
+name = "forwarder-queue"
+version = "0.0.0"
+authors = ["Costin Carabas <costin.carabas@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/forwarder_queue.rs"
+
+[features]
+promises = ["multiversx-sc/promises"]
+
+[dependencies.vault]
+path = "../vault"
+
+[dependencies.multiversx-sc]
+version = "0.39.8"
+path = "../../../../framework/base"
+
+[dependencies.multiversx-sc-wasm-adapter]
+version = "0.39.8"
+path = "../../../../framework/wasm-adapter"
+optional = true
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.39.8"
+path = "../../../../framework/scenario"

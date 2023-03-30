@@ -1,11 +1,8 @@
-use crate::num_bigint::BigUint;
+use super::AccountEsdt;
+use crate::{display_util::key_hex, num_bigint::BigUint};
 use alloc::vec::Vec;
 use multiversx_sc::types::heap::Address;
 use std::{collections::HashMap, fmt, fmt::Write};
-
-use crate::key_hex;
-
-use super::AccountEsdt;
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 

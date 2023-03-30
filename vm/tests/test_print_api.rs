@@ -1,4 +1,4 @@
-use multiversx_chain_vm::{BigUintPrinter, DebugApi};
+use multiversx_chain_vm::{display_util::BigUintPrinter, DebugApi};
 use multiversx_sc::types::BigUint;
 
 #[test]
