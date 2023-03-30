@@ -16,42 +16,42 @@ fn boxed_bytes_zeros_rs() {
     multiversx_sc_scenario::run_rs("scenarios/boxed_bytes_zeros.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore = "mock not implemented"]
 fn crypto_elliptic_curves_legacy_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_elliptic_curves_legacy.scen.json", world());
 }
 
 #[test]
-fn crypto_keccak256_legacy_alloc_rs() {
+fn crypto_keccak_256_legacy_alloc_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_keccak256_legacy_alloc.scen.json", world());
 }
 
-#[ignore]
 #[test]
-fn crypto_ripemd160_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160.scen.json", world());
+#[ignore = "mock not implemented"]
+fn crypto_ripemd_160_legacy_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/crypto_ripemd160_legacy.scen.json", world());
 }
 
 #[test]
-fn crypto_sha256_legacy_alloc_rs() {
+fn crypto_sha_256_legacy_alloc_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_sha256_legacy_alloc.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore = "mock not implemented"]
 fn crypto_verify_bls_legacy_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_bls_legacy.scen.json", world());
 }
 
 #[test]
-fn crypto_verify_ed25519_legacy_rs() {
+fn crypto_verify_ed_25519_legacy_rs() {
     multiversx_sc_scenario::run_rs("scenarios/crypto_verify_ed25519_legacy.scen.json", world());
 }
 
-#[ignore]
 #[test]
-fn crypto_verify_secp256k1_legacy_rs() {
+#[ignore = "mock not implemented"]
+fn crypto_verify_secp_256_k_1_legacy_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/crypto_verify_secp256k1_legacy.scen.json",
         world(),
@@ -84,7 +84,7 @@ fn echo_ser_ex_1_rs() {
 }
 
 #[test]
-fn echo_slice_u8_rs() {
+fn echo_slice_u_8_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_slice_u8.scen.json", world());
 }
 
@@ -104,12 +104,12 @@ fn echo_string_rs() {
 }
 
 #[test]
-fn echo_varargs_u32_alloc_rs() {
+fn echo_varargs_u_32_alloc_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_varargs_u32_alloc.scen.json", world());
 }
 
 #[test]
-fn echo_vec_u8_rs() {
+fn echo_vec_u_8_rs() {
     multiversx_sc_scenario::run_rs("scenarios/echo_vec_u8.scen.json", world());
 }
 
@@ -159,6 +159,6 @@ fn storage_opt_address_rs() {
 }
 
 #[test]
-fn storage_vec_u8_rs() {
+fn storage_vec_u_8_rs() {
     multiversx_sc_scenario::run_rs("scenarios/storage_vec_u8.scen.json", world());
 }

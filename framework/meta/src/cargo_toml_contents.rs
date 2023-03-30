@@ -43,6 +43,17 @@ impl CargoTomlContents {
             .expect("failed to write Cargo.toml contents to file");
     }
 
+    pub fn package_name(&self) -> String {
+        self.toml_value
+            .get("package")
+            .expect("missing package in Cargo.toml")
+            .get("name")
+            .expect("missing package name in Cargo.toml")
+            .as_str()
+            .expect("package name not a string value")
+            .to_string()
+    }
+
     /// Assumes that a package section already exists.
     pub fn change_package_name(&mut self, new_package_name: String) {
         let package = self
@@ -94,4 +105,30 @@ impl CargoTomlContents {
         }
         result
     }
+
+    pub fn change_features_for_parent_crate_dep(&mut self, features: &[String]) {
+        let deps_mut = self.dependencies_mut();
+        for (_, dep) in deps_mut {
+            if is_dep_path_above(dep) {
+                let feature_values = features
+                    .iter()
+                    .map(|feature| Value::String(feature.clone()))
+                    .collect();
+                dep.as_table_mut()
+                    .expect("malformed crate Cargo.toml")
+                    .insert("features".to_string(), Value::Array(feature_values));
+            }
+        }
+    }
+}
+
+/// Checks that path == ".." in a depdency.
+fn is_dep_path_above(dep: &Value) -> bool {
+    if let Some(path) = dep.get("path") {
+        if let Some(s) = path.as_str() {
+            return s == "..";
+        }
+    }
+
+    false
 }

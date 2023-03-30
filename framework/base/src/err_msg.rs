@@ -3,6 +3,7 @@ pub const PANIC_OCCURRED: &str = "panic occurred";
 pub const NON_PAYABLE_FUNC_EGLD: &str = "function does not accept EGLD payment";
 pub const NON_PAYABLE_FUNC_ESDT: &str = "function does not accept ESDT payment";
 pub const BAD_TOKEN_PROVIDED: &str = "bad call value token provided";
+pub const BAD_TOKEN_TICKER_FORMAT: &[u8] = b"bad token ticker format";
 pub const SINGLE_ESDT_EXPECTED: &str = "function expects single ESDT payment";
 pub const TOO_MANY_ESDT_TRANSFERS: &str = "too many ESDT transfers";
 pub const ESDT_INVALID_TOKEN_INDEX: &str = "invalid token index";

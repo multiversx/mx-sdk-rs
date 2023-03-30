@@ -23,6 +23,18 @@ impl OutputContractConfig {
             })
     }
 
+    pub fn main_contract_mut(&mut self) -> &mut OutputContract {
+        self.contracts
+            .iter_mut()
+            .find(|contract| contract.main)
+            .unwrap_or_else(|| {
+                panic!(
+                    "Could not find default contract '{}' among the output contracts.",
+                    self.default_contract_config_name
+                )
+            })
+    }
+
     pub fn secondary_contracts(&self) -> impl Iterator<Item = &OutputContract> {
         self.contracts.iter().filter(move |contract| !contract.main)
     }
@@ -62,6 +74,9 @@ pub struct OutputContractSettings {
     /// Panic messages add a lot of bloat to the final bytecode,
     /// so they should only be used for debugging purposes.
     pub panic_message: bool,
+
+    /// Features that are activated on the contract crate, from wasm.
+    pub features: Vec<String>,
 }
 
 /// Represents a contract created by the framework when building.
@@ -81,6 +96,11 @@ pub struct OutputContract {
     ///
     /// It is either defined in the multicontract.toml, or is inferred from the main crate name.
     pub contract_name: String,
+
+    /// The name of the wasm crate, as it appear in Cargo.toml. It is normally the `contract_name` field, followed by the `-wasm` suffix.
+    ///
+    /// However, the main contract Cargo.toml is given explicitly, so this name might differ.
+    pub wasm_crate_name: String,
 
     /// Collection of flags, specified in the multicontract config.
     pub settings: OutputContractSettings,
@@ -113,15 +133,8 @@ impl OutputContract {
         format!("{}/Cargo.toml", &self.wasm_crate_path())
     }
 
-    /// The name of the wasm crate, as defined in its corresponding `Cargo.toml`.
-    ///
-    /// Note this does not necessarily have to match the name of the crate directory.
-    pub fn wasm_crate_name(&self) -> String {
-        format!("{}-wasm", &self.contract_name)
-    }
-
     pub fn wasm_crate_name_snake_case(&self) -> String {
-        self.wasm_crate_name().replace('-', "_")
+        self.wasm_crate_name.replace('-', "_")
     }
 
     /// This is where Rust will initially compile the WASM binary.
