@@ -35,9 +35,9 @@ impl OutputContractBuilder {
     fn map_from_config(kvp: (&String, &OutputContractSerde)) -> (String, OutputContractBuilder) {
         let (contract_id, cms) = kvp;
         let external_view = cms.external_view.unwrap_or_default();
-        let mut constructors = Vec::new();
+        let mut collected_endpoints = Vec::new();
         if external_view {
-            constructors.push(
+            collected_endpoints.push(
                 multiversx_sc::external_view_contract::external_view_contract_constructor_abi(),
             )
         }
@@ -49,6 +49,7 @@ impl OutputContractBuilder {
                 add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
                 add_labels: cms.add_labels.iter().cloned().collect(),
                 add_endpoints: cms.add_endpoints.iter().cloned().collect(),
+                collected_endpoints,
                 settings: OutputContractSettings {
                     external_view: cms.external_view.unwrap_or_default(),
                     panic_message: cms.panic_message.unwrap_or_default(),

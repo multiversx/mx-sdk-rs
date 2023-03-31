@@ -9,18 +9,11 @@ pub fn validate_output_contract(output_contract: &OutputContract) -> Result<(), 
 }
 
 fn check_single_constructor(output_contract: &OutputContract) -> Result<(), String> {
-    if output_contract.settings.external_view {
-        match output_contract.abi.constructors.len() {
-            0 => Ok(()),
-            _ => Err("The contract is an external view, which already has a built-in constructor. No other constructors can be added.".to_string()),
-        }
-    } else {
-        match output_contract.abi.constructors.len() {
+    match output_contract.abi.constructors.len() {
             0 => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
             1 => Ok(()),
             _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
         }
-    }
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.
