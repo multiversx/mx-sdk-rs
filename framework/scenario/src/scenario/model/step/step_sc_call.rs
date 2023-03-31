@@ -10,19 +10,13 @@ use crate::multiversx_sc::{
 };
 
 #[derive(Debug, Default, Clone)]
-pub struct ScCallStep {
+pub struct ScCallStep{
     pub id: String,
     pub tx_id: Option<String>,
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
     pub response: Option<TxResponse>,
-}
-
-impl AsMut<ScCallStep> for ScCallStep {
-    fn as_mut(&mut self) -> &mut ScCallStep {
-        self
-    }
 }
 
 impl ScCallStep {
@@ -142,6 +136,12 @@ impl ScCallStep {
     {
         self = self.call(contract_call);
         self = self.expect(format_expect(expect_value));
+        self
+    }
+}
+
+impl AsMut<ScCallStep> for ScCallStep {
+    fn as_mut(&mut self) -> &mut ScCallStep {
         self
     }
 }

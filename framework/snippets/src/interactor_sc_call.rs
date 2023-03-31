@@ -3,26 +3,10 @@ use log::info;
 use multiversx_sc_scenario::{
     multiversx_sc::types::ContractCallWithEgld,
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, TransferStep, TxCall, TxResponse},
+    scenario_model::{ScCallStep, TxCall, TxResponse},
     DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;
-
-fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
-    let mut result = String::from_utf8(
-        contract_call
-            .basic
-            .endpoint_name
-            .to_boxed_bytes()
-            .into_vec(),
-    )
-    .unwrap();
-    for argument in contract_call.basic.arg_buffer.raw_arg_iter() {
-        result.push('@');
-        result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
-    }
-    result
-}
 
 impl Interactor {
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
@@ -52,24 +36,6 @@ impl Interactor {
         tx_hash
     }
 
-    pub async fn transfer(&mut self, transfer_step: TransferStep) -> String {
-        self.pre_runners.run_transfer_step(&transfer_step);
-
-        let sender_address = &transfer_step.tx.from.value;
-        let mut transaction = self.tx_call_to_blockchain_tx(&transfer_step.tx.to_tx_call());
-        self.set_nonce_and_sign_tx(sender_address, &mut transaction)
-            .await;
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
-        println!("transfer tx hash: {tx_hash}");
-        info!("transfer tx hash: {}", tx_hash);
-
-        self.retrieve_tx_on_network(tx_hash.clone()).await;
-
-        self.post_runners.run_transfer_step(&transfer_step);
-
-        tx_hash
-    }
-
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
         let contract_call = tx_call.to_contract_call();
         let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
@@ -93,4 +59,20 @@ impl Interactor {
             options: 0,
         }
     }
+}
+
+fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
+    let mut result = String::from_utf8(
+        contract_call
+            .basic
+            .endpoint_name
+            .to_boxed_bytes()
+            .into_vec(),
+    )
+    .unwrap();
+    for argument in contract_call.basic.arg_buffer.raw_arg_iter() {
+        result.push('@');
+        result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
+    }
+    result
 }

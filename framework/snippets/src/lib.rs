@@ -7,6 +7,7 @@ mod interactor_result;
 mod interactor_retrieve;
 mod interactor_sc_call;
 mod interactor_sc_deploy;
+mod interactor_sc_transfer;
 mod interactor_sender;
 mod interactor_tx_spec;
 mod interactor_vm_query;

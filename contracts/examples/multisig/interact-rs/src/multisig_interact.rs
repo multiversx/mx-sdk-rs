@@ -123,25 +123,23 @@ impl MultisigInteract {
 
     async fn deploy(&mut self) {
         let board = self.board();
-        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
-            .interactor
-            .sc_deploy(
-                self.state
-                    .default_multisig()
-                    .init(Config::load_config().quorum(), board)
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
-                    .contract_code(
-                        "file:../output/multisig.wasm",
-                        &InterpreterContext::default(),
-                    )
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok()),
+        let mut typed_sc_deploy = self
+            .state
+            .default_multisig()
+            .init(Config::load_config().quorum(), board)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .code_metadata(CodeMetadata::all())
+            .contract_code(
+                "file:../output/multisig.wasm",
+                &InterpreterContext::default(),
             )
-            .await;
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
 
-        let result = deploy_result.new_deployed_address();
+        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+
+        let result = typed_sc_deploy.response().new_deployed_address();
         if result.is_err() {
             println!("deploy failed: {}", result.err().unwrap());
             return;
@@ -166,7 +164,7 @@ impl MultisigInteract {
         let board = self.board();
         let mut steps = Vec::new();
         for _ in 0..*count {
-            let sc_deploy_step: ScDeployStep = self
+            let typed_sc_deploy = self
                 .state
                 .default_multisig()
                 .init(Config::load_config().quorum(), board.clone())
@@ -178,15 +176,17 @@ impl MultisigInteract {
                     &InterpreterContext::default(),
                 )
                 .gas_limit("70,000,000")
-                .expect(TxExpect::ok())
-                .into();
+                .expect(TxExpect::ok());
 
-            steps.push(sc_deploy_step);
+            steps.push(typed_sc_deploy);
         }
 
-        let results = self.interactor.multiple_sc_deploy_results(&steps).await;
-        for result in results {
-            let result = result.new_deployed_address();
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
+            .await;
+
+        for step in steps.iter() {
+            let result = step.response().new_deployed_address();
             if result.is_err() {
                 println!("deploy failed: {}", result.err().unwrap());
                 return;

@@ -36,7 +36,7 @@ impl TransactionSpec for ScCallStep {
 
 impl TransactionSpec for ScDeployStep {
     fn to_transaction(&self, interactor: &Interactor) -> Transaction {
-        interactor.sc_deploy_to_tx(self)
+        interactor.sc_deploy_to_blockchain_tx(self)
     }
 
     fn to_address(&self) -> &AddressValue {
@@ -47,7 +47,7 @@ impl TransactionSpec for ScDeployStep {
         step_runner.run_sc_deploy_step(self);
     }
 
-    fn set_response(&mut self, _tx_response: TxResponse) {
-        // self.response = Some(tx_response);
+    fn set_response(&mut self, tx_response: TxResponse) {
+        self.response = Some(tx_response);
     }
 }

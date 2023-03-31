@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::scenario_model::ScCallStep;
+use multiversx_sc_scenario::scenario_model::{ScCallStep, ScDeployStep};
 
 use crate::TransactionSpec;
 
@@ -34,6 +34,18 @@ impl<'a> StepBuffer<'a> {
     where
         'b: 'a,
         S: AsMut<ScCallStep>,
+    {
+        let mut buffer = Self::default();
+        for step in steps {
+            buffer.refs.push(step.as_mut());
+        }
+        buffer
+    }
+
+    pub fn from_sc_deploy_vec<'b, S>(steps: &'b mut Vec<S>) -> Self
+    where
+        'b: 'a,
+        S: AsMut<ScDeployStep>,
     {
         let mut buffer = Self::default();
         for step in steps {
