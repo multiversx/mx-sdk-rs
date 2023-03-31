@@ -1,5 +1,5 @@
 use crate::{
-    abi::{EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbis, TypeAbi},
+    abi::{EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbis, TypeAbi, EndpointTypeAbi},
     api::{
         const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApi, StorageWriteApiImpl,
         VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
@@ -39,6 +39,7 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
         only_admin: false,
         labels: &[],
         mutability: EndpointMutabilityAbi::Mutable,
+        endpoint_type: EndpointTypeAbi::Init,
         payable_in_tokens: &[],
         inputs: [InputAbi{
             arg_name: "target_contract_address",
