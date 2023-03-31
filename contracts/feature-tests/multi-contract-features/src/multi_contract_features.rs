@@ -5,13 +5,25 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait MultiContractFeatures {
     #[init]
-    fn init(&self, sample_value: BigUint) {
+    fn default_init(&self, sample_value: BigUint) {
         self.sample_value().set(sample_value);
+    }
+
+    #[init]
+    #[label("alt-impl")]
+    fn alternative_init(&self) -> &'static str {
+        "alternative init"
     }
 
     #[view]
     #[storage_mapper("sample-value")]
     fn sample_value(&self) -> SingleValueMapper<BigUint>;
+
+    #[view(sample_value)]
+    #[label("alt-impl")]
+    fn alternative_sample_value(&self) -> &'static str {
+        "alternative message instead of sample value"
+    }
 
     #[view]
     #[label("mcs-external-view")]

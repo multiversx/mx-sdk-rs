@@ -14,12 +14,23 @@ fn world() -> ScenarioWorld {
         multi_contract_features::ContractBuilder,
         "multi-contract-features-view",
     );
+    blockchain.register_partial_contract::<multi_contract_features::AbiProvider, _>(
+        "file:output/multi-contract-alt-init.wasm",
+        multi_contract_features::ContractBuilder,
+        "multi-contract-alt-init",
+    );
 
     blockchain
 }
 
 #[test]
-#[ignore] // not supported
+#[ignore = "not yet supported"]
+fn mcf_alt_init_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/mcf-alt-init.scen.json", world());
+}
+
+#[test]
+#[ignore = "not supported in principle"]
 fn mcf_example_feature_rs() {
     multiversx_sc_scenario::run_rs("scenarios/mcf-example-feature.scen.json", world());
 }

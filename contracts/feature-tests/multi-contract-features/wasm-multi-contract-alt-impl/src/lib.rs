@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            2
+// Endpoints:                            1
 // Async Callback (empty):               1
-// Total number of exported functions:   4
+// Total number of exported functions:   3
 
 #![no_std]
 #![feature(alloc_error_handler, lang_items)]
@@ -18,9 +18,8 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     multi_contract_features
     (
-        init => default_init
-        sample_value => sample_value
-        example_feature_message => example_feature_message
+        init => alternative_init
+        sample_value => alternative_sample_value
     )
 }
 

@@ -1,0 +1,50 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {}
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:mcf-alt-impl"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "alt impl deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/multi-contract-alt-impl.wasm",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [ "str:alternative init" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "alt impl query",
+            "tx": {
+                "to": "sc:mcf-alt-impl",
+                "function": "sample_value"
+            },
+            "expect": {
+                "out": [ "str:alternative message instead of sample value" ],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}
