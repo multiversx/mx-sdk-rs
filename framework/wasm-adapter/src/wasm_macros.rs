@@ -44,7 +44,7 @@ macro_rules! panic_handler_with_message {
 }
 
 #[macro_export]
-macro_rules! endpoints {
+macro_rules! endpoints_old {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
         #[no_mangle]
         fn init() {
@@ -62,7 +62,33 @@ macro_rules! endpoints {
 }
 
 #[macro_export]
+macro_rules! endpoints {
+    ($mod_name:ident ( $($endpoint_name:ident => $method_name:ident)* ) ) => {
+        $(
+            #[allow(non_snake_case)]
+            #[no_mangle]
+            fn $endpoint_name() {
+                $mod_name::endpoints::$method_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+            }
+        )*
+    };
+}
+
+#[macro_export]
 macro_rules! external_view_endpoints {
+    ($mod_name:ident ( $($endpoint_name:ident => $method_name:ident)* ) ) => {
+        $(
+            #[allow(non_snake_case)]
+            #[no_mangle]
+            fn $endpoint_name() {
+                $mod_name::endpoints::$method_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
+            }
+        )*
+    };
+}
+
+#[macro_export]
+macro_rules! external_view_endpoints_old {
     ($mod_name:ident ( $($endpoint_name:ident)* ) ) => {
         #[no_mangle]
         fn init() {
@@ -80,7 +106,28 @@ macro_rules! external_view_endpoints {
 }
 
 #[macro_export]
-macro_rules! empty_callback {
+macro_rules! external_view_init {
+    () => {
+        #[no_mangle]
+        fn init() {
+            multiversx_sc_wasm_adapter::multiversx_sc::external_view_contract::external_view_contract_constructor::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! async_callback {
+    ($mod_name:ident) => {
+        #[allow(non_snake_case)]
+        #[no_mangle]
+        fn callBack() {
+            $mod_name::endpoints::callBack::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! async_callback_empty {
     () => {
         #[allow(non_snake_case)]
         #[no_mangle]

@@ -1,6 +1,7 @@
 use super::util::*;
 use crate::model::{
-    AutoImpl, ContractTrait, EndpointMutabilityMetadata, EndpointTypeMetadata, Method, MethodImpl, PublicRole,
+    AutoImpl, ContractTrait, EndpointMutabilityMetadata, EndpointTypeMetadata, Method, MethodImpl,
+    PublicRole,
 };
 
 fn generate_endpoint_snippet(
