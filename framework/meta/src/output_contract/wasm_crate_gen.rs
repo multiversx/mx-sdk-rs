@@ -4,7 +4,7 @@ use std::{
     path::PathBuf,
 };
 
-use multiversx_sc::abi::EndpointAbi;
+use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
 
 use super::OutputContract;
 
@@ -126,6 +126,9 @@ fn write_endpoints_macro<'a, I>(
     writeln!(wasm_lib_file, "    {contract_module_name}").unwrap();
     writeln!(wasm_lib_file, "    (").unwrap();
     for endpoint in endpoint_iter {
+        if endpoint.rust_method_name == EXTERNAL_VIEW_CONSTRUCTOR_FLAG {
+            continue;
+        }
         writeln!(
             wasm_lib_file,
             "        {} => {}",
