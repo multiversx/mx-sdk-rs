@@ -15,9 +15,9 @@ fn world() -> ScenarioWorld {
         "multi-contract-features-view",
     );
     blockchain.register_partial_contract::<multi_contract_features::AbiProvider, _>(
-        "file:output/multi-contract-alt-init.wasm",
+        "file:output/multi-contract-alt-impl.wasm",
         multi_contract_features::ContractBuilder,
-        "multi-contract-alt-init",
+        "multi-contract-alt-impl",
     );
 
     blockchain
