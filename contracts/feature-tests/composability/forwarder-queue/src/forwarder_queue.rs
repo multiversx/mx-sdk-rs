@@ -118,7 +118,7 @@ pub trait ForwarderQueue {
                 },
                 QueuedCallType::Promise => {
                     call_promise(contract_call);
-                }
+                },
             }
         }
     }
@@ -159,7 +159,6 @@ pub trait ForwarderQueue {
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 }
-
 
 #[cfg(feature = "promises")]
 fn call_promise<A: VMApi>(contract_call: ContractCallWithEgld<A, ()>) {

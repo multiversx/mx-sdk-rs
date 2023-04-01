@@ -28,7 +28,11 @@ impl ComposabilityInteract {
         }
     }
 
-    pub async fn full_scenario(&mut self, endpoint_name: &str, _endpoint_args: &Option<Vec<String>>) {
+    pub async fn full_scenario(
+        &mut self,
+        endpoint_name: &str,
+        _endpoint_args: &Option<Vec<String>>,
+    ) {
         let config = Config::load_config();
         let payment_token = config.token_id();
         let call_type = config.call_type();

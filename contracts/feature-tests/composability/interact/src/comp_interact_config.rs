@@ -1,5 +1,8 @@
 use forwarder_queue::QueuedCallType;
-use multiversx_sc_snippets::{multiversx_sc::types::{EgldOrEsdtTokenIdentifier, TokenIdentifier}, multiversx_sc_scenario::DebugApi};
+use multiversx_sc_snippets::{
+    multiversx_sc::types::{EgldOrEsdtTokenIdentifier, TokenIdentifier},
+    multiversx_sc_scenario::DebugApi,
+};
 use serde::Deserialize;
 use std::io::Read;
 
