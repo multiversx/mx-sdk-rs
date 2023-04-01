@@ -18,15 +18,16 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     crowdfunding_esdt
     (
-        fund
-        status
-        getCurrentFunds
-        claim
-        getTarget
-        getDeadline
-        getDeposit
-        getCrowdfundingTokenIdentifier
+        init => init
+        fund => fund
+        status => status
+        getCurrentFunds => get_current_funds
+        claim => claim
+        getTarget => target
+        getDeadline => deadline
+        getDeposit => deposit
+        getCrowdfundingTokenIdentifier => cf_token_identifier
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

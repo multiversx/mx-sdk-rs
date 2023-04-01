@@ -18,8 +18,10 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     child
     (
-        issueWrappedEgld
-        getWrappedEgldTokenIdentifier
-        callBack
+        init => init
+        issueWrappedEgld => issue_wrapped_egld
+        getWrappedEgldTokenIdentifier => wrapped_egld_token_identifier
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { child }
