@@ -138,23 +138,21 @@ impl ComposabilityInteract {
         let fwd_addr_bech32 = bech32::encode(&fwd_addr);
         let fwd_addr_expr = format!("bech32:{fwd_addr_bech32}");
 
-        let _ = self
-            .interactor
-            .sc_call_and_forget(
-                self.state
-                    .forwarder_queue_from_addr(&fwd_addr_expr)
-                    .add_queued_call(
-                        call_type,
-                        to,
-                        endpoint_name,
-                        MultiValueEncoded::<DebugApi, _>::new(),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok()),
+        let mut typed_sc_call = self
+            .state
+            .forwarder_queue_from_addr(&fwd_addr_expr)
+            .add_queued_call(
+                call_type,
+                to,
+                endpoint_name,
+                MultiValueEncoded::<DebugApi, _>::new(),
             )
-            .await;
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
+
+        self.interactor.sc_call(&mut typed_sc_call).await;
     }
 
     pub async fn add_queued_calls_to_children(
@@ -246,17 +244,12 @@ impl ComposabilityInteract {
             let token_id = format!("str:{token_id_hex}");
 
             print!("token_id = {token_id}");
-            self.interactor
-                .sc_call_and_forget(sc_call_root_step.esdt_transfer(
-                    token_id,
-                    payment_nonce,
-                    payment_amount,
-                ))
-                .await;
+            let mut typed_sc_call =
+                sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount);
+            self.interactor.sc_call(&mut typed_sc_call).await;
         } else {
-            self.interactor
-                .sc_call_and_forget(sc_call_root_step.egld_value(payment_amount))
-                .await;
+            let mut typed_sc_call = sc_call_root_step.egld_value(payment_amount);
+            self.interactor.sc_call(&mut typed_sc_call).await;
         }
     }
 }
