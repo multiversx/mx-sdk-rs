@@ -34,82 +34,84 @@ impl ComposabilityInteract {
     }
 
     pub async fn deploy_vault(&mut self, vault_rc: Rc<RefCell<VaultTarget>>) {
-        let deploy_result: multiversx_sc_snippets::InteractorResult<OptionalValue<BoxedBytes>> =
-            self.interactor
-                .sc_deploy(
-                    self.state
-                        .default_vault_address()
-                        .init(OptionalValue::<BoxedBytes>::None)
-                        .into_blockchain_call()
-                        .from(&self.wallet_address)
-                        .code_metadata(CodeMetadata::all())
-                        .contract_code(
-                            "file:../vault/output/vault.wasm",
-                            &InterpreterContext::default(),
-                        )
-                        .gas_limit("70,000,000")
-                        .expect(TxExpect::ok()),
-                )
-                .await;
+        let mut typed_sc_deploy = self
+            .state
+            .default_vault_address()
+            .init(OptionalValue::<BoxedBytes>::None)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .code_metadata(CodeMetadata::all())
+            .contract_code(
+                "file:../vault/output/vault.wasm",
+                &InterpreterContext::default(),
+            )
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
 
-        let result = deploy_result.new_deployed_address();
-        let new_address = result.expect("deploy failed");
-        let new_address_bech32 = bech32::encode(&new_address);
+        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+
+        let result = typed_sc_deploy.response().new_deployed_address();
+        if result.is_err() {
+            println!("deploy failed: {}", result.err().unwrap());
+            return;
+        }
+
+        let new_address_bech32 = bech32::encode(&result.unwrap());
 
         let mut vault = vault_rc.borrow_mut();
         println!("{} address: {new_address_bech32}", &vault.name);
-        vault.address = Some(new_address);
+        vault.address = Some(result.unwrap());
     }
 
     pub async fn deploy_forwarder_queue(&mut self, fwd_rc: Rc<RefCell<ForwarderQueueTarget>>) {
-        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
-            .interactor
-            .sc_deploy(
-                self.state
-                    .default_forwarder_queue_address()
-                    .init()
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
-                    .contract_code(
-                        "file:../forwarder-queue/output/forwarder-queue.wasm",
-                        &InterpreterContext::default(),
-                    )
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok()),
+        let mut typed_sc_deploy = self
+            .state
+            .default_forwarder_queue_address()
+            .init()
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .code_metadata(CodeMetadata::all())
+            .contract_code(
+                "file:../forwarder-queue/output/forwarder-queue.wasm",
+                &InterpreterContext::default(),
             )
-            .await;
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
 
-        let result = deploy_result.new_deployed_address();
-        let new_address = result.expect("deploy failed");
-        let new_address_bech32 = bech32::encode(&new_address);
+        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+
+        let result = typed_sc_deploy.response().new_deployed_address();
+        if result.is_err() {
+            println!("deploy failed: {}", result.err().unwrap());
+            return;
+        }
+
+        let new_address_bech32 = bech32::encode(&result.unwrap());
 
         let mut fwd = fwd_rc.borrow_mut();
         println!("{} address: {new_address_bech32}", &fwd.name);
-        fwd.address = Some(new_address);
+        fwd.address = Some(result.unwrap());
     }
 
     #[allow(dead_code)]
     pub async fn deploy_promises(&mut self) {
-        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
-            .interactor
-            .sc_deploy(
-                self.state
-                    .default_promises_address()
-                    .init()
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
-                    .contract_code(
-                        "file:../../promises/output/promises.wasm",
-                        &InterpreterContext::default(),
-                    )
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok()),
+        let mut typed_sc_deploy = self
+            .state
+            .default_promises_address()
+            .init()
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .code_metadata(CodeMetadata::all())
+            .contract_code(
+                "file:../../promises/output/promises.wasm",
+                &InterpreterContext::default(),
             )
-            .await;
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
 
-        let result = deploy_result.new_deployed_address();
+        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+
+        let result = typed_sc_deploy.response().new_deployed_address();
         if result.is_err() {
             println!("deploy failed: {}", result.err().unwrap());
             return;
