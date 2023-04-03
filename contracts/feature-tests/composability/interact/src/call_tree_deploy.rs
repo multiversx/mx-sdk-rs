@@ -56,7 +56,7 @@ impl ComposabilityInteract {
             return;
         }
 
-        let new_address_bech32 = bech32::encode(&result.as_ref().unwrap());
+        let new_address_bech32 = bech32::encode(result.as_ref().unwrap());
 
         let mut vault = vault_rc.borrow_mut();
         println!("{} address: {new_address_bech32}", &vault.name);
@@ -86,7 +86,7 @@ impl ComposabilityInteract {
             return;
         }
 
-        let new_address_bech32 = bech32::encode(&result.as_ref().unwrap());
+        let new_address_bech32 = bech32::encode(result.as_ref().unwrap());
 
         let mut fwd = fwd_rc.borrow_mut();
         println!("{} address: {new_address_bech32}", &fwd.name);
