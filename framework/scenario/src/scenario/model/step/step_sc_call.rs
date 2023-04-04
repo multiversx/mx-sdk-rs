@@ -10,7 +10,7 @@ use crate::multiversx_sc::{
 };
 
 #[derive(Debug, Default, Clone)]
-pub struct ScCallStep{
+pub struct ScCallStep {
     pub id: String,
     pub tx_id: Option<String>,
     pub comment: Option<String>,
