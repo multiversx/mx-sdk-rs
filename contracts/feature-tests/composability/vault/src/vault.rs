@@ -104,6 +104,28 @@ pub trait Vault {
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
+    #[payable("*")]
+    #[endpoint]
+    fn retrieve_funds_promises(&self) {
+        let payment = self.call_value().egld_or_single_esdt();
+        let caller = self.blockchain().get_caller();
+        let endpoint_name = ManagedBuffer::from(b"");
+        let half_payment = EgldOrEsdtTokenPayment::new(
+            payment.token_identifier,
+            payment.token_nonce,
+            payment.amount / 2u32,
+        );
+
+        self.num_called_retrieve_funds_promises().update(|c| *c += 1);
+
+        self.send()
+            .contract_call::<()>(caller, endpoint_name)
+            .with_egld_or_single_esdt_transfer(half_payment)
+            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .async_call_promise()
+            .register_promise();
+    }
+
     #[endpoint]
     fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
@@ -207,4 +229,9 @@ pub trait Vault {
     #[view]
     #[storage_mapper("call_counts")]
     fn call_counts(&self, endpoint: ManagedBuffer) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("num_called_retrieve_funds_promises")]
+    fn num_called_retrieve_funds_promises(&self) -> SingleValueMapper<usize>;
+
 }

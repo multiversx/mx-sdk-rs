@@ -74,6 +74,37 @@ pub trait ForwarderQueue {
 
     #[endpoint]
     #[payable("*")]
+    fn add_queued_call_transfer_esdt(
+        &self,
+        to: ManagedAddress,
+        gas_limit: u64,
+        endpoint_name: ManagedBuffer,
+        token: TokenIdentifier,
+        amount: BigUint,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        let mut payment = ManagedVec::new();
+        payment.push(EsdtTokenPayment::new(token, 0, amount));
+
+        let payments = EgldOrMultiEsdtPayment::MultiEsdt(payment);
+
+        // let contract_call =
+        //     ContractCallWithMultiEsdt::<Self::Api, ()>::new(to, endpoint_name, payments.clone());
+
+        // contract_call.with_gas_limit(gas_limit).transfer_execute();
+        let call_type = QueuedCallType::Promise;
+        self.queued_calls().push_back(QueuedCall {
+            call_type,
+            to,
+            gas_limit,
+            endpoint_name,
+            args: args.to_arg_buffer(),
+            payments,
+        });
+    }
+
+    #[endpoint]
+    #[payable("*")]
     fn add_queued_call_promise(
         &self,
         to: ManagedAddress,

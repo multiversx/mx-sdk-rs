@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           13
+// Endpoints:                           15
 // Async Callback (empty):               1
-// Total number of exported functions:  15
+// Total number of exported functions:  17
 
 #![no_std]
 #![feature(alloc_error_handler, lang_items)]
@@ -26,11 +26,13 @@ multiversx_sc_wasm_adapter::endpoints! {
         accept_funds_single_esdt_transfer
         reject_funds
         retrieve_funds_with_transfer_exec
+        retrieve_funds_promises
         retrieve_funds
         retrieve_multi_funds_async
         burn_and_create_retrive_async
         get_owner_address
         call_counts
+        num_called_retrieve_funds_promises
     )
 }
 
