@@ -18,8 +18,9 @@ multiversx_sc_wasm_adapter::panic_handler_with_message!();
 multiversx_sc_wasm_adapter::endpoints! {
     panic_message_features
     (
-        panicWithMessage
+        init => init
+        panicWithMessage => panic_with_message
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

@@ -18,10 +18,11 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     forwarder_queue
     (
-        queued_calls
-        add_queued_call
-        forward_queued_calls
+        init => init
+        queued_calls => queued_calls
+        add_queued_call => add_queued_call
+        forward_queued_calls => forward_queued_calls
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

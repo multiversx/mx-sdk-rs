@@ -18,10 +18,12 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     fractional_nfts
     (
-        claimRoyaltiesFromMarketplace
-        fractionalizeNFT
-        unFractionalizeNFT
-        getFractionalToken
-        callBack
+        init => init
+        claimRoyaltiesFromMarketplace => claim_royalties_from_marketplace
+        fractionalizeNFT => fractionalize_nft
+        unFractionalizeNFT => unfractionalize_nft
+        getFractionalToken => fractional_token
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { fractional_nfts }

@@ -18,13 +18,15 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     lottery_erc20
     (
-        start
-        createLotteryPool
-        buy_ticket
-        determine_winner
-        status
-        lotteryInfo
-        erc20ContractManagedAddress
-        callBack
+        init => init
+        start => start
+        createLotteryPool => create_lottery_pool
+        buy_ticket => buy_ticket
+        determine_winner => determine_winner
+        status => status
+        lotteryInfo => get_lottery_info
+        erc20ContractManagedAddress => get_erc20_contract_address
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { lottery_erc20 }

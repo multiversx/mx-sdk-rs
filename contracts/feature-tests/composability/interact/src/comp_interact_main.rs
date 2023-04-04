@@ -28,10 +28,7 @@ async fn main() {
     match &cli.command {
         Some(comp_interact_cli::InteractCliCommand::Full(args)) => {
             composability_interact
-                .full_scenario(
-                    &args.endpoint_name,
-                    &args.endpoint_args,
-                )
+                .full_scenario(&args.endpoint_name, &args.endpoint_args)
                 .await;
         },
         None => {},

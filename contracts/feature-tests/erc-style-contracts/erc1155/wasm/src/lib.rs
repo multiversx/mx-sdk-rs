@@ -18,19 +18,21 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     erc1155
     (
-        safeTransferFrom
-        safeBatchTransferFrom
-        setApprovalForAll
-        createToken
-        mint
-        burn
-        balanceOf
-        balanceOfBatch
-        getTokenOwner
-        getTokenTypeCreator
-        getTokenTypeUri
-        isFungible
-        isApprovedForAll
-        callBack
+        init => init
+        safeTransferFrom => safe_transfer_from
+        safeBatchTransferFrom => safe_batch_transfer_from
+        setApprovalForAll => set_approved_for_all
+        createToken => create_token
+        mint => mint
+        burn => burn
+        balanceOf => balance_of
+        balanceOfBatch => balance_of_batch
+        getTokenOwner => token_owner
+        getTokenTypeCreator => token_type_creator
+        getTokenTypeUri => token_type_uri
+        isFungible => is_fungible
+        isApprovedForAll => is_approved
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { erc1155 }

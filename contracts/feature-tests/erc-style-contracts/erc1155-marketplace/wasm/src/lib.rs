@@ -18,19 +18,20 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     erc1155_marketplace
     (
-        onERC1155Received
-        onERC1155BatchReceived
-        claim
-        setCutPercentage
-        setTokenOwnershipContractAddress
-        bid
-        endAuction
-        isUpForAuction
-        getAuctionStatus
-        getCurrentWinningBid
-        getCurrentWinner
-        getPercentageCut
+        init => init
+        onERC1155Received => on_erc1155_received
+        onERC1155BatchReceived => on_erc1155_batch_received
+        claim => claim
+        setCutPercentage => set_percentage_cut_endpoint
+        setTokenOwnershipContractAddress => set_token_ownership_contract_address_endpoint
+        bid => bid
+        endAuction => end_auction
+        isUpForAuction => is_up_for_auction
+        getAuctionStatus => get_auction_status
+        getCurrentWinningBid => get_current_winning_bid
+        getCurrentWinner => get_current_winner
+        getPercentageCut => percentage_cut
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

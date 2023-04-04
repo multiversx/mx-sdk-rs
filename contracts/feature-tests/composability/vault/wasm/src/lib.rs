@@ -18,20 +18,21 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     vault
     (
-        echo_arguments
-        echo_arguments_without_storage
-        echo_caller
-        accept_funds
-        accept_funds_echo_payment
-        accept_funds_single_esdt_transfer
-        reject_funds
-        retrieve_funds_with_transfer_exec
-        retrieve_funds
-        retrieve_multi_funds_async
-        burn_and_create_retrive_async
-        get_owner_address
-        call_counts
+        init => init
+        echo_arguments => echo_arguments
+        echo_arguments_without_storage => echo_arguments_without_storage
+        echo_caller => echo_caller
+        accept_funds => accept_funds
+        accept_funds_echo_payment => accept_funds_echo_payment
+        accept_funds_single_esdt_transfer => accept_funds_single_esdt_transfer
+        reject_funds => reject_funds
+        retrieve_funds_with_transfer_exec => retrieve_funds_with_transfer_exec
+        retrieve_funds => retrieve_funds
+        retrieve_multi_funds_async => retrieve_multi_funds_async
+        burn_and_create_retrive_async => burn_and_create_retrive_async
+        get_owner_address => get_owner_address
+        call_counts => call_counts
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

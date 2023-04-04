@@ -18,15 +18,16 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     nft_storage_prepay
     (
-        setCostPerByte
-        reserveFunds
-        claim
-        depositPaymentForStorage
-        withdraw
-        getCostForSize
-        getDepositAmount
-        getCostPerByte
+        init => init
+        setCostPerByte => set_cost_per_byte
+        reserveFunds => reserve_funds
+        claim => claim
+        depositPaymentForStorage => deposit_payment_for_storage
+        withdraw => withdraw
+        getCostForSize => get_cost_for_size
+        getDepositAmount => get_deposit_amount
+        getCostPerByte => cost_per_byte
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

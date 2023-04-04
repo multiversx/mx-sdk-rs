@@ -18,10 +18,11 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     managed_map_features
     (
-        mm_get
-        mm_contains
-        mm_remove_get
+        init => init
+        mm_get => mm_get
+        mm_contains => mm_contains
+        mm_remove_get => mm_remove_get
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}
