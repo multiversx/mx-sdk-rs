@@ -50,23 +50,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c34f04666d835ff5d62e058c3995147c06f42fe86ff053337632bca83e42702d"
 
 [[package]]
-<<<<<<< HEAD:contracts/feature-tests/composability/forwarder-queue/wasm-forwarder-queue-promises/Cargo.lock
-name = "forwarder-queue"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "vault",
-]
-
-[[package]]
-name = "forwarder-queue-promises-wasm"
-version = "0.0.0"
-dependencies = [
- "forwarder-queue",
- "multiversx-sc-wasm-adapter",
-]
-
-[[package]]
 name = "hashbrown"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -89,46 +72,9 @@ checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
 
 [[package]]
 name = "libc"
-version = "0.2.140"
+version = "0.2.141"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99227334921fae1a979cf0bfdfcc6b3e5ce376ef57e16fb6fb3ea2ed6095f80c"
-
-[[package]]
-name = "memory_units"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
-
-[[package]]
-name = "multiversx-sc"
-version = "0.39.6"
-dependencies = [
-=======
-name = "hashbrown"
-version = "0.13.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "43a3c133739dddd0d2990f9a4bdf8eb4b21ef50e4851ca85ab661199821d510e"
-dependencies = [
- "ahash",
-]
-
-[[package]]
-name = "hex"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
-
-[[package]]
-name = "hex-literal"
-version = "0.3.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
-
-[[package]]
-name = "libc"
-version = "0.2.140"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99227334921fae1a979cf0bfdfcc6b3e5ce376ef57e16fb6fb3ea2ed6095f80c"
+checksum = "3304a64d199bb964be99741b7a14d26972741915b3649639149b2479bb46f4b5"
 
 [[package]]
 name = "memory_units"
@@ -155,14 +101,12 @@ dependencies = [
 name = "multiversx-sc"
 version = "0.39.8"
 dependencies = [
->>>>>>> rc/v0.40:contracts/feature-tests/multi-contract-features/wasm-multi-contract-alt-impl/Cargo.lock
  "bitflags",
  "hashbrown",
  "hex-literal",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
-<<<<<<< HEAD:contracts/feature-tests/composability/forwarder-queue/wasm-forwarder-queue-promises/Cargo.lock
 ]
 
 [[package]]
@@ -174,19 +118,6 @@ dependencies = [
 ]
 
 [[package]]
-=======
-]
-
-[[package]]
-name = "multiversx-sc-codec"
-version = "0.17.1"
-dependencies = [
- "arrayvec",
- "multiversx-sc-codec-derive",
-]
-
-[[package]]
->>>>>>> rc/v0.40:contracts/feature-tests/multi-contract-features/wasm-multi-contract-alt-impl/Cargo.lock
 name = "multiversx-sc-codec-derive"
 version = "0.17.1"
 dependencies = [
@@ -198,11 +129,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-<<<<<<< HEAD:contracts/feature-tests/composability/forwarder-queue/wasm-forwarder-queue-promises/Cargo.lock
-version = "0.39.6"
-=======
 version = "0.39.8"
->>>>>>> rc/v0.40:contracts/feature-tests/multi-contract-features/wasm-multi-contract-alt-impl/Cargo.lock
 dependencies = [
  "hex",
  "proc-macro2",
@@ -213,11 +140,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-<<<<<<< HEAD:contracts/feature-tests/composability/forwarder-queue/wasm-forwarder-queue-promises/Cargo.lock
-version = "0.39.6"
-=======
 version = "0.39.8"
->>>>>>> rc/v0.40:contracts/feature-tests/multi-contract-features/wasm-multi-contract-alt-impl/Cargo.lock
 dependencies = [
  "multiversx-sc",
  "wee_alloc",
@@ -249,15 +172,9 @@ checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
 
 [[package]]
 name = "proc-macro2"
-<<<<<<< HEAD:contracts/feature-tests/composability/forwarder-queue/wasm-forwarder-queue-promises/Cargo.lock
-version = "1.0.52"
+version = "1.0.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d0e1ae9e836cc3beddd63db0df682593d7e2d3d891ae8c9083d2113e1744224"
-=======
-version = "1.0.54"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e472a104799c74b514a57226160104aa483546de37e839ec50e3c2e41dd87534"
->>>>>>> rc/v0.40:contracts/feature-tests/multi-contract-features/wasm-multi-contract-alt-impl/Cargo.lock
+checksum = "2b63bdb0cd06f1f4dedf69b254734f9b45af66e4a031e42a7480257d9898b435"
 dependencies = [
  "unicode-ident",
 ]
@@ -305,16 +222,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5464a87b239f13a63a501f2701565754bae92d243d4bb7eb12f6d57d2269bf4"
 
 [[package]]
-<<<<<<< HEAD:contracts/feature-tests/composability/forwarder-queue/wasm-forwarder-queue-promises/Cargo.lock
-name = "vault"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
-]
-
-[[package]]
-=======
->>>>>>> rc/v0.40:contracts/feature-tests/multi-contract-features/wasm-multi-contract-alt-impl/Cargo.lock
 name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
