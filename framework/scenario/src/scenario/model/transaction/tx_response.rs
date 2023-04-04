@@ -1,16 +1,16 @@
-use std::{error::Error, marker::PhantomData};
+use std::error::Error;
 
-use log::info;
-use multiversx_sc_scenario::{
+use crate::{
     bech32,
-    multiversx_sc::{
-        codec::{PanicErrorHandler, TopDecodeMulti},
-        types::Address,
-    },
+    multiversx_sc::types::Address,
+    scenario_model::{BytesValue, U64Value},
 };
+use log::info;
 use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
+
+use super::Log;
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
@@ -28,46 +28,40 @@ impl std::fmt::Display for TxError {
 
 impl Error for TxError {}
 
-pub struct InteractorResult<T: TopDecodeMulti> {
-    pub scrs: Vec<ApiSmartContractResult>,
-    pub logs: Option<ApiLogs>,
-    _phantom: PhantomData<T>,
+#[derive(Debug, Default, Clone)]
+pub struct TxResponse {
+    pub out: Vec<BytesValue>,
+    pub status: U64Value,
+    pub message: BytesValue,
+    pub logs: Vec<Log>,
+    pub gas: U64Value,
+    pub refund: U64Value,
+    pub api_scrs: Vec<ApiSmartContractResult>,
+    pub api_logs: Option<ApiLogs>,
 }
 
-impl<T: TopDecodeMulti> InteractorResult<T> {
+impl TxResponse {
     pub fn new(tx: TransactionOnNetwork) -> Self {
         Self {
-            logs: tx.logs,
-            scrs: tx.smart_contract_results.unwrap_or_default(),
-            _phantom: PhantomData,
+            api_scrs: tx.smart_contract_results.unwrap_or_default(),
+            api_logs: tx.logs,
+            ..Default::default()
         }
     }
 
-    pub fn value(&self) -> Result<T, TxError> {
+    pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
         self.handle_signal_error_event()?;
 
-        let first_scr = self.scrs.get(0);
+        let first_scr = self.api_scrs.get(0);
         if first_scr.is_none() {
             return Err(TxError {
                 message: "no smart contract results obtained".to_string(),
             });
         }
 
-        let mut raw_result = decode_scr_data_or_panic(first_scr.unwrap().data.as_str());
-        Ok(T::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap())
+        Ok(decode_scr_data_or_panic(first_scr.unwrap().data.as_str()))
     }
 
-    pub fn find_log(&self, log_identifier: &str) -> Option<&Events> {
-        if let Some(logs) = &self.logs {
-            logs.events
-                .iter()
-                .find(|event| event.identifier == log_identifier)
-        } else {
-            None
-        }
-    }
-
-    // Returns the address of the newly deployed smart contract.
     pub fn new_deployed_address(&self) -> Result<Address, TxError> {
         self.handle_signal_error_event()?;
         self.handle_sc_deploy_event()
@@ -77,7 +71,10 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
     pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxError> {
         self.handle_signal_error_event()?;
 
-        let second_scr = self.scrs.iter().find(|scr| scr.data.starts_with("@00@"));
+        let second_scr = self
+            .api_scrs
+            .iter()
+            .find(|scr| scr.data.starts_with("@00@"));
         if second_scr.is_none() {
             return Err(TxError {
                 message: "no token identifier SCR found".to_string(),
@@ -93,6 +90,17 @@ impl<T: TopDecodeMulti> InteractorResult<T> {
         }
 
         Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
+    }
+
+    // Finds api logs matching the given log identifier.
+    pub fn find_log(&self, log_identifier: &str) -> Option<&Events> {
+        if let Some(logs) = &self.api_logs {
+            logs.events
+                .iter()
+                .find(|event| event.identifier == log_identifier)
+        } else {
+            None
+        }
     }
 
     // Handles a signalError event

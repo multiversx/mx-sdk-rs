@@ -2,6 +2,7 @@ use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterCont
 
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
+    scenario_model::TxResponse,
     DebugApi,
 };
 
@@ -16,11 +17,16 @@ pub struct ScDeployStep {
     pub comment: Option<String>,
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,
+    pub response: Option<TxResponse>,
 }
 
 impl ScDeployStep {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn response(&self) -> &TxResponse {
+        self.response.as_ref().unwrap()
     }
 
     pub fn from<V>(mut self, expr: V) -> Self
@@ -78,6 +84,12 @@ impl ScDeployStep {
         for arg in mandos_args {
             self = self.argument(arg.as_str());
         }
+        self
+    }
+}
+
+impl AsMut<ScDeployStep> for ScDeployStep {
+    fn as_mut(&mut self) -> &mut ScDeployStep {
         self
     }
 }

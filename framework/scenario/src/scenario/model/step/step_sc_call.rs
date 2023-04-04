@@ -1,5 +1,6 @@
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
+    scenario_model::TxResponse,
     DebugApi,
 };
 
@@ -15,11 +16,16 @@ pub struct ScCallStep {
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
+    pub response: Option<TxResponse>,
 }
 
 impl ScCallStep {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn response(&self) -> &TxResponse {
+        self.response.as_ref().unwrap()
     }
 
     pub fn from<A>(mut self, address: A) -> Self
@@ -130,6 +136,12 @@ impl ScCallStep {
     {
         self = self.call(contract_call);
         self = self.expect(format_expect(expect_value));
+        self
+    }
+}
+
+impl AsMut<ScCallStep> for ScCallStep {
+    fn as_mut(&mut self) -> &mut ScCallStep {
         self
     }
 }

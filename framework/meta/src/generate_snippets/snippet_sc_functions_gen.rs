@@ -52,23 +52,30 @@ fn write_deploy_method_impl(
     let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-        r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
-            .interactor
-            .sc_deploy(
-                self.contract
+        r#"    let mut typed_sc_deploy: TypedScDeploy<{}> =  self.contract
                     .{}({})
                     .into_blockchain_call()
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
                     .contract_code({}, &InterpreterContext::default())
-                    .gas_limit(DEFAULT_GAS_LIMIT),
-            )
-            .await;
+                    .gas_limit(DEFAULT_GAS_LIMIT);
 
-        let new_address = result.new_deployed_address();
-        let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {{}}", new_address_bech32);
-        let result_value = result.value();
+                self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+
+                let result = typed_sc_deploy.response().new_deployed_address();
+                if result.is_err() {{
+                    println!("deploy failed: {{}}", result.err().unwrap());
+                    return;
+                }}
+
+                let new_address_bech32 = bech32::encode(&result.unwrap());
+                println!("new address: {{}}", new_address_bech32);
+
+                let result = typed_sc_deploy.result();
+                if result.is_err() {{
+                    println!("Result error: {{}}", result.err().unwrap());
+                    return;
+                }}
 "#,
         output_type,
         init_abi.rust_method_name,
@@ -175,18 +182,19 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
-            .interactor
-            .sc_call_get_result(
-                self.contract
+        r#"     let mut typed_sc_call: TypedScCall<{}> = self.contract
                     .{}({})
                     .into_blockchain_call()
                     .from(&self.wallet_address){}
-                    .gas_limit(DEFAULT_GAS_LIMIT)
-                    .into(),
-            )
-            .await;
-        let result_value = result.value();
+                    .gas_limit(DEFAULT_GAS_LIMIT);
+
+                self.interactor.sc_call(&mut typed_sc_call).await;
+
+                let result = typed_sc_call.result();
+                if result.is_err() {{
+                    println!("Result error: {{}}", result.err().unwrap());
+                    return;
+                }}
 "#,
         output_type,
         endpoint_abi.rust_method_name,
@@ -213,7 +221,11 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
 }
 
 fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
-    writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
+    writeln!(
+        file,
+        r#"        println!("Result: {{:?}}", result.unwrap());"#
+    )
+    .unwrap();
 }
 
 fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {

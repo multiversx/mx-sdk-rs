@@ -2,6 +2,7 @@ use crate::{
     multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     scenario::model::{ScCallStep, TxESDT, TypedScCall},
 };
+
 use multiversx_chain_vm::{
     tx_execution::sc_call_with_async_and_callback,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult, TxTokenTransfer},
