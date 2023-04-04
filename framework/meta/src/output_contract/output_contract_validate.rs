@@ -1,17 +1,19 @@
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 
-pub fn validate_abi(abi: &ContractAbi) -> Result<(), String> {
-    check_single_constructor(abi)?;
-    validate_contract_var_args(abi)?;
+use crate::output_contract::OutputContract;
+
+pub fn validate_output_contract(output_contract: &OutputContract) -> Result<(), String> {
+    check_single_constructor(output_contract)?;
+    validate_contract_var_args(&output_contract.abi)?;
     Ok(())
 }
 
-fn check_single_constructor(abi: &ContractAbi) -> Result<(), String> {
-    match abi.constructors.len() {
-        0 => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
-        1 => Ok(()),
-        _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
-    }
+fn check_single_constructor(output_contract: &OutputContract) -> Result<(), String> {
+    match output_contract.abi.constructors.len() {
+            0 => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
+            1 => Ok(()),
+            _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
+        }
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.

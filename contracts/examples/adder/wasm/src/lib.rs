@@ -15,11 +15,12 @@
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
-multiversx_sc_wasm_adapter::endpoints! {
+multiversx_sc_wasm_adapter::endpoints2! {
     adder
     (
-        getSum
-        add
+        init => init
+        getSum => sum
+        add => add
     )
 }
 

@@ -27,6 +27,14 @@ pub enum EndpointMutabilityAbi {
 }
 
 #[derive(Clone, Default, Debug)]
+pub enum EndpointTypeAbi {
+    #[default]
+    Init,
+    Endpoint,
+    PromisesCallback,
+}
+
+#[derive(Clone, Default, Debug)]
 pub struct EndpointAbi {
     pub docs: &'static [&'static str],
     pub name: &'static str,
@@ -34,6 +42,7 @@ pub struct EndpointAbi {
     pub only_owner: bool,
     pub only_admin: bool,
     pub labels: &'static [&'static str],
+    pub endpoint_type: EndpointTypeAbi,
     pub mutability: EndpointMutabilityAbi,
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
@@ -54,13 +63,14 @@ impl EndpointAbi {
             .extend_from_slice(T::output_abis(output_names).as_slice());
     }
 
-    pub fn generate_with_name_and_labels(
+    pub fn endpoint_with_name_and_labels(
         name: &'static str,
         labels: &'static [&'static str],
     ) -> Self {
         EndpointAbi {
             name,
             labels,
+            endpoint_type: EndpointTypeAbi::Endpoint,
             ..Default::default()
         }
     }

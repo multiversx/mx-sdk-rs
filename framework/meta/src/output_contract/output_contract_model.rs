@@ -2,6 +2,8 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::cli_args::BuildArgs;
 
+use super::output_contract_validate::validate_output_contract;
+
 pub const DEFAULT_LABEL: &str = "default";
 
 #[derive(Debug)]
@@ -63,6 +65,14 @@ impl OutputContractConfig {
             .iter()
             .find(|contract| contract.contract_name == contract_name)
             .unwrap_or_else(|| panic!("output contract {contract_name} not found"))
+    }
+
+    pub fn validate_output_contracts(&self) {
+        for contract in &self.contracts {
+            validate_output_contract(contract).unwrap_or_else(|err| {
+                panic!("Invalid output contract {}: {err}", contract.contract_name)
+            });
+        }
     }
 }
 

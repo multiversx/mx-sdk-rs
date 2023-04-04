@@ -18,9 +18,8 @@ struct OutputContractBuilder {
     pub add_unlabelled: bool,
     pub add_labels: BTreeSet<String>,
     pub add_endpoints: BTreeSet<String>,
-    pub constructors: Vec<EndpointAbi>,
-    pub endpoint_names: HashSet<String>,
-    pub endpoints: Vec<EndpointAbi>,
+    pub collected_endpoints: Vec<EndpointAbi>,
+    endpoint_names: HashSet<String>, // help keep endpoints unique
     pub settings: OutputContractSettings,
 }
 
@@ -36,9 +35,9 @@ impl OutputContractBuilder {
     fn map_from_config(kvp: (&String, &OutputContractSerde)) -> (String, OutputContractBuilder) {
         let (contract_id, cms) = kvp;
         let external_view = cms.external_view.unwrap_or_default();
-        let mut constructors = Vec::new();
+        let mut collected_endpoints = Vec::new();
         if external_view {
-            constructors.push(
+            collected_endpoints.push(
                 multiversx_sc::external_view_contract::external_view_contract_constructor_abi(),
             )
         }
@@ -50,7 +49,7 @@ impl OutputContractBuilder {
                 add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
                 add_labels: cms.add_labels.iter().cloned().collect(),
                 add_endpoints: cms.add_endpoints.iter().cloned().collect(),
-                constructors,
+                collected_endpoints,
                 settings: OutputContractSettings {
                     external_view: cms.external_view.unwrap_or_default(),
                     panic_message: cms.panic_message.unwrap_or_default(),
@@ -69,21 +68,10 @@ impl OutputContractBuilder {
         }
     }
 
-    /// Keeps endpoints unique, while retaining their order.
-    fn add_constructor(&mut self, constructor_abi: &EndpointAbi) {
-        assert!(
-            self.constructors.is_empty(),
-            "More than one constructor specified for contract {}",
-            &self.explicit_name
-        );
-        self.constructors.push(constructor_abi.clone());
-    }
-
-    /// Keeps endpoints unique, while retaining their order.
-    fn add_endpoint(&mut self, endpoint_abi: &EndpointAbi) {
+    fn collect_endpoint(&mut self, endpoint_abi: &EndpointAbi) {
         if !self.endpoint_names.contains(endpoint_abi.name) {
             self.endpoint_names.insert(endpoint_abi.name.to_string());
-            self.endpoints.push(endpoint_abi.clone());
+            self.collected_endpoints.push(endpoint_abi.clone());
         }
     }
 }
@@ -120,14 +108,9 @@ fn collect_unlabelled_endpoints(
 ) {
     for builder in contract_builders.values_mut() {
         if builder.add_unlabelled {
-            for constructor_abi in &original_abi.constructors {
-                if endpoint_unlabelled(constructor_abi) {
-                    builder.add_constructor(constructor_abi);
-                }
-            }
-            for endpoint_abi in &original_abi.endpoints {
+            for endpoint_abi in original_abi.iter_all_exports() {
                 if endpoint_unlabelled(endpoint_abi) {
-                    builder.add_endpoint(endpoint_abi);
+                    builder.collect_endpoint(endpoint_abi);
                 }
             }
         }
@@ -139,14 +122,9 @@ fn collect_labelled_endpoints(
     original_abi: &ContractAbi,
 ) {
     for builder in contract_builders.values_mut() {
-        for constructor_abi in &original_abi.constructors {
-            if endpoint_matches_labels(constructor_abi, &builder.add_labels) {
-                builder.add_constructor(constructor_abi);
-            }
-        }
-        for endpoint_abi in &original_abi.endpoints {
+        for endpoint_abi in original_abi.iter_all_exports() {
             if endpoint_matches_labels(endpoint_abi, &builder.add_labels) {
-                builder.add_endpoint(endpoint_abi);
+                builder.collect_endpoint(endpoint_abi);
             }
         }
     }
@@ -157,27 +135,34 @@ fn collect_add_endpoints(
     original_abi: &ContractAbi,
 ) {
     for builder in contract_builders.values_mut() {
-        for constructor_abi in &original_abi.constructors {
-            if builder.add_endpoints.contains(constructor_abi.name) {
-                builder.add_constructor(constructor_abi);
-            }
-        }
-        for endpoint_abi in &original_abi.endpoints {
+        for endpoint_abi in original_abi.iter_all_exports() {
             if builder.add_endpoints.contains(endpoint_abi.name) {
-                builder.add_endpoint(endpoint_abi);
+                builder.collect_endpoint(endpoint_abi);
             }
         }
     }
 }
 
 fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi) -> ContractAbi {
+    let mut constructors = Vec::new();
+    let mut endpoints = Vec::new();
+    let mut promise_callbacks = Vec::new();
+    for endpoint_abi in builder.collected_endpoints {
+        match endpoint_abi.endpoint_type {
+            multiversx_sc::abi::EndpointTypeAbi::Init => constructors.push(endpoint_abi),
+            multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),
+            multiversx_sc::abi::EndpointTypeAbi::PromisesCallback => {
+                promise_callbacks.push(endpoint_abi)
+            },
+        }
+    }
     ContractAbi {
         build_info: original_abi.build_info.clone(),
         docs: original_abi.docs,
         name: original_abi.name,
-        constructors: builder.constructors,
-        endpoints: builder.endpoints,
-        promise_callbacks: original_abi.promise_callbacks.clone(),
+        constructors,
+        endpoints,
+        promise_callbacks,
         events: original_abi.events.clone(),
         has_callback: !builder.settings.external_view && original_abi.has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
