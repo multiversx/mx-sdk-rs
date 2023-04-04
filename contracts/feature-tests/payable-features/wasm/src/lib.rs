@@ -18,22 +18,23 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     payable_features
     (
-        echo_call_value
-        payment_multiple
-        payment_array_3
-        payable_any_1
-        payable_any_2
-        payable_any_3
-        payable_any_4
-        payable_egld_1
-        payable_egld_2
-        payable_egld_3
-        payable_egld_4
-        payable_token_1
-        payable_token_2
-        payable_token_3
-        payable_token_4
+        init => init
+        echo_call_value => echo_call_value
+        payment_multiple => payment_multiple
+        payment_array_3 => payment_array_3
+        payable_any_1 => payable_any_1
+        payable_any_2 => payable_any_2
+        payable_any_3 => payable_any_3
+        payable_any_4 => payable_any_4
+        payable_egld_1 => payable_egld_1
+        payable_egld_2 => payable_egld_2
+        payable_egld_3 => payable_egld_3
+        payable_egld_4 => payable_egld_4
+        payable_token_1 => payable_token_1
+        payable_token_2 => payable_token_2
+        payable_token_3 => payable_token_3
+        payable_token_4 => payable_token_4
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

@@ -114,6 +114,19 @@ where
     }
 }
 
+impl<'a, SA> IntoIterator for &'a UniqueIdMapper<SA>
+where
+    SA: StorageMapperApi,
+{
+    type Item = usize;
+
+    type IntoIter = Iter<'a, SA>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 pub struct Iter<'a, SA>
 where
     SA: StorageMapperApi,

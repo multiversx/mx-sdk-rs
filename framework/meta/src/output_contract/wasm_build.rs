@@ -1,10 +1,9 @@
 use std::{fs, process::Command};
 
-use super::{
-    print_util::{print_build_command, print_copy_contract},
-    OutputContract,
+use super::{print_util::print_copy_contract, OutputContract};
+use crate::{
+    cli_args::BuildArgs, meta_wasm_tools, output_contract::print_util::print_build_command,
 };
-use crate::{cli_args::BuildArgs, meta_wasm_tools};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -52,6 +51,12 @@ fn compose_rustflags(build_args: &BuildArgs) -> String {
             rustflags.push(' ');
         }
         rustflags.push_str("--emit=mir");
+    }
+    if build_args.emit_llvm_ir {
+        if !rustflags.is_empty() {
+            rustflags.push(' ');
+        }
+        rustflags.push_str("--emit=llvm-ir");
     }
     rustflags
 }

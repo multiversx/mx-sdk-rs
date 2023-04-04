@@ -48,6 +48,12 @@ pub enum StandaloneCliAction {
         about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
     )]
     LocalDeps(LocalDepsArgs),
+
+    #[command(
+        name = "test-gen",
+        about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
+    )]
+    TestGen(TestGenArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -127,4 +133,21 @@ pub struct LocalDepsArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TestGenArgs {
+    /// Target directory where to generate contract integration tests.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    /// Creates test files if they don't exist.
+    #[arg(long, verbatim_doc_comment)]
+    pub create: bool,
 }

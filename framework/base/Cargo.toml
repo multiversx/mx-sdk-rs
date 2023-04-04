@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc"
-version = "0.39.6"
+version = "0.39.8"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -19,6 +19,7 @@ alloc = ["multiversx-sc-codec/alloc"]
 ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
+managed-map = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]
@@ -31,7 +32,7 @@ version = "0.2"
 default-features = false
 
 [dependencies.multiversx-sc-derive]
-version = "=0.39.6"
+version = "=0.39.8"
 path = "../derive"
 
 [dependencies.multiversx-sc-codec]

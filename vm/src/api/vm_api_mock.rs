@@ -26,4 +26,6 @@ impl HandleTypeInfo for DebugApi {
     type BigFloatHandle = DebugHandle;
 
     type EllipticCurveHandle = DebugHandle;
+
+    type ManagedMapHandle = DebugHandle;
 }

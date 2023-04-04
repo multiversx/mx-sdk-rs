@@ -19,17 +19,18 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     forwarder_queue
     (
-        queued_calls
-        add_queued_call_sync
-        add_queued_call_legacy_async
-        add_queued_call_transfer_execute
-        add_queued_call_transfer_esdt
-        add_queued_call_promise
-        add_queued_call
-        forward_queued_calls
-        callback_count
-        promises_callback_method
+        init => init
+        queued_calls => queued_calls
+        add_queued_call_sync => add_queued_call_sync
+        add_queued_call_legacy_async => add_queued_call_legacy_async
+        add_queued_call_transfer_execute => add_queued_call_transfer_execute
+        add_queued_call_transfer_esdt => add_queued_call_transfer_esdt
+        add_queued_call_promise => add_queued_call_promise
+        add_queued_call => add_queued_call
+        forward_queued_calls => forward_queued_calls
+        callback_count => callback_count
+        promises_callback_method => promises_callback_method
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}
