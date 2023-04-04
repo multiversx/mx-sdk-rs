@@ -1,6 +1,7 @@
 mod multi_contract_serde;
 mod output_contract_builder;
 mod output_contract_model;
+mod output_contract_validate;
 mod print_util;
 mod wasm_build;
 mod wasm_clean;

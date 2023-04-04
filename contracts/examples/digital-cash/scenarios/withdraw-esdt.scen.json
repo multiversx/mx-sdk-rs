@@ -47,20 +47,16 @@
                         "str:CASHTOKEN-123456": "50"
                     },
                     "storage": {
-                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a": {
-                            "1-amount": "biguint:1,000,000",
-                            "2-depositor_address": "address:acc1",
-                            "3-expiration_round": "u64:16",
-                            "4-token_name": "nested:str:EGLD",
-                            "5-nonce": "u64:0"
-                        },
-                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8": {
-                            "1-amount": "biguint:50",
-                            "2-depositor_address": "address:acc2",
-                            "3-expiration_round": "u64:16",
-                            "4-token_name": "nested:str:CASHTOKEN-123456",
-                            "5-nonce": "u64:0"
-                        }
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.mapped|nested:str:EGLD|u64:0": "address:acc1|nested:str:EGLD|u64:0|biguint:1,000,000|u64:16",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.value|u32:1": "nested:str:EGLD|u64:0",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.node_id|nested:str:EGLD|u64:0": "1",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.info": "u32:1|u32:1|u32:1|u32:1",
+                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.mapped|nested:str:CASHTOKEN-123456|u64:0": "address:acc2|nested:str:CASHTOKEN-123456|u64:0|biguint:50|u64:16",
+                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.value|u32:1": "nested:str:CASHTOKEN-123456|u64:0",
+                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.node_id|nested:str:CASHTOKEN-123456|u64:0": "1",
+                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
@@ -148,13 +144,11 @@
                         "str:CASHTOKEN-123456": "0"
                     },
                     "storage": {
-                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a": {
-                            "1-amount": "biguint:1,000,000",
-                            "2-depositor_address": "address:acc1",
-                            "3-expiration_round": "u64:16",
-                            "4-token_name": "nested:str:EGLD",
-                            "5-nonce": "u64:0"
-                        }
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.mapped|nested:str:EGLD|u64:0": "address:acc1|nested:str:EGLD|u64:0|biguint:1,000,000|u64:16",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.node_links|u32:1": "u32:0|u32:0",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.value|u32:1": "nested:str:EGLD|u64:0",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.node_id|nested:str:EGLD|u64:0": "1",
+                        "str:deposit|0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },

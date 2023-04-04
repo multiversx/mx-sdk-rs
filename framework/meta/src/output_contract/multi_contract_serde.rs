@@ -35,6 +35,9 @@ pub struct OutputContractSerde {
     #[serde(default)]
     #[serde(rename = "panic-message")]
     pub panic_message: Option<bool>,
+
+    #[serde(default)]
+    pub features: Vec<String>,
 }
 
 #[derive(Deserialize, Default, Debug)]

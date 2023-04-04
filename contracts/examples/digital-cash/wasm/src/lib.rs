@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            5
+// Endpoints:                            6
 // Async Callback (empty):               1
-// Total number of exported functions:   7
+// Total number of exported functions:   8
 
 #![no_std]
 #![feature(alloc_error_handler, lang_items)]
@@ -18,12 +18,14 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     digital_cash
     (
-        fund
-        withdraw
-        claim
-        amount
-        deposit
+        init => init
+        fund => fund
+        withdraw => withdraw
+        claim => claim
+        forward => forward
+        amount => get_amount
+        deposit => deposit
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

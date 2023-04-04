@@ -24,3 +24,8 @@ mod big_float_cmp;
 mod big_float_operators;
 #[cfg(feature = "big-float")]
 pub use big_float::BigFloat;
+
+#[cfg(feature = "managed-map")]
+mod managed_map;
+#[cfg(feature = "managed-map")]
+pub use managed_map::ManagedMap;

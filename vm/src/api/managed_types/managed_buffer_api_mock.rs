@@ -39,7 +39,11 @@ impl DebugApi {
         f(value)
     }
 
-    fn mb_set(&self, handle: <Self as HandleTypeInfo>::ManagedBufferHandle, value: Vec<u8>) {
+    pub(super) fn mb_set(
+        &self,
+        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        value: Vec<u8>,
+    ) {
         let mut managed_types = handle.context.m_types_borrow_mut();
         managed_types
             .managed_buffer_map

@@ -24,7 +24,7 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
     let number_range = b'0'..=b'9';
 
     // ticker must be all uppercase alphanumeric
-    let ticker_len = length - ADDITIONAL_RANDOM_CHARS_LENGTH - 1;
+    let ticker_len = get_token_ticker_len(length);
     let ticker = &token_id_slice[..ticker_len];
     for ticker_char in ticker {
         let is_uppercase_letter = uppercase_letter_range.contains(ticker_char);
@@ -52,4 +52,8 @@ pub fn validate_token_identifier(token_id_slice: &[u8]) -> bool {
     }
 
     true
+}
+
+pub fn get_token_ticker_len(token_id_len: usize) -> usize {
+    token_id_len - ADDITIONAL_RANDOM_CHARS_LENGTH - 1
 }

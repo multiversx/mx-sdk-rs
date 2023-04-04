@@ -18,10 +18,11 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     str_repeat
     (
-        repeat
-        getByteArrayLength
-        getByteArray
+        init => init
+        repeat => repeat
+        getByteArrayLength => get_byte_array_length
+        getByteArray => byte_array
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

@@ -27,3 +27,8 @@ fn withdraw_egld_go() {
 fn withdraw_esdt_go() {
     multiversx_sc_scenario::run_go("scenarios/withdraw-esdt.scen.json");
 }
+
+#[test]
+fn forward_go() {
+    multiversx_sc_scenario::run_go("scenarios/forward.scen.json");
+}

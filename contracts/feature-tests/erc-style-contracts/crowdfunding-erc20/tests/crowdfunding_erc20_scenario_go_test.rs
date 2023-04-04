@@ -1,5 +1,5 @@
 #[test]
-fn deploy_erc20_and_crowdfunding_go() {
+fn deploy_erc_20_and_crowdfunding_go() {
     multiversx_sc_scenario::run_go("scenarios/deploy_erc20_and_crowdfunding.scen.json");
 }
 
