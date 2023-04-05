@@ -24,5 +24,5 @@ pub enum InteractCliCommand {
 pub struct AddArgs {
     /// The value to add
     #[arg(short = 'v', long = "value", verbatim_doc_comment)]
-    pub value: u8,
+    pub value: u64,
 }
