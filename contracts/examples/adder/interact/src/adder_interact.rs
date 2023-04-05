@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         bech32,
         num_bigint::BigUint,
         scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::{IntoBlockchainCall, TxExpect},
+        scenario_model::{IntoBlockchainCall, TransferStep, TxExpect},
         test_wallets, ContractInfo, DebugApi,
     },
     tokio, Interactor,
@@ -37,8 +37,11 @@ async fn main() {
         Some(adder_interact_cli::InteractCliCommand::Deploy) => {
             adder_interact.deploy().await;
         },
+        Some(adder_interact_cli::InteractCliCommand::Feed) => {
+            adder_interact.feed_contract_egld().await;
+        },
         Some(adder_interact_cli::InteractCliCommand::Sum) => {
-            adder_interact.sum().await;
+            adder_interact.print_sum().await;
         },
         None => {},
     }
@@ -91,6 +94,18 @@ impl AdderInteract {
         self.state.set_adder_address(&new_address_expr);
     }
 
+    async fn feed_contract_egld(&mut self) {
+        let _ = self
+            .interactor
+            .transfer(
+                TransferStep::new()
+                    .from(&self.wallet_address)
+                    .to(self.state.adder())
+                    .egld_value("0,050000000000000000"),
+            )
+            .await;
+    }
+
     async fn add(&mut self, value: u64) {
         let mut typed_sc_call = self
             .state
@@ -112,7 +127,7 @@ impl AdderInteract {
         println!("successfully performed add");
     }
 
-    async fn sum(&mut self) {
+    async fn print_sum(&mut self) {
         let sum: SingleValue<BigUint> = self.interactor.vm_query(self.state.adder().sum()).await;
         println!("sum: {}", sum.into());
     }
