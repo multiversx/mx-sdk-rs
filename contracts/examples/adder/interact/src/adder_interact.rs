@@ -19,8 +19,10 @@ use multiversx_sc_snippets::{
         scenario_model::{IntoBlockchainCall, TransferStep, TxExpect},
         test_wallets, ContractInfo, DebugApi,
     },
-    tokio, Interactor,
+    tokio, Interactor, StepBuffer,
 };
+
+const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
@@ -40,6 +42,9 @@ async fn main() {
         Some(adder_interact_cli::InteractCliCommand::Feed) => {
             adder_interact.feed_contract_egld().await;
         },
+        Some(adder_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
+            adder_interact.multi_deploy(&args.count).await;
+        },
         Some(adder_interact_cli::InteractCliCommand::Sum) => {
             adder_interact.print_sum().await;
         },
@@ -57,7 +62,10 @@ struct AdderInteract {
 impl AdderInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway()).await;
+        let mut interactor = Interactor::new(config.gateway())
+            .await
+            .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
+            .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
 
         Self {
@@ -92,6 +100,45 @@ impl AdderInteract {
 
         let new_address_expr = format!("bech32:{new_address_bech32}");
         self.state.set_adder_address(&new_address_expr);
+    }
+
+    async fn multi_deploy(&mut self, count: &u8) {
+        if *count == 0 {
+            println!("count must be greater than 0");
+            return;
+        }
+        println!("deploying {count} contracts...");
+
+        let mut steps = Vec::new();
+        for _ in 0..*count {
+            let typed_sc_deploy = self
+                .state
+                .default_adder()
+                .init(BigUint::from(0u64))
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .code_metadata(CodeMetadata::all())
+                .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
+                .gas_limit("70,000,000")
+                .expect(TxExpect::ok());
+
+            steps.push(typed_sc_deploy);
+        }
+
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
+            .await;
+
+        for step in steps.iter() {
+            let result = step.response().new_deployed_address();
+            if result.is_err() {
+                println!("deploy failed: {}", result.err().unwrap());
+                return;
+            }
+
+            let new_address_bech32 = bech32::encode(&result.unwrap());
+            println!("new address: {new_address_bech32}");
+        }
     }
 
     async fn feed_contract_egld(&mut self) {
