@@ -24,7 +24,7 @@ use multiversx_sc_snippets::{
         bech32, scenario_format::interpret_trait::InterpreterContext, scenario_model::*,
         ContractInfo, DebugApi,
     },
-    tokio, Interactor,
+    tokio, Interactor, StepBuffer,
 };
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
@@ -98,7 +98,7 @@ impl MultisigInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        let wallet_address = interactor.register_wallet(test_wallets::mike());
 
         Self {
             interactor,
@@ -123,25 +123,23 @@ impl MultisigInteract {
 
     async fn deploy(&mut self) {
         let board = self.board();
-        let deploy_result: multiversx_sc_snippets::InteractorResult<()> = self
-            .interactor
-            .sc_deploy(
-                self.state
-                    .default_multisig()
-                    .init(Config::load_config().quorum(), board)
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
-                    .contract_code(
-                        "file:../output/multisig.wasm",
-                        &InterpreterContext::default(),
-                    )
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok()),
+        let mut typed_sc_deploy = self
+            .state
+            .default_multisig()
+            .init(Config::load_config().quorum(), board)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .code_metadata(CodeMetadata::all())
+            .contract_code(
+                "file:../output/multisig.wasm",
+                &InterpreterContext::default(),
             )
-            .await;
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
 
-        let result = deploy_result.new_deployed_address();
+        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+
+        let result = typed_sc_deploy.response().new_deployed_address();
         if result.is_err() {
             println!("deploy failed: {}", result.err().unwrap());
             return;
@@ -166,7 +164,7 @@ impl MultisigInteract {
         let board = self.board();
         let mut steps = Vec::new();
         for _ in 0..*count {
-            let sc_deploy_step: ScDeployStep = self
+            let typed_sc_deploy = self
                 .state
                 .default_multisig()
                 .init(Config::load_config().quorum(), board.clone())
@@ -178,15 +176,17 @@ impl MultisigInteract {
                     &InterpreterContext::default(),
                 )
                 .gas_limit("70,000,000")
-                .expect(TxExpect::ok())
-                .into();
+                .expect(TxExpect::ok());
 
-            steps.push(sc_deploy_step);
+            steps.push(typed_sc_deploy);
         }
 
-        let results = self.interactor.multiple_sc_deploy_results(&steps).await;
-        for result in results {
-            let result = result.new_deployed_address();
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
+            .await;
+
+        for step in steps.iter() {
+            let result = step.response().new_deployed_address();
             if result.is_err() {
                 println!("deploy failed: {}", result.err().unwrap());
                 return;
@@ -224,25 +224,23 @@ impl MultisigInteract {
             .await;
     }
 
-    fn perform_action_step(&mut self, action_id: usize, gas_expr: &str) -> ScCallStep {
-        self.state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(gas_expr)
-            .into()
-    }
-
     async fn perform_action(&mut self, action_id: usize, gas_expr: &str) {
         if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
             return;
         }
         println!("quorum reached for action `{action_id}`");
 
-        let sc_call_step = self.perform_action_step(action_id, gas_expr);
-        let raw_result = self.interactor.sc_call_get_raw_result(sc_call_step).await;
-        let result = raw_result.handle_signal_error_event();
+        let mut typed_sc_call = self
+            .state
+            .multisig()
+            .perform_action_endpoint(action_id)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit(gas_expr);
+
+        self.interactor.sc_call(&mut typed_sc_call).await;
+
+        let result = typed_sc_call.response().handle_signal_error_event();
         if result.is_err() {
             println!(
                 "perform action `{action_id}` failed with: {}",
@@ -251,6 +249,42 @@ impl MultisigInteract {
             return;
         }
         println!("successfully performed action `{action_id}`");
+    }
+
+    async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: &str) {
+        let mut steps = Vec::new();
+        for action_id in actions.iter() {
+            if !self.quorum_reached(*action_id).await && !self.sign(*action_id).await {
+                continue;
+            }
+            println!("quorum reached for action `{action_id}`");
+
+            let typed_sc_call = self
+                .state
+                .multisig()
+                .perform_action_endpoint(action_id)
+                .into_blockchain_call()
+                .from(&self.wallet_address)
+                .gas_limit(gas_expr);
+
+            steps.push(typed_sc_call);
+        }
+
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
+            .await;
+
+        for (i, action_id) in actions.iter().enumerate() {
+            let result = steps[i].response().handle_signal_error_event();
+            if result.is_err() {
+                println!(
+                    "perform action `{action_id}` failed with: {}",
+                    result.err().unwrap()
+                );
+                continue;
+            }
+            println!("successfully performed action `{action_id}`");
+        }
     }
 
     async fn quorum_reached(&mut self, action_id: usize) -> bool {
@@ -289,9 +323,12 @@ impl MultisigInteract {
             steps.push(sc_call_step);
         }
 
-        let results = self.interactor.multiple_sc_calls_raw_results(&steps).await;
-        for result in results {
-            let result = result.handle_signal_error_event();
+        self.interactor
+            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
+            .await;
+
+        for step in steps.iter() {
+            let result = step.response().handle_signal_error_event();
             if result.is_err() {
                 println!(
                     "perform sign `{action_id}` failed with: {}",
@@ -305,6 +342,27 @@ impl MultisigInteract {
         true
     }
 
+    async fn dns_register(&mut self, name: &str) {
+        let dns_address = dns_address_for_name(name);
+        let mut typed_sc_call = self
+            .state
+            .multisig()
+            .dns_register(dns_address, name)
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("30,000,000");
+
+        self.interactor.sc_call(&mut typed_sc_call).await;
+
+        let result = typed_sc_call.response().handle_signal_error_event();
+        if result.is_err() {
+            println!("dns register failed with: {}", result.err().unwrap());
+            return;
+        }
+
+        println!("successfully registered dns");
+    }
+
     async fn print_quorum(&mut self) {
         let quorum: SingleValue<usize> = self
             .interactor
@@ -314,12 +372,6 @@ impl MultisigInteract {
         println!("quorum: {}", quorum.into());
     }
 
-    async fn get_action_last_index(&mut self) -> usize {
-        self.interactor
-            .vm_query(self.state.multisig().get_action_last_index())
-            .await
-    }
-
     async fn print_board(&mut self) {
         let board: SingleValue<usize> = self
             .interactor
@@ -327,18 +379,5 @@ impl MultisigInteract {
             .await;
 
         println!("board: {}", board.into());
-    }
-
-    async fn dns_register(&mut self, name: &str) {
-        let dns_address = dns_address_for_name(name);
-        let dns_register_call: ScCallStep = self
-            .state
-            .multisig()
-            .dns_register(dns_address, name)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("30,000,000")
-            .into();
-        self.interactor.sc_call(dns_register_call).await;
     }
 }
