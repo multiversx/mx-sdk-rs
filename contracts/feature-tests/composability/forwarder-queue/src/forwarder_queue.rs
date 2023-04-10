@@ -88,10 +88,6 @@ pub trait ForwarderQueue {
 
         let payments = EgldOrMultiEsdtPayment::MultiEsdt(payment);
 
-        // let contract_call =
-        //     ContractCallWithMultiEsdt::<Self::Api, ()>::new(to, endpoint_name, payments.clone());
-
-        // contract_call.with_gas_limit(gas_limit).transfer_execute();
         let call_type = QueuedCallType::Promise;
         self.queued_calls().push_back(QueuedCall {
             call_type,
@@ -180,6 +176,7 @@ pub trait ForwarderQueue {
                 call.endpoint_name,
                 call.payments,
             );
+
             match call.call_type {
                 QueuedCallType::Sync => {
                     contract_call.execute_on_dest_context::<()>();
@@ -196,6 +193,7 @@ pub trait ForwarderQueue {
                     #[cfg(feature = "promises")]
                     contract_call
                         .with_gas_limit(call.gas_limit)
+                        .with_raw_arguments(call.args)
                         .async_call_promise()
                         .with_callback(self.callbacks().promises_callback_method())
                         .register_promise();
@@ -205,7 +203,6 @@ pub trait ForwarderQueue {
     }
 
     #[promises_callback]
-    #[label("promises-callback")]
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
     }
