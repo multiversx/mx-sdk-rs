@@ -8,9 +8,6 @@ publish = false
 [lib]
 path = "src/recursive_caller.rs"
 
-[features]
-ei-unmanaged = ["multiversx-sc/ei-unmanaged"]
-
 [dependencies.vault]
 path = "../vault"
 
