@@ -11,7 +11,6 @@ extern "C" {
 
     fn bigIntGetCallValue(dest: i32);
 
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetMultiESDTCallValue(resultHandle: i32);
 
     fn getNumESDTTransfers() -> i32;
@@ -52,7 +51,6 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
         unsafe {
             managedGetMultiESDTCallValue(dest_handle);
