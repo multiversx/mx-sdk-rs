@@ -20,7 +20,6 @@ extern "C" {
     #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedSCAddress(resultHandle: i32);
 
-    fn getOwnerAddress(resultOffset: *mut u8);
     #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedOwnerAddress(resultHandle: i32);
 
@@ -183,15 +182,6 @@ impl BlockchainApiImpl for VmApiImpl {
     fn load_sc_address_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedSCAddress(dest);
-        }
-    }
-
-    #[inline]
-    fn get_owner_address_legacy(&self) -> Address {
-        unsafe {
-            let mut res = Address::zero();
-            getOwnerAddress(res.as_mut_ptr());
-            res
         }
     }
 

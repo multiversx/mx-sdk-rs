@@ -35,11 +35,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.mb_overwrite(dest, self.get_sc_address_legacy().as_bytes())
     }
 
-    fn get_owner_address_legacy(&self) -> Address;
-
-    fn load_owner_address_managed(&self, dest: Self::ManagedBufferHandle) {
-        self.mb_overwrite(dest, self.get_owner_address_legacy().as_bytes())
-    }
+    fn load_owner_address_managed(&self, dest: Self::ManagedBufferHandle);
 
     fn get_shard_of_address_legacy(&self, address: &Address) -> u32;
 
