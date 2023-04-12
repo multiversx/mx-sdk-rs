@@ -66,6 +66,14 @@ macro_rules! unary_op_method {
 }
 
 impl DebugApi {
+    pub(crate) fn bi_new_from_big_int(
+        &self,
+        value: num_bigint::BigInt,
+    ) -> <Self as HandleTypeInfo>::BigIntHandle {
+        let mut managed_types = self.m_types_borrow_mut();
+        managed_types.big_int_map.insert_new_handle(value)
+    }
+
     pub(crate) fn bi_overwrite(
         &self,
         destination: <Self as HandleTypeInfo>::BigIntHandle,
@@ -89,10 +97,7 @@ impl DebugApi {
 impl BigIntApi for DebugApi {
     #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Self::BigIntHandle {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types
-            .big_int_map
-            .insert_new_handle(num_bigint::BigInt::from(value))
+        self.bi_new_from_big_int(num_bigint::BigInt::from(value))
     }
 
     fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {

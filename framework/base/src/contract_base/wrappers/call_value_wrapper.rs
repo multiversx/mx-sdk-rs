@@ -91,15 +91,6 @@ where
         (payment.token_identifier, payment.amount)
     }
 
-    /// Retrieves the ESDT call value from the VM.
-    /// Will return 0 in case of an EGLD transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    pub fn esdt_value(&self) -> BigUint<A> {
-        let call_value_single_esdt: A::BigIntHandle =
-            use_raw_handle(const_handles::CALL_VALUE_SINGLE_ESDT);
-        A::call_value_api_impl().load_single_esdt_value(call_value_single_esdt.clone());
-        BigUint::from_handle(call_value_single_esdt)
-    }
-
     /// Accepts and returns either an EGLD payment, or a single ESDT token.
     ///
     /// Will halt execution if more than one ESDT transfer was received.
