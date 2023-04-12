@@ -65,12 +65,6 @@ where
         ManagedAddress::from_handle(handle)
     }
 
-    #[cfg(feature = "alloc")]
-    #[inline]
-    pub fn get_owner_address_legacy(&self) -> crate::types::Address {
-        A::blockchain_api_impl().get_owner_address_legacy()
-    }
-
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
         let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();

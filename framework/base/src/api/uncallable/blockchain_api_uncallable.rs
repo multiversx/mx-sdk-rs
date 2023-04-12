@@ -23,10 +23,9 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_owner_address_legacy(&self) -> Address {
+    fn load_owner_address_managed(&self, _dest: Self::ManagedBufferHandle) {
         unreachable!()
     }
-
     fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
         unreachable!()
     }

@@ -20,6 +20,17 @@ impl BlockchainApi for DebugApi {
     }
 }
 
+impl DebugApi {
+    fn get_owner_address(&self) -> Address {
+        self.with_contract_account(|account| {
+            account
+                .contract_owner
+                .clone()
+                .unwrap_or_else(|| panic!("contract owner address not set"))
+        })
+    }
+}
+
 impl BlockchainApiImpl for DebugApi {
     fn get_caller_legacy(&self) -> Address {
         self.input_ref().from.clone()
@@ -29,13 +40,9 @@ impl BlockchainApiImpl for DebugApi {
         self.input_ref().to.clone()
     }
 
-    fn get_owner_address_legacy(&self) -> Address {
-        self.with_contract_account(|account| {
-            account
-                .contract_owner
-                .clone()
-                .unwrap_or_else(|| panic!("contract owner address not set"))
-        })
+    fn load_owner_address_managed(&self, dest: Self::ManagedBufferHandle) {
+        let owner_address = self.get_owner_address();
+        self.mb_overwrite(dest, owner_address.as_bytes());
     }
 
     fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {

@@ -21,11 +21,6 @@ categories = [
     "development-tools::ffi",
 ]
 
-[features]
-vm-validate-token-identifier = []
-vm-esdt-local-roles = []
-ei-unmanaged-node = []
-
 [dependencies]
 wee_alloc = "0.4" 
 

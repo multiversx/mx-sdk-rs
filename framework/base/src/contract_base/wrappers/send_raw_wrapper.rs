@@ -26,19 +26,6 @@ where
         }
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
-    where
-        D: Into<ManagedBuffer<A>>,
-    {
-        A::send_api_impl().transfer_value_legacy(
-            &to.to_address(),
-            amount,
-            &data.into().to_boxed_bytes(),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, amount: &BigUint<A>, data: D)
     where
         D: Into<ManagedBuffer<A>>,
@@ -52,25 +39,6 @@ where
         );
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn direct_egld_execute(
-        &self,
-        to: &ManagedAddress<A>,
-        amount: &BigUint<A>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().transfer_value_execute_legacy(
-            &to.to_address(),
-            amount,
-            gas_limit,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn direct_egld_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -82,7 +50,6 @@ where
         A::send_api_impl().transfer_value_execute(to, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn transfer_esdt_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -102,27 +69,6 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn transfer_esdt_execute(
-        &self,
-        to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().transfer_esdt_execute_legacy(
-            &to.to_address(),
-            token,
-            amount,
-            gas_limit,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     #[allow(clippy::too_many_arguments)]
     pub fn transfer_esdt_nft_execute(
         &self,
@@ -145,49 +91,6 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    #[allow(clippy::too_many_arguments)]
-    pub fn transfer_esdt_nft_execute(
-        &self,
-        to: &ManagedAddress<A>,
-        token: &TokenIdentifier<A>,
-        nonce: u64,
-        amount: &BigUint<A>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().transfer_esdt_nft_execute_legacy(
-            &to.to_address(),
-            token,
-            nonce,
-            amount,
-            gas_limit,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn multi_esdt_transfer_execute(
-        &self,
-        to: &ManagedAddress<A>,
-        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> Result<(), &'static [u8]> {
-        let payments_vec = payments.clone().into_vec();
-        A::send_api_impl().multi_transfer_esdt_nft_execute_legacy(
-            &to.to_address(),
-            &payments_vec,
-            gas_limit,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn multi_esdt_transfer_execute(
         &self,
         to: &ManagedAddress<A>,
@@ -205,23 +108,6 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn async_call_raw(
-        &self,
-        to: &ManagedAddress<A>,
-        amount: &BigUint<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ! {
-        A::send_api_impl().async_call_raw_legacy(
-            &to.to_address(),
-            amount,
-            &endpoint_name.to_boxed_bytes(),
-            &arg_buffer.into(),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn async_call_raw(
         &self,
         to: &ManagedAddress<A>,
@@ -262,7 +148,6 @@ where
     /// Unlike `async_call_raw`, the deployment is synchronous and tx execution continues afterwards.
     /// Also unlike `async_call_raw`, it uses an argument buffer to pass arguments
     /// If the deployment fails, Option::None is returned
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn deploy_contract(
         &self,
         gas: u64,
@@ -274,28 +159,9 @@ where
         A::send_api_impl().deploy_contract(gas, amount, code, code_metadata, arg_buffer)
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn deploy_contract(
-        &self,
-        gas: u64,
-        amount: &BigUint<A>,
-        code: &ManagedBuffer<A>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> (ManagedAddress<A>, ManagedVec<A, ManagedBuffer<A>>) {
-        A::send_api_impl().deploy_contract_legacy(
-            gas,
-            amount,
-            &code.to_boxed_bytes(),
-            code_metadata,
-            &arg_buffer.into(),
-        )
-    }
-
     /// Deploys a new contract in the same shard by re-using the code of an already deployed source contract.
     /// The deployment is done synchronously and the new contract's address is returned.
     /// If the deployment fails, Option::None is returned
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn deploy_from_source_contract(
         &self,
         gas: u64,
@@ -313,25 +179,6 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn deploy_from_source_contract(
-        &self,
-        gas: u64,
-        amount: &BigUint<A>,
-        source_contract_address: &ManagedAddress<A>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> (ManagedAddress<A>, ManagedVec<A, ManagedBuffer<A>>) {
-        A::send_api_impl().deploy_from_source_contract_legacy(
-            gas,
-            amount,
-            &source_contract_address.to_address(),
-            code_metadata,
-            &arg_buffer.into(),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn upgrade_from_source_contract(
         &self,
         sc_address: &ManagedAddress<A>,
@@ -351,30 +198,9 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn upgrade_from_source_contract(
-        &self,
-        sc_address: &ManagedAddress<A>,
-        gas: u64,
-        amount: &BigUint<A>,
-        source_contract_address: &ManagedAddress<A>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) {
-        A::send_api_impl().upgrade_from_source_contract_legacy(
-            &sc_address.to_address(),
-            gas,
-            amount,
-            &source_contract_address.to_address(),
-            code_metadata,
-            &arg_buffer.into(),
-        )
-    }
-
     /// Upgrades a child contract of the currently executing contract.
     /// The upgrade is synchronous, and the current transaction will fail if the upgrade fails.
     /// The child contract's new init function will be called with the provided arguments
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn upgrade_contract(
         &self,
         sc_address: &ManagedAddress<A>,
@@ -394,28 +220,7 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn upgrade_contract(
-        &self,
-        sc_address: &ManagedAddress<A>,
-        gas: u64,
-        amount: &BigUint<A>,
-        code: &ManagedBuffer<A>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) {
-        A::send_api_impl().upgrade_contract_legacy(
-            &sc_address.to_address(),
-            gas,
-            amount,
-            &code.to_boxed_bytes(),
-            code_metadata,
-            &arg_buffer.into(),
-        )
-    }
-
     /// Same shard, in-line execution of another contract.
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn execute_on_dest_context_raw(
         &self,
         gas: u64,
@@ -433,25 +238,6 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn execute_on_dest_context_raw(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<A>,
-        value: &BigUint<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().execute_on_dest_context_raw_legacy(
-            gas,
-            &address.to_address(),
-            value,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn execute_on_same_context_raw(
         &self,
         gas: u64,
@@ -469,26 +255,7 @@ where
         )
     }
 
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn execute_on_same_context_raw(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<A>,
-        value: &BigUint<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().execute_on_same_context_raw_legacy(
-            gas,
-            &address.to_address(),
-            value,
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
-        )
-    }
-
     /// Same shard, in-line execution of another contract.
-    #[cfg(not(feature = "ei-unmanaged"))]
     pub fn execute_on_dest_context_readonly_raw(
         &self,
         gas: u64,
@@ -501,22 +268,6 @@ where
             address,
             endpoint_name,
             arg_buffer,
-        )
-    }
-
-    #[cfg(feature = "ei-unmanaged")]
-    pub fn execute_on_dest_context_readonly_raw(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> ManagedVec<A, ManagedBuffer<A>> {
-        A::send_api_impl().execute_on_dest_context_readonly_raw_legacy(
-            gas,
-            &address.to_address(),
-            &endpoint_name.to_boxed_bytes(),
-            &crate::types::heap::ArgBuffer::from(arg_buffer),
         )
     }
 

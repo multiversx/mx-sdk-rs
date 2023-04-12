@@ -8,9 +8,6 @@ publish = false
 [lib]
 path = "src/forwarder_raw.rs"
 
-[features]
-ei-unmanaged = ["multiversx-sc/ei-unmanaged"]
-
 [dependencies.multiversx-sc]
 version = "0.39.8"
 path = "../../../../framework/base"
