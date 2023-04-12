@@ -133,12 +133,21 @@ pub trait Vault {
         for _ in 0..nr_callbacks {
             self.num_async_calls_sent_from_child().update(|c| *c += 1);
 
+            #[cfg(feature = "promises")]
             self.send()
                 .contract_call::<()>(caller.clone(), endpoint_name.clone())
                 .with_egld_or_single_esdt_transfer(return_payment.clone())
                 .with_gas_limit(self.blockchain().get_gas_left() / 2)
                 .async_call_promise()
                 .register_promise();
+
+            #[cfg(not(feature = "promises"))]
+            self.send()
+                .contract_call::<()>(caller.clone(), endpoint_name.clone())
+                .with_egld_or_single_esdt_transfer(return_payment.clone())
+                .with_gas_limit(self.blockchain().get_gas_left() / 2)
+                .async_call()
+                .call_and_exit();
         }
     }
 
