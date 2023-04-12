@@ -106,25 +106,26 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn retrieve_funds_promises(&self, back_transfers: OptionalValue<u64>, back_transfer_value: OptionalValue<BigUint>) {
+    fn retrieve_funds_promises(
+        &self,
+        back_transfers: OptionalValue<u64>,
+        back_transfer_value: OptionalValue<BigUint>,
+    ) {
         let payment = self.call_value().egld_or_single_esdt();
         let caller = self.blockchain().get_caller();
         let endpoint_name = ManagedBuffer::from(b"");
         let nr_callbacks = match back_transfers.into_option() {
             Some(nr) => nr,
-            None => sc_panic!("Nr of calls is None")
+            None => sc_panic!("Nr of calls is None"),
         };
 
         let value = match back_transfer_value.into_option() {
             Some(val) => val,
-            None => sc_panic!("Value for parent callback is None")
+            None => sc_panic!("Value for parent callback is None"),
         };
 
-        let return_payment = EgldOrEsdtTokenPayment::new(
-            payment.token_identifier,
-            payment.token_nonce,
-            value,
-        );
+        let return_payment =
+            EgldOrEsdtTokenPayment::new(payment.token_identifier, payment.token_nonce, value);
 
         self.num_called_retrieve_funds_promises()
             .update(|c| *c += 1);
