@@ -79,7 +79,7 @@ fn convert_esdt(sdk_esdt: HashMap<String, EsdtBalance>) -> BTreeMap<String, Esdt
     for (key, value) in sdk_esdt.into_iter() {
         let (token_identifier, nonce) = split_token_identifer_nonce(key);
         let esdt_raw = result
-            .entry(token_identifier.clone())
+            .entry(format!("str:{}", token_identifier.clone()))
             .or_insert(EsdtRaw::Full(EsdtFullRaw::default()));
         if let EsdtRaw::Full(esdt_full_raw) = esdt_raw {
             esdt_full_raw.instances.push(EsdtInstanceRaw {

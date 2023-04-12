@@ -14,9 +14,11 @@ use multiversx_sc_snippets::{
     },
     multiversx_sc_scenario::{
         bech32,
+        mandos_system::ScenarioRunner,
         num_bigint::BigUint,
-        scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::{IntoBlockchainCall, TransferStep, TxExpect},
+        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
+        scenario_model::{IntoBlockchainCall, Scenario, TransferStep, TxExpect},
+        standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo, DebugApi,
     },
     tokio, Interactor, StepBuffer,
@@ -76,6 +78,19 @@ impl AdderInteract {
     }
 
     async fn deploy(&mut self) {
+        println!("wallet address: {}", bech32::encode(&self.wallet_address));
+        let scenario_raw = retrieve_account_as_scenario_set_state(
+            Config::load_config().gateway().to_string(),
+            bech32::encode(&self.wallet_address),
+            Some("bech32".to_string()),
+        )
+        .await;
+
+        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+
+        self.interactor.pre_runners.run_scenario(&scenario);
+        self.interactor.post_runners.run_scenario(&scenario);
+
         let mut typed_sc_deploy = self
             .state
             .default_adder()

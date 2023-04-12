@@ -12,3 +12,8 @@ fn world() -> ScenarioWorld {
 fn adder_rs() {
     multiversx_sc_scenario::run_rs("scenarios/adder.scen.json", world());
 }
+
+#[test]
+fn interactor_trace_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/interactor_trace.scen.json", world());
+}
