@@ -7,19 +7,17 @@ publish = false
 
 [lib]
 crate-type = ["cdylib"]
-
 [profile.release]
 codegen-units = 1
 opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
-
 [dependencies.managed-map-features]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.39.5"
+version = "0.39.8"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

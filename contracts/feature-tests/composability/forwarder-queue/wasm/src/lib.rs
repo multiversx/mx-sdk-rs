@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            3
+// Endpoints:                            9
 // Async Callback (empty):               1
-// Total number of exported functions:   5
+// Total number of exported functions:  11
 
 #![no_std]
 #![feature(alloc_error_handler, lang_items)]
@@ -20,8 +20,14 @@ multiversx_sc_wasm_adapter::endpoints! {
     (
         init => init
         queued_calls => queued_calls
+        add_queued_call_sync => add_queued_call_sync
+        add_queued_call_legacy_async => add_queued_call_legacy_async
+        add_queued_call_transfer_execute => add_queued_call_transfer_execute
+        add_queued_call_transfer_esdt => add_queued_call_transfer_esdt
+        add_queued_call_promise => add_queued_call_promise
         add_queued_call => add_queued_call
         forward_queued_calls => forward_queued_calls
+        callback_count => callback_count
     )
 }
 

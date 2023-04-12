@@ -37,13 +37,7 @@ where
     }
 
     fn transfer_execute(self) {
-        match self.esdt_payments.len() {
-            0 => self.basic.transfer_execute_egld(BigUint::zero()),
-            1 => self
-                .basic
-                .transfer_execute_single_esdt(self.esdt_payments.get(0)),
-            _ => self.basic.transfer_execute_multi_esdt(self.esdt_payments),
-        }
+        self.basic.transfer_execute_esdt(self.esdt_payments);
     }
 }
 

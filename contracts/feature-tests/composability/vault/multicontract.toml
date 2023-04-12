@@ -1,0 +1,11 @@
+[settings]
+main = "main"
+
+[contracts.main]
+name = "vault"
+add-unlabelled = true
+
+[contracts.promises]
+name = "vault-promises"
+add-unlabelled = true
+add-labels = ["promises-endpoint"]

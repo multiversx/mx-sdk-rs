@@ -104,6 +104,45 @@ pub trait Vault {
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
+    #[label("promises-endpoint")]
+    #[payable("*")]
+    #[endpoint]
+    fn retrieve_funds_promises(
+        &self,
+        back_transfers: OptionalValue<u64>,
+        back_transfer_value: OptionalValue<BigUint>,
+    ) {
+        let payment = self.call_value().egld_or_single_esdt();
+        let caller = self.blockchain().get_caller();
+        let endpoint_name = ManagedBuffer::from(b"");
+        let nr_callbacks = match back_transfers.into_option() {
+            Some(nr) => nr,
+            None => sc_panic!("Nr of calls is None"),
+        };
+
+        let value = match back_transfer_value.into_option() {
+            Some(val) => val,
+            None => sc_panic!("Value for parent callback is None"),
+        };
+
+        let return_payment =
+            EgldOrEsdtTokenPayment::new(payment.token_identifier, payment.token_nonce, value);
+
+        self.num_called_retrieve_funds_promises()
+            .update(|c| *c += 1);
+
+        for _ in 0..nr_callbacks {
+            self.num_async_calls_sent_from_child().update(|c| *c += 1);
+
+            self.send()
+                .contract_call::<()>(caller.clone(), endpoint_name.clone())
+                .with_egld_or_single_esdt_transfer(return_payment.clone())
+                .with_gas_limit(self.blockchain().get_gas_left() / 2)
+                .async_call_promise()
+                .register_promise();
+        }
+    }
+
     #[endpoint]
     fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
@@ -207,4 +246,12 @@ pub trait Vault {
     #[view]
     #[storage_mapper("call_counts")]
     fn call_counts(&self, endpoint: ManagedBuffer) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("num_called_retrieve_funds_promises")]
+    fn num_called_retrieve_funds_promises(&self) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("num_async_calls_sent_from_child")]
+    fn num_async_calls_sent_from_child(&self) -> SingleValueMapper<usize>;
 }
