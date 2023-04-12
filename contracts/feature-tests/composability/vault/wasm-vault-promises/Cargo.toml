@@ -15,7 +15,6 @@ debug = false
 panic = "abort"
 [dependencies.vault]
 path = ".."
-features = ["promises"]
 
 [dependencies.multiversx-sc-wasm-adapter]
 version = "0.39.8"

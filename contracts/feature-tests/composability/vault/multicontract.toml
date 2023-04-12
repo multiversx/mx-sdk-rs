@@ -8,5 +8,4 @@ add-unlabelled = true
 [contracts.promises]
 name = "vault-promises"
 add-unlabelled = true
-add-labels = ["promises-callback"]
-features = ["promises"]
+add-labels = ["promises-endpoint"]

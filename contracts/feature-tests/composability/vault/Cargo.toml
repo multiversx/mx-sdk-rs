@@ -8,12 +8,11 @@ publish = false
 [lib]
 path = "src/vault.rs"
 
-[features]
-promises = ["multiversx-sc/promises"]
 
 [dependencies.multiversx-sc]
 version = "0.39.8"
 path = "../../../../framework/base"
+features = ["promises"]
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.39.8"

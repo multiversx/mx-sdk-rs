@@ -27,7 +27,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         accept_funds_single_esdt_transfer => accept_funds_single_esdt_transfer
         reject_funds => reject_funds
         retrieve_funds_with_transfer_exec => retrieve_funds_with_transfer_exec
-        retrieve_funds_promises => retrieve_funds_promises
         retrieve_funds => retrieve_funds
         retrieve_multi_funds_async => retrieve_multi_funds_async
         burn_and_create_retrive_async => burn_and_create_retrive_async
@@ -35,6 +34,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         call_counts => call_counts
         num_called_retrieve_funds_promises => num_called_retrieve_funds_promises
         num_async_calls_sent_from_child => num_async_calls_sent_from_child
+        retrieve_funds_promises => retrieve_funds_promises
     )
 }
 
