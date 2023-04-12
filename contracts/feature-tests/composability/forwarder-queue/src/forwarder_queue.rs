@@ -203,6 +203,7 @@ pub trait ForwarderQueue {
     }
 
     #[promises_callback]
+    #[label("promises-callback")]
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
     }
