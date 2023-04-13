@@ -138,8 +138,7 @@ pub trait Vault {
                 .contract_call::<()>(caller.clone(), endpoint_name.clone())
                 .with_egld_or_single_esdt_transfer(return_payment.clone())
                 .with_gas_limit(self.blockchain().get_gas_left() / 2)
-                .async_call_promise()
-                .register_promise();
+                .transfer_execute()
         }
     }
 
