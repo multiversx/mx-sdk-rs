@@ -7,8 +7,8 @@ use crate::{
     },
     err_msg,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedType,
-        ManagedVec, TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedRef,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -32,14 +32,14 @@ where
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    pub fn egld_value(&self) -> BigUint<A> {
+    pub fn egld_value(&self) -> ManagedRef<'static, A, BigUint<A>> {
         let mut call_value_handle = A::static_var_api_impl().get_call_value_egld_handle();
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
             call_value_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
             A::static_var_api_impl().set_call_value_egld_handle(call_value_handle.clone());
             A::call_value_api_impl().load_egld_value(call_value_handle.clone());
         }
-        BigUint::from_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
+        unsafe { ManagedRef::wrap_handle(call_value_handle) }
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
@@ -111,7 +111,7 @@ where
             0 => EgldOrEsdtTokenPayment {
                 token_identifier: EgldOrEsdtTokenIdentifier::egld(),
                 token_nonce: 0,
-                amount: self.egld_value(),
+                amount: self.egld_value().clone_value(),
             },
             1 => esdt_transfers.get(0).into(),
             _ => A::error_api_impl().signal_error(err_msg::INCORRECT_NUM_ESDT_TRANSFERS.as_bytes()),

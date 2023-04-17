@@ -55,14 +55,14 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("EGLD")]
     #[endpoint]
     fn receive_egld(&self) -> BigUint {
-        self.call_value().egld_value()
+        self.call_value().egld_value().clone_value()
     }
 
     #[payable("EGLD")]
     #[endpoint]
     fn recieve_egld_half(&self) {
         let caller = self.blockchain().get_caller();
-        let payment_amount = self.call_value().egld_value() / 2u32;
+        let payment_amount = &*self.call_value().egld_value() / 2u32;
         self.send().direct(
             &caller,
             &EgldOrEsdtTokenIdentifier::egld(),

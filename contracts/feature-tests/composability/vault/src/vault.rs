@@ -63,7 +63,7 @@ pub trait Vault {
         self.call_counts(ManagedBuffer::from(b"accept_funds_echo_payment"))
             .update(|c| *c += 1);
 
-        (egld_value, esdt_transfers_multi).into()
+        (egld_value.clone_value(), esdt_transfers_multi).into()
     }
 
     #[payable("*")]

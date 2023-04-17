@@ -28,7 +28,7 @@ pub trait NftModule:
         let issue_cost = self.call_value().egld_value();
         self.nft_token_id().issue_and_set_all_roles(
             EsdtTokenType::NonFungible,
-            issue_cost,
+            issue_cost.clone_value(),
             token_display_name,
             token_ticker,
             0,
