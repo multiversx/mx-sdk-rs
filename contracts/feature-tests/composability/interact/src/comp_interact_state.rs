@@ -14,7 +14,6 @@ const STATE_FILE: &str = "state.toml";
 
 pub type VaultContract = ContractInfo<vault::Proxy<DebugApi>>;
 pub type ForwarderQueueContract = ContractInfo<forwarder_queue::Proxy<DebugApi>>;
-pub type PromisesContract = ContractInfo<promises_features::Proxy<DebugApi>>;
 
 /// Composability Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -42,11 +41,6 @@ impl State {
         ForwarderQueueContract::new(address)
     }
 
-    /// Returns the promises contract
-    pub fn _promises(&self) -> PromisesContract {
-        PromisesContract::new(self.promises_address.clone().unwrap())
-    }
-
     /// Returns the vault contract with default address
     pub fn default_vault_address(&self) -> VaultContract {
         VaultContract::new(DEFAULT_CONTRACT_ADDRESS)
@@ -57,10 +51,6 @@ impl State {
         ForwarderQueueContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
 
-    /// Returns the promises contract with default address
-    pub fn default_promises_address(&self) -> PromisesContract {
-        PromisesContract::new(DEFAULT_CONTRACT_ADDRESS)
-    }
 }
 
 impl Drop for State {

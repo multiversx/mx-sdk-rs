@@ -44,7 +44,10 @@ impl ComposabilityInteract {
 
         self.deploy_call_tree_contracts(&call_state).await;
 
-        self.add_calls_to_all_fwds(&call_state, call_type, endpoint_name)
+        // self.add_calls_to_all_fwds(&call_state, call_type, endpoint_name)
+        //     .await;
+
+        self.add_queued_calls_to_children(&call_state.forwarders, call_type, endpoint_name)
             .await;
 
         self.call_root(&call_state, payment_token, payment_nonce, payment_amount)
