@@ -206,11 +206,17 @@ pub trait ForwarderQueue {
     #[label("promises-callback")]
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
+        self.callback_payments()
+            .set(self.call_value().all_esdt_transfers());
     }
 
     #[view]
     #[storage_mapper("callback_count")]
     fn callback_count(&self) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("callback_payments")]
+    fn callback_payments(&self) -> SingleValueMapper<ManagedVec<EsdtTokenPayment>>;
 
     #[event("forward_queued_callback")]
     fn forward_queued_callback_event(&self);
