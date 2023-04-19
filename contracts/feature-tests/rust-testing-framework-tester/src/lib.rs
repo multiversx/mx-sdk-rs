@@ -98,7 +98,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("*")]
     #[endpoint]
     fn receive_multi_esdt(&self) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
-        self.call_value().all_esdt_transfers()
+        self.call_value().all_esdt_transfers().clone_value()
     }
 
     #[payable("*")]

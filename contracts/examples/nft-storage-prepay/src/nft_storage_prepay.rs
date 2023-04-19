@@ -52,7 +52,8 @@ pub trait NftStoragePrepay {
     fn deposit_payment_for_storage(&self) {
         let payment = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
-        self.deposit(&caller).update(|deposit| *deposit += &*payment);
+        self.deposit(&caller)
+            .update(|deposit| *deposit += &*payment);
     }
 
     /// defaults to max amount

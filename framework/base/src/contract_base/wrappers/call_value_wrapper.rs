@@ -45,14 +45,14 @@ where
     /// Returns all ESDT transfers that accompany this SC call.
     /// Will return 0 results if nothing was transfered, or just EGLD.
     /// Fully managed underlying types, very efficient.
-    pub fn all_esdt_transfers(&self) -> ManagedVec<A, EsdtTokenPayment<A>> {
+    pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
         let mut call_value_handle = A::static_var_api_impl().get_call_value_multi_esdt_handle();
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
             call_value_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
             A::static_var_api_impl().set_call_value_multi_esdt_handle(call_value_handle.clone());
             A::call_value_api_impl().load_all_esdt_transfers(call_value_handle.clone());
         }
-        ManagedVec::from_handle(call_value_handle) // unsafe, TODO: replace with ManagedRef<...>
+        unsafe { ManagedRef::wrap_handle(call_value_handle) }
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.
