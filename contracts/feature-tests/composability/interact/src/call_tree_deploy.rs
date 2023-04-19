@@ -1,8 +1,5 @@
-use std::{cell::RefCell, rc::Rc};
-
 use crate::{
-    call_tree::{CallState, ForwarderQueueTarget, VaultTarget},
-    comp_interact_controller::ComposabilityInteract,
+    comp_interact_controller::ComposabilityInteract, call_tree::CallState,
 };
 
 use forwarder_queue::ProxyTrait as _;
@@ -22,13 +19,13 @@ use vault::ProxyTrait as _;
 
 impl ComposabilityInteract {
     pub async fn deploy_call_tree_contracts(&mut self, call_state: &CallState) {
-        self.deploy_vault(&call_state.vaults).await;
-        self.deploy_forwarder_queue(&call_state.forwarders).await;
+        self.deploy_vault(call_state).await;
+        self.deploy_forwarder_queue(call_state).await;
     }
 
-    pub async fn deploy_vault(&mut self, vaults: &Vec<Rc<RefCell<VaultTarget>>>) {
+    pub async fn deploy_vault(&mut self, call_state: &CallState) {
         let mut steps = Vec::new();
-        for _ in vaults.iter() {
+        for _ in call_state.vaults.iter() {
             let typed_sc_deploy = self
                 .state
                 .default_vault_address()
@@ -49,7 +46,7 @@ impl ComposabilityInteract {
             .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
             .await;
 
-        let mut vault_iter = vaults.iter();
+        let mut vault_iter = call_state.vaults.iter();
         for step in steps.iter() {
             let result = step.response().new_deployed_address();
             if result.is_err() {
@@ -71,11 +68,11 @@ impl ComposabilityInteract {
 
     pub async fn deploy_forwarder_queue(
         &mut self,
-        forwarders: &Vec<Rc<RefCell<ForwarderQueueTarget>>>,
+        call_state: &CallState,
     ) {
         let mut steps = Vec::new();
 
-        for _ in forwarders.iter() {
+        for _ in call_state.forwarders.iter() {
             let typed_sc_deploy = self
                 .state
                 .default_forwarder_queue_address()
@@ -96,7 +93,7 @@ impl ComposabilityInteract {
             .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
             .await;
 
-        let mut fwd_iter = forwarders.iter();
+        let mut fwd_iter = call_state.forwarders.iter();
         for step in steps.iter() {
             let result = step.response().new_deployed_address();
             if result.is_err() {
