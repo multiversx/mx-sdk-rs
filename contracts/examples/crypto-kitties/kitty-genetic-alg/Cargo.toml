@@ -18,9 +18,9 @@ version = "0.0.0"
 path = "../common/random"
 
 [dependencies.multiversx-sc]
-version = "0.39.8"
+version = "0.40.0"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.8"
+version = "0.40.0"
 path = "../../../../framework/scenario"
