@@ -8,7 +8,7 @@ use crate::{
     err_msg,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
-        EsdtTokenPayment, ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
+        EsdtTokenPayment, ManagedRef, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -132,9 +132,9 @@ where
     pub fn any_payment(&self) -> EgldOrMultiEsdtPayment<A> {
         let esdt_transfers = self.all_esdt_transfers();
         if esdt_transfers.is_empty() {
-            EgldOrMultiEsdtPayment::Egld(self.egld_value())
+            EgldOrMultiEsdtPayment::Egld(self.egld_value().clone_value())
         } else {
-            EgldOrMultiEsdtPayment::MultiEsdt(esdt_transfers)
+            EgldOrMultiEsdtPayment::MultiEsdt(esdt_transfers.clone_value())
         }
     }
 }

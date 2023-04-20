@@ -139,20 +139,20 @@ impl ComposabilityInteract {
         let fwd_addr_bech32 = bech32::encode(&fwd_addr);
         let fwd_addr_expr = format!("bech32:{fwd_addr_bech32}");
 
-        let mut typed_sc_call = 
-                self.state
-                    .forwarder_queue_from_addr(&fwd_addr_expr)
-                    .add_queued_call(
-                        call_type,
-                        to,
-                        DEFAULT_GAS_LIMIT,
-                        endpoint_name,
-                        MultiValueEncoded::<DebugApi, _>::new(),
-                    )
-                    .into_blockchain_call()
-                    .from(&self.wallet_address)
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok());
+        let mut typed_sc_call = self
+            .state
+            .forwarder_queue_from_addr(&fwd_addr_expr)
+            .add_queued_call(
+                call_type,
+                to,
+                DEFAULT_GAS_LIMIT,
+                endpoint_name,
+                MultiValueEncoded::<DebugApi, _>::new(),
+            )
+            .into_blockchain_call()
+            .from(&self.wallet_address)
+            .gas_limit("70,000,000")
+            .expect(TxExpect::ok());
 
         self.interactor.sc_call(&mut typed_sc_call).await;
     }
