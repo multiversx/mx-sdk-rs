@@ -75,7 +75,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let mut payment_count = 0;
     let mut payment_expr = quote! { multiversx_sc::types::BigUint::<Self::Api>::zero() };
     let mut multi_count = 0;
-    let mut multi_expr = quote! { multiversx_sc::types::ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new() };
+    let mut multi_expr_opt = None;
 
     let mut arg_push_snippets = Vec::<proc_macro2::TokenStream>::new();
 
@@ -105,7 +105,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             ArgPaymentMetadata::PaymentMulti => {
                 multi_count += 1;
                 let pat = &arg.pat;
-                multi_expr = quote! { #pat };
+                multi_expr_opt = Some(quote! { #pat });
             },
         }
     }
@@ -154,12 +154,13 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             };
         }
     } else if multi_count > 0 {
+        let multi_expr = multi_expr_opt.unwrap();
         contract_call_type = quote! { multiversx_sc::types::ContractCallWithMultiEsdt };
         contract_call_init = quote! {
             let mut ___contract_call___ = multiversx_sc::types::ContractCallWithMultiEsdt::new(
                 ___address___,
                 #endpoint_name,
-                #multi_expr,
+                #multi_expr.clone_value(),
             );
         };
     } else {

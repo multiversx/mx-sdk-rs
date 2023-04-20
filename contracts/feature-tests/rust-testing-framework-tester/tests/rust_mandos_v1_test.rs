@@ -1416,20 +1416,7 @@ fn test_back_and_forth_transfers() {
 
     wrapper
         .execute_esdt_multi_transfer(&user, &forwarder_wrapper, &transfers, |sc| {
-            let mut managed_payments = ManagedVec::new();
-            managed_payments.push(EsdtTokenPayment::new(
-                managed_token_id!(&first_token_id[..]),
-                0,
-                managed_biguint!(first_token_amount.to_u64().unwrap()),
-            ));
-            managed_payments.push(EsdtTokenPayment::new(
-                managed_token_id!(&second_token_id[..]),
-                0,
-                managed_biguint!(second_token_amount.to_u64().unwrap()),
-            ));
-
             sc.forward_sync_retrieve_funds_with_accept_func(
-                managed_payments,
                 managed_address!(vault_wrapper.address_ref()),
                 managed_token_id!(&third_token_id[..]),
                 managed_biguint!(third_token_amount.to_u64().unwrap()),
