@@ -169,15 +169,15 @@ pub trait KittyAuction {
             "auction ended already!"
         );
         require!(
-            payment >= auction.starting_price,
+            *payment >= auction.starting_price,
             "bid amount must be higher than or equal to starting price!"
         );
         require!(
-            payment > auction.current_bid,
+            *payment > auction.current_bid,
             "bid amount must be higher than current winning bid!"
         );
         require!(
-            payment <= auction.ending_price,
+            *payment <= auction.ending_price,
             "bid amount must be less than or equal to ending price!"
         );
 
@@ -188,7 +188,7 @@ pub trait KittyAuction {
         }
 
         // update auction bid and winner
-        auction.current_bid = payment;
+        auction.current_bid = payment.clone_value();
         auction.current_winner = caller;
         self.auction(kitty_id).set(auction);
     }
