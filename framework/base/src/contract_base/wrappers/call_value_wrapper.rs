@@ -8,7 +8,7 @@ use crate::{
     err_msg,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedRef,
-        ManagedType, ManagedVec, TokenIdentifier,
+        ManagedVec, TokenIdentifier,
     },
 };
 
