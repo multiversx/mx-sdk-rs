@@ -38,7 +38,10 @@ pub trait Vault {
     }
 
     fn esdt_transfers_multi(&self) -> MultiValueEncoded<EsdtTokenPaymentMultiValue> {
-        self.call_value().all_esdt_transfers().into_multi_value()
+        self.call_value()
+            .all_esdt_transfers()
+            .clone_value()
+            .into_multi_value()
     }
 
     #[payable("*")]
@@ -63,7 +66,7 @@ pub trait Vault {
         self.call_counts(ManagedBuffer::from(b"accept_funds_echo_payment"))
             .update(|c| *c += 1);
 
-        (egld_value, esdt_transfers_multi).into()
+        (egld_value.clone_value(), esdt_transfers_multi).into()
     }
 
     #[payable("*")]
@@ -84,7 +87,6 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_funds_with_transfer_exec(
         &self,
-        #[payment_multi] _payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
         token: TokenIdentifier,
         amount: BigUint,
         opt_receive_func: OptionalValue<ManagedBuffer>,
