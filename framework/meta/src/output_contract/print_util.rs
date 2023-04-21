@@ -69,20 +69,15 @@ pub fn print_invalid_vm_hook(import_name: &str, ei_version: &str) {
     print!(
         "\n{}",
         format!(
-            "WARNING! Import '{}' is not available on EI version {}! This will become a hard error in the next release.",
-            import_name,
-            ei_version,
+            "WARNING! Import '{import_name}' is not available on EI version {ei_version}! This will become a hard error in the next release."
         ).yellow(),
     );
 }
 
 pub fn print_check_ei_ok() {
-    println!("{}", format!(" OK").green(),);
+    println!("{}", " OK".green(),);
 }
 
 pub fn print_ignore_ei_check() {
-    println!(
-        "{}",
-        format!("EI version check explicitly ignored").yellow(),
-    );
+    println!("{}", "EI version check explicitly ignored".yellow(),);
 }
