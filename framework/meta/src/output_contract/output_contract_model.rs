@@ -1,6 +1,6 @@
 use multiversx_sc::abi::ContractAbi;
 
-use crate::cli_args::BuildArgs;
+use crate::{cli_args::BuildArgs, ei::EIVersion};
 
 pub const DEFAULT_LABEL: &str = "default";
 
@@ -66,7 +66,7 @@ impl OutputContractConfig {
     }
 }
 
-#[derive(Default, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct OutputContractSettings {
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
@@ -75,8 +75,22 @@ pub struct OutputContractSettings {
     /// so they should only be used for debugging purposes.
     pub panic_message: bool,
 
+    /// Post-processing check of the VM hooks is based on this.
+    pub check_ei: Option<EIVersion>,
+
     /// Features that are activated on the contract crate, from wasm.
     pub features: Vec<String>,
+}
+
+impl Default for OutputContractSettings {
+    fn default() -> Self {
+        OutputContractSettings {
+            external_view: Default::default(),
+            panic_message: Default::default(),
+            check_ei: Some(EIVersion::default()),
+            features: Default::default(),
+        }
+    }
 }
 
 /// Represents a contract created by the framework when building.

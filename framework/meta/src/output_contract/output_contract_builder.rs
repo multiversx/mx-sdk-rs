@@ -6,8 +6,8 @@ use std::{
 };
 
 use super::{
-    MultiContractConfigSerde, OutputContract, OutputContractConfig, OutputContractSerde,
-    OutputContractSettings,
+    parse_check_ei, MultiContractConfigSerde, OutputContract, OutputContractConfig,
+    OutputContractSerde, OutputContractSettings,
 };
 
 /// Temporary structure, to help create instances of `OutputContract`. Not publicly exposed.
@@ -54,6 +54,7 @@ impl OutputContractBuilder {
                 settings: OutputContractSettings {
                     external_view: cms.external_view.unwrap_or_default(),
                     panic_message: cms.panic_message.unwrap_or_default(),
+                    check_ei: parse_check_ei(&cms.ei),
                     features: cms.features.clone(),
                 },
                 ..Default::default()
