@@ -1,3 +1,4 @@
+pub mod ei;
 mod multi_contract_serde;
 mod output_contract_builder;
 mod output_contract_model;

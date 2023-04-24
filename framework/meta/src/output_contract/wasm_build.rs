@@ -1,10 +1,7 @@
 use std::{fs, process::Command};
 
-use super::{
-    print_util::{print_build_command, print_copy_contract},
-    OutputContract,
-};
-use crate::{cli_args::BuildArgs, meta_wasm_tools};
+use super::{print_util::*, OutputContract};
+use crate::{cli_args::BuildArgs, ei::EIVersion, meta_wasm_tools};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -85,6 +82,7 @@ impl OutputContract {
         }
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
+        print_call_wasm_opt(&output_wasm_path);
         meta_wasm_tools::run_wasm_opt(output_wasm_path.as_str());
     }
 
@@ -95,6 +93,7 @@ impl OutputContract {
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_wat_path = format!("{output_path}/{}", self.wat_output_name(build_args));
+        print_call_wasm2wat(&output_wasm_path, &output_wat_path);
         meta_wasm_tools::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
 
@@ -109,15 +108,35 @@ impl OutputContract {
             output_path,
             self.imports_json_output_name(build_args)
         );
+        print_extract_imports(&output_imports_json_path);
         let result = meta_wasm_tools::run_wasm_objdump(output_wasm_path.as_str());
         let import_names = meta_wasm_tools::parse_imports(result.as_str());
         write_imports_output(output_imports_json_path.as_str(), import_names.as_slice());
+        validate_ei(&import_names, &self.settings.check_ei);
     }
 }
 
 fn write_imports_output(dest_path: &str, import_names: &[String]) {
     let json = serde_json::to_string_pretty(import_names).unwrap();
     fs::write(dest_path, json).expect("failed to write imports json file");
+}
+
+fn validate_ei(import_names: &[String], check_ei: &Option<EIVersion>) {
+    if let Some(ei) = check_ei {
+        print_check_ei(ei.name());
+        let mut num_errors = 0;
+        for import_name in import_names {
+            if !ei.contains_vm_hook(import_name) {
+                print_invalid_vm_hook(import_name, ei.name());
+                num_errors += 1;
+            }
+        }
+        if num_errors == 0 {
+            print_check_ei_ok();
+        }
+    } else {
+        print_ignore_ei_check();
+    }
 }
 
 impl OutputContract {
