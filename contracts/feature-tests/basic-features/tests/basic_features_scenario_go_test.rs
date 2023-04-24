@@ -404,6 +404,7 @@ fn storage_raw_api_features_go() {
 }
 
 #[test]
+#[ignore = "the error message has changed, re-enable when we move to VM 1.5"]
 fn storage_reserved_go() {
     multiversx_sc_scenario::run_go("scenarios/storage_reserved.scen.json");
 }
