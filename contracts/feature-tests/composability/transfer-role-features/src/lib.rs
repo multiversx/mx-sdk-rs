@@ -30,7 +30,7 @@ pub trait TransferRoleFeatures:
         }
 
         if !self.blockchain().is_smart_contract(&dest) {
-            self.transfer_to_user(original_caller, dest, payments, endpoint_name);
+            self.transfer_to_user(original_caller, dest, payments.clone_value(), endpoint_name);
         } else {
             let mut args_buffer = ManagedArgBuffer::new();
             for arg in args {
@@ -40,7 +40,7 @@ pub trait TransferRoleFeatures:
             self.transfer_to_contract_raw(
                 original_caller,
                 dest,
-                payments,
+                payments.clone_value(),
                 endpoint_name,
                 args_buffer,
                 None,

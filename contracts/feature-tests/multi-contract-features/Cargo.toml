@@ -12,9 +12,9 @@ path = "src/multi_contract_features.rs"
 example_feature = []
 
 [dependencies.multiversx-sc]
-version = "0.39.8"
+version = "0.40.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.8"
+version = "0.40.0"
 path = "../../../framework/scenario"

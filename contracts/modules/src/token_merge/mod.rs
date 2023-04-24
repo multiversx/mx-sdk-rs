@@ -21,7 +21,7 @@ pub trait TokenMergeModule:
 {
     fn merge_tokens<AttributesCreator: MergedTokenAttributesCreator<ScType = Self>>(
         &self,
-        payments: ManagedVec<EsdtTokenPayment>,
+        payments: &ManagedVec<EsdtTokenPayment>,
         attr_creator: &AttributesCreator,
     ) -> EsdtTokenPayment {
         self.require_not_paused();
@@ -36,7 +36,7 @@ pub trait TokenMergeModule:
 
         let mut already_merged_tokens = ArrayVec::<_, MAX_MERGED_TOKENS>::new();
         let mut single_tokens = ArrayVec::<_, MAX_MERGED_TOKENS>::new();
-        for token in &payments {
+        for token in payments {
             if token.token_identifier == merged_token_id {
                 let token_data = self.blockchain().get_esdt_token_data(
                     &sc_address,
@@ -81,7 +81,10 @@ pub trait TokenMergeModule:
         merged_token_payment
     }
 
-    fn split_tokens(&self, payments: ManagedVec<EsdtTokenPayment>) -> ManagedVec<EsdtTokenPayment> {
+    fn split_tokens(
+        &self,
+        payments: &ManagedVec<EsdtTokenPayment>,
+    ) -> ManagedVec<EsdtTokenPayment> {
         self.require_not_paused();
         require!(!payments.is_empty(), "No payments");
 
@@ -89,7 +92,7 @@ pub trait TokenMergeModule:
         let sc_address = self.blockchain().get_sc_address();
 
         let mut output_payments = ManagedVec::new();
-        for token in &payments {
+        for token in payments {
             require!(
                 token.token_identifier == merged_token_id,
                 "Invalid token to split"

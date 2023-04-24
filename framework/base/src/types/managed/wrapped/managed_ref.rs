@@ -49,6 +49,16 @@ where
     }
 }
 
+impl<'a, M, T> ManagedRef<'a, M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + Clone,
+{
+    pub fn clone_value(&self) -> T {
+        self.deref().clone()
+    }
+}
+
 impl<'a, M, T> Clone for ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,

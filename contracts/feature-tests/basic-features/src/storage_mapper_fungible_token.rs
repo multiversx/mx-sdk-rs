@@ -13,7 +13,7 @@ pub trait FungibleTokenMapperFeatures:
     ) {
         let payment_amount = self.call_value().egld_value();
         self.fungible_token_mapper().issue(
-            payment_amount,
+            payment_amount.clone_value(),
             ManagedBuffer::new(),
             token_ticker,
             initial_supply,
@@ -33,7 +33,7 @@ pub trait FungibleTokenMapperFeatures:
         };
 
         self.fungible_token_mapper().issue(
-            payment,
+            payment.clone_value(),
             ManagedBuffer::new(),
             token_ticker,
             initial_supply,
@@ -71,7 +71,7 @@ pub trait FungibleTokenMapperFeatures:
     fn issue_and_set_all_roles_fungible(&self, token_ticker: ManagedBuffer) {
         let payment = self.call_value().egld_value();
         self.fungible_token_mapper().issue_and_set_all_roles(
-            payment,
+            payment.clone_value(),
             ManagedBuffer::new(),
             token_ticker,
             0,
