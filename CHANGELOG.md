@@ -26,6 +26,10 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.40.1, vm 0.2.1] - 2023-04-24
+- Building contracts also triggers an EI check, which verifies compatibility with various VM versions. It currently only issues warnings.
+- `ManagedVecItem` implementation for arrays.
+
 ## [sc 0.40.0, vm 0.2.0] - 2023-04-20
 - Call value `egld_value` and `all_esdt_transfers` methods return `ManagedRef` instead of owned objects, because they are cached (to avoid accidental corruption of the underlying cache).
 

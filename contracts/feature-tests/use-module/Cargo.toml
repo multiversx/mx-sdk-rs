@@ -9,18 +9,18 @@ publish = false
 path = "src/use_module.rs"
 
 [dependencies.multiversx-sc-modules]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../contracts/modules"
 
 [dependencies.multiversx-sc]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../framework/base"
 features = [ "alloc" ]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../framework/scenario"
 
 [dev-dependencies.multiversx-sc-meta]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../framework/meta"
