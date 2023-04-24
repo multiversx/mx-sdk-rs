@@ -98,9 +98,9 @@ impl OutputContract {
     }
 
     fn extract_imports(&self, build_args: &BuildArgs, output_path: &str) {
-        // if !build_args.extract_imports {
-        //     return;
-        // }
+        if !build_args.extract_imports {
+            return;
+        }
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_imports_json_path = format!(
