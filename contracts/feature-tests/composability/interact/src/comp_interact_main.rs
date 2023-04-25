@@ -1,8 +1,8 @@
 #![allow(clippy::too_many_arguments)]
 
 mod call_tree;
-mod call_tree_deploy;
 mod call_tree_calling_functions;
+mod call_tree_deploy;
 mod comp_interact_cli;
 mod comp_interact_config;
 mod comp_interact_controller;

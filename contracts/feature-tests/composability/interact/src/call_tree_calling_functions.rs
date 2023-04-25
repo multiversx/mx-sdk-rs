@@ -2,8 +2,8 @@ use std::{cell::RefCell, rc::Rc};
 
 use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
-    multiversx_sc::types::{EgldOrEsdtTokenIdentifier, MultiValueEncoded},
-    multiversx_sc_scenario::{bech32, scenario_model::TxExpect, DebugApi},
+    multiversx_sc::types::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiValueEncoded},
+    multiversx_sc_scenario::{bech32, num_bigint::BigUint, scenario_model::TxExpect, DebugApi},
     StepBuffer,
 };
 
@@ -18,12 +18,14 @@ const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
 const DEFAULT_GAS_LIMIT: u64 = 10_000_000;
 
 impl ComposabilityInteract {
-
     pub async fn add_queued_calls_to_children(
         &mut self,
         forwarders: &Vec<Rc<RefCell<ForwarderQueueTarget>>>,
         call_type: QueuedCallType,
         endpoint_name: &str,
+        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_nonce: u64,
+        payment_amount: BigUint,
     ) {
         let mut steps = Vec::new();
 
@@ -59,6 +61,11 @@ impl ComposabilityInteract {
                                 FORWARD_QUEUED_CALLS_ENDPOINT,
                                 MultiValueEncoded::<DebugApi, _>::new(),
                             )
+                            .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::new(
+                                payment_token.clone(),
+                                payment_nonce,
+                                payment_amount.clone().into(),
+                            ))
                             .into_blockchain_call()
                             .from(&self.wallet_address)
                             .gas_limit("70,000,000")
@@ -84,6 +91,11 @@ impl ComposabilityInteract {
                                 endpoint_name,
                                 MultiValueEncoded::<DebugApi, _>::new(),
                             )
+                            .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::new(
+                                payment_token.clone(),
+                                payment_nonce,
+                                payment_amount.clone().into(),
+                            ))
                             .into_blockchain_call()
                             .from(&self.wallet_address)
                             .gas_limit("70,000,000")
@@ -111,13 +123,7 @@ impl ComposabilityInteract {
         }
     }
 
-    pub async fn call_root(
-        &mut self,
-        call_state: &CallState,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
-        payment_nonce: u64,
-        payment_amount: u64,
-    ) {
+    pub async fn call_root(&mut self, call_state: &CallState) {
         let root_addr = {
             let root_addr_ref = call_state.root.borrow();
             root_addr_ref.address.clone().unwrap()
@@ -125,7 +131,7 @@ impl ComposabilityInteract {
         let root_addr_bech32 = bech32::encode(&root_addr);
         let root_addr_expr = format!("bech32:{root_addr_bech32}");
 
-        let sc_call_root_step = self
+        let typed_sc_call = self
             .state
             .forwarder_queue_from_addr(&root_addr_expr)
             .forward_queued_calls()
@@ -134,17 +140,6 @@ impl ComposabilityInteract {
             .gas_limit("70,000,000")
             .expect(TxExpect::ok());
 
-        if payment_token.is_esdt() {
-            let token_id_hex = payment_token.unwrap_esdt().to_string();
-            let token_id = format!("str:{token_id_hex}");
-
-            print!("token_id = {token_id}");
-            let mut typed_sc_call =
-                sc_call_root_step.esdt_transfer(token_id, payment_nonce, payment_amount);
-            self.interactor.sc_call(&mut typed_sc_call).await;
-        } else {
-            let mut typed_sc_call = sc_call_root_step.egld_value(payment_amount);
-            self.interactor.sc_call(&mut typed_sc_call).await;
-        }
+        self.interactor.sc_call(typed_sc_call).await;
     }
 }

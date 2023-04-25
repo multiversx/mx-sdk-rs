@@ -50,7 +50,6 @@ impl State {
     pub fn default_forwarder_queue_address(&self) -> ForwarderQueueContract {
         ForwarderQueueContract::new(DEFAULT_CONTRACT_ADDRESS)
     }
-
 }
 
 impl Drop for State {

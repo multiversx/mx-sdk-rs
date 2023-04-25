@@ -1,6 +1,4 @@
-use crate::{
-    comp_interact_controller::ComposabilityInteract, call_tree::CallState,
-};
+use crate::{call_tree::CallState, comp_interact_controller::ComposabilityInteract};
 
 use forwarder_queue::ProxyTrait as _;
 use multiversx_sc_snippets::{
@@ -66,10 +64,7 @@ impl ComposabilityInteract {
         }
     }
 
-    pub async fn deploy_forwarder_queue(
-        &mut self,
-        call_state: &CallState,
-    ) {
+    pub async fn deploy_forwarder_queue(&mut self, call_state: &CallState) {
         let mut steps = Vec::new();
 
         for _ in call_state.forwarders.iter() {

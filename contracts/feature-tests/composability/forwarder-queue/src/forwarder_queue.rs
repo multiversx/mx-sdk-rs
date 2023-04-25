@@ -148,7 +148,6 @@ pub trait ForwarderQueue {
     }
 
     #[endpoint]
-    #[payable("*")]
     fn forward_queued_calls(&self) {
         while let Some(node) = self.queued_calls().pop_front() {
             let call = node.clone().into_value();
