@@ -1,5 +1,7 @@
 use crate::codec::TopDecodeMulti;
 
+use crate::formatter::SCLowerHex;
+use crate::types::ManagedBufferCachedBuilder;
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
@@ -29,19 +31,14 @@ where
         }
     }
 
-    pub fn call_data_string(&self) -> ManagedBuffer<SA> {
-        let mut return_buffer = ManagedBuffer::new();
-        return_buffer.append(&self.basic.endpoint_name);
-
-        for argument in self.basic.arg_buffer.raw_arg_iter() {
-            return_buffer.append(&ManagedBuffer::from(b"@"));
-
-            let arg = argument.to_boxed_bytes();
-            return_buffer.append(&ManagedBuffer::from(hex::encode(arg.as_slice()).as_str()));
-            ManagedBuffer::to_boxed_bytes(&arg.as_slice());
+    pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
+        let mut result = ManagedBufferCachedBuilder::default();
+        result.append_managed_buffer(&self.basic.endpoint_name);
+        for arg in self.basic.arg_buffer.raw_arg_iter() {
+            result.append_bytes(b"@");
+            SCLowerHex::fmt(&*arg, &mut result);
         }
-
-        return_buffer
+        result.into_managed_buffer()
     }
 
     pub(super) fn async_call(self) -> AsyncCall<SA> {
