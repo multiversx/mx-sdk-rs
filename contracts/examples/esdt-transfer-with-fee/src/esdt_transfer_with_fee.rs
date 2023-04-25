@@ -48,7 +48,7 @@ pub trait EsdtTransferWithFee {
     #[endpoint]
     fn transfer(&self, address: ManagedAddress) {
         require!(
-            self.call_value().egld_value() == 0,
+            *self.call_value().egld_value() == 0,
             "EGLD transfers not allowed"
         );
         let payments = self.call_value().all_esdt_transfers();

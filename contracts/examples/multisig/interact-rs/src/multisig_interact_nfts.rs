@@ -154,7 +154,7 @@ impl MultisigInteract {
         for item_index in 0..NUM_ITEMS {
             let item_name = format!("Test collection item #{item_index}");
             let image_cid = format!(
-                "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.jpeg"
+                "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.png"
             );
 
             let typed_sc_call = self

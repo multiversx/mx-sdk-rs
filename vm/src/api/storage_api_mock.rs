@@ -84,7 +84,7 @@ impl StorageWriteApiImpl for DebugApi {
         if key.starts_with(&b"ELROND"[..]) {
             std::panic::panic_any(TxPanic {
                 status: 10,
-                message: "cannot write to storage under Elrond reserved key".to_string(),
+                message: "cannot write to storage under reserved key".to_string(),
             });
         }
 

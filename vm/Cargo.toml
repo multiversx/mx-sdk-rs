@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-chain-vm"
-version = "0.1.8"
+version = "0.2.0"
 edition = "2021"
 
 authors = [
@@ -29,6 +29,6 @@ itertools = "0.10.3"
 bech32 = "0.9"
 
 [dependencies.multiversx-sc]
-version = "=0.39.8"
+version = "=0.40.0"
 path = "../framework/base"
 features = ["alloc", "num-bigint", "promises", "big-float"]

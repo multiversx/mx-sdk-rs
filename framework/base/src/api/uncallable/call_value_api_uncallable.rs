@@ -1,6 +1,4 @@
-use crate::{
-    api::{CallValueApi, CallValueApiImpl},
-};
+use crate::api::{CallValueApi, CallValueApiImpl};
 
 use super::UncallableApi;
 
