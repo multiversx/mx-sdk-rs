@@ -29,6 +29,21 @@ where
         }
     }
 
+    pub fn call_data_string(&self) -> ManagedBuffer<SA> {
+        let mut return_buffer = ManagedBuffer::new();
+        return_buffer.append(&self.basic.endpoint_name);
+
+        for argument in self.basic.arg_buffer.raw_arg_iter() {
+            return_buffer.append(&ManagedBuffer::from(b"@"));
+
+            let arg = argument.to_boxed_bytes();
+            return_buffer.append(&ManagedBuffer::from(hex::encode(arg.as_slice()).as_str()));
+            ManagedBuffer::to_boxed_bytes(&arg.as_slice());
+        }
+
+        return_buffer
+    }
+
     pub(super) fn async_call(self) -> AsyncCall<SA> {
         AsyncCall {
             to: self.basic.to,
