@@ -16,9 +16,9 @@ path = "parent"
 path = "child"
 
 [dependencies.multiversx-sc]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../framework/scenario"
