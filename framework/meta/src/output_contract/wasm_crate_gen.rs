@@ -20,7 +20,7 @@ const NUM_ASYNC_CB: usize = 1;
 
 const PREFIX_NO_STD: &str = "
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 ";
