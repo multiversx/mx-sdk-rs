@@ -104,7 +104,6 @@ version = "0.39.8"
 dependencies = [
  "bitflags",
  "hashbrown",
- "hex",
  "hex-literal",
  "multiversx-sc-codec",
  "multiversx-sc-derive",

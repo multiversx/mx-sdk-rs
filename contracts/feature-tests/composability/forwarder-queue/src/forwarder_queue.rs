@@ -207,36 +207,12 @@ pub trait ForwarderQueue {
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
         let payments = self.call_value().any_payment();
-        // if payments.is_empty() {
-        //     let egld_value = self.call_value().egld_value();
-        //     if egld_value > 0 {
-        //         let _ = self.callback_payments().push(&(
-        //             EgldOrEsdtTokenIdentifier::egld(),
-        //             0,
-        //             egld_value,
-        //         ));
-        //     }
-        // } else {
-        //     for payment in payments.into_iter() {
-        //         let _ = self.callback_payments().push(&(
-        //             EgldOrEsdtTokenIdentifier::esdt(payment.token_identifier),
-        //             payment.token_nonce,
-        //             payment.amount,
-        //         ));
-        //     }
-        // }
-        let contract_call = ContractCallWithAnyPayment::<_, ()>::new(
-            ManagedAddress::default(),
-            ManagedBuffer::from(b"ESDTTransfer"),
-            payments,
-        );
 
-        // let contract_call = ContractCallWithEgld::new(
-        //     ManagedAddress::default(),
-        //     ManagedBuffer::from(b"ESDTTransfer"),
-        //     BigUint::zero(),
-        // );
-        self.callback_payments().set(contract_call.into_normalized().call_data_string());
+        let payments_data_string =
+            ContractCallNoPayment::<_, ()>::new(ManagedAddress::default(), ManagedBuffer::new())
+                .with_any_payment(payments)
+                .into_call_data_string();
+        self.callback_payments().set(payments_data_string);
     }
 
     #[view]
