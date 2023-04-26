@@ -2,6 +2,8 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{cli_args::BuildArgs, ei::EIVersion};
 
+use super::ContractAllocator;
+
 pub const DEFAULT_LABEL: &str = "default";
 
 #[derive(Debug)]
@@ -78,6 +80,9 @@ pub struct OutputContractSettings {
     /// Post-processing check of the VM hooks is based on this.
     pub check_ei: Option<EIVersion>,
 
+    /// Allocator config, i.e which allocator to choose for the contract.
+    pub allocator: ContractAllocator,
+
     /// Features that are activated on the contract crate, from wasm.
     pub features: Vec<String>,
 }
@@ -88,6 +93,7 @@ impl Default for OutputContractSettings {
             external_view: Default::default(),
             panic_message: Default::default(),
             check_ei: Some(EIVersion::default()),
+            allocator: Default::default(),
             features: Default::default(),
         }
     }
