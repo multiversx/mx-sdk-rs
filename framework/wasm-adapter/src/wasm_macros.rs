@@ -2,6 +2,11 @@
 macro_rules! allocator {
     () => {
         #[global_allocator]
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::FailAllocator =
+            multiversx_sc_wasm_adapter::wasm_deps::FailAllocator;
+    };
+    (wee_alloc) => {
+        #[global_allocator]
         static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::WeeAlloc =
             multiversx_sc_wasm_adapter::wasm_deps::WeeAlloc::INIT;
     };
