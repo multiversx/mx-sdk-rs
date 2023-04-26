@@ -10,11 +10,6 @@ macro_rules! allocator {
 #[macro_export]
 macro_rules! panic_handler {
     () => {
-        #[alloc_error_handler]
-        fn alloc_error_handler(layout: multiversx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
-            multiversx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
-        }
-
         #[panic_handler]
         fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
             multiversx_sc_wasm_adapter::wasm_deps::panic_fmt(panic_info)
@@ -28,11 +23,6 @@ macro_rules! panic_handler {
 #[macro_export]
 macro_rules! panic_handler_with_message {
     () => {
-        #[alloc_error_handler]
-        fn alloc_error_handler(layout: multiversx_sc_wasm_adapter::wasm_deps::Layout) -> ! {
-            multiversx_sc_wasm_adapter::wasm_deps::alloc_error_handler(layout)
-        }
-
         #[panic_handler]
         fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
             multiversx_sc_wasm_adapter::wasm_deps::panic_fmt_with_message(panic_info)
