@@ -16,6 +16,24 @@ use super::{
     BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
 };
 
+#[derive(Debug, Clone)]
+pub struct ApiCalls {
+    pub transfers: usize,
+    pub trie_reads: usize,
+    // TODO not yet counted
+    pub built_in_calls: usize,
+}
+
+impl Default for ApiCalls {
+    fn default() -> Self {
+        ApiCalls {
+            transfers: 0,
+            built_in_calls: 0,
+            trie_reads: 0,
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
@@ -26,6 +44,7 @@ pub struct TxContext {
     pub tx_result_cell: RefCell<TxResult>,
     pub b_rng: RefCell<BlockchainRng>,
     pub printed_messages: RefCell<Vec<String>>,
+    pub api_calls: RefCell<ApiCalls>,
 }
 
 impl TxContext {
@@ -40,6 +59,7 @@ impl TxContext {
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
             printed_messages: RefCell::new(Vec::new()),
+            api_calls: RefCell::new(ApiCalls::default()),
         }
     }
 
@@ -75,6 +95,7 @@ impl TxContext {
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
             printed_messages: RefCell::new(Vec::new()),
+            api_calls: RefCell::new(ApiCalls::default()),
         }
     }
 

@@ -1,6 +1,6 @@
 use std::{ops::Deref, rc::Rc};
 
-use crate::tx_mock::{TxContext, TxResult};
+use crate::tx_mock::{ApiCalls, TxContext, TxResult};
 
 use super::{BlockchainUpdate, TxContextStack};
 
@@ -66,5 +66,23 @@ impl TxContextRef {
     /// Clears entire print history.
     pub fn printed_messages_clear(&self) {
         self.0.printed_messages.borrow_mut().clear();
+    }
+
+    pub fn count_transfers(num: usize) {
+        let tx_context_rc = TxContextStack::static_peek();
+        tx_context_rc.api_calls.borrow_mut().transfers += num;
+    }
+    pub fn count_trie_read() {
+        let tx_context_rc = TxContextStack::static_peek();
+        tx_context_rc.api_calls.borrow_mut().trie_reads += 1;
+    }
+    pub fn count_built_in_call() {
+        let tx_context_rc = TxContextStack::static_peek();
+        tx_context_rc.api_calls.borrow_mut().built_in_calls += 1;
+    }
+
+    pub fn get_api_calls(&self) -> ApiCalls {
+        let tx_context_rc = TxContextStack::static_peek();
+        let x = (*tx_context_rc.api_calls.borrow()).clone(); x
     }
 }

@@ -747,9 +747,10 @@ impl BlockchainStateWrapper {
         let exec_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
 
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
+        let api_calls = (*api_after_exec.api_calls.borrow()).clone();
         let updates = api_after_exec.into_blockchain_updates();
         let tx_result = match exec_result {
-            Ok(()) => TxResult::empty(),
+            Ok(()) => TxResult::with_api_calls(api_calls),
             Err(panic_any) => interpret_panic_as_tx_result(panic_any, false),
         };
 

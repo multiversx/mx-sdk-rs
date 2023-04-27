@@ -28,14 +28,17 @@ impl DebugApi {
 
 impl StorageReadApiImpl for DebugApi {
     fn storage_load_len(&self, key: &[u8]) -> usize {
+        DebugApi::count_trie_read();
         self.storage_load_vec_u8(key).len()
     }
 
     fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
+        DebugApi::count_trie_read();
         self.storage_load_vec_u8(key).into_boxed_slice()
     }
 
     fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::ManagedBufferHandle) {
+        DebugApi::count_trie_read();
         let bytes = self.storage_load_vec_u8(key);
         let bi = BigInt::from_bytes_be(Sign::Plus, bytes.as_slice());
         self.bi_overwrite(dest, bi);
@@ -46,6 +49,7 @@ impl StorageReadApiImpl for DebugApi {
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
+        DebugApi::count_trie_read();
         let key_bytes = self.mb_to_boxed_bytes(key_handle);
         let bytes = self.storage_load_vec_u8(key_bytes.as_slice());
         self.mb_overwrite(dest, bytes.as_slice());
@@ -57,6 +61,7 @@ impl StorageReadApiImpl for DebugApi {
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
+        DebugApi::count_trie_read();
         let address = multiversx_sc::types::heap::Address::from_slice(
             self.mb_to_boxed_bytes(address_handle).as_slice(),
         );
