@@ -2,18 +2,18 @@
 macro_rules! allocator {
     () => {
         #[global_allocator]
-        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::FailAllocator =
-            multiversx_sc_wasm_adapter::wasm_deps::FailAllocator;
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_alloc::FailAllocator =
+            multiversx_sc_wasm_adapter::wasm_alloc::FailAllocator;
     };
     (leaking) => {
         #[global_allocator]
-        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::LeakingAllocator =
-            multiversx_sc_wasm_adapter::wasm_deps::LeakingAllocator::new();
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_alloc::LeakingAllocator =
+            multiversx_sc_wasm_adapter::wasm_alloc::LeakingAllocator::new();
     };
     (static64k) => {
         #[global_allocator]
-        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::StaticAllocator64K =
-            multiversx_sc_wasm_adapter::wasm_deps::StaticAllocator64K::new();
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_alloc::StaticAllocator64K =
+            multiversx_sc_wasm_adapter::wasm_alloc::StaticAllocator64K::new();
     };
     (wee_alloc) => {
         #[global_allocator]
@@ -25,8 +25,8 @@ macro_rules! allocator {
 macro_rules! panic_handler {
     () => {
         #[panic_handler]
-        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
-            multiversx_sc_wasm_adapter::wasm_deps::panic_fmt(panic_info)
+        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::panic::PanicInfo) -> ! {
+            multiversx_sc_wasm_adapter::panic::panic_fmt(panic_info)
         }
 
         #[lang = "eh_personality"]
@@ -38,8 +38,8 @@ macro_rules! panic_handler {
 macro_rules! panic_handler_with_message {
     () => {
         #[panic_handler]
-        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_deps::PanicInfo) -> ! {
-            multiversx_sc_wasm_adapter::wasm_deps::panic_fmt_with_message(panic_info)
+        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_alloc::PanicInfo) -> ! {
+            multiversx_sc_wasm_adapter::wasm_alloc::panic_fmt_with_message(panic_info)
         }
 
         #[lang = "eh_personality"]

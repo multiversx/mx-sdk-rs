@@ -10,5 +10,6 @@ pub use multiversx_sc;
 
 pub mod api;
 pub mod error_hook;
-pub mod wasm_deps;
+pub mod wasm_alloc;
+pub mod panic;
 mod wasm_macros;
