@@ -56,6 +56,7 @@ version = "0.0.0"
 dependencies = [
  "crypto-bubbles-legacy",
  "multiversx-sc-wasm-adapter",
+ "wee_alloc",
 ]
 
 [[package]]
@@ -143,7 +144,6 @@ name = "multiversx-sc-wasm-adapter"
 version = "0.40.1"
 dependencies = [
  "multiversx-sc",
- "wee_alloc",
 ]
 
 [[package]]

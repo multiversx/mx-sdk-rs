@@ -4,4 +4,4 @@ main = "lottery-erc20"
 # the only purpose of this config is to specify the allocator
 [contracts.lottery-erc20]
 add-unlabelled = true
-allocator = "wee_alloc"
+allocator = "static64k"

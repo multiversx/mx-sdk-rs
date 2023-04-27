@@ -5,10 +5,19 @@ macro_rules! allocator {
         static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::FailAllocator =
             multiversx_sc_wasm_adapter::wasm_deps::FailAllocator;
     };
+    (leaking) => {
+        #[global_allocator]
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::LeakingAllocator =
+            multiversx_sc_wasm_adapter::wasm_deps::LeakingAllocator::new();
+    };
+    (static64k) => {
+        #[global_allocator]
+        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::StaticAllocator64K =
+            multiversx_sc_wasm_adapter::wasm_deps::StaticAllocator64K::new();
+    };
     (wee_alloc) => {
         #[global_allocator]
-        static ALLOC: multiversx_sc_wasm_adapter::wasm_deps::WeeAlloc =
-            multiversx_sc_wasm_adapter::wasm_deps::WeeAlloc::INIT;
+        static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
     };
 }
 
