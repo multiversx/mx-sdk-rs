@@ -38,8 +38,8 @@ macro_rules! panic_handler {
 macro_rules! panic_handler_with_message {
     () => {
         #[panic_handler]
-        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::wasm_alloc::PanicInfo) -> ! {
-            multiversx_sc_wasm_adapter::wasm_alloc::panic_fmt_with_message(panic_info)
+        fn panic_fmt(panic_info: &multiversx_sc_wasm_adapter::panic::PanicInfo) -> ! {
+            multiversx_sc_wasm_adapter::panic::panic_fmt_with_message(panic_info)
         }
 
         #[lang = "eh_personality"]
