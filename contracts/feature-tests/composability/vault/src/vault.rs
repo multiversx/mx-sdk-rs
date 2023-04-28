@@ -151,7 +151,7 @@ pub trait Vault {
 
         if let Some(esdt_token_id) = token.into_esdt_option() {
             self.send()
-                .transfer_esdt_via_async_call(caller, esdt_token_id, nonce, amount);
+                .direct_esdt(&caller, &esdt_token_id, nonce, &amount);
         } else {
             self.send().direct_egld(&caller, &amount);
         }
@@ -171,8 +171,7 @@ pub trait Vault {
             all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
-        self.send()
-            .transfer_multiple_esdt_via_async_call(caller, all_payments);
+        self.send().direct_multi(&caller, &all_payments);
     }
 
     #[payable("*")]
@@ -211,7 +210,7 @@ pub trait Vault {
         }
 
         self.send()
-            .transfer_multiple_esdt_via_async_call(self.blockchain().get_caller(), new_tokens);
+            .direct_multi(&self.blockchain().get_caller(), &new_tokens);
     }
 
     /// TODO: invert token_payment and token_nonce, for consistency.

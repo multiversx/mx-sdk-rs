@@ -19,6 +19,7 @@ fn forw_raw_async_echo_go() {
 }
 
 #[test]
+#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_async_send_and_retrieve_multi_transfer_funds_go() {
     multiversx_sc_scenario::run_go(
         "scenarios/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
@@ -40,6 +41,7 @@ fn forw_raw_builtin_nft_local_mint_via_sync_call_go() {
 }
 
 #[test]
+#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_call_async_retrieve_multi_transfer_go() {
     multiversx_sc_scenario::run_go(
         "scenarios/forw_raw_call_async_retrieve_multi_transfer.scen.json",
@@ -167,6 +169,7 @@ fn forwarder_call_async_retrieve_egld_go() {
 }
 
 #[test]
+#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forwarder_call_async_retrieve_esdt_go() {
     multiversx_sc_scenario::run_go("scenarios/forwarder_call_async_retrieve_esdt.scen.json");
 }
