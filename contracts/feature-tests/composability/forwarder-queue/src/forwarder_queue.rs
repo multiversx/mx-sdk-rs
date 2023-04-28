@@ -206,11 +206,22 @@ pub trait ForwarderQueue {
     #[label("promises-callback")]
     fn promises_callback_method(&self) {
         self.callback_count().update(|c| *c += 1);
+        let payments = self.call_value().any_payment();
+
+        let payments_data_string =
+            ContractCallNoPayment::<_, ()>::new(ManagedAddress::default(), ManagedBuffer::new())
+                .with_any_payment(payments)
+                .into_call_data_string();
+        self.callback_payments().set(payments_data_string);
     }
 
     #[view]
     #[storage_mapper("callback_count")]
     fn callback_count(&self) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("callback_payments")]
+    fn callback_payments(&self) -> SingleValueMapper<ManagedBuffer>;
 
     #[event("forward_queued_callback")]
     fn forward_queued_callback_event(&self);
