@@ -87,9 +87,7 @@ impl<OriginalResult> AsMut<ScDeployStep> for TypedScDeploy<OriginalResult> {
 
 impl<OriginalResult> From<TypedScDeploy<OriginalResult>> for ScDeployStep {
     fn from(typed: TypedScDeploy<OriginalResult>) -> Self {
-        Self {
-            ..typed.sc_deploy_step
-        }
+        typed.sc_deploy_step
     }
 }
 

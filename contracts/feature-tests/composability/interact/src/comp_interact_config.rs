@@ -1,10 +1,10 @@
 use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     multiversx_sc::types::{EgldOrEsdtTokenIdentifier, TokenIdentifier},
-    multiversx_sc_scenario::DebugApi,
+    multiversx_sc_scenario::{num_bigint::BigUint, DebugApi},
 };
 use serde::Deserialize;
-use std::io::Read;
+use std::{fmt::Debug, io::Read, str::FromStr};
 
 /// Config file
 const CONFIG_FILE: &str = "config.toml";
@@ -16,7 +16,7 @@ pub struct Config {
     call_type: String,
     token_id: String,
     token_nonce: u64,
-    amount: u64,
+    amount: String,
 }
 
 impl Config {
@@ -49,8 +49,11 @@ impl Config {
         }
     }
 
-    pub fn token_amount(&self) -> u64 {
-        self.amount
+    pub fn token_amount(&self) -> BigUint {
+        match BigUint::from_str(&self.amount) {
+            Ok(amount) => amount,
+            Err(_) => BigUint::default(),
+        }
     }
 
     pub fn token_nonce(&self) -> u64 {
