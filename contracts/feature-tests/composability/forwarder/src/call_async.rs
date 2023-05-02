@@ -19,6 +19,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[endpoint]
     fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
+        self.call_counter().update(|c| *c += 1);
         self.vault_proxy()
             .contract(to)
             .echo_arguments(args)
@@ -27,11 +28,17 @@ pub trait ForwarderAsyncCallModule {
             .call_and_exit();
     }
 
+    #[view]
+    #[storage_mapper("call_counter")]
+    fn call_counter(&self) -> SingleValueMapper<usize>;
+
+
     #[callback]
     fn echo_args_callback(
         &self,
         #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
     ) -> MultiValueEncoded<ManagedBuffer> {
+        self.call_counter().update(|c| *c += 1);
         match result {
             ManagedAsyncCallResult::Ok(results) => {
                 let mut cb_result =
