@@ -48,7 +48,7 @@ impl ScCallStep {
     where
         BigUintValue: From<A>,
     {
-        if !self.tx.esdt_value.is_empty() {
+        if !self.tx.esdt_value.is_empty() && self.tx.egld_value.value > 0u32.into() {
             panic!("Cannot transfer both EGLD and ESDT");
         }
 
