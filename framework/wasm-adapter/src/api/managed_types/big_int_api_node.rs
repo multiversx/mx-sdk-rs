@@ -205,6 +205,11 @@ impl BigIntApi for crate::api::VmApiImpl {
             bigIntToString(bi_handle, result_handle);
         }
     }
+
+    fn bi_assert_positive(&self, _bi_handle: Self::BigIntHandle) {
+    }
+
+
 }
 
 #[allow(unused)]
