@@ -4,18 +4,18 @@ use core::{
 };
 
 /// The pre-allocated buffer size.
-/// 
+///
 /// TODO: make configurable, experiment with it.
 pub const SIZE_64K: usize = 64 * 1024;
 
 pub type StaticAllocator64K = StaticAllocator<SIZE_64K>;
 
 /// Uses a statically pre-allocated section to allocate all memory.
-/// 
+///
 /// Does not free up memory. Cannot grow beyond what was statically pre-allocated.
-/// 
+///
 /// Never calls `memory.grow`.
-/// 
+///
 /// Largely inspired by this blog post:
 /// https://surma.dev/things/rust-to-webassembly/
 #[repr(C, align(32))]
@@ -49,7 +49,7 @@ unsafe impl<const SIZE: usize> GlobalAlloc for StaticAllocator<SIZE> {
         // signals a failed allocation.
         match arena.get_mut(idx) {
             Some(item) => item as *mut u8,
-            _ => core::ptr::null_mut(),
+            _ => super::mem_alloc_error(),
         }
     }
 

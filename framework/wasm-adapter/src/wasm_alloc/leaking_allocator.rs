@@ -1,36 +1,33 @@
-use super::memory_grow::{DefaultGrower, MemoryGrower, PageCount, ERROR_PAGE_COUNT, PAGE_SIZE};
+use super::memory_grow::{memory_grow, PageCount, PAGE_SIZE};
 use core::{
     alloc::{GlobalAlloc, Layout},
     cell::UnsafeCell,
-    ptr::null_mut,
 };
 
 /// A non-thread safe bump-pointer allocator.
 /// Does not free or reuse memory.
 /// Efficient for small allocations.
-/// 
+///
 /// Largely inspired by lol_alloc:
 /// https://github.com/Craig-Macomber/lol_alloc
-pub struct LeakingAllocator<T = DefaultGrower> {
+pub struct LeakingAllocator {
     used: UnsafeCell<usize>, // bytes
     size: UnsafeCell<usize>, // bytes
-    grower: T,
 }
 
 /// Single-threaded context only.
-unsafe impl<T> Sync for LeakingAllocator<T> {}
+unsafe impl Sync for LeakingAllocator {}
 
-impl LeakingAllocator<DefaultGrower> {
+impl LeakingAllocator {
     pub const fn new() -> Self {
         LeakingAllocator {
             used: UnsafeCell::new(0),
             size: UnsafeCell::new(0),
-            grower: DefaultGrower,
         }
     }
 }
 
-unsafe impl<T: MemoryGrower> GlobalAlloc for LeakingAllocator<T> {
+unsafe impl GlobalAlloc for LeakingAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let size: &mut usize = &mut *self.size.get();
         let used: &mut usize = &mut *self.used.get();
@@ -48,10 +45,7 @@ unsafe impl<T: MemoryGrower> GlobalAlloc for LeakingAllocator<T> {
             // Request enough new space for this allocation, even if we have some space left over from the last one incase they end up non-contiguous.
             // Round up to a number of pages
             let requested_pages = (requested_size + PAGE_SIZE - 1) / PAGE_SIZE;
-            let previous_page_count = self.grower.memory_grow(PageCount(requested_pages));
-            if previous_page_count == ERROR_PAGE_COUNT {
-                return null_mut();
-            }
+            let previous_page_count = memory_grow(PageCount(requested_pages));
 
             let previous_size = previous_page_count.size_in_bytes();
             if previous_size != *size {

@@ -27,7 +27,7 @@ impl ContractAllocator {
 
     pub fn parse_or_panic(s: &str) -> Self {
         Self::parse(s).unwrap_or_else(|| {
-            panic!("Unknown allocator option '{s}'. Valid options are: 'fail', 'wee_alloc'.")
+            panic!("Unknown allocator option '{s}'. Valid options are: 'fail', 'leaking', 'static64k', 'wee_alloc'.")
         })
     }
 

@@ -14,7 +14,7 @@ pub fn panic_fmt(_: &PanicInfo) -> ! {
 }
 
 /// Panic handler that formats and sends the original message.
-/// 
+///
 /// Mostly used for debugging, the additional code is normally not deemed to be worth it.
 pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     let mut panic_msg = ManagedPanicMessage::default();
