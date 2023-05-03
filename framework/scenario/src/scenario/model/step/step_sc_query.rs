@@ -55,7 +55,7 @@ impl ScQueryStep {
     where
         CC: ContractCall<DebugApi>,
     {
-        let (to_str, function, mandos_args) = process_contract_call(contract_call);
+        let (to_str, function, _, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
         for arg in mandos_args {

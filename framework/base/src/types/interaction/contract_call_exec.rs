@@ -1,12 +1,11 @@
 use crate::codec::TopDecodeMulti;
 
-use crate::formatter::SCLowerHex;
-use crate::types::ManagedBufferCachedBuilder;
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
+    formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedVec},
+    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};

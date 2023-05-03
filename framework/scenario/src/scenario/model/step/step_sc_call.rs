@@ -48,7 +48,7 @@ impl ScCallStep {
     where
         BigUintValue: From<A>,
     {
-        if !self.tx.esdt_value.is_empty() {
+        if !self.tx.esdt_value.is_empty() && self.tx.egld_value.value > 0u32.into() {
             panic!("Cannot transfer both EGLD and ESDT");
         }
 
@@ -109,9 +109,11 @@ impl ScCallStep {
     where
         CC: ContractCall<DebugApi>,
     {
-        let (to_str, function, scenario_args) = process_contract_call(contract_call);
+        let (to_str, function, egld_value_expr, scenario_args) =
+            process_contract_call(contract_call);
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
+        self = self.egld_value(egld_value_expr);
         for arg in scenario_args {
             self = self.argument(arg.as_str());
         }
@@ -150,19 +152,28 @@ impl AsMut<ScCallStep> for ScCallStep {
 /// - recipient,
 /// - endpoint name,
 /// - the arguments.
-pub(super) fn process_contract_call<CC>(contract_call: CC) -> (String, String, Vec<String>)
+pub(super) fn process_contract_call<CC>(
+    contract_call: CC,
+) -> (String, String, BigUintValue, Vec<String>)
 where
     CC: ContractCall<DebugApi>,
 {
-    let full_cc = contract_call.into_normalized();
+    let normalized_cc = contract_call.into_normalized();
     let to_str = format!(
         "0x{}",
-        hex::encode(full_cc.basic.to.to_address().as_bytes())
+        hex::encode(normalized_cc.basic.to.to_address().as_bytes())
     );
-    let function =
-        String::from_utf8(full_cc.basic.endpoint_name.to_boxed_bytes().into_vec()).unwrap();
-    let scenario_args = convert_call_args(&full_cc.basic.arg_buffer);
-    (to_str, function, scenario_args)
+    let function = String::from_utf8(
+        normalized_cc
+            .basic
+            .endpoint_name
+            .to_boxed_bytes()
+            .into_vec(),
+    )
+    .unwrap();
+    let egld_value_expr = BigUintValue::from(normalized_cc.egld_payment);
+    let scenario_args = convert_call_args(&normalized_cc.basic.arg_buffer);
+    (to_str, function, egld_value_expr, scenario_args)
 }
 
 pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String> {
