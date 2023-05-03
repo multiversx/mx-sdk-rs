@@ -122,4 +122,8 @@ impl BigIntApi for super::UncallableApi {
     fn bi_to_string(&self, _bi_handle: Self::BigIntHandle, _str_handle: Self::ManagedBufferHandle) {
         unreachable!()
     }
+
+    fn bi_assert_positive(&self, _x: Self::BigIntHandle) {
+        unreachable!()
+    }
 }

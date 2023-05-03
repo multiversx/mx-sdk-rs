@@ -221,4 +221,9 @@ impl BigIntApi for DebugApi {
         };
         self.mb_overwrite(str_handle, s.as_bytes());
     }
+
+    fn bi_assert_positive(&self, x: Self::BigIntHandle) {
+        let bi_x = self.bi_get(x);
+        assert_positive(&bi_x);
+    }
 }

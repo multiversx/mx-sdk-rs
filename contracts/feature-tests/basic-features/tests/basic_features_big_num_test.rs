@@ -1,7 +1,7 @@
-use multiversx_sc::types::{BigInt, BigUint, ManagedBuffer};
-use multiversx_sc_scenario::*;
+use multiversx_sc::{types::{BigInt, BigUint, ManagedBuffer, ManagedType}, api::{BigIntApi, HandleConstraints}};
+use multiversx_sc_scenario::{*, multiversx_chain_vm::api::DebugHandle};
 
-use basic_features::big_num_methods::BigIntMethods;
+use basic_features::{big_num_methods::BigIntMethods};
 
 #[test]
 fn test_big_uint_zero() {
@@ -9,6 +9,26 @@ fn test_big_uint_zero() {
     let bf = basic_features::contract_obj::<DebugApi>();
     let result = bf.big_uint_zero();
     assert_eq!(BigUint::zero(), result);
+}
+
+#[test]
+#[should_panic]
+fn test_big_assert_positive() {
+    let api = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
+
+    let bigint = bf.big_int_from_i64_2(16);
+    api.bi_assert_positive(bigint.get_handle());
+}
+
+
+#[test]
+fn test_big_assert_negative() {
+    let api = DebugApi::dummy();
+    let bf = basic_features::contract_obj::<DebugApi>();
+
+    let bigint = bf.big_int_from_i64_2(-16);
+    api.bi_assert_positive(bigint.get_handle());
 }
 
 #[test]

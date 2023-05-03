@@ -58,4 +58,6 @@ pub trait BigIntApi: HandleTypeInfo {
     fn bi_shl(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize);
 
     fn bi_to_string(&self, bi_handle: Self::BigIntHandle, str_handle: Self::ManagedBufferHandle);
+
+    fn bi_assert_positive(&self, x: Self::BigIntHandle);
 }
