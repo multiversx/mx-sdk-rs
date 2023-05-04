@@ -23,3 +23,17 @@ pub fn memory_grow(delta: PageCount) -> PageCount {
 pub fn memory_grow(_delta: PageCount) -> PageCount {
     super::mem_alloc_error()
 }
+
+/// Not currently used, leaving it for reference in case someone needs to access the data.
+#[allow(unused)]
+#[cfg(target_arch = "wasm32")]
+pub fn memory_size() -> PageCount {
+    PageCount(core::arch::wasm32::memory_size(0))
+}
+
+/// Not currently used, leaving it for reference in case someone needs to access the data.
+#[allow(unused)]
+#[cfg(not(target_arch = "wasm32"))]
+pub fn memory_size() -> PageCount {
+    super::mem_alloc_error()
+}
