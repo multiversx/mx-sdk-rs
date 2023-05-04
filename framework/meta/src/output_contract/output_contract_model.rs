@@ -194,6 +194,10 @@ impl OutputContract {
         format!("{}.wat", self.output_name_base(build_args))
     }
 
+    pub fn sc_file_output_name(&self, build_args: &BuildArgs) -> String {
+        format!("{}.mxsc.json", self.output_name_base(build_args))
+    }
+
     pub fn imports_json_output_name(&self, build_args: &BuildArgs) -> String {
         format!("{}.imports.json", self.output_name_base(build_args))
     }

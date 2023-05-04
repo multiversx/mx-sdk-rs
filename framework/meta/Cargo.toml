@@ -32,6 +32,7 @@ pathdiff = "0.2.1"
 common-path = "1.0.0"
 lazy_static = "1.4.0"
 convert_case = "0.6.0"
+hex = "0.4"
 
 [dependencies.multiversx-sc]
 version = "=0.40.1"
