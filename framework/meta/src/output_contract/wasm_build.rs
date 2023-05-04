@@ -68,9 +68,9 @@ impl OutputContract {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
-        self.pack_sc_file(build_args, output_path);
         self.extract_imports(build_args, output_path);
         self.run_twiggy(build_args, output_path);
+        self.pack_sc_file(build_args, output_path);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -84,12 +84,14 @@ impl OutputContract {
     fn pack_sc_file(&self, build_args: &BuildArgs, output_path: &str) {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let compiled_bytes = fs::read(output_wasm_path).expect("failed to open compiled contract");
+        let output_mxsc_path = format!("{output_path}/{}", self.sc_file_output_name(build_args));
+        print_pack_sc_file(&output_mxsc_path);
+        print_contract_size(compiled_bytes.len());
         let sc_file_json = ScFileJson {
             abi: ContractAbiJson::from(&self.abi),
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
         };
-        let output_mxsc_path = format!("{output_path}/{}", self.sc_file_output_name(build_args));
         save_sc_file_json(&sc_file_json, output_mxsc_path);
     }
 
