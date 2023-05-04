@@ -7,10 +7,14 @@ pub enum ContractAllocator {
     /// An allocator that never deallocates. It calls memory grow to reserve memory chuncks.
     LeakingAllocator,
 
-    /// An allocator that 
+    /// An allocator that uses a statically pre-allocated chunk of memory, of 64kb.
+    ///
+    /// It also never deallocates.
     StaticAllocator64K,
 
-    /// Backwards compatibility, for now.
+    /// Uses wee-alloc, but wee-alloc needs to be explicitly imported by the contract wasm crate.
+    ///
+    /// Mostly present for historical reasons, or if in some extreme case the contract needs deallocation.
     WeeAlloc,
 }
 

@@ -45,8 +45,7 @@ unsafe impl<const SIZE: usize> GlobalAlloc for StaticAllocator<SIZE> {
         // Bump the head to the next free byte
         *self.head.get() = idx + size;
         let arena: &mut [u8; SIZE] = &mut (*self.arena.get());
-        // If we ran out of arena space, we return a null pointer, which
-        // signals a failed allocation.
+        // If we ran out of arena space, kill execution with mem_alloc_error.
         match arena.get_mut(idx) {
             Some(item) => item as *mut u8,
             _ => super::mem_alloc_error(),

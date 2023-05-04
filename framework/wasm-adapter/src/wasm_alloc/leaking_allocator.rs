@@ -53,9 +53,6 @@ unsafe impl GlobalAlloc for LeakingAllocator {
                 // TODO: is handling this case necessary? Maybe make it optional behind a feature?
                 // This assumes PAGE_SIZE is always a multiple of the required alignment, which should be true for all practical use.
                 *used = previous_size;
-                // TODO: in free mode, have minimum alignment used is rounded up to and is maxed with alignment so we can ensure there is either:
-                // 1. no space at the end of the page
-                // 2. enough space we can add it to the free list
             }
             *size = previous_size + requested_pages * PAGE_SIZE;
         }
