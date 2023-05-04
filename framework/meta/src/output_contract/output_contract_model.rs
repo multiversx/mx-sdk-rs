@@ -2,7 +2,7 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{cli_args::BuildArgs, ei::EIVersion};
 
-use super::ContractAllocator;
+use super::{multi_contract_serde_stack_size::DEFAULT_STACK_SIZE, ContractAllocator};
 
 pub const DEFAULT_LABEL: &str = "default";
 
@@ -83,6 +83,8 @@ pub struct OutputContractSettings {
     /// Allocator config, i.e which allocator to choose for the contract.
     pub allocator: ContractAllocator,
 
+    pub stack_size: usize,
+
     /// Features that are activated on the contract crate, from wasm.
     pub features: Vec<String>,
 }
@@ -94,6 +96,7 @@ impl Default for OutputContractSettings {
             panic_message: Default::default(),
             check_ei: Some(EIVersion::default()),
             allocator: Default::default(),
+            stack_size: DEFAULT_STACK_SIZE,
             features: Default::default(),
         }
     }

@@ -6,8 +6,9 @@ use std::{
 };
 
 use super::{
-    parse_allocator, parse_check_ei, MultiContractConfigSerde, OutputContract,
-    OutputContractConfig, OutputContractSerde, OutputContractSettings,
+    multi_contract_serde_stack_size::parse_stack_size, parse_allocator, parse_check_ei,
+    MultiContractConfigSerde, OutputContract, OutputContractConfig, OutputContractSerde,
+    OutputContractSettings,
 };
 
 /// Temporary structure, to help create instances of `OutputContract`. Not publicly exposed.
@@ -56,6 +57,7 @@ impl OutputContractBuilder {
                     panic_message: cms.panic_message.unwrap_or_default(),
                     check_ei: parse_check_ei(&cms.ei),
                     allocator: parse_allocator(&cms.allocator),
+                    stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
                 },
                 ..Default::default()
