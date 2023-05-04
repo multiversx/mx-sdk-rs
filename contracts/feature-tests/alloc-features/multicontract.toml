@@ -5,3 +5,4 @@ main = "alloc-features"
 [contracts.alloc-features]
 add-unlabelled = true
 allocator = "static64k"
+stack-size = "32k"
