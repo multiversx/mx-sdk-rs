@@ -1,10 +1,12 @@
 use crate::api::VmApiImpl;
 pub use alloc::alloc::Layout;
-pub use core::panic::PanicInfo;
 use multiversx_sc::{
     api::{ErrorApi, ErrorApiImpl},
     types::{ManagedBuffer, ManagedType},
 };
+
+/// Also used in wasm crate macros.
+pub use core::panic::PanicInfo;
 
 /// Default panic handler for all contracts.
 pub fn panic_fmt(_: &PanicInfo) -> ! {
@@ -12,7 +14,7 @@ pub fn panic_fmt(_: &PanicInfo) -> ! {
 }
 
 /// Panic handler that formats and sends the original message.
-/// 
+///
 /// Mostly used for debugging, the additional code is normally not deemed to be worth it.
 pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     let mut panic_msg = ManagedPanicMessage::default();
