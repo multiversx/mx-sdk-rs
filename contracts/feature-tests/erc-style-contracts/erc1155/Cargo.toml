@@ -9,12 +9,12 @@ publish = false
 path = "src/erc1155.rs"
 
 [dependencies.multiversx-sc]
-version = "0.40.1"
+version = "0.41.0"
 path = "../../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.40.1"
+version = "0.41.0"
 path = "../../../../framework/scenario"
 
 [dev-dependencies.erc1155-user-mock]
