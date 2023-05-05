@@ -47,6 +47,10 @@ pub struct OutputContractSerde {
     pub allocator: Option<String>,
 
     #[serde(default)]
+    #[serde(rename = "stack-size")]
+    pub stack_size: Option<String>,
+
+    #[serde(default)]
     pub features: Vec<String>,
 }
 
