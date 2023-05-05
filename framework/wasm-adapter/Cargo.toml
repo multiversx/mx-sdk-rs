@@ -26,9 +26,6 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
 
-[dependencies]
-wee_alloc = "0.4" 
-
 [dependencies.multiversx-sc]
 version = "=0.40.1"
 path = "../base"

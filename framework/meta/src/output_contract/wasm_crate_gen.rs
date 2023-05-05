@@ -20,15 +20,21 @@ const NUM_ASYNC_CB: usize = 1;
 
 const PREFIX_NO_STD: &str = "
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
-multiversx_sc_wasm_adapter::allocator!();
 ";
 
 impl OutputContract {
     /// Makes sure that all the necessary wasm crate directories exist.
     pub fn create_wasm_crate_dir(&self) {
         fs::create_dir_all(PathBuf::from(&self.wasm_crate_path()).join("src")).unwrap();
+    }
+
+    fn allocator_macro_invocation(&self) -> String {
+        format!(
+            "multiversx_sc_wasm_adapter::allocator!({});",
+            self.settings.allocator.to_allocator_macro_selector()
+        )
     }
 
     fn panic_handler_macro_invocation(&self) -> &'static str {
@@ -62,9 +68,8 @@ impl OutputContract {
         self.write_stat_comments(wasm_lib_file);
         wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
 
-        wasm_lib_file
-            .write_all(self.panic_handler_macro_invocation().as_bytes())
-            .unwrap();
+        writeln!(wasm_lib_file, "{}", self.allocator_macro_invocation()).unwrap();
+        writeln!(wasm_lib_file, "{}", self.panic_handler_macro_invocation()).unwrap();
 
         let mut all_endpoint_names = explicit_endpoint_names;
         if self.abi.has_callback {
@@ -124,7 +129,7 @@ fn write_endpoints_macro<'a, I>(
 ) where
     I: Iterator<Item = &'a String>,
 {
-    writeln!(wasm_lib_file, "\n").unwrap();
+    writeln!(wasm_lib_file).unwrap();
     writeln!(wasm_lib_file, "{full_macro_name} {{").unwrap();
     writeln!(wasm_lib_file, "    {contract_module_name}").unwrap();
     writeln!(wasm_lib_file, "    (").unwrap();

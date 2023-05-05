@@ -3,6 +3,8 @@ use std::collections::HashMap;
 
 use crate::ei::EIVersion;
 
+use super::ContractAllocator;
+
 #[derive(Deserialize, Debug)]
 pub struct MultiContractConfigSerde {
     #[serde(default)]
@@ -42,6 +44,13 @@ pub struct OutputContractSerde {
     pub ei: Option<String>,
 
     #[serde(default)]
+    pub allocator: Option<String>,
+
+    #[serde(default)]
+    #[serde(rename = "stack-size")]
+    pub stack_size: Option<String>,
+
+    #[serde(default)]
     pub features: Vec<String>,
 }
 
@@ -62,4 +71,11 @@ pub fn parse_check_ei(ei: &Option<String>) -> Option<EIVersion> {
     } else {
         Some(EIVersion::default())
     }
+}
+
+pub fn parse_allocator(allocator: &Option<String>) -> ContractAllocator {
+    allocator
+        .as_ref()
+        .map(|s| ContractAllocator::parse_or_panic(s))
+        .unwrap_or_default()
 }

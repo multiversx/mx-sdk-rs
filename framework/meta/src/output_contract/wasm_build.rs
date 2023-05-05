@@ -1,4 +1,4 @@
-use std::{fs, process::Command};
+use std::{ffi::OsStr, fs, process::Command};
 
 use super::{print_util::*, OutputContract};
 use crate::{cli_args::BuildArgs, ei::EIVersion, meta_wasm_tools};
@@ -31,35 +31,35 @@ impl OutputContract {
         if let Some(target_dir) = &build_args.target_dir {
             command.args(["--target-dir", target_dir]);
         }
-        let rustflags = compose_rustflags(build_args);
+        let rustflags = self.compose_rustflags(build_args);
         if !rustflags.is_empty() {
             command.env("RUSTFLAGS", rustflags);
         }
         command
     }
-}
 
-fn compose_rustflags(build_args: &BuildArgs) -> String {
-    let mut rustflags = String::new();
-    if !build_args.wasm_symbols {
-        rustflags.push_str("-C link-arg=-s");
-    }
-    if build_args.emit_mir {
-        if !rustflags.is_empty() {
-            rustflags.push(' ');
-        }
-        rustflags.push_str("--emit=mir");
-    }
-    if build_args.emit_llvm_ir {
-        if !rustflags.is_empty() {
-            rustflags.push(' ');
-        }
-        rustflags.push_str("--emit=llvm-ir");
-    }
-    rustflags
-}
+    fn compose_rustflags(&self, build_args: &BuildArgs) -> Rustflags {
+        let mut rustflags = Rustflags::default();
 
-impl OutputContract {
+        if !build_args.wasm_symbols {
+            rustflags.push_flag("-C link-arg=-s");
+        }
+
+        rustflags.push_flag(&format!(
+            "-C link-arg=-zstack-size={}",
+            self.settings.stack_size
+        ));
+
+        if build_args.emit_mir {
+            rustflags.push_flag("--emit=mir");
+        }
+
+        if build_args.emit_llvm_ir {
+            rustflags.push_flag("--emit=llvm-ir");
+        }
+        rustflags
+    }
+
     fn finalize_build(&self, build_args: &BuildArgs, output_path: &str) {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
@@ -177,5 +177,28 @@ impl OutputContract {
                 );
             }
         }
+    }
+}
+
+/// For convenience, for building rustflags.
+#[derive(Default)]
+struct Rustflags(String);
+
+impl Rustflags {
+    fn push_flag(&mut self, s: &str) {
+        if !self.0.is_empty() {
+            self.0.push(' ');
+        }
+        self.0.push_str(s);
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
+impl AsRef<OsStr> for Rustflags {
+    fn as_ref(&self) -> &OsStr {
+        self.0.as_ref()
     }
 }
