@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
 use std::{fs::File, io::Write, path::Path};
 
-use crate::abi_json::ContractAbiJson;
+use crate::abi_json::{BuildInfoAbiJson, ContractAbiJson};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ScFileJson {
+    pub build_info: BuildInfoAbiJson,
     pub abi: ContractAbiJson,
     pub size: usize,
     pub code: String,

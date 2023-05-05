@@ -87,8 +87,11 @@ impl OutputContract {
         let output_mxsc_path = format!("{output_path}/{}", self.sc_file_output_name(build_args));
         print_pack_sc_file(&output_mxsc_path);
         print_contract_size(compiled_bytes.len());
+        let mut abi = ContractAbiJson::from(&self.abi);
+        let build_info = core::mem::take(&mut abi.build_info).unwrap();
         let sc_file_json = ScFileJson {
-            abi: ContractAbiJson::from(&self.abi),
+            build_info,
+            abi,
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
         };
