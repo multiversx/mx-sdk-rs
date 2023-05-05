@@ -72,8 +72,6 @@ impl OutputContract {
         writeln!(wasm_lib_file, "{}", self.allocator_macro_invocation()).unwrap();
         writeln!(wasm_lib_file, "{}", self.panic_handler_macro_invocation()).unwrap();
 
-        writeln!(wasm_lib_file).unwrap();
-
         if self.settings.external_view {
             write_external_view_init(wasm_lib_file);
         }
