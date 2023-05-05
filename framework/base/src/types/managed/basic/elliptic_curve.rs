@@ -151,6 +151,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         api.ec_is_on_curve(self.handle.clone(), x_point.handle, y_point.handle)
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `scalar_mult` instead.")]
     pub fn scalar_mult_legacy(
         &self,
         x_point: BigUint<M>,
@@ -197,6 +198,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `scalar_base_mult` instead."
+    )]
     pub fn scalar_base_mult_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
@@ -229,6 +234,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `marshal` instead.")]
     #[cfg(feature = "alloc")]
     pub fn marshal_legacy(
         &self,
@@ -250,6 +256,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         ManagedBuffer::from_handle(result_handle)
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `marshal_compressed` instead."
+    )]
     #[cfg(feature = "alloc")]
     pub fn marshal_compressed_legacy(
         &self,
@@ -271,6 +281,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         ManagedBuffer::from_handle(result_handle)
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `unmarshal` instead.")]
     pub fn unmarshal_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
@@ -303,6 +314,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `unmarshal_compressed` instead."
+    )]
     pub fn unmarshal_compressed_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
@@ -335,6 +350,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `generate_key` instead.")]
     #[cfg(feature = "alloc")]
     pub fn generate_key_legacy(&self) -> (BigUint<M>, BigUint<M>, crate::types::heap::BoxedBytes) {
         let api = M::managed_type_impl();

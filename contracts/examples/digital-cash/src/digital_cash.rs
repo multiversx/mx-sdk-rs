@@ -85,15 +85,17 @@ pub trait DigitalCash {
 
         let caller_address = self.blockchain().get_caller();
 
-        let addr = address.as_managed_byte_array();
         let message = caller_address.as_managed_buffer();
 
         let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
         let mut transfer_occured = false;
         let block_round = self.blockchain().get_block_round();
         require!(
-            self.crypto()
-                .verify_ed25519_legacy_managed::<32>(addr, message, &signature),
+            self.crypto().verify_ed25519(
+                address.as_managed_buffer(),
+                message,
+                signature.as_managed_buffer()
+            ),
             "invalid signature"
         );
 

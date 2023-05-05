@@ -37,6 +37,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn get_caller_legacy(&self) -> Address {
+        #[allow(deprecated)]
         self.blockchain().get_caller_legacy()
     }
 

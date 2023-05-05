@@ -16,7 +16,7 @@ use super::managed_type_util::big_int_to_i64;
 
 fn assert_positive(bi: &num_bigint::BigInt) {
     assert!(
-        bi.sign() == num_bigint::Sign::Minus,
+        bi.sign() != num_bigint::Sign::Minus,
         "bitwise operations only allowed on positive integers"
     );
 }
