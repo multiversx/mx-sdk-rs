@@ -4,8 +4,8 @@ pub mod cli_args;
 pub mod cmd;
 pub mod ei;
 mod folder_structure;
+mod mxsc_file_json;
 mod print_util;
-mod sc_file_json;
 mod tools;
 
 #[macro_use]

@@ -5,8 +5,8 @@ use crate::{
     abi_json::ContractAbiJson,
     cli_args::BuildArgs,
     ei::EIVersion,
+    mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
-    sc_file_json::{save_sc_file_json, ScFileJson},
     tools::post_build,
 };
 
@@ -73,7 +73,7 @@ impl OutputContract {
         self.run_wasm2wat(build_args, output_path);
         self.extract_imports(build_args, output_path);
         self.run_twiggy(build_args, output_path);
-        self.pack_sc_file(build_args, output_path);
+        self.pack_mxsc_file(build_args, output_path);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -84,21 +84,21 @@ impl OutputContract {
             .expect("failed to copy compiled contract to output directory");
     }
 
-    fn pack_sc_file(&self, build_args: &BuildArgs, output_path: &str) {
+    fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &str) {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let compiled_bytes = fs::read(output_wasm_path).expect("failed to open compiled contract");
-        let output_mxsc_path = format!("{output_path}/{}", self.sc_file_output_name(build_args));
-        print_pack_sc_file(&output_mxsc_path);
+        let output_mxsc_path = format!("{output_path}/{}", self.mxsc_file_output_name(build_args));
+        print_pack_mxsc_file(&output_mxsc_path);
         print_contract_size(compiled_bytes.len());
         let mut abi = ContractAbiJson::from(&self.abi);
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
-        let sc_file_json = ScFileJson {
+        let mxsc_file_json = MxscFileJson {
             build_info,
             abi,
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
         };
-        save_sc_file_json(&sc_file_json, output_mxsc_path);
+        save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
     }
 
     fn run_wasm_opt(&self, build_args: &BuildArgs, output_path: &str) {

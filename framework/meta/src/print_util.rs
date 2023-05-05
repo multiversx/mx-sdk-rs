@@ -51,7 +51,7 @@ pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
     );
 }
 
-pub fn print_pack_sc_file(output_mxsc_path: &str) {
+pub fn print_pack_mxsc_file(output_mxsc_path: &str) {
     println!("{}", format!("Packing {output_mxsc_path} ...").green(),);
 }
 
