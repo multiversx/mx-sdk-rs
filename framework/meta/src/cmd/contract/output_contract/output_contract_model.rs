@@ -4,8 +4,6 @@ use crate::{cli_args::BuildArgs, ei::EIVersion};
 
 use super::{multi_contract_serde_stack_size::DEFAULT_STACK_SIZE, ContractAllocator};
 
-pub const DEFAULT_LABEL: &str = "default";
-
 #[derive(Debug)]
 pub struct OutputContractConfig {
     pub default_contract_config_name: String,

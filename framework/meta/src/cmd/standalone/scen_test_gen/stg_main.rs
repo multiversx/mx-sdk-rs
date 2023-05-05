@@ -5,15 +5,12 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{
-    folder_structure::{RelevantDirectories, RelevantDirectory},
-    scen_test_gen::stg_write::{format_test_fn_go, format_test_fn_rs},
-};
+use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::{
     process_code,
     stg_print::print_no_folder,
-    stg_write::{DEFAULT_TEST_GO, DEFAULT_TEST_RS},
+    stg_write::{format_test_fn_go, format_test_fn_rs, DEFAULT_TEST_GO, DEFAULT_TEST_RS},
     WriteTestFn,
 };
 

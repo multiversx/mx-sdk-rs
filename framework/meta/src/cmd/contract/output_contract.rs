@@ -1,4 +1,3 @@
-pub mod ei;
 mod multi_contract_serde;
 mod multi_contract_serde_stack_size;
 mod output_contract_allocator;

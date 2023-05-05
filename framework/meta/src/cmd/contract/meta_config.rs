@@ -2,11 +2,9 @@ use std::fs;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::{
-    meta_wasm_tools::check_tools_installed, output_contract::OutputContract, CargoTomlContents,
-};
+use crate::{cli_args::BuildArgs, tools::post_build::check_tools_installed, CargoTomlContents};
 
-use super::{cli_args::BuildArgs, output_contract::OutputContractConfig};
+use super::output_contract::{OutputContract, OutputContractConfig};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
