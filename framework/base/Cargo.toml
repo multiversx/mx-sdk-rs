@@ -36,5 +36,5 @@ path = "../derive"
 
 [dependencies.multiversx-sc-codec]
 version = "=0.17.1"
-path = "../codec"
+path = "../../data/codec"
 features = ["derive"]
