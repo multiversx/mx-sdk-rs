@@ -2,13 +2,14 @@ mod generate_snippets;
 mod meta_abi;
 mod meta_config;
 pub mod output_contract;
+
 mod validate_abi;
 
 use crate::cli_args::{ContractCliAction, ContractCliArgs};
 use clap::Parser;
 use meta_config::MetaConfig;
 use multiversx_sc::contract_base::ContractAbiProvider;
-use output_contract::OutputContractConfig;
+use output_contract::OutputContractGlobalConfig;
 use validate_abi::validate_abi;
 
 /// Entry point in the program from the contract meta crates.
@@ -43,10 +44,13 @@ fn process_abi<AbiObj: ContractAbiProvider>(cli_args: &ContractCliArgs) -> MetaC
 
 pub fn multi_contract_config<AbiObj: ContractAbiProvider>(
     multi_contract_config_toml_path: &str,
-) -> OutputContractConfig {
+) -> OutputContractGlobalConfig {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
     validate_abi(&original_contract_abi).expect("Invalid contract structure");
 
-    OutputContractConfig::load_from_file(multi_contract_config_toml_path, &original_contract_abi)
-        .unwrap_or_else(|| panic!("could not find file {multi_contract_config_toml_path}"))
+    OutputContractGlobalConfig::load_from_file(
+        multi_contract_config_toml_path,
+        &original_contract_abi,
+    )
+    .unwrap_or_else(|| panic!("could not find file {multi_contract_config_toml_path}"))
 }

@@ -1,17 +1,16 @@
 mod multi_contract_serde;
-mod multi_contract_serde_stack_size;
-mod output_contract_allocator;
-mod output_contract_builder;
-mod output_contract_model;
-mod print_util;
-mod sc_file_json;
+mod oc_builder;
+mod oc_config;
+mod oc_global_config;
+mod oc_settings;
 mod wasm_build;
 mod wasm_clean;
 mod wasm_crate_gen;
 mod wasm_update;
 
 pub use multi_contract_serde::*;
-pub use output_contract_allocator::*;
-pub use output_contract_builder::*;
-pub use output_contract_model::*;
+pub use oc_builder::*;
+pub use oc_config::OutputContract;
+pub use oc_global_config::OutputContractGlobalConfig;
+pub use oc_settings::OutputContractSettings;
 pub use wasm_build::*;

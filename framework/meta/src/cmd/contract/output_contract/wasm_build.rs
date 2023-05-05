@@ -1,11 +1,14 @@
 use std::{ffi::OsStr, fs, process::Command};
 
-use super::{
-    print_util::{print_build_command, *},
+use super::OutputContract;
+use crate::{
+    abi_json::ContractAbiJson,
+    cli_args::BuildArgs,
+    ei::EIVersion,
+    print_util::*,
     sc_file_json::{save_sc_file_json, ScFileJson},
-    OutputContract,
+    tools::post_build,
 };
-use crate::{abi_json::ContractAbiJson, cli_args::BuildArgs, ei::EIVersion, tools::post_build};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
