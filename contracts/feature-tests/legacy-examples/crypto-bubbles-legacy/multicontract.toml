@@ -1,0 +1,8 @@
+[settings]
+main = "crypto-bubbles-legacy"
+
+# the only purpose of this config is to specify the allocator
+[contracts.crypto-bubbles-legacy]
+add-unlabelled = true
+allocator = "wee_alloc"
+stack-size = "16 pages"

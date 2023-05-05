@@ -1,0 +1,7 @@
+[settings]
+main = "promises-features"
+
+[contracts.promises-features]
+name = "promises-features"
+add-unlabelled = true
+ei = "1.3" # the whole point of this config is to explicitly specify that this contract needs EI 1.3/VM 1.5

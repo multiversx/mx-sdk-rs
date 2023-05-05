@@ -1,4 +1,4 @@
-use multiversx_sc_meta::scen_test_gen::{format_test_fn_go, process_code};
+use multiversx_sc_meta::cmd::standalone::scen_test_gen::{format_test_fn_go, process_code};
 
 const GO_TEST_1: &str = r#"#[test]
 fn test_1_go() {

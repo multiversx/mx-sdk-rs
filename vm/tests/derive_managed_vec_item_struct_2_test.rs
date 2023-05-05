@@ -15,6 +15,7 @@ pub struct Struct2 {
     pub u_64: u64,
     pub bool_field: bool,
     pub opt_field: Option<u8>,
+    pub arr: [u16; 2],
 }
 
 #[test]
@@ -22,7 +23,7 @@ pub struct Struct2 {
 fn struct_2_static() {
     assert_eq!(
         <Struct2 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE,
-        18
+        22
     );
     assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
 }
@@ -36,6 +37,7 @@ fn struct_to_bytes_writer() {
         u_64: 4u64,
         bool_field: true,
         opt_field: Some(5),
+        arr: [0x6111, 0x6222],
     };
 
     #[rustfmt::skip]
@@ -46,6 +48,7 @@ fn struct_to_bytes_writer() {
 		/* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
 		/* bool */ 0x01,
         /* opt  */ 0x01, 0x05,
+        /* arr  */ 0x61, 0x11, 0x62, 0x22,
 	];
 
     <Struct2 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
@@ -63,6 +66,7 @@ fn struct_2_from_bytes_reader() {
         u_64: 4u64,
         bool_field: false,
         opt_field: Some(5),
+        arr: [0x6111, 0x6222],
     };
 
     #[rustfmt::skip]
@@ -73,6 +77,7 @@ fn struct_2_from_bytes_reader() {
 		/* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
 		/* bool */ 0x00,
         /* opt  */ 0x01, 0x05,
+        /* arr  */ 0x61, 0x11, 0x62, 0x22,
 	];
 
     let struct_from_bytes =
