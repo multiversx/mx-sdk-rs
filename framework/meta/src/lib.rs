@@ -17,6 +17,7 @@ pub mod scen_test_gen;
 
 pub use cargo_toml_contents::CargoTomlContents;
 pub use meta_cli::{cli_main, cli_main_standalone, multi_contract_config};
+pub use output_contract::ei;
 
 #[macro_use]
 extern crate lazy_static;

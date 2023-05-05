@@ -39,3 +39,45 @@ pub fn print_copy_contract(source_wasm_path: &str, output_wasm_path: &str) {
         format!("Copying {source_wasm_path} to {output_wasm_path} ...").green(),
     );
 }
+
+pub fn print_call_wasm_opt(wasm_path: &str) {
+    println!("{}", format!("Calling wasm-opt on {wasm_path} ...").green(),);
+}
+
+pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
+    println!(
+        "{}",
+        format!("Calling wasm2wat on {wasm_path} -> {wat_path} ...").green(),
+    );
+}
+
+pub fn print_extract_imports(imports_path: &str) {
+    println!(
+        "{}",
+        format!("Extracting imports to {imports_path} ...").green(),
+    );
+}
+
+pub fn print_check_ei(ei_version: &str) {
+    print!(
+        "{}",
+        format!("Checking EI version: {ei_version} ...").green(),
+    );
+}
+
+pub fn print_invalid_vm_hook(import_name: &str, ei_version: &str) {
+    print!(
+        "\n{}",
+        format!(
+            "WARNING! Import '{import_name}' is not available on EI version {ei_version}! This will become a hard error in the next release."
+        ).yellow(),
+    );
+}
+
+pub fn print_check_ei_ok() {
+    println!("{}", " OK".green(),);
+}
+
+pub fn print_ignore_ei_check() {
+    println!("{}", "EI version check explicitly ignored".yellow(),);
+}

@@ -113,9 +113,19 @@ pub trait DigitalCash {
         let fee = self.fee().get();
         self.require_signature(&address, &caller_address, signature);
 
+        let message = caller_address.as_managed_buffer();
+
         let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
         let mut transfer_occured = false;
         let block_round = self.blockchain().get_block_round();
+        require!(
+            self.crypto().verify_ed25519(
+                address.as_managed_buffer(),
+                message,
+                signature.as_managed_buffer()
+            ),
+            "invalid signature"
+        );
 
         for (key, deposit) in self.deposit(&address).iter() {
             if deposit.expiration_round >= block_round {

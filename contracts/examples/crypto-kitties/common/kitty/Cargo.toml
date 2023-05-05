@@ -9,7 +9,7 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../../../framework/base"
 
 [dependencies.random]

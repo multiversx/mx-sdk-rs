@@ -13,11 +13,11 @@ path = "src/lib.rs"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../../framework/snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "0.40.0"
+version = "0.40.1"
 path = "../../../../framework/scenario"
 
 [dependencies.multiversx-chain-vm]

@@ -88,9 +88,9 @@ checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
 
 [[package]]
 name = "libc"
-version = "0.2.141"
+version = "0.2.142"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3304a64d199bb964be99741b7a14d26972741915b3649639149b2479bb46f4b5"
+checksum = "6a987beff54b60ffa6d51982e1aa1146bc42f19bd26be28b0586f252fccf5317"
 
 [[package]]
 name = "memory_units"
@@ -100,7 +100,7 @@ checksum = "8452105ba047068f40ff7093dd1d9da90898e63dd61736462e9cdda6a90ad3c3"
 
 [[package]]
 name = "multiversx-sc"
-version = "0.40.0"
+version = "0.40.1"
 dependencies = [
  "bitflags",
  "hashbrown",
@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.40.0"
+version = "0.40.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -141,14 +141,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.40.0"
+version = "0.40.1"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.40.0"
+version = "0.40.1"
 dependencies = [
  "multiversx-sc",
  "wee_alloc",
