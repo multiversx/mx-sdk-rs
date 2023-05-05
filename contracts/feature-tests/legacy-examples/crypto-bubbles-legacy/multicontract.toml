@@ -5,3 +5,4 @@ main = "crypto-bubbles-legacy"
 [contracts.crypto-bubbles-legacy]
 add-unlabelled = true
 allocator = "wee_alloc"
+stack-size = "16 pages"
