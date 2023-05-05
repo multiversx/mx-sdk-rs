@@ -2,9 +2,10 @@ use std::fs::File;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::{cli_args::GenerateSnippetsArgs, meta_config::MetaConfig};
+use crate::cli_args::GenerateSnippetsArgs;
 
 use super::{
+    super::meta_config::MetaConfig,
     snippet_crate_gen::{
         create_and_get_lib_file, create_snippets_cargo_toml, create_snippets_folder,
         create_snippets_gitignore, create_src_folder,

@@ -6,8 +6,8 @@ use std::{
 };
 
 use super::{
-    multi_contract_serde_stack_size::parse_stack_size, parse_allocator, parse_check_ei,
-    MultiContractConfigSerde, OutputContract, OutputContractConfig, OutputContractSerde,
+    oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
+    MultiContractConfigSerde, OutputContract, OutputContractGlobalConfig, OutputContractSerde,
     OutputContractSettings,
 };
 
@@ -241,7 +241,7 @@ fn validate_output_contracts(contracts: &[OutputContract]) {
     }
 }
 
-impl OutputContractConfig {
+impl OutputContractGlobalConfig {
     /// Assembles an `OutputContractConfig` from a raw config object that was loaded via Serde.
     ///
     /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
@@ -261,7 +261,7 @@ impl OutputContractConfig {
             .collect();
         set_main_contract_flag(&mut contracts, &config.settings.main);
         validate_output_contracts(&contracts);
-        OutputContractConfig {
+        OutputContractGlobalConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
             contracts,
         }
@@ -273,7 +273,7 @@ impl OutputContractConfig {
     pub fn default_config(original_abi: &ContractAbi) -> Self {
         let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
         let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
-        OutputContractConfig {
+        OutputContractGlobalConfig {
             default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![OutputContract {
                 main: true,

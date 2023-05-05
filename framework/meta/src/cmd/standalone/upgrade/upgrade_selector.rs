@@ -1,16 +1,15 @@
 use crate::{
     cli_args::UpgradeArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
-    sc_upgrade::{
-        upgrade_0_39::{postprocessing_after_39_0, upgrade_to_39_0},
-        upgrade_common::version_bump_in_cargo_toml,
-        upgrade_print::*,
-        upgrade_versions::{versions_iter, DEFAULT_LAST_VERSION, VERSIONS},
-    },
 };
 
 use super::{
-    upgrade_0_31::upgrade_to_31_0, upgrade_0_32::upgrade_to_32_0, upgrade_common::cargo_check,
+    upgrade_0_31::upgrade_to_31_0,
+    upgrade_0_32::upgrade_to_32_0,
+    upgrade_0_39::{postprocessing_after_39_0, upgrade_to_39_0},
+    upgrade_common::{cargo_check, version_bump_in_cargo_toml},
+    upgrade_print::*,
+    upgrade_versions::{versions_iter, DEFAULT_LAST_VERSION, VERSIONS},
 };
 
 pub fn upgrade_sc(args: &UpgradeArgs) {

@@ -1,11 +1,14 @@
 use std::{ffi::OsStr, fs, process::Command};
 
-use super::{
+use super::OutputContract;
+use crate::{
+    abi_json::ContractAbiJson,
+    cli_args::BuildArgs,
+    ei::EIVersion,
+    mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
-    sc_file_json::{save_sc_file_json, ScFileJson},
-    OutputContract,
+    tools::post_build,
 };
-use crate::{abi_json::ContractAbiJson, cli_args::BuildArgs, ei::EIVersion, meta_wasm_tools};
 
 impl OutputContract {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
@@ -70,7 +73,7 @@ impl OutputContract {
         self.run_wasm2wat(build_args, output_path);
         self.extract_imports(build_args, output_path);
         self.run_twiggy(build_args, output_path);
-        self.pack_sc_file(build_args, output_path);
+        self.pack_mxsc_file(build_args, output_path);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -81,21 +84,21 @@ impl OutputContract {
             .expect("failed to copy compiled contract to output directory");
     }
 
-    fn pack_sc_file(&self, build_args: &BuildArgs, output_path: &str) {
+    fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &str) {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let compiled_bytes = fs::read(output_wasm_path).expect("failed to open compiled contract");
-        let output_mxsc_path = format!("{output_path}/{}", self.sc_file_output_name(build_args));
-        print_pack_sc_file(&output_mxsc_path);
+        let output_mxsc_path = format!("{output_path}/{}", self.mxsc_file_output_name(build_args));
+        print_pack_mxsc_file(&output_mxsc_path);
         print_contract_size(compiled_bytes.len());
         let mut abi = ContractAbiJson::from(&self.abi);
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
-        let sc_file_json = ScFileJson {
+        let mxsc_file_json = MxscFileJson {
             build_info,
             abi,
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
         };
-        save_sc_file_json(&sc_file_json, output_mxsc_path);
+        save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
     }
 
     fn run_wasm_opt(&self, build_args: &BuildArgs, output_path: &str) {
@@ -105,7 +108,7 @@ impl OutputContract {
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         print_call_wasm_opt(&output_wasm_path);
-        meta_wasm_tools::run_wasm_opt(output_wasm_path.as_str());
+        post_build::run_wasm_opt(output_wasm_path.as_str());
     }
 
     fn run_wasm2wat(&self, build_args: &BuildArgs, output_path: &str) {
@@ -116,7 +119,7 @@ impl OutputContract {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_wat_path = format!("{output_path}/{}", self.wat_output_name(build_args));
         print_call_wasm2wat(&output_wasm_path, &output_wat_path);
-        meta_wasm_tools::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
+        post_build::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
 
     fn extract_imports(&self, build_args: &BuildArgs, output_path: &str) {
@@ -131,8 +134,8 @@ impl OutputContract {
             self.imports_json_output_name(build_args)
         );
         print_extract_imports(&output_imports_json_path);
-        let result = meta_wasm_tools::run_wasm_objdump(output_wasm_path.as_str());
-        let import_names = meta_wasm_tools::parse_imports(result.as_str());
+        let result = post_build::run_wasm_objdump(output_wasm_path.as_str());
+        let import_names = post_build::parse_imports(result.as_str());
         write_imports_output(output_imports_json_path.as_str(), import_names.as_slice());
         validate_ei(&import_names, &self.settings.check_ei);
     }
@@ -169,7 +172,7 @@ impl OutputContract {
             if build_args.twiggy_top {
                 let output_twiggy_top_path =
                     format!("{output_path}/{}", self.twiggy_top_name(build_args));
-                meta_wasm_tools::run_twiggy_top(
+                post_build::run_twiggy_top(
                     output_wasm_path.as_str(),
                     output_twiggy_top_path.as_str(),
                 );
@@ -177,7 +180,7 @@ impl OutputContract {
             if build_args.twiggy_paths {
                 let output_twiggy_paths_path =
                     format!("{output_path}/{}", self.twiggy_paths_name(build_args));
-                meta_wasm_tools::run_twiggy_paths(
+                post_build::run_twiggy_paths(
                     output_wasm_path.as_str(),
                     output_twiggy_paths_path.as_str(),
                 );
@@ -185,7 +188,7 @@ impl OutputContract {
             if build_args.twiggy_monos {
                 let output_twiggy_monos_path =
                     format!("{output_path}/{}", self.twiggy_monos_name(build_args));
-                meta_wasm_tools::run_twiggy_monos(
+                post_build::run_twiggy_monos(
                     output_wasm_path.as_str(),
                     output_twiggy_monos_path.as_str(),
                 );
@@ -193,7 +196,7 @@ impl OutputContract {
             if build_args.twiggy_dominators {
                 let output_twiggy_dominators_path =
                     format!("{output_path}/{}", self.twiggy_dominators_name(build_args));
-                meta_wasm_tools::run_twiggy_dominators(
+                post_build::run_twiggy_dominators(
                     output_wasm_path.as_str(),
                     output_twiggy_dominators_path.as_str(),
                 );

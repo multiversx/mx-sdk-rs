@@ -2,11 +2,9 @@ use std::fs;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::{
-    meta_wasm_tools::check_tools_installed, output_contract::OutputContract, CargoTomlContents,
-};
+use crate::{cli_args::BuildArgs, tools::post_build::check_tools_installed, CargoTomlContents};
 
-use super::{cli_args::BuildArgs, output_contract::OutputContractConfig};
+use super::output_contract::{OutputContract, OutputContractGlobalConfig};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
@@ -20,12 +18,12 @@ pub struct MetaConfig {
     pub output_dir: String,
     pub snippets_dir: String,
     pub original_contract_abi: ContractAbi,
-    pub output_contracts: OutputContractConfig,
+    pub output_contracts: OutputContractGlobalConfig,
 }
 
 impl MetaConfig {
     pub fn create(original_contract_abi: ContractAbi, load_abi_git_version: bool) -> MetaConfig {
-        let output_contracts = OutputContractConfig::load_from_file_or_default(
+        let output_contracts = OutputContractGlobalConfig::load_from_file_or_default(
             MULTI_CONTRACT_CONFIG_RELATIVE_PATH,
             &original_contract_abi,
         );
