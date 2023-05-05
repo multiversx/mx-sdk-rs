@@ -106,6 +106,53 @@ where
     }
 }
 
+#[cfg(feature = "alloc")]
+impl<M, T> From<MultiValueVec<T>> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+{
+    #[inline]
+    fn from(v: MultiValueVec<T>) -> Self {
+        let mut result = MultiValueEncoded::new();
+        for item in v.into_vec() {
+            result.push(item);
+        }
+
+        result
+    }
+}
+
+#[cfg(feature = "alloc")]
+impl<M, T> Into<MultiValueVec<T>> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti + TopDecodeMulti + TopDecodeMultiLength,
+{
+    fn into(self) -> MultiValueVec<T> {
+        let mut result = MultiValueVec::new();
+        let error_handler = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR);
+
+        let mut i = 0;
+        let items_per_loop = T::get_len();
+        while let Some(buffers) = self.raw_buffers.slice(i, i + items_per_loop) {
+            let mut decode_input = multiversx_sc_codec::Vec::new();
+            for buffer in &buffers {
+                decode_input.push(buffer.to_boxed_bytes().as_slice().to_vec());
+            }
+
+            let decode_result =
+                T::multi_decode_or_handle_err(&mut decode_input, error_handler.clone());
+            let decoded = decode_result.unwrap();
+            result.push(decoded);
+
+            i += items_per_loop;
+        }
+
+        result
+    }
+}
+
 impl<M, T> MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,

@@ -6,10 +6,10 @@ pub static DEBUG_API_SUFFIX: &str = "<DebugApi>";
 pub static PLACEHOLDER_INPUT_TYPE_NAME: &str = "PlaceholderInput";
 
 #[derive(Clone, Default)]
-pub struct RustTypeString {
-    type_name: String,          // used for return types
-    default_value_expr: String, // used for arguments
-    contains_custom_types: bool,
+pub(crate) struct RustTypeString {
+    pub(crate) type_name: String,          // used for return types
+    pub(crate) default_value_expr: String, // used for arguments
+    pub(crate) contains_custom_types: bool,
 }
 
 impl RustTypeString {
@@ -26,12 +26,13 @@ impl RustTypeString {
     }
 }
 
+pub(crate) type TypesMap = HashMap<&'static str, RustTypeString>;
+
 lazy_static! {
-    static ref ABI_TYPES_TO_RUST_TYPES_MAP: HashMap<&'static str, RustTypeString> =
-        init_rust_types_map();
+    pub(crate) static ref ABI_TYPES_TO_RUST_TYPES_MAP: TypesMap = init_rust_types_map();
 }
 
-fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
+fn init_rust_types_map() -> TypesMap {
     let mut m = HashMap::new();
 
     m.insert(
@@ -149,12 +150,12 @@ enum AbiType {
     Option(String),
 }
 
-fn get_abi_type(abi_type_str: &str) -> AbiType {
+fn get_abi_type(abi_type_str: &str, types_map: &TypesMap) -> AbiType {
     let opt_inner_type_start = abi_type_str.find(INNER_TYPE_SEPARATOR);
     if opt_inner_type_start.is_none() {
         let separated_str: Vec<&str> = abi_type_str.split(INNER_TYPE_END).collect();
         let type_name = separated_str[0];
-        let opt_basic_type = ABI_TYPES_TO_RUST_TYPES_MAP.get(type_name);
+        let opt_basic_type = types_map.get(type_name);
         return match opt_basic_type {
             Some(basic_type) => AbiType::Basic(basic_type.clone()),
             None => AbiType::UserDefined(type_name.to_string()),
@@ -183,8 +184,12 @@ fn get_abi_type(abi_type_str: &str) -> AbiType {
     }
 }
 
-fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
-    let abi_type = get_abi_type(&abi_type_str);
+pub(crate) fn handle_abi_type(
+    type_string: &mut RustTypeString,
+    abi_type_str: String,
+    types_map: &TypesMap,
+) {
+    let abi_type = get_abi_type(&abi_type_str, types_map);
     match abi_type {
         AbiType::UserDefined(user_type) => {
             // most user-defined types contain managed types
@@ -195,38 +200,46 @@ fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
             type_string.type_name += &basic_type.type_name;
             type_string.default_value_expr += &basic_type.default_value_expr;
         },
-        AbiType::Variadic(inner_types) => handle_variadic_type(type_string, inner_types),
-        AbiType::Optional(inner_types) => handle_optional_type(type_string, inner_types),
-        AbiType::Multi(inner_types) => handle_multi_type(type_string, inner_types),
-        AbiType::List(inner_types) => handle_list_type(type_string, inner_types),
+        AbiType::Variadic(inner_types) => handle_variadic_type(type_string, inner_types, types_map),
+        AbiType::Optional(inner_types) => handle_optional_type(type_string, inner_types, types_map),
+        AbiType::Multi(inner_types) => handle_multi_type(type_string, inner_types, types_map),
+        AbiType::List(inner_types) => handle_list_type(type_string, inner_types, types_map),
         AbiType::Array(array_size, inner_types) => {
-            handle_array_type(type_string, array_size, inner_types)
+            handle_array_type(type_string, array_size, inner_types, types_map)
         },
-        AbiType::Option(inner_types) => handle_option_type(type_string, inner_types),
+        AbiType::Option(inner_types) => handle_option_type(type_string, inner_types, types_map),
     }
 }
 
-fn handle_variadic_type(type_string: &mut RustTypeString, inner_types: String) {
+fn handle_variadic_type(
+    type_string: &mut RustTypeString,
+    inner_types: String,
+    types_map: &TypesMap,
+) {
     type_string.type_name += "MultiValueVec<";
     type_string.default_value_expr += "MultiValueVec::from(vec![";
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(type_string, inner_types, types_map);
 
     type_string.type_name += ">";
     type_string.default_value_expr += "])";
 }
 
-fn handle_optional_type(type_string: &mut RustTypeString, inner_types: String) {
+fn handle_optional_type(
+    type_string: &mut RustTypeString,
+    inner_types: String,
+    types_map: &TypesMap,
+) {
     type_string.type_name += "OptionalValue<";
     type_string.default_value_expr += "OptionalValue::Some(";
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(type_string, inner_types, types_map);
 
     type_string.type_name += ">";
     type_string.default_value_expr += ")";
 }
 
-fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {
+fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String, types_map: &TypesMap) {
     let multi_type_end_index = inner_types.find(INNER_TYPE_END).unwrap();
     let mut inner_multi_types: Vec<&str> = inner_types[..multi_type_end_index].split(',').collect();
     let inner_multi_types_len = inner_multi_types.len();
@@ -242,7 +255,7 @@ fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {
 
     for (i, multi_type) in inner_multi_types.iter_mut().enumerate() {
         let trimmed = multi_type.trim();
-        handle_abi_type(type_string, trimmed.to_string());
+        handle_abi_type(type_string, trimmed.to_string(), types_map);
 
         if i < inner_multi_types_len - 1 {
             type_string.type_name += ", ";
@@ -254,21 +267,26 @@ fn handle_multi_type(type_string: &mut RustTypeString, inner_types: String) {
     type_string.default_value_expr += "))";
 }
 
-fn handle_list_type(type_string: &mut RustTypeString, inner_types: String) {
+fn handle_list_type(type_string: &mut RustTypeString, inner_types: String, types_map: &TypesMap) {
     type_string.type_name += "ManagedVec<DebugApi, ";
     type_string.default_value_expr += "ManagedVec::from_single_item(";
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(type_string, inner_types, types_map);
 
     type_string.type_name += ">";
     type_string.default_value_expr += ")";
 }
 
-fn handle_array_type(type_string: &mut RustTypeString, array_size: String, inner_types: String) {
+fn handle_array_type(
+    type_string: &mut RustTypeString,
+    array_size: String,
+    inner_types: String,
+    types_map: &TypesMap,
+) {
     type_string.type_name += "[";
     type_string.default_value_expr += "[";
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(type_string, inner_types, types_map);
 
     type_string.type_name += ";";
     type_string.type_name += &array_size;
@@ -279,18 +297,18 @@ fn handle_array_type(type_string: &mut RustTypeString, array_size: String, inner
     type_string.default_value_expr += "]";
 }
 
-fn handle_option_type(type_string: &mut RustTypeString, inner_types: String) {
+fn handle_option_type(type_string: &mut RustTypeString, inner_types: String, types_map: &TypesMap) {
     type_string.type_name += "Option<";
     type_string.default_value_expr += "Option::Some(";
 
-    handle_abi_type(type_string, inner_types);
+    handle_abi_type(type_string, inner_types, types_map);
 
     type_string.type_name += ">";
     type_string.default_value_expr += ")";
 }
 
-pub(crate) fn map_abi_type_to_rust_type(abi_type: String) -> RustTypeString {
+pub(crate) fn map_abi_type_to_rust_type(abi_type: String, type_map: &TypesMap) -> RustTypeString {
     let mut type_string = RustTypeString::default();
-    handle_abi_type(&mut type_string, abi_type);
+    handle_abi_type(&mut type_string, abi_type, type_map);
     type_string
 }

@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           16
+// Endpoints:                           19
 // Async Callback (empty):               1
-// Total number of exported functions:  18
+// Total number of exported functions:  21
 
 #![no_std]
 #![feature(lang_items)]
@@ -29,11 +29,14 @@ multiversx_sc_wasm_adapter::endpoints! {
         option_type
         esdt_token_payment
         egld_or_esdt_payment
+        egld_only_endpoint
         payable_endpoint
         managed_buffer
         multi_value_2
         multi_value_4
         complex_multi_values
+        view_func
+        view_custom_type
     )
 }
 

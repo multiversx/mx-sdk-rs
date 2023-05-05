@@ -97,6 +97,10 @@ pub trait PayableFeatures {
         arg.token_identifier
     }
 
+    #[payable("EGLD")]
+    #[endpoint]
+    fn egld_only_endpoint(&self) {}
+
     #[payable("*")]
     #[endpoint]
     fn payable_endpoint(&self) {}
@@ -128,5 +132,17 @@ pub trait PayableFeatures {
         arg: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
     ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
         arg
+    }
+
+    #[view]
+    fn view_func(&self) -> u64 {
+        0
+    }
+
+    #[view]
+    fn view_custom_type(&self) -> MyCoolStruct<Self::Api> {
+        MyCoolStruct {
+            awesome: BigUint::from(420u32),
+        }
     }
 }
