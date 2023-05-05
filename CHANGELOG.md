@@ -35,6 +35,7 @@ They are:
 	- Contract call stack size is now configurable in `multicontract.toml`.
 	- The 'panic with message' system now relies on managed buffers instead of on an allocator.
 - Fixed BigUint bitwise operations in the debugger.
+- When building contracts, an additional `.mxsc.json` file is created, which packs both the contract binary, the ABI, and some additional metadata.
 - Refactor: reorganized the meta crate.
 - Deprecated some legacy methods in the API wrappers.
 
