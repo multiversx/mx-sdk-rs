@@ -51,6 +51,14 @@ pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
     );
 }
 
+pub fn print_pack_sc_file(output_mxsc_path: &str) {
+    println!("{}", format!("Packing {output_mxsc_path} ...").green(),);
+}
+
+pub fn print_contract_size(size: usize) {
+    println!("{}", format!("Contract size: {size} bytes.").blue(),);
+}
+
 pub fn print_extract_imports(imports_path: &str) {
     println!(
         "{}",

@@ -10,7 +10,9 @@ use super::{meta_config::MetaConfig, output_contract::OutputContract};
 
 fn write_contract_abi(output_contract: &OutputContract, git_version: &str, output_path: &str) {
     let mut abi_json = ContractAbiJson::from(&output_contract.abi);
-    abi_json.build_info.contract_crate.git_version = git_version.to_string();
+    if let Some(build_info) = &mut abi_json.build_info {
+        build_info.contract_crate.git_version = git_version.to_string();
+    }
     let abi_string = serialize_abi_to_json(&abi_json);
 
     let abi_file_path = format!("{output_path}/{}", output_contract.abi_output_name(),);

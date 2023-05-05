@@ -30,13 +30,15 @@ pub fn print_abi<AbiTrait: ContractAbiProvider>() {
 /// Will return the main contract ABI + view contract ABI.
 pub fn abi_to_json_dummy_environment(contract_abi: &ContractAbi) -> String {
     let mut abi_json = ContractAbiJson::from(contract_abi);
-    abi_json.build_info.contract_crate.git_version = "<git version here>".to_string();
-    abi_json.build_info.rustc = RustcAbiJson {
-        version: "x.x.x-nightly".to_string(),
-        commit_hash: "<commit hash here>".to_string(),
-        commit_date: "<commit date here>".to_string(),
-        channel: "Channel".to_string(),
-        short: "rustc <version> (<short hash> <date>)".to_string(),
-    };
+    if let Some(build_info) = &mut abi_json.build_info {
+        build_info.contract_crate.git_version = "<git version here>".to_string();
+        build_info.rustc = RustcAbiJson {
+            version: "x.x.x-nightly".to_string(),
+            commit_hash: "<commit hash here>".to_string(),
+            commit_date: "<commit date here>".to_string(),
+            channel: "Channel".to_string(),
+            short: "rustc <version> (<short hash> <date>)".to_string(),
+        };
+    }
     serialize_abi_to_json(&abi_json)
 }
