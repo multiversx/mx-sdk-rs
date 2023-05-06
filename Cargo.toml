@@ -2,9 +2,10 @@
 resolver = "2"
 
 members = [
+  "data/codec",
+  "data/codec-derive",
+
   "framework/base",
-  "framework/codec",
-  "framework/codec-derive",
   "framework/derive",
   "framework/meta",
   "framework/scenario",
@@ -14,7 +15,6 @@ members = [
   "sdk/core",
   "sdk/scenario-format",
 
-  "tools/test-gen",
   "tools/mxpy-snippet-generator",
 
   "vm",

@@ -1,0 +1,7 @@
+[settings]
+main = "erc1155-marketplace"
+
+# the only purpose of this config is to specify the allocator
+[contracts.erc1155-marketplace]
+add-unlabelled = true
+allocator = "static64k"
