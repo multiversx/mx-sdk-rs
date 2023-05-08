@@ -11,7 +11,7 @@ pub trait PanicMessageFeatures {
     fn init(&self) {}
 
     #[endpoint(panicWithMessage)]
-    fn panic_with_message(&self) {
-        panic!("example panic message");
+    fn panic_with_message(&self, some_value: u32) {
+        panic!("example panic message {some_value}");
     }
 }

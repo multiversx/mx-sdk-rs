@@ -9,13 +9,13 @@ publish = false
 path = "src/seed_nft_minter.rs"
 
 [dependencies.multiversx-sc]
-version = "0.40.1"
+version = "0.41.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.40.1"
+version = "0.41.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.40.1"
+version = "0.41.0"
 path = "../../../framework/scenario"
