@@ -1,23 +1,18 @@
 pub mod abi_json;
 mod cargo_toml_contents;
 pub mod cli_args;
+pub mod cmd;
+pub mod ei;
 mod folder_structure;
-mod generate_snippets;
-mod local_deps;
-mod meta_abi;
-mod meta_all;
-mod meta_cli;
-mod meta_config;
-mod meta_info;
-mod meta_validate_abi;
-mod meta_wasm_tools;
-pub mod output_contract;
-mod sc_upgrade;
-pub mod scen_test_gen;
-
-pub use cargo_toml_contents::CargoTomlContents;
-pub use meta_cli::{cli_main, cli_main_standalone, multi_contract_config};
-pub use output_contract::ei;
+mod mxsc_file_json;
+mod print_util;
+mod tools;
 
 #[macro_use]
 extern crate lazy_static;
+
+pub use cargo_toml_contents::CargoTomlContents;
+pub use cmd::{
+    contract::{cli_main, multi_contract_config},
+    standalone::cli_main_standalone,
+};

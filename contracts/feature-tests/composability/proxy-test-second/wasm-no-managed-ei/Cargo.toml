@@ -20,7 +20,7 @@ path = ".."
 features = ["ei-unmanaged"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.40.1"
+version = "0.41.0"
 path = "../../../../../framework/wasm-adapter"
 features = ["ei-unmanaged-node"]
 

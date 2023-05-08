@@ -2,9 +2,10 @@
 resolver = "2"
 
 members = [
+  "data/codec",
+  "data/codec-derive",
+
   "framework/base",
-  "framework/codec",
-  "framework/codec-derive",
   "framework/derive",
   "framework/meta",
   "framework/scenario",

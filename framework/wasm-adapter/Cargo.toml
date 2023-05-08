@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-wasm-adapter"
-version = "0.40.1"
+version = "0.41.0"
 edition = "2021"
 
 authors = [
@@ -26,9 +26,6 @@ vm-validate-token-identifier = []
 vm-esdt-local-roles = []
 ei-unmanaged-node = []
 
-[dependencies]
-wee_alloc = "0.4" 
-
 [dependencies.multiversx-sc]
-version = "=0.40.1"
+version = "=0.41.0"
 path = "../base"
