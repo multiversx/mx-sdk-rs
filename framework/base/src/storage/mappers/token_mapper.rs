@@ -10,6 +10,8 @@ use crate::{
     },
 };
 
+use super::TokenMapperState;
+
 pub(crate) const TOKEN_ID_ALREADY_SET_ERR_MSG: &[u8] = b"Token ID already set";
 pub(crate) const PENDING_ERR_MSG: &[u8] = b"Issue was already called";
 pub(crate) const MUST_SET_TOKEN_ID_ERR_MSG: &[u8] = b"Must issue or set token ID first";
@@ -100,7 +102,12 @@ where
 pub(crate) fn read_token_id<SA: StorageMapperApi + CallTypeApi>(
     storage_key: ManagedRef<SA, StorageKey<SA>>,
 ) -> TokenIdentifier<SA> {
-    storage_get(storage_key)
+    let storage_value: TokenMapperState<SA> = storage_get(storage_key);
+    match storage_value {
+        TokenMapperState::NotSet => SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG),
+        TokenMapperState::Pending => SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG),
+        TokenMapperState::Token(token) => token,
+    }
 }
 
 pub(crate) fn store_token_id<
@@ -111,11 +118,30 @@ pub(crate) fn store_token_id<
     token_id: &TokenIdentifier<SA>,
 ) {
     if !mapper.is_empty() {
-        SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-    }
-    if !token_id.is_valid_esdt_identifier() {
-        SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
-    }
+        let storage_value: TokenMapperState<SA> = storage_get(mapper.get_storage_key());
+        if !storage_value.is_not_set() {
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        }
 
-    storage_set(mapper.get_storage_key(), token_id);
+        if !token_id.is_valid_esdt_identifier() {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+        }
+    }
+    storage_set(mapper.get_storage_key(), &token_id);
+}
+
+pub(crate) fn check_not_set_or_pending<
+    SA: StorageMapperApi + CallTypeApi,
+    Mapper: StorageTokenWrapper<SA>,
+>(
+    mapper: &Mapper,
+) {
+    if !mapper.is_empty() {
+        let storage_value: TokenMapperState<SA> = storage_get(mapper.get_storage_key());
+        if storage_value.is_pending() {
+            SA::error_api_impl().signal_error(PENDING_ERR_MSG);
+        } else if !storage_value.is_not_set() {
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        }
+    }
 }

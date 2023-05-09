@@ -1,19 +1,16 @@
 use crate::{
     abi::TypeAbi,
     codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
-    storage_get, storage_set,
+    storage_set,
 };
 
 use super::{
-    token_mapper::{
-        read_token_id, store_token_id, StorageTokenWrapper, PENDING_ERR_MSG,
-        TOKEN_ID_ALREADY_SET_ERR_MSG,
-    },
+    token_mapper::{check_not_set_or_pending, read_token_id, store_token_id, StorageTokenWrapper},
     StorageMapper, TokenMapperState,
 };
 use crate::{
     abi::TypeName,
-    api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
+    api::{CallTypeApi, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
@@ -103,7 +100,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        self.check_not_set_or_pending();
+        check_not_set_or_pending(self);
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
@@ -158,7 +155,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        self.check_not_set_or_pending();
+        check_not_set_or_pending(self);
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
@@ -178,17 +175,6 @@ where
             .async_call()
             .with_callback(callback)
             .call_and_exit();
-    }
-
-    fn check_not_set_or_pending(&self) {
-        if !self.is_empty() {
-            let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
-            if storage_value.is_pending() {
-                SA::error_api_impl().signal_error(PENDING_ERR_MSG);
-            } else if !storage_value.is_not_set() {
-                SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-            }
-        }
     }
 
     fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {
