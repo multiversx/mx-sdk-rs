@@ -1,7 +1,7 @@
 multiversx_sc::imports!();
 
 /// Several alternative constructors, used for testing.
-/// 
+///
 /// We are using the multi-contract build system, to avoid having too many SC crates.
 /// We need to generate a separate contract for each of these constructors.
 #[multiversx_sc::module]
