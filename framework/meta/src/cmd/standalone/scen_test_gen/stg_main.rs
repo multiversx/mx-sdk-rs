@@ -21,7 +21,7 @@ pub fn perform_test_gen_all(path: impl AsRef<Path>, ignore: &[String], create: b
     let root_path = path.as_ref();
     let dirs = RelevantDirectories::find_all(root_path, ignore);
 
-    for contract_dir in dirs.iter_contract_crates() {
+    for contract_dir in dirs.iter() {
         perform_test_gen(contract_dir, create);
     }
 }
