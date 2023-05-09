@@ -24,7 +24,7 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/adder.wasm",
+                "contractCode": "mxsc:../output/adder.mxsc.json",
                 "arguments": [
                     "5"
                 ],

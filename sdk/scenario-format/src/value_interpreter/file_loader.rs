@@ -2,8 +2,15 @@ use std::{
     fs,
     path::{Component, Path, PathBuf},
 };
+use serde::{Deserialize, Serialize};
+
 
 use crate::interpret_trait::InterpreterContext;
+
+#[derive(Serialize, Deserialize)]
+pub struct MxscFileJson {
+    pub code: String,
+}
 
 pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
     let mut path_buf = context.context_path.clone();
@@ -16,6 +23,17 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
             panic!("not found: {path_buf:#?}")
         }
     })
+}
+
+pub fn load_mxsc_file_json(mxsc_file_path: &str, context: &InterpreterContext) -> Vec<u8> {
+    let mxsc_json_file = load_file(mxsc_file_path, context);
+    let mxsc_json_file = match std::str::from_utf8(&mxsc_json_file) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+
+    let mxsc_json: MxscFileJson = serde_json::from_str(mxsc_json_file).unwrap();
+    mxsc_json.code.into()
 }
 
 fn missing_file_value(path_buf: &Path) -> Vec<u8> {
