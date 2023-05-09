@@ -33,23 +33,31 @@ fn forw_raw_async_echo_go() {
 #[test]
 #[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_async_send_and_retrieve_multi_transfer_funds_go() {
-    multiversx_sc_scenario::run_go("scenarios/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json",
+    );
 }
 
 #[test]
 fn forw_raw_builtin_nft_local_mint_via_async_call_go() {
-    multiversx_sc_scenario::run_go("scenarios/forw_raw_builtin_nft_local_mint_via_async_call.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forw_raw_builtin_nft_local_mint_via_async_call.scen.json",
+    );
 }
 
 #[test]
 fn forw_raw_builtin_nft_local_mint_via_sync_call_go() {
-    multiversx_sc_scenario::run_go("scenarios/forw_raw_builtin_nft_local_mint_via_sync_call.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forw_raw_builtin_nft_local_mint_via_sync_call.scen.json",
+    );
 }
 
 #[test]
 #[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_call_async_retrieve_multi_transfer_go() {
-    multiversx_sc_scenario::run_go("scenarios/forw_raw_call_async_retrieve_multi_transfer.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forw_raw_call_async_retrieve_multi_transfer.scen.json",
+    );
 }
 
 #[test]
@@ -89,9 +97,13 @@ fn forw_raw_init_async_go() {
 }
 
 #[test]
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
-fn forw_raw_init_sync_go() {
-    multiversx_sc_scenario::run_go("scenarios/forw_raw_init_sync.scen.json");
+fn forw_raw_init_sync_accept_egld_go() {
+    multiversx_sc_scenario::run_go("scenarios/forw_raw_init_sync_accept_egld.scen.json");
+}
+
+#[test]
+fn forw_raw_init_sync_echo_go() {
+    multiversx_sc_scenario::run_go("scenarios/forw_raw_init_sync_echo.scen.json");
 }
 
 #[test]
@@ -252,7 +264,9 @@ fn forwarder_call_transf_exec_accept_egld_go() {
 
 #[test]
 fn forwarder_call_transf_exec_accept_egld_twice_go() {
-    multiversx_sc_scenario::run_go("scenarios/forwarder_call_transf_exec_accept_egld_twice.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forwarder_call_transf_exec_accept_egld_twice.scen.json",
+    );
 }
 
 #[test]
@@ -262,12 +276,16 @@ fn forwarder_call_transf_exec_accept_esdt_go() {
 
 #[test]
 fn forwarder_call_transf_exec_accept_esdt_twice_go() {
-    multiversx_sc_scenario::run_go("scenarios/forwarder_call_transf_exec_accept_esdt_twice.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forwarder_call_transf_exec_accept_esdt_twice.scen.json",
+    );
 }
 
 #[test]
 fn forwarder_call_transf_exec_accept_multi_transfer_go() {
-    multiversx_sc_scenario::run_go("scenarios/forwarder_call_transf_exec_accept_multi_transfer.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forwarder_call_transf_exec_accept_multi_transfer.scen.json",
+    );
 }
 
 #[test]
@@ -277,17 +295,23 @@ fn forwarder_call_transf_exec_accept_nft_go() {
 
 #[test]
 fn forwarder_call_transf_exec_accept_return_values_go() {
-    multiversx_sc_scenario::run_go("scenarios/forwarder_call_transf_exec_accept_return_values.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forwarder_call_transf_exec_accept_return_values.scen.json",
+    );
 }
 
 #[test]
 fn forwarder_call_transf_exec_accept_sft_twice_go() {
-    multiversx_sc_scenario::run_go("scenarios/forwarder_call_transf_exec_accept_sft_twice.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forwarder_call_transf_exec_accept_sft_twice.scen.json",
+    );
 }
 
 #[test]
 fn forwarder_call_transf_exec_reject_multi_transfer_go() {
-    multiversx_sc_scenario::run_go("scenarios/forwarder_call_transf_exec_reject_multi_transfer.scen.json");
+    multiversx_sc_scenario::run_go(
+        "scenarios/forwarder_call_transf_exec_reject_multi_transfer.scen.json",
+    );
 }
 
 #[test]

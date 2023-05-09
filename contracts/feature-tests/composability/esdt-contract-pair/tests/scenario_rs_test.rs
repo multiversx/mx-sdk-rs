@@ -33,7 +33,10 @@ fn simple_transfer_full_rs() {
 
 #[test]
 fn simple_transfer_full_wrong_token_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/simple_transfer_full_wrong_token.scen.json", world());
+    multiversx_sc_scenario::run_rs(
+        "scenarios/simple_transfer_full_wrong_token.scen.json",
+        world(),
+    );
 }
 
 #[test]

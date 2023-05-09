@@ -1,12 +1,11 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
             "accounts": {
                 "address:owner": {
                     "nonce": "0",
-                    "balance": "0"
+                    "balance": "1000"
                 },
                 "sc:vault": {
                     "nonce": "0",
@@ -28,11 +27,10 @@
             "tx": {
                 "from": "address:owner",
                 "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
+                "egldValue": "1000",
                 "arguments": [
                     "sc:vault",
-                    "str:echo_arguments",
-                    "1",
-                    "2"
+                    "str:accept_funds"
                 ],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"
@@ -40,7 +38,7 @@
             "expect": {
                 "out": [],
                 "status": "10",
-                "message": "str:async call is not allowed at this location",
+                "message": "str:failed transfer (insufficient funds)",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

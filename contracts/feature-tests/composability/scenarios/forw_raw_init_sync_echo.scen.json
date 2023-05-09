@@ -26,7 +26,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-async-call.wasm",
+                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
@@ -37,10 +37,26 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "10",
-                "message": "str:async call is not allowed at this location",
-                "logs": "*",
+                "out": [
+                    "1",
+                    "2"
+                ],
+                "status": "",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "",
+                        "topics": [
+                            "str:execute_on_dest_context_result"
+                        ],
+                        "data": {
+                            "0-echoed-args": [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
+                        }
+                    }
+                ],
                 "gas": "*",
                 "refund": "*"
             }
