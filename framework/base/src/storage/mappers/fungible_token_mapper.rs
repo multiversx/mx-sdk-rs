@@ -74,6 +74,24 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     /// Important: If you use custom callback, remember to save the token ID in the callback!
+    ///
+    /// #[callback]
+    /// fn my_custom_callback(
+    ///     &self,
+    ///     storage_key: ManagedBuffer,
+    ///     #[call_result] result: ManagedAsyncCallResult<()>,
+    /// ) {
+    ///     let mapper =
+    ///         SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(storage_key.into());
+    ///     match result {
+    ///         ManagedAsyncCallResult::Ok(()) => {
+    ///             mapper.set(TokenMapperState::Token(token_id));
+    ///         },
+    ///         ManagedAsyncCallResult::Err(_) => {
+    ///             mapper.set(TokenMapperState::NotSet);
+    ///         },
+    ///     }
+    ///
     /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from multiversx-sc-modules
     /// and pass None for the opt_callback argument
     pub fn issue(
@@ -112,6 +130,24 @@ where
     }
 
     /// Important: If you use custom callback, remember to save the token ID in the callback!
+    ///
+    /// #[callback]
+    /// fn my_custom_callback(
+    ///     &self,
+    ///     storage_key: ManagedBuffer,
+    ///     #[call_result] result: ManagedAsyncCallResult<()>,
+    /// ) {
+    ///     let mapper =
+    ///         SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(storage_key.into());
+    ///     match result {
+    ///         ManagedAsyncCallResult::Ok(()) => {
+    ///             mapper.set(TokenMapperState::Token(token_id));
+    ///         },
+    ///         ManagedAsyncCallResult::Err(_) => {
+    ///             mapper.set(TokenMapperState::NotSet);
+    ///         },
+    ///     }
+    ///
     /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from multiversx-sc-modules
     /// and pass None for the opt_callback argument
     pub fn issue_and_set_all_roles(
