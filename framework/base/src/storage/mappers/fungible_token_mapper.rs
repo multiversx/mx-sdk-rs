@@ -183,9 +183,9 @@ where
     fn check_not_set_or_pending(&self) {
         if !self.is_empty() {
             let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
-            if storage_value.is_not_available() {
+            if storage_value.is_pending() {
                 SA::error_api_impl().signal_error(PENDING_ERR_MSG);
-            } else {
+            } else if !storage_value.is_not_set() {
                 SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
             }
         }
