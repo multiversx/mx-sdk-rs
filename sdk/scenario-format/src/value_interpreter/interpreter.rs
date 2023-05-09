@@ -49,7 +49,7 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
     if s == "false" {
         return Vec::new();
     }
-    
+
     for str_prefix in STR_PREFIXES.iter() {
         if let Some(stripped) = s.strip_prefix(str_prefix) {
             return stripped.as_bytes().to_vec();
