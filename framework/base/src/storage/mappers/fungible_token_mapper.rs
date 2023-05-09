@@ -85,9 +85,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        if !self.is_empty() {
-            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
+        self.check_not_set_or_pending();
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
@@ -99,6 +97,7 @@ where
             ..Default::default()
         };
 
+        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         system_sc_proxy
             .issue_fungible(
                 issue_cost,
