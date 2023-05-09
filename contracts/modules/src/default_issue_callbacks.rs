@@ -1,13 +1,6 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub enum TokenMapperState<M: ManagedTypeApi> {
-    NotSet,
-    Pending,
-    Token(TokenIdentifier<M>),
-}
-
 // Always keep in sync with the token-related storage mappers. Only modify if really necessary.
 #[multiversx_sc::module]
 pub trait DefaultIssueCallbacksModule {
