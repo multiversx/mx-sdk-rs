@@ -192,7 +192,7 @@
                         "str:TICKER-000000": "1000"
                     },
                     "storage": {
-                        "str:fungibleTokenMapper": ""
+                        "str:fungibleTokenMapper": "u8:0"
                     },
                     "code": "file:../output/basic-features.wasm"
                 }
