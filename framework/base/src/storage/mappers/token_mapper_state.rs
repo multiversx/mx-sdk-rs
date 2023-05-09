@@ -23,6 +23,6 @@ impl<M: ManagedTypeApi> TokenMapperState<M> {
         matches!(self, TokenMapperState::NotSet)
     }
     pub fn is_not_available(&self) -> bool {
-        matches!(self, TokenMapperState::Pending | TokenMapperState::NotSet
+        matches!(self, TokenMapperState::Pending | TokenMapperState::NotSet)
     }
 }

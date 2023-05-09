@@ -83,7 +83,7 @@
                 "to": "sc:basic-features",
                 "function": "mapper_nft_set_token_id",
                 "arguments": [
-                    "str:TICKER-000000"
+                    "u8:2|nested:str:TICKER-000000"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
