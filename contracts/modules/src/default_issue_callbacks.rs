@@ -11,15 +11,15 @@ pub trait DefaultIssueCallbacksModule {
         storage_key: ManagedBuffer,
         #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
     ) {
+        let mapper =
+            SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(storage_key.into());
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                let mapper = SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(
-                    storage_key.into(),
-                );
                 mapper.set(TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
+                mapper.set(TokenMapperState::NotSet);
             },
         }
     }
@@ -31,16 +31,16 @@ pub trait DefaultIssueCallbacksModule {
         storage_key: ManagedBuffer,
         #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
+        let mapper =
+            SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(storage_key.into());
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_id = self.call_value().single_esdt().token_identifier;
-                let mapper = SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(
-                    storage_key.into(),
-                );
                 mapper.set(TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
+                mapper.set(TokenMapperState::NotSet);
             },
         }
     }
