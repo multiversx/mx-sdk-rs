@@ -1,12 +1,14 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
+mod forwarder_raw_alt_init;
+
 multiversx_sc::imports!();
 
 /// Test contract for investigating async calls.
 /// TODO: split into modules
 #[multiversx_sc::contract]
-pub trait ForwarderRaw {
+pub trait ForwarderRaw: forwarder_raw_alt_init::ForwarderRawAlterativeInit {
     #[init]
     fn init(&self) {}
 
