@@ -131,7 +131,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:2|nested:str:TICKER-111111"
+                    "str:TICKER-111111"
                 ],
                 "status": "",
                 "logs": "*",
@@ -297,7 +297,7 @@
             },
             "expect": {
                 "out": [
-                    "u8:2|nested:str:TICKER-333333"
+                    "str:TICKER-333333"
                 ],
                 "status": "",
                 "logs": "*",
