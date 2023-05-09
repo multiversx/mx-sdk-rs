@@ -28,7 +28,7 @@ fn adder_scenario_constructed_raw() {
         .sc_deploy_step(
             ScDeployStep::new()
                 .from(owner_address)
-                .contract_code("file:output/adder.wasm", &ic)
+                .contract_code("mxsc:output/adder.mxsc.json", &ic)
                 .call(adder_contract.init(5u32))
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),

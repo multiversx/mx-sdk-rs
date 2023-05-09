@@ -24,15 +24,11 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
     })
 }
 
-pub fn load_mxsc_file_json(mxsc_file_path: &str, context: &InterpreterContext) -> Vec<u8> {
-    let mxsc_json_file = load_file(mxsc_file_path, context);
-    let mxsc_json_file = match std::str::from_utf8(&mxsc_json_file) {
-        Ok(v) => v,
-        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
-    };
-
-    let mxsc_json: MxscFileJson = serde_json::from_str(mxsc_json_file).unwrap();
-    mxsc_json.code.into()
+pub fn load_mxsc_file_json(mxsc_file_path: &str) -> Vec<u8> {
+    let contents = fs::read_to_string(mxsc_file_path)
+        .unwrap_or_else(|e| panic!("not found: {} {:?}", e, mxsc_file_path));
+    let mxsc_json: MxscFileJson = serde_json::from_str(contents.as_str()).unwrap();
+    hex::decode(&mxsc_json.code).expect("Could not decode contract code")
 }
 
 fn missing_file_value(path_buf: &Path) -> Vec<u8> {
