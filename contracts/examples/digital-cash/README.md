@@ -8,7 +8,7 @@ The basic idea of MultiversX Digital Cash is that ONE link can hold information 
 
 The contract allows funding any number of tokens in 1 call within a address under a valability if the fee cost was covered.
 
-In order to fund one should first call `payment_fees` depositing the fee funds as `eGLD` within the contract. Only after the contract if the fees cover the transfer of the certain number of tokens set willdeposit the funds making them available for claiming or forwarding.
+In order to fund one should first call `deposit_fees` depositing the fee funds as `eGLD` within the contract. Only after the contract if the fees cover the transfer of the certain number of tokens set willdeposit the funds making them available for claiming or forwarding.
 
 `fund` after making sure everything is ok on the fee aspect will set up the `deposit` storage increasing the number of tokens to transfer by the number of tokens paid to the endpoint and set the expiration date by the number of rounds specified within the `valability` parameter.
 

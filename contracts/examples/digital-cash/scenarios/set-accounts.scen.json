@@ -34,7 +34,9 @@
             "tx": {
                 "from": "address:digital_cash_owner_address",
                 "contractCode": "file:../output/digital-cash.wasm",
-                "arguments": [],
+                "arguments": [
+                    "biguint:10"
+                ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },

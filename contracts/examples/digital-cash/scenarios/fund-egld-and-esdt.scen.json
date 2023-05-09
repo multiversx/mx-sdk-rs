@@ -7,7 +7,54 @@
         },
         {
             "step": "scCall",
-            "id": "fund",
+            "id": "fail-fund",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "1,000,000",
+                "function": "fund",
+                "arguments": [
+                    "0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a",
+                    "u64:100"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:fees not covered",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-funds",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "1,000,000",
+                "function": "deposit_fees",
+                "arguments": [
+                    "0x558fd9b0dd9fed3d3bed883d3b92907743362c56b9728392f84b261f1cc5ae0a"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fund-1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -62,6 +109,29 @@
                     "balance": "0",
                     "storage": {}
                 }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "payment-funds-2",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "1,000,000",
+                "function": "deposit_fees",
+                "arguments": [
+                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
             }
         },
         {

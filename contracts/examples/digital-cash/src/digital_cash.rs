@@ -23,10 +23,7 @@ pub trait DigitalCash {
     #[endpoint]
     #[payable("*")]
     fn fund(&self, address: ManagedAddress, valability: u64) {
-        require!(
-            !self.deposit(&address).is_empty(),
-            "cannot deposit funds without covering the fee cost first"
-        );
+        require!(!self.deposit(&address).is_empty(), "fees not covered");
 
         let esdt_payment = self.call_value().all_esdt_transfers().clone_value();
         let egld_payment = self.call_value().egld_value().clone_value();
@@ -142,7 +139,7 @@ pub trait DigitalCash {
 
     #[endpoint]
     #[payable("EGLD")]
-    fn payment_funds(&self, address: ManagedAddress) {
+    fn deposit_fees(&self, address: ManagedAddress) {
         let payment = self.call_value().egld_value().clone_value();
         let caller_address = self.blockchain().get_caller();
 
