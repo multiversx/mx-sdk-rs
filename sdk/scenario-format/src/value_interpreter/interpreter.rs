@@ -1,6 +1,11 @@
 use crate::{interpret_trait::InterpreterContext, serde_raw::ValueSubTree};
 
-use super::{file_loader::{load_file, load_mxsc_file_json}, functions::*, parse_num::*, prefixes::*};
+use super::{
+    file_loader::{load_file, load_mxsc_file_json},
+    functions::*,
+    parse_num::*,
+    prefixes::*,
+};
 
 pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Vec<u8> {
     match vst {

@@ -7,7 +7,6 @@ pub(super) const KECCAK256_PREFIX: &str = "keccak256:";
 pub(super) const BECH32_PREFIX: &str = "bech32:";
 pub(super) const MXSC_PREFIX: &str = "mxsc:";
 
-
 pub(super) const U64_PREFIX: &str = "u64:";
 pub(super) const U32_PREFIX: &str = "u32:";
 pub(super) const U16_PREFIX: &str = "u16:";
