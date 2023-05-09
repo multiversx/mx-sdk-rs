@@ -1,13 +1,17 @@
-use crate::codec::{
-    CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+use crate::{
+    codec::{
+        CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+    },
+    storage_get, storage_set,
 };
 
 use super::{
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
     token_mapper::{
-        read_token_id, store_token_id, StorageTokenWrapper, TOKEN_ID_ALREADY_SET_ERR_MSG,
+        read_token_id, store_token_id, StorageTokenWrapper, PENDING_ERR_MSG,
+        TOKEN_ID_ALREADY_SET_ERR_MSG,
     },
-    StorageMapper,
+    StorageMapper, TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -85,9 +89,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        if !self.is_empty() {
-            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
+        self.check_not_set_or_pending();
 
         let callback = match opt_callback {
             Some(cb) => cb,
@@ -106,6 +108,7 @@ where
             _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),
         };
 
+        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         contract_call
             .async_call()
             .with_callback(callback)
@@ -124,9 +127,8 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        if !self.is_empty() {
-            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
+        self.check_not_set_or_pending();
+
         if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
             SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
         }
@@ -137,6 +139,7 @@ where
             None => self.default_callback_closure_obj(),
         };
 
+        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         system_sc_proxy
             .issue_and_set_all_roles(
                 issue_cost,
@@ -148,6 +151,16 @@ where
             .async_call()
             .with_callback(callback)
             .call_and_exit();
+    }
+
+    fn check_not_set_or_pending(&self) {
+        if !self.is_empty() {
+            let storage_value: TokenMapperState<SA> = storage_get(self.get_storage_key());
+            if storage_value.is_not_available() {
+                SA::error_api_impl().signal_error(PENDING_ERR_MSG);
+            }
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        }
     }
 
     fn default_callback_closure_obj(&self) -> CallbackClosure<SA> {

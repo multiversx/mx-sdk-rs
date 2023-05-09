@@ -44,7 +44,7 @@
             },
             "expect": {
                 "out": [
-                    "str:TICKER-000000"
+                    "u8:2|nested:str:TICKER-000000"
                 ],
                 "status": "",
                 "logs": "*",
