@@ -102,12 +102,7 @@ where
 pub(crate) fn read_token_id<SA: StorageMapperApi + CallTypeApi>(
     storage_key: ManagedRef<SA, StorageKey<SA>>,
 ) -> TokenIdentifier<SA> {
-    let storage_value: TokenMapperState<SA> = storage_get(storage_key);
-    match storage_value {
-        TokenMapperState::NotSet => SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG),
-        TokenMapperState::Pending => SA::error_api_impl().signal_error(MUST_SET_TOKEN_ID_ERR_MSG),
-        TokenMapperState::Token(token) => token,
-    }
+    storage_get(storage_key)
 }
 
 pub(crate) fn store_token_id<
