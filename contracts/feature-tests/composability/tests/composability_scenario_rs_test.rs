@@ -37,6 +37,24 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+#[ignore = "not yet supported"]
+fn promises_multi_transfer_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios-promises/promises_multi_transfer.scen.json",
+        world(),
+    );
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn promises_single_transfer_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios-promises/promises_single_transfer.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn forw_queue_async_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forw_queue_async.scen.json", world());
 }
@@ -122,6 +140,27 @@ fn forw_raw_direct_multi_esdt_rs() {
 }
 
 #[test]
+#[ignore = "not yet supported"]
+fn forw_raw_init_async_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forw_raw_init_async.scen.json", world());
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_init_sync_accept_egld_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/forw_raw_init_sync_accept_egld.scen.json",
+        world(),
+    );
+}
+
+#[test]
+#[ignore = "not yet supported"]
+fn forw_raw_init_sync_echo_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/forw_raw_init_sync_echo.scen.json", world());
+}
+
+#[test]
 fn forw_raw_sync_echo_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_echo.scen.json", world());
 }
@@ -136,20 +175,20 @@ fn forw_raw_sync_egld_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_egld.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn forw_raw_sync_readonly_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_readonly.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn forw_raw_sync_same_context_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forw_raw_sync_same_context.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn forw_raw_sync_same_context_egld_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/forw_raw_sync_same_context_egld.scen.json",
@@ -521,14 +560,14 @@ fn forwarder_send_esdt_multi_transfer_rs() {
     );
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn forwarder_send_twice_egld_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forwarder_send_twice_egld.scen.json", world());
 }
 
-#[ignore]
 #[test]
+#[ignore]
 fn forwarder_send_twice_esdt_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forwarder_send_twice_esdt.scen.json", world());
 }
@@ -555,34 +594,17 @@ fn forwarder_validate_token_identifier_rs() {
 }
 
 #[test]
-fn promises_multi_transfer_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios-promises/promises_multi_transfer.scen.json",
-        world(),
-    );
-}
-
-#[ignore]
-#[test]
-fn promises_single_transfer_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios-promises/promises_single_transfer.scen.json",
-        world(),
-    );
-}
-
-#[test]
 fn proxy_test_init_rs() {
     multiversx_sc_scenario::run_rs("scenarios/proxy_test_init.scen.json", world());
 }
 
 #[test]
-fn proxy_test_message_othershard_rs() {
+fn proxy_test_message_other_shard_rs() {
     multiversx_sc_scenario::run_rs("scenarios/proxy_test_message_otherShard.scen.json", world());
 }
 
 #[test]
-fn proxy_test_message_othershard_callback_rs() {
+fn proxy_test_message_other_shard_callback_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/proxy_test_message_otherShard_callback.scen.json",
         world(),
@@ -590,12 +612,12 @@ fn proxy_test_message_othershard_callback_rs() {
 }
 
 #[test]
-fn proxy_test_message_sameshard_rs() {
+fn proxy_test_message_same_shard_rs() {
     multiversx_sc_scenario::run_rs("scenarios/proxy_test_message_sameShard.scen.json", world());
 }
 
 #[test]
-fn proxy_test_message_sameshard_callback_rs() {
+fn proxy_test_message_same_shard_callback_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/proxy_test_message_sameShard_callback.scen.json",
         world(),
@@ -603,12 +625,12 @@ fn proxy_test_message_sameshard_callback_rs() {
 }
 
 #[test]
-fn proxy_test_payment_othershard_rs() {
+fn proxy_test_payment_other_shard_rs() {
     multiversx_sc_scenario::run_rs("scenarios/proxy_test_payment_otherShard.scen.json", world());
 }
 
 #[test]
-fn proxy_test_payment_othershard_callback_rs() {
+fn proxy_test_payment_other_shard_callback_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/proxy_test_payment_otherShard_callback.scen.json",
         world(),
@@ -616,12 +638,12 @@ fn proxy_test_payment_othershard_callback_rs() {
 }
 
 #[test]
-fn proxy_test_payment_sameshard_rs() {
+fn proxy_test_payment_same_shard_rs() {
     multiversx_sc_scenario::run_rs("scenarios/proxy_test_payment_sameShard.scen.json", world());
 }
 
 #[test]
-fn proxy_test_payment_sameshard_callback_rs() {
+fn proxy_test_payment_same_shard_callback_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/proxy_test_payment_sameShard_callback.scen.json",
         world(),
