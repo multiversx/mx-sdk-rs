@@ -24,6 +24,22 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
             .call_and_exit();
     }
 
+    /// Will not work, only written for VM testing.
+    ///
+    /// Async calls are explicitly forbidden in upgrade constructors.
+    /// 
+    /// TODO: write test once scenario tests support upgrades directly.
+    #[endpoint(upgrade)]
+    #[label("init-async-call")]
+    fn upgrade_async_call(
+        &self,
+        to: ManagedAddress,
+        endpoint_name: ManagedBuffer,
+        args: MultiValueEncoded<ManagedBuffer>,
+    ) {
+        self.init_async_call(to, endpoint_name, args)
+    }
+
     /// Works, but without forwarding EGLD.
     ///
     /// Forwarding EGLD only shows up in a VM test.
