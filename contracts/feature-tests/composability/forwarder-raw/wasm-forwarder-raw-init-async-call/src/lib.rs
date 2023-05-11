@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            0
+// Endpoints:                            1
 // Async Callback:                       1
-// Total number of exported functions:   2
+// Total number of exported functions:   3
 
 #![no_std]
 #![feature(lang_items)]
@@ -19,6 +19,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     forwarder_raw
     (
         init => init_async_call
+        upgrade => upgrade_async_call
     )
 }
 
