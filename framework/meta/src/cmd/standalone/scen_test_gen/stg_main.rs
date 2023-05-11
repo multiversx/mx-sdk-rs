@@ -10,7 +10,7 @@ use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 use super::{
     process_code,
     stg_print::print_no_folder,
-    stg_write::{format_test_fn_go, format_test_fn_rs, DEFAULT_TEST_GO, DEFAULT_TEST_RS},
+    stg_write::{format_test_fn_go, format_test_fn_rs, DEFAULT_SETUP_GO, DEFAULT_SETUP_RS},
     WriteTestFn,
 };
 
@@ -48,7 +48,7 @@ fn perform_test_gen(contract_dir: &RelevantDirectory, create: bool) {
     process_file(
         ProcessFileConfig {
             suffix: "scenario_go_test.rs",
-            default_impl: DEFAULT_TEST_GO,
+            default_world_impl: DEFAULT_SETUP_GO,
             write_test_fn: format_test_fn_go,
         },
         ProcessFileContext {
@@ -62,7 +62,7 @@ fn perform_test_gen(contract_dir: &RelevantDirectory, create: bool) {
     process_file(
         ProcessFileConfig {
             suffix: "scenario_rs_test.rs",
-            default_impl: DEFAULT_TEST_RS,
+            default_world_impl: DEFAULT_SETUP_RS,
             write_test_fn: format_test_fn_rs,
         },
         ProcessFileContext {
@@ -76,7 +76,7 @@ fn perform_test_gen(contract_dir: &RelevantDirectory, create: bool) {
 
 struct ProcessFileConfig<'a> {
     suffix: &'a str,
-    default_impl: &'a str,
+    default_world_impl: &'a str,
     write_test_fn: WriteTestFn,
 }
 
@@ -97,10 +97,15 @@ fn process_file(config: ProcessFileConfig, context: ProcessFileContext) {
     let existing_code = if let Some(file_path) = &existing_file_path {
         fs::read_to_string(file_path).expect("could not read test file")
     } else {
-        config.default_impl.to_string()
+        config.default_world_impl.to_string()
     };
 
-    let new_code = process_code(&existing_code, context.scenario_names, config.write_test_fn);
+    let new_code = process_code(
+        &existing_code,
+        context.scenario_names,
+        config.write_test_fn,
+        config.default_world_impl,
+    );
     let file_path = if let Some(file_path) = &existing_file_path {
         file_path.clone()
     } else {
