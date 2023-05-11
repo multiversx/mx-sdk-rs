@@ -15,5 +15,5 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn panic_message_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/panic-message.scen.json", world());
+    world().run("scenarios/panic-message.scen.json");
 }

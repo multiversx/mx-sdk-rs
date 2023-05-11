@@ -12,10 +12,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn mmap_get_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mmap_get.scen.json", world());
+    world().run("scenarios/mmap_get.scen.json");
 }
 
 #[test]
 fn mmap_remove_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mmap_remove.scen.json", world());
+    world().run("scenarios/mmap_remove.scen.json");
 }
