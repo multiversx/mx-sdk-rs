@@ -49,7 +49,8 @@ pub trait FungibleTokenMapperFeatures:
     ) {
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                self.fungible_token_mapper().set_token_id(token_id);
+                self.fungible_token_mapper()
+                    .set_token_id(TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {},
         }
@@ -60,7 +61,8 @@ pub trait FungibleTokenMapperFeatures:
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_identifier = self.call_value().single_esdt().token_identifier;
-                self.fungible_token_mapper().set_token_id(token_identifier);
+                self.fungible_token_mapper()
+                    .set_token_id(TokenMapperState::Token(token_identifier));
             },
             ManagedAsyncCallResult::Err(_) => {},
         }

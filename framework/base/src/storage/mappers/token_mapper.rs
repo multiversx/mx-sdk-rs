@@ -118,7 +118,10 @@ pub(crate) fn store_token_id<
     if !token_id.is_valid_esdt_identifier() {
         SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
     }
-    storage_set(mapper.get_storage_key(), &token_id);
+    storage_set(
+        mapper.get_storage_key(),
+        &TokenMapperState::Token(token_id.clone()),
+    );
 }
 
 pub(crate) fn check_not_set_or_pending<

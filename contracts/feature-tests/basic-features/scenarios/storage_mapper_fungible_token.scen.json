@@ -4,34 +4,9 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features1": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features2": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features3": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features4": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000",
-                        "str:TICKER-222222": "2000"
-                    },
                     "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
@@ -64,7 +39,7 @@
             "id": "issue-default-callback-non-zero-initial-supply",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features1",
+                "to": "sc:basic-features",
                 "function": "issue_fungible_default_callback",
                 "arguments": [
                     "str:TICKER",
@@ -84,7 +59,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:basic-features1": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -92,31 +67,6 @@
                     },
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-000000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features2": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features3": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features4": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000",
-                        "str:TICKER-222222": "2000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -149,11 +99,28 @@
             }
         },
         {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
             "step": "scCall",
             "id": "issue-default-callback-zero-initial-supply",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features2",
+                "to": "sc:basic-features",
                 "function": "issue_fungible_default_callback",
                 "arguments": [
                     "str:TICKER",
@@ -175,18 +142,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:basic-features1": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "storage": {
-                        "str:fungibleTokenMapper": "str:TICKER-000000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features2": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -194,23 +150,6 @@
                     },
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-111111"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features3": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features4": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000",
-                        "str:TICKER-222222": "2000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -243,11 +182,28 @@
             }
         },
         {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
             "step": "scCall",
             "id": "issue-custom-callback-non-zero-initial-supply",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features3",
+                "to": "sc:basic-features",
                 "function": "issue_fungible_custom_callback",
                 "arguments": [
                     "str:TICKER",
@@ -267,29 +223,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:basic-features1": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "storage": {
-                        "str:fungibleTokenMapper": "str:TICKER-000000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features2": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "storage": {
-                        "str:fungibleTokenMapper": "str:TICKER-111111"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features3": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
@@ -298,15 +232,6 @@
                     },
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-222222"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features4": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000",
-                        "str:TICKER-222222": "2000"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
@@ -339,11 +264,29 @@
             }
         },
         {
+            "step": "setState",
+            "comment": "reset the token ID so we can issue again",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "esdt": {
+                        "str:TICKER-000000": "1000",
+                        "str:TICKER-222222": "2000"
+                    },
+                    "storage": {
+                        "str:fungibleTokenMapper": ""
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                }
+            }
+        },
+        {
             "step": "scCall",
             "id": "issue-custom-callback-initial-supply",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features4",
+                "to": "sc:basic-features",
                 "function": "issue_fungible_custom_callback",
                 "arguments": [
                     "str:TICKER",
@@ -365,41 +308,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:basic-features1": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "storage": {
-                        "str:fungibleTokenMapper": "str:TICKER-000000"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features2": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000"
-                    },
-                    "storage": {
-                        "str:fungibleTokenMapper": "str:TICKER-111111"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features3": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "esdt": {
-                        "str:TICKER-000000": "1000",
-                        "str:TICKER-222222": "2000"
-                    },
-                    "storage": {
-                        "str:fungibleTokenMapper": "str:TICKER-222222"
-                    },
-                    "code": "file:../output/basic-features.wasm"
-                },
-                "sc:basic-features4": {
+                "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
