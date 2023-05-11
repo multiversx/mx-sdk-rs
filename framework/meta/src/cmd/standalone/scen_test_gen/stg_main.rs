@@ -9,7 +9,7 @@ use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::{
     process_code,
-    stg_print::print_no_folder,
+    stg_print::*,
     stg_write::{format_test_fn_go, format_test_fn_rs, DEFAULT_SETUP_GO, DEFAULT_SETUP_RS},
     WriteTestFn,
 };
@@ -95,6 +95,7 @@ fn process_file(config: ProcessFileConfig, context: ProcessFileContext) {
     }
 
     let existing_code = if let Some(file_path) = &existing_file_path {
+        print_processing(file_path);
         fs::read_to_string(file_path).expect("could not read test file")
     } else {
         config.default_world_impl.to_string()
