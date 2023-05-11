@@ -7,17 +7,14 @@ const RUNNER_TOOL_NAME_LEGACY: &str = "mandos-test";
 /// Just marks that the tool was not found.
 struct ToolNotFound;
 
-/// Runs the Arwen executable,
+/// Runs the VM executable,
 /// which reads parses and executes one or more mandos tests.
-pub fn run_go<P: AsRef<Path>>(relative_path: P) {
+pub fn run_vm_go_tool(absolute_path: &Path) {
     if cfg!(not(feature = "run-go-tests")) {
         return;
     }
 
-    let mut absolute_path = std::env::current_dir().unwrap();
-    absolute_path.push(relative_path);
-
-    if run_scenario_tool(RUNNER_TOOL_NAME, absolute_path.as_path()).is_ok() {
+    if run_scenario_tool(RUNNER_TOOL_NAME, absolute_path).is_ok() {
         return;
     }
 
@@ -26,7 +23,7 @@ pub fn run_go<P: AsRef<Path>>(relative_path: P) {
         "{}",
         format!("Warning: `{RUNNER_TOOL_NAME}` not found. Using `{RUNNER_TOOL_NAME_LEGACY}` as fallback.").yellow(),
     );
-    if run_scenario_tool(RUNNER_TOOL_NAME_LEGACY, absolute_path.as_path()).is_ok() {
+    if run_scenario_tool(RUNNER_TOOL_NAME_LEGACY, absolute_path).is_ok() {
         return;
     }
 

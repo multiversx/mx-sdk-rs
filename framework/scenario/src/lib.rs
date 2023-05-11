@@ -3,10 +3,9 @@
 
 mod facade;
 pub mod scenario;
-mod scenario_go_runner;
-mod scenario_rs_runner;
 pub mod standalone;
 pub mod test_wallets;
+mod vm_go_tool;
 pub mod whitebox;
 
 /// Keeping this for backwards compatibility.
@@ -28,10 +27,19 @@ pub use crate::scenario as mandos_system;
 pub use multiversx_chain_scenario_format as scenario_format;
 
 pub use facade::{ContractInfo, ScenarioWorld};
-pub use scenario_go_runner::run_go;
-pub use scenario_rs_runner::run_rs;
 
 use std::path::Path;
+
+pub fn run_go<P: AsRef<Path>>(relative_path: P) {
+    ScenarioWorld::vm_go().run(relative_path);
+}
+
+/// Runs scenario test using the Rust infrastructure and the debug mode.
+/// Uses a contract map to replace the references to the wasm bytecode
+/// with the contracts running in debug mode.
+pub fn run_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
+    world.run(relative_path);
+}
 
 #[deprecated(
     since = "0.39.0",
