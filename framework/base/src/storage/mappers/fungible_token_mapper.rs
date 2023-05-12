@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     token_mapper::{check_not_set_or_pending, read_token_id, store_token_id, StorageTokenWrapper},
-    StorageMapper, TokenMapperState,
+    StorageClearable, StorageMapper, TokenMapperState,
 };
 use crate::{
     abi::TypeName,
@@ -41,6 +41,16 @@ where
             token_id: read_token_id(base_key.as_ref()),
             key: base_key,
         }
+    }
+}
+
+impl<SA> StorageClearable for FungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    fn clear(&mut self) {
+        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::NotSet);
+        self.token_id = TokenIdentifier::<SA>::from("");
     }
 }
 

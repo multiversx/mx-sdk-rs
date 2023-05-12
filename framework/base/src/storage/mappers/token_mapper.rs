@@ -123,7 +123,6 @@ pub(crate) fn store_token_id<
         &TokenMapperState::Token(token_id.clone()),
     );
 }
-
 pub(crate) fn check_not_set_or_pending<
     SA: StorageMapperApi + CallTypeApi,
     Mapper: StorageTokenWrapper<SA>,
