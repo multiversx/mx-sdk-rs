@@ -1,12 +1,13 @@
 use crate::{
     abi::TypeAbi,
+    api::ErrorApiImpl,
     codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
-    storage_clear, storage_set,
+    storage_clear, storage_get, storage_set,
 };
 
 use super::{
-    token_mapper::{check_not_set, read_token_id, store_token_id, StorageTokenWrapper},
-    StorageClearable, StorageMapper, TokenMapperState,
+    token_mapper::{check_not_set, store_token_id, StorageTokenWrapper, INVALID_TOKEN_ID_ERR_MSG},
+    StorageMapper, TokenMapperState,
 };
 use crate::{
     abi::TypeName,
@@ -16,7 +17,7 @@ use crate::{
     storage::StorageKey,
     types::{
         BigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier,
+        ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
 
@@ -29,7 +30,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     key: StorageKey<SA>,
-    token_id: TokenIdentifier<SA>,
+    token_state: TokenMapperState<SA>,
 }
 
 impl<SA> StorageMapper<SA> for FungibleTokenMapper<SA>
@@ -38,18 +39,9 @@ where
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         Self {
-            token_id: read_token_id(base_key.as_ref()),
+            token_state: storage_get(base_key.as_ref()),
             key: base_key,
         }
-    }
-}
-
-impl<SA> StorageClearable for FungibleTokenMapper<SA>
-where
-    SA: StorageMapperApi + CallTypeApi,
-{
-    fn clear(&mut self) {
-        storage_clear(self.key.as_ref());
     }
 }
 
@@ -57,21 +49,33 @@ impl<SA> StorageTokenWrapper<SA> for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    fn get_storage_key(&self) -> ManagedRef<SA, StorageKey<SA>> {
+    fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 
+    fn get_token_state(&self) -> TokenMapperState<SA> {
+        self.token_state.clone()
+    }
+
     fn get_token_id(&self) -> TokenIdentifier<SA> {
-        self.token_id.clone()
+        if let TokenMapperState::Token(token) = &self.token_state {
+            token.clone()
+        } else {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG)
+        }
     }
 
     fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
-        &self.token_id
+        if let TokenMapperState::Token(token) = &self.token_state {
+            token
+        } else {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+        }
     }
 
     fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
         store_token_id(self, &token_id);
-        self.token_id = token_id;
+        self.token_state = TokenMapperState::Token(token_id);
     }
 }
 
@@ -184,6 +188,13 @@ where
             .async_call()
             .with_callback(callback)
             .call_and_exit();
+    }
+
+    pub fn clear(&mut self) {
+        let state: TokenMapperState<SA> = storage_get(self.key.as_ref());
+        if state.is_pending() {
+            storage_clear(self.key.as_ref());
+        }
     }
 
     fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {

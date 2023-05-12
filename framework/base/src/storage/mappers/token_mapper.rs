@@ -28,6 +28,8 @@ where
         storage_get_len(self.get_storage_key()) == 0
     }
 
+    fn get_token_state(&self) -> TokenMapperState<SA>;
+
     fn get_token_id(&self) -> TokenIdentifier<SA>;
 
     fn get_token_id_ref(&self) -> &TokenIdentifier<SA>;
@@ -96,13 +98,6 @@ where
         let b_wrapper = BlockchainWrapper::new();
         b_wrapper.get_sc_address()
     }
-}
-
-#[inline]
-pub(crate) fn read_token_id<SA: StorageMapperApi + CallTypeApi>(
-    storage_key: ManagedRef<SA, StorageKey<SA>>,
-) -> TokenIdentifier<SA> {
-    storage_get(storage_key)
 }
 
 pub(crate) fn store_token_id<

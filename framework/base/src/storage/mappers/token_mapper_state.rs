@@ -6,7 +6,7 @@ use crate::{
 
 const PENDING_ENCODING: &[u8; 7] = b"pending";
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub enum TokenMapperState<M: ManagedTypeApi> {
     #[default]
     NotSet,
