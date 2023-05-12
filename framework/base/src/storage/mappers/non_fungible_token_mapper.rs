@@ -2,13 +2,13 @@ use crate::{
     codec::{
         CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage_set,
+    storage_clear, storage_set,
 };
 
 use super::{
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
-    token_mapper::{check_not_set_or_pending, read_token_id, store_token_id, StorageTokenWrapper},
-    StorageMapper, TokenMapperState,
+    token_mapper::{check_not_set, read_token_id, store_token_id, StorageTokenWrapper},
+    StorageClearable, StorageMapper, TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},
@@ -45,6 +45,15 @@ where
             token_id: read_token_id(base_key.as_ref()),
             key: base_key,
         }
+    }
+}
+
+impl<SA> StorageClearable for NonFungibleTokenMapper<SA>
+where
+    SA: StorageMapperApi + CallTypeApi,
+{
+    fn clear(&mut self) {
+        storage_clear(self.key.as_ref());
     }
 }
 
@@ -104,7 +113,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        check_not_set_or_pending(self);
+        check_not_set(self);
 
         let callback = match opt_callback {
             Some(cb) => cb,
@@ -160,7 +169,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        check_not_set_or_pending(self);
+        check_not_set(self);
 
         if token_type == EsdtTokenType::Fungible || token_type == EsdtTokenType::Invalid {
             SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);

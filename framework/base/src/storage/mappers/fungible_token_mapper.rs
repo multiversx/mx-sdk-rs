@@ -1,11 +1,11 @@
 use crate::{
     abi::TypeAbi,
     codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
-    storage_set,
+    storage_clear, storage_set,
 };
 
 use super::{
-    token_mapper::{check_not_set_or_pending, read_token_id, store_token_id, StorageTokenWrapper},
+    token_mapper::{check_not_set, read_token_id, store_token_id, StorageTokenWrapper},
     StorageClearable, StorageMapper, TokenMapperState,
 };
 use crate::{
@@ -49,8 +49,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     fn clear(&mut self) {
-        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::NotSet);
-        self.token_id = TokenIdentifier::<SA>::from("");
+        storage_clear(self.key.as_ref());
     }
 }
 
@@ -110,7 +109,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        check_not_set_or_pending(self);
+        check_not_set(self);
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
@@ -165,7 +164,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        check_not_set_or_pending(self);
+        check_not_set(self);
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
