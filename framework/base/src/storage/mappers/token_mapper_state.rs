@@ -1,10 +1,12 @@
 use crate::{
     api::ManagedTypeApi,
-    codec::{self, derive::TopDecode},
-    types::TokenIdentifier,
+    codec::{self},
+    types::{ManagedBuffer, TokenIdentifier},
 };
 
-#[derive(TopDecode, Default)]
+const PENDING_ENCODING: &[u8; 7] = b"pending";
+
+#[derive(Default)]
 pub enum TokenMapperState<M: ManagedTypeApi> {
     #[default]
     NotSet,
@@ -42,6 +44,24 @@ impl<M: ManagedTypeApi> codec::TopEncode for TokenMapperState<M> {
             TokenMapperState::Token(token) => {
                 codec::TopEncode::top_encode_or_handle_err(&token, output, h)
             },
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> codec::TopDecode for TokenMapperState<M> {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> core::result::Result<Self, H::HandledErr>
+    where
+        I: codec::TopDecodeInput,
+        H: codec::DecodeErrorHandler,
+    {
+        let decoded_input = ManagedBuffer::top_decode_or_handle_err(input, h)?;
+        if decoded_input.is_empty() {
+            Ok(TokenMapperState::NotSet)
+        } else if decoded_input == PENDING_ENCODING {
+            Ok(TokenMapperState::Pending)
+        } else {
+            let token_id = TokenIdentifier::from_esdt_bytes(decoded_input);
+            Ok(TokenMapperState::Token(token_id))
         }
     }
 }

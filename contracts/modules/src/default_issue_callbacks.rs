@@ -19,6 +19,7 @@ pub trait DefaultIssueCallbacksModule {
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
+                mapper.set(TokenMapperState::NotSet);
             },
         }
     }
@@ -39,6 +40,7 @@ pub trait DefaultIssueCallbacksModule {
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
+                mapper.set(TokenMapperState::NotSet);
             },
         }
     }
