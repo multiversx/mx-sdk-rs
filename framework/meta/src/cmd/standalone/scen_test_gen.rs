@@ -19,4 +19,6 @@ pub fn test_gen_tool(args: &TestGenArgs) {
 
 // Good for testing.
 pub use stg_process_code::process_code;
-pub use stg_write::{format_test_fn_go, format_test_fn_rs, WriteTestFn};
+pub use stg_write::{
+    format_test_fn_go, format_test_fn_rs, WriteTestFn, DEFAULT_SETUP_GO, DEFAULT_SETUP_RS,
+};
