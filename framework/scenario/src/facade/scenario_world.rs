@@ -19,7 +19,6 @@ use super::debugger_backend::DebuggerBackend;
 ///
 /// Currently defers most of the operations to the blockchain mock object directly,
 /// but that one will be refactored and broken up into smaller pieces.
-// #[derive(Default, Debug)]
 pub struct ScenarioWorld {
     pub(crate) current_dir: PathBuf,
     pub(crate) backend: Backend,

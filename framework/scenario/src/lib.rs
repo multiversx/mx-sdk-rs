@@ -30,14 +30,41 @@ pub use facade::{ContractInfo, ScenarioWorld};
 
 use std::path::Path;
 
+/// Legacy function for running a scenario test using the Go VM tool.
+///
+/// Use `sc-meta test-gen` to replace all calls to it automatically.
+#[deprecated(
+    since = "0.42.0",
+    note = "Call `sc-meta test-gen` in the project folder to automatically upgrade all scenario tests."
+)]
 pub fn run_go<P: AsRef<Path>>(relative_path: P) {
     ScenarioWorld::vm_go().run(relative_path);
 }
 
-/// Runs scenario test using the Rust infrastructure and the debug mode.
-/// Uses a contract map to replace the references to the wasm bytecode
-/// with the contracts running in debug mode.
+#[deprecated(
+    since = "0.39.0",
+    note = "Call `sc-meta test-gen` in the project folder to automatically upgrade all scenario tests."
+)]
+pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
+    ScenarioWorld::vm_go().run(relative_path);
+}
+
+/// Legacy function for running a scenario test using the Go VM tool.
+///
+/// Use `sc-meta test-gen` to replace all calls to it automatically.
+#[deprecated(
+    since = "0.42.0",
+    note = "Call `sc-meta test-gen` in the project folder to automatically upgrade all scenario tests."
+)]
 pub fn run_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
+    world.run(relative_path);
+}
+
+#[deprecated(
+    since = "0.39.0",
+    note = "Call `sc-meta test-gen` in the project folder to automatically upgrade all scenario tests."
+)]
+pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
     world.run(relative_path);
 }
 
@@ -46,19 +73,3 @@ pub fn run_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
     note = "Alias provided for backwards compatibility. Do replace `BlockchainMock` with `ScenarioWorld` after upgrading, though."
 )]
 pub type BlockchainMock = ScenarioWorld;
-
-#[deprecated(
-    since = "0.39.0",
-    note = "The old scenario testing method. Rename to `run_go`."
-)]
-pub fn mandos_go<P: AsRef<Path>>(relative_path: P) {
-    run_go(relative_path);
-}
-
-#[deprecated(
-    since = "0.39.0",
-    note = "The old scenario testing method. Rename to `run_rs`."
-)]
-pub fn mandos_rs<P: AsRef<Path>>(relative_path: P, world: ScenarioWorld) {
-    run_rs(relative_path, world);
-}

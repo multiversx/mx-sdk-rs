@@ -28,71 +28,71 @@ fn world() -> ScenarioWorld {
 #[test]
 #[ignore]
 fn call_other_shard_1_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/call_other_shard-1.scen.json", world());
+    world().run("scenarios/call_other_shard-1.scen.json");
 }
 
 #[test]
 #[ignore]
 fn call_other_shard_2_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/call_other_shard-2.scen.json", world());
+    world().run("scenarios/call_other_shard-2.scen.json");
 }
 
 #[test]
 fn change_board_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/changeBoard.scen.json", world());
+    world().run("scenarios/changeBoard.scen.json");
 }
 
 #[test]
 fn change_quorum_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/changeQuorum.scen.json", world());
+    world().run("scenarios/changeQuorum.scen.json");
 }
 
 #[test]
 fn change_quorum_too_big_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/changeQuorum_tooBig.scen.json", world());
+    world().run("scenarios/changeQuorum_tooBig.scen.json");
 }
 
 #[test]
 fn deploy_adder_err_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deployAdder_err.scen.json", world());
+    world().run("scenarios/deployAdder_err.scen.json");
 }
 
 #[test]
 fn deploy_adder_then_call_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deployAdder_then_call.scen.json", world());
+    world().run("scenarios/deployAdder_then_call.scen.json");
 }
 
 #[test]
 fn deploy_factorial_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deployFactorial.scen.json", world());
+    world().run("scenarios/deployFactorial.scen.json");
 }
 
 #[test]
 fn deploy_other_multisig_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deployOtherMultisig.scen.json", world());
+    world().run("scenarios/deployOtherMultisig.scen.json");
 }
 
 #[test]
 fn deploy_duplicate_bm_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deploy_duplicate_bm.scen.json", world());
+    world().run("scenarios/deploy_duplicate_bm.scen.json");
 }
 
 #[test]
 fn remove_everyone_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/remove_everyone.scen.json", world());
+    world().run("scenarios/remove_everyone.scen.json");
 }
 
 #[test]
 fn send_esdt_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/sendEsdt.scen.json", world());
+    world().run("scenarios/sendEsdt.scen.json");
 }
 
 #[test]
 fn upgrade_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/upgrade.scen.json", world());
+    world().run("scenarios/upgrade.scen.json");
 }
 
 #[test]
 fn upgrade_from_source_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/upgrade_from_source.scen.json", world());
+    world().run("scenarios/upgrade_from_source.scen.json");
 }

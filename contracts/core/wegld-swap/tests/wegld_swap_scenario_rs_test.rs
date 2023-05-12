@@ -13,10 +13,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn unwrap_egld_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/unwrap_egld.scen.json", world());
+    world().run("scenarios/unwrap_egld.scen.json");
 }
 
 #[test]
 fn wrap_egld_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/wrap_egld.scen.json", world());
+    world().run("scenarios/wrap_egld.scen.json");
 }
