@@ -126,12 +126,14 @@ pub(crate) fn store_token_id<
 pub(crate) fn check_not_set<SA: StorageMapperApi + CallTypeApi, Mapper: StorageTokenWrapper<SA>>(
     mapper: &Mapper,
 ) {
-    if !mapper.is_empty() {
-        let storage_value: TokenMapperState<SA> = storage_get(mapper.get_storage_key());
-        if storage_value.is_pending() {
+    let storage_value: TokenMapperState<SA> = storage_get(mapper.get_storage_key());
+    match storage_value {
+        TokenMapperState::NotSet => {},
+        TokenMapperState::Pending => {
             SA::error_api_impl().signal_error(PENDING_ERR_MSG);
-        } else if !storage_value.is_not_set() {
+        },
+        TokenMapperState::Token(_) => {
             SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
+        },
     }
 }

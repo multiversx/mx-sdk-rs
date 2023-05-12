@@ -1,3 +1,5 @@
+use multiversx_sc::{storage::StorageKey, storage_clear, storage_set};
+
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
@@ -11,15 +13,14 @@ pub trait DefaultIssueCallbacksModule {
         storage_key: ManagedBuffer,
         #[call_result] result: ManagedAsyncCallResult<TokenIdentifier>,
     ) {
-        let mapper =
-            SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(storage_key.into());
+        let key = StorageKey::from(storage_key);
         match result {
             ManagedAsyncCallResult::Ok(token_id) => {
-                mapper.set(TokenMapperState::Token(token_id));
+                storage_set(key.as_ref(), &TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
-                mapper.clear()
+                storage_clear(key.as_ref());
             },
         }
     }
@@ -31,16 +32,15 @@ pub trait DefaultIssueCallbacksModule {
         storage_key: ManagedBuffer,
         #[call_result] result: ManagedAsyncCallResult<()>,
     ) {
-        let mapper =
-            SingleValueMapper::<Self::Api, TokenMapperState<Self::Api>>::new(storage_key.into());
+        let key = StorageKey::from(storage_key);
         match result {
             ManagedAsyncCallResult::Ok(()) => {
                 let token_id = self.call_value().single_esdt().token_identifier;
-                mapper.set(TokenMapperState::Token(token_id));
+                storage_set(key.as_ref(), &TokenMapperState::Token(token_id));
             },
             ManagedAsyncCallResult::Err(_) => {
                 self.return_failed_issue_funds(initial_caller);
-                mapper.clear()
+                storage_clear(key.as_ref());
             },
         }
     }
