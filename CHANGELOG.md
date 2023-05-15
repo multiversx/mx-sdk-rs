@@ -26,6 +26,9 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.41.1, vm 0.3.1] - 2023-05-15
+- Fixed an edge case for the token storage mappers (`FungibleTokenMapper`, `NonFungibleTokenMapper`).
+
 ## [sc 0.41.0, vm 0.3.0] - 2023-05-05
 - Fixed compatibility with rustc v1.71.0.
 - Allocator system:
