@@ -15,10 +15,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/init.scen.json", world());
+    world().run("scenarios/init.scen.json");
 }
 
 #[test]
 fn pause_and_unpause_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/pause-and-unpause.scen.json", world());
+    world().run("scenarios/pause-and-unpause.scen.json");
 }

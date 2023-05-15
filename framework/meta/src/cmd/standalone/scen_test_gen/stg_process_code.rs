@@ -3,18 +3,27 @@ use std::collections::{BTreeSet, HashMap};
 use super::{
     stg_parse::parse_section,
     stg_section::{concat_sections, split_sections, Section},
-    stg_write::{format_section, WriteTestFn},
+    stg_write::{contains_world_fn, format_section, WriteTestFn},
 };
 
 pub fn process_code(
     raw_code: &str,
     scenario_names: &BTreeSet<String>,
     write_test_fn: WriteTestFn,
+    default_setup_code: &str,
 ) -> String {
     let input_sections = split_sections(raw_code);
 
     let mut result_sections = Vec::new();
     let mut scenario_sections = HashMap::new();
+
+    if !contains_world_fn(raw_code) {
+        result_sections.push(Section {
+            raw: default_setup_code.to_string(),
+            num_empty_lines_after: 1,
+            test_fn: None,
+        });
+    }
 
     for mut section in input_sections {
         section.test_fn = parse_section(&section.raw);

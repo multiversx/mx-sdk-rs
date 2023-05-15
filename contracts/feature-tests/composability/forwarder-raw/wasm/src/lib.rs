@@ -19,6 +19,12 @@ multiversx_sc_wasm_adapter::endpoints! {
     forwarder_raw
     (
         init => init
+        callback_args => callback_args
+        callback_payments => callback_payments
+        callback_payments_triples => callback_payments_triples
+        clear_callback_info => clear_callback_info
+        callback_args_at_index => callback_args_at_index
+        callback_payment_at_index => callback_payment_at_index
         forward_payment => forward_payment
         forward_direct_esdt_via_transf_exec => forward_direct_esdt_via_transf_exec
         forward_direct_esdt_multi => forward_direct_esdt_multi
@@ -30,12 +36,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         forward_transf_exec_twice => forward_transf_exec_twice
         forward_async_retrieve_multi_transfer_funds => forward_async_retrieve_multi_transfer_funds
         forwarder_async_send_and_retrieve_multi_transfer_funds => forwarder_async_send_and_retrieve_multi_transfer_funds
-        callback_args => callback_args
-        callback_payments => callback_payments
-        callback_payments_triples => callback_payments_triples
-        clear_callback_info => clear_callback_info
-        callback_args_at_index => callback_args_at_index
-        callback_payment_at_index => callback_payment_at_index
         call_execute_on_dest_context => call_execute_on_dest_context
         call_execute_on_dest_context_twice => call_execute_on_dest_context_twice
         call_execute_on_same_context => call_execute_on_same_context

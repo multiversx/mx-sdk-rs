@@ -16,30 +16,27 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/init.scen.json", world());
+    world().run("scenarios/init.scen.json");
+}
+
+// TODO: implement ESDTTransfer + async call
+#[test]
+#[ignore]
+fn reject_transfer_rs() {
+    world().run("scenarios/reject_transfer.scen.json");
 }
 
 #[test]
 fn simple_transfer_full_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/simple_transfer_full.scen.json", world());
-}
-
-#[test]
-fn simple_transfer_half_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/simple_transfer_half.scen.json", world());
+    world().run("scenarios/simple_transfer_full.scen.json");
 }
 
 #[test]
 fn simple_transfer_full_wrong_token_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/simple_transfer_full_wrong_token.scen.json",
-        world(),
-    );
+    world().run("scenarios/simple_transfer_full_wrong_token.scen.json");
 }
 
-// TODO: implement ESDTTransfer + async call
-#[ignore]
 #[test]
-fn rejected_transfer_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/reject_transfer.scen.json", world());
+fn simple_transfer_half_rs() {
+    world().run("scenarios/simple_transfer_half.scen.json");
 }

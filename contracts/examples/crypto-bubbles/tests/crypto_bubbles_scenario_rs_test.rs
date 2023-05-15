@@ -13,55 +13,55 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn balance_of_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/balanceOf.scen.json", world());
+    world().run("scenarios/balanceOf.scen.json");
 }
 
 #[test]
 fn create_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create.scen.json", world());
+    world().run("scenarios/create.scen.json");
 }
 
 #[test]
 fn exceptions_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/exceptions.scen.json", world());
+    world().run("scenarios/exceptions.scen.json");
 }
 
 #[test]
 fn join_game_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/joinGame.scen.json", world());
+    world().run("scenarios/joinGame.scen.json");
 }
 
 #[test]
 fn reward_and_send_to_wallet_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/rewardAndSendToWallet.scen.json", world());
+    world().run("scenarios/rewardAndSendToWallet.scen.json");
 }
 
 #[test]
 fn reward_winner_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/rewardWinner.scen.json", world());
+    world().run("scenarios/rewardWinner.scen.json");
 }
 
 #[test]
 fn reward_winner_last_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/rewardWinner_Last.scen.json", world());
+    world().run("scenarios/rewardWinner_Last.scen.json");
 }
 
 #[test]
 fn top_up_ok_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/topUp_ok.scen.json", world());
+    world().run("scenarios/topUp_ok.scen.json");
 }
 
 #[test]
 fn top_up_withdraw_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/topUp_withdraw.scen.json", world());
+    world().run("scenarios/topUp_withdraw.scen.json");
 }
 
 #[test]
 fn withdraw_ok_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/withdraw_Ok.scen.json", world());
+    world().run("scenarios/withdraw_Ok.scen.json");
 }
 
 #[test]
 fn withdraw_too_much_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/withdraw_TooMuch.scen.json", world());
+    world().run("scenarios/withdraw_TooMuch.scen.json");
 }

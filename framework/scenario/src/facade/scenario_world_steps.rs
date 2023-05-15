@@ -43,8 +43,9 @@ impl ScenarioWorld {
         CC: ContractCall<DebugApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
+        let vm_runner = &mut self.get_mut_contract_debugger_backend().vm_runner;
         let sc_query_step = ScQueryStep::new().call(contract_call);
-        let tx_result = self.vm_runner.perform_sc_query(&sc_query_step);
+        let tx_result = vm_runner.perform_sc_query(&sc_query_step);
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
@@ -89,7 +90,9 @@ impl TypedScCallExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.vm_runner.perform_sc_call_get_result(typed_sc_call)
+        self.get_mut_contract_debugger_backend()
+            .vm_runner
+            .perform_sc_call_get_result(typed_sc_call)
     }
 }
 
@@ -102,7 +105,9 @@ impl TypedScDeployExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.vm_runner.perform_sc_deploy_get_result(typed_sc_call)
+        self.get_mut_contract_debugger_backend()
+            .vm_runner
+            .perform_sc_deploy_get_result(typed_sc_call)
     }
 }
 
@@ -120,8 +125,9 @@ impl TypedScQueryExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
+        let debugger = self.get_mut_contract_debugger_backend();
         let mut sc_query_step: ScQueryStep = typed_sc_query.into();
-        let tx_result = self.vm_runner.perform_sc_query(&sc_query_step);
+        let tx_result = debugger.vm_runner.perform_sc_query(&sc_query_step);
 
         let mut tx_expect = TxExpect::ok();
         for raw_result in &tx_result.result_values {
@@ -129,7 +135,7 @@ impl TypedScQueryExecutor for ScenarioWorld {
             tx_expect = tx_expect.result(result_hex_string.as_str());
         }
         sc_query_step = sc_query_step.expect(tx_expect);
-        if let Some(trace) = &mut self.trace {
+        if let Some(trace) = &mut debugger.trace {
             trace.run_sc_query_step(&sc_query_step);
         }
 

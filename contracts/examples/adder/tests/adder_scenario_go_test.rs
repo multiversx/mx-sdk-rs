@@ -1,4 +1,10 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
 fn adder_go() {
-    multiversx_sc_scenario::run_go("scenarios/adder.scen.json");
+    world().run("scenarios/adder.scen.json");
 }

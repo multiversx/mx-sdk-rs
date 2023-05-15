@@ -10,10 +10,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn vec_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/vec_repeat.scen.json", world());
+    world().run("scenarios/vec_repeat.scen.json");
 }
 
 #[test]
 fn vec_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/vec_repeat_struct.scen.json", world());
+    world().run("scenarios/vec_repeat_struct.scen.json");
 }
