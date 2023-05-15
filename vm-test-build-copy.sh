@@ -14,7 +14,7 @@ build_and_copy() {
    sc-meta all build --target-dir $TARGET_DIR --path $contract_path || return 1
 
    mkdir -p $vm_contract_path/output
-   cp $contract_path/output/*.wasm \
+   cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
 }
 
@@ -26,7 +26,7 @@ build_and_copy_with_scenarios() {
    sc-meta all build --target-dir $TARGET_DIR --path $contract_path || return 1
    mkdir -p $vm_contract_path/output
    rm -rf $vm_contract_path/scenarios
-   cp $contract_path/output/*.wasm \
+   cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
    cp -R $contract_path/scenarios \
       $vm_contract_path
@@ -56,8 +56,8 @@ build_and_copy_composability() {
    contract_with_underscores="${contract//-/_}"
 
    sc-meta all build --target-dir $TARGET_DIR --path ./contracts/feature-tests/composability/$contract || return 1
-   cp -R contracts/feature-tests/composability/$contract/output/${contract}.wasm \
-      $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.wasm
+   cp -R contracts/feature-tests/composability/$contract/output/${contract}.mxsc.json \
+      $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.mxsc.json
 }
 
 build_and_copy ./contracts/feature-tests/composability/forwarder         $VM_REPO_PATH/test/features/composability/forwarder
