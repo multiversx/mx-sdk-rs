@@ -1,6 +1,11 @@
 use crate::{interpret_trait::InterpreterContext, serde_raw::ValueSubTree};
 
-use super::{file_loader::load_file, functions::*, parse_num::*, prefixes::*};
+use super::{
+    file_loader::{load_file, load_mxsc_file_json},
+    functions::*,
+    parse_num::*,
+    prefixes::*,
+};
 
 pub fn interpret_subtree(vst: &ValueSubTree, context: &InterpreterContext) -> Vec<u8> {
     match vst {
@@ -61,6 +66,10 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
 
     if let Some(stripped) = s.strip_prefix(FILE_PREFIX) {
         return load_file(stripped, context);
+    }
+
+    if let Some(stripped) = s.strip_prefix(MXSC_PREFIX) {
+        return load_mxsc_file_json(stripped);
     }
 
     if let Some(stripped) = s.strip_prefix(KECCAK256_PREFIX) {
