@@ -23,7 +23,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multi-contract-features.wasm",
+                "contractCode": "mxsc:../output/multi-contract-features.mxsc.json",
                 "arguments": [
                     "123"
                 ],
@@ -43,7 +43,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multi-contract-features-view.wasm",
+                "contractCode": "mxsc:../output/multi-contract-features-view.mxsc.json",
                 "arguments": [
                     "sc:mcf"
                 ],

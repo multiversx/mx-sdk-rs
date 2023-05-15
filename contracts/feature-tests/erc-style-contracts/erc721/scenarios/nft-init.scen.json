@@ -22,7 +22,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:contract_owner",
-                "contractCode": "file:../output/erc721.wasm",
+                "contractCode": "mxsc:../output/erc721.mxsc.json",
                 "arguments": [
                     "3"
                 ],

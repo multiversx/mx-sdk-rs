@@ -33,7 +33,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:digital_cash_owner_address",
-                "contractCode": "file:../output/digital-cash.wasm",
+                "contractCode": "mxsc:../output/digital-cash.mxsc.json",
                 "arguments": [],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"

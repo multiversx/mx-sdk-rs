@@ -31,7 +31,7 @@
             "id": "deploy - kitty genetic alg contract",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../../kitty-genetic-alg/output/kitty-genetic-alg.wasm",
+                "contractCode": "mxsc:../../kitty-genetic-alg/output/kitty-genetic-alg.mxsc.json",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -49,7 +49,7 @@
             "id": "deploy - kitty ownership contract",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../output/kitty-ownership.wasm",
+                "contractCode": "mxsc:../output/kitty-ownership.mxsc.json",
                 "arguments": [
                     "10",
                     "sc:kitty_genetic_alg",

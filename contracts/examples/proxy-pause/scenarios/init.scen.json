@@ -29,7 +29,7 @@
             "id": "1-deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/proxy-pause.wasm",
+                "contractCode": "mxsc:../output/proxy-pause.mxsc.json",
                 "arguments": [],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"

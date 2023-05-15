@@ -40,7 +40,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:erc20_owner",
-                "contractCode": "file:../../erc20/output/erc20.wasm",
+                "contractCode": "mxsc:../../erc20/output/erc20.mxsc.json",
                 "arguments": [
                     "1,000,000,000"
                 ],
@@ -93,7 +93,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../output/lottery-erc20.wasm",
+                "contractCode": "mxsc:../output/lottery-erc20.mxsc.json",
                 "arguments": [
                     "sc:erc20"
                 ],
