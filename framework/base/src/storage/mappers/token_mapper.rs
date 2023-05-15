@@ -107,7 +107,7 @@ pub(crate) fn store_token_id<
     mapper: &Mapper,
     token_id: &TokenIdentifier<SA>,
 ) {
-    if !mapper.is_empty() {
+    if mapper.get_token_state().is_set() {
         SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
     }
     if !token_id.is_valid_esdt_identifier() {

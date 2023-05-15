@@ -15,12 +15,18 @@ pub enum TokenMapperState<M: ManagedTypeApi> {
 }
 
 impl<M: ManagedTypeApi> TokenMapperState<M> {
+    pub fn is_set(&self) -> bool {
+        matches!(self, TokenMapperState::Token(_))
+    }
+
     pub fn is_pending(&self) -> bool {
         matches!(self, TokenMapperState::Pending)
     }
+
     pub fn is_not_set(&self) -> bool {
         matches!(self, TokenMapperState::NotSet)
     }
+
     pub fn is_not_available(&self) -> bool {
         matches!(self, TokenMapperState::Pending | TokenMapperState::NotSet)
     }
