@@ -6,9 +6,10 @@ use crate::{
 };
 
 use super::{
+    super::StorageMapper,
     fungible_token_mapper::DEFAULT_ISSUE_CALLBACK_NAME,
     token_mapper::{check_not_set, store_token_id, StorageTokenWrapper, INVALID_TOKEN_ID_ERR_MSG},
-    StorageMapper, TokenMapperState,
+    TokenMapperState,
 };
 use crate::{
     abi::{TypeAbi, TypeName},

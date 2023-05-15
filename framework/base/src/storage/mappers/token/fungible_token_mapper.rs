@@ -6,8 +6,9 @@ use crate::{
 };
 
 use super::{
+    super::StorageMapper,
     token_mapper::{check_not_set, store_token_id, StorageTokenWrapper, INVALID_TOKEN_ID_ERR_MSG},
-    StorageMapper, TokenMapperState,
+    TokenMapperState,
 };
 use crate::{
     abi::TypeName,
