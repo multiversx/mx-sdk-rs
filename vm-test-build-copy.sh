@@ -29,6 +29,7 @@ build_and_copy_with_scenarios() {
    rm -rf $vm_contract_path/scenarios
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
+   rm $vm_contract_path/output/*.wasm
    cp -R $contract_path/scenarios \
       $vm_contract_path
 }
