@@ -24,11 +24,21 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
     })
 }
 
-pub fn load_mxsc_file_json(mxsc_file_path: &str) -> Vec<u8> {
-    let contents = fs::read_to_string(mxsc_file_path)
-        .unwrap_or_else(|e| panic!("not found: {} {:?}", e, mxsc_file_path));
-    let mxsc_json: MxscFileJson = serde_json::from_str(contents.as_str()).unwrap();
-    hex::decode(mxsc_json.code).expect("Could not decode contract code")
+pub fn load_mxsc_file_json(mxsc_file_path: &str, context: &InterpreterContext) -> Vec<u8> {
+    match fs::read_to_string(mxsc_file_path) {
+        Ok(content) => {
+            let mxsc_json: MxscFileJson = serde_json::from_str(content.as_str()).unwrap();
+            hex::decode(mxsc_json.code).expect("Could not decode contract code")
+        },
+        Err(_) => {
+            if context.allow_missing_files {
+                let expr_str = format!("MISSING:{mxsc_file_path:?}");
+                expr_str.into_bytes()
+            } else {
+                panic!("not found: {mxsc_file_path:#?}")
+            }
+        },
+    }
 }
 
 fn missing_file_value(path_buf: &Path) -> Vec<u8> {
