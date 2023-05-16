@@ -40,12 +40,12 @@ fn test_mxsc_pack() {
     );
 }
 
-#[should_panic]
 #[test]
 fn test_mxsc_no_pack() {
-    let context = &InterpreterContext::default();
+    let context = &mut InterpreterContext::default().with_allowed_missing_files();
+
     assert_eq!(
-        b"not found :\"no_file.json\"".to_vec(),
+        b"MISSING:\"no_file.json\"".to_vec(),
         interpret_string("mxsc:no_file.json", context)
     );
 }

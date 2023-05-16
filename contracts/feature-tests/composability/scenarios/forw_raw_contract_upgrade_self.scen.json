@@ -6,11 +6,11 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm",
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "sc:vault": {
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 }
             }
         },
@@ -39,11 +39,11 @@
                     "nonce": "*"
                 },
                 "sc:forwarder": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "sc:vault": {
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 }
             }
         }

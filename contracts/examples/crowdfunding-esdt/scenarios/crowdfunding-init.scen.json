@@ -54,7 +54,7 @@
                         "str:deadline": "123,000",
                         "str:tokenIdentifier": "str:CROWD-123456"
                     },
-                    "code": "file:../output/crowdfunding-esdt.wasm"
+                    "code": "mxsc:../output/crowdfunding-esdt.mxsc.json"
                 }
             }
         }

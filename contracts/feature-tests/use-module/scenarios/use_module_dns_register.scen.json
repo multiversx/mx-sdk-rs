@@ -11,7 +11,7 @@
                 "sc:use_module": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/use-module.wasm",
+                    "code": "mxsc:../output/use-module.mxsc.json",
                     "owner": "address:a_user"
                 },
                 "sc:dns#87": {
@@ -55,7 +55,7 @@
                     "balance": "*",
                     "username": "str:coolname0001.elrond",
                     "storage": {},
-                    "code": "file:../output/use-module.wasm"
+                    "code": "mxsc:../output/use-module.mxsc.json"
                 },
                 "+": ""
             }

@@ -63,7 +63,7 @@
                     "storage": {
                         "str:erc20ContractAddress": "sc:erc20"
                     },
-                    "code": "file:../output/lottery-erc20.wasm"
+                    "code": "mxsc:../output/lottery-erc20.mxsc.json"
                 },
                 "sc:erc20": {
                     "nonce": "0",
@@ -72,7 +72,7 @@
                         "str:balance|address:erc20_owner": "1,000,000,000",
                         "str:totalSupply": "1,000,000,000"
                     },
-                    "code": "file:../../erc20/output/erc20.wasm"
+                    "code": "mxsc:../../erc20/output/erc20.mxsc.json"
                 },
                 "address:erc20_owner": {
                     "nonce": "1",

@@ -91,7 +91,7 @@
                     "storage": {
                         "str:sum": "8"
                     },
-                    "code": "file:../output/adder.wasm"
+                    "code": "mxsc:../output/adder.mxsc.json"
                 }
             }
         }

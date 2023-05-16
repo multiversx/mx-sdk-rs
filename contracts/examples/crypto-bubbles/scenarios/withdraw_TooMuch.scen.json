@@ -15,7 +15,7 @@
                     "storage": {
                         "str:playerBalance|address:acc1": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -60,7 +60,7 @@
                     "storage": {
                         "str:playerBalance|address:acc1": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "1",

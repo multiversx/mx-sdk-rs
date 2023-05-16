@@ -69,7 +69,7 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
     }
 
     if let Some(stripped) = s.strip_prefix(MXSC_PREFIX) {
-        return load_mxsc_file_json(stripped);
+        return load_mxsc_file_json(stripped, context);
     }
 
     if let Some(stripped) = s.strip_prefix(KECCAK256_PREFIX) {

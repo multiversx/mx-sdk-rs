@@ -49,7 +49,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/crypto-bubbles-legacy.wasm"
+                    "code": "mxsc:../output/crypto-bubbles-legacy.mxsc.json"
                 }
             }
         }
