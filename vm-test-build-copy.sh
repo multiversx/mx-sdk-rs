@@ -16,6 +16,7 @@ build_and_copy() {
    mkdir -p $vm_contract_path/output
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
+   rm $vm_contract_path/output/*.wasm
 }
 
 build_and_copy_with_scenarios() {
@@ -58,6 +59,7 @@ build_and_copy_composability() {
    sc-meta all build --target-dir $TARGET_DIR --path ./contracts/feature-tests/composability/$contract || return 1
    cp -R contracts/feature-tests/composability/$contract/output/${contract}.mxsc.json \
       $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.mxsc.json
+   rm contracts/feature-tests/composability/$contract/output/*.wasm
 }
 
 build_and_copy ./contracts/feature-tests/composability/forwarder         $VM_REPO_PATH/test/features/composability/forwarder
