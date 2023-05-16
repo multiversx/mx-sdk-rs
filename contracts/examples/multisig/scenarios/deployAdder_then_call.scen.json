@@ -80,7 +80,7 @@
                             ]
                         }
                     },
-                    "code": "file:../output/multisig.wasm"
+                    "code": "mxsc:../output/multisig.mxsc.json"
                 },
                 "+": ""
             }

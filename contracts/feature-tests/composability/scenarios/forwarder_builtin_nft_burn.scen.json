@@ -35,7 +35,7 @@
                             ]
                         }
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:forwarder2": {
                     "nonce": "0",
@@ -51,7 +51,7 @@
                             "lastNonce": "1"
                         }
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -149,7 +149,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:forwarder2": {
                     "nonce": "0",
@@ -166,7 +166,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

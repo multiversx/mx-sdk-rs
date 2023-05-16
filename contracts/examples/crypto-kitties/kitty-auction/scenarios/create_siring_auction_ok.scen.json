@@ -66,7 +66,7 @@
                         "str:nrOwnedKitties|sc:kitty_auction_contract": "1",
                         "str:owner|u32:1": "sc:kitty_auction_contract"
                     },
-                    "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
+                    "code": "mxsc:../../kitty-ownership/output/kitty-ownership.mxsc.json"
                 },
                 "sc:kitty_auction_contract": {
                     "nonce": "0",
@@ -78,7 +78,7 @@
                         "str:genZeroKittyAuctionDuration": "100,000",
                         "str:auction|u32:1": "u8:1|u32:2|u16:1000|u32:2|u16:5000|u64:200000|address:bidder2|u32:0|u64:0|u64:0|u64:0|u64:0"
                     },
-                    "code": "file:../output/kitty-auction.wasm"
+                    "code": "mxsc:../output/kitty-auction.mxsc.json"
                 }
             }
         }

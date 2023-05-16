@@ -82,7 +82,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/send-tx-repeat.wasm"
+                    "code": "mxsc:../output/send-tx-repeat.mxsc.json"
                 }
             }
         }

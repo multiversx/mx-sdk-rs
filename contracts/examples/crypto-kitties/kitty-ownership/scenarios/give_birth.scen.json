@@ -78,7 +78,7 @@
                         "str:nrOwnedKitties|address:acc1": "1",
                         "str:nrOwnedKitties|address:acc2": "2"
                     },
-                    "code": "file:../output/kitty-ownership.wasm"
+                    "code": "mxsc:../output/kitty-ownership.mxsc.json"
                 },
                 "+": ""
             }

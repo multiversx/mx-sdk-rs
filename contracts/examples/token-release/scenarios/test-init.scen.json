@@ -76,7 +76,7 @@
                         "str:setupPeriodStatus": "1",
                         "str:tokenIdentifier": "str:FIRSTTOKEN-123456"
                     },
-                    "code": "file:../output/token-release.wasm"
+                    "code": "mxsc:../output/token-release.mxsc.json"
                 }
             }
         },
@@ -127,7 +127,7 @@
                         "str:setupPeriodStatus": "1",
                         "str:tokenIdentifier": "str:FIRSTTOKEN-123456"
                     },
-                    "code": "file:../output/token-release.wasm",
+                    "code": "mxsc:../output/token-release.mxsc.json",
                     "owner": "address:owner"
                 }
             }

@@ -68,7 +68,7 @@
                         "str:user_count": "2",
                         "str:pongAllLastUser": "1"
                     },
-                    "code": "file:../output/ping-pong-egld.wasm"
+                    "code": "mxsc:../output/ping-pong-egld.mxsc.json"
                 }
             }
         },
@@ -127,7 +127,7 @@
                         "str:userStatus|0x0000002": "2",
                         "str:user_count": "2"
                     },
-                    "code": "file:../output/ping-pong-egld.wasm"
+                    "code": "mxsc:../output/ping-pong-egld.mxsc.json"
                 }
             }
         },

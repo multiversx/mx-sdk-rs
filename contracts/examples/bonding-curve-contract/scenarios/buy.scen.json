@@ -266,7 +266,7 @@
                         "str:owned_tokens|address:artist2|str:.node_id|nested:str:MFSFT-246802": "1",
                         "str:owned_tokens|address:artist2|str:.value|u32:1": "str:MFSFT-246802"
                     },
-                    "code": "file:../output/bonding-curve-contract.wasm"
+                    "code": "mxsc:../output/bonding-curve-contract.mxsc.json"
                 }
             }
         }

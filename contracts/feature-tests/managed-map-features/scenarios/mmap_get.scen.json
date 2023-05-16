@@ -6,7 +6,7 @@
                 "sc:mmap-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/managed-map-features.wasm",
+                    "code": "mxsc:../output/managed-map-features.mxsc.json",
                     "storage": {
                         "str:num_entries": "3",
                         "str:key|u32:0": "str:key0",

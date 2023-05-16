@@ -11,12 +11,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder-queue": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder-queue/output/forwarder-queue.wasm"
+                    "code": "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json"
                 }
             }
         },
@@ -103,12 +103,12 @@
                     "storage": {
                         "str:call_counts|nested:str:accept_funds": "1"
                     },
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder-queue": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder-queue/output/forwarder-queue.wasm"
+                    "code": "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json"
                 }
             }
         }

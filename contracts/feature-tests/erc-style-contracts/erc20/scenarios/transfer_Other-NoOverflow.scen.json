@@ -16,7 +16,7 @@
                         "str:balance|address:account_1": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         },
@@ -69,7 +69,7 @@
                         "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         }

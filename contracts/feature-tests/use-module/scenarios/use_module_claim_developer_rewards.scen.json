@@ -45,13 +45,13 @@
                 "sc:child": {
                     "balance": "500",
                     "owner": "sc:use_module",
-                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "developerRewards": "100"
                 },
                 "sc:not_child": {
                     "balance": "500",
                     "owner": "sc:not_owner",
-                    "code": "file:../../composability/vault/output/vault.wasm"
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json"
                 }
             }
         },
@@ -102,7 +102,7 @@
             "accounts": {
                 "sc:use_module": {
                     "balance": "100",
-                    "code": "file:../output/use-module.wasm",
+                    "code": "mxsc:../output/use-module.mxsc.json",
                     "owner": "address:owner"
                 },
                 "address:not_owner": {
@@ -116,13 +116,13 @@
                 "sc:child": {
                     "balance": "500",
                     "owner": "sc:use_module",
-                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "developerRewards": "0"
                 },
                 "sc:not_child": {
                     "balance": "500",
                     "owner": "sc:not_owner",
-                    "code": "file:../../composability/vault/output/vault.wasm"
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json"
                 }
             }
         }

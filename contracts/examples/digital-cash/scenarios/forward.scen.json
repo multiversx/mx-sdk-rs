@@ -81,7 +81,7 @@
                         "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.node_id|nested:str:CASHTOKEN-123456|u64:0": "1",
                         "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "2",

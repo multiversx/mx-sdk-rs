@@ -107,7 +107,7 @@
                         "str:num_board_members": "3",
                         "str:quorum": "2"
                     },
-                    "code": "file:../../output/multisig.wasm"
+                    "code": "mxsc:../../output/multisig.mxsc.json"
                 },
                 "+": ""
             }

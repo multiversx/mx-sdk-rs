@@ -76,7 +76,7 @@
                             "5-arguments": "u32:0"
                         }
                     },
-                    "code": "file:../output/multisig.wasm"
+                    "code": "mxsc:../output/multisig.mxsc.json"
                 },
                 "+": ""
             }
@@ -184,7 +184,7 @@
                         "str:quorum": "2",
                         "str:action_data.len": "3"
                     },
-                    "code": "file:../output/multisig.wasm"
+                    "code": "mxsc:../output/multisig.mxsc.json"
                 },
                 "sc:factorial": {
                     "nonce": "0",

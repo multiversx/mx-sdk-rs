@@ -61,7 +61,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/nft-minter.wasm"
+                    "code": "mxsc:../output/nft-minter.mxsc.json"
                 },
                 "+": ""
             }
@@ -83,7 +83,7 @@
                     "storage": {
                         "str:nftTokenId": "str:NFT-123456"
                     },
-                    "code": "file:../output/nft-minter.wasm",
+                    "code": "mxsc:../output/nft-minter.mxsc.json",
                     "owner": "address:owner"
                 }
             }

@@ -12,7 +12,7 @@
                 "sc:use-module": {
                     "nonce": "1",
                     "balance": "0",
-                    "code": "file:../../../feature-tests/use-module/output/use-module.wasm",
+                    "code": "mxsc:../../../feature-tests/use-module/output/use-module.mxsc.json",
                     "owner": "sc:proxy-pause"
                 }
             },
