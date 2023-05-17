@@ -49,6 +49,11 @@ fn deploy_duplicate_bm_go() {
 }
 
 #[test]
+fn interactor_trace_go() {
+    multiversx_sc_scenario::run_go("scenarios/interactor_trace.scen.json");
+}
+
+#[test]
 fn remove_everyone_go() {
     multiversx_sc_scenario::run_go("scenarios/remove_everyone.scen.json");
 }

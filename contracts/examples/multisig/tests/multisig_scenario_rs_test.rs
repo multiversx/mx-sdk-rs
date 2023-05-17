@@ -78,6 +78,11 @@ fn deploy_duplicate_bm_rs() {
 }
 
 #[test]
+fn interactor_trace_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/interactor_trace.scen.json", world());
+}
+
+#[test]
 fn remove_everyone_rs() {
     multiversx_sc_scenario::run_rs("scenarios/remove_everyone.scen.json", world());
 }

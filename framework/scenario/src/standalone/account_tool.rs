@@ -45,7 +45,7 @@ pub async fn retrieve_account_as_scenario_set_state(
             username: Some(ValueSubTree::Str(account.username.to_string())),
             storage: convert_storage(account_storage),
             comment: None,
-            code: None,
+            code: retrieve_code(account.code),
             owner: None,
             developer_rewards: None,
         },
@@ -64,6 +64,14 @@ pub async fn retrieve_account_as_scenario_set_state(
             current_block_info: None,
             previous_block_info: None,
         }],
+    }
+}
+
+fn retrieve_code(code: String) -> Option<ValueSubTree> {
+    if code.is_empty() {
+        None
+    } else {
+        Some(ValueSubTree::Str(format!("0x{code}")))
     }
 }
 

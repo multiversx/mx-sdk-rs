@@ -12,7 +12,10 @@ use multisig::{
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
-use multiversx_sc_scenario::test_wallets;
+use multiversx_sc_scenario::{
+    mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
+    standalone::retrieve_account_as_scenario_set_state, test_wallets,
+};
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
     multiversx_sc::{
@@ -121,7 +124,44 @@ impl MultisigInteract {
         }
     }
 
+    async fn set_state(&mut self) {
+        println!("wallet address: {}", bech32::encode(&self.wallet_address));
+        let scenario_raw = retrieve_account_as_scenario_set_state(
+            Config::load_config().gateway().to_string(),
+            bech32::encode(&self.wallet_address),
+            Some("bech32".to_string()),
+        )
+        .await;
+
+        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+
+        self.interactor.pre_runners.run_scenario(&scenario);
+        self.interactor.post_runners.run_scenario(&scenario);
+
+        let board = self.board();
+
+        for board_member_address in board.iter().skip(1) {
+            println!(
+                "board member address: {}",
+                bech32::encode(board_member_address)
+            );
+            let scenario_raw = retrieve_account_as_scenario_set_state(
+                Config::load_config().gateway().to_string(),
+                bech32::encode(board_member_address),
+                Some("bech32".to_string()),
+            )
+            .await;
+
+            let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+
+            self.interactor.pre_runners.run_scenario(&scenario);
+            self.interactor.post_runners.run_scenario(&scenario);
+        }
+    }
+
     async fn deploy(&mut self) {
+        self.set_state().await;
+
         let board = self.board();
         let mut typed_sc_deploy = self
             .state
@@ -159,6 +199,7 @@ impl MultisigInteract {
             println!("count must be greater than 0");
             return;
         }
+        self.set_state().await;
         println!("deploying {count} contracts...");
 
         let board = self.board();
