@@ -78,6 +78,7 @@ fn retrieve_code(code: String) -> Option<ValueSubTree> {
 fn convert_storage(account_storage: HashMap<String, String>) -> BTreeMap<String, ValueSubTree> {
     account_storage
         .into_iter()
+        .filter(|(k, _)| !k.starts_with("454c524f4e44"))
         .map(|(k, v)| (format!("0x{k}"), ValueSubTree::Str(format!("0x{v}"))))
         .collect()
 }
