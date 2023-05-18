@@ -25,7 +25,11 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
 }
 
 pub fn load_mxsc_file_json(mxsc_file_path: &str, context: &InterpreterContext) -> Vec<u8> {
-    match fs::read_to_string(mxsc_file_path) {
+    let mut path_buf = context.context_path.clone();
+    path_buf.push(mxsc_file_path);
+    path_buf = normalize_path(path_buf);
+
+    match fs::read_to_string(path_buf) {
         Ok(content) => {
             let mxsc_json: MxscFileJson = serde_json::from_str(content.as_str()).unwrap();
             hex::decode(mxsc_json.code).expect("Could not decode contract code")
