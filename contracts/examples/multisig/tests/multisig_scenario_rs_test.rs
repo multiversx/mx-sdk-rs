@@ -79,7 +79,7 @@ fn deploy_duplicate_bm_rs() {
 
 #[test]
 fn interactor_trace_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/interactor_trace.scen.json", world());
+    world().run("scenarios/interactor_trace.scen.json");
 }
 
 #[test]
