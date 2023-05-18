@@ -9,9 +9,9 @@ publish = false
 path = "src/formatted_message_features.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.8"
+version = "0.41.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.8"
+version = "0.41.0"
 path = "../../../framework/scenario"

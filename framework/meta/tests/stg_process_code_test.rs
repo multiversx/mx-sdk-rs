@@ -1,24 +1,38 @@
-use multiversx_sc_meta::scen_test_gen::{format_test_fn_go, process_code};
+use multiversx_sc_meta::cmd::standalone::scen_test_gen::{
+    format_test_fn_go, process_code, DEFAULT_SETUP_GO,
+};
 
-const GO_TEST_1: &str = r#"#[test]
-fn test_1_go() {
-    multiversx_sc_scenario::run_go("scenarios/test1.scen.json");
-}
-"#;
+const GO_TEST_1: &str = r#"use multiversx_sc_scenario::*;
 
-const GO_TEST_0_1_2: &str = r#"#[test]
-fn test_0_go() {
-    multiversx_sc_scenario::run_go("scenarios/test0.scen.json");
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
 }
 
 #[test]
 fn test_1_go() {
-    multiversx_sc_scenario::run_go("scenarios/test1.scen.json");
+    world().run("scenarios/test1.scen.json");
+}
+"#;
+
+const GO_TEST_0_1_2: &str = r#"use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
+#[test]
+fn test_0_go() {
+    world().run("scenarios/test0.scen.json");
+}
+
+#[test]
+fn test_1_go() {
+    world().run("scenarios/test1.scen.json");
 }
 
 #[test]
 fn test_2_go() {
-    multiversx_sc_scenario::run_go("scenarios/test2.scen.json");
+    world().run("scenarios/test2.scen.json");
 }
 "#;
 
@@ -31,7 +45,7 @@ fn check_transformation(
         .into_iter()
         .map(|s| s.to_string())
         .collect();
-    let new_code = process_code(input, &scenario_names, format_test_fn_go);
+    let new_code = process_code(input, &scenario_names, format_test_fn_go, DEFAULT_SETUP_GO);
     assert_eq!(new_code.as_str(), expected_out);
 }
 

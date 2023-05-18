@@ -17,30 +17,30 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn approve_siring_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/approve_siring.scen.json", world());
+    world().run("scenarios/approve_siring.scen.json");
 }
 
 #[test]
 fn breed_ok_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/breed_ok.scen.json", world());
+    world().run("scenarios/breed_ok.scen.json");
 }
 
 #[test]
 fn give_birth_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/give_birth.scen.json", world());
+    world().run("scenarios/give_birth.scen.json");
 }
 
 #[test]
 fn init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/init.scen.json", world());
+    world().run("scenarios/init.scen.json");
 }
 
 #[test]
 fn query_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/query.scen.json", world());
+    world().run("scenarios/query.scen.json");
 }
 
 #[test]
 fn setup_accounts_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/setup_accounts.scen.json", world());
+    world().run("scenarios/setup_accounts.scen.json");
 }

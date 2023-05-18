@@ -26,21 +26,21 @@ fn world() -> ScenarioWorld {
 #[test]
 #[ignore = "not yet supported"]
 fn mcf_alt_init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-alt-init.scen.json", world());
+    world().run("scenarios/mcf-alt-init.scen.json");
 }
 
 #[test]
 #[ignore = "not supported in principle"]
 fn mcf_example_feature_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-example-feature.scen.json", world());
+    world().run("scenarios/mcf-example-feature.scen.json");
 }
 
 #[test]
 fn mcf_external_get_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-external-get.scen.json", world());
+    world().run("scenarios/mcf-external-get.scen.json");
 }
 
 #[test]
 fn mcf_external_pure_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-external-pure.scen.json", world());
+    world().run("scenarios/mcf-external-pure.scen.json");
 }

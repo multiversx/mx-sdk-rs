@@ -13,7 +13,7 @@ pub trait ForwarderSftModule: storage::ForwarderStorageModule {
         self.send()
             .esdt_system_sc_proxy()
             .issue_semi_fungible(
-                issue_cost,
+                issue_cost.clone_value(),
                 &token_display_name,
                 &token_ticker,
                 SemiFungibleTokenProperties {

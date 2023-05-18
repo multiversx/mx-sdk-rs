@@ -13,10 +13,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn linked_list_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/linked_list_repeat.scen.json", world());
+    world().run("scenarios/linked_list_repeat.scen.json");
 }
 
 #[test]
 fn linked_list_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/linked_list_repeat_struct.scen.json", world());
+    world().run("scenarios/linked_list_repeat_struct.scen.json");
 }

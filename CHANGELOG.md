@@ -26,6 +26,26 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.41.0, vm 0.3.0] - 2023-05-05
+- Fixed compatibility with rustc v1.71.0.
+- Allocator system:
+	- Contracts can now choose their own allocator. This works in multi-contract contexts.
+	- New allocators: `fail` (default), `static64k`, `leaking`.
+	- Removed dependency to `wee_alloc`, but using it is still possible if the contract references it directly.
+	- Contract call stack size is now configurable in `multicontract.toml`.
+	- The 'panic with message' system now relies on managed buffers instead of on an allocator.
+- Fixed BigUint bitwise operations in the debugger.
+- When building contracts, an additional `.mxsc.json` file is created, which packs both the contract binary, the ABI, and some additional metadata.
+- Refactor: reorganized the meta crate.
+- Deprecated some legacy methods in the API wrappers.
+
+## [sc 0.40.1, vm 0.2.1] - 2023-04-24
+- Building contracts also triggers an EI check, which verifies compatibility with various VM versions. It currently only issues warnings.
+- `ManagedVecItem` implementation for arrays.
+
+## [sc 0.40.0, vm 0.2.0] - 2023-04-20
+- Call value `egld_value` and `all_esdt_transfers` methods return `ManagedRef` instead of owned objects, because they are cached (to avoid accidental corruption of the underlying cache).
+
 ## [sc 0.39.8, vm 0.1.8] - 2023-03-29
 - `multiversx-sc-meta` `test-gen` command: generates Rust integration tests based on scenarios present in the `scenarios` folder.
  - `UnorderedSetMapper` `swap_indexes` method.

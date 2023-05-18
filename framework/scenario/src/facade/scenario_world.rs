@@ -6,9 +6,12 @@ use crate::{
     },
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
+    vm_go_tool::run_vm_go_tool,
 };
 use multiversx_chain_vm::DebugApi;
 use std::path::{Path, PathBuf};
+
+use super::debugger_backend::DebuggerBackend;
 
 /// A facade for contracts tests.
 ///
@@ -16,24 +19,71 @@ use std::path::{Path, PathBuf};
 ///
 /// Currently defers most of the operations to the blockchain mock object directly,
 /// but that one will be refactored and broken up into smaller pieces.
-#[derive(Default, Debug)]
 pub struct ScenarioWorld {
-    pub current_dir: PathBuf,
-    pub vm_runner: ScenarioVMRunner, // TODO: convert to option at some point
-    pub trace: Option<ScenarioTrace>,
+    pub(crate) current_dir: PathBuf,
+    pub(crate) backend: Backend,
+}
+
+pub(crate) enum Backend {
+    Debugger(DebuggerBackend),
+    VmGoBackend,
+}
+
+impl Default for ScenarioWorld {
+    fn default() -> Self {
+        Self::debugger()
+    }
 }
 
 impl ScenarioWorld {
-    pub fn new() -> Self {
+    pub fn debugger() -> Self {
         ScenarioWorld {
             current_dir: std::env::current_dir().unwrap(),
-            vm_runner: ScenarioVMRunner::new(),
-            trace: None,
+            backend: Backend::Debugger(DebuggerBackend {
+                vm_runner: ScenarioVMRunner::new(),
+                trace: None,
+            }),
+        }
+    }
+
+    /// Backwards compatibility only.
+    pub fn new() -> Self {
+        Self::debugger()
+    }
+
+    pub fn vm_go() -> Self {
+        ScenarioWorld {
+            current_dir: std::env::current_dir().unwrap(),
+            backend: Backend::VmGoBackend,
+        }
+    }
+
+    /// Runs a scenario file (`.scen.json`) with the configured backend.
+    ///
+    /// Will crash and produce an output if the test failed for any reason.
+    pub fn run<P: AsRef<Path>>(self, relative_path: P) {
+        let mut absolute_path = self.current_dir.clone();
+        absolute_path.push(relative_path);
+        match self.backend {
+            Backend::Debugger(mut debugger) => {
+                debugger.run_scenario_file(&absolute_path);
+            },
+            Backend::VmGoBackend => {
+                run_vm_go_tool(&absolute_path);
+            },
+        }
+    }
+
+    pub(super) fn get_mut_contract_debugger_backend(&mut self) -> &mut DebuggerBackend {
+        if let Backend::Debugger(debugger) = &mut self.backend {
+            debugger
+        } else {
+            panic!("operation only available for the contract debugger backend")
         }
     }
 
     pub fn start_trace(&mut self) -> &mut Self {
-        self.trace = Some(ScenarioTrace::default());
+        self.get_mut_contract_debugger_backend().trace = Some(ScenarioTrace::default());
         self
     }
 
@@ -62,7 +112,8 @@ impl ScenarioWorld {
         contract_container: ContractContainer,
     ) {
         let contract_bytes = interpret_string(expression, &self.interpreter_context());
-        self.vm_runner
+        self.get_mut_contract_debugger_backend()
+            .vm_runner
             .blockchain_mock
             .register_contract_container(contract_bytes, contract_container);
     }
@@ -128,7 +179,7 @@ impl ScenarioWorld {
 
     /// Exports current scenario to a JSON file, as created.
     pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        if let Some(trace) = &mut self.trace {
+        if let Some(trace) = &mut self.get_mut_contract_debugger_backend().trace {
             trace.write_scenario_trace(file_path);
         } else {
             panic!("scenario trace no initialized")

@@ -7,14 +7,12 @@ publish = false
 
 [lib]
 path = "src/mmap_features.rs"
-
 [dependencies.multiversx-sc]
-version = "0.39.5"
+version = "0.41.0"
 path = "../../../framework/base"
 features = ["managed-map"]
-
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.5"
+version = "0.41.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies.esdt-system-sc-mock]

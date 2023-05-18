@@ -39,6 +39,7 @@ where
         }
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `get_caller` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_caller_legacy(&self) -> crate::types::Address {
@@ -52,6 +53,7 @@ where
         ManagedAddress::from_handle(handle)
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `get_sc_address` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_sc_address_legacy(&self) -> crate::types::Address {
@@ -86,6 +88,10 @@ where
         }
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `get_shard_of_address` instead."
+    )]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_shard_of_address_legacy(&self, address: &crate::types::Address) -> u32 {
@@ -97,6 +103,10 @@ where
         A::blockchain_api_impl().get_shard_of_address(address.get_handle())
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `is_smart_contract` instead."
+    )]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn is_smart_contract_legacy(&self, address: &crate::types::Address) -> bool {
@@ -108,6 +118,7 @@ where
         A::blockchain_api_impl().is_smart_contract(address.get_handle())
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `get_balance` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
@@ -133,6 +144,10 @@ where
         )
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `get_state_root_hash` instead."
+    )]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_state_root_hash_legacy(&self) -> crate::types::H256 {
@@ -146,6 +161,7 @@ where
         ManagedByteArray::from_handle(handle)
     }
 
+    #[deprecated(since = "0.41.0", note = "Please use method `get_tx_hash` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_tx_hash_legacy(&self) -> crate::types::H256 {
@@ -184,6 +200,10 @@ where
         A::blockchain_api_impl().get_block_epoch()
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `get_block_random_seed` instead."
+    )]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {
@@ -217,6 +237,10 @@ where
         A::blockchain_api_impl().get_prev_block_epoch()
     }
 
+    #[deprecated(
+        since = "0.41.0",
+        note = "Please use method `get_prev_block_random_seed` instead."
+    )]
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_prev_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {

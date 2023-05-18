@@ -7,17 +7,17 @@ fn world() -> ScenarioWorld {
 #[test]
 #[ignore = "not supported"]
 fn buy_nft_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/buy_nft.scen.json", world());
+    world().run("scenarios/buy_nft.scen.json");
 }
 
 #[test]
 #[ignore = "not supported"]
 fn create_nft_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_nft.scen.json", world());
+    world().run("scenarios/create_nft.scen.json");
 }
 
 #[test]
 #[ignore = "not supported"]
 fn init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/init.scen.json", world());
+    world().run("scenarios/init.scen.json");
 }

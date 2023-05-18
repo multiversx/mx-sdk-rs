@@ -23,8 +23,8 @@ pub trait Erc1155UserMock {
         &self,
         _operator: ManagedAddress,
         _from: ManagedAddress,
-        _type_ids: Vec<BigUint>,
-        _values: Vec<BigUint>,
+        _type_ids: ManagedVec<BigUint>,
+        _values: ManagedVec<BigUint>,
         _data: ManagedBuffer,
     ) {
     }

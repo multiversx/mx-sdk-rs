@@ -1,4 +1,4 @@
-use core::borrow::Borrow;
+use core::{borrow::Borrow, mem::MaybeUninit};
 
 use crate::{
     api::ManagedTypeApi,
@@ -7,11 +7,6 @@ use crate::{
         ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-
-/// We assume that no payloads will exceed this value.
-/// This limit cannot be determined at compile-time for types with generics, due to current Rust compiler contraints.
-/// TODO: find a way to validate this assumption, if possible at compile time.
-const MAX_PAYLOAD_SIZE: usize = 200;
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -131,21 +126,21 @@ impl ManagedVecItem for bool {
 
 impl<T> ManagedVecItem for Option<T>
 where
+    [(); 1 + T::PAYLOAD_SIZE]:,
     T: ManagedVecItem,
 {
-    const PAYLOAD_SIZE: usize = u8::PAYLOAD_SIZE + T::PAYLOAD_SIZE;
+    const PAYLOAD_SIZE: usize = 1 + T::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut arr: [u8; MAX_PAYLOAD_SIZE] = [0u8; MAX_PAYLOAD_SIZE];
-        let slice = &mut arr[..Self::PAYLOAD_SIZE];
-        reader(slice);
-        if slice[0] == 0 {
+        let mut byte_arr: [u8; 1 + T::PAYLOAD_SIZE] = [0u8; 1 + T::PAYLOAD_SIZE];
+        reader(&mut byte_arr[..]);
+        if byte_arr[0] == 0 {
             None
         } else {
             Some(T::from_byte_reader(|bytes| {
-                bytes.copy_from_slice(&slice[1..]);
+                bytes.copy_from_slice(&byte_arr[1..]);
             }))
         }
     }
@@ -157,15 +152,14 @@ where
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-        let mut arr: [u8; MAX_PAYLOAD_SIZE] = [0u8; MAX_PAYLOAD_SIZE];
-        let slice = &mut arr[..Self::PAYLOAD_SIZE];
+        let mut byte_arr: [u8; 1 + T::PAYLOAD_SIZE] = [0u8; 1 + T::PAYLOAD_SIZE];
         if let Some(t) = self {
-            slice[0] = 1;
+            byte_arr[0] = 1;
             T::to_byte_writer(t, |bytes| {
-                slice[1..].copy_from_slice(bytes);
+                byte_arr[1..].copy_from_slice(bytes);
             });
         }
-        writer(slice)
+        writer(&byte_arr[..])
     }
 }
 
@@ -230,15 +224,28 @@ where
     }
 }
 
-impl<const N: usize> ManagedVecItem for [u8; N] {
-    const PAYLOAD_SIZE: usize = N;
-    const SKIPS_RESERIALIZATION: bool = true;
+impl<T, const N: usize> ManagedVecItem for [T; N]
+where
+    [(); T::PAYLOAD_SIZE * N]:,
+    T: ManagedVecItem,
+{
+    const PAYLOAD_SIZE: usize = T::PAYLOAD_SIZE * N;
+    const SKIPS_RESERIALIZATION: bool = T::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut array: [u8; N] = [0u8; N];
-        reader(&mut array[..]);
-        array
+        let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
+        reader(&mut byte_arr[..]);
+        let mut result: [T; N] = unsafe { MaybeUninit::zeroed().assume_init() };
+        let mut from_index = 0;
+        for item in result.iter_mut() {
+            let to_index = from_index + T::PAYLOAD_SIZE;
+            *item = T::from_byte_reader(|bytes| {
+                bytes.copy_from_slice(&byte_arr[from_index..to_index]);
+            });
+            from_index = to_index;
+        }
+        result
     }
 
     unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
@@ -248,7 +255,16 @@ impl<const N: usize> ManagedVecItem for [u8; N] {
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-        writer(self.as_slice())
+        let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
+        let mut from_index = 0;
+        for item in self {
+            let to_index = from_index + T::PAYLOAD_SIZE;
+            item.to_byte_writer(|bytes| {
+                byte_arr[from_index..to_index].copy_from_slice(bytes);
+            });
+            from_index = to_index;
+        }
+        writer(&byte_arr[..])
     }
 }
 

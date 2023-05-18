@@ -461,8 +461,5 @@ fn world() -> multiversx_sc_scenario::ScenarioWorld {
 
 #[test]
 fn contract_without_macros_scenario() {
-    multiversx_sc_scenario::run_rs(
-        "../../contracts/examples/adder/scenarios/adder.scen.json",
-        world(),
-    );
+    world().run("../../contracts/examples/adder/scenarios/adder.scen.json");
 }

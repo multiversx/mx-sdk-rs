@@ -9,14 +9,14 @@ publish = false
 path = "src/abi_tester.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.8"
+version = "0.41.0"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.8"
+version = "0.41.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies.multiversx-sc-meta]
-version = "0.39.8"
+version = "0.41.0"
 path = "../../../framework/meta"

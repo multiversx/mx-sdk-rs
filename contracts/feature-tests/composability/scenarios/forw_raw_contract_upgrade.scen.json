@@ -20,7 +20,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "upgrade_from_source",
+                "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:child",
                     "sc:forwarder"
@@ -47,7 +47,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "upgrade",
+                "function": "call_upgrade",
                 "arguments": [
                     "sc:child",
                     "file:../vault/output/vault.wasm",

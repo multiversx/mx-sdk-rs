@@ -14,21 +14,21 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test.scen.json", world());
+    world().run("scenarios/test.scen.json");
 }
 
 #[test]
 fn test_esdt_generation_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test_esdt_generation.scen.json", world());
+    world().run("scenarios/test_esdt_generation.scen.json");
 }
 
 #[test]
 fn test_multiple_sc_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test_multiple_sc.scen.json", world());
+    world().run("scenarios/test_multiple_sc.scen.json");
 }
 
 #[test]
 #[ignore = "not supported"]
 fn trace_deploy_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/trace-deploy.scen.json", world());
+    world().run("scenarios/trace-deploy.scen.json");
 }

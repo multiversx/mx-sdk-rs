@@ -19,8 +19,11 @@ panic = "abort"
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.39.8"
+version = "0.41.0"
 path = "../../../../../framework/wasm-adapter"
+
+[dependencies]
+wee_alloc = "0.4" #now needs to be added explicitly in the contract wasm crate
 
 [workspace]
 members = ["."]

@@ -107,9 +107,7 @@ impl<OriginalResult> AsMut<ScCallStep> for TypedScCall<OriginalResult> {
 
 impl<OriginalResult> From<TypedScCall<OriginalResult>> for ScCallStep {
     fn from(typed: TypedScCall<OriginalResult>) -> Self {
-        Self {
-            ..typed.sc_call_step
-        }
+        typed.sc_call_step
     }
 }
 

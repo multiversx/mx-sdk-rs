@@ -1,9 +1,15 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
 fn map_repeat_go() {
-    multiversx_sc_scenario::run_go("scenarios/map_repeat.scen.json");
+    world().run("scenarios/map_repeat.scen.json");
 }
 
 #[test]
 fn map_repeat_struct_go() {
-    multiversx_sc_scenario::run_go("scenarios/map_repeat_struct.scen.json");
+    world().run("scenarios/map_repeat_struct.scen.json");
 }

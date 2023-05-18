@@ -1,25 +1,31 @@
-#[test]
-fn init_go() {
-    multiversx_sc_scenario::run_go("scenarios/init.scen.json");
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
 }
 
-#[ignore]
 #[test]
+fn init_go() {
+    world().run("scenarios/init.scen.json");
+}
+
+#[test]
+#[ignore]
 fn reject_transfer_go() {
-    multiversx_sc_scenario::run_go("scenarios/reject_transfer.scen.json");
+    world().run("scenarios/reject_transfer.scen.json");
 }
 
 #[test]
 fn simple_transfer_full_go() {
-    multiversx_sc_scenario::run_go("scenarios/simple_transfer_full.scen.json");
+    world().run("scenarios/simple_transfer_full.scen.json");
 }
 
 #[test]
 fn simple_transfer_full_wrong_token_go() {
-    multiversx_sc_scenario::run_go("scenarios/simple_transfer_full_wrong_token.scen.json");
+    world().run("scenarios/simple_transfer_full_wrong_token.scen.json");
 }
 
 #[test]
 fn simple_transfer_half_go() {
-    multiversx_sc_scenario::run_go("scenarios/simple_transfer_half.scen.json");
+    world().run("scenarios/simple_transfer_half.scen.json");
 }
