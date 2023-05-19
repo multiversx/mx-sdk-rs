@@ -54,7 +54,7 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/esdt-transfer-with-fee.wasm",
+                "contractCode": "mxsc:../output/esdt-transfer-with-fee.mxsc.json",
                 "arguments": [],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"

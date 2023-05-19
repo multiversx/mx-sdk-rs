@@ -75,7 +75,7 @@
             "id": "1",
             "tx": {
                 "from": "address:an_account",
-                "contractCode": "file:../output/basic-features.wasm",
+                "contractCode": "mxsc:../output/basic-features.mxsc.json",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"

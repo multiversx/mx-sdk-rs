@@ -1,7 +1,7 @@
 use crate::{interpret_trait::InterpreterContext, serde_raw::ValueSubTree};
 
 use super::{
-    file_loader::{load_file, load_mxsc_file_json},
+    file_loader::{load_file, MxscFileJson},
     functions::*,
     parse_num::*,
     prefixes::*,
@@ -65,11 +65,14 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
     }
 
     if let Some(stripped) = s.strip_prefix(FILE_PREFIX) {
-        return load_file(stripped, context);
+        return load_file(stripped, context, |c| c);
     }
 
     if let Some(stripped) = s.strip_prefix(MXSC_PREFIX) {
-        return load_mxsc_file_json(stripped, context);
+        return load_file(stripped, context, |content| {
+            let mxsc_json: MxscFileJson = serde_json::from_slice(&content).unwrap();
+            hex::decode(mxsc_json.code).expect("Could not decode contract code")
+        });
     }
 
     if let Some(stripped) = s.strip_prefix(KECCAK256_PREFIX) {

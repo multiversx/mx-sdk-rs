@@ -23,7 +23,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/erc1155.wasm",
+                "contractCode": "mxsc:../output/erc1155.mxsc.json",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x00"

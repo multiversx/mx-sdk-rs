@@ -31,7 +31,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../output/ping-pong-egld.wasm",
+                "contractCode": "mxsc:../output/ping-pong-egld.mxsc.json",
                 "arguments": [
                     "500,000,000,000",
                     "123,000",

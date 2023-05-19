@@ -22,7 +22,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../output/crowdfunding-esdt.wasm",
+                "contractCode": "mxsc:../output/crowdfunding-esdt.mxsc.json",
                 "arguments": [
                     "500,000,000,000",
                     "123,000",
