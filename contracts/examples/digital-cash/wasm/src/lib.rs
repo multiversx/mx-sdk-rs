@@ -21,7 +21,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         fund
         withdraw
         claim
-        payment_funds
+        deposit_fees
         forward
         amount
         deposit
