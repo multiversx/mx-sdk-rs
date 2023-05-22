@@ -203,7 +203,7 @@ where
         self.item_is_empty_unchecked_at_address(address, index)
     }
 
-    /// Get item at index from storage.
+    /// Set item at index in storage.
     /// Index must be valid (1 <= index <= count).
     pub fn set(&self, index: usize, item: &T) {
         if index == 0 || index > self.len() {
