@@ -77,7 +77,7 @@ impl AdderInteract {
         }
     }
 
-    async fn deploy(&mut self) {
+    async fn set_state(&mut self) {
         println!("wallet address: {}", bech32::encode(&self.wallet_address));
         let scenario_raw = retrieve_account_as_scenario_set_state(
             Config::load_config().gateway().to_string(),
@@ -90,6 +90,10 @@ impl AdderInteract {
 
         self.interactor.pre_runners.run_scenario(&scenario);
         self.interactor.post_runners.run_scenario(&scenario);
+    }
+
+    async fn deploy(&mut self) {
+        self.set_state().await;
 
         let mut typed_sc_deploy = self
             .state
@@ -122,6 +126,8 @@ impl AdderInteract {
             println!("count must be greater than 0");
             return;
         }
+
+        self.set_state().await;
         println!("deploying {count} contracts...");
 
         let mut steps = Vec::new();
