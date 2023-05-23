@@ -25,7 +25,7 @@ pub async fn retrieve_account_as_scenario_set_state(
     let account_esdt = blockchain.get_account_esdt_tokens(&address).await.unwrap();
     let account_storage = blockchain.get_account_storage_keys(&address).await.unwrap();
 
-    let addr_pretty = if custom_format.is_none() {
+    let _addr_pretty = if custom_format.is_none() {
         if account.code.is_empty() {
             format!("address:{addr}")
         } else {
@@ -37,7 +37,7 @@ pub async fn retrieve_account_as_scenario_set_state(
 
     let mut accounts = BTreeMap::new();
     accounts.insert(
-        addr_pretty,
+        format!("0x{}", hex::encode(address.to_bytes())),
         AccountRaw {
             nonce: Some(ValueSubTree::Str(account.nonce.to_string())),
             balance: Some(ValueSubTree::Str(account.balance.to_string())),

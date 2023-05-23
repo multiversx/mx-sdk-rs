@@ -57,7 +57,7 @@ impl Interactor {
         let set_state_step = SetStateStep::new().new_address(
             addr,
             nonce,
-            format!("bech32:{}", bech32::encode(&deploy_address)).as_str(),
+            format!("0x{}", hex::encode(&deploy_address)).as_str(),
         );
 
         println!("deploy address: {}", bech32::encode(&deploy_address));
