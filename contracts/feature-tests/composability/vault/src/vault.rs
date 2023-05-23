@@ -129,7 +129,7 @@ pub trait Vault {
         }
 
         self.send()
-            .transfer_multiple_esdt_via_async_call(caller, all_payments);
+            .direct_multi(&caller, &all_payments);
     }
 
     #[payable("*")]
@@ -166,9 +166,9 @@ pub trait Vault {
                 payment.amount,
             ));
         }
-
+        let caller = self.blockchain().get_caller();
         self.send()
-            .transfer_multiple_esdt_via_async_call(self.blockchain().get_caller(), new_tokens);
+            .direct_multi(&caller, &new_tokens);
     }
 
     /// TODO: invert token_payment and token_nonce, for consistency.
