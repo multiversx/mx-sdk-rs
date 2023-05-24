@@ -13,7 +13,7 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "withdraw",
                 "arguments": [
-                    "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440"
+                    "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -37,7 +37,7 @@
                         "str:CASHTOKEN-123456": "50"
                     },
                     "storage": {
-                        "str:deposit|0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440": {
+                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81": {
                             "0-depositor_address": "address:acc1",
                             "1-esdt_funds": "u32:0",
                             "2-egld_funds": "biguint:1,000",
@@ -123,7 +123,7 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "withdraw",
                 "arguments": [
-                    "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440"
+                    "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"

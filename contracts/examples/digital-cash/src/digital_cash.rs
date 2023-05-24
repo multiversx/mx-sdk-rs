@@ -122,6 +122,16 @@ pub trait DigitalCash {
         self.deposit(&address).clear();
     }
 
+    #[endpoint]
+    #[only_owner]
+    fn claim_fees(&self) {
+        let caller_address = self.blockchain().get_caller();
+        let fees = self.collected_fees().get();
+
+        self.send().direct_egld(&caller_address, &fees);
+        self.collected_fees().clear();
+    }
+
     fn require_signature(
         &self,
         address: &ManagedAddress,
