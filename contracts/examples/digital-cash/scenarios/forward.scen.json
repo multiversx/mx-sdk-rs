@@ -82,7 +82,7 @@
                     "nonce": "0",
                     "balance": "3,010",
                     "esdt": {
-                        "''CASHTOKEN-123456": "50"
+                        "str:CASHTOKEN-123456": "50"
                     },
                     "storage": {
                         "str:deposit|0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440": {
