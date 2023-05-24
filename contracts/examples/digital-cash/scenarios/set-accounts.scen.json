@@ -15,6 +15,15 @@
                         "str:CASHTOKEN-123456": "100"
                     }
                 },
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "100",
+                        "str:CASHTOKEN-445566": "100",
+                        "str:CASHTOKEN-778899": "100"
+                    }
+                },
                 "address:digital_cash_owner_address": {
                     "nonce": "0",
                     "balance": "0"
@@ -68,6 +77,16 @@
                     "balance": "1,000,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "100"
+                    },
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "100",
+                        "str:CASHTOKEN-445566": "100",
+                        "str:CASHTOKEN-778899": "100"
                     },
                     "storage": {}
                 },
