@@ -13,8 +13,8 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "claim",
                 "arguments": [
-                    "0xe068c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8",
-                    "0x800bbc507e379320ae7fc0f2d986b34888a8cc0717bb33aab8475a7a267a8daee3c955839a1b9f42284c512eff1b4032d4f1159679bd480ac794b467530e5405"
+                    "0x287bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
+                    "0xdd092ec3a8d971daede79da4e5c5c90d66af9f2209a6f6541affa00c46a72fc2596e4db1b1bb226ce76e50730733078ff74a79ff7d0d185054375e0989330600"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -46,8 +46,8 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "claim",
                 "arguments": [
-                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8",
-                    "0x800bbc507e379320ae7fc0f2d986b34888a8cc0717bb33aab8475a7a267a8daee3c955839a1b9f42284c512eff1b4032d4f1159679bd480ac794b467530e5405"
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
+                    "0xdd092ec3a8d971daede79da4e5c5c90d66af9f2209a6f6541affa00c46a72fc2596e4db1b1bb226ce76e50730733078ff74a79ff7d0d185054375e0989330600"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -79,8 +79,8 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "claim",
                 "arguments": [
-                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8",
-                    "0x1800bbc507e379320ae7fc0f2d986b34888a8cc0717bb33aab8475a7a267a8daee3c955839a1b9f42284c512eff1b4032d4f1159679bd480ac794b467530e5405"
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
+                    "0x1dd092ec3a8d971daede79da4e5c5c90d66af9f2209a6f6541affa00c46a72fc2596e4db1b1bb226ce76e50730733078ff74a79ff7d0d185054375e0989330600"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -102,8 +102,8 @@
                 "to": "sc:the_digital_cash_contract",
                 "function": "claim",
                 "arguments": [
-                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8",
-                    "0x800bbc507e379320ae7fc0f2d986b34888a8cc0717bb33aab8475a7a267a8daee3c955839a1b9f42284c512eff1b4032d4f1159679bd480ac794b467530e5405"
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
+                    "0xdd092ec3a8d971daede79da4e5c5c90d66af9f2209a6f6541affa00c46a72fc2596e4db1b1bb226ce76e50730733078ff74a79ff7d0d185054375e0989330600"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -122,9 +122,9 @@
             "accounts": {
                 "sc:the_digital_cash_contract": {
                     "nonce": "0",
-                    "balance": "3,000",
+                    "balance": "2,010",
                     "storage": {
-                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81": {
+                        "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc1",
                             "1-esdt_funds": "u32:0",
                             "2-egld_funds": "biguint:1,000",

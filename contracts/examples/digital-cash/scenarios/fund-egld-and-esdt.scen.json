@@ -14,7 +14,7 @@
                 "egldValue": "1,000",
                 "function": "fund",
                 "arguments": [
-                    "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81",
+                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
                     "u64:100"
                 ],
                 "gasLimit": "500,000,000",
@@ -38,7 +38,7 @@
                 "egldValue": "1,000",
                 "function": "deposit_fees",
                 "arguments": [
-                    "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81"
+                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -61,7 +61,7 @@
                 "egldValue": "1,000",
                 "function": "fund",
                 "arguments": [
-                    "0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81",
+                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
                     "u64:60"
                 ],
                 "gasLimit": "500,000,000",
@@ -83,7 +83,7 @@
                     "nonce": "0",
                     "balance": "2,000",
                     "storage": {
-                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81": {
+                        "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc1",
                             "1-esdt_funds": "u32:0",
                             "2-egld_funds": "biguint:1,000",
@@ -127,7 +127,7 @@
                 "egldValue": "1,000",
                 "function": "deposit_fees",
                 "arguments": [
-                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8"
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -155,7 +155,7 @@
                 ],
                 "function": "fund",
                 "arguments": [
-                    "0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8",
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
                     "u64:100"
                 ],
                 "gasLimit": "100,000,000",
@@ -179,7 +179,7 @@
                         "str:CASHTOKEN-123456": "50"
                     },
                     "storage": {
-                        "str:deposit|0xdfc7efc43c36853ab160e783ad65766043734e30ce46188a448c44e2bbab9d81": {
+                        "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
                             "0-depositor_address": "address:acc1",
                             "1-esdt_funds": "u32:0",
                             "2-egld_funds": "biguint:1,000",
@@ -190,7 +190,7 @@
                                 "1-value": "biguint:1,000"
                             }
                         },
-                        "str:deposit|0xe868c2baab2a20b612f1351da5945c52c60f5321c6cde572149db90c9e8fbfc8": {
+                        "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
                             "0-depositor_address": "address:acc2",
                             "1-esdt_funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
                             "2-egld_funds": "biguint:0",
