@@ -44,6 +44,7 @@ fn withdraw_esdt_rs() {
 }
 
 #[test]
+#[ignore] // verify_ed25519 not implemented
 fn forward_rs() {
     multiversx_sc_scenario::run_rs("scenarios/forward.scen.json", world());
 }
