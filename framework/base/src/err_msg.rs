@@ -40,6 +40,9 @@ pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
 pub const CAST_TO_I64_ERROR: &[u8] = b"cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
+pub const BIG_INT_BITWISE_OPERATION_NEGATIVE: &str =
+    "bitwise operations only allowed on positive integers";
+pub const BIG_INT_CANNOT_BE_REPRESENTED_AS_INT64: &str = "big int cannot be represented as int64";
 pub const DIVISION_BY_0: &str = "division by 0";
 pub const BAD_BOUNDS_LOWER: &str = "bad bounds (lower)";
 
