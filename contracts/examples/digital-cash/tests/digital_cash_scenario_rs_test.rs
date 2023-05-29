@@ -12,15 +12,18 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-#[ignore] // verify_ed25519 not implemented
 fn claim_egld_rs() {
     multiversx_sc_scenario::run_rs("scenarios/claim-egld.scen.json", world());
 }
 
 #[test]
-#[ignore] // verify_ed25519 not implemented
 fn claim_esdt_rs() {
     multiversx_sc_scenario::run_rs("scenarios/claim-esdt.scen.json", world());
+}
+
+#[test]
+fn claim_fees_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/claim-fees.scen.json", world());
 }
 
 #[test]

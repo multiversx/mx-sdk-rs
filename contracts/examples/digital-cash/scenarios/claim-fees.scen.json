@@ -1,28 +1,24 @@
 {
-    "name": "claim-egld",
+    "name": "claim-fees",
     "steps": [
         {
             "step": "externalSteps",
-            "path": "fund-egld-and-esdt.scen.json"
+            "path": "claim-egld.scen.json"
         },
         {
             "step": "scCall",
-            "id": "claim2",
+            "id": "claim-fees-fail",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "function": "claim",
-                "arguments": [
-                    "0xd0474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
-                    "0x443c75ceadb9ec42acff7e1b92e0305182279446c1d6c0502959484c147a0430d3f96f0b988e646f6736d5bf8e4a843d8ba7730d6fa7e60f0ef3edd225ce630f"
-                ],
+                "function": "claim_fees",
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:non-existent key",
+                "message": "str:Endpoint can only be called by owner",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -40,78 +36,17 @@
         },
         {
             "step": "scCall",
-            "id": "claim3",
+            "id": "claim-fees-ok",
             "tx": {
-                "from": "address:acc2",
+                "from": "address:digital_cash_owner_address",
                 "to": "sc:the_digital_cash_contract",
-                "function": "claim",
-                "arguments": [
-                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
-                    "0x443c75ceadb9ec42acff7e1b92e0305182279446c1d6c0502959484c147a0430d3f96f0b988e646f6736d5bf8e4a843d8ba7730d6fa7e60f0ef3edd225ce630f"
-                ],
-                "gasLimit": "500,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:deposit expired",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "setState",
-            "comment": "set block",
-            "currentBlockInfo": {
-                "blockTimestamp": "511",
-                "blockNonce": "8",
-                "blockRound": "8",
-                "blockEpoch": "1"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "claim4",
-            "tx": {
-                "from": "address:acc2",
-                "to": "sc:the_digital_cash_contract",
-                "function": "claim",
-                "arguments": [
-                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
-                    "0x12bb9e58dad361e9dadd0af1021ce53f9ca12b6580f5b3ab4f9c321ee055a38bcdcf35924eb46aef7a80b22387ded0b837734ac8a57e19ea12c33ef808f996c00"
-                ],
-                "gasLimit": "500,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:argument decode error (signature): bad array length",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
-        },
-        {
-            "step": "scCall",
-            "id": "claim5",
-            "tx": {
-                "from": "address:acc2",
-                "to": "sc:the_digital_cash_contract",
-                "function": "claim",
-                "arguments": [
-                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
-                    "0x443c75ceadb9ec42acff7e1b92e0305182279446c1d6c0502959484c147a0430d3f96f0b988e646f6736d5bf8e4a843d8ba7730d6fa7e60f0ef3edd225ce630f"
-                ],
+                "function": "claim_fees",
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "0",
-                "message": "",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
@@ -122,7 +57,7 @@
             "accounts": {
                 "sc:the_digital_cash_contract": {
                     "nonce": "0",
-                    "balance": "2,010",
+                    "balance": "2,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50",
                         "str:CASHTOKEN-112233": "50",
@@ -152,8 +87,7 @@
                                 "1-value": "biguint:1,000"
                             }
                         },
-                        "str:fee": "10",
-                        "str:collected_fees": "10"
+                        "str:fee": "10"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
@@ -163,7 +97,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "6",
+                    "nonce": "7",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
@@ -181,8 +115,8 @@
                     "storage": {}
                 },
                 "address:digital_cash_owner_address": {
-                    "nonce": "1",
-                    "balance": "0",
+                    "nonce": "2",
+                    "balance": "10",
                     "storage": {}
                 }
             }

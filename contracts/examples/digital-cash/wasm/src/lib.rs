@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            6
+// Endpoints:                            8
 // Async Callback (empty):               1
-// Total number of exported functions:   8
+// Total number of exported functions:  10
 
 #![no_std]
 #![feature(lang_items)]
@@ -21,6 +21,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         fund
         withdraw
         claim
+        claim_fees
+        deposit_fees
         forward
         amount
         deposit
