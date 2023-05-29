@@ -115,8 +115,10 @@ pub trait DigitalCash {
                     .direct_multi(&caller_address, &deposit.esdt_funds);
             }
 
-            self.send()
-                .direct_egld(&deposit.depositor_address, &deposit.fees.value);
+            if deposit.fees.value > 0 {
+                self.send()
+                    .direct_egld(&deposit.depositor_address, &deposit.fees.value);
+            }
         });
 
         self.deposit(&address).clear();
@@ -214,10 +216,12 @@ pub trait DigitalCash {
         self.collected_fees()
             .update(|collected_fees| *collected_fees += forward_fee);
 
-        self.send().direct_egld(
-            &forwarded_deposit.depositor_address,
-            &forwarded_deposit.fees.value,
-        );
+        if forwarded_deposit.fees.value > 0 {
+            self.send().direct_egld(
+                &forwarded_deposit.depositor_address,
+                &forwarded_deposit.fees.value,
+            );
+        }
 
         self.deposit(&address).clear();
     }
