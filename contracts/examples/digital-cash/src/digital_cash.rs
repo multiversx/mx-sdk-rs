@@ -100,7 +100,7 @@ pub trait DigitalCash {
             let fee_cost = fee * *num_tokens_transfered as u64;
 
             deposit.fees.num_token_to_transfer -= num_tokens_transfered;
-            deposit.fees.value -= fee_cost.clone();
+            deposit.fees.value -= &fee_cost;
 
             self.collected_fees()
                 .update(|collected_fees| *collected_fees += fee_cost);
