@@ -118,28 +118,13 @@ impl MultisigInteract {
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
-        for wallet in vec![carol, dan, eve] {
-            self.interactor.register_wallet(wallet);
+        for wallet in &[carol, dan, eve] {
+            self.interactor.register_wallet(*wallet);
         }
     }
 
     async fn set_state(&mut self) {
-        println!("wallet address: {}", bech32::encode(&self.wallet_address));
-        let scenario_raw = retrieve_account_as_scenario_set_state(
-            Config::load_config().gateway().to_string(),
-            bech32::encode(&self.wallet_address),
-            true,
-        )
-        .await;
-
-        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-        self.interactor.pre_runners.run_scenario(&scenario);
-        self.interactor.post_runners.run_scenario(&scenario);
-
-        let board = self.board();
-
-        for board_member_address in board.iter().skip(1) {
+        for board_member_address in self.board().iter() {
             println!(
                 "board member address: {}",
                 bech32::encode(board_member_address)
@@ -156,6 +141,8 @@ impl MultisigInteract {
             self.interactor.pre_runners.run_scenario(&scenario);
             self.interactor.post_runners.run_scenario(&scenario);
         }
+
+        self.wegld_swap_set_state().await;
     }
 
     async fn deploy(&mut self) {
@@ -183,8 +170,6 @@ impl MultisigInteract {
             println!("deploy failed: {}", result.err().unwrap());
             return;
         }
-
-        self.wegld_swap_set_state().await;
 
         let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("new address: {new_address_bech32}");
