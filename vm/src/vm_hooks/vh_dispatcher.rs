@@ -12,7 +12,7 @@ pub struct VMHooksDispatcher {
 impl VMHooksDispatcher {
     pub fn new_managed_type_cell() -> Self {
         VMHooksDispatcher {
-            source: Box::new(TxManagedTypesCell::default()),
+            source: Box::<TxManagedTypesCell>::default(),
         }
     }
 }
