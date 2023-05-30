@@ -82,7 +82,7 @@ impl AdderInteract {
         let scenario_raw = retrieve_account_as_scenario_set_state(
             Config::load_config().gateway().to_string(),
             bech32::encode(&self.wallet_address),
-            Some("bech32".to_string()),
+            true,
         )
         .await;
 

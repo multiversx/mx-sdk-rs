@@ -114,12 +114,11 @@ impl MultisigInteract {
     }
 
     fn register_wallets(&mut self) {
-        let bob = test_wallets::bob();
         let carol = test_wallets::carol();
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
-        for wallet in vec![bob, carol, dan, eve] {
+        for wallet in vec![carol, dan, eve] {
             self.interactor.register_wallet(wallet);
         }
     }
@@ -129,7 +128,7 @@ impl MultisigInteract {
         let scenario_raw = retrieve_account_as_scenario_set_state(
             Config::load_config().gateway().to_string(),
             bech32::encode(&self.wallet_address),
-            Some("bech32".to_string()),
+            true,
         )
         .await;
 
@@ -148,7 +147,7 @@ impl MultisigInteract {
             let scenario_raw = retrieve_account_as_scenario_set_state(
                 Config::load_config().gateway().to_string(),
                 bech32::encode(board_member_address),
-                Some("bech32".to_string()),
+                true,
             )
             .await;
 
@@ -239,14 +238,12 @@ impl MultisigInteract {
     }
 
     fn board(&mut self) -> MultiValueVec<Address> {
-        let bob = test_wallets::bob();
         let carol = test_wallets::carol();
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
         MultiValueVec::from([
             self.wallet_address.clone(),
-            bob.address().to_bytes().into(),
             carol.address().to_bytes().into(),
             dan.address().to_bytes().into(),
             eve.address().to_bytes().into(),

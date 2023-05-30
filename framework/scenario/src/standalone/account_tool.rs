@@ -10,38 +10,41 @@ use std::collections::{BTreeMap, HashMap};
 
 pub async fn print_account_as_scenario_set_state(api: String, args: &AccountArgs) {
     let scenario_raw =
-        retrieve_account_as_scenario_set_state(api, args.address.clone(), None).await;
+        retrieve_account_as_scenario_set_state(api, args.address.clone(), false).await;
     println!("{}", scenario_raw.to_json_string());
 }
 
 pub async fn retrieve_account_as_scenario_set_state(
     api: String,
     addr: String,
-    custom_format: Option<String>,
+    hex_encoded: bool,
 ) -> ScenarioRaw {
     let address = Address::from_bech32_string(&addr).unwrap();
     let blockchain = CommunicationProxy::new(api);
     let account = blockchain.get_account(&address).await.unwrap();
+
     let account_esdt = blockchain.get_account_esdt_tokens(&address).await.unwrap();
+    let account_esdt_roles = blockchain.get_account_esdt_roles(&address).await.unwrap();
+
     let account_storage = blockchain.get_account_storage_keys(&address).await.unwrap();
 
-    let _addr_pretty = if custom_format.is_none() {
+    let addr_pretty = if !hex_encoded {
         if account.code.is_empty() {
             format!("address:{addr}")
         } else {
             format!("sc:{addr}")
         }
     } else {
-        format!("{}:{addr}", custom_format.unwrap())
+        format!("0x{}", hex::encode(address.to_bytes()))
     };
 
     let mut accounts = BTreeMap::new();
     accounts.insert(
-        format!("0x{}", hex::encode(address.to_bytes())),
+        addr_pretty,
         AccountRaw {
             nonce: Some(ValueSubTree::Str(account.nonce.to_string())),
             balance: Some(ValueSubTree::Str(account.balance.to_string())),
-            esdt: convert_esdt(account_esdt),
+            esdt: convert_esdt(account_esdt, account_esdt_roles),
             username: Some(ValueSubTree::Str(account.username.to_string())),
             storage: convert_storage(account_storage),
             comment: None,
@@ -83,7 +86,10 @@ fn convert_storage(account_storage: HashMap<String, String>) -> BTreeMap<String,
         .collect()
 }
 
-fn convert_esdt(sdk_esdt: HashMap<String, EsdtBalance>) -> BTreeMap<String, EsdtRaw> {
+fn convert_esdt(
+    sdk_esdt: HashMap<String, EsdtBalance>,
+    sdk_esdt_roles: HashMap<String, Vec<String>>,
+) -> BTreeMap<String, EsdtRaw> {
     let mut result = BTreeMap::new();
     for (key, value) in sdk_esdt.into_iter() {
         let (token_identifier, nonce) = split_token_identifer_nonce(key);
@@ -99,6 +105,17 @@ fn convert_esdt(sdk_esdt: HashMap<String, EsdtBalance>) -> BTreeMap<String, Esdt
             });
         }
     }
+
+    for (key, roles) in sdk_esdt_roles.into_iter() {
+        let (token_identifier, _) = split_token_identifer_nonce(key);
+        let esdt_raw = result
+            .entry(format!("str:{}", token_identifier.clone()))
+            .or_insert(EsdtRaw::Full(EsdtFullRaw::default()));
+        if let EsdtRaw::Full(esdt_full_raw) = esdt_raw {
+            esdt_full_raw.roles = roles;
+        }
+    }
+
     result
 }
 
