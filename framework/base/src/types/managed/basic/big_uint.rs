@@ -66,6 +66,15 @@ impl<M: ManagedTypeApi> BigUint<M> {
         M::managed_type_impl().bi_set_int64(handle, cast_to_i64::<M, _>(value));
     }
 
+    pub(crate) fn new_from_num<T>(value: T) -> Self
+    where
+        T: TryInto<i64> + num_traits::Unsigned,
+    {
+        let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+        Self::set_value(handle.clone(), value);
+        BigUint::from_handle(handle)
+    }
+
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle
     where
         T: TryInto<i64> + num_traits::Unsigned,
@@ -81,9 +90,7 @@ macro_rules! big_uint_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-                Self::set_value(handle.clone(), value);
-                BigUint::from_handle(handle)
+                Self::new_from_num(value)
             }
         }
 

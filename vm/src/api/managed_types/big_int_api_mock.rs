@@ -77,13 +77,13 @@ impl DebugApi {
         destination: <Self as HandleTypeInfo>::BigIntHandle,
         value: num_bigint::BigInt,
     ) {
-        self.m_types_borrow_mut()
-            .bi_overwrite(destination.get_raw_handle_unchecked(), value)
+        let mut managed_types = destination.context.m_types_borrow_mut();
+        managed_types.bi_overwrite(destination.get_raw_handle_unchecked(), value)
     }
 
     pub(crate) fn bi_get(&self, handle: <Self as HandleTypeInfo>::BigIntHandle) -> BigInt {
-        self.m_types_borrow()
-            .bi_get(handle.get_raw_handle_unchecked())
+        let mut managed_types = handle.context.m_types_borrow_mut();
+        managed_types.bi_get(handle.get_raw_handle_unchecked())
     }
 }
 
