@@ -1,3 +1,70 @@
+use multiversx_sc::api::{InvalidSliceError, RawHandle};
+
 use super::TxManagedTypes;
 
-impl TxManagedTypes {}
+impl TxManagedTypes {
+    pub fn mb_get(&self, handle: RawHandle) -> Vec<u8> {
+        self.managed_buffer_map.get(handle).clone()
+    }
+
+    pub fn mb_len(&self, handle: RawHandle) -> usize {
+        self.managed_buffer_map.get(handle).len()
+    }
+
+    pub fn mb_get_slice(
+        &self,
+        source_handle: RawHandle,
+        starting_position: usize,
+        slice_len: usize,
+    ) -> Result<Vec<u8>, InvalidSliceError> {
+        let all_bytes = self.mb_get(source_handle);
+        if starting_position + slice_len <= all_bytes.len() {
+            Ok(all_bytes[starting_position..starting_position + slice_len].to_vec())
+        } else {
+            Err(InvalidSliceError)
+        }
+    }
+
+    pub fn mb_load_slice(
+        &self,
+        source_handle: RawHandle,
+        starting_position: usize,
+        dest_slice: &mut [u8],
+    ) -> Result<(), InvalidSliceError> {
+        let slice = self.mb_get_slice(source_handle, starting_position, dest_slice.len())?;
+        dest_slice.copy_from_slice(slice.as_slice());
+        Ok(())
+    }
+
+    pub fn mb_set(&mut self, handle: RawHandle, value: Vec<u8>) {
+        self.managed_buffer_map.insert(handle, value);
+    }
+
+    pub fn mb_update<R, F: FnOnce(&mut Vec<u8>) -> R>(&mut self, handle: RawHandle, f: F) -> R {
+        let value = self.managed_buffer_map.get_mut(handle);
+        f(value)
+    }
+
+    pub fn mb_set_slice(
+        &mut self,
+        dest_handle: RawHandle,
+        starting_position: usize,
+        source_slice: &[u8],
+    ) -> Result<(), InvalidSliceError> {
+        self.mb_update(dest_handle, |bytes| {
+            let end_position = starting_position + source_slice.len();
+            if end_position <= bytes.len() {
+                bytes[starting_position..end_position].copy_from_slice(source_slice);
+                Ok(())
+            } else {
+                Err(InvalidSliceError)
+            }
+        })
+    }
+
+    pub fn mb_append_bytes(&mut self, accumulator_handle: RawHandle, bytes: &[u8]) {
+        self.mb_update(accumulator_handle, |accumulator| {
+            accumulator.extend_from_slice(bytes);
+        });
+    }
+}
