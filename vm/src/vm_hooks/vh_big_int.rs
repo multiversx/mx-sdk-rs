@@ -98,11 +98,6 @@ pub trait VMHooksBigInt: ManagedTypesSource + VMHooksError {
             .bi_set_signed_bytes(destination, bytes);
     }
 
-    // fn bi_to_i64(&self, handle: RawHandle) -> Option<i64> {
-    //     let bi = self.bi_get(handle);
-    //     big_int_to_i64(&bi)
-    // }
-
     fn bi_is_int64(&self, destination_handle: RawHandle) -> i32 {
         if self
             .m_types_borrow()

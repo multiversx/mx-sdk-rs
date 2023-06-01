@@ -1194,7 +1194,12 @@ impl VMHooks for VMHooksDispatcher {
         data_length: MemLength,
         data_offset: MemPtr,
     ) -> i32 {
-        panic!("Unavailable: mbuffer_set_byte_slice")
+        unsafe {
+            mem_conv::with_bytes(data_offset, data_length, |bytes| {
+                self.source
+                    .mb_set_slice(m_buffer_handle, starting_position as usize, bytes)
+            })
+        }
     }
 
     fn mbuffer_append(&self, accumulator_handle: i32, data_handle: i32) -> i32 {

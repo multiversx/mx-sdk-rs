@@ -76,8 +76,15 @@ impl BigIntApi for VMHooksBackend {
         });
     }
 
-    fn bi_to_i64(&self, _reference: Self::BigIntHandle) -> Option<i64> {
-        todo!()
+    fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
+        self.with_vm_hooks(|vh| {
+            let is_i64_result = vh.big_int_is_int64(reference.get_raw_handle());
+            if is_i64_result > 0 {
+                Some(vh.big_int_get_int64(reference))
+            } else {
+                None
+            }
+        })
     }
 
     binary_op_method! {bi_add, big_int_add}

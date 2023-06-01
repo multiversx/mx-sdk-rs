@@ -99,11 +99,20 @@ impl ManagedBufferApi for VMHooksBackend {
 
     fn mb_set_slice(
         &self,
-        _dest_handle: Self::ManagedBufferHandle,
-        _starting_position: usize,
-        _source_slice: &[u8],
+        dest_handle: Self::ManagedBufferHandle,
+        starting_position: usize,
+        source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
-        todo!()
+        let err = self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr(source_slice, |offset, length| {
+                vh.mbuffer_set_byte_slice(dest_handle, starting_position as i32, offset, length)
+            })
+        });
+        if err == 0 {
+            Ok(())
+        } else {
+            Err(InvalidSliceError)
+        }
     }
 
     fn mb_set_random(&self, _dest_handle: Self::ManagedBufferHandle, _length: usize) {

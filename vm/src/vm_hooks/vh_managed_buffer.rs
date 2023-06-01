@@ -81,19 +81,21 @@ pub trait VMHooksManagedBuffer: ManagedTypesSource {
     //     self.mb_set(handle, value.into());
     // }
 
-    // fn mb_set_slice(
-    //     &self,
-    //     dest_handle: RawHandle,
-    //     starting_position: usize,
-    //     source_slice: &[u8],
-    // ) -> Result<(), InvalidSliceError> {
-    //     let mut managed_types = dest_handle.context.m_types_borrow_mut();
-    //     managed_types.mb_set_slice(
-    //         dest_handle.get_raw_handle_unchecked(),
-    //         starting_position,
-    //         source_slice,
-    //     )
-    // }
+    fn mb_set_slice(
+        &self,
+        dest_handle: RawHandle,
+        starting_position: usize,
+        source_slice: &[u8],
+    ) -> i32 {
+        let result =
+            self.m_types_borrow_mut()
+                .mb_set_slice(dest_handle, starting_position, source_slice);
+        if result.is_ok() {
+            0
+        } else {
+            1
+        }
+    }
 
     // fn mb_set_random(&self, dest_handle: RawHandle, length: usize) {
     //     let bytes = self.rng_borrow_mut().next_bytes(length);

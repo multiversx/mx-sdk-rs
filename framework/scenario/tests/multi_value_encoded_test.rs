@@ -1,14 +1,12 @@
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::{
     codec::multi_types::MultiValue5,
     types::{BigUint, MultiValueEncoded},
 };
+use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_multi_value_encoded_1() {
-    let _ = DebugApi::dummy();
-
-    let mut multi_value_1 = MultiValueEncoded::<DebugApi, BigUint<DebugApi>>::new();
+    let mut multi_value_1 = MultiValueEncoded::<StaticApi, BigUint<StaticApi>>::new();
     for i in 20u64..=30u64 {
         multi_value_1.push(BigUint::from(i));
     }
@@ -17,10 +15,8 @@ fn test_multi_value_encoded_1() {
 
 #[test]
 fn test_multi_value_encoded_5() {
-    let _ = DebugApi::dummy();
-
     let mut multi_value_1 =
-        MultiValueEncoded::<DebugApi, MultiValue5<u64, u64, u64, u64, u64>>::new();
+        MultiValueEncoded::<StaticApi, MultiValue5<u64, u64, u64, u64, u64>>::new();
     for i in 20u64..=30u64 {
         multi_value_1.push(MultiValue5::from((i, i, i, i, i)));
     }
@@ -43,14 +39,13 @@ fn test_multi_value5_ne_test() {
 
 #[test]
 fn test_multi_value5_from_iterator_trait() {
-    let _ = DebugApi::dummy();
     let mut multi_value1 =
-        MultiValueEncoded::<DebugApi, MultiValue5<u64, u64, u64, u64, u64>>::new();
+        MultiValueEncoded::<StaticApi, MultiValue5<u64, u64, u64, u64, u64>>::new();
     for i in 1..=10 {
         multi_value1.push(MultiValue5::from((i, i, i, i, i)));
     }
     let mut multi_value_expected =
-        MultiValueEncoded::<DebugApi, MultiValue5<u64, u64, u64, u64, u64>>::new();
+        MultiValueEncoded::<StaticApi, MultiValue5<u64, u64, u64, u64, u64>>::new();
     for i in 1..=5 {
         multi_value_expected.push(MultiValue5::from((i, i, i, i, i)));
     }
@@ -60,7 +55,7 @@ fn test_multi_value5_from_iterator_trait() {
         .map(|x| x.into_tuple())
         .filter(|(x, _, _, _, _)| x <= &5)
         .map(|t| t.into())
-        .collect::<MultiValueEncoded<DebugApi, MultiValue5<u64, u64, u64, u64, u64>>>();
+        .collect::<MultiValueEncoded<StaticApi, MultiValue5<u64, u64, u64, u64, u64>>>();
 
     assert_eq!(collected_vec, multi_value_expected);
 }
