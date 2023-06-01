@@ -6,6 +6,9 @@ use super::{
     ManagedTypesSource, VMHooksBigInt, VMHooksError, VMHooksManagedBuffer, VMHooksManagedTypes,
 };
 
+/// A simple wrapper around a managed type container RefCell.
+///
+/// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug, Default)]
 pub struct TxManagedTypesCell(RefCell<TxManagedTypes>);
 

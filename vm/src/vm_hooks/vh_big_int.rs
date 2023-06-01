@@ -1,15 +1,11 @@
-use crate::{num_bigint, tx_mock::big_int_to_i64, DebugApi};
+use crate::{num_bigint, tx_mock::big_int_to_i64};
 use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use multiversx_sc::{
-    api::{BigIntApi, ErrorApiImpl, HandleTypeInfo, ManagedBufferApi, RawHandle},
-    err_msg,
-    types::heap::BoxedBytes,
-};
-use num_bigint::BigInt;
-use num_traits::{pow, sign::Signed, Zero};
+use multiversx_sc::{api::RawHandle, err_msg, types::heap::BoxedBytes};
+
+use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
 use super::{vh_error::VMHooksError, ManagedTypesSource};
@@ -52,16 +48,8 @@ macro_rules! unary_op_method {
     };
 }
 
+/// Provides VM hook implementations for methods that deal big ints.
 pub trait VMHooksBigInt: ManagedTypesSource + VMHooksError {
-    // fn bi_new_from_big_int(
-    //     &self,
-    //     value: num_bigint::BigInt,
-    // ) -> RawHandle {
-    //     let mut managed_types = self.m_types_borrow_mut();
-    //     managed_types.big_int_map.insert_new_handle(value)
-    // }
-
-    #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> RawHandle {
         self.m_types_borrow_mut()
             .bi_new_from_big_int(num_bigint::BigInt::from(value))
@@ -84,10 +72,6 @@ pub trait VMHooksBigInt: ManagedTypesSource + VMHooksError {
         self.m_types_borrow_mut()
             .bi_set_unsigned_bytes(destination, bytes);
     }
-
-    // fn bi_signed_byte_length(&self, handle: RawHandle) -> usize {
-    //     self.bi_get_signed_bytes(handle).len()
-    // }
 
     fn bi_get_signed_bytes(&self, handle: RawHandle) -> BoxedBytes {
         self.m_types_borrow().bi_get_signed_bytes(handle)

@@ -1,7 +1,6 @@
 #![allow(clippy::type_complexity)]
 #![allow(clippy::derivable_impls)] // TODO: they were fixed in one of the branches, delete when everything gets merged
 #![feature(exhaustive_patterns)]
-#![allow(unused)] // TEMP
 
 pub mod api;
 pub mod bech32;

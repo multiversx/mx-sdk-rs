@@ -58,7 +58,8 @@ mod test {
         assert_eq!(data, cloned);
     }
 
-    fn test_mem_ptr_mut(data: Vec<u8>) {
+    #[test]
+    fn test_mem_ptr_mut() {
         let mut data = vec![1, 2, 3];
         with_mem_ptr_mut(data.as_mut_slice(), |offset, length| unsafe {
             with_bytes_mut(offset, length, |bytes| {

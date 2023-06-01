@@ -9,7 +9,7 @@ use multiversx_sc::{
     types::heap::BoxedBytes,
 };
 use num_bigint::BigInt;
-use num_traits::{pow, sign::Signed, Zero};
+use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
 fn assert_positive(bi: &num_bigint::BigInt) {
@@ -82,7 +82,7 @@ impl DebugApi {
     }
 
     pub(crate) fn bi_get(&self, handle: <Self as HandleTypeInfo>::BigIntHandle) -> BigInt {
-        let mut managed_types = handle.context.m_types_borrow_mut();
+        let managed_types = handle.context.m_types_borrow_mut();
         managed_types.bi_get(handle.get_raw_handle_unchecked())
     }
 }

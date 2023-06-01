@@ -1125,7 +1125,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_new_from_bytes(&self, data_offset: MemPtr, data_length: MemLength) -> i32 {
-        panic!("Unavailable: mbuffer_new_from_bytes")
+        unsafe {
+            mem_conv::with_bytes_mut(data_offset, data_length, |bytes| {
+                self.source.mb_new_from_bytes(bytes)
+            })
+        }
     }
 
     fn mbuffer_get_length(&self, m_buffer_handle: i32) -> i32 {

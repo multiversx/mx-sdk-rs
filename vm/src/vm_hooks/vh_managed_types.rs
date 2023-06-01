@@ -2,10 +2,11 @@ use std::fmt::Debug;
 
 use multiversx_sc::api::RawHandle;
 
-use crate::tx_mock::TxManagedTypes;
-
 use super::{VMHooksBigInt, VMHooksError, VMHooksManagedBuffer};
 
+/// Provides VM hook implementations for methods that deal with more than one type of managed type.
+///
+/// It is also the trait that unifies all managed type functionality.
 pub trait VMHooksManagedTypes: VMHooksBigInt + VMHooksManagedBuffer + VMHooksError + Debug {
     fn mb_to_big_int_unsigned(&self, buffer_handle: RawHandle, bi_handle: RawHandle) {
         let bytes = self.m_types_borrow().mb_to_boxed_bytes(buffer_handle);

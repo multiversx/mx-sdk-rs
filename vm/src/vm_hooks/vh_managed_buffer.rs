@@ -1,10 +1,8 @@
-use multiversx_sc::{
-    api::{InvalidSliceError, RawHandle},
-    types::BoxedBytes,
-};
+use multiversx_sc::api::RawHandle;
 
 use super::ManagedTypesSource;
 
+/// Provides VM hook implementations for methods that deal managed buffers.
 pub trait VMHooksManagedBuffer: ManagedTypesSource {
     fn mb_new_empty(&self) -> RawHandle {
         self.m_types_borrow_mut().mb_new(Vec::new())
@@ -66,20 +64,6 @@ pub trait VMHooksManagedBuffer: ManagedTypesSource {
             1
         }
     }
-
-    // fn mb_copy_to_slice_pad_right(
-    //     &self,
-    //     handle: RawHandle,
-    //     destination: &mut [u8],
-    // ) {
-    //     let bytes = self.mb_to_boxed_bytes(handle);
-    //     let offset = 32 - bytes.len();
-    //     destination[offset..].copy_from_slice(bytes.as_slice());
-    // }
-
-    // fn mb_overwrite(&self, handle: RawHandle, value: &[u8]) {
-    //     self.mb_set(handle, value.into());
-    // }
 
     fn mb_set_slice(
         &self,

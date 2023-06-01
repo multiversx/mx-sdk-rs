@@ -23,11 +23,6 @@ impl DebugApi {
             .m_types_borrow_mut()
             .mb_set(handle.get_raw_handle_unchecked(), value);
     }
-
-    fn mb_new(&self, value: Vec<u8>) -> <Self as HandleTypeInfo>::ManagedBufferHandle {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.managed_buffer_map.insert_new_handle(value)
-    }
 }
 
 impl ManagedBufferApi for DebugApi {
