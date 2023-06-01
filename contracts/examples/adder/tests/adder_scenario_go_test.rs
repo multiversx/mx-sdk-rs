@@ -8,3 +8,8 @@ fn world() -> ScenarioWorld {
 fn adder_go() {
     world().run("scenarios/adder.scen.json");
 }
+
+#[test]
+fn interactor_trace_go() {
+    world().run("scenarios/interactor_trace.scen.json");
+}

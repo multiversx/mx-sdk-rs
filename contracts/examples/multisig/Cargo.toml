@@ -26,6 +26,10 @@ path = "../adder"
 [dev-dependencies.factorial]
 path = "../factorial"
 
+[dev-dependencies.multiversx-wegld-swap-sc]
+version = "0.41.0"
+path = "../../core/wegld-swap"
+
 [dev-dependencies]
 num-bigint = "0.4.2"
 num-traits = "0.2"

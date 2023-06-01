@@ -12,7 +12,10 @@ use multisig::{
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
-use multiversx_sc_scenario::test_wallets;
+use multiversx_sc_scenario::{
+    mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
+    standalone::retrieve_account_as_scenario_set_state, test_wallets,
+};
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
     multiversx_sc::{
@@ -111,17 +114,40 @@ impl MultisigInteract {
     }
 
     fn register_wallets(&mut self) {
-        let bob = test_wallets::bob();
         let carol = test_wallets::carol();
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
-        for wallet in vec![bob, carol, dan, eve] {
-            self.interactor.register_wallet(wallet);
+        for wallet in &[carol, dan, eve] {
+            self.interactor.register_wallet(*wallet);
         }
     }
 
+    async fn set_state(&mut self) {
+        for board_member_address in self.board().iter() {
+            println!(
+                "board member address: {}",
+                bech32::encode(board_member_address)
+            );
+            let scenario_raw = retrieve_account_as_scenario_set_state(
+                Config::load_config().gateway().to_string(),
+                bech32::encode(board_member_address),
+                true,
+            )
+            .await;
+
+            let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+
+            self.interactor.pre_runners.run_scenario(&scenario);
+            self.interactor.post_runners.run_scenario(&scenario);
+        }
+
+        self.wegld_swap_set_state().await;
+    }
+
     async fn deploy(&mut self) {
+        self.set_state().await;
+
         let board = self.board();
         let mut typed_sc_deploy = self
             .state
@@ -145,8 +171,6 @@ impl MultisigInteract {
             return;
         }
 
-        self.wegld_swap_set_state().await;
-
         let new_address_bech32 = bech32::encode(&result.unwrap());
         println!("new address: {new_address_bech32}");
 
@@ -159,6 +183,7 @@ impl MultisigInteract {
             println!("count must be greater than 0");
             return;
         }
+        self.set_state().await;
         println!("deploying {count} contracts...");
 
         let board = self.board();
@@ -198,14 +223,12 @@ impl MultisigInteract {
     }
 
     fn board(&mut self) -> MultiValueVec<Address> {
-        let bob = test_wallets::bob();
         let carol = test_wallets::carol();
         let dan = test_wallets::dan();
         let eve = test_wallets::eve();
 
         MultiValueVec::from([
             self.wallet_address.clone(),
-            bob.address().to_bytes().into(),
             carol.address().to_bytes().into(),
             dan.address().to_bytes().into(),
             eve.address().to_bytes().into(),

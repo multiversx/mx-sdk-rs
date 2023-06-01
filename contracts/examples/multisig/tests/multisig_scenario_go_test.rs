@@ -55,6 +55,11 @@ fn deploy_duplicate_bm_go() {
 }
 
 #[test]
+fn interactor_trace_go() {
+    world().run("scenarios/interactor_trace.scen.json");
+}
+
+#[test]
 fn remove_everyone_go() {
     world().run("scenarios/remove_everyone.scen.json");
 }

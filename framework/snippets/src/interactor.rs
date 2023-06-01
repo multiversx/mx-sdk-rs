@@ -57,7 +57,7 @@ impl Interactor {
     }
 
     pub async fn with_tracer<P: AsRef<Path>>(mut self, path: P) -> Self {
-        self.pre_runners.push(ScenarioTraceFile::new(path));
+        self.post_runners.push(ScenarioTraceFile::new(path));
         self
     }
 }

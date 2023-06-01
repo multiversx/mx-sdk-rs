@@ -4,7 +4,7 @@ use crate::data::{
     account::{Account, AccountResponse},
     account_storage::AccountStorageResponse,
     address::Address,
-    esdt::{EsdtBalance, EsdtBalanceResponse},
+    esdt::{EsdtBalance, EsdtBalanceResponse, EsdtRolesResponse},
     hyperblock::{HyperBlock, HyperBlockResponse},
     network_config::{NetworkConfig, NetworkConfigResponse},
     network_economics::{NetworkEconomics, NetworkEconomicsResponse},
@@ -181,6 +181,31 @@ impl CommunicationProxy {
         match resp.data {
             None => Err(anyhow!("{}", resp.error)),
             Some(b) => Ok(b.account),
+        }
+    }
+
+    // get_account_esdt_roles retrieves an all esdt roles of an account from the network
+    pub async fn get_account_esdt_roles(
+        &self,
+        address: &Address,
+    ) -> Result<HashMap<String, Vec<String>>> {
+        if !address.is_valid() {
+            return Err(anyhow!("invalid address"));
+        }
+
+        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str() + "/esdts/roles";
+        let endpoint = self.get_endpoint(endpoint.as_str());
+        let resp = self
+            .client
+            .get(endpoint)
+            .send()
+            .await?
+            .json::<EsdtRolesResponse>()
+            .await?;
+
+        match resp.data {
+            None => Err(anyhow!("{}", resp.error)),
+            Some(b) => Ok(b.roles),
         }
     }
 

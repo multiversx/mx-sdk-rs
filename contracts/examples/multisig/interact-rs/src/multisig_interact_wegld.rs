@@ -53,14 +53,10 @@ impl MultisigInteract {
     }
 
     pub async fn wegld_swap_set_state(&mut self) {
-        if self.interactor.pre_runners.is_empty() && self.interactor.post_runners.is_empty() {
-            return;
-        }
-
         let scenario_raw = retrieve_account_as_scenario_set_state(
             Config::load_config().gateway().to_string(),
             WEGLD_SWAP_SC_BECH32.to_string(),
-            Some("bech32".to_string()),
+            true,
         )
         .await;
 
