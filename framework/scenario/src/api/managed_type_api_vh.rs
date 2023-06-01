@@ -5,7 +5,7 @@ mod managed_buffer_api_vh;
 mod managed_map_api_vh;
 mod static_var_api_vh;
 
-use multiversx_sc::api::{ManagedTypeApi, ManagedTypeApiImpl};
+use multiversx_sc::api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl};
 
 use super::{StaticApi, VMHooksBackend};
 
@@ -20,49 +20,79 @@ impl ManagedTypeApi for StaticApi {
 impl ManagedTypeApiImpl for VMHooksBackend {
     fn mb_to_big_int_unsigned(
         &self,
-        _buffer_handle: Self::ManagedBufferHandle,
-        _dest: Self::BigIntHandle,
+        buffer_handle: Self::ManagedBufferHandle,
+        big_int_handle: Self::BigIntHandle,
     ) {
-        unreachable!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_to_big_int_unsigned(
+                buffer_handle.get_raw_handle(),
+                big_int_handle.get_raw_handle(),
+            )
+        });
     }
 
     fn mb_to_big_int_signed(
         &self,
-        _buffer_handle: Self::ManagedBufferHandle,
-        _dest: Self::BigIntHandle,
+        buffer_handle: Self::ManagedBufferHandle,
+        big_int_handle: Self::BigIntHandle,
     ) {
-        unreachable!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_to_big_int_signed(
+                buffer_handle.get_raw_handle(),
+                big_int_handle.get_raw_handle(),
+            )
+        });
     }
 
     fn mb_from_big_int_unsigned(
         &self,
-        _big_int_handle: Self::BigIntHandle,
-        _dest: Self::ManagedBufferHandle,
+        big_int_handle: Self::BigIntHandle,
+        buffer_handle: Self::ManagedBufferHandle,
     ) {
-        unreachable!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_from_big_int_unsigned(
+                buffer_handle.get_raw_handle(),
+                big_int_handle.get_raw_handle(),
+            )
+        });
     }
 
     fn mb_from_big_int_signed(
         &self,
-        _big_int_handle: Self::BigIntHandle,
-        _dest: Self::ManagedBufferHandle,
+        big_int_handle: Self::BigIntHandle,
+        buffer_handle: Self::ManagedBufferHandle,
     ) {
-        unreachable!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_from_big_int_signed(
+                buffer_handle.get_raw_handle(),
+                big_int_handle.get_raw_handle(),
+            )
+        });
     }
 
     fn mb_to_big_float(
         &self,
-        _buffer_handle: Self::ManagedBufferHandle,
-        _dest: Self::BigFloatHandle,
+        buffer_handle: Self::ManagedBufferHandle,
+        big_float_handle: Self::BigFloatHandle,
     ) {
-        unreachable!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_to_big_float(
+                buffer_handle.get_raw_handle(),
+                big_float_handle.get_raw_handle(),
+            )
+        });
     }
 
     fn mb_from_big_float(
         &self,
-        _big_float_handle: Self::BigFloatHandle,
-        _dest: Self::ManagedBufferHandle,
+        big_float_handle: Self::BigFloatHandle,
+        buffer_handle: Self::ManagedBufferHandle,
     ) {
-        unreachable!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_from_big_float(
+                buffer_handle.get_raw_handle(),
+                big_float_handle.get_raw_handle(),
+            )
+        });
     }
 }

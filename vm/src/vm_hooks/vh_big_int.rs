@@ -12,7 +12,7 @@ use num_bigint::BigInt;
 use num_traits::{pow, sign::Signed, Zero};
 use std::convert::TryInto;
 
-use super::{vh_error::VMHooksError, vh_managed_types::ManagedTypesSource};
+use super::{vh_error::VMHooksError, ManagedTypesSource};
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
@@ -80,28 +80,23 @@ pub trait VMHooksBigInt: ManagedTypesSource + VMHooksError {
         self.m_types_borrow().bi_get_unsigned_bytes(handle)
     }
 
-    // fn bi_set_unsigned_bytes(&self, dest: RawHandle, bytes: &[u8]) {
-    //     let result = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
-    //     self.bi_overwrite(dest, result);
-    // }
+    fn bi_set_unsigned_bytes(&self, destination: RawHandle, bytes: &[u8]) {
+        self.m_types_borrow_mut()
+            .bi_set_unsigned_bytes(destination, bytes);
+    }
 
     // fn bi_signed_byte_length(&self, handle: RawHandle) -> usize {
     //     self.bi_get_signed_bytes(handle).len()
     // }
 
-    // fn bi_get_signed_bytes(&self, handle: RawHandle) -> BoxedBytes {
-    //     let bi = self.bi_get(handle);
-    //     if bi.is_zero() {
-    //         BoxedBytes::empty()
-    //     } else {
-    //         bi.to_signed_bytes_be().into()
-    //     }
-    // }
+    fn bi_get_signed_bytes(&self, handle: RawHandle) -> BoxedBytes {
+        self.m_types_borrow().bi_get_signed_bytes(handle)
+    }
 
-    // fn bi_set_signed_bytes(&self, dest: RawHandle, bytes: &[u8]) {
-    //     let result = num_bigint::BigInt::from_signed_bytes_be(bytes);
-    //     self.bi_overwrite(dest, result);
-    // }
+    fn bi_set_signed_bytes(&self, destination: RawHandle, bytes: &[u8]) {
+        self.m_types_borrow_mut()
+            .bi_set_signed_bytes(destination, bytes);
+    }
 
     // fn bi_to_i64(&self, handle: RawHandle) -> Option<i64> {
     //     let bi = self.bi_get(handle);

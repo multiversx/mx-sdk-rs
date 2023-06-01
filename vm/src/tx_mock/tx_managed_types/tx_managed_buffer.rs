@@ -1,14 +1,22 @@
-use multiversx_sc::api::{InvalidSliceError, RawHandle};
+use multiversx_sc::{
+    api::{InvalidSliceError, RawHandle},
+    types::BoxedBytes,
+};
 
 use super::TxManagedTypes;
 
 impl TxManagedTypes {
-    pub fn mb_get(&self, handle: RawHandle) -> Vec<u8> {
-        self.managed_buffer_map.get(handle).clone()
+    pub fn mb_get(&self, handle: RawHandle) -> &[u8] {
+        self.managed_buffer_map.get(handle).as_slice()
     }
 
     pub fn mb_len(&self, handle: RawHandle) -> usize {
         self.managed_buffer_map.get(handle).len()
+    }
+
+    pub fn mb_to_boxed_bytes(&self, handle: RawHandle) -> BoxedBytes {
+        let data = self.mb_get(handle);
+        data.into()
     }
 
     pub fn mb_get_slice(
@@ -38,6 +46,10 @@ impl TxManagedTypes {
 
     pub fn mb_set(&mut self, handle: RawHandle, value: Vec<u8>) {
         self.managed_buffer_map.insert(handle, value);
+    }
+
+    pub fn mb_new(&mut self, value: Vec<u8>) -> RawHandle {
+        self.managed_buffer_map.insert_new_handle(value)
     }
 
     pub fn mb_update<R, F: FnOnce(&mut Vec<u8>) -> R>(&mut self, handle: RawHandle, f: F) -> R {

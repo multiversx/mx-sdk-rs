@@ -102,7 +102,9 @@ impl BigIntApi for DebugApi {
     }
 
     fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        self.m_types_borrow()
+        handle
+            .context
+            .m_types_borrow()
             .bi_get_unsigned_bytes(handle.get_raw_handle_unchecked())
     }
 
@@ -116,12 +118,10 @@ impl BigIntApi for DebugApi {
     }
 
     fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        let bi = self.bi_get(handle);
-        if bi.is_zero() {
-            BoxedBytes::empty()
-        } else {
-            bi.to_signed_bytes_be().into()
-        }
+        handle
+            .context
+            .m_types_borrow()
+            .bi_get_signed_bytes(handle.get_raw_handle_unchecked())
     }
 
     fn bi_set_signed_bytes(&self, dest: Self::BigIntHandle, bytes: &[u8]) {

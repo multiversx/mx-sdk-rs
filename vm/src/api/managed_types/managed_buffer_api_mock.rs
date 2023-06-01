@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use multiversx_sc::{
-    api::{HandleTypeInfo, InvalidSliceError, ManagedBufferApi},
+    api::{use_raw_handle, HandleTypeInfo, InvalidSliceError, ManagedBufferApi},
     types::heap::BoxedBytes,
 };
 
@@ -10,6 +10,7 @@ impl DebugApi {
             .context
             .m_types_borrow()
             .mb_get(handle.get_raw_handle_unchecked())
+            .to_vec()
     }
 
     pub(super) fn mb_set(
@@ -31,11 +32,11 @@ impl DebugApi {
 
 impl ManagedBufferApi for DebugApi {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
-        self.mb_new(Vec::new())
+        use_raw_handle(self.m_types_borrow_mut().mb_new(Vec::new()))
     }
 
     fn mb_new_from_bytes(&self, bytes: &[u8]) -> Self::ManagedBufferHandle {
-        self.mb_new(Vec::from(bytes))
+        use_raw_handle(self.m_types_borrow_mut().mb_new(Vec::from(bytes)))
     }
 
     fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {

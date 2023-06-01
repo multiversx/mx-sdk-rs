@@ -20,8 +20,9 @@ impl ManagedTypeApiImpl for DebugApi {
         dest: Self::BigIntHandle,
     ) {
         let bytes = self.mb_to_boxed_bytes(buffer_handle);
-        let bi = BigInt::from_bytes_be(Sign::Plus, bytes.as_slice());
-        self.bi_overwrite(dest, bi);
+        dest.context
+            .m_types_borrow_mut()
+            .bi_set_unsigned_bytes(dest.get_raw_handle_unchecked(), bytes.as_slice());
     }
 
     fn mb_to_big_int_signed(
@@ -30,8 +31,9 @@ impl ManagedTypeApiImpl for DebugApi {
         dest: Self::BigIntHandle,
     ) {
         let bytes = self.mb_to_boxed_bytes(buffer_handle);
-        let bi = BigInt::from_signed_bytes_be(bytes.as_slice());
-        self.bi_overwrite(dest, bi);
+        dest.context
+            .m_types_borrow_mut()
+            .bi_set_signed_bytes(dest.get_raw_handle_unchecked(), bytes.as_slice());
     }
 
     fn mb_from_big_int_unsigned(

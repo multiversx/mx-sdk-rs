@@ -2,7 +2,9 @@ use std::ffi::c_void;
 
 use multiversx_vm_executor::{MemLength, MemPtr, VMHooks};
 
-use super::vh_managed_types::{TxManagedTypesCell, VMHooksManagedTypes};
+use crate::mem_conv;
+
+use super::{TxManagedTypesCell, VMHooksManagedTypes};
 
 #[derive(Debug)]
 pub struct VMHooksDispatcher {
@@ -983,7 +985,11 @@ impl VMHooks for VMHooksDispatcher {
         byte_offset: MemPtr,
         byte_length: MemLength,
     ) {
-        panic!("Unavailable: big_int_set_unsigned_bytes");
+        unsafe {
+            mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
+                self.source.bi_set_unsigned_bytes(destination_handle, bytes);
+            })
+        }
     }
 
     fn big_int_set_signed_bytes(
@@ -992,7 +998,11 @@ impl VMHooks for VMHooksDispatcher {
         byte_offset: MemPtr,
         byte_length: MemLength,
     ) {
-        panic!("Unavailable: big_int_set_signed_bytes");
+        unsafe {
+            mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
+                self.source.bi_set_signed_bytes(destination_handle, bytes);
+            })
+        }
     }
 
     fn big_int_is_int64(&self, destination_handle: i32) -> i32 {
@@ -1111,7 +1121,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_new(&self) -> i32 {
-        panic!("Unavailable: mbuffer_new")
+        self.source.mb_new_empty()
     }
 
     fn mbuffer_new_from_bytes(&self, data_offset: MemPtr, data_length: MemLength) -> i32 {
@@ -1119,11 +1129,14 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_get_length(&self, m_buffer_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_get_length")
+        self.source.mb_len(m_buffer_handle) as i32
     }
 
     fn mbuffer_get_bytes(&self, m_buffer_handle: i32, result_offset: MemPtr) -> i32 {
-        panic!("Unavailable: mbuffer_get_bytes")
+        unsafe {
+            self.source
+                .mb_copy_bytes(m_buffer_handle, result_offset as *mut u8) as i32
+        }
     }
 
     fn mbuffer_get_byte_slice(
@@ -1133,7 +1146,12 @@ impl VMHooks for VMHooksDispatcher {
         slice_length: i32,
         result_offset: MemPtr,
     ) -> i32 {
-        panic!("Unavailable: mbuffer_get_byte_slice")
+        unsafe {
+            mem_conv::with_bytes_mut(result_offset, slice_length as isize, |bytes| {
+                self.source
+                    .mb_load_slice(source_handle, starting_position as usize, bytes)
+            })
+        }
     }
 
     fn mbuffer_copy_byte_slice(
@@ -1143,11 +1161,16 @@ impl VMHooks for VMHooksDispatcher {
         slice_length: i32,
         destination_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: mbuffer_copy_byte_slice")
+        self.source.mb_copy_slice(
+            source_handle,
+            starting_position as usize,
+            slice_length as usize,
+            destination_handle,
+        )
     }
 
     fn mbuffer_eq(&self, m_buffer_handle1: i32, m_buffer_handle2: i32) -> i32 {
-        panic!("Unavailable: mbuffer_eq")
+        self.source.mb_eq(m_buffer_handle1, m_buffer_handle2)
     }
 
     fn mbuffer_set_bytes(
@@ -1156,7 +1179,12 @@ impl VMHooks for VMHooksDispatcher {
         data_offset: MemPtr,
         data_length: MemLength,
     ) -> i32 {
-        panic!("Unavailable: mbuffer_set_bytes")
+        unsafe {
+            mem_conv::with_bytes(data_offset, data_length, |bytes| {
+                self.source.mb_set(m_buffer_handle, bytes);
+            });
+        }
+        0
     }
 
     fn mbuffer_set_byte_slice(
@@ -1170,7 +1198,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_append(&self, accumulator_handle: i32, data_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_append")
+        self.source.mb_append(accumulator_handle, data_handle);
+        0
     }
 
     fn mbuffer_append_bytes(
@@ -1179,23 +1208,36 @@ impl VMHooks for VMHooksDispatcher {
         data_offset: MemPtr,
         data_length: MemLength,
     ) -> i32 {
-        panic!("Unavailable: mbuffer_append_bytes")
+        unsafe {
+            mem_conv::with_bytes(data_offset, data_length, |bytes| {
+                self.source.mb_append_bytes(accumulator_handle, bytes);
+            });
+        }
+        0
     }
 
     fn mbuffer_to_big_int_unsigned(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_to_big_int_unsigned")
+        self.source
+            .mb_to_big_int_unsigned(m_buffer_handle, big_int_handle);
+        0
     }
 
     fn mbuffer_to_big_int_signed(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_to_big_int_signed")
+        self.source
+            .mb_to_big_int_signed(m_buffer_handle, big_int_handle);
+        0
     }
 
     fn mbuffer_from_big_int_unsigned(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_from_big_int_unsigned")
+        self.source
+            .mb_from_big_int_unsigned(m_buffer_handle, big_int_handle);
+        0
     }
 
     fn mbuffer_from_big_int_signed(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_from_big_int_signed")
+        self.source
+            .mb_from_big_int_signed(m_buffer_handle, big_int_handle);
+        0
     }
 
     fn mbuffer_to_big_float(&self, m_buffer_handle: i32, big_float_handle: i32) -> i32 {

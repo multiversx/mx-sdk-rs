@@ -15,7 +15,7 @@ use std::{ops::Deref, thread::LocalKey};
 use multiversx_chain_vm::{executor::VMHooks, vm_hooks::VMHooksDispatcher};
 use multiversx_sc::api::{HandleTypeInfo, RawHandle};
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StaticApi;
 
 impl HandleTypeInfo for StaticApi {

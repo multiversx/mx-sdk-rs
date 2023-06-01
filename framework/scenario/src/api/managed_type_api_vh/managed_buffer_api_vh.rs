@@ -1,3 +1,4 @@
+use multiversx_chain_vm::{executor::MemPtr, mem_conv};
 use multiversx_sc::{
     api::{InvalidSliceError, ManagedBufferApi},
     types::BoxedBytes,
@@ -7,38 +8,77 @@ use crate::api::VMHooksBackend;
 
 impl ManagedBufferApi for VMHooksBackend {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
-        todo!()
+        self.with_vm_hooks(|vh| vh.mbuffer_new())
     }
 
-    fn mb_new_from_bytes(&self, _bytes: &[u8]) -> Self::ManagedBufferHandle {
-        todo!()
+    fn mb_new_from_bytes(&self, bytes: &[u8]) -> Self::ManagedBufferHandle {
+        self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr(bytes, |offset, length| {
+                vh.mbuffer_new_from_bytes(offset, length)
+            })
+        })
     }
 
-    fn mb_len(&self, _handle: Self::ManagedBufferHandle) -> usize {
-        todo!()
+    fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
+        self.with_vm_hooks(|vh| vh.mbuffer_get_length(handle) as usize)
     }
 
-    fn mb_to_boxed_bytes(&self, _handle: Self::ManagedBufferHandle) -> BoxedBytes {
-        todo!()
+    fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
+        self.with_vm_hooks(|vh| {
+            let len = vh.mbuffer_get_length(handle) as usize;
+            unsafe {
+                let mut res = BoxedBytes::allocate(len);
+                if len > 0 {
+                    let _ = vh.mbuffer_get_bytes(handle, res.as_mut_ptr() as MemPtr);
+                }
+                res
+            }
+        })
     }
 
     fn mb_load_slice(
         &self,
-        _source_handle: Self::ManagedBufferHandle,
-        _starting_position: usize,
-        _dest_slice: &mut [u8],
+        source_handle: Self::ManagedBufferHandle,
+        starting_position: usize,
+        dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        todo!()
+        let err = self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr_mut(dest_slice, |offset, length| {
+                vh.mbuffer_get_byte_slice(
+                    source_handle,
+                    starting_position as i32,
+                    length as i32,
+                    offset,
+                )
+            })
+        });
+        if err == 0 {
+            Ok(())
+        } else {
+            Err(InvalidSliceError)
+        }
     }
 
     fn mb_copy_slice(
         &self,
-        _source_handle: Self::ManagedBufferHandle,
-        _starting_pos: usize,
-        _slice_len: usize,
-        _dest_handle: Self::ManagedBufferHandle,
+        source_handle: Self::ManagedBufferHandle,
+        starting_pos: usize,
+        slice_len: usize,
+        dest_handle: Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError> {
-        todo!()
+        let err = self.with_vm_hooks(|vh| {
+            vh.mbuffer_copy_byte_slice(
+                source_handle,
+                starting_pos as i32,
+                slice_len as i32,
+                dest_handle,
+            )
+        });
+        if err == 0 {
+            Ok(())
+        } else {
+            Err(InvalidSliceError)
+        }
     }
 
     fn mb_copy_to_slice_pad_right(
@@ -49,8 +89,12 @@ impl ManagedBufferApi for VMHooksBackend {
         todo!()
     }
 
-    fn mb_overwrite(&self, _handle: Self::ManagedBufferHandle, _value: &[u8]) {
-        todo!()
+    fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
+        self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr(value, |offset, length| {
+                vh.mbuffer_set_bytes(handle, offset, length);
+            })
+        });
     }
 
     fn mb_set_slice(
@@ -68,22 +112,26 @@ impl ManagedBufferApi for VMHooksBackend {
 
     fn mb_append(
         &self,
-        _accumulator_handle: Self::ManagedBufferHandle,
-        _data_handle: Self::ManagedBufferHandle,
+        accumulator_handle: Self::ManagedBufferHandle,
+        data_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        self.with_vm_hooks(|vh| vh.mbuffer_append(accumulator_handle, data_handle));
     }
 
-    fn mb_append_bytes(&self, _accumulator_handle: Self::ManagedBufferHandle, _bytes: &[u8]) {
-        todo!()
+    fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
+        self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr(bytes, |offset, length| {
+                let _ = vh.mbuffer_append_bytes(accumulator_handle, offset, length);
+            })
+        });
     }
 
     fn mb_eq(
         &self,
-        _handle1: Self::ManagedBufferHandle,
-        _handle2: Self::ManagedBufferHandle,
+        handle1: Self::ManagedBufferHandle,
+        handle2: Self::ManagedBufferHandle,
     ) -> bool {
-        todo!()
+        self.with_vm_hooks(|vh| vh.mbuffer_eq(handle1, handle2) > 0)
     }
 
     fn mb_to_hex(

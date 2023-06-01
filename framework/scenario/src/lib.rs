@@ -3,6 +3,7 @@
 
 pub mod api;
 mod facade;
+pub mod managed_test_util;
 pub mod scenario;
 pub mod standalone;
 pub mod test_wallets;

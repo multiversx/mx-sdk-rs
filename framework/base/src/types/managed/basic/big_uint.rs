@@ -167,8 +167,9 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn to_bytes_be(&self) -> BoxedBytes {
-        let api = M::managed_type_impl();
-        api.bi_get_unsigned_bytes(self.handle.clone())
+        let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().mb_from_big_int_unsigned(self.handle.clone(), mb_handle.clone());
+        M::managed_type_impl().mb_to_boxed_bytes(mb_handle)
     }
 
     #[inline]

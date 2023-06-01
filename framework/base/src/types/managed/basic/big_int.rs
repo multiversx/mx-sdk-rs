@@ -3,8 +3,8 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, HandleConstraints, ManagedTypeApi,
-        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApi, HandleConstraints, ManagedBufferApi,
+        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
         CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
@@ -158,7 +158,9 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn to_signed_bytes_be(&self) -> BoxedBytes {
-        M::managed_type_impl().bi_get_signed_bytes(self.handle.clone())
+        let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().mb_from_big_int_signed(self.handle.clone(), mb_handle.clone());
+        M::managed_type_impl().mb_to_boxed_bytes(mb_handle)
     }
 
     #[inline]

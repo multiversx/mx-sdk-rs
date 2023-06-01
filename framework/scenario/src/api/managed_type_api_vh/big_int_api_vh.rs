@@ -1,5 +1,6 @@
 use core::cmp::Ordering;
 
+use multiversx_chain_vm::mem_conv;
 use multiversx_sc::{
     api::{BigIntApi, HandleConstraints, Sign},
     types::BoxedBytes,
@@ -43,28 +44,36 @@ impl BigIntApi for VMHooksBackend {
         self.with_vm_hooks(|vh| vh.big_int_set_int64(destination.get_raw_handle(), value));
     }
 
-    fn bi_unsigned_byte_length(&self, _x: Self::BigIntHandle) -> usize {
-        todo!()
+    fn bi_unsigned_byte_length(&self, x: Self::BigIntHandle) -> usize {
+        self.with_vm_hooks(|vh| vh.big_int_unsigned_byte_length(x.get_raw_handle()) as usize)
     }
 
     fn bi_get_unsigned_bytes(&self, _reference: Self::BigIntHandle) -> BoxedBytes {
         todo!()
     }
 
-    fn bi_set_unsigned_bytes(&self, _destination: Self::BigIntHandle, _bytes: &[u8]) {
-        todo!()
+    fn bi_set_unsigned_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]) {
+        self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr(bytes, |offset, length| {
+                vh.big_int_set_unsigned_bytes(destination, offset, length)
+            })
+        });
     }
 
-    fn bi_signed_byte_length(&self, _x: Self::BigIntHandle) -> usize {
-        todo!()
+    fn bi_signed_byte_length(&self, x: Self::BigIntHandle) -> usize {
+        self.with_vm_hooks(|vh| vh.big_int_signed_byte_length(x.get_raw_handle()) as usize)
     }
 
     fn bi_get_signed_bytes(&self, _reference: Self::BigIntHandle) -> BoxedBytes {
         todo!()
     }
 
-    fn bi_set_signed_bytes(&self, _destination: Self::BigIntHandle, _bytes: &[u8]) {
-        todo!()
+    fn bi_set_signed_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]) {
+        self.with_vm_hooks(|vh| {
+            mem_conv::with_mem_ptr(bytes, |offset, length| {
+                vh.big_int_set_signed_bytes(destination, offset, length)
+            })
+        });
     }
 
     fn bi_to_i64(&self, _reference: Self::BigIntHandle) -> Option<i64> {

@@ -33,6 +33,25 @@ impl TxManagedTypes {
             bytes.into()
         }
     }
+
+    pub fn bi_set_unsigned_bytes(&mut self, destination: RawHandle, bytes: &[u8]) {
+        let bi = num_bigint::BigInt::from_bytes_be(Sign::Plus, bytes);
+        self.bi_overwrite(destination, bi);
+    }
+
+    pub fn bi_get_signed_bytes(&self, handle: RawHandle) -> BoxedBytes {
+        let bi = self.bi_get(handle);
+        if bi.is_zero() {
+            BoxedBytes::empty()
+        } else {
+            bi.to_signed_bytes_be().into()
+        }
+    }
+
+    pub fn bi_set_signed_bytes(&mut self, destination: RawHandle, bytes: &[u8]) {
+        let bi = num_bigint::BigInt::from_signed_bytes_be(bytes);
+        self.bi_overwrite(destination, bi);
+    }
 }
 
 pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {

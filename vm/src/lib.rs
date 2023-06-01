@@ -6,13 +6,11 @@
 pub mod api;
 pub mod bech32;
 pub mod display_util;
-mod managed_test_util;
+pub mod mem_conv;
 pub mod tx_execution;
 pub mod tx_mock;
 pub mod vm_hooks;
 pub mod world_mock;
-
-pub use managed_test_util::*;
 
 pub use tx_mock::DebugApi;
 pub use world_mock::BlockchainMock;
