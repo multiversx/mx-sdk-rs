@@ -144,7 +144,9 @@ impl BigIntApi for VMHooksBackend {
         });
     }
 
-    fn bi_to_string(&self, _bi_handle: Self::BigIntHandle, _str_handle: Self::ManagedBufferHandle) {
-        todo!()
+    fn bi_to_string(&self, bi_handle: Self::BigIntHandle, str_handle: Self::ManagedBufferHandle) {
+        self.with_vm_hooks(|vh| {
+            vh.big_int_to_string(bi_handle.get_raw_handle(), str_handle.get_raw_handle())
+        });
     }
 }

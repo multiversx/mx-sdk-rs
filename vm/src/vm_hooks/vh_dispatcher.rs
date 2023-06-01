@@ -810,7 +810,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32) {
-        panic!("Unavailable: managed_buffer_to_hex");
+        self.source.mb_to_hex(source_handle, dest_handle);
     }
 
     fn big_float_new_from_parts(
@@ -1117,7 +1117,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_to_string(&self, big_int_handle: i32, destination_handle: i32) {
-        panic!("Unavailable: big_int_to_string");
+        self.source.bi_to_string(big_int_handle, destination_handle);
     }
 
     fn mbuffer_new(&self) -> i32 {

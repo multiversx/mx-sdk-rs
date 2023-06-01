@@ -31,4 +31,10 @@ pub trait VMHooksManagedTypes: VMHooksBigInt + VMHooksManagedBuffer + VMHooksErr
         self.m_types_borrow_mut()
             .mb_set(buffer_handle, bi_bytes.into_vec());
     }
+
+    fn bi_to_string(&self, bi_handle: RawHandle, str_handle: RawHandle) {
+        let bi = self.m_types_borrow().bi_get(bi_handle);
+        let s = bi.to_string();
+        self.m_types_borrow_mut().mb_set(str_handle, s.into_bytes());
+    }
 }

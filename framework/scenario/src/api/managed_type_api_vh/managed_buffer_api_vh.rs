@@ -145,9 +145,9 @@ impl ManagedBufferApi for VMHooksBackend {
 
     fn mb_to_hex(
         &self,
-        _source_handle: Self::ManagedBufferHandle,
-        _dest_handle: Self::ManagedBufferHandle,
+        source_handle: Self::ManagedBufferHandle,
+        dest_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        self.with_vm_hooks(|vh| vh.managed_buffer_to_hex(source_handle, dest_handle))
     }
 }

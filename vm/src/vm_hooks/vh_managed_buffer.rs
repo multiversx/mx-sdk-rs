@@ -81,11 +81,6 @@ pub trait VMHooksManagedBuffer: ManagedTypesSource {
         }
     }
 
-    // fn mb_set_random(&self, dest_handle: RawHandle, length: usize) {
-    //     let bytes = self.rng_borrow_mut().next_bytes(length);
-    //     self.mb_set(dest_handle, bytes);
-    // }
-
     fn mb_append(&self, accumulator_handle: RawHandle, data_handle: RawHandle) {
         let mut data = self.m_types_borrow().mb_get(data_handle).to_vec();
         self.m_types_borrow_mut()
@@ -110,14 +105,9 @@ pub trait VMHooksManagedBuffer: ManagedTypesSource {
         }
     }
 
-    // fn mb_to_hex(
-    //     &self,
-    //     source_handle: RawHandle,
-    //     dest_handle: RawHandle,
-    // ) {
-    //     // careful: the 2 handles might point to differnt maps
-    //     let data = self.mb_get(source_handle);
-    //     let encoded = hex::encode(data);
-    //     self.mb_set(dest_handle, encoded.into_bytes());
-    // }
+    fn mb_to_hex(&self, source_handle: RawHandle, dest_handle: RawHandle) {
+        let encoded = hex::encode(self.m_types_borrow().mb_get(source_handle));
+        self.m_types_borrow_mut()
+            .mb_set(dest_handle, encoded.into_bytes());
+    }
 }

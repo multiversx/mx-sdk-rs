@@ -164,12 +164,4 @@ pub trait VMHooksBigInt: ManagedTypesSource + VMHooksError {
         let result = bi_x.shl(bits);
         self.m_types_borrow_mut().bi_overwrite(dest, result);
     }
-
-    // fn bi_to_string(&self, x: RawHandle, str_handle: RawHandle) {
-    //     let s = {
-    //         let bi_x = self.bi_get(x);
-    //         bi_x.to_string()
-    //     };
-    //     self.mb_overwrite(str_handle, s.as_bytes());
-    // }
 }
