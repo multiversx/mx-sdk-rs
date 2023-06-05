@@ -12,7 +12,9 @@ use crate::{
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
 
-use super::{execute_builtin_function_or_default, execute_tx_context};
+use super::{
+    execute_builtin_function_or_default, execute_tx_context, system_sc::is_system_sc_address,
+};
 
 pub fn execute_sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
     let state_rc = Rc::new(state);
@@ -37,11 +39,15 @@ pub fn execute_sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResul
     (tx_result, state)
 }
 
+fn existing_account(state: &BlockchainMock, address: &Address) -> bool {
+    state.accounts.contains_key(address) || is_system_sc_address(address)
+}
+
 pub fn execute_async_call_and_callback(
     async_data: AsyncCallTxData,
     state: BlockchainMock,
 ) -> (TxResult, TxResult, BlockchainMock) {
-    if state.accounts.contains_key(&async_data.to) {
+    if existing_account(&state, &async_data.to) {
         let async_input = async_call_tx_input(&async_data);
 
         let (async_result, state) = sc_call_with_async_and_callback(async_input, state);

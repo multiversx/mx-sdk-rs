@@ -82,7 +82,6 @@ fn deploy_duplicate_bm_rs() {
 }
 
 #[test]
-#[ignore = "system SC not yet implemented"]
 fn interactor_nft_rs() {
     world().run("scenarios/interactor_nft.scen.json");
 }
