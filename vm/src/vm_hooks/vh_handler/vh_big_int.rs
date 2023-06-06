@@ -8,7 +8,7 @@ use multiversx_sc::{api::RawHandle, err_msg, types::heap::BoxedBytes};
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
-use super::{vh_error::VMHooksError, super::VMHooksHandlerSource};
+use super::{super::VMHooksHandlerSource, vh_error::VMHooksError};
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {

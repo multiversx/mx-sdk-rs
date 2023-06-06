@@ -1,8 +1,8 @@
 use multiversx_sc::api::{uncallable::UncallableApi, CallValueApi};
 
-use super::StaticApi;
+use super::{VMHooksApi, VMHooksBackendType};
 
-impl CallValueApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> CallValueApi for VMHooksApi<BACKEND_TYPE> {
     type CallValueApiImpl = UncallableApi;
 
     fn call_value_api_impl() -> Self::CallValueApiImpl {

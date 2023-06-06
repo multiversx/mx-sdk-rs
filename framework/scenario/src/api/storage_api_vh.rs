@@ -1,8 +1,8 @@
 use multiversx_sc::api::{uncallable::UncallableApi, StorageReadApi, StorageWriteApi};
 
-use super::StaticApi;
+use super::{VMHooksApi, VMHooksBackendType};
 
-impl StorageReadApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApi for VMHooksApi<BACKEND_TYPE> {
     type StorageReadApiImpl = UncallableApi;
 
     fn storage_read_api_impl() -> Self::StorageReadApiImpl {
@@ -10,7 +10,7 @@ impl StorageReadApi for StaticApi {
     }
 }
 
-impl StorageWriteApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApi for VMHooksApi<BACKEND_TYPE> {
     type StorageWriteApiImpl = UncallableApi;
 
     fn storage_write_api_impl() -> Self::StorageWriteApiImpl {

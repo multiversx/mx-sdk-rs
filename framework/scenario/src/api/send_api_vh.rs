@@ -1,8 +1,8 @@
 use multiversx_sc::api::{uncallable::UncallableApi, SendApi};
 
-use super::StaticApi;
+use super::{VMHooksApi, VMHooksBackendType};
 
-impl SendApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> SendApi for VMHooksApi<BACKEND_TYPE> {
     type SendApiImpl = UncallableApi;
 
     fn send_api_impl() -> Self::SendApiImpl {

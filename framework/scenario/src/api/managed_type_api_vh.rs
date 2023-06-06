@@ -7,9 +7,9 @@ mod static_var_api_vh;
 
 use multiversx_sc::api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl};
 
-use super::{StaticApi, VMHooksBackend};
+use super::{VMHooksApi, VMHooksBackend, VMHooksBackendType};
 
-impl ManagedTypeApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> ManagedTypeApi for VMHooksApi<BACKEND_TYPE> {
     type ManagedTypeApiImpl = VMHooksBackend;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl {

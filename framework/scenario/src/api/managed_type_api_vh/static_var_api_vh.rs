@@ -1,6 +1,6 @@
 use std::cell::RefCell;
 
-use crate::api::StaticApi;
+use crate::api::{VMHooksApi, VMHooksBackendType};
 use multiversx_chain_vm::tx_mock::TxStaticVars;
 use multiversx_sc::{
     api::{
@@ -10,7 +10,7 @@ use multiversx_sc::{
     types::LockableStaticBuffer,
 };
 
-impl StaticVarApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> StaticVarApi for VMHooksApi<BACKEND_TYPE> {
     type StaticVarApiImpl = StaticApiStaticVarImpl;
 
     fn static_var_api_impl() -> Self::StaticVarApiImpl {

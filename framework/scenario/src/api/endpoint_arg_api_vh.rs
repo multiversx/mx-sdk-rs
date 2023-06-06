@@ -1,8 +1,8 @@
 use multiversx_sc::api::{uncallable::UncallableApi, EndpointArgumentApi};
 
-use super::StaticApi;
+use super::{VMHooksApi, VMHooksBackendType};
 
-impl EndpointArgumentApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> EndpointArgumentApi for VMHooksApi<BACKEND_TYPE> {
     type EndpointArgumentApiImpl = UncallableApi;
 
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {

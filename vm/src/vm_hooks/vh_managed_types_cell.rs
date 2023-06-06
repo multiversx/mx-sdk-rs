@@ -3,7 +3,7 @@ use std::cell::{Ref, RefCell, RefMut};
 use crate::tx_mock::TxManagedTypes;
 
 use super::{
-    VMHooksHandlerSource, VMHooksBigInt, VMHooksError, VMHooksHandler, VMHooksManagedBuffer,
+    VMHooksBigInt, VMHooksError, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
     VMHooksManagedTypes,
 };
 

@@ -1,8 +1,8 @@
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
 
-use super::{StaticApi, VMHooksBackend};
+use super::{VMHooksApi, VMHooksBackend, VMHooksBackendType};
 
-impl ErrorApi for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApi for VMHooksApi<BACKEND_TYPE> {
     type ErrorApiImpl = VMHooksBackend;
 
     fn error_api_impl() -> Self::ErrorApiImpl {

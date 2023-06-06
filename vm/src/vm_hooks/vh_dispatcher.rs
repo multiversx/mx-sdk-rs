@@ -986,7 +986,8 @@ impl VMHooks for VMHooksDispatcher {
     ) {
         unsafe {
             mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
-                self.handler.bi_set_unsigned_bytes(destination_handle, bytes);
+                self.handler
+                    .bi_set_unsigned_bytes(destination_handle, bytes);
             })
         }
     }
@@ -1116,7 +1117,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_to_string(&self, big_int_handle: i32, destination_handle: i32) {
-        self.handler.bi_to_string(big_int_handle, destination_handle);
+        self.handler
+            .bi_to_string(big_int_handle, destination_handle);
     }
 
     fn mbuffer_new(&self) -> i32 {
