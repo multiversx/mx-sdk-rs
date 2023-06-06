@@ -4,18 +4,17 @@ use multiversx_vm_executor::{MemLength, MemPtr, VMHooks};
 
 use crate::mem_conv;
 
-use super::{TxManagedTypesCell, VMHooksManagedTypes};
+use super::VMHooksHandler;
 
+/// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
 pub struct VMHooksDispatcher {
-    source: Box<dyn VMHooksManagedTypes>,
+    handler: Box<dyn VMHooksHandler>,
 }
 
 impl VMHooksDispatcher {
-    pub fn new_managed_type_cell() -> Self {
-        VMHooksDispatcher {
-            source: Box::<TxManagedTypesCell>::default(),
-        }
+    pub fn new(handler: Box<dyn VMHooksHandler>) -> Self {
+        VMHooksDispatcher { handler }
     }
 }
 
@@ -810,7 +809,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32) {
-        self.source.mb_to_hex(source_handle, dest_handle);
+        self.handler.mb_to_hex(source_handle, dest_handle);
     }
 
     fn big_float_new_from_parts(
@@ -960,7 +959,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_new(&self, small_value: i64) -> i32 {
-        self.source.bi_new(small_value)
+        self.handler.bi_new(small_value)
     }
 
     fn big_int_unsigned_byte_length(&self, reference_handle: i32) -> i32 {
@@ -987,7 +986,7 @@ impl VMHooks for VMHooksDispatcher {
     ) {
         unsafe {
             mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
-                self.source.bi_set_unsigned_bytes(destination_handle, bytes);
+                self.handler.bi_set_unsigned_bytes(destination_handle, bytes);
             })
         }
     }
@@ -1000,45 +999,45 @@ impl VMHooks for VMHooksDispatcher {
     ) {
         unsafe {
             mem_conv::with_bytes_mut(byte_offset, byte_length, |bytes| {
-                self.source.bi_set_signed_bytes(destination_handle, bytes);
+                self.handler.bi_set_signed_bytes(destination_handle, bytes);
             })
         }
     }
 
     fn big_int_is_int64(&self, destination_handle: i32) -> i32 {
-        self.source.bi_is_int64(destination_handle)
+        self.handler.bi_is_int64(destination_handle)
     }
 
     fn big_int_get_int64(&self, destination_handle: i32) -> i64 {
-        self.source.bi_get_int64(destination_handle)
+        self.handler.bi_get_int64(destination_handle)
     }
 
     fn big_int_set_int64(&self, destination_handle: i32, value: i64) {
-        self.source.bi_set_int64(destination_handle, value);
+        self.handler.bi_set_int64(destination_handle, value);
     }
 
     fn big_int_add(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_add(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_sub(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_sub(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_mul(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_mul(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_tdiv(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_t_div(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_tmod(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_t_mod(destination_handle, op1_handle, op2_handle);
     }
 
@@ -1051,32 +1050,32 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_sqrt(&self, destination_handle: i32, op_handle: i32) {
-        self.source.bi_sqrt(destination_handle, op_handle);
+        self.handler.bi_sqrt(destination_handle, op_handle);
     }
 
     fn big_int_pow(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_pow(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_log2(&self, op_handle: i32) -> i32 {
-        self.source.bi_log2(op_handle)
+        self.handler.bi_log2(op_handle)
     }
 
     fn big_int_abs(&self, destination_handle: i32, op_handle: i32) {
-        self.source.bi_abs(destination_handle, op_handle);
+        self.handler.bi_abs(destination_handle, op_handle);
     }
 
     fn big_int_neg(&self, destination_handle: i32, op_handle: i32) {
-        self.source.bi_neg(destination_handle, op_handle);
+        self.handler.bi_neg(destination_handle, op_handle);
     }
 
     fn big_int_sign(&self, op_handle: i32) -> i32 {
-        self.source.bi_sign(op_handle)
+        self.handler.bi_sign(op_handle)
     }
 
     fn big_int_cmp(&self, op1_handle: i32, op2_handle: i32) -> i32 {
-        self.source.bi_cmp(op1_handle, op2_handle)
+        self.handler.bi_cmp(op1_handle, op2_handle)
     }
 
     fn big_int_not(&self, destination_handle: i32, op_handle: i32) {
@@ -1084,27 +1083,27 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_and(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_and(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_or(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_or(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_xor(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        self.source
+        self.handler
             .bi_xor(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_int_shr(&self, destination_handle: i32, op_handle: i32, bits: i32) {
-        self.source
+        self.handler
             .bi_shr(destination_handle, op_handle, bits as usize);
     }
 
     fn big_int_shl(&self, destination_handle: i32, op_handle: i32, bits: i32) {
-        self.source
+        self.handler
             .bi_shl(destination_handle, op_handle, bits as usize);
     }
 
@@ -1117,28 +1116,28 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_to_string(&self, big_int_handle: i32, destination_handle: i32) {
-        self.source.bi_to_string(big_int_handle, destination_handle);
+        self.handler.bi_to_string(big_int_handle, destination_handle);
     }
 
     fn mbuffer_new(&self) -> i32 {
-        self.source.mb_new_empty()
+        self.handler.mb_new_empty()
     }
 
     fn mbuffer_new_from_bytes(&self, data_offset: MemPtr, data_length: MemLength) -> i32 {
         unsafe {
             mem_conv::with_bytes_mut(data_offset, data_length, |bytes| {
-                self.source.mb_new_from_bytes(bytes)
+                self.handler.mb_new_from_bytes(bytes)
             })
         }
     }
 
     fn mbuffer_get_length(&self, m_buffer_handle: i32) -> i32 {
-        self.source.mb_len(m_buffer_handle) as i32
+        self.handler.mb_len(m_buffer_handle) as i32
     }
 
     fn mbuffer_get_bytes(&self, m_buffer_handle: i32, result_offset: MemPtr) -> i32 {
         unsafe {
-            self.source
+            self.handler
                 .mb_copy_bytes(m_buffer_handle, result_offset as *mut u8) as i32
         }
     }
@@ -1152,7 +1151,7 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         unsafe {
             mem_conv::with_bytes_mut(result_offset, slice_length as isize, |bytes| {
-                self.source
+                self.handler
                     .mb_load_slice(source_handle, starting_position as usize, bytes)
             })
         }
@@ -1165,7 +1164,7 @@ impl VMHooks for VMHooksDispatcher {
         slice_length: i32,
         destination_handle: i32,
     ) -> i32 {
-        self.source.mb_copy_slice(
+        self.handler.mb_copy_slice(
             source_handle,
             starting_position as usize,
             slice_length as usize,
@@ -1174,7 +1173,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_eq(&self, m_buffer_handle1: i32, m_buffer_handle2: i32) -> i32 {
-        self.source.mb_eq(m_buffer_handle1, m_buffer_handle2)
+        self.handler.mb_eq(m_buffer_handle1, m_buffer_handle2)
     }
 
     fn mbuffer_set_bytes(
@@ -1185,7 +1184,7 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         unsafe {
             mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.source.mb_set(m_buffer_handle, bytes);
+                self.handler.mb_set(m_buffer_handle, bytes);
             });
         }
         0
@@ -1200,14 +1199,14 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         unsafe {
             mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.source
+                self.handler
                     .mb_set_slice(m_buffer_handle, starting_position as usize, bytes)
             })
         }
     }
 
     fn mbuffer_append(&self, accumulator_handle: i32, data_handle: i32) -> i32 {
-        self.source.mb_append(accumulator_handle, data_handle);
+        self.handler.mb_append(accumulator_handle, data_handle);
         0
     }
 
@@ -1219,32 +1218,32 @@ impl VMHooks for VMHooksDispatcher {
     ) -> i32 {
         unsafe {
             mem_conv::with_bytes(data_offset, data_length, |bytes| {
-                self.source.mb_append_bytes(accumulator_handle, bytes);
+                self.handler.mb_append_bytes(accumulator_handle, bytes);
             });
         }
         0
     }
 
     fn mbuffer_to_big_int_unsigned(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        self.source
+        self.handler
             .mb_to_big_int_unsigned(m_buffer_handle, big_int_handle);
         0
     }
 
     fn mbuffer_to_big_int_signed(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        self.source
+        self.handler
             .mb_to_big_int_signed(m_buffer_handle, big_int_handle);
         0
     }
 
     fn mbuffer_from_big_int_unsigned(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        self.source
+        self.handler
             .mb_from_big_int_unsigned(m_buffer_handle, big_int_handle);
         0
     }
 
     fn mbuffer_from_big_int_signed(&self, m_buffer_handle: i32, big_int_handle: i32) -> i32 {
-        self.source
+        self.handler
             .mb_from_big_int_signed(m_buffer_handle, big_int_handle);
         0
     }

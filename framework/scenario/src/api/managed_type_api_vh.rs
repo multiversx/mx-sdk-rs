@@ -13,7 +13,7 @@ impl ManagedTypeApi for StaticApi {
     type ManagedTypeApiImpl = VMHooksBackend;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl {
-        VMHooksBackend::static_managed_type_backend()
+        Self::backend()
     }
 }
 

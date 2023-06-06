@@ -1,9 +1,9 @@
 use multiversx_sc::api::RawHandle;
 
-use super::ManagedTypesSource;
+use super::super::VMHooksHandlerSource;
 
 /// Provides VM hook implementations for methods that deal managed buffers.
-pub trait VMHooksManagedBuffer: ManagedTypesSource {
+pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
     fn mb_new_empty(&self) -> RawHandle {
         self.m_types_borrow_mut().mb_new(Vec::new())
     }

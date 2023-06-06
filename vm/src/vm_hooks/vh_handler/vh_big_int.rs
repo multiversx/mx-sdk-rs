@@ -8,7 +8,7 @@ use multiversx_sc::{api::RawHandle, err_msg, types::heap::BoxedBytes};
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
-use super::{vh_error::VMHooksError, ManagedTypesSource};
+use super::{vh_error::VMHooksError, super::VMHooksHandlerSource};
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
@@ -49,7 +49,7 @@ macro_rules! unary_op_method {
 }
 
 /// Provides VM hook implementations for methods that deal big ints.
-pub trait VMHooksBigInt: ManagedTypesSource + VMHooksError {
+pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     fn bi_new(&self, value: i64) -> RawHandle {
         self.m_types_borrow_mut()
             .bi_new_from_big_int(num_bigint::BigInt::from(value))

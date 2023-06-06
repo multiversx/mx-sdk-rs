@@ -1,3 +1,4 @@
+mod backend_type;
 mod blockchain_api_vh;
 mod call_value_api_vh;
 mod crypto_api_vh;
@@ -10,15 +11,20 @@ mod print_api_vh;
 mod send_api_vh;
 mod storage_api_vh;
 
+pub use backend_type::*;
+
 use std::{ops::Deref, thread::LocalKey};
 
-use multiversx_chain_vm::{executor::VMHooks, vm_hooks::VMHooksDispatcher};
+use multiversx_chain_vm::{
+    executor::VMHooks,
+    vm_hooks::{TxManagedTypesCell, VMHooksDispatcher},
+};
 use multiversx_sc::api::{HandleTypeInfo, RawHandle};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct StaticApi;
+pub struct VMHooksApi<const BACKEND_TYPE: VMHooksBackendType>;
 
-impl HandleTypeInfo for StaticApi {
+impl<const BACKEND_TYPE: VMHooksBackendType> HandleTypeInfo for VMHooksApi<BACKEND_TYPE> {
     type ManagedBufferHandle = RawHandle;
     type BigIntHandle = RawHandle;
     type BigFloatHandle = RawHandle;
@@ -26,9 +32,25 @@ impl HandleTypeInfo for StaticApi {
     type ManagedMapHandle = RawHandle;
 }
 
+fn new_vh_dispatcher_managed_types_cell() -> Box<dyn VMHooks> {
+    Box::new(VMHooksDispatcher::new(Box::<TxManagedTypesCell>::default()))
+}
+
 thread_local!(
-    static MANAGED_TYPES_CELL: Box<dyn VMHooks> = Box::new(VMHooksDispatcher::new_managed_type_cell())
+    static MANAGED_TYPES_CELL: Box<dyn VMHooks> = new_vh_dispatcher_managed_types_cell()
 );
+
+impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
+    pub fn backend() -> VMHooksBackend {
+        match BACKEND_TYPE {
+            STATIC_MANAGED_TYPES => VMHooksBackend::static_managed_type_backend(),
+            DEBUGGER_STACK => todo!(),
+            _ => panic!("invalid VMHooksBackendType"),
+        }
+    }
+}
+
+pub type StaticApi = VMHooksApi<STATIC_MANAGED_TYPES>;
 
 pub struct VMHooksBackend {
     pub vh_local: &'static LocalKey<Box<dyn VMHooks>>,
