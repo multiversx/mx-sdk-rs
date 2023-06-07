@@ -23,7 +23,7 @@ serde_json = { version = "1.0.68", features = ["preserve_order"] }
 serde_repr = "0.1.8"
 anyhow = "1.0.44"
 rand = "0.6.0"
-bip39 = "1.0.1"
+bip39 = { version = "2.0.0", features = ["rand"] }
 sha2 = "0.9.8"
 sha3 = "0.9.1"
 hmac = { version = "0.11.0", features = ["std"] }
