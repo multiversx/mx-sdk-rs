@@ -17,7 +17,7 @@ use std::{ops::Deref, thread::LocalKey};
 
 use multiversx_chain_vm::{
     executor::VMHooks,
-    vm_hooks::{TxManagedTypesCell, VMHooksDispatcher},
+    vm_hooks::{TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::api::{HandleTypeInfo, RawHandle};
 
@@ -33,7 +33,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> HandleTypeInfo for VMHooksApi<BACKE
 }
 
 fn new_vh_dispatcher_managed_types_cell() -> Box<dyn VMHooks> {
-    Box::new(VMHooksDispatcher::new(Box::<TxManagedTypesCell>::default()))
+    let vh_handler: Box<dyn VMHooksHandler> = Box::<TxManagedTypesCell>::default();
+    Box::new(VMHooksDispatcher::new(vh_handler))
 }
 
 thread_local!(
@@ -41,9 +42,9 @@ thread_local!(
 );
 
 impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
-    pub fn backend() -> VMHooksBackend {
+    pub fn api_impl() -> VMHooksApiImpl {
         match BACKEND_TYPE {
-            STATIC_MANAGED_TYPES => VMHooksBackend::static_managed_type_backend(),
+            STATIC_MANAGED_TYPES => VMHooksApiImpl::static_managed_type_backend(),
             DEBUGGER_STACK => todo!(),
             _ => panic!("invalid VMHooksBackendType"),
         }
@@ -52,13 +53,13 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
 
 pub type StaticApi = VMHooksApi<STATIC_MANAGED_TYPES>;
 
-pub struct VMHooksBackend {
+pub struct VMHooksApiImpl {
     pub vh_local: &'static LocalKey<Box<dyn VMHooks>>,
 }
 
-impl VMHooksBackend {
+impl VMHooksApiImpl {
     pub fn static_managed_type_backend() -> Self {
-        VMHooksBackend {
+        VMHooksApiImpl {
             vh_local: &MANAGED_TYPES_CELL,
         }
     }
@@ -71,7 +72,7 @@ impl VMHooksBackend {
     }
 }
 
-impl HandleTypeInfo for VMHooksBackend {
+impl HandleTypeInfo for VMHooksApiImpl {
     type ManagedBufferHandle = RawHandle;
     type BigIntHandle = RawHandle;
     type BigFloatHandle = RawHandle;

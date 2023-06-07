@@ -1,16 +1,16 @@
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
 
-use super::{VMHooksApi, VMHooksBackend, VMHooksBackendType};
+use super::{VMHooksApi, VMHooksApiImpl, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApi for VMHooksApi<BACKEND_TYPE> {
-    type ErrorApiImpl = VMHooksBackend;
+    type ErrorApiImpl = VMHooksApiImpl;
 
     fn error_api_impl() -> Self::ErrorApiImpl {
         todo!()
     }
 }
 
-impl ErrorApi for VMHooksBackend {
+impl ErrorApi for VMHooksApiImpl {
     type ErrorApiImpl = Self;
 
     fn error_api_impl() -> Self::ErrorApiImpl {
@@ -18,7 +18,7 @@ impl ErrorApi for VMHooksBackend {
     }
 }
 
-impl ErrorApiImpl for VMHooksBackend {
+impl ErrorApiImpl for VMHooksApiImpl {
     fn signal_error(&self, _message: &[u8]) -> ! {
         todo!()
     }

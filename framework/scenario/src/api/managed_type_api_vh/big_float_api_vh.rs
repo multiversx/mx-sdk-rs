@@ -2,9 +2,9 @@ use core::cmp::Ordering;
 
 use multiversx_sc::api::{BigFloatApi, Sign};
 
-use crate::api::VMHooksBackend;
+use crate::api::VMHooksApiImpl;
 
-impl BigFloatApi for VMHooksBackend {
+impl BigFloatApi for VMHooksApiImpl {
     fn bf_from_parts(
         &self,
         _integral_part: i32,

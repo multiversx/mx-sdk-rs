@@ -7,17 +7,17 @@ mod static_var_api_vh;
 
 use multiversx_sc::api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl};
 
-use super::{VMHooksApi, VMHooksBackend, VMHooksBackendType};
+use super::{VMHooksApi, VMHooksApiImpl, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> ManagedTypeApi for VMHooksApi<BACKEND_TYPE> {
-    type ManagedTypeApiImpl = VMHooksBackend;
+    type ManagedTypeApiImpl = VMHooksApiImpl;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl {
-        Self::backend()
+        Self::api_impl()
     }
 }
 
-impl ManagedTypeApiImpl for VMHooksBackend {
+impl ManagedTypeApiImpl for VMHooksApiImpl {
     fn mb_to_big_int_unsigned(
         &self,
         buffer_handle: Self::ManagedBufferHandle,
