@@ -1,5 +1,4 @@
 use core::fmt::Debug;
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{
@@ -7,6 +6,7 @@ use multiversx_sc::{
         TokenIdentifier,
     },
 };
+use multiversx_sc_scenario::api::StaticApi;
 
 fn test_managed_ref_for_type<M, T>(obj: T)
 where
@@ -25,21 +25,17 @@ where
 
 #[test]
 fn test_managed_ref() {
-    let _ = DebugApi::dummy();
-
-    test_managed_ref_for_type(BigUint::<DebugApi>::from(1u32));
-    test_managed_ref_for_type(BigInt::<DebugApi>::from(2i32));
-    test_managed_ref_for_type(ManagedBuffer::<DebugApi>::from(&b"3abc"[..]));
-    test_managed_ref_for_type(ManagedByteArray::<DebugApi, 4>::from(&[4u8; 4]));
-    test_managed_ref_for_type(ManagedAddress::<DebugApi>::from(&[5u8; 32]));
-    test_managed_ref_for_type(TokenIdentifier::<DebugApi>::from(&b"TOKEN-000006"[..]));
+    test_managed_ref_for_type(BigUint::<StaticApi>::from(1u32));
+    test_managed_ref_for_type(BigInt::<StaticApi>::from(2i32));
+    test_managed_ref_for_type(ManagedBuffer::<StaticApi>::from(&b"3abc"[..]));
+    test_managed_ref_for_type(ManagedByteArray::<StaticApi, 4>::from(&[4u8; 4]));
+    test_managed_ref_for_type(ManagedAddress::<StaticApi>::from(&[5u8; 32]));
+    test_managed_ref_for_type(TokenIdentifier::<StaticApi>::from(&b"TOKEN-000006"[..]));
 }
 
 #[test]
 fn test_managed_ref_clone() {
-    let _ = DebugApi::dummy();
-
-    let obj = BigUint::<DebugApi>::from(7u32);
+    let obj = BigUint::<StaticApi>::from(7u32);
     let obj_ref = obj.as_ref();
     assert_eq!(obj.get_handle(), obj_ref.get_handle());
 
@@ -50,15 +46,13 @@ fn test_managed_ref_clone() {
 
 #[test]
 fn test_managed_ref_eq() {
-    let _ = DebugApi::dummy();
-
     assert_eq!(
-        BigUint::<DebugApi>::from(1u32).as_ref(),
-        BigUint::<DebugApi>::from(1u32).as_ref()
+        BigUint::<StaticApi>::from(1u32).as_ref(),
+        BigUint::<StaticApi>::from(1u32).as_ref()
     );
 
     assert_ne!(
-        BigUint::<DebugApi>::from(1u32).as_ref(),
-        BigUint::<DebugApi>::from(2u32).as_ref()
+        BigUint::<StaticApi>::from(1u32).as_ref(),
+        BigUint::<StaticApi>::from(2u32).as_ref()
     );
 }

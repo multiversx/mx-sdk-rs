@@ -1,6 +1,5 @@
 #![feature(exhaustive_patterns)]
 
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::{
     codec::{
         multi_types::{MultiValue2, MultiValueVec, OptionalValue},
@@ -9,6 +8,7 @@ use multiversx_sc::{
     types::{AsyncCallResult, BigUint},
     HexCallDataDeserializer,
 };
+use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_simple_args() {
@@ -25,10 +25,9 @@ fn test_simple_args() {
 
 #[test]
 fn test_simple_managed_arg() {
-    let _ = DebugApi::dummy();
     let input: &[u8] = b"some_other_func@05";
     let mut de = HexCallDataDeserializer::new(input);
-    let Ok(arg1) = BigUint::<DebugApi>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
+    let Ok(arg1) = BigUint::<StaticApi>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
     assert_eq!(arg1, BigUint::from(5u32));
 
     de.assert_no_more_args(PanicErrorHandler).unwrap();

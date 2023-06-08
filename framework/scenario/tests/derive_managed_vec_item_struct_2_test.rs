@@ -1,5 +1,3 @@
-use multiversx_chain_vm::DebugApi;
-
 multiversx_sc::derive_imports!();
 
 // to test, run the following command in the crate folder:
@@ -58,7 +56,6 @@ fn struct_to_bytes_writer() {
 
 #[test]
 fn struct_2_from_bytes_reader() {
-    let _ = DebugApi::dummy();
     let expected_struct = Struct2 {
         u_8: 1u8,
         u_16: 2u16,

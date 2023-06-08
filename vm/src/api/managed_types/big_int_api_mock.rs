@@ -1,4 +1,4 @@
-use crate::{num_bigint, DebugApi};
+use crate::{num_bigint, tx_mock::big_int_to_i64, DebugApi};
 use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
@@ -9,15 +9,14 @@ use multiversx_sc::{
     types::heap::BoxedBytes,
 };
 use num_bigint::BigInt;
-use num_traits::{pow, sign::Signed, Zero};
+use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
-
-use super::managed_type_util::big_int_to_i64;
 
 fn assert_positive(bi: &num_bigint::BigInt) {
     assert!(
         bi.sign() != num_bigint::Sign::Minus,
-        "bitwise operations only allowed on positive integers"
+        "{}",
+        err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE,
     );
 }
 
@@ -70,8 +69,7 @@ impl DebugApi {
         &self,
         value: num_bigint::BigInt,
     ) -> <Self as HandleTypeInfo>::BigIntHandle {
-        let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_int_map.insert_new_handle(value)
+        self.m_types_borrow_mut().bi_new_from_big_int(value).into()
     }
 
     pub(crate) fn bi_overwrite(
@@ -80,17 +78,12 @@ impl DebugApi {
         value: num_bigint::BigInt,
     ) {
         let mut managed_types = destination.context.m_types_borrow_mut();
-        managed_types
-            .big_int_map
-            .insert(destination.get_raw_handle_unchecked(), value);
+        managed_types.bi_overwrite(destination.get_raw_handle_unchecked(), value)
     }
 
     pub(crate) fn bi_get(&self, handle: <Self as HandleTypeInfo>::BigIntHandle) -> BigInt {
         let managed_types = handle.context.m_types_borrow();
-        managed_types
-            .big_int_map
-            .get(handle.get_raw_handle_unchecked())
-            .clone()
+        managed_types.bi_get(handle.get_raw_handle_unchecked())
     }
 }
 
@@ -109,13 +102,10 @@ impl BigIntApi for DebugApi {
     }
 
     fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        let bi = self.bi_get(handle);
-        if bi.is_zero() {
-            BoxedBytes::empty()
-        } else {
-            let (_, bytes) = bi.to_bytes_be();
-            bytes.into()
-        }
+        handle
+            .context
+            .m_types_borrow()
+            .bi_get_unsigned_bytes(handle.get_raw_handle_unchecked())
     }
 
     fn bi_set_unsigned_bytes(&self, dest: Self::BigIntHandle, bytes: &[u8]) {
@@ -128,12 +118,10 @@ impl BigIntApi for DebugApi {
     }
 
     fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        let bi = self.bi_get(handle);
-        if bi.is_zero() {
-            BoxedBytes::empty()
-        } else {
-            bi.to_signed_bytes_be().into()
-        }
+        handle
+            .context
+            .m_types_borrow()
+            .bi_get_signed_bytes(handle.get_raw_handle_unchecked())
     }
 
     fn bi_set_signed_bytes(&self, dest: Self::BigIntHandle, bytes: &[u8]) {

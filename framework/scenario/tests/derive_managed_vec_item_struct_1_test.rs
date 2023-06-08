@@ -1,4 +1,3 @@
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
 multiversx_sc::derive_imports!();
@@ -78,7 +77,6 @@ fn struct_1_to_bytes_writer() {
 
 #[test]
 fn struct_1_from_bytes_reader() {
-    let _ = DebugApi::dummy();
     let s = Struct1 {
         u_8: 1u8,
         u_16: 2u16,

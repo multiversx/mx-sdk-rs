@@ -1,13 +1,11 @@
 use std::ops::Deref;
 
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::types::{BigUint, ManagedVec};
+use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_managed_vec_iter_rev() {
-    let _ = DebugApi::dummy();
-
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in 20u64..=30u64 {
         managed_vec.push(BigUint::from(i));
     }
@@ -29,12 +27,11 @@ fn test_managed_vec_iter_rev() {
 
 #[test]
 fn test_managed_vec_from_iterator_trait() {
-    let _ = DebugApi::dummy();
-    let mut managed_vec = ManagedVec::<DebugApi, i32>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, i32>::new();
     for i in 1..=10 {
         managed_vec.push(i);
     }
-    let mut expected_vec = ManagedVec::<DebugApi, i32>::new();
+    let mut expected_vec = ManagedVec::<StaticApi, i32>::new();
     for i in 1..=5 {
         expected_vec.push(i);
     }
@@ -42,30 +39,29 @@ fn test_managed_vec_from_iterator_trait() {
     let collected_vec = managed_vec
         .iter()
         .filter(|x| x <= &5)
-        .collect::<ManagedVec<DebugApi, i32>>();
+        .collect::<ManagedVec<StaticApi, i32>>();
 
     assert_eq!(collected_vec, expected_vec);
 }
 
 #[test]
 fn test_managed_vec_extend_trait() {
-    let _ = DebugApi::dummy();
-    let mut managed_vec = ManagedVec::<DebugApi, i32>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, i32>::new();
     for i in 1..=10 {
         managed_vec.push(i);
     }
-    let mut expected_vec1 = ManagedVec::<DebugApi, i32>::new();
+    let mut expected_vec1 = ManagedVec::<StaticApi, i32>::new();
     for i in 1..=5 {
         expected_vec1.push(i);
     }
-    let mut expected_vec2 = ManagedVec::<DebugApi, i32>::new();
+    let mut expected_vec2 = ManagedVec::<StaticApi, i32>::new();
     for i in 6..=10 {
         expected_vec2.push(i);
     }
 
     let (collected_vec1, collected_vec2) = managed_vec
         .iter()
-        .partition::<ManagedVec<DebugApi, i32>, _>(|x| x <= &5);
+        .partition::<ManagedVec<StaticApi, i32>, _>(|x| x <= &5);
 
     assert_eq!(collected_vec1, expected_vec1);
     assert_eq!(collected_vec2, expected_vec2);
@@ -73,9 +69,7 @@ fn test_managed_vec_extend_trait() {
 
 #[test]
 fn test_managed_vec_iter_exact_size_trait() {
-    let _ = DebugApi::dummy();
-
-    let mut managed_vec = ManagedVec::<DebugApi, i32>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, i32>::new();
     for i in 1..=10 {
         managed_vec.push(i);
     }
@@ -92,10 +86,8 @@ fn test_managed_vec_iter_exact_size_trait() {
 
 #[test]
 fn test_into_vec() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in 20u64..=30u64 {
         let biguint = BigUint::from(i);
         managed_vec.push(biguint.clone());
@@ -107,10 +99,8 @@ fn test_into_vec() {
 
 #[test]
 fn test_sort_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in (20u64..=30u64).rev() {
         managed_vec.push(i);
         vec.push(i);
@@ -129,12 +119,10 @@ fn test_sort_u64() {
 
 #[test]
 fn test_sort_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in (20u64..=30u64).rev() {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -153,10 +141,8 @@ fn flip(n: &u64) -> u64 {
 
 #[test]
 fn test_sort_by_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in (20u64..=30u64).rev() {
         managed_vec.push(i);
         vec.push(i);
@@ -176,12 +162,10 @@ fn test_sort_by_u64() {
 
 #[test]
 fn test_sort_by_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in (20u64..=30u64).rev() {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -216,10 +200,8 @@ fn test_sort_by_biguint() {
 
 #[test]
 fn test_sort_by_key_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in [4444u64, 333u64, 1u64, 22u64] {
         managed_vec.push(i);
         vec.push(i);
@@ -239,12 +221,10 @@ fn test_sort_by_key_u64() {
 
 #[test]
 fn test_sort_by_key_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in [4444u64, 333u64, 1u64, 22u64] {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -263,10 +243,8 @@ fn test_sort_by_key_biguint() {
 
 #[test]
 fn test_sort_by_cached_key_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in [4u64, 33u64, 222u64, 1111u64] {
         managed_vec.push(i);
         vec.push(i);
@@ -282,12 +260,10 @@ fn test_sort_by_cached_key_u64() {
 
 #[test]
 fn test_sort_by_cached_key_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in [4u64, 33u64, 222u64, 1111u64] {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -302,10 +278,8 @@ fn test_sort_by_cached_key_biguint() {
 
 #[test]
 fn test_sort_unstable_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in (20u64..=30u64).rev() {
         managed_vec.push(i);
         vec.push(i);
@@ -318,12 +292,10 @@ fn test_sort_unstable_u64() {
 
 #[test]
 fn test_sort_unstable_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in (20u64..=30u64).rev() {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -335,10 +307,8 @@ fn test_sort_unstable_biguint() {
 
 #[test]
 fn test_sort_unstable_by_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in (20u64..=30u64).rev() {
         managed_vec.push(i);
         vec.push(i);
@@ -358,12 +328,10 @@ fn test_sort_unstable_by_u64() {
 
 #[test]
 fn test_sort_unstable_by_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in (20u64..=30u64).rev() {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -398,10 +366,8 @@ fn test_sort_unstable_by_biguint() {
 
 #[test]
 fn test_sort_unstable_by_key_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in [4444u64, 333u64, 1u64, 22u64] {
         managed_vec.push(i);
         vec.push(i);
@@ -421,12 +387,10 @@ fn test_sort_unstable_by_key_u64() {
 
 #[test]
 fn test_sort_unstable_by_key_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in [4444u64, 333u64, 1u64, 22u64] {
-        let biguint = BigUint::<DebugApi>::from(i);
+        let biguint = BigUint::<StaticApi>::from(i);
         managed_vec.push(biguint.clone());
         vec.push(biguint);
     }
@@ -445,10 +409,8 @@ fn test_sort_unstable_by_key_biguint() {
 
 #[test]
 fn test_dedup_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
         managed_vec.push(i);
         vec.push(i);
@@ -461,10 +423,8 @@ fn test_dedup_u64() {
 
 #[test]
 fn test_dedup_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
         let biguint = BigUint::from(i);
         managed_vec.push(biguint.clone());
@@ -478,10 +438,8 @@ fn test_dedup_biguint() {
 
 #[test]
 fn test_sorted_dedup_u64() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::<u64>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
     for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
         managed_vec.push(i);
         vec.push(i);
@@ -497,10 +455,8 @@ fn test_sorted_dedup_u64() {
 
 #[test]
 fn test_sorted_dedup_biguint() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in [2u64, 3u64, 2u64, 2u64, 6u64, 3u64, 5u64, 2u64] {
         let biguint = BigUint::from(i);
         managed_vec.push(biguint.clone());
@@ -517,10 +473,8 @@ fn test_sorted_dedup_biguint() {
 
 #[test]
 fn test_with_self_as_vec() {
-    let _ = DebugApi::dummy();
-
-    let mut vec = Vec::<BigUint<DebugApi>>::new();
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     for i in 20u64..=30u64 {
         let biguint = BigUint::from(i);
         managed_vec.push(biguint.clone());
@@ -542,23 +496,19 @@ fn test_with_self_as_vec() {
 
 #[test]
 fn test_managed_from() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::new();
     for i in 20u64..=30u64 {
         let biguint = BigUint::from(i);
         vec.push(biguint);
     }
 
-    let managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::from(vec.clone());
+    let managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::from(vec.clone());
 
     assert_eq!(vec, managed_vec.into_vec());
 }
 
 #[test]
 fn test_append_vec() {
-    let _ = DebugApi::dummy();
-
     let mut vec1 = Vec::new();
     let mut vec2 = Vec::new();
     let mut vec = Vec::new();
@@ -575,9 +525,9 @@ fn test_append_vec() {
         vec2.push(biguint);
     }
 
-    let managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::from(vec.clone());
-    let mut managed_vec1 = ManagedVec::<DebugApi, BigUint<DebugApi>>::from(vec1.clone());
-    let managed_vec2 = ManagedVec::<DebugApi, BigUint<DebugApi>>::from(vec2.clone());
+    let managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::from(vec.clone());
+    let mut managed_vec1 = ManagedVec::<StaticApi, BigUint<StaticApi>>::from(vec1.clone());
+    let managed_vec2 = ManagedVec::<StaticApi, BigUint<StaticApi>>::from(vec2.clone());
 
     managed_vec1.append_vec(managed_vec2);
     assert_eq!(managed_vec, managed_vec1);
@@ -585,15 +535,13 @@ fn test_append_vec() {
 
 #[test]
 fn test_overwrite_with_single_item() {
-    let _ = DebugApi::dummy();
-
     let mut vec = Vec::new();
     for i in 20u64..=30u64 {
         let biguint = BigUint::from(i);
         vec.push(biguint);
     }
 
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::from(vec.clone());
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::from(vec.clone());
     assert_eq!(vec, managed_vec.clone().into_vec());
 
     let single_elem = BigUint::from(100u64);
@@ -605,9 +553,7 @@ fn test_overwrite_with_single_item() {
 
 #[test]
 fn test_managed_vec_get_mut() {
-    let _ = DebugApi::dummy();
-
-    let mut managed_vec = ManagedVec::<DebugApi, BigUint<DebugApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
     managed_vec.push(BigUint::from(100u32));
     managed_vec.push(BigUint::from(100u32));
 

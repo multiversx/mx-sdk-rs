@@ -1,23 +1,22 @@
-use multiversx_chain_vm::{display_util::BigUintPrinter, DebugApi};
+use multiversx_chain_vm::display_util::BigUintPrinter;
 use multiversx_sc::types::BigUint;
+use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_print_api() {
-    let _ = DebugApi::dummy();
-
-    let zero = BigUint::<DebugApi>::from(0u64);
+    let zero = BigUint::<StaticApi>::from(0u64);
     assert_eq!(
         format!("{:?}", BigUintPrinter { value: zero }),
         "BigUint { handle: -100, hex: \"00\", dec: \"0\" }"
     );
 
-    let regular = BigUint::<DebugApi>::from(257u64);
+    let regular = BigUint::<StaticApi>::from(257u64);
     assert_eq!(
         format!("{:?}", BigUintPrinter { value: regular }),
         "BigUint { handle: -101, hex: \"0101\", dec: \"257\" }"
     );
 
-    let huge_number = BigUint::<DebugApi>::from_bytes_be(&[
+    let huge_number = BigUint::<StaticApi>::from_bytes_be(&[
         255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
         255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
     ]);

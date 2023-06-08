@@ -1,12 +1,10 @@
-use std::cmp::Ordering;
-
 use multiversx_sc::{
     api::{HandleTypeInfo, ManagedBufferApi},
     types::{heap::Address, ManagedBuffer, ManagedType},
 };
 use num_traits::Zero;
 
-use crate::{num_bigint, num_bigint::Sign, DebugApi};
+use crate::{num_bigint, DebugApi};
 
 impl DebugApi {
     pub fn insert_new_managed_buffer(
@@ -15,11 +13,6 @@ impl DebugApi {
     ) -> <Self as HandleTypeInfo>::ManagedBufferHandle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types.managed_buffer_map.insert_new_handle(value)
-    }
-
-    pub fn insert_new_managed_buffer_old(&self, value: Vec<u8>) -> ManagedBuffer<Self> {
-        let handle = self.insert_new_managed_buffer(value);
-        ManagedBuffer::from_handle(handle)
     }
 
     pub fn mb_handle_to_value(
@@ -83,36 +76,5 @@ impl DebugApi {
             .get(bu_handle.get_raw_handle_unchecked())
             .magnitude()
             .clone()
-    }
-}
-
-pub fn big_int_to_i64(bi: &num_bigint::BigInt) -> Option<i64> {
-    let (sign, digits) = bi.to_u64_digits();
-    match sign {
-        Sign::NoSign => Some(0),
-        Sign::Plus => {
-            if digits.len() == 1 {
-                let as_u64 = digits[0];
-                if as_u64 <= i64::MAX as u64 {
-                    Some(as_u64 as i64)
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        },
-        Sign::Minus => {
-            if digits.len() == 1 {
-                let as_u64 = digits[0];
-                match as_u64.cmp(&0x8000000000000000u64) {
-                    Ordering::Less => Some(-(as_u64 as i64)),
-                    Ordering::Equal => Some(i64::MIN),
-                    Ordering::Greater => None,
-                }
-            } else {
-                None
-            }
-        },
     }
 }

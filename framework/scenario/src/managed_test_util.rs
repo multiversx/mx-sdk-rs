@@ -6,12 +6,12 @@ use multiversx_sc::{
 
 use core::fmt::Debug;
 
-use crate::DebugApi;
+use crate::api::StaticApi;
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
-pub fn check_managed_top_encode<T: TopEncode>(_api: DebugApi, obj: &T) -> BoxedBytes {
-    let serializer = ManagedSerializer::<DebugApi>::new();
+pub fn check_managed_top_encode<T: TopEncode>(obj: &T) -> BoxedBytes {
+    let serializer = ManagedSerializer::<StaticApi>::new();
     let as_mb = serializer.top_encode_to_managed_buffer(obj);
     let as_bb = serializer.top_encode_to_boxed_bytes(obj);
     assert_eq!(as_mb.to_boxed_bytes(), as_bb);
@@ -28,11 +28,8 @@ pub fn check_managed_top_encode<T: TopEncode>(_api: DebugApi, obj: &T) -> BoxedB
 
 /// Uses the managed types api to test encoding.
 /// Can be used on any type, but managed types are especially relevant.
-pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
-    _api: DebugApi,
-    bytes: &[u8],
-) -> T {
-    let serializer = ManagedSerializer::<DebugApi>::new();
+pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
+    let serializer = ManagedSerializer::<StaticApi>::new();
     let mb = ManagedBuffer::new_from_bytes(bytes);
     let from_mb: T = serializer.top_decode_from_managed_buffer(&mb);
     let from_slice: T = serializer.top_decode_from_byte_slice(bytes);
@@ -54,15 +51,15 @@ pub fn check_managed_top_decode<T: TopDecode + PartialEq + Debug>(
 }
 
 /// Uses the managed types api to test encoding both ways.
-pub fn check_managed_top_encode_decode<V>(api: DebugApi, element: V, expected_bytes: &[u8])
+pub fn check_managed_top_encode_decode<V>(element: V, expected_bytes: &[u8])
 where
     V: TopEncode + TopDecode + PartialEq + Debug + 'static,
 {
     // serialize
-    let serialized_bytes = check_managed_top_encode(api.clone(), &element);
+    let serialized_bytes = check_managed_top_encode(&element);
     assert_eq!(serialized_bytes.as_slice(), expected_bytes);
 
     // deserialize
-    let deserialized: V = check_managed_top_decode::<V>(api, serialized_bytes.as_slice());
+    let deserialized: V = check_managed_top_decode::<V>(serialized_bytes.as_slice());
     assert_eq!(deserialized, element);
 }
