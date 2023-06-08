@@ -48,7 +48,7 @@ where
 
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_caller_managed(handle.clone());
         ManagedAddress::from_handle(handle)
     }
@@ -62,14 +62,14 @@ where
 
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_sc_address_managed(handle.clone());
         ManagedAddress::from_handle(handle)
     }
 
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_owner_address_managed(handle.clone());
         ManagedAddress::from_handle(handle)
     }
@@ -122,14 +122,14 @@ where
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
-        let handle: A::BigIntHandle = A::static_var_api_impl().next_handle();
+        let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance_legacy(handle.clone(), address);
         BigUint::from_handle(handle)
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
-        let handle: A::BigIntHandle = A::static_var_api_impl().next_handle();
+        let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
         BigUint::from_handle(handle)
     }
@@ -156,7 +156,7 @@ where
 
     #[inline]
     pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_state_root_hash_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
     }
@@ -170,7 +170,7 @@ where
 
     #[inline]
     pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_tx_hash_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
     }
@@ -212,7 +212,7 @@ where
 
     #[inline]
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_block_random_seed_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
     }
@@ -249,7 +249,7 @@ where
 
     #[inline]
     pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
-        let handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_prev_block_random_seed_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
     }
@@ -271,7 +271,7 @@ where
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> BigUint<A> {
-        let result_handle: A::BigIntHandle = A::static_var_api_impl().next_handle();
+        let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_esdt_balance(
             address.get_handle(),
             token_id.get_handle(),
@@ -339,7 +339,7 @@ where
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
-        let result_handle: A::BigIntHandle = A::static_var_api_impl().next_handle();
+        let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::storage_read_api_impl().storage_load_big_uint_raw(
             storage::protected_keys::ELROND_REWARD_KEY,
             result_handle.clone(),

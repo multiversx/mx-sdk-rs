@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use multiversx_sc::{
-    api::{use_raw_handle, HandleConstraints, StaticVarApi, StaticVarApiImpl},
+    api::{use_raw_handle, HandleConstraints, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -18,13 +18,13 @@ impl StaticVarApiImpl for DebugApi {
         f(&mut lockable_static_buffer)
     }
 
-    fn set_external_view_target_address_handle(&self, handle: Self::ManagedBufferHandle) {
+    fn set_external_view_target_address_handle(&self, handle: RawHandle) {
         self.static_vars_cell
             .borrow_mut()
-            .external_view_target_address_handle = handle.get_raw_handle();
+            .external_view_target_address_handle = handle;
     }
 
-    fn get_external_view_target_address_handle(&self) -> Self::ManagedBufferHandle {
+    fn get_external_view_target_address_handle(&self) -> RawHandle {
         use_raw_handle(
             self.static_vars_cell
                 .borrow()
@@ -32,11 +32,11 @@ impl StaticVarApiImpl for DebugApi {
         )
     }
 
-    fn next_handle<H: HandleConstraints>(&self) -> H {
+    fn next_handle(&self) -> RawHandle {
         let mut ref_tx_static_vars = self.static_vars_cell.borrow_mut();
         let new_handle = ref_tx_static_vars.next_handle;
         ref_tx_static_vars.next_handle -= 1;
-        use_raw_handle(new_handle)
+        new_handle
     }
 
     fn set_num_arguments(&self, num_arguments: i32) {
@@ -47,21 +47,21 @@ impl StaticVarApiImpl for DebugApi {
         self.static_vars_cell.borrow().num_arguments
     }
 
-    fn set_call_value_egld_handle(&self, handle: Self::BigIntHandle) {
-        self.static_vars_cell.borrow_mut().call_value_egld_handle = handle.get_raw_handle();
+    fn set_call_value_egld_handle(&self, handle: RawHandle) {
+        self.static_vars_cell.borrow_mut().call_value_egld_handle = handle;
     }
 
-    fn get_call_value_egld_handle(&self) -> Self::BigIntHandle {
-        use_raw_handle(self.static_vars_cell.borrow().call_value_egld_handle)
+    fn get_call_value_egld_handle(&self) -> RawHandle {
+        self.static_vars_cell.borrow().call_value_egld_handle
     }
 
-    fn set_call_value_multi_esdt_handle(&self, handle: Self::ManagedBufferHandle) {
+    fn set_call_value_multi_esdt_handle(&self, handle: RawHandle) {
         self.static_vars_cell
             .borrow_mut()
             .call_value_multi_esdt_handle = handle.get_raw_handle();
     }
 
-    fn get_call_value_multi_esdt_handle(&self) -> Self::ManagedBufferHandle {
-        use_raw_handle(self.static_vars_cell.borrow().call_value_multi_esdt_handle)
+    fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
+        self.static_vars_cell.borrow().call_value_multi_esdt_handle
     }
 }
