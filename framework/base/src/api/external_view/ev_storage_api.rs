@@ -1,5 +1,5 @@
 use crate::api::{
-    const_handles, use_raw_handle, ManagedBufferApi, ManagedTypeApiImpl, StaticVarApiImpl,
+    const_handles, use_raw_handle, ManagedBufferApiImpl, ManagedTypeApiImpl, StaticVarApiImpl,
     StorageReadApi, StorageReadApiImpl, VMApi,
 };
 

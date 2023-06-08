@@ -1,7 +1,7 @@
 use crate::types::managed::basic::big_num_cmp::cmp_conv_i64;
 use core::cmp::Ordering;
 
-use crate::api::{BigIntApi, ManagedTypeApi};
+use crate::api::{BigIntApiImpl, ManagedTypeApi};
 
 use super::BigUint;
 

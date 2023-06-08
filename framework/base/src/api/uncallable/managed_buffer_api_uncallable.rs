@@ -1,9 +1,9 @@
 use crate::{
-    api::{InvalidSliceError, ManagedBufferApi},
+    api::{InvalidSliceError, ManagedBufferApiImpl},
     types::heap::BoxedBytes,
 };
 
-impl ManagedBufferApi for super::UncallableApi {
+impl ManagedBufferApiImpl for super::UncallableApi {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         unreachable!()
     }

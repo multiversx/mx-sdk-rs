@@ -1,6 +1,6 @@
-use crate::api::ManagedMapApi;
+use crate::api::ManagedMapApiImpl;
 
-impl ManagedMapApi for super::UncallableApi {
+impl ManagedMapApiImpl for super::UncallableApi {
     fn mm_new(&self) -> Self::ManagedBufferHandle {
         unreachable!()
     }

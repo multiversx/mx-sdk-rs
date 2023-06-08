@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, use_raw_handle, EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi,
-        HandleTypeInfo, ManagedBufferApi, ManagedTypeApi, StaticVarApi, VMApi,
+        HandleTypeInfo, ManagedBufferApiImpl, ManagedTypeApi, StaticVarApi, VMApi,
     },
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType},
 };

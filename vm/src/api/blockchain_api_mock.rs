@@ -4,7 +4,9 @@ use crate::{
     DebugApi,
 };
 use multiversx_sc::{
-    api::{BlockchainApi, BlockchainApiImpl, HandleConstraints, ManagedBufferApi, ManagedTypeApi},
+    api::{
+        BlockchainApi, BlockchainApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
+    },
     types::{
         heap::{Address, H256},
         BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,

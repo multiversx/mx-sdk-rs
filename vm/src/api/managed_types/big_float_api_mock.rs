@@ -6,7 +6,7 @@ use core::{
 use std::convert::TryInto;
 
 use multiversx_sc::{
-    api::{BigFloatApi, BigIntApi, ErrorApiImpl, HandleTypeInfo, Sign},
+    api::{BigFloatApiImpl, BigIntApiImpl, ErrorApiImpl, HandleTypeInfo, Sign},
     codec::num_bigint::BigInt,
     err_msg,
 };
@@ -67,7 +67,7 @@ macro_rules! unary_op_method_big_int_handle {
     };
 }
 
-impl BigFloatApi for DebugApi {
+impl BigFloatApiImpl for DebugApi {
     fn bf_from_parts(
         &self,
         integral_part: i32,

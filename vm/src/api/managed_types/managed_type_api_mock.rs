@@ -1,6 +1,6 @@
 use std::convert::TryInto;
 
-use multiversx_sc::api::{BigIntApi, ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl};
+use multiversx_sc::api::{BigIntApiImpl, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl};
 
 use crate::DebugApi;
 

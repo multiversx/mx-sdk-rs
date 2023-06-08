@@ -1,6 +1,6 @@
 use crate::{num_bigint, tx_mock::TxPanic, DebugApi};
 use multiversx_sc::{
-    api::{handle_to_be_bytes, CallValueApi, CallValueApiImpl, ManagedBufferApi},
+    api::{handle_to_be_bytes, CallValueApi, CallValueApiImpl, ManagedBufferApiImpl},
     err_msg,
 };
 use num_traits::Zero;

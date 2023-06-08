@@ -1,8 +1,8 @@
-use multiversx_sc::{api::EllipticCurveApi, types::heap::BoxedBytes};
+use multiversx_sc::{api::EllipticCurveApiImpl, types::heap::BoxedBytes};
 
 use crate::DebugApi;
 
-impl EllipticCurveApi for DebugApi {
+impl EllipticCurveApiImpl for DebugApi {
     fn ec_create_from_name_bytes(&self, _name: &[u8]) -> Self::ManagedBufferHandle {
         panic!("ec_create not implemented")
     }

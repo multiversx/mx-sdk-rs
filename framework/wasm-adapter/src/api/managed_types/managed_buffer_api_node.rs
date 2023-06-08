@@ -1,6 +1,6 @@
 use crate::{api::unsafe_buffer, error_hook};
 use multiversx_sc::{
-    api::{InvalidSliceError, ManagedBufferApi},
+    api::{InvalidSliceError, ManagedBufferApiImpl},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -40,7 +40,7 @@ extern "C" {
     fn managedBufferToHex(sourceHandle: i32, destinationHandle: i32);
 }
 
-impl ManagedBufferApi for crate::api::VmApiImpl {
+impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     #[inline]
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         unsafe { mBufferNew() }

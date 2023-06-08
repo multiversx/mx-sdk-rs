@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_chain_vm::mem_conv;
 use multiversx_sc::{
-    api::{BigIntApi, HandleConstraints, Sign},
+    api::{BigIntApiImpl, HandleConstraints, Sign},
     types::BoxedBytes,
 };
 
@@ -35,7 +35,7 @@ macro_rules! unary_op_method {
     };
 }
 
-impl BigIntApi for VMHooksApiImpl {
+impl BigIntApiImpl for VMHooksApiImpl {
     fn bi_new(&self, _value: i64) -> Self::BigIntHandle {
         todo!()
     }

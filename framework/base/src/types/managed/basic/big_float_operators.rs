@@ -1,6 +1,6 @@
 use super::BigFloat;
 use crate::{
-    api::{BigFloatApi, ManagedTypeApi, StaticVarApiImpl},
+    api::{BigFloatApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::managed::managed_type_trait::ManagedType,
 };
 use core::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};

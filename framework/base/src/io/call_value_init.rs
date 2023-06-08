@@ -1,7 +1,7 @@
 use crate::{
     api::{
         const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedBufferApi, ManagedTypeApi,
+        ManagedBufferApiImpl, ManagedTypeApi,
     },
     contract_base::CallValueWrapper,
     err_msg,

@@ -1,8 +1,8 @@
 use core::cmp::Ordering;
 
-use crate::api::{BigFloatApi, Sign};
+use crate::api::{BigFloatApiImpl, Sign};
 
-impl BigFloatApi for super::UncallableApi {
+impl BigFloatApiImpl for super::UncallableApi {
     fn bf_from_parts(
         &self,
         _integral_part: i32,

@@ -1,7 +1,7 @@
 use crate::{
     abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, OutputAbis, TypeAbi},
     api::{
-        const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApi, StorageWriteApiImpl,
+        const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApiImpl, StorageWriteApiImpl,
         VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
     },
     io::load_endpoint_args,

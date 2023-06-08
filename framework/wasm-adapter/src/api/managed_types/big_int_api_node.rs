@@ -3,7 +3,7 @@ use core::cmp::Ordering;
 use crate::{api::unsafe_buffer, error_hook};
 
 use multiversx_sc::{
-    api::{BigIntApi, Sign},
+    api::{BigIntApiImpl, Sign},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -72,7 +72,7 @@ macro_rules! unary_op_wrapper {
     };
 }
 
-impl BigIntApi for crate::api::VmApiImpl {
+impl BigIntApiImpl for crate::api::VmApiImpl {
     #[inline]
     fn bi_new(&self, value: i64) -> Self::BigIntHandle {
         unsafe { bigIntNew(value) }

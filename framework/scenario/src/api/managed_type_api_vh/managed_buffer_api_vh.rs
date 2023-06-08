@@ -1,12 +1,12 @@
 use multiversx_chain_vm::{executor::MemPtr, mem_conv};
 use multiversx_sc::{
-    api::{InvalidSliceError, ManagedBufferApi},
+    api::{InvalidSliceError, ManagedBufferApiImpl},
     types::BoxedBytes,
 };
 
 use crate::api::VMHooksApiImpl;
 
-impl ManagedBufferApi for VMHooksApiImpl {
+impl ManagedBufferApiImpl for VMHooksApiImpl {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         self.with_vm_hooks(|vh| vh.mbuffer_new())
     }

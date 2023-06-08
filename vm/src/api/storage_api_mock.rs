@@ -5,7 +5,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use multiversx_sc::api::{
-    BigIntApi, ManagedBufferApi, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
+    BigIntApiImpl, ManagedBufferApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
     StorageWriteApiImpl,
 };
 

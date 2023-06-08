@@ -3,7 +3,7 @@ use core::ops::{
 };
 
 use crate::{
-    api::{BigIntApi, ManagedTypeApi, StaticVarApiImpl},
+    api::{BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::{BigInt, BigUint, ManagedType, Sign},
 };
 
