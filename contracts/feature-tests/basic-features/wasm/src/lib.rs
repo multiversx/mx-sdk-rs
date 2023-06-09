@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          340
+// Endpoints:                          342
 // Async Callback:                       1
-// Total number of exported functions: 342
+// Total number of exported functions: 344
 
 #![no_std]
 #![feature(lang_items)]
@@ -222,6 +222,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         storage_read_raw => storage_read_raw
         storage_write_raw => storage_write_raw
         storage_read_from_address => storage_read_from_address
+        load_bytes => load_bytes
         load_big_uint => load_big_uint
         load_big_int => load_big_int
         load_u64 => load_u64
@@ -238,6 +239,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         load_map2 => load_map2
         load_map3 => load_map3
         load_from_address_raw => load_from_address_raw
+        store_bytes => store_bytes
         store_big_uint => store_big_uint
         store_big_int => store_big_int
         store_usize => store_usize
