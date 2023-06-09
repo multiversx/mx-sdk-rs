@@ -48,6 +48,7 @@ struct BasicFeaturesInteract {
     interactor: Interactor,
     wallet_address: Address,
     state: State,
+    large_storage_payload: Vec<u8>,
 }
 
 impl BasicFeaturesInteract {
@@ -63,6 +64,7 @@ impl BasicFeaturesInteract {
             interactor,
             wallet_address,
             state: State::load_state(),
+            large_storage_payload: Vec::new(),
         }
     }
 
@@ -71,7 +73,7 @@ impl BasicFeaturesInteract {
         let payload = &large_data[0..size_kb * 1024];
         println!("payload size: {}", payload.len());
         self.set_large_storage(payload).await;
-
+        self.large_storage_payload = payload.to_vec();
         self.print_length().await;
     }
 
@@ -151,5 +153,8 @@ impl BasicFeaturesInteract {
             .vm_query(self.state.bf_contract().load_bytes())
             .await;
         println!("retrieved data length: {}", data.len());
+        if data != self.large_storage_payload {
+            println!("WARNING! Payload mismatch!");
+        }
     }
 }

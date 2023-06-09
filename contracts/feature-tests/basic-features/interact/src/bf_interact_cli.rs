@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand, Args};
+use clap::{Args, Parser, Subcommand};
 
 /// Adder Interact CLI
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
