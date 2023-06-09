@@ -70,7 +70,7 @@ impl BasicFeaturesInteract {
         let large_data = std::fs::read_to_string("pi.txt").unwrap().into_bytes();
         let payload = &large_data[0..size_kb * 1024];
         println!("payload size: {}", payload.len());
-        self.set_large_storage(&payload).await;
+        self.set_large_storage(payload).await;
 
         self.print_length().await;
     }
