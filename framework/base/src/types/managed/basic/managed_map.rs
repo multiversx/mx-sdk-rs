@@ -1,5 +1,5 @@
 use crate::{
-    api::{ManagedMapApi, ManagedTypeApi, StaticVarApiImpl},
+    api::{ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::ManagedType,
 };
 

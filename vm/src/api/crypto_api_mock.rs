@@ -2,7 +2,7 @@ use crate::DebugApi;
 use ed25519_dalek::*;
 use multiversx_sc::{
     api::{
-        CryptoApi, CryptoApiImpl, ManagedBufferApi, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
+        CryptoApi, CryptoApiImpl, ManagedBufferApiImpl, KECCAK256_RESULT_LEN, RIPEMD_RESULT_LEN,
         SHA256_RESULT_LEN,
     },
     types::{heap::BoxedBytes, MessageHashType},

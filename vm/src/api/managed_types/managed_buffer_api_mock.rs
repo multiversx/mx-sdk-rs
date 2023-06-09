@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use multiversx_sc::{
-    api::{use_raw_handle, HandleTypeInfo, InvalidSliceError, ManagedBufferApi},
+    api::{use_raw_handle, HandleTypeInfo, InvalidSliceError, ManagedBufferApiImpl},
     types::heap::BoxedBytes,
 };
 
@@ -25,7 +25,7 @@ impl DebugApi {
     }
 }
 
-impl ManagedBufferApi for DebugApi {
+impl ManagedBufferApiImpl for DebugApi {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         use_raw_handle(self.m_types_borrow_mut().mb_new(Vec::new()))
     }

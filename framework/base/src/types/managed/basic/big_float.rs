@@ -1,7 +1,7 @@
 use super::ManagedBuffer;
 
 use crate::{
-    api::{BigFloatApi, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl},
+    api::{BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl},
     types::{BigInt, BigUint, ManagedType},
 };
 use alloc::string::String;

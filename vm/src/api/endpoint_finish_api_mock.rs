@@ -2,7 +2,9 @@ use crate::{
     num_bigint::{BigInt, BigUint},
     DebugApi,
 };
-use multiversx_sc::api::{BigIntApi, EndpointFinishApi, EndpointFinishApiImpl, ManagedBufferApi};
+use multiversx_sc::api::{
+    BigIntApiImpl, EndpointFinishApi, EndpointFinishApiImpl, ManagedBufferApiImpl,
+};
 
 impl EndpointFinishApi for DebugApi {
     type EndpointFinishApiImpl = DebugApi;

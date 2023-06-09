@@ -4,7 +4,7 @@ use crate::{
     DebugApi,
 };
 use alloc::vec::Vec;
-use multiversx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedBufferApi};
+use multiversx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl, ManagedBufferApiImpl};
 use num_traits::cast::ToPrimitive;
 
 impl EndpointArgumentApi for DebugApi {

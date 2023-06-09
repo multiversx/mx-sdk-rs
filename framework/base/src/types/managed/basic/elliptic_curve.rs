@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{BigIntApi, EllipticCurveApi, ManagedTypeApi},
+    api::{BigIntApiImpl, EllipticCurveApiImpl, ManagedTypeApi},
     types::{BigUint, ManagedType},
 };
 

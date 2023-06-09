@@ -12,7 +12,7 @@ pub enum Sign {
 }
 
 /// Definition of the BigInt type required by the API.
-pub trait BigIntApi: HandleTypeInfo {
+pub trait BigIntApiImpl: HandleTypeInfo {
     fn bi_new(&self, value: i64) -> Self::BigIntHandle;
 
     fn bi_new_zero(&self) -> Self::BigIntHandle {

@@ -1,11 +1,11 @@
 use core::cmp::Ordering;
 
 use crate::{
-    api::{BigIntApi, Sign},
+    api::{BigIntApiImpl, Sign},
     types::heap::BoxedBytes,
 };
 
-impl BigIntApi for super::UncallableApi {
+impl BigIntApiImpl for super::UncallableApi {
     fn bi_new(&self, _value: i64) -> Self::BigIntHandle {
         unreachable!()
     }

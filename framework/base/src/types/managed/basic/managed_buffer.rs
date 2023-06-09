@@ -1,7 +1,7 @@
 use crate::{
     abi::TypeName,
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi,
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
         ManagedTypeApi, StaticVarApiImpl,
     },
     codec::{

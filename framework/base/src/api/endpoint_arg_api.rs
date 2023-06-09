@@ -1,8 +1,8 @@
 use crate::{err_msg, types::heap::BoxedBytes};
 
 use super::{
-    const_handles, use_raw_handle, BigIntApi, ErrorApi, ErrorApiImpl, HandleTypeInfo,
-    ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl,
+    const_handles, use_raw_handle, BigIntApiImpl, ErrorApi, ErrorApiImpl, HandleTypeInfo,
+    ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
 };
 
 pub trait EndpointArgumentApi: HandleTypeInfo {

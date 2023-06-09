@@ -1,7 +1,7 @@
 use core::{cmp::Ordering, convert::TryInto};
 
 use crate::{
-    api::{const_handles, BigIntApi, ManagedTypeApi},
+    api::{const_handles, BigIntApiImpl, ManagedTypeApi},
     types::ManagedType,
 };
 

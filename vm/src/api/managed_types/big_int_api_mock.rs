@@ -4,7 +4,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use multiversx_sc::{
-    api::{BigIntApi, ErrorApiImpl, HandleTypeInfo, ManagedBufferApi},
+    api::{BigIntApiImpl, ErrorApiImpl, HandleTypeInfo, ManagedBufferApiImpl},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -87,7 +87,7 @@ impl DebugApi {
     }
 }
 
-impl BigIntApi for DebugApi {
+impl BigIntApiImpl for DebugApi {
     #[allow(dead_code)]
     fn bi_new(&self, value: i64) -> Self::BigIntHandle {
         self.bi_new_from_big_int(num_bigint::BigInt::from(value))

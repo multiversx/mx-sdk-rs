@@ -5,7 +5,7 @@ use crate::api::{
     VmApiImpl,
 };
 use multiversx_sc::{
-    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApi, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, ManagedTypeApi},
     types::{
         heap::{Address, Box, H256},
         BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
@@ -366,7 +366,7 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use multiversx_sc::{api::BigIntApi, types::heap::BoxedBytes};
+        use multiversx_sc::{api::BigIntApiImpl, types::heap::BoxedBytes};
 
         let address = m_address.to_address();
         let token_bytes = token.to_boxed_bytes();
@@ -457,7 +457,7 @@ impl BlockchainApiImpl for VmApiImpl {
         token: &TokenIdentifier<M>,
         nonce: u64,
     ) -> EsdtTokenData<M> {
-        use multiversx_sc::api::BigIntApi;
+        use multiversx_sc::api::BigIntApiImpl;
 
         let managed_token_id = token.as_managed_buffer();
 

@@ -1,5 +1,5 @@
 use crate::{tx_mock::ManagedMapImpl, DebugApi};
-use multiversx_sc::api::{HandleTypeInfo, ManagedMapApi};
+use multiversx_sc::api::{HandleTypeInfo, ManagedMapApiImpl};
 
 impl DebugApi {
     fn mm_values_insert(
@@ -40,7 +40,7 @@ impl DebugApi {
     }
 }
 
-impl ManagedMapApi for DebugApi {
+impl ManagedMapApiImpl for DebugApi {
     fn mm_new(&self) -> Self::ManagedMapHandle {
         let mut managed_types = self.m_types_borrow_mut();
         managed_types
