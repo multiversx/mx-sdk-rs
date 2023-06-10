@@ -1,8 +1,14 @@
+mod vh_big_int;
+mod vh_managed_buffer;
+
+pub use vh_big_int::VMHooksBigInt;
+pub use vh_managed_buffer::VMHooksManagedBuffer;
+
 use std::fmt::Debug;
 
 use multiversx_sc::api::RawHandle;
 
-use super::{VMHooksBigInt, VMHooksError, VMHooksManagedBuffer};
+use super::VMHooksError;
 
 /// Provides VM hook implementations for methods that deal with more than one type of managed type.
 ///

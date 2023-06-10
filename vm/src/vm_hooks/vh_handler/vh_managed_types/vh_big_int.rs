@@ -1,4 +1,8 @@
-use crate::{num_bigint, tx_mock::big_int_to_i64};
+use crate::{
+    num_bigint,
+    tx_mock::big_int_to_i64,
+    vm_hooks::{VMHooksError, VMHooksHandlerSource},
+};
 use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
@@ -7,8 +11,6 @@ use multiversx_sc::{api::RawHandle, err_msg, types::heap::BoxedBytes};
 
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
-
-use super::{super::VMHooksHandlerSource, vh_error::VMHooksError};
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {

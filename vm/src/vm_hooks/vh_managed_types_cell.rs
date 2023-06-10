@@ -1,6 +1,6 @@
 use std::cell::{Ref, RefCell, RefMut};
 
-use crate::tx_mock::TxManagedTypes;
+use crate::tx_mock::{TxInput, TxManagedTypes, TxResult};
 
 use super::{
     VMHooksBigInt, VMHooksError, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
@@ -20,6 +20,14 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
 
     fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
         self.0.borrow_mut()
+    }
+
+    fn input_ref(&self) -> &TxInput {
+        panic!("cannot access tx inputs in the StaticApi")
+    }
+
+    fn result_borrow_mut(&self) -> RefMut<TxResult> {
+        panic!("cannot access tx results in the StaticApi")
     }
 }
 

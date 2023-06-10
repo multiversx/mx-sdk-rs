@@ -1,8 +1,8 @@
 use multiversx_sc::api::ManagedMapApiImpl;
 
-use crate::api::VMHooksApiImpl;
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
-impl ManagedMapApiImpl for VMHooksApiImpl {
+impl<const BACKEND_TYPE: VMHooksBackendType> ManagedMapApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn mm_new(&self) -> Self::ManagedBufferHandle {
         todo!()
     }

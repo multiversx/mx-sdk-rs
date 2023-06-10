@@ -13,11 +13,12 @@ mod storage_api_vh;
 
 pub use backend_type::*;
 
-use std::{ops::Deref, thread::LocalKey};
+use std::ops::Deref;
 
 use multiversx_chain_vm::{
     executor::VMHooks,
-    vm_hooks::{TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
+    tx_mock::TxContextStack,
+    vm_hooks::{TxContextWrapper, TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::api::{HandleTypeInfo, RawHandle};
 
@@ -42,10 +43,22 @@ thread_local!(
 );
 
 impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
-    pub fn api_impl() -> VMHooksApiImpl {
+    pub fn api_impl() -> VMHooksApi<BACKEND_TYPE> {
+        VMHooksApi {}
+    }
+
+    pub fn with_vm_hooks<R, F>(&self, f: F) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
         match BACKEND_TYPE {
-            STATIC_MANAGED_TYPES => VMHooksApiImpl::static_managed_type_backend(),
-            DEBUGGER_STACK => todo!(),
+            STATIC_MANAGED_TYPES => MANAGED_TYPES_CELL.with(|vh| f(vh.deref())),
+            DEBUGGER_STACK => {
+                let top_context = TxContextStack::static_peek();
+                let wrapper = TxContextWrapper::new(top_context);
+                let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
+                f(&dispatcher)
+            },
             _ => panic!("invalid VMHooksBackendType"),
         }
     }
@@ -53,29 +66,4 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
 
 pub type StaticApi = VMHooksApi<STATIC_MANAGED_TYPES>;
 
-pub struct VMHooksApiImpl {
-    pub vh_local: &'static LocalKey<Box<dyn VMHooks>>,
-}
-
-impl VMHooksApiImpl {
-    pub fn static_managed_type_backend() -> Self {
-        VMHooksApiImpl {
-            vh_local: &MANAGED_TYPES_CELL,
-        }
-    }
-
-    pub fn with_vm_hooks<R, F>(&self, f: F) -> R
-    where
-        F: FnOnce(&dyn VMHooks) -> R,
-    {
-        self.vh_local.with(|vh| f(vh.deref()))
-    }
-}
-
-impl HandleTypeInfo for VMHooksApiImpl {
-    type ManagedBufferHandle = RawHandle;
-    type BigIntHandle = RawHandle;
-    type BigFloatHandle = RawHandle;
-    type EllipticCurveHandle = RawHandle;
-    type ManagedMapHandle = RawHandle;
-}
+pub type DebuggerApi = VMHooksApi<DEBUGGER_STACK>;

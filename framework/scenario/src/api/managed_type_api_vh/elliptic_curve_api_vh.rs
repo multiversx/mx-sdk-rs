@@ -1,8 +1,8 @@
 use multiversx_sc::{api::EllipticCurveApiImpl, types::BoxedBytes};
 
-use crate::api::VMHooksApiImpl;
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
-impl EllipticCurveApiImpl for VMHooksApiImpl {
+impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn ec_create_from_name_bytes(&self, _name: &[u8]) -> Self::ManagedBufferHandle {
         todo!()
     }

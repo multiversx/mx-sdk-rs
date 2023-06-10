@@ -1,24 +1,16 @@
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
 
-use super::{VMHooksApi, VMHooksApiImpl, VMHooksBackendType};
+use super::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApi for VMHooksApi<BACKEND_TYPE> {
-    type ErrorApiImpl = VMHooksApiImpl;
-
-    fn error_api_impl() -> Self::ErrorApiImpl {
-        todo!()
-    }
-}
-
-impl ErrorApi for VMHooksApiImpl {
     type ErrorApiImpl = Self;
 
     fn error_api_impl() -> Self::ErrorApiImpl {
-        panic!("TODO: bad dependency, sort it out!")
+        Self::api_impl()
     }
 }
 
-impl ErrorApiImpl for VMHooksApiImpl {
+impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn signal_error(&self, _message: &[u8]) -> ! {
         todo!()
     }
