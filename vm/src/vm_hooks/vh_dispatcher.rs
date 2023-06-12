@@ -284,7 +284,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn get_num_arguments(&self) -> i32 {
-        panic!("Unavailable: get_num_arguments")
+        self.handler.get_num_arguments()
     }
 
     fn storage_store(
@@ -341,7 +341,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn check_no_payment(&self) {
-        panic!("Unavailable: check_no_payment");
+        self.handler.check_not_payable();
     }
 
     fn get_call_value(&self, result_offset: MemPtr) -> i32 {
@@ -1117,11 +1117,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_finish_unsigned(&self, reference_handle: i32) {
-        panic!("Unavailable: big_int_finish_unsigned");
+        self.handler.finish_big_uint_raw(reference_handle);
     }
 
     fn big_int_finish_signed(&self, reference_handle: i32) {
-        panic!("Unavailable: big_int_finish_signed");
+        self.handler.finish_big_int_raw(reference_handle);
     }
 
     fn big_int_to_string(&self, big_int_handle: i32, destination_handle: i32) {
@@ -1284,7 +1284,9 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_get_argument(&self, id: i32, destination_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_get_argument")
+        self.handler
+            .load_argument_managed_buffer(id, destination_handle);
+        0
     }
 
     fn mbuffer_finish(&self, source_handle: i32) -> i32 {

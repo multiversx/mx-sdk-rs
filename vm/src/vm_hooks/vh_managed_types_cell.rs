@@ -3,8 +3,8 @@ use std::cell::{Ref, RefCell, RefMut};
 use crate::tx_mock::{TxInput, TxManagedTypes, TxResult};
 
 use super::{
-    VMHooksBigInt, VMHooksError, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
-    VMHooksManagedTypes,
+    VMHooksBigInt, VMHooksCallValue, VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError,
+    VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer, VMHooksManagedTypes,
 };
 
 /// A simple wrapper around a managed type container RefCell.
@@ -31,8 +31,12 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
     }
 }
 
-impl VMHooksError for TxManagedTypesCell {}
 impl VMHooksBigInt for TxManagedTypesCell {}
 impl VMHooksManagedBuffer for TxManagedTypesCell {}
 impl VMHooksManagedTypes for TxManagedTypesCell {}
 impl VMHooksHandler for TxManagedTypesCell {}
+
+impl VMHooksCallValue for TxManagedTypesCell {}
+impl VMHooksEndpointArgument for TxManagedTypesCell {}
+impl VMHooksEndpointFinish for TxManagedTypesCell {}
+impl VMHooksError for TxManagedTypesCell {}

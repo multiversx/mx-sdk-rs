@@ -1,7 +1,9 @@
 use multiversx_sc::{
-    api::{InvalidSliceError, RawHandle},
+    api::{handle_to_be_bytes, InvalidSliceError, RawHandle},
     types::BoxedBytes,
 };
+
+use crate::tx_mock::TxTokenTransfer;
 
 use super::TxManagedTypes;
 
@@ -88,5 +90,25 @@ impl TxManagedTypes {
             m_vec_raw_data.extend_from_slice(handle.to_be_bytes().as_slice());
         }
         self.mb_set(destination_handle, m_vec_raw_data);
+    }
+    
+    pub fn write_all_esdt_transfers_to_managed_vec(
+        &mut self,
+        dest_handle: RawHandle,
+        transfers: &[TxTokenTransfer],
+    ) {
+        self.mb_set(dest_handle, vec![]);
+
+        for transfer in transfers {
+            let token_identifier_handle = self.mb_new(transfer.token_identifier.clone());
+            let amount_handle = self.bi_new_from_big_int(transfer.value.clone().into());
+
+            self.mb_append_bytes(
+                dest_handle,
+                &handle_to_be_bytes(token_identifier_handle)[..],
+            );
+            self.mb_append_bytes(dest_handle, &transfer.nonce.to_be_bytes()[..]);
+            self.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
+        }
     }
 }

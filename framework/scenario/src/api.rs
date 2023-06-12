@@ -10,6 +10,7 @@ mod managed_type_api_vh;
 mod print_api_vh;
 mod send_api_vh;
 mod storage_api_vh;
+mod vm_api_vh;
 
 pub use backend_type::*;
 
