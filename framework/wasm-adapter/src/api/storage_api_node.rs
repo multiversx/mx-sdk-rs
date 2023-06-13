@@ -102,12 +102,4 @@ impl StorageWriteApiImpl for VmApiImpl {
             mBufferStorageStore(key_handle, value_handle);
         }
     }
-
-    fn storage_store_managed_buffer_clear(&self, key_handle: Self::ManagedBufferHandle) {
-        unsafe {
-            // TODO: this will no longer be necessay once the ("no managed buffer under the given handle" is removed from VM
-            let _ = mBufferSetBytes(const_handles::MBUF_CONST_EMPTY, core::ptr::null(), 0);
-            mBufferStorageStore(key_handle, const_handles::MBUF_CONST_EMPTY);
-        }
-    }
 }

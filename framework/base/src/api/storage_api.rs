@@ -55,6 +55,4 @@ pub trait StorageWriteApiImpl: HandleTypeInfo {
         key_handle: Self::ManagedBufferHandle,
         value_handle: Self::ManagedBufferHandle,
     );
-
-    fn storage_store_managed_buffer_clear(&self, key_handle: Self::ManagedBufferHandle);
 }

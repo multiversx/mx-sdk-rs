@@ -58,8 +58,4 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApiImpl for VMHooksApi<
     ) {
         todo!()
     }
-
-    fn storage_store_managed_buffer_clear(&self, _key_handle: Self::ManagedBufferHandle) {
-        todo!()
-    }
 }

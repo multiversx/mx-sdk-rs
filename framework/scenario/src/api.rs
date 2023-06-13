@@ -50,6 +50,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
         VMHooksApi {}
     }
 
+    /// All communication with the VM happens via this method.
     pub fn with_vm_hooks<R, F>(&self, f: F) -> R
     where
         F: FnOnce(&dyn VMHooks) -> R,
@@ -66,7 +67,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
         }
     }
 
-    /// Static data does not belong to the VMHooks, since it belongs to the contract only.
+    /// Static data does not belong to the VM, or to the VM hooks. It belongs to the contract only.
     pub fn with_static_data<R, F>(&self, f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R,
