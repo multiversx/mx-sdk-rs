@@ -7,7 +7,7 @@ mod vh_managed_types;
 pub use vh_call_value::VMHooksCallValue;
 pub use vh_endpoint_arg::VMHooksEndpointArgument;
 pub use vh_endpoint_finish::VMHooksEndpointFinish;
-pub use vh_error::VMHooksError;
+pub use vh_error::{VMHooksError, VMHooksErrorManaged};
 pub use vh_managed_types::{VMHooksBigInt, VMHooksManagedBuffer, VMHooksManagedTypes};
 
 /// Defines all methods that can handle VM hooks. They are spread out over several traits.
@@ -17,5 +17,6 @@ pub trait VMHooksHandler:
     + VMHooksEndpointArgument
     + VMHooksEndpointFinish
     + VMHooksError
+    + VMHooksErrorManaged
 {
 }

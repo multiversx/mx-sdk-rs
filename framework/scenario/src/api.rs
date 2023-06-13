@@ -18,7 +18,7 @@ use std::ops::Deref;
 
 use multiversx_chain_vm::{
     executor::VMHooks,
-    tx_mock::TxContextStack,
+    tx_mock::{StaticVarData, StaticVarStack, TxContextStack},
     vm_hooks::{TxContextWrapper, TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::api::{HandleTypeInfo, RawHandle};
@@ -39,9 +39,11 @@ fn new_vh_dispatcher_managed_types_cell() -> Box<dyn VMHooks> {
     Box::new(VMHooksDispatcher::new(vh_handler))
 }
 
-thread_local!(
-    static MANAGED_TYPES_CELL: Box<dyn VMHooks> = new_vh_dispatcher_managed_types_cell()
-);
+thread_local! {
+    static MANAGED_TYPES_CELL: Box<dyn VMHooks> = new_vh_dispatcher_managed_types_cell();
+
+    static STATIC_VAR_DATA_CELL: StaticVarData = StaticVarData::default();
+}
 
 impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
     pub fn api_impl() -> VMHooksApi<BACKEND_TYPE> {
@@ -59,6 +61,21 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
                 let wrapper = TxContextWrapper::new(top_context);
                 let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
                 f(&dispatcher)
+            },
+            _ => panic!("invalid VMHooksBackendType"),
+        }
+    }
+
+    /// Static data does not belong to the VMHooks, since it belongs to the contract only.
+    pub fn with_static_data<R, F>(&self, f: F) -> R
+    where
+        F: FnOnce(&StaticVarData) -> R,
+    {
+        match BACKEND_TYPE {
+            STATIC_MANAGED_TYPES => STATIC_VAR_DATA_CELL.with(|data| f(data)),
+            DEBUGGER_STACK => {
+                let top_context = StaticVarStack::static_peek();
+                f(&top_context)
             },
             _ => panic!("invalid VMHooksBackendType"),
         }

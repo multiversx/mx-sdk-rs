@@ -36,3 +36,7 @@ pub use tx_panic::*;
 pub use tx_result::*;
 pub use tx_result_calls::*;
 pub use tx_static_vars::TxStaticVars;
+
+// TODO: move to framework/scenario
+mod static_var_data_vh;
+pub use static_var_data_vh::{StaticVarData, StaticVarStack};

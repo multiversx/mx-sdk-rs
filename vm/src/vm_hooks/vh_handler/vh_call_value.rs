@@ -21,8 +21,8 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
     }
 
     fn load_egld_value(&self, dest: RawHandle) {
-        self.m_types_borrow_mut()
-            .bi_overwrite(dest, self.input_ref().received_egld().clone().into())
+        let value = self.input_ref().received_egld().clone();
+        self.m_types_borrow_mut().bi_overwrite(dest, value.into());
     }
 
     fn load_all_esdt_transfers(&self, dest_handle: RawHandle) {

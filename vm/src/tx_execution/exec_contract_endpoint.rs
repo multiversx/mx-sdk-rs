@@ -5,7 +5,7 @@ use multiversx_sc::err_msg;
 
 use crate::{
     display_util::address_hex,
-    tx_mock::{TxContext, TxContextStack, TxFunctionName, TxPanic, TxResult},
+    tx_mock::{StaticVarStack, TxContext, TxContextStack, TxFunctionName, TxPanic, TxResult},
     world_mock::ContractContainer,
     DebugApi,
 };
@@ -36,9 +36,11 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
         contract_map.get_contract(contract_identifier.as_slice(), tx_context_ref.clone());
 
     TxContextStack::static_push(tx_context_rc.clone());
+    StaticVarStack::static_push();
     let tx_result = execute_contract_instance_endpoint(contract_container, func_name);
 
     let tx_context_rc = TxContextStack::static_pop();
+    StaticVarStack::static_pop();
     (tx_context_rc, tx_result)
 }
 

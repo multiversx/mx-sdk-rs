@@ -43,7 +43,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn signal_error(&self, message_offset: MemPtr, message_length: MemLength) {
-        panic!("Unavailable: signal_error");
+        unsafe {
+            mem_conv::with_bytes(message_offset, message_length, |message| {
+                self.handler.signal_error(message);
+            });
+        }
     }
 
     fn get_external_balance(&self, address_offset: MemPtr, result_offset: MemPtr) {
@@ -390,7 +394,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn get_num_esdt_transfers(&self) -> i32 {
-        panic!("Unavailable: get_num_esdt_transfers")
+        self.handler.esdt_num_transfers() as i32
     }
 
     fn get_call_value_token_name(
@@ -476,7 +480,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn finish(&self, pointer: MemPtr, length: MemLength) {
-        panic!("Unavailable: finish");
+        unsafe {
+            mem_conv::with_bytes(pointer, length, |bytes| {
+                self.handler.finish_slice_u8(bytes);
+            })
+        }
     }
 
     fn execute_on_same_context(
@@ -594,7 +602,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_signal_error(&self, err_handle: i32) {
-        panic!("Unavailable: managed_signal_error");
+        self.handler.signal_error_from_buffer(err_handle);
     }
 
     fn managed_write_log(&self, topics_handle: i32, data_handle: i32) {
@@ -622,7 +630,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_get_multi_esdt_call_value(&self, multi_call_value_handle: i32) {
-        panic!("Unavailable: managed_get_multi_esdt_call_value");
+        self.handler
+            .load_all_esdt_transfers(multi_call_value_handle)
     }
 
     fn managed_get_esdt_balance(
@@ -940,7 +949,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_get_call_value(&self, destination_handle: i32) {
-        panic!("Unavailable: big_int_get_call_value");
+        self.handler.load_egld_value(destination_handle);
     }
 
     fn big_int_get_esdt_call_value(&self, destination: i32) {
@@ -1290,7 +1299,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_finish(&self, source_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_finish")
+        self.handler.finish_managed_buffer_raw(source_handle);
+        0
     }
 
     fn mbuffer_set_random(&self, destination_handle: i32, length: i32) -> i32 {

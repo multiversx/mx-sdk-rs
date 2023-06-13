@@ -14,7 +14,9 @@ use crate::testing_framework::raw_converter::bytes_to_hex;
 use multiversx_chain_vm::{
     num_bigint,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
-    tx_mock::{TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult},
+    tx_mock::{
+        StaticVarStack, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult,
+    },
     world_mock::{AccountData, AccountEsdt, ContractContainer, EsdtInstanceMetadata},
     BlockchainMock, DebugApi,
 };
@@ -738,11 +740,13 @@ impl BlockchainStateWrapper {
         let tx_input = build_tx_input(caller, sc_address, egld_payment, esdt_payments);
         let tx_context_rc = Rc::new(TxContext::new(tx_input, tx_cache));
         TxContextStack::static_push(tx_context_rc);
+        StaticVarStack::static_push();
 
         let sc = (sc_wrapper.obj_builder)();
         let exec_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
-
+        StaticVarStack::static_pop();
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
+
         let updates = api_after_exec.into_blockchain_updates();
         let tx_result = match exec_result {
             Ok(()) => TxResult::empty(),

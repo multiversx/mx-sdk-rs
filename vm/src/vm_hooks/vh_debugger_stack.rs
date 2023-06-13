@@ -7,7 +7,8 @@ use crate::tx_mock::{TxContext, TxInput, TxManagedTypes, TxResult};
 
 use super::{
     VMHooksBigInt, VMHooksCallValue, VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError,
-    VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer, VMHooksManagedTypes,
+    VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
+    VMHooksManagedTypes,
 };
 
 /// A simple wrapper around a managed type container RefCell.
@@ -49,3 +50,4 @@ impl VMHooksCallValue for TxContextWrapper {}
 impl VMHooksEndpointArgument for TxContextWrapper {}
 impl VMHooksEndpointFinish for TxContextWrapper {}
 impl VMHooksError for TxContextWrapper {}
+impl VMHooksErrorManaged for TxContextWrapper {}
