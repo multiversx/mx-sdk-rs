@@ -7,6 +7,10 @@ use crate::types::*;
 /// Storage tests: direct load.
 #[multiversx_sc::module]
 pub trait StorageLoadFeatures {
+    #[view]
+    #[storage_get("storage_bytes")]
+    fn load_bytes(&self) -> ManagedBuffer;
+
     #[endpoint]
     #[storage_get("big_uint")]
     fn load_big_uint(&self) -> BigUint;

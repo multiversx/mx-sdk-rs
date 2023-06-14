@@ -101,6 +101,7 @@ members = [
   "contracts/feature-tests/alloc-features/meta",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/meta",
+  "contracts/feature-tests/basic-features/interact",
   "contracts/feature-tests/big-float-features",
   "contracts/feature-tests/big-float-features/meta",
   "contracts/feature-tests/composability",
