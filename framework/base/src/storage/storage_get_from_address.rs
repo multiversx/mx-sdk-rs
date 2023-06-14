@@ -34,7 +34,8 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
-        let mbuf_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let mbuf_handle: A::ManagedBufferHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::storage_read_api_impl().storage_load_from_address(
             self.addr.get_handle(),
             self.key.buffer.get_handle(),

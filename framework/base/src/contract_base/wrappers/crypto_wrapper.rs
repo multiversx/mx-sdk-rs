@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        CryptoApi, CryptoApiImpl, StaticVarApiImpl, ED25519_KEY_BYTE_LEN,
+        use_raw_handle, CryptoApi, CryptoApiImpl, StaticVarApiImpl, ED25519_KEY_BYTE_LEN,
         ED25519_SIGNATURE_BYTE_LEN, KECCAK256_RESULT_LEN, SHA256_RESULT_LEN,
     },
     types::{ManagedBuffer, ManagedByteArray, ManagedType, MessageHashType},
@@ -30,7 +30,8 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
-        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let new_handle: A::ManagedBufferHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().sha256_managed(new_handle.clone(), data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
@@ -58,7 +59,8 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
-        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let new_handle: A::ManagedBufferHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().keccak256_managed(new_handle.clone(), data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
@@ -92,7 +94,8 @@ where
         &self,
         data: B,
     ) -> ManagedByteArray<A, { crate::api::RIPEMD_RESULT_LEN }> {
-        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let new_handle: A::ManagedBufferHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().ripemd160_managed(new_handle.clone(), data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
@@ -222,7 +225,8 @@ where
         r: &ManagedBuffer<A>,
         s: &ManagedBuffer<A>,
     ) -> ManagedBuffer<A> {
-        let new_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let new_handle: A::ManagedBufferHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().encode_secp256k1_der_signature_managed(
             r.get_handle(),
             s.get_handle(),

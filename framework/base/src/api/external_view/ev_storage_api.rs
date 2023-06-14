@@ -1,6 +1,6 @@
 use crate::api::{
-    const_handles, use_raw_handle, ManagedBufferApiImpl, ManagedTypeApiImpl, StaticVarApiImpl,
-    StorageReadApi, StorageReadApiImpl, VMApi,
+    const_handles, managed_types::HandleConstraints, use_raw_handle, ManagedBufferApiImpl,
+    ManagedTypeApiImpl, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, VMApi,
 };
 
 use super::ExternalViewApi;
@@ -33,13 +33,14 @@ where
             EXTERNAL_VIEW_TARGET_ADRESS_KEY,
         );
         let external_view_target_address_handle: A::ManagedBufferHandle =
-            A::static_var_api_impl().next_handle();
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::storage_read_api_impl().storage_load_managed_buffer_raw(
             external_view_target_key_handle,
             external_view_target_address_handle.clone(),
         );
-        A::static_var_api_impl()
-            .set_external_view_target_address_handle(external_view_target_address_handle);
+        A::static_var_api_impl().set_external_view_target_address_handle(
+            external_view_target_address_handle.get_raw_handle(),
+        );
     }
 }
 
@@ -80,7 +81,7 @@ impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
         dest: Self::ManagedBufferHandle,
     ) {
         let target_address_handle =
-            A::static_var_api_impl().get_external_view_target_address_handle();
+            use_raw_handle(A::static_var_api_impl().get_external_view_target_address_handle());
         A::storage_read_api_impl().storage_load_from_address(
             target_address_handle,
             key_handle,

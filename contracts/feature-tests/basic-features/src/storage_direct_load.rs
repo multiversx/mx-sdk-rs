@@ -1,6 +1,6 @@
 multiversx_sc::imports!();
 
-use multiversx_sc::api::HandleTypeInfo;
+use multiversx_sc::api::{use_raw_handle, HandleTypeInfo};
 
 use crate::types::*;
 
@@ -78,7 +78,7 @@ pub trait StorageLoadFeatures {
             StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
         };
         let value_handle: <<Self as ContractBase>::Api as HandleTypeInfo>::ManagedBufferHandle =
-            Self::Api::static_var_api_impl().next_handle();
+            use_raw_handle(Self::Api::static_var_api_impl().next_handle());
         Self::Api::storage_read_api_impl().storage_load_from_address(
             address.get_handle(),
             key.get_handle(),
