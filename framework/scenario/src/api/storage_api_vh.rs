@@ -25,12 +25,23 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApiImpl for VMHooksApi<B
         todo!()
     }
 
-    fn storage_load_managed_buffer_raw(&self, _key_handle: i32, _dest: i32) {
-        todo!()
+    fn storage_load_managed_buffer_raw(
+        &self,
+        key_handle: Self::ManagedBufferHandle,
+        dest: Self::ManagedBufferHandle,
+    ) {
+        self.with_vm_hooks(|vh| vh.mbuffer_storage_load(key_handle, dest));
     }
 
-    fn storage_load_from_address(&self, _address_handle: i32, _key_handle: i32, _dest: i32) {
-        todo!()
+    fn storage_load_from_address(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        key_handle: Self::ManagedBufferHandle,
+        dest: Self::ManagedBufferHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_storage_load_from_address(address_handle, key_handle, dest);
+        })
     }
 }
 
@@ -53,9 +64,11 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApiImpl for VMHooksApi<
 
     fn storage_store_managed_buffer_raw(
         &self,
-        _key_handle: Self::ManagedBufferHandle,
-        _value_handle: Self::ManagedBufferHandle,
+        key_handle: Self::ManagedBufferHandle,
+        value_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_storage_store( key_handle, value_handle);
+        });
     }
 }

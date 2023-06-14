@@ -3,7 +3,9 @@ mod vh_endpoint_arg;
 mod vh_endpoint_finish;
 mod vh_error;
 mod vh_managed_types;
+mod vh_storage;
 
+pub use vh_storage::{VMHooksStorageRead, VMHooksStorageWrite};
 pub use vh_call_value::VMHooksCallValue;
 pub use vh_endpoint_arg::VMHooksEndpointArgument;
 pub use vh_endpoint_finish::VMHooksEndpointFinish;
@@ -18,5 +20,7 @@ pub trait VMHooksHandler:
     + VMHooksEndpointFinish
     + VMHooksError
     + VMHooksErrorManaged
+    + VMHooksStorageRead
+    + VMHooksStorageWrite
 {
 }

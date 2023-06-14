@@ -1276,11 +1276,15 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_storage_store(&self, key_handle: i32, source_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_storage_store")
+        self.handler
+            .storage_store_managed_buffer_raw(key_handle, source_handle);
+        0
     }
 
     fn mbuffer_storage_load(&self, key_handle: i32, destination_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_storage_load")
+        self.handler
+            .storage_load_managed_buffer_raw(key_handle, destination_handle);
+        0
     }
 
     fn mbuffer_storage_load_from_address(
