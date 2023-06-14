@@ -5,12 +5,12 @@ mod vh_error;
 mod vh_managed_types;
 mod vh_storage;
 
-pub use vh_storage::{VMHooksStorageRead, VMHooksStorageWrite};
 pub use vh_call_value::VMHooksCallValue;
 pub use vh_endpoint_arg::VMHooksEndpointArgument;
 pub use vh_endpoint_finish::VMHooksEndpointFinish;
 pub use vh_error::{VMHooksError, VMHooksErrorManaged};
 pub use vh_managed_types::{VMHooksBigInt, VMHooksManagedBuffer, VMHooksManagedTypes};
+pub use vh_storage::{VMHooksStorageRead, VMHooksStorageWrite};
 
 /// Defines all methods that can handle VM hooks. They are spread out over several traits.
 pub trait VMHooksHandler:

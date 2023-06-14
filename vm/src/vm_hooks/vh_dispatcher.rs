@@ -1332,19 +1332,19 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn small_int_get_unsigned_argument(&self, id: i32) -> i64 {
-        panic!("Unavailable: small_int_get_unsigned_argument")
+        self.handler.get_argument_u64(id) as i64
     }
 
     fn small_int_get_signed_argument(&self, id: i32) -> i64 {
-        panic!("Unavailable: small_int_get_signed_argument")
+        self.handler.get_argument_i64(id)
     }
 
     fn small_int_finish_unsigned(&self, value: i64) {
-        panic!("Unavailable: small_int_finish_unsigned");
+        self.handler.finish_u64(value as u64);
     }
 
     fn small_int_finish_signed(&self, value: i64) {
-        panic!("Unavailable: small_int_finish_signed");
+        self.handler.finish_i64(value);
     }
 
     fn small_int_storage_store_unsigned(

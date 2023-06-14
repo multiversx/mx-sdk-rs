@@ -32,11 +32,11 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApiImpl for VMHooksAp
         self.with_vm_hooks(|vh| vh.mbuffer_finish(handle));
     }
 
-    fn finish_u64(&self, _value: u64) {
-        unreachable!()
+    fn finish_u64(&self, value: u64) {
+        self.with_vm_hooks(|vh| vh.small_int_finish_unsigned(value as i64));
     }
 
-    fn finish_i64(&self, _value: i64) {
-        unreachable!()
+    fn finish_i64(&self, value: i64) {
+        self.with_vm_hooks(|vh| vh.small_int_finish_signed(value));
     }
 }
