@@ -1,7 +1,7 @@
 use super::{HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl, RawHandle};
 use crate::types::{
     heap::{Address, Box, H256},
-    EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, TokenIdentifier,
+    EsdtLocalRoleFlags,
 };
 
 pub trait BlockchainApi: ManagedTypeApi {
@@ -132,24 +132,6 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
     );
-
-    fn load_esdt_token_data<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token_id: &TokenIdentifier<M>,
-        nonce: u64,
-    ) -> EsdtTokenData<M>;
-
-    #[deprecated(
-        since = "0.31.0",
-        note = "Only used for limited backwards compatibility tests. Never use! Use `load_esdt_token_data` instead."
-    )]
-    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token_id: &TokenIdentifier<M>,
-        nonce: u64,
-    ) -> EsdtTokenData<M>;
 
     fn check_esdt_frozen(
         &self,
