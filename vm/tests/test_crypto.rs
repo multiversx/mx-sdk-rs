@@ -1,6 +1,7 @@
 use hex::FromHex;
 use multiversx_chain_vm::DebugApi;
-use multiversx_sc::api::CryptoApiImpl;
+
+// TODO: change all these to the VM hooks implementation.
 
 #[test]
 fn test_verify_ed25519_basic() {
