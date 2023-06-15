@@ -1,4 +1,4 @@
-use multiversx_vm_executor::{MemLength, MemPtr};
+use multiversx_chain_vm_executor::{MemLength, MemPtr};
 
 pub fn with_mem_ptr<F, R>(bytes: &[u8], f: F) -> R
 where

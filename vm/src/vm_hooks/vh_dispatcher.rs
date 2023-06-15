@@ -1,6 +1,6 @@
 use std::ffi::c_void;
 
-use multiversx_vm_executor::{MemLength, MemPtr, VMHooks};
+use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks};
 
 use crate::mem_conv;
 
@@ -810,6 +810,14 @@ impl VMHooks for VMHooksDispatcher {
 
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32) {
         self.handler.mb_to_hex(source_handle, dest_handle);
+    }
+
+    fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32) {
+        panic!("Unavailable: managed_get_code_metadata")
+    }
+
+    fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {
+        panic!("Unavailable: managed_is_builtin_function")
     }
 
     fn big_float_new_from_parts(
