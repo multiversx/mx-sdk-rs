@@ -18,7 +18,7 @@ pub use world_mock::BlockchainMock;
 pub use multiversx_sc::codec::num_bigint;
 
 // Re-exporting the executor, for convenience.
-pub use multiversx_vm_executor as executor;
+pub use multiversx_chain_vm_executor as executor;
 
 #[macro_use]
 extern crate alloc;

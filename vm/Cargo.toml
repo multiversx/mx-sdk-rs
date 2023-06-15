@@ -33,6 +33,5 @@ version = "=0.41.0"
 path = "../framework/base"
 features = ["alloc", "num-bigint", "promises", "big-float"]
 
-[dependencies.multiversx-vm-executor]
-git = "https://github.com/multiversx/mx-vm-executor-rs" # TODO: release, replace with version
-branch = "master"
+[dependencies.multiversx-chain-vm-executor]
+version = "0.1.0"
