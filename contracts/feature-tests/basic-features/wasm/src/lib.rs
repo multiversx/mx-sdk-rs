@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          342
+// Endpoints:                          340
 // Async Callback:                       1
-// Total number of exported functions: 344
+// Total number of exported functions: 342
 
 #![no_std]
 #![feature(lang_items)]
@@ -136,9 +136,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         codec_err_event_data => codec_err_event_data
         codec_err_contract_init => codec_err_contract_init
         codec_err_contract_call => codec_err_contract_call
-        compute_sha256_legacy_managed => compute_sha256_legacy_managed
         compute_sha256 => compute_sha256
-        compute_keccak256_legacy_managed => compute_keccak256_legacy_managed
         compute_keccak256 => compute_keccak256
         compute_ripemd160 => compute_ripemd160
         verify_bls_signature => verify_bls_signature
