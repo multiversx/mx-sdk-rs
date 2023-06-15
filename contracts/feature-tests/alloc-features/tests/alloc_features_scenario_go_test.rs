@@ -10,41 +10,6 @@ fn boxed_bytes_zeros_go() {
 }
 
 #[test]
-fn crypto_elliptic_curves_legacy_go() {
-    world().run("scenarios/crypto_elliptic_curves_legacy.scen.json");
-}
-
-#[test]
-fn crypto_keccak_256_legacy_alloc_go() {
-    world().run("scenarios/crypto_keccak256_legacy_alloc.scen.json");
-}
-
-#[test]
-fn crypto_ripemd_160_legacy_go() {
-    world().run("scenarios/crypto_ripemd160_legacy.scen.json");
-}
-
-#[test]
-fn crypto_sha_256_legacy_alloc_go() {
-    world().run("scenarios/crypto_sha256_legacy_alloc.scen.json");
-}
-
-#[test]
-fn crypto_verify_bls_legacy_go() {
-    world().run("scenarios/crypto_verify_bls_legacy.scen.json");
-}
-
-#[test]
-fn crypto_verify_ed_25519_legacy_go() {
-    world().run("scenarios/crypto_verify_ed25519_legacy.scen.json");
-}
-
-#[test]
-fn crypto_verify_secp_256_k_1_legacy_go() {
-    world().run("scenarios/crypto_verify_secp256k1_legacy.scen.json");
-}
-
-#[test]
 fn echo_async_result_empty_go() {
     world().run("scenarios/echo_async_result_empty.scen.json");
 }

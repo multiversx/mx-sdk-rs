@@ -3,7 +3,6 @@
 
 multiversx_sc::imports!();
 
-pub mod crypto_features_alloc;
 pub mod echo_alloc;
 pub mod echo_managed_alloc;
 pub mod elliptic_curve_features_legacy;
@@ -24,8 +23,7 @@ pub mod types;
 /// - some will be kept to provide test coverage for otherwise unused VM endpoints.
 #[multiversx_sc::contract]
 pub trait AllocFeatures:
-    crypto_features_alloc::CryptoFeaturesAlloc
-    + echo_alloc::EchoAllocTypes
+    echo_alloc::EchoAllocTypes
     + echo_managed_alloc::EchoManagedTypesWithAlloc
     + elliptic_curve_features_legacy::EllipticCurveFeatures
     + event_features_legacy::EventFeaturesLegacy
