@@ -17,45 +17,6 @@ fn boxed_bytes_zeros_rs() {
 }
 
 #[test]
-#[ignore = "mock not implemented"]
-fn crypto_elliptic_curves_legacy_rs() {
-    world().run("scenarios/crypto_elliptic_curves_legacy.scen.json");
-}
-
-#[test]
-fn crypto_keccak_256_legacy_alloc_rs() {
-    world().run("scenarios/crypto_keccak256_legacy_alloc.scen.json");
-}
-
-#[test]
-#[ignore = "mock not implemented"]
-fn crypto_ripemd_160_legacy_rs() {
-    world().run("scenarios/crypto_ripemd160_legacy.scen.json");
-}
-
-#[test]
-fn crypto_sha_256_legacy_alloc_rs() {
-    world().run("scenarios/crypto_sha256_legacy_alloc.scen.json");
-}
-
-#[test]
-#[ignore = "mock not implemented"]
-fn crypto_verify_bls_legacy_rs() {
-    world().run("scenarios/crypto_verify_bls_legacy.scen.json");
-}
-
-#[test]
-fn crypto_verify_ed_25519_legacy_rs() {
-    world().run("scenarios/crypto_verify_ed25519_legacy.scen.json");
-}
-
-#[test]
-#[ignore = "mock not implemented"]
-fn crypto_verify_secp_256_k_1_legacy_rs() {
-    world().run("scenarios/crypto_verify_secp256k1_legacy.scen.json");
-}
-
-#[test]
 fn echo_async_result_empty_rs() {
     world().run("scenarios/echo_async_result_empty.scen.json");
 }
