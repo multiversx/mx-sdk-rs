@@ -11,8 +11,8 @@ use crate::{
 };
 
 use super::{
-    VMHooksBigInt, VMHooksCallValue, VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError,
-    VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
+    VMHooksBigInt, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument, VMHooksEndpointFinish,
+    VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
     VMHooksManagedTypes, VMHooksStorageRead, VMHooksStorageWrite,
 };
 
@@ -71,5 +71,6 @@ impl VMHooksError for TxContextWrapper {}
 impl VMHooksErrorManaged for TxContextWrapper {}
 impl VMHooksStorageRead for TxContextWrapper {}
 impl VMHooksStorageWrite for TxContextWrapper {}
+impl VMHooksCrypto for TxContextWrapper {}
 
 impl VMHooksHandler for TxContextWrapper {}

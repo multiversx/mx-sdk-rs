@@ -68,7 +68,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApiImpl for VMHooksApi<
         value_handle: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_store( key_handle, value_handle);
+            vh.mbuffer_storage_store(key_handle, value_handle);
         });
     }
 }

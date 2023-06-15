@@ -1394,7 +1394,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_sha256(&self, input_handle: i32, output_handle: i32) -> i32 {
-        panic!("Unavailable: managed_sha256")
+        self.handler.sha256_managed(output_handle, input_handle);
+        0
     }
 
     fn keccak256(&self, data_offset: MemPtr, length: MemLength, result_offset: MemPtr) -> i32 {
@@ -1402,7 +1403,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_keccak256(&self, input_handle: i32, output_handle: i32) -> i32 {
-        panic!("Unavailable: managed_keccak256")
+        self.handler.keccak256_managed(output_handle, input_handle);
+        0
     }
 
     fn ripemd160(&self, data_offset: MemPtr, length: MemLength, result_offset: MemPtr) -> i32 {
@@ -1438,7 +1440,9 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_verify_ed25519(&self, key_handle: i32, message_handle: i32, sig_handle: i32) -> i32 {
-        panic!("Unavailable: managed_verify_ed25519")
+        self.handler
+            .verify_ed25519_managed(key_handle, message_handle, sig_handle);
+        0
     }
 
     fn verify_custom_secp256k1(

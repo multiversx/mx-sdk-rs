@@ -5,8 +5,8 @@ use multiversx_sc::types::Address;
 use crate::tx_mock::{TxInput, TxManagedTypes, TxResult};
 
 use super::{
-    VMHooksBigInt, VMHooksCallValue, VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError,
-    VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
+    VMHooksBigInt, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument, VMHooksEndpointFinish,
+    VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
     VMHooksManagedTypes, VMHooksStorageRead, VMHooksStorageWrite,
 };
 
@@ -53,5 +53,6 @@ impl VMHooksError for TxManagedTypesCell {}
 impl VMHooksErrorManaged for TxManagedTypesCell {}
 impl VMHooksStorageRead for TxManagedTypesCell {}
 impl VMHooksStorageWrite for TxManagedTypesCell {}
+impl VMHooksCrypto for TxManagedTypesCell {}
 
 impl VMHooksHandler for TxManagedTypesCell {}
