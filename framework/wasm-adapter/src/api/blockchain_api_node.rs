@@ -5,7 +5,7 @@ use crate::api::{
     VmApiImpl,
 };
 use multiversx_sc::{
-    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, ManagedTypeApi, RawHandle},
     types::{
         heap::{Address, Box, H256},
         BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
@@ -448,6 +448,37 @@ impl BlockchainApiImpl for VmApiImpl {
                 royalties: BigUint::from_raw_handle(royalties_handle),
                 uris: uris_vec,
             }
+        }
+    }
+
+    fn managed_get_esdt_token_data(
+        &self,
+        address_handle: RawHandle,
+        token_id_handle: RawHandle,
+        nonce: u64,
+        value_handle: RawHandle,
+        properties_handle: RawHandle,
+        hash_handle: RawHandle,
+        name_handle: RawHandle,
+        attributes_handle: RawHandle,
+        creator_handle: RawHandle,
+        royalties_handle: RawHandle,
+        uris_handle: RawHandle,
+    ) {
+        unsafe {
+            managedGetESDTTokenData(
+                address_handle,
+                token_id_handle,
+                nonce as i64,
+                value_handle,
+                properties_handle,
+                hash_handle,
+                name_handle,
+                attributes_handle,
+                creator_handle,
+                royalties_handle,
+                uris_handle,
+            );
         }
     }
 

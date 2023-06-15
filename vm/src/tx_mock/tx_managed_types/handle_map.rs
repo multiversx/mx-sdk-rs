@@ -23,10 +23,15 @@ impl<V> Default for HandleMap<V> {
 }
 
 impl<V> HandleMap<V> {
-    pub fn insert_new_handle<H: HandleConstraints>(&mut self, value: V) -> H {
+    pub fn insert_new_handle_raw(&mut self, value: V) -> RawHandle {
         let new_handle = self.next_handle;
         self.map.insert(new_handle, value);
         self.next_handle += 1;
+        new_handle
+    }
+
+    pub fn insert_new_handle<H: HandleConstraints>(&mut self, value: V) -> H {
+        let new_handle = self.insert_new_handle_raw(value);
         use_raw_handle(new_handle)
     }
 

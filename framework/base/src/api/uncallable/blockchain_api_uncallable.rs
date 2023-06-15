@@ -1,7 +1,7 @@
 use alloc::boxed::Box;
 
 use crate::{
-    api::{BlockchainApi, BlockchainApiImpl, ManagedTypeApi},
+    api::{BlockchainApi, BlockchainApiImpl, ManagedTypeApi, RawHandle},
     types::{
         heap::{Address, H256},
         EsdtTokenData, ManagedAddress, TokenIdentifier,
@@ -108,6 +108,23 @@ impl BlockchainApiImpl for UncallableApi {
         _token_id_handle: Self::ManagedBufferHandle,
         _nonce: u64,
         _dest: Self::BigIntHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn managed_get_esdt_token_data(
+        &self,
+        _address_handle: RawHandle,
+        _token_id_handle: RawHandle,
+        _nonce: u64,
+        _value_handle: RawHandle,
+        _properties_handle: RawHandle,
+        _hash_handle: RawHandle,
+        _name_handle: RawHandle,
+        _attributes_handle: RawHandle,
+        _creator_handle: RawHandle,
+        _royalties_handle: RawHandle,
+        _uris_handle: RawHandle,
     ) {
         unreachable!()
     }

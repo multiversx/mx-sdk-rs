@@ -1,4 +1,4 @@
-use super::{HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl};
+use super::{HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl, RawHandle};
 use crate::types::{
     heap::{Address, Box, H256},
     EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress, TokenIdentifier,
@@ -115,6 +115,22 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         token_id_handle: Self::ManagedBufferHandle,
         nonce: u64,
         dest: Self::BigIntHandle,
+    );
+
+    #[allow(clippy::too_many_arguments)]
+    fn managed_get_esdt_token_data(
+        &self,
+        address_handle: RawHandle,
+        token_id_handle: RawHandle,
+        nonce: u64,
+        value_handle: RawHandle,
+        properties_handle: RawHandle,
+        hash_handle: RawHandle,
+        name_handle: RawHandle,
+        attributes_handle: RawHandle,
+        creator_handle: RawHandle,
+        royalties_handle: RawHandle,
+        uris_handle: RawHandle,
     );
 
     fn load_esdt_token_data<M: ManagedTypeApi>(
