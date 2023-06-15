@@ -4,15 +4,17 @@ use crate::{
     DebugApi,
 };
 use multiversx_sc::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
-    },
+    api::{use_raw_handle, BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, RawHandle},
     types::{
         heap::{Address, H256},
-        BigUint, EsdtLocalRole, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        EsdtLocalRole, EsdtLocalRoleFlags, ManagedAddress, ManagedType, TokenIdentifier,
     },
 };
+use num_bigint::BigInt;
+use num_traits::Zero;
+
+// The Go VM doesn't do it, but if we change that, we can enable it easily here too via this constant.
+const ESDT_TOKEN_DATA_FUNC_RESETS_VALUES: bool = false;
 
 impl BlockchainApi for DebugApi {
     type BlockchainApiImpl = DebugApi;
@@ -169,45 +171,71 @@ impl BlockchainApiImpl for DebugApi {
         self.bi_overwrite(dest, esdt_balance.into());
     }
 
-    fn load_esdt_token_data<M: ManagedTypeApi>(
+    fn managed_get_esdt_token_data(
         &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        address_handle: RawHandle,
+        token_id_handle: RawHandle,
         nonce: u64,
-    ) -> EsdtTokenData<M> {
+        value_handle: RawHandle,
+        properties_handle: RawHandle,
+        hash_handle: RawHandle,
+        name_handle: RawHandle,
+        attributes_handle: RawHandle,
+        creator_handle: RawHandle,
+        royalties_handle: RawHandle,
+        uris_handle: RawHandle,
+    ) {
+        let address = ManagedAddress::<Self>::from_handle(use_raw_handle(address_handle));
+        let token_id = TokenIdentifier::<Self>::from_handle(use_raw_handle(token_id_handle));
+
         self.blockchain_cache()
             .with_account(&address.to_address(), |account| {
-                let token_identifier_value = token.to_boxed_bytes();
+                let token_identifier_value = token_id.to_boxed_bytes();
                 if let Some(esdt_data) = account
                     .esdt
                     .get_by_identifier(token_identifier_value.as_slice())
                 {
                     if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
-                        self.esdt_token_data_from_instance(esdt_data, nonce, instance)
+                        // self.esdt_token_data_from_instance(esdt_data, nonce, instance)
+                        self.set_esdt_data_values(
+                            esdt_data,
+                            instance,
+                            value_handle,
+                            properties_handle,
+                            hash_handle,
+                            name_handle,
+                            attributes_handle,
+                            creator_handle,
+                            royalties_handle,
+                            uris_handle,
+                        )
                     } else {
                         // missing nonce
-                        EsdtTokenData {
-                            token_type: EsdtTokenType::based_on_token_nonce(nonce),
-                            ..Default::default()
-                        }
+                        self.reset_esdt_data_values(
+                            value_handle,
+                            properties_handle,
+                            hash_handle,
+                            name_handle,
+                            attributes_handle,
+                            creator_handle,
+                            royalties_handle,
+                            uris_handle,
+                        );
                     }
                 } else {
                     // missing token identifier
-                    EsdtTokenData {
-                        token_type: EsdtTokenType::Fungible,
-                        ..Default::default()
-                    }
+                    self.reset_esdt_data_values(
+                        value_handle,
+                        properties_handle,
+                        hash_handle,
+                        name_handle,
+                        attributes_handle,
+                        creator_handle,
+                        royalties_handle,
+                        uris_handle,
+                    );
                 }
             })
-    }
-
-    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
-        &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
-        _nonce: u64,
-    ) -> EsdtTokenData<M> {
-        panic!("get_esdt_token_data_unmanaged is deprecated and should never be used in Rust tests")
     }
 
     fn check_esdt_frozen(
@@ -262,48 +290,67 @@ impl BlockchainApiImpl for DebugApi {
 }
 
 impl DebugApi {
-    fn esdt_token_data_from_instance<M: ManagedTypeApi>(
+    #[allow(clippy::too_many_arguments)]
+    fn set_esdt_data_values(
         &self,
         esdt_data: &EsdtData,
-        nonce: u64,
         instance: &EsdtInstance,
-    ) -> EsdtTokenData<M> {
-        let creator = if let Some(creator) = &instance.metadata.creator {
-            ManagedAddress::from_address(creator)
+        value_handle: RawHandle,
+        properties_handle: RawHandle,
+        hash_handle: RawHandle,
+        name_handle: RawHandle,
+        attributes_handle: RawHandle,
+        creator_handle: RawHandle,
+        royalties_handle: RawHandle,
+        uris_handle: RawHandle,
+    ) {
+        let mut m_types = self.m_types_borrow_mut();
+        m_types.bi_overwrite(value_handle, instance.balance.clone().into());
+        if esdt_data.frozen {
+            m_types.mb_set(properties_handle, vec![1, 0]);
         } else {
-            ManagedAddress::zero()
-        };
-
-        let mut uris = ManagedVec::new();
-        for uri in &instance.metadata.uri {
-            uris.push(ManagedBuffer::new_from_bytes(uri.as_slice()));
+            m_types.mb_set(properties_handle, vec![0, 0]);
         }
+        m_types.mb_set(
+            hash_handle,
+            instance.metadata.hash.clone().unwrap_or_default(),
+        );
+        m_types.mb_set(name_handle, instance.metadata.name.clone());
+        m_types.mb_set(attributes_handle, instance.metadata.attributes.clone());
+        if let Some(creator) = &instance.metadata.creator {
+            m_types.mb_set(creator_handle, creator.to_vec());
+        } else {
+            m_types.mb_set(creator_handle, vec![0u8; 32]);
+        };
+        m_types.bi_overwrite(
+            royalties_handle,
+            num_bigint::BigInt::from(instance.metadata.royalties),
+        );
+        m_types.mb_set_new_vec(uris_handle, instance.metadata.uri.clone());
+    }
 
-        EsdtTokenData {
-            token_type: EsdtTokenType::based_on_token_nonce(nonce),
-            amount: BigUint::from_handle(
-                self.insert_new_big_uint(instance.balance.clone())
-                    .cast_or_signal_error::<M, _>(),
-            ),
-            frozen: esdt_data.frozen,
-            hash: ManagedBuffer::from_handle(
-                self.insert_new_managed_buffer(instance.metadata.hash.clone().unwrap_or_default())
-                    .cast_or_signal_error::<M, _>(),
-            ),
-            name: ManagedBuffer::from_handle(
-                self.insert_new_managed_buffer(instance.metadata.name.clone())
-                    .cast_or_signal_error::<M, _>(),
-            ),
-            attributes: ManagedBuffer::from_handle(
-                self.insert_new_managed_buffer(instance.metadata.attributes.clone())
-                    .cast_or_signal_error::<M, _>(),
-            ),
-            creator,
-            royalties: BigUint::from_handle(
-                self.insert_new_big_uint(num_bigint::BigUint::from(instance.metadata.royalties))
-                    .cast_or_signal_error::<M, _>(),
-            ),
-            uris,
+    #[allow(clippy::too_many_arguments)]
+    fn reset_esdt_data_values(
+        &self,
+        value_handle: RawHandle,
+        properties_handle: RawHandle,
+        hash_handle: RawHandle,
+        name_handle: RawHandle,
+        attributes_handle: RawHandle,
+        creator_handle: RawHandle,
+        royalties_handle: RawHandle,
+        uris_handle: RawHandle,
+    ) {
+        if ESDT_TOKEN_DATA_FUNC_RESETS_VALUES {
+            let mut m_types = self.m_types_borrow_mut();
+            m_types.bi_overwrite(value_handle, BigInt::zero());
+            m_types.mb_set(properties_handle, vec![0, 0]);
+            m_types.mb_set(hash_handle, vec![]);
+            m_types.mb_set(name_handle, vec![]);
+            m_types.mb_set(attributes_handle, vec![]);
+            m_types.mb_set(creator_handle, vec![0u8; 32]);
+            m_types.bi_overwrite(royalties_handle, BigInt::zero());
+            m_types.bi_overwrite(uris_handle, BigInt::zero());
         }
     }
 }

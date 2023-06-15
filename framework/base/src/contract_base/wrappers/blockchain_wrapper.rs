@@ -1,17 +1,17 @@
 use core::marker::PhantomData;
 
-use crate::codec::TopDecode;
-
 use crate::{
     api::{
-        const_handles, use_raw_handle, BlockchainApi, BlockchainApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
+        ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl,
+        StorageReadApi, StorageReadApiImpl,
     },
+    codec::TopDecode,
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, ManagedAddress,
-        ManagedByteArray, ManagedType, TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
+        ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -281,14 +281,65 @@ where
         BigUint::from_handle(result_handle)
     }
 
-    #[inline]
     pub fn get_esdt_token_data(
         &self,
         address: &ManagedAddress<A>,
         token_id: &TokenIdentifier<A>,
         nonce: u64,
     ) -> EsdtTokenData<A> {
-        A::blockchain_api_impl().load_esdt_token_data::<A>(address, token_id, nonce)
+        // initializing outputs
+        // the current version of VM does not set/overwrite them if the token is missing,
+        // which is why we need to initialize them explicitly
+        let managed_api_impl = A::managed_type_impl();
+        let value_handle = managed_api_impl.bi_new_zero();
+        let properties_handle = managed_api_impl.mb_new_empty(); // TODO: replace with const_handles::MBUF_TEMPORARY_1 after VM fix
+        let hash_handle = managed_api_impl.mb_new_empty();
+        let name_handle = managed_api_impl.mb_new_empty();
+        let attributes_handle = managed_api_impl.mb_new_empty();
+        let creator_handle = managed_api_impl.mb_new_empty();
+        let royalties_handle = managed_api_impl.bi_new_zero();
+        let uris_handle = managed_api_impl.mb_new_empty();
+
+        A::blockchain_api_impl().managed_get_esdt_token_data(
+            address.get_handle().get_raw_handle(),
+            token_id.get_handle().get_raw_handle(),
+            nonce,
+            value_handle.get_raw_handle(),
+            properties_handle.get_raw_handle(),
+            hash_handle.get_raw_handle(),
+            name_handle.get_raw_handle(),
+            attributes_handle.get_raw_handle(),
+            creator_handle.get_raw_handle(),
+            royalties_handle.get_raw_handle(),
+            uris_handle.get_raw_handle(),
+        );
+
+        let token_type = if nonce == 0 {
+            EsdtTokenType::Fungible
+        } else {
+            EsdtTokenType::NonFungible
+        };
+
+        if managed_api_impl.mb_len(creator_handle.clone()) == 0 {
+            managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);
+        }
+
+        // here we trust Arwen that it always gives us a properties buffer of length 2
+        let mut properties_bytes = [0u8; 2];
+        let _ = managed_api_impl.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
+        let frozen = esdt_is_frozen(&properties_bytes);
+
+        EsdtTokenData {
+            token_type,
+            amount: BigUint::from_raw_handle(value_handle.get_raw_handle()),
+            frozen,
+            hash: ManagedBuffer::from_raw_handle(hash_handle.get_raw_handle()),
+            name: ManagedBuffer::from_raw_handle(name_handle.get_raw_handle()),
+            attributes: ManagedBuffer::from_raw_handle(attributes_handle.get_raw_handle()),
+            creator: ManagedAddress::from_raw_handle(creator_handle.get_raw_handle()),
+            royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
+            uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
+        }
     }
 
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
@@ -346,4 +397,8 @@ where
         );
         BigUint::from_handle(result_handle)
     }
+}
+
+fn esdt_is_frozen(properties_bytes: &[u8; 2]) -> bool {
+    properties_bytes[0] > 0 // token is frozen if the first byte is 1
 }

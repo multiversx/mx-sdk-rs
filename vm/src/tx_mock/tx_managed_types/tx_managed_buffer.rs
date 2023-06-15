@@ -79,4 +79,14 @@ impl TxManagedTypes {
             accumulator.extend_from_slice(bytes);
         });
     }
+
+    /// Creates the underlying structure of a ManagedVec<ManagedBuffer> from raw data.
+    pub fn mb_set_new_vec(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
+        let mut m_vec_raw_data = Vec::new();
+        for item in data.into_iter() {
+            let handle = self.managed_buffer_map.insert_new_handle_raw(item);
+            m_vec_raw_data.extend_from_slice(handle.to_be_bytes().as_slice());
+        }
+        self.mb_set(destination_handle, m_vec_raw_data);
+    }
 }
