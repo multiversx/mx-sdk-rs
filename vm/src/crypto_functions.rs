@@ -17,9 +17,6 @@ pub fn keccak256(data: &[u8]) -> [u8; KECCAK256_RESULT_LEN] {
     hasher.finalize().into()
 }
 
-/// There is a test that uses this directly.
-///
-/// TODO: switch that test to the managed version, or better still directly to the VM hooks implementation.
 pub fn verify_ed25519(key: &[u8], message: &[u8], signature: &[u8]) -> bool {
     let public = PublicKey::from_bytes(key);
     if public.is_err() {
