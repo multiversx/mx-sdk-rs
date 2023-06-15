@@ -4,6 +4,7 @@
 
 pub mod api;
 pub mod bech32;
+pub mod crypto_functions;
 pub mod display_util;
 pub mod mem_conv;
 pub mod tx_execution;

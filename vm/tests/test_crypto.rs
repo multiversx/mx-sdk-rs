@@ -1,7 +1,5 @@
 use hex::FromHex;
-use multiversx_chain_vm::DebugApi;
-
-// TODO: change all these to the VM hooks implementation.
+use multiversx_chain_vm::crypto_functions;
 
 #[test]
 fn test_verify_ed25519_basic() {
@@ -13,8 +11,7 @@ fn test_verify_ed25519_basic() {
     let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
     let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
-    let ctx = DebugApi::dummy();
-    let success = ctx.verify_ed25519_legacy(&pub_bytes, &msg_bytes, &sig_bytes);
+    let success = crypto_functions::verify_ed25519(&pub_bytes, &msg_bytes, &sig_bytes);
     assert!(success);
 }
 
@@ -28,8 +25,7 @@ fn test_verify_ed25519_bad_sig() {
     let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
     let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
-    let ctx = DebugApi::dummy();
-    let success = ctx.verify_ed25519_legacy(&pub_bytes, &msg_bytes, &sig_bytes);
+    let success = crypto_functions::verify_ed25519(&pub_bytes, &msg_bytes, &sig_bytes);
     assert!(!success);
 }
 
@@ -43,7 +39,6 @@ fn test_verify_ed25519_invalid_args() {
     let msg_bytes: Vec<u8> = FromHex::from_hex(message).unwrap();
     let sig_bytes: Vec<u8> = FromHex::from_hex(signature).unwrap();
 
-    let ctx = DebugApi::dummy();
-    let success = ctx.verify_ed25519_legacy(&pub_bytes, &msg_bytes, &sig_bytes);
+    let success = crypto_functions::verify_ed25519(&pub_bytes, &msg_bytes, &sig_bytes);
     assert!(!success);
 }
