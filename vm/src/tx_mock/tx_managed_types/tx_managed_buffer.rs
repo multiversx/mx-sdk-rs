@@ -91,7 +91,7 @@ impl TxManagedTypes {
         }
         self.mb_set(destination_handle, m_vec_raw_data);
     }
-    
+
     pub fn write_all_esdt_transfers_to_managed_vec(
         &mut self,
         dest_handle: RawHandle,

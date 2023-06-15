@@ -7,13 +7,13 @@ use multiversx_sc::types::Address;
 
 use crate::{
     tx_mock::{TxContext, TxInput, TxManagedTypes, TxResult},
-    world_mock::check_reserved_key,
+    world_mock::{check_reserved_key, AccountData, BlockInfo},
 };
 
 use super::{
-    VMHooksBigInt, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument, VMHooksEndpointFinish,
-    VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource, VMHooksManagedBuffer,
-    VMHooksManagedTypes, VMHooksStorageRead, VMHooksStorageWrite,
+    VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument,
+    VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource,
+    VMHooksManagedBuffer, VMHooksManagedTypes, VMHooksStorageRead, VMHooksStorageWrite,
 };
 
 /// A simple wrapper around a managed type container RefCell.
@@ -58,6 +58,18 @@ impl VMHooksHandlerSource for TxContextWrapper {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
     }
+
+    fn get_previous_block_info(&self) -> &BlockInfo {
+        &self.0.blockchain_ref().previous_block_info
+    }
+
+    fn get_current_block_info(&self) -> &BlockInfo {
+        &self.0.blockchain_ref().current_block_info
+    }
+
+    fn account_data(&self, address: &Address) -> AccountData {
+        self.0.with_account(address, |account| account.clone())
+    }
 }
 
 impl VMHooksBigInt for TxContextWrapper {}
@@ -72,5 +84,6 @@ impl VMHooksErrorManaged for TxContextWrapper {}
 impl VMHooksStorageRead for TxContextWrapper {}
 impl VMHooksStorageWrite for TxContextWrapper {}
 impl VMHooksCrypto for TxContextWrapper {}
+impl VMHooksBlockchain for TxContextWrapper {}
 
 impl VMHooksHandler for TxContextWrapper {}

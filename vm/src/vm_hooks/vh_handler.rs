@@ -1,3 +1,4 @@
+mod vh_blockchain;
 mod vh_call_value;
 mod vh_crypto;
 mod vh_endpoint_arg;
@@ -6,6 +7,7 @@ mod vh_error;
 mod vh_managed_types;
 mod vh_storage;
 
+pub use vh_blockchain::VMHooksBlockchain;
 pub use vh_call_value::VMHooksCallValue;
 pub use vh_crypto::VMHooksCrypto;
 pub use vh_endpoint_arg::VMHooksEndpointArgument;
@@ -25,5 +27,6 @@ pub trait VMHooksHandler:
     + VMHooksStorageRead
     + VMHooksStorageWrite
     + VMHooksCrypto
+    + VMHooksBlockchain
 {
 }

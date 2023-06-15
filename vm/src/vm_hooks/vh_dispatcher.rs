@@ -18,12 +18,20 @@ impl VMHooksDispatcher {
     }
 }
 
+fn bool_to_i32(b: bool) -> i32 {
+    if b {
+        1
+    } else {
+        0
+    }
+}
+
 #[allow(unused)]
 impl VMHooks for VMHooksDispatcher {
     fn set_vm_hooks_ptr(&mut self, _vm_hooks_ptr: *mut c_void) {}
 
     fn get_gas_left(&self) -> i64 {
-        panic!("Unavailable: get_gas_left")
+        self.handler.get_gas_left() as i64
     }
 
     fn get_sc_address(&self, result_offset: MemPtr) {
@@ -39,7 +47,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32 {
-        panic!("Unavailable: is_smart_contract")
+        unsafe {
+            bool_to_i32(mem_conv::with_bytes(address_offset, 32, |address_bytes| {
+                self.handler.is_smart_contract(address_bytes)
+            }))
+        }
     }
 
     fn signal_error(&self, message_offset: MemPtr, message_length: MemLength) {
@@ -118,7 +130,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn get_esdt_local_roles(&self, token_id_handle: i32) -> i64 {
-        panic!("Unavailable: get_esdt_local_roles")
+        self.handler.get_esdt_local_roles_bits(token_id_handle) as i64
     }
 
     fn validate_token_identifier(&self, token_id_handle: i32) -> i32 {
@@ -382,7 +394,15 @@ impl VMHooks for VMHooksDispatcher {
         token_id_offset: MemPtr,
         token_id_len: MemLength,
     ) -> i64 {
-        panic!("Unavailable: get_current_esdt_nft_nonce")
+        unsafe {
+            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
+                mem_conv::with_bytes(token_id_offset, token_id_len, |token_id_bytes| {
+                    self.handler
+                        .get_current_esdt_nft_nonce(address_bytes, token_id_bytes)
+                        as i64
+                })
+            })
+        }
     }
 
     fn get_esdt_token_type(&self) -> i32 {
@@ -436,19 +456,19 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn get_block_timestamp(&self) -> i64 {
-        panic!("Unavailable: get_block_timestamp")
+        self.handler.get_block_timestamp() as i64
     }
 
     fn get_block_nonce(&self) -> i64 {
-        panic!("Unavailable: get_block_nonce")
+        self.handler.get_block_nonce() as i64
     }
 
     fn get_block_round(&self) -> i64 {
-        panic!("Unavailable: get_block_round")
+        self.handler.get_block_round() as i64
     }
 
     fn get_block_epoch(&self) -> i64 {
-        panic!("Unavailable: get_block_epoch")
+        self.handler.get_block_epoch() as i64
     }
 
     fn get_block_random_seed(&self, pointer: MemPtr) {
@@ -460,19 +480,19 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn get_prev_block_timestamp(&self) -> i64 {
-        panic!("Unavailable: get_prev_block_timestamp")
+        self.handler.get_prev_block_timestamp() as i64
     }
 
     fn get_prev_block_nonce(&self) -> i64 {
-        panic!("Unavailable: get_prev_block_nonce")
+        self.handler.get_prev_block_nonce() as i64
     }
 
     fn get_prev_block_round(&self) -> i64 {
-        panic!("Unavailable: get_prev_block_round")
+        self.handler.get_prev_block_round() as i64
     }
 
     fn get_prev_block_epoch(&self) -> i64 {
-        panic!("Unavailable: get_prev_block_epoch")
+        self.handler.get_prev_block_epoch() as i64
     }
 
     fn get_prev_block_random_seed(&self, pointer: MemPtr) {
@@ -590,15 +610,15 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_sc_address(&self, destination_handle: i32) {
-        panic!("Unavailable: managed_sc_address");
+        self.handler.managed_sc_address(destination_handle);
     }
 
     fn managed_owner_address(&self, destination_handle: i32) {
-        panic!("Unavailable: managed_owner_address");
+        self.handler.managed_owner_address(destination_handle);
     }
 
     fn managed_caller(&self, destination_handle: i32) {
-        panic!("Unavailable: managed_caller");
+        self.handler.managed_caller(destination_handle);
     }
 
     fn managed_signal_error(&self, err_handle: i32) {
@@ -610,7 +630,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_get_original_tx_hash(&self, result_handle: i32) {
-        panic!("Unavailable: managed_get_original_tx_hash");
+        self.handler.get_tx_hash(result_handle);
     }
 
     fn managed_get_state_root_hash(&self, result_handle: i32) {
@@ -618,11 +638,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_get_block_random_seed(&self, result_handle: i32) {
-        panic!("Unavailable: managed_get_block_random_seed");
+        self.handler.get_block_random_seed(result_handle);
     }
 
     fn managed_get_prev_block_random_seed(&self, result_handle: i32) {
-        panic!("Unavailable: managed_get_prev_block_random_seed");
+        self.handler.get_prev_block_random_seed(result_handle);
     }
 
     fn managed_get_return_data(&self, result_id: i32, result_handle: i32) {
@@ -658,7 +678,19 @@ impl VMHooks for VMHooksDispatcher {
         royalties_handle: i32,
         uris_handle: i32,
     ) {
-        panic!("Unavailable: managed_get_esdt_token_data");
+        self.handler.managed_get_esdt_token_data(
+            address_handle,
+            token_id_handle,
+            nonce as u64,
+            value_handle,
+            properties_handle,
+            hash_handle,
+            name_handle,
+            attributes_handle,
+            creator_handle,
+            royalties_handle,
+            uris_handle,
+        );
     }
 
     fn managed_async_call(
@@ -806,7 +838,10 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_is_esdt_frozen(&self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
-        panic!("Unavailable: managed_is_esdt_frozen")
+        bool_to_i32(
+            self.handler
+                .check_esdt_frozen(address_handle, token_id_handle, nonce as u64),
+        )
     }
 
     fn managed_is_esdt_limited_transfer(&self, token_id_handle: i32) -> i32 {
@@ -961,7 +996,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn big_int_get_external_balance(&self, address_offset: MemPtr, result: i32) {
-        panic!("Unavailable: big_int_get_external_balance");
+        unsafe {
+            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
+                self.handler.load_balance(address_bytes, result);
+            })
+        }
     }
 
     fn big_int_get_esdt_external_balance(
@@ -972,7 +1011,18 @@ impl VMHooks for VMHooksDispatcher {
         nonce: i64,
         result_handle: i32,
     ) {
-        panic!("Unavailable: big_int_get_esdt_external_balance");
+        unsafe {
+            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
+                mem_conv::with_bytes(token_id_offset, token_id_len, |token_id_bytes| {
+                    self.handler.big_int_get_esdt_external_balance(
+                        address_bytes,
+                        token_id_bytes,
+                        nonce as u64,
+                        result_handle,
+                    );
+                })
+            })
+        }
     }
 
     fn big_int_new(&self, small_value: i64) -> i32 {
@@ -1440,9 +1490,10 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_verify_ed25519(&self, key_handle: i32, message_handle: i32, sig_handle: i32) -> i32 {
-        self.handler
-            .verify_ed25519_managed(key_handle, message_handle, sig_handle);
-        0
+        bool_to_i32(
+            self.handler
+                .verify_ed25519_managed(key_handle, message_handle, sig_handle),
+        )
     }
 
     fn verify_custom_secp256k1(

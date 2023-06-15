@@ -17,11 +17,11 @@ pub use backend_type::*;
 use std::ops::Deref;
 
 use multiversx_chain_vm::{
-    executor::VMHooks,
+    executor::{MemPtr, VMHooks},
     tx_mock::{StaticVarData, StaticVarStack, TxContextStack},
     vm_hooks::{TxContextWrapper, TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
 };
-use multiversx_sc::api::{HandleTypeInfo, RawHandle};
+use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl, RawHandle};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct VMHooksApi<const BACKEND_TYPE: VMHooksBackendType>;
@@ -80,6 +80,23 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
             },
             _ => panic!("invalid VMHooksBackendType"),
         }
+    }
+
+    /// Convenience method for calling VM hooks with a pointer to a temporary buffer in which we load a managed buffer.
+    ///
+    /// It is used for
+    /// - addresses
+    /// - token identifiers.
+    ///
+    /// The buffer is 32 bytes long, enough for both addresses and token identifiers.
+    pub(crate) fn with_temp_buffer_ptr<R, F>(&self, handle: RawHandle, f: F) -> R
+    where
+        F: FnOnce(MemPtr) -> R,
+    {
+        let mut temp_buffer = [0u8; 32];
+        self.mb_load_slice(handle, 0, &mut temp_buffer[..])
+            .expect("error extracting address bytes");
+        f(temp_buffer.as_ptr() as MemPtr)
     }
 }
 
