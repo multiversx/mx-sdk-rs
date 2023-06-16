@@ -69,12 +69,15 @@ where
         )
     }
 
+    /// Will crash if the verification fails.
+    /// 
+    /// The error comes straight form the VM, the message is "invalid signature".
     pub fn verify_ed25519(
         &self,
         key: &ManagedBuffer<A>,
         message: &ManagedBuffer<A>,
         signature: &ManagedBuffer<A>,
-    ) -> bool {
+    ) {
         A::crypto_api_impl().verify_ed25519_managed(
             key.get_handle(),
             message.get_handle(),

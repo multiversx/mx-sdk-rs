@@ -84,8 +84,10 @@ impl CryptoApiImpl for VmApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        unsafe { managedVerifyEd25519(key, message, signature) == 0 }
+    ) {
+        unsafe {
+            managedVerifyEd25519(key, message, signature);
+        }
     }
 
     #[inline]

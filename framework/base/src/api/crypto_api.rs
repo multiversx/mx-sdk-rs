@@ -51,7 +51,7 @@ pub trait CryptoApiImpl: ManagedTypeApiImpl {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool;
+    );
 
     /// Note: the signature is minimum 2 bytes in length,
     /// the second byte encodes the length of the remaining signature bytes.

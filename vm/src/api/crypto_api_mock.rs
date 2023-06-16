@@ -1,4 +1,4 @@
-use crate::{crypto_functions, DebugApi};
+use crate::{crypto_functions, tx_mock::TxPanic, DebugApi};
 use multiversx_sc::{
     api::{CryptoApi, CryptoApiImpl, ManagedBufferApiImpl},
     types::MessageHashType,
@@ -58,12 +58,18 @@ impl CryptoApiImpl for DebugApi {
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        crypto_functions::verify_ed25519(
+    ) {
+        let sig_valid = crypto_functions::verify_ed25519(
             self.mb_to_boxed_bytes(key).as_slice(),
             self.mb_to_boxed_bytes(message).as_slice(),
             self.mb_to_boxed_bytes(signature).as_slice(),
-        )
+        );
+        if !sig_valid {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: "invalid signature".to_string(),
+            });
+        }
     }
 
     fn verify_secp256k1_managed(
