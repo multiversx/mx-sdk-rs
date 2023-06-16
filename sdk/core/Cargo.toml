@@ -35,3 +35,9 @@ zeroize = "1.4.2"
 bech32 = "0.9"
 itertools = "0.10.1"
 pem = "1.0.1"
+rustc-serialize = "0.3.24"
+num-bigint = "0.4.2"
+multiversx-sc = { path = "../../framework/base" }
+multiversx-sc-scenario = { path = "../../framework/scenario" }
+multiversx-sc-codec = { path = "../../data/codec" }
+multiversx-sc-codec-derive = { path = "../../data/codec-derive" }

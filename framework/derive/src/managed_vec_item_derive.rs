@@ -94,6 +94,7 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
 
 fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
+    println!("{:?}", ast.generics.params);
     let self_expr = if ast.generics.params.is_empty() {
         quote! { #name }
     } else {
