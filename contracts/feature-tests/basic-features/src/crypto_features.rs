@@ -34,8 +34,8 @@ pub trait CryptoFeatures {
         key: ManagedBuffer,
         message: ManagedBuffer,
         signature: ManagedBuffer,
-    ) -> bool {
-        self.crypto().verify_ed25519(&key, &message, &signature)
+    ) {
+        self.crypto().verify_ed25519(&key, &message, &signature);
     }
 
     #[endpoint]
