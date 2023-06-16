@@ -1343,7 +1343,8 @@ impl VMHooks for VMHooksDispatcher {
         key_handle: i32,
         destination_handle: i32,
     ) {
-        panic!("Unavailable: mbuffer_storage_load_from_address");
+        self.handler
+            .storage_load_from_address(address_handle, key_handle, destination_handle);
     }
 
     fn mbuffer_get_argument(&self, id: i32, destination_handle: i32) -> i32 {

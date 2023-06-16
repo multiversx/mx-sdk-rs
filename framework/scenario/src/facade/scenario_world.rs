@@ -144,7 +144,7 @@ impl ScenarioWorld {
             ContractContainer::new(
                 contract_builder.new_contract_obj::<DebuggerApi>(),
                 None,
-                true,
+                false,
             ),
         )
     }
