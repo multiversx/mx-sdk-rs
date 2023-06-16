@@ -50,29 +50,6 @@ where
     }
 }
 
-/*impl<M, T> ManagedType<M> for NativeValueManagedVecItem<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + TopEncode + NestedEncode + TopDecode + NestedDecode + ManagedVecItem + Clone
-{
-    type OwnHandle = T::OwnHandle;
-
-    fn from_handle(handle: Self::OwnHandle) -> Self {
-        NativeValueManagedVecItem::new(T::from_handle(handle))
-    }
-
-    fn get_handle(&self) -> Self::OwnHandle {
-        self.value.get_handle()
-    }
-
-    fn transmute_from_handle_ref(handle_ref: &Self::OwnHandle) -> &Self {
-        unsafe {
-            core::mem::transmute(handle_ref)
-        }
-    }
-}*/
-
-
 impl<T> ManagedVecItem for NativeValueManagedVecItem<T>
 where
     T: TopEncode + NestedEncode + TopDecode + NestedDecode + ManagedVecItem + Clone
