@@ -13,10 +13,6 @@ extern "C" {
 	fn storageLoadLength(keyOffset: *const u8, keyLength: i32) -> i32;
 	fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
-	// big int API
-	fn bigIntStorageStoreUnsigned(keyOffset: *const u8, keyLength: i32, source: i32) -> i32;
-	fn bigIntStorageLoadUnsigned(keyOffset: *const u8, keyLength: i32, destination: i32) -> i32;
-
     // managed buffer API
     fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
@@ -49,13 +45,6 @@ impl StorageReadApiImpl for VmApiImpl {
                 storageLoad(key.as_ref().as_ptr(), key.len() as i32, res.as_mut_ptr());
             }
             res.into_box()
-        }
-    }
-
-    #[inline]
-    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::ManagedBufferHandle) {
-        unsafe {
-            bigIntStorageLoadUnsigned(key.as_ref().as_ptr(), key.len() as i32, dest);
         }
     }
 
@@ -101,13 +90,6 @@ impl StorageWriteApiImpl for VmApiImpl {
                 value.as_ptr(),
                 value.len() as i32,
             );
-        }
-    }
-
-    #[inline]
-    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Self::BigIntHandle) {
-        unsafe {
-            bigIntStorageStoreUnsigned(key.as_ref().as_ptr(), key.len() as i32, value_handle);
         }
     }
 

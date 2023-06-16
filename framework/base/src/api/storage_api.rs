@@ -21,8 +21,6 @@ pub trait StorageReadApiImpl: HandleTypeInfo {
 
     fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]>;
 
-    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::BigIntHandle);
-
     fn storage_load_managed_buffer_raw(
         &self,
         key_handle: Self::ManagedBufferHandle,
@@ -51,8 +49,6 @@ pub trait StorageWriteApi: HandleTypeInfo {
 
 pub trait StorageWriteApiImpl: HandleTypeInfo {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]);
-
-    fn storage_store_big_uint_raw(&self, key: &[u8], value_handle: Self::BigIntHandle);
 
     fn storage_store_managed_buffer_raw(
         &self,

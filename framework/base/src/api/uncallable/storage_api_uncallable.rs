@@ -20,10 +20,6 @@ impl StorageReadApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn storage_load_big_uint_raw(&self, _key: &[u8], _dest: i32) {
-        unreachable!()
-    }
-
     fn storage_load_managed_buffer_raw(&self, _key_handle: i32, _dest: i32) {
         unreachable!()
     }
@@ -43,10 +39,6 @@ impl StorageWriteApi for UncallableApi {
 
 impl StorageWriteApiImpl for super::UncallableApi {
     fn storage_store_slice_u8(&self, _key: &[u8], _value: &[u8]) {
-        unreachable!()
-    }
-
-    fn storage_store_big_uint_raw(&self, _key: &[u8], _value_handle: Self::BigIntHandle) {
         unreachable!()
     }
 

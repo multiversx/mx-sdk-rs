@@ -1,12 +1,7 @@
-use crate::{
-    num_bigint::{BigInt, Sign},
-    tx_mock::TxPanic,
-    DebugApi,
-};
+use crate::{tx_mock::TxPanic, DebugApi};
 use alloc::vec::Vec;
 use multiversx_sc::api::{
-    BigIntApiImpl, ManagedBufferApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi,
-    StorageWriteApiImpl,
+    ManagedBufferApiImpl, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
 impl StorageReadApi for DebugApi {
@@ -33,12 +28,6 @@ impl StorageReadApiImpl for DebugApi {
 
     fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
         self.storage_load_vec_u8(key).into_boxed_slice()
-    }
-
-    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::ManagedBufferHandle) {
-        let bytes = self.storage_load_vec_u8(key);
-        let bi = BigInt::from_bytes_be(Sign::Plus, bytes.as_slice());
-        self.bi_overwrite(dest, bi);
     }
 
     fn storage_load_managed_buffer_raw(
@@ -91,10 +80,6 @@ impl StorageWriteApiImpl for DebugApi {
         self.with_contract_account_mut(|account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
-    }
-
-    fn storage_store_big_uint_raw(&self, key: &[u8], handle: Self::BigIntHandle) {
-        self.storage_store_slice_u8(key, self.bi_get_signed_bytes(handle).as_slice());
     }
 
     fn storage_store_managed_buffer_raw(
