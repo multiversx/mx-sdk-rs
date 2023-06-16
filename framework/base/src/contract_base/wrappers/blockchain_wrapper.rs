@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
-        ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, StaticVarApiImpl,
-        StorageReadApi, StorageReadApiImpl,
+        ErrorApiImpl, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
+        StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     codec::TopDecode,
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
@@ -390,11 +390,24 @@ where
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
     pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
-        let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::storage_read_api_impl().storage_load_big_uint_raw(
+        let temp_handle_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        let temp_handle_2: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_2);
+
+        // prepare key
+        A::managed_type_impl().mb_overwrite(
+            temp_handle_1.clone(),
             storage::protected_keys::ELROND_REWARD_KEY,
-            result_handle.clone(),
         );
+
+        // load value
+        A::storage_read_api_impl()
+            .storage_load_managed_buffer_raw(temp_handle_1, temp_handle_2.clone());
+        let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
+
+        // convert value to BigUint
+        A::managed_type_impl().mb_to_big_int_unsigned(temp_handle_2, result_handle.clone());
+
+        //wrap
         BigUint::from_handle(result_handle)
     }
 }

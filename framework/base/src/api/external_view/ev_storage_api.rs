@@ -1,6 +1,6 @@
 use crate::api::{
     const_handles, managed_types::HandleConstraints, use_raw_handle, ManagedBufferApiImpl,
-    ManagedTypeApiImpl, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, VMApi,
+    StaticVarApiImpl, StorageReadApi, StorageReadApiImpl, VMApi,
 };
 
 use super::ExternalViewApi;
@@ -65,14 +65,6 @@ impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
         A::managed_type_impl()
             .mb_to_boxed_bytes(mbuf_temp_2)
             .into_box()
-    }
-
-    fn storage_load_big_uint_raw(&self, key: &[u8], dest: Self::BigIntHandle) {
-        let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        A::managed_type_impl().mb_overwrite(mbuf_temp_1.clone(), key);
-        let mbuf_temp_2: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_2);
-        self.storage_load_managed_buffer_raw(mbuf_temp_1, mbuf_temp_2.clone());
-        A::managed_type_impl().mb_to_big_int_unsigned(mbuf_temp_2, dest)
     }
 
     fn storage_load_managed_buffer_raw(

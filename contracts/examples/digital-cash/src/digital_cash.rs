@@ -90,7 +90,7 @@ pub trait DigitalCash {
         let mut withdrawed_tokens = ManagedVec::<Self::Api, FundType<Self::Api>>::new();
         let mut transfer_occured = false;
         let block_round = self.blockchain().get_block_round();
-        
+
         self.crypto().verify_ed25519(
             address.as_managed_buffer(),
             message,

@@ -70,7 +70,7 @@ where
     }
 
     /// Will crash if the verification fails.
-    /// 
+    ///
     /// The error comes straight form the VM, the message is "invalid signature".
     pub fn verify_ed25519(
         &self,
