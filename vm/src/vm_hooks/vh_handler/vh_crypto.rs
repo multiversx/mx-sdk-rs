@@ -1,4 +1,4 @@
-use crate::{crypto_functions, vm_hooks::VMHooksHandlerSource};
+use crate::{crypto_functions, tx_mock::TxPanic, vm_hooks::VMHooksHandlerSource};
 use multiversx_sc::api::RawHandle;
 
 pub trait VMHooksCrypto: VMHooksHandlerSource {
@@ -18,16 +18,18 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
             .mb_set(dest, result_bytes[..].to_vec());
     }
 
-    fn verify_ed25519_managed(
-        &self,
-        key: RawHandle,
-        message: RawHandle,
-        signature: RawHandle,
-    ) -> bool {
-        crypto_functions::verify_ed25519(
+    /// Should crash if the signature is invalid.
+    fn verify_ed25519_managed(&self, key: RawHandle, message: RawHandle, signature: RawHandle) {
+        let sig_valid = crypto_functions::verify_ed25519(
             self.m_types_borrow().mb_get(key),
             self.m_types_borrow().mb_get(message),
             self.m_types_borrow().mb_get(signature),
-        )
+        );
+        if !sig_valid {
+            std::panic::panic_any(TxPanic {
+                status: 10,
+                message: "invalid signature".to_string(),
+            });
+        }
     }
 }

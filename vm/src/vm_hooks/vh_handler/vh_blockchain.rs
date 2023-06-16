@@ -48,10 +48,8 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             self.is_contract_address(address_bytes),
             "get balance not yet implemented for accounts other than the contract itself"
         );
-        self.m_types_borrow_mut().bi_overwrite(
-            dest,
-            self.current_account_data().egld_balance.clone().into(),
-        );
+        self.m_types_borrow_mut()
+            .bi_overwrite(dest, self.current_account_data().egld_balance.into());
     }
 
     fn get_tx_hash(&self, dest: RawHandle) {
@@ -141,6 +139,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .bi_overwrite(dest, esdt_balance.into());
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn managed_get_esdt_token_data(
         &self,
         address_handle: RawHandle,

@@ -1,8 +1,6 @@
 use super::VmApiImpl;
 use multiversx_sc::{
-    api::{
-        const_handles, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
-    },
+    api::{StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl},
     types::heap::{Box, BoxedBytes},
 };
 
@@ -14,7 +12,6 @@ extern "C" {
 	fn storageLoad(keyOffset: *const u8, keyLength: i32, dataOffset: *mut u8) -> i32;
 
     // managed buffer API
-    fn mBufferSetBytes(mBufferHandle: i32, byte_ptr: *const u8, byte_len: i32) -> i32;
     fn mBufferStorageStore(keyHandle: i32, mBufferHandle: i32) -> i32;
     fn mBufferStorageLoad(keyHandle: i32, mBufferHandle: i32) -> i32;
     

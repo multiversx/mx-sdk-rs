@@ -1490,10 +1490,9 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_verify_ed25519(&self, key_handle: i32, message_handle: i32, sig_handle: i32) -> i32 {
-        bool_to_i32(
-            self.handler
-                .verify_ed25519_managed(key_handle, message_handle, sig_handle),
-        )
+        self.handler
+            .verify_ed25519_managed(key_handle, message_handle, sig_handle);
+        0
     }
 
     fn verify_custom_secp256k1(

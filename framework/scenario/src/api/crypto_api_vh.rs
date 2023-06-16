@@ -52,9 +52,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApiImpl for VMHooksApi<BACKEN
         key: Self::ManagedBufferHandle,
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
-    ) -> bool {
-        let result = self.with_vm_hooks(|vh| vh.managed_verify_ed25519(key, message, signature));
-        result == 0
+    ) {
+        self.with_vm_hooks(|vh| vh.managed_verify_ed25519(key, message, signature));
     }
 
     fn verify_secp256k1_managed(
