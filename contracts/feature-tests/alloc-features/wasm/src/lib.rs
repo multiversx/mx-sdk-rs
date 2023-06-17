@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           66
+// Endpoints:                           64
 // Async Callback (empty):               1
-// Total number of exported functions:  68
+// Total number of exported functions:  66
 
 #![no_std]
 #![feature(lang_items)]
@@ -50,8 +50,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         compute_unmarshal_ec => compute_unmarshal_ec
         compute_unmarshal_compressed_ec => compute_unmarshal_compressed_ec
         compute_generate_key_ec => compute_generate_key_ec
-        logLegacyEventA => log_legacy_event_a
-        logLegacyEventB => log_legacy_event_b
         only_owner_legacy => only_owner_legacy
         return_sc_error => return_sc_error
         result_ok => result_ok

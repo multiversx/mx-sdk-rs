@@ -65,11 +65,6 @@ fn echo_vec_u_8_go() {
 }
 
 #[test]
-fn events_legacy_go() {
-    world().run("scenarios/events_legacy.scen.json");
-}
-
-#[test]
 fn managed_buffer_concat_2_go() {
     world().run("scenarios/managed_buffer_concat_2.scen.json");
 }

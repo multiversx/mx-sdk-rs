@@ -6,7 +6,6 @@ multiversx_sc::imports!();
 pub mod echo_alloc;
 pub mod echo_managed_alloc;
 pub mod elliptic_curve_features_legacy;
-pub mod event_features_legacy;
 pub mod macro_features_legacy;
 pub mod managed_buffer_features_alloc;
 pub mod storage_direct_load_alloc;
@@ -26,7 +25,6 @@ pub trait AllocFeatures:
     echo_alloc::EchoAllocTypes
     + echo_managed_alloc::EchoManagedTypesWithAlloc
     + elliptic_curve_features_legacy::EllipticCurveFeatures
-    + event_features_legacy::EventFeaturesLegacy
     + macro_features_legacy::MacroFeaturesLegacy
     + managed_buffer_features_alloc::ManagedBufferFeatures
     + storage_direct_load_alloc::StorageLoadFeatures

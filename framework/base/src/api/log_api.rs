@@ -1,5 +1,3 @@
-use crate::types::heap::ArgBuffer;
-
 use super::HandleTypeInfo;
 
 pub trait LogApi: HandleTypeInfo {
@@ -18,12 +16,6 @@ pub trait LogApi: HandleTypeInfo {
 /// The smart contract code doesn't have access to these methods directly.
 pub trait LogApiImpl: HandleTypeInfo {
     /// Saves an event log.
-    fn write_event_log(&self, topics_buffer: &ArgBuffer, data: &[u8]);
-
-    /// The legacy Arwen hook for saving event logs. It does the same, but only accepts 32-byte topics.
-    /// Only kept for backwards compatibility.
-    fn write_legacy_log(&self, topics: &[[u8; 32]], data: &[u8]);
-
     fn managed_write_log(
         &self,
         topics_handle: Self::ManagedBufferHandle,

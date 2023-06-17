@@ -72,11 +72,6 @@ fn echo_vec_u_8_rs() {
 }
 
 #[test]
-fn events_legacy_rs() {
-    world().run("scenarios/events_legacy.scen.json");
-}
-
-#[test]
 fn managed_buffer_concat_2_rs() {
     world().run("scenarios/managed_buffer_concat_2.scen.json");
 }

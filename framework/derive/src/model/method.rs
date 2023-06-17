@@ -3,7 +3,6 @@ use super::*;
 /// Indicates how smart contract method implementations will be auto-generated based on their annotations.
 #[derive(Clone, Debug)]
 pub enum AutoImpl {
-    LegacyEvent { identifier: Vec<u8> },
     Event { identifier: String },
     StorageGetter { identifier: String },
     StorageSetter { identifier: String },
