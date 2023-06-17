@@ -82,8 +82,32 @@ impl TxManagedTypes {
         });
     }
 
-    /// Creates the underlying structure of a ManagedVec<ManagedBuffer> from raw data.
-    pub fn mb_set_new_vec(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
+    /// Retrieves data saved in the format of a ManagedVec<ManagedBuffer>,
+    /// i.e. the main data structure encodes the handles of other buffers.
+    pub fn mb_get_vec(&self, source_handle: RawHandle) -> Vec<Vec<u8>> {
+        let mut result = Vec::new();
+        let mut iter = self.mb_get(source_handle).iter();
+        while let Some(byte) = iter.next() {
+            let handle_bytes_be = [
+                *byte,
+                *iter
+                    .next()
+                    .expect("malformed ManagedVec<ManagedBuffer> data"),
+                *iter
+                    .next()
+                    .expect("malformed ManagedVec<ManagedBuffer> data"),
+                *iter
+                    .next()
+                    .expect("malformed ManagedVec<ManagedBuffer> data"),
+            ];
+            let item_handle = i32::from_be_bytes(handle_bytes_be);
+            result.push(self.mb_get(item_handle).to_vec());
+        }
+        result
+    }
+
+    /// Creates the underlying structure of a ManagedVec<ManagedBuffer> from memory..
+    pub fn mb_set_vec(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
         let mut m_vec_raw_data = Vec::new();
         for item in data.into_iter() {
             let handle = self.managed_buffer_map.insert_new_handle_raw(item);

@@ -6,7 +6,7 @@ use std::{
 use multiversx_sc::types::Address;
 
 use crate::{
-    tx_mock::{TxInput, TxManagedTypes, TxResult},
+    tx_mock::{TxInput, TxLog, TxManagedTypes, TxResult},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -43,4 +43,6 @@ pub trait VMHooksHandlerSource: Debug {
     fn current_account_data(&self) -> AccountData {
         self.account_data(&self.input_ref().to)
     }
+
+    fn push_tx_log(&self, tx_log: TxLog);
 }

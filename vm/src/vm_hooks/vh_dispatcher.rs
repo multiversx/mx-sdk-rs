@@ -626,7 +626,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_write_log(&self, topics_handle: i32, data_handle: i32) {
-        panic!("Unavailable: managed_write_log");
+        self.handler.managed_write_log(topics_handle, data_handle);
     }
 
     fn managed_get_original_tx_hash(&self, result_handle: i32) {

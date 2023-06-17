@@ -3,14 +3,14 @@ use std::cell::{Ref, RefCell, RefMut};
 use multiversx_sc::types::Address;
 
 use crate::{
-    tx_mock::{TxInput, TxManagedTypes, TxResult},
+    tx_mock::{TxInput, TxLog, TxManagedTypes, TxResult},
     world_mock::{AccountData, BlockInfo},
 };
 
 use super::{
     VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument,
     VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource,
-    VMHooksManagedBuffer, VMHooksManagedTypes, VMHooksStorageRead, VMHooksStorageWrite,
+    VMHooksLog, VMHooksManagedBuffer, VMHooksManagedTypes, VMHooksStorageRead, VMHooksStorageWrite,
 };
 
 /// A simple wrapper around a managed type container RefCell.
@@ -55,6 +55,10 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
     fn account_data(&self, _address: &Address) -> AccountData {
         panic!("cannot access account data in the StaticApi")
     }
+
+    fn push_tx_log(&self, _tx_log: TxLog) {
+        panic!("cannot log events in the StaticApi")
+    }
 }
 
 impl VMHooksBigInt for TxManagedTypesCell {}
@@ -70,5 +74,6 @@ impl VMHooksStorageRead for TxManagedTypesCell {}
 impl VMHooksStorageWrite for TxManagedTypesCell {}
 impl VMHooksCrypto for TxManagedTypesCell {}
 impl VMHooksBlockchain for TxManagedTypesCell {}
+impl VMHooksLog for TxManagedTypesCell {}
 
 impl VMHooksHandler for TxManagedTypesCell {}

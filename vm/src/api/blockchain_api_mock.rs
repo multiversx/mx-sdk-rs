@@ -326,7 +326,7 @@ impl DebugApi {
             royalties_handle,
             num_bigint::BigInt::from(instance.metadata.royalties),
         );
-        m_types.mb_set_new_vec(uris_handle, instance.metadata.uri.clone());
+        m_types.mb_set_vec(uris_handle, instance.metadata.uri.clone());
     }
 
     #[allow(clippy::too_many_arguments)]
