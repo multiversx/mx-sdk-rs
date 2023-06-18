@@ -4,7 +4,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/alloc-features");
 
-    blockchain.register_contract(
+    blockchain.register_contract_new_api(
         "file:output/alloc-features.wasm",
         alloc_features::ContractBuilder,
     );
