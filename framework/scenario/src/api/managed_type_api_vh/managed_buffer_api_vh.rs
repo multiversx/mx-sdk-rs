@@ -105,7 +105,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi
     ) -> Result<(), InvalidSliceError> {
         let err = self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(source_slice, |offset, length| {
-                vh.mbuffer_set_byte_slice(dest_handle, starting_position as i32, offset, length)
+                vh.mbuffer_set_byte_slice(dest_handle, starting_position as i32, length, offset)
             })
         });
         if err == 0 {
