@@ -2,7 +2,7 @@ use crate::{
     api::{ManagedTypeApi, SendApi, SendApiImpl},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedVec, TokenIdentifier,
+        ManagedVec,
     },
 };
 
@@ -20,31 +20,6 @@ impl SendApiImpl for UncallableApi {
     fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         _to: &ManagedAddress<M>,
-        _amount: &BigUint<M>,
-        _gas_limit: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
-        unreachable!()
-    }
-
-    fn transfer_esdt_execute<M: ManagedTypeApi>(
-        &self,
-        _to: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
-        _amount: &BigUint<M>,
-        _gas: u64,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
-        unreachable!()
-    }
-
-    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
-        &self,
-        _to: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
-        _nonce: u64,
         _amount: &BigUint<M>,
         _gas_limit: u64,
         _endpoint_name: &ManagedBuffer<M>,

@@ -129,6 +129,113 @@ impl DebugApi {
         }
     }
 
+    fn perform_transfer_execute_esdt<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
+        amount: &BigUint<M>,
+        _gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]> {
+        let recipient = to.to_address();
+        let token_bytes = top_encode_to_vec_u8(token).unwrap();
+        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
+
+        let mut args = vec![token_bytes, amount_bytes];
+        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
+
+        let _ = self.perform_transfer_execute(
+            recipient,
+            num_bigint::BigUint::zero(),
+            ESDT_TRANSFER_FUNC_NAME.into(),
+            args,
+        );
+
+        Ok(())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn perform_transfer_execute_nft<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        token: &TokenIdentifier<M>,
+        nonce: u64,
+        amount: &BigUint<M>,
+        _gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]> {
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+
+        let token_bytes = top_encode_to_vec_u8(token).unwrap();
+        let nonce_bytes = top_encode_to_vec_u8(&nonce).unwrap();
+        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
+
+        let mut args = vec![
+            token_bytes,
+            nonce_bytes,
+            amount_bytes,
+            recipient.as_bytes().to_vec(),
+        ];
+
+        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
+
+        let _ = self.perform_transfer_execute(
+            contract_address,
+            num_bigint::BigUint::zero(),
+            ESDT_NFT_TRANSFER_FUNC_NAME.into(),
+            args,
+        );
+
+        Ok(())
+    }
+
+    fn perform_transfer_execute_multi<M: ManagedTypeApi>(
+        &self,
+        to: &ManagedAddress<M>,
+        payments: &ManagedVec<M, EsdtTokenPayment<M>>,
+        _gas_limit: u64,
+        endpoint_name: &ManagedBuffer<M>,
+        arg_buffer: &ManagedArgBuffer<M>,
+    ) -> Result<(), &'static [u8]> {
+        let contract_address = self.input_ref().to.clone();
+        let recipient = to.to_address();
+
+        let mut args = vec![
+            recipient.as_bytes().to_vec(),
+            top_encode_to_vec_u8(&payments.len()).unwrap(),
+        ];
+
+        for payment in payments.into_iter() {
+            let token_bytes = top_encode_to_vec_u8(&payment.token_identifier).unwrap();
+            args.push(token_bytes);
+            let nonce_bytes = top_encode_to_vec_u8(&payment.token_nonce).unwrap();
+            args.push(nonce_bytes);
+            let amount_bytes = top_encode_to_vec_u8(&payment.amount).unwrap();
+            args.push(amount_bytes);
+        }
+
+        if !endpoint_name.is_empty() {
+            args.push(endpoint_name.to_boxed_bytes().into_vec());
+            args.extend(
+                arg_buffer
+                    .raw_arg_iter()
+                    .map(|mb| mb.to_boxed_bytes().into_vec()),
+            );
+        }
+
+        let _ = self.perform_transfer_execute(
+            contract_address,
+            num_bigint::BigUint::zero(),
+            ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
+            args,
+        );
+
+        Ok(())
+    }
+
     fn perform_deploy(
         &self,
         contract_code: Vec<u8>,
@@ -246,110 +353,39 @@ impl SendApiImpl for DebugApi {
         Ok(())
     }
 
-    fn transfer_esdt_execute<M: ManagedTypeApi>(
-        &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        amount: &BigUint<M>,
-        _gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
-        let recipient = to.to_address();
-        let token_bytes = top_encode_to_vec_u8(token).unwrap();
-        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
-
-        let mut args = vec![token_bytes, amount_bytes];
-        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
-
-        let _ = self.perform_transfer_execute(
-            recipient,
-            num_bigint::BigUint::zero(),
-            ESDT_TRANSFER_FUNC_NAME.into(),
-            args,
-        );
-
-        Ok(())
-    }
-
-    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
-        &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        nonce: u64,
-        amount: &BigUint<M>,
-        _gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
-        let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
-
-        let token_bytes = top_encode_to_vec_u8(token).unwrap();
-        let nonce_bytes = top_encode_to_vec_u8(&nonce).unwrap();
-        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
-
-        let mut args = vec![
-            token_bytes,
-            nonce_bytes,
-            amount_bytes,
-            recipient.as_bytes().to_vec(),
-        ];
-
-        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
-
-        let _ = self.perform_transfer_execute(
-            contract_address,
-            num_bigint::BigUint::zero(),
-            ESDT_NFT_TRANSFER_FUNC_NAME.into(),
-            args,
-        );
-
-        Ok(())
-    }
-
     fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
         payments: &ManagedVec<M, EsdtTokenPayment<M>>,
-        _gas_limit: u64,
+        gas_limit: u64,
         endpoint_name: &ManagedBuffer<M>,
         arg_buffer: &ManagedArgBuffer<M>,
     ) -> Result<(), &'static [u8]> {
-        let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
-
-        let mut args = vec![
-            recipient.as_bytes().to_vec(),
-            top_encode_to_vec_u8(&payments.len()).unwrap(),
-        ];
-
-        for payment in payments.into_iter() {
-            let token_bytes = top_encode_to_vec_u8(&payment.token_identifier).unwrap();
-            args.push(token_bytes);
-            let nonce_bytes = top_encode_to_vec_u8(&payment.token_nonce).unwrap();
-            args.push(nonce_bytes);
-            let amount_bytes = top_encode_to_vec_u8(&payment.amount).unwrap();
-            args.push(amount_bytes);
+        if payments.len() == 1 {
+            let payment = payments.get(0);
+            if payment.token_nonce == 0 {
+                self.perform_transfer_execute_esdt(
+                    to,
+                    &payment.token_identifier,
+                    &payment.amount,
+                    gas_limit,
+                    endpoint_name,
+                    arg_buffer,
+                )
+            } else {
+                self.perform_transfer_execute_nft(
+                    to,
+                    &payment.token_identifier,
+                    payment.token_nonce,
+                    &payment.amount,
+                    gas_limit,
+                    endpoint_name,
+                    arg_buffer,
+                )
+            }
+        } else {
+            self.perform_transfer_execute_multi(to, payments, gas_limit, endpoint_name, arg_buffer)
         }
-
-        if !endpoint_name.is_empty() {
-            args.push(endpoint_name.to_boxed_bytes().into_vec());
-            args.extend(
-                arg_buffer
-                    .raw_arg_iter()
-                    .map(|mb| mb.to_boxed_bytes().into_vec()),
-            );
-        }
-
-        let _ = self.perform_transfer_execute(
-            contract_address,
-            num_bigint::BigUint::zero(),
-            ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
-            args,
-        );
-
-        Ok(())
     }
 
     fn async_call_raw<M: ManagedTypeApi>(

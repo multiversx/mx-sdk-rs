@@ -1,7 +1,7 @@
 use super::{BlockchainApi, HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl};
 use crate::types::{
     BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-    ManagedVec, TokenIdentifier,
+    ManagedVec,
 };
 
 pub trait SendApi: ManagedTypeApi + BlockchainApi {
@@ -22,30 +22,6 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
     fn transfer_value_execute<M: ManagedTypeApi>(
         &self,
         to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]>;
-
-    /// Sends ESDT to an address and executes like an async call, but without callback.
-    fn transfer_esdt_execute<M: ManagedTypeApi>(
-        &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        amount: &BigUint<M>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]>;
-
-    /// Sends ESDT NFT to an address and executes like an async call, but without callback.
-    #[allow(clippy::too_many_arguments)]
-    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
-        &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        nonce: u64,
         amount: &BigUint<M>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<M>,
