@@ -200,6 +200,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         self.perform_async_call(to, egld_value, endpoint_name, arg_buffer)
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn create_async_call_raw(
         &self,
         to_handle: RawHandle,
@@ -246,6 +247,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         tx_result.pending_calls.promises.push(promise);
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn deploy_contract(
         &self,
         _gas: u64,
@@ -272,6 +274,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn deploy_from_source_contract(
         &self,
         _gas: u64,
