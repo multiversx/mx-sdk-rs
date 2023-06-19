@@ -36,9 +36,6 @@ pub trait SendApiImpl: ManagedTypeApiImpl {
     /// Sends an asynchronous call to another contract.
     /// Calling this method immediately terminates tx execution.
     /// Using it directly is generally discouraged.
-    ///
-    /// The data is expected to be of the form `functionName@<arg1-hex>@<arg2-hex>@...`.
-    /// Use a `HexCallDataSerializer` to prepare this field.
     fn async_call_raw(
         &self,
         to_handle: RawHandle,
