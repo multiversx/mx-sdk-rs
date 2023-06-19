@@ -39,7 +39,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
     }
 
     fn get_shard_of_address(&self, address_handle: Self::ManagedBufferHandle) -> u32 {
-        self.with_temp_buffer_ptr(address_handle, |address_ptr| {
+        self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_vm_hooks(|vh| vh.get_shard_of_address(address_ptr))
         }) as u32
     }
@@ -49,7 +49,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
     }
 
     fn is_smart_contract(&self, address_handle: Self::ManagedBufferHandle) -> bool {
-        let result = self.with_temp_buffer_ptr(address_handle, |address_ptr| {
+        let result = self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_vm_hooks(|vh| vh.is_smart_contract(address_ptr))
         });
         result > 0
@@ -60,7 +60,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
     }
 
     fn load_balance(&self, dest: Self::BigIntHandle, address_handle: Self::ManagedBufferHandle) {
-        self.with_temp_buffer_ptr(address_handle, |address_ptr: isize| {
+        self.with_temp_address_ptr(address_handle, |address_ptr: isize| {
             self.with_vm_hooks(|vh| vh.big_int_get_external_balance(address_ptr, dest))
         });
     }
@@ -139,8 +139,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
         token_id_handle: Self::ManagedBufferHandle,
     ) -> u64 {
         let token_id_len = self.mb_len(token_id_handle);
-        let result = self.with_temp_buffer_ptr(address_handle, |address_ptr| {
-            self.with_temp_buffer_ptr(token_id_handle, |token_id_ptr| {
+        let result = self.with_temp_address_ptr(address_handle, |address_ptr| {
+            self.with_temp_buffer_ptr(token_id_handle, token_id_len, |token_id_ptr| {
                 self.with_vm_hooks(|vh| {
                     vh.get_current_esdt_nft_nonce(address_ptr, token_id_ptr, token_id_len as isize)
                 })
@@ -157,8 +157,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
         dest: Self::BigIntHandle,
     ) {
         let token_id_len = self.mb_len(token_id_handle);
-        self.with_temp_buffer_ptr(address_handle, |address_ptr| {
-            self.with_temp_buffer_ptr(token_id_handle, |token_id_ptr| {
+        self.with_temp_address_ptr(address_handle, |address_ptr| {
+            self.with_temp_buffer_ptr(token_id_handle, token_id_len, |token_id_ptr| {
                 self.with_vm_hooks(|vh| {
                     vh.big_int_get_esdt_external_balance(
                         address_ptr,

@@ -89,14 +89,22 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
     /// - token identifiers.
     ///
     /// The buffer is 32 bytes long, enough for both addresses and token identifiers.
-    pub(crate) fn with_temp_buffer_ptr<R, F>(&self, handle: RawHandle, f: F) -> R
+    pub(crate) fn with_temp_buffer_ptr<R, F>(&self, handle: RawHandle, length: usize, f: F) -> R
     where
         F: FnOnce(MemPtr) -> R,
     {
         let mut temp_buffer = [0u8; 32];
-        self.mb_load_slice(handle, 0, &mut temp_buffer[..])
+        self.mb_load_slice(handle, 0, &mut temp_buffer[..length])
             .expect("error extracting address bytes");
         f(temp_buffer.as_ptr() as MemPtr)
+    }
+
+    /// Convenience method for calling VM hooks with a pointer to a temporary buffer in which we load an address.
+    pub(crate) fn with_temp_address_ptr<R, F>(&self, handle: RawHandle, f: F) -> R
+    where
+        F: FnOnce(MemPtr) -> R,
+    {
+        self.with_temp_buffer_ptr(handle, 32, f)
     }
 }
 
