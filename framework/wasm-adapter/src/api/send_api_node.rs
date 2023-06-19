@@ -1,17 +1,7 @@
 use crate::api::VmApiImpl;
-use multiversx_sc::{
-    api::{const_handles, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
-    types::{
-        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedType, ManagedVec,
-    },
-};
+use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
 
 extern "C" {
-
-    // managed buffer API
-    fn mBufferNewFromBytes(byte_ptr: *const u8, byte_len: i32) -> i32;
-
     fn managedMultiTransferESDTNFTExecute(
         dstHandle: i32,
         tokenTransfersHandle: i32,
@@ -19,6 +9,7 @@ extern "C" {
         functionHandle: i32,
         argumentsHandle: i32,
     ) -> i32;
+
     fn managedTransferValueExecute(
         dstHandle: i32,
         valueHandle: i32,
@@ -26,6 +17,7 @@ extern "C" {
         functionHandle: i32,
         argumentsHandle: i32,
     ) -> i32;
+
     fn managedExecuteOnDestContext(
         gas: i64,
         addressHandle: i32,
@@ -34,6 +26,7 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     ) -> i32;
+
     fn managedExecuteOnSameContext(
         gas: i64,
         addressHandle: i32,
@@ -42,6 +35,7 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     ) -> i32;
+
     fn managedExecuteReadOnly(
         gas: i64,
         addressHandle: i32,
@@ -49,6 +43,7 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     ) -> i32;
+
     fn managedCreateContract(
         gas: i64,
         valueHandle: i32,
@@ -58,6 +53,7 @@ extern "C" {
         resultAddressHandle: i32,
         resultHandle: i32,
     ) -> i32;
+
     fn managedDeployFromSourceContract(
         gas: i64,
         valueHandle: i32,
@@ -67,6 +63,7 @@ extern "C" {
         resultAddressHandle: i32,
         resultHandle: i32,
     ) -> i32;
+
     fn managedUpgradeContract(
         dstHandle: i32,
         gas: i64,
@@ -76,6 +73,7 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     );
+
     fn managedUpgradeFromSourceContract(
         dstHandle: i32,
         gas: i64,
@@ -85,6 +83,7 @@ extern "C" {
         argumentsHandle: i32,
         resultHandle: i32,
     );
+
     fn managedAsyncCall(
         dstHandle: i32,
         valueHandle: i32,
@@ -114,14 +113,6 @@ extern "C" {
     fn deleteFromReturnData(resultID: i32);
 }
 
-unsafe fn code_metadata_to_buffer_handle(code_metadata: CodeMetadata) -> i32 {
-    let code_metadata_bytes = code_metadata.to_byte_array();
-    mBufferNewFromBytes(
-        code_metadata_bytes.as_ptr(),
-        code_metadata_bytes.len() as i32,
-    )
-}
-
 impl SendApi for VmApiImpl {
     type SendApiImpl = VmApiImpl;
 
@@ -132,21 +123,21 @@ impl SendApi for VmApiImpl {
 }
 
 impl SendApiImpl for VmApiImpl {
-    fn transfer_value_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
+        to_handle: RawHandle,
+        amount_handle: RawHandle,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let result = managedTransferValueExecute(
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
+                to_handle,
+                amount_handle,
                 gas_limit as i64,
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
+                endpoint_name_handle,
+                arg_buffer_handle,
             );
             if result == 0 {
                 Ok(())
@@ -156,21 +147,21 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute(
         &self,
-        to: &ManagedAddress<M>,
-        payments: &ManagedVec<M, EsdtTokenPayment<M>>,
+        to_handle: RawHandle,
+        payments_handle: RawHandle,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) -> Result<(), &'static [u8]> {
         unsafe {
             let result = managedMultiTransferESDTNFTExecute(
-                to.get_raw_handle(),
-                payments.get_raw_handle(),
+                to_handle,
+                payments_handle,
                 gas_limit as i64,
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
+                endpoint_name_handle,
+                arg_buffer_handle,
             );
             if result == 0 {
                 Ok(())
@@ -180,153 +171,139 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn async_call_raw<M: ManagedTypeApi>(
+    fn async_call_raw(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) -> ! {
         unsafe {
             managedAsyncCall(
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
             )
         }
     }
 
     fn create_async_call_raw(
         &self,
-        to: Self::ManagedBufferHandle,
-        amount: Self::BigIntHandle,
-        endpoint_name: Self::ManagedBufferHandle,
-        arg_buffer: Self::ManagedBufferHandle,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
         success_callback: &'static str,
         error_callback: &'static str,
         gas: u64,
         extra_gas_for_callback: u64,
-        callback_closure: Self::ManagedBufferHandle,
+        callback_closure_handle: RawHandle,
     ) {
         unsafe {
             let _ = managedCreateAsyncCall(
-                to,
-                amount,
-                endpoint_name,
-                arg_buffer,
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
                 success_callback.as_ptr(),
                 success_callback.len() as i32,
                 error_callback.as_ptr(),
                 error_callback.len() as i32,
                 gas as i64,
                 extra_gas_for_callback as i64,
-                callback_closure,
+                callback_closure_handle,
             );
         }
     }
 
-    fn deploy_contract<M: ManagedTypeApi>(
+    fn deploy_contract(
         &self,
         gas: u64,
-        amount: &BigUint<M>,
-        code: &ManagedBuffer<M>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        unsafe {
-            let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let new_address_handle = self.next_handle();
-            let result_handle = self.next_handle();
-            let _ = managedCreateContract(
-                gas as i64,
-                amount.get_raw_handle(),
-                code.get_raw_handle(),
-                code_metadata_handle,
-                arg_buffer.get_raw_handle(),
-                new_address_handle,
-                result_handle,
-            );
-
-            let new_managed_address = ManagedAddress::from_raw_handle(new_address_handle);
-            let results = ManagedVec::from_raw_handle(result_handle);
-
-            (new_managed_address, results)
-        }
-    }
-
-    fn deploy_from_source_contract<M: ManagedTypeApi>(
-        &self,
-        gas: u64,
-        amount: &BigUint<M>,
-        source_contract_address: &ManagedAddress<M>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        unsafe {
-            let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
-            let new_address_handle = self.next_handle();
-            let result_handle = self.next_handle();
-            let _ = managedDeployFromSourceContract(
-                gas as i64,
-                amount.get_raw_handle(),
-                source_contract_address.get_raw_handle(),
-                code_metadata_handle,
-                arg_buffer.get_raw_handle(),
-                new_address_handle,
-                result_handle,
-            );
-
-            let new_managed_address = ManagedAddress::from_raw_handle(new_address_handle);
-            let results = ManagedVec::from_raw_handle(result_handle);
-
-            (new_managed_address, results)
-        }
-    }
-
-    fn upgrade_from_source_contract<M: ManagedTypeApi>(
-        &self,
-        sc_address: &ManagedAddress<M>,
-        gas: u64,
-        amount: &BigUint<M>,
-        source_contract_address: &ManagedAddress<M>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
+        egld_value_handle: RawHandle,
+        code_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        new_address_handle: RawHandle,
+        result_handle: RawHandle,
     ) {
         unsafe {
-            let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
+            let _ = managedCreateContract(
+                gas as i64,
+                egld_value_handle,
+                code_handle,
+                code_metadata_handle,
+                arg_buffer_handle,
+                new_address_handle,
+                result_handle,
+            );
+        }
+    }
+
+    fn deploy_from_source_contract(
+        &self,
+        gas: u64,
+        egld_value_handle: RawHandle,
+        source_contract_address_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        new_address_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
+        unsafe {
+            let _ = managedDeployFromSourceContract(
+                gas as i64,
+                egld_value_handle,
+                source_contract_address_handle,
+                code_metadata_handle,
+                arg_buffer_handle,
+                new_address_handle,
+                result_handle,
+            );
+        }
+    }
+
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address_handle: RawHandle,
+        gas: u64,
+        egld_value_handle: RawHandle,
+        source_contract_address_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+    ) {
+        unsafe {
             let unused_result_handle = const_handles::MBUF_TEMPORARY_1;
             managedUpgradeFromSourceContract(
-                sc_address.get_raw_handle(),
+                sc_address_handle,
                 gas as i64,
-                amount.get_raw_handle(),
-                source_contract_address.get_raw_handle(),
+                egld_value_handle,
+                source_contract_address_handle,
                 code_metadata_handle,
-                arg_buffer.get_raw_handle(),
+                arg_buffer_handle,
                 unused_result_handle,
             );
         }
     }
 
-    fn upgrade_contract<M: ManagedTypeApi>(
+    fn upgrade_contract(
         &self,
-        sc_address: &ManagedAddress<M>,
+        sc_address_handle: RawHandle,
         gas: u64,
-        amount: &BigUint<M>,
-        code: &ManagedBuffer<M>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
+        egld_value_handle: RawHandle,
+        code_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) {
         unsafe {
-            let code_metadata_handle = code_metadata_to_buffer_handle(code_metadata);
             let unused_result_handle = const_handles::MBUF_TEMPORARY_1;
             managedUpgradeContract(
-                sc_address.get_raw_handle(),
+                sc_address_handle,
                 gas as i64,
-                amount.get_raw_handle(),
-                code.get_raw_handle(),
+                egld_value_handle,
+                code_handle,
                 code_metadata_handle,
-                arg_buffer.get_raw_handle(),
+                arg_buffer_handle,
                 unused_result_handle,
             );
 
@@ -335,72 +312,64 @@ impl SendApiImpl for VmApiImpl {
         }
     }
 
-    fn execute_on_dest_context_raw<M: ManagedTypeApi>(
+    fn execute_on_dest_context_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
         unsafe {
-            let result_handle = self.next_handle();
             let _ = managedExecuteOnDestContext(
                 gas as i64,
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
                 result_handle,
             );
-
-            ManagedVec::from_raw_handle(result_handle)
         }
     }
 
-    fn execute_on_same_context_raw<M: ManagedTypeApi>(
+    fn execute_on_same_context_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
         unsafe {
-            let result_handle = self.next_handle();
-
             let _ = managedExecuteOnSameContext(
                 gas as i64,
-                to.get_raw_handle(),
-                amount.get_raw_handle(),
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
+                to_handle,
+                egld_value_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
                 result_handle,
             );
-
-            ManagedVec::from_raw_handle(result_handle)
         }
     }
 
-    fn execute_on_dest_context_readonly_raw<M: ManagedTypeApi>(
+    fn execute_on_dest_context_readonly_raw(
         &self,
         gas: u64,
-        to: &ManagedAddress<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        to_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
         unsafe {
-            let result_handle = self.next_handle();
-
             let _ = managedExecuteReadOnly(
                 gas as i64,
-                to.get_raw_handle(),
-                endpoint_name.get_raw_handle(),
-                arg_buffer.get_raw_handle(),
+                to_handle,
+                endpoint_name_handle,
+                arg_buffer_handle,
                 result_handle,
             );
-
-            ManagedVec::from_raw_handle(result_handle)
         }
     }
 

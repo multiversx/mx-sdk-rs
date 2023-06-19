@@ -3,38 +3,30 @@ use crate::{
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxFunctionName,
-        TxInput, TxPanic, TxResult,
+        TxInput, TxPanic, TxResult, TxTokenTransfer,
     },
     DebugApi,
 };
 use multiversx_sc::{
     api::{
-        BlockchainApiImpl, HandleConstraints, ManagedTypeApi, SendApi, SendApiImpl,
-        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
-        UPGRADE_CONTRACT_FUNC_NAME,
+        BlockchainApiImpl, RawHandle, SendApi, SendApiImpl, ESDT_MULTI_TRANSFER_FUNC_NAME,
+        ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     codec::top_encode_to_vec_u8,
     err_msg,
-    types::{
-        heap::Address, BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
-    },
+    types::{heap::Address, CodeMetadata},
 };
 use num_traits::Zero;
 
 impl DebugApi {
-    fn append_endpoint_name_and_args<M: ManagedTypeApi>(
+    fn append_endpoint_name_and_args(
         args: &mut Vec<Vec<u8>>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        endpoint_name: TxFunctionName,
+        arg_buffer: Vec<Vec<u8>>,
     ) {
         if !endpoint_name.is_empty() {
-            args.push(endpoint_name.to_boxed_bytes().into_vec());
-            args.extend(
-                arg_buffer
-                    .raw_arg_iter()
-                    .map(|mb| mb.to_boxed_bytes().into_vec()),
-            );
+            args.push(endpoint_name.into_bytes());
+            args.extend(arg_buffer.into_iter());
         }
     }
 
@@ -129,24 +121,20 @@ impl DebugApi {
         }
     }
 
-    fn perform_transfer_execute_esdt<M: ManagedTypeApi>(
+    fn perform_transfer_execute_esdt(
         &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        amount: &BigUint<M>,
+        to: Address,
+        token: Vec<u8>,
+        amount: num_bigint::BigUint,
         _gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
     ) -> Result<(), &'static [u8]> {
-        let recipient = to.to_address();
-        let token_bytes = top_encode_to_vec_u8(token).unwrap();
-        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
-
-        let mut args = vec![token_bytes, amount_bytes];
-        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
+        let mut args = vec![token, amount.to_bytes_be()];
+        Self::append_endpoint_name_and_args(&mut args, func_name, arguments);
 
         let _ = self.perform_transfer_execute(
-            recipient,
+            to,
             num_bigint::BigUint::zero(),
             ESDT_TRANSFER_FUNC_NAME.into(),
             args,
@@ -156,31 +144,26 @@ impl DebugApi {
     }
 
     #[allow(clippy::too_many_arguments)]
-    fn perform_transfer_execute_nft<M: ManagedTypeApi>(
+    fn perform_transfer_execute_nft(
         &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        to: Address,
+        token: Vec<u8>,
         nonce: u64,
-        amount: &BigUint<M>,
+        amount: num_bigint::BigUint,
         _gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
     ) -> Result<(), &'static [u8]> {
         let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
-
-        let token_bytes = top_encode_to_vec_u8(token).unwrap();
-        let nonce_bytes = top_encode_to_vec_u8(&nonce).unwrap();
-        let amount_bytes = top_encode_to_vec_u8(amount).unwrap();
 
         let mut args = vec![
-            token_bytes,
-            nonce_bytes,
-            amount_bytes,
-            recipient.as_bytes().to_vec(),
+            token,
+            top_encode_to_vec_u8(&nonce).unwrap(),
+            amount.to_bytes_be(),
+            to.to_vec(),
         ];
 
-        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
+        Self::append_endpoint_name_and_args(&mut args, func_name, arguments);
 
         let _ = self.perform_transfer_execute(
             contract_address,
@@ -192,39 +175,28 @@ impl DebugApi {
         Ok(())
     }
 
-    fn perform_transfer_execute_multi<M: ManagedTypeApi>(
+    fn perform_transfer_execute_multi(
         &self,
-        to: &ManagedAddress<M>,
-        payments: &ManagedVec<M, EsdtTokenPayment<M>>,
+        to: Address,
+        payments: Vec<TxTokenTransfer>,
         _gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        endpoint_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
     ) -> Result<(), &'static [u8]> {
         let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
 
-        let mut args = vec![
-            recipient.as_bytes().to_vec(),
-            top_encode_to_vec_u8(&payments.len()).unwrap(),
-        ];
+        let mut args = vec![to.to_vec(), top_encode_to_vec_u8(&payments.len()).unwrap()];
 
         for payment in payments.into_iter() {
             let token_bytes = top_encode_to_vec_u8(&payment.token_identifier).unwrap();
             args.push(token_bytes);
-            let nonce_bytes = top_encode_to_vec_u8(&payment.token_nonce).unwrap();
+            let nonce_bytes = top_encode_to_vec_u8(&payment.nonce).unwrap();
             args.push(nonce_bytes);
-            let amount_bytes = top_encode_to_vec_u8(&payment.amount).unwrap();
+            let amount_bytes = top_encode_to_vec_u8(&payment.value).unwrap();
             args.push(amount_bytes);
         }
 
-        if !endpoint_name.is_empty() {
-            args.push(endpoint_name.to_boxed_bytes().into_vec());
-            args.extend(
-                arg_buffer
-                    .raw_arg_iter()
-                    .map(|mb| mb.to_boxed_bytes().into_vec()),
-            );
-        }
+        Self::append_endpoint_name_and_args(&mut args, endpoint_name, arguments);
 
         let _ = self.perform_transfer_execute(
             contract_address,
@@ -238,8 +210,9 @@ impl DebugApi {
 
     fn perform_deploy(
         &self,
-        contract_code: Vec<u8>,
         egld_value: num_bigint::BigUint,
+        contract_code: Vec<u8>,
+        _code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> (Address, Vec<Vec<u8>>) {
         let contract_address = &self.input_ref().to;
@@ -284,30 +257,23 @@ impl DebugApi {
         std::panic::panic_any(tx_result)
     }
 
-    fn perform_upgrade_contract<M: ManagedTypeApi>(
+    fn perform_upgrade_contract(
         &self,
-        sc_address: &ManagedAddress<M>,
-        amount: &BigUint<M>,
+        to: Address,
+        egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
+        args: Vec<Vec<u8>>,
     ) -> ! {
-        let recipient = sc_address.to_address();
-        let call_value =
-            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
         let tx_hash = self.get_tx_hash_legacy();
 
         let mut arguments = vec![contract_code, top_encode_to_vec_u8(&code_metadata).unwrap()];
-        arguments.extend(
-            arg_buffer
-                .raw_arg_iter()
-                .map(|mb| mb.to_boxed_bytes().into_vec()),
-        );
+        arguments.extend(args.into_iter());
         let call = AsyncCallTxData {
             from: contract_address,
-            to: recipient,
-            call_value,
+            to,
+            call_value: egld_value,
             endpoint_name: UPGRADE_CONTRACT_FUNC_NAME.into(),
             arguments,
             tx_hash,
@@ -331,43 +297,50 @@ impl SendApi for DebugApi {
 }
 
 impl SendApiImpl for DebugApi {
-    fn transfer_value_execute<M: ManagedTypeApi>(
+    fn transfer_value_execute(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
+        to_handle: RawHandle,
+        amount_handle: RawHandle,
         _gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) -> Result<(), &'static [u8]> {
-        let egld_value =
-            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
-        let recipient = to.to_address();
+        let recipient = self.m_types_borrow().mb_to_address(to_handle);
+        let egld_value = self.m_types_borrow().bu_get(amount_handle);
+        let endpoint_name = self
+            .m_types_borrow()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
 
-        let _ = self.perform_transfer_execute(
-            recipient,
-            egld_value,
-            endpoint_name.to_boxed_bytes().as_slice().into(),
-            arg_buffer.to_raw_args_vec(),
-        );
+        let _ = self.perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer);
 
         Ok(())
     }
 
-    fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
+    fn multi_transfer_esdt_nft_execute(
         &self,
-        to: &ManagedAddress<M>,
-        payments: &ManagedVec<M, EsdtTokenPayment<M>>,
+        to_handle: RawHandle,
+        payments_handle: RawHandle,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) -> Result<(), &'static [u8]> {
+        let to = self.m_types_borrow().mb_to_address(to_handle);
+        let payments = self
+            .m_types_borrow()
+            .mb_get_vec_of_esdt_payments(payments_handle);
+        let endpoint_name = self
+            .m_types_borrow()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+
         if payments.len() == 1 {
-            let payment = payments.get(0);
-            if payment.token_nonce == 0 {
+            let payment = payments[0].clone();
+            if payment.nonce == 0 {
                 self.perform_transfer_execute_esdt(
                     to,
-                    &payment.token_identifier,
-                    &payment.amount,
+                    payment.token_identifier,
+                    payment.value,
                     gas_limit,
                     endpoint_name,
                     arg_buffer,
@@ -375,9 +348,9 @@ impl SendApiImpl for DebugApi {
             } else {
                 self.perform_transfer_execute_nft(
                     to,
-                    &payment.token_identifier,
-                    payment.token_nonce,
-                    &payment.amount,
+                    payment.token_identifier,
+                    payment.nonce,
+                    payment.value,
                     gas_limit,
                     endpoint_name,
                     arg_buffer,
@@ -388,24 +361,28 @@ impl SendApiImpl for DebugApi {
         }
     }
 
-    fn async_call_raw<M: ManagedTypeApi>(
+    fn async_call_raw(
         &self,
-        to: &ManagedAddress<M>,
-        amount: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) -> ! {
-        let amount_value =
-            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let contract_address = self.input_ref().to.clone();
-        let recipient = to.to_address();
+        let to = self.m_types_borrow().mb_to_address(to_handle);
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let endpoint_name = self
+            .m_types_borrow()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.get_tx_hash_legacy();
+
         let call = AsyncCallTxData {
             from: contract_address,
-            to: recipient,
-            call_value: amount_value,
-            endpoint_name: endpoint_name.to_boxed_bytes().as_slice().into(),
-            arguments: arg_buffer.to_raw_args_vec(),
+            to,
+            call_value: egld_value,
+            endpoint_name,
+            arguments: arg_buffer,
             tx_hash,
         };
         self.perform_async_call(call)
@@ -413,32 +390,35 @@ impl SendApiImpl for DebugApi {
 
     fn create_async_call_raw(
         &self,
-        to: Self::ManagedBufferHandle,
-        amount: Self::BigIntHandle,
-        endpoint_name_handle: Self::ManagedBufferHandle,
-        arg_buffer_handle: Self::ManagedBufferHandle,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
         success_callback: &'static str,
         error_callback: &'static str,
         _gas: u64,
         _extra_gas_for_callback: u64,
-        callback_closure_handle: Self::ManagedBufferHandle,
+        callback_closure_handle: RawHandle,
     ) {
-        let amount_value = self.big_uint_handle_to_value(amount);
         let contract_address = self.input_ref().to.clone();
-        let recipient = self.address_handle_to_value(to);
-        let endpoint_name = self.mb_handle_to_value(endpoint_name_handle);
+        let to = self.m_types_borrow().mb_to_address(to_handle);
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let endpoint_name = self
+            .m_types_borrow()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.get_tx_hash_legacy();
-        let callback_closure_data = self.mb_handle_to_value(callback_closure_handle);
+        let callback_closure_data = self
+            .m_types_borrow()
+            .mb_get(callback_closure_handle)
+            .to_vec();
 
         let call = AsyncCallTxData {
             from: contract_address,
-            to: recipient,
-            call_value: amount_value,
-            endpoint_name: endpoint_name.into(),
-            arguments: ManagedArgBuffer::<Self>::from_raw_handle(
-                arg_buffer_handle.get_raw_handle_unchecked(),
-            )
-            .to_raw_args_vec(),
+            to,
+            call_value: egld_value,
+            endpoint_name,
+            arguments: arg_buffer,
             tx_hash,
         };
 
@@ -454,109 +434,153 @@ impl SendApiImpl for DebugApi {
         tx_result.pending_calls.promises.push(promise);
     }
 
-    fn deploy_contract<M: ManagedTypeApi>(
+    fn deploy_contract(
         &self,
         _gas: u64,
-        amount: &BigUint<M>,
-        code: &ManagedBuffer<M>,
-        _code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        let egld_value =
-            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
-        let contract_code = code.to_boxed_bytes().into_vec();
+        egld_value_handle: RawHandle,
+        code_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        new_address_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let code = self.m_types_borrow().mb_get(code_handle).to_vec();
+        let code_metadata = self
+            .m_types_borrow()
+            .mb_to_code_metadata(code_metadata_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+
         let (new_address, result) =
-            self.perform_deploy(contract_code, egld_value, arg_buffer.to_raw_args_vec());
+            self.perform_deploy(egld_value, code, code_metadata, arg_buffer);
 
-        (ManagedAddress::from(new_address), ManagedVec::from(result))
+        self.m_types_borrow_mut()
+            .mb_set(new_address_handle, new_address.to_vec());
+        self.m_types_borrow_mut()
+            .mb_set_vec_of_bytes(result_handle, result);
     }
 
-    fn deploy_from_source_contract<M: ManagedTypeApi>(
+    fn deploy_from_source_contract(
         &self,
         _gas: u64,
-        amount: &BigUint<M>,
-        source_contract_address: &ManagedAddress<M>,
-        _code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> (ManagedAddress<M>, ManagedVec<M, ManagedBuffer<M>>) {
-        let egld_value =
-            self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
-        let source_contract_code = self.get_contract_code(&source_contract_address.to_address());
-        let (new_address, result) = self.perform_deploy(
+        egld_value_handle: RawHandle,
+        source_contract_address_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        new_address_handle: RawHandle,
+        result_handle: RawHandle,
+    ) {
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let source_contract_address = self
+            .m_types_borrow()
+            .mb_to_address(source_contract_address_handle);
+        let source_contract_code = self.get_contract_code(&source_contract_address);
+        let code_metadata = self
+            .m_types_borrow()
+            .mb_to_code_metadata(code_metadata_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        let (new_address, result) =
+            self.perform_deploy(egld_value, source_contract_code, code_metadata, arg_buffer);
+
+        self.m_types_borrow_mut()
+            .mb_set(new_address_handle, new_address.to_vec());
+        self.m_types_borrow_mut()
+            .mb_set_vec_of_bytes(result_handle, result);
+    }
+
+    fn upgrade_from_source_contract(
+        &self,
+        sc_address_handle: RawHandle,
+        _gas: u64,
+        egld_value_handle: RawHandle,
+        source_contract_address_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+    ) {
+        let to = self.m_types_borrow().mb_to_address(sc_address_handle);
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let source_contract_address = self
+            .m_types_borrow()
+            .mb_to_address(source_contract_address_handle);
+        let source_contract_code = self.get_contract_code(&source_contract_address);
+        let code_metadata = self
+            .m_types_borrow()
+            .mb_to_code_metadata(code_metadata_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        self.perform_upgrade_contract(
+            to,
+            egld_value,
             source_contract_code,
-            egld_value,
-            arg_buffer.to_raw_args_vec(),
-        );
-
-        (ManagedAddress::from(new_address), ManagedVec::from(result))
+            code_metadata,
+            arg_buffer,
+        )
     }
 
-    fn upgrade_contract<M: ManagedTypeApi>(
+    fn upgrade_contract(
         &self,
-        sc_address: &ManagedAddress<M>,
+        sc_address_handle: RawHandle,
         _gas: u64,
-        amount: &BigUint<M>,
-        code: &ManagedBuffer<M>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
+        egld_value_handle: RawHandle,
+        code_handle: RawHandle,
+        code_metadata_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
     ) {
-        let contract_code = code.to_boxed_bytes().into_vec();
-        self.perform_upgrade_contract(sc_address, amount, contract_code, code_metadata, arg_buffer)
+        let to = self.m_types_borrow().mb_to_address(sc_address_handle);
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let code = self.m_types_borrow().mb_get(code_handle).to_vec();
+        let code_metadata = self
+            .m_types_borrow()
+            .mb_to_code_metadata(code_metadata_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        self.perform_upgrade_contract(to, egld_value, code, code_metadata, arg_buffer)
     }
 
-    fn upgrade_from_source_contract<M: ManagedTypeApi>(
+    fn execute_on_dest_context_raw(
         &self,
-        sc_address: &ManagedAddress<M>,
         _gas: u64,
-        amount: &BigUint<M>,
-        source_contract_address: &ManagedAddress<M>,
-        code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<M>,
+        to_handle: RawHandle,
+        egld_value_handle: RawHandle,
+        endpoint_name_handle: RawHandle,
+        arg_buffer_handle: RawHandle,
+        result_handle: RawHandle,
     ) {
-        let contract_code = self.get_contract_code(&source_contract_address.to_address());
-        self.perform_upgrade_contract(sc_address, amount, contract_code, code_metadata, arg_buffer)
+        let to = self.m_types_borrow().mb_to_address(to_handle);
+        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let endpoint_name = self
+            .m_types_borrow()
+            .mb_to_function_name(endpoint_name_handle);
+        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+
+        let result =
+            self.perform_execute_on_dest_context(to, egld_value, endpoint_name, arg_buffer);
+
+        self.m_types_borrow_mut()
+            .mb_set_vec_of_bytes(result_handle, result);
     }
 
-    fn execute_on_dest_context_raw<M: ManagedTypeApi>(
+    fn execute_on_same_context_raw(
         &self,
         _gas: u64,
-        to: &ManagedAddress<M>,
-        value: &BigUint<M>,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
-        let egld_value =
-            self.big_uint_handle_to_value(value.get_handle().cast_or_signal_error::<M, _>());
-        let recipient = to.to_address();
-
-        let result = self.perform_execute_on_dest_context(
-            recipient,
-            egld_value,
-            endpoint_name.to_boxed_bytes().as_slice().into(),
-            arg_buffer.to_raw_args_vec(),
-        );
-
-        ManagedVec::from(result)
-    }
-
-    fn execute_on_same_context_raw<M: ManagedTypeApi>(
-        &self,
-        _gas: u64,
-        _to: &ManagedAddress<M>,
-        _value: &BigUint<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        _to_handle: RawHandle,
+        _egld_value_handle: RawHandle,
+        _endpoint_name_handle: RawHandle,
+        _arg_buffer_handle: RawHandle,
+        _result_handle: RawHandle,
+    ) {
         panic!("execute_on_same_context_raw not implemented yet!");
     }
 
-    fn execute_on_dest_context_readonly_raw<M: ManagedTypeApi>(
+    fn execute_on_dest_context_readonly_raw(
         &self,
         _gas: u64,
-        _to: &ManagedAddress<M>,
-        _endpoint_name: &ManagedBuffer<M>,
-        _arg_buffer: &ManagedArgBuffer<M>,
-    ) -> ManagedVec<M, ManagedBuffer<M>> {
+        _to_handle: RawHandle,
+        _endpoint_name_handle: RawHandle,
+        _arg_buffer_handle: RawHandle,
+        _result_handle: RawHandle,
+    ) {
         panic!("execute_on_dest_context_readonly_raw not implemented yet!");
     }
 
