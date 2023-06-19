@@ -916,12 +916,12 @@ impl VMHooks for VMHooksDispatcher {
         )
     }
 
-    fn managed_is_esdt_limited_transfer(&self, token_id_handle: i32) -> i32 {
-        panic!("Unavailable: managed_is_esdt_limited_transfer")
+    fn managed_is_esdt_limited_transfer(&self, _token_id_handle: i32) -> i32 {
+        bool_to_i32(false)
     }
 
-    fn managed_is_esdt_paused(&self, token_id_handle: i32) -> i32 {
-        panic!("Unavailable: managed_is_esdt_paused")
+    fn managed_is_esdt_paused(&self, _token_id_handle: i32) -> i32 {
+        bool_to_i32(false)
     }
 
     fn managed_buffer_to_hex(&self, source_handle: i32, dest_handle: i32) {
