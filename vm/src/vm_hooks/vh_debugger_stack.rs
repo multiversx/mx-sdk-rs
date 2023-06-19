@@ -6,7 +6,7 @@ use std::{
 use multiversx_sc::types::Address;
 
 use crate::{
-    tx_mock::{TxContext, TxInput, TxLog, TxManagedTypes, TxResult},
+    tx_mock::{TxContext, TxInput, TxManagedTypes, TxResult},
     world_mock::{check_reserved_key, AccountData, BlockInfo},
 };
 
@@ -69,10 +69,6 @@ impl VMHooksHandlerSource for TxContextWrapper {
 
     fn account_data(&self, address: &Address) -> AccountData {
         self.0.with_account(address, |account| account.clone())
-    }
-
-    fn push_tx_log(&self, tx_log: TxLog) {
-        self.0.result_borrow_mut().result_logs.push(tx_log);
     }
 }
 

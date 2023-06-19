@@ -36,6 +36,10 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         panic!("cannot access tx results in the StaticApi")
     }
 
+    fn push_tx_log(&self, _tx_log: TxLog) {
+        panic!("cannot log events in the StaticApi")
+    }
+
     fn storage_read_any_address(&self, _address: &Address, _key: &[u8]) -> Vec<u8> {
         panic!("cannot access the storage in the StaticApi")
     }
@@ -54,10 +58,6 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
 
     fn account_data(&self, _address: &Address) -> AccountData {
         panic!("cannot access account data in the StaticApi")
-    }
-
-    fn push_tx_log(&self, _tx_log: TxLog) {
-        panic!("cannot log events in the StaticApi")
     }
 }
 

@@ -20,6 +20,10 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn result_borrow_mut(&self) -> RefMut<TxResult>;
 
+    fn push_tx_log(&self, tx_log: TxLog) {
+        self.result_borrow_mut().result_logs.push(tx_log);
+    }
+
     fn storage_read(&self, key: &[u8]) -> Vec<u8> {
         self.storage_read_any_address(&self.input_ref().to, key)
     }
@@ -43,6 +47,4 @@ pub trait VMHooksHandlerSource: Debug {
     fn current_account_data(&self) -> AccountData {
         self.account_data(&self.input_ref().to)
     }
-
-    fn push_tx_log(&self, tx_log: TxLog);
 }
