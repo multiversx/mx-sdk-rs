@@ -26,6 +26,9 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.41.2, codec 0.17.2, vm 0.3.2] - 2023-06-09
+- Releasing a new version of the codec, without the dependency to `wee_alloc`.
+
 ## [sc 0.41.1, vm 0.3.1] - 2023-05-15
 - Fixed an edge case for the token storage mappers (`FungibleTokenMapper`, `NonFungibleTokenMapper`).
 

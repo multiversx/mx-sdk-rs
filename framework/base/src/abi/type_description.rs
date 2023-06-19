@@ -24,6 +24,7 @@ pub enum TypeContents {
     NotSpecified,
     Enum(Vec<EnumVariantDescription>),
     Struct(Vec<StructFieldDescription>),
+    ExplicitEnum(Vec<ExplicitEnumVariantDescription>),
 }
 
 impl TypeContents {
@@ -45,4 +46,15 @@ pub struct StructFieldDescription {
     pub docs: &'static [&'static str],
     pub name: &'static str,
     pub field_type: String,
+}
+
+/// An explicit enum is an enum that gets serialized by name instead of discriminant.
+///
+/// This makes it easier for humans to read readable in the transaction output.
+///
+/// It cannot have data fields, only simple enums allowed.
+#[derive(Clone, Debug)]
+pub struct ExplicitEnumVariantDescription {
+    pub docs: &'static [&'static str],
+    pub name: &'static str,
 }

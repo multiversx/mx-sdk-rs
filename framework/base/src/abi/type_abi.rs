@@ -6,7 +6,7 @@ pub trait TypeAbi {
         core::any::type_name::<Self>().into()
     }
 
-    /// A type can provide more than its own description.
+    /// A type can provide more than its own name.
     /// For instance, a struct can also provide the descriptions of the type of its fields.
     /// TypeAbi doesn't care for the exact accumulator type,
     /// which is abstracted by the TypeDescriptionContainer trait.
