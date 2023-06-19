@@ -90,16 +90,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BigIntApiImpl for VMHooksApi<BACKEN
 
     binary_op_method! {bi_add, big_int_add}
     binary_op_method! {bi_sub, big_int_sub}
-
-    fn bi_sub_unsigned(
-        &self,
-        _dest: Self::BigIntHandle,
-        _x: Self::BigIntHandle,
-        _y: Self::BigIntHandle,
-    ) {
-        todo!()
-    }
-
     binary_op_method! {bi_mul, big_int_mul}
     binary_op_method! {bi_t_div, big_int_tdiv}
     binary_op_method! {bi_t_mod, big_int_tmod}

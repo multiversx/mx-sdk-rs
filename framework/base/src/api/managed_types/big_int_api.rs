@@ -1,10 +1,15 @@
 use core::cmp::Ordering;
 
-use crate::types::heap::BoxedBytes;
+use crate::{
+    api::{ErrorApi, ErrorApiImpl},
+    err_msg,
+    types::heap::BoxedBytes,
+};
 
 use super::HandleTypeInfo;
 
 /// Only used for sending sign information from the API.
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Sign {
     Minus,
     NoSign,
@@ -12,7 +17,7 @@ pub enum Sign {
 }
 
 /// Definition of the BigInt type required by the API.
-pub trait BigIntApiImpl: HandleTypeInfo {
+pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
     fn bi_new(&self, value: i64) -> Self::BigIntHandle;
 
     fn bi_new_zero(&self) -> Self::BigIntHandle {
@@ -32,12 +37,19 @@ pub trait BigIntApiImpl: HandleTypeInfo {
 
     fn bi_add(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_sub(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
+
     fn bi_sub_unsigned(
         &self,
         dest: Self::BigIntHandle,
         x: Self::BigIntHandle,
         y: Self::BigIntHandle,
-    );
+    ) {
+        self.bi_sub(dest.clone(), x, y);
+        if self.bi_sign(dest) == Sign::Minus {
+            Self::error_api_impl().signal_error(err_msg::BIG_UINT_SUB_NEGATIVE);
+        }
+    }
+
     fn bi_mul(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_t_div(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
     fn bi_t_mod(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);
