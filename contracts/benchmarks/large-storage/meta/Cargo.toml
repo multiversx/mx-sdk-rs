@@ -1,0 +1,12 @@
+[package]
+name = "large-storage-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.large-storage]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.41.0"
+path = "../../../../framework/meta"
