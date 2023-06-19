@@ -590,11 +590,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn clean_return_data(&self) {
-        panic!("Unavailable: clean_return_data");
+        self.handler.clean_return_data();
     }
 
     fn delete_from_return_data(&self, result_id: i32) {
-        panic!("Unavailable: delete_from_return_data");
+        self.handler.delete_from_return_data(result_id as usize);
     }
 
     fn get_original_tx_hash(&self, data_offset: MemPtr) {
@@ -700,7 +700,8 @@ impl VMHooks for VMHooksDispatcher {
         function_handle: i32,
         arguments_handle: i32,
     ) {
-        panic!("Unavailable: managed_async_call");
+        self.handler
+            .async_call_raw(dest_handle, value_handle, function_handle, arguments_handle)
     }
 
     fn managed_create_async_call(
@@ -717,7 +718,24 @@ impl VMHooks for VMHooksDispatcher {
         extra_gas_for_callback: i64,
         callback_closure_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_create_async_call")
+        unsafe {
+            mem_conv::with_bytes(success_offset, success_length, |success_callback| {
+                mem_conv::with_bytes(error_offset, error_length, |error_callback| {
+                    self.handler.create_async_call_raw(
+                        dest_handle,
+                        value_handle,
+                        function_handle,
+                        arguments_handle,
+                        success_callback,
+                        error_callback,
+                        gas as u64,
+                        extra_gas_for_callback as u64,
+                        callback_closure_handle,
+                    );
+                })
+            })
+        }
+        0
     }
 
     fn managed_get_callback_closure(&self, callback_closure_handle: i32) {
@@ -732,9 +750,16 @@ impl VMHooks for VMHooksDispatcher {
         address_handle: i32,
         code_metadata_handle: i32,
         arguments_handle: i32,
-        result_handle: i32,
+        _result_handle: i32,
     ) {
-        panic!("Unavailable: managed_upgrade_from_source_contract");
+        self.handler.upgrade_from_source_contract(
+            dest_handle,
+            gas as u64,
+            value_handle,
+            address_handle,
+            code_metadata_handle,
+            arguments_handle,
+        );
     }
 
     fn managed_upgrade_contract(
@@ -745,9 +770,16 @@ impl VMHooks for VMHooksDispatcher {
         code_handle: i32,
         code_metadata_handle: i32,
         arguments_handle: i32,
-        result_handle: i32,
+        _result_handle: i32,
     ) {
-        panic!("Unavailable: managed_upgrade_contract");
+        self.handler.upgrade_contract(
+            dest_handle,
+            gas as u64,
+            value_handle,
+            code_handle,
+            code_metadata_handle,
+            arguments_handle,
+        )
     }
 
     fn managed_delete_contract(&self, dest_handle: i32, gas_limit: i64, arguments_handle: i32) {
@@ -764,7 +796,16 @@ impl VMHooks for VMHooksDispatcher {
         result_address_handle: i32,
         result_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_deploy_from_source_contract")
+        self.handler.deploy_from_source_contract(
+            gas as u64,
+            value_handle,
+            address_handle,
+            code_metadata_handle,
+            arguments_handle,
+            result_address_handle,
+            result_handle,
+        );
+        0
     }
 
     fn managed_create_contract(
@@ -777,7 +818,16 @@ impl VMHooks for VMHooksDispatcher {
         result_address_handle: i32,
         result_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_create_contract")
+        self.handler.deploy_contract(
+            gas as u64,
+            value_handle,
+            code_handle,
+            code_metadata_handle,
+            arguments_handle,
+            result_address_handle,
+            result_handle,
+        );
+        0
     }
 
     fn managed_execute_read_only(
@@ -812,7 +862,15 @@ impl VMHooks for VMHooksDispatcher {
         arguments_handle: i32,
         result_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_execute_on_dest_context")
+        self.handler.execute_on_dest_context_raw(
+            gas as u64,
+            address_handle,
+            value_handle,
+            function_handle,
+            arguments_handle,
+            result_handle,
+        );
+        0
     }
 
     fn managed_multi_transfer_esdt_nft_execute(
@@ -823,7 +881,14 @@ impl VMHooks for VMHooksDispatcher {
         function_handle: i32,
         arguments_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_multi_transfer_esdt_nft_execute")
+        self.handler.multi_transfer_esdt_nft_execute(
+            dst_handle,
+            token_transfers_handle,
+            gas_limit as u64,
+            function_handle,
+            arguments_handle,
+        );
+        0
     }
 
     fn managed_transfer_value_execute(
@@ -834,7 +899,14 @@ impl VMHooks for VMHooksDispatcher {
         function_handle: i32,
         arguments_handle: i32,
     ) -> i32 {
-        panic!("Unavailable: managed_transfer_value_execute")
+        self.handler.transfer_value_execute(
+            dst_handle,
+            value_handle,
+            gas_limit as u64,
+            function_handle,
+            arguments_handle,
+        );
+        0
     }
 
     fn managed_is_esdt_frozen(&self, address_handle: i32, token_id_handle: i32, nonce: i64) -> i32 {
