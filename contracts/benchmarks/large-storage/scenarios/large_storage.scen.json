@@ -1,0 +1,82 @@
+{
+    "name": "large-storage",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            },
+            "newAddresses": [
+                {
+                    "creatorAddress": "address:owner",
+                    "creatorNonce": "0",
+                    "newAddress": "sc:contract"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:owner",
+                "contractCode": "file:../output/large-storage.wasm",
+                "arguments": [],
+                "gasLimit": "2,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "save",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "saveStructure",
+                "arguments": [
+                    "str:abc",
+                    "1",
+                    "file:../pi.txt"
+                ],
+                "gasLimit": "600,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:savedStructure": [
+                            "u32:3",
+                            "str:abc",
+                            "1",
+                            "u32:40330",
+                            "file:../pi.txt"
+                        ]
+                    },
+                    "code": "*"
+                },
+                "+": ""
+            }
+        }
+    ]
+}

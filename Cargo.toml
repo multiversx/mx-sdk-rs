@@ -39,6 +39,8 @@ members = [
   "contracts/benchmarks/mappers/single-value-repeat/meta",
   "contracts/benchmarks/mappers/vec-repeat",
   "contracts/benchmarks/mappers/vec-repeat/meta",
+  "contracts/benchmarks/large-storage",
+  "contracts/benchmarks/large-storage/meta",
   "contracts/benchmarks/str-repeat",
   "contracts/benchmarks/str-repeat/meta",
   "contracts/benchmarks/send-tx-repeat",
