@@ -28,7 +28,7 @@ pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
     fn load_all_esdt_transfers(&self, dest_handle: RawHandle) {
         let transfers = self.input_ref().received_esdt();
         self.m_types_borrow_mut()
-            .write_all_esdt_transfers_to_managed_vec(dest_handle, transfers);
+            .mb_set_vec_of_esdt_payments(dest_handle, transfers);
     }
 
     fn esdt_num_transfers(&self) -> usize {

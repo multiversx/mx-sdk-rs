@@ -66,7 +66,7 @@ impl TxInput {
 }
 
 /// Models ESDT transfers between accounts.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TxTokenTransfer {
     pub token_identifier: Vec<u8>,
     pub nonce: u64,
