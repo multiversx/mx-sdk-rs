@@ -1,5 +1,5 @@
 use crate::{
-    api::{DebugApi, DebuggerApi},
+    api::DebugApi,
     multiversx_chain_vm::world_mock::ContractContainer,
     multiversx_sc::{
         api,
@@ -126,11 +126,7 @@ impl ScenarioWorld {
     ) {
         self.register_contract_container(
             expression,
-            ContractContainer::new(
-                contract_builder.new_contract_obj::<DebuggerApi>(),
-                None,
-                false,
-            ),
+            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None, false),
         )
     }
 
@@ -169,41 +165,6 @@ impl ScenarioWorld {
             contract_builder.new_contract_obj::<api::ExternalViewApi<DebugApi>>()
         } else {
             contract_builder.new_contract_obj::<DebugApi>()
-        };
-
-        self.register_contract_container(
-            expression,
-            ContractContainer::new(
-                contract_obj,
-                Some(sub_contract.all_exported_function_names()),
-                sub_contract.settings.panic_message,
-            ),
-        );
-    }
-
-    /// Temporary.
-    ///
-    /// TODO: use DebuggerApi in `register_partial_contract` when all tests pass.
-    pub fn register_partial_contract_new_api<Abi, B>(
-        &mut self,
-        expression: &str,
-        contract_builder: B,
-        sub_contract_name: &str,
-    ) where
-        Abi: ContractAbiProvider,
-        B: CallableContractBuilder,
-    {
-        let multi_contract_config = multiversx_sc_meta::multi_contract_config::<Abi>(
-            self.current_dir
-                .join("multicontract.toml")
-                .to_str()
-                .unwrap(),
-        );
-        let sub_contract = multi_contract_config.find_contract(sub_contract_name);
-        let contract_obj = if sub_contract.settings.external_view {
-            contract_builder.new_contract_obj::<api::ExternalViewApi<DebuggerApi>>()
-        } else {
-            contract_builder.new_contract_obj::<DebuggerApi>()
         };
 
         self.register_contract_container(

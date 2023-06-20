@@ -8,7 +8,7 @@ use multiversx_sc::{
     },
 };
 use multiversx_sc_scenario::{
-    api::{DebugHandle, DebuggerApi as DebugApi},
+    api::{DebugHandle, DebugApi},
     num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
 };
 

@@ -78,9 +78,9 @@ impl VMHooksApiBackend for DebugApiBackend {
 }
 
 /// TODO: rename to DebugApi
-pub type DebuggerApi = VMHooksApi<DebugApiBackend>;
+pub type DebugApi = VMHooksApi<DebugApiBackend>;
 
-impl DebuggerApi {
+impl DebugApi {
     pub fn dummy() {
         let tx_context = TxContext::dummy();
         let tx_context_rc = Rc::new(tx_context);
@@ -90,7 +90,7 @@ impl DebuggerApi {
     }
 }
 
-impl std::fmt::Debug for DebuggerApi {
+impl std::fmt::Debug for DebugApi {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("DebugApi")
     }
