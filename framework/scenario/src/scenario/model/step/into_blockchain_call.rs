@@ -1,12 +1,14 @@
-use crate::multiversx_sc::{
-    codec::TopEncodeMulti,
-    types::{
-        ContractCall, ContractCallNoPayment, ContractCallWithEgld,
-        ContractCallWithEgldOrSingleEsdt, ContractCallWithMultiEsdt, ContractDeploy,
+use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
+use crate::{
+    api::DebugApi,
+    multiversx_sc::{
+        codec::TopEncodeMulti,
+        types::{
+            ContractCall, ContractCallNoPayment, ContractCallWithEgld,
+            ContractCallWithEgldOrSingleEsdt, ContractCallWithMultiEsdt, ContractDeploy,
+        },
     },
 };
-use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
-use crate::api::DebugApi;
 
 /// Converts a `ContractCall` or `ContractDeploy` into a scenario object that additonally
 /// contains gas costs and transaction-related data.

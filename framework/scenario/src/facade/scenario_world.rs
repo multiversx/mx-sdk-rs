@@ -1,5 +1,5 @@
 use crate::{
-    api::{DebuggerApi, DebugApi},
+    api::{DebugApi, DebuggerApi},
     multiversx_chain_vm::world_mock::ContractContainer,
     multiversx_sc::{
         api,

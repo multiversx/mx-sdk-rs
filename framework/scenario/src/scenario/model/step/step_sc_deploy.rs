@@ -1,5 +1,7 @@
-use crate::api::DebugApi;
-use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
+use crate::{
+    api::DebugApi,
+    scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
+};
 
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},

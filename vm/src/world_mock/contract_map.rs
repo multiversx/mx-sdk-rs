@@ -1,5 +1,3 @@
-use crate::DebugApi;
-
 use super::*;
 
 use alloc::vec::Vec;
@@ -22,11 +20,7 @@ impl ContractMap {
         }
     }
 
-    pub fn get_contract(
-        &self,
-        contract_identifier: &[u8],
-        _debug_api: DebugApi,
-    ) -> &ContractContainer {
+    pub fn get_contract(&self, contract_identifier: &[u8]) -> &ContractContainer {
         if let Some(contract_contatiner) = self.contract_objs.get(contract_identifier) {
             contract_contatiner
         } else {

@@ -1,8 +1,8 @@
-use multiversx_sc_scenario::api::DebugApi;
 use multiversx_sc::storage::{
     mappers::{LinkedListMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
+use multiversx_sc_scenario::api::DebugApi;
 
 fn create_list() -> LinkedListMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

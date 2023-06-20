@@ -9,7 +9,8 @@ use multiversx_sc_snippets::{
     multiversx_sc_scenario::{
         bech32,
         scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::{IntoBlockchainCall, TxExpect, TypedScDeploy}, DebugApi,
+        scenario_model::{IntoBlockchainCall, TxExpect, TypedScDeploy},
+        DebugApi,
     },
     StepBuffer,
 };
