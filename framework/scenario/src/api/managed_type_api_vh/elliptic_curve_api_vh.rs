@@ -4,14 +4,14 @@ use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn ec_create_from_name_bytes(&self, _name: &[u8]) -> Self::ManagedBufferHandle {
-        todo!()
+        panic!("ec_create not implemented")
     }
 
     fn ec_create_from_name_mb(
         &self,
         _name_handle: Self::ManagedBufferHandle,
     ) -> Self::ManagedBufferHandle {
-        todo!()
+        panic!("ec_create not implemented")
     }
 
     fn ec_get_values(
@@ -23,15 +23,15 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _x_base_point_handle: Self::BigIntHandle,
         _y_base_point_handle: Self::BigIntHandle,
     ) {
-        todo!()
+        panic!("ec_get_values not implemented")
     }
 
     fn ec_curve_length(&self, _ec_handle: Self::EllipticCurveHandle) -> u32 {
-        todo!()
+        panic!("ec_curve_length not implemented")
     }
 
     fn ec_private_key_byte_length(&self, _ec_handle: Self::EllipticCurveHandle) -> u32 {
-        todo!()
+        panic!("ec_private_key_byte_length not implemented")
     }
 
     fn ec_add(
@@ -44,7 +44,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _x_second_point: Self::BigIntHandle,
         _y_second_point: Self::BigIntHandle,
     ) {
-        todo!()
+        panic!("ec_add not implemented")
     }
 
     fn ec_double(
@@ -55,7 +55,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _x_point_handle: Self::BigIntHandle,
         _y_point_handle: Self::BigIntHandle,
     ) {
-        todo!()
+        panic!("ec_double not implemented")
     }
 
     fn ec_is_on_curve(
@@ -64,7 +64,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _x_point_handle: Self::BigIntHandle,
         _y_point_handle: Self::BigIntHandle,
     ) -> bool {
-        todo!()
+        panic!("ec_is_on_curve not implemented")
     }
 
     fn ec_scalar_mult_legacy(
@@ -76,7 +76,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _y_point_handle: Self::BigIntHandle,
         _data: &[u8],
     ) {
-        todo!()
+        panic!("ec_scalar_mult not implemented")
     }
 
     fn ec_scalar_mult(
@@ -88,7 +88,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _y_point_handle: Self::BigIntHandle,
         _data_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_scalar_mult not implemented")
     }
 
     fn ec_scalar_base_mult_legacy(
@@ -98,7 +98,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _data: &[u8],
     ) {
-        todo!()
+        panic!("ec_scalar_base_mult not implemented")
     }
 
     fn ec_scalar_base_mult(
@@ -108,7 +108,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _data_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_scalar_base_mult not implemented")
     }
 
     fn ec_marshal_legacy(
@@ -117,7 +117,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _x_pair_handle: Self::BigIntHandle,
         _y_pair_handle: Self::BigIntHandle,
     ) -> BoxedBytes {
-        todo!()
+        panic!("ec_marshal not implemented")
     }
 
     fn ec_marshal(
@@ -127,7 +127,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _y_pair_handle: Self::BigIntHandle,
         _result_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_marshal not implemented")
     }
 
     fn ec_marshal_compressed_legacy(
@@ -136,7 +136,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _x_pair_handle: Self::BigIntHandle,
         _y_pair_handle: Self::BigIntHandle,
     ) -> BoxedBytes {
-        todo!()
+        panic!("ec_marshal_compressed not implemented")
     }
 
     fn ec_marshal_compressed(
@@ -146,7 +146,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _y_pair_handle: Self::BigIntHandle,
         _result_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_marshal_compressed not implemented")
     }
 
     fn ec_unmarshal_legacy(
@@ -156,7 +156,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _data: &[u8],
     ) {
-        todo!()
+        panic!("ec_unmarshal not implemented")
     }
 
     fn ec_unmarshal(
@@ -166,7 +166,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _data_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_unmarshal not implemented")
     }
 
     fn ec_unmarshal_compressed_legacy(
@@ -176,7 +176,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _data: &[u8],
     ) {
-        todo!()
+        panic!("ec_unmarshal_compressed not implemented")
     }
 
     fn ec_unmarshal_compressed(
@@ -186,7 +186,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _data_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_unmarshal_compressed not implemented")
     }
 
     fn ec_generate_key_legacy(
@@ -195,7 +195,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _y_pub_key_handle: Self::BigIntHandle,
         _ec_handle: Self::EllipticCurveHandle,
     ) -> BoxedBytes {
-        todo!()
+        panic!("ec_generate_key not implemented")
     }
 
     fn ec_generate_key(
@@ -205,6 +205,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EllipticCurveApiImpl for VMHooksApi
         _ec_handle: Self::EllipticCurveHandle,
         _result_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        panic!("ec_generate_key not implemented")
     }
 }
