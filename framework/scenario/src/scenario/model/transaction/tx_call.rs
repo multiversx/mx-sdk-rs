@@ -4,8 +4,7 @@ use crate::{
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::TxCallRaw,
-    },
-    DebugApi,
+    }, api::DebugApi,
 };
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};

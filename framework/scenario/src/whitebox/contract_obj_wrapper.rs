@@ -10,7 +10,7 @@ use crate::multiversx_sc::{
 };
 use num_traits::Zero;
 
-use crate::testing_framework::raw_converter::bytes_to_hex;
+use crate::{api::DebugApi, testing_framework::raw_converter::bytes_to_hex};
 use multiversx_chain_vm::{
     num_bigint,
     tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
@@ -18,7 +18,7 @@ use multiversx_chain_vm::{
         StaticVarStack, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult,
     },
     world_mock::{AccountData, AccountEsdt, ContractContainer, EsdtInstanceMetadata},
-    BlockchainMock, DebugApi,
+    BlockchainMock,
 };
 
 use super::{

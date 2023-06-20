@@ -1,5 +1,5 @@
 use crate::{
-    api::DebuggerApi,
+    api::{DebuggerApi, DebugApi},
     multiversx_chain_vm::world_mock::ContractContainer,
     multiversx_sc::{
         api,
@@ -9,7 +9,6 @@ use crate::{
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     vm_go_tool::run_vm_go_tool,
 };
-use multiversx_chain_vm::DebugApi;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;

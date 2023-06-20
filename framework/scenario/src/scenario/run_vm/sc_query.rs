@@ -1,4 +1,5 @@
 use crate::{
+    api::DebugApi,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
@@ -10,7 +11,6 @@ use multiversx_chain_vm::{
     tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
-    DebugApi,
 };
 
 use super::{check_tx_output, ScenarioVMRunner};

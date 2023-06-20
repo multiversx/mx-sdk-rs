@@ -1,4 +1,4 @@
-use multiversx_chain_vm::DebugApi;
+use multiversx_sc_scenario::api::DebugApi;
 use multiversx_sc::types::{LockableStaticBuffer, StaticBufferRef};
 
 #[test]

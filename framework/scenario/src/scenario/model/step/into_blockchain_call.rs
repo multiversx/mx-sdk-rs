@@ -5,10 +5,8 @@ use crate::multiversx_sc::{
         ContractCallWithEgldOrSingleEsdt, ContractCallWithMultiEsdt, ContractDeploy,
     },
 };
-
-use multiversx_chain_vm::DebugApi;
-
 use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
+use crate::api::DebugApi;
 
 /// Converts a `ContractCall` or `ContractDeploy` into a scenario object that additonally
 /// contains gas costs and transaction-related data.

@@ -1,11 +1,10 @@
-use crate::multiversx_sc::{
-    codec::{CodecFrom, TopEncodeMulti},
-    types::ContractCall,
-};
-
 use crate::{
+    api::DebuggerApi,
+    multiversx_sc::{
+        codec::{CodecFrom, TopEncodeMulti},
+        types::ContractCall,
+    },
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
-    DebugApi,
 };
 
 use super::{format_expect, process_contract_call};
@@ -53,7 +52,7 @@ impl ScQueryStep {
     /// - "arguments"
     pub fn call<CC>(mut self, contract_call: CC) -> Self
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<DebuggerApi>,
     {
         let (to_str, function, _, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
@@ -77,7 +76,7 @@ impl ScQueryStep {
         expect_value: ExpectedResult,
     ) -> Self
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<DebuggerApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self = self.call(contract_call);

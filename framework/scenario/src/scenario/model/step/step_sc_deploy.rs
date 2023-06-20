@@ -1,9 +1,9 @@
+use crate::api::DebugApi;
 use crate::scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use crate::{
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxDeploy, TxExpect, U64Value},
     scenario_model::TxResponse,
-    DebugApi,
 };
 
 use crate::multiversx_sc::types::{CodeMetadata, ContractDeploy};

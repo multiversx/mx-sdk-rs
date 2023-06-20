@@ -12,6 +12,7 @@ use multiversx_sc::{
     contract_base::ProxyObjBase,
     types::{BigInt, ManagedAddress},
 };
+use multiversx_sc_scenario::DebugApi;
 
 use crate::module_1::VersionModule;
 
@@ -410,7 +411,6 @@ mod sample_adder {
 
 #[test]
 fn contract_without_macros_basic() {
-    use multiversx_chain_vm::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
     let _ = DebugApi::dummy();
