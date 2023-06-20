@@ -4,7 +4,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/big-float-features");
 
-    blockchain.register_contract_new_api(
+    blockchain.register_contract(
         "file:output/big-float-features.wasm",
         big_float_features::ContractBuilder,
     );

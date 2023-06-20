@@ -127,20 +127,6 @@ impl ScenarioWorld {
     ) {
         self.register_contract_container(
             expression,
-            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None, false),
-        )
-    }
-
-    /// Currently in transition phase.
-    ///
-    /// Will become the (only) implementation of `register_contract`.
-    pub fn register_contract_new_api<B: CallableContractBuilder>(
-        &mut self,
-        expression: &str,
-        contract_builder: B,
-    ) {
-        self.register_contract_container(
-            expression,
             ContractContainer::new(
                 contract_builder.new_contract_obj::<DebuggerApi>(),
                 None,
