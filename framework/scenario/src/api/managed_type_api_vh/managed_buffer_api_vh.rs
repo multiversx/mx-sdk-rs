@@ -81,14 +81,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi
         }
     }
 
-    fn mb_copy_to_slice_pad_right(
-        &self,
-        _handle: Self::ManagedBufferHandle,
-        _destination: &mut [u8],
-    ) {
-        todo!()
-    }
-
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(value, |offset, length| {

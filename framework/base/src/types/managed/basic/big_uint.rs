@@ -187,13 +187,6 @@ impl<M: ManagedTypeApi> BigUint<M> {
         M::managed_type_impl().mb_from_big_int_unsigned(self.handle.clone(), mb_handle.clone());
         ManagedBuffer::from_handle(mb_handle)
     }
-
-    pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
-        let api = M::managed_type_impl();
-        let mbuf_temp_1: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        api.mb_from_big_int_unsigned(self.handle.clone(), mbuf_temp_1.clone());
-        api.mb_copy_to_slice_pad_right(mbuf_temp_1, &mut target[..]);
-    }
 }
 
 impl<M: ManagedTypeApi> BigUint<M> {
