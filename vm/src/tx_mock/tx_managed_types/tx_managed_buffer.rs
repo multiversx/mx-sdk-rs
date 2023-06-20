@@ -164,6 +164,26 @@ impl TxManagedTypes {
             self.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
         }
     }
+
+    pub fn mm_values_insert(&mut self, map_handle: RawHandle, key: Vec<u8>, value: Vec<u8>) {
+        let mmap = self.managed_map_map.get_mut(map_handle);
+        mmap.insert(key, value);
+    }
+
+    pub fn mm_values_get(&self, map_handle: RawHandle, key: &[u8]) -> Vec<u8> {
+        let mmap = self.managed_map_map.get(map_handle);
+        mmap.get(key).cloned().unwrap_or_default()
+    }
+
+    pub fn mm_contains(&self, map_handle: RawHandle, key: &[u8]) -> bool {
+        let mmap = self.managed_map_map.get(map_handle);
+        mmap.contains_key(key)
+    }
+
+    pub fn mm_values_remove(&mut self, map_handle: RawHandle, key: &[u8]) -> Vec<u8> {
+        let mmap = self.managed_map_map.get_mut(map_handle);
+        mmap.remove(key).unwrap_or_default()
+    }
 }
 
 #[cfg(test)]

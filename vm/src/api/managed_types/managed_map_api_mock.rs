@@ -1,44 +1,5 @@
 use crate::{tx_mock::ManagedMapImpl, DebugApi};
-use multiversx_sc::api::{HandleTypeInfo, ManagedMapApiImpl};
-
-impl DebugApi {
-    fn mm_values_insert(
-        &self,
-        map_handle: <Self as HandleTypeInfo>::ManagedMapHandle,
-        key: Vec<u8>,
-        value: Vec<u8>,
-    ) {
-        let mut managed_types = self.m_types_borrow_mut();
-        let mmap = managed_types
-            .managed_map_map
-            .get_mut(map_handle.get_raw_handle_unchecked());
-        mmap.insert(key, value);
-    }
-
-    fn mm_values_get(
-        &self,
-        map_handle: <Self as HandleTypeInfo>::ManagedMapHandle,
-        key: &[u8],
-    ) -> Vec<u8> {
-        let managed_types = self.m_types_borrow();
-        let mmap = managed_types
-            .managed_map_map
-            .get(map_handle.get_raw_handle_unchecked());
-        mmap.get(key).cloned().unwrap_or_default()
-    }
-
-    fn mm_values_remove(
-        &self,
-        map_handle: <Self as HandleTypeInfo>::ManagedMapHandle,
-        key: &[u8],
-    ) -> Vec<u8> {
-        let mut managed_types = self.m_types_borrow_mut();
-        let mmap = managed_types
-            .managed_map_map
-            .get_mut(map_handle.get_raw_handle_unchecked());
-        mmap.remove(key).unwrap_or_default()
-    }
-}
+use multiversx_sc::api::ManagedMapApiImpl;
 
 impl ManagedMapApiImpl for DebugApi {
     fn mm_new(&self) -> Self::ManagedMapHandle {
@@ -55,8 +16,11 @@ impl ManagedMapApiImpl for DebugApi {
         out_value_handle: Self::ManagedBufferHandle,
     ) {
         let key = self.mb_get(key_handle);
-        let value = self.mm_values_get(map_handle, key.as_slice());
-        self.mb_set(out_value_handle, value);
+        let value = self
+            .m_types_borrow()
+            .mm_values_get(map_handle.get_raw_handle_unchecked(), key.as_slice());
+        self.m_types_borrow_mut()
+            .mb_set(out_value_handle.get_raw_handle_unchecked(), value);
     }
 
     fn mm_put(
@@ -65,9 +29,19 @@ impl ManagedMapApiImpl for DebugApi {
         key_handle: Self::ManagedBufferHandle,
         value_handle: Self::ManagedBufferHandle,
     ) {
-        let key = self.mb_get(key_handle);
-        let value = self.mb_get(value_handle);
-        self.mm_values_insert(map_handle, key, value);
+        let key = self
+            .m_types_borrow()
+            .mb_get(key_handle.get_raw_handle_unchecked())
+            .to_vec();
+        let value = self
+            .m_types_borrow()
+            .mb_get(value_handle.get_raw_handle_unchecked())
+            .to_vec();
+        self.m_types_borrow_mut().mm_values_insert(
+            map_handle.get_raw_handle_unchecked(),
+            key,
+            value,
+        );
     }
 
     fn mm_remove(
@@ -76,8 +50,13 @@ impl ManagedMapApiImpl for DebugApi {
         key_handle: Self::ManagedBufferHandle,
         out_value_handle: Self::ManagedBufferHandle,
     ) {
-        let key = self.mb_get(key_handle);
-        let value = self.mm_values_remove(map_handle, key.as_slice());
+        let key = self
+            .m_types_borrow()
+            .mb_get(key_handle.get_raw_handle_unchecked())
+            .to_vec();
+        let value = self
+            .m_types_borrow_mut()
+            .mm_values_remove(map_handle.get_raw_handle_unchecked(), key.as_slice());
         self.mb_set(out_value_handle, value);
     }
 
@@ -86,15 +65,11 @@ impl ManagedMapApiImpl for DebugApi {
         map_handle: Self::ManagedMapHandle,
         key_handle: Self::ManagedBufferHandle,
     ) -> bool {
-        let managed_types = self.m_types_borrow();
-        let mmap = managed_types
-            .managed_map_map
-            .get(map_handle.get_raw_handle_unchecked());
-        let key = self.mb_get(key_handle);
-        if let Some(value) = mmap.get(&key) {
-            !value.is_empty()
-        } else {
-            false
-        }
+        let key = self
+            .m_types_borrow()
+            .mb_get(key_handle.get_raw_handle_unchecked())
+            .to_vec();
+        self.m_types_borrow_mut()
+            .mm_contains(map_handle.get_raw_handle_unchecked(), key.as_slice())
     }
 }
