@@ -1436,7 +1436,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_set_random(&self, destination_handle: i32, length: i32) -> i32 {
-        panic!("Unavailable: mbuffer_set_random")
+        self.handler.mb_set_random(destination_handle, length as usize);
+        0
     }
 
     fn managed_map_new(&self) -> i32 {

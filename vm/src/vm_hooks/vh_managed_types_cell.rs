@@ -33,6 +33,10 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         panic!("cannot access tx inputs in the StaticApi")
     }
 
+    fn random_next_bytes(&self, _length: usize) -> Vec<u8> {
+        panic!("cannot access the random bytes generator in the StaticApi")
+    }
+
     fn result_borrow_mut(&self) -> RefMut<TxResult> {
         panic!("cannot access tx results in the StaticApi")
     }
