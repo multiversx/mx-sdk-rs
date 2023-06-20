@@ -25,10 +25,6 @@ extern "C" {
 
     /// Currently not used.
     #[allow(dead_code)]
-    fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
-
-    /// Currently not used.
-    #[allow(dead_code)]
     fn getFunction(functionOffset: *const u8) -> i32;
 
     fn getGasLeft() -> i64;
@@ -36,10 +32,6 @@ extern "C" {
     fn getBlockNonce() -> i64;
     fn getBlockRound() -> i64;
     fn getBlockEpoch() -> i64;
-    fn getBlockRandomSeed(resultOffset: *mut u8);
-    /// Currently not used.
-    #[allow(dead_code)]
-    fn getStateRootHash(resultOffset: *mut u8);
     fn getPrevBlockTimestamp() -> i64;
     fn getPrevBlockNonce() -> i64;
     fn getPrevBlockRound() -> i64;
@@ -175,15 +167,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_state_root_hash_legacy(&self) -> H256 {
-        unsafe {
-            let mut res = H256::zero();
-            getOriginalTxHash(res.as_mut_ptr());
-            res
-        }
-    }
-
-    #[inline]
     fn load_state_root_hash_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedGetStateRootHash(dest);
@@ -229,15 +212,6 @@ impl BlockchainApiImpl for VmApiImpl {
     #[inline]
     fn get_block_epoch(&self) -> u64 {
         unsafe { getBlockEpoch() as u64 }
-    }
-
-    #[inline]
-    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
-        unsafe {
-            let mut res = [0u8; 48];
-            getBlockRandomSeed(res.as_mut_ptr());
-            Box::new(res)
-        }
     }
 
     #[inline]
