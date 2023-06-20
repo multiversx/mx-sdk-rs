@@ -1,4 +1,4 @@
-use crate::{api::unsafe_buffer};
+use crate::api::unsafe_buffer;
 use multiversx_sc::{
     api::{InvalidSliceError, ManagedBufferApiImpl},
     types::heap::BoxedBytes,

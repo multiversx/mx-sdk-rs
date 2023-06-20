@@ -85,6 +85,26 @@ impl DebugApi {
         let managed_types = handle.context.m_types_borrow();
         managed_types.bi_get(handle.get_raw_handle_unchecked())
     }
+
+    pub(crate) fn bi_get_unsigned_bytes(
+        &self,
+        handle: <Self as HandleTypeInfo>::BigIntHandle,
+    ) -> BoxedBytes {
+        handle
+            .context
+            .m_types_borrow()
+            .bi_get_unsigned_bytes(handle.get_raw_handle_unchecked())
+    }
+
+    pub(crate) fn bi_get_signed_bytes(
+        &self,
+        handle: <Self as HandleTypeInfo>::BigIntHandle,
+    ) -> BoxedBytes {
+        handle
+            .context
+            .m_types_borrow()
+            .bi_get_signed_bytes(handle.get_raw_handle_unchecked())
+    }
 }
 
 impl BigIntApiImpl for DebugApi {
@@ -95,38 +115,6 @@ impl BigIntApiImpl for DebugApi {
 
     fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
         self.bi_overwrite(destination, num_bigint::BigInt::from(value))
-    }
-
-    fn bi_unsigned_byte_length(&self, handle: Self::BigIntHandle) -> usize {
-        self.bi_get_unsigned_bytes(handle).len()
-    }
-
-    fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        handle
-            .context
-            .m_types_borrow()
-            .bi_get_unsigned_bytes(handle.get_raw_handle_unchecked())
-    }
-
-    fn bi_set_unsigned_bytes(&self, dest: Self::BigIntHandle, bytes: &[u8]) {
-        let result = num_bigint::BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes);
-        self.bi_overwrite(dest, result);
-    }
-
-    fn bi_signed_byte_length(&self, handle: Self::BigIntHandle) -> usize {
-        self.bi_get_signed_bytes(handle).len()
-    }
-
-    fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        handle
-            .context
-            .m_types_borrow()
-            .bi_get_signed_bytes(handle.get_raw_handle_unchecked())
-    }
-
-    fn bi_set_signed_bytes(&self, dest: Self::BigIntHandle, bytes: &[u8]) {
-        let result = num_bigint::BigInt::from_signed_bytes_be(bytes);
-        self.bi_overwrite(dest, result);
     }
 
     fn bi_to_i64(&self, handle: Self::BigIntHandle) -> Option<i64> {
