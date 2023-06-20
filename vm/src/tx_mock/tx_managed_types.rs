@@ -1,4 +1,5 @@
 mod handle_map;
+mod tx_big_float;
 mod tx_big_int;
 mod tx_managed_buffer;
 mod tx_managed_map;

@@ -1,7 +1,9 @@
+mod vh_big_float;
 mod vh_big_int;
 mod vh_managed_buffer;
 mod vh_managed_map;
 
+pub use vh_big_float::VMHooksBigFloat;
 pub use vh_big_int::VMHooksBigInt;
 pub use vh_managed_buffer::VMHooksManagedBuffer;
 pub use vh_managed_map::VMHooksManagedMap;
@@ -16,7 +18,7 @@ use super::VMHooksError;
 ///
 /// It is also the trait that unifies all managed type functionality.
 pub trait VMHooksManagedTypes:
-    VMHooksBigInt + VMHooksManagedBuffer + VMHooksManagedMap + VMHooksError + Debug
+    VMHooksBigInt + VMHooksManagedBuffer + VMHooksManagedMap + VMHooksBigFloat + VMHooksError + Debug
 {
     fn mb_to_big_int_unsigned(&self, buffer_handle: RawHandle, bi_handle: RawHandle) {
         let bytes = self.m_types_borrow().mb_to_boxed_bytes(buffer_handle);

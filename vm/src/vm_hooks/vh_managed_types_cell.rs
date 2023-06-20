@@ -8,10 +8,10 @@ use crate::{
 };
 
 use super::{
-    VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument,
-    VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource,
-    VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap, VMHooksManagedTypes, VMHooksSend,
-    VMHooksStorageRead, VMHooksStorageWrite,
+    VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
+    VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
+    VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
+    VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
 };
 
 /// A simple wrapper around a managed type container RefCell.
@@ -109,6 +109,7 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
 impl VMHooksBigInt for TxManagedTypesCell {}
 impl VMHooksManagedBuffer for TxManagedTypesCell {}
 impl VMHooksManagedMap for TxManagedTypesCell {}
+impl VMHooksBigFloat for TxManagedTypesCell {}
 impl VMHooksManagedTypes for TxManagedTypesCell {}
 
 impl VMHooksCallValue for TxManagedTypesCell {}
