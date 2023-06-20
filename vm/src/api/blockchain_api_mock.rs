@@ -95,9 +95,13 @@ impl BlockchainApiImpl for DebugApi {
     }
 
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
-        self.mb_overwrite(dest, self.blockchain_ref()
-        .current_block_info
-        .block_random_seed.as_slice())
+        self.mb_overwrite(
+            dest,
+            self.blockchain_ref()
+                .current_block_info
+                .block_random_seed
+                .as_slice(),
+        )
     }
 
     fn get_prev_block_timestamp(&self) -> u64 {
