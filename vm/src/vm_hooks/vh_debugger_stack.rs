@@ -20,8 +20,8 @@ use crate::{
 use super::{
     VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto, VMHooksEndpointArgument,
     VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged, VMHooksHandler, VMHooksHandlerSource,
-    VMHooksLog, VMHooksManagedBuffer, VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead,
-    VMHooksStorageWrite,
+    VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap, VMHooksManagedTypes, VMHooksSend,
+    VMHooksStorageRead, VMHooksStorageWrite,
 };
 
 /// A simple wrapper around a managed type container RefCell.
@@ -229,6 +229,7 @@ impl TxContextWrapper {
 
 impl VMHooksBigInt for TxContextWrapper {}
 impl VMHooksManagedBuffer for TxContextWrapper {}
+impl VMHooksManagedMap for TxContextWrapper {}
 impl VMHooksManagedTypes for TxContextWrapper {}
 
 impl VMHooksCallValue for TxContextWrapper {}

@@ -3,7 +3,7 @@ use multiversx_sc::{
     types::{Address, EsdtLocalRoleFlags, H256},
 };
 
-use super::{VMHooksApi, VMHooksBackendType};
+use super::{i32_to_bool, VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApi for VMHooksApi<BACKEND_TYPE> {
     type BlockchainApiImpl = Self;
@@ -52,7 +52,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
         let result = self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_vm_hooks(|vh| vh.is_smart_contract(address_ptr))
         });
-        result > 0
+        i32_to_bool(result)
     }
 
     fn load_balance_legacy(&self, _dest: Self::BigIntHandle, _address: &Address) {
@@ -212,17 +212,17 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
         let result = self.with_vm_hooks(|vh| {
             vh.managed_is_esdt_frozen(address_handle, token_id_handle, nonce as i64)
         });
-        result > 0
+        i32_to_bool(result)
     }
 
     fn check_esdt_paused(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
         let result = self.with_vm_hooks(|vh| vh.managed_is_esdt_paused(token_id_handle));
-        result > 0
+        i32_to_bool(result)
     }
 
     fn check_esdt_limited_transfer(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
         let result = self.with_vm_hooks(|vh| vh.managed_is_esdt_limited_transfer(token_id_handle));
-        result > 0
+        i32_to_bool(result)
     }
 
     fn load_esdt_local_roles(

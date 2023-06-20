@@ -1435,23 +1435,28 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_map_new(&self) -> i32 {
-        panic!("Unavailable: managed_map_new")
+        self.handler.mm_new()
     }
 
-    fn managed_map_put(&self, m_map_handle: i32, key_handle: i32, value_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_put")
+    fn managed_map_put(&self, map_handle: i32, key_handle: i32, value_handle: i32) -> i32 {
+        self.handler.mm_put(map_handle, key_handle, value_handle);
+        0
     }
 
-    fn managed_map_get(&self, m_map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_get")
+    fn managed_map_get(&self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
+        self.handler
+            .mm_get(map_handle, key_handle, out_value_handle);
+        0
     }
 
-    fn managed_map_remove(&self, m_map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_remove")
+    fn managed_map_remove(&self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
+        self.handler
+            .mm_remove(map_handle, key_handle, out_value_handle);
+        0
     }
 
-    fn managed_map_contains(&self, m_map_handle: i32, key_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_contains")
+    fn managed_map_contains(&self, map_handle: i32, key_handle: i32) -> i32 {
+        bool_to_i32(self.handler.mm_contains(map_handle, key_handle))
     }
 
     fn small_int_get_unsigned_argument(&self, id: i32) -> i64 {

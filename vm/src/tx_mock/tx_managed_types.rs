@@ -1,6 +1,7 @@
 mod handle_map;
 mod tx_big_int;
 mod tx_managed_buffer;
+mod tx_managed_map;
 
 pub use handle_map::HandleMap;
 pub use tx_big_int::big_int_to_i64;

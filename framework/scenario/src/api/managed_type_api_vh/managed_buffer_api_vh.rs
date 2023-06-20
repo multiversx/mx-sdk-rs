@@ -4,7 +4,7 @@ use multiversx_sc::{
     types::BoxedBytes,
 };
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
@@ -140,7 +140,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi
         handle1: Self::ManagedBufferHandle,
         handle2: Self::ManagedBufferHandle,
     ) -> bool {
-        self.with_vm_hooks(|vh| vh.mbuffer_eq(handle1, handle2) > 0)
+        i32_to_bool(self.with_vm_hooks(|vh| vh.mbuffer_eq(handle1, handle2)))
     }
 
     fn mb_to_hex(

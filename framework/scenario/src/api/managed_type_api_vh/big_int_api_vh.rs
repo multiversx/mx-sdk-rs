@@ -6,7 +6,7 @@ use multiversx_sc::{
     types::BoxedBytes,
 };
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
 
 macro_rules! binary_op_method {
     ($api_method_name:ident, $vh_method_name:ident) => {
@@ -79,8 +79,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BigIntApiImpl for VMHooksApi<BACKEN
 
     fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
         self.with_vm_hooks(|vh| {
-            let is_i64_result = vh.big_int_is_int64(reference.get_raw_handle());
-            if is_i64_result > 0 {
+            let is_i64_result = vh.big_int_is_int64(reference);
+            if i32_to_bool(is_i64_result) {
                 Some(vh.big_int_get_int64(reference))
             } else {
                 None
