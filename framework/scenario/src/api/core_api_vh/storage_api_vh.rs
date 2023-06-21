@@ -2,7 +2,7 @@ use multiversx_sc::api::{
     StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApi for VMHooksApi<BACKEND_TYPE> {
     type StorageReadApiImpl = Self;

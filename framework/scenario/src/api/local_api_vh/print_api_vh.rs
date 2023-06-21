@@ -5,7 +5,7 @@ use multiversx_sc::{
     types::ManagedBufferCachedBuilder,
 };
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 thread_local!(
     static PRINTED_MESSAGES: RefCell<Vec<String>> = RefCell::new(Vec::new())

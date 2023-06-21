@@ -1,6 +1,6 @@
 use multiversx_sc::api::{LogApi, LogApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> LogApi for VMHooksApi<BACKEND_TYPE> {
     type LogApiImpl = Self;

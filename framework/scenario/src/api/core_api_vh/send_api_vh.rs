@@ -1,7 +1,7 @@
 use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{const_handles, RawHandle, SendApi, SendApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> SendApi for VMHooksApi<BACKEND_TYPE> {
     type SendApiImpl = Self;

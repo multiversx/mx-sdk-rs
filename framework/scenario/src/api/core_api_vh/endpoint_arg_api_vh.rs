@@ -1,6 +1,6 @@
 use multiversx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> EndpointArgumentApi for VMHooksApi<BACKEND_TYPE> {
     type EndpointArgumentApiImpl = Self;

@@ -1,7 +1,7 @@
 use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApi for VMHooksApi<BACKEND_TYPE> {
     type EndpointFinishApiImpl = Self;

@@ -3,7 +3,7 @@ use multiversx_sc::{
     types::MessageHashType,
 };
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApi for VMHooksApi<BACKEND_TYPE> {
     type CryptoApiImpl = Self;

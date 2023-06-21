@@ -3,11 +3,10 @@ mod big_int_api_vh;
 mod elliptic_curve_api_vh;
 mod managed_buffer_api_vh;
 mod managed_map_api_vh;
-mod static_var_api_vh;
 
 use multiversx_sc::api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> ManagedTypeApi for VMHooksApi<BACKEND_TYPE> {
     type ManagedTypeApiImpl = Self;

@@ -3,7 +3,7 @@ use multiversx_sc::{
     types::{Address, EsdtLocalRoleFlags, H256},
 };
 
-use super::{i32_to_bool, VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApi for VMHooksApi<BACKEND_TYPE> {
     type BlockchainApiImpl = Self;

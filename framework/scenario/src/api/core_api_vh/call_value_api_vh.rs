@@ -1,6 +1,6 @@
 use multiversx_sc::api::{CallValueApi, CallValueApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> CallValueApi for VMHooksApi<BACKEND_TYPE> {
     type CallValueApiImpl = Self;
