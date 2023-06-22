@@ -1,18 +1,18 @@
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 use multiversx_sc::{
     api::{use_raw_handle, HandleConstraints, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StaticVarApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> StaticVarApi for VMHooksApi<VHB> {
     type StaticVarApiImpl = Self;
 
     fn static_var_api_impl() -> Self::StaticVarApiImpl {
-        Self
+        Self::api_impl()
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StaticVarApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
     fn with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(&self, f: F) -> R {
         self.with_static_data(|data| {
             let mut lockable_static_buffer = data.lockable_static_buffer_cell.borrow_mut();

@@ -3,9 +3,9 @@ use multiversx_sc::{
     types::MessageHashType,
 };
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> CryptoApi for VMHooksApi<VHB> {
     type CryptoApiImpl = Self;
 
     fn crypto_api_impl() -> Self::CryptoApiImpl {
@@ -13,7 +13,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApi for VMHooksApi<BACKEND_TY
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
     fn sha256_managed(
         &self,
         result_handle: Self::ManagedBufferHandle,

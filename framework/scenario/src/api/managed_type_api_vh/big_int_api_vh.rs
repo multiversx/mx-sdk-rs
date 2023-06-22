@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_sc::api::{use_raw_handle, BigIntApiImpl, HandleConstraints, Sign};
 
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
 
 macro_rules! binary_op_method {
     ($api_method_name:ident, $vh_method_name:ident) => {
@@ -31,7 +31,7 @@ macro_rules! unary_op_method {
     };
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> BigIntApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     fn bi_new(&self, value: i64) -> Self::BigIntHandle {
         let handle = self.with_vm_hooks(|vh| vh.big_int_new(value));
         use_raw_handle(handle)

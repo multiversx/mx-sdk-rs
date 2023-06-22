@@ -5,13 +5,13 @@ use multiversx_sc::{
     types::ManagedBufferCachedBuilder,
 };
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
 thread_local!(
     static PRINTED_MESSAGES: RefCell<Vec<String>> = RefCell::new(Vec::new())
 );
 
-impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// Clears static buffer used for testing.
     pub fn printed_messages_clear() {
         PRINTED_MESSAGES.with(|cell| cell.replace(Vec::new()));
@@ -25,7 +25,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> PrintApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> PrintApi for VMHooksApi<VHB> {
     type PrintApiImpl = Self;
 
     fn print_api_impl() -> Self::PrintApiImpl {
@@ -33,7 +33,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> PrintApi for VMHooksApi<BACKEND_TYP
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> PrintApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> PrintApiImpl for VMHooksApi<VHB> {
     type Buffer = ManagedBufferCachedBuilder<Self>;
 
     fn print_buffer(&self, buffer: Self::Buffer) {

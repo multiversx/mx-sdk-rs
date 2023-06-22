@@ -1,9 +1,9 @@
 use multiversx_sc::api::{CallTypeApi, StorageMapperApi, VMApi};
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CallTypeApi for VMHooksApi<BACKEND_TYPE> {}
+impl<VHB: VMHooksApiBackend> CallTypeApi for VMHooksApi<VHB> {}
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StorageMapperApi for VMHooksApi<BACKEND_TYPE> {}
+impl<VHB: VMHooksApiBackend> StorageMapperApi for VMHooksApi<VHB> {}
 
-impl<const BACKEND_TYPE: VMHooksBackendType> VMApi for VMHooksApi<BACKEND_TYPE> {}
+impl<VHB: VMHooksApiBackend> VMApi for VMHooksApi<VHB> {}

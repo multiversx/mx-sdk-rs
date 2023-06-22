@@ -1,4 +1,3 @@
-
 mod blockchain_api_vh;
 mod call_value_api_vh;
 mod crypto_api_vh;

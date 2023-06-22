@@ -6,9 +6,9 @@ mod managed_map_api_vh;
 
 use multiversx_sc::api::{HandleConstraints, ManagedTypeApi, ManagedTypeApiImpl};
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> ManagedTypeApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> ManagedTypeApi for VMHooksApi<VHB> {
     type ManagedTypeApiImpl = Self;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl {
@@ -16,7 +16,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ManagedTypeApi for VMHooksApi<BACKE
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> ManagedTypeApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
     fn mb_to_big_int_unsigned(
         &self,
         buffer_handle: Self::ManagedBufferHandle,

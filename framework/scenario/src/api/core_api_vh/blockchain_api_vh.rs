@@ -3,9 +3,9 @@ use multiversx_sc::{
     types::{Address, EsdtLocalRoleFlags, H256},
 };
 
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> BlockchainApi for VMHooksApi<VHB> {
     type BlockchainApiImpl = Self;
 
     fn blockchain_api_impl() -> Self::BlockchainApiImpl {
@@ -13,7 +13,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApi for VMHooksApi<BACKEN
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     fn get_caller_legacy(&self) -> Address {
         panic!("legacy BlockchainApi functionality no longer supported")
     }
