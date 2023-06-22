@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use multiversx_sc::api::{use_raw_handle, BigFloatApiImpl, Sign};
+use multiversx_sc::api::{use_raw_handle, BigFloatApiImpl, HandleConstraints, Sign};
 
 use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
 
@@ -12,7 +12,13 @@ macro_rules! binary_op_wrapper {
             x: Self::BigFloatHandle,
             y: Self::BigFloatHandle,
         ) {
-            self.with_vm_hooks(|vh| vh.$hook_name(dest, x, y));
+            self.with_vm_hooks(|vh| {
+                vh.$hook_name(
+                    dest.get_raw_handle(),
+                    x.get_raw_handle(),
+                    y.get_raw_handle(),
+                )
+            });
         }
     };
 }
@@ -20,7 +26,7 @@ macro_rules! binary_op_wrapper {
 macro_rules! unary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
         fn $method_name(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {
-            self.with_vm_hooks(|vh| vh.$hook_name(dest, x));
+            self.with_vm_hooks(|vh| vh.$hook_name(dest.get_raw_handle(), x.get_raw_handle()));
         }
     };
 }
@@ -28,7 +34,7 @@ macro_rules! unary_op_wrapper {
 macro_rules! unary_op_method_big_int_handle {
     ($method_name:ident, $hook_name:ident) => {
         fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigFloatHandle) {
-            self.with_vm_hooks(|vh| vh.$hook_name(dest, x));
+            self.with_vm_hooks(|vh| vh.$hook_name(dest.get_raw_handle(), x.get_raw_handle()));
         }
     };
 }
@@ -52,11 +58,7 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
         use_raw_handle(raw_handle)
     }
 
-    fn bf_from_sci(
-        &self,
-        significand_value: i64,
-        exponent_value: i64,
-    ) -> Self::ManagedBufferHandle {
+    fn bf_from_sci(&self, significand_value: i64, exponent_value: i64) -> Self::BigFloatHandle {
         let raw_handle =
             self.with_vm_hooks(|vh| vh.big_float_new_from_sci(significand_value, exponent_value));
         use_raw_handle(raw_handle)
@@ -70,13 +72,14 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     unary_op_wrapper! {bf_neg, big_float_neg}
     unary_op_wrapper! {bf_abs, big_float_abs}
 
-    fn bf_cmp(&self, x: Self::ManagedBufferHandle, y: Self::ManagedBufferHandle) -> Ordering {
-        let result = self.with_vm_hooks(|vh| vh.big_float_cmp(x, y));
+    fn bf_cmp(&self, x: Self::BigFloatHandle, y: Self::BigFloatHandle) -> Ordering {
+        let result =
+            self.with_vm_hooks(|vh| vh.big_float_cmp(x.get_raw_handle(), y.get_raw_handle()));
         result.cmp(&0)
     }
 
-    fn bf_sign(&self, x: Self::ManagedBufferHandle) -> Sign {
-        let result = self.with_vm_hooks(|vh| vh.big_float_sign(x));
+    fn bf_sign(&self, x: Self::BigFloatHandle) -> Sign {
+        let result = self.with_vm_hooks(|vh| vh.big_float_sign(x.get_raw_handle()));
         match result.cmp(&0) {
             Ordering::Greater => Sign::Plus,
             Ordering::Equal => Sign::NoSign,
@@ -88,7 +91,7 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     unary_op_wrapper! {bf_sqrt, big_float_sqrt}
 
     fn bf_pow(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle, exp: i32) {
-        self.with_vm_hooks(|vh| vh.big_float_pow(dest, x, exp));
+        self.with_vm_hooks(|vh| vh.big_float_pow(dest.get_raw_handle(), x.get_raw_handle(), exp));
     }
 
     unary_op_method_big_int_handle! {bf_floor , big_float_floor}
@@ -96,22 +99,24 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     unary_op_method_big_int_handle! {bf_trunc , big_float_truncate}
 
     fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
-        i32_to_bool(self.with_vm_hooks(|vh| vh.big_float_is_int(x)))
+        i32_to_bool(self.with_vm_hooks(|vh| vh.big_float_is_int(x.get_raw_handle())))
     }
 
     fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
-        self.with_vm_hooks(|vh| vh.big_float_set_int64(dest, value));
+        self.with_vm_hooks(|vh| vh.big_float_set_int64(dest.get_raw_handle(), value));
     }
 
     fn bf_set_bi(&self, dest: Self::BigFloatHandle, x: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| vh.big_float_set_big_int(dest, x));
+        self.with_vm_hooks(|vh| {
+            vh.big_float_set_big_int(dest.get_raw_handle(), x.get_raw_handle())
+        });
     }
 
     fn bf_get_const_e(&self, dest: Self::BigFloatHandle) {
-        self.with_vm_hooks(|vh| vh.big_float_get_const_e(dest));
+        self.with_vm_hooks(|vh| vh.big_float_get_const_e(dest.get_raw_handle()));
     }
 
     fn bf_get_const_pi(&self, dest: Self::BigFloatHandle) {
-        self.with_vm_hooks(|vh| vh.big_float_get_const_pi(dest));
+        self.with_vm_hooks(|vh| vh.big_float_get_const_pi(dest.get_raw_handle()));
     }
 }

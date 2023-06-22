@@ -1,4 +1,4 @@
-use multiversx_sc::api::{LogApi, LogApiImpl};
+use multiversx_sc::api::{HandleConstraints, LogApi, LogApiImpl};
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 
@@ -16,6 +16,8 @@ impl<VHB: VMHooksApiBackend> LogApiImpl for VMHooksApi<VHB> {
         topics_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_write_log(topics_handle, data_handle));
+        self.with_vm_hooks(|vh| {
+            vh.managed_write_log(topics_handle.get_raw_handle(), data_handle.get_raw_handle())
+        });
     }
 }

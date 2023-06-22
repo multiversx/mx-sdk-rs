@@ -5,11 +5,9 @@ use multiversx_chain_vm::{
     tx_mock::StaticVarData,
     vm_hooks::{TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
 };
+use multiversx_sc::api::RawHandle;
 
 use super::{VMHooksApi, VMHooksApiBackend};
-
-#[derive(Clone)]
-pub struct StaticApiBackend;
 
 fn new_vh_dispatcher_managed_types_cell() -> Box<dyn VMHooks> {
     let vh_handler: Box<dyn VMHooksHandler> = Box::<TxManagedTypesCell>::default();
@@ -22,7 +20,12 @@ thread_local! {
     static STATIC_VAR_DATA_CELL: StaticVarData = StaticVarData::default();
 }
 
+#[derive(Clone)]
+pub struct StaticApiBackend;
+
 impl VMHooksApiBackend for StaticApiBackend {
+    type HandleType = RawHandle;
+
     fn with_vm_hooks<R, F>(f: F) -> R
     where
         F: FnOnce(&dyn VMHooks) -> R,

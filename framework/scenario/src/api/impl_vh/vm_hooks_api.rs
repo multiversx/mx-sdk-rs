@@ -6,19 +6,11 @@ use multiversx_chain_vm::{
     executor::{MemPtr, VMHooks},
     tx_mock::StaticVarData,
 };
-use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl, RawHandle};
+use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl};
 
 #[derive(Clone, Debug)]
 pub struct VMHooksApi<S: VMHooksApiBackend> {
     _phantom: PhantomData<S>,
-}
-
-impl<VHB: VMHooksApiBackend> HandleTypeInfo for VMHooksApi<VHB> {
-    type ManagedBufferHandle = RawHandle;
-    type BigIntHandle = RawHandle;
-    type BigFloatHandle = RawHandle;
-    type EllipticCurveHandle = RawHandle;
-    type ManagedMapHandle = RawHandle;
 }
 
 impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
@@ -51,7 +43,12 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// - token identifiers.
     ///
     /// The buffer is 32 bytes long, enough for both addresses and token identifiers.
-    pub(crate) fn with_temp_buffer_ptr<R, F>(&self, handle: RawHandle, length: usize, f: F) -> R
+    pub(crate) fn with_temp_buffer_ptr<R, F>(
+        &self,
+        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        length: usize,
+        f: F,
+    ) -> R
     where
         F: FnOnce(MemPtr) -> R,
     {
@@ -62,7 +59,11 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     }
 
     /// Convenience method for calling VM hooks with a pointer to a temporary buffer in which we load an address.
-    pub(crate) fn with_temp_address_ptr<R, F>(&self, handle: RawHandle, f: F) -> R
+    pub(crate) fn with_temp_address_ptr<R, F>(
+        &self,
+        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        f: F,
+    ) -> R
     where
         F: FnOnce(MemPtr) -> R,
     {
@@ -72,6 +73,14 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
 
 pub(crate) fn i32_to_bool(vm_hooks_result: i32) -> bool {
     vm_hooks_result > 0
+}
+
+impl<VHB: VMHooksApiBackend> HandleTypeInfo for VMHooksApi<VHB> {
+    type ManagedBufferHandle = VHB::HandleType;
+    type BigIntHandle = VHB::HandleType;
+    type BigFloatHandle = VHB::HandleType;
+    type EllipticCurveHandle = VHB::HandleType;
+    type ManagedMapHandle = VHB::HandleType;
 }
 
 impl<VHB: VMHooksApiBackend> PartialEq for VMHooksApi<VHB> {

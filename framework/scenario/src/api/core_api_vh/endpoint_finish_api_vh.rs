@@ -1,5 +1,5 @@
 use multiversx_chain_vm::mem_conv;
-use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
+use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl, HandleConstraints};
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 
@@ -21,15 +21,15 @@ impl<VHB: VMHooksApiBackend> EndpointFinishApiImpl for VMHooksApi<VHB> {
     }
 
     fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| vh.big_int_finish_signed(handle));
+        self.with_vm_hooks(|vh| vh.big_int_finish_signed(handle.get_raw_handle()));
     }
 
     fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| vh.big_int_finish_unsigned(handle));
+        self.with_vm_hooks(|vh| vh.big_int_finish_unsigned(handle.get_raw_handle()));
     }
 
     fn finish_managed_buffer_raw(&self, handle: Self::ManagedBufferHandle) {
-        self.with_vm_hooks(|vh| vh.mbuffer_finish(handle));
+        self.with_vm_hooks(|vh| vh.mbuffer_finish(handle.get_raw_handle()));
     }
 
     fn finish_u64(&self, value: u64) {

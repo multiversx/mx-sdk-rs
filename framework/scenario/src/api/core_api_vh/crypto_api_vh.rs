@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::{CryptoApi, CryptoApiImpl},
+    api::{CryptoApi, CryptoApiImpl, HandleConstraints},
     types::MessageHashType,
 };
 
@@ -19,7 +19,9 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         result_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_sha256(data_handle, result_handle));
+        self.with_vm_hooks(|vh| {
+            vh.managed_sha256(data_handle.get_raw_handle(), result_handle.get_raw_handle())
+        });
     }
 
     fn keccak256_managed(
@@ -27,7 +29,9 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         result_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_keccak256(data_handle, result_handle));
+        self.with_vm_hooks(|vh| {
+            vh.managed_keccak256(data_handle.get_raw_handle(), result_handle.get_raw_handle())
+        });
     }
 
     fn ripemd160_managed(
@@ -53,7 +57,13 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_verify_ed25519(key, message, signature));
+        self.with_vm_hooks(|vh| {
+            vh.managed_verify_ed25519(
+                key.get_raw_handle(),
+                message.get_raw_handle(),
+                signature.get_raw_handle(),
+            )
+        });
     }
 
     fn verify_secp256k1_managed(

@@ -1,6 +1,10 @@
 use multiversx_chain_vm::{executor::VMHooks, tx_mock::StaticVarData};
+use multiversx_sc::api::HandleConstraints;
 
 pub trait VMHooksApiBackend: Clone + 'static {
+    /// We use a single handle type for all handles.
+    type HandleType: HandleConstraints;
+
     /// All communication with the VM happens via this method.
     fn with_vm_hooks<R, F>(f: F) -> R
     where
