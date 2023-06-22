@@ -2,9 +2,10 @@ use std::rc::Rc;
 
 use multiversx_chain_vm::{
     executor::VMHooks,
-    tx_mock::{StaticVarData, StaticVarStack, TxContext, TxContextStack},
+    tx_mock::{StaticVarData, StaticVarStack, TxContext, TxContextStack, TxPanic},
     vm_hooks::{TxContextWrapper, VMHooksDispatcher},
 };
+use multiversx_sc::err_msg;
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
@@ -37,10 +38,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        assert!(
-            Rc::ptr_eq(&handle1.context, &handle2.context),
-            "VMHooksApi misuse: operation called with handles from 2 different contexts"
-        );
+        assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
     }
 
@@ -53,14 +51,8 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        assert!(
-            Rc::ptr_eq(&handle1.context, &handle2.context),
-            "VMHooksApi misuse: operation called with handles from 2 different contexts"
-        );
-        assert!(
-            Rc::ptr_eq(&handle1.context, &handle3.context),
-            "VMHooksApi misuse: operation called with handles from 2 different contexts"
-        );
+        assert_handles_on_same_context(&handle1, &handle2);
+        assert_handles_on_same_context(&handle1, &handle3);
         Self::with_vm_hooks_ctx_1(handle1, f)
     }
 
@@ -93,5 +85,14 @@ impl DebugApi {
 impl std::fmt::Debug for DebugApi {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("DebugApi")
+    }
+}
+
+fn assert_handles_on_same_context(handle1: &DebugHandle, handle2: &DebugHandle) {
+    if !Rc::ptr_eq(&handle1.context, &handle2.context) {
+        std::panic::panic_any(TxPanic {
+            status: err_msg::DEBUG_API_ERR_STATUS,
+            message: err_msg::DEBUG_API_ERR_BAD_HANDLE_CONTEXT.to_string(),
+        })
     }
 }

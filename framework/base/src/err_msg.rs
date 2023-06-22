@@ -70,3 +70,8 @@ pub const STORAGE_NOT_32_BYTES: &[u8] = b"32 bytes of data expected in storage a
 
 /// Mirrors the error message from the VM.
 pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcontract";
+
+/// An additional non-VM status, meant just to signal an error in the debugger infrastructure of in the tests.
+pub const DEBUG_API_ERR_STATUS: u64 = 100;
+pub const DEBUG_API_ERR_BAD_HANDLE_CONTEXT: &str =
+    "VMHooksApi misuse: operation called with handles from 2 different contexts";
