@@ -13,7 +13,7 @@ pub struct DebugHandle {
 }
 
 impl DebugHandle {
-    fn assert_current_context(&self) {
+    pub fn assert_current_context(&self) {
         assert!(
             Rc::ptr_eq(&self.context, &TxContextStack::static_peek()),
             "Managed value not used in original context"

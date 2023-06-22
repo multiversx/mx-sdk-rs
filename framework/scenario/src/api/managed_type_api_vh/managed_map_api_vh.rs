@@ -14,7 +14,7 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
         out_value_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| {
+        self.with_vm_hooks_ctx_3(&map_handle, &key_handle, &out_value_handle, |vh| {
             vh.managed_map_get(
                 map_handle.get_raw_handle_unchecked(),
                 key_handle.get_raw_handle_unchecked(),
@@ -27,13 +27,13 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
         &self,
         map_handle: Self::ManagedMapHandle,
         key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        value_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| {
+        self.with_vm_hooks_ctx_3(&map_handle, &key_handle, &value_handle, |vh| {
             vh.managed_map_put(
                 map_handle.get_raw_handle_unchecked(),
                 key_handle.get_raw_handle_unchecked(),
-                out_value_handle.get_raw_handle_unchecked(),
+                value_handle.get_raw_handle_unchecked(),
             )
         });
     }
@@ -44,7 +44,7 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
         out_value_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| {
+        self.with_vm_hooks_ctx_3(&map_handle, &key_handle, &out_value_handle, |vh| {
             vh.managed_map_remove(
                 map_handle.get_raw_handle_unchecked(),
                 key_handle.get_raw_handle_unchecked(),
@@ -58,8 +58,11 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
         map_handle: Self::ManagedMapHandle,
         key_handle: Self::ManagedBufferHandle,
     ) -> bool {
-        i32_to_bool(self.with_vm_hooks(|vh| {
-            vh.managed_map_contains(map_handle.get_raw_handle_unchecked(), key_handle.get_raw_handle_unchecked())
+        i32_to_bool(self.with_vm_hooks_ctx_2(&map_handle, &key_handle, |vh| {
+            vh.managed_map_contains(
+                map_handle.get_raw_handle_unchecked(),
+                key_handle.get_raw_handle_unchecked(),
+            )
         }))
     }
 }

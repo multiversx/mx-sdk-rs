@@ -12,7 +12,7 @@ macro_rules! binary_op_wrapper {
             x: Self::BigFloatHandle,
             y: Self::BigFloatHandle,
         ) {
-            self.with_vm_hooks(|vh| {
+            self.with_vm_hooks_ctx_3(&dest, &x, &y, |vh| {
                 vh.$hook_name(
                     dest.get_raw_handle_unchecked(),
                     x.get_raw_handle_unchecked(),
@@ -26,7 +26,12 @@ macro_rules! binary_op_wrapper {
 macro_rules! unary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
         fn $method_name(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {
-            self.with_vm_hooks(|vh| vh.$hook_name(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked()));
+            self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
+                vh.$hook_name(
+                    dest.get_raw_handle_unchecked(),
+                    x.get_raw_handle_unchecked(),
+                )
+            });
         }
     };
 }
@@ -34,7 +39,12 @@ macro_rules! unary_op_wrapper {
 macro_rules! unary_op_method_big_int_handle {
     ($method_name:ident, $hook_name:ident) => {
         fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigFloatHandle) {
-            self.with_vm_hooks(|vh| vh.$hook_name(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked()));
+            self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
+                vh.$hook_name(
+                    dest.get_raw_handle_unchecked(),
+                    x.get_raw_handle_unchecked(),
+                )
+            });
         }
     };
 }
@@ -73,13 +83,15 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     unary_op_wrapper! {bf_abs, big_float_abs}
 
     fn bf_cmp(&self, x: Self::BigFloatHandle, y: Self::BigFloatHandle) -> Ordering {
-        let result =
-            self.with_vm_hooks(|vh| vh.big_float_cmp(x.get_raw_handle_unchecked(), y.get_raw_handle_unchecked()));
+        let result = self.with_vm_hooks_ctx_2(&x, &y, |vh| {
+            vh.big_float_cmp(x.get_raw_handle_unchecked(), y.get_raw_handle_unchecked())
+        });
         result.cmp(&0)
     }
 
     fn bf_sign(&self, x: Self::BigFloatHandle) -> Sign {
-        let result = self.with_vm_hooks(|vh| vh.big_float_sign(x.get_raw_handle_unchecked()));
+        let result =
+            self.with_vm_hooks_ctx_1(&x, |vh| vh.big_float_sign(x.get_raw_handle_unchecked()));
         match result.cmp(&0) {
             Ordering::Greater => Sign::Plus,
             Ordering::Equal => Sign::NoSign,
@@ -91,7 +103,13 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     unary_op_wrapper! {bf_sqrt, big_float_sqrt}
 
     fn bf_pow(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle, exp: i32) {
-        self.with_vm_hooks(|vh| vh.big_float_pow(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked(), exp));
+        self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
+            vh.big_float_pow(
+                dest.get_raw_handle_unchecked(),
+                x.get_raw_handle_unchecked(),
+                exp,
+            )
+        });
     }
 
     unary_op_method_big_int_handle! {bf_floor , big_float_floor}
@@ -99,24 +117,35 @@ impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     unary_op_method_big_int_handle! {bf_trunc , big_float_truncate}
 
     fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
-        i32_to_bool(self.with_vm_hooks(|vh| vh.big_float_is_int(x.get_raw_handle_unchecked())))
+        i32_to_bool(
+            self.with_vm_hooks_ctx_1(&x, |vh| vh.big_float_is_int(x.get_raw_handle_unchecked())),
+        )
     }
 
     fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
-        self.with_vm_hooks(|vh| vh.big_float_set_int64(dest.get_raw_handle_unchecked(), value));
+        self.with_vm_hooks_ctx_1(&dest, |vh| {
+            vh.big_float_set_int64(dest.get_raw_handle_unchecked(), value)
+        });
     }
 
     fn bf_set_bi(&self, dest: Self::BigFloatHandle, x: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| {
-            vh.big_float_set_big_int(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked())
+        self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
+            vh.big_float_set_big_int(
+                dest.get_raw_handle_unchecked(),
+                x.get_raw_handle_unchecked(),
+            )
         });
     }
 
     fn bf_get_const_e(&self, dest: Self::BigFloatHandle) {
-        self.with_vm_hooks(|vh| vh.big_float_get_const_e(dest.get_raw_handle_unchecked()));
+        self.with_vm_hooks_ctx_1(&dest, |vh| {
+            vh.big_float_get_const_e(dest.get_raw_handle_unchecked())
+        });
     }
 
     fn bf_get_const_pi(&self, dest: Self::BigFloatHandle) {
-        self.with_vm_hooks(|vh| vh.big_float_get_const_pi(dest.get_raw_handle_unchecked()));
+        self.with_vm_hooks_ctx_1(&dest, |vh| {
+            vh.big_float_get_const_pi(dest.get_raw_handle_unchecked())
+        });
     }
 }

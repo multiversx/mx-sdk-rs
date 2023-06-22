@@ -19,6 +19,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_caller_managed(&self, dest: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| vh.managed_caller(dest.get_raw_handle_unchecked()));
     }
 
@@ -27,6 +28,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_sc_address_managed(&self, dest: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| vh.managed_sc_address(dest.get_raw_handle_unchecked()));
     }
 
@@ -39,6 +41,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn get_shard_of_address(&self, address_handle: Self::ManagedBufferHandle) -> u32 {
+        self.assert_live_handle(&address_handle);
         self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_vm_hooks(|vh| vh.get_shard_of_address(address_ptr))
         }) as u32
@@ -49,6 +52,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn is_smart_contract(&self, address_handle: Self::ManagedBufferHandle) -> bool {
+        self.assert_live_handle(&address_handle);
         let result = self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_vm_hooks(|vh| vh.is_smart_contract(address_ptr))
         });
@@ -60,6 +64,8 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_balance(&self, dest: Self::BigIntHandle, address_handle: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
+        self.assert_live_handle(&address_handle);
         self.with_temp_address_ptr(address_handle, |address_ptr: isize| {
             self.with_vm_hooks(|vh| {
                 vh.big_int_get_external_balance(address_ptr, dest.get_raw_handle_unchecked())
@@ -76,6 +82,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_tx_hash_managed(&self, dest: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| vh.managed_get_original_tx_hash(dest.get_raw_handle_unchecked()));
     }
 
@@ -100,6 +107,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| vh.managed_get_block_random_seed(dest.get_raw_handle_unchecked()));
     }
 
@@ -124,7 +132,10 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_prev_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
-        self.with_vm_hooks(|vh| vh.managed_get_prev_block_random_seed(dest.get_raw_handle_unchecked()));
+        self.assert_live_handle(&dest);
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_prev_block_random_seed(dest.get_raw_handle_unchecked())
+        });
     }
 
     fn get_current_esdt_nft_nonce(
@@ -132,6 +143,8 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         address_handle: Self::ManagedBufferHandle,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> u64 {
+        self.assert_live_handle(&address_handle);
+        self.assert_live_handle(&token_id_handle);
         let token_id_len = self.mb_len(token_id_handle.clone());
         let result = self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_temp_buffer_ptr(token_id_handle, token_id_len, |token_id_ptr| {
@@ -150,6 +163,8 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         nonce: u64,
         dest: Self::BigIntHandle,
     ) {
+        self.assert_live_handle(&address_handle);
+        self.assert_live_handle(&token_id_handle);
         let token_id_len = self.mb_len(token_id_handle.clone());
         self.with_temp_address_ptr(address_handle, |address_ptr| {
             self.with_temp_buffer_ptr(token_id_handle, token_id_len, |token_id_ptr| {
@@ -203,6 +218,8 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         token_id_handle: Self::ManagedBufferHandle,
         nonce: u64,
     ) -> bool {
+        self.assert_live_handle(&address_handle);
+        self.assert_live_handle(&token_id_handle);
         let result = self.with_vm_hooks(|vh| {
             vh.managed_is_esdt_frozen(
                 address_handle.get_raw_handle_unchecked(),
@@ -214,12 +231,15 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
     }
 
     fn check_esdt_paused(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
-        let result =
-            self.with_vm_hooks(|vh| vh.managed_is_esdt_paused(token_id_handle.get_raw_handle_unchecked()));
+        self.assert_live_handle(&token_id_handle);
+        let result = self.with_vm_hooks(|vh| {
+            vh.managed_is_esdt_paused(token_id_handle.get_raw_handle_unchecked())
+        });
         i32_to_bool(result)
     }
 
     fn check_esdt_limited_transfer(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
+        self.assert_live_handle(&token_id_handle);
         let result = self.with_vm_hooks(|vh| {
             vh.managed_is_esdt_limited_transfer(token_id_handle.get_raw_handle_unchecked())
         });
@@ -230,8 +250,10 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> EsdtLocalRoleFlags {
-        let result =
-            self.with_vm_hooks(|vh| vh.get_esdt_local_roles(token_id_handle.get_raw_handle_unchecked()));
+        self.assert_live_handle(&token_id_handle);
+        let result = self.with_vm_hooks(|vh| {
+            vh.get_esdt_local_roles(token_id_handle.get_raw_handle_unchecked())
+        });
         unsafe { EsdtLocalRoleFlags::from_bits_unchecked(result as u64) }
     }
 }

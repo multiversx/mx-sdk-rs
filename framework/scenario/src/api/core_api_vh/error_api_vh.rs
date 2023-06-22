@@ -25,7 +25,8 @@ impl<VHB: VMHooksApiBackend> ErrorApiImpl for VMHooksApi<VHB> {
     }
 
     fn signal_error_from_buffer(&self, message_handle: Self::ManagedBufferHandle) -> ! {
-        self.with_vm_hooks(|vh| vh.managed_signal_error(message_handle.get_raw_handle_unchecked()));
+        self.assert_live_handle(&message_handle);
+        self.with_vm_hooks(|vh| vh.managed_signal_error(message_handle.get_raw_handle()));
 
         // even though not explicitly stated in the VM hooks definition,
         // `managed_signal_error` is expected to terminate execution

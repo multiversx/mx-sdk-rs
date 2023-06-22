@@ -16,10 +16,12 @@ impl<VHB: VMHooksApiBackend> EndpointArgumentApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_argument_managed_buffer(&self, arg_id: i32, dest: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| vh.mbuffer_get_argument(arg_id, dest.get_raw_handle_unchecked()));
     }
 
     fn load_callback_closure_buffer(&self, dest: Self::ManagedBufferHandle) {
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| vh.managed_get_callback_closure(dest.get_raw_handle_unchecked()));
     }
 
