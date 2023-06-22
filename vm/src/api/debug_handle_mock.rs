@@ -21,10 +21,6 @@ impl DebugHandle {
             "Managed value not used in original context"
         );
     }
-
-    pub(crate) fn get_raw_handle_unchecked(&self) -> RawHandle {
-        self.raw_handle
-    }
 }
 
 impl core::fmt::Debug for DebugHandle {
@@ -48,6 +44,10 @@ impl HandleConstraints for DebugHandle {
 
     fn get_raw_handle(&self) -> RawHandle {
         self.assert_current_context();
+        self.raw_handle
+    }
+
+    fn get_raw_handle_unchecked(&self) -> RawHandle {
         self.raw_handle
     }
 }

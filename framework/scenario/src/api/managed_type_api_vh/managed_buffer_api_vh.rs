@@ -22,17 +22,17 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     }
 
     fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
-        self.with_vm_hooks(|vh| vh.mbuffer_get_length(handle.get_raw_handle()) as usize)
+        self.with_vm_hooks(|vh| vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize)
     }
 
     fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         self.with_vm_hooks(|vh| {
-            let len = vh.mbuffer_get_length(handle.get_raw_handle()) as usize;
+            let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize;
             unsafe {
                 let mut res = BoxedBytes::allocate(len);
                 if len > 0 {
                     let _ =
-                        vh.mbuffer_get_bytes(handle.get_raw_handle(), res.as_mut_ptr() as MemPtr);
+                        vh.mbuffer_get_bytes(handle.get_raw_handle_unchecked(), res.as_mut_ptr() as MemPtr);
                 }
                 res
             }
@@ -48,7 +48,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         let err = self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr_mut(dest_slice, |offset, length| {
                 vh.mbuffer_get_byte_slice(
-                    source_handle.get_raw_handle(),
+                    source_handle.get_raw_handle_unchecked(),
                     starting_position as i32,
                     length as i32,
                     offset,
@@ -71,10 +71,10 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     ) -> Result<(), InvalidSliceError> {
         let err = self.with_vm_hooks(|vh| {
             vh.mbuffer_copy_byte_slice(
-                source_handle.get_raw_handle(),
+                source_handle.get_raw_handle_unchecked(),
                 starting_pos as i32,
                 slice_len as i32,
-                dest_handle.get_raw_handle(),
+                dest_handle.get_raw_handle_unchecked(),
             )
         });
         if err == 0 {
@@ -87,7 +87,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(value, |offset, length| {
-                vh.mbuffer_set_bytes(handle.get_raw_handle(), offset, length);
+                vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length);
             })
         });
     }
@@ -101,7 +101,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         let err = self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(source_slice, |offset, length| {
                 vh.mbuffer_set_byte_slice(
-                    dest_handle.get_raw_handle(),
+                    dest_handle.get_raw_handle_unchecked(),
                     starting_position as i32,
                     length,
                     offset,
@@ -116,7 +116,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     }
 
     fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
-        self.with_vm_hooks(|vh| vh.mbuffer_set_random(dest_handle.get_raw_handle(), length as i32));
+        self.with_vm_hooks(|vh| vh.mbuffer_set_random(dest_handle.get_raw_handle_unchecked(), length as i32));
     }
 
     fn mb_append(
@@ -126,8 +126,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     ) {
         self.with_vm_hooks(|vh| {
             vh.mbuffer_append(
-                accumulator_handle.get_raw_handle(),
-                data_handle.get_raw_handle(),
+                accumulator_handle.get_raw_handle_unchecked(),
+                data_handle.get_raw_handle_unchecked(),
             )
         });
     }
@@ -136,7 +136,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(bytes, |offset, length| {
                 let _ =
-                    vh.mbuffer_append_bytes(accumulator_handle.get_raw_handle(), offset, length);
+                    vh.mbuffer_append_bytes(accumulator_handle.get_raw_handle_unchecked(), offset, length);
             })
         });
     }
@@ -148,7 +148,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     ) -> bool {
         i32_to_bool(
             self.with_vm_hooks(|vh| {
-                vh.mbuffer_eq(handle1.get_raw_handle(), handle2.get_raw_handle())
+                vh.mbuffer_eq(handle1.get_raw_handle_unchecked(), handle2.get_raw_handle_unchecked())
             }),
         )
     }
@@ -159,7 +159,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         dest_handle: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.managed_buffer_to_hex(source_handle.get_raw_handle(), dest_handle.get_raw_handle())
+            vh.managed_buffer_to_hex(source_handle.get_raw_handle_unchecked(), dest_handle.get_raw_handle_unchecked())
         })
     }
 }

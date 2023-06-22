@@ -41,7 +41,11 @@ impl HandleConstraints for DebugHandle {
     }
 
     fn get_raw_handle(&self) -> RawHandle {
-        // self.assert_current_context();
+        self.assert_current_context();
+        self.raw_handle
+    }
+
+    fn get_raw_handle_unchecked(&self) -> RawHandle {
         self.raw_handle
     }
 }

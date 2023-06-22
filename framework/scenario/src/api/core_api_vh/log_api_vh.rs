@@ -17,7 +17,7 @@ impl<VHB: VMHooksApiBackend> LogApiImpl for VMHooksApi<VHB> {
         data_handle: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.managed_write_log(topics_handle.get_raw_handle(), data_handle.get_raw_handle())
+            vh.managed_write_log(topics_handle.get_raw_handle_unchecked(), data_handle.get_raw_handle_unchecked())
         });
     }
 }

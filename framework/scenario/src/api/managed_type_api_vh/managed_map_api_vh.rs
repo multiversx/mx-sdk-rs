@@ -16,9 +16,9 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
     ) {
         self.with_vm_hooks(|vh| {
             vh.managed_map_get(
-                map_handle.get_raw_handle(),
-                key_handle.get_raw_handle(),
-                out_value_handle.get_raw_handle(),
+                map_handle.get_raw_handle_unchecked(),
+                key_handle.get_raw_handle_unchecked(),
+                out_value_handle.get_raw_handle_unchecked(),
             )
         });
     }
@@ -31,9 +31,9 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
     ) {
         self.with_vm_hooks(|vh| {
             vh.managed_map_put(
-                map_handle.get_raw_handle(),
-                key_handle.get_raw_handle(),
-                out_value_handle.get_raw_handle(),
+                map_handle.get_raw_handle_unchecked(),
+                key_handle.get_raw_handle_unchecked(),
+                out_value_handle.get_raw_handle_unchecked(),
             )
         });
     }
@@ -46,9 +46,9 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
     ) {
         self.with_vm_hooks(|vh| {
             vh.managed_map_remove(
-                map_handle.get_raw_handle(),
-                key_handle.get_raw_handle(),
-                out_value_handle.get_raw_handle(),
+                map_handle.get_raw_handle_unchecked(),
+                key_handle.get_raw_handle_unchecked(),
+                out_value_handle.get_raw_handle_unchecked(),
             )
         });
     }
@@ -59,7 +59,7 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
     ) -> bool {
         i32_to_bool(self.with_vm_hooks(|vh| {
-            vh.managed_map_contains(map_handle.get_raw_handle(), key_handle.get_raw_handle())
+            vh.managed_map_contains(map_handle.get_raw_handle_unchecked(), key_handle.get_raw_handle_unchecked())
         }))
     }
 }

@@ -4,7 +4,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use multiversx_sc::{
-    api::{BigIntApiImpl, HandleTypeInfo, ManagedBufferApiImpl},
+    api::{BigIntApiImpl, HandleConstraints, HandleTypeInfo, ManagedBufferApiImpl},
     err_msg,
     types::heap::BoxedBytes,
 };

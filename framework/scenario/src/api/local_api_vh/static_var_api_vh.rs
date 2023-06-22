@@ -1,6 +1,6 @@
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 use multiversx_sc::{
-    api::{use_raw_handle, HandleConstraints, RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{use_raw_handle, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -24,7 +24,7 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
         self.with_static_data(|data| {
             data.static_vars_cell
                 .borrow_mut()
-                .external_view_target_address_handle = handle.get_raw_handle();
+                .external_view_target_address_handle = handle;
         });
     }
 
@@ -57,7 +57,7 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
 
     fn set_call_value_egld_handle(&self, handle: RawHandle) {
         self.with_static_data(|data| {
-            data.static_vars_cell.borrow_mut().call_value_egld_handle = handle.get_raw_handle();
+            data.static_vars_cell.borrow_mut().call_value_egld_handle = handle;
         })
     }
 
@@ -71,7 +71,7 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
         self.with_static_data(|data| {
             data.static_vars_cell
                 .borrow_mut()
-                .call_value_multi_esdt_handle = handle.get_raw_handle();
+                .call_value_multi_esdt_handle = handle;
         })
     }
 

@@ -16,11 +16,11 @@ impl<VHB: VMHooksApiBackend> EndpointArgumentApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_argument_managed_buffer(&self, arg_id: i32, dest: Self::ManagedBufferHandle) {
-        self.with_vm_hooks(|vh| vh.mbuffer_get_argument(arg_id, dest.get_raw_handle()));
+        self.with_vm_hooks(|vh| vh.mbuffer_get_argument(arg_id, dest.get_raw_handle_unchecked()));
     }
 
     fn load_callback_closure_buffer(&self, dest: Self::ManagedBufferHandle) {
-        self.with_vm_hooks(|vh| vh.managed_get_callback_closure(dest.get_raw_handle()));
+        self.with_vm_hooks(|vh| vh.managed_get_callback_closure(dest.get_raw_handle_unchecked()));
     }
 
     fn get_argument_u64(&self, arg_index: i32) -> u64 {

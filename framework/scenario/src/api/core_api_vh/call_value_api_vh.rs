@@ -16,11 +16,11 @@ impl<VHB: VMHooksApiBackend> CallValueApiImpl for VMHooksApi<VHB> {
     }
 
     fn load_egld_value(&self, dest: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| vh.big_int_get_call_value(dest.get_raw_handle()));
+        self.with_vm_hooks(|vh| vh.big_int_get_call_value(dest.get_raw_handle_unchecked()));
     }
 
     fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
-        self.with_vm_hooks(|vh| vh.managed_get_multi_esdt_call_value(dest_handle.get_raw_handle()));
+        self.with_vm_hooks(|vh| vh.managed_get_multi_esdt_call_value(dest_handle.get_raw_handle_unchecked()));
     }
 
     fn esdt_num_transfers(&self) -> usize {
