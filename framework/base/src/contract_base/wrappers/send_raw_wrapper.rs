@@ -59,14 +59,7 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().transfer_esdt_execute(
-            to,
-            token,
-            amount,
-            gas_limit,
-            endpoint_name,
-            arg_buffer,
-        )
+        self.transfer_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -80,15 +73,9 @@ where
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        A::send_api_impl().transfer_esdt_nft_execute(
-            to,
-            token,
-            nonce,
-            amount,
-            gas_limit,
-            endpoint_name,
-            arg_buffer,
-        )
+        let mut payments: ManagedVec<A, EsdtTokenPayment<A>> = ManagedVec::new();
+        payments.push(EsdtTokenPayment::new(token.clone(), nonce, amount.clone()));
+        self.multi_esdt_transfer_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
 
     pub fn multi_esdt_transfer_execute(

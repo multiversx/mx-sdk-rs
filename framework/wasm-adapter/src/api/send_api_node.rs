@@ -3,7 +3,7 @@ use multiversx_sc::{
     api::{const_handles, ManagedTypeApi, SendApi, SendApiImpl, StaticVarApiImpl},
     types::{
         BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedType, ManagedVec, TokenIdentifier,
+        ManagedType, ManagedVec,
     },
 };
 
@@ -154,33 +154,6 @@ impl SendApiImpl for VmApiImpl {
                 Err(b"transferValueExecute failed")
             }
         }
-    }
-
-    fn transfer_esdt_execute<M: ManagedTypeApi>(
-        &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        amount: &BigUint<M>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
-        self.transfer_esdt_nft_execute(to, token, 0, amount, gas_limit, endpoint_name, arg_buffer)
-    }
-
-    fn transfer_esdt_nft_execute<M: ManagedTypeApi>(
-        &self,
-        to: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        nonce: u64,
-        amount: &BigUint<M>,
-        gas_limit: u64,
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
-    ) -> Result<(), &'static [u8]> {
-        let mut payments = ManagedVec::new();
-        payments.push(EsdtTokenPayment::new(token.clone(), nonce, amount.clone()));
-        self.multi_transfer_esdt_nft_execute(to, &payments, gas_limit, endpoint_name, arg_buffer)
     }
 
     fn multi_transfer_esdt_nft_execute<M: ManagedTypeApi>(
