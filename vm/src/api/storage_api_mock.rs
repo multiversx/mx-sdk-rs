@@ -22,14 +22,6 @@ impl DebugApi {
 }
 
 impl StorageReadApiImpl for DebugApi {
-    fn storage_load_len(&self, key: &[u8]) -> usize {
-        self.storage_load_vec_u8(key).len()
-    }
-
-    fn storage_load_to_heap(&self, key: &[u8]) -> Box<[u8]> {
-        self.storage_load_vec_u8(key).into_boxed_slice()
-    }
-
     fn storage_load_managed_buffer_raw(
         &self,
         key_handle: Self::ManagedBufferHandle,
@@ -67,7 +59,7 @@ impl StorageWriteApi for DebugApi {
     }
 }
 
-impl StorageWriteApiImpl for DebugApi {
+impl DebugApi {
     fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
         // TODO: extract magic strings somewhere
         if key.starts_with(&b"ELROND"[..]) {
@@ -81,7 +73,9 @@ impl StorageWriteApiImpl for DebugApi {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
     }
+}
 
+impl StorageWriteApiImpl for DebugApi {
     fn storage_store_managed_buffer_raw(
         &self,
         key_handle: Self::ManagedBufferHandle,

@@ -18,10 +18,6 @@ use multiversx_sc::{
 use super::VMHooksManagedTypes;
 
 pub trait VMHooksStorageRead: VMHooksHandlerSource {
-    fn storage_load_len(&self, key: &[u8]) -> usize {
-        self.storage_read(key).len()
-    }
-
     fn storage_load_managed_buffer_raw(&self, key_handle: RawHandle, dest: RawHandle) {
         let value = self.storage_read(self.m_types_borrow().mb_get(key_handle));
         self.m_types_borrow_mut().mb_set(dest, value);
@@ -41,14 +37,6 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
 }
 
 pub trait VMHooksStorageWrite: VMHooksHandlerSource + VMHooksManagedTypes {
-    fn storage_store_slice_u8(&self, key: &[u8], value: &[u8]) {
-        self.storage_write(key, value);
-    }
-
-    fn storage_store_big_uint_raw(&self, key: &[u8], handle: RawHandle) {
-        self.storage_write(key, self.bi_get_signed_bytes(handle).as_slice());
-    }
-
     fn storage_store_managed_buffer_raw(&self, key_handle: RawHandle, value_handle: RawHandle) {
         self.storage_write(
             self.m_types_borrow().mb_get(key_handle),

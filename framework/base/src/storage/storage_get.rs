@@ -66,8 +66,7 @@ where
     }
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
-        let key_bytes = self.key.to_boxed_bytes();
-        A::storage_read_api_impl().storage_load_to_heap(key_bytes.as_slice())
+        self.to_managed_buffer().to_boxed_bytes().into_box()
     }
 
     #[inline]
