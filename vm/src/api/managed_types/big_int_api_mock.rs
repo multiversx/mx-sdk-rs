@@ -4,7 +4,7 @@ use core::{
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
 use multiversx_sc::{
-    api::{BigIntApiImpl, ErrorApiImpl, HandleTypeInfo, ManagedBufferApiImpl},
+    api::{BigIntApiImpl, HandleTypeInfo, ManagedBufferApiImpl},
     err_msg,
     types::heap::BoxedBytes,
 };
@@ -136,22 +136,6 @@ impl BigIntApiImpl for DebugApi {
 
     binary_op_method! {bi_add, add}
     binary_op_method! {bi_sub, sub}
-
-    fn bi_sub_unsigned(
-        &self,
-        dest: Self::BigIntHandle,
-        x: Self::BigIntHandle,
-        y: Self::BigIntHandle,
-    ) {
-        let bi_x = self.bi_get(x);
-        let bi_y = self.bi_get(y);
-        let result = bi_x.sub(bi_y);
-        if result.sign() == num_bigint::Sign::Minus {
-            self.signal_error(err_msg::BIG_UINT_SUB_NEGATIVE);
-        }
-        self.bi_overwrite(dest, result);
-    }
-
     binary_op_method! {bi_mul, mul}
     binary_op_method! {bi_t_div, div}
     binary_op_method! {bi_t_mod, rem}

@@ -136,21 +136,6 @@ impl BigIntApiImpl for crate::api::VmApiImpl {
 
     binary_op_wrapper! {bi_add, bigIntAdd}
     binary_op_wrapper! {bi_sub, bigIntSub}
-
-    fn bi_sub_unsigned(
-        &self,
-        dest: Self::BigIntHandle,
-        x: Self::BigIntHandle,
-        y: Self::BigIntHandle,
-    ) {
-        unsafe {
-            bigIntSub(dest, x, y);
-            if bigIntSign(dest) < 0 {
-                error_hook::signal_error(err_msg::BIG_UINT_SUB_NEGATIVE)
-            }
-        }
-    }
-
     binary_op_wrapper! {bi_mul, bigIntMul}
     binary_op_wrapper! {bi_t_div, bigIntTDiv}
     binary_op_wrapper! {bi_t_mod, bigIntTMod}

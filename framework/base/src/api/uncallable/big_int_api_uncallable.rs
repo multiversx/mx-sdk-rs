@@ -50,15 +50,6 @@ impl BigIntApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn bi_sub_unsigned(
-        &self,
-        _dest: Self::BigIntHandle,
-        _x: Self::BigIntHandle,
-        _y: Self::BigIntHandle,
-    ) {
-        unreachable!()
-    }
-
     fn bi_mul(&self, _dest: Self::BigIntHandle, _x: Self::BigIntHandle, _y: Self::BigIntHandle) {
         unreachable!()
     }

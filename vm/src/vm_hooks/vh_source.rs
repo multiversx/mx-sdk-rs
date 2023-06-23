@@ -3,10 +3,10 @@ use std::{
     fmt::Debug,
 };
 
-use multiversx_sc::types::Address;
+use multiversx_sc::types::{Address, CodeMetadata, H256};
 
 use crate::{
-    tx_mock::{TxInput, TxLog, TxManagedTypes, TxResult},
+    tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -18,7 +18,15 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn input_ref(&self) -> &TxInput;
 
+    fn tx_hash(&self) -> H256 {
+        self.input_ref().tx_hash.clone()
+    }
+
     fn result_borrow_mut(&self) -> RefMut<TxResult>;
+
+    fn push_tx_log(&self, tx_log: TxLog) {
+        self.result_borrow_mut().result_logs.push(tx_log);
+    }
 
     fn storage_read(&self, key: &[u8]) -> Vec<u8> {
         self.storage_read_any_address(&self.input_ref().to, key)
@@ -44,5 +52,37 @@ pub trait VMHooksHandlerSource: Debug {
         self.account_data(&self.input_ref().to)
     }
 
-    fn push_tx_log(&self, tx_log: TxLog);
+    fn account_code(&self, address: &Address) -> Vec<u8>;
+
+    fn perform_async_call(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: TxFunctionName,
+        args: Vec<Vec<u8>>,
+    ) -> !;
+
+    fn perform_execute_on_dest_context(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: TxFunctionName,
+        args: Vec<Vec<u8>>,
+    ) -> Vec<Vec<u8>>;
+
+    fn perform_deploy(
+        &self,
+        egld_value: num_bigint::BigUint,
+        contract_code: Vec<u8>,
+        code_metadata: CodeMetadata,
+        args: Vec<Vec<u8>>,
+    ) -> (Address, Vec<Vec<u8>>);
+
+    fn perform_transfer_execute(
+        &self,
+        to: Address,
+        egld_value: num_bigint::BigUint,
+        func_name: TxFunctionName,
+        arguments: Vec<Vec<u8>>,
+    );
 }

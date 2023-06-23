@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_chain_vm::mem_conv;
 use multiversx_sc::{
-    api::{BigIntApiImpl, HandleConstraints, Sign},
+    api::{use_raw_handle, BigIntApiImpl, HandleConstraints, Sign},
     types::BoxedBytes,
 };
 
@@ -36,8 +36,9 @@ macro_rules! unary_op_method {
 }
 
 impl<const BACKEND_TYPE: VMHooksBackendType> BigIntApiImpl for VMHooksApi<BACKEND_TYPE> {
-    fn bi_new(&self, _value: i64) -> Self::BigIntHandle {
-        todo!()
+    fn bi_new(&self, value: i64) -> Self::BigIntHandle {
+        let handle = self.with_vm_hooks(|vh| vh.big_int_new(value));
+        use_raw_handle(handle)
     }
 
     fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
@@ -89,16 +90,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BigIntApiImpl for VMHooksApi<BACKEN
 
     binary_op_method! {bi_add, big_int_add}
     binary_op_method! {bi_sub, big_int_sub}
-
-    fn bi_sub_unsigned(
-        &self,
-        _dest: Self::BigIntHandle,
-        _x: Self::BigIntHandle,
-        _y: Self::BigIntHandle,
-    ) {
-        todo!()
-    }
-
     binary_op_method! {bi_mul, big_int_mul}
     binary_op_method! {bi_t_div, big_int_tdiv}
     binary_op_method! {bi_t_mod, big_int_tmod}
