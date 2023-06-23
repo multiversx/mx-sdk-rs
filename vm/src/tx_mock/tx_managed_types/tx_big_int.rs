@@ -19,6 +19,12 @@ impl TxManagedTypes {
         self.big_int_map.get(handle).clone()
     }
 
+    pub fn bu_get(&self, handle: RawHandle) -> num_bigint::BigUint {
+        self.bi_get(handle)
+            .try_into()
+            .expect("number cannot be negative")
+    }
+
     pub fn bi_to_i64(&self, handle: RawHandle) -> Option<i64> {
         let bi = self.bi_get(handle);
         big_int_to_i64(&bi)

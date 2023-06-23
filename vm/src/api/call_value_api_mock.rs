@@ -36,10 +36,7 @@ impl CallValueApiImpl for DebugApi {
     fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
         let transfers = self.input_ref().received_esdt();
         self.m_types_borrow_mut()
-            .write_all_esdt_transfers_to_managed_vec(
-                dest_handle.get_raw_handle_unchecked(),
-                transfers,
-            );
+            .mb_set_vec_of_esdt_payments(dest_handle.get_raw_handle_unchecked(), transfers);
     }
 
     fn esdt_num_transfers(&self) -> usize {
