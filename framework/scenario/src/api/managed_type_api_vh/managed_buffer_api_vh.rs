@@ -4,9 +4,9 @@ use multiversx_sc::{
     types::BoxedBytes,
 };
 
-use crate::api::VMHooksApiImpl;
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
-impl ManagedBufferApiImpl for VMHooksApiImpl {
+impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         self.with_vm_hooks(|vh| vh.mbuffer_new())
     }

@@ -4,11 +4,11 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
-    blockchain.register_contract(
+    blockchain.register_contract_new_api(
         "file:output/basic-features.wasm",
         basic_features::ContractBuilder,
     );
-    blockchain.register_contract(
+    blockchain.register_contract_new_api(
         "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
         esdt_system_sc_mock::ContractBuilder,
     );

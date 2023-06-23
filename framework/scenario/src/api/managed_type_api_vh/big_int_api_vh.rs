@@ -6,7 +6,7 @@ use multiversx_sc::{
     types::BoxedBytes,
 };
 
-use crate::api::VMHooksApiImpl;
+use crate::api::{VMHooksApi, VMHooksBackendType};
 
 macro_rules! binary_op_method {
     ($api_method_name:ident, $vh_method_name:ident) => {
@@ -35,7 +35,7 @@ macro_rules! unary_op_method {
     };
 }
 
-impl BigIntApiImpl for VMHooksApiImpl {
+impl<const BACKEND_TYPE: VMHooksBackendType> BigIntApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn bi_new(&self, _value: i64) -> Self::BigIntHandle {
         todo!()
     }

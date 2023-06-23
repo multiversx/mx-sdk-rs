@@ -1,4 +1,8 @@
+use multiversx_sc::api::RawHandle;
+
 use crate::tx_mock::TxPanic;
+
+use super::VMHooksManagedTypes;
 
 pub trait VMHooksError {
     fn signal_vm_error(&self, message: &str) -> ! {
@@ -21,5 +25,11 @@ pub trait VMHooksError {
             status: 4,
             message: String::from_utf8(message.to_vec()).unwrap(),
         })
+    }
+}
+
+pub trait VMHooksErrorManaged: VMHooksManagedTypes + VMHooksError {
+    fn signal_error_from_buffer(&self, message_handle: RawHandle) -> ! {
+        self.signal_error(self.m_types_borrow().mb_get(message_handle))
     }
 }

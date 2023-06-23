@@ -1,6 +1,6 @@
 use multiversx_sc::api::RawHandle;
 
-use super::super::VMHooksHandlerSource;
+use crate::vm_hooks::VMHooksHandlerSource;
 
 /// Provides VM hook implementations for methods that deal managed buffers.
 pub trait VMHooksManagedBuffer: VMHooksHandlerSource {

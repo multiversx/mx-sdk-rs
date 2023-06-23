@@ -98,4 +98,10 @@ impl TxInput {
             self.esdt_values.as_slice()
         }
     }
+
+    pub fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
+        let arg_idx_usize = arg_index as usize;
+        assert!(arg_idx_usize < self.args.len(), "Tx arg index out of range");
+        self.args[arg_idx_usize].clone()
+    }
 }

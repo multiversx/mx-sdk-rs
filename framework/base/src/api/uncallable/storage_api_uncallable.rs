@@ -49,8 +49,4 @@ impl StorageWriteApiImpl for super::UncallableApi {
     ) {
         unreachable!()
     }
-
-    fn storage_store_managed_buffer_clear(&self, _key_handle: Self::ManagedBufferHandle) {
-        unreachable!()
-    }
 }

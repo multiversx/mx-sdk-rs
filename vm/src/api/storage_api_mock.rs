@@ -91,9 +91,4 @@ impl StorageWriteApiImpl for DebugApi {
         let value_bytes = self.mb_to_boxed_bytes(value_handle);
         self.storage_store_slice_u8(key_bytes.as_slice(), value_bytes.as_slice());
     }
-
-    fn storage_store_managed_buffer_clear(&self, key_handle: Self::ManagedBufferHandle) {
-        let key_bytes = self.mb_to_boxed_bytes(key_handle);
-        self.storage_store_slice_u8(key_bytes.as_slice(), &[]);
-    }
 }

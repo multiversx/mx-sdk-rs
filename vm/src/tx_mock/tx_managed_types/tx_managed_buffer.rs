@@ -1,7 +1,9 @@
 use multiversx_sc::{
-    api::{InvalidSliceError, RawHandle},
+    api::{handle_to_be_bytes, InvalidSliceError, RawHandle},
     types::BoxedBytes,
 };
+
+use crate::tx_mock::TxTokenTransfer;
 
 use super::TxManagedTypes;
 
@@ -80,13 +82,57 @@ impl TxManagedTypes {
         });
     }
 
-    /// Creates the underlying structure of a ManagedVec<ManagedBuffer> from raw data.
-    pub fn mb_set_new_vec(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
+    /// Retrieves data saved in the format of a ManagedVec<ManagedBuffer>,
+    /// i.e. the main data structure encodes the handles of other buffers.
+    pub fn mb_get_vec(&self, source_handle: RawHandle) -> Vec<Vec<u8>> {
+        let mut result = Vec::new();
+        let mut iter = self.mb_get(source_handle).iter();
+        while let Some(byte) = iter.next() {
+            let handle_bytes_be = [
+                *byte,
+                *iter
+                    .next()
+                    .expect("malformed ManagedVec<ManagedBuffer> data"),
+                *iter
+                    .next()
+                    .expect("malformed ManagedVec<ManagedBuffer> data"),
+                *iter
+                    .next()
+                    .expect("malformed ManagedVec<ManagedBuffer> data"),
+            ];
+            let item_handle = i32::from_be_bytes(handle_bytes_be);
+            result.push(self.mb_get(item_handle).to_vec());
+        }
+        result
+    }
+
+    /// Creates the underlying structure of a ManagedVec<ManagedBuffer> from memory..
+    pub fn mb_set_vec(&mut self, destination_handle: RawHandle, data: Vec<Vec<u8>>) {
         let mut m_vec_raw_data = Vec::new();
         for item in data.into_iter() {
             let handle = self.managed_buffer_map.insert_new_handle_raw(item);
             m_vec_raw_data.extend_from_slice(handle.to_be_bytes().as_slice());
         }
         self.mb_set(destination_handle, m_vec_raw_data);
+    }
+
+    pub fn write_all_esdt_transfers_to_managed_vec(
+        &mut self,
+        dest_handle: RawHandle,
+        transfers: &[TxTokenTransfer],
+    ) {
+        self.mb_set(dest_handle, vec![]);
+
+        for transfer in transfers {
+            let token_identifier_handle = self.mb_new(transfer.token_identifier.clone());
+            let amount_handle = self.bi_new_from_big_int(transfer.value.clone().into());
+
+            self.mb_append_bytes(
+                dest_handle,
+                &handle_to_be_bytes(token_identifier_handle)[..],
+            );
+            self.mb_append_bytes(dest_handle, &transfer.nonce.to_be_bytes()[..]);
+            self.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
+        }
     }
 }
