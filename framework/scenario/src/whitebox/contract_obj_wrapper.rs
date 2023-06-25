@@ -13,9 +13,10 @@ use num_traits::Zero;
 use crate::{api::DebugApi, testing_framework::raw_converter::bytes_to_hex};
 use multiversx_chain_vm::{
     num_bigint,
-    tx_execution::{execute_async_call_and_callback, interpret_panic_as_tx_result},
+    tx_execution::{catch_tx_panic, execute_async_call_and_callback},
     tx_mock::{
-        StaticVarStack, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxResult,
+        StaticVarStack, TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxInput,
+        TxResult,
     },
     world_mock::{AccountData, AccountEsdt, ContractContainer, EsdtInstanceMetadata},
     BlockchainMock,
@@ -698,7 +699,7 @@ impl BlockchainStateWrapper {
     }
 
     // deduplicates code for execution
-    fn execute_tx_any<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
+    fn execute_tx_any<CB, ContractObjBuilder, TxFn>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
@@ -709,6 +710,7 @@ impl BlockchainStateWrapper {
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB),
     {
         let sc_address = sc_wrapper.address_ref();
         let tx_cache = TxCache::new(self.rc_b_mock.clone());
@@ -743,15 +745,20 @@ impl BlockchainStateWrapper {
         StaticVarStack::static_push();
 
         let sc = (sc_wrapper.obj_builder)();
-        let exec_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| tx_fn(sc)));
+        let result = catch_tx_panic(false, || {
+            tx_fn(sc);
+            Ok(())
+        });
+
+        if let Err(tx_panic) = result {
+            TxContextRef::new_from_static().replace_tx_result_with_error(tx_panic);
+        }
+        let tx_result = TxContextRef::new_from_static().into_tx_result();
+
         StaticVarStack::static_pop();
         let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
 
         let updates = api_after_exec.into_blockchain_updates();
-        let tx_result = match exec_result {
-            Ok(()) => TxResult::empty(),
-            Err(panic_any) => interpret_panic_as_tx_result(panic_any, false),
-        };
 
         // only commit for successful non-query calls (caller == SC for queries)
         let is_successful_tx = tx_result.result_status == 0 && caller != sc_wrapper.address_ref();

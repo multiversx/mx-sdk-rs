@@ -73,5 +73,7 @@ pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcont
 
 /// An additional non-VM status, meant just to signal an error in the debugger infrastructure of in the tests.
 pub const DEBUG_API_ERR_STATUS: u64 = 100;
-pub const DEBUG_API_ERR_BAD_HANDLE_CONTEXT: &str =
+pub const DEBUG_API_ERR_HANDLE_STALE: &str =
+    "VMHooksApi misuse: operation called with a handle that does not point to the top context of the call stack";
+pub const DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH: &str =
     "VMHooksApi misuse: operation called with handles from 2 different contexts";

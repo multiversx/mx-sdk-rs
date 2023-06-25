@@ -3,6 +3,7 @@ use std::{
     rc::Rc,
 };
 
+use multiversx_chain_vm_executor::BreakpointValue;
 use multiversx_sc::{
     err_msg,
     types::{Address, CodeMetadata},
@@ -90,21 +91,6 @@ impl VMHooksHandlerSource for TxContextWrapper {
             .unwrap_or_else(|| panic!("Account is not a smart contract, it has no code"))
     }
 
-    // fn perform_async_call(
-    //     &self,
-    //     to: Address,
-    //     egld_value: num_bigint::BigUint,
-    //     func_name: TxFunctionName,
-    //     arguments: Vec<Vec<u8>>,
-    // ) -> ! {
-    //     let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
-    //     // the cell is no longer needed, since we end in a panic
-    //     let mut tx_result = self.result_borrow_mut();
-    //     tx_result.all_calls.push(async_call_data.clone());
-    //     tx_result.pending_calls.async_call = Some(async_call_data);
-    //     std::panic::panic_any(BreakpointValue::AsyncCall);
-    // }
-
     fn perform_async_call(
         &self,
         to: Address,
@@ -114,11 +100,26 @@ impl VMHooksHandlerSource for TxContextWrapper {
     ) -> ! {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         // the cell is no longer needed, since we end in a panic
-        let mut tx_result = self.0.extract_result();
+        let mut tx_result = self.result_borrow_mut();
         tx_result.all_calls.push(async_call_data.clone());
         tx_result.pending_calls.async_call = Some(async_call_data);
-        std::panic::panic_any(tx_result)
+        std::panic::panic_any(BreakpointValue::AsyncCall);
     }
+
+    // fn perform_async_call(
+    //     &self,
+    //     to: Address,
+    //     egld_value: num_bigint::BigUint,
+    //     func_name: TxFunctionName,
+    //     arguments: Vec<Vec<u8>>,
+    // ) -> ! {
+    //     let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
+    //     // the cell is no longer needed, since we end in a panic
+    //     let mut tx_result = self.0.extract_result();
+    //     tx_result.all_calls.push(async_call_data.clone());
+    //     tx_result.pending_calls.async_call = Some(async_call_data);
+    //     std::panic::panic_any(tx_result)
+    // }
 
     fn perform_execute_on_dest_context(
         &self,

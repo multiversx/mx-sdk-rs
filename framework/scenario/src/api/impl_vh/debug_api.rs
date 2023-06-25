@@ -1,8 +1,8 @@
 use std::rc::Rc;
 
 use multiversx_chain_vm::{
-    executor::VMHooks,
-    tx_mock::{StaticVarData, StaticVarStack, TxContext, TxContextStack, TxPanic},
+    executor::{BreakpointValue, VMHooks},
+    tx_mock::{StaticVarData, StaticVarStack, TxContext, TxContextRef, TxContextStack, TxPanic},
     vm_hooks::{TxContextWrapper, VMHooksDispatcher},
 };
 use multiversx_sc::err_msg;
@@ -57,9 +57,13 @@ impl VMHooksApiBackend for DebugApiBackend {
     }
 
     fn assert_live_handle(handle: &Self::HandleType) {
-        handle.assert_current_context()
+        if !handle.is_on_current_context() {
+            debugger_panic(
+                err_msg::DEBUG_API_ERR_STATUS,
+                err_msg::DEBUG_API_ERR_HANDLE_STALE,
+            );
+        }
     }
-
     fn with_static_data<R, F>(f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R,
@@ -69,7 +73,6 @@ impl VMHooksApiBackend for DebugApiBackend {
     }
 }
 
-/// TODO: rename to DebugApi
 pub type DebugApi = VMHooksApi<DebugApiBackend>;
 
 impl DebugApi {
@@ -88,11 +91,16 @@ impl std::fmt::Debug for DebugApi {
     }
 }
 
+fn debugger_panic(status: u64, message: &str) {
+    TxContextRef::new_from_static().replace_tx_result_with_error(TxPanic::new(status, message));
+    std::panic::panic_any(BreakpointValue::SignalError);
+}
+
 fn assert_handles_on_same_context(handle1: &DebugHandle, handle2: &DebugHandle) {
-    if !Rc::ptr_eq(&handle1.context, &handle2.context) {
-        std::panic::panic_any(TxPanic {
-            status: err_msg::DEBUG_API_ERR_STATUS,
-            message: err_msg::DEBUG_API_ERR_BAD_HANDLE_CONTEXT.to_string(),
-        })
+    if !handle1.is_on_same_context(handle2) {
+        debugger_panic(
+            err_msg::DEBUG_API_ERR_STATUS,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
+        );
     }
 }
