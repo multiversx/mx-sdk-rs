@@ -1,8 +1,5 @@
 use std::rc::Rc;
 
-use alloc::boxed::Box;
-use multiversx_sc::err_msg;
-
 use crate::{
     display_util::address_hex,
     tx_mock::{
@@ -76,33 +73,4 @@ fn execute_contract_instance_endpoint(
     }
 
     TxContextRef::new_from_static().into_tx_result()
-}
-
-/// Interprets a panic thrown during execution as a tx failure.
-/// Note: specific tx outcomes from the debugger are signalled via specific panic objects.
-pub fn interpret_panic_as_tx_result(
-    panic_any: Box<dyn std::any::Any + std::marker::Send>,
-    panic_message_flag: bool,
-) -> TxPanic {
-    if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
-        return panic_obj.clone();
-    }
-
-    if let Some(panic_string) = panic_any.downcast_ref::<String>() {
-        return interpret_panic_str_as_tx_result(panic_string.as_str(), panic_message_flag);
-    }
-
-    if let Some(panic_string) = panic_any.downcast_ref::<&str>() {
-        return interpret_panic_str_as_tx_result(panic_string, panic_message_flag);
-    }
-
-    TxPanic::user_error("unknown panic object")
-}
-
-pub fn interpret_panic_str_as_tx_result(panic_str: &str, panic_message_flag: bool) -> TxPanic {
-    if panic_message_flag {
-        TxPanic::user_error(&format!("panic occurred: {panic_str}"))
-    } else {
-        TxPanic::user_error(err_msg::PANIC_OCCURRED)
-    }
 }
