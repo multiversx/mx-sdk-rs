@@ -725,19 +725,16 @@ impl BlockchainStateWrapper {
 
         for esdt in &esdt_payments {
             if esdt.value > rust_zero {
-                let metadata = tx_cache.subtract_esdt_balance(
+                let transfer_result = tx_cache.transfer_esdt_balance(
                     caller,
-                    &esdt.token_identifier,
-                    esdt.nonce,
-                    &esdt.value,
-                );
-                tx_cache.increase_esdt_balance(
                     sc_address,
                     &esdt.token_identifier,
                     esdt.nonce,
                     &esdt.value,
-                    metadata,
                 );
+                if let Err(err) = transfer_result {
+                    return TxResult::from_panic_obj(&err);
+                }
             }
         }
 
