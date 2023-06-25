@@ -1,7 +1,4 @@
-use crate::{
-    tx_mock::TxPanic,
-    vm_hooks::{VMHooksError, VMHooksHandlerSource},
-};
+use crate::vm_hooks::{VMHooksError, VMHooksHandlerSource};
 use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Neg, Sub},
@@ -45,10 +42,7 @@ macro_rules! unary_op_method_big_int_handle {
 pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     fn bf_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> RawHandle {
         if exponent > 0 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::EXPONENT_IS_POSITIVE.to_string(),
-            });
+            self.vm_error(err_msg::EXPONENT_IS_POSITIVE);
         }
 
         let exponent_multiplier = (10.0_f64).powi(exponent);
@@ -66,10 +60,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
 
     fn bf_from_frac(&self, numerator: i64, denominator: i64) -> RawHandle {
         if denominator == 0 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::DIVISION_BY_0.to_string(),
-            });
+            self.vm_error(err_msg::DIVISION_BY_0);
         }
         let value = if let (Some(f_numerator), Some(f_denominator)) =
             (numerator.to_f64(), denominator.to_f64())
@@ -85,10 +76,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
 
     fn bf_from_sci(&self, significand: i64, exponent: i64) -> RawHandle {
         if exponent > 0 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::EXPONENT_IS_POSITIVE.to_string(),
-            });
+            self.vm_error(err_msg::EXPONENT_IS_POSITIVE);
         }
 
         let value = if let Some(f_significand) = significand.to_f64() {
@@ -145,10 +133,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     fn bf_sqrt(&self, dest: RawHandle, x: RawHandle) {
         let bf_x = self.m_types_borrow().bf_get_f64(x);
         if bf_x < 0f64 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::BAD_BOUNDS_LOWER.to_string(),
-            });
+            self.vm_error(err_msg::BAD_BOUNDS_LOWER);
         }
         let result = bf_x.sqrt();
         self.m_types_borrow_mut().bf_overwrite(dest, result);

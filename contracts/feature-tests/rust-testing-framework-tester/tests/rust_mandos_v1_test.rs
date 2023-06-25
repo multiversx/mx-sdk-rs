@@ -5,7 +5,8 @@ use num_traits::ToPrimitive;
 use basic_features::BasicFeatures;
 use multiversx_sc::{
     codec::Empty,
-    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier}, err_msg,
+    err_msg,
+    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use multiversx_sc_scenario::{
     api::DebugApi, assert_values_eq, managed_address, managed_biguint, managed_buffer,

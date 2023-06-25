@@ -28,11 +28,11 @@ macro_rules! binary_bitwise_op_method {
         fn $method_name(&self, dest: RawHandle, x: RawHandle, y: RawHandle) {
             let bi_x = self.m_types_borrow().bi_get(x);
             if bi_x.sign() == num_bigint::Sign::Minus {
-                self.signal_vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                self.vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
             }
             let bi_y = self.m_types_borrow().bi_get(y);
             if bi_y.sign() == num_bigint::Sign::Minus {
-                self.signal_vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+                self.vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
             }
             let result = bi_x.$rust_op_name(bi_y);
             self.m_types_borrow_mut().bi_overwrite(dest, result);
@@ -99,7 +99,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     fn bi_get_int64(&self, destination_handle: RawHandle) -> i64 {
         self.m_types_borrow()
             .bi_to_i64(destination_handle)
-            .unwrap_or_else(|| self.signal_vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE))
+            .unwrap_or_else(|| self.vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE))
     }
 
     binary_op_method! {bi_add, add}
@@ -152,7 +152,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     fn bi_shr(&self, dest: RawHandle, x: RawHandle, bits: usize) {
         let bi_x = self.m_types_borrow().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.signal_vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
         }
         let result = bi_x.shr(bits);
         self.m_types_borrow_mut().bi_overwrite(dest, result);
@@ -161,7 +161,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     fn bi_shl(&self, dest: RawHandle, x: RawHandle, bits: usize) {
         let bi_x = self.m_types_borrow().bi_get(x);
         if bi_x.sign() == num_bigint::Sign::Minus {
-            self.signal_vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
+            self.vm_error(err_msg::BIG_INT_BITWISE_OPERATION_NEGATIVE);
         }
         let result = bi_x.shl(bits);
         self.m_types_borrow_mut().bi_overwrite(dest, result);
