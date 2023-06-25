@@ -13,7 +13,7 @@ use crate::{
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BlockchainUpdate, TxCache, TxContext, TxFunctionName,
-        TxInput, TxManagedTypes, TxResult,
+        TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     world_mock::{AccountData, BlockInfo, STORAGE_RESERVED_PREFIX},
 };
@@ -44,6 +44,15 @@ impl VMHooksHandlerSource for TxContextWrapper {
 
     fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
         self.0.m_types_borrow_mut()
+    }
+
+    fn halt_with_error(&self, status: u64, message: &str) -> ! {
+        *self.0.result_borrow_mut() = TxResult::from_panic_obj(&TxPanic::new(status, message));
+        let breakpoint = match status {
+            4 => BreakpointValue::SignalError,
+            _ => BreakpointValue::ExecutionFailed,
+        };
+        std::panic::panic_any(breakpoint);
     }
 
     fn input_ref(&self) -> &TxInput {

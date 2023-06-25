@@ -33,10 +33,6 @@ fn interpret_panic_as_tx_panic(
     panic_any: Box<dyn std::any::Any + std::marker::Send>,
     panic_message_flag: bool,
 ) -> TxPanic {
-    if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
-        return panic_obj.clone();
-    }
-
     if let Some(panic_string) = panic_any.downcast_ref::<String>() {
         return interpret_panic_str_as_tx_result(panic_string.as_str(), panic_message_flag);
     }

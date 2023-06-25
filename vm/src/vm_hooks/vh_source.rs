@@ -6,7 +6,7 @@ use std::{
 use multiversx_sc::types::{Address, CodeMetadata, H256};
 
 use crate::{
-    tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxPanic, TxResult},
+    tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -16,12 +16,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes>;
 
-    fn halt_with_error(&self, status: u64, message: &str) -> ! {
-        std::panic::panic_any(TxPanic {
-            status,
-            message: message.to_string(),
-        })
-    }
+    fn halt_with_error(&self, status: u64, message: &str) -> !;
 
     fn vm_error(&self, message: &str) -> ! {
         self.halt_with_error(10, message)
