@@ -1,3 +1,8 @@
+use multiversx_chain_vm::{
+    api::DebugHandle,
+    num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
+    DebugApi,
+};
 use multiversx_sc::{
     codec::multi_types::OptionalValue,
     esdt::ESDTSystemSmartContractProxy,
@@ -6,11 +11,6 @@ use multiversx_sc::{
         BigFloat, BigInt, BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedAddress,
         ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
     },
-};
-use multiversx_chain_vm::{
-    api::DebugHandle,
-    num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
-    DebugApi,
 };
 
 macro_rules! push {

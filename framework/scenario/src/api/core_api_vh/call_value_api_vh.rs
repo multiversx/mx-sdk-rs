@@ -1,8 +1,8 @@
 use multiversx_sc::api::{CallValueApi, CallValueApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CallValueApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> CallValueApi for VMHooksApi<VHB> {
     type CallValueApiImpl = Self;
 
     fn call_value_api_impl() -> Self::CallValueApiImpl {
@@ -10,7 +10,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> CallValueApi for VMHooksApi<BACKEND
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CallValueApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> CallValueApiImpl for VMHooksApi<VHB> {
     fn check_not_payable(&self) {
         self.with_vm_hooks(|vh| vh.check_no_payment())
     }

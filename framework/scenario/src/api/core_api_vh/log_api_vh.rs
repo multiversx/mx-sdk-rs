@@ -1,8 +1,8 @@
 use multiversx_sc::api::{LogApi, LogApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> LogApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> LogApi for VMHooksApi<VHB> {
     type LogApiImpl = Self;
 
     fn log_api_impl() -> Self::LogApiImpl {
@@ -10,7 +10,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> LogApi for VMHooksApi<BACKEND_TYPE>
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> LogApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> LogApiImpl for VMHooksApi<VHB> {
     fn managed_write_log(
         &self,
         topics_handle: Self::ManagedBufferHandle,

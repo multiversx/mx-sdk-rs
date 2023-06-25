@@ -1,8 +1,8 @@
 use multiversx_sc::api::{EndpointArgumentApi, EndpointArgumentApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> EndpointArgumentApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> EndpointArgumentApi for VMHooksApi<VHB> {
     type EndpointArgumentApiImpl = Self;
 
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {
@@ -10,7 +10,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EndpointArgumentApi for VMHooksApi<
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> EndpointArgumentApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> EndpointArgumentApiImpl for VMHooksApi<VHB> {
     fn get_num_arguments(&self) -> i32 {
         self.with_vm_hooks(|vh| vh.get_num_arguments())
     }

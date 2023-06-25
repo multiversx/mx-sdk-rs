@@ -2,7 +2,7 @@ use core::cmp::Ordering;
 
 use multiversx_sc::api::{use_raw_handle, BigFloatApiImpl, Sign};
 
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
 
 macro_rules! binary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
@@ -33,7 +33,7 @@ macro_rules! unary_op_method_big_int_handle {
     };
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> BigFloatApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> BigFloatApiImpl for VMHooksApi<VHB> {
     fn bf_from_parts(
         &self,
         integral_part_value: i32,

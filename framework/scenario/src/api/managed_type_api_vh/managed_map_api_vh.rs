@@ -1,8 +1,8 @@
 use multiversx_sc::api::{use_raw_handle, ManagedMapApiImpl};
 
-use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> ManagedMapApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
     fn mm_new(&self) -> Self::ManagedBufferHandle {
         let raw_handle = self.with_vm_hooks(|vh| vh.managed_map_new());
         use_raw_handle(raw_handle)

@@ -1,9 +1,9 @@
 use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> EndpointFinishApi for VMHooksApi<VHB> {
     type EndpointFinishApiImpl = Self;
 
     fn finish_api_impl() -> Self::EndpointFinishApiImpl {
@@ -11,7 +11,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApi for VMHooksApi<BA
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> EndpointFinishApiImpl for VMHooksApi<VHB> {
     fn finish_slice_u8(&self, bytes: &[u8]) {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(bytes, |offset, length| {

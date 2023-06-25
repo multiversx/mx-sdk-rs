@@ -1,9 +1,9 @@
 use multiversx_chain_vm::mem_conv;
 use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> ErrorApi for VMHooksApi<VHB> {
     type ErrorApiImpl = Self;
 
     fn error_api_impl() -> Self::ErrorApiImpl {
@@ -11,7 +11,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApi for VMHooksApi<BACKEND_TYP
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> ErrorApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> ErrorApiImpl for VMHooksApi<VHB> {
     fn signal_error(&self, message: &[u8]) -> ! {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(message, |offset, length| {
