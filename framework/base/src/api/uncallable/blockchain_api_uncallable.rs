@@ -39,7 +39,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_state_root_hash_legacy(&self) -> H256 {
+    fn load_state_root_hash_managed(&self, _dest: Self::ManagedBufferHandle) {
         unreachable!()
     }
 
@@ -67,7 +67,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+    fn load_block_random_seed_managed(&self, _dest: Self::ManagedBufferHandle) {
         unreachable!()
     }
 

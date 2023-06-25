@@ -81,14 +81,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi
         }
     }
 
-    fn mb_copy_to_slice_pad_right(
-        &self,
-        _handle: Self::ManagedBufferHandle,
-        _destination: &mut [u8],
-    ) {
-        todo!()
-    }
-
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(value, |offset, length| {
@@ -115,8 +107,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> ManagedBufferApiImpl for VMHooksApi
         }
     }
 
-    fn mb_set_random(&self, _dest_handle: Self::ManagedBufferHandle, _length: usize) {
-        todo!()
+    fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
+        self.with_vm_hooks(|vh| vh.mbuffer_set_random(dest_handle, length as i32));
     }
 
     fn mb_append(

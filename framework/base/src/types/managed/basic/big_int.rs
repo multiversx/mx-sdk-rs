@@ -152,8 +152,10 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
+        let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().bi_set_signed_bytes(handle.clone(), bytes);
+        M::managed_type_impl().mb_to_big_int_signed(mb_handle, handle.clone());
         BigInt::from_handle(handle)
     }
 

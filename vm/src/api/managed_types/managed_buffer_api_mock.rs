@@ -78,16 +78,6 @@ impl ManagedBufferApiImpl for DebugApi {
         Ok(())
     }
 
-    fn mb_copy_to_slice_pad_right(
-        &self,
-        handle: Self::ManagedBufferHandle,
-        destination: &mut [u8],
-    ) {
-        let bytes = self.mb_to_boxed_bytes(handle);
-        let offset = 32 - bytes.len();
-        destination[offset..].copy_from_slice(bytes.as_slice());
-    }
-
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
         self.mb_set(handle, value.into());
     }

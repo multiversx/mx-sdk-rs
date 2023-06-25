@@ -65,10 +65,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
         });
     }
 
-    fn get_state_root_hash_legacy(&self) -> H256 {
-        panic!("legacy BlockchainApi functionality no longer supported")
-    }
-
     fn load_state_root_hash_managed(&self, _dest: Self::ManagedBufferHandle) {
         panic!("state root hash not implemented")
     }
@@ -99,10 +95,6 @@ impl<const BACKEND_TYPE: VMHooksBackendType> BlockchainApiImpl for VMHooksApi<BA
 
     fn get_block_epoch(&self) -> u64 {
         self.with_vm_hooks(|vh| vh.get_block_epoch()) as u64
-    }
-
-    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
-        panic!("legacy BlockchainApi functionality no longer supported")
     }
 
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {

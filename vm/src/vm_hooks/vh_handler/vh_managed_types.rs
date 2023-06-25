@@ -49,4 +49,9 @@ pub trait VMHooksManagedTypes:
         let s = bi.to_string();
         self.m_types_borrow_mut().mb_set(str_handle, s.into_bytes());
     }
+
+    fn mb_set_random(&self, dest_handle: RawHandle, length: usize) {
+        let bytes = self.random_next_bytes(length);
+        self.mb_set(dest_handle, bytes.as_slice());
+    }
 }

@@ -19,8 +19,8 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EndpointArgumentApiImpl for VMHooks
         self.with_vm_hooks(|vh| vh.mbuffer_get_argument(arg_id, dest));
     }
 
-    fn load_callback_closure_buffer(&self, _dest: Self::ManagedBufferHandle) {
-        todo!()
+    fn load_callback_closure_buffer(&self, dest: Self::ManagedBufferHandle) {
+        self.with_vm_hooks(|vh| vh.managed_get_callback_closure(dest));
     }
 
     fn get_argument_u64(&self, arg_index: i32) -> u64 {

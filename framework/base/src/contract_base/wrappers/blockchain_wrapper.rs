@@ -151,7 +151,7 @@ where
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_state_root_hash_legacy(&self) -> crate::types::H256 {
-        A::blockchain_api_impl().get_state_root_hash_legacy()
+        self.get_state_root_hash().to_byte_array().into()
     }
 
     #[inline]
@@ -207,7 +207,7 @@ where
     #[cfg(feature = "alloc")]
     #[inline]
     pub fn get_block_random_seed_legacy(&self) -> crate::types::Box<[u8; 48]> {
-        A::blockchain_api_impl().get_block_random_seed_legacy()
+        crate::types::Box::new(self.get_block_random_seed().to_byte_array())
     }
 
     #[inline]

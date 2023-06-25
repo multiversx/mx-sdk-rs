@@ -3,7 +3,6 @@ use core::cmp::Ordering;
 use crate::{
     api::{ErrorApi, ErrorApiImpl},
     err_msg,
-    types::heap::BoxedBytes,
 };
 
 use super::HandleTypeInfo;
@@ -25,14 +24,6 @@ pub trait BigIntApiImpl: HandleTypeInfo + ErrorApi {
     }
 
     fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64);
-    fn bi_unsigned_byte_length(&self, handle: Self::BigIntHandle) -> usize;
-    fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes;
-    fn bi_set_unsigned_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]);
-
-    fn bi_signed_byte_length(&self, handle: Self::BigIntHandle) -> usize;
-    fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes;
-    fn bi_set_signed_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]);
-
     fn bi_to_i64(&self, handle: Self::BigIntHandle) -> Option<i64>;
 
     fn bi_add(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, y: Self::BigIntHandle);

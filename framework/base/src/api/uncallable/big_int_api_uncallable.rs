@@ -1,9 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::{
-    api::{BigIntApiImpl, Sign},
-    types::heap::BoxedBytes,
-};
+use crate::api::{BigIntApiImpl, Sign};
 
 impl BigIntApiImpl for super::UncallableApi {
     fn bi_new(&self, _value: i64) -> Self::BigIntHandle {
@@ -11,30 +8,6 @@ impl BigIntApiImpl for super::UncallableApi {
     }
 
     fn bi_set_int64(&self, _destination: Self::BigIntHandle, _value: i64) {
-        unreachable!()
-    }
-
-    fn bi_unsigned_byte_length(&self, _x: Self::BigIntHandle) -> usize {
-        unreachable!()
-    }
-
-    fn bi_get_unsigned_bytes(&self, _reference: Self::BigIntHandle) -> BoxedBytes {
-        unreachable!()
-    }
-
-    fn bi_set_unsigned_bytes(&self, _destination: Self::BigIntHandle, _bytes: &[u8]) {
-        unreachable!()
-    }
-
-    fn bi_signed_byte_length(&self, _x: Self::BigIntHandle) -> usize {
-        unreachable!()
-    }
-
-    fn bi_get_signed_bytes(&self, _reference: Self::BigIntHandle) -> BoxedBytes {
-        unreachable!()
-    }
-
-    fn bi_set_signed_bytes(&self, _destination: Self::BigIntHandle, _bytes: &[u8]) {
         unreachable!()
     }
 

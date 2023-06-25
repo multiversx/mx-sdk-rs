@@ -22,6 +22,9 @@ pub trait VMHooksHandlerSource: Debug {
         self.input_ref().tx_hash.clone()
     }
 
+    /// Random number generator, based on the blockchain randomness source.
+    fn random_next_bytes(&self, length: usize) -> Vec<u8>;
+
     fn result_borrow_mut(&self) -> RefMut<TxResult>;
 
     fn push_tx_log(&self, tx_log: TxLog) {

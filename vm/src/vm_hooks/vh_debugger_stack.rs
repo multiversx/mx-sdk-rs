@@ -49,6 +49,10 @@ impl VMHooksHandlerSource for TxContextWrapper {
         self.0.input_ref()
     }
 
+    fn random_next_bytes(&self, length: usize) -> Vec<u8> {
+        self.0.rng_borrow_mut().next_bytes(length)
+    }
+
     fn result_borrow_mut(&self) -> RefMut<TxResult> {
         self.0.result_borrow_mut()
     }
