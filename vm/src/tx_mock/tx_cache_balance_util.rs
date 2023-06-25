@@ -6,15 +6,17 @@ use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
 use super::TxCache;
 
 impl TxCache {
-    pub fn subtract_egld_balance(&self, address: &Address, call_value: &BigUint) {
+    pub fn subtract_egld_balance(
+        &self,
+        address: &Address,
+        call_value: &BigUint,
+    ) -> Result<(), TxPanic> {
         self.with_account_mut(address, |account| {
             if call_value > &account.egld_balance {
-                std::panic::panic_any(TxPanic {
-                    status: 10,
-                    message: "failed transfer (insufficient funds)".to_string(),
-                });
+                return Err(TxPanic::vm_error("failed transfer (insufficient funds)"));
             }
             account.egld_balance -= call_value;
+            Ok(())
         })
     }
 
