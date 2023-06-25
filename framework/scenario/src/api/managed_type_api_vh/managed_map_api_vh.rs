@@ -1,44 +1,45 @@
-use multiversx_sc::api::ManagedMapApiImpl;
+use multiversx_sc::api::{use_raw_handle, ManagedMapApiImpl};
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
 
 impl<const BACKEND_TYPE: VMHooksBackendType> ManagedMapApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn mm_new(&self) -> Self::ManagedBufferHandle {
-        todo!()
+        let raw_handle = self.with_vm_hooks(|vh| vh.managed_map_new());
+        use_raw_handle(raw_handle)
     }
 
     fn mm_get(
         &self,
-        _map_handle: Self::ManagedMapHandle,
-        _key_handle: Self::ManagedBufferHandle,
-        _value_handle: Self::ManagedBufferHandle,
+        map_handle: Self::ManagedMapHandle,
+        key_handle: Self::ManagedBufferHandle,
+        out_value_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        self.with_vm_hooks(|vh| vh.managed_map_get(map_handle, key_handle, out_value_handle));
     }
 
     fn mm_put(
         &self,
-        _map_handle: Self::ManagedMapHandle,
-        _key_handle: Self::ManagedBufferHandle,
-        _out_value_handle: Self::ManagedBufferHandle,
+        map_handle: Self::ManagedMapHandle,
+        key_handle: Self::ManagedBufferHandle,
+        out_value_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        self.with_vm_hooks(|vh| vh.managed_map_put(map_handle, key_handle, out_value_handle));
     }
 
     fn mm_remove(
         &self,
-        _map_handle: Self::ManagedMapHandle,
-        _key_handle: Self::ManagedBufferHandle,
-        _out_value_handle: Self::ManagedBufferHandle,
+        map_handle: Self::ManagedMapHandle,
+        key_handle: Self::ManagedBufferHandle,
+        out_value_handle: Self::ManagedBufferHandle,
     ) {
-        todo!()
+        self.with_vm_hooks(|vh| vh.managed_map_remove(map_handle, key_handle, out_value_handle));
     }
 
     fn mm_contains(
         &self,
-        _map_handle: Self::ManagedMapHandle,
-        _key_handle: Self::ManagedBufferHandle,
+        map_handle: Self::ManagedMapHandle,
+        key_handle: Self::ManagedBufferHandle,
     ) -> bool {
-        todo!()
+        i32_to_bool(self.with_vm_hooks(|vh| vh.managed_map_contains(map_handle, key_handle)))
     }
 }

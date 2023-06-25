@@ -108,6 +108,10 @@ impl<const BACKEND_TYPE: VMHooksBackendType> VMHooksApi<BACKEND_TYPE> {
     }
 }
 
+pub(crate) fn i32_to_bool(vm_hooks_result: i32) -> bool {
+    vm_hooks_result > 0
+}
+
 pub type StaticApi = VMHooksApi<STATIC_MANAGED_TYPES>;
 
 pub type DebuggerApi = VMHooksApi<DEBUGGER_STACK>;

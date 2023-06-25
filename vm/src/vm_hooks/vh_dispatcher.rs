@@ -942,91 +942,96 @@ impl VMHooks for VMHooksDispatcher {
         fractional_part: i32,
         exponent: i32,
     ) -> i32 {
-        panic!("Unavailable: big_float_new_from_parts")
+        self.handler
+            .bf_from_parts(integral_part, fractional_part, exponent)
     }
 
     fn big_float_new_from_frac(&self, numerator: i64, denominator: i64) -> i32 {
-        panic!("Unavailable: big_float_new_from_frac")
+        self.handler.bf_from_frac(numerator, denominator)
     }
 
     fn big_float_new_from_sci(&self, significand: i64, exponent: i64) -> i32 {
-        panic!("Unavailable: big_float_new_from_sci")
+        self.handler.bf_from_sci(significand, exponent)
     }
 
     fn big_float_add(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        panic!("Unavailable: big_float_add");
+        self.handler
+            .bf_add(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_float_sub(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        panic!("Unavailable: big_float_sub");
+        self.handler
+            .bf_sub(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_float_mul(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        panic!("Unavailable: big_float_mul");
+        self.handler
+            .bf_mul(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_float_div(&self, destination_handle: i32, op1_handle: i32, op2_handle: i32) {
-        panic!("Unavailable: big_float_div");
+        self.handler
+            .bf_div(destination_handle, op1_handle, op2_handle);
     }
 
     fn big_float_neg(&self, destination_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_neg");
+        self.handler.bf_neg(destination_handle, op_handle);
     }
 
     fn big_float_clone(&self, destination_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_clone");
+        self.handler.bf_clone(destination_handle, op_handle);
     }
 
     fn big_float_cmp(&self, op1_handle: i32, op2_handle: i32) -> i32 {
-        panic!("Unavailable: big_float_cmp")
+        self.handler.bf_cmp(op1_handle, op2_handle)
     }
 
     fn big_float_abs(&self, destination_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_abs");
+        self.handler.bf_abs(destination_handle, op_handle);
     }
 
     fn big_float_sign(&self, op_handle: i32) -> i32 {
-        panic!("Unavailable: big_float_sign")
+        self.handler.bf_sign(op_handle)
     }
 
     fn big_float_sqrt(&self, destination_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_sqrt");
+        self.handler.bf_sqrt(destination_handle, op_handle);
     }
 
     fn big_float_pow(&self, destination_handle: i32, op_handle: i32, exponent: i32) {
-        panic!("Unavailable: big_float_pow");
+        self.handler.bf_pow(destination_handle, op_handle, exponent);
     }
 
     fn big_float_floor(&self, dest_big_int_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_floor");
+        self.handler.bf_floor(dest_big_int_handle, op_handle);
     }
 
     fn big_float_ceil(&self, dest_big_int_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_ceil");
+        self.handler.bf_ceil(dest_big_int_handle, op_handle);
     }
 
     fn big_float_truncate(&self, dest_big_int_handle: i32, op_handle: i32) {
-        panic!("Unavailable: big_float_truncate");
+        self.handler.bf_trunc(dest_big_int_handle, op_handle);
     }
 
     fn big_float_set_int64(&self, destination_handle: i32, value: i64) {
-        panic!("Unavailable: big_float_set_int64");
+        self.handler.bf_set_i64(destination_handle, value);
     }
 
     fn big_float_is_int(&self, op_handle: i32) -> i32 {
-        panic!("Unavailable: big_float_is_int")
+        bool_to_i32(self.handler.bf_is_bi(op_handle))
     }
 
     fn big_float_set_big_int(&self, destination_handle: i32, big_int_handle: i32) {
-        panic!("Unavailable: big_float_set_big_int");
+        self.handler.bf_set_bi(destination_handle, big_int_handle);
     }
 
     fn big_float_get_const_pi(&self, destination_handle: i32) {
-        panic!("Unavailable: big_float_get_const_pi");
+        self.handler.bf_get_const_pi(destination_handle);
     }
 
     fn big_float_get_const_e(&self, destination_handle: i32) {
-        panic!("Unavailable: big_float_get_const_e");
+        self.handler.bf_get_const_e(destination_handle);
     }
 
     fn big_int_get_unsigned_argument(&self, id: i32, destination_handle: i32) {
@@ -1435,23 +1440,28 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_map_new(&self) -> i32 {
-        panic!("Unavailable: managed_map_new")
+        self.handler.mm_new()
     }
 
-    fn managed_map_put(&self, m_map_handle: i32, key_handle: i32, value_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_put")
+    fn managed_map_put(&self, map_handle: i32, key_handle: i32, value_handle: i32) -> i32 {
+        self.handler.mm_put(map_handle, key_handle, value_handle);
+        0
     }
 
-    fn managed_map_get(&self, m_map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_get")
+    fn managed_map_get(&self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
+        self.handler
+            .mm_get(map_handle, key_handle, out_value_handle);
+        0
     }
 
-    fn managed_map_remove(&self, m_map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_remove")
+    fn managed_map_remove(&self, map_handle: i32, key_handle: i32, out_value_handle: i32) -> i32 {
+        self.handler
+            .mm_remove(map_handle, key_handle, out_value_handle);
+        0
     }
 
-    fn managed_map_contains(&self, m_map_handle: i32, key_handle: i32) -> i32 {
-        panic!("Unavailable: managed_map_contains")
+    fn managed_map_contains(&self, map_handle: i32, key_handle: i32) -> i32 {
+        bool_to_i32(self.handler.mm_contains(map_handle, key_handle))
     }
 
     fn small_int_get_unsigned_argument(&self, id: i32) -> i64 {

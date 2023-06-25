@@ -16,7 +16,9 @@ pub use vh_endpoint_arg::VMHooksEndpointArgument;
 pub use vh_endpoint_finish::VMHooksEndpointFinish;
 pub use vh_error::{VMHooksError, VMHooksErrorManaged};
 pub use vh_log::VMHooksLog;
-pub use vh_managed_types::{VMHooksBigInt, VMHooksManagedBuffer, VMHooksManagedTypes};
+pub use vh_managed_types::{
+    VMHooksBigFloat, VMHooksBigInt, VMHooksManagedBuffer, VMHooksManagedMap, VMHooksManagedTypes,
+};
 pub use vh_send::VMHooksSend;
 pub use vh_storage::{VMHooksStorageRead, VMHooksStorageWrite};
 

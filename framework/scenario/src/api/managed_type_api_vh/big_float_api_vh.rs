@@ -1,106 +1,117 @@
 use core::cmp::Ordering;
 
-use multiversx_sc::api::{BigFloatApiImpl, Sign};
+use multiversx_sc::api::{use_raw_handle, BigFloatApiImpl, Sign};
 
-use crate::api::{VMHooksApi, VMHooksBackendType};
+use crate::api::{i32_to_bool, VMHooksApi, VMHooksBackendType};
+
+macro_rules! binary_op_wrapper {
+    ($method_name:ident, $hook_name:ident) => {
+        fn $method_name(
+            &self,
+            dest: Self::BigFloatHandle,
+            x: Self::BigFloatHandle,
+            y: Self::BigFloatHandle,
+        ) {
+            self.with_vm_hooks(|vh| vh.$hook_name(dest, x, y));
+        }
+    };
+}
+
+macro_rules! unary_op_wrapper {
+    ($method_name:ident, $hook_name:ident) => {
+        fn $method_name(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {
+            self.with_vm_hooks(|vh| vh.$hook_name(dest, x));
+        }
+    };
+}
+
+macro_rules! unary_op_method_big_int_handle {
+    ($method_name:ident, $hook_name:ident) => {
+        fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigFloatHandle) {
+            self.with_vm_hooks(|vh| vh.$hook_name(dest, x));
+        }
+    };
+}
 
 impl<const BACKEND_TYPE: VMHooksBackendType> BigFloatApiImpl for VMHooksApi<BACKEND_TYPE> {
     fn bf_from_parts(
         &self,
-        _integral_part: i32,
-        _fractional_part: i32,
-        _exponent: i32,
+        integral_part_value: i32,
+        fractional_part_value: i32,
+        exponent_value: i32,
     ) -> Self::BigFloatHandle {
-        unreachable!()
-    }
-    fn bf_from_frac(&self, _numerator: i64, _denominator: i64) -> Self::BigFloatHandle {
-        unreachable!()
-    }
-    fn bf_from_sci(&self, _significand: i64, _exponent: i64) -> Self::BigFloatHandle {
-        unreachable!()
+        let raw_handle = self.with_vm_hooks(|vh| {
+            vh.big_float_new_from_parts(integral_part_value, fractional_part_value, exponent_value)
+        });
+        use_raw_handle(raw_handle)
     }
 
-    fn bf_add(
+    fn bf_from_frac(&self, numerator_value: i64, denominator_value: i64) -> Self::BigFloatHandle {
+        let raw_handle =
+            self.with_vm_hooks(|vh| vh.big_float_new_from_frac(numerator_value, denominator_value));
+        use_raw_handle(raw_handle)
+    }
+
+    fn bf_from_sci(
         &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
-    ) {
-        unreachable!()
-    }
-    fn bf_sub(
-        &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
-    ) {
-        unreachable!()
-    }
-    fn bf_mul(
-        &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
-    ) {
-        unreachable!()
-    }
-    fn bf_div(
-        &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
-    ) {
-        unreachable!()
+        significand_value: i64,
+        exponent_value: i64,
+    ) -> Self::ManagedBufferHandle {
+        let raw_handle =
+            self.with_vm_hooks(|vh| vh.big_float_new_from_sci(significand_value, exponent_value));
+        use_raw_handle(raw_handle)
     }
 
-    fn bf_abs(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_neg(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_cmp(&self, _x: Self::BigFloatHandle, _y: Self::BigFloatHandle) -> Ordering {
-        unreachable!()
-    }
-    fn bf_sign(&self, _x: Self::BigFloatHandle) -> Sign {
-        unreachable!()
-    }
-    fn bf_clone(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_sqrt(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_pow(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle, _exp: i32) {
-        unreachable!()
+    binary_op_wrapper! {bf_add, big_float_add}
+    binary_op_wrapper! {bf_sub, big_float_sub}
+    binary_op_wrapper! {bf_mul, big_float_mul}
+    binary_op_wrapper! {bf_div, big_float_div}
+
+    unary_op_wrapper! {bf_neg, big_float_neg}
+    unary_op_wrapper! {bf_abs, big_float_abs}
+
+    fn bf_cmp(&self, x: Self::ManagedBufferHandle, y: Self::ManagedBufferHandle) -> Ordering {
+        let result = self.with_vm_hooks(|vh| vh.big_float_cmp(x, y));
+        result.cmp(&0)
     }
 
-    fn bf_floor(&self, _dest: Self::BigIntHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_ceil(&self, _dest: Self::BigIntHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_trunc(&self, _dest: Self::BigIntHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-
-    fn bf_is_bi(&self, _x: Self::BigFloatHandle) -> bool {
-        unreachable!()
+    fn bf_sign(&self, x: Self::ManagedBufferHandle) -> Sign {
+        let result = self.with_vm_hooks(|vh| vh.big_float_sign(x));
+        match result.cmp(&0) {
+            Ordering::Greater => Sign::Plus,
+            Ordering::Equal => Sign::NoSign,
+            Ordering::Less => Sign::Minus,
+        }
     }
 
-    fn bf_set_i64(&self, _dest: Self::BigFloatHandle, _value: i64) {
-        unreachable!()
+    unary_op_wrapper! {bf_clone, big_float_clone}
+    unary_op_wrapper! {bf_sqrt, big_float_sqrt}
+
+    fn bf_pow(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle, exp: i32) {
+        self.with_vm_hooks(|vh| vh.big_float_pow(dest, x, exp));
     }
 
-    fn bf_set_bi(&self, _dest: Self::BigFloatHandle, _bi: Self::BigIntHandle) {
-        unreachable!()
+    unary_op_method_big_int_handle! {bf_floor , big_float_floor}
+    unary_op_method_big_int_handle! {bf_ceil ,  big_float_ceil}
+    unary_op_method_big_int_handle! {bf_trunc , big_float_truncate}
+
+    fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
+        i32_to_bool(self.with_vm_hooks(|vh| vh.big_float_is_int(x)))
     }
 
-    fn bf_get_const_pi(&self, _dest: Self::BigFloatHandle) {
-        unreachable!()
+    fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
+        self.with_vm_hooks(|vh| vh.big_float_set_int64(dest, value));
     }
-    fn bf_get_const_e(&self, _dest: Self::BigFloatHandle) {
-        unreachable!()
+
+    fn bf_set_bi(&self, dest: Self::BigFloatHandle, x: Self::BigIntHandle) {
+        self.with_vm_hooks(|vh| vh.big_float_set_big_int(dest, x));
+    }
+
+    fn bf_get_const_e(&self, dest: Self::BigFloatHandle) {
+        self.with_vm_hooks(|vh| vh.big_float_get_const_e(dest));
+    }
+
+    fn bf_get_const_pi(&self, dest: Self::BigFloatHandle) {
+        self.with_vm_hooks(|vh| vh.big_float_get_const_pi(dest));
     }
 }
