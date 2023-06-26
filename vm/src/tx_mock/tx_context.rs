@@ -4,7 +4,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use core::cell::RefCell;
-use multiversx_sc::types::{heap::Address, LockableStaticBuffer};
+use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
 use std::{
     cell::{Ref, RefMut},
@@ -12,20 +12,15 @@ use std::{
     rc::Rc,
 };
 
-use super::{
-    BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
-};
+use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 
 #[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
-    pub lockable_static_buffer_cell: RefCell<LockableStaticBuffer>,
-    pub static_vars_cell: RefCell<TxStaticVars>,
     pub tx_result_cell: RefCell<TxResult>,
     pub b_rng: RefCell<BlockchainRng>,
-    pub printed_messages: RefCell<Vec<String>>,
 }
 
 impl TxContext {
@@ -35,11 +30,8 @@ impl TxContext {
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
-            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
-            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
-            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
@@ -70,11 +62,8 @@ impl TxContext {
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
-            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
-            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
-            printed_messages: RefCell::new(Vec::new()),
         }
     }
 

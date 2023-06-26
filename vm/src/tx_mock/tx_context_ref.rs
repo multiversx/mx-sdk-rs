@@ -65,14 +65,4 @@ impl TxContextRef {
             .tx_result_cell
             .replace(TxResult::from_panic_obj(&tx_panic));
     }
-
-    /// Will yield a copy of all messages printed on this context.
-    pub fn printed_messages(&self) -> Vec<String> {
-        self.0.printed_messages.borrow().clone()
-    }
-
-    /// Clears entire print history.
-    pub fn printed_messages_clear(&self) {
-        self.0.printed_messages.borrow_mut().clear();
-    }
 }
