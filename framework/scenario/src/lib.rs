@@ -2,6 +2,7 @@
 #![feature(exhaustive_patterns)]
 
 pub mod api;
+pub mod debug_executor;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
@@ -9,7 +10,6 @@ pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
 pub mod whitebox;
-pub mod debug_executor;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.

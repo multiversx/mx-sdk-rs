@@ -2,10 +2,11 @@ use std::ops::Deref;
 
 use multiversx_chain_vm::{
     executor::VMHooks,
-    tx_mock::StaticVarData,
     vm_hooks::{TxManagedTypesCell, VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::api::RawHandle;
+
+use crate::debug_executor::StaticVarData;
 
 use super::{VMHooksApi, VMHooksApiBackend};
 

@@ -1,9 +1,9 @@
 use multiversx_chain_vm_executor::Executor;
 
 /// Dummy executor that fails whenever called.
-/// 
+///
 /// Used in dummy contexts.
-/// 
+///
 /// TODO: either remove, or move to vm-executor repo.
 pub struct FailingExecutor;
 

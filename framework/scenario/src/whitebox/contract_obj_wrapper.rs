@@ -2,7 +2,7 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{catch_tx_panic, ContractContainer, ContractMapRef},
+    debug_executor::{catch_tx_panic, ContractContainer, ContractMapRef, StaticVarStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
@@ -17,8 +17,7 @@ use multiversx_chain_vm::{
     num_bigint,
     tx_execution::execute_async_call_and_callback,
     tx_mock::{
-        StaticVarStack, TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxInput,
-        TxResult,
+        TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxInput, TxResult,
     },
     world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock,
