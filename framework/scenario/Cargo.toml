@@ -50,6 +50,9 @@ path = "../meta"
 version = "0.19.1"
 path = "../../sdk/scenario-format"
 
+[dependencies.multiversx-chain-vm-executor]
+version = "0.1.0"
+
 [dependencies.multiversx-chain-vm]
 version = "=0.3.0"
 path = "../../vm"

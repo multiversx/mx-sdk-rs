@@ -2,7 +2,6 @@ use crate::{
     num_bigint::BigUint,
     world_mock::{AccountData, AccountEsdt, BlockchainMock, FailingExecutor},
 };
-use alloc::vec::Vec;
 use core::cell::RefCell;
 use multiversx_sc::types::heap::Address;
 use num_traits::Zero;

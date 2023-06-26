@@ -98,7 +98,7 @@ impl BlockchainMock {
     where
         F: FnOnce(Self) -> (R, Self),
     {
-        let obj = std::mem::replace(self, Self::default());
+        let obj = std::mem::take(self);
         let (result, obj) = f(obj);
         *self = obj;
         result

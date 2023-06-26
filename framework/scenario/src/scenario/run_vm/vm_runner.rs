@@ -1,6 +1,5 @@
-use multiversx_chain_vm::world_mock::ContractMapRef;
-
 use crate::{
+    debug_executor::ContractMapRef,
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
 };

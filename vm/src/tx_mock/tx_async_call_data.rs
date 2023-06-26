@@ -9,8 +9,6 @@ use multiversx_sc::{
 
 use crate::num_bigint::BigUint;
 
-use alloc::vec::Vec;
-
 use super::{CallbackPayments, Promise, TxFunctionName};
 
 #[derive(Debug, Clone)]

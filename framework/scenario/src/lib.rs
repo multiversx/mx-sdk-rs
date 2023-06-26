@@ -9,6 +9,7 @@ pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
 pub mod whitebox;
+pub mod debug_executor;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.

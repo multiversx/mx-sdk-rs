@@ -1,13 +1,10 @@
 use std::rc::Rc;
 
-use alloc::vec::Vec;
+use multiversx_chain_vm::tx_mock::{StaticVarStack, TxContextRef, TxFunctionName, TxPanic};
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 use multiversx_sc::contract_base::CallableContract;
 
-use crate::{
-    tx_execution::catch_tx_panic,
-    tx_mock::{StaticVarStack, TxContextRef, TxFunctionName, TxPanic},
-};
+use super::catch_tx_panic;
 
 /// Contains a reference to a contract implementation.
 ///

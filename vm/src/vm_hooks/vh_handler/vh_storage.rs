@@ -5,7 +5,6 @@ use crate::{
     tx_mock::{TxContextRef, TxPanic},
     vm_hooks::VMHooksHandlerSource,
 };
-use alloc::vec::Vec;
 use multiversx_sc::{
     api::{
         BigIntApiImpl, ManagedBufferApiImpl, RawHandle, StorageReadApi, StorageReadApiImpl,
