@@ -10,6 +10,7 @@ mod esdt_instance;
 mod esdt_instance_metadata;
 mod esdt_instances;
 mod esdt_roles;
+mod failing_executor;
 
 pub use account_data::*;
 pub use block_info::*;
@@ -22,3 +23,4 @@ pub use esdt_instance::*;
 pub use esdt_instance_metadata::*;
 pub use esdt_instances::*;
 pub use esdt_roles::*;
+pub use failing_executor::FailingExecutor;

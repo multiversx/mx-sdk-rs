@@ -1,10 +1,18 @@
 use super::*;
 
 use alloc::vec::Vec;
-use std::{collections::HashMap, fmt};
+use multiversx_chain_vm_executor::{
+    CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
+};
+use std::{
+    cell::{Ref, RefCell, RefMut},
+    collections::HashMap,
+    fmt,
+    rc::Rc,
+};
 
 pub struct ContractMap {
-    contract_objs: HashMap<Vec<u8>, ContractContainer>,
+    contract_objs: HashMap<Vec<u8>, ContractContainerRef>,
 }
 
 impl fmt::Debug for ContractMap {
@@ -20,9 +28,9 @@ impl ContractMap {
         }
     }
 
-    pub fn get_contract(&self, contract_identifier: &[u8]) -> &ContractContainer {
+    pub fn get_contract(&self, contract_identifier: &[u8]) -> ContractContainerRef {
         if let Some(contract_contatiner) = self.contract_objs.get(contract_identifier) {
-            contract_contatiner
+            contract_contatiner.clone()
         } else {
             unknown_contract_panic(contract_identifier)
         }
@@ -33,9 +41,10 @@ impl ContractMap {
         contract_bytes: Vec<u8>,
         contract_container: ContractContainer,
     ) {
-        let previous_entry = self
-            .contract_objs
-            .insert(contract_bytes, contract_container);
+        let previous_entry = self.contract_objs.insert(
+            contract_bytes,
+            ContractContainerRef::new(contract_container),
+        );
         assert!(previous_entry.is_none(), "contract inserted twice");
     }
 
@@ -58,5 +67,51 @@ fn unknown_contract_panic(contract_identifier: &[u8]) -> ! {
 impl Default for ContractMap {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[derive(Default, Clone, Debug)]
+pub struct ContractMapRef(Rc<RefCell<ContractMap>>);
+
+impl ContractMapRef {
+    pub fn new() -> Self {
+        ContractMapRef(Rc::new(RefCell::new(ContractMap::new())))
+    }
+
+    pub fn borrow(&self) -> Ref<ContractMap> {
+        self.0.borrow()
+    }
+
+    pub fn borrow_mut(&self) -> RefMut<ContractMap> {
+        self.0.borrow_mut()
+    }
+}
+
+impl Executor for ContractMapRef {
+    fn set_vm_hooks_ptr(
+        &mut self,
+        _vm_hooks_ptr: *mut std::ffi::c_void,
+    ) -> Result<(), ExecutorError> {
+        todo!()
+    }
+
+    fn set_opcode_cost(&mut self, _opcode_cost: &OpcodeCost) -> Result<(), ExecutorError> {
+        Ok(())
+    }
+
+    fn new_instance(
+        &self,
+        wasm_bytes: &[u8],
+        _compilation_options: &CompilationOptions,
+    ) -> Result<Box<dyn Instance>, ExecutorError> {
+        Ok(Box::new(self.borrow().get_contract(wasm_bytes)))
+    }
+
+    fn new_instance_from_cache(
+        &self,
+        _cache_bytes: &[u8],
+        _compilation_options: &CompilationOptions,
+    ) -> Result<Box<dyn Instance>, ExecutorError> {
+        panic!("ContractMap new_instance_from_cache not supported")
     }
 }

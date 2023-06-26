@@ -1,3 +1,5 @@
+use multiversx_chain_vm::world_mock::ContractMapRef;
+
 use crate::{
     multiversx_chain_vm::BlockchainMock,
     scenario::{model::*, ScenarioRunner},
@@ -7,13 +9,17 @@ use crate::{
 /// while implementing the StepRunner interface.
 #[derive(Default, Debug)]
 pub struct ScenarioVMRunner {
+    pub contract_map_ref: ContractMapRef,
     pub blockchain_mock: BlockchainMock,
 }
 
 impl ScenarioVMRunner {
     pub fn new() -> Self {
+        let contract_map_ref = ContractMapRef::new();
+        let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
         ScenarioVMRunner {
-            blockchain_mock: BlockchainMock::new(),
+            contract_map_ref,
+            blockchain_mock,
         }
     }
 }
