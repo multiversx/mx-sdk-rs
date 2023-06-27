@@ -1,6 +1,4 @@
-use multiversx_sc::api::RawHandle;
-
-use crate::{tx_mock::TxLog, vm_hooks::VMHooksHandlerSource};
+use crate::{tx_mock::TxLog, types::RawHandle, vm_hooks::VMHooksHandlerSource};
 
 pub trait VMHooksLog: VMHooksHandlerSource {
     fn managed_write_log(&self, topics_handle: RawHandle, data_handle: RawHandle) {

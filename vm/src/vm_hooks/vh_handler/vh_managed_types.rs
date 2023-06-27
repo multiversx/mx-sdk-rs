@@ -10,7 +10,7 @@ pub use vh_managed_map::VMHooksManagedMap;
 
 use std::fmt::Debug;
 
-use multiversx_sc::api::RawHandle;
+use crate::types::RawHandle;
 
 use super::VMHooksError;
 

@@ -5,11 +5,9 @@ use crate::{
         UPGRADE_CONTRACT_FUNC_NAME,
     },
     tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-    types::{top_encode_big_uint, top_encode_u64, CodeMetadata, VMAddress},
+    types::{top_encode_big_uint, top_encode_u64, CodeMetadata, RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
 };
-
-use multiversx_sc::api::RawHandle;
 use num_traits::Zero;
 
 fn append_endpoint_name_and_args(

@@ -1,4 +1,5 @@
 use crate::{
+    types::RawHandle,
     vm_err_msg,
     vm_hooks::{VMHooksError, VMHooksHandlerSource},
 };
@@ -6,10 +7,9 @@ use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Neg, Sub},
 };
-use std::convert::TryInto;
-
-use multiversx_sc::{api::RawHandle, codec::num_bigint::BigInt};
+use num_bigint::BigInt;
 use num_traits::ToPrimitive;
+use std::convert::TryInto;
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {

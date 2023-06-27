@@ -1,6 +1,7 @@
 use crate::{
     num_bigint,
     tx_mock::big_int_to_i64,
+    types::RawHandle,
     vm_err_msg,
     vm_hooks::{VMHooksError, VMHooksHandlerSource},
 };
@@ -8,7 +9,7 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use multiversx_sc::{api::RawHandle, types::heap::BoxedBytes};
+use multiversx_sc::types::heap::BoxedBytes;
 
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;

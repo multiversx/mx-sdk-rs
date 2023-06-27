@@ -1,4 +1,4 @@
-use multiversx_sc::api::RawHandle;
+use crate::types::RawHandle;
 use std::collections::HashMap;
 
 #[derive(Debug)]

@@ -1,11 +1,11 @@
 use multiversx_sc::{
-    api::{handle_to_be_bytes, InvalidSliceError, RawHandle},
+    api::{handle_to_be_bytes, InvalidSliceError},
     types::BoxedBytes,
 };
 
 use crate::{
     tx_mock::{TxFunctionName, TxTokenTransfer},
-    types::{CodeMetadata, VMAddress},
+    types::{CodeMetadata, RawHandle, VMAddress},
 };
 
 use super::TxManagedTypes;

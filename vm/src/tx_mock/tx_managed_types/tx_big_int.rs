@@ -1,6 +1,7 @@
 use std::cmp::Ordering;
 
-use multiversx_sc::{api::RawHandle, types::BoxedBytes};
+use crate::types::RawHandle;
+use multiversx_sc::types::BoxedBytes;
 use num_bigint::Sign;
 use num_traits::Zero;
 

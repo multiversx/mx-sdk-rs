@@ -3,7 +3,7 @@ use crate::{
     vm_hooks::VMHooksHandlerSource,
 };
 
-use multiversx_sc::api::RawHandle;
+use crate::types::RawHandle;
 use num_traits::cast::ToPrimitive;
 
 use super::VMHooksManagedTypes;

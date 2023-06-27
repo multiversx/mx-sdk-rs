@@ -1,5 +1,7 @@
-use crate::{types::VMAddress, vm_hooks::VMHooksHandlerSource};
-use multiversx_sc::api::RawHandle;
+use crate::{
+    types::{RawHandle, VMAddress},
+    vm_hooks::VMHooksHandlerSource,
+};
 
 use super::VMHooksManagedTypes;
 

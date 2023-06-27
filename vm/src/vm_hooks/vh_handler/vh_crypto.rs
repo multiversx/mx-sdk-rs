@@ -1,5 +1,4 @@
-use crate::{crypto_functions, vm_hooks::VMHooksHandlerSource};
-use multiversx_sc::api::RawHandle;
+use crate::{crypto_functions, types::RawHandle, vm_hooks::VMHooksHandlerSource};
 
 pub trait VMHooksCrypto: VMHooksHandlerSource {
     fn sha256_managed(&self, dest: RawHandle, data_handle: RawHandle) {

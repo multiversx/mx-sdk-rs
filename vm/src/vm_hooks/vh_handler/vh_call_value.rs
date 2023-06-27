@@ -1,5 +1,4 @@
-use crate::{num_bigint, vm_err_msg, vm_hooks::VMHooksHandlerSource};
-use multiversx_sc::api::RawHandle;
+use crate::{num_bigint, types::RawHandle, vm_err_msg, vm_hooks::VMHooksHandlerSource};
 use num_traits::Zero;
 
 use super::VMHooksManagedTypes;
