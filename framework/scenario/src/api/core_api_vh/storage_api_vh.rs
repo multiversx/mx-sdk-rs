@@ -1,10 +1,10 @@
 use multiversx_sc::api::{
-    StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
+    HandleConstraints, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> StorageReadApi for VMHooksApi<VHB> {
     type StorageReadApiImpl = Self;
 
     fn storage_read_api_impl() -> Self::StorageReadApiImpl {
@@ -12,13 +12,15 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApi for VMHooksApi<BACKE
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
     fn storage_load_managed_buffer_raw(
         &self,
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.mbuffer_storage_load(key_handle, dest));
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_storage_load(key_handle.get_raw_handle_unchecked(), dest.get_raw_handle_unchecked())
+        });
     }
 
     fn storage_load_from_address(
@@ -28,12 +30,16 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageReadApiImpl for VMHooksApi<B
         dest: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_load_from_address(address_handle, key_handle, dest);
+            vh.mbuffer_storage_load_from_address(
+                address_handle.get_raw_handle_unchecked(),
+                key_handle.get_raw_handle_unchecked(),
+                dest.get_raw_handle_unchecked(),
+            );
         })
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> StorageWriteApi for VMHooksApi<VHB> {
     type StorageWriteApiImpl = Self;
 
     fn storage_write_api_impl() -> Self::StorageWriteApiImpl {
@@ -41,14 +47,14 @@ impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApi for VMHooksApi<BACK
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> StorageWriteApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> StorageWriteApiImpl for VMHooksApi<VHB> {
     fn storage_store_managed_buffer_raw(
         &self,
         key_handle: Self::ManagedBufferHandle,
         value_handle: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_store(key_handle, value_handle);
+            vh.mbuffer_storage_store(key_handle.get_raw_handle_unchecked(), value_handle.get_raw_handle_unchecked());
         });
     }
 }

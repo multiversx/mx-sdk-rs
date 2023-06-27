@@ -1,9 +1,9 @@
 use multiversx_chain_vm::mem_conv;
-use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl};
+use multiversx_sc::api::{EndpointFinishApi, EndpointFinishApiImpl, HandleConstraints};
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> EndpointFinishApi for VMHooksApi<VHB> {
     type EndpointFinishApiImpl = Self;
 
     fn finish_api_impl() -> Self::EndpointFinishApiImpl {
@@ -11,7 +11,7 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApi for VMHooksApi<BA
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> EndpointFinishApiImpl for VMHooksApi<VHB> {
     fn finish_slice_u8(&self, bytes: &[u8]) {
         self.with_vm_hooks(|vh| {
             mem_conv::with_mem_ptr(bytes, |offset, length| {
@@ -21,15 +21,15 @@ impl<const BACKEND_TYPE: VMHooksBackendType> EndpointFinishApiImpl for VMHooksAp
     }
 
     fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| vh.big_int_finish_signed(handle));
+        self.with_vm_hooks(|vh| vh.big_int_finish_signed(handle.get_raw_handle_unchecked()));
     }
 
     fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
-        self.with_vm_hooks(|vh| vh.big_int_finish_unsigned(handle));
+        self.with_vm_hooks(|vh| vh.big_int_finish_unsigned(handle.get_raw_handle_unchecked()));
     }
 
     fn finish_managed_buffer_raw(&self, handle: Self::ManagedBufferHandle) {
-        self.with_vm_hooks(|vh| vh.mbuffer_finish(handle));
+        self.with_vm_hooks(|vh| vh.mbuffer_finish(handle.get_raw_handle_unchecked()));
     }
 
     fn finish_u64(&self, value: u64) {

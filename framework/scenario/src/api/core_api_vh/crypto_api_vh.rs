@@ -1,11 +1,11 @@
 use multiversx_sc::{
-    api::{CryptoApi, CryptoApiImpl},
+    api::{CryptoApi, CryptoApiImpl, HandleConstraints},
     types::MessageHashType,
 };
 
-use super::{VMHooksApi, VMHooksBackendType};
+use crate::api::{VMHooksApi, VMHooksApiBackend};
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApi for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> CryptoApi for VMHooksApi<VHB> {
     type CryptoApiImpl = Self;
 
     fn crypto_api_impl() -> Self::CryptoApiImpl {
@@ -13,13 +13,15 @@ impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApi for VMHooksApi<BACKEND_TY
     }
 }
 
-impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApiImpl for VMHooksApi<BACKEND_TYPE> {
+impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
     fn sha256_managed(
         &self,
         result_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_sha256(data_handle, result_handle));
+        self.with_vm_hooks(|vh| {
+            vh.managed_sha256(data_handle.get_raw_handle_unchecked(), result_handle.get_raw_handle_unchecked())
+        });
     }
 
     fn keccak256_managed(
@@ -27,7 +29,9 @@ impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApiImpl for VMHooksApi<BACKEN
         result_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_keccak256(data_handle, result_handle));
+        self.with_vm_hooks(|vh| {
+            vh.managed_keccak256(data_handle.get_raw_handle_unchecked(), result_handle.get_raw_handle_unchecked())
+        });
     }
 
     fn ripemd160_managed(
@@ -53,7 +57,13 @@ impl<const BACKEND_TYPE: VMHooksBackendType> CryptoApiImpl for VMHooksApi<BACKEN
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.managed_verify_ed25519(key, message, signature));
+        self.with_vm_hooks(|vh| {
+            vh.managed_verify_ed25519(
+                key.get_raw_handle_unchecked(),
+                message.get_raw_handle_unchecked(),
+                signature.get_raw_handle_unchecked(),
+            )
+        });
     }
 
     fn verify_secp256k1_managed(

@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::{HandleTypeInfo, ManagedBufferApiImpl},
+    api::{HandleConstraints, HandleTypeInfo, ManagedBufferApiImpl},
     types::{heap::Address, ManagedBuffer, ManagedType},
 };
 use num_traits::Zero;
