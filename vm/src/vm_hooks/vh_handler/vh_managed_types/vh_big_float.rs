@@ -58,7 +58,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         }
 
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(value)
+        managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
     fn bf_from_frac(&self, numerator: i64, denominator: i64) -> RawHandle {
@@ -74,7 +74,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         };
 
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(value)
+        managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
     fn bf_from_sci(&self, significand: i64, exponent: i64) -> RawHandle {
@@ -90,7 +90,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         };
 
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(value)
+        managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
     binary_op_method!(bf_add, add);

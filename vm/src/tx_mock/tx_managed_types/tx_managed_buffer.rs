@@ -67,7 +67,7 @@ impl TxManagedTypes {
     }
 
     pub fn mb_new(&mut self, value: Vec<u8>) -> RawHandle {
-        self.managed_buffer_map.insert_new_handle(value)
+        self.managed_buffer_map.insert_new_handle_raw(value)
     }
 
     pub fn mb_update<R, F: FnOnce(&mut Vec<u8>) -> R>(&mut self, handle: RawHandle, f: F) -> R {

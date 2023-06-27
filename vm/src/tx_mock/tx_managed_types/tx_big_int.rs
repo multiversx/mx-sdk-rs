@@ -8,7 +8,7 @@ use super::TxManagedTypes;
 
 impl TxManagedTypes {
     pub fn bi_new_from_big_int(&mut self, value: num_bigint::BigInt) -> RawHandle {
-        self.big_int_map.insert_new_handle(value)
+        self.big_int_map.insert_new_handle_raw(value)
     }
 
     pub fn bi_overwrite(&mut self, destination: RawHandle, value: num_bigint::BigInt) {

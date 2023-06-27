@@ -5,7 +5,7 @@ use super::{ManagedMapImpl, TxManagedTypes};
 impl TxManagedTypes {
     pub fn mm_new(&mut self) -> RawHandle {
         self.managed_map_map
-            .insert_new_handle(ManagedMapImpl::new())
+            .insert_new_handle_raw(ManagedMapImpl::new())
     }
 
     pub fn mm_values_insert(&mut self, map_handle: RawHandle, key: Vec<u8>, value: Vec<u8>) {
