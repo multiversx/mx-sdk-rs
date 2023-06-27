@@ -1,8 +1,8 @@
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::storage::{
     mappers::{QueueMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
+use multiversx_sc_scenario::api::DebugApi;
 
 fn create_queue() -> QueueMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

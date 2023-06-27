@@ -9,8 +9,6 @@ use super::{BlockchainUpdate, StaticVarStack, TxContextStack};
 #[derive(Debug)]
 pub struct TxContextRef(Rc<TxContext>);
 
-pub type DebugApi = TxContextRef;
-
 impl Deref for TxContextRef {
     type Target = TxContext;
     fn deref(&self) -> &Self::Target {

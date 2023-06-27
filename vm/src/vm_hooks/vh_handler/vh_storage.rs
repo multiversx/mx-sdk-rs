@@ -2,9 +2,8 @@
 
 use crate::{
     num_bigint::{BigInt, Sign},
-    tx_mock::TxPanic,
+    tx_mock::{TxContextRef, TxPanic},
     vm_hooks::VMHooksHandlerSource,
-    DebugApi,
 };
 use alloc::vec::Vec;
 use multiversx_sc::{

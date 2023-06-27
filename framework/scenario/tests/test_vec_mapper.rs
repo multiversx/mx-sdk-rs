@@ -1,8 +1,8 @@
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::storage::{
     mappers::{StorageMapper, VecMapper},
     StorageKey,
 };
+use multiversx_sc_scenario::api::DebugApi;
 
 fn create_vec() -> VecMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

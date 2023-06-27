@@ -1,11 +1,10 @@
-use crate::multiversx_sc::{
-    codec::{CodecFrom, TopEncodeMulti},
-    types::ContractCall,
-};
-
 use crate::{
+    api::DebugApi,
+    multiversx_sc::{
+        codec::{CodecFrom, TopEncodeMulti},
+        types::ContractCall,
+    },
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
-    DebugApi,
 };
 
 use super::{format_expect, process_contract_call};

@@ -1,5 +1,5 @@
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::types::{LockableStaticBuffer, StaticBufferRef};
+use multiversx_sc_scenario::api::DebugApi;
 
 #[test]
 fn test_try_extend_from_slice() {

@@ -1,8 +1,8 @@
-use multiversx_chain_vm::DebugApi;
 use multiversx_sc::storage::{
     mappers::{SetMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
+use multiversx_sc_scenario::api::DebugApi;
 
 fn create_set() -> SetMapper<DebugApi, u64> {
     let _ = DebugApi::dummy();

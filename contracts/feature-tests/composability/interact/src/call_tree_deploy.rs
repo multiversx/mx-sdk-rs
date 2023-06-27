@@ -8,9 +8,9 @@ use multiversx_sc_snippets::{
     },
     multiversx_sc_scenario::{
         bech32,
-        multiversx_chain_vm::tx_mock::TxContextRef,
         scenario_format::interpret_trait::InterpreterContext,
         scenario_model::{IntoBlockchainCall, TxExpect, TypedScDeploy},
+        DebugApi,
     },
     StepBuffer,
 };
@@ -75,7 +75,7 @@ impl ComposabilityInteract {
     pub async fn typed_sc_deploy_vault(
         &mut self,
         call_state: &CallState,
-    ) -> Vec<TypedScDeploy<OptionalValue<ManagedBuffer<TxContextRef>>>> {
+    ) -> Vec<TypedScDeploy<OptionalValue<ManagedBuffer<DebugApi>>>> {
         let mut typed_vault_deploys = Vec::new();
         for _ in call_state.vaults.iter() {
             let typed_sc_deploy = self
