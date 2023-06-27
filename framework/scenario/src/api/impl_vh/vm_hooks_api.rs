@@ -28,6 +28,48 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         VHB::with_vm_hooks(f)
     }
 
+    /// Works with the VM hooks given by the context of 1 handle.
+    pub fn with_vm_hooks_ctx_1<R, F>(&self, handle: &VHB::HandleType, f: F) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
+        VHB::with_vm_hooks_ctx_1(handle.clone(), f)
+    }
+
+    /// Works with the VM hooks given by the context of 2 handles.
+    pub fn with_vm_hooks_ctx_2<R, F>(
+        &self,
+        handle1: &VHB::HandleType,
+        handle2: &VHB::HandleType,
+        f: F,
+    ) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
+        VHB::with_vm_hooks_ctx_2(handle1.clone(), handle2.clone(), f)
+    }
+
+    /// Works with the VM hooks given by the context of 3 handles.
+    pub fn with_vm_hooks_ctx_3<R, F>(
+        &self,
+        handle1: &VHB::HandleType,
+        handle2: &VHB::HandleType,
+        handle3: &VHB::HandleType,
+        f: F,
+    ) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
+        VHB::with_vm_hooks_ctx_3(handle1.clone(), handle2.clone(), handle3.clone(), f)
+    }
+
+    /// Checks that the handle refers to the current active context (if possible).
+    ///
+    /// This is to prevent working with handles pointing to the wrong context, when debugging.
+    pub fn assert_live_handle(&self, handle: &VHB::HandleType) {
+        VHB::assert_live_handle(handle);
+    }
+
     /// Static data does not belong to the VM, or to the VM hooks. It belongs to the contract only.
     pub fn with_static_data<R, F>(&self, f: F) -> R
     where

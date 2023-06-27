@@ -8,8 +8,8 @@ use multiversx_sc::{
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use multiversx_sc_scenario::{
-    assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
-    rust_biguint, testing_framework::*, DebugApi,
+    api::DebuggerApi as DebugApi, assert_values_eq, managed_address, managed_biguint,
+    managed_buffer, managed_token_id, rust_biguint, testing_framework::*,
 };
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
@@ -1187,6 +1187,7 @@ fn managed_environment_test() {
 }
 
 #[test]
+#[should_panic] // VMHooksApi misuse: operation called with handles from 2 different contexts
 fn managed_environment_consistency_test() {
     let mut wrapper = BlockchainStateWrapper::new();
     let adder_wrapper = wrapper.create_sc_account(
@@ -1208,6 +1209,7 @@ fn managed_environment_consistency_test() {
 }
 
 #[test]
+#[should_panic] // VMHooksApi misuse: operation called with handles from 2 different contexts
 fn test_managed_values_standalone_consistency() {
     let _ = DebugApi::dummy();
 

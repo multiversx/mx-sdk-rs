@@ -19,8 +19,11 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         result_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| {
-            vh.managed_sha256(data_handle.get_raw_handle_unchecked(), result_handle.get_raw_handle_unchecked())
+        self.with_vm_hooks_ctx_2(&result_handle, &data_handle, |vh| {
+            vh.managed_sha256(
+                data_handle.get_raw_handle_unchecked(),
+                result_handle.get_raw_handle_unchecked(),
+            )
         });
     }
 
@@ -29,8 +32,11 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         result_handle: Self::ManagedBufferHandle,
         data_handle: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| {
-            vh.managed_keccak256(data_handle.get_raw_handle_unchecked(), result_handle.get_raw_handle_unchecked())
+        self.with_vm_hooks_ctx_2(&result_handle, &data_handle, |vh| {
+            vh.managed_keccak256(
+                data_handle.get_raw_handle_unchecked(),
+                result_handle.get_raw_handle_unchecked(),
+            )
         });
     }
 
@@ -57,7 +63,7 @@ impl<VHB: VMHooksApiBackend> CryptoApiImpl for VMHooksApi<VHB> {
         message: Self::ManagedBufferHandle,
         signature: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| {
+        self.with_vm_hooks_ctx_3(&key, &message, &signature, |vh| {
             vh.managed_verify_ed25519(
                 key.get_raw_handle_unchecked(),
                 message.get_raw_handle_unchecked(),

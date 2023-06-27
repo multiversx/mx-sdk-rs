@@ -1,5 +1,5 @@
 use crate::{tx_mock::ManagedMapImpl, DebugApi};
-use multiversx_sc::api::{ManagedMapApiImpl, HandleConstraints};
+use multiversx_sc::api::{HandleConstraints, ManagedMapApiImpl};
 
 impl ManagedMapApiImpl for DebugApi {
     fn mm_new(&self) -> Self::ManagedMapHandle {

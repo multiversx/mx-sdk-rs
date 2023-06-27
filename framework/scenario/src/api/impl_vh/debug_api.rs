@@ -24,6 +24,50 @@ impl VMHooksApiBackend for DebugApiBackend {
         f(&dispatcher)
     }
 
+    fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
+        let wrapper = TxContextWrapper::new(handle.context);
+        let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
+        f(&dispatcher)
+    }
+
+    fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
+        assert!(
+            Rc::ptr_eq(&handle1.context, &handle2.context),
+            "VMHooksApi misuse: operation called with handles from 2 different contexts"
+        );
+        Self::with_vm_hooks_ctx_1(handle1, f)
+    }
+
+    fn with_vm_hooks_ctx_3<R, F>(
+        handle1: Self::HandleType,
+        handle2: Self::HandleType,
+        handle3: Self::HandleType,
+        f: F,
+    ) -> R
+    where
+        F: FnOnce(&dyn VMHooks) -> R,
+    {
+        assert!(
+            Rc::ptr_eq(&handle1.context, &handle2.context),
+            "VMHooksApi misuse: operation called with handles from 2 different contexts"
+        );
+        assert!(
+            Rc::ptr_eq(&handle1.context, &handle3.context),
+            "VMHooksApi misuse: operation called with handles from 2 different contexts"
+        );
+        Self::with_vm_hooks_ctx_1(handle1, f)
+    }
+
+    fn assert_live_handle(handle: &Self::HandleType) {
+        handle.assert_current_context()
+    }
+
     fn with_static_data<R, F>(f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R,

@@ -778,6 +778,7 @@ impl BlockchainStateWrapper {
         let _ = DebugApi::dummy();
         let result = f();
         let _ = TxContextStack::static_pop();
+        let _ = StaticVarStack::static_pop();
 
         result
     }

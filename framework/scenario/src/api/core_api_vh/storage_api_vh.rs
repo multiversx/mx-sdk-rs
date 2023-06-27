@@ -18,8 +18,13 @@ impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
+        self.assert_live_handle(&key_handle);
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_load(key_handle.get_raw_handle_unchecked(), dest.get_raw_handle_unchecked())
+            vh.mbuffer_storage_load(
+                key_handle.get_raw_handle_unchecked(),
+                dest.get_raw_handle_unchecked(),
+            )
         });
     }
 
@@ -29,6 +34,9 @@ impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
+        self.assert_live_handle(&address_handle);
+        self.assert_live_handle(&key_handle);
+        self.assert_live_handle(&dest);
         self.with_vm_hooks(|vh| {
             vh.mbuffer_storage_load_from_address(
                 address_handle.get_raw_handle_unchecked(),
@@ -53,8 +61,13 @@ impl<VHB: VMHooksApiBackend> StorageWriteApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
         value_handle: Self::ManagedBufferHandle,
     ) {
+        self.assert_live_handle(&key_handle);
+        self.assert_live_handle(&value_handle);
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_store(key_handle.get_raw_handle_unchecked(), value_handle.get_raw_handle_unchecked());
+            vh.mbuffer_storage_store(
+                key_handle.get_raw_handle_unchecked(),
+                value_handle.get_raw_handle_unchecked(),
+            );
         });
     }
 }
