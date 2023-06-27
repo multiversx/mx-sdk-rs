@@ -1,10 +1,9 @@
 use crate::{
     num_bigint,
-    types::{RawHandle, VMAddress},
+    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
 };
-use multiversx_sc::types::{EsdtLocalRole, EsdtLocalRoleFlags};
 use num_bigint::BigInt;
 use num_traits::Zero;
 
