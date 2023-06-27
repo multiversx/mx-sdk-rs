@@ -1,5 +1,5 @@
 use multiversx_sc::api::{
-    StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
+    HandleConstraints, StorageReadApi, StorageReadApiImpl, StorageWriteApi, StorageWriteApiImpl,
 };
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
@@ -18,7 +18,9 @@ impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
         key_handle: Self::ManagedBufferHandle,
         dest: Self::ManagedBufferHandle,
     ) {
-        self.with_vm_hooks(|vh| vh.mbuffer_storage_load(key_handle, dest));
+        self.with_vm_hooks(|vh| {
+            vh.mbuffer_storage_load(key_handle.get_raw_handle_unchecked(), dest.get_raw_handle_unchecked())
+        });
     }
 
     fn storage_load_from_address(
@@ -28,7 +30,11 @@ impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
         dest: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_load_from_address(address_handle, key_handle, dest);
+            vh.mbuffer_storage_load_from_address(
+                address_handle.get_raw_handle_unchecked(),
+                key_handle.get_raw_handle_unchecked(),
+                dest.get_raw_handle_unchecked(),
+            );
         })
     }
 }
@@ -48,7 +54,7 @@ impl<VHB: VMHooksApiBackend> StorageWriteApiImpl for VMHooksApi<VHB> {
         value_handle: Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks(|vh| {
-            vh.mbuffer_storage_store(key_handle, value_handle);
+            vh.mbuffer_storage_store(key_handle.get_raw_handle_unchecked(), value_handle.get_raw_handle_unchecked());
         });
     }
 }

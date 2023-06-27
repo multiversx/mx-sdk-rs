@@ -1,6 +1,6 @@
 use crate::DebugApi;
 use multiversx_sc::{
-    api::{use_raw_handle, HandleTypeInfo, InvalidSliceError, ManagedBufferApiImpl},
+    api::{use_raw_handle, HandleTypeInfo, InvalidSliceError, ManagedBufferApiImpl, HandleConstraints},
     types::heap::BoxedBytes,
 };
 

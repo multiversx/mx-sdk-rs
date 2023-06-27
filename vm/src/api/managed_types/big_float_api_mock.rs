@@ -6,7 +6,7 @@ use core::{
 use std::convert::TryInto;
 
 use multiversx_sc::{
-    api::{BigFloatApiImpl, BigIntApiImpl, ErrorApiImpl, HandleTypeInfo, Sign},
+    api::{BigFloatApiImpl, BigIntApiImpl, ErrorApiImpl, HandleConstraints, HandleTypeInfo, Sign},
     codec::num_bigint::BigInt,
     err_msg,
 };

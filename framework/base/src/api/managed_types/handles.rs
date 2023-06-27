@@ -31,6 +31,10 @@ pub trait HandleConstraints:
             E::error_api_impl().signal_error(b"Cast type mismatch")
         }
     }
+
+    fn get_raw_handle_unchecked(&self) -> RawHandle {
+        self.get_raw_handle()
+    }
 }
 
 pub fn use_raw_handle<H>(handle: RawHandle) -> H

@@ -1,5 +1,5 @@
 use multiversx_chain_vm::mem_conv;
-use multiversx_sc::api::{ErrorApi, ErrorApiImpl};
+use multiversx_sc::api::{ErrorApi, ErrorApiImpl, HandleConstraints};
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 
@@ -25,7 +25,7 @@ impl<VHB: VMHooksApiBackend> ErrorApiImpl for VMHooksApi<VHB> {
     }
 
     fn signal_error_from_buffer(&self, message_handle: Self::ManagedBufferHandle) -> ! {
-        self.with_vm_hooks(|vh| vh.managed_signal_error(message_handle));
+        self.with_vm_hooks(|vh| vh.managed_signal_error(message_handle.get_raw_handle_unchecked()));
 
         // even though not explicitly stated in the VM hooks definition,
         // `managed_signal_error` is expected to terminate execution

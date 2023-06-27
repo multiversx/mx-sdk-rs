@@ -1,12 +1,10 @@
-use std::rc::Rc;
-
+use multiversx_chain_vm::tx_mock::{TxContext, TxContextStack};
 use multiversx_sc::{
     api::{use_raw_handle, HandleConstraints, RawHandle},
     codec::TryStaticCast,
     types::ManagedVecItem,
 };
-
-use crate::tx_mock::{TxContext, TxContextStack};
+use std::rc::Rc;
 
 #[derive(Clone)]
 pub struct DebugHandle {

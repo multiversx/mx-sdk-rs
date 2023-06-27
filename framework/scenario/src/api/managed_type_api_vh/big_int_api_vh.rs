@@ -14,9 +14,9 @@ macro_rules! binary_op_method {
         ) {
             self.with_vm_hooks(|vh| {
                 vh.$vh_method_name(
-                    dest.get_raw_handle(),
-                    x.get_raw_handle(),
-                    y.get_raw_handle(),
+                    dest.get_raw_handle_unchecked(),
+                    x.get_raw_handle_unchecked(),
+                    y.get_raw_handle_unchecked(),
                 )
             });
         }
@@ -26,7 +26,7 @@ macro_rules! binary_op_method {
 macro_rules! unary_op_method {
     ($api_method_name:ident, $vh_method_name:ident) => {
         fn $api_method_name(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle) {
-            self.with_vm_hooks(|vh| vh.$vh_method_name(dest.get_raw_handle(), x.get_raw_handle()));
+            self.with_vm_hooks(|vh| vh.$vh_method_name(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked()));
         }
     };
 }
@@ -38,14 +38,14 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     }
 
     fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
-        self.with_vm_hooks(|vh| vh.big_int_set_int64(destination.get_raw_handle(), value));
+        self.with_vm_hooks(|vh| vh.big_int_set_int64(destination.get_raw_handle_unchecked(), value));
     }
 
     fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
         self.with_vm_hooks(|vh| {
-            let is_i64_result = vh.big_int_is_int64(reference);
+            let is_i64_result = vh.big_int_is_int64(reference.get_raw_handle_unchecked());
             if i32_to_bool(is_i64_result) {
-                Some(vh.big_int_get_int64(reference))
+                Some(vh.big_int_get_int64(reference.get_raw_handle_unchecked()))
             } else {
                 None
             }
@@ -62,7 +62,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     unary_op_method! {bi_neg, big_int_neg}
 
     fn bi_sign(&self, x: Self::BigIntHandle) -> Sign {
-        let sign_raw = self.with_vm_hooks(|vh| vh.big_int_sign(x.get_raw_handle()));
+        let sign_raw = self.with_vm_hooks(|vh| vh.big_int_sign(x.get_raw_handle_unchecked()));
         match sign_raw.cmp(&0) {
             Ordering::Greater => Sign::Plus,
             Ordering::Equal => Sign::NoSign,
@@ -72,7 +72,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
 
     fn bi_cmp(&self, x: Self::BigIntHandle, y: Self::BigIntHandle) -> Ordering {
         let ordering_raw =
-            self.with_vm_hooks(|vh| vh.big_int_cmp(x.get_raw_handle(), y.get_raw_handle()));
+            self.with_vm_hooks(|vh| vh.big_int_cmp(x.get_raw_handle_unchecked(), y.get_raw_handle_unchecked()));
         ordering_raw.cmp(&0)
     }
 
@@ -80,7 +80,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     binary_op_method! {bi_pow, big_int_pow}
 
     fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
-        self.with_vm_hooks(|vh| vh.big_int_log2(x.get_raw_handle())) as u32
+        self.with_vm_hooks(|vh| vh.big_int_log2(x.get_raw_handle_unchecked())) as u32
     }
 
     binary_op_method! {bi_and, big_int_and}
@@ -89,19 +89,19 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
 
     fn bi_shr(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
         self.with_vm_hooks(|vh| {
-            vh.big_int_shr(dest.get_raw_handle(), x.get_raw_handle(), bits as i32)
+            vh.big_int_shr(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked(), bits as i32)
         });
     }
 
     fn bi_shl(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
         self.with_vm_hooks(|vh| {
-            vh.big_int_shl(dest.get_raw_handle(), x.get_raw_handle(), bits as i32)
+            vh.big_int_shl(dest.get_raw_handle_unchecked(), x.get_raw_handle_unchecked(), bits as i32)
         });
     }
 
     fn bi_to_string(&self, bi_handle: Self::BigIntHandle, str_handle: Self::ManagedBufferHandle) {
         self.with_vm_hooks(|vh| {
-            vh.big_int_to_string(bi_handle.get_raw_handle(), str_handle.get_raw_handle())
+            vh.big_int_to_string(bi_handle.get_raw_handle_unchecked(), str_handle.get_raw_handle_unchecked())
         });
     }
 }
