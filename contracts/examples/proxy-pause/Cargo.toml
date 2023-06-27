@@ -16,5 +16,6 @@ path = "../../../framework/base"
 version = "0.41.3"
 path = "../../../framework/scenario"
 
-[dev-dependencies.use-module]
-path = "../../feature-tests/use-module"
+[dev-dependencies.check-pause]
+path = "../check-pause"
+

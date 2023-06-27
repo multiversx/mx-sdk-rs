@@ -1,0 +1,28 @@
+[package]
+name = "check-pause-wasm"
+version = "0.0.0"
+edition = "2018"
+publish = false
+authors = [ "you",]
+
+[lib]
+crate-type = [ "cdylib",]
+
+[dev-dependencies]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies.check-pause]
+path = ".."
+
+[dependencies.multiversx-sc-wasm-adapter]
+version = "0.41.3"
+path = "../../../../framework/wasm-adapter"
+
+[workspace]
+members = ["."]
