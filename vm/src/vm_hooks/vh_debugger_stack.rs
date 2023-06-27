@@ -4,7 +4,6 @@ use std::{
 };
 
 use multiversx_chain_vm_executor::BreakpointValue;
-use multiversx_sc::err_msg;
 
 use crate::{
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
@@ -13,6 +12,7 @@ use crate::{
         TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     types::{CodeMetadata, VMAddress},
+    vm_err_msg,
     world_mock::{AccountData, BlockInfo, STORAGE_RESERVED_PREFIX},
 };
 
@@ -168,7 +168,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
                 self.sync_call_post_processing(tx_result, blockchain_updates),
             ),
             10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error(err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
 
@@ -192,7 +192,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
             },
             10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
-            _ => self.vm_error(err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
+            _ => self.vm_error(vm_err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
 }

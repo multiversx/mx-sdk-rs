@@ -1,5 +1,5 @@
-use crate::{num_bigint, vm_hooks::VMHooksHandlerSource};
-use multiversx_sc::{api::RawHandle, err_msg};
+use crate::{num_bigint, vm_err_msg, vm_hooks::VMHooksHandlerSource};
+use multiversx_sc::api::RawHandle;
 use num_traits::Zero;
 
 use super::VMHooksManagedTypes;
@@ -7,10 +7,10 @@ use super::VMHooksManagedTypes;
 pub trait VMHooksCallValue: VMHooksHandlerSource + VMHooksManagedTypes {
     fn check_not_payable(&self) {
         if self.input_ref().egld_value > num_bigint::BigUint::zero() {
-            self.vm_error(err_msg::NON_PAYABLE_FUNC_EGLD);
+            self.vm_error(vm_err_msg::NON_PAYABLE_FUNC_EGLD);
         }
         if self.esdt_num_transfers() > 0 {
-            self.vm_error(err_msg::NON_PAYABLE_FUNC_ESDT);
+            self.vm_error(vm_err_msg::NON_PAYABLE_FUNC_ESDT);
         }
     }
 
