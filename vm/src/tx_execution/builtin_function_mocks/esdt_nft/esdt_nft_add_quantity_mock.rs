@@ -1,5 +1,7 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::codec::{top_encode_to_vec_u8, TopDecode};
+use crate::{
+    num_bigint::BigUint,
+    types::{top_decode_u64, top_encode_u64},
+};
 
 use crate::{
     tx_execution::builtin_function_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
@@ -23,7 +25,7 @@ impl BuiltinFunction for ESDTNftAddQuantity {
         }
 
         let token_identifier = tx_input.args[0].clone();
-        let nonce = u64::top_decode(tx_input.args[1].as_slice()).unwrap();
+        let nonce = top_decode_u64(tx_input.args[1].as_slice());
         let value = BigUint::from_bytes_be(tx_input.args[2].as_slice());
 
         tx_cache.increase_esdt_balance(
@@ -39,7 +41,7 @@ impl BuiltinFunction for ESDTNftAddQuantity {
             endpoint: ESDT_NFT_ADD_QUANTITY_FUNC_NAME.into(),
             topics: vec![
                 token_identifier.to_vec(),
-                top_encode_to_vec_u8(&nonce).unwrap(),
+                top_encode_u64(nonce),
                 value.to_bytes_be(),
             ],
             data: vec![],

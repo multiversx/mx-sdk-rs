@@ -1,7 +1,7 @@
 use crate::{
     tx_execution::BuiltinFunctionMap,
     tx_mock::{TxInput, TxResult},
-    types::{VMAddress, H256},
+    types::{top_encode_u64, VMAddress, H256},
 };
 use multiversx_sc::codec::*;
 
@@ -38,7 +38,7 @@ fn result_status_bytes(result_status: u64) -> Vec<u8> {
     if result_status == 0 {
         vec![0x00]
     } else {
-        top_encode_to_vec_u8(&result_status).unwrap()
+        top_encode_u64(result_status)
     }
 }
 
@@ -97,7 +97,7 @@ pub fn async_promise_tx_input(
     async_result: &TxResult,
 ) -> TxInput {
     let mut args: Vec<Vec<u8>> = Vec::new();
-    let serialized_bytes = top_encode_to_vec_u8(&async_result.result_status).unwrap();
+    let serialized_bytes = async_result.result_status.to_be_bytes().to_vec();
     args.push(serialized_bytes);
     let callback_name = if async_result.result_status == 0 {
         args.extend_from_slice(async_result.result_values.as_slice());

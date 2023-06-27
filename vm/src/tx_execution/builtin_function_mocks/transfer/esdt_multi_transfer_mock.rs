@@ -1,5 +1,6 @@
-use crate::tx_execution::builtin_function_names::ESDT_MULTI_TRANSFER_FUNC_NAME;
-use multiversx_sc::codec::TopDecode;
+use crate::{
+    tx_execution::builtin_function_names::ESDT_MULTI_TRANSFER_FUNC_NAME, types::top_decode_u64,
+};
 
 use crate::{
     tx_execution::BuiltinFunctionEsdtTransferInfo,
@@ -56,15 +57,15 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
     let destination_bytes = tx_input.args[arg_index].as_slice();
     let destination = VMAddress::from_slice(destination_bytes);
     arg_index += 1;
-    let payments = usize::top_decode(tx_input.args[arg_index].as_slice()).unwrap();
+    let num_payments = top_decode_u64(tx_input.args[arg_index].as_slice()) as usize;
     arg_index += 1;
 
-    if tx_input.args.len() < 2 + payments * 3 {
+    if tx_input.args.len() < 2 + num_payments * 3 {
         return Err("MultiESDTNFTTransfer too few arguments");
     }
 
     let mut raw_esdt_transfers = Vec::new();
-    for _ in 0..payments {
+    for _ in 0..num_payments {
         let token_identifier = tx_input.args[arg_index].clone();
         arg_index += 1;
         let nonce_bytes = tx_input.args[arg_index].clone();

@@ -5,11 +5,11 @@ use crate::{
         UPGRADE_CONTRACT_FUNC_NAME,
     },
     tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-    types::{CodeMetadata, VMAddress},
+    types::{top_encode_big_uint, top_encode_u64, CodeMetadata, VMAddress},
     vm_hooks::VMHooksHandlerSource,
 };
 
-use multiversx_sc::{api::RawHandle, codec::top_encode_to_vec_u8};
+use multiversx_sc::api::RawHandle;
 use num_traits::Zero;
 
 fn append_endpoint_name_and_args(
@@ -59,8 +59,8 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
         let mut args = vec![
             token,
-            top_encode_to_vec_u8(&nonce).unwrap(),
-            amount.to_bytes_be(),
+            top_encode_u64(nonce),
+            top_encode_big_uint(&amount),
             to.to_vec(),
         ];
 
@@ -84,14 +84,14 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     ) {
         let contract_address = self.input_ref().to.clone();
 
-        let mut args = vec![to.to_vec(), top_encode_to_vec_u8(&payments.len()).unwrap()];
+        let mut args = vec![to.to_vec(), top_encode_u64(payments.len() as u64)];
 
         for payment in payments.into_iter() {
-            let token_bytes = top_encode_to_vec_u8(&payment.token_identifier).unwrap();
+            let token_bytes = payment.token_identifier;
             args.push(token_bytes);
-            let nonce_bytes = top_encode_to_vec_u8(&payment.nonce).unwrap();
+            let nonce_bytes = top_encode_u64(payment.nonce);
             args.push(nonce_bytes);
-            let amount_bytes = top_encode_to_vec_u8(&payment.value).unwrap();
+            let amount_bytes = top_encode_big_uint(&payment.value);
             args.push(amount_bytes);
         }
 

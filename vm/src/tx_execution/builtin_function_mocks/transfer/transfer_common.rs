@@ -6,9 +6,8 @@ use crate::{
     tx_mock::{
         BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxLog, TxResult, TxTokenTransfer,
     },
-    types::VMAddress,
+    types::{top_decode_u64, VMAddress},
 };
-use multiversx_sc::codec::TopDecode;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -28,7 +27,7 @@ pub(super) struct RawEsdtTransfer {
 pub(super) fn process_raw_esdt_transfer(raw_esdt_transfer: RawEsdtTransfer) -> TxTokenTransfer {
     TxTokenTransfer {
         token_identifier: raw_esdt_transfer.token_identifier,
-        nonce: u64::top_decode(raw_esdt_transfer.nonce_bytes.as_slice()).unwrap(),
+        nonce: top_decode_u64(raw_esdt_transfer.nonce_bytes.as_slice()),
         value: BigUint::from_bytes_be(raw_esdt_transfer.value_bytes.as_slice()),
     }
 }

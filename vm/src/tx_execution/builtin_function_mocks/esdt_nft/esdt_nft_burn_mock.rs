@@ -2,8 +2,8 @@ use crate::{
     num_bigint::BigUint,
     tx_execution::builtin_function_names::ESDT_NFT_BURN_FUNC_NAME,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+    types::{top_decode_u64, top_encode_u64},
 };
-use multiversx_sc::codec::{top_encode_to_vec_u8, TopDecode};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -21,7 +21,7 @@ impl BuiltinFunction for ESDTNftBurn {
         }
 
         let token_identifier = tx_input.args[0].clone();
-        let nonce = u64::top_decode(tx_input.args[1].as_slice()).unwrap();
+        let nonce = top_decode_u64(tx_input.args[1].as_slice());
         let value = BigUint::from_bytes_be(tx_input.args[2].as_slice());
 
         let subtract_result =
@@ -35,7 +35,7 @@ impl BuiltinFunction for ESDTNftBurn {
             endpoint: ESDT_NFT_BURN_FUNC_NAME.into(),
             topics: vec![
                 token_identifier.to_vec(),
-                top_encode_to_vec_u8(&nonce).unwrap(),
+                top_encode_u64(nonce),
                 value.to_bytes_be(),
             ],
             data: vec![],
