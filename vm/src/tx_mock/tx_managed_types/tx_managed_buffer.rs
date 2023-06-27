@@ -1,9 +1,12 @@
 use multiversx_sc::{
     api::{handle_to_be_bytes, InvalidSliceError, RawHandle},
-    types::{Address, BoxedBytes, CodeMetadata},
+    types::BoxedBytes,
 };
 
-use crate::tx_mock::{TxFunctionName, TxTokenTransfer};
+use crate::{
+    tx_mock::{TxFunctionName, TxTokenTransfer},
+    types::{CodeMetadata, VMAddress},
+};
 
 use super::TxManagedTypes;
 
@@ -21,8 +24,8 @@ impl TxManagedTypes {
         data.into()
     }
 
-    pub fn mb_to_address(&self, handle: RawHandle) -> Address {
-        Address::from_slice(self.mb_get(handle))
+    pub fn mb_to_address(&self, handle: RawHandle) -> VMAddress {
+        VMAddress::from_slice(self.mb_get(handle))
     }
 
     pub fn mb_to_function_name(&self, handle: RawHandle) -> TxFunctionName {

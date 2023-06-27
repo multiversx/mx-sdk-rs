@@ -6,13 +6,14 @@ use crate::{
     tx_mock::{
         BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxLog, TxResult, TxTokenTransfer,
     },
+    types::VMAddress,
 };
-use multiversx_sc::{codec::TopDecode, types::heap::Address};
+use multiversx_sc::codec::TopDecode;
 use num_bigint::BigUint;
 use num_traits::Zero;
 
 pub(super) struct ParsedTransferBuiltinFunCall {
-    pub destination: Address,
+    pub destination: VMAddress,
     pub raw_esdt_transfers: Vec<RawEsdtTransfer>,
     pub func_name: TxFunctionName,
     pub args: Vec<Vec<u8>>,

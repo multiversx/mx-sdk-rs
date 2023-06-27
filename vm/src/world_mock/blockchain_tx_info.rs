@@ -1,5 +1,4 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::types::heap::Address;
+use crate::{num_bigint::BigUint, types::VMAddress};
 
 use super::{AccountEsdt, BlockInfo, BlockchainMock};
 
@@ -12,11 +11,11 @@ pub struct BlockchainTxInfo {
     pub current_block_info: BlockInfo,
     pub contract_balance: BigUint,
     pub contract_esdt: AccountEsdt,
-    pub contract_owner: Option<Address>,
+    pub contract_owner: Option<VMAddress>,
 }
 
 impl BlockchainMock {
-    pub fn create_tx_info(&self, contract_address: &Address) -> BlockchainTxInfo {
+    pub fn create_tx_info(&self, contract_address: &VMAddress) -> BlockchainTxInfo {
         if let Some(contract) = self.accounts.get(contract_address) {
             BlockchainTxInfo {
                 previous_block_info: self.previous_block_info.clone(),

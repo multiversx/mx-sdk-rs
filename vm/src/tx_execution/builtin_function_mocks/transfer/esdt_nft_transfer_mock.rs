@@ -1,8 +1,9 @@
 use crate::{
     tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    types::VMAddress,
 };
-use multiversx_sc::{api::ESDT_NFT_TRANSFER_FUNC_NAME, codec::TopDecode, types::heap::Address};
+use multiversx_sc::api::ESDT_NFT_TRANSFER_FUNC_NAME;
 
 use super::{
     super::builtin_func_trait::BuiltinFunction,
@@ -52,7 +53,7 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
     let token_identifier = tx_input.args[0].clone();
     let nonce_bytes = tx_input.args[1].clone();
     let value_bytes = tx_input.args[2].clone();
-    let destination = Address::top_decode(tx_input.args[3].as_slice()).unwrap();
+    let destination = VMAddress::from_slice(&tx_input.args[3]);
 
     let func_name = tx_input.func_name_from_arg_index(4);
     let args = if tx_input.args.len() > 5 {

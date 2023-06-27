@@ -12,7 +12,7 @@ use crate::{
 };
 use multiversx_chain_vm::{
     num_bigint,
-    world_mock::{AccountData, BlockInfo, EsdtData},
+    world_mock::{AccountData, BlockInfo, EsdtData}, types::VMAddress,
 };
 use num_traits::Zero;
 
@@ -50,7 +50,7 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
         comment: None,
         esdt: all_esdt_raw,
         nonce: Some(u64_as_raw(acc.nonce)),
-        owner: acc.contract_owner.as_ref().map(address_as_raw),
+        owner: acc.contract_owner.as_ref().map(vm_address_as_raw),
         storage: storage_raw,
         username: None, // TODO: Add if needed
         developer_rewards: developer_rewards_raw,
@@ -75,7 +75,7 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
         let inst_raw = EsdtInstanceRaw {
             attributes: Some(bytes_as_raw(&inst.metadata.attributes)),
             balance: Some(rust_biguint_as_raw(&inst.balance)),
-            creator: inst.metadata.creator.as_ref().map(address_as_raw),
+            creator: inst.metadata.creator.as_ref().map(vm_address_as_raw),
             hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
@@ -298,6 +298,10 @@ pub(crate) fn rust_biguint_as_opt_raw(big_uint: &num_bigint::BigUint) -> Option<
 }
 
 pub(crate) fn address_as_raw(address: &Address) -> ValueSubTree {
+    bytes_as_raw(address.as_bytes())
+}
+
+pub(crate) fn vm_address_as_raw(address: &VMAddress) -> ValueSubTree {
     bytes_as_raw(address.as_bytes())
 }
 

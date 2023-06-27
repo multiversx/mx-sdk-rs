@@ -1,8 +1,9 @@
-use multiversx_sc::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, codec::TopDecode, types::heap::Address};
+use multiversx_sc::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, codec::TopDecode};
 
 use crate::{
     tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    types::VMAddress,
 };
 
 use super::{
@@ -52,7 +53,7 @@ fn try_parse_input(tx_input: &TxInput) -> Result<ParsedTransferBuiltinFunCall, &
 
     let mut arg_index = 0;
     let destination_bytes = tx_input.args[arg_index].as_slice();
-    let destination = Address::top_decode(destination_bytes).unwrap();
+    let destination = VMAddress::from_slice(destination_bytes);
     arg_index += 1;
     let payments = usize::top_decode(tx_input.args[arg_index].as_slice()).unwrap();
     arg_index += 1;

@@ -4,10 +4,7 @@ use std::{
 };
 
 use multiversx_chain_vm_executor::BreakpointValue;
-use multiversx_sc::{
-    err_msg,
-    types::{Address, CodeMetadata},
-};
+use multiversx_sc::err_msg;
 
 use crate::{
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
@@ -15,6 +12,7 @@ use crate::{
         async_call_tx_input, AsyncCallTxData, BlockchainUpdate, TxCache, TxContext, TxFunctionName,
         TxInput, TxManagedTypes, TxPanic, TxResult,
     },
+    types::{CodeMetadata, VMAddress},
     world_mock::{AccountData, BlockInfo, STORAGE_RESERVED_PREFIX},
 };
 
@@ -67,7 +65,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
         self.0.result_borrow_mut()
     }
 
-    fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8> {
+    fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {
         self.0.with_account_mut(address, |account| {
             account.storage.get(key).cloned().unwrap_or_default()
         })
@@ -89,11 +87,11 @@ impl VMHooksHandlerSource for TxContextWrapper {
         &self.0.blockchain_ref().current_block_info
     }
 
-    fn account_data(&self, address: &Address) -> AccountData {
+    fn account_data(&self, address: &VMAddress) -> AccountData {
         self.0.with_account(address, |account| account.clone())
     }
 
-    fn account_code(&self, address: &Address) -> Vec<u8> {
+    fn account_code(&self, address: &VMAddress) -> Vec<u8> {
         self.0
             .blockchain_cache()
             .with_account(address, |account| account.contract_path.clone())
@@ -102,7 +100,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
 
     fn perform_async_call(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -117,7 +115,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
 
     fn perform_execute_on_dest_context(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -143,12 +141,12 @@ impl VMHooksHandlerSource for TxContextWrapper {
         contract_code: Vec<u8>,
         _code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> (Address, Vec<Vec<u8>>) {
+    ) -> (VMAddress, Vec<Vec<u8>>) {
         let contract_address = &self.input_ref().to;
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
             from: contract_address.clone(),
-            to: Address::zero(),
+            to: VMAddress::zero(),
             egld_value,
             esdt_values: Vec::new(),
             func_name: TxFunctionName::EMPTY,
@@ -176,7 +174,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
 
     fn perform_transfer_execute(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
@@ -202,7 +200,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
 impl TxContextWrapper {
     fn create_async_call_data(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,

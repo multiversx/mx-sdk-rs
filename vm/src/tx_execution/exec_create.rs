@@ -1,9 +1,8 @@
 use std::rc::Rc;
 
-use multiversx_sc::types::Address;
-
 use crate::{
     tx_mock::{TxCache, TxInput, TxResult},
+    types::VMAddress,
     world_mock::BlockchainMock,
 };
 
@@ -13,7 +12,7 @@ pub fn sc_create(
     tx_input: TxInput,
     contract_path: &[u8],
     mut state: BlockchainMock,
-) -> (TxResult, Address, BlockchainMock) {
+) -> (TxResult, VMAddress, BlockchainMock) {
     // nonce gets increased irrespective of whether the tx fails or not
     // must be done after computing the new address
     state.increase_account_nonce(&tx_input.from);

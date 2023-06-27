@@ -1,11 +1,8 @@
-use crate::{num_bigint, num_bigint::BigInt};
+use crate::{num_bigint, num_bigint::BigInt, types::VMAddress};
 use alloc::string::String;
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{
-        heap::{Address, BoxedBytes},
-        BigUint, ManagedType,
-    },
+    types::{heap::BoxedBytes, BigUint, ManagedType},
 };
 use std::fmt;
 
@@ -13,7 +10,7 @@ pub struct BigUintPrinter<M: ManagedTypeApi> {
     pub value: BigUint<M>,
 }
 
-pub fn address_hex(address: &Address) -> String {
+pub fn address_hex(address: &VMAddress) -> String {
     alloc::format!("0x{}", hex::encode(address.as_bytes()))
 }
 

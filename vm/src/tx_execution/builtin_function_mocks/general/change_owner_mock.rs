@@ -1,6 +1,9 @@
-use multiversx_sc::{api::CHANGE_OWNER_BUILTIN_FUNC_NAME, codec::TopDecode, types::heap::Address};
+use multiversx_sc::api::CHANGE_OWNER_BUILTIN_FUNC_NAME;
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
+use crate::{
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    types::VMAddress,
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -19,7 +22,7 @@ impl BuiltinFunction for ChangeOwner {
             );
         }
 
-        let new_owner_address = Address::top_decode(tx_input.args[0].as_slice()).unwrap();
+        let new_owner_address = VMAddress::from_slice(&tx_input.args[0]);
         tx_cache.with_account_mut(&tx_input.to, |account| {
             account.contract_owner = Some(new_owner_address);
         });

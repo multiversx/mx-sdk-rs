@@ -1,9 +1,9 @@
 use crate::{
     num_bigint::BigUint,
+    types::VMAddress,
     world_mock::{AccountData, AccountEsdt, BlockchainMock, FailingExecutor},
 };
 use core::cell::RefCell;
-use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
 use std::{
     cell::{Ref, RefMut},
@@ -36,7 +36,7 @@ impl TxContext {
 
     pub fn dummy() -> Self {
         let tx_cache = TxCache::new(Rc::new(BlockchainMock::new(Box::new(FailingExecutor))));
-        let contract_address = Address::from(&[b'c'; 32]);
+        let contract_address = VMAddress::from([b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
             nonce: 0,
@@ -82,7 +82,7 @@ impl TxContext {
         self.tx_cache.blockchain_ref()
     }
 
-    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
@@ -96,7 +96,7 @@ impl TxContext {
         self.with_account(&self.tx_input_box.to, f)
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -132,9 +132,9 @@ impl TxContext {
 
     pub fn create_new_contract(
         &self,
-        new_address: &Address,
+        new_address: &VMAddress,
         contract_path: Vec<u8>,
-        contract_owner: Address,
+        contract_owner: VMAddress,
     ) {
         assert!(
             !self.tx_cache.blockchain_ref().account_exists(new_address),

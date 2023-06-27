@@ -5,10 +5,9 @@ use std::{
     rc::Rc,
 };
 
-use multiversx_sc::types::heap::Address;
-
 use crate::{
     display_util::address_hex,
+    types::VMAddress,
     world_mock::{AccountData, BlockchainMock},
 };
 
@@ -16,7 +15,7 @@ use super::TxCacheSource;
 
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
-    pub(super) accounts: RefCell<HashMap<Address, AccountData>>,
+    pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
 }
 
 impl fmt::Debug for TxCache {
@@ -39,7 +38,7 @@ impl TxCache {
         self.source_ref.blockchain_ref()
     }
 
-    fn load_account_if_necessary(&self, address: &Address) {
+    fn load_account_if_necessary(&self, address: &VMAddress) {
         let mut accounts_mut = self.accounts.borrow_mut();
         if !accounts_mut.contains_key(address) {
             if let Some(blockchain_account) = self.source_ref.load_account(address) {
@@ -48,7 +47,7 @@ impl TxCache {
         }
     }
 
-    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
@@ -60,7 +59,7 @@ impl TxCache {
         f(account)
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -78,18 +77,18 @@ impl TxCache {
             .insert(account_data.address.clone(), account_data);
     }
 
-    pub fn increase_acount_nonce(&self, address: &Address) {
+    pub fn increase_acount_nonce(&self, address: &VMAddress) {
         self.with_account_mut(address, |account| {
             account.nonce += 1;
         });
     }
 
-    pub fn get_all_accounts(&self) -> Ref<HashMap<Address, AccountData>> {
+    pub fn get_all_accounts(&self) -> Ref<HashMap<VMAddress, AccountData>> {
         self.accounts.borrow()
     }
 
     /// Assumes the nonce has already been increased.
-    pub fn get_new_address(&self, creator_address: &Address) -> Address {
+    pub fn get_new_address(&self, creator_address: &VMAddress) -> VMAddress {
         let current_nonce = self.with_account(creator_address, |account| account.nonce);
         self.blockchain_ref()
             .get_new_address(creator_address.clone(), current_nonce - 1)
@@ -112,7 +111,7 @@ impl TxCache {
 }
 
 pub struct BlockchainUpdate {
-    accounts: HashMap<Address, AccountData>,
+    accounts: HashMap<VMAddress, AccountData>,
 }
 
 impl BlockchainUpdate {

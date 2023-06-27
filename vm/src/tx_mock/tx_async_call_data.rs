@@ -1,11 +1,9 @@
 use crate::{
     tx_execution::BuiltinFunctionMap,
     tx_mock::{TxInput, TxResult},
+    types::{VMAddress, H256},
 };
-use multiversx_sc::{
-    codec::*,
-    types::heap::{Address, H256},
-};
+use multiversx_sc::codec::*;
 
 use crate::num_bigint::BigUint;
 
@@ -13,8 +11,8 @@ use super::{CallbackPayments, Promise, TxFunctionName};
 
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
-    pub from: Address,
-    pub to: Address,
+    pub from: VMAddress,
+    pub to: VMAddress,
     pub call_value: BigUint,
     pub endpoint_name: TxFunctionName,
     pub arguments: Vec<Vec<u8>>,
@@ -73,7 +71,7 @@ pub fn async_callback_tx_input(
 }
 
 fn extract_callback_payments(
-    callback_contract_address: &Address,
+    callback_contract_address: &VMAddress,
     async_result: &TxResult,
     builtin_functions: &BuiltinFunctionMap,
 ) -> CallbackPayments {
@@ -94,7 +92,7 @@ fn extract_callback_payments(
 }
 
 pub fn async_promise_tx_input(
-    address: &Address,
+    address: &VMAddress,
     promise: &Promise,
     async_result: &TxResult,
 ) -> TxInput {

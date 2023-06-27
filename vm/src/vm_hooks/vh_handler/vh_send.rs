@@ -1,6 +1,7 @@
 use crate::{
     num_bigint,
     tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
+    types::{CodeMetadata, VMAddress},
     vm_hooks::VMHooksHandlerSource,
 };
 use multiversx_sc::{
@@ -9,7 +10,6 @@ use multiversx_sc::{
         ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
     },
     codec::top_encode_to_vec_u8,
-    types::{heap::Address, CodeMetadata},
 };
 use num_traits::Zero;
 
@@ -27,7 +27,7 @@ fn append_endpoint_name_and_args(
 pub trait VMHooksSend: VMHooksHandlerSource {
     fn perform_transfer_execute_esdt(
         &self,
-        to: Address,
+        to: VMAddress,
         token: Vec<u8>,
         amount: num_bigint::BigUint,
         _gas_limit: u64,
@@ -48,7 +48,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     #[allow(clippy::too_many_arguments)]
     fn perform_transfer_execute_nft(
         &self,
-        to: Address,
+        to: VMAddress,
         token: Vec<u8>,
         nonce: u64,
         amount: num_bigint::BigUint,
@@ -77,7 +77,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     fn perform_transfer_execute_multi(
         &self,
-        to: Address,
+        to: VMAddress,
         payments: Vec<TxTokenTransfer>,
         _gas_limit: u64,
         endpoint_name: TxFunctionName,
@@ -108,13 +108,13 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     fn perform_upgrade_contract(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
         code_metadata: CodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> ! {
-        let mut arguments = vec![contract_code, top_encode_to_vec_u8(&code_metadata).unwrap()];
+        let mut arguments = vec![contract_code, code_metadata.to_vec()];
         arguments.extend(args.into_iter());
         self.perform_async_call(to, egld_value, UPGRADE_CONTRACT_FUNC_NAME.into(), arguments)
     }
