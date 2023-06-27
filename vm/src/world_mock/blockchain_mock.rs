@@ -1,10 +1,10 @@
 use crate::{
-    num_bigint::BigUint,
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
     types::VMAddress,
 };
 use multiversx_chain_vm_executor::Executor;
+use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 

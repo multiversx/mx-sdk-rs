@@ -1,5 +1,6 @@
+use num_bigint::{BigInt, BigUint};
+
 use crate::{
-    num_bigint::{BigInt, BigUint},
     types::RawHandle,
     vm_hooks::{VMHooksHandlerSource, VMHooksManagedTypes},
 };

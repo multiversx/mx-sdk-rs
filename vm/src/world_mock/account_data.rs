@@ -1,5 +1,7 @@
+use num_bigint::BigUint;
+
 use super::AccountEsdt;
-use crate::{display_util::key_hex, num_bigint::BigUint, types::VMAddress};
+use crate::{display_util::key_hex, types::VMAddress};
 use std::{collections::HashMap, fmt, fmt::Write};
 
 pub const STORAGE_RESERVED_PREFIX: &[u8] = b"ELROND";

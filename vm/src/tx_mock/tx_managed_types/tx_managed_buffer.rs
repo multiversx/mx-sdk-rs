@@ -1,11 +1,13 @@
-use multiversx_sc::api::{handle_to_be_bytes, InvalidSliceError};
-
 use crate::{
     tx_mock::{TxFunctionName, TxTokenTransfer},
     types::{CodeMetadata, RawHandle, VMAddress},
 };
 
 use super::TxManagedTypes;
+
+/// Returned if load/copy slice could not be performed.
+/// No further data needed.
+pub struct InvalidSliceError;
 
 impl TxManagedTypes {
     pub fn mb_get(&self, handle: RawHandle) -> &[u8] {
@@ -163,6 +165,10 @@ impl TxManagedTypes {
             self.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
         }
     }
+}
+
+pub fn handle_to_be_bytes(handle: RawHandle) -> [u8; 4] {
+    handle.to_be_bytes()
 }
 
 #[cfg(test)]

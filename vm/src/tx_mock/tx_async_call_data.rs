@@ -3,9 +3,8 @@ use crate::{
     tx_mock::{TxInput, TxResult},
     types::{top_encode_u64, VMAddress, H256},
 };
-use multiversx_sc::codec::*;
 
-use crate::num_bigint::BigUint;
+use num_bigint::BigUint;
 
 use super::{CallbackPayments, Promise, TxFunctionName};
 

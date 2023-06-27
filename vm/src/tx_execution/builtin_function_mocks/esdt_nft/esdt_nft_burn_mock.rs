@@ -1,5 +1,6 @@
+use num_bigint::BigUint;
+
 use crate::{
-    num_bigint::BigUint,
     tx_execution::builtin_function_names::ESDT_NFT_BURN_FUNC_NAME,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::{top_decode_u64, top_encode_u64},

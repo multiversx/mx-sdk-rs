@@ -1,5 +1,7 @@
-use crate::{display_util::key_hex, num_bigint::BigUint};
+use num_bigint::BigUint;
 use num_traits::Zero;
+
+use crate::display_util::key_hex;
 use std::{
     collections::{hash_map::Iter, HashMap},
     fmt::{self, Write},

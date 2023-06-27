@@ -1,4 +1,6 @@
-use crate::{num_bigint::BigUint, types::VMAddress};
+use num_bigint::BigUint;
+
+use crate::types::VMAddress;
 
 use super::{AccountEsdt, BlockInfo, BlockchainMock};
 

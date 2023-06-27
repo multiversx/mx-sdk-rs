@@ -1,7 +1,6 @@
-use crate::{
-    num_bigint::BigUint,
-    types::{top_decode_u64, top_encode_u64},
-};
+use num_bigint::BigUint;
+
+use crate::types::{top_decode_u64, top_encode_u64};
 
 use crate::{
     tx_execution::builtin_function_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,

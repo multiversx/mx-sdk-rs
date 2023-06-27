@@ -1,4 +1,6 @@
-use crate::{num_bigint::BigUint, tx_execution::builtin_function_names::ESDT_LOCAL_MINT_FUNC_NAME};
+use num_bigint::BigUint;
+
+use crate::tx_execution::builtin_function_names::ESDT_LOCAL_MINT_FUNC_NAME;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},

@@ -1,9 +1,10 @@
+use num_bigint::BigUint;
+use num_traits::Zero;
+
 use crate::{
     display_util::*,
-    num_bigint::BigUint,
     types::{VMAddress, H256},
 };
-use num_traits::Zero;
 use std::fmt;
 
 use super::TxFunctionName;

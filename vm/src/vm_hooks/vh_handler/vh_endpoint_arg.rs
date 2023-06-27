@@ -1,10 +1,9 @@
-use crate::{
-    num_bigint::{BigInt, BigUint},
-    vm_hooks::VMHooksHandlerSource,
-};
+use num_bigint::{BigInt, BigUint};
+use num_traits::ToPrimitive;
+
+use crate::vm_hooks::VMHooksHandlerSource;
 
 use crate::types::RawHandle;
-use num_traits::cast::ToPrimitive;
 
 use super::VMHooksManagedTypes;
 

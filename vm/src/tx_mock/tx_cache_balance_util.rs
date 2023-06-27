@@ -1,6 +1,6 @@
-use crate::{
-    num_bigint::BigUint, tx_mock::TxPanic, types::VMAddress, world_mock::EsdtInstanceMetadata,
-};
+use num_bigint::BigUint;
+
+use crate::{tx_mock::TxPanic, types::VMAddress, world_mock::EsdtInstanceMetadata};
 
 use super::TxCache;
 

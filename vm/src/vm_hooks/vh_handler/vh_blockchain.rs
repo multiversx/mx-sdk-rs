@@ -1,5 +1,4 @@
 use crate::{
-    num_bigint,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},

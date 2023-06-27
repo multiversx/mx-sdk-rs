@@ -1,4 +1,4 @@
-use crate::{num_bigint, types::RawHandle, vm_err_msg, vm_hooks::VMHooksHandlerSource};
+use crate::{types::RawHandle, vm_err_msg, vm_hooks::VMHooksHandlerSource};
 use num_traits::Zero;
 
 use super::VMHooksManagedTypes;

@@ -1,5 +1,4 @@
 use crate::{
-    num_bigint,
     tx_mock::big_int_to_i64,
     types::RawHandle,
     vm_err_msg,

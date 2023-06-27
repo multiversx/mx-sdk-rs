@@ -1,9 +1,9 @@
 use crate::{
-    num_bigint::BigUint,
     types::VMAddress,
     world_mock::{AccountData, AccountEsdt, BlockchainMock, FailingExecutor},
 };
 use core::cell::RefCell;
+use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
     cell::{Ref, RefMut},
