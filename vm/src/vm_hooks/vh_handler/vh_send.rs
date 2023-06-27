@@ -1,16 +1,15 @@
 use crate::{
     num_bigint,
+    tx_execution::builtin_function_names::{
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        UPGRADE_CONTRACT_FUNC_NAME,
+    },
     tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
     types::{CodeMetadata, VMAddress},
     vm_hooks::VMHooksHandlerSource,
 };
-use multiversx_sc::{
-    api::{
-        RawHandle, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
-    },
-    codec::top_encode_to_vec_u8,
-};
+
+use multiversx_sc::{api::RawHandle, codec::top_encode_to_vec_u8};
 use num_traits::Zero;
 
 fn append_endpoint_name_and_args(

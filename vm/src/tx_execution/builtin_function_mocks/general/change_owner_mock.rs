@@ -1,4 +1,4 @@
-use multiversx_sc::api::CHANGE_OWNER_BUILTIN_FUNC_NAME;
+use crate::tx_execution::builtin_function_names::CHANGE_OWNER_BUILTIN_FUNC_NAME;
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},

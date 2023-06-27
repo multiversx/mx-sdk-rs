@@ -1,12 +1,13 @@
 use crate::{
-    tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
+    tx_execution::{
+        builtin_function_names::ESDT_NFT_TRANSFER_FUNC_NAME, BuiltinFunctionEsdtTransferInfo,
+    },
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
-use multiversx_sc::api::ESDT_NFT_TRANSFER_FUNC_NAME;
 
 use super::{
-    super::builtin_func_trait::BuiltinFunction,
+    super::BuiltinFunction,
     transfer_common::{
         execute_transfer_builtin_func, extract_transfer_info, ParsedTransferBuiltinFunCall,
         RawEsdtTransfer,

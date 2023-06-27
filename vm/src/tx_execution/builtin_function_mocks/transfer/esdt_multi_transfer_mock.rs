@@ -1,13 +1,14 @@
-use multiversx_sc::{api::ESDT_MULTI_TRANSFER_FUNC_NAME, codec::TopDecode};
+use crate::tx_execution::builtin_function_names::ESDT_MULTI_TRANSFER_FUNC_NAME;
+use multiversx_sc::codec::TopDecode;
 
 use crate::{
-    tx_execution::builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
+    tx_execution::BuiltinFunctionEsdtTransferInfo,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::VMAddress,
 };
 
 use super::{
-    super::builtin_func_trait::BuiltinFunction,
+    super::BuiltinFunction,
     transfer_common::{
         execute_transfer_builtin_func, extract_transfer_info, ParsedTransferBuiltinFunCall,
         RawEsdtTransfer,

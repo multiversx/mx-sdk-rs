@@ -1,10 +1,9 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::{
-    api::ESDT_NFT_BURN_FUNC_NAME,
-    codec::{top_encode_to_vec_u8, TopDecode},
+use crate::{
+    num_bigint::BigUint,
+    tx_execution::builtin_function_names::ESDT_NFT_BURN_FUNC_NAME,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
 };
-
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};
+use multiversx_sc::codec::{top_encode_to_vec_u8, TopDecode};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 

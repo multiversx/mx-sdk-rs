@@ -1,10 +1,8 @@
 use crate::num_bigint::BigUint;
-use multiversx_sc::{
-    api::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
-    codec::{top_encode_to_vec_u8, TopDecode},
-};
+use multiversx_sc::codec::{top_encode_to_vec_u8, TopDecode};
 
 use crate::{
+    tx_execution::builtin_function_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     world_mock::EsdtInstanceMetadata,
 };
