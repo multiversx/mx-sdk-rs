@@ -12,7 +12,8 @@ use crate::{
 };
 use multiversx_chain_vm::{
     num_bigint,
-    world_mock::{AccountData, BlockInfo, EsdtData}, types::VMAddress,
+    types::VMAddress,
+    world_mock::{AccountData, BlockInfo, EsdtData},
 };
 use num_traits::Zero;
 
