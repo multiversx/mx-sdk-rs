@@ -38,6 +38,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "check-pause"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-modules",
+]
+
+[[package]]
+name = "check-pause-wasm"
+version = "0.0.0"
+dependencies = [
+ "check-pause",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
 name = "endian-type"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -169,22 +185,6 @@ checksum = "c069c179fcdc6a2fe24d8d18305cf085fdbd4f922c041943e203685d6a1c58fd"
 dependencies = [
  "endian-type",
  "nibble_vec",
-]
-
-[[package]]
-name = "seed-nft-minter"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "multiversx-sc-modules",
-]
-
-[[package]]
-name = "seed-nft-minter-wasm"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc-wasm-adapter",
- "seed-nft-minter",
 ]
 
 [[package]]

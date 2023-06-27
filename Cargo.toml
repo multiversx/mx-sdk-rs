@@ -58,6 +58,8 @@ members = [
   "contracts/examples/crypto-bubbles/meta",
   "contracts/examples/crypto-zombies",
   "contracts/examples/crypto-zombies/meta",
+  "contracts/examples/check-pause",
+  "contracts/examples/check-pause/meta",
   "contracts/examples/crypto-kitties/kitty-ownership",
   "contracts/examples/crypto-kitties/kitty-ownership/meta",
   "contracts/examples/crypto-kitties/kitty-genetic-alg",
