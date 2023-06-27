@@ -6,6 +6,10 @@ fn world() -> ScenarioWorld {
 
     blockchain.register_contract("file:output/proxy-pause.wasm", proxy_pause::ContractBuilder);
 
+    blockchain.register_contract(
+        "file:../check-pause/output/check-pause.wasm",
+        check_pause::ContractBuilder,
+    );
     blockchain
 }
 
