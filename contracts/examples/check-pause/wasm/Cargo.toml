@@ -1,12 +1,15 @@
 [package]
 name = "check-pause-wasm"
 version = "0.0.0"
-edition = "2018"
+edition = "2021"
+authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
 publish = false
-authors = [ "you",]
 
 [lib]
 crate-type = [ "cdylib",]
+
+[workspace]
+members = [".",]
 
 [dev-dependencies]
 
@@ -23,6 +26,3 @@ path = ".."
 [dependencies.multiversx-sc-wasm-adapter]
 version = "0.41.3"
 path = "../../../../framework/wasm-adapter"
-
-[workspace]
-members = ["."]
