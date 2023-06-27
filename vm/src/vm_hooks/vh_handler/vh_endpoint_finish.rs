@@ -17,13 +17,13 @@ pub trait VMHooksEndpointFinish: VMHooksHandlerSource + VMHooksManagedTypes {
     fn finish_big_int_raw(&self, handle: RawHandle) {
         let bi_bytes = self.bi_get_signed_bytes(handle);
         let mut tx_result = self.result_borrow_mut();
-        tx_result.result_values.push(bi_bytes.into_vec());
+        tx_result.result_values.push(bi_bytes);
     }
 
     fn finish_big_uint_raw(&self, handle: RawHandle) {
         let bu_bytes = self.bi_get_unsigned_bytes(handle);
         let mut tx_result = self.result_borrow_mut();
-        tx_result.result_values.push(bu_bytes.into_vec());
+        tx_result.result_values.push(bu_bytes);
     }
 
     fn finish_managed_buffer_raw(&self, handle: RawHandle) {

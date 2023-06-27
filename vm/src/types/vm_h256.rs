@@ -139,15 +139,4 @@ impl H256 {
     pub fn is_zero(&self) -> bool {
         self.as_bytes() == ZERO_32
     }
-
-    // /// Transmutes self to an (in principle) variable length boxed bytes object.
-    // /// Both BoxedBytes and H256 keep the data on the heap, so only the pointer to that data needs to be transmuted.
-    // /// Does not reallocate or copy data, the data on the heap remains untouched.
-    // pub fn into_boxed_bytes(self) -> BoxedBytes {
-    //     let raw = Box::into_raw(self.0) as *mut u8;
-    //     unsafe {
-    //         let bytes_box = Box::<[u8]>::from_raw(core::slice::from_raw_parts_mut(raw, 32));
-    //         bytes_box.into()
-    //     }
-    // }
 }

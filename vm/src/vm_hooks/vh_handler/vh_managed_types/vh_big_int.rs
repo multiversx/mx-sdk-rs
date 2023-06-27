@@ -9,8 +9,6 @@ use core::{
     cmp::Ordering,
     ops::{Add, BitAnd, BitOr, BitXor, Div, Mul, Neg, Rem, Shl, Shr, Sub},
 };
-use multiversx_sc::types::heap::BoxedBytes;
-
 use num_traits::{pow, sign::Signed};
 use std::convert::TryInto;
 
@@ -68,7 +66,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
         self.m_types_borrow().bi_get_unsigned_bytes(handle).len()
     }
 
-    fn bi_get_unsigned_bytes(&self, handle: RawHandle) -> BoxedBytes {
+    fn bi_get_unsigned_bytes(&self, handle: RawHandle) -> Vec<u8> {
         self.m_types_borrow().bi_get_unsigned_bytes(handle)
     }
 
@@ -77,7 +75,7 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
             .bi_set_unsigned_bytes(destination, bytes);
     }
 
-    fn bi_get_signed_bytes(&self, handle: RawHandle) -> BoxedBytes {
+    fn bi_get_signed_bytes(&self, handle: RawHandle) -> Vec<u8> {
         self.m_types_borrow().bi_get_signed_bytes(handle)
     }
 

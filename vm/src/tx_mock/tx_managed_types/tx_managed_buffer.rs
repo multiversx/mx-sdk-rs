@@ -1,7 +1,4 @@
-use multiversx_sc::{
-    api::{handle_to_be_bytes, InvalidSliceError},
-    types::BoxedBytes,
-};
+use multiversx_sc::api::{handle_to_be_bytes, InvalidSliceError};
 
 use crate::{
     tx_mock::{TxFunctionName, TxTokenTransfer},
@@ -19,9 +16,8 @@ impl TxManagedTypes {
         self.managed_buffer_map.get(handle).len()
     }
 
-    pub fn mb_to_boxed_bytes(&self, handle: RawHandle) -> BoxedBytes {
-        let data = self.mb_get(handle);
-        data.into()
+    pub fn mb_to_bytes(&self, handle: RawHandle) -> Vec<u8> {
+        self.mb_get(handle).to_vec()
     }
 
     pub fn mb_to_address(&self, handle: RawHandle) -> VMAddress {
