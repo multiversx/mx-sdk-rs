@@ -1,6 +1,5 @@
-use multiversx_chain_vm::display_util::BigUintPrinter;
 use multiversx_sc::types::BigUint;
-use multiversx_sc_scenario::api::StaticApi;
+use multiversx_sc_scenario::{api::StaticApi, display_util::BigUintPrinter};
 
 #[test]
 fn test_print_api() {

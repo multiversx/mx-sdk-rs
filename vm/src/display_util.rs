@@ -1,14 +1,4 @@
-use crate::{num_bigint, num_bigint::BigInt, types::VMAddress};
-use alloc::string::String;
-use multiversx_sc::{
-    api::ManagedTypeApi,
-    types::{heap::BoxedBytes, BigUint, ManagedType},
-};
-use std::fmt;
-
-pub struct BigUintPrinter<M: ManagedTypeApi> {
-    pub value: BigUint<M>,
-}
+use crate::types::VMAddress;
 
 pub fn address_hex(address: &VMAddress) -> String {
     alloc::format!("0x{}", hex::encode(address.as_bytes()))
@@ -38,23 +28,4 @@ pub fn verbose_hex_list(values: &[Vec<u8>]) -> String {
 /// returns it as hex formatted number if it's not valid utf8
 pub fn bytes_to_string(bytes: &[u8]) -> String {
     String::from_utf8(bytes.to_vec()).unwrap_or_else(|_| verbose_hex(bytes))
-}
-
-impl<M: ManagedTypeApi> fmt::Debug for BigUintPrinter<M> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let handle = self.value.get_handle();
-        let mut bytes = self.value.to_bytes_be();
-        if bytes.is_empty() {
-            bytes = BoxedBytes::from(vec![0u8]);
-        }
-
-        let hex = hex::encode(bytes.as_slice());
-        let dec = BigInt::from_bytes_be(num_bigint::Sign::Plus, bytes.as_slice());
-
-        f.debug_struct("BigUint")
-            .field("handle", &handle)
-            .field("hex", &hex)
-            .field("dec", &dec.to_string())
-            .finish()
-    }
 }

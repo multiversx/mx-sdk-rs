@@ -4,6 +4,7 @@
 pub mod api;
 pub mod bech32;
 pub mod debug_executor;
+pub mod display_util;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
