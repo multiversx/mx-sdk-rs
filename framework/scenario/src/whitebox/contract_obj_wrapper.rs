@@ -11,7 +11,6 @@ use crate::{
     testing_framework::raw_converter::bytes_to_hex,
 };
 use multiversx_chain_vm::{
-    num_bigint,
     tx_execution::execute_async_call_and_callback,
     tx_mock::{
         TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxInput, TxResult,

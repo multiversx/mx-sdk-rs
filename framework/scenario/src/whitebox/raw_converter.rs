@@ -11,7 +11,6 @@ use crate::{
     },
 };
 use multiversx_chain_vm::{
-    num_bigint,
     types::VMAddress,
     world_mock::{AccountData, BlockInfo, EsdtData},
 };

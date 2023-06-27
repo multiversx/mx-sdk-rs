@@ -18,7 +18,10 @@ pub mod whitebox;
 pub use whitebox as testing_framework;
 
 pub use api::DebugApi;
-pub use multiversx_chain_vm::{self, num_bigint};
+pub use multiversx_chain_vm;
+
+/// Re-exporting for convenience.
+pub use num_bigint;
 
 pub use multiversx_sc;
 
