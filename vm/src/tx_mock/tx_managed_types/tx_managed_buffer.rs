@@ -1,6 +1,6 @@
 use crate::{
     tx_mock::{TxFunctionName, TxTokenTransfer},
-    types::{CodeMetadata, RawHandle, VMAddress},
+    types::{RawHandle, VMAddress, VMCodeMetadata},
 };
 
 use super::TxManagedTypes;
@@ -30,9 +30,9 @@ impl TxManagedTypes {
         TxFunctionName::from(self.mb_get(handle))
     }
 
-    pub fn mb_to_code_metadata(&self, handle: RawHandle) -> CodeMetadata {
+    pub fn mb_to_code_metadata(&self, handle: RawHandle) -> VMCodeMetadata {
         let bytes: [u8; 2] = self.mb_get(handle).try_into().unwrap();
-        CodeMetadata::from(bytes)
+        VMCodeMetadata::from(bytes)
     }
 
     pub fn mb_get_slice(

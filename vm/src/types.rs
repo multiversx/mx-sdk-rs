@@ -7,7 +7,7 @@ mod vm_h256;
 use num_bigint::BigUint;
 use num_traits::Zero;
 pub use vm_address::VMAddress;
-pub use vm_code_metadata::CodeMetadata;
+pub use vm_code_metadata::VMCodeMetadata;
 pub use vm_esdt_local_role::EsdtLocalRole;
 pub use vm_esdt_local_role_flags::EsdtLocalRoleFlags;
 pub use vm_h256::H256;

@@ -5,7 +5,7 @@ use std::{
 
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
-    types::{CodeMetadata, VMAddress, H256},
+    types::{VMAddress, VMCodeMetadata, H256},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -82,7 +82,7 @@ pub trait VMHooksHandlerSource: Debug {
         &self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: CodeMetadata,
+        code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> (VMAddress, Vec<Vec<u8>>);
 

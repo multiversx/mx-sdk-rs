@@ -4,11 +4,10 @@ use core::fmt::Debug;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
-/// An Address is just a H256 with a different name.
-/// Has a different ABI name than H256.
+/// Address type being used in the VM only.
 ///
-/// Note: we are currently using ManagedAddress in contracts.
-/// While this also works, its use in contracts is discouraged.
+/// Its implementation is similar to that of the heap Address in the framework,
+/// but we have a separate implementation for the VM, because it is a separate component.
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct VMAddress(H256);
 
@@ -86,11 +85,6 @@ impl VMAddress {
         VMAddress(H256::zero())
     }
 
-    /// Returns the size of an address in bytes.
-    pub fn len_bytes() -> usize {
-        H256::len_bytes()
-    }
-
     /// Extracts a byte slice containing the entire fixed hash.
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_bytes()
@@ -100,28 +94,8 @@ impl VMAddress {
         self.0.as_array()
     }
 
-    pub fn copy_to_array(&self, target: &mut [u8; 32]) {
-        self.0.copy_to_array(target)
-    }
-
     pub fn to_vec(&self) -> Vec<u8> {
         self.0.to_vec()
-    }
-
-    /// Pointer to the data on the heap.
-    pub fn as_ptr(&self) -> *const u8 {
-        self.0.as_ptr()
-    }
-
-    /// Returns an unsafe mutable pointer to the data on the heap.
-    /// Used by the API to populate data.
-    pub fn as_mut_ptr(&mut self) -> *mut u8 {
-        self.0.as_mut_ptr()
-    }
-
-    /// True if all 32 bytes of the hash are zero.
-    pub fn is_zero(&self) -> bool {
-        self.0.is_zero()
     }
 
     pub fn is_smart_contract_address(&self) -> bool {

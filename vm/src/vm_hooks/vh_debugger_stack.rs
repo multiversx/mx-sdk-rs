@@ -11,7 +11,7 @@ use crate::{
         async_call_tx_input, AsyncCallTxData, BlockchainUpdate, TxCache, TxContext, TxFunctionName,
         TxInput, TxManagedTypes, TxPanic, TxResult,
     },
-    types::{CodeMetadata, VMAddress},
+    types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
     world_mock::{AccountData, BlockInfo, STORAGE_RESERVED_PREFIX},
 };
@@ -139,7 +139,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
         &self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        _code_metadata: CodeMetadata,
+        _code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> (VMAddress, Vec<Vec<u8>>) {
         let contract_address = &self.input_ref().to;

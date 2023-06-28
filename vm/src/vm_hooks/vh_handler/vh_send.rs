@@ -4,7 +4,7 @@ use crate::{
         UPGRADE_CONTRACT_FUNC_NAME,
     },
     tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-    types::{top_encode_big_uint, top_encode_u64, CodeMetadata, RawHandle, VMAddress},
+    types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
     vm_hooks::VMHooksHandlerSource,
 };
 use num_traits::Zero;
@@ -107,7 +107,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         to: VMAddress,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: CodeMetadata,
+        code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> ! {
         let mut arguments = vec![contract_code, code_metadata.to_vec()];

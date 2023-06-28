@@ -2,7 +2,7 @@ use std::cell::{Ref, RefCell, RefMut};
 
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
-    types::{CodeMetadata, VMAddress},
+    types::{VMAddress, VMCodeMetadata},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -96,7 +96,7 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         &self,
         _egld_value: num_bigint::BigUint,
         _contract_code: Vec<u8>,
-        _code_metadata: CodeMetadata,
+        _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
     ) -> (VMAddress, Vec<Vec<u8>>) {
         panic!("cannot launch contract calls in the StaticApi")

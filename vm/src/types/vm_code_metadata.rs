@@ -1,14 +1,8 @@
 use bitflags::bitflags;
 
-// const UPGRADEABLE_STRING: &[u8] = b"Upgradeable";
-// const READABLE_STRING: &[u8] = b"Readable";
-// const PAYABLE_STRING: &[u8] = b"Payable";
-// const PAYABLE_BY_SC_STRING: &[u8] = b"PayableBySC";
-// const DEFAULT_STRING: &[u8] = b"Default";
-
 bitflags! {
     #[derive(Default)]
-    pub struct CodeMetadata: u16 {
+    pub struct VMCodeMetadata: u16 {
         const DEFAULT = 0;
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
         const READABLE = 0b0000_0100_0000_0000; // 3rd LSB of first byte
@@ -17,21 +11,21 @@ bitflags! {
     }
 }
 
-impl CodeMetadata {
+impl VMCodeMetadata {
     pub fn is_upgradeable(&self) -> bool {
-        *self & CodeMetadata::UPGRADEABLE != CodeMetadata::DEFAULT
+        *self & VMCodeMetadata::UPGRADEABLE != VMCodeMetadata::DEFAULT
     }
 
     pub fn is_payable(&self) -> bool {
-        *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
+        *self & VMCodeMetadata::PAYABLE != VMCodeMetadata::DEFAULT
     }
 
     pub fn is_payable_by_sc(&self) -> bool {
-        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
+        *self & VMCodeMetadata::PAYABLE_BY_SC != VMCodeMetadata::DEFAULT
     }
 
     pub fn is_readable(&self) -> bool {
-        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
+        *self & VMCodeMetadata::READABLE != VMCodeMetadata::DEFAULT
     }
 
     pub fn to_byte_array(&self) -> [u8; 2] {
@@ -43,17 +37,17 @@ impl CodeMetadata {
     }
 }
 
-impl From<[u8; 2]> for CodeMetadata {
+impl From<[u8; 2]> for VMCodeMetadata {
     #[inline]
     fn from(arr: [u8; 2]) -> Self {
-        CodeMetadata::from(u16::from_be_bytes(arr))
+        VMCodeMetadata::from(u16::from_be_bytes(arr))
     }
 }
 
-impl From<u16> for CodeMetadata {
+impl From<u16> for VMCodeMetadata {
     #[inline]
     fn from(value: u16) -> Self {
-        CodeMetadata::from_bits_truncate(value)
+        VMCodeMetadata::from_bits_truncate(value)
     }
 }
 
@@ -63,17 +57,17 @@ mod tests {
 
     #[test]
     fn test_default() {
-        assert!(!CodeMetadata::DEFAULT.is_upgradeable());
-        assert!(!CodeMetadata::DEFAULT.is_payable());
-        assert!(!CodeMetadata::DEFAULT.is_readable());
+        assert!(!VMCodeMetadata::DEFAULT.is_upgradeable());
+        assert!(!VMCodeMetadata::DEFAULT.is_payable());
+        assert!(!VMCodeMetadata::DEFAULT.is_readable());
     }
 
     #[test]
     fn test_all() {
-        let all = CodeMetadata::UPGRADEABLE
-            | CodeMetadata::PAYABLE
-            | CodeMetadata::PAYABLE_BY_SC
-            | CodeMetadata::READABLE;
+        let all = VMCodeMetadata::UPGRADEABLE
+            | VMCodeMetadata::PAYABLE
+            | VMCodeMetadata::PAYABLE_BY_SC
+            | VMCodeMetadata::READABLE;
         assert!(all.is_upgradeable());
         assert!(all.is_payable());
         assert!(all.is_payable_by_sc());
@@ -81,42 +75,42 @@ mod tests {
 
         assert_eq!(all.bits(), 0x0506);
 
-        assert_eq!(CodeMetadata::from_bits_truncate(0xffff), all);
+        assert_eq!(VMCodeMetadata::from_bits_truncate(0xffff), all);
     }
 
     #[test]
     fn test_each() {
-        assert!(CodeMetadata::UPGRADEABLE.is_upgradeable());
-        assert!(!CodeMetadata::PAYABLE.is_upgradeable());
-        assert!(!CodeMetadata::PAYABLE_BY_SC.is_upgradeable());
-        assert!(!CodeMetadata::READABLE.is_upgradeable());
+        assert!(VMCodeMetadata::UPGRADEABLE.is_upgradeable());
+        assert!(!VMCodeMetadata::PAYABLE.is_upgradeable());
+        assert!(!VMCodeMetadata::PAYABLE_BY_SC.is_upgradeable());
+        assert!(!VMCodeMetadata::READABLE.is_upgradeable());
 
-        assert!(!CodeMetadata::UPGRADEABLE.is_payable());
-        assert!(CodeMetadata::PAYABLE.is_payable());
-        assert!(!CodeMetadata::PAYABLE_BY_SC.is_payable());
-        assert!(!CodeMetadata::READABLE.is_payable());
+        assert!(!VMCodeMetadata::UPGRADEABLE.is_payable());
+        assert!(VMCodeMetadata::PAYABLE.is_payable());
+        assert!(!VMCodeMetadata::PAYABLE_BY_SC.is_payable());
+        assert!(!VMCodeMetadata::READABLE.is_payable());
 
-        assert!(!CodeMetadata::UPGRADEABLE.is_payable_by_sc());
-        assert!(!CodeMetadata::PAYABLE.is_payable_by_sc());
-        assert!(CodeMetadata::PAYABLE_BY_SC.is_payable_by_sc());
-        assert!(!CodeMetadata::READABLE.is_payable_by_sc());
+        assert!(!VMCodeMetadata::UPGRADEABLE.is_payable_by_sc());
+        assert!(!VMCodeMetadata::PAYABLE.is_payable_by_sc());
+        assert!(VMCodeMetadata::PAYABLE_BY_SC.is_payable_by_sc());
+        assert!(!VMCodeMetadata::READABLE.is_payable_by_sc());
 
-        assert!(!CodeMetadata::UPGRADEABLE.is_readable());
-        assert!(!CodeMetadata::PAYABLE.is_readable());
-        assert!(!CodeMetadata::PAYABLE_BY_SC.is_readable());
-        assert!(CodeMetadata::READABLE.is_readable());
+        assert!(!VMCodeMetadata::UPGRADEABLE.is_readable());
+        assert!(!VMCodeMetadata::PAYABLE.is_readable());
+        assert!(!VMCodeMetadata::PAYABLE_BY_SC.is_readable());
+        assert!(VMCodeMetadata::READABLE.is_readable());
     }
 
     /// Translated from vm-wasm.
     #[test]
     fn test_from_array() {
-        assert!(CodeMetadata::from([1, 0]).is_upgradeable());
-        assert!(!CodeMetadata::from([1, 0]).is_readable());
-        assert!(CodeMetadata::from([0, 2]).is_payable());
-        assert!(CodeMetadata::from([4, 0]).is_readable());
-        assert!(!CodeMetadata::from([4, 0]).is_upgradeable());
-        assert!(!CodeMetadata::from([0, 0]).is_upgradeable());
-        assert!(!CodeMetadata::from([0, 0]).is_payable());
-        assert!(!CodeMetadata::from([0, 0]).is_readable());
+        assert!(VMCodeMetadata::from([1, 0]).is_upgradeable());
+        assert!(!VMCodeMetadata::from([1, 0]).is_readable());
+        assert!(VMCodeMetadata::from([0, 2]).is_payable());
+        assert!(VMCodeMetadata::from([4, 0]).is_readable());
+        assert!(!VMCodeMetadata::from([4, 0]).is_upgradeable());
+        assert!(!VMCodeMetadata::from([0, 0]).is_upgradeable());
+        assert!(!VMCodeMetadata::from([0, 0]).is_payable());
+        assert!(!VMCodeMetadata::from([0, 0]).is_readable());
     }
 }

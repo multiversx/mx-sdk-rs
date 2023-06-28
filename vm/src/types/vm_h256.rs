@@ -14,7 +14,6 @@ impl From<[u8; 32]> for H256 {
     /// # Note
     ///
     /// The given bytes are interpreted in big endian order.
-    #[inline]
     fn from(arr: [u8; 32]) -> Self {
         H256(Box::new(arr))
     }
@@ -27,7 +26,6 @@ impl<'a> From<&'a [u8; 32]> for H256 {
     /// # Note
     ///
     /// The given bytes are interpreted in big endian order.
-    #[inline]
     fn from(bytes: &'a [u8; 32]) -> Self {
         H256(Box::new(*bytes))
     }
@@ -40,14 +38,12 @@ impl<'a> From<&'a mut [u8; 32]> for H256 {
     /// # Note
     ///
     /// The given bytes are interpreted in big endian order.
-    #[inline]
     fn from(bytes: &'a mut [u8; 32]) -> Self {
         H256(Box::new(*bytes))
     }
 }
 
 impl From<Box<[u8; 32]>> for H256 {
-    #[inline]
     fn from(bytes: Box<[u8; 32]>) -> Self {
         H256(bytes)
     }
@@ -63,21 +59,18 @@ impl H256 {
 }
 
 impl From<H256> for [u8; 32] {
-    #[inline]
     fn from(s: H256) -> Self {
         *(s.0)
     }
 }
 
 impl AsRef<[u8]> for H256 {
-    #[inline]
     fn as_ref(&self) -> &[u8] {
         self.as_bytes()
     }
 }
 
 impl AsMut<[u8]> for H256 {
-    #[inline]
     fn as_mut(&mut self) -> &mut [u8] {
         self.0.as_mut()
     }
@@ -95,44 +88,17 @@ impl H256 {
         }
     }
 
-    /// Returns the size of this hash in bytes.
-    #[inline]
-    pub fn len_bytes() -> usize {
-        32
-    }
-
     /// Extracts a byte slice containing the entire fixed hash.
-    #[inline]
     pub fn as_bytes(&self) -> &[u8] {
         self.0.as_ref()
     }
 
-    #[inline]
     pub fn as_array(&self) -> &[u8; 32] {
         self.0.as_ref()
     }
 
-    #[inline]
-    pub fn copy_to_array(&self, target: &mut [u8; 32]) {
-        target.copy_from_slice(&self.0[..]);
-    }
-
-    #[inline]
     pub fn to_vec(&self) -> Vec<u8> {
         self.0[..].to_vec()
-    }
-
-    /// Pointer to the data on the heap.
-    #[inline]
-    pub fn as_ptr(&self) -> *const u8 {
-        self.0.as_ptr()
-    }
-
-    /// Returns an unsafe mutable pointer to the data on the heap.
-    /// Used by the API to populate data.
-    #[inline]
-    pub fn as_mut_ptr(&mut self) -> *mut u8 {
-        self.0.as_mut_ptr()
     }
 
     /// True if all 32 bytes of the hash are zero.
