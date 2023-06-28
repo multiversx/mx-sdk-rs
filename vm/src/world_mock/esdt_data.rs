@@ -168,10 +168,8 @@ impl AccountEsdt {
     pub fn set_special_role(&mut self, token_identifier: &[u8], role: &[u8]) {
         if let Some(esdt_data) = self.get_mut_by_identifier(token_identifier) {
             let roles = esdt_data.roles.get();
-            if roles.contains(role.to_vec().as_ref()) {
-                return;
-            } else {
-                let mut new_roles = roles.clone();
+            if !roles.contains(role.to_vec().as_ref()) {
+                let mut new_roles = roles;
                 new_roles.push(role.to_vec());
                 esdt_data.roles = EsdtRoles::new(new_roles);
             }

@@ -61,28 +61,3 @@ pub fn issue_non_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
 
     (tx_context, tx_result)
 }
-
-// todo#1: generate token identifier randomly
-// - - - - - - - - - - - - - - - - - - - - - - - - -
-//            code from mx-chain-go
-// - - - - - - - - - - - - - - - - - - - - - - - - -
-
-// newRandomBase := append(caller, e.eei.BlockChainHook().CurrentRandomSeed()...)
-// newRandom := e.hasher.Compute(string(newRandomBase))
-// newRandomForTicker := newRandom[:tickerRandomSequenceLength]
-
-// tickerPrefix := append(ticker, []byte(tickerSeparator)...)
-// newRandomAsBigInt := big.NewInt(0).SetBytes(newRandomForTicker)
-
-// one := big.NewInt(1)
-// for i := 0; i < numOfRetriesForIdentifier; i++ {
-// 	encoded := fmt.Sprintf("%06x", newRandomAsBigInt)
-// 	newIdentifier := append(tickerPrefix, encoded...)
-// 	buff := e.eei.GetStorage(newIdentifier)
-// 	if len(buff) == 0 {
-// 		return newIdentifier, nil
-// 	}
-// 	newRandomAsBigInt.Add(newRandomAsBigInt, one)
-// }
-
-// return nil, vm.ErrCouldNotCreateNewTokenIdentifier
