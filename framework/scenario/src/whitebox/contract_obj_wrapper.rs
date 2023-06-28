@@ -1,26 +1,28 @@
 use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
-use crate::multiversx_sc::{
-    codec::{TopDecode, TopEncode},
-    contract_base::{CallableContract, ContractBase},
-    types::{
-        heap::{Address, H256},
-        EsdtLocalRole,
+use crate::{
+    api::DebugApi,
+    debug_executor::{catch_tx_panic, ContractContainer, ContractMapRef, StaticVarStack},
+    multiversx_sc::{
+        codec::{TopDecode, TopEncode},
+        contract_base::{CallableContract, ContractBase},
+        types::{
+            heap::{Address, H256},
+            EsdtLocalRole,
+        },
     },
+    testing_framework::raw_converter::bytes_to_hex,
 };
-use num_traits::Zero;
-
-use crate::{api::DebugApi, testing_framework::raw_converter::bytes_to_hex};
 use multiversx_chain_vm::{
     num_bigint,
-    tx_execution::{catch_tx_panic, execute_async_call_and_callback},
+    tx_execution::execute_async_call_and_callback,
     tx_mock::{
-        StaticVarStack, TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxInput,
-        TxResult,
+        TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxInput, TxResult,
     },
-    world_mock::{AccountData, AccountEsdt, ContractContainer, EsdtInstanceMetadata},
+    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
     BlockchainMock,
 };
+use num_traits::Zero;
 
 use super::{
     tx_mandos::{ScCallMandos, TxExpectMandos},
@@ -57,6 +59,7 @@ where
 
 pub struct BlockchainStateWrapper {
     address_factory: AddressFactory,
+    contract_map_ref: ContractMapRef,
     rc_b_mock: Rc<BlockchainMock>,
     address_to_code_path: HashMap<Address, Vec<u8>>,
     scenario_generator: MandosGenerator,
@@ -69,9 +72,13 @@ impl BlockchainStateWrapper {
         let mut current_dir = std::env::current_dir().unwrap();
         current_dir.push(PathBuf::from_str("scenarios/").unwrap());
 
+        let contract_map_ref = ContractMapRef::new();
+        let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
+
         BlockchainStateWrapper {
             address_factory: AddressFactory::new(),
-            rc_b_mock: Rc::new(BlockchainMock::new()),
+            contract_map_ref,
+            rc_b_mock: Rc::new(blockchain_mock),
             address_to_code_path: HashMap::new(),
             scenario_generator: MandosGenerator::new(),
             workspace_path: current_dir,
@@ -259,11 +266,14 @@ impl BlockchainStateWrapper {
             Some(wasm_relative_path_expr_bytes),
         );
 
-        if !self.rc_b_mock.contains_contract(contract_bytes.as_slice()) {
+        let contains_contract = self
+            .contract_map_ref
+            .borrow()
+            .contains_contract(contract_bytes.as_slice());
+        if !contains_contract {
             let contract_obj = create_contract_obj_box(obj_builder);
 
-            let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-            b_mock_ref.register_contract_container(
+            self.contract_map_ref.borrow_mut().register_contract(
                 contract_bytes,
                 ContractContainer::new(contract_obj, None, false),
             );

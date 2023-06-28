@@ -1,4 +1,3 @@
-use alloc::vec::Vec;
 use multiversx_sc::types::heap::Address;
 
 use super::TxFunctionName;

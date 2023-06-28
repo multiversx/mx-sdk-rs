@@ -1,14 +1,21 @@
 use std::rc::Rc;
 
+use multiversx_chain_vm_executor::CompilationOptions;
+
 use crate::{
     display_util::address_hex,
-    tx_mock::{
-        StaticVarStack, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxPanic, TxResult,
-    },
-    world_mock::ContractContainer,
+    tx_mock::{TxContext, TxContextRef, TxContextStack, TxResult},
 };
 
-use super::catch_tx_panic;
+const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
+    gas_limit: 1,
+    unmetered_locals: 0,
+    max_memory_grow: 0,
+    max_memory_grow_delta: 0,
+    opcode_trace: false,
+    metering: false,
+    runtime_breakpoints: false,
+};
 
 /// Runs contract code using the auto-generated function selector.
 /// The endpoint name is taken from the tx context.
@@ -27,17 +34,18 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
     let tx_context_ref = TxContextRef::new(tx_context_rc.clone());
 
     let func_name = &tx_context_ref.tx_input_box.func_name;
-    let contract_identifier = get_contract_identifier(&tx_context_ref);
-    let contract_map = &tx_context_rc.blockchain_ref().contract_map;
-
-    let contract_container = contract_map.get_contract(contract_identifier.as_slice());
+    let contract_code = get_contract_identifier(&tx_context_ref);
+    let executor = &tx_context_rc.blockchain_ref().executor;
+    let instance = executor
+        .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
+        .expect("error instantiating executor instance");
 
     TxContextStack::static_push(tx_context_rc.clone());
-    StaticVarStack::static_push();
-    let tx_result = execute_contract_instance_endpoint(contract_container, func_name);
 
+    instance.call(func_name.as_str()).expect("execution error");
+
+    let tx_result = TxContextRef::new_from_static().into_tx_result();
     let tx_context_rc = TxContextStack::static_pop();
-    StaticVarStack::static_pop();
     (tx_context_rc, tx_result)
 }
 
@@ -52,25 +60,4 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
                 )
             })
         })
-}
-
-/// The actual execution and the extraction/wrapping of results.
-fn execute_contract_instance_endpoint(
-    contract_container: &ContractContainer,
-    endpoint_name: &TxFunctionName,
-) -> TxResult {
-    let result = catch_tx_panic(contract_container.panic_message, || {
-        let call_successful = contract_container.call(endpoint_name);
-        if call_successful {
-            Ok(())
-        } else {
-            Err(TxPanic::new(1, "invalid function (not found)"))
-        }
-    });
-
-    if let Err(tx_panic) = result {
-        TxContextRef::new_from_static().replace_tx_result_with_error(tx_panic);
-    }
-
-    TxContextRef::new_from_static().into_tx_result()
 }

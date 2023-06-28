@@ -1,7 +1,6 @@
+use multiversx_chain_vm::tx_mock::TxPanic;
 use multiversx_chain_vm_executor::BreakpointValue;
 use multiversx_sc::err_msg;
-
-use crate::tx_mock::TxPanic;
 
 /// Catches all thrown panics, as follows:
 /// - BreakpointValue is considered expected abortion of execution and already handled, for them it returns Ok;

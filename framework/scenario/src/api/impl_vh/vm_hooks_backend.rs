@@ -1,5 +1,7 @@
-use multiversx_chain_vm::{executor::VMHooks, tx_mock::StaticVarData};
+use multiversx_chain_vm::executor::VMHooks;
 use multiversx_sc::api::HandleConstraints;
+
+use crate::debug_executor::StaticVarData;
 
 pub trait VMHooksApiBackend: Clone + 'static {
     /// We use a single handle type for all handles.

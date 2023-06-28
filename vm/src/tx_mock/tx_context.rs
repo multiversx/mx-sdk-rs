@@ -1,8 +1,7 @@
 use crate::{
     num_bigint::BigUint,
-    world_mock::{AccountData, AccountEsdt, BlockchainMock},
+    world_mock::{AccountData, AccountEsdt, BlockchainMock, FailingExecutor},
 };
-use alloc::vec::Vec;
 use core::cell::RefCell;
 use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
@@ -36,7 +35,7 @@ impl TxContext {
     }
 
     pub fn dummy() -> Self {
-        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new()));
+        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new(Box::new(FailingExecutor))));
         let contract_address = Address::from(&[b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),

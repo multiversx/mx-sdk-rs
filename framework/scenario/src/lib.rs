@@ -2,6 +2,7 @@
 #![feature(exhaustive_patterns)]
 
 pub mod api;
+pub mod debug_executor;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;

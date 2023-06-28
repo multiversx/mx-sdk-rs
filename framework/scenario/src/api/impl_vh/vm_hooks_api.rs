@@ -1,11 +1,10 @@
+use crate::debug_executor::StaticVarData;
+
 use super::VMHooksApiBackend;
 
 use std::marker::PhantomData;
 
-use multiversx_chain_vm::{
-    executor::{MemPtr, VMHooks},
-    tx_mock::StaticVarData,
-};
+use multiversx_chain_vm::executor::{MemPtr, VMHooks};
 use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl};
 
 #[derive(Clone, Debug)]

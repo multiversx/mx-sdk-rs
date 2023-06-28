@@ -2,10 +2,12 @@ use std::rc::Rc;
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
-    tx_mock::{StaticVarData, StaticVarStack, TxContext, TxContextRef, TxContextStack, TxPanic},
+    tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
     vm_hooks::{TxContextWrapper, VMHooksDispatcher},
 };
 use multiversx_sc::err_msg;
+
+use crate::debug_executor::{StaticVarData, StaticVarStack};
 
 use super::{DebugHandle, VMHooksApi, VMHooksApiBackend};
 
