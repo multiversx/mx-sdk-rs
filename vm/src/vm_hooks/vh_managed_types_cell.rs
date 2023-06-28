@@ -29,6 +29,10 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         self.0.borrow_mut()
     }
 
+    fn halt_with_error(&self, status: u64, message: &str) -> ! {
+        panic!("VM error occured, status: {status}, message: {message}")
+    }
+
     fn input_ref(&self) -> &TxInput {
         panic!("cannot access tx inputs in the StaticApi")
     }

@@ -6,15 +6,17 @@ use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
 use super::TxCache;
 
 impl TxCache {
-    pub fn subtract_egld_balance(&self, address: &Address, call_value: &BigUint) {
+    pub fn subtract_egld_balance(
+        &self,
+        address: &Address,
+        call_value: &BigUint,
+    ) -> Result<(), TxPanic> {
         self.with_account_mut(address, |account| {
             if call_value > &account.egld_balance {
-                std::panic::panic_any(TxPanic {
-                    status: 10,
-                    message: "failed transfer (insufficient funds)".to_string(),
-                });
+                return Err(TxPanic::vm_error("failed transfer (insufficient funds)"));
             }
             account.egld_balance -= call_value;
+            Ok(())
         })
     }
 
@@ -35,32 +37,32 @@ impl TxCache {
         });
     }
 
-    #[allow(clippy::redundant_closure)] // clippy is wrong here, `.unwrap_or_else(panic_insufficient_funds)` won't compile
     pub fn subtract_esdt_balance(
         &self,
         address: &Address,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
-    ) -> EsdtInstanceMetadata {
+    ) -> Result<EsdtInstanceMetadata, TxPanic> {
         self.with_account_mut(address, |account| {
             let esdt_data_map = &mut account.esdt;
             let esdt_data = esdt_data_map
                 .get_mut_by_identifier(esdt_token_identifier)
-                .unwrap_or_else(|| panic_insufficient_funds());
+                .ok_or_else(err_insufficient_funds)?;
 
             let esdt_instances = &mut esdt_data.instances;
             let esdt_instance = esdt_instances
                 .get_mut_by_nonce(nonce)
-                .unwrap_or_else(|| panic_insufficient_funds());
+                .ok_or_else(err_insufficient_funds)?;
+
             let esdt_balance = &mut esdt_instance.balance;
             if &*esdt_balance < value {
-                panic_insufficient_funds();
+                return Err(err_insufficient_funds());
             }
 
             *esdt_balance -= value;
 
-            esdt_instance.metadata.clone()
+            Ok(esdt_instance.metadata.clone())
         })
     }
 
@@ -89,16 +91,13 @@ impl TxCache {
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
-    ) {
-        let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value);
-
+    ) -> Result<(), TxPanic> {
+        let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value)?;
         self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
+        Ok(())
     }
 }
 
-fn panic_insufficient_funds() -> ! {
-    std::panic::panic_any(TxPanic {
-        status: 10,
-        message: "insufficient funds".to_string(),
-    });
+fn err_insufficient_funds() -> TxPanic {
+    TxPanic::vm_error("insufficient funds")
 }

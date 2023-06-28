@@ -57,7 +57,10 @@ pub fn execute_async_call_and_callback(
     } else {
         let state_rc = Rc::new(state);
         let tx_cache = TxCache::new(state_rc.clone());
-        tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value);
+        if let Err(err) = tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value) {
+            let state = Rc::try_unwrap(state_rc).unwrap();
+            return (TxResult::from_panic_obj(&err), TxResult::empty(), state);
+        }
         tx_cache.insert_account(AccountData {
             address: async_data.to.clone(),
             nonce: 0,
@@ -136,7 +139,10 @@ pub fn execute_promise_call_and_callback(
     } else {
         let state_rc = Rc::new(state);
         let tx_cache = TxCache::new(state_rc.clone());
-        tx_cache.subtract_egld_balance(address, &promise.call.call_value);
+        if let Err(err) = tx_cache.subtract_egld_balance(address, &promise.call.call_value) {
+            let state = Rc::try_unwrap(state_rc).unwrap();
+            return (TxResult::from_panic_obj(&err), TxResult::empty(), state);
+        }
         tx_cache.insert_account(AccountData {
             address: promise.call.to.clone(),
             nonce: 0,
