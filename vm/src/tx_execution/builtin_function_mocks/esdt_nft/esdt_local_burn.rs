@@ -1,7 +1,9 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::api::ESDT_LOCAL_BURN_FUNC_NAME;
+use num_bigint::BigUint;
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};
+use crate::{
+    tx_execution::builtin_function_names::ESDT_LOCAL_BURN_FUNC_NAME,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 

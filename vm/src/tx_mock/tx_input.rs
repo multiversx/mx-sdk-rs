@@ -1,14 +1,18 @@
-use crate::{display_util::*, num_bigint::BigUint};
-use multiversx_sc::types::heap::{Address, H256};
+use num_bigint::BigUint;
 use num_traits::Zero;
+
+use crate::{
+    display_util::*,
+    types::{VMAddress, H256},
+};
 use std::fmt;
 
 use super::TxFunctionName;
 
 #[derive(Clone, Debug)]
 pub struct TxInput {
-    pub from: Address,
-    pub to: Address,
+    pub from: VMAddress,
+    pub to: VMAddress,
     pub egld_value: BigUint,
     pub esdt_values: Vec<TxTokenTransfer>,
     pub func_name: TxFunctionName,
@@ -23,8 +27,8 @@ pub struct TxInput {
 impl Default for TxInput {
     fn default() -> Self {
         TxInput {
-            from: Address::zero(),
-            to: Address::zero(),
+            from: VMAddress::zero(),
+            to: VMAddress::zero(),
             egld_value: BigUint::zero(),
             esdt_values: Vec::new(),
             func_name: TxFunctionName::EMPTY,

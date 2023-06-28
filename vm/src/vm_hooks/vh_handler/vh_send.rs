@@ -1,15 +1,11 @@
 use crate::{
-    num_bigint,
-    tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
-    vm_hooks::VMHooksHandlerSource,
-};
-use multiversx_sc::{
-    api::{
-        RawHandle, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME, UPGRADE_CONTRACT_FUNC_NAME,
+    tx_execution::builtin_function_names::{
+        ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME, ESDT_TRANSFER_FUNC_NAME,
+        UPGRADE_CONTRACT_FUNC_NAME,
     },
-    codec::top_encode_to_vec_u8,
-    types::{heap::Address, CodeMetadata},
+    tx_mock::{AsyncCallTxData, Promise, TxFunctionName, TxTokenTransfer},
+    types::{top_encode_big_uint, top_encode_u64, RawHandle, VMAddress, VMCodeMetadata},
+    vm_hooks::VMHooksHandlerSource,
 };
 use num_traits::Zero;
 
@@ -27,7 +23,7 @@ fn append_endpoint_name_and_args(
 pub trait VMHooksSend: VMHooksHandlerSource {
     fn perform_transfer_execute_esdt(
         &self,
-        to: Address,
+        to: VMAddress,
         token: Vec<u8>,
         amount: num_bigint::BigUint,
         _gas_limit: u64,
@@ -48,7 +44,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     #[allow(clippy::too_many_arguments)]
     fn perform_transfer_execute_nft(
         &self,
-        to: Address,
+        to: VMAddress,
         token: Vec<u8>,
         nonce: u64,
         amount: num_bigint::BigUint,
@@ -60,8 +56,8 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
         let mut args = vec![
             token,
-            top_encode_to_vec_u8(&nonce).unwrap(),
-            amount.to_bytes_be(),
+            top_encode_u64(nonce),
+            top_encode_big_uint(&amount),
             to.to_vec(),
         ];
 
@@ -77,7 +73,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     fn perform_transfer_execute_multi(
         &self,
-        to: Address,
+        to: VMAddress,
         payments: Vec<TxTokenTransfer>,
         _gas_limit: u64,
         endpoint_name: TxFunctionName,
@@ -85,14 +81,14 @@ pub trait VMHooksSend: VMHooksHandlerSource {
     ) {
         let contract_address = self.input_ref().to.clone();
 
-        let mut args = vec![to.to_vec(), top_encode_to_vec_u8(&payments.len()).unwrap()];
+        let mut args = vec![to.to_vec(), top_encode_u64(payments.len() as u64)];
 
         for payment in payments.into_iter() {
-            let token_bytes = top_encode_to_vec_u8(&payment.token_identifier).unwrap();
+            let token_bytes = payment.token_identifier;
             args.push(token_bytes);
-            let nonce_bytes = top_encode_to_vec_u8(&payment.nonce).unwrap();
+            let nonce_bytes = top_encode_u64(payment.nonce);
             args.push(nonce_bytes);
-            let amount_bytes = top_encode_to_vec_u8(&payment.value).unwrap();
+            let amount_bytes = top_encode_big_uint(&payment.value);
             args.push(amount_bytes);
         }
 
@@ -108,13 +104,13 @@ pub trait VMHooksSend: VMHooksHandlerSource {
 
     fn perform_upgrade_contract(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: CodeMetadata,
+        code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> ! {
-        let mut arguments = vec![contract_code, top_encode_to_vec_u8(&code_metadata).unwrap()];
+        let mut arguments = vec![contract_code, code_metadata.to_vec()];
         arguments.extend(args.into_iter());
         self.perform_async_call(to, egld_value, UPGRADE_CONTRACT_FUNC_NAME.into(), arguments)
     }

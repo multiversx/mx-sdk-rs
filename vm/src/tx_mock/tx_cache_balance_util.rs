@@ -1,14 +1,13 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::types::heap::Address;
+use num_bigint::BigUint;
 
-use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
+use crate::{tx_mock::TxPanic, types::VMAddress, world_mock::EsdtInstanceMetadata};
 
 use super::TxCache;
 
 impl TxCache {
     pub fn subtract_egld_balance(
         &self,
-        address: &Address,
+        address: &VMAddress,
         call_value: &BigUint,
     ) -> Result<(), TxPanic> {
         self.with_account_mut(address, |account| {
@@ -20,7 +19,7 @@ impl TxCache {
         })
     }
 
-    pub fn subtract_tx_gas(&self, address: &Address, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_gas(&self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
         self.with_account_mut(address, |account| {
             let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
             assert!(
@@ -31,7 +30,7 @@ impl TxCache {
         });
     }
 
-    pub fn increase_egld_balance(&self, address: &Address, amount: &BigUint) {
+    pub fn increase_egld_balance(&self, address: &VMAddress, amount: &BigUint) {
         self.with_account_mut(address, |account| {
             account.egld_balance += amount;
         });
@@ -39,7 +38,7 @@ impl TxCache {
 
     pub fn subtract_esdt_balance(
         &self,
-        address: &Address,
+        address: &VMAddress,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
@@ -68,7 +67,7 @@ impl TxCache {
 
     pub fn increase_esdt_balance(
         &self,
-        address: &Address,
+        address: &VMAddress,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
@@ -86,8 +85,8 @@ impl TxCache {
 
     pub fn transfer_esdt_balance(
         &self,
-        from: &Address,
-        to: &Address,
+        from: &VMAddress,
+        to: &VMAddress,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,

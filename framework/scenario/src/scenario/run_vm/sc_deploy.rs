@@ -48,7 +48,7 @@ impl ScenarioVMRunner {
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap();
 
-        (new_address, deser_result)
+        (new_address.as_array().into(), deser_result)
     }
 }
 
@@ -58,8 +58,8 @@ pub(crate) fn execute(
 ) -> (TxResult, Address, BlockchainMock) {
     let tx = &sc_deploy_step.tx;
     let tx_input = TxInput {
-        from: tx.from.to_address(),
-        to: Address::zero(),
+        from: tx.from.to_vm_address(),
+        to: multiversx_chain_vm::types::VMAddress::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
         func_name: TxFunctionName::INIT,
@@ -73,7 +73,8 @@ pub(crate) fn execute(
         tx_hash: generate_tx_hash_dummy(&sc_deploy_step.id),
         ..Default::default()
     };
-    sc_create(tx_input, &tx.contract_code.value, state)
+    let (tx_result, address, blockchain_mock) = sc_create(tx_input, &tx.contract_code.value, state);
+    (tx_result, address.as_array().into(), blockchain_mock)
 }
 
 fn execute_and_check(
@@ -84,5 +85,5 @@ fn execute_and_check(
     if let Some(tx_expect) = &sc_deploy_step.expect {
         check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
     }
-    (tx_result, address, state)
+    (tx_result, address.as_array().into(), state)
 }

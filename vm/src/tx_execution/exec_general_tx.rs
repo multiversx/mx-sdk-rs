@@ -1,8 +1,8 @@
-use multiversx_sc::types::heap::Address;
 use num_traits::Zero;
 
-use crate::tx_mock::{
-    BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult,
+use crate::{
+    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult},
+    types::VMAddress,
 };
 
 use super::execute_tx_context;
@@ -27,7 +27,7 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         && !tx_context.tx_input_box.egld_value.is_zero();
     let transfer_value_log = if add_transfer_log {
         Some(TxLog {
-            address: Address::zero(), // TODO: figure out the real VM behavior
+            address: VMAddress::zero(), // TODO: figure out the real VM behavior
             endpoint: "transferValueOnly".into(),
             topics: vec![
                 tx_context.tx_input_box.from.to_vec(),
@@ -78,7 +78,7 @@ pub fn deploy_contract(
     mut tx_input: TxInput,
     contract_path: Vec<u8>,
     tx_cache: TxCache,
-) -> (TxResult, Address, BlockchainUpdate) {
+) -> (TxResult, VMAddress, BlockchainUpdate) {
     let new_address = tx_cache.get_new_address(&tx_input.from);
     tx_input.to = new_address.clone();
     tx_input.func_name = TxFunctionName::INIT;
@@ -91,7 +91,7 @@ pub fn deploy_contract(
     {
         return (
             TxResult::from_panic_obj(&err),
-            Address::zero(),
+            VMAddress::zero(),
             BlockchainUpdate::empty(),
         );
     }

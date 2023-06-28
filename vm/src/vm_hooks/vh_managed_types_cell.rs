@@ -1,9 +1,8 @@
 use std::cell::{Ref, RefCell, RefMut};
 
-use multiversx_sc::types::{Address, CodeMetadata};
-
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    types::{VMAddress, VMCodeMetadata},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -49,7 +48,7 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         panic!("cannot log events in the StaticApi")
     }
 
-    fn storage_read_any_address(&self, _address: &Address, _key: &[u8]) -> Vec<u8> {
+    fn storage_read_any_address(&self, _address: &VMAddress, _key: &[u8]) -> Vec<u8> {
         panic!("cannot access the storage in the StaticApi")
     }
 
@@ -65,17 +64,17 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         panic!("cannot access the block info in the StaticApi")
     }
 
-    fn account_data(&self, _address: &Address) -> AccountData {
+    fn account_data(&self, _address: &VMAddress) -> AccountData {
         panic!("cannot access account data in the StaticApi")
     }
 
-    fn account_code(&self, _address: &Address) -> Vec<u8> {
+    fn account_code(&self, _address: &VMAddress) -> Vec<u8> {
         panic!("cannot access account data in the StaticApi")
     }
 
     fn perform_async_call(
         &self,
-        _to: Address,
+        _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
@@ -85,7 +84,7 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
 
     fn perform_execute_on_dest_context(
         &self,
-        _to: Address,
+        _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _args: Vec<Vec<u8>>,
@@ -97,15 +96,15 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
         &self,
         _egld_value: num_bigint::BigUint,
         _contract_code: Vec<u8>,
-        _code_metadata: CodeMetadata,
+        _code_metadata: VMCodeMetadata,
         _args: Vec<Vec<u8>>,
-    ) -> (Address, Vec<Vec<u8>>) {
+    ) -> (VMAddress, Vec<Vec<u8>>) {
         panic!("cannot launch contract calls in the StaticApi")
     }
 
     fn perform_transfer_execute(
         &self,
-        _to: Address,
+        _to: VMAddress,
         _egld_value: num_bigint::BigUint,
         _func_name: TxFunctionName,
         _arguments: Vec<Vec<u8>>,

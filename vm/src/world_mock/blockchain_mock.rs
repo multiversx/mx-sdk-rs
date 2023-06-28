@@ -1,10 +1,10 @@
 use crate::{
-    num_bigint::BigUint,
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
+    types::VMAddress,
 };
 use multiversx_chain_vm_executor::Executor;
-use multiversx_sc::types::heap::Address;
+use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
@@ -13,9 +13,9 @@ use super::{AccountData, BlockInfo, FailingExecutor};
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
 pub struct BlockchainMock {
-    pub accounts: HashMap<Address, AccountData>,
+    pub accounts: HashMap<VMAddress, AccountData>,
     pub builtin_functions: Rc<BuiltinFunctionMap>,
-    pub new_addresses: HashMap<(Address, u64), Address>,
+    pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub executor: Box<dyn Executor>,
@@ -41,7 +41,7 @@ impl Default for BlockchainMock {
 }
 
 impl BlockchainMock {
-    pub fn account_exists(&self, address: &Address) -> bool {
+    pub fn account_exists(&self, address: &VMAddress) -> bool {
         self.accounts.contains_key(address)
     }
 
@@ -49,7 +49,7 @@ impl BlockchainMock {
         updates.apply(self);
     }
 
-    pub fn increase_account_nonce(&mut self, address: &Address) {
+    pub fn increase_account_nonce(&mut self, address: &VMAddress) {
         let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
@@ -59,7 +59,7 @@ impl BlockchainMock {
         account.nonce += 1;
     }
 
-    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_gas(&mut self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
         let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
@@ -74,7 +74,7 @@ impl BlockchainMock {
         account.egld_balance -= &gas_cost;
     }
 
-    pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
+    pub fn increase_validator_reward(&mut self, address: &VMAddress, amount: &BigUint) {
         let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",

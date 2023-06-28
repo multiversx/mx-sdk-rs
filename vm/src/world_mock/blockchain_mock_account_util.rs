@@ -1,8 +1,6 @@
-use multiversx_sc::types::heap::Address;
-
 use std::{collections::HashMap, fmt::Write};
 
-use crate::display_util::address_hex;
+use crate::{display_util::address_hex, types::VMAddress};
 
 use super::{AccountData, BlockchainMock};
 
@@ -17,7 +15,7 @@ impl BlockchainMock {
         self.add_account(acct);
     }
 
-    pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
+    pub fn update_accounts(&mut self, accounts: HashMap<VMAddress, AccountData>) {
         self.accounts.extend(accounts.into_iter());
     }
 
@@ -31,15 +29,19 @@ impl BlockchainMock {
 
     pub fn put_new_address(
         &mut self,
-        creator_address: Address,
+        creator_address: VMAddress,
         creator_nonce: u64,
-        new_address: Address,
+        new_address: VMAddress,
     ) {
         self.new_addresses
             .insert((creator_address, creator_nonce), new_address);
     }
 
-    pub fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
+    pub fn get_new_address(
+        &self,
+        creator_address: VMAddress,
+        creator_nonce: u64,
+    ) -> Option<VMAddress> {
         self.new_addresses
             .get(&(creator_address, creator_nonce))
             .cloned()

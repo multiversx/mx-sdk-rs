@@ -1,6 +1,7 @@
-use multiversx_sc::types::Address;
-
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer};
+use crate::{
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer},
+    types::VMAddress,
+};
 
 pub trait BuiltinFunction {
     fn name(&self) -> &str;
@@ -15,7 +16,7 @@ pub trait BuiltinFunction {
 /// Contains a builtin function call ESDT transfers (if any) and the real recipient of the transfer
 /// (can be different from the "to" field.)
 pub struct BuiltinFunctionEsdtTransferInfo {
-    pub real_recipient: Address,
+    pub real_recipient: VMAddress,
     pub transfers: Vec<TxTokenTransfer>,
 }
 

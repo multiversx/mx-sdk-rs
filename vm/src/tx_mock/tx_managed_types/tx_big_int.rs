@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-use multiversx_sc::{api::RawHandle, types::BoxedBytes};
+use crate::types::RawHandle;
 use num_bigint::Sign;
 use num_traits::Zero;
 
@@ -8,7 +8,7 @@ use super::TxManagedTypes;
 
 impl TxManagedTypes {
     pub fn bi_new_from_big_int(&mut self, value: num_bigint::BigInt) -> RawHandle {
-        self.big_int_map.insert_new_handle(value)
+        self.big_int_map.insert_new_handle_raw(value)
     }
 
     pub fn bi_overwrite(&mut self, destination: RawHandle, value: num_bigint::BigInt) {
@@ -30,13 +30,13 @@ impl TxManagedTypes {
         big_int_to_i64(&bi)
     }
 
-    pub fn bi_get_unsigned_bytes(&self, handle: RawHandle) -> BoxedBytes {
+    pub fn bi_get_unsigned_bytes(&self, handle: RawHandle) -> Vec<u8> {
         let bi = self.bi_get(handle);
         if bi.is_zero() {
-            BoxedBytes::empty()
+            Vec::new()
         } else {
             let (_, bytes) = bi.to_bytes_be();
-            bytes.into()
+            bytes
         }
     }
 
@@ -45,12 +45,12 @@ impl TxManagedTypes {
         self.bi_overwrite(destination, bi);
     }
 
-    pub fn bi_get_signed_bytes(&self, handle: RawHandle) -> BoxedBytes {
+    pub fn bi_get_signed_bytes(&self, handle: RawHandle) -> Vec<u8> {
         let bi = self.bi_get(handle);
         if bi.is_zero() {
-            BoxedBytes::empty()
+            Vec::new()
         } else {
-            bi.to_signed_bytes_be().into()
+            bi.to_signed_bytes_be()
         }
     }
 

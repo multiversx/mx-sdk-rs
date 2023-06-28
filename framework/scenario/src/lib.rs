@@ -2,7 +2,9 @@
 #![feature(exhaustive_patterns)]
 
 pub mod api;
+pub mod bech32;
 pub mod debug_executor;
+pub mod display_util;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
@@ -16,7 +18,10 @@ pub mod whitebox;
 pub use whitebox as testing_framework;
 
 pub use api::DebugApi;
-pub use multiversx_chain_vm::{self, bech32, num_bigint};
+pub use multiversx_chain_vm;
+
+/// Re-exporting for convenience.
+pub use num_bigint;
 
 pub use multiversx_sc;
 

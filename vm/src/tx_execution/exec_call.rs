@@ -1,16 +1,14 @@
-use std::{collections::HashMap, rc::Rc};
-
-use multiversx_sc::types::Address;
-use num_bigint::BigUint;
-use num_traits::Zero;
-
 use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
         AsyncCallTxData, Promise, TxCache, TxContext, TxInput, TxResult, TxResultCalls,
     },
+    types::VMAddress,
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
+use num_bigint::BigUint;
+use num_traits::Zero;
+use std::{collections::HashMap, rc::Rc};
 
 use super::{execute_builtin_function_or_default, execute_tx_context};
 
@@ -121,7 +119,7 @@ pub fn sc_call_with_async_and_callback(
 }
 
 pub fn execute_promise_call_and_callback(
-    address: &Address,
+    address: &VMAddress,
     promise: &Promise,
     state: BlockchainMock,
 ) -> (TxResult, TxResult, BlockchainMock) {
