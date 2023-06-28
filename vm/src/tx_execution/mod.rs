@@ -10,3 +10,4 @@ pub use exec_call::*;
 pub use exec_contract_endpoint::*;
 pub use exec_create::*;
 pub use exec_general_tx::*;
+pub use system_sc::*;

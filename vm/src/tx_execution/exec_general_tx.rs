@@ -5,17 +5,19 @@ use crate::tx_mock::{
     BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult,
 };
 
-use super::{execute_tx_context, system_sc};
+use super::{execute_system_sc, execute_tx_context, is_system_sc_address};
 
 pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     let mut tx_context = TxContext::new(tx_input, tx_cache);
 
-    tx_context.tx_cache.subtract_egld_balance(
-        &tx_context.tx_input_box.from,
-        &tx_context.tx_input_box.egld_value,
-    );
+    if !is_system_sc_address(&tx_context.tx_input_box.from) {
+        tx_context.tx_cache.subtract_egld_balance(
+            &tx_context.tx_input_box.from,
+            &tx_context.tx_input_box.egld_value,
+        );
+    }
 
-    if !system_sc::is_system_sc_address(&tx_context.tx_input_box.to) {
+    if !is_system_sc_address(&tx_context.tx_input_box.to) {
         tx_context.tx_cache.increase_egld_balance(
             &tx_context.tx_input_box.to,
             &tx_context.tx_input_box.egld_value,
@@ -58,8 +60,8 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
     {
         // direct EGLD transfer
         TxResult::empty()
-    } else if system_sc::is_system_sc_address(recipient_address) {
-        let (tx_context_modified, tx_result) = system_sc::execute_system_sc(tx_context);
+    } else if is_system_sc_address(recipient_address) {
+        let (tx_context_modified, tx_result) = execute_system_sc(tx_context);
         tx_context = tx_context_modified;
         tx_result
     } else {

@@ -1,9 +1,11 @@
 mod system_sc_issue;
+mod system_sc_special_roles;
 
 use crate::tx_mock::{TxContext, TxResult};
 use hex_literal::hex;
 use multiversx_sc::types::Address;
 use system_sc_issue::*;
+use system_sc_special_roles::*;
 
 /// Address of the system smart contract that manages ESDT.
 /// Bech32: erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u
@@ -39,7 +41,7 @@ pub fn execute_system_sc(tx_context: TxContext) -> (TxContext, TxResult) {
         "transferOwnership" => todo!(),
         "getTokenProperties" => todo!(),
         "getSpecialRoles" => todo!(),
-        "setSpecialRole" => todo!(),
+        "setSpecialRole" => set_special_role(tx_context),
         "unSetSpecialRole" => todo!(),
         "transferNFTCreateRole" => todo!(),
         "stopNFTCreate" => todo!(),

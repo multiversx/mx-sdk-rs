@@ -12,9 +12,7 @@ use crate::{
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
 
-use super::{
-    execute_builtin_function_or_default, execute_tx_context, system_sc::is_system_sc_address,
-};
+use super::{execute_builtin_function_or_default, execute_tx_context, is_system_sc_address};
 
 pub fn execute_sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
     let state_rc = Rc::new(state);
@@ -25,7 +23,9 @@ pub fn execute_sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, 
 }
 
 pub fn execute_sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResult, BlockchainMock) {
-    state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
+    if !is_system_sc_address(&tx_input.from) {
+        state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
+    }
 
     let state_rc = Rc::new(state);
     let tx_cache = TxCache::new(state_rc.clone());

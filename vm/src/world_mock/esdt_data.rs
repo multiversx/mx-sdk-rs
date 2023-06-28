@@ -147,6 +147,36 @@ impl AccountEsdt {
     pub fn iter(&self) -> Iter<Vec<u8>, EsdtData> {
         self.0.iter()
     }
+
+    pub fn issue_token(&mut self, token_identifier: &[u8]) {
+        let roles = vec![
+            "ESDTLocalMint".as_bytes().to_vec(),
+            "ESDTLocalBurn".as_bytes().to_vec(),
+        ];
+
+        self.0.insert(
+            token_identifier.to_vec(),
+            EsdtData {
+                instances: EsdtInstances::new(),
+                last_nonce: 0,
+                roles: EsdtRoles::new(roles),
+                frozen: false,
+            },
+        );
+    }
+
+    pub fn set_special_role(&mut self, token_identifier: &[u8], role: &[u8]) {
+        if let Some(esdt_data) = self.get_mut_by_identifier(token_identifier) {
+            let roles = esdt_data.roles.get();
+            if roles.contains(role.to_vec().as_ref()) {
+                return;
+            } else {
+                let mut new_roles = roles.clone();
+                new_roles.push(role.to_vec());
+                esdt_data.roles = EsdtRoles::new(new_roles);
+            }
+        }
+    }
 }
 
 impl fmt::Display for EsdtData {
