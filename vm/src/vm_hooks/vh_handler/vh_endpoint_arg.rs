@@ -1,6 +1,5 @@
 use crate::{
     num_bigint::{BigInt, BigUint},
-    tx_mock::TxPanic,
     vm_hooks::VMHooksHandlerSource,
 };
 
@@ -33,10 +32,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(v) = bi.to_i64() {
             v
         } else {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: "argument out of range".to_string(),
-            })
+            self.vm_error("argument out of range");
         }
     }
 
@@ -47,10 +43,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
         if let Some(v) = bu.to_u64() {
             v
         } else {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: "argument out of range".to_string(),
-            })
+            self.vm_error("argument out of range");
         }
     }
 

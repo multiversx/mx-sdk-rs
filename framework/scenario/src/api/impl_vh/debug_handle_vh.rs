@@ -13,9 +13,17 @@ pub struct DebugHandle {
 }
 
 impl DebugHandle {
+    pub fn is_on_current_context(&self) -> bool {
+        Rc::ptr_eq(&self.context, &TxContextStack::static_peek())
+    }
+
+    pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
+        Rc::ptr_eq(&self.context, &other.context)
+    }
+
     pub fn assert_current_context(&self) {
         assert!(
-            Rc::ptr_eq(&self.context, &TxContextStack::static_peek()),
+            self.is_on_current_context(),
             "Managed value not used in original context"
         );
     }

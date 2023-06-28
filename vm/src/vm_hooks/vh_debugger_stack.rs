@@ -3,6 +3,7 @@ use std::{
     rc::Rc,
 };
 
+use multiversx_chain_vm_executor::BreakpointValue;
 use multiversx_sc::{
     err_msg,
     types::{Address, CodeMetadata},
@@ -12,9 +13,9 @@ use crate::{
     tx_execution::{deploy_contract, execute_builtin_function_or_default},
     tx_mock::{
         async_call_tx_input, AsyncCallTxData, BlockchainUpdate, TxCache, TxContext, TxFunctionName,
-        TxInput, TxManagedTypes, TxPanic, TxResult,
+        TxInput, TxManagedTypes, TxResult,
     },
-    world_mock::{check_reserved_key, AccountData, BlockInfo},
+    world_mock::{AccountData, BlockInfo, STORAGE_RESERVED_PREFIX},
 };
 
 use super::{
@@ -64,7 +65,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
     }
 
     fn storage_write(&self, key: &[u8], value: &[u8]) {
-        check_reserved_key(key);
+        self.check_reserved_key(key);
 
         self.0.with_contract_account_mut(|account| {
             account.storage.insert(key.to_vec(), value.to_vec());
@@ -99,10 +100,10 @@ impl VMHooksHandlerSource for TxContextWrapper {
     ) -> ! {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         // the cell is no longer needed, since we end in a panic
-        let mut tx_result = self.0.extract_result();
+        let mut tx_result = self.result_borrow_mut();
         tx_result.all_calls.push(async_call_data.clone());
         tx_result.pending_calls.async_call = Some(async_call_data);
-        std::panic::panic_any(tx_result)
+        std::panic::panic_any(BreakpointValue::AsyncCall);
     }
 
     fn perform_execute_on_dest_context(
@@ -123,10 +124,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
             self.sync_call_post_processing(tx_result, blockchain_updates)
         } else {
             // also kill current execution
-            std::panic::panic_any(TxPanic {
-                status: tx_result.result_status,
-                message: tx_result.result_message,
-            })
+            self.halt_with_error(tx_result.result_status, &tx_result.result_message)
         }
     }
 
@@ -157,17 +155,13 @@ impl VMHooksHandlerSource for TxContextWrapper {
         let (tx_result, new_address, blockchain_updates) =
             deploy_contract(tx_input, contract_code, tx_cache);
 
-        if tx_result.result_status == 0 {
-            (
+        match tx_result.result_status {
+            0 => (
                 new_address,
                 self.sync_call_post_processing(tx_result, blockchain_updates),
-            )
-        } else {
-            // also kill current execution
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT.to_string(),
-            })
+            ),
+            10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
+            _ => self.vm_error(err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
 
@@ -184,16 +178,14 @@ impl VMHooksHandlerSource for TxContextWrapper {
         let (tx_result, blockchain_updates) =
             execute_builtin_function_or_default(tx_input, tx_cache);
 
-        if tx_result.result_status == 0 {
-            self.0.result_borrow_mut().all_calls.push(async_call_data);
+        match tx_result.result_status {
+            0 => {
+                self.0.result_borrow_mut().all_calls.push(async_call_data);
 
-            let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
-        } else {
-            // also kill current execution
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT.to_string(),
-            })
+                let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
+            },
+            10 => self.vm_error(&tx_result.result_message), // TODO: not sure it's the right condition, it catches insufficient funds
+            _ => self.vm_error(err_msg::ERROR_SIGNALLED_BY_SMARTCONTRACT),
         }
     }
 }
@@ -228,6 +220,12 @@ impl TxContextWrapper {
         self.0.result_borrow_mut().merge_after_sync_call(&tx_result);
 
         tx_result.result_values
+    }
+
+    fn check_reserved_key(&self, key: &[u8]) {
+        if key.starts_with(STORAGE_RESERVED_PREFIX) {
+            self.vm_error("cannot write to storage under reserved key");
+        }
     }
 }
 

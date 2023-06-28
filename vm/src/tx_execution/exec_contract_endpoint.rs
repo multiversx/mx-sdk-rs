@@ -1,8 +1,5 @@
 use std::rc::Rc;
 
-use alloc::boxed::Box;
-use multiversx_sc::err_msg;
-
 use crate::{
     display_util::address_hex,
     tx_mock::{
@@ -10,6 +7,8 @@ use crate::{
     },
     world_mock::ContractContainer,
 };
+
+use super::catch_tx_panic;
 
 /// Runs contract code using the auto-generated function selector.
 /// The endpoint name is taken from the tx context.
@@ -60,53 +59,18 @@ fn execute_contract_instance_endpoint(
     contract_container: &ContractContainer,
     endpoint_name: &TxFunctionName,
 ) -> TxResult {
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+    let result = catch_tx_panic(contract_container.panic_message, || {
         let call_successful = contract_container.call(endpoint_name);
-        if !call_successful {
-            std::panic::panic_any(TxPanic {
-                status: 1,
-                message: "invalid function (not found)".to_string(),
-            });
+        if call_successful {
+            Ok(())
+        } else {
+            Err(TxPanic::new(1, "invalid function (not found)"))
         }
-        TxContextRef::new_from_static().into_tx_result()
-    }));
-    match result {
-        Ok(tx_output) => tx_output,
-        Err(panic_any) => interpret_panic_as_tx_result(panic_any, contract_container.panic_message),
-    }
-}
+    });
 
-/// Interprets a panic thrown during execution as a tx failure.
-/// Note: specific tx outcomes from the debugger are signalled via specific panic objects.
-pub fn interpret_panic_as_tx_result(
-    panic_any: Box<dyn std::any::Any + std::marker::Send>,
-    panic_message_flag: bool,
-) -> TxResult {
-    if panic_any.downcast_ref::<TxResult>().is_some() {
-        // async calls panic with the tx output directly
-        // it is not a failure, simply a way to kill the execution
-        return *panic_any.downcast::<TxResult>().unwrap();
+    if let Err(tx_panic) = result {
+        TxContextRef::new_from_static().replace_tx_result_with_error(tx_panic);
     }
 
-    if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
-        return TxResult::from_panic_obj(panic_obj);
-    }
-
-    if let Some(panic_string) = panic_any.downcast_ref::<String>() {
-        return interpret_panic_str_as_tx_result(panic_string.as_str(), panic_message_flag);
-    }
-
-    if let Some(panic_string) = panic_any.downcast_ref::<&str>() {
-        return interpret_panic_str_as_tx_result(panic_string, panic_message_flag);
-    }
-
-    TxResult::from_unknown_panic()
-}
-
-pub fn interpret_panic_str_as_tx_result(panic_str: &str, panic_message_flag: bool) -> TxResult {
-    if panic_message_flag {
-        TxResult::from_panic_string(&format!("panic occurred: {panic_str}"))
-    } else {
-        TxResult::from_panic_string(err_msg::PANIC_OCCURRED)
-    }
+    TxContextRef::new_from_static().into_tx_result()
 }

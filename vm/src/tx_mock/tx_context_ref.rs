@@ -2,7 +2,7 @@ use std::{ops::Deref, rc::Rc};
 
 use crate::tx_mock::{TxContext, TxResult};
 
-use super::{BlockchainUpdate, StaticVarStack, TxContextStack};
+use super::{BlockchainUpdate, StaticVarStack, TxContextStack, TxPanic};
 
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.
@@ -55,6 +55,15 @@ impl TxContextRef {
         // can be done if we can make sure that no more references exist at this point
         // let tx_context = Rc::try_unwrap(self.0).unwrap();
         self.tx_result_cell.replace(TxResult::default())
+    }
+
+    /// The current method for signalling that the current execution is failed, and with what error.
+    ///
+    /// Note: does not terminate execution or panic, that is handled separately.
+    pub fn replace_tx_result_with_error(self, tx_panic: TxPanic) {
+        let _ = self
+            .tx_result_cell
+            .replace(TxResult::from_panic_obj(&tx_panic));
     }
 
     /// Will yield a copy of all messages printed on this context.

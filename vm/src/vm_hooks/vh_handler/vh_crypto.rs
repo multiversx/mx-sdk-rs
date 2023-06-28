@@ -1,4 +1,4 @@
-use crate::{crypto_functions, tx_mock::TxPanic, vm_hooks::VMHooksHandlerSource};
+use crate::{crypto_functions, vm_hooks::VMHooksHandlerSource};
 use multiversx_sc::api::RawHandle;
 
 pub trait VMHooksCrypto: VMHooksHandlerSource {
@@ -26,10 +26,7 @@ pub trait VMHooksCrypto: VMHooksHandlerSource {
             self.m_types_borrow().mb_get(signature),
         );
         if !sig_valid {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: "invalid signature".to_string(),
-            });
+            self.vm_error("invalid signature");
         }
     }
 }

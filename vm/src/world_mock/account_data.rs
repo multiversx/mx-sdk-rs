@@ -1,5 +1,5 @@
 use super::AccountEsdt;
-use crate::{display_util::key_hex, num_bigint::BigUint, tx_mock::TxPanic};
+use crate::{display_util::key_hex, num_bigint::BigUint};
 use alloc::vec::Vec;
 use multiversx_sc::types::heap::Address;
 use std::{collections::HashMap, fmt, fmt::Write};
@@ -55,14 +55,5 @@ impl fmt::Display for AccountData {
             storage_buf,
             self.developer_rewards
         )
-    }
-}
-
-pub fn check_reserved_key(key: &[u8]) {
-    if key.starts_with(STORAGE_RESERVED_PREFIX) {
-        std::panic::panic_any(TxPanic {
-            status: 10,
-            message: "cannot write to storage under reserved key".to_string(),
-        });
     }
 }
