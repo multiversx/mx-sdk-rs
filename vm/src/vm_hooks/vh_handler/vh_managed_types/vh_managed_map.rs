@@ -1,5 +1,4 @@
-use crate::vm_hooks::VMHooksHandlerSource;
-use multiversx_sc::api::RawHandle;
+use crate::{types::RawHandle, vm_hooks::VMHooksHandlerSource};
 
 pub trait VMHooksManagedMap: VMHooksHandlerSource {
     fn mm_new(&self) -> RawHandle {

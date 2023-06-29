@@ -1,9 +1,8 @@
-use multiversx_sc::{
-    api::ESDT_NFT_ADD_URI_FUNC_NAME,
-    codec::{top_encode_to_vec_u8, TopDecode},
+use crate::{
+    tx_execution::builtin_function_names::ESDT_NFT_ADD_URI_FUNC_NAME,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+    types::{top_decode_u64, top_encode_u64},
 };
-
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -21,7 +20,7 @@ impl BuiltinFunction for ESDTNftAddUri {
         }
 
         let token_identifier = tx_input.args[0].clone();
-        let nonce = u64::top_decode(tx_input.args[1].as_slice()).unwrap();
+        let nonce = top_decode_u64(tx_input.args[1].as_slice());
         let mut new_uris = tx_input.args[2..].to_vec();
 
         tx_cache.with_account_mut(&tx_input.from, |account| {
@@ -32,7 +31,7 @@ impl BuiltinFunction for ESDTNftAddUri {
 
         let mut topics = vec![
             token_identifier.to_vec(),
-            top_encode_to_vec_u8(&nonce).unwrap(),
+            top_encode_u64(nonce),
             Vec::new(), // value = 0
         ];
         topics.append(&mut new_uris);

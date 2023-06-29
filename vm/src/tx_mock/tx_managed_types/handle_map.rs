@@ -1,4 +1,4 @@
-use multiversx_sc::api::{use_raw_handle, HandleConstraints, RawHandle};
+use crate::types::RawHandle;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -28,11 +28,6 @@ impl<V> HandleMap<V> {
         self.map.insert(new_handle, value);
         self.next_handle += 1;
         new_handle
-    }
-
-    pub fn insert_new_handle<H: HandleConstraints>(&mut self, value: V) -> H {
-        let new_handle = self.insert_new_handle_raw(value);
-        use_raw_handle(new_handle)
     }
 
     pub fn get(&self, handle: RawHandle) -> &V {

@@ -1,4 +1,4 @@
-use multiversx_sc::api::CLAIM_DEVELOPER_REWARDS_FUNC_NAME;
+use crate::tx_execution::builtin_function_names::CLAIM_DEVELOPER_REWARDS_FUNC_NAME;
 use num_bigint::BigUint;
 use num_traits::Zero;
 

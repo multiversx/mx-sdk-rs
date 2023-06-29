@@ -5,9 +5,9 @@ mod tx_managed_buffer;
 mod tx_managed_map;
 
 pub use handle_map::HandleMap;
+use num_bigint::BigInt;
 pub use tx_big_int::big_int_to_i64;
 
-use crate::num_bigint::BigInt;
 use std::collections::HashMap;
 
 pub(crate) type ManagedBufferImpl = Vec<u8>;

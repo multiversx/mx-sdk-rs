@@ -5,7 +5,8 @@ use num_traits::ToPrimitive;
 use basic_features::BasicFeatures;
 use multiversx_sc::{
     codec::Empty,
-    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier}, err_msg,
+    err_msg,
+    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use multiversx_sc_scenario::{
     api::DebugApi, assert_values_eq, managed_address, managed_biguint, managed_buffer,
@@ -1207,7 +1208,7 @@ fn managed_environment_consistency_test() {
         })
         .assert_error(
             err_msg::DEBUG_API_ERR_STATUS,
-            err_msg::DEBUG_API_ERR_BAD_HANDLE_CONTEXT,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
         );
 }
 
@@ -1237,7 +1238,7 @@ fn test_managed_values_standalone_consistency() {
         })
         .assert_error(
             err_msg::DEBUG_API_ERR_STATUS,
-            err_msg::DEBUG_API_ERR_BAD_HANDLE_CONTEXT,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
         );
 }
 
@@ -1274,7 +1275,7 @@ fn test_managed_values_argument_and_return_value_consistency() {
         )
         .assert_error(
             err_msg::DEBUG_API_ERR_STATUS,
-            err_msg::DEBUG_API_ERR_BAD_HANDLE_CONTEXT,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
         );
 }
 

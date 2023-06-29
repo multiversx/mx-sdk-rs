@@ -1,17 +1,6 @@
-#![allow(unused)]
-
 use crate::{
-    num_bigint::{BigInt, Sign},
-    tx_mock::{TxContextRef, TxPanic},
+    types::{RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
-};
-use alloc::vec::Vec;
-use multiversx_sc::{
-    api::{
-        BigIntApiImpl, ManagedBufferApiImpl, RawHandle, StorageReadApi, StorageReadApiImpl,
-        StorageWriteApi, StorageWriteApiImpl,
-    },
-    types::heap::Address,
 };
 
 use super::VMHooksManagedTypes;
@@ -28,7 +17,7 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
         key_handle: RawHandle,
         dest: RawHandle,
     ) {
-        let address = Address::from_slice(self.m_types_borrow().mb_get(address_handle));
+        let address = VMAddress::from_slice(self.m_types_borrow().mb_get(address_handle));
         let value =
             self.storage_read_any_address(&address, self.m_types_borrow().mb_get(key_handle));
         self.m_types_borrow_mut().mb_set(dest, value);

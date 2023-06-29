@@ -1,14 +1,20 @@
 use std::rc::Rc;
 
-use alloc::boxed::Box;
-use multiversx_sc::err_msg;
+use multiversx_chain_vm_executor::CompilationOptions;
 
 use crate::{
     display_util::address_hex,
-    tx_mock::{
-        StaticVarStack, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxPanic, TxResult,
-    },
-    world_mock::ContractContainer,
+    tx_mock::{TxContext, TxContextRef, TxContextStack, TxResult},
+};
+
+const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
+    gas_limit: 1,
+    unmetered_locals: 0,
+    max_memory_grow: 0,
+    max_memory_grow_delta: 0,
+    opcode_trace: false,
+    metering: false,
+    runtime_breakpoints: false,
 };
 
 /// Runs contract code using the auto-generated function selector.
@@ -28,17 +34,18 @@ fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResu
     let tx_context_ref = TxContextRef::new(tx_context_rc.clone());
 
     let func_name = &tx_context_ref.tx_input_box.func_name;
-    let contract_identifier = get_contract_identifier(&tx_context_ref);
-    let contract_map = &tx_context_rc.blockchain_ref().contract_map;
-
-    let contract_container = contract_map.get_contract(contract_identifier.as_slice());
+    let contract_code = get_contract_identifier(&tx_context_ref);
+    let executor = &tx_context_rc.blockchain_ref().executor;
+    let instance = executor
+        .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
+        .expect("error instantiating executor instance");
 
     TxContextStack::static_push(tx_context_rc.clone());
-    StaticVarStack::static_push();
-    let tx_result = execute_contract_instance_endpoint(contract_container, func_name);
 
+    instance.call(func_name.as_str()).expect("execution error");
+
+    let tx_result = TxContextRef::new_from_static().into_tx_result();
     let tx_context_rc = TxContextStack::static_pop();
-    StaticVarStack::static_pop();
     (tx_context_rc, tx_result)
 }
 
@@ -53,60 +60,4 @@ fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {
                 )
             })
         })
-}
-
-/// The actual execution and the extraction/wrapping of results.
-fn execute_contract_instance_endpoint(
-    contract_container: &ContractContainer,
-    endpoint_name: &TxFunctionName,
-) -> TxResult {
-    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-        let call_successful = contract_container.call(endpoint_name);
-        if !call_successful {
-            std::panic::panic_any(TxPanic {
-                status: 1,
-                message: "invalid function (not found)".to_string(),
-            });
-        }
-        TxContextRef::new_from_static().into_tx_result()
-    }));
-    match result {
-        Ok(tx_output) => tx_output,
-        Err(panic_any) => interpret_panic_as_tx_result(panic_any, contract_container.panic_message),
-    }
-}
-
-/// Interprets a panic thrown during execution as a tx failure.
-/// Note: specific tx outcomes from the debugger are signalled via specific panic objects.
-pub fn interpret_panic_as_tx_result(
-    panic_any: Box<dyn std::any::Any + std::marker::Send>,
-    panic_message_flag: bool,
-) -> TxResult {
-    if panic_any.downcast_ref::<TxResult>().is_some() {
-        // async calls panic with the tx output directly
-        // it is not a failure, simply a way to kill the execution
-        return *panic_any.downcast::<TxResult>().unwrap();
-    }
-
-    if let Some(panic_obj) = panic_any.downcast_ref::<TxPanic>() {
-        return TxResult::from_panic_obj(panic_obj);
-    }
-
-    if let Some(panic_string) = panic_any.downcast_ref::<String>() {
-        return interpret_panic_str_as_tx_result(panic_string.as_str(), panic_message_flag);
-    }
-
-    if let Some(panic_string) = panic_any.downcast_ref::<&str>() {
-        return interpret_panic_str_as_tx_result(panic_string, panic_message_flag);
-    }
-
-    TxResult::from_unknown_panic()
-}
-
-pub fn interpret_panic_str_as_tx_result(panic_str: &str, panic_message_flag: bool) -> TxResult {
-    if panic_message_flag {
-        TxResult::from_panic_string(&format!("panic occurred: {panic_str}"))
-    } else {
-        TxResult::from_panic_string(err_msg::PANIC_OCCURRED)
-    }
 }

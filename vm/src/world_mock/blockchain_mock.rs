@@ -1,68 +1,55 @@
 use crate::{
-    num_bigint::BigUint,
     tx_execution::{init_builtin_functions, BuiltinFunctionMap},
     tx_mock::BlockchainUpdate,
+    types::VMAddress,
 };
-use multiversx_sc::types::heap::Address;
+use multiversx_chain_vm_executor::Executor;
+use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, rc::Rc};
+use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
-use super::{AccountData, BlockInfo, ContractContainer, ContractMap};
+use super::{AccountData, BlockInfo, FailingExecutor};
 
 const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
 
-#[derive(Debug)]
 pub struct BlockchainMock {
-    pub accounts: HashMap<Address, AccountData>,
+    pub accounts: HashMap<VMAddress, AccountData>,
     pub builtin_functions: Rc<BuiltinFunctionMap>,
-    pub new_addresses: HashMap<(Address, u64), Address>,
+    pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
-    pub contract_map: ContractMap,
+    pub executor: Box<dyn Executor>,
 }
 
 impl BlockchainMock {
-    pub fn new() -> Self {
+    pub fn new(executor: Box<dyn Executor>) -> Self {
         BlockchainMock {
             accounts: HashMap::new(),
             builtin_functions: Rc::new(init_builtin_functions()),
             new_addresses: HashMap::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
-            contract_map: ContractMap::default(),
+            executor,
         }
     }
 }
 
 impl Default for BlockchainMock {
     fn default() -> Self {
-        Self::new()
+        Self::new(Box::new(FailingExecutor))
     }
 }
 
 impl BlockchainMock {
-    pub fn account_exists(&self, address: &Address) -> bool {
+    pub fn account_exists(&self, address: &VMAddress) -> bool {
         self.accounts.contains_key(address)
-    }
-
-    pub fn register_contract_container(
-        &mut self,
-        contract_bytes: Vec<u8>,
-        contract_container: ContractContainer,
-    ) {
-        self.contract_map
-            .register_contract(contract_bytes, contract_container);
-    }
-
-    pub fn contains_contract(&self, contract_bytes: &[u8]) -> bool {
-        self.contract_map.contains_contract(contract_bytes)
     }
 
     pub fn commit_updates(&mut self, updates: BlockchainUpdate) {
         updates.apply(self);
     }
 
-    pub fn increase_account_nonce(&mut self, address: &Address) {
+    pub fn increase_account_nonce(&mut self, address: &VMAddress) {
         let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
@@ -72,7 +59,7 @@ impl BlockchainMock {
         account.nonce += 1;
     }
 
-    pub fn subtract_tx_gas(&mut self, address: &Address, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_gas(&mut self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
         let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
@@ -87,7 +74,7 @@ impl BlockchainMock {
         account.egld_balance -= &gas_cost;
     }
 
-    pub fn increase_validator_reward(&mut self, address: &Address, amount: &BigUint) {
+    pub fn increase_validator_reward(&mut self, address: &VMAddress, amount: &BigUint) {
         let account = self.accounts.get_mut(address).unwrap_or_else(|| {
             panic!(
                 "Account not found: {}",
@@ -111,9 +98,19 @@ impl BlockchainMock {
     where
         F: FnOnce(Self) -> (R, Self),
     {
-        let obj = std::mem::replace(self, Self::new());
+        let obj = std::mem::take(self);
         let (result, obj) = f(obj);
         *self = obj;
         result
+    }
+}
+
+impl Debug for BlockchainMock {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("BlockchainMock")
+            .field("accounts", &self.accounts)
+            .field("new_addresses", &self.new_addresses)
+            .field("current_block_info", &self.current_block_info)
+            .finish()
     }
 }

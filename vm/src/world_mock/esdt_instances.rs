@@ -1,5 +1,6 @@
 use super::{EsdtInstance, EsdtInstanceMetadata};
-use crate::{display_util::verbose_hex_list, num_bigint::BigUint};
+use crate::display_util::verbose_hex_list;
+use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
     collections::BTreeMap,

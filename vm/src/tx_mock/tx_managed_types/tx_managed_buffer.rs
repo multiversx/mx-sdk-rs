@@ -1,11 +1,13 @@
-use multiversx_sc::{
-    api::{handle_to_be_bytes, InvalidSliceError, RawHandle},
-    types::{Address, BoxedBytes, CodeMetadata},
+use crate::{
+    tx_mock::{TxFunctionName, TxTokenTransfer},
+    types::{RawHandle, VMAddress, VMCodeMetadata},
 };
 
-use crate::tx_mock::{TxFunctionName, TxTokenTransfer};
-
 use super::TxManagedTypes;
+
+/// Returned if load/copy slice could not be performed.
+/// No further data needed.
+pub struct InvalidSliceError;
 
 impl TxManagedTypes {
     pub fn mb_get(&self, handle: RawHandle) -> &[u8] {
@@ -16,22 +18,21 @@ impl TxManagedTypes {
         self.managed_buffer_map.get(handle).len()
     }
 
-    pub fn mb_to_boxed_bytes(&self, handle: RawHandle) -> BoxedBytes {
-        let data = self.mb_get(handle);
-        data.into()
+    pub fn mb_to_bytes(&self, handle: RawHandle) -> Vec<u8> {
+        self.mb_get(handle).to_vec()
     }
 
-    pub fn mb_to_address(&self, handle: RawHandle) -> Address {
-        Address::from_slice(self.mb_get(handle))
+    pub fn mb_to_address(&self, handle: RawHandle) -> VMAddress {
+        VMAddress::from_slice(self.mb_get(handle))
     }
 
     pub fn mb_to_function_name(&self, handle: RawHandle) -> TxFunctionName {
         TxFunctionName::from(self.mb_get(handle))
     }
 
-    pub fn mb_to_code_metadata(&self, handle: RawHandle) -> CodeMetadata {
+    pub fn mb_to_code_metadata(&self, handle: RawHandle) -> VMCodeMetadata {
         let bytes: [u8; 2] = self.mb_get(handle).try_into().unwrap();
-        CodeMetadata::from(bytes)
+        VMCodeMetadata::from(bytes)
     }
 
     pub fn mb_get_slice(
@@ -64,7 +65,7 @@ impl TxManagedTypes {
     }
 
     pub fn mb_new(&mut self, value: Vec<u8>) -> RawHandle {
-        self.managed_buffer_map.insert_new_handle(value)
+        self.managed_buffer_map.insert_new_handle_raw(value)
     }
 
     pub fn mb_update<R, F: FnOnce(&mut Vec<u8>) -> R>(&mut self, handle: RawHandle, f: F) -> R {
@@ -164,6 +165,10 @@ impl TxManagedTypes {
             self.mb_append_bytes(dest_handle, &handle_to_be_bytes(amount_handle)[..]);
         }
     }
+}
+
+pub fn handle_to_be_bytes(handle: RawHandle) -> [u8; 4] {
+    handle.to_be_bytes()
 }
 
 #[cfg(test)]

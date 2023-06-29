@@ -3,10 +3,9 @@ use std::{
     fmt::Debug,
 };
 
-use multiversx_sc::types::{Address, CodeMetadata, H256};
-
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    types::{VMAddress, VMCodeMetadata, H256},
     world_mock::{AccountData, BlockInfo},
 };
 
@@ -15,6 +14,12 @@ pub trait VMHooksHandlerSource: Debug {
     fn m_types_borrow(&self) -> Ref<TxManagedTypes>;
 
     fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes>;
+
+    fn halt_with_error(&self, status: u64, message: &str) -> !;
+
+    fn vm_error(&self, message: &str) -> ! {
+        self.halt_with_error(10, message)
+    }
 
     fn input_ref(&self) -> &TxInput;
 
@@ -35,7 +40,7 @@ pub trait VMHooksHandlerSource: Debug {
         self.storage_read_any_address(&self.input_ref().to, key)
     }
 
-    fn storage_read_any_address(&self, address: &Address, key: &[u8]) -> Vec<u8>;
+    fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;
 
     fn storage_write(&self, key: &[u8], value: &[u8]);
 
@@ -46,7 +51,7 @@ pub trait VMHooksHandlerSource: Debug {
     /// For ownership reasons, needs to return a clone.
     ///
     /// Can be optimized, but is not a priority right now.
-    fn account_data(&self, address: &Address) -> AccountData;
+    fn account_data(&self, address: &VMAddress) -> AccountData;
 
     /// For ownership reasons, needs to return a clone.
     ///
@@ -55,11 +60,11 @@ pub trait VMHooksHandlerSource: Debug {
         self.account_data(&self.input_ref().to)
     }
 
-    fn account_code(&self, address: &Address) -> Vec<u8>;
+    fn account_code(&self, address: &VMAddress) -> Vec<u8>;
 
     fn perform_async_call(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
@@ -67,7 +72,7 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn perform_execute_on_dest_context(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         args: Vec<Vec<u8>>,
@@ -77,13 +82,13 @@ pub trait VMHooksHandlerSource: Debug {
         &self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: CodeMetadata,
+        code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
-    ) -> (Address, Vec<Vec<u8>>);
+    ) -> (VMAddress, Vec<Vec<u8>>);
 
     fn perform_transfer_execute(
         &self,
-        to: Address,
+        to: VMAddress,
         egld_value: num_bigint::BigUint,
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,

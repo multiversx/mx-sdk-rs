@@ -1,10 +1,9 @@
+use multiversx_sc::types::{heap::Address, ContractCall};
+
 use crate::{
     api::DebugApi,
     facade::ScenarioWorld,
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-        types::{Address, ContractCall},
-    },
+    multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     scenario::{model::*, ScenarioRunner},
 };
 

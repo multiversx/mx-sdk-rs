@@ -1,16 +1,14 @@
-use std::{collections::HashMap, rc::Rc};
-
-use multiversx_sc::types::Address;
-use num_bigint::BigUint;
-use num_traits::Zero;
-
 use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
         AsyncCallTxData, Promise, TxCache, TxContext, TxInput, TxResult, TxResultCalls,
     },
+    types::VMAddress,
     world_mock::{AccountData, AccountEsdt, BlockchainMock},
 };
+use num_bigint::BigUint;
+use num_traits::Zero;
+use std::{collections::HashMap, rc::Rc};
 
 use super::{execute_builtin_function_or_default, execute_tx_context};
 
@@ -57,7 +55,10 @@ pub fn execute_async_call_and_callback(
     } else {
         let state_rc = Rc::new(state);
         let tx_cache = TxCache::new(state_rc.clone());
-        tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value);
+        if let Err(err) = tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value) {
+            let state = Rc::try_unwrap(state_rc).unwrap();
+            return (TxResult::from_panic_obj(&err), TxResult::empty(), state);
+        }
         tx_cache.insert_account(AccountData {
             address: async_data.to.clone(),
             nonce: 0,
@@ -118,7 +119,7 @@ pub fn sc_call_with_async_and_callback(
 }
 
 pub fn execute_promise_call_and_callback(
-    address: &Address,
+    address: &VMAddress,
     promise: &Promise,
     state: BlockchainMock,
 ) -> (TxResult, TxResult, BlockchainMock) {
@@ -136,7 +137,10 @@ pub fn execute_promise_call_and_callback(
     } else {
         let state_rc = Rc::new(state);
         let tx_cache = TxCache::new(state_rc.clone());
-        tx_cache.subtract_egld_balance(address, &promise.call.call_value);
+        if let Err(err) = tx_cache.subtract_egld_balance(address, &promise.call.call_value) {
+            let state = Rc::try_unwrap(state_rc).unwrap();
+            return (TxResult::from_panic_obj(&err), TxResult::empty(), state);
+        }
         tx_cache.insert_account(AccountData {
             address: promise.call.to.clone(),
             nonce: 0,

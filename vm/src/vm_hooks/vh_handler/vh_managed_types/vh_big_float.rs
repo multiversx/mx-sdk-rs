@@ -1,15 +1,15 @@
 use crate::{
-    tx_mock::TxPanic,
+    types::RawHandle,
+    vm_err_msg,
     vm_hooks::{VMHooksError, VMHooksHandlerSource},
 };
 use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Neg, Sub},
 };
-use std::convert::TryInto;
-
-use multiversx_sc::{api::RawHandle, codec::num_bigint::BigInt, err_msg};
+use num_bigint::BigInt;
 use num_traits::ToPrimitive;
+use std::convert::TryInto;
 
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
@@ -45,10 +45,7 @@ macro_rules! unary_op_method_big_int_handle {
 pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     fn bf_from_parts(&self, integral_part: i32, fractional_part: i32, exponent: i32) -> RawHandle {
         if exponent > 0 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::EXPONENT_IS_POSITIVE.to_string(),
-            });
+            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE);
         }
 
         let exponent_multiplier = (10.0_f64).powi(exponent);
@@ -61,15 +58,12 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         }
 
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(value)
+        managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
     fn bf_from_frac(&self, numerator: i64, denominator: i64) -> RawHandle {
         if denominator == 0 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::DIVISION_BY_0.to_string(),
-            });
+            self.vm_error(vm_err_msg::DIVISION_BY_0);
         }
         let value = if let (Some(f_numerator), Some(f_denominator)) =
             (numerator.to_f64(), denominator.to_f64())
@@ -80,15 +74,12 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         };
 
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(value)
+        managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
     fn bf_from_sci(&self, significand: i64, exponent: i64) -> RawHandle {
         if exponent > 0 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::EXPONENT_IS_POSITIVE.to_string(),
-            });
+            self.vm_error(vm_err_msg::EXPONENT_IS_POSITIVE);
         }
 
         let value = if let Some(f_significand) = significand.to_f64() {
@@ -99,7 +90,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
         };
 
         let mut managed_types = self.m_types_borrow_mut();
-        managed_types.big_float_map.insert_new_handle(value)
+        managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
     binary_op_method!(bf_add, add);
@@ -118,14 +109,14 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
             Some(Ordering::Less) => -1,
             Some(Ordering::Equal) => 0,
             Some(Ordering::Greater) => 1,
-            None => self.signal_error(err_msg::CANNOT_COMPARE_VALUES),
+            None => self.vm_error(vm_err_msg::CANNOT_COMPARE_VALUES),
         }
     }
 
     fn bf_sign(&self, x: RawHandle) -> i32 {
         let bf = self.m_types_borrow().bf_get_f64(x);
         if !bf.is_normal() {
-            self.signal_error(err_msg::NUMBER_IS_NOT_NORMAL)
+            self.vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL)
         }
 
         if bf.is_sign_positive() {
@@ -145,10 +136,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     fn bf_sqrt(&self, dest: RawHandle, x: RawHandle) {
         let bf_x = self.m_types_borrow().bf_get_f64(x);
         if bf_x < 0f64 {
-            std::panic::panic_any(TxPanic {
-                status: 10,
-                message: err_msg::BAD_BOUNDS_LOWER.to_string(),
-            });
+            self.vm_error(vm_err_msg::BAD_BOUNDS_LOWER);
         }
         let result = bf_x.sqrt();
         self.m_types_borrow_mut().bf_overwrite(dest, result);

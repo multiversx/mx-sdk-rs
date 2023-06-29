@@ -1,11 +1,7 @@
 use crate::{
-    num_bigint,
+    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
-};
-use multiversx_sc::{
-    api::RawHandle,
-    types::{heap::Address, EsdtLocalRole, EsdtLocalRoleFlags},
 };
 use num_bigint::BigInt;
 use num_traits::Zero;
@@ -15,7 +11,7 @@ const ESDT_TOKEN_DATA_FUNC_RESETS_VALUES: bool = false;
 
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn is_contract_address(&self, address_bytes: &[u8]) -> bool {
-        let address = Address::from_slice(address_bytes);
+        let address = VMAddress::from_slice(address_bytes);
         address == self.input_ref().to
     }
 
@@ -40,7 +36,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn is_smart_contract(&self, address_bytes: &[u8]) -> bool {
-        Address::from_slice(address_bytes).is_smart_contract_address()
+        VMAddress::from_slice(address_bytes).is_smart_contract_address()
     }
 
     fn load_balance(&self, address_bytes: &[u8], dest: RawHandle) {
@@ -154,7 +150,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
     ) {
-        let address = Address::from_slice(self.m_types_borrow().mb_get(address_handle));
+        let address = VMAddress::from_slice(self.m_types_borrow().mb_get(address_handle));
         let token_id_bytes = self.m_types_borrow().mb_get(token_id_handle).to_vec();
         let account = self.account_data(&address);
 
@@ -206,7 +202,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         token_id_handle: RawHandle,
         _nonce: u64,
     ) -> bool {
-        let address = Address::from_slice(self.m_types_borrow().mb_get(address_handle));
+        let address = VMAddress::from_slice(self.m_types_borrow().mb_get(address_handle));
         let token_id_bytes = self.m_types_borrow().mb_get(token_id_handle).to_vec();
         let account = self.account_data(&address);
         if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {

@@ -1,17 +1,18 @@
-use multiversx_sc::types::heap::Address;
-
-use crate::world_mock::{AccountData, BlockchainMock};
+use crate::{
+    types::VMAddress,
+    world_mock::{AccountData, BlockchainMock},
+};
 
 use super::TxCache;
 
 pub trait TxCacheSource {
-    fn load_account(&self, address: &Address) -> Option<AccountData>;
+    fn load_account(&self, address: &VMAddress) -> Option<AccountData>;
 
     fn blockchain_ref(&self) -> &BlockchainMock;
 }
 
 impl TxCacheSource for TxCache {
-    fn load_account(&self, address: &Address) -> Option<AccountData> {
+    fn load_account(&self, address: &VMAddress) -> Option<AccountData> {
         Some(self.with_account(address, AccountData::clone))
     }
 
@@ -21,7 +22,7 @@ impl TxCacheSource for TxCache {
 }
 
 impl TxCacheSource for BlockchainMock {
-    fn load_account(&self, address: &Address) -> Option<AccountData> {
+    fn load_account(&self, address: &VMAddress) -> Option<AccountData> {
         self.accounts.get(address).map(AccountData::clone)
     }
 
