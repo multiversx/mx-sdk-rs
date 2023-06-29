@@ -10,16 +10,13 @@ use super::execute_tx_context;
 pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     let mut tx_context = TxContext::new(tx_input, tx_cache);
 
-    if let Err(err) = tx_context.tx_cache.subtract_egld_balance(
+    if let Err(err) = tx_context.tx_cache.transfer_egld_balance(
         &tx_context.tx_input_box.from,
+        &tx_context.tx_input_box.to,
         &tx_context.tx_input_box.egld_value,
     ) {
         return (TxResult::from_panic_obj(&err), BlockchainUpdate::empty());
     }
-    tx_context.tx_cache.increase_egld_balance(
-        &tx_context.tx_input_box.to,
-        &tx_context.tx_input_box.egld_value,
-    );
 
     // skip for transactions coming directly from scenario json, which should all be coming from user wallets
     // TODO: reorg context logic
