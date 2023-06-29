@@ -5,9 +5,10 @@ use multiversx_sc::err_msg;
 
 use crate::{
     display_util::address_hex,
-    tx_mock::{TxContext, TxContextStack, TxFunctionName, TxPanic, TxResult},
+    tx_mock::{
+        StaticVarStack, TxContext, TxContextRef, TxContextStack, TxFunctionName, TxPanic, TxResult,
+    },
     world_mock::ContractContainer,
-    DebugApi,
 };
 
 /// Runs contract code using the auto-generated function selector.
@@ -24,21 +25,20 @@ pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
 /// The argument is returned and can be unwrapped,
 /// since the lifetimes of all other references created from it cannot outlive this function.
 fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResult) {
-    let tx_context_ref = DebugApi::new(tx_context_rc.clone());
+    let tx_context_ref = TxContextRef::new(tx_context_rc.clone());
 
     let func_name = &tx_context_ref.tx_input_box.func_name;
     let contract_identifier = get_contract_identifier(&tx_context_ref);
     let contract_map = &tx_context_rc.blockchain_ref().contract_map;
 
-    // Not redundant at all, func_name is borrowed from it...
-    #[allow(clippy::redundant_clone)]
-    let contract_container =
-        contract_map.get_contract(contract_identifier.as_slice(), tx_context_ref.clone());
+    let contract_container = contract_map.get_contract(contract_identifier.as_slice());
 
     TxContextStack::static_push(tx_context_rc.clone());
+    StaticVarStack::static_push();
     let tx_result = execute_contract_instance_endpoint(contract_container, func_name);
 
     let tx_context_rc = TxContextStack::static_pop();
+    StaticVarStack::static_pop();
     (tx_context_rc, tx_result)
 }
 
@@ -68,7 +68,7 @@ fn execute_contract_instance_endpoint(
                 message: "invalid function (not found)".to_string(),
             });
         }
-        DebugApi::new_from_static().into_tx_result()
+        TxContextRef::new_from_static().into_tx_result()
     }));
     match result {
         Ok(tx_output) => tx_output,

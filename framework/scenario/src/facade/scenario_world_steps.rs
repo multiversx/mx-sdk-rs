@@ -1,4 +1,5 @@
 use crate::{
+    api::DebugApi,
     facade::ScenarioWorld,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
@@ -6,7 +7,6 @@ use crate::{
     },
     scenario::{model::*, ScenarioRunner},
 };
-use multiversx_chain_vm::DebugApi;
 
 impl ScenarioWorld {
     /// Imports and processes steps from an external scenario file.

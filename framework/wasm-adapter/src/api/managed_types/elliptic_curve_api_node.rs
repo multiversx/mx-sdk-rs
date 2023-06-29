@@ -142,7 +142,7 @@ extern "C" {
 }
 
 impl EllipticCurveApiImpl for crate::api::VmApiImpl {
-    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Self::ManagedBufferHandle {
+    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Self::EllipticCurveHandle {
         unsafe { createEC(name.as_ptr() as i32, name.len() as i32) }
     }
 

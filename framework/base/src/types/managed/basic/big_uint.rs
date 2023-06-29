@@ -159,10 +159,11 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
     #[inline]
     pub fn from_bytes_be(bytes: &[u8]) -> Self {
-        let api = M::managed_type_impl();
-        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_set_unsigned_bytes(result_handle.clone(), bytes);
-        BigUint::from_handle(result_handle)
+        let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
+        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
+        M::managed_type_impl().mb_to_big_int_unsigned(mb_handle, handle.clone());
+        BigUint::from_handle(handle)
     }
 
     #[inline]
@@ -186,13 +187,6 @@ impl<M: ManagedTypeApi> BigUint<M> {
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_from_big_int_unsigned(self.handle.clone(), mb_handle.clone());
         ManagedBuffer::from_handle(mb_handle)
-    }
-
-    pub fn copy_to_array_big_endian_pad_right(&self, target: &mut [u8; 32]) {
-        let api = M::managed_type_impl();
-        let mbuf_temp_1: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        api.mb_from_big_int_unsigned(self.handle.clone(), mbuf_temp_1.clone());
-        api.mb_copy_to_slice_pad_right(mbuf_temp_1, &mut target[..]);
     }
 }
 

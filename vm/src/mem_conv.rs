@@ -7,7 +7,7 @@ where
     f(bytes.as_ptr() as MemPtr, bytes.len() as MemLength)
 }
 
-pub fn with_mem_ptr_mut<F, R>(bytes: &[u8], f: F) -> R
+pub fn with_mem_ptr_mut<F, R>(bytes: &mut [u8], f: F) -> R
 where
     F: FnOnce(MemPtr, MemLength) -> R,
 {

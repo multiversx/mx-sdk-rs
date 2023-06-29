@@ -1,7 +1,7 @@
 use crate::{
+    api::DebugApi,
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
     scenario_model::TxResponse,
-    DebugApi,
 };
 
 use crate::multiversx_sc::{

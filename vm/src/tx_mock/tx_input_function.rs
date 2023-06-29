@@ -64,6 +64,10 @@ impl TxFunctionName {
         self.0.into_owned()
     }
 
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.into_string().into_bytes()
+    }
+
     pub fn as_str(&self) -> &str {
         &self.0
     }

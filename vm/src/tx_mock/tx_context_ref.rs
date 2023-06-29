@@ -2,14 +2,12 @@ use std::{ops::Deref, rc::Rc};
 
 use crate::tx_mock::{TxContext, TxResult};
 
-use super::{BlockchainUpdate, TxContextStack};
+use super::{BlockchainUpdate, StaticVarStack, TxContextStack};
 
 /// The VM API implementation based on a blockchain mock written in Rust.
 /// Implemented as a smart pointer to a TxContext structure, which tracks a blockchain transaction.
 #[derive(Debug)]
 pub struct TxContextRef(Rc<TxContext>);
-
-pub type DebugApi = TxContextRef;
 
 impl Deref for TxContextRef {
     type Target = TxContext;
@@ -39,6 +37,7 @@ impl TxContextRef {
         let tx_context_rc = Rc::new(tx_context);
         // TODO: WARNING: this does not clean up after itself, must fix!!!
         TxContextStack::static_push(tx_context_rc.clone());
+        StaticVarStack::static_push();
         Self(tx_context_rc)
     }
 

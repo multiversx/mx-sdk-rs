@@ -1,11 +1,11 @@
 use crate::{
+    api::DebugApi,
     multiversx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::TxCallRaw,
     },
-    DebugApi,
 };
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};

@@ -1,7 +1,7 @@
 use crate::{api::EllipticCurveApiImpl, types::heap::BoxedBytes};
 
 impl EllipticCurveApiImpl for super::UncallableApi {
-    fn ec_create_from_name_bytes(&self, _name: &[u8]) -> Self::ManagedBufferHandle {
+    fn ec_create_from_name_bytes(&self, _name: &[u8]) -> Self::EllipticCurveHandle {
         unreachable!()
     }
 

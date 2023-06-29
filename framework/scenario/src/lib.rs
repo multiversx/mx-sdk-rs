@@ -14,7 +14,8 @@ pub mod whitebox;
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
 pub use whitebox as testing_framework;
 
-pub use multiversx_chain_vm::{self, bech32, num_bigint, DebugApi};
+pub use api::DebugApi;
+pub use multiversx_chain_vm::{self, bech32, num_bigint};
 
 pub use multiversx_sc;
 

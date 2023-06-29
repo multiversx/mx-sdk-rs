@@ -36,8 +36,6 @@ pub trait ManagedBufferApiImpl: HandleTypeInfo {
         dest_handle: Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError>;
 
-    fn mb_copy_to_slice_pad_right(&self, handle: Self::ManagedBufferHandle, destination: &mut [u8]);
-
     fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]);
 
     fn mb_set_slice(
