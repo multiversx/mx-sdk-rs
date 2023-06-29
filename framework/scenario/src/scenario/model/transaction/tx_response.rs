@@ -15,6 +15,8 @@ use super::Log;
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
+const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
+
 #[derive(Debug)]
 pub struct TxError {
     pub message: String,
@@ -71,21 +73,28 @@ impl TxResponse {
     pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxError> {
         self.handle_signal_error_event()?;
 
-        let second_scr = self
+        let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
             .api_scrs
             .iter()
-            .find(|scr| scr.data.starts_with("@00@"));
-        if second_scr.is_none() {
+            .find(|scr| {
+                scr.sender.to_string() == SYSTEM_SC_BECH32
+                    && scr.data.starts_with("@00@")
+            });
+
+        if token_identifier_issue_scr.is_none() {
             return Err(TxError {
                 message: "no token identifier SCR found".to_string(),
             });
         }
 
-        let second_scr = second_scr.unwrap();
-        let encoded_tid = second_scr.data.split('@').nth(2);
+        let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
+        let encoded_tid = token_identifier_issue_scr.data.split('@').nth(2);
         if encoded_tid.is_none() {
             return Err(TxError {
-                message: format!("bad issue token SCR data: {}", second_scr.data),
+                message: format!(
+                    "bad issue token SCR data: {}",
+                    token_identifier_issue_scr.data
+                ),
             });
         }
 

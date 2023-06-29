@@ -8,7 +8,7 @@ const ISSUE_COST: u64 = 50000000000000000; // 0.05 EGLD
 
 const COLLECTION_NAME: &str = "TestCollection1";
 const COLLECTION_TICKER: &str = "TESTCOLL1";
-pub const COLLECTION_TOKEN_IDENTIFIER: &str = "TESTCOLL1-4096bf";
+
 const NUM_ITEMS: usize = 3;
 const ROYALTIES: usize = 3000;
 const METADATA: &str = "tags:test,rust-interactor";

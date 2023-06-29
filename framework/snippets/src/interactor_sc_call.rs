@@ -3,7 +3,7 @@ use log::info;
 use multiversx_sc_scenario::{
     multiversx_sc::types::ContractCallWithEgld,
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, TxCall, TxResponse},
+    scenario_model::{ScCallStep, SetStateStep, TxCall, TxResponse},
     DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;
@@ -18,6 +18,17 @@ impl Interactor {
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
         sc_call_step.response = Some(TxResponse::new(tx));
+
+        if let Ok(token_identifier) = sc_call_step
+            .response()
+            .issue_non_fungible_new_token_identifier()
+        {
+            let set_state_step = SetStateStep::new().new_token_identifier(token_identifier.clone());
+
+            println!("token identifier: {}", token_identifier);
+            self.pre_runners.run_set_state_step(&set_state_step);
+            self.post_runners.run_set_state_step(&set_state_step);
+        }
 
         self.post_runners.run_sc_call_step(sc_call_step);
     }
