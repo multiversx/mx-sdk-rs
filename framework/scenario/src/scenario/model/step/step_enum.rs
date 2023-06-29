@@ -42,6 +42,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 accounts,
                 new_addresses,
+                new_token_identifiers,
                 block_hashes,
                 previous_block_info,
                 current_block_info,
@@ -60,6 +61,7 @@ impl InterpretableFrom<StepRaw> for Step {
                     .into_iter()
                     .map(|t| NewAddress::interpret_from(t, context))
                     .collect(),
+                new_token_identifiers,
                 block_hashes: block_hashes
                     .into_iter()
                     .map(|t| BytesValue::interpret_from(t, context))
@@ -165,6 +167,7 @@ impl IntoRaw<StepRaw> for Step {
                     .into_iter()
                     .map(|na| na.into_raw())
                     .collect(),
+                new_token_identifiers: s.new_token_identifiers,
                 block_hashes: s.block_hashes.into_iter().map(|bh| bh.original).collect(),
                 previous_block_info: s.previous_block_info.map(|bi| bi.into_raw()),
                 current_block_info: s.current_block_info.map(|bi| bi.into_raw()),
