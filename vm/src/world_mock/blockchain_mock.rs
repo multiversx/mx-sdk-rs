@@ -6,7 +6,11 @@ use crate::{
 use multiversx_chain_vm_executor::Executor;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, fmt::Debug, rc::Rc};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Debug,
+    rc::Rc,
+};
 
 use super::{AccountData, BlockInfo, FailingExecutor};
 
@@ -16,6 +20,7 @@ pub struct BlockchainMock {
     pub accounts: HashMap<VMAddress, AccountData>,
     pub builtin_functions: Rc<BuiltinFunctionMap>,
     pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
+    pub new_token_identifiers: HashSet<String>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub executor: Box<dyn Executor>,
@@ -27,20 +32,25 @@ impl BlockchainMock {
             accounts: HashMap::new(),
             builtin_functions: Rc::new(init_builtin_functions()),
             new_addresses: HashMap::new(),
+            new_token_identifiers: HashSet::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
             executor,
         }
     }
-}
 
-impl Default for BlockchainMock {
-    fn default() -> Self {
-        Self::new(Box::new(FailingExecutor))
+    pub fn put_new_token_identifier(&mut self, token_identifier: String) {
+        self.new_token_identifiers.insert(token_identifier);
     }
-}
 
-impl BlockchainMock {
+    pub fn clear_issued_token_identifiers(&mut self, issued_token_identifiers: HashSet<String>) {
+        self.new_token_identifiers = self
+            .new_token_identifiers
+            .difference(&issued_token_identifiers)
+            .cloned()
+            .collect();
+    }
+
     pub fn account_exists(&self, address: &VMAddress) -> bool {
         self.accounts.contains_key(address)
     }
@@ -102,6 +112,12 @@ impl BlockchainMock {
         let (result, obj) = f(obj);
         *self = obj;
         result
+    }
+}
+
+impl Default for BlockchainMock {
+    fn default() -> Self {
+        Self::new(Box::new(FailingExecutor))
     }
 }
 

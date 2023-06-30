@@ -1,6 +1,6 @@
 use std::{
     cell::{Ref, RefCell},
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fmt,
     rc::Rc,
 };
@@ -100,6 +100,7 @@ impl TxCache {
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         BlockchainUpdate {
             accounts: self.accounts.into_inner(),
+            issued_token_identifiers: HashSet::new(),
         }
     }
 
@@ -112,16 +113,19 @@ impl TxCache {
 
 pub struct BlockchainUpdate {
     accounts: HashMap<VMAddress, AccountData>,
+    issued_token_identifiers: HashSet<String>, // todo: new issued token hashset
 }
 
 impl BlockchainUpdate {
     pub fn empty() -> Self {
         BlockchainUpdate {
             accounts: HashMap::new(),
+            issued_token_identifiers: HashSet::new(),
         }
     }
 
     pub fn apply(self, blockchain: &mut BlockchainMock) {
         blockchain.update_accounts(self.accounts);
+        blockchain.clear_issued_token_identifiers(self.issued_token_identifiers);
     }
 }
