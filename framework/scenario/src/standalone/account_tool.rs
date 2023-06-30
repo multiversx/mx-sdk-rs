@@ -63,6 +63,7 @@ pub async fn retrieve_account_as_scenario_set_state(
             accounts,
             block_hashes: Vec::new(),
             new_addresses: Vec::new(),
+            new_token_identifiers: Vec::new(),
             comment: None,
             current_block_info: None,
             previous_block_info: None,

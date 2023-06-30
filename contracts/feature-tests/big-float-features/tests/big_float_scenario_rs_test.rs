@@ -8,10 +8,6 @@ fn world() -> ScenarioWorld {
         "file:output/big-float-features.wasm",
         big_float_features::ContractBuilder,
     );
-    blockchain.register_contract(
-        "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
-        esdt_system_sc_mock::ContractBuilder,
-    );
 
     blockchain
 }

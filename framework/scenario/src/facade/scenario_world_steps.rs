@@ -1,12 +1,11 @@
+use multiversx_sc::types::{heap::Address, ContractCall};
+
 use crate::{
+    api::DebugApi,
     facade::ScenarioWorld,
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-        types::{Address, ContractCall},
-    },
+    multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     scenario::{model::*, ScenarioRunner},
 };
-use multiversx_chain_vm::DebugApi;
 
 impl ScenarioWorld {
     /// Imports and processes steps from an external scenario file.

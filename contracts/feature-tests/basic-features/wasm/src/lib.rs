@@ -136,9 +136,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         codec_err_event_data => codec_err_event_data
         codec_err_contract_init => codec_err_contract_init
         codec_err_contract_call => codec_err_contract_call
-        compute_sha256_legacy_managed => compute_sha256_legacy_managed
         compute_sha256 => compute_sha256
-        compute_keccak256_legacy_managed => compute_keccak256_legacy_managed
         compute_keccak256 => compute_keccak256
         compute_ripemd160 => compute_ripemd160
         verify_bls_signature => verify_bls_signature
@@ -222,6 +220,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         storage_read_raw => storage_read_raw
         storage_write_raw => storage_write_raw
         storage_read_from_address => storage_read_from_address
+        load_bytes => load_bytes
         load_big_uint => load_big_uint
         load_big_int => load_big_int
         load_u64 => load_u64
@@ -238,6 +237,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         load_map2 => load_map2
         load_map3 => load_map3
         load_from_address_raw => load_from_address_raw
+        store_bytes => store_bytes
         store_big_uint => store_big_uint
         store_big_int => store_big_int
         store_usize => store_usize

@@ -1,4 +1,4 @@
-use multiversx_sc::api::ManagedMapApi;
+use multiversx_sc::api::ManagedMapApiImpl;
 
 #[allow(dead_code)]
 extern "C" {
@@ -9,7 +9,7 @@ extern "C" {
     fn managedMapContains(map_handle: i32, key_handle: i32) -> i32;
 }
 
-impl ManagedMapApi for crate::api::VmApiImpl {
+impl ManagedMapApiImpl for crate::api::VmApiImpl {
     fn mm_new(&self) -> Self::ManagedBufferHandle {
         unsafe { managedMapNew() }
     }

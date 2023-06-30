@@ -1,7 +1,9 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::api::ESDT_LOCAL_BURN_FUNC_NAME;
+use num_bigint::BigUint;
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult};
+use crate::{
+    tx_execution::builtin_function_names::ESDT_LOCAL_BURN_FUNC_NAME,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -21,7 +23,11 @@ impl BuiltinFunction for ESDTLocalBurn {
         let token_identifier = tx_input.args[0].clone();
         let value = BigUint::from_bytes_be(tx_input.args[1].as_slice());
 
-        tx_cache.subtract_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
+        let subtract_result =
+            tx_cache.subtract_esdt_balance(&tx_input.to, &token_identifier, 0, &value);
+        if let Err(err) = subtract_result {
+            return (TxResult::from_panic_obj(&err), BlockchainUpdate::empty());
+        }
 
         let esdt_nft_create_log = TxLog {
             address: tx_input.from,

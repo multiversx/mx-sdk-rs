@@ -1,5 +1,5 @@
 use crate::{
-    api::{ManagedMapApi, ManagedTypeApi, StaticVarApiImpl},
+    api::{use_raw_handle, ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::ManagedType,
 };
 
@@ -44,7 +44,8 @@ impl<M: ManagedTypeApi> Default for ManagedMap<M> {
 
 impl<M: ManagedTypeApi> ManagedMap<M> {
     pub fn get(&self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mm_get(self.handle.clone(), key.handle.clone(), new_handle.clone());
         ManagedBuffer::from_handle(new_handle)
     }
@@ -58,7 +59,8 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
     }
 
     pub fn remove(&mut self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mm_remove(
             self.handle.clone(),
             key.handle.clone(),

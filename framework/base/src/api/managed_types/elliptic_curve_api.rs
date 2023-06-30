@@ -3,7 +3,7 @@ use crate::types::heap::BoxedBytes;
 use super::HandleTypeInfo;
 
 /// Wrapper around the EllipticCurve functionality provided by Arwen.
-pub trait EllipticCurveApi: HandleTypeInfo {
+pub trait EllipticCurveApiImpl: HandleTypeInfo {
     fn ec_create_from_name_bytes(&self, name: &[u8]) -> Self::EllipticCurveHandle;
 
     fn ec_create_from_name_mb(

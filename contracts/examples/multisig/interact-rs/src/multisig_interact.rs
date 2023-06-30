@@ -107,8 +107,7 @@ impl MultisigInteract {
             interactor,
             wallet_address,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
-            collection_token_identifier: multisig_interact_nfts::COLLECTION_TOKEN_IDENTIFIER
-                .to_string(),
+            collection_token_identifier: String::new(),
             state: State::load_state(),
         }
     }

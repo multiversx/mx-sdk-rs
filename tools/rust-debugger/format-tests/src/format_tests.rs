@@ -7,10 +7,9 @@ use multiversx_sc::{
         ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use multiversx_chain_vm::{
-    api::DebugHandle,
+use multiversx_sc_scenario::{
+    api::{DebugHandle, DebugApi},
     num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
-    DebugApi,
 };
 
 macro_rules! push {

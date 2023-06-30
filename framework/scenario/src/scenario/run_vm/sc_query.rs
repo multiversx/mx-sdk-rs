@@ -1,4 +1,5 @@
 use crate::{
+    api::DebugApi,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
@@ -10,7 +11,6 @@ use multiversx_chain_vm::{
     tx_execution::execute_sc_query,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
-    DebugApi,
 };
 
 use super::{check_tx_output, ScenarioVMRunner};
@@ -48,8 +48,8 @@ pub(crate) fn execute(
     sc_query_step: &ScQueryStep,
 ) -> (TxResult, BlockchainMock) {
     let tx_input = TxInput {
-        from: sc_query_step.tx.to.to_address(),
-        to: sc_query_step.tx.to.to_address(),
+        from: sc_query_step.tx.to.to_vm_address(),
+        to: sc_query_step.tx.to.to_vm_address(),
         egld_value: BigUint::from(0u32),
         esdt_values: Vec::new(),
         func_name: sc_query_step.tx.function.clone().into(),

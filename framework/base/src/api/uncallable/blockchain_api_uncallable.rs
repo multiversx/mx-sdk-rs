@@ -1,11 +1,8 @@
 use alloc::boxed::Box;
 
 use crate::{
-    api::{BlockchainApi, BlockchainApiImpl, ManagedTypeApi},
-    types::{
-        heap::{Address, H256},
-        EsdtTokenData, ManagedAddress, TokenIdentifier,
-    },
+    api::{BlockchainApi, BlockchainApiImpl, RawHandle},
+    types::heap::{Address, H256},
 };
 
 use super::UncallableApi;
@@ -42,7 +39,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_state_root_hash_legacy(&self) -> H256 {
+    fn load_state_root_hash_managed(&self, _dest: Self::ManagedBufferHandle) {
         unreachable!()
     }
 
@@ -70,7 +67,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
+    fn load_block_random_seed_managed(&self, _dest: Self::ManagedBufferHandle) {
         unreachable!()
     }
 
@@ -112,21 +109,20 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_esdt_token_data<M: ManagedTypeApi>(
+    fn managed_get_esdt_token_data(
         &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
+        _address_handle: RawHandle,
+        _token_id_handle: RawHandle,
         _nonce: u64,
-    ) -> EsdtTokenData<M> {
-        unreachable!()
-    }
-
-    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
-        &self,
-        _address: &ManagedAddress<M>,
-        _token: &TokenIdentifier<M>,
-        _nonce: u64,
-    ) -> EsdtTokenData<M> {
+        _value_handle: RawHandle,
+        _properties_handle: RawHandle,
+        _hash_handle: RawHandle,
+        _name_handle: RawHandle,
+        _attributes_handle: RawHandle,
+        _creator_handle: RawHandle,
+        _royalties_handle: RawHandle,
+        _uris_handle: RawHandle,
+    ) {
         unreachable!()
     }
 

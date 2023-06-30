@@ -2,7 +2,7 @@ use crate::multiversx_sc::{
     codec::{top_encode_to_vec_u8_or_panic, TopEncode},
     types::heap::Address,
 };
-use multiversx_chain_vm::{num_bigint, tx_mock::TxTokenTransfer};
+use multiversx_chain_vm::tx_mock::TxTokenTransfer;
 use num_traits::Zero;
 
 pub struct ScCallMandos {

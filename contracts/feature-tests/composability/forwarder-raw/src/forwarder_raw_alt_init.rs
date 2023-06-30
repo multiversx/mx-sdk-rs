@@ -27,7 +27,7 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
     /// Will not work, only written for VM testing.
     ///
     /// Async calls are explicitly forbidden in upgrade constructors.
-    /// 
+    ///
     /// TODO: write test once scenario tests support upgrades directly.
     #[endpoint(upgrade)]
     #[label("init-async-call")]

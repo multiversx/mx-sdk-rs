@@ -48,8 +48,8 @@ pub(crate) fn execute(
 ) -> (TxResult, BlockchainMock) {
     let tx = &sc_call_step.tx;
     let tx_input = TxInput {
-        from: tx.from.to_address(),
-        to: tx.to.to_address(),
+        from: tx.from.to_vm_address(),
+        to: tx.to.to_vm_address(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: tx_esdt_transfers_from_scenario(tx.esdt_value.as_slice()),
         func_name: tx.function.clone().into(),

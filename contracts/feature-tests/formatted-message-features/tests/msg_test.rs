@@ -1,16 +1,15 @@
 use formatted_message_features::*;
-use multiversx_sc_scenario::DebugApi;
+use multiversx_sc_scenario::api::StaticApi;
 
 fn check_printed_and_clear(expected: &str) {
-    let printed = DebugApi::new_from_static().printed_messages();
+    let printed = StaticApi::printed_messages();
     assert_eq!(printed, vec![expected.to_string()]);
-    DebugApi::new_from_static().printed_messages_clear();
+    StaticApi::printed_messages_clear();
 }
 
 #[test]
 fn test_print_ascii() {
-    let _ = DebugApi::dummy();
-    let fmf = formatted_message_features::contract_obj::<DebugApi>();
+    let fmf = formatted_message_features::contract_obj::<StaticApi>();
 
     fmf.print_message(5);
     check_printed_and_clear("Printing x: 5");
@@ -27,8 +26,7 @@ fn test_print_ascii() {
 
 #[test]
 fn test_print_binary() {
-    let _ = DebugApi::dummy();
-    let fmf = formatted_message_features::contract_obj::<DebugApi>();
+    let fmf = formatted_message_features::contract_obj::<StaticApi>();
 
     fmf.print_message_binary(12);
     check_printed_and_clear("Printing x: 1100");
@@ -45,8 +43,7 @@ fn test_print_binary() {
 
 #[test]
 fn test_print_hex() {
-    let _ = DebugApi::dummy();
-    let fmf = formatted_message_features::contract_obj::<DebugApi>();
+    let fmf = formatted_message_features::contract_obj::<StaticApi>();
 
     fmf.print_message_hex(0);
     check_printed_and_clear("Printing x: 0");
@@ -66,8 +63,7 @@ fn test_print_hex() {
 
 #[test]
 fn test_print_codecs() {
-    let _ = DebugApi::dummy();
-    let fmf = formatted_message_features::contract_obj::<DebugApi>();
+    let fmf = formatted_message_features::contract_obj::<StaticApi>();
 
     fmf.print_message_codec(0);
     check_printed_and_clear("Printing x: ");

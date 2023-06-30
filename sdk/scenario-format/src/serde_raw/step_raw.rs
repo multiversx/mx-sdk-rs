@@ -35,6 +35,10 @@ pub enum StepRaw {
 
         #[serde(default)]
         #[serde(skip_serializing_if = "Vec::is_empty")]
+        new_token_identifiers: Vec<String>,
+
+        #[serde(default)]
+        #[serde(skip_serializing_if = "Vec::is_empty")]
         block_hashes: Vec<ValueSubTree>,
 
         #[serde(default)]

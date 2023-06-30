@@ -1,21 +1,23 @@
+use num_bigint::BigUint;
+
 use super::AccountEsdt;
-use crate::{display_util::key_hex, num_bigint::BigUint};
-use alloc::vec::Vec;
-use multiversx_sc::types::heap::Address;
+use crate::{display_util::key_hex, types::VMAddress};
 use std::{collections::HashMap, fmt, fmt::Write};
+
+pub const STORAGE_RESERVED_PREFIX: &[u8] = b"ELROND";
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 
 #[derive(Clone, Debug)]
 pub struct AccountData {
-    pub address: Address,
+    pub address: VMAddress,
     pub nonce: u64,
     pub egld_balance: BigUint,
     pub esdt: AccountEsdt,
     pub storage: AccountStorage,
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
-    pub contract_owner: Option<Address>,
+    pub contract_owner: Option<VMAddress>,
     pub developer_rewards: BigUint,
 }
 

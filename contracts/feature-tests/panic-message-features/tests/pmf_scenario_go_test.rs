@@ -5,6 +5,11 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
+fn panic_after_log_go() {
+    world().run("scenarios/panic-after-log.scen.json");
+}
+
+#[test]
 fn panic_message_go() {
     world().run("scenarios/panic-message.scen.json");
 }

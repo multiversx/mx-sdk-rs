@@ -1,7 +1,7 @@
 use super::HandleTypeInfo;
 
 /// A raw bytes buffer managed by Arwen.
-pub trait ManagedMapApi: HandleTypeInfo {
+pub trait ManagedMapApiImpl: HandleTypeInfo {
     /// Requests a new handle from the VM.
     fn mm_new(&self) -> Self::ManagedMapHandle;
 

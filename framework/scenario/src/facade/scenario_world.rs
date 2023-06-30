@@ -1,5 +1,6 @@
 use crate::{
-    multiversx_chain_vm::world_mock::ContractContainer,
+    api::DebugApi,
+    debug_executor::ContractContainer,
     multiversx_sc::{
         api,
         contract_base::{CallableContractBuilder, ContractAbiProvider},
@@ -8,7 +9,6 @@ use crate::{
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     vm_go_tool::run_vm_go_tool,
 };
-use multiversx_chain_vm::DebugApi;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;
@@ -114,8 +114,9 @@ impl ScenarioWorld {
         let contract_bytes = interpret_string(expression, &self.interpreter_context());
         self.get_mut_contract_debugger_backend()
             .vm_runner
-            .blockchain_mock
-            .register_contract_container(contract_bytes, contract_container);
+            .contract_map_ref
+            .borrow_mut()
+            .register_contract(contract_bytes, contract_container);
     }
 
     /// Links a contract path in a test to a contract implementation.

@@ -5,11 +5,12 @@ use num_traits::ToPrimitive;
 use basic_features::BasicFeatures;
 use multiversx_sc::{
     codec::Empty,
+    err_msg,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use multiversx_sc_scenario::{
-    assert_values_eq, managed_address, managed_biguint, managed_buffer, managed_token_id,
-    rust_biguint, testing_framework::*, DebugApi,
+    api::DebugApi, assert_values_eq, managed_address, managed_biguint, managed_buffer,
+    managed_token_id, rust_biguint, testing_framework::*,
 };
 use rust_testing_framework_tester::{dummy_module::DummyModule, *};
 
@@ -1187,6 +1188,7 @@ fn managed_environment_test() {
 }
 
 #[test]
+// #[should_panic] // VMHooksApi misuse: operation called with handles from 2 different contexts
 fn managed_environment_consistency_test() {
     let mut wrapper = BlockchainStateWrapper::new();
     let adder_wrapper = wrapper.create_sc_account(
@@ -1204,7 +1206,10 @@ fn managed_environment_consistency_test() {
             let sum = first_var + second_var;
             assert_eq!(sum, third_var);
         })
-        .assert_ok();
+        .assert_error(
+            err_msg::DEBUG_API_ERR_STATUS,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
+        );
 }
 
 #[test]
@@ -1231,7 +1236,10 @@ fn test_managed_values_standalone_consistency() {
                 TokenIdentifier::<DebugApi>::from_esdt_bytes(b"FOO-a1a1a1")
             );
         })
-        .assert_ok();
+        .assert_error(
+            err_msg::DEBUG_API_ERR_STATUS,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
+        );
 }
 
 #[test]
@@ -1265,9 +1273,10 @@ fn test_managed_values_argument_and_return_value_consistency() {
                 assert_eq!(result.to_u64().unwrap(), 49);
             },
         )
-        .assert_ok();
-    // 'result' was created in the context of 'execute_tx'
-    assert_eq!(result.to_u64().unwrap(), 49);
+        .assert_error(
+            err_msg::DEBUG_API_ERR_STATUS,
+            err_msg::DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH,
+        );
 }
 
 #[test]

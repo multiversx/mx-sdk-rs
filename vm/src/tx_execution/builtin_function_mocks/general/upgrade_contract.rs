@@ -1,4 +1,4 @@
-use multiversx_sc::api::UPGRADE_CONTRACT_FUNC_NAME;
+use crate::tx_execution::builtin_function_names::UPGRADE_CONTRACT_FUNC_NAME;
 
 use crate::{
     tx_execution::default_execution,

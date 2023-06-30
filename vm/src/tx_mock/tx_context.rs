@@ -1,10 +1,9 @@
 use crate::{
-    num_bigint::BigUint,
-    world_mock::{AccountData, AccountEsdt, BlockchainMock},
+    types::VMAddress,
+    world_mock::{AccountData, AccountEsdt, BlockchainMock, FailingExecutor},
 };
-use alloc::vec::Vec;
 use core::cell::RefCell;
-use multiversx_sc::types::{heap::Address, LockableStaticBuffer};
+use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
     cell::{Ref, RefMut},
@@ -12,20 +11,15 @@ use std::{
     rc::Rc,
 };
 
-use super::{
-    BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
-};
+use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 
 #[derive(Debug)]
 pub struct TxContext {
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
-    pub lockable_static_buffer_cell: RefCell<LockableStaticBuffer>,
-    pub static_vars_cell: RefCell<TxStaticVars>,
     pub tx_result_cell: RefCell<TxResult>,
     pub b_rng: RefCell<BlockchainRng>,
-    pub printed_messages: RefCell<Vec<String>>,
 }
 
 impl TxContext {
@@ -35,17 +29,14 @@ impl TxContext {
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
-            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
-            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
-            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
     pub fn dummy() -> Self {
-        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new()));
-        let contract_address = Address::from(&[b'c'; 32]);
+        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new(Box::new(FailingExecutor))));
+        let contract_address = VMAddress::from([b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
             nonce: 0,
@@ -70,11 +61,8 @@ impl TxContext {
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
-            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
-            static_vars_cell: RefCell::new(TxStaticVars::default()),
             tx_result_cell: RefCell::new(TxResult::empty()),
             b_rng,
-            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
@@ -94,7 +82,7 @@ impl TxContext {
         self.tx_cache.blockchain_ref()
     }
 
-    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
@@ -108,7 +96,7 @@ impl TxContext {
         self.with_account(&self.tx_input_box.to, f)
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -144,9 +132,9 @@ impl TxContext {
 
     pub fn create_new_contract(
         &self,
-        new_address: &Address,
+        new_address: &VMAddress,
         contract_path: Vec<u8>,
-        contract_owner: Address,
+        contract_owner: VMAddress,
     ) {
         assert!(
             !self.tx_cache.blockchain_ref().account_exists(new_address),

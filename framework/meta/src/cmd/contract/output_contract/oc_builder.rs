@@ -58,6 +58,7 @@ impl OutputContractBuilder {
                     allocator: parse_allocator(&cms.allocator),
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
+                    kill_legacy_callback: cms.kill_legacy_callback,
                 },
                 ..Default::default()
             },
@@ -160,6 +161,9 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
             },
         }
     }
+    let has_callback = original_abi.has_callback
+        && !builder.settings.external_view
+        && !builder.settings.kill_legacy_callback;
     ContractAbi {
         build_info: original_abi.build_info.clone(),
         docs: original_abi.docs,
@@ -168,7 +172,7 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
         endpoints,
         promise_callbacks,
         events: original_abi.events.clone(),
-        has_callback: !builder.settings.external_view && original_abi.has_callback,
+        has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
     }
 }

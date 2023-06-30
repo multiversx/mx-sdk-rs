@@ -21,6 +21,7 @@ base64 = "0.13.0"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
+bech32 = "0.9"
 log = "0.4.17"
 sha2 = "0.10.6"
 serde = "1.0"
@@ -49,6 +50,9 @@ path = "../meta"
 [dependencies.multiversx-chain-scenario-format]
 version = "0.19.1"
 path = "../../sdk/scenario-format"
+
+[dependencies.multiversx-chain-vm-executor]
+version = "0.1.0"
 
 [dependencies.multiversx-chain-vm]
 version = "=0.3.0"
