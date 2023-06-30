@@ -1,0 +1,13 @@
+[package]
+name = "check-pause-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
+
+[dependencies.check-pause]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.41.3"
+path = "../../../../framework/meta"
