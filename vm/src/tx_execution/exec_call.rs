@@ -37,7 +37,7 @@ pub fn execute_sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResul
     (tx_result, state)
 }
 
-fn existing_account(state: &BlockchainMock, address: &Address) -> bool {
+fn existing_account(state: &BlockchainMock, address: &VMAddress) -> bool {
     state.accounts.contains_key(address) || is_system_sc_address(address)
 }
 

@@ -1,8 +1,10 @@
+use num_bigint::BigUint;
+
 use crate::{
-    num_bigint::BigUint,
+    crypto_functions::keccak256,
     tx_mock::{TxContext, TxResult},
+    types::top_decode_u64,
 };
-use multiversx_sc::codec::TopDecode;
 
 pub fn issue(tx_context: TxContext) -> (TxContext, TxResult) {
     let tx_input = tx_context.input_ref();
@@ -14,11 +16,28 @@ pub fn issue(tx_context: TxContext) -> (TxContext, TxResult) {
         return (tx_context, tx_result);
     }
     let _name = tx_input.args[0].clone();
-    let _ticker = tx_input.args[1].clone();
+    let ticker = tx_input.args[1].clone();
     let _total_supply = BigUint::from_bytes_be(tx_input.args[2].clone().as_ref());
-    let _decimals = u32::top_decode(tx_input.args[3].clone().as_ref()).unwrap();
+    let _decimals = top_decode_u64(tx_input.args[3].clone().as_ref()) as u32;
 
-    let token_identifier = b"TESTCOLL1-4096af".to_vec();
+    let new_random_base = [
+        tx_input.from.as_bytes(),
+        tx_cache
+            .blockchain_ref()
+            .current_block_info
+            .block_random_seed
+            .as_slice(),
+    ]
+    .concat();
+    let new_random = keccak256(&new_random_base);
+    let new_random_for_ticker = &new_random[..3];
+
+    let token_identifier = [
+        &ticker,
+        "-".as_bytes(),
+        hex::encode(new_random_for_ticker).as_bytes(),
+    ]
+    .concat();
 
     tx_cache.with_account_mut(&tx_input.from, |account| {
         account.esdt.issue_token(&token_identifier);
@@ -33,7 +52,46 @@ pub fn issue(tx_context: TxContext) -> (TxContext, TxResult) {
 }
 
 pub fn issue_semi_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
-    issue_non_fungible(tx_context)
+    let tx_input = tx_context.input_ref();
+    let tx_cache = tx_context.blockchain_cache();
+    let tx_result: TxResult;
+
+    if tx_input.args.len() < 2 {
+        tx_result = TxResult::from_vm_error("not enough arguments");
+        return (tx_context, tx_result);
+    }
+    let _name = tx_input.args[0].clone();
+    let ticker = tx_input.args[1].clone();
+
+    let new_random_base = [
+        tx_input.from.as_bytes(),
+        tx_cache
+            .blockchain_ref()
+            .current_block_info
+            .block_random_seed
+            .as_slice(),
+    ]
+    .concat();
+    let new_random = keccak256(&new_random_base);
+    let new_random_for_ticker = &new_random[..3];
+
+    let token_identifier = [
+        &ticker,
+        "-".as_bytes(),
+        hex::encode(new_random_for_ticker).as_bytes(),
+    ]
+    .concat();
+
+    tx_cache.with_account_mut(&tx_input.from, |account| {
+        account.esdt.issue_token(&token_identifier);
+    });
+
+    tx_result = TxResult {
+        result_values: vec![token_identifier],
+        ..Default::default()
+    };
+
+    (tx_context, tx_result)
 }
 
 pub fn issue_non_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
@@ -46,9 +104,30 @@ pub fn issue_non_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
         return (tx_context, tx_result);
     }
     let _name = tx_input.args[0].clone();
-    let _ticker = tx_input.args[1].clone();
+    let ticker = tx_input.args[1].clone();
 
-    let token_identifier = b"TESTCOLL1-4096bf".to_vec();
+    let new_random_base = [
+        tx_input.from.as_bytes(),
+        tx_cache
+            .blockchain_ref()
+            .current_block_info
+            .block_random_seed
+            .as_slice(),
+    ]
+    .concat();
+    let new_random = keccak256(&new_random_base);
+    let new_random_for_ticker = &new_random[..3];
+
+    let token_identifier = [
+        &ticker,
+        "-".as_bytes(),
+        hex::encode(new_random_for_ticker).as_bytes(),
+    ]
+    .concat();
+    println!(
+        "\n\ntoken_identifier: {}\n\n",
+        std::str::from_utf8(&token_identifier).unwrap()
+    );
 
     tx_cache.with_account_mut(&tx_input.from, |account| {
         account.esdt.issue_token(&token_identifier);

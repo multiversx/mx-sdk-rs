@@ -1,9 +1,8 @@
 mod system_sc_issue;
 mod system_sc_special_roles;
 
-use crate::tx_mock::{TxContext, TxResult};
+use crate::{tx_mock::{TxContext, TxResult}, types::VMAddress};
 use hex_literal::hex;
-use multiversx_sc::types::Address;
 use system_sc_issue::*;
 use system_sc_special_roles::*;
 
@@ -12,7 +11,7 @@ use system_sc_special_roles::*;
 pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
     hex!("000000000000000000010000000000000000000000000000000000000002ffff");
 
-pub fn is_system_sc_address(address: &Address) -> bool {
+pub fn is_system_sc_address(address: &VMAddress) -> bool {
     address.as_array() == &ESDT_SYSTEM_SC_ADDRESS_ARRAY
 }
 

@@ -1,6 +1,4 @@
-use crate::tx_mock::{TxContext, TxResult};
-
-use multiversx_sc::{codec::TopDecode, types::heap::Address};
+use crate::{tx_mock::{TxContext, TxResult}, types::VMAddress};
 
 pub fn set_special_role(tx_context: TxContext) -> (TxContext, TxResult) {
     let tx_input = tx_context.input_ref();
@@ -12,7 +10,7 @@ pub fn set_special_role(tx_context: TxContext) -> (TxContext, TxResult) {
         return (tx_context, tx_result);
     }
     let token_identifier = tx_input.args[0].clone();
-    let address = Address::top_decode(tx_input.args[1].as_slice()).unwrap();
+    let address = VMAddress::from_slice(tx_input.args[1].as_slice());
     let role = tx_input.args[2].clone();
 
     tx_cache.with_account_mut(&address, |account| {
