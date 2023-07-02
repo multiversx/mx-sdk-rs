@@ -8,7 +8,7 @@ use crate::{
     scenario::model::ScQueryStep,
 };
 use multiversx_chain_vm::{
-    tx_execution::execute_sc_query,
+    tx_execution::{execute_on_vm_stack, execute_sc_query, execute_sc_query_lambda},
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
     world_mock::BlockchainMock,
 };
@@ -20,6 +20,25 @@ impl ScenarioVMRunner {
     pub fn perform_sc_query(&mut self, sc_query_step: &ScQueryStep) -> TxResult {
         self.blockchain_mock
             .with_borrowed(|state| execute_and_check(state, sc_query_step))
+    }
+
+    pub fn perform_sc_query_lambda<F>(&mut self, sc_query_step: &ScQueryStep, f: F) -> TxResult
+    where
+        F: FnOnce(),
+    {
+        let tx_input = tx_input_from_query(sc_query_step);
+        self.blockchain_mock.with_borrowed(|state| {
+            let (tx_result, state) = execute_sc_query_lambda(tx_input, state, |tx_context| {
+                execute_on_vm_stack(tx_context, || {
+                    f();
+                })
+            });
+            assert!(
+                tx_result.pending_calls.no_calls(),
+                "Can't query a view function that performs an async call"
+            );
+            (tx_result, state)
+        })
     }
 }
 
@@ -47,23 +66,7 @@ pub(crate) fn execute(
     state: BlockchainMock,
     sc_query_step: &ScQueryStep,
 ) -> (TxResult, BlockchainMock) {
-    let tx_input = TxInput {
-        from: sc_query_step.tx.to.to_vm_address(),
-        to: sc_query_step.tx.to.to_vm_address(),
-        egld_value: BigUint::from(0u32),
-        esdt_values: Vec::new(),
-        func_name: sc_query_step.tx.function.clone().into(),
-        args: sc_query_step
-            .tx
-            .arguments
-            .iter()
-            .map(|scen_arg| scen_arg.value.clone())
-            .collect(),
-        gas_limit: u64::MAX,
-        gas_price: 0u64,
-        tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
-        ..Default::default()
-    };
+    let tx_input = tx_input_from_query(sc_query_step);
 
     let (tx_result, state) = execute_sc_query(tx_input, state);
     assert!(
@@ -83,4 +86,24 @@ fn execute_and_check(
     }
 
     (tx_result, state)
+}
+
+fn tx_input_from_query(sc_query_step: &ScQueryStep) -> TxInput {
+    TxInput {
+        from: sc_query_step.tx.to.to_vm_address(),
+        to: sc_query_step.tx.to.to_vm_address(),
+        egld_value: BigUint::from(0u32),
+        esdt_values: Vec::new(),
+        func_name: sc_query_step.tx.function.clone().into(),
+        args: sc_query_step
+            .tx
+            .arguments
+            .iter()
+            .map(|scen_arg| scen_arg.value.clone())
+            .collect(),
+        gas_limit: u64::MAX,
+        gas_price: 0u64,
+        tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
+        ..Default::default()
+    }
 }

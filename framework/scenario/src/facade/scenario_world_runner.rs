@@ -3,18 +3,18 @@ use crate::{
     scenario::{model::*, ScenarioRunner},
 };
 
-use super::scenario_world::Backend::{Debugger, VmGoBackend};
+use super::scenario_world::Backend;
 
 impl ScenarioWorld {
     pub fn for_each_runner_mut<F: FnMut(&mut dyn ScenarioRunner)>(&mut self, mut f: F) {
         match &mut self.backend {
-            Debugger(cd_debugger) => {
+            Backend::Debugger(cd_debugger) => {
                 f(&mut cd_debugger.vm_runner);
                 if let Some(trace) = &mut cd_debugger.trace {
                     f(trace);
                 }
             },
-            VmGoBackend => {
+            Backend::VmGoBackend => {
                 panic!("the VM Go backend does not support step-by-step execution")
             },
         }

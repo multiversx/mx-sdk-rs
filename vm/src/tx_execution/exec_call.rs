@@ -12,12 +12,24 @@ use std::{collections::HashMap, rc::Rc};
 
 use super::{execute_builtin_function_or_default, execute_tx_context};
 
-pub fn execute_sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
+pub fn execute_sc_query_lambda<F>(
+    tx_input: TxInput,
+    state: BlockchainMock,
+    f: F,
+) -> (TxResult, BlockchainMock)
+where
+    F: FnOnce(TxContext) -> TxContext,
+{
     let state_rc = Rc::new(state);
     let tx_cache = TxCache::new(state_rc.clone());
     let tx_context = TxContext::new(tx_input, tx_cache);
-    let (_, tx_result) = execute_tx_context(tx_context);
+    let tx_context = f(tx_context);
+    let (tx_result, _) = tx_context.into_results();
     (tx_result, Rc::try_unwrap(state_rc).unwrap())
+}
+
+pub fn execute_sc_query(tx_input: TxInput, state: BlockchainMock) -> (TxResult, BlockchainMock) {
+    execute_sc_query_lambda(tx_input, state, execute_tx_context)
 }
 
 pub fn execute_sc_call(tx_input: TxInput, mut state: BlockchainMock) -> (TxResult, BlockchainMock) {
