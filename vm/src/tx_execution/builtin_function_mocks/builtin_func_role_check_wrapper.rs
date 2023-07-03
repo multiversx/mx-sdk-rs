@@ -1,4 +1,7 @@
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
+use crate::{
+    tx_execution::BlockchainVMRef,
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+};
 
 use super::builtin_func_trait::{BuiltinFunction, BuiltinFunctionEsdtTransferInfo};
 
@@ -26,9 +29,14 @@ impl BuiltinFunction for BuiltinFunctionRoleCheckWrapper {
         self.builtin_function.extract_esdt_transfers(tx_input)
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute(
+        &self,
+        vm: &BlockchainVMRef,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+    ) -> (TxResult, BlockchainUpdate) {
         if check_allowed_to_execute(self.role_name, &tx_input, &tx_cache) {
-            self.builtin_function.execute(tx_input, tx_cache)
+            self.builtin_function.execute(vm, tx_input, tx_cache)
         } else {
             (
                 TxResult::from_vm_error("action is not allowed"),

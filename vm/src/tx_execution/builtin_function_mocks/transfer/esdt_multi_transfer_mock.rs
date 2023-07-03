@@ -1,5 +1,6 @@
 use crate::{
-    tx_execution::builtin_function_names::ESDT_MULTI_TRANSFER_FUNC_NAME, types::top_decode_u64,
+    tx_execution::{builtin_function_names::ESDT_MULTI_TRANSFER_FUNC_NAME, BlockchainVMRef},
+    types::top_decode_u64,
 };
 
 use crate::{
@@ -31,10 +32,15 @@ impl BuiltinFunction for ESDTMultiTransfer {
         }
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute(
+        &self,
+        vm: &BlockchainVMRef,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+    ) -> (TxResult, BlockchainUpdate) {
         match try_parse_input(&tx_input) {
             Ok(parsed_tx) => {
-                execute_transfer_builtin_func(parsed_tx, self.name(), tx_input, tx_cache)
+                execute_transfer_builtin_func(vm, parsed_tx, self.name(), tx_input, tx_cache)
             },
             Err(message) => {
                 let err_result = TxResult::from_vm_error(message);

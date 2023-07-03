@@ -1,10 +1,3 @@
-use std::rc::Rc;
-
-use crate::{
-    tx_execution::default_execution,
-    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
-};
-
 use super::{
     builtin_func_map::BuiltinFunctionMap,
     builtin_func_role_check_wrapper::BuiltinFunctionRoleCheckWrapper,
@@ -67,16 +60,4 @@ fn builtin_function_impls() -> Vec<Box<dyn BuiltinFunction>> {
 
 pub fn init_builtin_functions() -> BuiltinFunctionMap {
     BuiltinFunctionMap::init(builtin_function_impls())
-}
-
-pub fn execute_builtin_function_or_default(
-    tx_input: TxInput,
-    tx_cache: TxCache,
-) -> (TxResult, BlockchainUpdate) {
-    let builtin_functions = Rc::clone(&tx_cache.blockchain_ref().builtin_functions);
-    if let Some(builtin_func) = builtin_functions.get(&tx_input.func_name) {
-        builtin_func.execute(tx_input, tx_cache)
-    } else {
-        default_execution(tx_input, tx_cache)
-    }
 }

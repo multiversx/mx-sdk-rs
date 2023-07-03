@@ -8,7 +8,7 @@ use std::{
 use crate::{
     display_util::address_hex,
     types::VMAddress,
-    world_mock::{AccountData, BlockchainMock},
+    world_mock::{AccountData, BlockchainState},
 };
 
 use super::TxCacheSource;
@@ -34,7 +34,7 @@ impl TxCache {
         }
     }
 
-    pub fn blockchain_ref(&self) -> &BlockchainMock {
+    pub fn blockchain_ref(&self) -> &BlockchainState {
         self.source_ref.blockchain_ref()
     }
 
@@ -121,7 +121,7 @@ impl BlockchainUpdate {
         }
     }
 
-    pub fn apply(self, blockchain: &mut BlockchainMock) {
+    pub fn apply(self, blockchain: &mut BlockchainState) {
         blockchain.update_accounts(self.accounts);
     }
 }

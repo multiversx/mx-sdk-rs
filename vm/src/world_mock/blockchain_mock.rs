@@ -1,35 +1,19 @@
-use crate::{
-    tx_execution::{init_builtin_functions, BuiltinFunctionMap},
-    tx_mock::BlockchainUpdate,
-    types::VMAddress,
-};
+use crate::tx_execution::BlockchainVMRef;
 use multiversx_chain_vm_executor::Executor;
-use num_bigint::BigUint;
-use num_traits::Zero;
-use std::{collections::HashMap, fmt::Debug, rc::Rc};
+use std::fmt::Debug;
 
-use super::{AccountData, BlockInfo, FailingExecutor};
-
-const ELROND_REWARD_KEY: &[u8] = b"ELRONDreward";
+use super::{BlockchainState, FailingExecutor};
 
 pub struct BlockchainMock {
-    pub accounts: HashMap<VMAddress, AccountData>,
-    pub builtin_functions: Rc<BuiltinFunctionMap>,
-    pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
-    pub previous_block_info: BlockInfo,
-    pub current_block_info: BlockInfo,
-    pub executor: Box<dyn Executor>,
+    pub vm: BlockchainVMRef,
+    pub state: BlockchainState,
 }
 
 impl BlockchainMock {
     pub fn new(executor: Box<dyn Executor>) -> Self {
         BlockchainMock {
-            accounts: HashMap::new(),
-            builtin_functions: Rc::new(init_builtin_functions()),
-            new_addresses: HashMap::new(),
-            previous_block_info: BlockInfo::new(),
-            current_block_info: BlockInfo::new(),
-            executor,
+            vm: BlockchainVMRef::new(executor),
+            state: BlockchainState::default(),
         }
     }
 }
@@ -41,66 +25,13 @@ impl Default for BlockchainMock {
 }
 
 impl BlockchainMock {
-    pub fn account_exists(&self, address: &VMAddress) -> bool {
-        self.accounts.contains_key(address)
-    }
-
-    pub fn commit_updates(&mut self, updates: BlockchainUpdate) {
-        updates.apply(self);
-    }
-
-    pub fn increase_account_nonce(&mut self, address: &VMAddress) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
-        account.nonce += 1;
-    }
-
-    pub fn subtract_tx_gas(&mut self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
-        let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
-        assert!(
-            account.egld_balance >= gas_cost,
-            "Not enough balance to pay gas upfront"
-        );
-        account.egld_balance -= &gas_cost;
-    }
-
-    pub fn increase_validator_reward(&mut self, address: &VMAddress, amount: &BigUint) {
-        let account = self.accounts.get_mut(address).unwrap_or_else(|| {
-            panic!(
-                "Account not found: {}",
-                &std::str::from_utf8(address.as_ref()).unwrap()
-            )
-        });
-        account.egld_balance += amount;
-        let mut storage_v_rew =
-            if let Some(old_storage_value) = account.storage.get(ELROND_REWARD_KEY) {
-                BigUint::from_bytes_be(old_storage_value)
-            } else {
-                BigUint::zero()
-            };
-        storage_v_rew += amount;
-        account
-            .storage
-            .insert(ELROND_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
-    }
-
     pub fn with_borrowed<F, R>(&mut self, f: F) -> R
     where
-        F: FnOnce(Self) -> (R, Self),
+        F: FnOnce(BlockchainVMRef, BlockchainState) -> (R, BlockchainState),
     {
-        let obj = std::mem::take(self);
-        let (result, obj) = f(obj);
-        *self = obj;
+        let obj = std::mem::take(&mut self.state);
+        let (result, obj) = f(self.vm.clone(), obj);
+        self.state = obj;
         result
     }
 }
@@ -108,9 +39,7 @@ impl BlockchainMock {
 impl Debug for BlockchainMock {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("BlockchainMock")
-            .field("accounts", &self.accounts)
-            .field("new_addresses", &self.new_addresses)
-            .field("current_block_info", &self.current_block_info)
+            .field("state", &self.state)
             .finish()
     }
 }

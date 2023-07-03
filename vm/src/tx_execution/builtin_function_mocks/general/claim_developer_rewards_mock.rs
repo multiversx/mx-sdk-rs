@@ -1,4 +1,6 @@
-use crate::tx_execution::builtin_function_names::CLAIM_DEVELOPER_REWARDS_FUNC_NAME;
+use crate::tx_execution::{
+    builtin_function_names::CLAIM_DEVELOPER_REWARDS_FUNC_NAME, BlockchainVMRef,
+};
 use num_bigint::BigUint;
 use num_traits::Zero;
 
@@ -13,7 +15,12 @@ impl BuiltinFunction for ClaimDeveloperRewards {
         CLAIM_DEVELOPER_REWARDS_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute(
+        &self,
+        _vm: &BlockchainVMRef,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+    ) -> (TxResult, BlockchainUpdate) {
         if !tx_input.args.is_empty() {
             return (
                 TxResult::from_vm_error("ClaimDeveloperRewards expects no arguments"),

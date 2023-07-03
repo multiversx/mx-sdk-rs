@@ -30,4 +30,20 @@ impl TxContextStack {
             stack.0.pop().unwrap()
         })
     }
+
+    /// Manages the stack.
+    ///
+    /// Pushes the context to the stack, executes closure, pops after.
+    pub fn execute_on_vm_stack<F>(tx_context: TxContext, f: F) -> TxContext
+    where
+        F: FnOnce(),
+    {
+        let tx_context_rc = Rc::new(tx_context);
+        TxContextStack::static_push(tx_context_rc);
+
+        f();
+
+        let tx_context_rc = TxContextStack::static_pop();
+        Rc::try_unwrap(tx_context_rc).unwrap()
+    }
 }

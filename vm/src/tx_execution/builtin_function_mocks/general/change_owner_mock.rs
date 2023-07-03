@@ -1,4 +1,6 @@
-use crate::tx_execution::builtin_function_names::CHANGE_OWNER_BUILTIN_FUNC_NAME;
+use crate::tx_execution::{
+    builtin_function_names::CHANGE_OWNER_BUILTIN_FUNC_NAME, BlockchainVMRef,
+};
 
 use crate::{
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
@@ -14,7 +16,12 @@ impl BuiltinFunction for ChangeOwner {
         CHANGE_OWNER_BUILTIN_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute(
+        &self,
+        _vm: &BlockchainVMRef,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+    ) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() != 1 {
             return (
                 TxResult::from_vm_error("ChangeOwnerAddress expects 1 argument"),
