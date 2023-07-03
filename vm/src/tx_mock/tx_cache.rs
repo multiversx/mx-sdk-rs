@@ -11,7 +11,7 @@ use crate::{
     world_mock::{AccountData, BlockchainState},
 };
 
-use super::TxCacheSource;
+use super::{BlockchainUpdate, TxCacheSource};
 
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
@@ -107,21 +107,5 @@ impl TxCache {
         self.accounts
             .borrow_mut()
             .extend(updates.accounts.into_iter());
-    }
-}
-
-pub struct BlockchainUpdate {
-    accounts: HashMap<VMAddress, AccountData>,
-}
-
-impl BlockchainUpdate {
-    pub fn empty() -> Self {
-        BlockchainUpdate {
-            accounts: HashMap::new(),
-        }
-    }
-
-    pub fn apply(self, blockchain: &mut BlockchainState) {
-        blockchain.update_accounts(self.accounts);
     }
 }
