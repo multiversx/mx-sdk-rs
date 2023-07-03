@@ -1,6 +1,6 @@
 use std::{
     cell::{Ref, RefCell},
-    collections::{HashMap, HashSet},
+    collections::{HashMap, VecDeque},
     fmt,
     rc::Rc,
 };
@@ -16,6 +16,7 @@ use super::TxCacheSource;
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
     pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
+    pub(super) new_token_identifiers: RefCell<Option<VecDeque<String>>>,
 }
 
 impl fmt::Debug for TxCache {
@@ -31,6 +32,7 @@ impl TxCache {
         TxCache {
             source_ref,
             accounts: RefCell::new(HashMap::new()),
+            new_token_identifiers: RefCell::new(None),
         }
     }
 
@@ -97,10 +99,18 @@ impl TxCache {
             })
     }
 
+    pub fn get_new_token_identifiers(&self) -> VecDeque<String> {
+        self.blockchain_ref().get_new_token_identifiers()
+    }
+
+    pub fn set_new_token_identifiers(&self, token_identifiers: VecDeque<String>) {
+        *self.new_token_identifiers.borrow_mut() = Some(token_identifiers);
+    }
+
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         BlockchainUpdate {
             accounts: self.accounts.into_inner(),
-            issued_token_identifiers: HashSet::new(),
+            new_token_identifiers: self.new_token_identifiers.into_inner(),
         }
     }
 
@@ -113,19 +123,22 @@ impl TxCache {
 
 pub struct BlockchainUpdate {
     accounts: HashMap<VMAddress, AccountData>,
-    issued_token_identifiers: HashSet<String>, // todo: new issued token hashset
+    new_token_identifiers: Option<VecDeque<String>>,
 }
 
 impl BlockchainUpdate {
     pub fn empty() -> Self {
         BlockchainUpdate {
             accounts: HashMap::new(),
-            issued_token_identifiers: HashSet::new(),
+            new_token_identifiers: None,
         }
     }
 
     pub fn apply(self, blockchain: &mut BlockchainMock) {
         blockchain.update_accounts(self.accounts);
-        blockchain.clear_issued_token_identifiers(self.issued_token_identifiers);
+
+        if let Some(token_identifiers) = self.new_token_identifiers {
+            blockchain.update_new_token_identifiers(token_identifiers);
+        }
     }
 }
