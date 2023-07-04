@@ -93,21 +93,16 @@ pub fn issue_non_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
 }
 
 fn first_token_identifier_with_ticker(
-    token_identifiers: &Vec<String>,
+    token_identifiers: &[String],
     ticker: &[u8],
 ) -> Option<(usize, String)> {
     let extract_ticker =
-        |ti: &String| -> String { ti.split("-").map(|x| x.to_string()).next().unwrap() };
+        |ti: &String| -> String { ti.split('-').map(|x| x.to_string()).next().unwrap() };
 
-    let position = token_identifiers
+    token_identifiers
         .iter()
-        .position(|x| extract_ticker(x).as_bytes() == ticker);
-
-    if let Some(i) = position {
-        Some((i, token_identifiers[i].clone()))
-    } else {
-        None
-    }
+        .position(|x| extract_ticker(x).as_bytes() == ticker)
+        .map(|i| (i, token_identifiers[i].clone()))
 }
 
 fn generate_token_identifier_from_ticker(
