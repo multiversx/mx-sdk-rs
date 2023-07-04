@@ -82,8 +82,13 @@ fn deploy_duplicate_bm_rs() {
 }
 
 #[test]
-fn interactor_trace_rs() {
-    world().run("scenarios/interactor_trace.scen.json");
+fn interactor_nft_rs() {
+    world().run("scenarios/interactor_nft.scen.json");
+}
+
+#[test]
+fn interactor_wegld_rs() {
+    world().run("scenarios/interactor_wegld.scen.json");
 }
 
 #[test]

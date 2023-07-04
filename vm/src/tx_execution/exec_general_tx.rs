@@ -5,21 +5,26 @@ use crate::{
     types::VMAddress,
 };
 
-use super::execute_tx_context;
+use super::{execute_system_sc, execute_tx_context, is_system_sc_address};
 
 pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     let mut tx_context = TxContext::new(tx_input, tx_cache);
 
-    if let Err(err) = tx_context.tx_cache.subtract_egld_balance(
-        &tx_context.tx_input_box.from,
-        &tx_context.tx_input_box.egld_value,
-    ) {
-        return (TxResult::from_panic_obj(&err), BlockchainUpdate::empty());
+    if !is_system_sc_address(&tx_context.tx_input_box.from) {
+        if let Err(err) = tx_context.tx_cache.subtract_egld_balance(
+            &tx_context.tx_input_box.from,
+            &tx_context.tx_input_box.egld_value,
+        ) {
+            return (TxResult::from_panic_obj(&err), BlockchainUpdate::empty());
+        }
     }
-    tx_context.tx_cache.increase_egld_balance(
-        &tx_context.tx_input_box.to,
-        &tx_context.tx_input_box.egld_value,
-    );
+
+    if !is_system_sc_address(&tx_context.tx_input_box.to) {
+        tx_context.tx_cache.increase_egld_balance(
+            &tx_context.tx_input_box.to,
+            &tx_context.tx_input_box.egld_value,
+        );
+    }
 
     // skip for transactions coming directly from scenario json, which should all be coming from user wallets
     // TODO: reorg context logic
@@ -54,11 +59,16 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         }
     }
 
-    let mut tx_result = if !tx_context.tx_input_box.to.is_smart_contract_address()
+    let recipient_address = &tx_context.tx_input_box.to;
+    let mut tx_result = if !recipient_address.is_smart_contract_address()
         || tx_context.tx_input_box.func_name.is_empty()
     {
         // direct EGLD transfer
         TxResult::empty()
+    } else if is_system_sc_address(recipient_address) {
+        let (tx_context_modified, tx_result) = execute_system_sc(tx_context);
+        tx_context = tx_context_modified;
+        tx_result
     } else {
         let (tx_context_modified, tx_result) = execute_tx_context(tx_context);
         tx_context = tx_context_modified;
