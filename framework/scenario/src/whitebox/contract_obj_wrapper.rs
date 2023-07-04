@@ -739,10 +739,13 @@ impl BlockchainStateWrapper {
         let rust_zero = num_bigint::BigUint::zero();
 
         if egld_payment > &rust_zero {
-            if let Err(err) = tx_cache.subtract_egld_balance(&to_vm_address(caller), egld_payment) {
+            if let Err(err) = tx_cache.transfer_egld_balance(
+                &to_vm_address(caller),
+                &to_vm_address(sc_address),
+                egld_payment,
+            ) {
                 return TxResult::from_panic_obj(&err);
             }
-            tx_cache.increase_egld_balance(&to_vm_address(sc_address), egld_payment);
         }
 
         for esdt in &esdt_payments {

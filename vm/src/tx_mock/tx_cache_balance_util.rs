@@ -83,6 +83,17 @@ impl TxCache {
         });
     }
 
+    pub fn transfer_egld_balance(
+        &self,
+        from: &VMAddress,
+        to: &VMAddress,
+        value: &BigUint,
+    ) -> Result<(), TxPanic> {
+        self.subtract_egld_balance(from, value)?;
+        self.increase_egld_balance(to, value);
+        Ok(())
+    }
+
     pub fn transfer_esdt_balance(
         &self,
         from: &VMAddress,

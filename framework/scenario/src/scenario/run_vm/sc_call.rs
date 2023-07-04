@@ -42,12 +42,9 @@ impl ScenarioVMRunner {
     }
 }
 
-pub(crate) fn execute(
-    mut state: BlockchainMock,
-    sc_call_step: &ScCallStep,
-) -> (TxResult, BlockchainMock) {
+fn tx_input_from_call(sc_call_step: &ScCallStep) -> TxInput {
     let tx = &sc_call_step.tx;
-    let tx_input = TxInput {
+    TxInput {
         from: tx.from.to_vm_address(),
         to: tx.to.to_vm_address(),
         egld_value: tx.egld_value.value.clone(),
@@ -62,7 +59,14 @@ pub(crate) fn execute(
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(&sc_call_step.id),
         ..Default::default()
-    };
+    }
+}
+
+pub(crate) fn execute(
+    mut state: BlockchainMock,
+    sc_call_step: &ScCallStep,
+) -> (TxResult, BlockchainMock) {
+    let tx_input = tx_input_from_call(sc_call_step);
 
     // nonce gets increased irrespective of whether the tx fails or not
     state.increase_account_nonce(&tx_input.from);

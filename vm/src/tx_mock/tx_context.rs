@@ -158,4 +158,11 @@ impl TxContext {
         let tx_cache = Rc::try_unwrap(self.tx_cache).unwrap();
         tx_cache.into_blockchain_updates()
     }
+
+    pub fn into_results(self) -> (TxResult, BlockchainUpdate) {
+        let tx_cache = Rc::try_unwrap(self.tx_cache).unwrap();
+        let tx_result = RefCell::into_inner(self.tx_result_cell);
+        let blockchain_updates = tx_cache.into_blockchain_updates();
+        (tx_result, blockchain_updates)
+    }
 }

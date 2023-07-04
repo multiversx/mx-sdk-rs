@@ -8,18 +8,15 @@ use crate::{
 use super::execute_tx_context;
 
 pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
-    let mut tx_context = TxContext::new(tx_input, tx_cache);
+    let tx_context = TxContext::new(tx_input, tx_cache);
 
-    if let Err(err) = tx_context.tx_cache.subtract_egld_balance(
+    if let Err(err) = tx_context.tx_cache.transfer_egld_balance(
         &tx_context.tx_input_box.from,
+        &tx_context.tx_input_box.to,
         &tx_context.tx_input_box.egld_value,
     ) {
         return (TxResult::from_panic_obj(&err), BlockchainUpdate::empty());
     }
-    tx_context.tx_cache.increase_egld_balance(
-        &tx_context.tx_input_box.to,
-        &tx_context.tx_input_box.egld_value,
-    );
 
     // skip for transactions coming directly from scenario json, which should all be coming from user wallets
     // TODO: reorg context logic
@@ -54,22 +51,18 @@ pub fn default_execution(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Blo
         }
     }
 
-    let mut tx_result = if !tx_context.tx_input_box.to.is_smart_contract_address()
+    let tx_context = if !tx_context.tx_input_box.to.is_smart_contract_address()
         || tx_context.tx_input_box.func_name.is_empty()
     {
-        // direct EGLD transfer
-        TxResult::empty()
+        tx_context
     } else {
-        let (tx_context_modified, tx_result) = execute_tx_context(tx_context);
-        tx_context = tx_context_modified;
-        tx_result
+        execute_tx_context(tx_context)
     };
 
+    let (mut tx_result, blockchain_updates) = tx_context.into_results();
     if let Some(tv_log) = transfer_value_log {
         tx_result.result_logs.insert(0, tv_log);
     }
-
-    let blockchain_updates = tx_context.into_blockchain_updates();
 
     (tx_result, blockchain_updates)
 }
@@ -100,8 +93,8 @@ pub fn deploy_contract(
         .tx_cache
         .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-    let (tx_context, tx_result) = execute_tx_context(tx_context);
-    let blockchain_updates = tx_context.into_blockchain_updates();
+    let tx_context = execute_tx_context(tx_context);
+    let (tx_result, blockchain_updates) = tx_context.into_results();
 
     (tx_result, new_address, blockchain_updates)
 }
