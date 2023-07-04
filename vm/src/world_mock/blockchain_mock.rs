@@ -6,11 +6,7 @@ use crate::{
 use multiversx_chain_vm_executor::Executor;
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{
-    collections::{HashMap, VecDeque},
-    fmt::Debug,
-    rc::Rc,
-};
+use std::{collections::HashMap, fmt::Debug, rc::Rc};
 
 use super::{AccountData, BlockInfo, FailingExecutor};
 
@@ -20,7 +16,7 @@ pub struct BlockchainMock {
     pub accounts: HashMap<VMAddress, AccountData>,
     pub builtin_functions: Rc<BuiltinFunctionMap>,
     pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
-    pub new_token_identifiers: VecDeque<String>,
+    pub new_token_identifiers: Vec<String>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
     pub executor: Box<dyn Executor>,
@@ -32,7 +28,7 @@ impl BlockchainMock {
             accounts: HashMap::new(),
             builtin_functions: Rc::new(init_builtin_functions()),
             new_addresses: HashMap::new(),
-            new_token_identifiers: VecDeque::new(),
+            new_token_identifiers: Vec::new(),
             previous_block_info: BlockInfo::new(),
             current_block_info: BlockInfo::new(),
             executor,
@@ -40,14 +36,14 @@ impl BlockchainMock {
     }
 
     pub fn put_new_token_identifier(&mut self, token_identifier: String) {
-        self.new_token_identifiers.push_back(token_identifier)
+        self.new_token_identifiers.push(token_identifier)
     }
 
-    pub fn get_new_token_identifiers(&self) -> VecDeque<String> {
+    pub fn get_new_token_identifiers(&self) -> Vec<String> {
         self.new_token_identifiers.clone()
     }
 
-    pub fn update_new_token_identifiers(&mut self, token_identifiers: VecDeque<String>) {
+    pub fn update_new_token_identifiers(&mut self, token_identifiers: Vec<String>) {
         self.new_token_identifiers = token_identifiers;
     }
 

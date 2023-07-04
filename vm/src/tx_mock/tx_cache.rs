@@ -1,6 +1,6 @@
 use std::{
     cell::{Ref, RefCell},
-    collections::{HashMap, VecDeque},
+    collections::HashMap,
     fmt,
     rc::Rc,
 };
@@ -16,7 +16,7 @@ use super::TxCacheSource;
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
     pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
-    pub(super) new_token_identifiers: RefCell<Option<VecDeque<String>>>,
+    pub(super) new_token_identifiers: RefCell<Option<Vec<String>>>,
 }
 
 impl fmt::Debug for TxCache {
@@ -99,11 +99,11 @@ impl TxCache {
             })
     }
 
-    pub fn get_new_token_identifiers(&self) -> VecDeque<String> {
+    pub fn get_new_token_identifiers(&self) -> Vec<String> {
         self.blockchain_ref().get_new_token_identifiers()
     }
 
-    pub fn set_new_token_identifiers(&self, token_identifiers: VecDeque<String>) {
+    pub fn set_new_token_identifiers(&self, token_identifiers: Vec<String>) {
         *self.new_token_identifiers.borrow_mut() = Some(token_identifiers);
     }
 
@@ -123,7 +123,7 @@ impl TxCache {
 
 pub struct BlockchainUpdate {
     accounts: HashMap<VMAddress, AccountData>,
-    new_token_identifiers: Option<VecDeque<String>>,
+    new_token_identifiers: Option<Vec<String>>,
 }
 
 impl BlockchainUpdate {
