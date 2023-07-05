@@ -4,9 +4,9 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::sc_call_with_async_and_callback,
+    tx_execution::BlockchainVMRef,
     tx_mock::{generate_tx_hash_dummy, TxInput, TxResult, TxTokenTransfer},
-    world_mock::BlockchainMock,
+    world_mock::BlockchainState,
 };
 
 use super::{check_tx_output, ScenarioVMRunner};
@@ -16,7 +16,7 @@ impl ScenarioVMRunner {
     pub fn perform_sc_call(&mut self, sc_call_step: &ScCallStep) {
         let _ = self
             .blockchain_mock
-            .with_borrowed(|state| execute_and_check(state, sc_call_step));
+            .with_borrowed(|vm, state| execute_and_check(vm, state, sc_call_step));
     }
 
     /// Adds a SC call step, executes it and retrieves the transaction result ("out" field).
@@ -36,7 +36,7 @@ impl ScenarioVMRunner {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_result = self
             .blockchain_mock
-            .with_borrowed(|state| execute_and_check(state, &sc_call_step));
+            .with_borrowed(|vm, state| execute_and_check(vm, state, &sc_call_step));
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
@@ -63,22 +63,24 @@ fn tx_input_from_call(sc_call_step: &ScCallStep) -> TxInput {
 }
 
 pub(crate) fn execute(
-    mut state: BlockchainMock,
+    vm: BlockchainVMRef,
+    mut state: BlockchainState,
     sc_call_step: &ScCallStep,
-) -> (TxResult, BlockchainMock) {
+) -> (TxResult, BlockchainState) {
     let tx_input = tx_input_from_call(sc_call_step);
 
     // nonce gets increased irrespective of whether the tx fails or not
     state.increase_account_nonce(&tx_input.from);
 
-    sc_call_with_async_and_callback(tx_input, state)
+    vm.sc_call_with_async_and_callback(tx_input, state)
 }
 
 fn execute_and_check(
-    state: BlockchainMock,
+    vm: BlockchainVMRef,
+    state: BlockchainState,
     sc_call_step: &ScCallStep,
-) -> (TxResult, BlockchainMock) {
-    let (tx_result, state) = execute(state, sc_call_step);
+) -> (TxResult, BlockchainState) {
+    let (tx_result, state) = execute(vm, state, sc_call_step);
     if let Some(tx_expect) = &sc_call_step.expect {
         check_tx_output(&sc_call_step.id, tx_expect, &tx_result);
     }

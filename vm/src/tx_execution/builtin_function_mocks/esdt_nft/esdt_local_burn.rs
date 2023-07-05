@@ -1,7 +1,7 @@
 use num_bigint::BigUint;
 
 use crate::{
-    tx_execution::builtin_function_names::ESDT_LOCAL_BURN_FUNC_NAME,
+    tx_execution::{builtin_function_names::ESDT_LOCAL_BURN_FUNC_NAME, BlockchainVMRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
 };
 
@@ -14,7 +14,12 @@ impl BuiltinFunction for ESDTLocalBurn {
         ESDT_LOCAL_BURN_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute(
+        &self,
+        _vm: &BlockchainVMRef,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+    ) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() != 2 {
             let err_result = TxResult::from_vm_error("ESDTLocalBurn expects 2 arguments");
             return (err_result, BlockchainUpdate::empty());

@@ -7,9 +7,9 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::sc_create,
+    tx_execution::BlockchainVMRef,
     tx_mock::{generate_tx_hash_dummy, TxFunctionName, TxInput, TxResult},
-    world_mock::BlockchainMock,
+    world_mock::BlockchainState,
 };
 
 use super::{check_tx_output, ScenarioVMRunner};
@@ -17,8 +17,8 @@ use super::{check_tx_output, ScenarioVMRunner};
 impl ScenarioVMRunner {
     /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
     pub fn perform_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) {
-        self.blockchain_mock.with_borrowed(|state| {
-            let (_, _, state) = execute_and_check(state, sc_deploy_step);
+        self.blockchain_mock.with_borrowed(|vm, state| {
+            let (_, _, state) = execute_and_check(vm, state, sc_deploy_step);
             ((), state)
         });
     }
@@ -38,8 +38,8 @@ impl ScenarioVMRunner {
         RequestedResult: CodecFrom<OriginalResult>,
     {
         let sc_deploy_step: ScDeployStep = typed_sc_deploy.into();
-        let (tx_result, new_address) = self.blockchain_mock.with_borrowed(|state| {
-            let (tx_result, new_address, state) = execute(state, &sc_deploy_step);
+        let (tx_result, new_address) = self.blockchain_mock.with_borrowed(|vm, state| {
+            let (tx_result, new_address, state) = execute(vm, state, &sc_deploy_step);
             ((tx_result, new_address), state)
         });
 
@@ -53,9 +53,10 @@ impl ScenarioVMRunner {
 }
 
 pub(crate) fn execute(
-    state: BlockchainMock,
+    vm: BlockchainVMRef,
+    state: BlockchainState,
     sc_deploy_step: &ScDeployStep,
-) -> (TxResult, Address, BlockchainMock) {
+) -> (TxResult, Address, BlockchainState) {
     let tx = &sc_deploy_step.tx;
     let tx_input = TxInput {
         from: tx.from.to_vm_address(),
@@ -73,15 +74,17 @@ pub(crate) fn execute(
         tx_hash: generate_tx_hash_dummy(&sc_deploy_step.id),
         ..Default::default()
     };
-    let (tx_result, address, blockchain_mock) = sc_create(tx_input, &tx.contract_code.value, state);
+    let (tx_result, address, blockchain_mock) =
+        vm.sc_create(tx_input, &tx.contract_code.value, state);
     (tx_result, address.as_array().into(), blockchain_mock)
 }
 
 fn execute_and_check(
-    state: BlockchainMock,
+    vm: BlockchainVMRef,
+    state: BlockchainState,
     sc_deploy_step: &ScDeployStep,
-) -> (TxResult, Address, BlockchainMock) {
-    let (tx_result, address, state) = execute(state, sc_deploy_step);
+) -> (TxResult, Address, BlockchainState) {
+    let (tx_result, address, state) = execute(vm, state, sc_deploy_step);
     if let Some(tx_expect) = &sc_deploy_step.expect {
         check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
     }

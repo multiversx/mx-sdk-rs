@@ -8,9 +8,9 @@ use crate::{
     scenario::model::ScQueryStep,
 };
 use multiversx_chain_vm::{
-    tx_execution::{execute_on_vm_stack, execute_sc_query, execute_sc_query_lambda},
-    tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
-    world_mock::BlockchainMock,
+    tx_execution::BlockchainVMRef,
+    tx_mock::{generate_tx_hash_dummy, TxContextStack, TxInput, TxResult},
+    world_mock::BlockchainState,
 };
 
 use super::{check_tx_output, ScenarioVMRunner};
@@ -19,7 +19,7 @@ impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
     pub fn perform_sc_query(&mut self, sc_query_step: &ScQueryStep) -> TxResult {
         self.blockchain_mock
-            .with_borrowed(|state| execute_and_check(state, sc_query_step))
+            .with_borrowed(|vm, state| execute_and_check(vm, state, sc_query_step))
     }
 
     pub fn perform_sc_query_lambda<F>(&mut self, sc_query_step: &ScQueryStep, f: F) -> TxResult
@@ -27,9 +27,9 @@ impl ScenarioVMRunner {
         F: FnOnce(),
     {
         let tx_input = tx_input_from_query(sc_query_step);
-        self.blockchain_mock.with_borrowed(|state| {
-            let (tx_result, state) = execute_sc_query_lambda(tx_input, state, |tx_context| {
-                execute_on_vm_stack(tx_context, || {
+        self.blockchain_mock.with_borrowed(|vm, state| {
+            let (tx_result, state) = vm.execute_sc_query_lambda(tx_input, state, |tx_context| {
+                TxContextStack::execute_on_vm_stack(tx_context, || {
                     f();
                 })
             });
@@ -56,19 +56,20 @@ impl ScenarioVMRunner {
         let sc_query_step = ScQueryStep::new().call(contract_call);
         let tx_result = self
             .blockchain_mock
-            .with_borrowed(|state| execute(state, &sc_query_step));
+            .with_borrowed(|vm, state| execute(vm, state, &sc_query_step));
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 }
 
 pub(crate) fn execute(
-    state: BlockchainMock,
+    vm: BlockchainVMRef,
+    state: BlockchainState,
     sc_query_step: &ScQueryStep,
-) -> (TxResult, BlockchainMock) {
+) -> (TxResult, BlockchainState) {
     let tx_input = tx_input_from_query(sc_query_step);
 
-    let (tx_result, state) = execute_sc_query(tx_input, state);
+    let (tx_result, state) = vm.execute_sc_query(tx_input, state);
     assert!(
         tx_result.pending_calls.no_calls(),
         "Can't query a view function that performs an async call"
@@ -77,10 +78,11 @@ pub(crate) fn execute(
 }
 
 fn execute_and_check(
-    state: BlockchainMock,
+    vm: BlockchainVMRef,
+    state: BlockchainState,
     sc_query_step: &ScQueryStep,
-) -> (TxResult, BlockchainMock) {
-    let (tx_result, state) = execute(state, sc_query_step);
+) -> (TxResult, BlockchainState) {
+    let (tx_result, state) = execute(vm, state, sc_query_step);
     if let Some(tx_expect) = &sc_query_step.expect {
         check_tx_output(&sc_query_step.id, tx_expect, &tx_result);
     }

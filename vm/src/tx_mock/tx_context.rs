@@ -1,6 +1,7 @@
 use crate::{
+    tx_execution::BlockchainVMRef,
     types::VMAddress,
-    world_mock::{AccountData, AccountEsdt, BlockchainMock, FailingExecutor},
+    world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };
 use core::cell::RefCell;
 use num_bigint::BigUint;
@@ -13,8 +14,8 @@ use std::{
 
 use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 
-#[derive(Debug)]
 pub struct TxContext {
+    pub vm_ref: BlockchainVMRef,
     pub tx_input_box: Box<TxInput>,
     pub tx_cache: Rc<TxCache>,
     pub managed_types: RefCell<TxManagedTypes>,
@@ -23,9 +24,10 @@ pub struct TxContext {
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
+    pub fn new(vm_ref: BlockchainVMRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
         let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
+            vm_ref,
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
@@ -35,7 +37,7 @@ impl TxContext {
     }
 
     pub fn dummy() -> Self {
-        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new(Box::new(FailingExecutor))));
+        let tx_cache = TxCache::new(Rc::new(BlockchainState::default()));
         let contract_address = VMAddress::from([b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
@@ -58,6 +60,7 @@ impl TxContext {
 
         let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
+            vm_ref: BlockchainVMRef::new(Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
             tx_cache: Rc::new(tx_cache),
             managed_types: RefCell::new(TxManagedTypes::new()),
@@ -78,7 +81,7 @@ impl TxContext {
         self.tx_cache.clone()
     }
 
-    pub fn blockchain_ref(&self) -> &BlockchainMock {
+    pub fn blockchain_ref(&self) -> &BlockchainState {
         self.tx_cache.blockchain_ref()
     }
 
@@ -164,5 +167,17 @@ impl TxContext {
         let tx_result = RefCell::into_inner(self.tx_result_cell);
         let blockchain_updates = tx_cache.into_blockchain_updates();
         (tx_result, blockchain_updates)
+    }
+}
+
+impl std::fmt::Debug for TxContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TxContext")
+            .field("tx_input_box", &self.tx_input_box)
+            .field("tx_cache", &self.tx_cache)
+            .field("managed_types", &self.managed_types)
+            .field("tx_result_cell", &self.tx_result_cell)
+            .field("b_rng", &self.b_rng)
+            .finish()
     }
 }

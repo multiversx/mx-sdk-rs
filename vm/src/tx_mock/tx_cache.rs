@@ -8,10 +8,10 @@ use std::{
 use crate::{
     display_util::address_hex,
     types::VMAddress,
-    world_mock::{AccountData, BlockchainMock},
+    world_mock::{AccountData, BlockchainState},
 };
 
-use super::TxCacheSource;
+use super::{BlockchainUpdate, TxCacheSource};
 
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
@@ -34,7 +34,7 @@ impl TxCache {
         }
     }
 
-    pub fn blockchain_ref(&self) -> &BlockchainMock {
+    pub fn blockchain_ref(&self) -> &BlockchainState {
         self.source_ref.blockchain_ref()
     }
 
@@ -107,21 +107,5 @@ impl TxCache {
         self.accounts
             .borrow_mut()
             .extend(updates.accounts.into_iter());
-    }
-}
-
-pub struct BlockchainUpdate {
-    accounts: HashMap<VMAddress, AccountData>,
-}
-
-impl BlockchainUpdate {
-    pub fn empty() -> Self {
-        BlockchainUpdate {
-            accounts: HashMap::new(),
-        }
-    }
-
-    pub fn apply(self, blockchain: &mut BlockchainMock) {
-        blockchain.update_accounts(self.accounts);
     }
 }

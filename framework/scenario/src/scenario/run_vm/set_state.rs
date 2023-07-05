@@ -3,7 +3,7 @@ use crate::scenario::model::SetStateStep;
 use multiversx_chain_vm::{
     types::VMAddress,
     world_mock::{
-        AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainMock, EsdtData,
+        AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainState, EsdtData,
         EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
     },
 };
@@ -12,11 +12,11 @@ use super::ScenarioVMRunner;
 
 impl ScenarioVMRunner {
     pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) {
-        execute(&mut self.blockchain_mock, set_state_step);
+        execute(&mut self.blockchain_mock.state, set_state_step);
     }
 }
 
-fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
+fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
     for (address, account) in set_state_step.accounts.iter() {
         let storage = account
             .storage

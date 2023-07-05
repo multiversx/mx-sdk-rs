@@ -2,9 +2,9 @@ use std::{collections::HashMap, fmt::Write};
 
 use crate::{display_util::address_hex, types::VMAddress};
 
-use super::{AccountData, BlockchainMock};
+use super::{AccountData, BlockchainState};
 
-impl BlockchainMock {
+impl BlockchainState {
     pub fn add_account(&mut self, acct: AccountData) {
         let address = acct.address.clone();
         self.accounts.insert(address, acct);

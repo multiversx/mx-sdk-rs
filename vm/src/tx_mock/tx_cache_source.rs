@@ -1,6 +1,6 @@
 use crate::{
     types::VMAddress,
-    world_mock::{AccountData, BlockchainMock},
+    world_mock::{AccountData, BlockchainState},
 };
 
 use super::TxCache;
@@ -8,7 +8,7 @@ use super::TxCache;
 pub trait TxCacheSource {
     fn load_account(&self, address: &VMAddress) -> Option<AccountData>;
 
-    fn blockchain_ref(&self) -> &BlockchainMock;
+    fn blockchain_ref(&self) -> &BlockchainState;
 }
 
 impl TxCacheSource for TxCache {
@@ -16,17 +16,17 @@ impl TxCacheSource for TxCache {
         Some(self.with_account(address, AccountData::clone))
     }
 
-    fn blockchain_ref(&self) -> &BlockchainMock {
+    fn blockchain_ref(&self) -> &BlockchainState {
         self.blockchain_ref()
     }
 }
 
-impl TxCacheSource for BlockchainMock {
+impl TxCacheSource for BlockchainState {
     fn load_account(&self, address: &VMAddress) -> Option<AccountData> {
         self.accounts.get(address).map(AccountData::clone)
     }
 
-    fn blockchain_ref(&self) -> &BlockchainMock {
+    fn blockchain_ref(&self) -> &BlockchainState {
         self
     }
 }
