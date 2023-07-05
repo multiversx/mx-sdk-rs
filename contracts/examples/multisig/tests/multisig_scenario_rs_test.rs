@@ -87,7 +87,6 @@ fn interactor_nft_rs() {
 }
 
 #[test]
-#[should_panic(expected = "not implemented")]
 fn interactor_nft_all_roles_rs() {
     world().run("scenarios/interactor_nft_all_roles.scen.json");
 }
