@@ -93,19 +93,24 @@ impl BlockchainVMRef {
         (tx_result, blockchain_updates)
     }
 
-    pub fn deploy_contract(
+    pub fn deploy_contract<F>(
         &self,
         mut tx_input: TxInput,
         contract_path: Vec<u8>,
         tx_cache: TxCache,
-    ) -> (TxResult, VMAddress, BlockchainUpdate) {
+        f: F,
+    ) -> (TxResult, VMAddress, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         let new_address = tx_cache.get_new_address(&tx_input.from);
         tx_input.to = new_address.clone();
         tx_input.func_name = TxFunctionName::INIT;
         let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        let tx_input_ref = &*tx_context.tx_input_box;
+        let mut tx_context_sh = Shareable::new(tx_context);
+        let tx_input_ref = tx_context_sh.input_ref();
 
-        if let Err(err) = tx_context
+        if let Err(err) = tx_context_sh
             .tx_cache
             .subtract_egld_balance(&tx_input_ref.from, &tx_input_ref.egld_value)
         {
@@ -115,14 +120,14 @@ impl BlockchainVMRef {
                 BlockchainUpdate::empty(),
             );
         }
-        tx_context.create_new_contract(&new_address, contract_path, tx_input_ref.from.clone());
-        tx_context
+        tx_context_sh.create_new_contract(&new_address, contract_path, tx_input_ref.from.clone());
+        tx_context_sh
             .tx_cache
             .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
 
-        let tx_context = self.execute_tx_context(tx_context);
-        let (tx_result, blockchain_updates) = tx_context.into_results();
+        TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
 
+        let (tx_result, blockchain_updates) = tx_context_sh.into_inner().into_results();
         (tx_result, new_address, blockchain_updates)
     }
 }

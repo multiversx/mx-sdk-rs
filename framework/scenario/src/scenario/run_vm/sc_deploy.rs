@@ -7,20 +7,55 @@ use crate::{
 };
 
 use multiversx_chain_vm::{
-    tx_execution::BlockchainVMRef,
+    tx_execution::execute_current_tx_context_input,
     tx_mock::{generate_tx_hash_dummy, TxFunctionName, TxInput, TxResult},
-    world_mock::BlockchainState,
 };
 
 use super::{check_tx_output, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
+    pub fn perform_sc_deploy_lambda<F>(
+        &mut self,
+        sc_deploy_step: &ScDeployStep,
+        f: F,
+    ) -> (Address, TxResult)
+    where
+        F: FnOnce(),
+    {
+        let tx_input = tx_input_from_deploy(sc_deploy_step);
+        let contract_code = &sc_deploy_step.tx.contract_code.value;
+        let (new_address, tx_result) = self.blockchain_mock.vm.sc_create(
+            tx_input,
+            contract_code,
+            &mut self.blockchain_mock.state,
+            f,
+        );
+        assert!(
+            tx_result.pending_calls.no_calls(),
+            "Async calls from constructors are currently not supported"
+        );
+        (new_address.as_array().into(), tx_result)
+    }
+
+    pub fn perform_sc_deploy_lambda_and_check<F>(
+        &mut self,
+        sc_deploy_step: &ScDeployStep,
+        f: F,
+    ) -> (Address, TxResult)
+    where
+        F: FnOnce(),
+    {
+        let (new_address, tx_result) = self.perform_sc_deploy_lambda(sc_deploy_step, f);
+        if let Some(tx_expect) = &sc_deploy_step.expect {
+            check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
+        }
+        (new_address, tx_result)
+    }
+
     /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
     pub fn perform_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) {
-        self.blockchain_mock.with_borrowed(|vm, state| {
-            let (_, _, state) = execute_and_check(vm, state, sc_deploy_step);
-            ((), state)
-        });
+        let _ = self
+            .perform_sc_deploy_lambda_and_check(sc_deploy_step, execute_current_tx_context_input);
     }
 
     /// Adds a SC deploy step, executes it and retrieves the transaction result ("out" field).
@@ -38,27 +73,20 @@ impl ScenarioVMRunner {
         RequestedResult: CodecFrom<OriginalResult>,
     {
         let sc_deploy_step: ScDeployStep = typed_sc_deploy.into();
-        let (tx_result, new_address) = self.blockchain_mock.with_borrowed(|vm, state| {
-            let (tx_result, new_address, state) = execute(vm, state, &sc_deploy_step);
-            ((tx_result, new_address), state)
-        });
-
+        let (new_address, tx_result) =
+            self.perform_sc_deploy_lambda(&sc_deploy_step, execute_current_tx_context_input);
         let mut raw_result = tx_result.result_values;
         let deser_result =
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap();
 
-        (new_address.as_array().into(), deser_result)
+        (new_address, deser_result)
     }
 }
 
-pub(crate) fn execute(
-    vm: BlockchainVMRef,
-    state: BlockchainState,
-    sc_deploy_step: &ScDeployStep,
-) -> (TxResult, Address, BlockchainState) {
+fn tx_input_from_deploy(sc_deploy_step: &ScDeployStep) -> TxInput {
     let tx = &sc_deploy_step.tx;
-    let tx_input = TxInput {
+    TxInput {
         from: tx.from.to_vm_address(),
         to: multiversx_chain_vm::types::VMAddress::zero(),
         egld_value: tx.egld_value.value.clone(),
@@ -73,20 +101,5 @@ pub(crate) fn execute(
         gas_price: tx.gas_price.value,
         tx_hash: generate_tx_hash_dummy(&sc_deploy_step.id),
         ..Default::default()
-    };
-    let (tx_result, address, blockchain_mock) =
-        vm.sc_create(tx_input, &tx.contract_code.value, state);
-    (tx_result, address.as_array().into(), blockchain_mock)
-}
-
-fn execute_and_check(
-    vm: BlockchainVMRef,
-    state: BlockchainState,
-    sc_deploy_step: &ScDeployStep,
-) -> (TxResult, Address, BlockchainState) {
-    let (tx_result, address, state) = execute(vm, state, sc_deploy_step);
-    if let Some(tx_expect) = &sc_deploy_step.expect {
-        check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
     }
-    (tx_result, address.as_array().into(), state)
 }
