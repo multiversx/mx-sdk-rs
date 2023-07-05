@@ -2,7 +2,7 @@ use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
         AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxCacheSource, TxContext,
-        TxContextStack, TxInput, TxResult, TxResultCalls,
+        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMAddress,
     with_shared::Shareable,
@@ -75,29 +75,6 @@ impl BlockchainVMRef {
         }
     }
 
-    pub fn execute_sc_call(
-        &self,
-        tx_input: TxInput,
-        mut state: BlockchainState,
-    ) -> (TxResult, BlockchainState) {
-        state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
-
-        let state_rc = Rc::new(state);
-        let tx_cache = TxCache::new(state_rc.clone());
-        let (tx_result, blockchain_updates) = self.execute_builtin_function_or_default(
-            tx_input,
-            tx_cache,
-            execute_current_tx_context_input,
-        );
-
-        let mut state = Rc::try_unwrap(state_rc).unwrap();
-        if tx_result.result_status == 0 {
-            blockchain_updates.apply(&mut state);
-        }
-
-        (tx_result, state)
-    }
-
     pub fn execute_sc_call_lambda<F>(
         &self,
         tx_input: TxInput,
@@ -124,57 +101,54 @@ impl BlockchainVMRef {
     pub fn execute_async_call_and_callback(
         &self,
         async_data: AsyncCallTxData,
-        state: BlockchainState,
-    ) -> (TxResult, TxResult, BlockchainState) {
+        state: &mut Shareable<BlockchainState>,
+    ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&async_data.to) {
             let async_input = async_call_tx_input(&async_data);
 
-            let (async_result, state) = self.sc_call_with_async_and_callback(async_input, state);
+            let async_result = self.sc_call_with_async_and_callback(
+                async_input,
+                state,
+                execute_current_tx_context_input,
+            );
 
             let callback_input =
                 async_callback_tx_input(&async_data, &async_result, &self.builtin_functions);
-            let (callback_result, state) = self.execute_sc_call(callback_input, state);
+            let callback_result = self.execute_sc_call_lambda(
+                callback_input,
+                state,
+                execute_current_tx_context_input,
+            );
             assert!(
                 callback_result.pending_calls.async_call.is_none(),
                 "successive asyncs currently not supported"
             );
-            (async_result, callback_result, state)
+            (async_result, callback_result)
         } else {
-            let state_rc = Rc::new(state);
-            let tx_cache = TxCache::new(state_rc.clone());
-            if let Err(err) =
-                tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)
-            {
-                let state = Rc::try_unwrap(state_rc).unwrap();
-                return (TxResult::from_panic_obj(&err), TxResult::empty(), state);
+            let result = self.insert_ghost_account(&async_data, state);
+            match result {
+                Ok(blockchain_updates) => {
+                    state.commit_updates(blockchain_updates);
+                    (TxResult::empty(), TxResult::empty())
+                },
+                Err(err) => (TxResult::from_panic_obj(&err), TxResult::empty()),
             }
-            tx_cache.insert_account(AccountData {
-                address: async_data.to.clone(),
-                nonce: 0,
-                egld_balance: async_data.call_value,
-                esdt: AccountEsdt::default(),
-                username: Vec::new(),
-                storage: HashMap::new(),
-                contract_path: None,
-                contract_owner: None,
-                developer_rewards: BigUint::zero(),
-            });
-            let blockchain_updates = tx_cache.into_blockchain_updates();
-            let mut state = Rc::try_unwrap(state_rc).unwrap();
-            state.commit_updates(blockchain_updates);
-
-            (TxResult::empty(), TxResult::empty(), state)
         }
     }
 
     // TODO: refactor
-    pub fn sc_call_with_async_and_callback(
+    pub fn sc_call_with_async_and_callback<F>(
         &self,
         tx_input: TxInput,
-        state: BlockchainState,
-    ) -> (TxResult, BlockchainState) {
+        state: &mut Shareable<BlockchainState>,
+        f: F,
+    ) -> TxResult
+    where
+        F: FnOnce() + 'static,
+    {
+        // main call
         let contract_address = tx_input.to.clone();
-        let (mut tx_result, mut state) = self.execute_sc_call(tx_input, state);
+        let mut tx_result = self.execute_sc_call_lambda(tx_input, state, f);
 
         // take & clear pending calls
         let pending_calls = std::mem::replace(&mut tx_result.pending_calls, TxResultCalls::empty());
@@ -183,59 +157,79 @@ impl BlockchainVMRef {
         // the async call also gets reset
         if tx_result.result_status == 0 {
             if let Some(async_data) = pending_calls.async_call {
-                let (async_result, callback_result, new_state) =
+                let (async_result, callback_result) =
                     self.execute_async_call_and_callback(async_data, state);
-                state = new_state;
 
                 tx_result = merge_results(tx_result, async_result);
                 tx_result = merge_results(tx_result, callback_result);
 
-                return (tx_result, state);
+                return tx_result;
             }
         }
 
         // calling all promises
         // the promises are also reset
         for promise in pending_calls.promises {
-            let (async_result, callback_result, new_state) =
+            let (async_result, callback_result) =
                 self.execute_promise_call_and_callback(&contract_address, &promise, state);
-            state = new_state;
 
             tx_result = merge_results(tx_result, async_result.clone());
             tx_result = merge_results(tx_result, callback_result.clone());
         }
 
-        (tx_result, state)
+        tx_result
     }
 
     pub fn execute_promise_call_and_callback(
         &self,
         address: &VMAddress,
         promise: &Promise,
-        state: BlockchainState,
-    ) -> (TxResult, TxResult, BlockchainState) {
+        state: &mut Shareable<BlockchainState>,
+    ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&promise.call.to) {
             let async_input = async_call_tx_input(&promise.call);
-            let (async_result, state) = self.sc_call_with_async_and_callback(async_input, state);
+            let async_result = self.sc_call_with_async_and_callback(
+                async_input,
+                state,
+                execute_current_tx_context_input,
+            );
 
             let callback_input = async_promise_tx_input(address, promise, &async_result);
-            let (callback_result, state) = self.execute_sc_call(callback_input, state);
+            let callback_result = self.execute_sc_call_lambda(
+                callback_input,
+                state,
+                execute_current_tx_context_input,
+            );
             assert!(
                 callback_result.pending_calls.promises.is_empty(),
                 "successive promises currently not supported"
             );
-            (async_result, callback_result, state)
+            (async_result, callback_result)
         } else {
-            let state_rc = Rc::new(state);
-            let tx_cache = TxCache::new(state_rc.clone());
-            if let Err(err) = tx_cache.subtract_egld_balance(address, &promise.call.call_value) {
-                let state = Rc::try_unwrap(state_rc).unwrap();
-                return (TxResult::from_panic_obj(&err), TxResult::empty(), state);
+            let result = self.insert_ghost_account(&promise.call, state);
+            match result {
+                Ok(blockchain_updates) => {
+                    state.commit_updates(blockchain_updates);
+                    (TxResult::empty(), TxResult::empty())
+                },
+                Err(err) => (TxResult::from_panic_obj(&err), TxResult::empty()),
             }
+        }
+    }
+
+    /// When calling a contract that is unknown to the state, we insert a ghost account.
+    fn insert_ghost_account(
+        &self,
+        async_data: &AsyncCallTxData,
+        state: &mut Shareable<BlockchainState>,
+    ) -> Result<BlockchainUpdate, TxPanic> {
+        state.with_shared(|state_rc| {
+            let tx_cache = TxCache::new(state_rc.clone());
+            tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)?;
             tx_cache.insert_account(AccountData {
-                address: promise.call.to.clone(),
+                address: async_data.to.clone(),
                 nonce: 0,
-                egld_balance: promise.call.call_value.clone(),
+                egld_balance: async_data.call_value.clone(),
                 esdt: AccountEsdt::default(),
                 username: Vec::new(),
                 storage: HashMap::new(),
@@ -243,11 +237,7 @@ impl BlockchainVMRef {
                 contract_owner: None,
                 developer_rewards: BigUint::zero(),
             });
-            let blockchain_updates = tx_cache.into_blockchain_updates();
-            let mut state = Rc::try_unwrap(state_rc).unwrap();
-            state.commit_updates(blockchain_updates);
-
-            (TxResult::empty(), TxResult::empty(), state)
-        }
+            Ok(tx_cache.into_blockchain_updates())
+        })
     }
 }
