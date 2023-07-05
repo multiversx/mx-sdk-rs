@@ -1,13 +1,13 @@
 use std::rc::Rc;
 
 /// Temporarily converts a mutable reference into a reference-counted smart pointer (`Rc`).
-/// 
+///
 /// This only takes as long as the closure `f` is executed.
-/// 
+///
 /// All subsequent Rc clones must be dropped before `f` terminates, otherwise the function will panic.
-/// 
+///
 /// The `Clone` of the argument is not used, except to preserve memory consistency in case of failure.
-/// 
+///
 /// See the `Shared` type for a safer implementation, which does not require `Clone`.
 pub fn with_shared_mut_ref<T, F, R>(t: &mut T, f: F) -> R
 where

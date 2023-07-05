@@ -4,9 +4,9 @@ use std::{
 };
 
 /// Wraps an object and provides mutable access to it.
-/// 
+///
 /// The point is that sometimes we want to stop mutability and proliferate reference-counted pointers to it.
-/// 
+///
 /// This happens in a controlled environment, in the `with_shared` method closure argument.
 /// All reference-counted pointers are expected to be dropped until that closure finishes.
 pub enum Shareable<T> {
@@ -102,9 +102,9 @@ impl<T> Shareable<T> {
     }
 
     /// The main functionality of `Shared`.
-    /// 
+    ///
     /// Temporarily makes the object immutable, and creates a Rc pointer to the contents, which can then be cloned.
-    /// 
+    ///
     /// Important restriction: all Rc pointers creates from the one given to the closure `f` must be dropped before its execution ends.
     /// Otherwise the operation will panic.
     pub fn with_shared<F, R>(&mut self, f: F) -> R

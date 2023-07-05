@@ -1,10 +1,11 @@
 use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
-        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxContext, TxInput, TxResult,
-        TxResultCalls,
+        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxCacheSource, TxContext,
+        TxContextStack, TxInput, TxResult, TxResultCalls,
     },
     types::VMAddress,
+    with_shared::Shareable,
     world_mock::{AccountData, AccountEsdt, BlockchainState},
 };
 use num_bigint::BigUint;
@@ -13,31 +14,48 @@ use std::{collections::HashMap, rc::Rc};
 
 use super::BlockchainVMRef;
 
+/// Executes the SC endpoint, as given by the current TxInput in the current TxContext.
+///
+/// Works directly with the top of the execution stack, that is why it takes no arguments.
+///
+/// It expectes that the stack is properly set up.
+pub fn execute_current_tx_context_input() {
+    let tx_context_rc = TxContextStack::static_peek();
+    let func_name = tx_context_rc.input_ref().func_name.clone();
+    let instance = tx_context_rc.vm_ref.get_contract_instance(&tx_context_rc);
+    instance.call(func_name.as_str()).expect("execution error");
+}
+
 impl BlockchainVMRef {
     pub fn execute_sc_query_lambda<F>(
         &self,
         tx_input: TxInput,
-        state: BlockchainState,
+        state: &mut Shareable<BlockchainState>,
         f: F,
-    ) -> (TxResult, BlockchainState)
+    ) -> TxResult
     where
-        F: FnOnce(TxContext) -> TxContext,
+        F: FnOnce(),
     {
-        let state_rc = Rc::new(state);
-        let tx_cache = TxCache::new(state_rc.clone());
-        let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
-        let tx_context = f(tx_context);
-        let (tx_result, _) = tx_context.into_results();
-        (tx_result, Rc::try_unwrap(state_rc).unwrap())
+        let (tx_result, _) = self.execute_in_debugger(tx_input, state, f);
+        tx_result
     }
 
-    pub fn execute_sc_query(
+    pub fn execute_in_debugger<S, F>(
         &self,
         tx_input: TxInput,
-        state: BlockchainState,
-    ) -> (TxResult, BlockchainState) {
-        self.execute_sc_query_lambda(tx_input, state, |tx_context| {
-            self.execute_tx_context(tx_context)
+        state: &mut Shareable<S>,
+        f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        S: TxCacheSource + Clone + 'static,
+        F: FnOnce(),
+    {
+        state.with_shared(|state_rc| {
+            let tx_cache = TxCache::new(state_rc);
+            let mut tx_context_sh =
+                Shareable::new(TxContext::new(self.clone(), tx_input, tx_cache));
+            TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
+            tx_context_sh.into_inner().into_results()
         })
     }
 

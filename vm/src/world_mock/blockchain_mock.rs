@@ -1,19 +1,22 @@
-use crate::tx_execution::BlockchainVMRef;
+use crate::{tx_execution::BlockchainVMRef, with_shared::Shareable};
 use multiversx_chain_vm_executor::Executor;
-use std::fmt::Debug;
+use std::{
+    fmt::Debug,
+    ops::{Deref, DerefMut},
+};
 
 use super::{BlockchainState, FailingExecutor};
 
 pub struct BlockchainMock {
     pub vm: BlockchainVMRef,
-    pub state: BlockchainState,
+    pub state: Shareable<BlockchainState>,
 }
 
 impl BlockchainMock {
     pub fn new(executor: Box<dyn Executor>) -> Self {
         BlockchainMock {
             vm: BlockchainVMRef::new(executor),
-            state: BlockchainState::default(),
+            state: Shareable::default(),
         }
     }
 }
@@ -29,9 +32,10 @@ impl BlockchainMock {
     where
         F: FnOnce(BlockchainVMRef, BlockchainState) -> (R, BlockchainState),
     {
-        let obj = std::mem::take(&mut self.state);
+        let state_mut = self.state.deref_mut();
+        let obj = std::mem::take(state_mut);
         let (result, obj) = f(self.vm.clone(), obj);
-        self.state = obj;
+        *state_mut = obj;
         result
     }
 }
@@ -39,7 +43,7 @@ impl BlockchainMock {
 impl Debug for BlockchainMock {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("BlockchainMock")
-            .field("state", &self.state)
+            .field("state", self.state.deref())
             .finish()
     }
 }

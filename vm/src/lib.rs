@@ -6,8 +6,8 @@ pub mod tx_mock;
 pub mod types;
 pub mod vm_err_msg;
 pub mod vm_hooks;
-pub mod world_mock;
 pub mod with_shared;
+pub mod world_mock;
 
 pub use world_mock::BlockchainMock;
 
