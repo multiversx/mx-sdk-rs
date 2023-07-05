@@ -2,7 +2,7 @@ use multiversx_chain_vm::tx_mock::{TxFunctionName, TxResult};
 use multiversx_sc::contract_base::{CallableContract, ContractBase};
 
 use crate::{
-    scenario_model::{ScCallStep, ScQueryStep},
+    scenario_model::{ScCallStep, ScDeployStep, ScQueryStep},
     DebugApi, ScenarioWorld,
 };
 
@@ -90,6 +90,44 @@ impl ScenarioWorld {
                 .perform_sc_call_lambda_and_check(&sc_call_step, || {
                     f(contract_obj);
                 });
+        check_result(tx_result);
+        self
+    }
+
+    pub fn whitebox_deploy<ContractObj, F>(
+        &mut self,
+        whitebox_contract: &WhiteboxContract<ContractObj>,
+        sc_deploy_step: ScDeployStep,
+        f: F,
+    ) -> &mut Self
+    where
+        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        F: FnOnce(ContractObj) + 'static,
+    {
+        self.whitebox_deploy_check(whitebox_contract, sc_deploy_step, f, |tx_result| {
+            tx_result.assert_ok();
+        })
+    }
+
+    pub fn whitebox_deploy_check<ContractObj, F, C>(
+        &mut self,
+        whitebox_contract: &WhiteboxContract<ContractObj>,
+        sc_deploy_step: ScDeployStep,
+        f: F,
+        check_result: C,
+    ) -> &mut Self
+    where
+        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        F: FnOnce(ContractObj) + 'static,
+        C: FnOnce(TxResult),
+    {
+        let contract_obj = (whitebox_contract.contract_obj_builder)();
+        let debugger_backend = self.get_mut_contract_debugger_backend();
+        let (_, tx_result) = debugger_backend
+            .vm_runner
+            .perform_sc_deploy_lambda_and_check(&sc_deploy_step, || {
+                f(contract_obj);
+            });
         check_result(tx_result);
         self
     }
