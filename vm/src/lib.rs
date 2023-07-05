@@ -7,11 +7,14 @@ pub mod types;
 pub mod vm_err_msg;
 pub mod vm_hooks;
 pub mod world_mock;
+mod with_shared;
 
 pub use world_mock::BlockchainMock;
 
 // Re-exporting the executor, for convenience.
 pub use multiversx_chain_vm_executor as executor;
+
+use with_shared::with_shared_mut_ref;
 
 #[macro_use]
 extern crate alloc;
