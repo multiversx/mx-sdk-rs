@@ -47,7 +47,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        S: TxCacheSource + Clone + 'static,
+        S: TxCacheSource + 'static,
         F: FnOnce(),
     {
         state.with_shared(|state_rc| {

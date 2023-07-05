@@ -74,6 +74,6 @@ mod test {
     #[should_panic = "failed to recover owned object from Rc"]
     fn test_with_shared_mut_ref_fail() {
         let mut s = "test string".to_string();
-        let _illegal_clone = with_shared_mut_ref(&mut s, |s_rc| s_rc.clone());
+        let _illegally_extracted_rc = with_shared_mut_ref(&mut s, |s_rc| s_rc);
     }
 }

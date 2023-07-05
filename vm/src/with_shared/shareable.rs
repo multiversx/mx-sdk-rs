@@ -148,6 +148,6 @@ mod test {
     #[should_panic = "failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped"]
     fn test_shareable_mut_fail() {
         let mut s = Shareable::new("test string".to_string());
-        let _illegal_clone = s.with_shared(|s_rc| s_rc.clone());
+        let _illegally_extracted_rc = s.with_shared(|s_rc| s_rc);
     }
 }
