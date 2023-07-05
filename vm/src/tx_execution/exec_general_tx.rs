@@ -67,7 +67,7 @@ impl BlockchainVMRef {
         }
 
         if tx_context_sh.tx_input_box.to.is_smart_contract_address()
-            || !tx_context_sh.tx_input_box.func_name.is_empty()
+            && !tx_context_sh.tx_input_box.func_name.is_empty()
         {
             TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
         };
