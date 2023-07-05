@@ -32,81 +32,86 @@ fn world() -> ScenarioWorld {
 #[test]
 #[ignore]
 fn call_other_shard_1_rs() {
-    world().run("scenarios/call_other_shard-1.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/call_other_shard-1.scen.json", world());
 }
 
 #[test]
 #[ignore]
 fn call_other_shard_2_rs() {
-    world().run("scenarios/call_other_shard-2.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/call_other_shard-2.scen.json", world());
 }
 
 #[test]
 fn change_board_rs() {
-    world().run("scenarios/changeBoard.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/changeBoard.scen.json", world());
 }
 
 #[test]
 fn change_quorum_rs() {
-    world().run("scenarios/changeQuorum.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/changeQuorum.scen.json", world());
 }
 
 #[test]
 fn change_quorum_too_big_rs() {
-    world().run("scenarios/changeQuorum_tooBig.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/changeQuorum_tooBig.scen.json", world());
 }
 
 #[test]
 fn deploy_adder_err_rs() {
-    world().run("scenarios/deployAdder_err.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/deployAdder_err.scen.json", world());
 }
 
 #[test]
 fn deploy_adder_then_call_rs() {
-    world().run("scenarios/deployAdder_then_call.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/deployAdder_then_call.scen.json", world());
 }
 
 #[test]
 fn deploy_factorial_rs() {
-    world().run("scenarios/deployFactorial.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/deployFactorial.scen.json", world());
 }
 
 #[test]
 fn deploy_other_multisig_rs() {
-    world().run("scenarios/deployOtherMultisig.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/deployOtherMultisig.scen.json", world());
 }
 
 #[test]
 fn deploy_duplicate_bm_rs() {
-    world().run("scenarios/deploy_duplicate_bm.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/deploy_duplicate_bm.scen.json", world());
 }
 
 #[test]
 fn interactor_nft_rs() {
-    world().run("scenarios/interactor_nft.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/interactor_nft.scen.json", world());
+}
+
+#[test]
+fn interactor_nft_all_roles_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/interactor_nft_all_roles.scen.json", world());
 }
 
 #[test]
 fn interactor_wegld_rs() {
-    world().run("scenarios/interactor_wegld.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/interactor_wegld.scen.json", world());
 }
 
 #[test]
 fn remove_everyone_rs() {
-    world().run("scenarios/remove_everyone.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/remove_everyone.scen.json", world());
 }
 
 #[test]
 fn send_esdt_rs() {
-    world().run("scenarios/sendEsdt.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/sendEsdt.scen.json", world());
 }
 
 #[test]
 fn upgrade_rs() {
-    world().run("scenarios/upgrade.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/upgrade.scen.json", world());
 }
 
 #[test]
 fn upgrade_from_source_rs() {
-    world().run("scenarios/upgrade_from_source.scen.json");
+    multiversx_sc_scenario::run_rs("scenarios/upgrade_from_source.scen.json", world());
 }

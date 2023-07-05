@@ -58,8 +58,16 @@ async fn main() {
         Some(multisig_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
             multisig_interact.multi_deploy(&args.count).await;
         },
+        Some(multisig_interact_cli::InteractCliCommand::NftFullAllRoles) => {
+            multisig_interact
+                .issue_multisig_and_collection_with_all_roles_full()
+                .await;
+        },
         Some(multisig_interact_cli::InteractCliCommand::NftFull) => {
             multisig_interact.issue_multisig_and_collection_full().await;
+        },
+        Some(multisig_interact_cli::InteractCliCommand::NftIssueAllRoles) => {
+            multisig_interact.issue_collection_with_all_roles().await;
         },
         Some(multisig_interact_cli::InteractCliCommand::NftIssue) => {
             multisig_interact.issue_collection().await;
