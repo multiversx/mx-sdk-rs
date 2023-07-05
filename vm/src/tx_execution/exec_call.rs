@@ -10,7 +10,7 @@ use crate::{
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::{collections::HashMap, rc::Rc};
+use std::collections::HashMap;
 
 use super::BlockchainVMRef;
 
@@ -224,7 +224,7 @@ impl BlockchainVMRef {
         state: &mut Shareable<BlockchainState>,
     ) -> Result<BlockchainUpdate, TxPanic> {
         state.with_shared(|state_rc| {
-            let tx_cache = TxCache::new(state_rc.clone());
+            let tx_cache = TxCache::new(state_rc);
             tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)?;
             tx_cache.insert_account(AccountData {
                 address: async_data.to.clone(),

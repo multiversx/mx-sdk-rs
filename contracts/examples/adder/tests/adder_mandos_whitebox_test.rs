@@ -34,13 +34,10 @@ fn adder_whitebox() {
             let sum_value = sc.sum();
             assert_eq!(sum_value.get(), 5u32);
         })
-        .sc_call_step(
-            ScCallStep::new()
-                .from("address:owner")
-                .to("sc:adder")
-                .function("add")
-                .argument("3")
-                .expect(TxExpect::ok().no_result()),
+        .whitebox_call(
+            &adder_whitebox,
+            ScCallStep::new().from("address:owner"),
+            |sc| sc.add(3u32.into()),
         )
         .check_state_step(
             CheckStateStep::new()

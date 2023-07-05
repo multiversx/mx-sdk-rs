@@ -11,6 +11,21 @@ use crate::{
 
 use super::BlockchainVMRef;
 
+fn should_execute_sc_call(tx_input: &TxInput) -> bool {
+    // execute whitebox calls no matter what
+    if tx_input.func_name == TxFunctionName::WHITEBOX_CALL {
+        return true;
+    }
+
+    // don't execute anything for an EOA
+    if !tx_input.to.is_smart_contract_address() {
+        return false;
+    }
+
+    // calls with empty func name are simple transfers
+    !tx_input.func_name.is_empty()
+}
+
 impl BlockchainVMRef {
     /// Executes without builtin functions, directly on the contract or the given lambda closure.
     pub fn default_execution<F>(
@@ -66,9 +81,7 @@ impl BlockchainVMRef {
             }
         }
 
-        if tx_context_sh.tx_input_box.to.is_smart_contract_address()
-            && !tx_context_sh.tx_input_box.func_name.is_empty()
-        {
+        if should_execute_sc_call(&tx_context_sh.tx_input_box) {
             TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
         };
 
