@@ -1,40 +1,50 @@
 use num_traits::Zero;
 
 use crate::{
-    tx_mock::{BlockchainUpdate, TxCache, TxContext, TxFunctionName, TxInput, TxLog, TxResult},
+    tx_mock::{
+        BlockchainUpdate, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput, TxLog,
+        TxResult,
+    },
     types::VMAddress,
+    with_shared::Shareable,
 };
 
 use super::BlockchainVMRef;
 
 impl BlockchainVMRef {
-    pub fn default_execution(
+    /// Executes without builtin functions, directly on the contract or the given lambda closure.
+    pub fn default_execution<F>(
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         let tx_context = TxContext::new(self.clone(), tx_input, tx_cache);
+        let mut tx_context_sh = Shareable::new(tx_context);
 
-        if let Err(err) = tx_context.tx_cache.transfer_egld_balance(
-            &tx_context.tx_input_box.from,
-            &tx_context.tx_input_box.to,
-            &tx_context.tx_input_box.egld_value,
+        if let Err(err) = tx_context_sh.tx_cache.transfer_egld_balance(
+            &tx_context_sh.tx_input_box.from,
+            &tx_context_sh.tx_input_box.to,
+            &tx_context_sh.tx_input_box.egld_value,
         ) {
             return (TxResult::from_panic_obj(&err), BlockchainUpdate::empty());
         }
 
         // skip for transactions coming directly from scenario json, which should all be coming from user wallets
         // TODO: reorg context logic
-        let add_transfer_log = tx_context.tx_input_box.from.is_smart_contract_address()
-            && !tx_context.tx_input_box.egld_value.is_zero();
+        let add_transfer_log = tx_context_sh.tx_input_box.from.is_smart_contract_address()
+            && !tx_context_sh.tx_input_box.egld_value.is_zero();
         let transfer_value_log = if add_transfer_log {
             Some(TxLog {
                 address: VMAddress::zero(), // TODO: figure out the real VM behavior
                 endpoint: "transferValueOnly".into(),
                 topics: vec![
-                    tx_context.tx_input_box.from.to_vec(),
-                    tx_context.tx_input_box.to.to_vec(),
-                    tx_context.tx_input_box.egld_value.to_bytes_be(),
+                    tx_context_sh.tx_input_box.from.to_vec(),
+                    tx_context_sh.tx_input_box.to.to_vec(),
+                    tx_context_sh.tx_input_box.egld_value.to_bytes_be(),
                 ],
                 data: Vec::new(),
             })
@@ -43,10 +53,10 @@ impl BlockchainVMRef {
         };
 
         // TODO: temporary, will convert to explicit builtin function first
-        for esdt_transfer in tx_context.tx_input_box.esdt_values.iter() {
-            let transfer_result = tx_context.tx_cache.transfer_esdt_balance(
-                &tx_context.tx_input_box.from,
-                &tx_context.tx_input_box.to,
+        for esdt_transfer in tx_context_sh.tx_input_box.esdt_values.iter() {
+            let transfer_result = tx_context_sh.tx_cache.transfer_esdt_balance(
+                &tx_context_sh.tx_input_box.from,
+                &tx_context_sh.tx_input_box.to,
                 &esdt_transfer.token_identifier,
                 esdt_transfer.nonce,
                 &esdt_transfer.value,
@@ -56,15 +66,13 @@ impl BlockchainVMRef {
             }
         }
 
-        let tx_context = if !tx_context.tx_input_box.to.is_smart_contract_address()
-            || tx_context.tx_input_box.func_name.is_empty()
+        if tx_context_sh.tx_input_box.to.is_smart_contract_address()
+            || !tx_context_sh.tx_input_box.func_name.is_empty()
         {
-            tx_context
-        } else {
-            self.execute_tx_context(tx_context)
+            TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
         };
 
-        let (mut tx_result, blockchain_updates) = tx_context.into_results();
+        let (mut tx_result, blockchain_updates) = tx_context_sh.into_inner().into_results();
         if let Some(tv_log) = transfer_value_log {
             tx_result.result_logs.insert(0, tv_log);
         }

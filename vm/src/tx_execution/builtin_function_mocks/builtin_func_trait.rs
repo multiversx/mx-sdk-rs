@@ -1,5 +1,5 @@
 use crate::{
-    tx_execution::BlockchainVMRef,
+    tx_execution::{execute_current_tx_context_input, BlockchainVMRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult, TxTokenTransfer},
     types::VMAddress,
 };
@@ -16,7 +16,24 @@ pub trait BuiltinFunction {
         vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate);
+    ) -> (TxResult, BlockchainUpdate) {
+        self.execute_lambda(
+            vm,
+            tx_input,
+            tx_cache,
+            Box::new(execute_current_tx_context_input),
+        )
+    }
+
+    fn execute_lambda(
+        &self,
+        vm: &BlockchainVMRef,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+        _f: Box<dyn FnOnce()>,
+    ) -> (TxResult, BlockchainUpdate) {
+        self.execute(vm, tx_input, tx_cache)
+    }
 }
 
 /// Contains a builtin function call ESDT transfers (if any) and the real recipient of the transfer

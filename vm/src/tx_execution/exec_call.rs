@@ -59,15 +59,19 @@ impl BlockchainVMRef {
         })
     }
 
-    pub fn execute_builtin_function_or_default(
+    pub fn execute_builtin_function_or_default<F>(
         &self,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce() + 'static,
+    {
         if let Some(builtin_func) = self.builtin_functions.get(&tx_input.func_name) {
-            builtin_func.execute(self, tx_input, tx_cache)
+            builtin_func.execute_lambda(self, tx_input, tx_cache, Box::new(f))
         } else {
-            self.default_execution(tx_input, tx_cache)
+            self.default_execution(tx_input, tx_cache, f)
         }
     }
 
@@ -80,8 +84,11 @@ impl BlockchainVMRef {
 
         let state_rc = Rc::new(state);
         let tx_cache = TxCache::new(state_rc.clone());
-        let (tx_result, blockchain_updates) =
-            self.execute_builtin_function_or_default(tx_input, tx_cache);
+        let (tx_result, blockchain_updates) = self.execute_builtin_function_or_default(
+            tx_input,
+            tx_cache,
+            execute_current_tx_context_input,
+        );
 
         let mut state = Rc::try_unwrap(state_rc).unwrap();
         if tx_result.result_status == 0 {
@@ -89,6 +96,29 @@ impl BlockchainVMRef {
         }
 
         (tx_result, state)
+    }
+
+    pub fn execute_sc_call_lambda<F>(
+        &self,
+        tx_input: TxInput,
+        state: &mut Shareable<BlockchainState>,
+        f: F,
+    ) -> TxResult
+    where
+        F: FnOnce() + 'static,
+    {
+        state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
+
+        let (tx_result, blockchain_updates) = state.with_shared(|state_rc| {
+            let tx_cache = TxCache::new(state_rc);
+            self.execute_builtin_function_or_default(tx_input, tx_cache, f)
+        });
+
+        if tx_result.result_status == 0 {
+            blockchain_updates.apply(state);
+        }
+
+        tx_result
     }
 
     pub fn execute_async_call_and_callback(
