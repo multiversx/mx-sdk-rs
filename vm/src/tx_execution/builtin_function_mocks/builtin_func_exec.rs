@@ -9,14 +9,7 @@ use super::{
     general::{ChangeOwner, ClaimDeveloperRewards, SetUsername, UpgradeContract},
     transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
 };
-
-const ESDT_ROLE_LOCAL_MINT: &str = "ESDTRoleLocalMint";
-const ESDT_ROLE_LOCAL_BURN: &str = "ESDTRoleLocalBurn";
-const ESDT_ROLE_NFT_CREATE: &str = "ESDTRoleNFTCreate";
-const ESDT_ROLE_NFT_ADD_QUANTITY: &str = "ESDTRoleNFTAddQuantity";
-const ESDT_ROLE_NFT_BURN: &str = "ESDTRoleNFTBurn";
-const ESDT_ROLE_NFT_ADD_URI: &str = "ESDTRoleNFTAddURI";
-const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &str = "ESDTRoleNFTUpdateAttributes";
+use crate::types::esdt_local_role_names::*;
 
 fn builtin_function_impls() -> Vec<Box<dyn BuiltinFunction>> {
     vec![
