@@ -1,6 +1,14 @@
-use super::{esdt_local_role_names::*, EsdtLocalRoleFlags};
+use super::EsdtLocalRoleFlags;
 
 const ESDT_ROLE_NONE: &str = "";
+const ESDT_ROLE_LOCAL_MINT: &str = "ESDTRoleLocalMint";
+const ESDT_ROLE_LOCAL_BURN: &str = "ESDTRoleLocalBurn";
+const ESDT_ROLE_NFT_CREATE: &str = "ESDTRoleNFTCreate";
+const ESDT_ROLE_NFT_ADD_QUANTITY: &str = "ESDTRoleNFTAddQuantity";
+const ESDT_ROLE_NFT_BURN: &str = "ESDTRoleNFTBurn";
+const ESDT_ROLE_NFT_ADD_URI: &str = "ESDTRoleNFTAddURI";
+const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &str = "ESDTRoleNFTUpdateAttributes";
+const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
 
 /// The VM implementation for EsdtLocalRole, used internally in builtin functions.
 ///

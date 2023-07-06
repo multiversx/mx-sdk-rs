@@ -1,4 +1,3 @@
-pub mod esdt_local_role_names;
 mod vm_address;
 mod vm_code_metadata;
 mod vm_esdt_local_role;
