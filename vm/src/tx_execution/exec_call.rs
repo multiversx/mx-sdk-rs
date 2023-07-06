@@ -68,11 +68,13 @@ impl BlockchainVMRef {
     where
         F: FnOnce() + 'static,
     {
-        if let Some(builtin_func) = self.builtin_functions.get(&tx_input.func_name) {
-            builtin_func.execute_lambda(self, tx_input, tx_cache, Box::new(f))
-        } else {
-            self.default_execution(tx_input, tx_cache, f)
-        }
+        self.builtin_functions.execute_builtin_function_or_else(
+            self,
+            tx_input,
+            tx_cache,
+            f,
+            |tx_input, tx_cache, f| self.default_execution(tx_input, tx_cache, f),
+        )
     }
 
     pub fn execute_sc_call_lambda<F>(

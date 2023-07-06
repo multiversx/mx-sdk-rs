@@ -35,17 +35,17 @@ impl EsdtLocalRole {
         }
     }
 
-    pub fn as_role_name(&self) -> &'static [u8] {
+    pub fn name(&self) -> &'static str {
         match self {
-            Self::None => ESDT_ROLE_NONE.as_bytes(),
-            Self::Mint => ESDT_ROLE_LOCAL_MINT.as_bytes(),
-            Self::Burn => ESDT_ROLE_LOCAL_BURN.as_bytes(),
-            Self::NftCreate => ESDT_ROLE_NFT_CREATE.as_bytes(),
-            Self::NftAddQuantity => ESDT_ROLE_NFT_ADD_QUANTITY.as_bytes(),
-            Self::NftBurn => ESDT_ROLE_NFT_BURN.as_bytes(),
-            Self::NftAddUri => ESDT_ROLE_NFT_ADD_URI.as_bytes(),
-            Self::NftUpdateAttributes => ESDT_ROLE_NFT_UPDATE_ATTRIBUTES.as_bytes(),
-            Self::Transfer => ESDT_ROLE_TRANSFER.as_bytes(),
+            Self::None => ESDT_ROLE_NONE,
+            Self::Mint => ESDT_ROLE_LOCAL_MINT,
+            Self::Burn => ESDT_ROLE_LOCAL_BURN,
+            Self::NftCreate => ESDT_ROLE_NFT_CREATE,
+            Self::NftAddQuantity => ESDT_ROLE_NFT_ADD_QUANTITY,
+            Self::NftBurn => ESDT_ROLE_NFT_BURN,
+            Self::NftAddUri => ESDT_ROLE_NFT_ADD_URI,
+            Self::NftUpdateAttributes => ESDT_ROLE_NFT_UPDATE_ATTRIBUTES,
+            Self::Transfer => ESDT_ROLE_TRANSFER,
         }
     }
 
