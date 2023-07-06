@@ -33,7 +33,7 @@ impl BuiltinFunctionContainer {
         or_else: Else,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
         Else: FnOnce(TxInput, TxCache, F) -> (TxResult, BlockchainUpdate),
     {
         BuiltinFunctionCall::new(vm, tx_input, tx_cache).execute_or_else(f, or_else)
@@ -76,7 +76,7 @@ impl<'a> BuiltinFunctionCall<'a> {
 
     pub fn execute_or_else<F, Else>(self, f: F, or_else: Else) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
         Else: FnOnce(TxInput, TxCache, F) -> (TxResult, BlockchainUpdate),
     {
         match self.tx_input.func_name.as_str() {
@@ -121,9 +121,9 @@ impl<'a> BuiltinFunctionCall<'a> {
     fn execute_bf<B, F>(self, builtin_func: B, f: F) -> (TxResult, BlockchainUpdate)
     where
         B: BuiltinFunction,
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
-        builtin_func.execute_lambda(self.vm, self.tx_input, self.tx_cache, Box::new(f))
+        builtin_func.execute_lambda(self.vm, self.tx_input, self.tx_cache, f)
     }
 
     fn check_role_and_execute<B, F>(
@@ -134,7 +134,7 @@ impl<'a> BuiltinFunctionCall<'a> {
     ) -> (TxResult, BlockchainUpdate)
     where
         B: BuiltinFunction,
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         if check_allowed_to_execute(role, &self.tx_input, &self.tx_cache) {
             self.execute_bf(builtin_func, f)

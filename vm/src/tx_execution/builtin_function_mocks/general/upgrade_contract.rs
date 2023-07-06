@@ -11,13 +11,16 @@ impl BuiltinFunction for UpgradeContract {
         UPGRADE_CONTRACT_FUNC_NAME
     }
 
-    fn execute_lambda(
+    fn execute_lambda<F>(
         &self,
         vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-        f: Box<dyn FnOnce()>,
-    ) -> (TxResult, BlockchainUpdate) {
+        f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() < 2 {
             return (
                 TxResult::from_vm_error("upgradeContract expects at least 2 arguments"),

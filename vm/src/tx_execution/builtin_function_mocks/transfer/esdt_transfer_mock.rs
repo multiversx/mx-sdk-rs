@@ -29,13 +29,16 @@ impl BuiltinFunction for ESDTTransfer {
         }
     }
 
-    fn execute_lambda(
+    fn execute_lambda<F>(
         &self,
         vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-        f: Box<dyn FnOnce()>,
-    ) -> (TxResult, BlockchainUpdate) {
+        f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         match try_parse_input(&tx_input) {
             Ok(parsed_tx) => {
                 execute_transfer_builtin_func(vm, parsed_tx, self.name(), tx_input, tx_cache, f)

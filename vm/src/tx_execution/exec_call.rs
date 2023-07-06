@@ -66,7 +66,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         self.builtin_functions.execute_builtin_function_or_else(
             self,
@@ -84,7 +84,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
@@ -146,7 +146,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         // main call
         let contract_address = tx_input.to.clone();
