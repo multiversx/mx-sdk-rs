@@ -123,7 +123,7 @@ impl<'a> BuiltinFunctionCall<'a> {
         B: BuiltinFunction,
         F: FnOnce(),
     {
-        builtin_func.execute_lambda(self.vm, self.tx_input, self.tx_cache, f)
+        builtin_func.execute(self.tx_input, self.tx_cache, self.vm, f)
     }
 
     fn check_role_and_execute<B, F>(

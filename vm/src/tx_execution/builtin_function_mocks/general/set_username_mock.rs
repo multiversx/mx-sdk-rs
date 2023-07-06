@@ -11,12 +11,16 @@ impl BuiltinFunction for SetUsername {
         SET_USERNAME_FUNC_NAME
     }
 
-    fn execute(
+    fn execute<F>(
         &self,
-        _vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() != 1 {
             return (
                 TxResult::from_vm_error("SetUserName expects 1 argument"),

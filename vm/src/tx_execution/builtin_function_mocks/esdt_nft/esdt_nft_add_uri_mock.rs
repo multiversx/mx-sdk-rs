@@ -13,12 +13,16 @@ impl BuiltinFunction for ESDTNftAddUri {
         ESDT_NFT_ADD_URI_FUNC_NAME
     }
 
-    fn execute(
+    fn execute<F>(
         &self,
-        _vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() < 3 {
             let err_result = TxResult::from_vm_error("ESDTNFTAddURI expects at least 3 arguments");
             return (err_result, BlockchainUpdate::empty());

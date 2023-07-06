@@ -29,11 +29,11 @@ impl BuiltinFunction for ESDTTransfer {
         }
     }
 
-    fn execute_lambda<F>(
+    fn execute<F>(
         &self,
-        vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
+        vm: &BlockchainVMRef,
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
