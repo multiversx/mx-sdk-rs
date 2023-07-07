@@ -243,11 +243,12 @@ impl BlockchainStateWrapper {
             &self.world.interpreter_context(),
         );
 
-        let mut account = Account::new().balance(egld_balance);
+        let mut account = Account::new()
+            .balance(egld_balance)
+            .code(contract_code_expr.clone());
         if let Some(owner) = owner {
-            account.owner = Some(owner.into());
+            account = account.owner(owner);
         }
-        account.code = Some(contract_code_expr.clone());
 
         self.world
             .set_state_step(SetStateStep::new().put_account(address, account));
