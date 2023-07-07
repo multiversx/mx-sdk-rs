@@ -13,7 +13,7 @@ multiversx_sc::imports!();
 
 /// Standard smart contract module that deals with registering usernames in a DNS contract.
 ///
-/// Elrond usernames/herotags need to be requested by the beneficiary.
+/// MultiversX usernames/herotags need to be requested by the beneficiary.
 /// For a contract, this means that they need an endpoint via which to request a username from the DNS.
 ///
 #[multiversx_sc::module]
