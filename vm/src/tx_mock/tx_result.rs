@@ -1,6 +1,7 @@
 use alloc::vec::Vec;
 
 use std::fmt;
+use crate::tx_mock::ApiCalls;
 
 use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
 
@@ -11,6 +12,8 @@ pub struct TxResult {
     pub result_message: String,
     pub result_values: Vec<Vec<u8>>,
     pub result_logs: Vec<TxLog>,
+
+    pub api_calls: ApiCalls,
 
     /// Calls that need to be executed.
     ///
@@ -32,13 +35,26 @@ impl Default for TxResult {
             result_logs: Vec::new(),
             pending_calls: TxResultCalls::empty(),
             all_calls: Vec::new(),
+            api_calls: ApiCalls::default(),
         }
     }
 }
 
 impl TxResult {
+    // TODO delete?
     pub fn empty() -> TxResult {
         TxResult::default()
+    }
+    pub fn with_api_calls(api_calls: ApiCalls) -> TxResult {
+        TxResult {
+            result_status: 0,
+            result_message: String::new(),
+            result_values: Vec::new(),
+            result_logs: Vec::new(),
+            pending_calls: TxResultCalls::empty(),
+            all_calls: Vec::new(),
+            api_calls,
+        }
     }
 
     pub fn print(&self) {

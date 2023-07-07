@@ -236,6 +236,7 @@ impl SendApiImpl for DebugApi {
             self.big_uint_handle_to_value(amount.get_handle().cast_or_signal_error::<M, _>());
         let recipient = to.to_address();
 
+        DebugApi::count_transfers(1);
         let _ = self.perform_transfer_execute(
             recipient,
             egld_value,
@@ -262,6 +263,7 @@ impl SendApiImpl for DebugApi {
         let mut args = vec![token_bytes, amount_bytes];
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
+        DebugApi::count_transfers(1);
         let _ = self.perform_transfer_execute(
             recipient,
             num_bigint::BigUint::zero(),
@@ -298,6 +300,7 @@ impl SendApiImpl for DebugApi {
 
         Self::append_endpoint_name_and_args(&mut args, endpoint_name, arg_buffer);
 
+        DebugApi::count_transfers(1);
         let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
@@ -342,6 +345,7 @@ impl SendApiImpl for DebugApi {
             );
         }
 
+        DebugApi::count_transfers(payments.len());
         let _ = self.perform_transfer_execute(
             contract_address,
             num_bigint::BigUint::zero(),
