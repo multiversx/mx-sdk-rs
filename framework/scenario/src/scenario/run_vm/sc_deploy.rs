@@ -8,10 +8,10 @@ use crate::{
 
 use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
-    tx_mock::{generate_tx_hash_dummy, TxFunctionName, TxInput, TxResult},
+    tx_mock::{TxFunctionName, TxInput, TxResult},
 };
 
-use super::{check_tx_output, ScenarioVMRunner};
+use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
     pub fn perform_sc_deploy_lambda<F>(
@@ -99,7 +99,7 @@ fn tx_input_from_deploy(sc_deploy_step: &ScDeployStep) -> TxInput {
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(&sc_deploy_step.id),
+        tx_hash: generate_tx_hash(&sc_deploy_step.id, &sc_deploy_step.explicit_tx_hash),
         ..Default::default()
     }
 }

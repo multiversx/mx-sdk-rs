@@ -1180,15 +1180,15 @@ fn fixed_address_invalid_sc_test() {
 #[test]
 fn managed_environment_test() {
     let wrapper = BlockchainStateWrapper::new();
-    let _my_struct =
-        wrapper.execute_in_managed_environment(|| StructWithManagedTypes::<DebugApi> {
+    wrapper.execute_in_managed_environment(|| {
+        let _my_struct = StructWithManagedTypes::<DebugApi> {
             big_uint: managed_biguint!(500),
             buffer: managed_buffer!(b"MyBuffer"),
-        });
+        };
+    });
 }
 
 #[test]
-// #[should_panic] // VMHooksApi misuse: operation called with handles from 2 different contexts
 fn managed_environment_consistency_test() {
     let mut wrapper = BlockchainStateWrapper::new();
     let adder_wrapper = wrapper.create_sc_account(

@@ -42,7 +42,7 @@ impl ScenarioWorld {
         CC: ContractCall<DebugApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
-        let vm_runner = &mut self.get_mut_contract_debugger_backend().vm_runner;
+        let vm_runner = &mut self.get_mut_debugger_backend().vm_runner;
         let sc_query_step = ScQueryStep::new().call(contract_call);
         let tx_result = vm_runner.perform_sc_query(&sc_query_step);
         let mut raw_result = tx_result.result_values;
@@ -89,7 +89,7 @@ impl TypedScCallExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.get_mut_contract_debugger_backend()
+        self.get_mut_debugger_backend()
             .vm_runner
             .perform_sc_call_get_result(typed_sc_call)
     }
@@ -104,7 +104,7 @@ impl TypedScDeployExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.get_mut_contract_debugger_backend()
+        self.get_mut_debugger_backend()
             .vm_runner
             .perform_sc_deploy_get_result(typed_sc_call)
     }
@@ -124,7 +124,7 @@ impl TypedScQueryExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let debugger = self.get_mut_contract_debugger_backend();
+        let debugger = self.get_mut_debugger_backend();
         let mut sc_query_step: ScQueryStep = typed_sc_query.into();
         let tx_result = debugger.vm_runner.perform_sc_query(&sc_query_step);
 

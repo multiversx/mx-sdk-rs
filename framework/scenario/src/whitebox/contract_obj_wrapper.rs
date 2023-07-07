@@ -2,23 +2,23 @@ use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
 
 use crate::{
     api::DebugApi,
-    debug_executor::{catch_tx_panic, ContractContainer, ContractMapRef, StaticVarStack},
+    debug_executor::{contract_instance_wrapped_execution, ContractContainer, StaticVarStack},
     multiversx_sc::{
         codec::{TopDecode, TopEncode},
         contract_base::{CallableContract, ContractBase},
         types::{heap::Address, EsdtLocalRole},
     },
+    scenario_model::{Account, BytesValue, ScCallStep, SetStateStep},
     testing_framework::raw_converter::bytes_to_hex,
+    ScenarioWorld,
 };
+use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::{
-    tx_mock::{
-        BlockchainUpdate, TxCache, TxContext, TxContextRef, TxContextStack, TxFunctionName,
-        TxInput, TxResult,
-    },
+    tx_mock::{TxContext, TxContextStack, TxFunctionName, TxResult},
     types::VMAddress,
-    world_mock::{AccountData, AccountEsdt, EsdtInstanceMetadata},
-    BlockchainMock,
+    world_mock::EsdtInstanceMetadata,
 };
+use multiversx_sc::types::H256;
 use num_traits::Zero;
 
 use super::{
@@ -55,11 +55,10 @@ where
 }
 
 pub struct BlockchainStateWrapper {
+    world: ScenarioWorld,
     address_factory: AddressFactory,
-    contract_map_ref: ContractMapRef,
-    rc_b_mock: Rc<BlockchainMock>,
     address_to_code_path: HashMap<Address, Vec<u8>>,
-    scenario_generator: MandosGenerator,
+    current_tx_id: u64,
     workspace_path: PathBuf,
 }
 
@@ -69,33 +68,29 @@ impl BlockchainStateWrapper {
         let mut current_dir = std::env::current_dir().unwrap();
         current_dir.push(PathBuf::from_str("scenarios/").unwrap());
 
-        let contract_map_ref = ContractMapRef::new();
-        let blockchain_mock = BlockchainMock::new(Box::new(contract_map_ref.clone()));
+        let mut world = ScenarioWorld::debugger();
+        world.start_trace();
 
         BlockchainStateWrapper {
+            world,
             address_factory: AddressFactory::new(),
-            contract_map_ref,
-            rc_b_mock: Rc::new(blockchain_mock),
             address_to_code_path: HashMap::new(),
-            scenario_generator: MandosGenerator::new(),
+            current_tx_id: 0,
             workspace_path: current_dir,
         }
     }
 
-    pub fn get_mut_state(&mut self) -> &mut Rc<BlockchainMock> {
-        &mut self.rc_b_mock
-    }
-
-    pub fn write_mandos_output(self, file_name: &str) {
+    pub fn write_mandos_output(mut self, file_name: &str) {
         let mut full_path = self.workspace_path;
         full_path.push(file_name);
 
-        self.scenario_generator
-            .write_mandos_output(full_path.to_str().unwrap());
+        if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
+            trace.write_scenario_trace(&full_path);
+        }
     }
 
     pub fn check_egld_balance(&self, address: &Address, expected_balance: &num_bigint::BigUint) {
-        let actual_balance = match &self.rc_b_mock.state.accounts.get(&to_vm_address(address)) {
+        let actual_balance = match &self.world.get_state().accounts.get(&to_vm_address(address)) {
             Some(acc) => acc.egld_balance.clone(),
             None => num_bigint::BigUint::zero(),
         };
@@ -115,7 +110,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         expected_balance: &num_bigint::BigUint,
     ) {
-        let actual_balance = match &self.rc_b_mock.state.accounts.get(&to_vm_address(address)) {
+        let actual_balance = match &self.world.get_state().accounts.get(&to_vm_address(address)) {
             Some(acc) => acc.esdt.get_esdt_balance(token_id, 0),
             None => num_bigint::BigUint::zero(),
         };
@@ -141,7 +136,7 @@ impl BlockchainStateWrapper {
         T: TopEncode + TopDecode + PartialEq + core::fmt::Debug,
     {
         let (actual_balance, actual_attributes_serialized) =
-            match &self.rc_b_mock.state.accounts.get(&to_vm_address(address)) {
+            match &self.world.get_state().accounts.get(&to_vm_address(address)) {
                 Some(acc) => {
                     let esdt_data = acc.esdt.get_by_identifier_or_default(token_id);
                     let opt_instance = esdt_data.instances.get_by_nonce(nonce);
@@ -242,38 +237,43 @@ impl BlockchainStateWrapper {
             pathdiff::diff_paths(wasm_full_path.clone(), self.workspace_path.clone()).unwrap();
         let path_str = path_diff.to_str().unwrap();
 
-        let wasm_full_path_as_expr = "file:".to_owned() + wasm_full_path.to_str().unwrap();
-        let contract_bytes = crate::scenario_format::value_interpreter::interpret_string(
-            &wasm_full_path_as_expr,
-            &crate::scenario_format::interpret_trait::InterpreterContext::default()
-                .with_allowed_missing_files(),
+        let contract_code_expr_str = format!("file:{path_str}");
+        let contract_code_expr = BytesValue::interpret_from(
+            contract_code_expr_str.clone(),
+            &self.world.interpreter_context(),
         );
 
-        let wasm_relative_path_expr = "file:".to_owned() + path_str;
-        let wasm_relative_path_expr_bytes = wasm_relative_path_expr.as_bytes().to_vec();
+        let mut account = Account::new().balance(egld_balance);
+        if let Some(owner) = owner {
+            account.owner = Some(owner.into());
+        }
+        account.code = Some(contract_code_expr.clone());
+
+        self.world
+            .set_state_step(SetStateStep::new().put_account(address, account));
 
         self.address_to_code_path
-            .insert(address.clone(), wasm_relative_path_expr_bytes.clone());
-
-        self.create_account_raw(
-            address,
-            egld_balance,
-            owner,
-            Some(contract_bytes.clone()),
-            Some(wasm_relative_path_expr_bytes),
-        );
+            .insert(address.clone(), contract_code_expr_str.into_bytes());
 
         let contains_contract = self
+            .world
+            .get_mut_debugger_backend()
+            .vm_runner
             .contract_map_ref
             .borrow()
-            .contains_contract(contract_bytes.as_slice());
+            .contains_contract(contract_code_expr.value.as_slice());
         if !contains_contract {
             let contract_obj = create_contract_obj_box(obj_builder);
 
-            self.contract_map_ref.borrow_mut().register_contract(
-                contract_bytes,
-                ContractContainer::new(contract_obj, None, false),
-            );
+            self.world
+                .get_mut_debugger_backend()
+                .vm_runner
+                .contract_map_ref
+                .borrow_mut()
+                .register_contract(
+                    contract_code_expr.value,
+                    ContractContainer::new(contract_obj, None, false),
+                );
         }
 
         ContractObjWrapper::new(address.clone(), obj_builder)
@@ -283,31 +283,19 @@ impl BlockchainStateWrapper {
         &mut self,
         address: &Address,
         egld_balance: &num_bigint::BigUint,
-        owner: Option<&Address>,
-        sc_identifier: Option<Vec<u8>>,
-        sc_mandos_path_expr: Option<Vec<u8>>,
+        _owner: Option<&Address>,
+        _sc_identifier: Option<Vec<u8>>,
+        _sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
         let vm_address = to_vm_address(address);
-        if self.rc_b_mock.state.account_exists(&vm_address) {
+        if self.world.get_state().account_exists(&vm_address) {
             panic!("Address already used: {:?}", address_to_hex(address));
         }
 
-        let acc_data = AccountData {
-            address: vm_address,
-            nonce: 0,
-            egld_balance: egld_balance.clone(),
-            esdt: AccountEsdt::default(),
-            storage: HashMap::new(),
-            username: Vec::new(),
-            contract_path: sc_identifier,
-            contract_owner: owner.map(to_vm_address),
-            developer_rewards: num_bigint::BigUint::zero(),
-        };
-        self.scenario_generator
-            .set_account(&acc_data, sc_mandos_path_expr);
+        let account = Account::new().balance(egld_balance);
 
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.add_account(acc_data);
+        self.world
+            .set_state_step(SetStateStep::new().put_account(address, account));
     }
 
     // Has to be used before perfoming a deploy from a SC
@@ -322,16 +310,16 @@ impl BlockchainStateWrapper {
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let deployer_vm_address = to_vm_address(deployer);
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        let deployer_acc = b_mock_ref
-            .state
+        let deployer_acc = self
+            .world
+            .get_state()
             .accounts
             .get(&deployer_vm_address)
             .unwrap()
             .clone();
 
         let new_sc_address = self.address_factory.new_sc_address();
-        b_mock_ref.state.put_new_address(
+        self.world.get_mut_state().put_new_address(
             deployer_vm_address,
             deployer_acc.nonce,
             to_vm_address(&new_sc_address),
@@ -355,9 +343,8 @@ impl BlockchainStateWrapper {
     }
 
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         let vm_address = to_vm_address(address);
-        match b_mock_ref.state.accounts.get_mut(&vm_address) {
+        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
             Some(acc) => {
                 acc.egld_balance = balance.clone();
 
@@ -377,9 +364,8 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         balance: &num_bigint::BigUint,
     ) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         let vm_address = to_vm_address(address);
-        match b_mock_ref.state.accounts.get_mut(&vm_address) {
+        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
             Some(acc) => {
                 acc.esdt.set_esdt_balance(
                     token_id.to_vec(),
@@ -424,9 +410,8 @@ impl BlockchainStateWrapper {
         address: &Address,
         developer_rewards: num_bigint::BigUint,
     ) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         let vm_address: VMAddress = to_vm_address(address);
-        match b_mock_ref.state.accounts.get_mut(&vm_address) {
+        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
             Some(acc) => {
                 acc.developer_rewards = developer_rewards;
 
@@ -453,9 +438,8 @@ impl BlockchainStateWrapper {
         hash: Option<&[u8]>,
         uris: &[Vec<u8>],
     ) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         let vm_address = to_vm_address(address);
-        match b_mock_ref.state.accounts.get_mut(&vm_address) {
+        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
             Some(acc) => {
                 acc.esdt.set_esdt_balance(
                     token_id.to_vec(),
@@ -486,9 +470,8 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         roles: &[EsdtLocalRole],
     ) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
         let vm_address = to_vm_address(address);
-        match b_mock_ref.state.accounts.get_mut(&vm_address) {
+        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
             Some(acc) => {
                 let mut roles_raw = Vec::new();
                 for role in roles {
@@ -506,103 +489,54 @@ impl BlockchainStateWrapper {
     }
 
     pub fn set_block_epoch(&mut self, block_epoch: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.current_block_info.block_epoch = block_epoch;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().block_epoch(block_epoch));
     }
 
     pub fn set_block_nonce(&mut self, block_nonce: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.current_block_info.block_nonce = block_nonce;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().block_nonce(block_nonce));
     }
 
-    pub fn set_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.current_block_info.block_random_seed = block_random_seed;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+    pub fn set_block_random_seed(&mut self, block_random_seed: &[u8; 48]) {
+        self.world
+            .set_state_step(SetStateStep::new().block_random_seed(block_random_seed.as_slice()));
     }
 
     pub fn set_block_round(&mut self, block_round: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.current_block_info.block_round = block_round;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().block_round(block_round));
     }
 
     pub fn set_block_timestamp(&mut self, block_timestamp: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.current_block_info.block_timestamp = block_timestamp;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().block_timestamp(block_timestamp));
     }
 
     pub fn set_prev_block_epoch(&mut self, block_epoch: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.previous_block_info.block_epoch = block_epoch;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().prev_block_epoch(block_epoch));
     }
 
     pub fn set_prev_block_nonce(&mut self, block_nonce: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.previous_block_info.block_nonce = block_nonce;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().prev_block_nonce(block_nonce));
     }
 
-    pub fn set_prev_block_random_seed(&mut self, block_random_seed: Box<[u8; 48]>) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.previous_block_info.block_random_seed = block_random_seed;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
+    pub fn set_prev_block_random_seed(&mut self, block_random_seed: &[u8; 48]) {
+        self.world.set_state_step(
+            SetStateStep::new().prev_block_random_seed(block_random_seed.as_slice()),
         );
     }
 
     pub fn set_prev_block_round(&mut self, block_round: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.previous_block_info.block_round = block_round;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().prev_block_round(block_round));
     }
 
     pub fn set_prev_block_timestamp(&mut self, block_timestamp: u64) {
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        b_mock_ref.state.previous_block_info.block_timestamp = block_timestamp;
-
-        self.scenario_generator.set_block_info(
-            &self.rc_b_mock.state.current_block_info,
-            &self.rc_b_mock.state.previous_block_info,
-        );
+        self.world
+            .set_state_step(SetStateStep::new().prev_block_timestamp(block_timestamp));
     }
 
     pub fn add_mandos_sc_call(
@@ -610,8 +544,10 @@ impl BlockchainStateWrapper {
         sc_call: ScCallMandos,
         opt_expect: Option<TxExpectMandos>,
     ) {
-        self.scenario_generator
-            .create_tx(&sc_call, opt_expect.as_ref());
+        if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
+            MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
+                .create_tx(&sc_call, opt_expect.as_ref());
+        }
     }
 
     pub fn add_mandos_sc_query(
@@ -619,23 +555,30 @@ impl BlockchainStateWrapper {
         sc_query: ScQueryMandos,
         opt_expect: Option<TxExpectMandos>,
     ) {
-        self.scenario_generator
-            .create_query(&sc_query, opt_expect.as_ref());
+        if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
+            MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
+                .create_query(&sc_query, opt_expect.as_ref());
+        }
     }
 
     pub fn add_mandos_set_account(&mut self, address: &Address) {
         let vm_address = to_vm_address(address);
-        if let Some(acc) = self.rc_b_mock.state.accounts.get(&vm_address) {
+        if let Some(acc) = self.world.get_state().accounts.get(&vm_address).cloned() {
             let opt_contract_path = self.address_to_code_path.get(address);
-            self.scenario_generator
-                .set_account(acc, opt_contract_path.cloned());
+            if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
+                MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
+                    .set_account(&acc, opt_contract_path.cloned());
+            }
         }
     }
 
     pub fn add_mandos_check_account(&mut self, address: &Address) {
         let vm_address = to_vm_address(address);
-        if let Some(acc) = self.rc_b_mock.state.accounts.get(&vm_address) {
-            self.scenario_generator.check_account(acc);
+        if let Some(acc) = self.world.get_state().accounts.get(&vm_address).cloned() {
+            if let Some(trace) = &mut self.world.get_mut_debugger_backend().trace {
+                MandosGenerator::new(&mut trace.scenario_trace, &mut self.current_tx_id)
+                    .check_account(&acc);
+            }
         }
     }
 }
@@ -684,7 +627,7 @@ impl BlockchainStateWrapper {
         )
     }
 
-    pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
+    pub fn execute_esdt_multi_transfer<CB, ContractObjBuilder, TxFn>(
         &mut self,
         caller: &Address,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
@@ -694,6 +637,7 @@ impl BlockchainStateWrapper {
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB),
     {
         self.execute_tx_any(
             caller,
@@ -704,7 +648,7 @@ impl BlockchainStateWrapper {
         )
     }
 
-    pub fn execute_query<CB, ContractObjBuilder, TxFn: FnOnce(CB)>(
+    pub fn execute_query<CB, ContractObjBuilder, TxFn>(
         &mut self,
         sc_wrapper: &ContractObjWrapper<CB, ContractObjBuilder>,
         query_fn: TxFn,
@@ -712,6 +656,7 @@ impl BlockchainStateWrapper {
     where
         CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
+        TxFn: FnOnce(CB),
     {
         self.execute_tx(
             sc_wrapper.address_ref(),
@@ -735,95 +680,46 @@ impl BlockchainStateWrapper {
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
-        let sc_address = sc_wrapper.address_ref();
-        let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-        let (tx_result, updates) = b_mock_ref.with_borrowed(|vm, state| {
-            let state_rc = Rc::new(state);
-            let tx_cache = TxCache::new(state_rc.clone());
-            let rust_zero = num_bigint::BigUint::zero();
+        let mut sc_call_step = ScCallStep::new()
+            .from(caller)
+            .to(sc_wrapper.address_ref())
+            .function(TxFunctionName::WHITEBOX_CALL.as_str())
+            .egld_value(egld_payment)
+            .gas_limit(u64::MAX);
 
-            if egld_payment > &rust_zero {
-                if let Err(err) = tx_cache.transfer_egld_balance(
-                    &to_vm_address(caller),
-                    &to_vm_address(sc_address),
-                    egld_payment,
-                ) {
-                    // TODO: refactor
-                    let state = Rc::try_unwrap(state_rc).unwrap();
-                    return (
-                        (TxResult::from_panic_obj(&err), BlockchainUpdate::empty()),
-                        state,
-                    );
-                }
-            }
+        sc_call_step.explicit_tx_hash = Some(H256::zero());
 
-            for esdt in &esdt_payments {
-                if esdt.value > rust_zero {
-                    let transfer_result = tx_cache.transfer_esdt_balance(
-                        &to_vm_address(caller),
-                        &to_vm_address(sc_address),
-                        &esdt.token_identifier,
-                        esdt.nonce,
-                        &esdt.value,
-                    );
-                    if let Err(err) = transfer_result {
-                        // TODO: refactor
-                        let state = Rc::try_unwrap(state_rc).unwrap();
-                        return (
-                            (TxResult::from_panic_obj(&err), BlockchainUpdate::empty()),
-                            state,
-                        );
-                    }
-                }
-            }
+        for esdt_payment in &esdt_payments {
+            sc_call_step = sc_call_step.esdt_transfer(
+                esdt_payment.token_identifier.as_slice(),
+                esdt_payment.nonce,
+                &esdt_payment.value,
+            );
+        }
 
-            let tx_input = build_tx_input(caller, sc_address, egld_payment, esdt_payments);
-            let tx_context_rc = Rc::new(TxContext::new(vm, tx_input, tx_cache));
-            TxContextStack::static_push(tx_context_rc);
-            StaticVarStack::static_push();
-
-            let sc = (sc_wrapper.obj_builder)();
-            let result = catch_tx_panic(false, || {
-                tx_fn(sc);
-                Ok(())
+        let sc = (sc_wrapper.obj_builder)();
+        let tx_result = self
+            .world
+            .get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_call_lambda_and_check(&sc_call_step, || {
+                contract_instance_wrapped_execution(false, || {
+                    tx_fn(sc);
+                    Ok(())
+                });
             });
-
-            if let Err(tx_panic) = result {
-                TxContextRef::new_from_static().replace_tx_result_with_error(tx_panic);
-            }
-            let tx_result = TxContextRef::new_from_static().into_tx_result();
-
-            StaticVarStack::static_pop();
-            let api_after_exec = Rc::try_unwrap(TxContextStack::static_pop()).unwrap();
-
-            let updates = api_after_exec.into_blockchain_updates();
-
-            let state = Rc::try_unwrap(state_rc).unwrap();
-            ((tx_result, updates), state)
-        });
-
-        // only commit for successful non-query calls (caller == SC for queries)
-        let is_successful_tx = tx_result.result_status == 0 && caller != sc_wrapper.address_ref();
-
-        // need two different scopes, so b_mock_ref is destroyed
-        if is_successful_tx {
-            let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-            updates.apply(&mut b_mock_ref.state);
-        }
-        if is_successful_tx {
-            if let Some(async_data) = &tx_result.pending_calls.async_call {
-                let b_mock_ref = Rc::get_mut(&mut self.rc_b_mock).unwrap();
-                let _ = b_mock_ref
-                    .vm
-                    .execute_async_call_and_callback(async_data.clone(), &mut b_mock_ref.state);
-            }
-        }
 
         tx_result
     }
 
-    pub fn execute_in_managed_environment<T, Func: FnOnce() -> T>(&self, f: Func) -> T {
-        DebugApi::dummy();
+    pub fn execute_in_managed_environment<T, F>(&self, f: F) -> T
+    where
+        F: FnOnce() -> T,
+    {
+        let tx_context = TxContext::dummy();
+        let tx_context_rc = Rc::new(tx_context);
+        TxContextStack::static_push(tx_context_rc);
+        StaticVarStack::static_push();
         let result = f();
         let _ = TxContextStack::static_pop();
         let _ = StaticVarStack::static_pop();
@@ -834,7 +730,7 @@ impl BlockchainStateWrapper {
 
 impl BlockchainStateWrapper {
     pub fn get_egld_balance(&self, address: &Address) -> num_bigint::BigUint {
-        match self.rc_b_mock.state.accounts.get(&to_vm_address(address)) {
+        match self.world.get_state().accounts.get(&to_vm_address(address)) {
             Some(acc) => acc.egld_balance.clone(),
             None => panic!(
                 "get_egld_balance: Account {:?} does not exist",
@@ -849,7 +745,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         token_nonce: u64,
     ) -> num_bigint::BigUint {
-        match self.rc_b_mock.state.accounts.get(&to_vm_address(address)) {
+        match self.world.get_state().accounts.get(&to_vm_address(address)) {
             Some(acc) => acc.esdt.get_esdt_balance(token_id, token_nonce),
             None => panic!(
                 "get_esdt_balance: Account {:?} does not exist",
@@ -864,7 +760,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         token_nonce: u64,
     ) -> Option<T> {
-        match self.rc_b_mock.state.accounts.get(&to_vm_address(address)) {
+        match self.world.get_state().accounts.get(&to_vm_address(address)) {
             Some(acc) => match acc.esdt.get_by_identifier(token_id) {
                 Some(esdt_data) => esdt_data
                     .instances
@@ -880,7 +776,7 @@ impl BlockchainStateWrapper {
     }
 
     pub fn dump_state(&self) {
-        for addr in self.rc_b_mock.state.accounts.keys() {
+        for addr in self.world.get_state().accounts.keys() {
             self.dump_state_for_account_hex_attributes(&to_framework_address(addr));
             println!();
         }
@@ -898,7 +794,7 @@ impl BlockchainStateWrapper {
         address: &Address,
     ) {
         let vm_address = to_vm_address(address);
-        let account = match self.rc_b_mock.state.accounts.get(&vm_address) {
+        let account = match self.world.get_state().accounts.get(&vm_address) {
             Some(acc) => acc,
             None => panic!(
                 "dump_state_for_account: Account {:?} does not exist",
@@ -951,26 +847,6 @@ impl BlockchainStateWrapper {
 
             println!("  {key_str}: {value_str}");
         }
-    }
-}
-
-fn build_tx_input(
-    caller: &Address,
-    dest: &Address,
-    egld_value: &num_bigint::BigUint,
-    esdt_values: Vec<TxTokenTransfer>,
-) -> TxInput {
-    TxInput {
-        from: to_vm_address(caller),
-        to: to_vm_address(dest),
-        egld_value: egld_value.clone(),
-        esdt_values,
-        func_name: TxFunctionName::EMPTY,
-        args: Vec::new(),
-        gas_limit: u64::MAX,
-        gas_price: 0,
-        tx_hash: multiversx_chain_vm::types::H256::zero(),
-        ..Default::default()
     }
 }
 

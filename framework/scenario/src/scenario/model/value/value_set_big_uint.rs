@@ -77,6 +77,22 @@ impl From<u128> for BigUintValue {
     }
 }
 
+impl From<BigUint> for BigUintValue {
+    fn from(from: BigUint) -> Self {
+        let s = from.to_string();
+        BigUintValue {
+            value: from,
+            original: ValueSubTree::Str(s),
+        }
+    }
+}
+
+impl From<&BigUint> for BigUintValue {
+    fn from(from: &BigUint) -> Self {
+        Self::from(from.clone())
+    }
+}
+
 impl<M: ManagedTypeApi> From<crate::multiversx_sc::types::BigUint<M>> for BigUintValue {
     fn from(from: crate::multiversx_sc::types::BigUint<M>) -> Self {
         let value = BigUint::from_bytes_be(from.to_bytes_be().as_slice());
