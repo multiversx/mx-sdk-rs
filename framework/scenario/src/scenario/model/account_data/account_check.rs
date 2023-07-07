@@ -137,8 +137,8 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
             esdt: self.esdt.into_raw(),
             username: self.username.into_raw(),
             storage: self.storage.into_raw(),
-            code: self.code.into_raw(),
-            owner: self.owner.into_raw(),
+            code: self.code.into_raw_explicit(), // TODO: convert back to into_raw after VM CI upgrade
+            owner: self.owner.into_raw_explicit(), // TODO: convert back to into_raw after VM CI upgrade
             developer_rewards: self.developer_rewards.into_raw(),
             async_call_data: self.async_call_data.into_raw(),
         }

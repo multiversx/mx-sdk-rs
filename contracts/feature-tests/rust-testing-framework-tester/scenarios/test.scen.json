@@ -40,6 +40,8 @@
                     "storage": {
                         "str:totalValue": "0x01"
                     },
+                    "code": "*",
+                    "owner": "*",
                     "developerRewards": "0"
                 },
                 "+": ""
@@ -74,6 +76,8 @@
                         "0x76616c756550657243616c6c657266687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": "0x32",
                         "str:totalValue": "0x33"
                     },
+                    "code": "*",
+                    "owner": "*",
                     "developerRewards": "0"
                 },
                 "+": ""
