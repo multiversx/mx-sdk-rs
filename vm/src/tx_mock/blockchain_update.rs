@@ -18,5 +18,9 @@ impl BlockchainUpdate {
 
     pub fn apply(self, blockchain: &mut BlockchainState) {
         blockchain.update_accounts(self.accounts);
+
+        if let Some(token_identifiers) = self.new_token_identifiers {
+            blockchain.update_new_token_identifiers(token_identifiers);
+        }
     }
 }
