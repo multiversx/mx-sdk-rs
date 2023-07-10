@@ -2,10 +2,10 @@ use multiversx_chain_vm_executor::{CompilationOptions, Instance};
 
 use crate::{
     display_util::address_hex,
-    tx_mock::{TxContext, TxContextStack},
+    tx_mock::{TxContext, TxContextStack}, with_shared::Shareable,
 };
 
-use super::BlockchainVMRef;
+use super::{BlockchainVMRef, execute_current_tx_context_input};
 
 const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,
@@ -22,15 +22,12 @@ impl BlockchainVMRef {
     /// The endpoint name is taken from the tx context.
     /// Catches and wraps any panics thrown in the contract.
     pub fn execute_tx_context(&self, tx_context: TxContext) -> TxContext {
-        let func_name = tx_context.tx_input_box.func_name.clone();
-        let instance = self.get_contract_instance(&tx_context);
-
-        TxContextStack::execute_on_vm_stack(tx_context, || {
-            instance.call(func_name.as_str()).expect("execution error");
-        })
+        let mut tx_context_sh = Shareable::new(tx_context);
+        TxContextStack::execute_on_vm_stack(&mut tx_context_sh, execute_current_tx_context_input);
+        tx_context_sh.into_inner()
     }
 
-    fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn Instance> {
+    pub fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn Instance> {
         let contract_code = get_contract_identifier(tx_context);
         self.executor
             .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)

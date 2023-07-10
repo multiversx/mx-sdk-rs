@@ -36,7 +36,7 @@ impl ScenarioWorld {
         let debugger_backend = self.get_mut_contract_debugger_backend();
         let tx_result = debugger_backend
             .vm_runner
-            .perform_sc_query_lambda(&sc_query_step, || {
+            .perform_sc_query_lambda_and_check(&sc_query_step, || {
                 f(contract_obj);
             });
         check_result(tx_result);
