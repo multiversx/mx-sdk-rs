@@ -150,23 +150,6 @@ impl AccountEsdt {
         self.0.iter()
     }
 
-    pub fn issue_token(&mut self, token_identifier: &[u8]) {
-        let roles = vec![
-            "ESDTLocalMint".as_bytes().to_vec(),
-            "ESDTLocalBurn".as_bytes().to_vec(),
-        ];
-
-        self.0.insert(
-            token_identifier.to_vec(),
-            EsdtData {
-                instances: EsdtInstances::new(),
-                last_nonce: 0,
-                roles: EsdtRoles::new(roles),
-                frozen: false,
-            },
-        );
-    }
-
     pub fn set_special_role(&mut self, token_identifier: &[u8], role: &[u8]) {
         if let Some(esdt_data) = self.get_mut_by_identifier(token_identifier) {
             let roles = esdt_data.roles.get();
@@ -175,6 +158,48 @@ impl AccountEsdt {
                 new_roles.push(role.to_vec());
                 esdt_data.roles = EsdtRoles::new(new_roles);
             }
+        }
+    }
+
+    pub fn register_and_set_roles(&mut self, token_identifier: &[u8], token_type: &str) {
+        self.issue_token(token_identifier);
+        self.set_roles(
+            token_identifier.to_vec(),
+            Self::get_all_roles_for_token_type(token_type),
+        );
+    }
+
+    fn issue_token(&mut self, token_identifier: &[u8]) {
+        self.0.insert(
+            token_identifier.to_vec(),
+            EsdtData {
+                instances: EsdtInstances::new(),
+                last_nonce: 0,
+                roles: EsdtRoles::default(),
+                frozen: false,
+            },
+        );
+    }
+
+    fn get_all_roles_for_token_type(token_type: &str) -> Vec<Vec<u8>> {
+        match token_type {
+            "NFT" => vec![
+                "ESDTRoleNFTCreate".as_bytes().to_vec(),
+                "ESDTRoleNFTBurn".as_bytes().to_vec(),
+                "ESDTRoleNFTUpdateAttributes".as_bytes().to_vec(),
+                "ESDTRoleNFTAddURI".as_bytes().to_vec(),
+            ],
+            "SFT" | "META" => vec![
+                "ESDTRoleNFTCreate".as_bytes().to_vec(),
+                "ESDTRoleNFTBurn".as_bytes().to_vec(),
+                "ESDTRoleNFTAddQuantity".as_bytes().to_vec(),
+            ],
+            "FNG" => vec![
+                "ESDTRoleLocalMint".as_bytes().to_vec(),
+                "ESDTRoleLocalBurn".as_bytes().to_vec(),
+                "ESDTRoleLocalTransfer".as_bytes().to_vec(),
+            ],
+            _ => panic!("invalid token type"),
         }
     }
 }

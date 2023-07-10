@@ -9,17 +9,12 @@ pub fn register_meta_esdt(tx_context: TxContext) -> (TxContext, TxResult) {
 }
 
 #[allow(unused_variables)]
-pub fn change_sft_to_meta_esdt(_tx_context: TxContext) -> (TxContext, TxResult) {
+pub fn change_sft_to_meta_esdt(tx_context: TxContext) -> (TxContext, TxResult) {
     unimplemented!()
 }
 
 #[allow(unused_variables)]
-pub fn register_and_set_all_roles() -> (TxContext, TxResult) {
-    unimplemented!()
-}
-
-#[allow(unused_variables)]
-pub fn esdt_burn(_tx_context: TxContext) -> (TxContext, TxResult) {
+pub fn esdt_burn(tx_context: TxContext) -> (TxContext, TxResult) {
     unimplemented!()
 }
 

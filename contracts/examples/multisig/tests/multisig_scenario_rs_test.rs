@@ -87,6 +87,11 @@ fn interactor_nft_rs() {
 }
 
 #[test]
+fn interactor_nft_all_roles_rs() {
+    world().run("scenarios/interactor_nft_all_roles.scen.json");
+}
+
+#[test]
 fn interactor_wegld_rs() {
     world().run("scenarios/interactor_wegld.scen.json");
 }

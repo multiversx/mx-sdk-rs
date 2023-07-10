@@ -28,7 +28,7 @@ pub fn execute_system_sc(tx_context: TxContext) -> (TxContext, TxResult) {
         "issueNonFungible" => issue_non_fungible(tx_context),
         "registerMetaESDT" => register_meta_esdt(tx_context),
         "changeSFTToMetaESDT" => change_sft_to_meta_esdt(tx_context),
-        "registerAndSetAllRoles" => register_and_set_all_roles(),
+        "registerAndSetAllRoles" => register_and_set_all_roles(tx_context),
         "ESDTBurn" => esdt_burn(tx_context),
         "mint" => mint(tx_context),
         "freeze" => freeze(tx_context),
