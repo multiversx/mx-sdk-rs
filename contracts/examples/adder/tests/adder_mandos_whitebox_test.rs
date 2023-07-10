@@ -22,13 +22,14 @@ fn adder_whitebox() {
                 .put_account("address:owner", Account::new().nonce(1))
                 .new_address("address:owner", 1, "sc:adder"),
         )
-        .sc_deploy_step(
+        .whitebox_deploy(
+            &adder_whitebox,
             ScDeployStep::new()
                 .from("address:owner")
-                .contract_code("file:output/adder.wasm", &ic)
-                .argument("5")
-                .gas_limit("5,000,000")
-                .expect(TxExpect::ok().no_result()),
+                .contract_code("file:output/adder.wasm", &ic),
+            |sc| {
+                sc.init(5u32.into());
+            },
         )
         .whitebox_query(&adder_whitebox, |sc| {
             let sum_value = sc.sum();

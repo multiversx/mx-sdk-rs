@@ -161,10 +161,12 @@ impl VMHooksHandlerSource for TxContextWrapper {
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_rc());
         tx_cache.increase_acount_nonce(contract_address);
-        let (tx_result, new_address, blockchain_updates) =
-            self.0
-                .vm_ref
-                .deploy_contract(tx_input, contract_code, tx_cache);
+        let (tx_result, new_address, blockchain_updates) = self.0.vm_ref.deploy_contract(
+            tx_input,
+            contract_code,
+            tx_cache,
+            execute_current_tx_context_input,
+        );
 
         match tx_result.result_status {
             0 => (
