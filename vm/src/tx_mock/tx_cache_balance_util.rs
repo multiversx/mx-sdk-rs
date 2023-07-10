@@ -92,10 +92,10 @@ impl TxCache {
         to: &VMAddress,
         value: &BigUint,
     ) -> Result<(), TxPanic> {
-        if !is_system_sc_address(&from) {
+        if !is_system_sc_address(from) {
             self.subtract_egld_balance(from, value)?;
         }
-        if !is_system_sc_address(&to) {
+        if !is_system_sc_address(to) {
             self.increase_egld_balance(to, value);
         }
         Ok(())
@@ -109,7 +109,7 @@ impl TxCache {
         nonce: u64,
         value: &BigUint,
     ) -> Result<(), TxPanic> {
-        if !is_system_sc_address(&from) && !is_system_sc_address(&to) {
+        if !is_system_sc_address(from) && !is_system_sc_address(to) {
             let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value)?;
             self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
         }
