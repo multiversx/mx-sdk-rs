@@ -32,7 +32,7 @@ impl BlockchainVMRef {
     pub fn default_execution<F>(
         &self,
         tx_input: TxInput,
-        mut tx_cache: TxCache,
+        tx_cache: TxCache,
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where

@@ -1,9 +1,6 @@
 use crate::{tx_execution::BlockchainVMRef, with_shared::Shareable};
 use multiversx_chain_vm_executor::Executor;
-use std::{
-    fmt::Debug,
-    ops::{Deref, DerefMut},
-};
+use std::{fmt::Debug, ops::Deref};
 
 use super::{BlockchainState, FailingExecutor};
 

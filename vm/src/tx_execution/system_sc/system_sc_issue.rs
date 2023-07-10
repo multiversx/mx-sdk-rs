@@ -2,72 +2,60 @@ use num_bigint::BigUint;
 
 use crate::{
     crypto_functions::keccak256,
-    tx_mock::{TxCache, TxContext, TxInput, TxResult},
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
     types::top_decode_u64,
 };
 
 /// Issues a new fungible token.
 #[allow(unused_variables)]
-pub fn issue(tx_context: TxContext) -> (TxContext, TxResult) {
-    let tx_input = tx_context.input_ref();
-    let tx_cache = tx_context.blockchain_cache();
-    let tx_result: TxResult;
-
+pub fn issue(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 4 {
-        tx_result = TxResult::from_vm_error("not enough arguments");
-        return (tx_context, tx_result);
+        let tx_result = TxResult::from_vm_error("not enough arguments");
+        return (tx_result, BlockchainUpdate::empty());
     }
     let name = tx_input.args[0].clone();
     let ticker = tx_input.args[1].clone();
     let total_supply = BigUint::from_bytes_be(tx_input.args[2].clone().as_ref());
     let decimals = top_decode_u64(tx_input.args[3].clone().as_ref()) as u32;
 
-    register_and_set_roles(tx_context, ticker, "FT".to_string())
+    register_and_set_roles(tx_input, tx_cache, ticker, "FT".to_string())
 }
 
 /// Issues a new semi-fungible token.
 #[allow(unused_variables)]
-pub fn issue_semi_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
-    let tx_input = tx_context.input_ref();
-    let tx_cache = tx_context.blockchain_cache();
-    let tx_result: TxResult;
-
+pub fn issue_semi_fungible(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 2 {
-        tx_result = TxResult::from_vm_error("not enough arguments");
-        return (tx_context, tx_result);
+        let tx_result = TxResult::from_vm_error("not enough arguments");
+        return (tx_result, BlockchainUpdate::empty());
     }
     let name = tx_input.args[0].clone();
     let ticker = tx_input.args[1].clone();
 
-    register_and_set_roles(tx_context, ticker, "SFT".to_string())
+    register_and_set_roles(tx_input, tx_cache, ticker, "SFT".to_string())
 }
 
 /// Issues a new non-fungible token.
 #[allow(unused_variables)]
-pub fn issue_non_fungible(tx_context: TxContext) -> (TxContext, TxResult) {
-    let tx_input = tx_context.input_ref();
-    let tx_cache = tx_context.blockchain_cache();
-    let tx_result: TxResult;
-
+pub fn issue_non_fungible(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 2 {
-        tx_result = TxResult::from_vm_error("not enough arguments");
-        return (tx_context, tx_result);
+        let tx_result = TxResult::from_vm_error("not enough arguments");
+        return (tx_result, BlockchainUpdate::empty());
     }
     let name = tx_input.args[0].clone();
     let ticker = tx_input.args[1].clone();
 
-    register_and_set_roles(tx_context, ticker, "NFT".to_string())
+    register_and_set_roles(tx_input, tx_cache, ticker, "NFT".to_string())
 }
 
 // Issues a new token and sets all roles for its type.
 #[allow(unused_variables)]
-pub fn register_and_set_all_roles(tx_context: TxContext) -> (TxContext, TxResult) {
-    let tx_input = tx_context.input_ref();
-    let tx_cache = tx_context.blockchain_cache();
-
+pub fn register_and_set_all_roles(
+    tx_input: TxInput,
+    tx_cache: TxCache,
+) -> (TxResult, BlockchainUpdate) {
     if tx_input.args.len() < 4 {
         let tx_result = TxResult::from_vm_error("not enough arguments");
-        return (tx_context, tx_result);
+        return (tx_result, BlockchainUpdate::empty());
     }
 
     let name = tx_input.args[0].clone();
@@ -75,17 +63,15 @@ pub fn register_and_set_all_roles(tx_context: TxContext) -> (TxContext, TxResult
     let token_type = String::from_utf8(tx_input.args[2].clone()).unwrap();
     let decimals = top_decode_u64(tx_input.args[3].clone().as_ref()) as u32;
 
-    register_and_set_roles(tx_context, ticker, token_type)
+    register_and_set_roles(tx_input, tx_cache, ticker, token_type)
 }
 
 fn register_and_set_roles(
-    tx_context: TxContext,
+    tx_input: TxInput,
+    tx_cache: TxCache,
     ticker: Vec<u8>,
     token_type: String,
-) -> (TxContext, TxResult) {
-    let tx_input = tx_context.input_ref();
-    let tx_cache = tx_context.blockchain_cache();
-
+) -> (TxResult, BlockchainUpdate) {
     let mut new_token_identifiers = tx_cache.get_new_token_identifiers();
 
     let token_identifier = if let Some((i, ti)) =
@@ -94,7 +80,7 @@ fn register_and_set_roles(
         new_token_identifiers.remove(i);
         ti.into_bytes()
     } else {
-        generate_token_identifier_from_ticker(tx_input, tx_cache, &ticker)
+        generate_token_identifier_from_ticker(&tx_input, &tx_cache, &ticker)
     };
 
     tx_cache.with_account_mut(&tx_input.from, |account| {
@@ -109,7 +95,7 @@ fn register_and_set_roles(
         ..Default::default()
     };
 
-    (tx_context, tx_result)
+    (tx_result, tx_cache.into_blockchain_updates())
 }
 
 fn first_token_identifier_with_ticker(
