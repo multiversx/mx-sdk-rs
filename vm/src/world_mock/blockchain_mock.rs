@@ -27,19 +27,6 @@ impl Default for BlockchainMock {
     }
 }
 
-impl BlockchainMock {
-    pub fn with_borrowed<F, R>(&mut self, f: F) -> R
-    where
-        F: FnOnce(BlockchainVMRef, BlockchainState) -> (R, BlockchainState),
-    {
-        let state_mut = self.state.deref_mut();
-        let obj = std::mem::take(state_mut);
-        let (result, obj) = f(self.vm.clone(), obj);
-        *state_mut = obj;
-        result
-    }
-}
-
 impl Debug for BlockchainMock {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("BlockchainMock")

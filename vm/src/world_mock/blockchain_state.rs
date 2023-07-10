@@ -13,6 +13,7 @@ pub struct BlockchainState {
     pub new_addresses: HashMap<(VMAddress, u64), VMAddress>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
+    pub new_token_identifiers: Vec<String>,
 }
 
 impl BlockchainState {
@@ -67,6 +68,18 @@ impl BlockchainState {
         account
             .storage
             .insert(STORAGE_REWARD_KEY.to_vec(), storage_v_rew.to_bytes_be());
+    }
+
+    pub fn put_new_token_identifier(&mut self, token_identifier: String) {
+        self.new_token_identifiers.push(token_identifier)
+    }
+
+    pub fn get_new_token_identifiers(&self) -> Vec<String> {
+        self.new_token_identifiers.clone()
+    }
+
+    pub fn update_new_token_identifiers(&mut self, token_identifiers: Vec<String>) {
+        self.new_token_identifiers = token_identifiers;
     }
 }
 

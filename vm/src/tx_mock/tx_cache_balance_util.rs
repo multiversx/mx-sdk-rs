@@ -1,6 +1,9 @@
 use num_bigint::BigUint;
 
-use crate::{tx_mock::TxPanic, types::VMAddress, world_mock::EsdtInstanceMetadata};
+use crate::{
+    tx_execution::is_system_sc_address, tx_mock::TxPanic, types::VMAddress,
+    world_mock::EsdtInstanceMetadata,
+};
 
 use super::TxCache;
 
@@ -89,8 +92,12 @@ impl TxCache {
         to: &VMAddress,
         value: &BigUint,
     ) -> Result<(), TxPanic> {
-        self.subtract_egld_balance(from, value)?;
-        self.increase_egld_balance(to, value);
+        if !is_system_sc_address(&from) {
+            self.subtract_egld_balance(from, value)?;
+        }
+        if !is_system_sc_address(&to) {
+            self.increase_egld_balance(to, value);
+        }
         Ok(())
     }
 
@@ -102,8 +109,10 @@ impl TxCache {
         nonce: u64,
         value: &BigUint,
     ) -> Result<(), TxPanic> {
-        let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value)?;
-        self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
+        if !is_system_sc_address(&from) && !is_system_sc_address(&to) {
+            let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value)?;
+            self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
+        }
         Ok(())
     }
 }

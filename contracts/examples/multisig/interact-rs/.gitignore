@@ -5,4 +5,4 @@
 state.toml
 
 # Trace file of interactor tooling
-interactor_trace.scen.json
+interactor*.scen.json

@@ -43,6 +43,7 @@ impl<'a> MandosGenerator<'a> {
             accounts: accounts_raw,
             block_hashes: Vec::new(),
             new_addresses: Vec::new(),
+            new_token_identifiers: Vec::new(),
             comment: None,
             current_block_info: None,
             previous_block_info: None,

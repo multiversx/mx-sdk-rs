@@ -55,8 +55,20 @@ fn deploy_duplicate_bm_go() {
 }
 
 #[test]
-fn interactor_trace_go() {
-    world().run("scenarios/interactor_trace.scen.json");
+#[ignore = "system SC not yet implemented"]
+fn interactor_nft_go() {
+    world().run("scenarios/interactor_nft.scen.json");
+}
+
+#[test]
+#[ignore = "system SC not yet implemented"]
+fn interactor_nft_all_roles_go() {
+    world().run("scenarios/interactor_nft_all_roles.scen.json");
+}
+
+#[test]
+fn interactor_wegld_go() {
+    world().run("scenarios/interactor_wegld.scen.json");
 }
 
 #[test]

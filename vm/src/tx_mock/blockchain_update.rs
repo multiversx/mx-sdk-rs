@@ -5,15 +5,15 @@ use crate::{
     world_mock::{AccountData, BlockchainState},
 };
 
+#[derive(Default)]
 pub struct BlockchainUpdate {
     pub accounts: HashMap<VMAddress, AccountData>,
+    pub new_token_identifiers: Option<Vec<String>>,
 }
 
 impl BlockchainUpdate {
     pub fn empty() -> Self {
-        BlockchainUpdate {
-            accounts: HashMap::new(),
-        }
+        BlockchainUpdate::default()
     }
 
     pub fn apply(self, blockchain: &mut BlockchainState) {
