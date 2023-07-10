@@ -1,20 +1,18 @@
 use multiversx_sc::types::{BigUint, ManagedVec};
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::{api::StaticApi, *};
 
 use basic_features::managed_vec_features::ManagedVecFeatures;
 
 #[test]
 fn test_managed_vec_new() {
-    let _ = DebugApi::dummy();
-    let bf = basic_features::contract_obj::<DebugApi>();
+    let bf = basic_features::contract_obj::<StaticApi>();
     let result = bf.managed_vec_new();
     assert_eq!(ManagedVec::new(), result);
 }
 
 #[test]
 fn test_managed_vec_eq() {
-    let _ = DebugApi::dummy();
-    let bf = basic_features::contract_obj::<DebugApi>();
+    let bf = basic_features::contract_obj::<StaticApi>();
 
     let mut mv1 = ManagedVec::new();
     mv1.push(BigUint::from(1u32));
@@ -37,8 +35,7 @@ fn test_managed_vec_eq() {
 
 #[test]
 fn test_managed_vec_set() {
-    let _ = DebugApi::dummy();
-    let bf = basic_features::contract_obj::<DebugApi>();
+    let bf = basic_features::contract_obj::<StaticApi>();
 
     let mut mv1 = ManagedVec::new();
     mv1.push(BigUint::from(1u32));

@@ -1,10 +1,9 @@
 use multiversx_sc::contract_base::CallableContract;
-use multiversx_sc_scenario::*;
+use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_function_selector() {
-    let _ = DebugApi::dummy();
-    let use_module = use_module::contract_obj::<DebugApi>();
+    let use_module = use_module::contract_obj::<StaticApi>();
 
     assert!(!use_module.call("invalid_endpoint"));
 
