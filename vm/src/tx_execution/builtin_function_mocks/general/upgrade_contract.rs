@@ -11,11 +11,12 @@ impl BuiltinFunction for UpgradeContract {
         UPGRADE_CONTRACT_FUNC_NAME
     }
 
-    fn execute(
+    fn execute_lambda(
         &self,
         vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
+        f: Box<dyn FnOnce()>,
     ) -> (TxResult, BlockchainUpdate) {
         if tx_input.args.len() < 2 {
             return (
@@ -52,6 +53,6 @@ impl BuiltinFunction for UpgradeContract {
             ..Default::default()
         };
 
-        vm.default_execution(exec_input, tx_cache)
+        vm.default_execution(exec_input, tx_cache, f)
     }
 }

@@ -2,10 +2,11 @@ use multiversx_chain_vm_executor::{CompilationOptions, Instance};
 
 use crate::{
     display_util::address_hex,
-    tx_mock::{TxContext, TxContextStack}, with_shared::Shareable,
+    tx_mock::{TxContext, TxContextStack},
+    with_shared::Shareable,
 };
 
-use super::{BlockchainVMRef, execute_current_tx_context_input};
+use super::{execute_current_tx_context_input, BlockchainVMRef};
 
 const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,
