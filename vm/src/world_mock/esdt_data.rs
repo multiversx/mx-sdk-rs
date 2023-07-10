@@ -1,7 +1,7 @@
 use num_bigint::BigUint;
 use num_traits::Zero;
 
-use crate::display_util::key_hex;
+use crate::{display_util::key_hex, types::VMTokenType};
 use std::{
     collections::{hash_map::Iter, HashMap},
     fmt::{self, Write},
@@ -161,7 +161,7 @@ impl AccountEsdt {
         }
     }
 
-    pub fn register_and_set_roles(&mut self, token_identifier: &[u8], token_type: &str) {
+    pub fn register_and_set_roles(&mut self, token_identifier: &[u8], token_type: VMTokenType) {
         self.issue_token(token_identifier);
         self.set_roles(
             token_identifier.to_vec(),
@@ -181,25 +181,24 @@ impl AccountEsdt {
         );
     }
 
-    fn get_all_roles_for_token_type(token_type: &str) -> Vec<Vec<u8>> {
+    fn get_all_roles_for_token_type(token_type: VMTokenType) -> Vec<Vec<u8>> {
         match token_type {
-            "NFT" => vec![
+            VMTokenType::NonFungible => vec![
                 "ESDTRoleNFTCreate".as_bytes().to_vec(),
                 "ESDTRoleNFTBurn".as_bytes().to_vec(),
                 "ESDTRoleNFTUpdateAttributes".as_bytes().to_vec(),
                 "ESDTRoleNFTAddURI".as_bytes().to_vec(),
             ],
-            "SFT" | "META" => vec![
+            VMTokenType::SemiFungible | VMTokenType::Meta => vec![
                 "ESDTRoleNFTCreate".as_bytes().to_vec(),
                 "ESDTRoleNFTBurn".as_bytes().to_vec(),
                 "ESDTRoleNFTAddQuantity".as_bytes().to_vec(),
             ],
-            "FNG" => vec![
+            VMTokenType::Fungible => vec![
                 "ESDTRoleLocalMint".as_bytes().to_vec(),
                 "ESDTRoleLocalBurn".as_bytes().to_vec(),
                 "ESDTRoleLocalTransfer".as_bytes().to_vec(),
             ],
-            _ => panic!("invalid token type"),
         }
     }
 }

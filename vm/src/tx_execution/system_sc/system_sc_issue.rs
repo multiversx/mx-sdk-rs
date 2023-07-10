@@ -3,7 +3,7 @@ use num_bigint::BigUint;
 use crate::{
     crypto_functions::keccak256,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
-    types::top_decode_u64,
+    types::{top_decode_u64, VMTokenType},
 };
 
 /// Issues a new fungible token.
@@ -18,7 +18,7 @@ pub fn issue(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdat
     let total_supply = BigUint::from_bytes_be(tx_input.args[2].clone().as_ref());
     let decimals = top_decode_u64(tx_input.args[3].clone().as_ref()) as u32;
 
-    register_and_set_roles(tx_input, tx_cache, ticker, "FT".to_string())
+    register_and_set_roles(tx_input, tx_cache, ticker, VMTokenType::Fungible)
 }
 
 /// Issues a new semi-fungible token.
@@ -31,7 +31,7 @@ pub fn issue_semi_fungible(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, B
     let name = tx_input.args[0].clone();
     let ticker = tx_input.args[1].clone();
 
-    register_and_set_roles(tx_input, tx_cache, ticker, "SFT".to_string())
+    register_and_set_roles(tx_input, tx_cache, ticker, VMTokenType::SemiFungible)
 }
 
 /// Issues a new non-fungible token.
@@ -44,7 +44,7 @@ pub fn issue_non_fungible(tx_input: TxInput, tx_cache: TxCache) -> (TxResult, Bl
     let name = tx_input.args[0].clone();
     let ticker = tx_input.args[1].clone();
 
-    register_and_set_roles(tx_input, tx_cache, ticker, "NFT".to_string())
+    register_and_set_roles(tx_input, tx_cache, ticker, VMTokenType::NonFungible)
 }
 
 // Issues a new token and sets all roles for its type.
@@ -60,7 +60,7 @@ pub fn register_and_set_all_roles(
 
     let name = tx_input.args[0].clone();
     let ticker = tx_input.args[1].clone();
-    let token_type = String::from_utf8(tx_input.args[2].clone()).unwrap();
+    let token_type = VMTokenType::from_system_sc_arg(&tx_input.args[2]);
     let decimals = top_decode_u64(tx_input.args[3].clone().as_ref()) as u32;
 
     register_and_set_roles(tx_input, tx_cache, ticker, token_type)
@@ -70,7 +70,7 @@ fn register_and_set_roles(
     tx_input: TxInput,
     tx_cache: TxCache,
     ticker: Vec<u8>,
-    token_type: String,
+    token_type: VMTokenType,
 ) -> (TxResult, BlockchainUpdate) {
     let mut new_token_identifiers = tx_cache.get_new_token_identifiers();
 
@@ -86,7 +86,7 @@ fn register_and_set_roles(
     tx_cache.with_account_mut(&tx_input.from, |account| {
         account
             .esdt
-            .register_and_set_roles(&token_identifier, &token_type);
+            .register_and_set_roles(&token_identifier, token_type);
     });
     tx_cache.set_new_token_identifiers(new_token_identifiers);
 
