@@ -24,8 +24,8 @@ use multiversx_sc_snippets::{
         types::{Address, CodeMetadata},
     },
     multiversx_sc_scenario::{
-        bech32, scenario_format::interpret_trait::InterpreterContext, scenario_model::*,
-        ContractInfo, DebugApi,
+        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
+        scenario_model::*, ContractInfo,
     },
     tokio, Interactor, StepBuffer,
 };
@@ -35,7 +35,6 @@ const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
-    DebugApi::dummy();
     env_logger::init();
 
     let mut multisig_interact = MultisigInteract::init().await;

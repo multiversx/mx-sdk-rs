@@ -1,6 +1,6 @@
 use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     multiversx_sc::{
         codec::TopEncodeMulti,
         types::{
@@ -22,7 +22,7 @@ pub trait IntoBlockchainCall {
 // otherwise the orphan rules kick in
 macro_rules! impl_into_blockchain_call_cc {
     ($cc:ident) => {
-        impl<OriginalResult> IntoBlockchainCall for $cc<DebugApi, OriginalResult>
+        impl<OriginalResult> IntoBlockchainCall for $cc<StaticApi, OriginalResult>
         where
             OriginalResult: TopEncodeMulti,
         {
@@ -40,7 +40,7 @@ impl_into_blockchain_call_cc! {ContractCallWithEgld}
 impl_into_blockchain_call_cc! {ContractCallWithEgldOrSingleEsdt}
 impl_into_blockchain_call_cc! {ContractCallWithMultiEsdt}
 
-impl<OriginalResult> IntoBlockchainCall for ContractDeploy<DebugApi, OriginalResult> {
+impl<OriginalResult> IntoBlockchainCall for ContractDeploy<StaticApi, OriginalResult> {
     type BlockchainCall = TypedScDeploy<OriginalResult>;
 
     fn into_blockchain_call(self) -> Self::BlockchainCall {
@@ -57,7 +57,7 @@ pub trait IntoVMQuery {
 
 impl<CC> IntoVMQuery for CC
 where
-    CC: ContractCall<DebugApi>,
+    CC: ContractCall<StaticApi>,
 {
     type VMQuery = TypedScQuery<CC::OriginalResult>;
     fn into_vm_query(self) -> Self::VMQuery {

@@ -1,7 +1,7 @@
 use multiversx_sc::types::H256;
 
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     multiversx_sc::{
         codec::{CodecFrom, TopEncodeMulti},
         types::ContractCall,
@@ -55,7 +55,7 @@ impl ScQueryStep {
     /// - "arguments"
     pub fn call<CC>(mut self, contract_call: CC) -> Self
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
     {
         let (to_str, function, _, mandos_args) = process_contract_call(contract_call);
         self = self.to(to_str.as_str());
@@ -79,7 +79,7 @@ impl ScQueryStep {
         expect_value: ExpectedResult,
     ) -> Self
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self = self.call(contract_call);

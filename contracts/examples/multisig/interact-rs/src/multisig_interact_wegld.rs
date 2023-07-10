@@ -94,7 +94,7 @@ impl MultisigInteract {
     }
 
     async fn propose_unwrap_egld(&mut self) -> Option<usize> {
-        let contract_call = ContractCallNoPayment::<DebugApi, ()>::new(
+        let contract_call = ContractCallNoPayment::<StaticApi, ()>::new(
             bech32::decode(WEGLD_SWAP_SC_BECH32).into(),
             "unwrapEgld",
         )

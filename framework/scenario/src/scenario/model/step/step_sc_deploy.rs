@@ -1,7 +1,7 @@
 use multiversx_sc::types::H256;
 
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
 };
 
@@ -83,7 +83,7 @@ impl ScDeployStep {
     /// - "arguments"
     pub fn call<OriginalResult>(
         mut self,
-        contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
+        contract_deploy: ContractDeploy<StaticApi, OriginalResult>,
     ) -> Self {
         let (_, mandos_args) = process_contract_deploy(contract_deploy);
         for arg in mandos_args {
@@ -103,7 +103,7 @@ impl AsMut<ScDeployStep> for ScDeployStep {
 /// - (optional) recipient (needed for contract upgrade, not yet used);
 /// - the arguments.
 fn process_contract_deploy<OriginalResult>(
-    contract_deploy: ContractDeploy<DebugApi, OriginalResult>,
+    contract_deploy: ContractDeploy<StaticApi, OriginalResult>,
 ) -> (Option<String>, Vec<String>) {
     let to_str = contract_deploy
         .to

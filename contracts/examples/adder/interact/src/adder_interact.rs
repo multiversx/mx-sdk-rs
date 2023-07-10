@@ -13,13 +13,14 @@ use multiversx_sc_snippets::{
         types::{Address, CodeMetadata},
     },
     multiversx_sc_scenario::{
+        api::StaticApi,
         bech32,
         mandos_system::ScenarioRunner,
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
         scenario_model::{IntoBlockchainCall, Scenario, TransferStep, TxExpect},
         standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo, DebugApi,
+        test_wallets, ContractInfo,
     },
     tokio, Interactor, StepBuffer,
 };
@@ -28,7 +29,6 @@ const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
-    DebugApi::dummy();
     env_logger::init();
 
     let mut adder_interact = AdderInteract::init().await;

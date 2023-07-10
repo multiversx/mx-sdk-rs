@@ -1,5 +1,5 @@
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
@@ -61,7 +61,7 @@ impl ScenarioVMRunner {
     /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
     pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let sc_query_step = ScQueryStep::new().call(contract_call);

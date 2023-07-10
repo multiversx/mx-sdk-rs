@@ -76,10 +76,7 @@ impl TxResponse {
         let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
             .api_scrs
             .iter()
-            .find(|scr| {
-                scr.sender.to_string() == SYSTEM_SC_BECH32
-                    && scr.data.starts_with("@00@")
-            });
+            .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
 
         if token_identifier_issue_scr.is_none() {
             return Err(TxError {

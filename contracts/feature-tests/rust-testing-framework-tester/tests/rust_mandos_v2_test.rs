@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{scenario_model::*, *};
+use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
 use rust_testing_framework_tester::*; // TODO: clean up imports
 
 const WASM_PATH_EXPR: &str = "file:output/rust-testing-framework-tester.wasm";
@@ -17,13 +17,12 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn tester_deploy_test() {
-    let _ = DebugApi::dummy();
     let mut world = world();
     let ic = world.interpreter_context();
 
     let owner_address = "address:owner";
     let mut adder_contract =
-        ContractInfo::<rust_testing_framework_tester::Proxy<DebugApi>>::new("sc:contract");
+        ContractInfo::<rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
 
     world.start_trace().set_state_step(
         SetStateStep::new()

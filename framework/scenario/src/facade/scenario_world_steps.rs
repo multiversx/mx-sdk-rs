@@ -1,7 +1,7 @@
 use multiversx_sc::types::{heap::Address, ContractCall};
 
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     facade::ScenarioWorld,
     multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     scenario::{model::*, ScenarioRunner},
@@ -39,7 +39,7 @@ impl ScenarioWorld {
     /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
     pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let vm_runner = &mut self.get_mut_debugger_backend().vm_runner;
