@@ -13,12 +13,16 @@ impl BuiltinFunction for MigrateUserName {
         MIGRATE_USERNAME_FUNC_NAME
     }
 
-    fn execute(
+    fn execute<F>(
         &self,
-        _vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         self.execute_with_result(tx_input, tx_cache)
             .unwrap_or_else(|err_result| (err_result, BlockchainUpdate::empty()))
     }

@@ -16,12 +16,16 @@ impl BuiltinFunction for ESDTLocalMint {
         ESDT_LOCAL_MINT_FUNC_NAME
     }
 
-    fn execute(
+    fn execute<F>(
         &self,
-        _vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() != 2 {
             let err_result = TxResult::from_vm_error("ESDTLocalMint expects 2 arguments");
             return (err_result, BlockchainUpdate::empty());

@@ -15,12 +15,16 @@ impl BuiltinFunction for ClaimDeveloperRewards {
         CLAIM_DEVELOPER_REWARDS_FUNC_NAME
     }
 
-    fn execute(
+    fn execute<F>(
         &self,
-        _vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-    ) -> (TxResult, BlockchainUpdate) {
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if !tx_input.args.is_empty() {
             return (
                 TxResult::from_vm_error("ClaimDeveloperRewards expects no arguments"),
