@@ -1,7 +1,7 @@
 use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     multiversx_sc::types::{EgldOrEsdtTokenIdentifier, TokenIdentifier},
-    multiversx_sc_scenario::{num_bigint::BigUint, DebugApi},
+    multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint},
 };
 use serde::Deserialize;
 use std::{fmt::Debug, io::Read, str::FromStr};
@@ -42,7 +42,7 @@ impl Config {
         }
     }
 
-    pub fn token_id(&self) -> EgldOrEsdtTokenIdentifier<DebugApi> {
+    pub fn token_id(&self) -> EgldOrEsdtTokenIdentifier<StaticApi> {
         match self.token_id.as_str() {
             "EGLD" => EgldOrEsdtTokenIdentifier::egld(),
             _ => EgldOrEsdtTokenIdentifier::esdt(TokenIdentifier::from(self.token_id.as_str())),

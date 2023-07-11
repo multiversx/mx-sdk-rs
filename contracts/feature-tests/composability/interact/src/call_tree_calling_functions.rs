@@ -3,7 +3,9 @@ use std::{cell::RefCell, rc::Rc};
 use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     multiversx_sc::types::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiValueEncoded},
-    multiversx_sc_scenario::{bech32, num_bigint::BigUint, scenario_model::TxExpect, DebugApi},
+    multiversx_sc_scenario::{
+        api::StaticApi, bech32, num_bigint::BigUint, scenario_model::TxExpect,
+    },
     StepBuffer,
 };
 
@@ -23,7 +25,7 @@ impl ComposabilityInteract {
         forwarders: &Vec<Rc<RefCell<ForwarderQueueTarget>>>,
         call_type: QueuedCallType,
         endpoint_name: &str,
-        payment_token: EgldOrEsdtTokenIdentifier<DebugApi>,
+        payment_token: EgldOrEsdtTokenIdentifier<StaticApi>,
         payment_nonce: u64,
         payment_amount: BigUint,
     ) {
@@ -59,7 +61,7 @@ impl ComposabilityInteract {
                                 child_fwd_addr,
                                 DEFAULT_GAS_LIMIT,
                                 FORWARD_QUEUED_CALLS_ENDPOINT,
-                                MultiValueEncoded::<DebugApi, _>::new(),
+                                MultiValueEncoded::<StaticApi, _>::new(),
                             )
                             .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::new(
                                 payment_token.clone(),
@@ -89,7 +91,7 @@ impl ComposabilityInteract {
                                 vault_addr,
                                 DEFAULT_GAS_LIMIT,
                                 endpoint_name,
-                                MultiValueEncoded::<DebugApi, _>::new(),
+                                MultiValueEncoded::<StaticApi, _>::new(),
                             )
                             .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::new(
                                 payment_token.clone(),

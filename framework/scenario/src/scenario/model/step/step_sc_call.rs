@@ -1,7 +1,7 @@
 use multiversx_sc::types::H256;
 
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
     scenario_model::TxResponse,
 };
@@ -110,7 +110,7 @@ impl ScCallStep {
     /// - "arguments"
     pub fn call<CC>(mut self, contract_call: CC) -> Self
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
     {
         let (to_str, function, egld_value_expr, scenario_args) =
             process_contract_call(contract_call);
@@ -136,7 +136,7 @@ impl ScCallStep {
         expect_value: ExpectedResult,
     ) -> Self
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self = self.call(contract_call);
@@ -159,7 +159,7 @@ pub(super) fn process_contract_call<CC>(
     contract_call: CC,
 ) -> (String, String, BigUintValue, Vec<String>)
 where
-    CC: ContractCall<DebugApi>,
+    CC: ContractCall<StaticApi>,
 {
     let normalized_cc = contract_call.into_normalized();
     let to_str = format!(
@@ -179,7 +179,7 @@ where
     (to_str, function, egld_value_expr, scenario_args)
 }
 
-pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<DebugApi>) -> Vec<String> {
+pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<StaticApi>) -> Vec<String> {
     arg_buffer
         .to_raw_args_vec()
         .iter()

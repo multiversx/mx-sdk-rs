@@ -1,6 +1,6 @@
 use crowdfunding_esdt::*;
 use multiversx_sc::types::EgldOrEsdtTokenIdentifier;
-use multiversx_sc_scenario::{scenario_model::*, *};
+use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -15,7 +15,6 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn crowdfunding_scenario_rust_test() {
-    let _ = DebugApi::dummy();
     let mut world = world();
     let ctx = world.interpreter_context();
 
@@ -26,7 +25,7 @@ fn crowdfunding_scenario_rust_test() {
     let deadline: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
     let cf_token_id_value = "CROWD-123456"; // when passing as argument
     let cf_token_id = "str:CROWD-123456"; // when specifying the token transfer
-    let mut cf_sc = ContractInfo::<crowdfunding_esdt::Proxy<DebugApi>>::new("sc:crowdfunding");
+    let mut cf_sc = ContractInfo::<crowdfunding_esdt::Proxy<StaticApi>>::new("sc:crowdfunding");
 
     // setup owner and crowdfunding SC
     world.start_trace().set_state_step(

@@ -1,18 +1,18 @@
 use crate::{address_h256_to_erdrs, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
+    api::StaticApi,
     multiversx_sc::{
         codec::{CodecFrom, PanicErrorHandler},
         types::ContractCall,
     },
-    DebugApi,
 };
 use multiversx_sdk::data::vm::VmValueRequest;
 
 impl Interactor {
     pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let full_cc = contract_call.into_normalized();

@@ -1,4 +1,4 @@
-use crate::{ContractInfo, DebugApi};
+use crate::{ContractInfo, StaticApi};
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
@@ -12,7 +12,7 @@ const DEFAULT_MULTISIG_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
+pub type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
 
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]

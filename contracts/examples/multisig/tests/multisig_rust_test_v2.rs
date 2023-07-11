@@ -11,9 +11,10 @@ use multiversx_sc::{
     types::{Address, CodeMetadata},
 };
 use multiversx_sc_scenario::{
+    api::StaticApi,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
     scenario_model::*,
-    ContractInfo, DebugApi, ScenarioWorld,
+    ContractInfo, ScenarioWorld,
 };
 use num_bigint::BigUint;
 
@@ -28,8 +29,6 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn basic_setup_test() {
-    let _ = DebugApi::dummy();
-
     let mut test = MultisigTestState::setup();
     test.multisig_deploy();
 
@@ -53,8 +52,6 @@ fn basic_setup_test() {
 
 #[test]
 fn multisig_adder_test() {
-    let _ = DebugApi::dummy();
-
     let mut test = MultisigTestState::setup();
     test.adder_deploy().multisig_deploy();
 
@@ -76,8 +73,8 @@ fn multisig_adder_test() {
     test.adder_expect_get_sum(expected_sum, caller);
 }
 
-type MultisigContract = ContractInfo<multisig::Proxy<DebugApi>>;
-type AdderContract = ContractInfo<adder::Proxy<DebugApi>>;
+type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
+type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
 
 struct MultisigTestState {
     world: ScenarioWorld,

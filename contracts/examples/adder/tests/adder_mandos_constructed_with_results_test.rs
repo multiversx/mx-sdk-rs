@@ -1,6 +1,6 @@
 use adder::*;
 use multiversx_sc::storage::mappers::SingleValue;
-use multiversx_sc_scenario::{num_bigint::BigUint, scenario_model::*, *}; // TODO: clean up imports
+use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *}; // TODO: clean up imports
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -12,12 +12,11 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn adder_mandos_constructed() {
-    let _ = DebugApi::dummy();
     let mut world = world();
     let ic = world.interpreter_context();
 
     let owner_address = "address:owner";
-    let mut adder_contract = ContractInfo::<adder::Proxy<DebugApi>>::new("sc:adder");
+    let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace().set_state_step(
         SetStateStep::new()

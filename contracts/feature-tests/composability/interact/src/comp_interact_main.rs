@@ -14,13 +14,12 @@ use comp_interact_controller::ComposabilityInteract;
 
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc_scenario::{ContractInfo, DebugApi},
+    multiversx_sc_scenario::{api::StaticApi, ContractInfo},
     tokio,
 };
 
 #[tokio::main]
 async fn main() {
-    DebugApi::dummy();
     env_logger::init();
 
     let mut composability_interact = ComposabilityInteract::init().await;
