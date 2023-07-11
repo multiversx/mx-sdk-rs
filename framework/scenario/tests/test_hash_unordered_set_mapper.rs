@@ -2,15 +2,14 @@ use multiversx_sc::storage::{
     mappers::{StorageClearable, StorageMapper, UnorderedSetMapper},
     StorageKey,
 };
-use multiversx_sc_scenario::api::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_set() -> UnorderedSetMapper<DebugApi, u64> {
-    let _ = DebugApi::dummy();
+fn create_set() -> UnorderedSetMapper<SingleTxApi, u64> {
     let base_key = StorageKey::new(&b"my_unordered_set"[..]);
     UnorderedSetMapper::new(base_key)
 }
 
-fn check_set(set: &UnorderedSetMapper<DebugApi, u64>, expected: Vec<u64>) {
+fn check_set(set: &UnorderedSetMapper<SingleTxApi, u64>, expected: Vec<u64>) {
     assert_eq!(set.len(), expected.len());
     let actual: Vec<u64> = set.iter().collect();
     assert_eq!(actual, expected);
