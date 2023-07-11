@@ -48,14 +48,17 @@ pub(super) fn extract_transfer_info(
     }
 }
 
-pub(super) fn execute_transfer_builtin_func(
+pub(super) fn execute_transfer_builtin_func<F>(
     vm: &BlockchainVMRef,
     parsed_tx: ParsedTransferBuiltinFunCall,
     builtin_function_name: &str,
     tx_input: TxInput,
     tx_cache: TxCache,
-    f: Box<dyn FnOnce()>,
-) -> (TxResult, BlockchainUpdate) {
+    f: F,
+) -> (TxResult, BlockchainUpdate)
+where
+    F: FnOnce(),
+{
     let mut builtin_logs = Vec::new();
     for raw_esdt_transfer in &parsed_tx.raw_esdt_transfers {
         builtin_logs.push(TxLog {

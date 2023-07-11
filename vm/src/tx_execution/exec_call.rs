@@ -66,13 +66,15 @@ impl BlockchainVMRef {
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
-        if let Some(builtin_func) = self.builtin_functions.get(&tx_input.func_name) {
-            builtin_func.execute_lambda(self, tx_input, tx_cache, Box::new(f))
-        } else {
-            self.default_execution(tx_input, tx_cache, f)
-        }
+        self.builtin_functions.execute_builtin_function_or_else(
+            self,
+            tx_input,
+            tx_cache,
+            f,
+            |tx_input, tx_cache, f| self.default_execution(tx_input, tx_cache, f),
+        )
     }
 
     pub fn execute_sc_call_lambda<F>(
@@ -82,7 +84,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
@@ -144,7 +146,7 @@ impl BlockchainVMRef {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         // main call
         let contract_address = tx_input.to.clone();

@@ -25,13 +25,16 @@ pub trait BuiltinFunction {
         )
     }
 
-    fn execute_lambda(
+    fn execute_lambda<F>(
         &self,
         vm: &BlockchainVMRef,
         tx_input: TxInput,
         tx_cache: TxCache,
-        _f: Box<dyn FnOnce()>,
-    ) -> (TxResult, BlockchainUpdate) {
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         self.execute(vm, tx_input, tx_cache)
     }
 }

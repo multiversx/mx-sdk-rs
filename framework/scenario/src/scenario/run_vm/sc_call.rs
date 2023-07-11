@@ -40,7 +40,7 @@ impl ScenarioVMRunner {
 
     pub fn perform_sc_call_lambda<F>(&mut self, sc_call_step: &ScCallStep, f: F) -> TxResult
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         let tx_input = tx_input_from_call(sc_call_step);
 
@@ -62,7 +62,7 @@ impl ScenarioVMRunner {
         f: F,
     ) -> TxResult
     where
-        F: FnOnce() + 'static,
+        F: FnOnce(),
     {
         let tx_result = self.perform_sc_call_lambda(sc_call_step, f);
         if let Some(tx_expect) = &sc_call_step.expect {

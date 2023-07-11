@@ -1,14 +1,14 @@
 use super::EsdtLocalRoleFlags;
 
-static ESDT_ROLE_NONE: &[u8] = &[];
-static ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
-static ESDT_ROLE_LOCAL_BURN: &[u8] = b"ESDTRoleLocalBurn";
-static ESDT_ROLE_NFT_CREATE: &[u8] = b"ESDTRoleNFTCreate";
-static ESDT_ROLE_NFT_ADD_QUANTITY: &[u8] = b"ESDTRoleNFTAddQuantity";
-static ESDT_ROLE_NFT_BURN: &[u8] = b"ESDTRoleNFTBurn";
-static ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
-static ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
-static ESDT_ROLE_TRANSFER: &[u8] = b"ESDTTransferRole";
+const ESDT_ROLE_NONE: &str = "";
+const ESDT_ROLE_LOCAL_MINT: &str = "ESDTRoleLocalMint";
+const ESDT_ROLE_LOCAL_BURN: &str = "ESDTRoleLocalBurn";
+const ESDT_ROLE_NFT_CREATE: &str = "ESDTRoleNFTCreate";
+const ESDT_ROLE_NFT_ADD_QUANTITY: &str = "ESDTRoleNFTAddQuantity";
+const ESDT_ROLE_NFT_BURN: &str = "ESDTRoleNFTBurn";
+const ESDT_ROLE_NFT_ADD_URI: &str = "ESDTRoleNFTAddURI";
+const ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &str = "ESDTRoleNFTUpdateAttributes";
+const ESDT_ROLE_TRANSFER: &str = "ESDTTransferRole";
 
 /// The VM implementation for EsdtLocalRole, used internally in builtin functions.
 ///
@@ -43,7 +43,7 @@ impl EsdtLocalRole {
         }
     }
 
-    pub fn as_role_name(&self) -> &'static [u8] {
+    pub fn name(&self) -> &'static str {
         match self {
             Self::None => ESDT_ROLE_NONE,
             Self::Mint => ESDT_ROLE_LOCAL_MINT,
@@ -111,21 +111,21 @@ impl From<u16> for EsdtLocalRole {
 impl<'a> From<&'a [u8]> for EsdtLocalRole {
     #[inline]
     fn from(byte_slice: &'a [u8]) -> Self {
-        if byte_slice == ESDT_ROLE_LOCAL_MINT {
+        if byte_slice == ESDT_ROLE_LOCAL_MINT.as_bytes() {
             Self::Mint
-        } else if byte_slice == ESDT_ROLE_LOCAL_BURN {
+        } else if byte_slice == ESDT_ROLE_LOCAL_BURN.as_bytes() {
             Self::Burn
-        } else if byte_slice == ESDT_ROLE_NFT_CREATE {
+        } else if byte_slice == ESDT_ROLE_NFT_CREATE.as_bytes() {
             Self::NftCreate
-        } else if byte_slice == ESDT_ROLE_NFT_ADD_QUANTITY {
+        } else if byte_slice == ESDT_ROLE_NFT_ADD_QUANTITY.as_bytes() {
             Self::NftAddQuantity
-        } else if byte_slice == ESDT_ROLE_NFT_BURN {
+        } else if byte_slice == ESDT_ROLE_NFT_BURN.as_bytes() {
             Self::NftBurn
-        } else if byte_slice == ESDT_ROLE_NFT_ADD_URI {
+        } else if byte_slice == ESDT_ROLE_NFT_ADD_URI.as_bytes() {
             Self::NftAddUri
-        } else if byte_slice == ESDT_ROLE_NFT_UPDATE_ATTRIBUTES {
+        } else if byte_slice == ESDT_ROLE_NFT_UPDATE_ATTRIBUTES.as_bytes() {
             Self::NftUpdateAttributes
-        } else if byte_slice == ESDT_ROLE_TRANSFER {
+        } else if byte_slice == ESDT_ROLE_TRANSFER.as_bytes() {
             Self::Transfer
         } else {
             Self::None

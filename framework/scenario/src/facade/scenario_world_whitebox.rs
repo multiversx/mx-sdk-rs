@@ -55,7 +55,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        F: FnOnce(ContractObj) + 'static,
+        F: FnOnce(ContractObj),
     {
         self.whitebox_call_check(whitebox_contract, sc_call_step, f, |tx_result| {
             tx_result.assert_ok();
@@ -71,7 +71,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        F: FnOnce(ContractObj) + 'static,
+        F: FnOnce(ContractObj),
         C: FnOnce(TxResult),
     {
         // the recipient can be deduced from the contract object, it is redundant to provide it in the step
@@ -102,7 +102,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        F: FnOnce(ContractObj) + 'static,
+        F: FnOnce(ContractObj),
     {
         self.whitebox_deploy_check(whitebox_contract, sc_deploy_step, f, |tx_result| {
             tx_result.assert_ok();
@@ -118,7 +118,7 @@ impl ScenarioWorld {
     ) -> &mut Self
     where
         ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
-        F: FnOnce(ContractObj) + 'static,
+        F: FnOnce(ContractObj),
         C: FnOnce(TxResult),
     {
         let contract_obj = (whitebox_contract.contract_obj_builder)();
