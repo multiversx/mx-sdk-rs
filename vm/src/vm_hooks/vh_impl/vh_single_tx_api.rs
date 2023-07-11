@@ -26,6 +26,19 @@ pub struct SingleTxApiData {
     pub current_block_info: BlockInfo,
 }
 
+impl SingleTxApiData {
+    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
+    where
+        F: FnOnce(&mut AccountData) -> R,
+    {
+        let mut accounts = self.accounts.borrow_mut();
+        let account = accounts
+            .entry(address.clone())
+            .or_insert(AccountData::new_empty(address.clone()));
+        f(account)
+    }
+}
+
 #[derive(Default, Debug, Clone)]
 pub struct SingleTxApiVMHooksHandler(Rc<SingleTxApiData>);
 
@@ -37,17 +50,6 @@ impl SingleTxApiVMHooksHandler {
         let data = Rc::get_mut(&mut self.0)
             .expect("could not retrieve mutable reference to SingleTxApi data");
         f(data)
-    }
-
-    fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
-    where
-        F: FnOnce(&mut AccountData) -> R,
-    {
-        let mut accounts = self.0.accounts.borrow_mut();
-        let account = accounts
-            .entry(address.clone())
-            .or_insert(AccountData::new_empty(address.clone()));
-        f(account)
     }
 }
 
@@ -77,13 +79,13 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {
-        self.with_account_mut(address, |account| {
+        self.0.with_account_mut(address, |account| {
             account.storage.get(key).cloned().unwrap_or_default()
         })
     }
 
     fn storage_write(&self, key: &[u8], value: &[u8]) {
-        self.with_account_mut(&self.0.tx_input_box.to, |account| {
+        self.0.with_account_mut(&self.0.tx_input_box.to, |account| {
             account.storage.insert(key.to_vec(), value.to_vec());
         });
     }
@@ -97,7 +99,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn account_data(&self, address: &VMAddress) -> AccountData {
-        self.with_account_mut(address, |account| account.clone())
+        self.0.with_account_mut(address, |account| account.clone())
     }
 
     fn account_code(&self, _address: &VMAddress) -> Vec<u8> {

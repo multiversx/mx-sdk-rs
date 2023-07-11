@@ -2,7 +2,9 @@ use std::cell::RefCell;
 
 use multiversx_chain_vm::{
     executor::VMHooks,
+    types::VMAddress,
     vm_hooks::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksDispatcher},
+    world_mock::AccountData,
 };
 use multiversx_sc::api::RawHandle;
 
@@ -51,7 +53,7 @@ impl SingleTxApi {
         })
     }
 
-    pub fn with_global<F, R>(&mut self, f: F) -> R
+    pub fn with_global<F, R>(f: F) -> R
     where
         F: FnOnce(&mut SingleTxApiData) -> R,
     {
@@ -59,6 +61,13 @@ impl SingleTxApi {
             let mut handler = cell.borrow_mut();
             handler.with_mut_data(f)
         })
+    }
+
+    pub fn with_global_default_account<F, R>(f: F) -> R
+    where
+        F: FnOnce(&mut AccountData) -> R,
+    {
+        Self::with_global(|data| data.with_account_mut(&VMAddress::zero(), f))
     }
 }
 
