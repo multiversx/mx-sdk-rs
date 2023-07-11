@@ -9,6 +9,7 @@ pub struct SetStateStep {
     pub comment: Option<String>,
     pub accounts: BTreeMap<AddressKey, Account>,
     pub new_addresses: Vec<NewAddress>,
+    pub new_token_identifiers: Vec<String>,
     pub block_hashes: Vec<BytesValue>,
     pub previous_block_info: Box<Option<BlockInfo>>,
     pub current_block_info: Box<Option<BlockInfo>>,
@@ -43,6 +44,15 @@ impl SetStateStep {
             creator_nonce: U64Value::from(creator_nonce_expr),
             new_address: AddressValue::from(new_address_expr),
         });
+        self
+    }
+
+    pub fn new_token_identifier<T>(mut self, token_identifier: T) -> Self
+    where
+        String: From<T>,
+    {
+        self.new_token_identifiers
+            .push(String::from(token_identifier));
         self
     }
 
