@@ -5,10 +5,10 @@ use crate::{
 
 use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
-    tx_mock::{generate_tx_hash_dummy, TxInput, TxResult, TxTokenTransfer},
+    tx_mock::{TxInput, TxResult, TxTokenTransfer},
 };
 
-use super::{check_tx_output, ScenarioVMRunner};
+use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
     /// Adds a SC call step, as specified in the `sc_call_step` argument, then executes it.
@@ -87,7 +87,7 @@ fn tx_input_from_call(sc_call_step: &ScCallStep) -> TxInput {
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(&sc_call_step.id),
+        tx_hash: generate_tx_hash(&sc_call_step.id, &sc_call_step.explicit_tx_hash),
         ..Default::default()
     }
 }

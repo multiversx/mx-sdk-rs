@@ -1,46 +1,32 @@
-use std::{collections::BTreeMap, fs::File, io::Write};
+use std::collections::BTreeMap;
 
-use crate::scenario_format::serde_raw::{ScenarioRaw, StepRaw};
-use serde::Serialize;
+use crate::{
+    scenario_format::serde_raw::StepRaw,
+    scenario_model::{Scenario, Step},
+};
+use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
 
 use super::{raw_converter::*, ScCallMandos, ScQueryMandos, TxExpectMandos};
-use multiversx_chain_vm::world_mock::{AccountData, BlockInfo};
+use multiversx_chain_vm::world_mock::AccountData;
 
-pub(crate) struct MandosGenerator {
-    scenario: ScenarioRaw,
-    current_tx_id: u64,
+pub(crate) struct MandosGenerator<'a> {
+    scenario: &'a mut Scenario,
+    current_tx_id: &'a mut u64,
 }
 
-impl MandosGenerator {
-    pub fn new() -> Self {
+impl<'a> MandosGenerator<'a> {
+    pub fn new(scenario: &'a mut Scenario, current_tx_id: &'a mut u64) -> Self {
         Self {
-            scenario: ScenarioRaw {
-                check_gas: None,
-                comment: None,
-                gas_schedule: None,
-                name: None,
-                steps: Vec::new(),
-            },
-            current_tx_id: 0,
+            scenario,
+            current_tx_id,
         }
     }
 
-    pub fn write_mandos_output(self, file_path: &str) {
-        let buf = Vec::new();
-        let formatter = serde_json::ser::PrettyFormatter::with_indent(b"    ");
-        let mut ser = serde_json::Serializer::with_formatter(buf, formatter);
-        self.scenario.serialize(&mut ser).unwrap();
-        let mut serialized = String::from_utf8(ser.into_inner()).unwrap();
-        serialized.push('\n');
-
-        let mut file = File::create(file_path).unwrap();
-        file.write_all(serialized.as_bytes()).unwrap();
-    }
-}
-
-impl MandosGenerator {
-    fn add_step(&mut self, step: StepRaw) {
-        self.scenario.steps.push(step);
+    fn add_step(&mut self, step_raw: StepRaw) {
+        self.scenario.steps.push(Step::interpret_from(
+            step_raw,
+            &InterpreterContext::default().with_allowed_missing_files(),
+        ));
     }
 
     pub fn set_account(&mut self, acc: &AccountData, sc_scenario_path_expr: Option<Vec<u8>>) {
@@ -65,25 +51,9 @@ impl MandosGenerator {
         self.add_step(step);
     }
 
-    pub fn set_block_info(&mut self, current_block_info: &BlockInfo, prev_block_info: &BlockInfo) {
-        let current_raw = block_info_as_raw(current_block_info);
-        let prev_raw = block_info_as_raw(prev_block_info);
-
-        let step = StepRaw::SetState {
-            accounts: BTreeMap::new(),
-            block_hashes: Vec::new(),
-            new_addresses: Vec::new(),
-            new_token_identifiers: Vec::new(),
-            comment: None,
-            current_block_info: Some(current_raw),
-            previous_block_info: Some(prev_raw),
-        };
-        self.add_step(step);
-    }
-
     pub fn next_tx_id_string(&mut self) -> String {
         let id_str = self.current_tx_id.to_string();
-        self.current_tx_id += 1;
+        *self.current_tx_id += 1;
 
         id_str
     }

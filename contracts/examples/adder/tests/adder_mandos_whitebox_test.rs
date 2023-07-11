@@ -11,7 +11,6 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn adder_whitebox() {
-    DebugApi::dummy();
     let adder_whitebox = WhiteboxContract::new("sc:adder", adder::contract_obj);
 
     let mut world = world();

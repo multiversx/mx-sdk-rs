@@ -2,6 +2,7 @@ use multiversx_chain_vm::tx_mock::{TxFunctionName, TxResult};
 use multiversx_sc::contract_base::{CallableContract, ContractBase};
 
 use crate::{
+    debug_executor::contract_instance_wrapped_execution,
     scenario_model::{ScCallStep, ScDeployStep, ScQueryStep},
     DebugApi, ScenarioWorld,
 };
@@ -36,11 +37,13 @@ impl ScenarioWorld {
     {
         let sc_query_step = ScQueryStep::new().to(&whitebox_contract.address_expr);
         let contract_obj = (whitebox_contract.contract_obj_builder)();
-        let debugger_backend = self.get_mut_contract_debugger_backend();
+        let debugger_backend = self.get_mut_debugger_backend();
         let tx_result = debugger_backend
             .vm_runner
             .perform_sc_query_lambda_and_check(&sc_query_step, || {
-                f(contract_obj);
+                catch_whitebox_panic(|| {
+                    f(contract_obj);
+                });
             });
         check_result(tx_result);
 
@@ -83,12 +86,14 @@ impl ScenarioWorld {
         }
 
         let contract_obj = (whitebox_contract.contract_obj_builder)();
-        let debugger_backend = self.get_mut_contract_debugger_backend();
+        let debugger_backend = self.get_mut_debugger_backend();
         let tx_result =
             debugger_backend
                 .vm_runner
                 .perform_sc_call_lambda_and_check(&sc_call_step, || {
-                    f(contract_obj);
+                    catch_whitebox_panic(|| {
+                        f(contract_obj);
+                    });
                 });
         check_result(tx_result);
         self
@@ -122,13 +127,25 @@ impl ScenarioWorld {
         C: FnOnce(TxResult),
     {
         let contract_obj = (whitebox_contract.contract_obj_builder)();
-        let debugger_backend = self.get_mut_contract_debugger_backend();
+        let debugger_backend = self.get_mut_debugger_backend();
         let (_, tx_result) = debugger_backend
             .vm_runner
             .perform_sc_deploy_lambda_and_check(&sc_deploy_step, || {
-                f(contract_obj);
+                catch_whitebox_panic(|| {
+                    f(contract_obj);
+                });
             });
         check_result(tx_result);
         self
     }
+}
+
+fn catch_whitebox_panic<F>(f: F)
+where
+    F: FnOnce(),
+{
+    contract_instance_wrapped_execution(true, || {
+        f();
+        Ok(())
+    });
 }

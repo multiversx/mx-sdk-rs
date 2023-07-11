@@ -62,15 +62,9 @@ impl SetStateStep {
     {
         let block_epoch = U64Value::from(block_epoch_expr);
 
-        if let Some(block_info) = &mut *self.current_block_info {
-            block_info.block_epoch = Some(block_epoch);
-        } else {
-            *self.current_block_info = Some(BlockInfo {
-                block_epoch: Some(block_epoch),
-                ..Default::default()
-            });
-        }
-
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_epoch = Some(block_epoch);
+        self.current_block_info = Box::new(Some(block_info));
         self
     }
 
@@ -80,15 +74,9 @@ impl SetStateStep {
     {
         let block_nonce = U64Value::from(block_nonce_expr);
 
-        if let Some(block_info) = &mut *self.current_block_info {
-            block_info.block_nonce = Some(block_nonce);
-        } else {
-            *self.current_block_info = Some(BlockInfo {
-                block_nonce: Some(block_nonce),
-                ..Default::default()
-            });
-        }
-
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_nonce = Some(block_nonce);
+        self.current_block_info = Box::new(Some(block_info));
         self
     }
 
@@ -98,15 +86,9 @@ impl SetStateStep {
     {
         let block_round = U64Value::from(block_round_expr);
 
-        if let Some(block_info) = &mut *self.current_block_info {
-            block_info.block_round = Some(block_round);
-        } else {
-            *self.current_block_info = Some(BlockInfo {
-                block_round: Some(block_round),
-                ..Default::default()
-            });
-        }
-
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_round = Some(block_round);
+        self.current_block_info = Box::new(Some(block_info));
         self
     }
 
@@ -116,15 +98,9 @@ impl SetStateStep {
     {
         let block_timestamp = U64Value::from(block_timestamp_expr);
 
-        if let Some(block_info) = &mut *self.current_block_info {
-            block_info.block_timestamp = Some(block_timestamp);
-        } else {
-            *self.current_block_info = Some(BlockInfo {
-                block_timestamp: Some(block_timestamp),
-                ..Default::default()
-            });
-        }
-
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_timestamp = Some(block_timestamp);
+        self.current_block_info = Box::new(Some(block_info));
         self
     }
 
@@ -134,15 +110,69 @@ impl SetStateStep {
     {
         let block_random_seed = BytesValue::from(block_random_seed_expr);
 
-        if let Some(block_info) = &mut *self.current_block_info {
-            block_info.block_random_seed = Some(block_random_seed);
-        } else {
-            *self.current_block_info = Some(BlockInfo {
-                block_random_seed: Some(block_random_seed),
-                ..Default::default()
-            });
-        }
+        let mut block_info = self.current_block_info.unwrap_or_default();
+        block_info.block_random_seed = Some(block_random_seed);
+        self.current_block_info = Box::new(Some(block_info));
+        self
+    }
 
+    pub fn prev_block_epoch<N>(mut self, block_epoch_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        let block_epoch = U64Value::from(block_epoch_expr);
+
+        let mut block_info = self.previous_block_info.unwrap_or_default();
+        block_info.block_epoch = Some(block_epoch);
+        self.previous_block_info = Box::new(Some(block_info));
+        self
+    }
+
+    pub fn prev_block_nonce<N>(mut self, block_nonce_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        let block_nonce = U64Value::from(block_nonce_expr);
+
+        let mut block_info = self.previous_block_info.unwrap_or_default();
+        block_info.block_nonce = Some(block_nonce);
+        self.previous_block_info = Box::new(Some(block_info));
+        self
+    }
+
+    pub fn prev_block_round<N>(mut self, block_round_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        let block_round = U64Value::from(block_round_expr);
+
+        let mut block_info = self.previous_block_info.unwrap_or_default();
+        block_info.block_round = Some(block_round);
+        self.previous_block_info = Box::new(Some(block_info));
+        self
+    }
+
+    pub fn prev_block_timestamp<N>(mut self, block_timestamp_expr: N) -> Self
+    where
+        U64Value: From<N>,
+    {
+        let block_timestamp = U64Value::from(block_timestamp_expr);
+
+        let mut block_info = self.previous_block_info.unwrap_or_default();
+        block_info.block_timestamp = Some(block_timestamp);
+        self.previous_block_info = Box::new(Some(block_info));
+        self
+    }
+
+    pub fn prev_block_random_seed<B>(mut self, block_random_seed_expr: B) -> Self
+    where
+        BytesValue: From<B>,
+    {
+        let block_random_seed = BytesValue::from(block_random_seed_expr);
+
+        let mut block_info = self.previous_block_info.unwrap_or_default();
+        block_info.block_random_seed = Some(block_random_seed);
+        self.previous_block_info = Box::new(Some(block_info));
         self
     }
 }

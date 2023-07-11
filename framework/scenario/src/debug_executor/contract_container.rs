@@ -47,6 +47,23 @@ impl ContractContainer {
     }
 }
 
+/// Prepares the StaticVarStack and catches panics.
+/// The result of the panics is written to the top of the TxContext stack.
+pub fn contract_instance_wrapped_execution<F>(panic_message: bool, f: F)
+where
+    F: FnOnce() -> Result<(), TxPanic>,
+{
+    StaticVarStack::static_push();
+
+    let result = catch_tx_panic(panic_message, f);
+
+    if let Err(tx_panic) = result {
+        TxContextRef::new_from_static().replace_tx_result_with_error(tx_panic);
+    }
+
+    StaticVarStack::static_pop();
+}
+
 #[derive(Clone)]
 pub struct ContractContainerRef(pub(crate) Rc<ContractContainer>);
 
@@ -59,9 +76,8 @@ impl ContractContainerRef {
 impl Instance for ContractContainerRef {
     fn call(&self, func_name: &str) -> Result<(), String> {
         let tx_func_name = TxFunctionName::from(func_name);
-        StaticVarStack::static_push();
 
-        let result = catch_tx_panic(self.0.panic_message, || {
+        contract_instance_wrapped_execution(self.0.panic_message, || {
             let call_successful = self.0.call(&tx_func_name);
             if call_successful {
                 Ok(())
@@ -69,12 +85,6 @@ impl Instance for ContractContainerRef {
                 Err(TxPanic::new(1, "invalid function (not found)"))
             }
         });
-
-        if let Err(tx_panic) = result {
-            TxContextRef::new_from_static().replace_tx_result_with_error(tx_panic);
-        }
-
-        StaticVarStack::static_pop();
 
         Ok(())
     }

@@ -3,16 +3,16 @@ use std::collections::BTreeMap;
 use crate::{
     multiversx_sc::types::heap::Address,
     scenario_format::serde_raw::{
-        AccountRaw, BlockInfoRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw,
-        CheckEsdtDataRaw, CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw,
-        CheckEsdtMapRaw, CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw,
-        CheckValueListRaw, EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, TxCallRaw, TxESDTRaw,
-        TxExpectRaw, TxQueryRaw, ValueSubTree,
+        AccountRaw, CheckAccountRaw, CheckAccountsRaw, CheckBytesValueRaw, CheckEsdtDataRaw,
+        CheckEsdtInstanceRaw, CheckEsdtInstancesRaw, CheckEsdtMapContentsRaw, CheckEsdtMapRaw,
+        CheckEsdtRaw, CheckLogsRaw, CheckStorageDetailsRaw, CheckStorageRaw, CheckValueListRaw,
+        EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw,
+        ValueSubTree,
     },
 };
 use multiversx_chain_vm::{
     types::VMAddress,
-    world_mock::{AccountData, BlockInfo, EsdtData},
+    world_mock::{AccountData, EsdtData},
 };
 use num_traits::Zero;
 
@@ -92,16 +92,6 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
         roles: roles_raw,
         token_identifier: None,
     })
-}
-
-pub(crate) fn block_info_as_raw(block_info: &BlockInfo) -> BlockInfoRaw {
-    BlockInfoRaw {
-        block_epoch: Some(u64_as_raw(block_info.block_epoch)),
-        block_nonce: Some(u64_as_raw(block_info.block_nonce)),
-        block_round: Some(u64_as_raw(block_info.block_round)),
-        block_timestamp: Some(u64_as_raw(block_info.block_timestamp)),
-        block_random_seed: Some(bytes_as_raw(&block_info.block_random_seed[..])),
-    }
 }
 
 pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
@@ -243,7 +233,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
         storages: raw_storage,
     };
     let check_acc_raw = CheckAccountRaw {
-        nonce: CheckBytesValueRaw::Equal(u64_as_raw(acc.nonce)),
+        nonce: CheckBytesValueRaw::Star,
         balance: CheckBytesValueRaw::Equal(rust_biguint_as_raw(&acc.egld_balance)),
         esdt: CheckEsdtMapRaw::Equal(CheckEsdtMapContentsRaw {
             other_esdts_allowed: false,

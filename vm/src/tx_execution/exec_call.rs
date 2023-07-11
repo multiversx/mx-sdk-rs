@@ -1,8 +1,8 @@
 use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
-        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxCacheSource, TxContext,
-        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
+        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxContext, TxContextStack, TxInput,
+        TxPanic, TxResult, TxResultCalls,
     },
     types::VMAddress,
     with_shared::Shareable,
@@ -40,14 +40,13 @@ impl BlockchainVMRef {
         tx_result
     }
 
-    pub fn execute_in_debugger<S, F>(
+    pub fn execute_in_debugger<F>(
         &self,
         tx_input: TxInput,
-        state: &mut Shareable<S>,
+        state: &mut Shareable<BlockchainState>,
         f: F,
     ) -> (TxResult, BlockchainUpdate)
     where
-        S: TxCacheSource + 'static,
         F: FnOnce(),
     {
         state.with_shared(|state_rc| {

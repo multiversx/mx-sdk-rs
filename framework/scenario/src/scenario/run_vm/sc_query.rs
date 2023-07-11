@@ -9,10 +9,10 @@ use crate::{
 };
 use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
-    tx_mock::{generate_tx_hash_dummy, TxInput, TxResult},
+    tx_mock::{TxInput, TxResult},
 };
 
-use super::{check_tx_output, ScenarioVMRunner};
+use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
@@ -86,7 +86,7 @@ fn tx_input_from_query(sc_query_step: &ScQueryStep) -> TxInput {
             .collect(),
         gas_limit: u64::MAX,
         gas_price: 0u64,
-        tx_hash: generate_tx_hash_dummy(&sc_query_step.id),
+        tx_hash: generate_tx_hash(&sc_query_step.id, &sc_query_step.explicit_tx_hash),
         ..Default::default()
     }
 }

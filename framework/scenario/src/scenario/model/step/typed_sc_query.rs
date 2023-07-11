@@ -34,6 +34,7 @@ impl<OriginalResult> From<TypedScQuery<OriginalResult>> for ScQueryStep {
         Self {
             id: typed.id,
             tx_id: typed.tx_id,
+            explicit_tx_hash: None,
             comment: typed.comment,
             tx: typed.tx,
             expect: typed.expect,
