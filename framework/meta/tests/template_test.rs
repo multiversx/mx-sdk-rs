@@ -29,18 +29,10 @@ async fn test_template_download() {
 
     let target_dir = template_temp_path.join("new-adder");
 
-    // let args = TemplateArgs {
-    //     name: target_dir.clone(),
-    //     template: "adder".to_string(),
-    // };
-    let downloader = TemplateDownloader::new(&repo_source, "adder".to_string(), target_dir);
+    let downloader = TemplateDownloader::new(&repo_source, "adder".to_string(), target_dir.clone());
     downloader.template_download();
 
-    // let _ = TemplateCreator::with_path(template_temp_path)
-    //     .download_contract_template(&args)
-    //     .await;
-
-    // cargo_test(build_dir);
+    cargo_test(target_dir);
 }
 
 pub fn cargo_test(contract_location: PathBuf) {

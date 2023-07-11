@@ -1,6 +1,6 @@
 use std::{
     fs::{self, File},
-    io::Write,
+    io::{ErrorKind, Write},
     path::{Path, PathBuf},
 };
 
@@ -101,7 +101,12 @@ impl RepoTempDownload {
     }
 
     fn delete_temp_folder(&self) {
-        fs::remove_dir_all(self.repository_temp_dir_path()).unwrap();
+        fs::remove_dir_all(self.repository_temp_dir_path()).unwrap_or_else(|error| {
+            // don't throw error if the temp repo doesn't exist
+            if error.kind() != ErrorKind::NotFound {
+                panic!("{:?}", error);
+            }
+        });
     }
 }
 
