@@ -16,9 +16,9 @@ use crate::{
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug, Default)]
-pub struct TxManagedTypesCell(RefCell<TxManagedTypes>);
+pub struct StaticApiVMHooksHandler(RefCell<TxManagedTypes>);
 
-impl VMHooksHandlerSource for TxManagedTypesCell {
+impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
         self.0.borrow()
     }
@@ -112,22 +112,22 @@ impl VMHooksHandlerSource for TxManagedTypesCell {
     }
 }
 
-impl VMHooksBigInt for TxManagedTypesCell {}
-impl VMHooksManagedBuffer for TxManagedTypesCell {}
-impl VMHooksManagedMap for TxManagedTypesCell {}
-impl VMHooksBigFloat for TxManagedTypesCell {}
-impl VMHooksManagedTypes for TxManagedTypesCell {}
+impl VMHooksBigInt for StaticApiVMHooksHandler {}
+impl VMHooksManagedBuffer for StaticApiVMHooksHandler {}
+impl VMHooksManagedMap for StaticApiVMHooksHandler {}
+impl VMHooksBigFloat for StaticApiVMHooksHandler {}
+impl VMHooksManagedTypes for StaticApiVMHooksHandler {}
 
-impl VMHooksCallValue for TxManagedTypesCell {}
-impl VMHooksEndpointArgument for TxManagedTypesCell {}
-impl VMHooksEndpointFinish for TxManagedTypesCell {}
-impl VMHooksError for TxManagedTypesCell {}
-impl VMHooksErrorManaged for TxManagedTypesCell {}
-impl VMHooksStorageRead for TxManagedTypesCell {}
-impl VMHooksStorageWrite for TxManagedTypesCell {}
-impl VMHooksCrypto for TxManagedTypesCell {}
-impl VMHooksBlockchain for TxManagedTypesCell {}
-impl VMHooksLog for TxManagedTypesCell {}
-impl VMHooksSend for TxManagedTypesCell {}
+impl VMHooksCallValue for StaticApiVMHooksHandler {}
+impl VMHooksEndpointArgument for StaticApiVMHooksHandler {}
+impl VMHooksEndpointFinish for StaticApiVMHooksHandler {}
+impl VMHooksError for StaticApiVMHooksHandler {}
+impl VMHooksErrorManaged for StaticApiVMHooksHandler {}
+impl VMHooksStorageRead for StaticApiVMHooksHandler {}
+impl VMHooksStorageWrite for StaticApiVMHooksHandler {}
+impl VMHooksCrypto for StaticApiVMHooksHandler {}
+impl VMHooksBlockchain for StaticApiVMHooksHandler {}
+impl VMHooksLog for StaticApiVMHooksHandler {}
+impl VMHooksSend for StaticApiVMHooksHandler {}
 
-impl VMHooksHandler for TxManagedTypesCell {}
+impl VMHooksHandler for StaticApiVMHooksHandler {}

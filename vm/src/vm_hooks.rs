@@ -5,5 +5,5 @@ mod vh_source;
 
 pub use vh_dispatcher::VMHooksDispatcher;
 pub use vh_handler::*;
-pub use vh_impl::{TxContextWrapper, TxManagedTypesCell};
+pub use vh_impl::{DebugApiVMHooksHandler, StaticApiVMHooksHandler};
 pub use vh_source::VMHooksHandlerSource;
