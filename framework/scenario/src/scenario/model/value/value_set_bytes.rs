@@ -68,13 +68,19 @@ impl From<String> for BytesValue {
     }
 }
 
-impl From<Vec<u8>> for BytesValue {
-    fn from(v: Vec<u8>) -> Self {
-        let expr = format!("0x{}", hex::encode(&v));
+impl From<&[u8]> for BytesValue {
+    fn from(bytes: &[u8]) -> Self {
+        let expr = format!("0x{}", hex::encode(bytes));
         BytesValue {
-            value: v,
+            value: bytes.to_vec(),
             original: ValueSubTree::Str(expr),
         }
+    }
+}
+
+impl From<Vec<u8>> for BytesValue {
+    fn from(v: Vec<u8>) -> Self {
+        Self::from(v.as_slice())
     }
 }
 

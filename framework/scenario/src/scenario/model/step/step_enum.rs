@@ -86,7 +86,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxCall::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
-                response: None,
+                ..Default::default()
             }),
             StepRaw::ScQuery {
                 id,
@@ -101,6 +101,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxQuery::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
+                ..Default::default()
             }),
             StepRaw::ScDeploy {
                 id,
@@ -115,7 +116,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxDeploy::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
-                response: None,
+                ..Default::default()
             }),
             StepRaw::Transfer {
                 id,

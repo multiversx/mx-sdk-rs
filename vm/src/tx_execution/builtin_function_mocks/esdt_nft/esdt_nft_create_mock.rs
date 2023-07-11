@@ -1,7 +1,7 @@
 use num_bigint::BigUint;
 
 use crate::{
-    tx_execution::builtin_function_names::ESDT_NFT_CREATE_FUNC_NAME,
+    tx_execution::{builtin_function_names::ESDT_NFT_CREATE_FUNC_NAME, BlockchainVMRef},
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     types::{top_decode_u64, top_encode_u64},
     world_mock::{EsdtInstance, EsdtInstanceMetadata},
@@ -16,7 +16,16 @@ impl BuiltinFunction for ESDTNftCreate {
         ESDT_NFT_CREATE_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute<F>(
+        &self,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() < 7 {
             let err_result = TxResult::from_vm_error("ESDTNFTCreate too few arguments");
             return (err_result, BlockchainUpdate::empty());

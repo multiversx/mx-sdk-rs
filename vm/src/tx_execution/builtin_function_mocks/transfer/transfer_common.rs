@@ -1,7 +1,7 @@
 use crate::{
     tx_execution::{
         builtin_function_mocks::builtin_func_trait::BuiltinFunctionEsdtTransferInfo,
-        default_execution,
+        BlockchainVMRef,
     },
     tx_mock::{
         BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxLog, TxResult, TxTokenTransfer,
@@ -48,12 +48,17 @@ pub(super) fn extract_transfer_info(
     }
 }
 
-pub(super) fn execute_transfer_builtin_func(
+pub(super) fn execute_transfer_builtin_func<F>(
+    vm: &BlockchainVMRef,
     parsed_tx: ParsedTransferBuiltinFunCall,
     builtin_function_name: &str,
     tx_input: TxInput,
     tx_cache: TxCache,
-) -> (TxResult, BlockchainUpdate) {
+    f: F,
+) -> (TxResult, BlockchainUpdate)
+where
+    F: FnOnce(),
+{
     let mut builtin_logs = Vec::new();
     for raw_esdt_transfer in &parsed_tx.raw_esdt_transfers {
         builtin_logs.push(TxLog {
@@ -82,7 +87,7 @@ pub(super) fn execute_transfer_builtin_func(
         ..Default::default()
     };
 
-    let (mut tx_result, blockchain_updates) = default_execution(exec_input, tx_cache);
+    let (mut tx_result, blockchain_updates) = vm.default_execution(exec_input, tx_cache, f);
 
     // prepends esdt log
     tx_result.result_logs = [builtin_logs.as_slice(), tx_result.result_logs.as_slice()].concat();

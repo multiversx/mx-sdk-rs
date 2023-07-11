@@ -1,3 +1,5 @@
+use multiversx_sc::types::H256;
+
 use crate::{
     api::DebugApi,
     scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
@@ -16,6 +18,7 @@ use super::convert_call_args;
 pub struct ScDeployStep {
     pub id: String,
     pub tx_id: Option<String>,
+    pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,

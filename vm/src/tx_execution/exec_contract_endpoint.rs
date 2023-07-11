@@ -1,11 +1,12 @@
-use std::rc::Rc;
-
-use multiversx_chain_vm_executor::CompilationOptions;
+use multiversx_chain_vm_executor::{CompilationOptions, Instance};
 
 use crate::{
     display_util::address_hex,
-    tx_mock::{TxContext, TxContextRef, TxContextStack, TxResult},
+    tx_mock::{TxContext, TxContextStack},
+    with_shared::Shareable,
 };
+
+use super::{execute_current_tx_context_input, BlockchainVMRef};
 
 const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     gas_limit: 1,
@@ -17,36 +18,22 @@ const COMPILATION_OPTIONS: CompilationOptions = CompilationOptions {
     runtime_breakpoints: false,
 };
 
-/// Runs contract code using the auto-generated function selector.
-/// The endpoint name is taken from the tx context.
-/// Catches and wraps any panics thrown in the contract.
-pub fn execute_tx_context(tx_context: TxContext) -> (TxContext, TxResult) {
-    let tx_context_rc = Rc::new(tx_context);
-    let (tx_context_rc, tx_result) = execute_tx_context_rc(tx_context_rc);
-    let tx_context = Rc::try_unwrap(tx_context_rc).unwrap();
-    (tx_context, tx_result)
-}
+impl BlockchainVMRef {
+    /// Runs contract code using the auto-generated function selector.
+    /// The endpoint name is taken from the tx context.
+    /// Catches and wraps any panics thrown in the contract.
+    pub fn execute_tx_context(&self, tx_context: TxContext) -> TxContext {
+        let mut tx_context_sh = Shareable::new(tx_context);
+        TxContextStack::execute_on_vm_stack(&mut tx_context_sh, execute_current_tx_context_input);
+        tx_context_sh.into_inner()
+    }
 
-/// The actual core of the execution.
-/// The argument is returned and can be unwrapped,
-/// since the lifetimes of all other references created from it cannot outlive this function.
-fn execute_tx_context_rc(tx_context_rc: Rc<TxContext>) -> (Rc<TxContext>, TxResult) {
-    let tx_context_ref = TxContextRef::new(tx_context_rc.clone());
-
-    let func_name = &tx_context_ref.tx_input_box.func_name;
-    let contract_code = get_contract_identifier(&tx_context_ref);
-    let executor = &tx_context_rc.blockchain_ref().executor;
-    let instance = executor
-        .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
-        .expect("error instantiating executor instance");
-
-    TxContextStack::static_push(tx_context_rc.clone());
-
-    instance.call(func_name.as_str()).expect("execution error");
-
-    let tx_result = TxContextRef::new_from_static().into_tx_result();
-    let tx_context_rc = TxContextStack::static_pop();
-    (tx_context_rc, tx_result)
+    pub fn get_contract_instance(&self, tx_context: &TxContext) -> Box<dyn Instance> {
+        let contract_code = get_contract_identifier(tx_context);
+        self.executor
+            .new_instance(contract_code.as_slice(), &COMPILATION_OPTIONS)
+            .expect("error instantiating executor instance")
+    }
 }
 
 fn get_contract_identifier(tx_context: &TxContext) -> Vec<u8> {

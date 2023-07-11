@@ -1,3 +1,5 @@
+use multiversx_sc::types::H256;
+
 use crate::{
     api::DebugApi,
     scenario::model::{AddressValue, BigUintValue, BytesValue, TxCall, TxESDT, TxExpect, U64Value},
@@ -13,6 +15,7 @@ use crate::multiversx_sc::{
 pub struct ScCallStep {
     pub id: String,
     pub tx_id: Option<String>,
+    pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,

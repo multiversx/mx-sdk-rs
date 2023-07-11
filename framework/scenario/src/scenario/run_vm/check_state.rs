@@ -6,22 +6,22 @@ use num_traits::Zero;
 
 use multiversx_chain_vm::{
     display_util::{bytes_to_string, verbose_hex, verbose_hex_list},
-    world_mock::{AccountEsdt, BlockchainMock, EsdtData, EsdtInstance, EsdtInstances},
+    world_mock::{AccountEsdt, BlockchainState, EsdtData, EsdtInstance, EsdtInstances},
 };
 
 use super::ScenarioVMRunner;
 
 impl ScenarioVMRunner {
     pub fn perform_check_state(&mut self, check_state_step: &CheckStateStep) {
-        execute(&self.blockchain_mock, &check_state_step.accounts);
+        execute(&self.blockchain_mock.state, &check_state_step.accounts);
     }
 
     pub fn perform_dump_state(&mut self) {
-        self.blockchain_mock.print_accounts();
+        self.blockchain_mock.state.print_accounts();
     }
 }
 
-fn execute(state: &BlockchainMock, accounts: &CheckAccounts) {
+fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
     for (expected_address, expected_account) in accounts.accounts.iter() {
         if let Some(account) = state.accounts.get(&expected_address.to_vm_address()) {
             assert!(

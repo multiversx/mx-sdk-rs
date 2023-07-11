@@ -4,6 +4,7 @@ pub mod sc_deploy;
 pub mod sc_query;
 mod set_state;
 mod transfer;
+mod tx_input_util;
 mod tx_output_check;
 mod vm_runner;
 

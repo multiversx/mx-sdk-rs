@@ -1,3 +1,5 @@
+use multiversx_sc::types::H256;
+
 use crate::{
     api::DebugApi,
     multiversx_sc::{
@@ -13,6 +15,7 @@ use super::{format_expect, process_contract_call};
 pub struct ScQueryStep {
     pub id: String,
     pub tx_id: Option<String>,
+    pub explicit_tx_hash: Option<H256>,
     pub comment: Option<String>,
     pub tx: Box<TxQuery>,
     pub expect: Option<TxExpect>,

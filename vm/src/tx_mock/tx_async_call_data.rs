@@ -1,5 +1,5 @@
 use crate::{
-    tx_execution::BuiltinFunctionMap,
+    tx_execution::BuiltinFunctionContainer,
     tx_mock::{TxInput, TxResult},
     types::{top_encode_u64, VMAddress, H256},
 };
@@ -44,7 +44,7 @@ fn result_status_bytes(result_status: u64) -> Vec<u8> {
 pub fn async_callback_tx_input(
     async_data: &AsyncCallTxData,
     async_result: &TxResult,
-    builtin_functions: &BuiltinFunctionMap,
+    builtin_functions: &BuiltinFunctionContainer,
 ) -> TxInput {
     let mut args: Vec<Vec<u8>> = vec![result_status_bytes(async_result.result_status)];
     if async_result.result_status == 0 {
@@ -72,7 +72,7 @@ pub fn async_callback_tx_input(
 fn extract_callback_payments(
     callback_contract_address: &VMAddress,
     async_result: &TxResult,
-    builtin_functions: &BuiltinFunctionMap,
+    builtin_functions: &BuiltinFunctionContainer,
 ) -> CallbackPayments {
     let mut callback_payments = CallbackPayments::default();
     for async_call in &async_result.all_calls {

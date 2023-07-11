@@ -1,6 +1,9 @@
 use num_bigint::BigUint;
 
-use crate::types::{top_decode_u64, top_encode_u64};
+use crate::{
+    tx_execution::BlockchainVMRef,
+    types::{top_decode_u64, top_encode_u64},
+};
 
 use crate::{
     tx_execution::builtin_function_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
@@ -17,7 +20,16 @@ impl BuiltinFunction for ESDTNftAddQuantity {
         ESDT_NFT_ADD_QUANTITY_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute<F>(
+        &self,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() != 3 {
             let err_result = TxResult::from_vm_error("ESDTNFTAddQuantity expects 3 arguments");
             return (err_result, BlockchainUpdate::empty());

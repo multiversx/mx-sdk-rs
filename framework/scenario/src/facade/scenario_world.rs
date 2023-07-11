@@ -1,3 +1,5 @@
+use multiversx_chain_vm::world_mock::BlockchainState;
+
 use crate::{
     api::DebugApi,
     debug_executor::ContractContainer,
@@ -74,7 +76,15 @@ impl ScenarioWorld {
         }
     }
 
-    pub(super) fn get_mut_contract_debugger_backend(&mut self) -> &mut DebuggerBackend {
+    pub(crate) fn get_debugger_backend(&self) -> &DebuggerBackend {
+        if let Backend::Debugger(debugger) = &self.backend {
+            debugger
+        } else {
+            panic!("operation only available for the contract debugger backend")
+        }
+    }
+
+    pub(crate) fn get_mut_debugger_backend(&mut self) -> &mut DebuggerBackend {
         if let Backend::Debugger(debugger) = &mut self.backend {
             debugger
         } else {
@@ -82,8 +92,20 @@ impl ScenarioWorld {
         }
     }
 
+    pub(crate) fn get_state(&self) -> &BlockchainState {
+        &self.get_debugger_backend().vm_runner.blockchain_mock.state
+    }
+
+    pub(crate) fn get_mut_state(&mut self) -> &mut BlockchainState {
+        &mut self
+            .get_mut_debugger_backend()
+            .vm_runner
+            .blockchain_mock
+            .state
+    }
+
     pub fn start_trace(&mut self) -> &mut Self {
-        self.get_mut_contract_debugger_backend().trace = Some(ScenarioTrace::default());
+        self.get_mut_debugger_backend().trace = Some(ScenarioTrace::default());
         self
     }
 
@@ -112,7 +134,7 @@ impl ScenarioWorld {
         contract_container: ContractContainer,
     ) {
         let contract_bytes = interpret_string(expression, &self.interpreter_context());
-        self.get_mut_contract_debugger_backend()
+        self.get_mut_debugger_backend()
             .vm_runner
             .contract_map_ref
             .borrow_mut()
@@ -180,7 +202,7 @@ impl ScenarioWorld {
 
     /// Exports current scenario to a JSON file, as created.
     pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        if let Some(trace) = &mut self.get_mut_contract_debugger_backend().trace {
+        if let Some(trace) = &mut self.get_mut_debugger_backend().trace {
             trace.write_scenario_trace(file_path);
         } else {
             panic!("scenario trace no initialized")
