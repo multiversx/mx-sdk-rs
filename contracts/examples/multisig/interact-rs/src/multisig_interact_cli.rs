@@ -22,8 +22,18 @@ pub enum InteractCliCommand {
     Feed,
     #[command(name = "multi-deploy", about = "Multiple deploy contracts")]
     MultiDeploy(MultiDeployArgs),
+    #[command(
+        name = "nft-full-all-roles",
+        about = "Issue multisig and collection with all roles"
+    )]
+    NftFullAllRoles,
     #[command(name = "nft-full", about = "Issue multisig and collection")]
     NftFull,
+    #[command(
+        name = "nft-issue-all-roles",
+        about = "Issue collection with all roles"
+    )]
+    NftIssueAllRoles,
     #[command(name = "nft-issue", about = "Issue collection")]
     NftIssue,
     #[command(name = "nft-items", about = "Create items")]

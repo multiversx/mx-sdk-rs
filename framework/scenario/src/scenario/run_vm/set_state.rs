@@ -76,6 +76,9 @@ fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
             new_address.new_address.to_vm_address(),
         )
     }
+    for new_token_identifier in set_state_step.new_token_identifiers.iter().cloned() {
+        state.put_new_token_identifier(new_token_identifier)
+    }
     if let Some(block_info_obj) = &*set_state_step.previous_block_info {
         update_block_info(&mut state.previous_block_info, block_info_obj);
     }

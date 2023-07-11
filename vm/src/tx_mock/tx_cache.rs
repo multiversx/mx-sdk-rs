@@ -16,6 +16,7 @@ use super::{BlockchainUpdate, TxCacheSource};
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
     pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
+    pub(super) new_token_identifiers: RefCell<Option<Vec<String>>>,
 }
 
 impl fmt::Debug for TxCache {
@@ -31,6 +32,7 @@ impl TxCache {
         TxCache {
             source_ref,
             accounts: RefCell::new(HashMap::new()),
+            new_token_identifiers: RefCell::new(None),
         }
     }
 
@@ -97,9 +99,18 @@ impl TxCache {
             })
     }
 
+    pub fn get_new_token_identifiers(&self) -> Vec<String> {
+        self.blockchain_ref().get_new_token_identifiers()
+    }
+
+    pub fn set_new_token_identifiers(&self, token_identifiers: Vec<String>) {
+        *self.new_token_identifiers.borrow_mut() = Some(token_identifiers);
+    }
+
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         BlockchainUpdate {
             accounts: self.accounts.into_inner(),
+            new_token_identifiers: self.new_token_identifiers.into_inner(),
         }
     }
 
