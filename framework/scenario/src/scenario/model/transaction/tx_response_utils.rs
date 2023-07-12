@@ -4,14 +4,14 @@ pub fn process_topics_error(topics: Option<&Vec<String>>) -> Option<String> {
     }
 
     let topics = topics.unwrap();
-    return if topics.len() != 2 {
+    if topics.len() != 2 {
         Some(format!(
             "expected to have 2 topics, found {} instead",
             topics.len()
         ))
     } else {
         None
-    };
+    }
 }
 
 pub fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
