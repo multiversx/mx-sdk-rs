@@ -32,26 +32,30 @@ impl Error for TxError {}
 
 #[derive(Debug, Default, Clone)]
 pub struct TxResponse {
-    pub out: Vec<BytesValue>,
-    pub status: U64Value,
-    pub message: BytesValue,
+    pub out: Vec<Vec<u8>>,
+    pub new_deployed_address: Address,
+    pub status: u64,
+    pub message: Vec<u8>,
     pub logs: Vec<Log>,
-    pub gas: U64Value,
-    pub refund: U64Value,
+    pub gas: u64,
+    pub refund: u64,
     pub api_scrs: Vec<ApiSmartContractResult>,
     pub api_logs: Option<ApiLogs>,
 }
 
 impl TxResponse {
     pub fn new(tx: TransactionOnNetwork) -> Self {
-        Self {
+        let mut response = Self {
             api_scrs: tx.smart_contract_results.unwrap_or_default(),
             api_logs: tx.logs,
             ..Default::default()
-        }
+        };
+
+        response.out = response.raw_result().unwrap();
+        response.new_deployed_address = response.new_deployed_address().unwrap();
     }
 
-    pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
+    pub fn process_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
         self.handle_signal_error_event()?;
 
         let first_scr = self.api_scrs.get(0);
@@ -62,6 +66,10 @@ impl TxResponse {
         }
 
         Ok(decode_scr_data_or_panic(first_scr.unwrap().data.as_str()))
+    }
+
+    pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
+        Ok(self.out)
     }
 
     pub fn new_deployed_address(&self) -> Result<Address, TxError> {
@@ -123,7 +131,7 @@ impl TxResponse {
 
     // Handles a scDeploy event
     fn handle_sc_deploy_event(&self) -> Result<Address, TxError> {
-        let event = self.find_log(LOG_IDENTIFIER_SC_DEPLOY);
+        let event: Option<&Events> = self.find_log(LOG_IDENTIFIER_SC_DEPLOY);
         if event.is_none() {
             return Err(TxError {
                 message: format!("`{LOG_IDENTIFIER_SC_DEPLOY}` event not found"),
