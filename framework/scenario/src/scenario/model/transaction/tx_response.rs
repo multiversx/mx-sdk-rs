@@ -6,7 +6,7 @@ use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
-use super::{Log, TxResponseStatus};
+use super::{decode_scr_data_or_panic, process_topics_error, Log, TxResponseStatus};
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
@@ -17,6 +17,7 @@ const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 pub struct TxResponse {
     pub out: Vec<Vec<u8>>,
     pub new_deployed_address: Option<Address>,
+    pub new_issued_token_identifier: Option<String>,
     pub tx_error: TxResponseStatus,
     pub logs: Vec<Log>,
     pub gas: u64,
@@ -52,41 +53,19 @@ impl TxResponse {
         response.process()
     }
 
-    fn process(self) -> Self {
-        self.process_out().process_new_deployed_address()
-    }
-
-    fn process_out(mut self) -> Self {
-        if let Some(first_scr) = self.api_scrs.get(0) {
-            self.out = decode_scr_data_or_panic(first_scr.data.as_str());
-        } else {
-            panic!("no smart contract results obtained")
-            // self.tx_error.status = 0; // TODO: Add correct status
-            // self.tx_error.message = "no smart contract results obtained".to_string();
-        }
-        self
-    }
-
-    fn process_new_deployed_address(mut self) -> Self {
-        if let Some(event) = self.find_log(LOG_IDENTIFIER_SC_DEPLOY).cloned() {
-            // handle topics
-            if let Some(topics) = event.topics.as_ref() {
-                if topics.len() != 2 {
-                    self.tx_error.message.push_str(
-                        format!("expected to have 2 topics, found {} instead", topics.len())
-                            .as_str(),
-                    );
-                }
-
-                let address_raw = base64::decode(topics.get(0).unwrap()).unwrap();
-                let address = Address::from_slice(address_raw.as_slice());
-                self.new_deployed_address = Some(address);
-            } else {
-                self.tx_error.message.push_str("missing topics");
+    fn process_signal_error(&self) -> TxResponseStatus {
+        if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
+            let topics = event.topics.as_ref();
+            if let Some(error) = process_topics_error(topics) {
+                return TxResponseStatus::signal_error(&error);
             }
+
+            let error_raw = base64::decode(topics.unwrap().get(1).unwrap()).unwrap();
+            let error = String::from_utf8(error_raw).unwrap();
+            return TxResponseStatus::signal_error(&error);
         }
 
-        self
+        TxResponseStatus::default()
     }
 
     // Finds api logs matching the given log identifier.
@@ -100,58 +79,45 @@ impl TxResponse {
         }
     }
 
-    fn process_signal_error(&self) -> TxResponseStatus {
-        let mut tx_error = TxResponseStatus::default();
+    fn process(self) -> Self {
+        self.process_out()
+            .process_new_deployed_address()
+            .process_new_issued_token_identifier()
+    }
 
-        if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
-            tx_error.status = 4;
-            tx_error.message = "signal error: ".to_string();
+    fn process_out(mut self) -> Self {
+        if let Some(first_scr) = self.api_scrs.get(0) {
+            self.out = decode_scr_data_or_panic(first_scr.data.as_str());
+        } else {
+            panic!("no smart contract results obtained");
+        }
 
-            if let Some(topics) = event.topics.as_ref() {
-                if topics.len() != 2 {
-                    tx_error.message.push_str(
-                        format!(" expected to have 2 topics, found {} instead", topics.len())
-                            .as_str(),
-                    );
-                }
+        self
+    }
 
-                let error_raw = base64::decode(topics.get(1).unwrap()).unwrap();
-                let error = String::from_utf8(error_raw).unwrap();
-
-                tx_error.message.push_str(&error);
-            } else {
-                tx_error.message.push_str("missing topics");
+    fn process_new_deployed_address(mut self) -> Self {
+        if let Some(event) = self.find_log(LOG_IDENTIFIER_SC_DEPLOY).cloned() {
+            let topics = event.topics.as_ref();
+            if let Some(error) = process_topics_error(topics) {
+                panic!("{error}");
             }
+
+            let address_raw = base64::decode(topics.unwrap().get(0).unwrap()).unwrap();
+            let address: Address = Address::from_slice(address_raw.as_slice());
+            self.new_deployed_address = Some(address);
         }
 
-        tx_error
+        self
     }
 
-    pub fn handle_signal_error_event(&self) -> Result<(), TxResponseStatus> {
-        if !self.tx_error.is_success() {
-            Err(self.tx_error.clone())
-        } else {
-            Ok(())
-        }
-    }
-
-    pub fn new_deployed_address(&self) -> Result<Address, TxResponseStatus> {
-        if !self.tx_error.is_success() {
-            Err(self.tx_error.clone())
-        } else {
-            Ok(self.new_deployed_address.clone().unwrap())
-        }
-    }
-
-    // Returns the token identifier of the newly issued non-fungible token.
-    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxResponseStatus> {
+    fn process_new_issued_token_identifier(mut self) -> Self {
         let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
             .api_scrs
             .iter()
             .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
 
         if token_identifier_issue_scr.is_none() {
-            panic!("no token identifier issue SCR found");
+            return self;
         }
 
         let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
@@ -160,17 +126,41 @@ impl TxResponse {
             panic!("no token identifier found in SCR");
         }
 
-        Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
+        self.new_issued_token_identifier =
+            Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+        self
     }
-}
 
-fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
-    let mut split = data.split('@');
-    let _ = split.next().expect("SCR data should start with '@'");
-    let result_code = split.next().expect("missing result code");
-    assert_eq!(result_code, "6f6b", "result code is not 'ok'");
+    #[deprecated(
+        note = "used for consistency, will be removed soon"
+    )]
+    pub fn handle_signal_error_event(&self) -> Result<(), TxResponseStatus> {
+        if !self.tx_error.is_success() {
+            Err(self.tx_error.clone())
+        } else {
+            Ok(())
+        }
+    }
 
-    split
-        .map(|encoded_arg| hex::decode(encoded_arg).expect("error hex-decoding result"))
-        .collect()
+    #[deprecated(
+        note = "used for consistency, will be removed soon"
+    )]
+    pub fn new_deployed_address(&self) -> Result<Address, TxResponseStatus> {
+        if !self.tx_error.is_success() {
+            Err(self.tx_error.clone())
+        } else {
+            Ok(self.new_deployed_address.clone().unwrap())
+        }
+    }
+
+    #[deprecated(
+        note = "used for consistency, will be removed soon"
+    )]
+    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxResponseStatus> {
+        if !self.tx_error.is_success() {
+            Err(self.tx_error.clone())
+        } else {
+            Ok(self.new_issued_token_identifier.clone().unwrap())
+        }
+    }
 }
