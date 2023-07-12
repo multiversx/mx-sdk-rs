@@ -8,7 +8,7 @@ use crate::{
         types::{Address, CodeMetadata},
     },
     scenario_format::interpret_trait::InterpreterContext,
-    scenario_model::{TxError, TxResponse},
+    scenario_model::{TxResponseStatus, TxResponse},
 };
 
 use crate::scenario::model::{AddressValue, BigUintValue, TxExpect, U64Value};
@@ -23,7 +23,7 @@ pub struct TypedScDeploy<OriginalResult> {
 }
 
 impl<OriginalResult> TypedScDeploy<OriginalResult> {
-    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxError>
+    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,

@@ -6,36 +6,23 @@ use crate::{
     scenario_model::{BytesValue, U64Value},
 };
 use log::info;
+use multiversx_chain_vm::tx_mock::TxResult;
 use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
-use super::Log;
+use super::{Log, TxResponseStatus};
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 
-#[derive(Debug)]
-pub struct TxError {
-    pub message: String,
-}
-
-impl std::fmt::Display for TxError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "transaction error: {}", self.message)
-    }
-}
-
-impl Error for TxError {}
-
 #[derive(Debug, Default, Clone)]
 pub struct TxResponse {
     pub out: Vec<Vec<u8>>,
-    pub new_deployed_address: Address,
-    pub status: u64,
-    pub message: Vec<u8>,
+    pub new_deployed_address: Option<Address>,
+    pub tx_error: TxResponseStatus,
     pub logs: Vec<Log>,
     pub gas: u64,
     pub refund: u64,
@@ -44,7 +31,7 @@ pub struct TxResponse {
 }
 
 impl TxResponse {
-    pub fn new(tx: TransactionOnNetwork) -> Self {
+    pub fn from_network_tx(tx: TransactionOnNetwork) -> Self {
         let mut response = Self {
             api_scrs: tx.smart_contract_results.unwrap_or_default(),
             api_logs: tx.logs,
@@ -55,12 +42,23 @@ impl TxResponse {
         response.new_deployed_address = response.new_deployed_address().unwrap();
     }
 
-    pub fn process_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
+    pub fn from_tx_result(tx_result: TxResult) -> Self {
+        TxResponse {
+            out: tx_result.result_values,
+            tx_error: TxResponseStatus {
+                status: tx_result.result_status,
+                message: tx_result.result_message,
+            },
+            ..Default::default()
+        }
+    }
+
+    pub fn process_result(&self) -> Result<Vec<Vec<u8>>, TxResponseStatus> {
         self.handle_signal_error_event()?;
 
         let first_scr = self.api_scrs.get(0);
         if first_scr.is_none() {
-            return Err(TxError {
+            return Err(TxResponseStatus {
                 message: "no smart contract results obtained".to_string(),
             });
         }
@@ -68,17 +66,17 @@ impl TxResponse {
         Ok(decode_scr_data_or_panic(first_scr.unwrap().data.as_str()))
     }
 
-    pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxError> {
+    pub fn raw_result(&self) -> Result<Vec<Vec<u8>>, TxResponseStatus> {
         Ok(self.out)
     }
 
-    pub fn new_deployed_address(&self) -> Result<Address, TxError> {
+    pub fn new_deployed_address(&self) -> Result<Address, TxResponseStatus> {
         self.handle_signal_error_event()?;
         self.handle_sc_deploy_event()
     }
 
     // Returns the token identifier of the newly issued non-fungible token.
-    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxError> {
+    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxResponseStatus> {
         self.handle_signal_error_event()?;
 
         let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
@@ -87,7 +85,7 @@ impl TxResponse {
             .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
 
         if token_identifier_issue_scr.is_none() {
-            return Err(TxError {
+            return Err(TxResponseStatus {
                 message: "no token identifier SCR found".to_string(),
             });
         }
@@ -95,7 +93,7 @@ impl TxResponse {
         let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
         let encoded_tid = token_identifier_issue_scr.data.split('@').nth(2);
         if encoded_tid.is_none() {
-            return Err(TxError {
+            return Err(TxResponseStatus {
                 message: format!(
                     "bad issue token SCR data: {}",
                     token_identifier_issue_scr.data
@@ -118,22 +116,22 @@ impl TxResponse {
     }
 
     // Handles a signalError event
-    pub fn handle_signal_error_event(&self) -> Result<(), TxError> {
+    pub fn handle_signal_error_event(&self) -> Result<(), TxResponseStatus> {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
             let topics = self.handle_event_topics(event, LOG_IDENTIFIER_SIGNAL_ERROR)?;
             let error_raw = base64::decode(topics.get(1).unwrap()).unwrap();
             let error = String::from_utf8(error_raw).unwrap();
 
-            return Err(TxError { message: error });
+            return Err(TxResponseStatus { message: error });
         }
         Ok(())
     }
 
     // Handles a scDeploy event
-    fn handle_sc_deploy_event(&self) -> Result<Address, TxError> {
+    fn handle_sc_deploy_event(&self) -> Result<Address, TxResponseStatus> {
         let event: Option<&Events> = self.find_log(LOG_IDENTIFIER_SC_DEPLOY);
         if event.is_none() {
-            return Err(TxError {
+            return Err(TxResponseStatus {
                 message: format!("`{LOG_IDENTIFIER_SC_DEPLOY}` event not found"),
             });
         }
@@ -150,17 +148,17 @@ impl TxResponse {
         &'a self,
         event: &'b Events,
         log_identifier: &str,
-    ) -> Result<&Vec<String>, TxError> {
+    ) -> Result<&Vec<String>, TxResponseStatus> {
         let option = event.topics.as_ref();
         if option.is_none() {
-            return Err(TxError {
+            return Err(TxResponseStatus {
                 message: "missing topics".to_string(),
             });
         }
 
         let topics = option.unwrap();
         if topics.len() != 2 {
-            return Err(TxError {
+            return Err(TxResponseStatus {
                 message: format!(
                     "`{log_identifier}` is expected to have 2 topics, found {}",
                     topics.len()

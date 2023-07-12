@@ -6,7 +6,7 @@ use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     scenario::model::{AddressValue, U64Value},
-    scenario_model::{BigUintValue, BytesValue, TxError, TxExpect, TxResponse},
+    scenario_model::{BigUintValue, BytesValue, TxResponseStatus, TxExpect, TxResponse},
 };
 
 use super::ScCallStep;
@@ -19,7 +19,7 @@ pub struct TypedScCall<OriginalResult> {
 }
 
 impl<OriginalResult> TypedScCall<OriginalResult> {
-    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxError>
+    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
