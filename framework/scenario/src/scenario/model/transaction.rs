@@ -8,6 +8,7 @@ mod tx_expect;
 mod tx_interpret_util;
 mod tx_query;
 mod tx_response;
+mod tx_response_status;
 mod tx_transfer;
 mod tx_validator_reward;
 
@@ -19,6 +20,7 @@ pub use tx_deploy::*;
 pub use tx_esdt::*;
 pub use tx_expect::*;
 pub use tx_query::*;
-pub use tx_response::*;
+pub use tx_response::TxResponse;
+pub use tx_response_status::TxResponseStatus;
 pub use tx_transfer::*;
 pub use tx_validator_reward::*;

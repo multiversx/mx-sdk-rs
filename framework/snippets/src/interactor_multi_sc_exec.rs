@@ -19,7 +19,7 @@ impl Interactor {
         let results = self.process_txs(txs).await;
 
         for (i, sc_call_step) in buffer.refs.iter_mut().enumerate() {
-            sc_call_step.set_response(TxResponse::new(results.get(i).unwrap().clone()));
+            sc_call_step.set_response(TxResponse::from_network_tx(results.get(i).unwrap().clone()));
         }
 
         for step in buffer.refs.iter() {
