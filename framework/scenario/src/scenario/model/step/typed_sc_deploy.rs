@@ -8,7 +8,7 @@ use crate::{
         types::{Address, CodeMetadata},
     },
     scenario_format::interpret_trait::InterpreterContext,
-    scenario_model::{TxResponseStatus, TxResponse},
+    scenario_model::{TxResponse, TxResponseStatus},
 };
 
 use crate::scenario::model::{AddressValue, BigUintValue, TxExpect, U64Value};
@@ -28,7 +28,7 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let mut raw_result = self.response().raw_result()?;
+        let mut raw_result = self.response().out.clone();
         Ok(
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap(),

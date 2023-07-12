@@ -24,7 +24,7 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let mut raw_result = self.response().raw_result()?;
+        let mut raw_result = self.response().out.clone();
         Ok(
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap(),

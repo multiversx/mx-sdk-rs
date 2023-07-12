@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct TxResponseStatus {
     pub status: u64,
     pub message: String,
