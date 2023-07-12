@@ -2,10 +2,9 @@ use multiversx_sc::storage::{
     mappers::{StorageMapper, VecMapper},
     StorageKey,
 };
-use multiversx_sc_scenario::api::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_vec() -> VecMapper<DebugApi, u64> {
-    let _ = DebugApi::dummy();
+fn create_vec() -> VecMapper<SingleTxApi, u64> {
     let base_key = StorageKey::new(&b"my_queue"[..]);
     VecMapper::new(base_key)
 }
@@ -38,7 +37,7 @@ fn test_vec_simple() {
     assert_eq!(it.next(), None);
 }
 
-fn check_vec(vect: &VecMapper<DebugApi, u64>, expected: Vec<u64>) {
+fn check_vec(vect: &VecMapper<SingleTxApi, u64>, expected: Vec<u64>) {
     assert_eq!(vect.len(), expected.len());
     let vec: Vec<u64> = vect.load_as_vec();
     assert_eq!(vec, expected);

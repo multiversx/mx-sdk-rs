@@ -3,7 +3,7 @@ use std::rc::Rc;
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
     tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
-    vm_hooks::{TxContextWrapper, VMHooksDispatcher},
+    vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
 use multiversx_sc::err_msg;
 
@@ -22,7 +22,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         F: FnOnce(&dyn VMHooks) -> R,
     {
         let top_context = TxContextStack::static_peek();
-        let wrapper = TxContextWrapper::new(top_context);
+        let wrapper = DebugApiVMHooksHandler::new(top_context);
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
         f(&dispatcher)
     }
@@ -31,7 +31,7 @@ impl VMHooksApiBackend for DebugApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        let wrapper = TxContextWrapper::new(handle.context);
+        let wrapper = DebugApiVMHooksHandler::new(handle.context);
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
         f(&dispatcher)
     }

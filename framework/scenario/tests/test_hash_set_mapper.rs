@@ -2,15 +2,14 @@ use multiversx_sc::storage::{
     mappers::{SetMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use multiversx_sc_scenario::api::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_set() -> SetMapper<DebugApi, u64> {
-    let _ = DebugApi::dummy();
+fn create_set() -> SetMapper<SingleTxApi, u64> {
     let base_key = StorageKey::new(&b"my_set"[..]);
     SetMapper::new(base_key)
 }
 
-fn check_set(set: &SetMapper<DebugApi, u64>, expected: Vec<u64>) {
+fn check_set(set: &SetMapper<SingleTxApi, u64>, expected: Vec<u64>) {
     assert_eq!(set.len(), expected.len());
     assert!(set.check_internal_consistency());
     let actual: Vec<u64> = set.iter().collect();

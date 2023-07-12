@@ -2,10 +2,9 @@ use multiversx_sc::storage::{
     mappers::{MapMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use multiversx_sc_scenario::api::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_map() -> MapMapper<DebugApi, u64, u64> {
-    let _ = DebugApi::dummy();
+fn create_map() -> MapMapper<SingleTxApi, u64, u64> {
     let base_key = StorageKey::new(&b"my_map"[..]);
     MapMapper::new(base_key)
 }

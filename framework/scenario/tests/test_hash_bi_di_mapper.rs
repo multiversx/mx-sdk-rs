@@ -2,15 +2,14 @@ use multiversx_sc::storage::{
     mappers::{BiDiMapper, StorageMapper},
     StorageKey,
 };
-use multiversx_sc_scenario::api::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_set_1() -> BiDiMapper<DebugApi, u64, u32> {
-    let _ = DebugApi::dummy();
+fn create_set_1() -> BiDiMapper<SingleTxApi, u64, u32> {
     let base_key = StorageKey::new(&b"my_bidi_set"[..]);
     BiDiMapper::new(base_key)
 }
 
-fn check_set_1(set: &BiDiMapper<DebugApi, u64, u32>, ids: Vec<u64>, values: Vec<u32>) {
+fn check_set_1(set: &BiDiMapper<SingleTxApi, u64, u32>, ids: Vec<u64>, values: Vec<u32>) {
     assert_eq!(values.len(), ids.len());
     assert_eq!(set.len(), ids.len());
 

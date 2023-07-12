@@ -12,7 +12,7 @@ use multiversx_sc::{
     contract_base::ProxyObjBase,
     types::{BigInt, ManagedAddress},
 };
-use multiversx_sc_scenario::DebugApi;
+use multiversx_sc_scenario::api::{SingleTxApi, StaticApi};
 
 use crate::module_1::VersionModule;
 
@@ -413,9 +413,7 @@ mod sample_adder {
 fn contract_without_macros_basic() {
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let _ = DebugApi::dummy();
-
-    let adder = sample_adder::contract_obj::<DebugApi>();
+    let adder = sample_adder::contract_obj::<SingleTxApi>();
 
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
@@ -436,7 +434,7 @@ fn contract_without_macros_basic() {
     assert!(adder.call("version"));
 
     let mut own_proxy =
-        sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
+        sample_adder::Proxy::<StaticApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
     let _ = multiversx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();

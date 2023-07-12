@@ -13,29 +13,28 @@ use crate::{
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
+    vm_hooks::{
+        VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
+        VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
+        VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
+        VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
+    },
     world_mock::{reserved::STORAGE_RESERVED_PREFIX, AccountData, BlockInfo},
-};
-
-use super::{
-    VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
-    VMHooksEndpointArgument, VMHooksEndpointFinish, VMHooksError, VMHooksErrorManaged,
-    VMHooksHandler, VMHooksHandlerSource, VMHooksLog, VMHooksManagedBuffer, VMHooksManagedMap,
-    VMHooksManagedTypes, VMHooksSend, VMHooksStorageRead, VMHooksStorageWrite,
 };
 
 /// A simple wrapper around a managed type container RefCell.
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug)]
-pub struct TxContextWrapper(Rc<TxContext>);
+pub struct DebugApiVMHooksHandler(Rc<TxContext>);
 
-impl TxContextWrapper {
+impl DebugApiVMHooksHandler {
     pub fn new(tx_context_rc: Rc<TxContext>) -> Self {
-        TxContextWrapper(tx_context_rc)
+        DebugApiVMHooksHandler(tx_context_rc)
     }
 }
 
-impl VMHooksHandlerSource for TxContextWrapper {
+impl VMHooksHandlerSource for DebugApiVMHooksHandler {
     fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
         self.0.m_types_borrow()
     }
@@ -206,7 +205,7 @@ impl VMHooksHandlerSource for TxContextWrapper {
     }
 }
 
-impl TxContextWrapper {
+impl DebugApiVMHooksHandler {
     fn create_async_call_data(
         &self,
         to: VMAddress,
@@ -245,22 +244,22 @@ impl TxContextWrapper {
     }
 }
 
-impl VMHooksBigInt for TxContextWrapper {}
-impl VMHooksManagedBuffer for TxContextWrapper {}
-impl VMHooksManagedMap for TxContextWrapper {}
-impl VMHooksBigFloat for TxContextWrapper {}
-impl VMHooksManagedTypes for TxContextWrapper {}
+impl VMHooksBigInt for DebugApiVMHooksHandler {}
+impl VMHooksManagedBuffer for DebugApiVMHooksHandler {}
+impl VMHooksManagedMap for DebugApiVMHooksHandler {}
+impl VMHooksBigFloat for DebugApiVMHooksHandler {}
+impl VMHooksManagedTypes for DebugApiVMHooksHandler {}
 
-impl VMHooksCallValue for TxContextWrapper {}
-impl VMHooksEndpointArgument for TxContextWrapper {}
-impl VMHooksEndpointFinish for TxContextWrapper {}
-impl VMHooksError for TxContextWrapper {}
-impl VMHooksErrorManaged for TxContextWrapper {}
-impl VMHooksStorageRead for TxContextWrapper {}
-impl VMHooksStorageWrite for TxContextWrapper {}
-impl VMHooksCrypto for TxContextWrapper {}
-impl VMHooksBlockchain for TxContextWrapper {}
-impl VMHooksLog for TxContextWrapper {}
-impl VMHooksSend for TxContextWrapper {}
+impl VMHooksCallValue for DebugApiVMHooksHandler {}
+impl VMHooksEndpointArgument for DebugApiVMHooksHandler {}
+impl VMHooksEndpointFinish for DebugApiVMHooksHandler {}
+impl VMHooksError for DebugApiVMHooksHandler {}
+impl VMHooksErrorManaged for DebugApiVMHooksHandler {}
+impl VMHooksStorageRead for DebugApiVMHooksHandler {}
+impl VMHooksStorageWrite for DebugApiVMHooksHandler {}
+impl VMHooksCrypto for DebugApiVMHooksHandler {}
+impl VMHooksBlockchain for DebugApiVMHooksHandler {}
+impl VMHooksLog for DebugApiVMHooksHandler {}
+impl VMHooksSend for DebugApiVMHooksHandler {}
 
-impl VMHooksHandler for TxContextWrapper {}
+impl VMHooksHandler for DebugApiVMHooksHandler {}

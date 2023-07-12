@@ -1,4 +1,5 @@
 use num_bigint::BigUint;
+use num_traits::Zero;
 
 use super::AccountEsdt;
 use crate::{display_util::key_hex, types::VMAddress};
@@ -17,6 +18,22 @@ pub struct AccountData {
     pub contract_path: Option<Vec<u8>>,
     pub contract_owner: Option<VMAddress>,
     pub developer_rewards: BigUint,
+}
+
+impl AccountData {
+    pub fn new_empty(address: VMAddress) -> Self {
+        AccountData {
+            address,
+            nonce: 0,
+            egld_balance: BigUint::zero(),
+            esdt: AccountEsdt::default(),
+            storage: AccountStorage::default(),
+            username: vec![],
+            contract_path: None,
+            contract_owner: None,
+            developer_rewards: BigUint::zero(),
+        }
+    }
 }
 
 impl fmt::Display for AccountData {

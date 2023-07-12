@@ -2,10 +2,9 @@ use multiversx_sc::storage::{
     mappers::{QueueMapper, StorageClearable, StorageMapper},
     StorageKey,
 };
-use multiversx_sc_scenario::api::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_queue() -> QueueMapper<DebugApi, u64> {
-    let _ = DebugApi::dummy();
+fn create_queue() -> QueueMapper<SingleTxApi, u64> {
     let base_key = StorageKey::new(&b"my_queue"[..]);
     QueueMapper::new(base_key)
 }
@@ -33,7 +32,7 @@ fn test_queue_simple() {
     assert!(queue.check_internal_consistency());
 }
 
-fn check_queue(queue: &QueueMapper<DebugApi, u64>, expected: Vec<u64>) {
+fn check_queue(queue: &QueueMapper<SingleTxApi, u64>, expected: Vec<u64>) {
     assert_eq!(queue.len(), expected.len());
     let vec: Vec<u64> = queue.iter().collect();
     assert_eq!(vec, expected);
