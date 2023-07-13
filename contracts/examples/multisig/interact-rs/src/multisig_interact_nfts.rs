@@ -105,7 +105,7 @@ impl MultisigInteract {
             return;
         }
 
-        self.collection_token_identifier = result.unwrap();
+        self.collection_token_identifier = result.unwrap().unwrap();
         println!(
             "collection token identifier: {}",
             self.collection_token_identifier
@@ -180,7 +180,7 @@ impl MultisigInteract {
             return;
         }
 
-        self.collection_token_identifier = result.unwrap();
+        self.collection_token_identifier = result.unwrap().unwrap();
         println!(
             "collection token identifier: {}",
             self.collection_token_identifier
