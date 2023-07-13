@@ -1,6 +1,7 @@
 use crate::{
     multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
     scenario::model::{ScCallStep, TxESDT, TypedScCall},
+    scenario_model::TxResponse,
 };
 
 use multiversx_chain_vm::{
@@ -15,6 +16,14 @@ impl ScenarioVMRunner {
     pub fn perform_sc_call(&mut self, sc_call_step: &ScCallStep) {
         let _ =
             self.perform_sc_call_lambda_and_check(sc_call_step, execute_current_tx_context_input);
+    }
+
+    pub fn perform_sc_call_update_results(&mut self, sc_call_step: &mut ScCallStep) {
+        let tx_result =
+            self.perform_sc_call_lambda_and_check(sc_call_step, execute_current_tx_context_input);
+        let response = TxResponse::from_tx_result(tx_result);
+        sc_call_step.response = Some(response);
+        sc_call_step.trigger_handler();
     }
 
     /// Adds a SC call step, executes it and retrieves the transaction result ("out" field).

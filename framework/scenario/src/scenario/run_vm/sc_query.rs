@@ -1,12 +1,4 @@
-use crate::{
-    api::StaticApi,
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler},
-        types::ContractCall,
-    },
-    num_bigint::BigUint,
-    scenario::model::ScQueryStep,
-};
+use crate::{num_bigint::BigUint, scenario::model::ScQueryStep, scenario_model::TxResponse};
 use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{TxInput, TxResult},
@@ -18,6 +10,13 @@ impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
     pub fn perform_sc_query(&mut self, sc_query_step: &ScQueryStep) -> TxResult {
         self.perform_sc_query_lambda_and_check(sc_query_step, execute_current_tx_context_input)
+    }
+
+    pub fn perform_sc_query_update_results(&mut self, sc_query_step: &mut ScQueryStep) {
+        let tx_result =
+            self.perform_sc_query_lambda_and_check(sc_query_step, execute_current_tx_context_input);
+        let response = TxResponse::from_tx_result(tx_result);
+        sc_query_step.response = Some(response);
     }
 
     pub fn perform_sc_query_lambda<F>(&mut self, sc_query_step: &ScQueryStep, f: F) -> TxResult
@@ -50,24 +49,6 @@ impl ScenarioVMRunner {
             check_tx_output(&sc_query_step.id, tx_expect, &tx_result);
         }
         tx_result
-    }
-}
-
-impl ScenarioVMRunner {
-    /// Performs a SC query to a contract, leaves no scenario trace behind.
-    ///
-    /// Meant to be used for the test to investigate the state of the contract.
-    ///
-    /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
-    pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
-    where
-        CC: ContractCall<StaticApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
-    {
-        let sc_query_step = ScQueryStep::new().call(contract_call);
-        let tx_result = self.perform_sc_query(&sc_query_step);
-        let mut raw_result = tx_result.result_values;
-        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 }
 

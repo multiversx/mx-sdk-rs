@@ -4,6 +4,7 @@ use crate::{
         types::heap::Address,
     },
     scenario::model::{ScDeployStep, TypedScDeploy},
+    scenario_model::TxResponse,
 };
 
 use multiversx_chain_vm::{
@@ -81,6 +82,14 @@ impl ScenarioVMRunner {
                 .unwrap();
 
         (new_address, deser_result)
+    }
+
+    pub fn perform_sc_deploy_update_results(&mut self, sc_deploy_step: &mut ScDeployStep) {
+        let (new_address, tx_result) = self
+            .perform_sc_deploy_lambda_and_check(sc_deploy_step, execute_current_tx_context_input);
+        let mut response = TxResponse::from_tx_result(tx_result);
+        response.new_deployed_address = Some(new_address);
+        sc_deploy_step.response = Some(response);
     }
 }
 

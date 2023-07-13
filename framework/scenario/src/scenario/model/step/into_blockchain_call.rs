@@ -44,7 +44,7 @@ impl<OriginalResult> IntoBlockchainCall for ContractDeploy<StaticApi, OriginalRe
     type BlockchainCall = TypedScDeploy<OriginalResult>;
 
     fn into_blockchain_call(self) -> Self::BlockchainCall {
-        ScDeployStep::new().call(self).into()
+        ScDeployStep::new().call(self)
     }
 }
 
@@ -61,6 +61,6 @@ where
 {
     type VMQuery = TypedScQuery<CC::OriginalResult>;
     fn into_vm_query(self) -> Self::VMQuery {
-        ScQueryStep::default().call(self).into()
+        ScQueryStep::default().call(self)
     }
 }

@@ -28,11 +28,11 @@ impl ScenarioRunner for DebuggerBackend {
         self.for_each_runner_mut(|runner| runner.run_set_state_step(step));
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_call_step(step));
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         self.for_each_runner_mut(|runner| runner.run_multi_sc_call_step(steps));
     }
 
@@ -67,9 +67,9 @@ impl ScenarioRunner for DebuggerBackend {
 
 impl DebuggerBackend {
     pub(super) fn run_scenario_file(&mut self, steps_path: &Path) {
-        let scenario = scenario::parse_scenario(steps_path);
+        let mut scenario = scenario::parse_scenario(steps_path);
 
-        for step in &scenario.steps {
+        for step in &mut scenario.steps {
             match step {
                 Step::ExternalSteps(external_steps_step) => {
                     let parent_path = steps_path.parent().unwrap();

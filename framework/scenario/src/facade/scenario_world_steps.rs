@@ -21,15 +21,129 @@ impl ScenarioWorld {
     }
 
     /// Adds a SC call step, then executes it.
-    pub fn sc_call_step(&mut self, step: ScCallStep) -> &mut Self {
-        self.run_sc_call_step(&step);
+    pub fn sc_call_step<S>(&mut self, mut sc_call_step: S) -> &mut Self
+    where
+        S: AsMut<ScCallStep>,
+    {
+        let base_step = sc_call_step.as_mut();
+        self.run_sc_call_step(base_step);
         self
     }
 
-    /// Adds a SC query step, then executes it.
-    pub fn sc_query_step(&mut self, step: ScQueryStep) -> &mut Self {
-        self.run_sc_query_step(&step);
+    pub fn sc_call_use_raw_response<S, F>(
+        &mut self,
+        mut sc_call_step: S,
+        use_raw_response: F,
+    ) -> &mut Self
+    where
+        S: AsMut<ScCallStep>,
+        F: FnOnce(&TxResponse),
+    {
+        let base_step = sc_call_step.as_mut();
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_call_update_results(base_step);
+        let response = unwrap_response(&base_step.response);
+        use_raw_response(response);
         self
+    }
+
+    pub fn sc_call_use_result<OriginalResult, RequestedResult, F>(
+        &mut self,
+        mut step: TypedScCall<OriginalResult>,
+        use_result: F,
+    ) -> &mut Self
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(TypedResponse<RequestedResult>),
+    {
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_call_update_results(&mut step.sc_call_step);
+        let response = unwrap_response(&step.sc_call_step.response);
+        let typed_response = TypedResponse::from_raw(response);
+        use_result(typed_response);
+        self
+    }
+
+    pub fn sc_call_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        mut step: TypedScCall<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_call_update_results(&mut step.sc_call_step);
+        let response = unwrap_response(&step.sc_call_step.response);
+        let typed_response = TypedResponse::from_raw(response);
+        typed_response.result.unwrap()
+    }
+
+    /// Adds a SC query step, then executes it.
+    pub fn sc_query_step<S>(&mut self, mut sc_call_step: S) -> &mut Self
+    where
+        S: AsMut<ScQueryStep>,
+    {
+        let base_step: &mut ScQueryStep = sc_call_step.as_mut();
+        self.run_sc_query_step(base_step);
+        self
+    }
+
+    pub fn sc_query_use_raw_response<S, F>(
+        &mut self,
+        mut sc_call_step: S,
+        use_raw_response: F,
+    ) -> &mut Self
+    where
+        S: AsMut<ScQueryStep>,
+        F: FnOnce(&TxResponse),
+    {
+        let base_step = sc_call_step.as_mut();
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_query_update_results(base_step);
+        let response = unwrap_response(&base_step.response);
+        use_raw_response(response);
+        self
+    }
+
+    pub fn sc_query_use_result<OriginalResult, RequestedResult, F>(
+        &mut self,
+        mut step: TypedScQuery<OriginalResult>,
+        use_result: F,
+    ) -> &mut Self
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(TypedResponse<RequestedResult>),
+    {
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_query_update_results(&mut step.sc_query_step);
+        let response = unwrap_response(&step.sc_query_step.response);
+        let typed_response = TypedResponse::from_raw(response);
+        use_result(typed_response);
+        self
+    }
+
+    pub fn sc_query_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        mut step: TypedScQuery<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_query_update_results(&mut step.sc_query_step);
+        let response = unwrap_response(&step.sc_query_step.response);
+        let typed_response = TypedResponse::from_raw(response);
+        typed_response.result.unwrap()
     }
 
     /// Performs a SC query to a contract, leaves no scenario trace behind.
@@ -43,15 +157,76 @@ impl ScenarioWorld {
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let vm_runner = &mut self.get_mut_debugger_backend().vm_runner;
-        let sc_query_step = ScQueryStep::new().call(contract_call);
-        let tx_result = vm_runner.perform_sc_query(&sc_query_step);
+        let typed_sc_query = ScQueryStep::new().call(contract_call);
+        let tx_result = vm_runner.perform_sc_query(&typed_sc_query.sc_query_step);
         let mut raw_result = tx_result.result_values;
         RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
     }
 
     /// Adds a SC deploy step, then executes it.
-    pub fn sc_deploy_step(&mut self, step: ScDeployStep) -> &mut Self {
-        self.run_sc_deploy_step(&step);
+    pub fn sc_deploy_step<S>(&mut self, mut step: S) -> &mut Self
+    where
+        S: AsMut<ScDeployStep>,
+    {
+        let base_step = step.as_mut();
+        self.run_sc_deploy_step(base_step);
+        self
+    }
+
+    pub fn sc_deploy_use_raw_response<S, F>(
+        &mut self,
+        mut sc_deploy_step: S,
+        use_raw_response: F,
+    ) -> &mut Self
+    where
+        S: AsMut<ScDeployStep>,
+        F: FnOnce(&TxResponse),
+    {
+        let base_step = sc_deploy_step.as_mut();
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_deploy_update_results(base_step);
+        let response = unwrap_response(&base_step.response);
+        use_raw_response(response);
+        self
+    }
+
+    pub fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
+        &mut self,
+        mut step: TypedScDeploy<OriginalResult>,
+        use_result: F,
+    ) -> &mut Self
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(Address, TypedResponse<RequestedResult>),
+    {
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_deploy_update_results(&mut step.sc_deploy_step);
+        let response = unwrap_response(&step.sc_deploy_step.response);
+        let new_address = unwrap_new_address(response);
+        let typed_response = TypedResponse::from_raw(response);
+        use_result(new_address, typed_response);
+        self
+    }
+
+    pub fn sc_deploy_use_new_address<S, F>(
+        &mut self,
+        mut sc_deploy_step: S,
+        use_new_address: F,
+    ) -> &mut Self
+    where
+        S: AsMut<ScDeployStep>,
+        F: FnOnce(Address),
+    {
+        let base_step = sc_deploy_step.as_mut();
+        self.get_mut_debugger_backend()
+            .vm_runner
+            .perform_sc_deploy_update_results(base_step);
+        let response = unwrap_response(&base_step.response);
+        let new_address = unwrap_new_address(response);
+        use_new_address(new_address);
         self
     }
 
@@ -186,4 +361,15 @@ impl ScenarioWorld {
     pub fn mandos_dump_state(&mut self) -> &mut Self {
         self.dump_state_step()
     }
+}
+
+fn unwrap_response(opt_response: &Option<TxResponse>) -> &TxResponse {
+    opt_response.as_ref().expect("response not processed")
+}
+
+fn unwrap_new_address(response: &TxResponse) -> Address {
+    response
+        .new_deployed_address
+        .clone()
+        .expect("missing new address after deploy")
 }

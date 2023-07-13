@@ -7,9 +7,10 @@ use crate::{
         types::ContractCall,
     },
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
+    scenario_model::TxResponse,
 };
 
-use super::{format_expect, process_contract_call};
+use super::{process_contract_call, TypedScQuery};
 
 #[derive(Debug, Default, Clone)]
 pub struct ScQueryStep {
@@ -19,6 +20,7 @@ pub struct ScQueryStep {
     pub comment: Option<String>,
     pub tx: Box<TxQuery>,
     pub expect: Option<TxExpect>,
+    pub response: Option<TxResponse>,
 }
 
 impl ScQueryStep {
@@ -53,7 +55,7 @@ impl ScQueryStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<CC>(mut self, contract_call: CC) -> Self
+    pub fn call<CC>(mut self, contract_call: CC) -> TypedScQuery<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
     {
@@ -63,7 +65,7 @@ impl ScQueryStep {
         for arg in mandos_args {
             self = self.argument(arg.as_str());
         }
-        self
+        self.into()
     }
 
     /// Sets following fields based on the smart contract proxy:
@@ -74,16 +76,15 @@ impl ScQueryStep {
     ///     - "out"
     ///     - "status" set to 0
     pub fn call_expect<CC, ExpectedResult>(
-        mut self,
+        self,
         contract_call: CC,
-        expect_value: ExpectedResult,
-    ) -> Self
+        expected_value: ExpectedResult,
+    ) -> TypedScQuery<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
-        self = self.call(contract_call);
-        self = self.expect(format_expect(expect_value));
-        self
+        let typed = self.call(contract_call);
+        typed.expect_value(expected_value)
     }
 }

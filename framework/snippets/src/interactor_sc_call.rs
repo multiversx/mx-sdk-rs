@@ -18,6 +18,7 @@ impl Interactor {
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
         sc_call_step.response = Some(TxResponse::from_network_tx(tx));
+        sc_call_step.trigger_handler();
 
         if let Ok(token_identifier) = sc_call_step
             .response()
@@ -33,7 +34,7 @@ impl Interactor {
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> String {
+    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> String {
         self.pre_runners.run_sc_call_step(sc_call_step);
 
         let sender_address = &sc_call_step.tx.from.value;

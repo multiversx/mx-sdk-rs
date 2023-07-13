@@ -19,7 +19,7 @@ pub struct ExternalStepsStep {
     pub path: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Step {
     ExternalSteps(ExternalStepsStep),
     SetState(SetStateStep),

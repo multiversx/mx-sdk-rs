@@ -37,11 +37,11 @@ impl ScenarioRunner for ScenarioTraceFile {
         self.with_tracer(|tracer| tracer.run_set_state_step(step));
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
         self.with_tracer(|tracer| tracer.run_sc_call_step(step));
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         self.with_tracer(|tracer| tracer.run_multi_sc_call_step(steps));
     }
 

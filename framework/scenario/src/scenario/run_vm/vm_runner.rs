@@ -32,13 +32,13 @@ impl ScenarioRunner for ScenarioVMRunner {
         self.perform_set_state(step);
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
-        self.perform_sc_call(step);
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
+        self.perform_sc_call_update_results(step);
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         for step in steps {
-            self.perform_sc_call(step);
+            self.perform_sc_call_update_results(step);
         }
     }
 

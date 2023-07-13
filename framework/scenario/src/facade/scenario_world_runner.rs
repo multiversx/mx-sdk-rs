@@ -30,11 +30,11 @@ impl ScenarioRunner for ScenarioWorld {
         self.for_each_runner_mut(|runner| runner.run_set_state_step(step));
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_call_step(step));
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         self.for_each_runner_mut(|runner| runner.run_multi_sc_call_step(steps));
     }
 
