@@ -2,54 +2,26 @@ use std::marker::PhantomData;
 
 use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
-use crate::scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery};
+use crate::scenario::model::{AddressValue, BytesValue, TxExpect};
 
 use super::ScQueryStep;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TypedScQuery<OriginalResult> {
-    pub id: String,
-    pub tx_id: Option<String>,
-    pub comment: Option<String>,
-    pub tx: Box<TxQuery>,
-    pub expect: Option<TxExpect>,
+    pub sc_query_step: ScQueryStep,
     _return_type: PhantomData<OriginalResult>,
-}
-
-impl<OriginalResult> Default for TypedScQuery<OriginalResult> {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            tx_id: Default::default(),
-            comment: Default::default(),
-            tx: Default::default(),
-            expect: Default::default(),
-            _return_type: PhantomData,
-        }
-    }
 }
 
 impl<OriginalResult> From<TypedScQuery<OriginalResult>> for ScQueryStep {
     fn from(typed: TypedScQuery<OriginalResult>) -> Self {
-        Self {
-            id: typed.id,
-            tx_id: typed.tx_id,
-            explicit_tx_hash: None,
-            comment: typed.comment,
-            tx: typed.tx,
-            expect: typed.expect,
-        }
+        typed.sc_query_step
     }
 }
 
 impl<OriginalResult> From<ScQueryStep> for TypedScQuery<OriginalResult> {
     fn from(untyped: ScQueryStep) -> Self {
         Self {
-            id: untyped.id,
-            tx_id: untyped.tx_id,
-            comment: untyped.comment,
-            tx: untyped.tx,
-            expect: untyped.expect,
+            sc_query_step: untyped,
             _return_type: PhantomData,
         }
     }
@@ -57,7 +29,7 @@ impl<OriginalResult> From<ScQueryStep> for TypedScQuery<OriginalResult> {
 
 impl<OriginalResult> TypedScQuery<OriginalResult> {
     pub fn function(mut self, expr: &str) -> Self {
-        self.tx.function = expr.to_string();
+        self.sc_query_step.tx.function = expr.to_string();
         self
     }
 
@@ -65,7 +37,7 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
     where
         BytesValue: From<A>,
     {
-        self.tx.arguments.push(BytesValue::from(expr));
+        self.sc_query_step.tx.arguments.push(BytesValue::from(expr));
         self
     }
 
@@ -73,12 +45,12 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
     where
         AddressValue: From<A>,
     {
-        self.tx.to = AddressValue::from(address);
+        self.sc_query_step.tx.to = AddressValue::from(address);
         self
     }
 
     pub fn expect(mut self, expect: TxExpect) -> Self {
-        self.expect = Some(expect);
+        self.sc_query_step.expect = Some(expect);
         self
     }
 }
