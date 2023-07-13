@@ -19,7 +19,7 @@ impl Interactor {
 
         sc_call_step.response = Some(TxResponse::from_network_tx(tx));
 
-        if let Ok(token_identifier) = sc_call_step
+        if let Ok(Some(token_identifier)) = sc_call_step
             .response()
             .issue_non_fungible_new_token_identifier()
         {

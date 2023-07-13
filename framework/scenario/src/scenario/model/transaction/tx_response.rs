@@ -59,12 +59,19 @@ impl TxResponse {
     fn process_out(mut self) -> Self {
         if let Some(first_scr) = self.api_scrs.get(0) {
             self.out = decode_scr_data_or_panic(first_scr.data.as_str());
-        } else {
-            panic!("no smart contract results obtained")
-            // self.tx_error.status = 0; // TODO: Add correct status
-            // self.tx_error.message = "no smart contract results obtained".to_string();
+
+            return self
+        } else if let Some(write_log_logs) = self.find_last_log("writeLog") {
+            if let Some(data) = &write_log_logs.data {
+                let decoded_data = String::from_utf8(base64::decode(data).unwrap()).unwrap();
+                self.out = decode_scr_data_or_panic(decoded_data.as_str());
+                return self
+            }
         }
-        self
+
+        panic!("no smart contract results obtained")
+        // self.tx_error.status = 0; // TODO: Add correct status
+        // self.tx_error.message = "no smart contract results obtained".to_string();
     }
 
     fn process_new_deployed_address(mut self) -> Self {
@@ -95,6 +102,18 @@ impl TxResponse {
             logs.events
                 .iter()
                 .find(|event| event.identifier == log_identifier)
+        } else {
+            None
+        }
+    }
+
+    // Finds last api logs matching the given log identifier.
+    fn find_last_log(&self, log_identifier: &str) -> Option<&Events> {
+        if let Some(logs) = &self.api_logs {
+            logs.events
+                .iter()
+                .filter(|event| event.identifier == log_identifier)
+                .last()
         } else {
             None
         }
@@ -144,14 +163,14 @@ impl TxResponse {
     }
 
     // Returns the token identifier of the newly issued non-fungible token.
-    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxResponseStatus> {
+    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<Option<String>, TxResponseStatus> {
         let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
             .api_scrs
             .iter()
             .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
 
         if token_identifier_issue_scr.is_none() {
-            panic!("no token identifier issue SCR found");
+            return Ok(None);
         }
 
         let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
@@ -160,7 +179,7 @@ impl TxResponse {
             panic!("no token identifier found in SCR");
         }
 
-        Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
+        Ok(Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap()))
     }
 }
 
