@@ -24,22 +24,24 @@ fn tester_deploy_test() {
     let mut adder_contract =
         ContractInfo::<rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
 
-    world.start_trace().set_state_step(
-        SetStateStep::new()
-            .put_account(owner_address, Account::new())
-            .new_address(owner_address, 0, &adder_contract),
-    );
-
-    // deploy
-    let (new_address, result): (_, String) = adder_contract
-        .init()
-        .into_blockchain_call()
-        .from(owner_address)
-        .contract_code(WASM_PATH_EXPR, &ic)
-        .gas_limit("5,000,000")
-        .execute(&mut world);
-    assert_eq!(new_address, adder_contract.to_address());
-    assert_eq!(result, "constructor-result");
-
-    world.write_scenario_trace("scenarios/trace-deploy.scen.json");
+    world
+        .start_trace()
+        .set_state_step(
+            SetStateStep::new()
+                .put_account(owner_address, Account::new())
+                .new_address(owner_address, 0, &adder_contract),
+        )
+        .sc_deploy_use_result(
+            ScDeployStep::new()
+                .from(owner_address)
+                .contract_code(WASM_PATH_EXPR, &ic)
+                .call(adder_contract.init())
+                .gas_limit("5,000,000")
+                .expect(TxExpect::ok()),
+            |address, tr: TypedResponse<String>| {
+                assert_eq!(address, adder_contract.to_address());
+                assert_eq!(tr.result.unwrap(), "constructor-result");
+            },
+        )
+        .write_scenario_trace("scenarios/trace-deploy.scen.json");
 }

@@ -1,10 +1,10 @@
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
+    api::StaticApi,
     multiversx_sc::types::ContractCallWithEgld,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall, TxResponse},
-    DebugApi,
 };
 use multiversx_sdk::data::transaction::Transaction;
 
@@ -73,7 +73,7 @@ impl Interactor {
     }
 }
 
-fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
+fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<StaticApi, ()>) -> String {
     let mut result = String::from_utf8(
         contract_call
             .basic

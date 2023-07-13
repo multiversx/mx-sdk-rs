@@ -1,5 +1,5 @@
 use crate::{
-    api::DebugApi,
+    api::StaticApi,
     multiversx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
@@ -70,7 +70,7 @@ impl IntoRaw<TxCallRaw> for TxCall {
 }
 
 impl TxCall {
-    pub fn to_contract_call(&self) -> ContractCallWithEgld<DebugApi, ()> {
+    pub fn to_contract_call(&self) -> ContractCallWithEgld<StaticApi, ()> {
         let mut contract_call = ContractCallWithEgld::new(
             (&self.to.value).into(),
             self.function.as_bytes(),

@@ -33,18 +33,19 @@ fn crowdfunding_scenario_rust_test() {
             .put_account(owner_addr, Account::new())
             .new_address(owner_addr, 0, &cf_sc),
     );
-    let (_, ()) = cf_sc
-        .init(
-            2_000u32,
-            deadline,
-            EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
-        )
-        .into_blockchain_call()
-        .from(owner_addr)
-        .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
-        .gas_limit("5,000,000")
-        .expect(TxExpect::ok().no_result())
-        .execute(&mut world);
+
+    world.sc_deploy_step(
+        ScDeployStep::new()
+            .from(owner_addr)
+            .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
+            .call(cf_sc.init(
+                2_000u32,
+                deadline,
+                EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
+            ))
+            .gas_limit("5,000,000")
+            .expect(TxExpect::ok().no_result()),
+    );
 
     // setup user accounts
     world
