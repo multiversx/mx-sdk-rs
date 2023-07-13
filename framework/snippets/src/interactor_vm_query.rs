@@ -2,30 +2,30 @@ use crate::{address_h256_to_erdrs, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler},
-        types::ContractCall,
-    },
+    multiversx_sc::{codec::CodecFrom, types::ContractCall},
+    scenario_model::{ScQueryStep, TxResponse},
 };
 use multiversx_sdk::data::vm::VmValueRequest;
 
 impl Interactor {
-    pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
+    pub async fn sc_query<S>(&mut self, mut step: S) -> &mut Self
     where
-        CC: ContractCall<StaticApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
+        S: AsMut<ScQueryStep>,
     {
-        let full_cc = contract_call.into_normalized();
-        let sc_address = address_h256_to_erdrs(&full_cc.basic.to.to_address());
+        self.perform_sc_query(step.as_mut()).await;
+        self
+    }
+
+    pub async fn perform_sc_query(&mut self, step: &mut ScQueryStep) {
+        let sc_address = address_h256_to_erdrs(&step.tx.to.to_address());
         let req = VmValueRequest {
             sc_address: sc_address.clone(),
-            func_name: String::from_utf8(full_cc.basic.endpoint_name.to_boxed_bytes().into_vec())
-                .unwrap(),
-            args: full_cc
-                .basic
-                .arg_buffer
-                .raw_arg_iter()
-                .map(|arg| hex::encode(arg.to_boxed_bytes().as_slice()))
+            func_name: step.tx.function.clone(),
+            args: step
+                .tx
+                .arguments
+                .iter()
+                .map(|arg| hex::encode(&arg.value))
                 .collect(),
             caller: sc_address,
             value: "0".to_string(),
@@ -38,12 +38,21 @@ impl Interactor {
 
         info!("{:#?}", result);
 
-        let mut raw_results: Vec<Vec<u8>> = result
+        let raw_results: Vec<Vec<u8>> = result
             .data
             .return_data
             .iter()
             .map(|result| base64::decode(result).expect("query result base64 decode error"))
             .collect();
-        RequestedResult::multi_decode_or_handle_err(&mut raw_results, PanicErrorHandler).unwrap()
+        step.response = Some(TxResponse::from_raw_results(raw_results));
+    }
+
+    #[deprecated(since = "0.42.0", note = "Was renamed to `quick_query`.")]
+    pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
+    where
+        CC: ContractCall<StaticApi>,
+        RequestedResult: CodecFrom<CC::OriginalResult>,
+    {
+        self.quick_query(contract_call).await
     }
 }

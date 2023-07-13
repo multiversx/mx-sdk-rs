@@ -318,13 +318,13 @@ impl MultisigInteract {
 
     async fn quorum_reached(&mut self, action_id: usize) -> bool {
         self.interactor
-            .vm_query(self.state.multisig().quorum_reached(action_id))
+            .quick_query(self.state.multisig().quorum_reached(action_id))
             .await
     }
 
     async fn signed(&mut self, signer: &Address, action_id: usize) -> bool {
         self.interactor
-            .vm_query(self.state.multisig().signed(signer, action_id))
+            .quick_query(self.state.multisig().signed(signer, action_id))
             .await
     }
 
@@ -395,7 +395,7 @@ impl MultisigInteract {
     async fn print_quorum(&mut self) {
         let quorum: SingleValue<usize> = self
             .interactor
-            .vm_query(self.state.multisig().quorum())
+            .quick_query(self.state.multisig().quorum())
             .await;
 
         println!("quorum: {}", quorum.into());
@@ -404,7 +404,7 @@ impl MultisigInteract {
     async fn print_board(&mut self) {
         let board: SingleValue<usize> = self
             .interactor
-            .vm_query(self.state.multisig().num_board_members())
+            .quick_query(self.state.multisig().num_board_members())
             .await;
 
         println!("board: {}", board.into());

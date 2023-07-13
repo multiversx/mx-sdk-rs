@@ -168,8 +168,7 @@ impl ScenarioWorld {
     where
         S: AsMut<ScDeployStep>,
     {
-        let base_step = step.as_mut();
-        self.run_sc_deploy_step(base_step);
+        self.run_sc_deploy_step(step.as_mut());
         self
     }
 

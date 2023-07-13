@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         bech32,
         mandos_system::ScenarioRunner,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{IntoBlockchainCall, Scenario, TxExpect},
+        scenario_model::{ScCallStep, ScDeployStep, Scenario, TxExpect},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -95,54 +95,46 @@ impl BasicFeaturesInteract {
     async fn deploy(&mut self) {
         self.set_state().await;
 
-        let mut typed_sc_deploy = self
-            .state
-            .default_contract()
-            .init()
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .code_metadata(CodeMetadata::all())
-            .contract_code(
-                "file:../output/basic-features-storage-bytes.wasm",
-                &InterpreterContext::default(),
+        self.interactor
+            .sc_deploy_use_result(
+                ScDeployStep::new()
+                    .call(self.state.default_contract().init())
+                    .from(&self.wallet_address)
+                    .code_metadata(CodeMetadata::all())
+                    .contract_code(
+                        "file:../output/basic-features-storage-bytes.wasm",
+                        &InterpreterContext::default(),
+                    )
+                    .gas_limit("4,000,000")
+                    .expect(TxExpect::ok()),
+                |new_address, tr| {
+                    tr.result
+                        .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));
+
+                    let new_address_bech32 = bech32::encode(&new_address);
+                    println!("new address: {new_address_bech32}");
+
+                    let new_address_expr = format!("bech32:{new_address_bech32}");
+                    self.state.set_bf_address(&new_address_expr);
+                },
             )
-            .gas_limit("4,000,000")
-            .expect(TxExpect::ok());
-
-        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
-
-        let result = typed_sc_deploy.response().new_deployed_address();
-        if result.is_err() {
-            println!("deploy failed: {}", result.err().unwrap());
-            return;
-        }
-
-        let new_address_bech32 = bech32::encode(&result.unwrap());
-        println!("new address: {new_address_bech32}");
-
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_bf_address(&new_address_expr);
+            .await;
     }
 
     async fn set_large_storage(&mut self, value: &[u8]) {
-        let mut typed_sc_call = self
-            .state
-            .bf_contract()
-            .store_bytes(value)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("600,000,000")
-            .expect(TxExpect::ok());
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.response().handle_signal_error_event();
-        if result.is_err() {
-            panic!(
-                "performing store_bytes failed with: {}",
-                result.err().unwrap()
-            );
-        }
+        self.interactor
+            .sc_call_use_result(
+                ScCallStep::new()
+                    .call(self.state.bf_contract().store_bytes(value))
+                    .from(&self.wallet_address)
+                    .gas_limit("600,000,000"),
+                |tr| {
+                    tr.result.unwrap_or_else(|err| {
+                        panic!("performing store_bytes failed with: {}", err.message)
+                    });
+                },
+            )
+            .await;
 
         println!("successfully performed add");
     }
@@ -150,7 +142,7 @@ impl BasicFeaturesInteract {
     async fn print_length(&mut self) {
         let data: Vec<u8> = self
             .interactor
-            .vm_query(self.state.bf_contract().load_bytes())
+            .quick_query(self.state.bf_contract().load_bytes())
             .await;
         println!("retrieved data length: {}", data.len());
         if data != self.large_storage_payload {

@@ -5,6 +5,7 @@ mod interactor_multi_sc_process;
 mod interactor_retrieve;
 mod interactor_sc_call;
 mod interactor_sc_deploy;
+mod interactor_sc_extra;
 mod interactor_sc_transfer;
 mod interactor_sender;
 mod interactor_tx_spec;
