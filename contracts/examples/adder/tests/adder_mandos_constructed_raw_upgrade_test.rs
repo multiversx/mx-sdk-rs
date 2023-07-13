@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{scenario_model::*, *};
+use multiversx_sc_scenario::{scenario_model::*, *, scenario_format::interpret_trait::InterpretableFrom};
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -31,7 +31,7 @@ fn adder_mandos_constructed_raw_upgrade_test() {
                 .from("address:owner")
                 .to("sc:adder")
                 .function("upgradeContract")
-                .argument("file:output/adder.wasm") // code 
+                .argument(BytesValue::interpret_from("file:output/adder.wasm", &ic)) 
                 .argument("0x0502")                 // codeMetadata
                 .argument("8")                      // contract argument
                 .expect(TxExpect::ok().no_result()),
