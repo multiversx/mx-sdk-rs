@@ -3,7 +3,9 @@ use std::{cell::RefCell, rc::Rc};
 use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     multiversx_sc::types::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiValueEncoded},
-    multiversx_sc_scenario::{api::StaticApi, bech32, num_bigint::BigUint},
+    multiversx_sc_scenario::{
+        api::StaticApi, bech32, num_bigint::BigUint, scenario_model::ScCallStep,
+    },
     StepBuffer,
 };
 
@@ -51,22 +53,25 @@ impl ComposabilityInteract {
                             child_fwd.address.clone().unwrap()
                         };
 
-                        let typed_sc_call = self
-                            .state
-                            .forwarder_queue_from_addr(&fwd_addr_expr)
-                            .add_queued_call(
-                                call_type.clone(),
-                                child_fwd_addr,
-                                DEFAULT_GAS_LIMIT,
-                                FORWARD_QUEUED_CALLS_ENDPOINT,
-                                MultiValueEncoded::<StaticApi, _>::new(),
+                        let typed_sc_call = ScCallStep::new()
+                            .call(
+                                self.state
+                                    .forwarder_queue_from_addr(&fwd_addr_expr)
+                                    .add_queued_call(
+                                        call_type.clone(),
+                                        child_fwd_addr,
+                                        DEFAULT_GAS_LIMIT,
+                                        FORWARD_QUEUED_CALLS_ENDPOINT,
+                                        MultiValueEncoded::<StaticApi, _>::new(),
+                                    )
+                                    .with_egld_or_single_esdt_transfer(
+                                        EgldOrEsdtTokenPayment::new(
+                                            payment_token.clone(),
+                                            payment_nonce,
+                                            payment_amount.clone().into(),
+                                        ),
+                                    ),
                             )
-                            .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::new(
-                                payment_token.clone(),
-                                payment_nonce,
-                                payment_amount.clone().into(),
-                            ))
-                            .into_blockchain_call()
                             .from(&self.wallet_address)
                             .gas_limit("70,000,000");
 
@@ -80,22 +85,25 @@ impl ComposabilityInteract {
                             vault.address.clone().unwrap()
                         };
 
-                        let typed_sc_call = self
-                            .state
-                            .forwarder_queue_from_addr(&fwd_addr_expr)
-                            .add_queued_call(
-                                call_type.clone(),
-                                vault_addr,
-                                DEFAULT_GAS_LIMIT,
-                                endpoint_name,
-                                MultiValueEncoded::<StaticApi, _>::new(),
+                        let typed_sc_call = ScCallStep::new()
+                            .call(
+                                self.state
+                                    .forwarder_queue_from_addr(&fwd_addr_expr)
+                                    .add_queued_call(
+                                        call_type.clone(),
+                                        vault_addr,
+                                        DEFAULT_GAS_LIMIT,
+                                        endpoint_name,
+                                        MultiValueEncoded::<StaticApi, _>::new(),
+                                    )
+                                    .with_egld_or_single_esdt_transfer(
+                                        EgldOrEsdtTokenPayment::new(
+                                            payment_token.clone(),
+                                            payment_nonce,
+                                            payment_amount.clone().into(),
+                                        ),
+                                    ),
                             )
-                            .with_egld_or_single_esdt_transfer(EgldOrEsdtTokenPayment::new(
-                                payment_token.clone(),
-                                payment_nonce,
-                                payment_amount.clone().into(),
-                            ))
-                            .into_blockchain_call()
                             .from(&self.wallet_address)
                             .gas_limit("70,000,000");
 
@@ -128,14 +136,24 @@ impl ComposabilityInteract {
         let root_addr_bech32 = bech32::encode(&root_addr);
         let root_addr_expr = format!("bech32:{root_addr_bech32}");
 
-        let typed_sc_call = self
-            .state
-            .forwarder_queue_from_addr(&root_addr_expr)
-            .forward_queued_calls()
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("70,000,000");
-
-        self.interactor.sc_call(typed_sc_call).await;
+        self.interactor
+            .sc_call_use_raw_response(
+                ScCallStep::new()
+                    .call(
+                        self.state
+                            .forwarder_queue_from_addr(&root_addr_expr)
+                            .forward_queued_calls(),
+                    )
+                    .from(&self.wallet_address)
+                    .gas_limit("70,000,000"),
+                |response| {
+                    if !response.is_success() {
+                        println!("calling root failed withh: {}", response.tx_error);
+                    } else {
+                        println!("successfully called root");
+                    }
+                },
+            )
+            .await;
     }
 }
