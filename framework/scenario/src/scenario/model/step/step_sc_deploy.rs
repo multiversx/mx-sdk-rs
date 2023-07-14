@@ -14,7 +14,7 @@ use crate::multiversx_sc::types::{CodeMetadata, ContractDeploy};
 
 use super::{convert_call_args, TypedScDeploy};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct ScDeployStep {
     pub id: String,
     pub tx_id: Option<String>,
@@ -23,6 +23,23 @@ pub struct ScDeployStep {
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,
     pub response: Option<TxResponse>,
+}
+
+impl Default for ScDeployStep {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            tx_id: Default::default(),
+            explicit_tx_hash: Default::default(),
+            comment: Default::default(),
+            tx: Box::new(TxDeploy {
+                code_metadata: CodeMetadata::all(),
+                ..Default::default()
+            }),
+            expect: Default::default(),
+            response: Default::default(),
+        }
+    }
 }
 
 impl ScDeployStep {

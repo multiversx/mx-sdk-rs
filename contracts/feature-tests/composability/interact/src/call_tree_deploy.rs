@@ -4,7 +4,7 @@ use forwarder_queue::ProxyTrait as _;
 use multiversx_sc_snippets::{
     multiversx_sc::{
         codec::multi_types::OptionalValue,
-        types::{BoxedBytes, CodeMetadata, ManagedBuffer},
+        types::{BoxedBytes, ManagedBuffer},
     },
     multiversx_sc_scenario::{
         api::StaticApi,
@@ -82,7 +82,6 @@ impl ComposabilityInteract {
                         .init(OptionalValue::<BoxedBytes>::None),
                 )
                 .from(&self.wallet_address)
-                .code_metadata(CodeMetadata::all())
                 .code(&self.vault_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());
@@ -102,7 +101,6 @@ impl ComposabilityInteract {
             let typed_sc_deploy = ScDeployStep::new()
                 .call(self.state.default_forwarder_queue_address().init())
                 .from(&self.wallet_address)
-                .code_metadata(CodeMetadata::all())
                 .code(&self.forw_queue_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());

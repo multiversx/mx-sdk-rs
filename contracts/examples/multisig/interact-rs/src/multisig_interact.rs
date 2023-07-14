@@ -19,9 +19,7 @@ use multiversx_sc_scenario::{
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
     multiversx_sc::{
-        codec::multi_types::MultiValueVec,
-        storage::mappers::SingleValue,
-        types::{Address, CodeMetadata},
+        codec::multi_types::MultiValueVec, storage::mappers::SingleValue, types::Address,
     },
     multiversx_sc_scenario::{
         api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
@@ -167,7 +165,6 @@ impl MultisigInteract {
             .init(Config::load_config().quorum(), board)
             .into_blockchain_call()
             .from(&self.wallet_address)
-            .code_metadata(CodeMetadata::all())
             .code(&self.multisig_code)
             .gas_limit("70,000,000")
             .expect(TxExpect::ok());
@@ -205,7 +202,6 @@ impl MultisigInteract {
                         .init(Config::load_config().quorum(), board.clone()),
                 )
                 .from(&self.wallet_address)
-                .code_metadata(CodeMetadata::all())
                 .code(&self.multisig_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());

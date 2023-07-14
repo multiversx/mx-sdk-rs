@@ -8,10 +8,7 @@ use adder_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::{
-        storage::mappers::SingleValue,
-        types::{Address, CodeMetadata},
-    },
+    multiversx_sc::{storage::mappers::SingleValue, types::Address},
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
@@ -106,7 +103,6 @@ impl AdderInteract {
                 ScDeployStep::new()
                     .call(self.state.default_adder().init(BigUint::from(0u64)))
                     .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
                     .code(&self.adder_code)
                     .gas_limit("5,000,000")
                     .expect(TxExpect::ok()),
@@ -138,7 +134,6 @@ impl AdderInteract {
             let typed_sc_deploy = ScDeployStep::new()
                 .call(self.state.default_adder().init(0u32))
                 .from(&self.wallet_address)
-                .code_metadata(CodeMetadata::all())
                 .code(&self.adder_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());

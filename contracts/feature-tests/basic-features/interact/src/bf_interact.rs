@@ -10,7 +10,7 @@ use bf_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::types::{Address, CodeMetadata},
+    multiversx_sc::types::Address,
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
@@ -106,7 +106,6 @@ impl BasicFeaturesInteract {
                 ScDeployStep::new()
                     .call(self.state.default_contract().init())
                     .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
                     .code(&self.code_expr)
                     .gas_limit("4,000,000")
                     .expect(TxExpect::ok()),
