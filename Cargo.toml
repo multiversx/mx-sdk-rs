@@ -79,7 +79,7 @@ members = [
   "contracts/examples/lottery-esdt/meta",
   "contracts/examples/multisig",
   "contracts/examples/multisig/meta",
-  "contracts/examples/multisig/interact-rs",
+  "contracts/examples/multisig/interact",
   "contracts/examples/nft-minter",
   "contracts/examples/nft-minter/meta",
   "contracts/examples/nft-storage-prepay",

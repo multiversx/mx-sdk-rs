@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
 use crate::{
     api::StaticApi,
@@ -10,11 +12,19 @@ use crate::{
     },
 };
 
-/// Converts a `ContractCall` or `ContractDeploy` into a scenario object that additonally
+/// Converts a [`ContractCall`] or [`ContractDeploy`] into a scenario object that additonally
 /// contains gas costs and transaction-related data.
+#[deprecated(
+    since = "0.42.0",
+    note = "The recommended syntax is a variation of `sc_call` or `sc_deploy` with a scenario step built from the ContractCall."
+)]
 pub trait IntoBlockchainCall {
     type BlockchainCall;
 
+    #[deprecated(
+        since = "0.42.0",
+        note = "The recommended syntax is a variation of `sc_call` or `sc_deploy` with a scenario step built from the ContractCall."
+    )]
     fn into_blockchain_call(self) -> Self::BlockchainCall;
 }
 

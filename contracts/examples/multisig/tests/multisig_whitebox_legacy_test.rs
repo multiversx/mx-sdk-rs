@@ -1,16 +1,18 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use std::borrow::Borrow;
 
 use multisig::user_role::UserRole;
-use multisig_rust_test_setup::{CallActionDataRaw, MultisigSetup};
+use multisig_blackbox_setup::{CallActionDataRaw, MultisigSetup};
 use multiversx_sc::types::{BoxedBytes, CodeMetadata, ManagedAddress};
 use multiversx_sc_scenario::{managed_address, managed_biguint, rust_biguint, DebugApi};
 
-mod multisig_rust_test_setup;
+mod multisig_blackbox_setup;
 use adder::Adder;
 use factorial::Factorial;
 use multisig::Multisig;
 
-use crate::multisig_rust_test_setup::{ActionRaw, EGLD_TOKEN_ID};
+use crate::multisig_blackbox_setup::{ActionRaw, EGLD_TOKEN_ID};
 
 #[test]
 fn init_test() {

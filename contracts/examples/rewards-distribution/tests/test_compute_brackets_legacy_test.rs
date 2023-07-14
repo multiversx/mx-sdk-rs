@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use core::iter::zip;
 
 use multiversx_sc_scenario::{rust_biguint, testing_framework::BlockchainStateWrapper, DebugApi};

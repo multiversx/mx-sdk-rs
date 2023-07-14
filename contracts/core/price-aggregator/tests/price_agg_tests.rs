@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
     staking::StakingModule,

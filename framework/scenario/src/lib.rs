@@ -8,14 +8,21 @@ pub mod display_util;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
+mod scenario_macros;
 pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
-pub mod whitebox;
+
+#[deprecated(
+    since = "0.42.0",
+    note = "Use the blackbox testing framework instead. If needed, it also supports whitebox calls."
+)]
+pub mod whitebox_legacy;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
-pub use whitebox as testing_framework;
+#[allow(deprecated)]
+pub use whitebox_legacy as testing_framework;
 
 pub use api::DebugApi;
 pub use multiversx_chain_vm;

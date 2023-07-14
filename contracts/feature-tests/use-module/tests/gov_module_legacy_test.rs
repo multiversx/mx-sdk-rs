@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
 use multiversx_sc_modules::governance::{
     governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
