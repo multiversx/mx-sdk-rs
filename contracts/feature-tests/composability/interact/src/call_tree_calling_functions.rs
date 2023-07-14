@@ -4,7 +4,10 @@ use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     multiversx_sc::types::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiValueEncoded},
     multiversx_sc_scenario::{
-        api::StaticApi, bech32, num_bigint::BigUint, scenario_model::ScCallStep,
+        api::StaticApi,
+        bech32,
+        num_bigint::BigUint,
+        scenario_model::{ScCallStep, TxExpect},
     },
     StepBuffer,
 };
@@ -14,7 +17,6 @@ use crate::{
     comp_interact_controller::ComposabilityInteract,
 };
 use forwarder_queue::ProxyTrait;
-use multiversx_sc_snippets::multiversx_sc_scenario::scenario_model::IntoBlockchainCall;
 
 const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
 const DEFAULT_GAS_LIMIT: u64 = 10_000_000;
@@ -137,7 +139,7 @@ impl ComposabilityInteract {
         let root_addr_expr = format!("bech32:{root_addr_bech32}");
 
         self.interactor
-            .sc_call_use_raw_response(
+            .sc_call(
                 ScCallStep::new()
                     .call(
                         self.state
@@ -145,15 +147,11 @@ impl ComposabilityInteract {
                             .forward_queued_calls(),
                     )
                     .from(&self.wallet_address)
-                    .gas_limit("70,000,000"),
-                |response| {
-                    if !response.is_success() {
-                        println!("calling root failed withh: {}", response.tx_error);
-                    } else {
-                        println!("successfully called root");
-                    }
-                },
+                    .gas_limit("70,000,000")
+                    .expect(TxExpect::ok().additional_error_message("calling root failed with: ")),
             )
             .await;
+
+        println!("successfully called root");
     }
 }

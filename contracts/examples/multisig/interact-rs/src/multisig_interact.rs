@@ -262,23 +262,18 @@ impl MultisigInteract {
         println!("quorum reached for action `{action_id}`");
 
         self.interactor
-            .sc_call_use_raw_response(
+            .sc_call(
                 ScCallStep::new()
                     .call(self.state.multisig().perform_action_endpoint(action_id))
                     .from(&self.wallet_address)
-                    .gas_limit(gas_expr),
-                |response| {
-                    if !response.is_success() {
-                        println!(
-                            "perform action `{action_id}` failed with: {}",
-                            response.tx_error
-                        );
-                    } else {
-                        println!("successfully performed action `{action_id}`");
-                    }
-                },
+                    .gas_limit(gas_expr)
+                    .expect(TxExpect::ok().additional_error_message(format!(
+                        "perform action `{action_id}` failed with: "
+                    ))),
             )
             .await;
+
+        println!("successfully performed action `{action_id}`");
     }
 
     async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: &str) {
@@ -367,20 +362,16 @@ impl MultisigInteract {
     async fn dns_register(&mut self, name: &str) {
         let dns_address = dns_address_for_name(name);
         self.interactor
-            .sc_call_use_raw_response(
+            .sc_call(
                 ScCallStep::new()
                     .call(self.state.multisig().dns_register(dns_address, name))
                     .from(&self.wallet_address)
-                    .gas_limit("30,000,000"),
-                |response| {
-                    if !response.is_success() {
-                        println!("dns register failed with: {}", response.tx_error);
-                    } else {
-                        println!("successfully registered dns");
-                    }
-                },
+                    .gas_limit("30,000,000")
+                    .expect(TxExpect::ok().additional_error_message("dns register failed with: ")),
             )
             .await;
+
+        println!("successfully registered dns");
     }
 
     async fn print_quorum(&mut self) {

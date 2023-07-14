@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         bech32,
         mandos_system::ScenarioRunner,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario},
+        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario, TxExpect},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -124,16 +124,15 @@ impl BasicFeaturesInteract {
 
     async fn set_large_storage(&mut self, value: &[u8]) {
         self.interactor
-            .sc_call_use_result(
+            .sc_call(
                 ScCallStep::new()
                     .call(self.state.bf_contract().store_bytes(value))
                     .from(&self.wallet_address)
-                    .gas_limit("600,000,000"),
-                |tr| {
-                    tr.result.unwrap_or_else(|err| {
-                        panic!("performing store_bytes failed with: {}", err.message)
-                    });
-                },
+                    .gas_limit("600,000,000")
+                    .expect(
+                        TxExpect::ok()
+                            .additional_error_message("performing store_bytes failed with: "),
+                    ),
             )
             .await;
 

@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use multiversx_sc_scenario::multiversx_sc::codec::multi_types::IgnoreValue;
 use multiversx_sc_snippets::multiversx_sc::codec::test_util::top_encode_to_vec_u8_or_panic;
 
 use super::*;
@@ -50,9 +51,12 @@ impl MultisigInteract {
                         ]),
                     ))
                     .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+                    .gas_limit("10,000,000")
+                    .expect(TxExpect::ok().additional_error_message("failed to issue collection")),
             )
-            .await;
+            .await
+            .result
+            .unwrap();
 
         println!("successfully proposed issue colllection with roles all action `{action_id}`");
         action_id
@@ -69,27 +73,25 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        self.interactor
-            .sc_call_use_raw_response(
+        let response: TypedResponse<IgnoreValue> = self
+            .interactor
+            .sc_call_get_result(
                 ScCallStep::new()
                     .call(self.state.multisig().perform_action_endpoint(action_id))
                     .from(&self.wallet_address)
-                    .gas_limit("80,000,000"),
-                |response| {
-                    let new_issued_token_identifier = response.new_issued_token_identifier.clone();
-
-                    if let Some(token_identifier) = new_issued_token_identifier {
-                        self.collection_token_identifier = token_identifier;
-                        println!(
-                            "collection token identifier: {}",
-                            self.collection_token_identifier
-                        );
-                    } else {
-                        println!("perform issue collection with all roles failed");
-                    }
-                },
+                    .gas_limit("80,000,000")
+                    .expect(TxExpect::ok().additional_error_message(
+                        "perform issue collection with all roles failed: ",
+                    )),
             )
             .await;
+        self.collection_token_identifier = response
+            .new_issued_token_identifier
+            .expect("new token identifier could not be retrieved");
+        println!(
+            "collection token identifier: {}",
+            self.collection_token_identifier
+        );
     }
 
     pub async fn propose_issue_collection(&mut self) -> usize {
@@ -110,7 +112,9 @@ impl MultisigInteract {
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000"),
             )
-            .await;
+            .await
+            .result
+            .unwrap();
 
         println!("successfully proposed issue colllection action `{action_id}`");
         action_id
@@ -127,27 +131,25 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        self.interactor
-            .sc_call_use_raw_response(
-                ScCallStep::new()
-                    .call(self.state.multisig().perform_action_endpoint(action_id))
-                    .from(&self.wallet_address)
-                    .gas_limit("80,000,000"),
-                |response| {
-                    let new_issued_token_identifier = response.new_issued_token_identifier.clone();
-
-                    if let Some(token_identifier) = new_issued_token_identifier {
-                        self.collection_token_identifier = token_identifier;
-                        println!(
-                            "collection token identifier: {}",
-                            self.collection_token_identifier
-                        );
-                    } else {
-                        println!("perform issue collection with all failed");
-                    }
-                },
-            )
-            .await;
+        let response: TypedResponse<IgnoreValue> =
+            self.interactor
+                .sc_call_get_result(
+                    ScCallStep::new()
+                        .call(self.state.multisig().perform_action_endpoint(action_id))
+                        .from(&self.wallet_address)
+                        .gas_limit("80,000,000")
+                        .expect(TxExpect::ok().additional_error_message(
+                            "perform issue collection with all failed: ",
+                        )),
+                )
+                .await;
+        self.collection_token_identifier = response
+            .new_issued_token_identifier
+            .expect("new token identifier could not be retrieved");
+        println!(
+            "collection token identifier: {}",
+            self.collection_token_identifier
+        );
     }
 
     pub async fn propose_set_special_role(&mut self) -> usize {
@@ -169,7 +171,9 @@ impl MultisigInteract {
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000"),
             )
-            .await;
+            .await
+            .result
+            .unwrap();
 
         println!("successfully proposed set special role with action `{action_id}`");
         action_id

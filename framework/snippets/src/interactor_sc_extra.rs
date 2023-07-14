@@ -54,8 +54,7 @@ impl Interactor {
     {
         self.sc_call(step.as_mut()).await;
         let response = unwrap_response(&step.as_mut().response);
-        let typed_response = TypedResponse::from_raw(response);
-        typed_response
+        TypedResponse::from_raw(response)
     }
 
     pub async fn sc_query_use_raw_response<S, F>(

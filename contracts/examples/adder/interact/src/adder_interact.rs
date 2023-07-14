@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
         scenario_model::{
-            BytesValue, ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep,
+            BytesValue, ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect,
         },
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
@@ -171,15 +171,13 @@ impl AdderInteract {
 
     async fn add(&mut self, value: u64) {
         self.interactor
-            .sc_call_use_result(
+            .sc_call(
                 ScCallStep::new()
                     .call(self.state.adder().add(value))
-                    .from(&self.wallet_address),
-                |tr| {
-                    tr.result.unwrap_or_else(|err| {
-                        panic!("performing add failed with: {}", err.message)
-                    });
-                },
+                    .from(&self.wallet_address)
+                    .expect(
+                        TxExpect::ok().additional_error_message("performing add failed with: "),
+                    ),
             )
             .await;
 

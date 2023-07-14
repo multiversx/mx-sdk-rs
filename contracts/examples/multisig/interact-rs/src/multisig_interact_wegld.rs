@@ -72,7 +72,9 @@ impl MultisigInteract {
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000"),
             )
-            .await;
+            .await
+            .result
+            .unwrap();
 
         println!("successfully proposed wrap egld action `{action_id}`");
         action_id
@@ -103,7 +105,9 @@ impl MultisigInteract {
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000"),
             )
-            .await;
+            .await
+            .result
+            .unwrap();
 
         println!("successfully proposed unwrap egld action `{action_id}`");
         action_id

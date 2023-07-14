@@ -35,6 +35,7 @@ fn basic_setup_test() {
     let mut test = MultisigTestState::setup();
     test.multisig_deploy();
 
+    // TODO: transform into a framework test and replace here with sc_call_get_result
     let mut board_members = MultiValueVec::<Address>::new();
     test.world.sc_call_use_result(
         ScCallStep::new()
