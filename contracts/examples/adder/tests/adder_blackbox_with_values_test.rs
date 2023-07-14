@@ -13,7 +13,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_scenario_constructed_raw() {
+fn adder_blackbox_with_values() {
     let mut world = world();
     let owner_address = "address:owner";
     let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
