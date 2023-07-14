@@ -11,13 +11,17 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
 
 use {contract_crate_name}::ProxyTrait as _;
 use {contract_crate_name}::*;
+
 use multiversx_sc_snippets::{{
     env_logger,
     erdrs::wallet::Wallet,
     multiversx_sc::{{codec::multi_types::*, types::*}},
     multiversx_sc_scenario::{{
-        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::*, ContractInfo,
+        api::StaticApi,
+        bech32,
+        scenario_format::interpret_trait::{{InterpretableFrom, InterpreterContext}},
+        scenario_model::*,
+        ContractInfo,
     }},
     sdk, tokio, Interactor,
 }};
@@ -29,13 +33,18 @@ use multiversx_sc_snippets::{{
 }
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
-    writeln!(file, "const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
+    writeln!(
+        file,
+        "const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = \"alice.pem\";
 const SC_ADDRESS: &str = \"\";
 
 const SYSTEM_SC_BECH32: &str = \"erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u\";
-const DEFAULT_ADDRESS_EXPR: &str = \"0x0000000000000000000000000000000000000000000000000000000000000000\";
-const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;").unwrap();
+const DEFAULT_ADDRESS_EXPR: &str =
+    \"0x0000000000000000000000000000000000000000000000000000000000000000\";
+const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;"
+    )
+    .unwrap();
 
     write_newline(file);
 }
@@ -95,6 +104,7 @@ pub(crate) fn write_state_struct_declaration(file: &mut File) {
         "struct State {{
     interactor: Interactor,
     wallet_address: Address,
+    contract_code: BytesValue,
     contract: ContractType,
 }}"
     )

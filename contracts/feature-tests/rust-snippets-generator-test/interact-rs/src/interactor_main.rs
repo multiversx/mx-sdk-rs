@@ -2,13 +2,17 @@
 
 use rust_snippets_generator_test::ProxyTrait as _;
 use rust_snippets_generator_test::*;
+
 use multiversx_sc_snippets::{
     env_logger,
     erdrs::wallet::Wallet,
     multiversx_sc::{codec::multi_types::*, types::*},
     multiversx_sc_scenario::{
-        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::*, ContractInfo,
+        api::StaticApi,
+        bech32,
+        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
+        scenario_model::*,
+        ContractInfo,
     },
     sdk, tokio, Interactor,
 };
@@ -19,7 +23,8 @@ const PEM: &str = "alice.pem";
 const SC_ADDRESS: &str = "";
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-const DEFAULT_ADDRESS_EXPR: &str = "0x0000000000000000000000000000000000000000000000000000000000000000";
+const DEFAULT_ADDRESS_EXPR: &str =
+    "0x0000000000000000000000000000000000000000000000000000000000000000";
 const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;
 
 type ContractType = ContractInfo<rust_snippets_generator_test::Proxy<StaticApi>>;
@@ -57,6 +62,7 @@ async fn main() {
 struct State {
     interactor: Interactor,
     wallet_address: Address,
+    contract_code: BytesValue,
     contract: ContractType,
 }
 
@@ -69,11 +75,17 @@ impl State {
         } else {
             "bech32:".to_string() + SC_ADDRESS
         };
+        let contract_code =
+            BytesValue::interpret_from(
+                "file:../output/rust-snippets-generator-test.wasm", 
+                &InterpreterContext::default(),
+            );
         let contract = ContractType::new(sc_addr_expr);
 
         State {
             interactor,
             wallet_address,
+            contract_code,
             contract,
         }
     }
@@ -84,10 +96,7 @@ impl State {
                 ScDeployStep::new()
                     .call(self.contract.init())
                     .from(&self.wallet_address)
-                    .contract_code(
-                        "file:../output/rust-snippets-generator-test.wasm",
-                        &InterpreterContext::default(),
-                    ),
+                    .code(&self.contract_code),
                 |new_address, tr: TypedResponse<()>| {
                     tr.result.unwrap_or_else(|err| {
                         panic!(

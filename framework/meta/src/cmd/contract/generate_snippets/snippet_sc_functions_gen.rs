@@ -11,27 +11,35 @@ pub(crate) fn write_state_struct_impl(
 ) {
     writeln!(
         file,
-        "impl State {{
+        r#"impl State {{
     async fn new() -> Self {{
         let mut interactor = Interactor::new(GATEWAY).await;
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
-        let sc_addr_expr = if SC_ADDRESS == \"\" {{
+        let sc_addr_expr = if SC_ADDRESS == "" {{
             DEFAULT_ADDRESS_EXPR.to_string()
         }} else {{
-            \"bech32:\".to_string() + SC_ADDRESS
+            "bech32:".to_string() + SC_ADDRESS
         }};
+        let contract_code =
+            BytesValue::interpret_from(
+                {}, 
+                &InterpreterContext::default(),
+            );
         let contract = ContractType::new(sc_addr_expr);
 
         State {{
             interactor,
             wallet_address,
+            contract_code,
             contract,
         }}
-    }}\n"
+    }}
+"#,
+        wasm_output_file_path_expr,
     )
     .unwrap();
 
-    write_deploy_method_impl(file, &abi.constructors[0], wasm_output_file_path_expr);
+    write_deploy_method_impl(file, &abi.constructors[0]);
 
     for endpoint_abi in &abi.endpoints {
         write_endpoint_impl(file, endpoint_abi);
@@ -41,26 +49,19 @@ pub(crate) fn write_state_struct_impl(
     writeln!(file, "}}").unwrap();
 }
 
-fn write_deploy_method_impl(
-    file: &mut File,
-    init_abi: &EndpointAbi,
-    wasm_output_file_path_expr: &str,
-) {
+fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi) {
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
 
     let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-r#"        self.interactor
+        r#"        self.interactor
             .sc_deploy_use_result(
                 ScDeployStep::new()
                     .call(self.contract.{}({}))
                     .from(&self.wallet_address)
-                    .contract_code(
-                        {},
-                        &InterpreterContext::default(),
-                    ),
+                    .code(&self.contract_code),
                 |new_address, tr: TypedResponse<{}>| {{
                     tr.result.unwrap_or_else(|err| {{
                         panic!(
@@ -77,7 +78,6 @@ r#"        self.interactor
 "#,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
-        wasm_output_file_path_expr,
         output_type,
     )
     .unwrap();
@@ -177,7 +177,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-r#"        self.interactor
+        r#"        self.interactor
         .sc_call_use_result(
             ScCallStep::new()
                 .call(self.contract.{}({}))

@@ -70,8 +70,9 @@ path = ".."
 
 [dependencies.multiversx-sc-snippets]
 version = "0.41.3"
+path = "../../../../framework/snippets"
 
-[workspace]
+# [workspace]
 
 "#
     )
