@@ -12,17 +12,14 @@ pub(crate) fn write_snippet_imports(file: &mut File, contract_crate_name: &str) 
 use {contract_crate_name}::ProxyTrait as _;
 use {contract_crate_name}::*;
 use multiversx_sc_snippets::{{
-    multiversx_sc::{{
-        codec::multi_types::*,
-        types::*,
-    }},
     env_logger,
     erdrs::wallet::Wallet,
-    tokio, Interactor,
-}};
-use multiversx_sc_scenario::scenario_model::*;
-use multiversx_chain_vm::{{
-    bech32, scenario_format::interpret_trait::InterpreterContext, ContractInfo, DebugApi,
+    multiversx_sc::{{codec::multi_types::*, types::*}},
+    multiversx_sc_scenario::{{
+        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
+        scenario_model::*, ContractInfo,
+    }},
+    sdk, tokio, Interactor,
 }};
 "
     )
@@ -32,13 +29,12 @@ use multiversx_chain_vm::{{
 }
 
 pub(crate) fn write_snippet_constants(file: &mut File) {
-    writeln!(file, "const GATEWAY: &str = multiversx_sdk::blockchain::DEVNET_GATEWAY;
+    writeln!(file, "const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = \"alice.pem\";
 const SC_ADDRESS: &str = \"\";
 
 const SYSTEM_SC_BECH32: &str = \"erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u\";
 const DEFAULT_ADDRESS_EXPR: &str = \"0x0000000000000000000000000000000000000000000000000000000000000000\";
-const DEFAULT_GAS_LIMIT: u64 = 100_000_000;
 const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;").unwrap();
 
     write_newline(file);
@@ -47,7 +43,7 @@ const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;").unwrap();
 pub(crate) fn write_contract_type_alias(file: &mut File, contract_crate_name: &str) {
     writeln!(
         file,
-        "type ContractType = ContractInfo<{contract_crate_name}::Proxy<DebugApi>>;"
+        "type ContractType = ContractInfo<{contract_crate_name}::Proxy<StaticApi>>;"
     )
     .unwrap();
 
@@ -60,7 +56,6 @@ pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi) {
         "#[tokio::main]
 async fn main() {{
     env_logger::init();
-    DebugApi::dummy();
 
     let mut args = std::env::args();
     let _ = args.next();

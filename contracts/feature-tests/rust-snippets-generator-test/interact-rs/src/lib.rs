@@ -1,33 +1,32 @@
 #![allow(non_snake_case)]
 
-use multiversx_chain_vm::{
-    bech32, scenario_format::interpret_trait::InterpreterContext, ContractInfo, DebugApi,
-};
-use multiversx_sc_scenario::scenario_model::*;
+use rust_snippets_generator_test::ProxyTrait as _;
+use rust_snippets_generator_test::*;
 use multiversx_sc_snippets::{
     env_logger,
     erdrs::wallet::Wallet,
     multiversx_sc::{codec::multi_types::*, types::*},
-    tokio, Interactor,
+    multiversx_sc_scenario::{
+        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
+        scenario_model::*, ContractInfo,
+    },
+    sdk, tokio, Interactor,
 };
-use rust_snippets_generator_test::{ProxyTrait as _, *};
 
-const GATEWAY: &str = multiversx_sdk::blockchain::DEVNET_GATEWAY;
+
+const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const SC_ADDRESS: &str = "";
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-const DEFAULT_ADDRESS_EXPR: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-const DEFAULT_GAS_LIMIT: u64 = 100_000_000;
+const DEFAULT_ADDRESS_EXPR: &str = "0x0000000000000000000000000000000000000000000000000000000000000000";
 const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;
 
-type ContractType = ContractInfo<rust_snippets_generator_test::Proxy<DebugApi>>;
+type ContractType = ContractInfo<rust_snippets_generator_test::Proxy<StaticApi>>;
 
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    DebugApi::dummy();
 
     let mut args = std::env::args();
     let _ = args.next();
@@ -80,382 +79,421 @@ impl State {
     }
 
     async fn deploy(&mut self) {
-        let mut typed_sc_deploy = self
-            .contract
-            .init()
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .contract_code(
-                "file:../output/rust-snippets-generator-test.wasm",
-                &InterpreterContext::default(),
+        self.interactor
+            .sc_deploy_use_result(
+                ScDeployStep::new()
+                    .call(self.contract.init())
+                    .from(&self.wallet_address)
+                    .contract_code(
+                        "file:../output/rust-snippets-generator-test.wasm",
+                        &InterpreterContext::default(),
+                    ),
+                |new_address, tr: TypedResponse<()>| {
+                    tr.result.unwrap_or_else(|err| {
+                        panic!(
+                            "deploy failed: status: {}, message: {}",
+                            err.status, err.message
+                        )
+                    });
+
+                    let new_address_bech32 = bech32::encode(&new_address);
+                    println!("new address: {new_address_bech32}");
+                },
             )
-            .gas_limit(DEFAULT_GAS_LIMIT);
+            .await;
 
-        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
-
-        if let Some(new_address) = typed_sc_deploy.response().new_deployed_address.clone() {
-            let new_address_bech32 = bech32::encode(&new_address);
-            println!("new address: {}", new_address_bech32);
-
-            let result = typed_sc_deploy.result();
-            if result.is_err() {
-                println!("Result error: {}", result.err().unwrap());
-                return;
-            }
-
-            println!("Result: {:?}", result.unwrap());
-        } else {
-            println!("deploy failed");
-            return;
-        }
     }
 
     async fn no_arg_no_result_endpoint(&mut self) {
-        let mut typed_sc_call = self
-            .contract
-            .no_arg_no_result_endpoint()
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.no_arg_no_result_endpoint())
+                .from(&self.wallet_address),
+            |tr: TypedResponse<()>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn no_arg_one_result_endpoint(&mut self) {
-        let mut typed_sc_call = self
-            .contract
-            .no_arg_one_result_endpoint()
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.no_arg_one_result_endpoint())
+                .from(&self.wallet_address),
+            |tr: TypedResponse<u64>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn one_arg_no_result_endpoint(&mut self) {
         let _arg = 0u64;
 
-        let mut typed_sc_call = self
-            .contract
-            .one_arg_no_result_endpoint(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.one_arg_no_result_endpoint(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<()>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn one_arg_one_result_endpoint(&mut self) {
         let _arg = 0u64;
 
-        let mut typed_sc_call = self
-            .contract
-            .one_arg_one_result_endpoint(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.one_arg_one_result_endpoint(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<BigUint<StaticApi>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn multi_result(&mut self) {
         let _arg = TokenIdentifier::from_esdt_bytes(&b""[..]);
 
-        let mut typed_sc_call = self
-            .contract
-            .multi_result(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.multi_result(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<MultiValueVec<BigUint<StaticApi>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn nested_result(&mut self) {
         let _arg = TokenIdentifier::from_esdt_bytes(&b""[..]);
 
-        let mut typed_sc_call = self
-            .contract
-            .nested_result(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.nested_result(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<ManagedVec<StaticApi, ManagedVec<StaticApi, BigUint<StaticApi>>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn custom_struct(&mut self) {
         let _arg = PlaceholderInput;
 
-        let mut typed_sc_call = self
-            .contract
-            .custom_struct(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.custom_struct(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<MyCoolStruct<StaticApi>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn optional_type(&mut self) {
-        let _arg = OptionalValue::Some(BigUint::<DebugApi>::from(0u64));
+        let _arg = OptionalValue::Some(BigUint::<StaticApi>::from(0u128));
 
-        let mut typed_sc_call = self
-            .contract
-            .optional_type(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.optional_type(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<OptionalValue<TokenIdentifier<StaticApi>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn option_type(&mut self) {
-        let _arg = Option::Some(ManagedVec::from_single_item(
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-        ));
+        let _arg = Option::Some(ManagedVec::from_single_item(TokenIdentifier::from_esdt_bytes(&b""[..])));
 
-        let mut typed_sc_call = self
-            .contract
-            .option_type(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.option_type(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<Option<u64>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn esdt_token_payment(&mut self) {
         let _arg = OptionalValue::Some(EsdtTokenPayment::new(
             TokenIdentifier::from_esdt_bytes(&b""[..]),
             0u64,
-            BigUint::from(0u64),
+            BigUint::from(0u128)
         ));
 
-        let mut typed_sc_call = self
-            .contract
-            .esdt_token_payment(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.esdt_token_payment(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<EsdtTokenPayment<StaticApi>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn egld_or_esdt_payment(&mut self) {
         let arg = EgldOrEsdtTokenPayment::new(
             EgldOrEsdtTokenIdentifier::esdt(&b""[..]),
             0u64,
-            BigUint::from(0u64),
+            BigUint::from(0u128)
         );
 
-        let mut typed_sc_call = self
-            .contract
-            .egld_or_esdt_payment(arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.egld_or_esdt_payment(arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<EgldOrEsdtTokenIdentifier<StaticApi>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn payable_endpoint(&mut self) {
         let token_id = b"";
         let token_nonce = 0u64;
-        let token_amount = BigUint::<DebugApi>::from(0u64);
+        let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        let mut typed_sc_call = self
-            .contract
-            .payable_endpoint()
-            .into_blockchain_call()
-            .from(&self.wallet_address)
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.payable_endpoint())
+                .from(&self.wallet_address)
             .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+,
+            |tr: TypedResponse<()>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn managed_buffer(&mut self) {
         let _arg = Option::Some(ManagedBuffer::new_from_bytes(&b""[..]));
 
-        let mut typed_sc_call = self
-            .contract
-            .managed_buffer(_arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.managed_buffer(_arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<MultiValueVec<ManagedVec<StaticApi, MyCoolStruct<StaticApi>>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn multi_value_2(&mut self) {
-        let arg = MultiValue2::from((0u64, BigUint::<DebugApi>::from(0u64)));
+        let arg = MultiValue2::from((0u64, BigUint::<StaticApi>::from(0u128)));
 
-        let mut typed_sc_call = self
-            .contract
-            .multi_value_2(arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.multi_value_2(arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<MultiValue2<u64, BigUint<StaticApi>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn multi_value_4(&mut self) {
         let arg = PlaceholderInput;
 
-        let mut typed_sc_call = self
-            .contract
-            .multi_value_4(arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.multi_value_4(arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<MultiValue4<u64, BigUint<StaticApi>, MyCoolStruct<StaticApi>, TokenIdentifier<StaticApi>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn complex_multi_values(&mut self) {
-        let arg = MultiValueVec::from(vec![MultiValue3::from((
-            TokenIdentifier::from_esdt_bytes(&b""[..]),
-            0u64,
-            BigUint::<DebugApi>::from(0u64),
-        ))]);
+        let arg = MultiValueVec::from(vec![MultiValue3::from((TokenIdentifier::from_esdt_bytes(&b""[..]), 0u64, BigUint::<StaticApi>::from(0u128)))]);
 
-        let mut typed_sc_call = self
-            .contract
-            .complex_multi_values(arg)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(DEFAULT_GAS_LIMIT);
+        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.complex_multi_values(arg))
+                .from(&self.wallet_address),
+            |tr: TypedResponse<MultiValueVec<MultiValue3<TokenIdentifier<StaticApi>, u64, BigUint<StaticApi>>>>| {
+                match tr.result {
+                    Ok(result) => {
+                        println!("Result: {result:?}");
+                    },
+                    Err(err) => panic!(
+                        "SC call failed: status: {}, message: {}",
+                        err.status, err.message
+                    )
+                };
+            },
+        )
+        .await;
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
+
 }

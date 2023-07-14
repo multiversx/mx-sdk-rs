@@ -52,38 +52,35 @@ fn write_deploy_method_impl(
     let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-        r#"    let mut typed_sc_deploy: TypedScDeploy<{}> =  self.contract
-                    .{}({})
-                    .into_blockchain_call()
+r#"        self.interactor
+            .sc_deploy_use_result(
+                ScDeployStep::new()
+                    .call(self.contract.{}({}))
                     .from(&self.wallet_address)
-                    .contract_code({}, &InterpreterContext::default())
-                    .gas_limit(DEFAULT_GAS_LIMIT);
+                    .contract_code(
+                        {},
+                        &InterpreterContext::default(),
+                    ),
+                |new_address, tr: TypedResponse<{}>| {{
+                    tr.result.unwrap_or_else(|err| {{
+                        panic!(
+                            "deploy failed: status: {{}}, message: {{}}",
+                            err.status, err.message
+                        )
+                    }});
 
-                self.interactor.sc_deploy(&mut typed_sc_deploy).await;
-
-                let result = typed_sc_deploy.response().new_deployed_address();
-                if result.is_err() {{
-                    println!("deploy failed: {{}}", result.err().unwrap());
-                    return;
-                }}
-
-                let new_address_bech32 = bech32::encode(&result.unwrap());
-                println!("new address: {{}}", new_address_bech32);
-
-                let result = typed_sc_deploy.result();
-                if result.is_err() {{
-                    println!("Result error: {{}}", result.err().unwrap());
-                    return;
-                }}
+                    let new_address_bech32 = bech32::encode(&new_address);
+                    println!("new address: {{new_address_bech32}}");
+                }},
+            )
+            .await;
 "#,
-        output_type,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
-        wasm_output_file_path_expr
+        wasm_output_file_path_expr,
+        output_type,
     )
     .unwrap();
-
-    write_call_results_print(file, &init_abi.outputs);
 
     // close method block brackets
     writeln!(file, "    }}").unwrap();
@@ -99,7 +96,6 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
     } else {
         write_contract_call(file, endpoint_abi);
     }
-    write_call_results_print(file, &endpoint_abi.outputs);
 
     // close method block brackets
     writeln!(file, "    }}").unwrap();
@@ -181,24 +177,29 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"     let mut typed_sc_call: TypedScCall<{}> = self.contract
-                    .{}({})
-                    .into_blockchain_call()
-                    .from(&self.wallet_address){}
-                    .gas_limit(DEFAULT_GAS_LIMIT);
-
-                self.interactor.sc_call(&mut typed_sc_call).await;
-
-                let result = typed_sc_call.result();
-                if result.is_err() {{
-                    println!("Result error: {{}}", result.err().unwrap());
-                    return;
-                }}
+r#"        self.interactor
+        .sc_call_use_result(
+            ScCallStep::new()
+                .call(self.contract.{}({}))
+                .from(&self.wallet_address){},
+            |tr: TypedResponse<{}>| {{
+                match tr.result {{
+                    Ok(result) => {{
+                        println!("Result: {{result:?}}");
+                    }},
+                    Err(err) => panic!(
+                        "SC call failed: status: {{}}, message: {{}}",
+                        err.status, err.message
+                    )
+                }};
+            }},
+        )
+        .await;
 "#,
-        output_type,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
         payment_snippet,
+        output_type,
     )
     .unwrap();
 }
@@ -215,14 +216,6 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
         output_type,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
-    )
-    .unwrap();
-}
-
-fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
-    writeln!(
-        file,
-        r#"        println!("Result: {{:?}}", result.unwrap());"#
     )
     .unwrap();
 }
