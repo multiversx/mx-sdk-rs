@@ -191,17 +191,6 @@ impl ScenarioWorld {
         (new_address, typed_response.result.unwrap())
     }
 
-    pub fn sc_deploy_use_new_address<S, F>(&mut self, step: S, use_new_address: F) -> &mut Self
-    where
-        S: AsMut<ScDeployStep>,
-        F: FnOnce(Address),
-    {
-        self.sc_deploy_use_raw_response(step, |response| {
-            let new_address = unwrap_new_address(response);
-            use_new_address(new_address);
-        })
-    }
-
     /// Adds a simple transfer step, then executes it.
     pub fn transfer_step(&mut self, step: TransferStep) -> &mut Self {
         self.run_transfer_step(&step);

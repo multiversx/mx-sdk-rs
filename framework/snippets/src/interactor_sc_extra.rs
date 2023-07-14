@@ -134,22 +134,6 @@ impl Interactor {
         })
         .await
     }
-
-    pub async fn sc_deploy_use_new_address<S, F>(
-        &mut self,
-        step: S,
-        use_new_address: F,
-    ) -> &mut Self
-    where
-        S: AsMut<ScDeployStep>,
-        F: FnOnce(Address),
-    {
-        self.sc_deploy_use_raw_response(step, |response| {
-            let new_address = unwrap_new_address(response);
-            use_new_address(new_address);
-        })
-        .await
-    }
 }
 
 fn unwrap_response(opt_response: &Option<TxResponse>) -> &TxResponse {

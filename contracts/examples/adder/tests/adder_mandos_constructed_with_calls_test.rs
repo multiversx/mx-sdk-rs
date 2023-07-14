@@ -24,14 +24,14 @@ fn adder_scenario_constructed_raw() {
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .sc_deploy_use_new_address(
+        .sc_deploy_use_result(
             ScDeployStep::new()
                 .from(owner_address)
                 .contract_code("file:output/adder.wasm", &ic)
                 .call(adder_contract.init(5u32))
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
-            |new_address| {
+            |new_address, _| {
                 assert_eq!(new_address, adder_contract.to_address());
             },
         )
