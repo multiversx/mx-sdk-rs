@@ -8,6 +8,7 @@ pub mod display_util;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
+mod scenario_macros;
 pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
