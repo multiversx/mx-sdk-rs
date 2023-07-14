@@ -7,7 +7,7 @@ publish = false
 
 [[bin]]
 name = "rust-interact"
-path = "src/lib.rs"
+path = "src/interactor_main.rs"
 
 [dependencies.rust-snippets-generator-test]
 path = ".."
@@ -16,18 +16,6 @@ path = ".."
 version = "0.41.3"
 path = "../../../../framework/snippets"
 
-[dependencies.multiversx-sc-scenario]
-version = "0.41.3"
-path = "../../../../framework/scenario"
-
-[dependencies.multiversx-chain-vm]
-version = "0.1.2"
-path = "../../../../vm"
-
-[dependencies.multiversx-sdk]
-version = "0.1.1"
-path = "../../../../sdk/core"
-
-[workspace]
+# [workspace]
 
 

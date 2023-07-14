@@ -105,8 +105,12 @@ impl AdderInteract {
                     .from(&self.wallet_address)
                     .code(&self.adder_code),
                 |new_address, tr| {
-                    tr.result
-                        .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));
+                    tr.result.unwrap_or_else(|err| {
+                        panic!(
+                            "deploy failed: status: {}, message: {}",
+                            err.status, err.message
+                        )
+                    });
 
                     let new_address_bech32 = bech32::encode(&new_address);
                     println!("new address: {new_address_bech32}");
