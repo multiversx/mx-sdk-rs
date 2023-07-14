@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use std::borrow::Borrow;
 
 use multisig::user_role::UserRole;

@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use adder::*;
 use forwarder::call_sync::*;
 use num_traits::ToPrimitive;

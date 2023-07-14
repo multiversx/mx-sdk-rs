@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use multiversx_sc::types::{
     Address, EsdtLocalRole, EsdtTokenPayment, ManagedArgBuffer, ManagedVec, MultiValueEncoded,
 };

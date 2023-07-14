@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use multiversx_sc::types::{EgldOrEsdtTokenIdentifier, ManagedVec};
 use multiversx_sc_modules::staking::StakingModule;
 use multiversx_sc_scenario::{

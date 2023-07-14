@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use crowdfunding_esdt::*;
 use multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier};
 use multiversx_sc_scenario::{
