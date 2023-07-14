@@ -60,7 +60,7 @@ pub(crate) fn write_snippet_main_function(file: &mut File, abi: &ContractAbi) {
         "#[tokio::main]
 async fn main() {{
     env_logger::init();
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut args = std::env::args();
     let _ = args.next();
