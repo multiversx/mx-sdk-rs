@@ -118,7 +118,7 @@ impl TxResponse {
     }
 
     fn process_out(mut self) -> Self {
-        let out_scr = self.api_scrs.iter().find(|scr| is_out_scr(scr));
+        let out_scr = self.api_scrs.iter().find(is_out_scr);
 
         if let Some(out_scr) = out_scr {
             self.out = decode_scr_data_or_panic(&out_scr.data);
