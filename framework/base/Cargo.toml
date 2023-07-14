@@ -16,9 +16,9 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-t
 [features]
 num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = ["multiversx-sc-codec/alloc"]
-ei-unmanaged = ["alloc"]
 promises = []
 big-float = []
+managed-map = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]

@@ -1,4 +1,10 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
 fn factorial_go() {
-    multiversx_sc_scenario::run_go("scenarios/factorial.scen.json");
+    world().run("scenarios/factorial.scen.json");
 }

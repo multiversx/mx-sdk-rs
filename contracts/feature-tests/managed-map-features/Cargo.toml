@@ -1,0 +1,21 @@
+[package]
+name = "managed-map-features"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/mmap_features.rs"
+[dependencies.multiversx-sc]
+version = "0.41.3"
+path = "../../../framework/base"
+
+features = ["managed-map"]
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.41.3"
+path = "../../../framework/scenario"
+
+[dev-dependencies.esdt-system-sc-mock]
+path = "../esdt-system-sc-mock"

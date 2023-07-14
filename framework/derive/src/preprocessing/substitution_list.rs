@@ -49,6 +49,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type(substitutions, &quote!(EllipticCurveComponents));
     add_managed_type(substitutions, &quote!(EllipticCurve));
     add_managed_type(substitutions, &quote!(ManagedBuffer));
+    add_managed_type(substitutions, &quote!(ManagedMap));
 
     // types::managed::multi-value
     add_managed_type(substitutions, &quote!(ManagedAsyncCallError));

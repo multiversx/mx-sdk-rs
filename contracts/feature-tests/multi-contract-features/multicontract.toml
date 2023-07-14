@@ -14,3 +14,6 @@ add-labels = ["mcs-external-view"]
 [contracts.multi-contract-example-feature]
 add-unlabelled = true
 features = ["example_feature"]
+
+[contracts.multi-contract-alt-impl]
+add-labels = ["alt-impl"]

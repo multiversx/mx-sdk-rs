@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: migrate tests
+
 use multiversx_price_aggregator_sc::{staking::StakingModule, PriceAggregator};
 use multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier, MultiValueEncoded};
 use multiversx_sc_modules::pause::PauseModule;

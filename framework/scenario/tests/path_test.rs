@@ -6,13 +6,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn local_path_test() {
-    multiversx_sc_scenario::run_rs("tests/scenarios-self/path_test.scen.json", world());
+    world().run("tests/scenarios-self/path_test.scen.json");
 }
 
 #[test]
 fn nested_path_test() {
-    multiversx_sc_scenario::run_rs(
-        "tests/scenarios-self/external_steps/external_path_test.scen.json",
-        world(),
-    );
+    world().run("tests/scenarios-self/external_steps/external_path_test.scen.json");
 }

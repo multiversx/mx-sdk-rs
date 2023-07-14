@@ -22,14 +22,6 @@ impl Interactor {
         account.nonce
     }
 
-    async fn get_sender_nonce(&self, sender: &Sender) -> u64 {
-        if let Some(nonce) = sender.current_nonce {
-            nonce + 1
-        } else {
-            self.recall_nonce(&sender.address).await
-        }
-    }
-
     pub(crate) async fn set_nonce_and_sign_tx(
         &mut self,
         sender_address: &Address,
@@ -41,18 +33,20 @@ impl Interactor {
             .get(sender_address)
             .expect("the wallet that was supposed to sign is not registered");
 
-        // recall if necessary
-        let nonce = self.get_sender_nonce(sender).await;
+        // recall
+        let nonce = self.recall_nonce(&sender.address).await;
+        println!("sender's recalled nonce: {nonce}");
+
+        // set tx nonce
+        transaction.nonce = nonce;
+        println!("-- tx nonce: {}", transaction.nonce);
 
         // update
         let sender = self
             .sender_map
             .get_mut(sender_address)
             .expect("the wallet that was supposed to sign is not registered");
-        sender.current_nonce = Some(nonce);
-
-        // set tx nonce
-        transaction.nonce = nonce;
+        sender.current_nonce = Some(nonce + 1);
 
         // sign
         let signature = sender.wallet.sign_tx(transaction);

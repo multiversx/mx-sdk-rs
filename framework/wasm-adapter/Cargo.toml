@@ -21,11 +21,6 @@ categories = [
     "development-tools::ffi",
 ]
 
-[features]
-vm-validate-token-identifier = []
-vm-esdt-local-roles = []
-ei-unmanaged-node = []
-
 [dependencies.multiversx-sc]
 version = "=0.41.3"
 path = "../base"

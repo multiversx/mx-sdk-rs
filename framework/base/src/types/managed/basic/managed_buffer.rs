@@ -1,7 +1,7 @@
 use crate::{
     abi::TypeName,
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi,
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
         ManagedTypeApi, StaticVarApiImpl,
     },
     codec::{
@@ -41,7 +41,8 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn new() -> Self {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         // TODO: remove after VM no longer crashes with "unknown handle":
         M::managed_type_impl().mb_overwrite(new_handle.clone(), &[]);
         ManagedBuffer::from_handle(new_handle)
@@ -49,14 +50,16 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_overwrite(new_handle.clone(), bytes);
         ManagedBuffer::from_handle(new_handle)
     }
 
     #[inline]
     pub fn new_random(nr_bytes: usize) -> Self {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_set_random(new_handle.clone(), nr_bytes);
         ManagedBuffer::from_handle(new_handle)
     }

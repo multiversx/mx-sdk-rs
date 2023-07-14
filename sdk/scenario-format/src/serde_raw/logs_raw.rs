@@ -13,9 +13,11 @@ pub struct CheckLogListRaw {
     pub more_allowed_at_end: bool,
 }
 
+#[derive(Default)]
 pub enum CheckLogsRaw {
     Star,
     List(CheckLogListRaw),
+    #[default]
     Unspecified,
 }
 
@@ -26,12 +28,6 @@ impl CheckLogsRaw {
 
     pub fn is_default(&self) -> bool {
         matches!(self, CheckLogsRaw::Unspecified)
-    }
-}
-
-impl Default for CheckLogsRaw {
-    fn default() -> Self {
-        CheckLogsRaw::Unspecified
     }
 }
 

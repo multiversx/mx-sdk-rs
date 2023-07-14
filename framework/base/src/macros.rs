@@ -12,12 +12,7 @@ macro_rules! imports {
         };
         use multiversx_sc::{
             abi::TypeAbi,
-            api::{
-                BigFloatApi, BigIntApi, BlockchainApi, BlockchainApiImpl, CallValueApi,
-                CallValueApiImpl, CryptoApi, CryptoApiImpl, EllipticCurveApi, ErrorApi,
-                ErrorApiImpl, LogApi, LogApiImpl, ManagedTypeApi, PrintApi, PrintApiImpl, SendApi,
-                SendApiImpl,
-            },
+            api::{ErrorApiImpl, ManagedTypeApi},
             arrayvec::ArrayVec,
             codec::{
                 multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,

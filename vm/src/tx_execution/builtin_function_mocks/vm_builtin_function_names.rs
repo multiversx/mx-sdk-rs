@@ -1,0 +1,15 @@
+pub const ESDT_LOCAL_MINT_FUNC_NAME: &str = "ESDTLocalMint";
+pub const ESDT_LOCAL_BURN_FUNC_NAME: &str = "ESDTLocalBurn";
+pub const ESDT_MULTI_TRANSFER_FUNC_NAME: &str = "MultiESDTNFTTransfer";
+pub const ESDT_NFT_TRANSFER_FUNC_NAME: &str = "ESDTNFTTransfer";
+pub const ESDT_NFT_CREATE_FUNC_NAME: &str = "ESDTNFTCreate";
+pub const ESDT_NFT_ADD_QUANTITY_FUNC_NAME: &str = "ESDTNFTAddQuantity";
+pub const ESDT_NFT_ADD_URI_FUNC_NAME: &str = "ESDTNFTAddURI";
+pub const ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME: &str = "ESDTNFTUpdateAttributes";
+pub const ESDT_NFT_BURN_FUNC_NAME: &str = "ESDTNFTBurn";
+pub const ESDT_TRANSFER_FUNC_NAME: &str = "ESDTTransfer";
+pub const CHANGE_OWNER_BUILTIN_FUNC_NAME: &str = "ChangeOwnerAddress";
+pub const CLAIM_DEVELOPER_REWARDS_FUNC_NAME: &str = "ClaimDeveloperRewards";
+pub const SET_USERNAME_FUNC_NAME: &str = "SetUserName";
+pub const MIGRATE_USERNAME_FUNC_NAME: &str = "migrateUserName";
+pub const UPGRADE_CONTRACT_FUNC_NAME: &str = "upgradeContract";

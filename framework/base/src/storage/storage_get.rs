@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, ManagedBufferApi, ManagedTypeApi,
-        StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
+        const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
+        ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
     },
     codec::*,
     err_msg,
@@ -32,7 +32,8 @@ where
     }
 
     fn to_managed_buffer(&self) -> ManagedBuffer<A> {
-        let mbuf_handle: A::ManagedBufferHandle = A::static_var_api_impl().next_handle();
+        let mbuf_handle: A::ManagedBufferHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
         A::storage_read_api_impl()
             .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), mbuf_handle.clone());
         ManagedBuffer::from_handle(mbuf_handle)
@@ -65,8 +66,7 @@ where
     }
 
     fn into_boxed_slice_u8(self) -> Box<[u8]> {
-        let key_bytes = self.key.to_boxed_bytes();
-        A::storage_read_api_impl().storage_load_to_heap(key_bytes.as_slice())
+        self.to_managed_buffer().to_boxed_bytes().into_box()
     }
 
     #[inline]

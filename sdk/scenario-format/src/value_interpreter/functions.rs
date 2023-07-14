@@ -1,7 +1,13 @@
+use crate::value_interpreter::*;
 use bech32::FromBase32;
 use sha3::{Digest, Keccak256};
 
-const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
+pub const SC_ADDRESS_NUM_LEADING_ZEROS: usize = 8;
+
+// Represents the number of zero bytes every smart contract address begins with.
+// Its value is 10.
+// 10 = 8 zeros for all SC addresses + 2 zeros as placeholder for the VM type.
+pub const SC_ADDRESS_RESERVED_PREFIX_LENGTH: usize = SC_ADDRESS_NUM_LEADING_ZEROS + VM_TYPE_LENGTH;
 
 pub fn keccak256(data: &[u8]) -> Vec<u8> {
     let mut hasher = Keccak256::new();
@@ -56,8 +62,12 @@ pub(crate) fn address_expression(input: &str) -> Vec<u8> {
 }
 
 /// Generates a 32-byte smart contract address based on the input.
-pub(crate) fn sc_address_expression(input: &str) -> Vec<u8> {
-    create_address_optional_shard_id(input, SC_ADDRESS_NUM_LEADING_ZEROS)
+pub(crate) fn sc_address_expression(input: &str, vm_type: &VMIdentifier) -> Vec<u8> {
+    let mut address = create_address_optional_shard_id(input, SC_ADDRESS_RESERVED_PREFIX_LENGTH);
+    let mut vm = vm_type.vm_type;
+    address[SC_ADDRESS_RESERVED_PREFIX_LENGTH - VM_TYPE_LENGTH..SC_ADDRESS_RESERVED_PREFIX_LENGTH]
+        .swap_with_slice(&mut vm);
+    address
 }
 
 pub(crate) fn bech32(input: &str) -> Vec<u8> {

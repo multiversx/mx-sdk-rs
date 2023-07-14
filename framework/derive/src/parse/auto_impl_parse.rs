@@ -5,7 +5,7 @@ use super::attributes::*;
 fn assert_no_other_auto_impl(method: &Method) {
     assert!(
 		method.implementation.is_no_implementation(),
-		"Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}{}",
+		"Only one auto-implementation can be specified at one time. Auto-implementations are: {}{}{}{}{}{}{}{}",
 		"`#[storage_get]`, ",
 		"`#[storage_set]`, ",
 		"`#[storage_mapper]`, ",
@@ -13,20 +13,8 @@ fn assert_no_other_auto_impl(method: &Method) {
 		"`#[storage_clear]`, ",
 		"`#[proxy]`, ",
 		"`#[module]`, ",
-		"`#[event]`, ",
-		"`#[legacy-event]`."
+		"`#[event]`."
 	)
-}
-
-pub fn process_legacy_event_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {
-    LegacyEventAttribute::parse(attr)
-        .map(|event_attr| {
-            assert_no_other_auto_impl(&*method);
-            method.implementation = MethodImpl::Generated(AutoImpl::LegacyEvent {
-                identifier: event_attr.identifier,
-            });
-        })
-        .is_some()
 }
 
 pub fn process_event_attribute(attr: &syn::Attribute, method: &mut Method) -> bool {

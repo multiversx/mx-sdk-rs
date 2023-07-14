@@ -18,14 +18,15 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     lottery_esdt
     (
-        start
-        createLotteryPool
-        buy_ticket
-        determine_winner
-        status
-        getLotteryInfo
-        getLotteryWhitelist
+        init => init
+        start => start
+        createLotteryPool => create_lottery_pool
+        buy_ticket => buy_ticket
+        determine_winner => determine_winner
+        status => status
+        getLotteryInfo => lottery_info
+        getLotteryWhitelist => lottery_whitelist
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

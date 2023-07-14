@@ -1,0 +1,22 @@
+[package]
+name = "adder-interact"
+version = "0.0.0"
+authors = ["Ovidiu Stinga <ovidiu.stinga@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[[bin]]
+name = "adder-interact"
+path = "src/adder_interact.rs"
+
+[dependencies]
+clap = { version = "4.1.0", features = ["derive", "cargo"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.7.2"
+
+[dependencies.adder]
+path = ".."
+
+[dependencies.multiversx-sc-snippets]
+version = "0.41.3"
+path = "../../../../framework/snippets"
