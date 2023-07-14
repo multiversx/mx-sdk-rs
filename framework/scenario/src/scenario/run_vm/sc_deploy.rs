@@ -18,7 +18,7 @@ impl ScenarioVMRunner {
             self.perform_sc_deploy_lambda_and_check(step, execute_current_tx_context_input);
         let mut response = TxResponse::from_tx_result(tx_result);
         response.new_deployed_address = Some(new_address);
-        step.response = Some(response);
+        step.save_response(response);
     }
 
     pub fn perform_sc_deploy_lambda<F>(

@@ -30,9 +30,13 @@ impl TxResponse {
     pub fn to_expect(&self) -> TxExpect {
         if self.tx_error.is_success() {
             let mut tx_expect = TxExpect::ok();
-            for raw_result in &self.out {
-                let result_hex_string = format!("0x{}", hex::encode(raw_result));
-                tx_expect = tx_expect.result(result_hex_string.as_str());
+            if self.out.is_empty() {
+                tx_expect = tx_expect.no_result();
+            } else {
+                for raw_result in &self.out {
+                    let result_hex_string = format!("0x{}", hex::encode(raw_result));
+                    tx_expect = tx_expect.result(result_hex_string.as_str());
+                }
             }
             tx_expect
         } else {

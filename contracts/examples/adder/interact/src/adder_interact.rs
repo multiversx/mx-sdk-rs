@@ -18,7 +18,7 @@ use multiversx_sc_snippets::{
         mandos_system::ScenarioRunner,
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{ScCallStep, ScDeployStep, Scenario, TransferStep, TxExpect},
+        scenario_model::{ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -174,7 +174,8 @@ impl AdderInteract {
                 ScCallStep::new()
                     .call(self.state.adder().add(value))
                     .from(&self.wallet_address)
-                    .gas_limit("5,000,000"),
+                    .gas_limit("5,000,000")
+                    .expect(TxExpect::ok()),
                 |tr| {
                     tr.result.unwrap_or_else(|err| {
                         panic!("performing add failed with: {}", err.message)
@@ -187,7 +188,16 @@ impl AdderInteract {
     }
 
     async fn print_sum(&mut self) {
-        let sum: SingleValue<BigUint> = self.interactor.quick_query(self.state.adder().sum()).await;
-        println!("sum: {}", sum.into());
+        self.interactor
+            .sc_query_use_result(
+                ScQueryStep::new()
+                    .call(self.state.adder().sum())
+                    .expect(TxExpect::ok()),
+                |tr| {
+                    let sum: SingleValue<BigUint> = tr.result.unwrap();
+                    println!("sum: {}", sum.into());
+                },
+            )
+            .await;
     }
 }

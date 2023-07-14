@@ -111,26 +111,6 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
     {
         self.expect(format_expect(expected_value))
     }
-
-    pub fn with_result_ok<RequestedResult, F>(mut self, mut f: F) -> Self
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
-        F: FnMut(RequestedResult) + 'static,
-    {
-        self.sc_call_step.push_response_handler(move |response| {
-            assert!(
-                response.tx_error.is_success(),
-                "successful transaction expected"
-            );
-
-            let mut raw_result = response.out.clone();
-            let Ok(decoded) =
-                RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler);
-            f(decoded);
-        });
-        self
-    }
 }
 
 impl<OriginalResult> AsMut<ScCallStep> for TypedScCall<OriginalResult> {

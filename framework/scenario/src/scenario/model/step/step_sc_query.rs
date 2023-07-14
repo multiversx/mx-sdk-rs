@@ -92,4 +92,13 @@ impl ScQueryStep {
         let typed = self.call(contract_call);
         typed.expect_value(expected_value)
     }
+
+    pub fn save_response(&mut self, tx_response: TxResponse) {
+        if let Some(expect) = &mut self.expect {
+            if expect.build_from_response {
+                expect.update_from_response(&tx_response)
+            }
+        }
+        self.response = Some(tx_response);
+    }
 }

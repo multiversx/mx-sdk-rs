@@ -19,8 +19,7 @@ impl ScenarioVMRunner {
         let tx_result =
             self.perform_sc_call_lambda_and_check(step, execute_current_tx_context_input);
         let response = TxResponse::from_tx_result(tx_result);
-        step.response = Some(response);
-        step.trigger_handler();
+        step.save_response(response);
     }
 
     /// Adds a SC call step, executes it and retrieves the transaction result ("out" field).

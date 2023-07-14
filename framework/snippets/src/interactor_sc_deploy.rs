@@ -50,7 +50,7 @@ impl Interactor {
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
-        sc_deploy_step.response = Some(TxResponse::from_network_tx(tx));
+        sc_deploy_step.save_response(TxResponse::from_network_tx(tx));
 
         let deploy_address = sc_deploy_step
             .response()

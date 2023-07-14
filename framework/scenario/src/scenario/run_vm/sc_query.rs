@@ -10,18 +10,18 @@ impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
     ///
     /// The result of the operation gets saved back in the step's response field.
-    pub fn perform_sc_query_update_results(&mut self, sc_query_step: &mut ScQueryStep) {
+    pub fn perform_sc_query_update_results(&mut self, step: &mut ScQueryStep) {
         let tx_result =
-            self.perform_sc_query_lambda_and_check(sc_query_step, execute_current_tx_context_input);
+            self.perform_sc_query_lambda_and_check(step, execute_current_tx_context_input);
         let response = TxResponse::from_tx_result(tx_result);
-        sc_query_step.response = Some(response);
+        step.save_response(response);
     }
 
-    pub fn perform_sc_query_lambda<F>(&mut self, sc_query_step: &ScQueryStep, f: F) -> TxResult
+    pub fn perform_sc_query_lambda<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult
     where
         F: FnOnce(),
     {
-        let tx_input = tx_input_from_query(sc_query_step);
+        let tx_input = tx_input_from_query(step);
         let tx_result = self.blockchain_mock.vm.execute_sc_query_lambda(
             tx_input,
             &mut self.blockchain_mock.state,
@@ -34,17 +34,13 @@ impl ScenarioVMRunner {
         tx_result
     }
 
-    pub fn perform_sc_query_lambda_and_check<F>(
-        &mut self,
-        sc_query_step: &ScQueryStep,
-        f: F,
-    ) -> TxResult
+    pub fn perform_sc_query_lambda_and_check<F>(&mut self, step: &ScQueryStep, f: F) -> TxResult
     where
         F: FnOnce(),
     {
-        let tx_result = self.perform_sc_query_lambda(sc_query_step, f);
-        if let Some(tx_expect) = &sc_query_step.expect {
-            check_tx_output(&sc_query_step.id, tx_expect, &tx_result);
+        let tx_result = self.perform_sc_query_lambda(step, f);
+        if let Some(tx_expect) = &step.expect {
+            check_tx_output(&step.id, tx_expect, &tx_result);
         }
         tx_result
     }

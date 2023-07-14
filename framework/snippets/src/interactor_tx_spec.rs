@@ -30,8 +30,8 @@ impl TransactionSpec for ScCallStep {
         step_runner.run_sc_call_step(&mut clone); // TODO: make mutability uniform
     }
 
-    fn set_response(&mut self, tx_response: TxResponse) {
-        self.response = Some(tx_response);
+    fn set_response(&mut self, response: TxResponse) {
+        self.save_response(response);
     }
 }
 
@@ -48,7 +48,7 @@ impl TransactionSpec for ScDeployStep {
         step_runner.run_sc_deploy_step(self);
     }
 
-    fn set_response(&mut self, tx_response: TxResponse) {
-        self.response = Some(tx_response);
+    fn set_response(&mut self, response: TxResponse) {
+        self.save_response(response);
     }
 }

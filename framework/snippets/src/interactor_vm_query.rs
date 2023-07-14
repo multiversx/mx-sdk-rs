@@ -2,6 +2,7 @@ use crate::{address_h256_to_erdrs, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
+    mandos_system::ScenarioRunner,
     multiversx_sc::{codec::CodecFrom, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
@@ -44,7 +45,10 @@ impl Interactor {
             .iter()
             .map(|result| base64::decode(result).expect("query result base64 decode error"))
             .collect();
-        step.response = Some(TxResponse::from_raw_results(raw_results));
+        step.save_response(TxResponse::from_raw_results(raw_results));
+
+        self.pre_runners.run_sc_query_step(step);
+        self.post_runners.run_sc_query_step(step);
     }
 
     #[deprecated(since = "0.42.0", note = "Was renamed to `quick_query`.")]

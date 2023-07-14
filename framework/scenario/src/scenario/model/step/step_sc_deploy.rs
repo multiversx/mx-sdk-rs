@@ -91,6 +91,15 @@ impl ScDeployStep {
         }
         self.into()
     }
+
+    pub fn save_response(&mut self, response: TxResponse) {
+        if let Some(expect) = &mut self.expect {
+            if expect.build_from_response {
+                expect.update_from_response(&response)
+            }
+        }
+        self.response = Some(response);
+    }
 }
 
 impl AsMut<ScDeployStep> for ScDeployStep {

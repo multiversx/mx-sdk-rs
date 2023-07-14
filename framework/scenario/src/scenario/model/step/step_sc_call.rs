@@ -22,7 +22,6 @@ pub struct ScCallStep {
     pub tx: Box<TxCall>,
     pub expect: Option<TxExpect>,
     pub response: Option<TxResponse>,
-    pub response_handlers: Vec<Box<dyn FnMut(&TxResponse)>>,
 }
 
 impl ScCallStep {
@@ -146,27 +145,13 @@ impl ScCallStep {
         typed.expect_value(expected_value)
     }
 
-    pub fn trigger_handler(&mut self) {
-        let response = self.response.clone().expect("response not yet ready");
-        let mut current_handlers = std::mem::take(&mut self.response_handlers);
-        for handler in current_handlers.iter_mut() {
-            handler(&response);
+    pub fn save_response(&mut self, tx_response: TxResponse) {
+        if let Some(expect) = &mut self.expect {
+            if expect.build_from_response {
+                expect.update_from_response(&tx_response)
+            }
         }
-    }
-
-    pub(crate) fn push_response_handler<F>(&mut self, f: F)
-    where
-        F: FnMut(&TxResponse) + 'static,
-    {
-        self.response_handlers.push(Box::new(f));
-    }
-
-    pub fn with_raw_response<F>(mut self, f: F) -> Self
-    where
-        F: FnMut(&TxResponse) + 'static,
-    {
-        self.push_response_handler(f);
-        self
+        self.response = Some(tx_response);
     }
 }
 
@@ -233,7 +218,6 @@ impl Clone for ScCallStep {
             tx: self.tx.clone(),
             expect: self.expect.clone(),
             response: self.response.clone(),
-            response_handlers: Vec::new(),
         }
     }
 }
