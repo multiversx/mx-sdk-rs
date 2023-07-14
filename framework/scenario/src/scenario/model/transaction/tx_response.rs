@@ -96,6 +96,11 @@ impl TxResponse {
         }
     }
 
+    /// Checks if the transaction was successful.
+    pub fn is_success(&self) -> bool {
+        self.tx_error.is_success()
+    }
+
     fn process_signal_error(&self) -> TxResponseStatus {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
             let topics = event.topics.as_ref();
@@ -164,7 +169,6 @@ impl TxResponse {
         self
     }
 
-    // Finds api logs matching the given log identifier.
     fn find_log(&self, log_identifier: &str) -> Option<&Events> {
         if let Some(logs) = &self.api_logs {
             logs.events
@@ -172,33 +176,6 @@ impl TxResponse {
                 .find(|event| event.identifier == log_identifier)
         } else {
             None
-        }
-    }
-
-    #[deprecated(note = "used for consistency, will be removed soon")]
-    pub fn handle_signal_error_event(&self) -> Result<(), TxResponseStatus> {
-        if !self.tx_error.is_success() {
-            Err(self.tx_error.clone())
-        } else {
-            Ok(())
-        }
-    }
-
-    #[deprecated(note = "used for consistency, will be removed soon")]
-    pub fn new_deployed_address(&self) -> Result<Address, &'static str> {
-        if let Some(address) = &self.new_deployed_address {
-            Ok(address.clone())
-        } else {
-            Err("new deployed address process failed")
-        }
-    }
-
-    #[deprecated(note = "used for consistency, will be removed soon")]
-    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, &'static str> {
-        if let Some(token_identifier) = &self.new_issued_token_identifier {
-            Ok(token_identifier.clone())
-        } else {
-            Err("new issued token identifier process failed")
         }
     }
 }

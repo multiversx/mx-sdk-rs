@@ -19,13 +19,11 @@ impl Interactor {
 
         sc_call_step.save_response(TxResponse::from_network_tx(tx));
 
-        if let Ok(token_identifier) = sc_call_step
-            .response()
-            .issue_non_fungible_new_token_identifier()
+        if let Some(token_identifier) = sc_call_step.response().new_issued_token_identifier.clone()
         {
-            let set_state_step = SetStateStep::new().new_token_identifier(token_identifier.clone());
-
             println!("token identifier: {}", token_identifier);
+            let set_state_step = SetStateStep::new().new_token_identifier(token_identifier);
+
             self.pre_runners.run_set_state_step(&set_state_step);
             self.post_runners.run_set_state_step(&set_state_step);
         }

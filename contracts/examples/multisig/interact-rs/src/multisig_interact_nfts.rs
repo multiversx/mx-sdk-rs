@@ -94,22 +94,19 @@ impl MultisigInteract {
 
         self.interactor.sc_call(&mut typed_sc_call).await;
 
-        let result = typed_sc_call
-            .response()
-            .issue_non_fungible_new_token_identifier();
-        if result.is_err() {
+        let new_issued_token_identifier =
+            typed_sc_call.response().new_issued_token_identifier.clone();
+
+        if let Some(token_identifier) = new_issued_token_identifier {
+            self.collection_token_identifier = token_identifier;
             println!(
-                "perform issue collection with all roles failed with: {}",
-                result.err().unwrap()
+                "collection token identifier: {}",
+                self.collection_token_identifier
             );
             return;
         }
 
-        self.collection_token_identifier = result.unwrap();
-        println!(
-            "collection token identifier: {}",
-            self.collection_token_identifier
-        );
+        println!("perform issue collection with all roles failed");
     }
 
     pub async fn propose_issue_collection(&mut self) -> Option<usize> {
@@ -169,22 +166,19 @@ impl MultisigInteract {
 
         self.interactor.sc_call(&mut typed_sc_call).await;
 
-        let result = typed_sc_call
-            .response()
-            .issue_non_fungible_new_token_identifier();
-        if result.is_err() {
+        let new_issued_token_identifier =
+            typed_sc_call.response().new_issued_token_identifier.clone();
+
+        if let Some(token_identifier) = new_issued_token_identifier {
+            self.collection_token_identifier = token_identifier;
             println!(
-                "perform issue collection failed with: {}",
-                result.err().unwrap()
+                "collection token identifier: {}",
+                self.collection_token_identifier
             );
             return;
         }
 
-        self.collection_token_identifier = result.unwrap();
-        println!(
-            "collection token identifier: {}",
-            self.collection_token_identifier
-        );
+        println!("perform issue collection failed");
     }
 
     pub async fn propose_set_special_role(&mut self) -> Option<usize> {

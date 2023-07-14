@@ -20,6 +20,8 @@ impl TxResponseStatus {
     pub(crate) fn signal_error(message: &str) -> Self {
         Self::new(4, message)
     }
+
+    /// Checks if the transaction was successful.
     pub fn is_success(&self) -> bool {
         self.status == 0
     }
