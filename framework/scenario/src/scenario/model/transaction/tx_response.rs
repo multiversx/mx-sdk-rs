@@ -12,19 +12,30 @@ const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 
 #[derive(Debug, Default, Clone)]
+/// The response of a transaction.
 pub struct TxResponse {
+    /// The output of the transaction.
     pub out: Vec<Vec<u8>>,
+    /// The address of the newly deployed smart contract.
     pub new_deployed_address: Option<Address>,
+    /// The identifier of the newly issued token.
     pub new_issued_token_identifier: Option<String>,
+    /// The status of the transaction.
     pub tx_error: TxResponseStatus,
+    /// The logs of the transaction.
     pub logs: Vec<Log>,
+    /// The gas used by the transaction.
     pub gas: u64,
+    /// The refund of the transaction.
     pub refund: u64,
+    /// The smart contract results of the transaction.
     pub api_scrs: Vec<ApiSmartContractResult>,
+    /// The api logs of the transaction.
     pub api_logs: Option<ApiLogs>,
 }
 
 impl TxResponse {
+    /// Creates a [`TxResponse`] from a [`TxResult`].
     pub fn from_tx_result(tx_result: TxResult) -> Self {
         TxResponse {
             out: tx_result.result_values,
@@ -36,6 +47,7 @@ impl TxResponse {
         }
     }
 
+    /// Creates a [`TxResponse`] from a [`TransactionOnNetwork`].
     pub fn from_network_tx(tx: TransactionOnNetwork) -> Self {
         let mut response = Self {
             api_scrs: tx.smart_contract_results.unwrap_or_default(),
@@ -51,6 +63,7 @@ impl TxResponse {
         response.process()
     }
 
+    /// Creates a [`TxResponse`] from raw results.
     pub fn from_raw_results(raw_results: Vec<Vec<u8>>) -> Self {
         TxResponse {
             out: raw_results,
@@ -182,7 +195,6 @@ impl TxResponse {
     }
 
     #[deprecated(note = "used for consistency, will be removed soon")]
-    // Returns the token identifier of the newly issued non-fungible token.
     pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, &'static str> {
         if let Some(token_identifier) = &self.new_issued_token_identifier {
             Ok(token_identifier.clone())

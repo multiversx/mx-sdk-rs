@@ -7,6 +7,7 @@ const TX_GET_RESULTS_NUM_RETRIES: usize = 8;
 const EXTRA_WAITING_TIME_MS: Duration = Duration::from_millis(8000);
 
 impl Interactor {
+    /// Retrieves a transaction from the network.
     pub(crate) async fn retrieve_tx_on_network(&self, tx_hash: String) -> TransactionOnNetwork {
         let mut waiting_time_ms = 0;
         let mut break_outer = false;
@@ -51,6 +52,7 @@ impl Interactor {
     }
 }
 
+/// Sleeps for the given duration and adds the duration to the waiting time.
 pub async fn sleep(waiting_time_ms: &mut u64, duration: Duration) {
     *waiting_time_ms += duration.as_millis() as u64;
     tokio::time::sleep(duration).await;

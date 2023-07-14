@@ -1,10 +1,14 @@
 #[derive(Debug, Default, Clone)]
+/// The status of a transaction.
 pub struct TxResponseStatus {
+    /// The status of the transaction.
     pub status: u64,
+    /// The message of the transaction.
     pub message: String,
 }
 
 impl TxResponseStatus {
+    /// Creates a [`TxResponseStatus`]
     pub(crate) fn new(status: u64, message: &str) -> Self {
         Self {
             status,
@@ -12,6 +16,7 @@ impl TxResponseStatus {
         }
     }
 
+    /// Creates a [`TxResponseStatus`] that signals an error.
     pub(crate) fn signal_error(message: &str) -> Self {
         Self::new(4, message)
     }

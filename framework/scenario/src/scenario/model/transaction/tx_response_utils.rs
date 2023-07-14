@@ -1,3 +1,4 @@
+/// Checks for invalid topics.
 pub fn process_topics_error(topics: Option<&Vec<String>>) -> Option<String> {
     if topics.is_none() {
         return Some("missing topics".to_string());
@@ -14,6 +15,7 @@ pub fn process_topics_error(topics: Option<&Vec<String>>) -> Option<String> {
     }
 }
 
+/// Decodes the data of a smart contract result.
 pub fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
     let mut split = data.split('@');
     let _ = split.next().expect("SCR data should start with '@'");
