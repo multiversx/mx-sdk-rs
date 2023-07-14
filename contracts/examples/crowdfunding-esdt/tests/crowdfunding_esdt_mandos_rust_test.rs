@@ -33,7 +33,7 @@ fn crowdfunding_scenario_rust_test() {
             .new_address(owner_addr, 0, &cf_sc),
     );
 
-    world.sc_deploy_step(
+    world.sc_deploy(
         ScDeployStep::new()
             .from(owner_addr)
             .code(cf_code)
@@ -57,7 +57,7 @@ fn crowdfunding_scenario_rust_test() {
 
     // first user deposit
     world
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(first_user_addr)
                 .to(&cf_sc)
@@ -78,7 +78,7 @@ fn crowdfunding_scenario_rust_test() {
 
     // second user deposit
     world
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(second_user_addr)
                 .to(&cf_sc)
@@ -120,7 +120,7 @@ fn crowdfunding_scenario_rust_test() {
 
     // owner claim - failed campaign - nothing is transferred
     world
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(owner_addr)
                 .to(&cf_sc)
@@ -140,7 +140,7 @@ fn crowdfunding_scenario_rust_test() {
 
     // first user claim - failed campaign
     world
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(first_user_addr)
                 .to(&cf_sc)
@@ -160,7 +160,7 @@ fn crowdfunding_scenario_rust_test() {
 
     // second user claim - failed campaign
     world
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(second_user_addr)
                 .to(&cf_sc)
@@ -180,7 +180,7 @@ fn crowdfunding_scenario_rust_test() {
     world.set_state_step(SetStateStep::new().block_timestamp(deadline / 2));
 
     // first user deposit
-    world.sc_call_step(
+    world.sc_call(
         ScCallStep::new()
             .from(first_user_addr)
             .to(&cf_sc)
@@ -189,7 +189,7 @@ fn crowdfunding_scenario_rust_test() {
     );
 
     // second user deposit
-    world.sc_call_step(
+    world.sc_call(
         ScCallStep::new()
             .from(second_user_addr)
             .to(&cf_sc)
@@ -214,7 +214,7 @@ fn crowdfunding_scenario_rust_test() {
     assert_eq!(status, Status::Successful);
 
     // first user try claim - successful campaign
-    world.sc_call_step(
+    world.sc_call(
         ScCallStep::new()
             .from(first_user_addr)
             .to(&cf_sc)
@@ -227,7 +227,7 @@ fn crowdfunding_scenario_rust_test() {
 
     // owner claim successful campaign
     world
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(owner_addr)
                 .to(&cf_sc)

@@ -21,7 +21,7 @@ impl ScenarioWorld {
     }
 
     /// Adds a SC call step, then executes it.
-    pub fn sc_call_step<S>(&mut self, mut step: S) -> &mut Self
+    pub fn sc_call<S>(&mut self, mut step: S) -> &mut Self
     where
         S: AsMut<ScCallStep>,
     {
@@ -71,7 +71,7 @@ impl ScenarioWorld {
     }
 
     /// Adds a SC query step, then executes it.
-    pub fn sc_query_step<S>(&mut self, mut step: S) -> &mut Self
+    pub fn sc_query<S>(&mut self, mut step: S) -> &mut Self
     where
         S: AsMut<ScQueryStep>,
     {
@@ -135,7 +135,7 @@ impl ScenarioWorld {
     }
 
     /// Adds a SC deploy step, then executes it.
-    pub fn sc_deploy_step<S>(&mut self, mut step: S) -> &mut Self
+    pub fn sc_deploy<S>(&mut self, mut step: S) -> &mut Self
     where
         S: AsMut<ScDeployStep>,
     {
@@ -257,51 +257,6 @@ impl TypedScQueryExecutor for ScenarioWorld {
         RequestedResult: CodecFrom<OriginalResult>,
     {
         self.sc_query_get_result(typed_sc_query)
-    }
-}
-
-impl ScenarioWorld {
-    #[deprecated(since = "0.39.0", note = "Renamed, use `set_state_step` instead.")]
-    pub fn mandos_set_state(&mut self, step: SetStateStep) -> &mut Self {
-        self.set_state_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_call_step` instead.")]
-    pub fn mandos_sc_call(&mut self, step: ScCallStep) -> &mut Self {
-        self.sc_call_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_query_step` instead.")]
-    pub fn mandos_sc_query(&mut self, step: ScQueryStep) -> &mut Self {
-        self.sc_query_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_deploy_step` instead.")]
-    pub fn mandos_sc_deploy(&mut self, step: ScDeployStep) -> &mut Self {
-        self.sc_deploy_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `transfer_step` instead.")]
-    pub fn mandos_transfer(&mut self, step: TransferStep) -> &mut Self {
-        self.transfer_step(step)
-    }
-
-    #[deprecated(
-        since = "0.39.0",
-        note = "Renamed, use `validator_reward_step` instead."
-    )]
-    pub fn mandos_validator_reward(&mut self, step: ValidatorRewardStep) -> &mut Self {
-        self.validator_reward_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `check_state_step` instead.")]
-    pub fn mandos_check_state(&mut self, step: CheckStateStep) -> &mut Self {
-        self.check_state_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `dump_state_step` instead.")]
-    pub fn mandos_dump_state(&mut self) -> &mut Self {
-        self.dump_state_step()
     }
 }
 
