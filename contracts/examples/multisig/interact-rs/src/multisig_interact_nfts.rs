@@ -69,29 +69,27 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("80,000,000");
+        self.interactor
+            .sc_call_use_raw_response(
+                ScCallStep::new()
+                    .call(self.state.multisig().perform_action_endpoint(action_id))
+                    .from(&self.wallet_address)
+                    .gas_limit("80,000,000"),
+                |response| {
+                    let new_issued_token_identifier = response.new_issued_token_identifier.clone();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let new_issued_token_identifier =
-            typed_sc_call.response().new_issued_token_identifier.clone();
-
-        if let Some(token_identifier) = new_issued_token_identifier {
-            self.collection_token_identifier = token_identifier;
-            println!(
-                "collection token identifier: {}",
-                self.collection_token_identifier
-            );
-            return;
-        }
-
-        println!("perform issue collection with all roles failed");
+                    if let Some(token_identifier) = new_issued_token_identifier {
+                        self.collection_token_identifier = token_identifier;
+                        println!(
+                            "collection token identifier: {}",
+                            self.collection_token_identifier
+                        );
+                    } else {
+                        println!("perform issue collection with all roles failed");
+                    }
+                },
+            )
+            .await;
     }
 
     pub async fn propose_issue_collection(&mut self) -> usize {
@@ -129,29 +127,27 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("80,000,000");
+        self.interactor
+            .sc_call_use_raw_response(
+                ScCallStep::new()
+                    .call(self.state.multisig().perform_action_endpoint(action_id))
+                    .from(&self.wallet_address)
+                    .gas_limit("80,000,000"),
+                |response| {
+                    let new_issued_token_identifier = response.new_issued_token_identifier.clone();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let new_issued_token_identifier =
-            typed_sc_call.response().new_issued_token_identifier.clone();
-
-        if let Some(token_identifier) = new_issued_token_identifier {
-            self.collection_token_identifier = token_identifier;
-            println!(
-                "collection token identifier: {}",
-                self.collection_token_identifier
-            );
-            return;
-        }
-
-        println!("perform issue collection failed");
+                    if let Some(token_identifier) = new_issued_token_identifier {
+                        self.collection_token_identifier = token_identifier;
+                        println!(
+                            "collection token identifier: {}",
+                            self.collection_token_identifier
+                        );
+                    } else {
+                        println!("perform issue collection with all failed");
+                    }
+                },
+            )
+            .await;
     }
 
     pub async fn propose_set_special_role(&mut self) -> usize {
@@ -199,10 +195,8 @@ impl MultisigInteract {
                 "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.png"
             );
 
-            let typed_sc_call = self
-                .state
-                .multisig()
-                .propose_async_call(
+            let typed_sc_call = ScCallStep::new()
+                .call(self.state.multisig().propose_async_call(
                     &multisig_address,
                     0u64,
                     "ESDTNFTCreate".to_string(),
@@ -215,8 +209,7 @@ impl MultisigInteract {
                         METADATA.as_bytes(),
                         image_cid.as_bytes(),
                     ]),
-                )
-                .into_blockchain_call()
+                ))
                 .from(&self.wallet_address)
                 .gas_limit("10,000,000");
 
