@@ -26,6 +26,40 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.42.0, codec 0.18.0, vm 0.4.0, scenario-format 0.20.0, sdk 0.2.0] - 2023-07-15
+- Multi-endpoints in multi-contracts:
+	- It is now possible to have multiple versions of the same endpoint in different multi-contract variants.
+	- We can also have multiple versions of the constructor.
+- Major architectural redesign of the debugger:
+	- The VM executor interface inserted between the smart contract API objects and the Rust VM. A new `VMHooksApi` is used to connect on the smart contract side. A `VMHooksDispatcher` object and `VMHooksHandler` interface provide the connection on the VM side.
+	- The `VMHooksApi` comes in several flavors (backends):
+		- The old `DebugApi` is now only used at runtime, on the VM context stack;
+		- A new `StaticApi` provides support for managed types in a regular context, without needing to be initialized;
+		- An additional `SingleTxApi` is useful for unit tests. Aside managed types, it also allows some basic context for tx inputs, results, storage and block info.
+	- Removed almost all of the legacy functionality from the smart contract APIs.
+- System SC mock.
+	- It is now possible to issue tokens (fungible, SFT, NFT) in integration tests.
+	- Setting roles is modelled.
+	- It is, however, not fully mocked.
+- Integration of blackbox and whitebox testing into one unified framework.
+	- Whitebox testing was the modus operandi of the old testing framework.
+	- Integration of whitebox functionality into the new testing framework allows easier migration in some specific cases.
+	- Tested the new whitebox framework with the old tests by injecting it into the implementation of the old one.
+- Interactors can now export a trace of their execution, thus producing integration tests.
+	- Integrated tool for retrieving the initial states of the involved accounts from the blockchain.
+	- Tight integration with the scenario testing infrastructure makes generating the trace straightforward;
+	- The same format for the trace is used, as in the case of the integration tests.
+- Interactors can now execute several steps (calls, deploys) in parallel.
+- Redesigned the wrappers around the Rust and Go JSON scenario executors;
+	- Also improved the  `sc-meta test-gen` tool for auto-generating these wrappers.
+	- Using the `ScenarioRunner` interface to abstract away the various backends used to run tests.
+- Redesigned syntax of both the testing and the interactor (snippets) frameworks.
+	- While the codebases are separate (the latter is async Rust), the names and arguments of the methods are the same, and both use the scenario infrastructure.
+	- Methods that allow chaining scenario steps, while also processing results;
+	- Added several defaults in the syntax, for more concise code;
+	- Deprecated the old testing framework;
+	- Updated all contract interactors and blackbox tests with the new syntax;
+	- Upgraded the snippets generator to produce new syntax.
 
 ## [sc 0.41.3, vm 0.3.3] - 2023-06-19
 - Bugfix on `ManagedBufferCachedBuilder`, involving large inputs.
