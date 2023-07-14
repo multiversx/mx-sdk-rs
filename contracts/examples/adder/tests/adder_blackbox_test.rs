@@ -11,7 +11,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_mandos_constructed_raw() {
+fn adder_blackbox_raw() {
     let mut world = world();
     let adder_code = world.code_expression(ADDER_PATH_EXPR);
 

@@ -3,7 +3,7 @@ use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::api::SingleTxApi;
 
 #[test]
-fn test_add() {
+fn adder_unit_test() {
     let adder = adder::contract_obj::<SingleTxApi>();
 
     adder.init(BigUint::from(5u32));
