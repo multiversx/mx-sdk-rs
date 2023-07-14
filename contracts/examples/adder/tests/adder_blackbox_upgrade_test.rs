@@ -9,7 +9,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_mandos_constructed_raw_upgrade_test() {
+fn adder_blackbox_upgrade() {
     let mut world = world();
     let ic = world.interpreter_context();
     world
