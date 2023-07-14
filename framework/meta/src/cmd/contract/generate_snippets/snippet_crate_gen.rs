@@ -3,7 +3,7 @@ use std::{
     io::Write,
 };
 
-static SNIPPETS_SOURCE_FILE_NAME: &str = "lib.rs";
+static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
 
 pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result

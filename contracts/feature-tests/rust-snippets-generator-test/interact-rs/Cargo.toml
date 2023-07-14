@@ -7,7 +7,7 @@ publish = false
 
 [[bin]]
 name = "rust-interact"
-path = "src/lib.rs"
+path = "src/interactor_main.rs"
 
 [dependencies.rust-snippets-generator-test]
 path = ".."
