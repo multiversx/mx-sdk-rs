@@ -1,2 +1,2 @@
 gateway = 'https://testnet-gateway.multiversx.com'
-quorum = 2
+quorum = 1

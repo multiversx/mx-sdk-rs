@@ -4,7 +4,7 @@ use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
-use super::{Log, TxExpect, TxResponseStatus};
+use super::{decode_scr_data_or_panic, process_topics_error, Log, TxExpect, TxResponseStatus};
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
@@ -15,6 +15,7 @@ const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqq
 pub struct TxResponse {
     pub out: Vec<Vec<u8>>,
     pub new_deployed_address: Option<Address>,
+    pub new_issued_token_identifier: Option<String>,
     pub tx_error: TxResponseStatus,
     pub logs: Vec<Log>,
     pub gas: u64,
@@ -80,35 +81,73 @@ impl TxResponse {
         }
     }
 
+    fn process_signal_error(&self) -> TxResponseStatus {
+        if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
+            let topics = event.topics.as_ref();
+            if let Some(error) = process_topics_error(topics) {
+                return TxResponseStatus::signal_error(&error);
+            }
+
+            let error_raw = base64::decode(topics.unwrap().get(1).unwrap()).unwrap();
+            let error = String::from_utf8(error_raw).unwrap();
+            return TxResponseStatus::signal_error(&error);
+        }
+
+        TxResponseStatus::default()
+    }
+
     fn process(self) -> Self {
-        self.process_out().process_new_deployed_address()
+        self.process_out()
+            .process_new_deployed_address()
+            .process_new_issued_token_identifier()
     }
 
     fn process_out(mut self) -> Self {
-        if let Some(first_scr) = self.api_scrs.get(0) {
-            self.out = decode_scr_data_or_panic(first_scr.data.as_str());
+        let out_scr = self
+            .api_scrs
+            .iter()
+            .find(|scr| scr.nonce != 0 && scr.data.starts_with('@'));
+
+        if out_scr.is_some() {
+            self.out = decode_scr_data_or_panic(&out_scr.unwrap().data);
         }
+
         self
     }
 
     fn process_new_deployed_address(mut self) -> Self {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SC_DEPLOY).cloned() {
-            // handle topics
-            if let Some(topics) = event.topics.as_ref() {
-                if topics.len() != 2 {
-                    self.tx_error.message.push_str(
-                        format!("expected to have 2 topics, found {} instead", topics.len())
-                            .as_str(),
-                    );
-                }
-
-                let address_raw = base64::decode(topics.get(0).unwrap()).unwrap();
-                let address = Address::from_slice(address_raw.as_slice());
-                self.new_deployed_address = Some(address);
-            } else {
-                self.tx_error.message.push_str("missing topics");
+            let topics = event.topics.as_ref();
+            if let Some(_) = process_topics_error(topics) {
+                return self;
             }
+
+            let address_raw = base64::decode(topics.unwrap().get(0).unwrap()).unwrap();
+            let address: Address = Address::from_slice(address_raw.as_slice());
+            self.new_deployed_address = Some(address);
         }
+
+        self
+    }
+
+    fn process_new_issued_token_identifier(mut self) -> Self {
+        let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
+            .api_scrs
+            .iter()
+            .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
+
+        if token_identifier_issue_scr.is_none() {
+            return self;
+        }
+
+        let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
+        let encoded_tid = token_identifier_issue_scr.data.split('@').nth(2);
+        if encoded_tid.is_none() {
+            return self;
+        }
+
+        self.new_issued_token_identifier =
+            Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
 
         self
     }
@@ -124,33 +163,7 @@ impl TxResponse {
         }
     }
 
-    fn process_signal_error(&self) -> TxResponseStatus {
-        let mut tx_error = TxResponseStatus::default();
-
-        if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
-            tx_error.status = 4;
-            tx_error.message = "signal error: ".to_string();
-
-            if let Some(topics) = event.topics.as_ref() {
-                if topics.len() != 2 {
-                    tx_error.message.push_str(
-                        format!(" expected to have 2 topics, found {} instead", topics.len())
-                            .as_str(),
-                    );
-                }
-
-                let error_raw = base64::decode(topics.get(1).unwrap()).unwrap();
-                let error = String::from_utf8(error_raw).unwrap();
-
-                tx_error.message.push_str(&error);
-            } else {
-                tx_error.message.push_str("missing topics");
-            }
-        }
-
-        tx_error
-    }
-
+    #[deprecated(note = "used for consistency, will be removed soon")]
     pub fn handle_signal_error_event(&self) -> Result<(), TxResponseStatus> {
         if !self.tx_error.is_success() {
             Err(self.tx_error.clone())
@@ -159,42 +172,22 @@ impl TxResponse {
         }
     }
 
-    pub fn new_deployed_address(&self) -> Result<Address, TxResponseStatus> {
-        if !self.tx_error.is_success() {
-            Err(self.tx_error.clone())
+    #[deprecated(note = "used for consistency, will be removed soon")]
+    pub fn new_deployed_address(&self) -> Result<Address, &'static str> {
+        if let Some(address) = &self.new_deployed_address {
+            Ok(address.clone())
         } else {
-            Ok(self.new_deployed_address.clone().unwrap())
+            Err("new deployed address process failed")
         }
     }
 
+    #[deprecated(note = "used for consistency, will be removed soon")]
     // Returns the token identifier of the newly issued non-fungible token.
     pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, &'static str> {
-        let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
-            .api_scrs
-            .iter()
-            .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
-
-        if token_identifier_issue_scr.is_none() {
-            return Err("no token identifier issue SCR found");
+        if let Some(token_identifier) = &self.new_issued_token_identifier {
+            Ok(token_identifier.clone())
+        } else {
+            Err("new issued token identifier process failed")
         }
-
-        let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
-        let encoded_tid = token_identifier_issue_scr.data.split('@').nth(2);
-        if encoded_tid.is_none() {
-            return Err("no token identifier found in SCR");
-        }
-
-        Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())
     }
-}
-
-fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
-    let mut split = data.split('@');
-    let _ = split.next().expect("SCR data should start with '@'");
-    let result_code = split.next().expect("missing result code");
-    assert_eq!(result_code, "6f6b", "result code is not 'ok'");
-
-    split
-        .map(|encoded_arg| hex::decode(encoded_arg).expect("error hex-decoding result"))
-        .collect()
 }

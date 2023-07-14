@@ -5,6 +5,16 @@ pub struct TxResponseStatus {
 }
 
 impl TxResponseStatus {
+    pub(crate) fn new(status: u64, message: &str) -> Self {
+        Self {
+            status,
+            message: message.to_string(),
+        }
+    }
+
+    pub(crate) fn signal_error(message: &str) -> Self {
+        Self::new(4, message)
+    }
     pub fn is_success(&self) -> bool {
         self.status == 0
     }
@@ -15,7 +25,11 @@ impl std::fmt::Display for TxResponseStatus {
         if self.is_success() {
             write!(f, "transaction successful")
         } else {
-            write!(f, "transaction error: {}", self.message)
+            write!(
+                f,
+                "transaction failed: (status: {}, message: {})",
+                self.status, self.message
+            )
         }
     }
 }
