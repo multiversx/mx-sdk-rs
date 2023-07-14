@@ -22,6 +22,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         fund => fund
         withdraw => withdraw
         claim => claim
+        claim_fees => claim_fees
+        deposit_fees => deposit_fees
         forward => forward
         amount => get_amount
         deposit => deposit
