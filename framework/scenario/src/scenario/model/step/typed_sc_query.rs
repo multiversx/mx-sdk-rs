@@ -2,7 +2,10 @@ use std::marker::PhantomData;
 
 use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
-use crate::scenario::model::{AddressValue, BytesValue, TxExpect};
+use crate::{
+    scenario::model::{AddressValue, BytesValue, TxExpect},
+    scenario_model::TxResponse,
+};
 
 use super::{format_expect, ScQueryStep};
 
@@ -49,8 +52,17 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
         self
     }
 
+    /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
-        self.sc_query_step.expect = Some(expect);
+        self.sc_query_step = self.sc_query_step.expect(expect);
+        self
+    }
+
+    /// Explicitly states that no tx expect section should be added and no checks should be performed.
+    ///
+    /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
+    pub fn no_expect(mut self) -> Self {
+        self.sc_query_step.expect = None;
         self
     }
 
@@ -63,6 +75,11 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
         ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
     {
         self.expect(format_expect(expected_value))
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.sc_query_step.response()
     }
 }
 

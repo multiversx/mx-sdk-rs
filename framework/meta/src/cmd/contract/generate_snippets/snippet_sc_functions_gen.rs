@@ -56,7 +56,6 @@ fn write_deploy_method_impl(
                     .{}({})
                     .into_blockchain_call()
                     .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
                     .contract_code({}, &InterpreterContext::default())
                     .gas_limit(DEFAULT_GAS_LIMIT);
 

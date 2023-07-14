@@ -41,9 +41,7 @@ fn crowdfunding_scenario_rust_test() {
                 2_000u32,
                 deadline,
                 EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
-            ))
-            .gas_limit("5,000,000")
-            .expect(TxExpect::ok().no_result()),
+            )),
     );
 
     // setup user accounts
@@ -64,8 +62,7 @@ fn crowdfunding_scenario_rust_test() {
                 .from(first_user_addr)
                 .to(&cf_sc)
                 .esdt_transfer(cf_token_id, 0u64, 1_000u64)
-                .call(cf_sc.fund())
-                .expect(TxExpect::ok().no_result()),
+                .call(cf_sc.fund()),
         )
         .check_state_step(
             CheckStateStep::new()
@@ -86,8 +83,7 @@ fn crowdfunding_scenario_rust_test() {
                 .from(second_user_addr)
                 .to(&cf_sc)
                 .esdt_transfer(cf_token_id, 0u64, 500u64)
-                .call(cf_sc.fund())
-                .expect(TxExpect::ok().no_result()),
+                .call(cf_sc.fund()),
         )
         .check_state_step(
             CheckStateStep::new()
@@ -128,8 +124,7 @@ fn crowdfunding_scenario_rust_test() {
             ScCallStep::new()
                 .from(owner_addr)
                 .to(&cf_sc)
-                .call(cf_sc.claim())
-                .expect(TxExpect::ok().no_result()),
+                .call(cf_sc.claim()),
         )
         .check_state_step(
             CheckStateStep::new()
@@ -149,8 +144,7 @@ fn crowdfunding_scenario_rust_test() {
             ScCallStep::new()
                 .from(first_user_addr)
                 .to(&cf_sc)
-                .call(cf_sc.claim())
-                .expect(TxExpect::ok().no_result()),
+                .call(cf_sc.claim()),
         )
         .check_state_step(
             CheckStateStep::new()
@@ -170,8 +164,7 @@ fn crowdfunding_scenario_rust_test() {
             ScCallStep::new()
                 .from(second_user_addr)
                 .to(&cf_sc)
-                .call(cf_sc.claim())
-                .expect(TxExpect::ok().no_result()),
+                .call(cf_sc.claim()),
         )
         .check_state_step(
             CheckStateStep::new()
@@ -192,8 +185,7 @@ fn crowdfunding_scenario_rust_test() {
             .from(first_user_addr)
             .to(&cf_sc)
             .esdt_transfer(cf_token_id, 0u64, 1_000u64)
-            .call(cf_sc.fund())
-            .expect(TxExpect::ok().no_result()),
+            .call(cf_sc.fund()),
     );
 
     // second user deposit
@@ -202,8 +194,7 @@ fn crowdfunding_scenario_rust_test() {
             .from(second_user_addr)
             .to(&cf_sc)
             .esdt_transfer(cf_token_id, 0u64, 1_000u64)
-            .call(cf_sc.fund())
-            .expect(TxExpect::ok().no_result()),
+            .call(cf_sc.fund()),
     );
 
     let status: Status = cf_sc
@@ -240,8 +231,7 @@ fn crowdfunding_scenario_rust_test() {
             ScCallStep::new()
                 .from(owner_addr)
                 .to(&cf_sc)
-                .call(cf_sc.claim())
-                .expect(TxExpect::ok().no_result()),
+                .call(cf_sc.claim()),
         )
         .check_state_step(
             CheckStateStep::new()

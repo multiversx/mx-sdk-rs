@@ -10,13 +10,13 @@ use bf_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::types::{Address, CodeMetadata},
+    multiversx_sc::types::Address,
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
         mandos_system::ScenarioRunner,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario, TxExpect},
+        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -106,10 +106,8 @@ impl BasicFeaturesInteract {
                 ScDeployStep::new()
                     .call(self.state.default_contract().init())
                     .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
                     .code(&self.code_expr)
-                    .gas_limit("4,000,000")
-                    .expect(TxExpect::ok()),
+                    .gas_limit("4,000,000"),
                 |new_address, tr| {
                     tr.result
                         .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));

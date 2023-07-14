@@ -85,7 +85,6 @@ impl State {
             .init()
             .into_blockchain_call()
             .from(&self.wallet_address)
-            .code_metadata(CodeMetadata::all())
             .contract_code(
                 "file:../output/rust-snippets-generator-test.wasm",
                 &InterpreterContext::default(),
