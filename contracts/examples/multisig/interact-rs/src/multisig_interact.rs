@@ -13,7 +13,8 @@ use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
 use multiversx_sc_scenario::{
-    mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
+    mandos_system::ScenarioRunner, multiversx_sc::codec::multi_types::IgnoreValue,
+    scenario_format::interpret_trait::InterpretableFrom,
     standalone::retrieve_account_as_scenario_set_state, test_wallets,
 };
 use multiversx_sc_snippets::{
@@ -159,8 +160,9 @@ impl MultisigInteract {
         self.set_state().await;
 
         let board = self.board();
-        self.interactor
-            .sc_deploy_use_result(
+        let (new_address, _) = self
+            .interactor
+            .sc_deploy_get_result::<_, IgnoreValue>(
                 ScDeployStep::new()
                     .call(
                         self.state
@@ -169,19 +171,16 @@ impl MultisigInteract {
                     )
                     .from(&self.wallet_address)
                     .code(&self.multisig_code)
-                    .gas_limit("5,000,000"),
-                |new_address, tr| {
-                    tr.result
-                        .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));
-
-                    let new_address_bech32 = bech32::encode(&new_address);
-                    println!("new address: {new_address_bech32}");
-
-                    let new_address_expr = format!("bech32:{new_address_bech32}");
-                    self.state.set_multisig_address(&new_address_expr);
-                },
+                    .gas_limit("100,000,000")
+                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
             )
             .await;
+
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!("new address: {new_address_bech32}");
+
+        let new_address_expr = format!("bech32:{new_address_bech32}");
+        self.state.set_multisig_address(&new_address_expr);
     }
 
     async fn multi_deploy(&mut self, count: &u8) {

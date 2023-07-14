@@ -37,11 +37,8 @@ impl Interactor {
         RequestedResult: CodecFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
-        self.sc_call_use_raw_response(step, |response| {
-            let typed_response = TypedResponse::from_raw(response);
-            use_result(typed_response);
-        })
-        .await
+        use_result(self.sc_call_get_result(step).await);
+        self
     }
 
     pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
@@ -82,25 +79,21 @@ impl Interactor {
         RequestedResult: CodecFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
-        self.sc_query_use_raw_response(step, |response| {
-            let typed_response = TypedResponse::from_raw(response);
-            use_result(typed_response);
-        })
-        .await
+        use_result(self.sc_query_get_result(step).await);
+        self
     }
 
     pub async fn sc_query_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScQuery<OriginalResult>,
-    ) -> RequestedResult
+    ) -> TypedResponse<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
         self.sc_query(step.as_mut()).await;
         let response = unwrap_response(&step.sc_query_step.response);
-        let typed_response = TypedResponse::from_raw(response);
-        typed_response.result.unwrap()
+        TypedResponse::from_raw(response)
     }
 
     pub async fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
@@ -140,12 +133,24 @@ impl Interactor {
         RequestedResult: CodecFrom<OriginalResult>,
         F: FnOnce(Address, TypedResponse<RequestedResult>),
     {
-        self.sc_deploy_use_raw_response(step, |response| {
-            let new_address = unwrap_new_address(response);
-            let typed_response = TypedResponse::from_raw(response);
-            use_result(new_address, typed_response);
-        })
-        .await
+        let (new_address, response) = self.sc_deploy_get_result(step).await;
+        use_result(new_address, response);
+        self
+    }
+
+    pub async fn sc_deploy_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        mut step: TypedScDeploy<OriginalResult>,
+    ) -> (Address, TypedResponse<RequestedResult>)
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.sc_deploy(step.as_mut()).await;
+        let response = unwrap_response(&step.sc_deploy_step.response);
+        let new_address = unwrap_new_address(response);
+        let response = TypedResponse::from_raw(response);
+        (new_address, response)
     }
 }
 

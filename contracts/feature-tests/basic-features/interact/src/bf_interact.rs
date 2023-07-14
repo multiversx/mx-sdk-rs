@@ -10,7 +10,7 @@ use bf_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::types::Address,
+    multiversx_sc::{codec::multi_types::IgnoreValue, types::Address},
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
@@ -101,25 +101,23 @@ impl BasicFeaturesInteract {
     async fn deploy(&mut self) {
         self.set_state().await;
 
-        self.interactor
-            .sc_deploy_use_result(
+        let (new_address, _) = self
+            .interactor
+            .sc_deploy_get_result::<_, IgnoreValue>(
                 ScDeployStep::new()
                     .call(self.state.default_contract().init())
                     .from(&self.wallet_address)
                     .code(&self.code_expr)
-                    .gas_limit("4,000,000"),
-                |new_address, tr| {
-                    tr.result
-                        .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));
-
-                    let new_address_bech32 = bech32::encode(&new_address);
-                    println!("new address: {new_address_bech32}");
-
-                    let new_address_expr = format!("bech32:{new_address_bech32}");
-                    self.state.set_bf_address(&new_address_expr);
-                },
+                    .gas_limit("4,000,000")
+                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
             )
             .await;
+
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!("new address: {new_address_bech32}");
+
+        let new_address_expr = format!("bech32:{new_address_bech32}");
+        self.state.set_bf_address(&new_address_expr);
     }
 
     async fn set_large_storage(&mut self, value: &[u8]) {
