@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use multiversx_sc_scenario::multiversx_sc::codec::multi_types::IgnoreValue;
 use multiversx_sc_snippets::multiversx_sc::codec::test_util::top_encode_to_vec_u8_or_panic;
 
 use super::*;
@@ -32,50 +33,39 @@ impl MultisigInteract {
         self.create_items().await;
     }
 
-    pub async fn propose_issue_collection_with_all_roles(&mut self) -> Option<usize> {
+    pub async fn propose_issue_collection_with_all_roles(&mut self) -> usize {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .propose_async_call(
-                system_sc_address,
-                ISSUE_COST,
-                "registerAndSetAllRoles".to_string(),
-                MultiValueVec::from([
-                    COLLECTION_NAME.as_bytes(),
-                    COLLECTION_TICKER.as_bytes(),
-                    TOKEN_TYPE.as_bytes(),
-                    top_encode_to_vec_u8_or_panic(&0u32).as_slice(),
-                ]),
+        let action_id = self
+            .interactor
+            .sc_call_get_result(
+                ScCallStep::new()
+                    .call(self.state.multisig().propose_async_call(
+                        system_sc_address,
+                        ISSUE_COST,
+                        "registerAndSetAllRoles".to_string(),
+                        MultiValueVec::from([
+                            COLLECTION_NAME.as_bytes(),
+                            COLLECTION_TICKER.as_bytes(),
+                            TOKEN_TYPE.as_bytes(),
+                            top_encode_to_vec_u8_or_panic(&0u32).as_slice(),
+                        ]),
+                    ))
+                    .from(&self.wallet_address)
+                    .gas_limit("10,000,000")
+                    .expect(TxExpect::ok().additional_error_message("failed to issue collection")),
             )
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("10,000,000");
+            .await
+            .result
+            .unwrap();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!(
-                "propose issue collection with roles failed with: {}",
-                result.err().unwrap()
-            );
-            return None;
-        }
-
-        let action_id = result.unwrap();
-        println!("successfully proposed issue colllection with roles action `{action_id}`");
-        Some(action_id)
+        println!("successfully proposed issue colllection with roles all action `{action_id}`");
+        action_id
     }
 
     pub async fn issue_collection_with_all_roles(&mut self) {
         println!("proposing issue collection with all roles...");
         let action_id = self.propose_issue_collection_with_all_roles().await;
-        if action_id.is_none() {
-            return;
-        }
 
-        let action_id = action_id.unwrap();
         println!("perfoming issue collection with all roles action `{action_id}`...");
 
         if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
@@ -83,70 +73,57 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("80,000,000");
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let new_issued_token_identifier =
-            typed_sc_call.response().new_issued_token_identifier.clone();
-
-        if let Some(token_identifier) = new_issued_token_identifier {
-            self.collection_token_identifier = token_identifier;
-            println!(
-                "collection token identifier: {}",
-                self.collection_token_identifier
-            );
-            return;
-        }
-
-        println!("perform issue collection with all roles failed");
+        let response: TypedResponse<IgnoreValue> = self
+            .interactor
+            .sc_call_get_result(
+                ScCallStep::new()
+                    .call(self.state.multisig().perform_action_endpoint(action_id))
+                    .from(&self.wallet_address)
+                    .gas_limit("80,000,000")
+                    .expect(TxExpect::ok().additional_error_message(
+                        "perform issue collection with all roles failed: ",
+                    )),
+            )
+            .await;
+        self.collection_token_identifier = response
+            .new_issued_token_identifier
+            .expect("new token identifier could not be retrieved");
+        println!(
+            "collection token identifier: {}",
+            self.collection_token_identifier
+        );
     }
 
-    pub async fn propose_issue_collection(&mut self) -> Option<usize> {
+    pub async fn propose_issue_collection(&mut self) -> usize {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .propose_async_call(
-                system_sc_address,
-                ISSUE_COST,
-                "issueNonFungible".to_string(),
-                MultiValueVec::from([COLLECTION_NAME.to_string(), COLLECTION_TICKER.to_string()]),
+        let action_id = self
+            .interactor
+            .sc_call_get_result(
+                ScCallStep::new()
+                    .call(self.state.multisig().propose_async_call(
+                        system_sc_address,
+                        ISSUE_COST,
+                        "issueNonFungible".to_string(),
+                        MultiValueVec::from([
+                            COLLECTION_NAME.to_string(),
+                            COLLECTION_TICKER.to_string(),
+                        ]),
+                    ))
+                    .from(&self.wallet_address)
+                    .gas_limit("10,000,000"),
             )
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("10,000,000");
+            .await
+            .result
+            .unwrap();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!(
-                "propose issue collection failed with: {}",
-                result.err().unwrap()
-            );
-            return None;
-        }
-
-        let action_id = result.unwrap();
         println!("successfully proposed issue colllection action `{action_id}`");
-        Some(action_id)
+        action_id
     }
 
     pub async fn issue_collection(&mut self) {
         println!("proposing issue collection...");
         let action_id = self.propose_issue_collection().await;
-        if action_id.is_none() {
-            return;
-        }
 
-        let action_id = action_id.unwrap();
         println!("perfoming issue collection action `{action_id}`...");
 
         if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
@@ -154,74 +131,58 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("80,000,000");
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let new_issued_token_identifier =
-            typed_sc_call.response().new_issued_token_identifier.clone();
-
-        if let Some(token_identifier) = new_issued_token_identifier {
-            self.collection_token_identifier = token_identifier;
-            println!(
-                "collection token identifier: {}",
-                self.collection_token_identifier
-            );
-            return;
-        }
-
-        println!("perform issue collection failed");
+        let response: TypedResponse<IgnoreValue> =
+            self.interactor
+                .sc_call_get_result(
+                    ScCallStep::new()
+                        .call(self.state.multisig().perform_action_endpoint(action_id))
+                        .from(&self.wallet_address)
+                        .gas_limit("80,000,000")
+                        .expect(TxExpect::ok().additional_error_message(
+                            "perform issue collection with all failed: ",
+                        )),
+                )
+                .await;
+        self.collection_token_identifier = response
+            .new_issued_token_identifier
+            .expect("new token identifier could not be retrieved");
+        println!(
+            "collection token identifier: {}",
+            self.collection_token_identifier
+        );
     }
 
-    pub async fn propose_set_special_role(&mut self) -> Option<usize> {
+    pub async fn propose_set_special_role(&mut self) -> usize {
         let multisig_address = self.state.multisig().to_address();
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .propose_async_call(
-                &self.system_sc_address,
-                0u64,
-                "setSpecialRole".to_string(),
-                MultiValueVec::from([
-                    self.collection_token_identifier.as_bytes(),
-                    multisig_address.as_bytes(),
-                    "ESDTRoleNFTCreate".as_bytes(),
-                ]),
+        let action_id = self
+            .interactor
+            .sc_call_get_result(
+                ScCallStep::new()
+                    .call(self.state.multisig().propose_async_call(
+                        &self.system_sc_address,
+                        0u64,
+                        "setSpecialRole".to_string(),
+                        MultiValueVec::from([
+                            self.collection_token_identifier.as_bytes(),
+                            multisig_address.as_bytes(),
+                            "ESDTRoleNFTCreate".as_bytes(),
+                        ]),
+                    ))
+                    .from(&self.wallet_address)
+                    .gas_limit("10,000,000"),
             )
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("10,000,000");
+            .await
+            .result
+            .unwrap();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!(
-                "propose set special role failed with: {}",
-                result.err().unwrap()
-            );
-            return None;
-        }
-
-        let action_id = result.unwrap();
         println!("successfully proposed set special role with action `{action_id}`");
-        Some(action_id)
+        action_id
     }
 
     pub async fn set_special_role(&mut self) {
         println!("proposing set special role...");
         let action_id = self.propose_set_special_role().await;
-        if action_id.is_none() {
-            return;
-        }
 
-        let action_id = action_id.unwrap();
         println!("performing set special role action `{action_id}`...");
         self.perform_action(action_id, "80,000,000").await;
     }
@@ -238,10 +199,8 @@ impl MultisigInteract {
                 "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.png"
             );
 
-            let typed_sc_call = self
-                .state
-                .multisig()
-                .propose_async_call(
+            let typed_sc_call = ScCallStep::new()
+                .call(self.state.multisig().propose_async_call(
                     &multisig_address,
                     0u64,
                     "ESDTNFTCreate".to_string(),
@@ -254,8 +213,7 @@ impl MultisigInteract {
                         METADATA.as_bytes(),
                         image_cid.as_bytes(),
                     ]),
-                )
-                .into_blockchain_call()
+                ))
                 .from(&self.wallet_address)
                 .gas_limit("10,000,000");
 

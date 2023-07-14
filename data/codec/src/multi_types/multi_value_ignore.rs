@@ -1,6 +1,6 @@
 use crate::{
-    DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput, TopEncodeMulti,
-    TopEncodeMultiOutput,
+    CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
+    TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
 
 /// Structure that allows taking a variable number of arguments,
@@ -28,3 +28,6 @@ impl TopDecodeMulti for IgnoreValue {
         Ok(IgnoreValue)
     }
 }
+
+impl !CodecFromSelf for IgnoreValue {}
+impl<T> CodecFrom<T> for IgnoreValue where T: TopEncodeMulti {}

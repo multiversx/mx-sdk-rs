@@ -31,11 +31,7 @@ impl MultisigInteract {
     pub async fn wrap_egld(&mut self) {
         println!("proposing wrap egld...");
         let action_id = self.propose_wrap_egld().await;
-        if action_id.is_none() {
-            return;
-        }
 
-        let action_id = action_id.unwrap();
         println!("perfoming wrap egld action `{action_id}`...");
         self.perform_action(action_id, "15,000,000").await;
     }
@@ -43,11 +39,7 @@ impl MultisigInteract {
     pub async fn unwrap_egld(&mut self) {
         println!("proposing unwrap egld...");
         let action_id = self.propose_unwrap_egld().await;
-        if action_id.is_none() {
-            return;
-        }
 
-        let action_id = action_id.unwrap();
         println!("perfoming unwrap egld action `{action_id}`...");
         self.perform_action(action_id, "15,000,000").await;
     }
@@ -66,34 +58,29 @@ impl MultisigInteract {
         self.interactor.post_runners.run_scenario(&scenario);
     }
 
-    async fn propose_wrap_egld(&mut self) -> Option<usize> {
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .propose_async_call(
-                bech32::decode(WEGLD_SWAP_SC_BECH32),
-                WRAP_AMOUNT,
-                "wrapEgld".to_string(),
-                MultiValueEncoded::new(),
+    async fn propose_wrap_egld(&mut self) -> usize {
+        let action_id = self
+            .interactor
+            .sc_call_get_result(
+                ScCallStep::new()
+                    .call(self.state.multisig().propose_async_call(
+                        bech32::decode(WEGLD_SWAP_SC_BECH32),
+                        WRAP_AMOUNT,
+                        "wrapEgld".to_string(),
+                        MultiValueEncoded::new(),
+                    ))
+                    .from(&self.wallet_address)
+                    .gas_limit("10,000,000"),
             )
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("10,000,000");
+            .await
+            .result
+            .unwrap();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("propose wrap egld failed with: {}", result.err().unwrap());
-            return None;
-        }
-
-        let action_id = result.unwrap();
         println!("successfully proposed wrap egld action `{action_id}`");
-        Some(action_id)
+        action_id
     }
 
-    async fn propose_unwrap_egld(&mut self) -> Option<usize> {
+    async fn propose_unwrap_egld(&mut self) -> usize {
         let contract_call = ContractCallNoPayment::<StaticApi, ()>::new(
             bech32::decode(WEGLD_SWAP_SC_BECH32).into(),
             "unwrapEgld",
@@ -105,29 +92,24 @@ impl MultisigInteract {
         ))
         .into_normalized();
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .propose_async_call(
-                contract_call.basic.to,
-                0u64,
-                contract_call.basic.endpoint_name,
-                contract_call.basic.arg_buffer.into_multi_value_encoded(),
+        let action_id = self
+            .interactor
+            .sc_call_get_result(
+                ScCallStep::new()
+                    .call(self.state.multisig().propose_async_call(
+                        contract_call.basic.to,
+                        0u64,
+                        contract_call.basic.endpoint_name,
+                        contract_call.basic.arg_buffer.into_multi_value_encoded(),
+                    ))
+                    .from(&self.wallet_address)
+                    .gas_limit("10,000,000"),
             )
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("10,000,000");
+            .await
+            .result
+            .unwrap();
 
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.result();
-        if result.is_err() {
-            println!("propose unwrap egld failed with: {}", result.err().unwrap());
-            return None;
-        }
-
-        let action_id = result.unwrap();
         println!("successfully proposed unwrap egld action `{action_id}`");
-        Some(action_id)
+        action_id
     }
 }

@@ -20,6 +20,7 @@ pub struct TxExpect {
     pub gas: CheckValue<U64Value>,
     pub refund: CheckValue<U64Value>,
     pub build_from_response: bool,
+    pub additional_error_message: String,
 }
 
 impl TxExpect {
@@ -32,6 +33,7 @@ impl TxExpect {
             gas: CheckValue::Star,
             refund: CheckValue::Star,
             build_from_response: true,
+            additional_error_message: Default::default(),
         }
     }
 
@@ -51,6 +53,7 @@ impl TxExpect {
             gas: CheckValue::Star,
             refund: CheckValue::Star,
             build_from_response: true,
+            additional_error_message: Default::default(),
         }
     }
 
@@ -74,10 +77,19 @@ impl TxExpect {
         self
     }
 
+    pub fn additional_error_message<A>(mut self, message: A) -> Self
+    where
+        A: AsRef<str>,
+    {
+        self.additional_error_message = message.as_ref().to_string();
+        self
+    }
+
     fn check_response(&self, tx_response: &TxResponse) {
         assert!(
             self.status.check(tx_response.tx_error.status),
-            "result code mismatch. Want: {}. Have: {}. Message: {}",
+            "{}result code mismatch. Want: {}. Have: {}. Message: {}",
+            &self.additional_error_message,
             self.status,
             tx_response.tx_error.status,
             &tx_response.tx_error.message,
@@ -85,14 +97,16 @@ impl TxExpect {
 
         assert!(
             self.out.check(&tx_response.out),
-            "bad out value. Want: [{}]. Have: [{}]",
+            "{}bad out value. Want: [{}]. Have: [{}]",
+            &self.additional_error_message,
             self.out_to_string(),
             result_values_to_string(&tx_response.out),
         );
 
         assert!(
             self.message.check(tx_response.tx_error.message.as_str()),
-            "result message mismatch. Want: {}. Have: {}.",
+            "{}result message mismatch. Want: {}. Have: {}.",
+            &self.additional_error_message,
             &self.status,
             &tx_response.tx_error.message,
         );
@@ -116,6 +130,7 @@ impl InterpretableFrom<TxExpectRaw> for TxExpect {
             gas: CheckValue::<U64Value>::interpret_from(from.gas, context),
             refund: CheckValue::<U64Value>::interpret_from(from.refund, context),
             build_from_response: false,
+            additional_error_message: Default::default(),
         }
     }
 }

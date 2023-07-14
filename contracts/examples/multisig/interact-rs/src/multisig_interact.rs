@@ -13,7 +13,8 @@ use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_modules::dns::ProxyTrait as _;
 use multiversx_sc_scenario::{
-    mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
+    mandos_system::ScenarioRunner, multiversx_sc::codec::multi_types::IgnoreValue,
+    scenario_format::interpret_trait::InterpretableFrom,
     standalone::retrieve_account_as_scenario_set_state, test_wallets,
 };
 use multiversx_sc_snippets::{
@@ -159,28 +160,27 @@ impl MultisigInteract {
         self.set_state().await;
 
         let board = self.board();
-        let mut typed_sc_deploy = self
-            .state
-            .default_multisig()
-            .init(Config::load_config().quorum(), board)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .code(&self.multisig_code)
-            .gas_limit("70,000,000");
+        let (new_address, _) = self
+            .interactor
+            .sc_deploy_get_result::<_, IgnoreValue>(
+                ScDeployStep::new()
+                    .call(
+                        self.state
+                            .default_multisig()
+                            .init(Config::load_config().quorum(), board),
+                    )
+                    .from(&self.wallet_address)
+                    .code(&self.multisig_code)
+                    .gas_limit("100,000,000")
+                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
+            )
+            .await;
 
-        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!("new address: {new_address_bech32}");
 
-        let new_deployed_address = typed_sc_deploy.response().new_deployed_address.clone();
-        if let Some(new_address) = new_deployed_address {
-            let new_address_bech32 = bech32::encode(&new_address);
-            println!("new address: {new_address_bech32}");
-
-            let new_address_expr = format!("bech32:{new_address_bech32}");
-            self.state.set_multisig_address(&new_address_expr);
-            return;
-        }
-
-        println!("deploy failed");
+        let new_address_expr = format!("bech32:{new_address_bech32}");
+        self.state.set_multisig_address(&new_address_expr);
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -260,23 +260,17 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(gas_expr);
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        if !typed_sc_call.response().is_success() {
-            println!(
-                "perform action `{action_id}` failed with: {}",
-                typed_sc_call.response().tx_error
-            );
-            return;
-        }
+        self.interactor
+            .sc_call(
+                ScCallStep::new()
+                    .call(self.state.multisig().perform_action_endpoint(action_id))
+                    .from(&self.wallet_address)
+                    .gas_limit(gas_expr)
+                    .expect(TxExpect::ok().additional_error_message(format!(
+                        "perform action `{action_id}` failed with: "
+                    ))),
+            )
+            .await;
 
         println!("successfully performed action `{action_id}`");
     }
@@ -289,11 +283,8 @@ impl MultisigInteract {
             }
             println!("quorum reached for action `{action_id}`");
 
-            let typed_sc_call = self
-                .state
-                .multisig()
-                .perform_action_endpoint(action_id)
-                .into_blockchain_call()
+            let typed_sc_call = ScCallStep::new()
+                .call(self.state.multisig().perform_action_endpoint(action_id))
                 .from(&self.wallet_address)
                 .gas_limit(gas_expr);
 
@@ -341,16 +332,12 @@ impl MultisigInteract {
                 continue;
             }
 
-            let sc_call_step: ScCallStep = self
-                .state
-                .multisig()
-                .sign(action_id)
-                .into_blockchain_call()
+            let typed_sc_call = ScCallStep::new()
+                .call(self.state.multisig().sign(action_id))
                 .from(signer)
-                .gas_limit("15,000,000")
-                .into();
+                .gas_limit("15,000,000");
 
-            steps.push(sc_call_step);
+            steps.push(typed_sc_call);
         }
 
         self.interactor
@@ -373,23 +360,15 @@ impl MultisigInteract {
 
     async fn dns_register(&mut self, name: &str) {
         let dns_address = dns_address_for_name(name);
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .dns_register(dns_address, name)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("30,000,000");
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        if !typed_sc_call.response().is_success() {
-            println!(
-                "dns register failed with: {}",
-                typed_sc_call.response().tx_error
-            );
-            return;
-        }
+        self.interactor
+            .sc_call(
+                ScCallStep::new()
+                    .call(self.state.multisig().dns_register(dns_address, name))
+                    .from(&self.wallet_address)
+                    .gas_limit("30,000,000")
+                    .expect(TxExpect::ok().additional_error_message("dns register failed with: ")),
+            )
+            .await;
 
         println!("successfully registered dns");
     }
