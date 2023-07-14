@@ -4,7 +4,7 @@ use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
-use super::{Log, TxResponseStatus};
+use super::{Log, TxExpect, TxResponseStatus};
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
@@ -24,6 +24,25 @@ pub struct TxResponse {
 }
 
 impl TxResponse {
+    /// Creates a scenario "expect" field based on the real response.
+    ///
+    /// Useful for creating traces that also check the results come out always the same.
+    pub fn to_expect(&self) -> TxExpect {
+        if self.tx_error.is_success() {
+            let mut tx_expect = TxExpect::ok();
+            for raw_result in &self.out {
+                let result_hex_string = format!("0x{}", hex::encode(raw_result));
+                tx_expect = tx_expect.result(result_hex_string.as_str());
+            }
+            tx_expect
+        } else {
+            TxExpect::err(
+                self.tx_error.status,
+                format!("str:{}", self.tx_error.message),
+            )
+        }
+    }
+
     pub fn from_tx_result(tx_result: TxResult) -> Self {
         TxResponse {
             out: tx_result.result_values,

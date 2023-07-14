@@ -29,23 +29,47 @@ impl ScenarioRunner for DebuggerBackend {
     }
 
     fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
-        self.for_each_runner_mut(|runner| runner.run_sc_call_step(step));
+        self.vm_runner.run_sc_call_step(step);
+        step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        if let Some(trace) = &mut self.trace {
+            trace.run_sc_call_step(step);
+        }
     }
 
     fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
-        self.for_each_runner_mut(|runner| runner.run_multi_sc_call_step(steps));
+        self.vm_runner.run_multi_sc_call_step(steps);
+        for step in steps.iter_mut() {
+            step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        }
+        if let Some(trace) = &mut self.trace {
+            trace.run_multi_sc_call_step(steps);
+        }
     }
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
-        self.for_each_runner_mut(|runner| runner.run_multi_sc_deploy_step(steps));
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
+        self.vm_runner.run_sc_query_step(step);
+        step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        if let Some(trace) = &mut self.trace {
+            trace.run_sc_query_step(step);
+        }
     }
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep) {
-        self.for_each_runner_mut(|runner| runner.run_sc_query_step(step));
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
+        self.vm_runner.run_sc_deploy_step(step);
+        step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        if let Some(trace) = &mut self.trace {
+            trace.run_sc_deploy_step(step);
+        }
     }
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
-        self.for_each_runner_mut(|runner| runner.run_sc_deploy_step(step));
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
+        self.vm_runner.run_multi_sc_deploy_step(steps);
+        for step in steps.iter_mut() {
+            step.expect = step.response.as_ref().map(TxResponse::to_expect);
+        }
+        if let Some(trace) = &mut self.trace {
+            trace.run_multi_sc_deploy_step(steps);
+        }
     }
 
     fn run_transfer_step(&mut self, step: &TransferStep) {

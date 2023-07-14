@@ -8,10 +8,8 @@ use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
     /// Adds a SC query step, as specified in the `sc_query_step` argument, then executes it.
-    pub fn perform_sc_query(&mut self, sc_query_step: &ScQueryStep) -> TxResult {
-        self.perform_sc_query_lambda_and_check(sc_query_step, execute_current_tx_context_input)
-    }
-
+    ///
+    /// The result of the operation gets saved back in the step's response field.
     pub fn perform_sc_query_update_results(&mut self, sc_query_step: &mut ScQueryStep) {
         let tx_result =
             self.perform_sc_query_lambda_and_check(sc_query_step, execute_current_tx_context_input);

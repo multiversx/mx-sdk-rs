@@ -26,7 +26,7 @@ impl Interactor {
         }
     }
 
-    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) -> String {
+    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) -> String {
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);
 
         let sender_address = &sc_deploy_step.tx.from.value;

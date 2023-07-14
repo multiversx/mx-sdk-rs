@@ -38,15 +38,15 @@ impl ScenarioRunner for ScenarioWorld {
         self.for_each_runner_mut(|runner| runner.run_multi_sc_call_step(steps));
     }
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
         self.for_each_runner_mut(|runner| runner.run_multi_sc_deploy_step(steps));
     }
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep) {
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_query_step(step));
     }
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_deploy_step(step));
     }
 

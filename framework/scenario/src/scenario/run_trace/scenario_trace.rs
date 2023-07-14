@@ -86,19 +86,19 @@ impl ScenarioRunner for ScenarioTrace {
         }
     }
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
         for step in steps {
             self.process_address_value(&step.tx.from);
             self.scenario_trace.steps.push(Step::ScDeploy(step.clone()));
         }
     }
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep) {
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
         self.process_address_value(&step.tx.to);
         self.scenario_trace.steps.push(Step::ScQuery(step.clone()));
     }
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
         self.process_address_value(&step.tx.from);
         self.scenario_trace.steps.push(Step::ScDeploy(step.clone()));
     }
