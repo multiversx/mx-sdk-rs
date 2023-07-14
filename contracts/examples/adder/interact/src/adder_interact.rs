@@ -145,14 +145,17 @@ impl AdderInteract {
             .await;
 
         for step in steps.iter() {
-            let result = step.response().new_deployed_address();
-            if result.is_err() {
-                println!("deploy failed: {}", result.err().unwrap());
+            // warning: multi deploy not yet fully supported
+            // only works with last deployed address
+            // will be addressed in future versions
+            let new_deployed_address = step.response().new_deployed_address.clone();
+            if let Some(new_address) = new_deployed_address {
+                let new_address_bech32 = bech32::encode(&new_address);
+                println!("new address: {new_address_bech32}");
+            } else {
+                println!("deploy failed");
                 return;
             }
-
-            let new_address_bech32 = bech32::encode(&result.unwrap());
-            println!("new address: {new_address_bech32}");
         }
     }
 

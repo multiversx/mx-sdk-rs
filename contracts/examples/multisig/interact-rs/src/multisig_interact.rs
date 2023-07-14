@@ -171,17 +171,17 @@ impl MultisigInteract {
 
         self.interactor.sc_deploy(&mut typed_sc_deploy).await;
 
-        let result = typed_sc_deploy.response().new_deployed_address();
-        if result.is_err() {
-            println!("deploy failed: {}", result.err().unwrap());
+        let new_deployed_address = typed_sc_deploy.response().new_deployed_address.clone();
+        if let Some(new_address) = new_deployed_address {
+            let new_address_bech32 = bech32::encode(&new_address);
+            println!("new address: {new_address_bech32}");
+
+            let new_address_expr = format!("bech32:{new_address_bech32}");
+            self.state.set_multisig_address(&new_address_expr);
             return;
         }
 
-        let new_address_bech32 = bech32::encode(&result.unwrap());
-        println!("new address: {new_address_bech32}");
-
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_multisig_address(&new_address_expr);
+        println!("deploy failed");
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -217,14 +217,20 @@ impl MultisigInteract {
             .await;
 
         for step in steps.iter() {
-            let result = step.response().new_deployed_address();
-            if result.is_err() {
-                println!("deploy failed: {}", result.err().unwrap());
+            // warning: multi deploy not yet fully supported
+            // only works with last deployed address
+            // will be addressed in future versions
+            let new_deployed_address = step.response().new_deployed_address.clone();
+            if let Some(new_address) = new_deployed_address {
+                let new_address_bech32 = bech32::encode(&new_address);
+                println!("new address: {new_address_bech32}");
+
+                let new_address_expr = format!("bech32:{new_address_bech32}");
+                self.state.set_multisig_address(&new_address_expr);
+            } else {
+                println!("deploy failed");
                 return;
             }
-
-            let new_address_bech32 = bech32::encode(&result.unwrap());
-            println!("new address: {new_address_bech32}");
         }
     }
 
@@ -269,14 +275,14 @@ impl MultisigInteract {
 
         self.interactor.sc_call(&mut typed_sc_call).await;
 
-        let result = typed_sc_call.response().handle_signal_error_event();
-        if result.is_err() {
+        if !typed_sc_call.response().is_success() {
             println!(
                 "perform action `{action_id}` failed with: {}",
-                result.err().unwrap()
+                typed_sc_call.response().tx_error
             );
             return;
         }
+
         println!("successfully performed action `{action_id}`");
     }
 
@@ -304,14 +310,14 @@ impl MultisigInteract {
             .await;
 
         for (i, action_id) in actions.iter().enumerate() {
-            let result = steps[i].response().handle_signal_error_event();
-            if result.is_err() {
+            if !steps[i].response().is_success() {
                 println!(
                     "perform action `{action_id}` failed with: {}",
-                    result.err().unwrap()
+                    steps[i].response().tx_error
                 );
                 continue;
             }
+
             println!("successfully performed action `{action_id}`");
         }
     }
@@ -357,11 +363,10 @@ impl MultisigInteract {
             .await;
 
         for step in steps.iter() {
-            let result = step.response().handle_signal_error_event();
-            if result.is_err() {
+            if !step.response().is_success() {
                 println!(
                     "perform sign `{action_id}` failed with: {}",
-                    result.err().unwrap()
+                    step.response().tx_error
                 );
                 return false;
             }
@@ -383,9 +388,11 @@ impl MultisigInteract {
 
         self.interactor.sc_call(&mut typed_sc_call).await;
 
-        let result = typed_sc_call.response().handle_signal_error_event();
-        if result.is_err() {
-            println!("dns register failed with: {}", result.err().unwrap());
+        if !typed_sc_call.response().is_success() {
+            println!(
+                "dns register failed with: {}",
+                typed_sc_call.response().tx_error
+            );
             return;
         }
 

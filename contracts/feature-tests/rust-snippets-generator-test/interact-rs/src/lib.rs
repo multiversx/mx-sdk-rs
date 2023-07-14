@@ -94,22 +94,21 @@ impl State {
 
         self.interactor.sc_deploy(&mut typed_sc_deploy).await;
 
-        let result = typed_sc_deploy.response().new_deployed_address();
-        if result.is_err() {
-            println!("deploy failed: {}", result.err().unwrap());
+        if let Some(new_address) = typed_sc_deploy.response().new_deployed_address.clone() {
+            let new_address_bech32 = bech32::encode(&new_address);
+            println!("new address: {}", new_address_bech32);
+
+            let result = typed_sc_deploy.result();
+            if result.is_err() {
+                println!("Result error: {}", result.err().unwrap());
+                return;
+            }
+
+            println!("Result: {:?}", result.unwrap());
+        } else {
+            println!("deploy failed");
             return;
         }
-
-        let new_address_bech32 = bech32::encode(&result.unwrap());
-        println!("new address: {}", new_address_bech32);
-
-        let result = typed_sc_deploy.result();
-        if result.is_err() {
-            println!("Result error: {}", result.err().unwrap());
-            return;
-        }
-
-        println!("Result: {:?}", result.unwrap());
     }
 
     async fn no_arg_no_result_endpoint(&mut self) {

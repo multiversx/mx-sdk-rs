@@ -113,11 +113,10 @@ impl ComposabilityInteract {
             .await;
 
         for step in steps.iter() {
-            let result = step.response().handle_signal_error_event();
-            if result.is_err() {
+            if !step.response().is_success() {
                 println!(
                     "perform 'add_queued_call' failed with: {}",
-                    result.err().unwrap()
+                    step.response().tx_error
                 );
                 continue;
             }

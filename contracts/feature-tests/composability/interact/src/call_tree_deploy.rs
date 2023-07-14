@@ -35,40 +35,38 @@ impl ComposabilityInteract {
 
         let mut vault_iter = call_state.vaults.iter();
         for step in typed_vault_deploys.iter() {
-            let result = step.response().new_deployed_address();
-            if result.is_err() {
-                println!("deploy failed: {}", result.err().unwrap());
+            if let Some(new_address) = step.response().new_deployed_address.clone() {
+                let new_address_bech32 = bech32::encode(&new_address);
+                let rc_vault = vault_iter.next().unwrap();
+                let mut vault = rc_vault.borrow_mut();
+                println!(
+                    "New vault {0} deployed address: {1}",
+                    vault.name, new_address_bech32
+                );
+
+                vault.address = Some(new_address);
+            } else {
+                println!("deploy failed");
                 return;
             }
-
-            let new_address_bech32 = bech32::encode(result.as_ref().unwrap());
-            let rc_vault = vault_iter.next().unwrap();
-            let mut vault = rc_vault.borrow_mut();
-            println!(
-                "New vault {0} deployed address: {1}",
-                vault.name, new_address_bech32
-            );
-
-            vault.address = Some(result.unwrap());
         }
 
         let mut fwd_iter = call_state.forwarders.iter();
         for step in typed_forwarder_deploys.iter() {
-            let result = step.response().new_deployed_address();
-            if result.is_err() {
-                println!("deploy failed: {}", result.err().unwrap());
+            if let Some(new_address) = step.response().new_deployed_address.clone() {
+                let new_address_bech32 = bech32::encode(&new_address);
+                let rc_fwd = fwd_iter.next().unwrap();
+                let mut fwd = rc_fwd.borrow_mut();
+                println!(
+                    "New forwarder {0} deployed address: {1}",
+                    fwd.name, new_address_bech32
+                );
+
+                fwd.address = Some(new_address);
+            } else {
+                println!("deploy failed");
                 return;
             }
-
-            let new_address_bech32 = bech32::encode(result.as_ref().unwrap());
-            let rc_fwd = fwd_iter.next().unwrap();
-            let mut fwd = rc_fwd.borrow_mut();
-            println!(
-                "New vault {0} deployed address: {1}",
-                fwd.name, new_address_bech32
-            );
-
-            fwd.address = Some(result.unwrap());
         }
     }
 
