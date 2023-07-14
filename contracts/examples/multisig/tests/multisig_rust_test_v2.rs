@@ -18,12 +18,15 @@ use multiversx_sc_scenario::{
 };
 use num_bigint::BigUint;
 
+const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
+const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract("file:test-contracts/adder.wasm", adder::ContractBuilder);
-    blockchain.register_contract("file:output/multisig.wasm", multisig::ContractBuilder);
+    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    blockchain.register_contract(MULTISIG_PATH_EXPR, multisig::ContractBuilder);
     blockchain
 }
 
@@ -134,7 +137,7 @@ impl MultisigTestState {
         self.world.sc_deploy_step(
             ScDeployStep::new()
                 .from(self.owner.clone())
-                .contract_code("file:output/multisig.wasm", ic)
+                .code(self.world.code_expression(MULTISIG_PATH_EXPR))
                 .call(self.multisig.init(2u32, board))
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
@@ -153,7 +156,7 @@ impl MultisigTestState {
         self.world.sc_deploy_step(
             ScDeployStep::new()
                 .from(self.owner.clone())
-                .contract_code("file:test-contracts/adder.wasm", ic)
+                .code(self.world.code_expression(ADDER_PATH_EXPR))
                 .call(self.adder.init(0u64))
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),

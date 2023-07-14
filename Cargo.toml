@@ -109,6 +109,7 @@ members = [
   "contracts/feature-tests/big-float-features",
   "contracts/feature-tests/big-float-features/meta",
   "contracts/feature-tests/composability",
+  "contracts/feature-tests/composability/interact",
   "contracts/feature-tests/composability/esdt-contract-pair",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract/meta",

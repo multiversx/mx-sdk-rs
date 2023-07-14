@@ -61,6 +61,19 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         self
     }
 
+    pub fn code<V>(mut self, expr: V) -> Self
+    where
+        BytesValue: From<V>,
+    {
+        self.sc_deploy_step = self.sc_deploy_step.code(expr);
+        self
+    }
+
+    #[deprecated(
+        since = "0.42.0",
+        note = "Please use method `code` instead. To ease transition, it is also possible to call it with a tuple like so: `.code((expr, context))`"
+    )]
+    #[allow(deprecated)]
     pub fn contract_code(mut self, expr: &str, context: &InterpreterContext) -> Self {
         self.sc_deploy_step = self.sc_deploy_step.contract_code(expr, context);
         self

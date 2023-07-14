@@ -98,6 +98,7 @@ struct MultisigInteract {
     wallet_address: Address,
     system_sc_address: Address,
     collection_token_identifier: String,
+    multisig_code: BytesValue,
     state: State,
 }
 
@@ -109,12 +110,17 @@ impl MultisigInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let multisig_code = BytesValue::interpret_from(
+            "file:../output/multisig.wasm",
+            &InterpreterContext::default(),
+        );
 
         Self {
             interactor,
             wallet_address,
             system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
             collection_token_identifier: String::new(),
+            multisig_code,
             state: State::load_state(),
         }
     }
@@ -162,10 +168,7 @@ impl MultisigInteract {
             .into_blockchain_call()
             .from(&self.wallet_address)
             .code_metadata(CodeMetadata::all())
-            .contract_code(
-                "file:../output/multisig.wasm",
-                &InterpreterContext::default(),
-            )
+            .code(&self.multisig_code)
             .gas_limit("70,000,000")
             .expect(TxExpect::ok());
 
@@ -195,17 +198,15 @@ impl MultisigInteract {
         let board = self.board();
         let mut steps = Vec::new();
         for _ in 0..*count {
-            let typed_sc_deploy = self
-                .state
-                .default_multisig()
-                .init(Config::load_config().quorum(), board.clone())
-                .into_blockchain_call()
+            let typed_sc_deploy = ScDeployStep::new()
+                .call(
+                    self.state
+                        .default_multisig()
+                        .init(Config::load_config().quorum(), board.clone()),
+                )
                 .from(&self.wallet_address)
                 .code_metadata(CodeMetadata::all())
-                .contract_code(
-                    "file:../output/multisig.wasm",
-                    &InterpreterContext::default(),
-                )
+                .code(&self.multisig_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());
 

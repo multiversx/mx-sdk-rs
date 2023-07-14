@@ -9,8 +9,7 @@ use multiversx_sc_snippets::{
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
-        scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::{IntoBlockchainCall, TxExpect, TypedScDeploy},
+        scenario_model::{ScDeployStep, TxExpect, TypedScDeploy},
     },
     StepBuffer,
 };
@@ -76,17 +75,15 @@ impl ComposabilityInteract {
     ) -> Vec<TypedScDeploy<OptionalValue<ManagedBuffer<StaticApi>>>> {
         let mut typed_vault_deploys = Vec::new();
         for _ in call_state.vaults.iter() {
-            let typed_sc_deploy = self
-                .state
-                .default_vault_address()
-                .init(OptionalValue::<BoxedBytes>::None)
-                .into_blockchain_call()
+            let typed_sc_deploy = ScDeployStep::new()
+                .call(
+                    self.state
+                        .default_vault_address()
+                        .init(OptionalValue::<BoxedBytes>::None),
+                )
                 .from(&self.wallet_address)
                 .code_metadata(CodeMetadata::all())
-                .contract_code(
-                    "file:../vault/output/vault.wasm",
-                    &InterpreterContext::default(),
-                )
+                .code(&self.vault_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());
 
@@ -102,17 +99,11 @@ impl ComposabilityInteract {
         let mut typed_forwarder_deploys = Vec::new();
 
         for _ in call_state.forwarders.iter() {
-            let typed_sc_deploy = self
-                .state
-                .default_forwarder_queue_address()
-                .init()
-                .into_blockchain_call()
+            let typed_sc_deploy = ScDeployStep::new()
+                .call(self.state.default_forwarder_queue_address().init())
                 .from(&self.wallet_address)
                 .code_metadata(CodeMetadata::all())
-                .contract_code(
-                    "file:../forwarder-queue/output/forwarder-queue.wasm",
-                    &InterpreterContext::default(),
-                )
+                .code(&self.forw_queue_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());
 
