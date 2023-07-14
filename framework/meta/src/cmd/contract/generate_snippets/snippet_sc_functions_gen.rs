@@ -20,11 +20,10 @@ pub(crate) fn write_state_struct_impl(
         }} else {{
             "bech32:".to_string() + SC_ADDRESS
         }};
-        let contract_code =
-            BytesValue::interpret_from(
-                {}, 
-                &InterpreterContext::default(),
-            );
+        let contract_code = BytesValue::interpret_from(
+            {},
+            &InterpreterContext::default(),
+        );
         let contract = ContractType::new(sc_addr_expr);
 
         State {{
@@ -74,8 +73,7 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi) {
                     println!("new address: {{new_address_bech32}}");
                 }},
             )
-            .await;
-"#,
+            .await;"#,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
         output_type,
@@ -169,33 +167,32 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
         ""
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
-        "\n            .egld_value(egld_amount)\n"
+        "\n                    .egld_value(egld_amount)"
     } else {
-        "\n            .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)\n"
+        "\n                    .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)"
     };
 
     let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
         r#"        self.interactor
-        .sc_call_use_result(
-            ScCallStep::new()
-                .call(self.contract.{}({}))
-                .from(&self.wallet_address){},
-            |tr: TypedResponse<{}>| {{
-                match tr.result {{
-                    Ok(result) => {{
-                        println!("Result: {{result:?}}");
-                    }},
-                    Err(err) => panic!(
-                        "SC call failed: status: {{}}, message: {{}}",
-                        err.status, err.message
-                    )
-                }};
-            }},
-        )
-        .await;
-"#,
+            .sc_call_use_result(
+                ScCallStep::new()
+                    .call(self.contract.{}({}))
+                    .from(&self.wallet_address){},
+                |tr: TypedResponse<{}>| {{
+                    match tr.result {{
+                        Ok(result) => {{
+                            println!("Result: {{result:?}}");
+                        }},
+                        Err(err) => panic!(
+                            "SC call failed: status: {{}}, message: {{}}",
+                            err.status, err.message
+                        ),
+                    }};
+                }},
+            )
+            .await;"#,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
         payment_snippet,

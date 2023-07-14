@@ -115,7 +115,7 @@ fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
             default_value_expr: "EsdtTokenPayment::new(
             TokenIdentifier::from_esdt_bytes(&b\"\"[..]),
             0u64,
-            BigUint::from(0u128)
+            BigUint::from(0u128),
         )"
             .to_string(),
             contains_custom_types: false,
@@ -128,7 +128,7 @@ fn init_rust_types_map() -> HashMap<&'static str, RustTypeString> {
             default_value_expr: "EgldOrEsdtTokenPayment::new(
             EgldOrEsdtTokenIdentifier::esdt(&b\"\"[..]),
             0u64,
-            BigUint::from(0u128)
+            BigUint::from(0u128),
         )"
             .to_string(),
             contains_custom_types: false,
