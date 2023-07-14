@@ -4,7 +4,9 @@ use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
-use super::{decode_scr_data_or_panic, process_topics_error, Log, TxExpect, TxResponseStatus};
+use super::{
+    decode_scr_data_or_panic, is_out_scr, process_topics_error, Log, TxExpect, TxResponseStatus,
+};
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
@@ -116,10 +118,7 @@ impl TxResponse {
     }
 
     fn process_out(mut self) -> Self {
-        let out_scr = self
-            .api_scrs
-            .iter()
-            .find(|scr| scr.nonce != 0 && scr.data.starts_with('@'));
+        let out_scr = self.api_scrs.iter().find(|scr| is_out_scr(scr));
 
         if let Some(out_scr) = out_scr {
             self.out = decode_scr_data_or_panic(&out_scr.data);

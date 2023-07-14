@@ -5,17 +5,19 @@ use std::time::Duration;
 
 const TX_GET_RESULTS_NUM_RETRIES: usize = 8;
 const EXTRA_WAITING_TIME_MS: Duration = Duration::from_millis(8000);
+const WAITING_TIME_MS: Duration = Duration::from_secs(25);
+const WAIT: u64 = 1000;
 
 impl Interactor {
     /// Retrieves a transaction from the network.
     pub(crate) async fn retrieve_tx_on_network(&self, tx_hash: String) -> TransactionOnNetwork {
         let mut waiting_time_ms = 0;
         let mut break_outer = false;
-        sleep(&mut waiting_time_ms, Duration::from_secs(25)).await;
+        sleep(&mut waiting_time_ms, WAITING_TIME_MS).await;
 
         let tx = 'outer: loop {
             let mut retries = TX_GET_RESULTS_NUM_RETRIES;
-            let mut wait = 1000u64;
+            let mut wait = WAIT;
             loop {
                 let tx_info_result = self.proxy.get_transaction_info_with_results(&tx_hash).await;
                 match tx_info_result {
@@ -23,7 +25,10 @@ impl Interactor {
                         if break_outer {
                             break 'outer tx;
                         }
-                        waiting_time_ms = Duration::from_secs(25).as_millis() as u64;
+
+                        // reset waiting time
+                        waiting_time_ms = WAITING_TIME_MS.as_millis() as u64;
+
                         tokio::time::sleep(EXTRA_WAITING_TIME_MS).await;
                         break_outer = true;
 
