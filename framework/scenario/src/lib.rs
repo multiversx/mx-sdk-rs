@@ -12,11 +12,11 @@ mod scenario_macros;
 pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
-pub mod whitebox;
+pub mod whitebox_legacy;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
-pub use whitebox as testing_framework;
+pub use whitebox_legacy as testing_framework;
 
 pub use api::DebugApi;
 pub use multiversx_chain_vm;
