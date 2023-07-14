@@ -36,7 +36,6 @@ fn tester_deploy_test() {
                 .from(owner_address)
                 .code(code)
                 .call(adder_contract.init())
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
             |address, tr: TypedResponse<String>| {
                 assert_eq!(address, adder_contract.to_address());

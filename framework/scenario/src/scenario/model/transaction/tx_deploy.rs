@@ -7,9 +7,9 @@ use crate::{
     },
 };
 
-use super::tx_interpret_util::interpret_egld_value;
+use super::{tx_interpret_util::interpret_egld_value, DEFAULT_GAS_EXPR};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct TxDeploy {
     pub from: AddressValue,
     pub egld_value: BigUintValue,
@@ -18,6 +18,20 @@ pub struct TxDeploy {
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
+}
+
+impl Default for TxDeploy {
+    fn default() -> Self {
+        Self {
+            from: Default::default(),
+            egld_value: Default::default(),
+            code_metadata: CodeMetadata::all(),
+            contract_code: Default::default(),
+            arguments: Default::default(),
+            gas_limit: U64Value::from(DEFAULT_GAS_EXPR),
+            gas_price: Default::default(),
+        }
+    }
 }
 
 impl InterpretableFrom<TxDeployRaw> for TxDeploy {

@@ -26,7 +26,6 @@ fn adder_mandos_constructed_raw() {
                 .from("address:owner")
                 .code(adder_code)
                 .argument("5")
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
         )
         .sc_query_step(

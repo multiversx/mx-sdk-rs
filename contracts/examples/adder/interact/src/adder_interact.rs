@@ -104,7 +104,6 @@ impl AdderInteract {
                     .call(self.state.default_adder().init(BigUint::from(0u64)))
                     .from(&self.wallet_address)
                     .code(&self.adder_code)
-                    .gas_limit("5,000,000")
                     .expect(TxExpect::ok()),
                 |new_address, tr| {
                     tr.result
@@ -178,7 +177,6 @@ impl AdderInteract {
                 ScCallStep::new()
                     .call(self.state.adder().add(value))
                     .from(&self.wallet_address)
-                    .gas_limit("5,000,000")
                     .expect(TxExpect::ok()),
                 |tr| {
                     tr.result.unwrap_or_else(|err| {

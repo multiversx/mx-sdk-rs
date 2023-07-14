@@ -139,7 +139,6 @@ impl MultisigTestState {
                 .from(self.owner.clone())
                 .code(self.world.code_expression(MULTISIG_PATH_EXPR))
                 .call(self.multisig.init(2u32, board))
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
         );
 
@@ -158,7 +157,6 @@ impl MultisigTestState {
                 .from(self.owner.clone())
                 .code(self.world.code_expression(ADDER_PATH_EXPR))
                 .call(self.adder.init(0u64))
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
         );
 
@@ -185,7 +183,6 @@ impl MultisigTestState {
             ScCallStep::new()
                 .from(caller)
                 .call(self.multisig.perform_action_endpoint(action_id))
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
         );
         output.into_option()
@@ -224,7 +221,6 @@ impl MultisigTestState {
                     CodeMetadata::DEFAULT,
                     adder_init_args,
                 ))
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
         )
     }
@@ -245,7 +241,6 @@ impl MultisigTestState {
                     adder_call.endpoint_name,
                     adder_call.arg_buffer.into_multi_value_encoded(),
                 ))
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),
         )
     }

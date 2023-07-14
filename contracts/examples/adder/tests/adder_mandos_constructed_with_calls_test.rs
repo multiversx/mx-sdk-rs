@@ -31,7 +31,6 @@ fn adder_scenario_constructed_raw() {
                 .from(owner_address)
                 .code(adder_code)
                 .call(adder_contract.init(5u32))
-                .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
             |new_address, _: TypedResponse<()>| {
                 assert_eq!(new_address, adder_contract.to_address());

@@ -10,7 +10,9 @@ use crate::{
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 
-#[derive(Debug, Default, Clone)]
+pub const DEFAULT_GAS_EXPR: &str = "5,000,000";
+
+#[derive(Debug, Clone)]
 pub struct TxCall {
     pub from: AddressValue,
     pub to: AddressValue,
@@ -20,6 +22,21 @@ pub struct TxCall {
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
+}
+
+impl Default for TxCall {
+    fn default() -> Self {
+        Self {
+            from: Default::default(),
+            to: Default::default(),
+            egld_value: Default::default(),
+            esdt_value: Default::default(),
+            function: Default::default(),
+            arguments: Default::default(),
+            gas_limit: U64Value::from(DEFAULT_GAS_EXPR),
+            gas_price: Default::default(),
+        }
+    }
 }
 
 impl InterpretableFrom<TxCallRaw> for TxCall {

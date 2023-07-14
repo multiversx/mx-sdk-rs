@@ -42,7 +42,6 @@ fn crowdfunding_scenario_rust_test() {
                 deadline,
                 EgldOrEsdtTokenIdentifier::esdt(cf_token_id_value),
             ))
-            .gas_limit("5,000,000")
             .expect(TxExpect::ok().no_result()),
     );
 
