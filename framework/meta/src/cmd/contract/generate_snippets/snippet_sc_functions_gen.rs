@@ -55,28 +55,22 @@ fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi) {
     let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-        r#"        self.interactor
-            .sc_deploy_use_result(
+        r#"        let (new_address, _) = self
+            .interactor
+            .sc_deploy_get_result::<_, {}>(
                 ScDeployStep::new()
                     .call(self.contract.{}({}))
                     .from(&self.wallet_address)
-                    .code(&self.contract_code),
-                |new_address, tr: TypedResponse<{}>| {{
-                    tr.result.unwrap_or_else(|err| {{
-                        panic!(
-                            "deploy failed: status: {{}}, message: {{}}",
-                            err.status, err.message
-                        )
-                    }});
-
-                    let new_address_bech32 = bech32::encode(&new_address);
-                    println!("new address: {{new_address_bech32}}");
-                }},
+                    .code(&self.contract_code)
+                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
             )
-            .await;"#,
+            .await;
+s
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!("new address: {{new_address_bech32}}");"#,
+        output_type,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
-        output_type,
     )
     .unwrap();
 
@@ -175,28 +169,22 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"        self.interactor
+        r#"        let response: TypedResponse<{}> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.{}({}))
-                    .from(&self.wallet_address){},
-                |tr: TypedResponse<{}>| {{
-                    match tr.result {{
-                        Ok(result) => {{
-                            println!("Result: {{result:?}}");
-                        }},
-                        Err(err) => panic!(
-                            "SC call failed: status: {{}}, message: {{}}",
-                            err.status, err.message
-                        ),
-                    }};
-                }},
+                    .from(&self.wallet_address){}
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
-            .await;"#,
+            .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {{result:?}}");"#,
+        output_type,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
         payment_snippet,
-        output_type,
     )
     .unwrap();
 }

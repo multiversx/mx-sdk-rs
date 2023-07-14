@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 
-use rust_snippets_generator_test::ProxyTrait as _;
-use rust_snippets_generator_test::*;
+use rust_snippets_generator_test::{ProxyTrait as _, *};
 
 use multiversx_sc_snippets::{
     env_logger,
@@ -16,7 +15,6 @@ use multiversx_sc_snippets::{
     },
     sdk, tokio, Interactor,
 };
-
 
 const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = "alice.pem";
@@ -90,228 +88,172 @@ impl State {
     }
 
     async fn deploy(&mut self) {
-        self.interactor
-            .sc_deploy_use_result(
+        let (new_address, _) = self
+            .interactor
+            .sc_deploy_get_result::<_, ()>(
                 ScDeployStep::new()
                     .call(self.contract.init())
                     .from(&self.wallet_address)
-                    .code(&self.contract_code),
-                |new_address, tr: TypedResponse<()>| {
-                    tr.result.unwrap_or_else(|err| {
-                        panic!(
-                            "deploy failed: status: {}, message: {}",
-                            err.status, err.message
-                        )
-                    });
-
-                    let new_address_bech32 = bech32::encode(&new_address);
-                    println!("new address: {new_address_bech32}");
-                },
+                    .code(&self.contract_code)
+                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
             )
             .await;
+
+        let new_address_bech32 = bech32::encode(&new_address);
+        println!("new address: {new_address_bech32}");
     }
 
     async fn no_arg_no_result_endpoint(&mut self) {
-        self.interactor
+        let response: TypedResponse<()> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.no_arg_no_result_endpoint())
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<()>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn no_arg_one_result_endpoint(&mut self) {
-        self.interactor
+        let response: TypedResponse<u64> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.no_arg_one_result_endpoint())
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<u64>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn one_arg_no_result_endpoint(&mut self) {
         let _arg = 0u64;
 
-        self.interactor
+        let response: TypedResponse<()> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.one_arg_no_result_endpoint(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<()>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn one_arg_one_result_endpoint(&mut self) {
         let _arg = 0u64;
 
-        self.interactor
+        let response: TypedResponse<BigUint<StaticApi>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.one_arg_one_result_endpoint(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<BigUint<StaticApi>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn multi_result(&mut self) {
         let _arg = TokenIdentifier::from_esdt_bytes(&b""[..]);
 
-        self.interactor
+        let response: TypedResponse<MultiValueVec<BigUint<StaticApi>>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.multi_result(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<MultiValueVec<BigUint<StaticApi>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn nested_result(&mut self) {
         let _arg = TokenIdentifier::from_esdt_bytes(&b""[..]);
 
-        self.interactor
+        let response: TypedResponse<
+            ManagedVec<StaticApi, ManagedVec<StaticApi, BigUint<StaticApi>>>,
+        > = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.nested_result(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<ManagedVec<StaticApi, ManagedVec<StaticApi, BigUint<StaticApi>>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn custom_struct(&mut self) {
         let _arg = PlaceholderInput;
 
-        self.interactor
+        let response: TypedResponse<MyCoolStruct<StaticApi>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.custom_struct(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<MyCoolStruct<StaticApi>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn optional_type(&mut self) {
         let _arg = OptionalValue::Some(BigUint::<StaticApi>::from(0u128));
 
-        self.interactor
+        let response: TypedResponse<OptionalValue<TokenIdentifier<StaticApi>>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.optional_type(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<OptionalValue<TokenIdentifier<StaticApi>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn option_type(&mut self) {
-        let _arg = Option::Some(ManagedVec::from_single_item(TokenIdentifier::from_esdt_bytes(&b""[..])));
+        let _arg = Option::Some(ManagedVec::from_single_item(
+            TokenIdentifier::from_esdt_bytes(&b""[..]),
+        ));
 
-        self.interactor
+        let response: TypedResponse<Option<u64>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.option_type(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<Option<u64>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn esdt_token_payment(&mut self) {
@@ -321,24 +263,18 @@ impl State {
             BigUint::from(0u128),
         ));
 
-        self.interactor
+        let response: TypedResponse<EsdtTokenPayment<StaticApi>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.esdt_token_payment(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<EsdtTokenPayment<StaticApi>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn egld_or_esdt_payment(&mut self) {
@@ -348,24 +284,18 @@ impl State {
             BigUint::from(0u128),
         );
 
-        self.interactor
+        let response: TypedResponse<EgldOrEsdtTokenIdentifier<StaticApi>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.egld_or_esdt_payment(arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<EgldOrEsdtTokenIdentifier<StaticApi>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn payable_endpoint(&mut self) {
@@ -373,117 +303,99 @@ impl State {
         let token_nonce = 0u64;
         let token_amount = BigUint::<StaticApi>::from(0u128);
 
-        self.interactor
+        let response: TypedResponse<()> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.payable_endpoint())
                     .from(&self.wallet_address)
-                    .esdt_transfer(token_id.to_vec(), token_nonce, token_amount),
-                |tr: TypedResponse<()>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn managed_buffer(&mut self) {
         let _arg = Option::Some(ManagedBuffer::new_from_bytes(&b""[..]));
 
-        self.interactor
-            .sc_call_use_result(
-                ScCallStep::new()
-                    .call(self.contract.managed_buffer(_arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<MultiValueVec<ManagedVec<StaticApi, MyCoolStruct<StaticApi>>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
-            )
-            .await;
+        let response: TypedResponse<MultiValueVec<ManagedVec<StaticApi, MyCoolStruct<StaticApi>>>> =
+            self.interactor
+                .sc_call_use_result(
+                    ScCallStep::new()
+                        .call(self.contract.managed_buffer(_arg))
+                        .from(&self.wallet_address)
+                        .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
+                )
+                .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn multi_value_2(&mut self) {
         let arg = MultiValue2::from((0u64, BigUint::<StaticApi>::from(0u128)));
 
-        self.interactor
+        let response: TypedResponse<MultiValue2<u64, BigUint<StaticApi>>> = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.multi_value_2(arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<MultiValue2<u64, BigUint<StaticApi>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn multi_value_4(&mut self) {
         let arg = PlaceholderInput;
 
-        self.interactor
+        let response: TypedResponse<
+            MultiValue4<
+                u64,
+                BigUint<StaticApi>,
+                MyCoolStruct<StaticApi>,
+                TokenIdentifier<StaticApi>,
+            >,
+        > = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.multi_value_4(arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<MultiValue4<u64, BigUint<StaticApi>, MyCoolStruct<StaticApi>, TokenIdentifier<StaticApi>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
+
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
     }
 
     async fn complex_multi_values(&mut self) {
-        let arg = MultiValueVec::from(vec![MultiValue3::from((TokenIdentifier::from_esdt_bytes(&b""[..]), 0u64, BigUint::<StaticApi>::from(0u128)))]);
+        let arg = MultiValueVec::from(vec![MultiValue3::from((
+            TokenIdentifier::from_esdt_bytes(&b""[..]),
+            0u64,
+            BigUint::<StaticApi>::from(0u128),
+        ))]);
 
-        self.interactor
+        let response: TypedResponse<
+            MultiValueVec<MultiValue3<TokenIdentifier<StaticApi>, u64, BigUint<StaticApi>>>,
+        > = self
+            .interactor
             .sc_call_use_result(
                 ScCallStep::new()
                     .call(self.contract.complex_multi_values(arg))
-                    .from(&self.wallet_address),
-                |tr: TypedResponse<MultiValueVec<MultiValue3<TokenIdentifier<StaticApi>, u64, BigUint<StaticApi>>>>| {
-                    match tr.result {
-                        Ok(result) => {
-                            println!("Result: {result:?}");
-                        },
-                        Err(err) => panic!(
-                            "SC call failed: status: {}, message: {}",
-                            err.status, err.message
-                        ),
-                    };
-                },
+                    .from(&self.wallet_address)
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
-    }
 
+        let result = response.result.unwrap();
+        println!("Result: {result:?}");
+    }
 }
