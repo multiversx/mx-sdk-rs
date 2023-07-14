@@ -374,25 +374,21 @@ impl MultisigInteract {
 
     async fn dns_register(&mut self, name: &str) {
         let dns_address = dns_address_for_name(name);
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .dns_register(dns_address, name)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("30,000,000");
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        if !typed_sc_call.response().is_success() {
-            println!(
-                "dns register failed with: {}",
-                typed_sc_call.response().tx_error
-            );
-            return;
-        }
-
-        println!("successfully registered dns");
+        self.interactor
+            .sc_call_use_raw_response(
+                ScCallStep::new()
+                    .call(self.state.multisig().dns_register(dns_address, name))
+                    .from(&self.wallet_address)
+                    .gas_limit("30,000,000"),
+                |response| {
+                    if !response.is_success() {
+                        println!("dns register failed with: {}", response.tx_error);
+                    } else {
+                        println!("successfully registered dns");
+                    }
+                },
+            )
+            .await;
     }
 
     async fn print_quorum(&mut self) {
