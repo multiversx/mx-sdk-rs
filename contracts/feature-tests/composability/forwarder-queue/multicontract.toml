@@ -1,0 +1,12 @@
+[settings]
+main = "main"
+
+[contracts.main]
+name = "forwarder-queue"
+add-unlabelled = true
+
+[contracts.promises]
+name = "forwarder-queue-promises"
+add-unlabelled = true
+add-labels = ["promises-callback"]
+features = ["promises"]

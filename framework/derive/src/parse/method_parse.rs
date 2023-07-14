@@ -3,10 +3,9 @@ use crate::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitP
 use super::{
     attributes::extract_doc,
     auto_impl_parse::{
-        process_event_attribute, process_legacy_event_attribute, process_proxy_attribute,
-        process_storage_clear_attribute, process_storage_get_attribute,
-        process_storage_is_empty_attribute, process_storage_mapper_attribute,
-        process_storage_set_attribute,
+        process_event_attribute, process_proxy_attribute, process_storage_clear_attribute,
+        process_storage_get_attribute, process_storage_is_empty_attribute,
+        process_storage_mapper_attribute, process_storage_set_attribute,
     },
     extract_method_args, process_callback_attribute, process_callback_raw_attribute,
     process_endpoint_attribute, process_external_view_attribute, process_init_attribute,
@@ -118,7 +117,6 @@ fn process_attribute_second_pass(
         || process_callback_raw_attribute(attr, method)
         || process_callback_attribute(attr, method)
         || process_promises_callback_attribute(attr, method)
-        || process_legacy_event_attribute(attr, method)
         || process_event_attribute(attr, method)
         || process_proxy_attribute(attr, method)
         || process_storage_get_attribute(attr, method)
@@ -134,9 +132,9 @@ fn validate_method(method: &Method) {
     assert!(
         matches!(
             method.public_role,
-            PublicRole::Init(_) | PublicRole::Endpoint(_)
+            PublicRole::Init(_) | PublicRole::Endpoint(_) | PublicRole::CallbackPromise(_)
         ) || method.label_names.is_empty(),
-        "Labels can only be placed on endpoints and constructors. Method '{}' is neither.",
+        "Labels can only be placed on endpoints, constructors, and promises callbacks. Method '{}' is neither.",
         &method.name.to_string()
     )
 }

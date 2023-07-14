@@ -1,25 +1,11 @@
 use core::cmp::Ordering;
 
-use crate::{api::unsafe_buffer, error_hook};
-
-use multiversx_sc::{
-    api::{BigIntApi, Sign},
-    err_msg,
-    types::heap::BoxedBytes,
-};
+use multiversx_sc::api::{BigIntApiImpl, Sign};
 
 extern "C" {
     fn bigIntNew(value: i64) -> i32;
 
     fn bigIntSetInt64(destination: i32, value: i64);
-    fn bigIntUnsignedByteLength(x: i32) -> i32;
-    fn bigIntGetUnsignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
-    fn bigIntSetUnsignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
-
-    fn bigIntSignedByteLength(x: i32) -> i32;
-    fn bigIntGetSignedBytes(reference: i32, byte_ptr: *mut u8) -> i32;
-    fn bigIntSetSignedBytes(destination: i32, byte_ptr: *const u8, byte_len: i32);
-
     fn bigIntIsInt64(reference: i32) -> i32;
     fn bigIntGetInt64(reference: i32) -> i64;
 
@@ -72,7 +58,7 @@ macro_rules! unary_op_wrapper {
     };
 }
 
-impl BigIntApi for crate::api::VmApiImpl {
+impl BigIntApiImpl for crate::api::VmApiImpl {
     #[inline]
     fn bi_new(&self, value: i64) -> Self::BigIntHandle {
         unsafe { bigIntNew(value) }
@@ -83,44 +69,6 @@ impl BigIntApi for crate::api::VmApiImpl {
         unsafe {
             bigIntSetInt64(destination, value);
         }
-    }
-
-    #[inline]
-    fn bi_unsigned_byte_length(&self, x: Self::BigIntHandle) -> usize {
-        unsafe { bigIntUnsignedByteLength(x) as usize }
-    }
-
-    fn bi_get_unsigned_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        unsafe {
-            let byte_len = bigIntUnsignedByteLength(handle);
-            let mut bb = BoxedBytes::allocate(byte_len as usize);
-            bigIntGetUnsignedBytes(handle, bb.as_mut_ptr());
-            bb
-        }
-    }
-
-    #[inline]
-    fn bi_set_unsigned_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]) {
-        unsafe { bigIntSetUnsignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
-    }
-
-    #[inline]
-    fn bi_signed_byte_length(&self, x: Self::BigIntHandle) -> usize {
-        unsafe { bigIntSignedByteLength(x) as usize }
-    }
-
-    fn bi_get_signed_bytes(&self, handle: Self::BigIntHandle) -> BoxedBytes {
-        unsafe {
-            let byte_len = bigIntSignedByteLength(handle);
-            let mut bb = BoxedBytes::allocate(byte_len as usize);
-            bigIntGetSignedBytes(handle, bb.as_mut_ptr());
-            bb
-        }
-    }
-
-    #[inline]
-    fn bi_set_signed_bytes(&self, destination: Self::BigIntHandle, bytes: &[u8]) {
-        unsafe { bigIntSetSignedBytes(destination, bytes.as_ptr(), bytes.len() as i32) }
     }
 
     fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
@@ -136,21 +84,6 @@ impl BigIntApi for crate::api::VmApiImpl {
 
     binary_op_wrapper! {bi_add, bigIntAdd}
     binary_op_wrapper! {bi_sub, bigIntSub}
-
-    fn bi_sub_unsigned(
-        &self,
-        dest: Self::BigIntHandle,
-        x: Self::BigIntHandle,
-        y: Self::BigIntHandle,
-    ) {
-        unsafe {
-            bigIntSub(dest, x, y);
-            if bigIntSign(dest) < 0 {
-                error_hook::signal_error(err_msg::BIG_UINT_SUB_NEGATIVE)
-            }
-        }
-    }
-
     binary_op_wrapper! {bi_mul, bigIntMul}
     binary_op_wrapper! {bi_t_div, bigIntTDiv}
     binary_op_wrapper! {bi_t_mod, bigIntTMod}
@@ -205,20 +138,4 @@ impl BigIntApi for crate::api::VmApiImpl {
             bigIntToString(bi_handle, result_handle);
         }
     }
-}
-
-#[allow(unused)]
-pub(crate) unsafe fn unsafe_buffer_load_be_pad_right(bi_handle: i32, nr_bytes: usize) -> *const u8 {
-    let byte_len = bigIntUnsignedByteLength(bi_handle) as usize;
-    if byte_len > nr_bytes {
-        error_hook::signal_error(err_msg::BIG_UINT_EXCEEDS_SLICE);
-    }
-    unsafe_buffer::clear_buffer_1();
-    if byte_len > 0 {
-        bigIntGetUnsignedBytes(
-            bi_handle,
-            unsafe_buffer::buffer_1_ptr().add(nr_bytes - byte_len),
-        );
-    }
-    unsafe_buffer::buffer_1_ptr()
 }

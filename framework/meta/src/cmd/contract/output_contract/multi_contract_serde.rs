@@ -48,6 +48,9 @@ pub struct OutputContractSerde {
 
     #[serde(default)]
     pub features: Vec<String>,
+
+    #[serde(default)]
+    pub kill_legacy_callback: bool,
 }
 
 #[derive(Deserialize, Default, Debug)]

@@ -52,6 +52,10 @@ where
         self
     }
 
+    fn into_call_data_string(self) -> ManagedBuffer<SA> {
+        self.into_normalized().to_call_data_string()
+    }
+
     /// Converts to a legacy async call.
     #[inline]
     fn async_call(self) -> AsyncCall<SA> {

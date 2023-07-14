@@ -1,6 +1,6 @@
 use core::cmp::Ordering;
 
-use crate::api::{BigFloatApi, ManagedTypeApi, StaticVarApiImpl};
+use crate::api::{use_raw_handle, BigFloatApiImpl, ManagedTypeApi, StaticVarApiImpl};
 
 use super::{BigFloat, BigInt};
 
@@ -37,14 +37,15 @@ fn cmp_i64<M: ManagedTypeApi>(bf: &BigFloat<M>, other: i64) -> Ordering {
             crate::api::Sign::Minus => Ordering::Less,
         }
     } else {
-        let new_bf_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
+        let new_bf_handle: M::BigFloatHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_set_i64(new_bf_handle.clone(), other);
         M::managed_type_impl().bf_cmp(bf.handle.clone(), new_bf_handle)
     }
 }
 
 fn cmp_bi<M: ManagedTypeApi>(bf: &BigFloat<M>, other: &BigInt<M>) -> Ordering {
-    let new_bf_handle: M::BigFloatHandle = M::static_var_api_impl().next_handle();
+    let new_bf_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
     M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), other.handle.clone());
     M::managed_type_impl().bf_cmp(bf.handle.clone(), new_bf_handle)
 }

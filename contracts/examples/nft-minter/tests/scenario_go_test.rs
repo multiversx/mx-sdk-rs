@@ -1,14 +1,20 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
 fn buy_nft_go() {
-    multiversx_sc_scenario::run_go("scenarios/buy_nft.scen.json");
+    world().run("scenarios/buy_nft.scen.json");
 }
 
 #[test]
 fn create_nft_go() {
-    multiversx_sc_scenario::run_go("scenarios/create_nft.scen.json");
+    world().run("scenarios/create_nft.scen.json");
 }
 
 #[test]
 fn init_go() {
-    multiversx_sc_scenario::run_go("scenarios/init.scen.json");
+    world().run("scenarios/init.scen.json");
 }

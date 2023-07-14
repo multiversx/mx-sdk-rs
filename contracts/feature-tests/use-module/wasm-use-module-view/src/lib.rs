@@ -15,12 +15,14 @@
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
+multiversx_sc_wasm_adapter::external_view_init! {}
+
 multiversx_sc_wasm_adapter::external_view_endpoints! {
     use_module
     (
-        external_view_mod_a
-        external_view_mod_b
+        external_view_mod_a => external_view_mod_a
+        external_view_mod_b => external_view_mod_b
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

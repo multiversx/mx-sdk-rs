@@ -11,6 +11,7 @@ mod endpoint_finish_api_uncallable;
 mod error_api_uncallable;
 mod log_api_uncallable;
 mod managed_buffer_api_uncallable;
+mod managed_map_api_uncallable;
 mod managed_type_api_uncallable;
 mod print_api_uncallable;
 mod send_api_uncallable;

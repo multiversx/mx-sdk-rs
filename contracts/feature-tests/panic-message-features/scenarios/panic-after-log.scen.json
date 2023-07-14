@@ -1,0 +1,67 @@
+{
+    "name": "panic",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:panic_features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/panic-message-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:panic_features",
+                "function": "panicAfterLog",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0x04",
+                "message": "str:panic occurred: panic after log",
+                "logs": [
+                    {
+                        "address": "address:an_account",
+                        "endpoint": "str:internalVMErrors",
+                        "topics": [
+                            "sc:panic_features",
+                            "str:panicAfterLog"
+                        ],
+                        "data": "*"
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:panic_features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/panic-message-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        }
+    ]
+}

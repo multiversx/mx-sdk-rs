@@ -1,25 +1,39 @@
-use crate::num_bigint::BigUint;
-use alloc::vec::Vec;
-use multiversx_sc::types::heap::Address;
-use std::{collections::HashMap, fmt, fmt::Write};
-
-use crate::key_hex;
+use num_bigint::BigUint;
+use num_traits::Zero;
 
 use super::AccountEsdt;
+use crate::{display_util::key_hex, types::VMAddress};
+use std::{collections::HashMap, fmt, fmt::Write};
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
 
 #[derive(Clone, Debug)]
 pub struct AccountData {
-    pub address: Address,
+    pub address: VMAddress,
     pub nonce: u64,
     pub egld_balance: BigUint,
     pub esdt: AccountEsdt,
     pub storage: AccountStorage,
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
-    pub contract_owner: Option<Address>,
+    pub contract_owner: Option<VMAddress>,
     pub developer_rewards: BigUint,
+}
+
+impl AccountData {
+    pub fn new_empty(address: VMAddress) -> Self {
+        AccountData {
+            address,
+            nonce: 0,
+            egld_balance: BigUint::zero(),
+            esdt: AccountEsdt::default(),
+            storage: AccountStorage::default(),
+            username: vec![],
+            contract_path: None,
+            contract_owner: None,
+            developer_rewards: BigUint::zero(),
+        }
+    }
 }
 
 impl fmt::Display for AccountData {

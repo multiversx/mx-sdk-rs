@@ -11,5 +11,5 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn send_tx_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/send_tx_repeat.scen.json", world());
+    world().run("scenarios/send_tx_repeat.scen.json");
 }

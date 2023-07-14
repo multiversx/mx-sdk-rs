@@ -1,5 +1,3 @@
-use alloc::vec::Vec;
-
 use std::fmt;
 
 use super::{AsyncCallTxData, TxLog, TxPanic, TxResultCalls};
@@ -144,11 +142,13 @@ impl fmt::Display for TxResult {
 
 impl TxResult {
     pub fn result_values_to_string(&self) -> String {
-        itertools::join(
-            self.result_values
-                .iter()
-                .map(|val| format!("0x{}", hex::encode(val))),
-            ", ",
-        )
+        result_values_to_string(&self.result_values)
     }
+}
+
+pub fn result_values_to_string(values: &[Vec<u8>]) -> String {
+    itertools::join(
+        values.iter().map(|val| format!("0x{}", hex::encode(val))),
+        ", ",
+    )
 }

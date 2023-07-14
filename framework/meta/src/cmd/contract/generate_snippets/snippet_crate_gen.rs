@@ -3,7 +3,7 @@ use std::{
     io::Write,
 };
 
-static SNIPPETS_SOURCE_FILE_NAME: &str = "interact.rs";
+static SNIPPETS_SOURCE_FILE_NAME: &str = "interactor_main.rs";
 
 pub(crate) fn create_snippets_folder(snippets_folder_path: &str) {
     // returns error if folder already exists, so we ignore the result
@@ -69,18 +69,9 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.39.2"
+version = "0.42.0"
 
-[dependencies.multiversx-sc-scenario]
-version = "0.39.2"
-
-[dependencies.multiversx-chain-vm]
-version = "0.1.2"
-
-[dependencies.multiversx-sdk]
-version = "0.1.1"
-
-[workspace]
+# [workspace]
 
 "#
     )
@@ -101,7 +92,7 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: boo
     } else {
         match File::options().create_new(true).write(true).open(&lib_path) {
             Ok(f) => f,
-            Err(_) => panic!("lib.rs file already exists, --overwrite option was not provided"),
+            Err(_) => panic!("{lib_path} file already exists, --overwrite option was not provided"),
         }
     }
 }

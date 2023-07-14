@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{BigIntApi, EllipticCurveApi, ManagedTypeApi},
+    api::{use_raw_handle, BigIntApiImpl, EllipticCurveApiImpl, ManagedTypeApi},
     types::{BigUint, ManagedType},
 };
 
@@ -246,7 +246,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     }
 
     pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
-        let result_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let result_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().ec_marshal(
             self.handle.clone(),
             x_pair.handle,
@@ -271,7 +272,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     }
 
     pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
-        let result_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let result_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().ec_marshal_compressed(
             self.handle.clone(),
             x_pair.handle,
@@ -372,7 +374,8 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
         let y_pub_key_handle = api.bi_new_zero();
-        let private_key_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let private_key_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         api.ec_generate_key(
             x_pub_key_handle.clone(),
             y_pub_key_handle.clone(),

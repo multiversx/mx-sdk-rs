@@ -18,7 +18,9 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     transfer_role_features
     (
-        forwardPayments
-        callBack
+        init => init
+        forwardPayments => forward_payments
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { transfer_role_features }

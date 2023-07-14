@@ -86,7 +86,8 @@ fn upgrade_post_processing(dir: &RelevantDirectory) {
     match dir.upgrade_in_progress {
         Some((_, "0.28.0")) | Some((_, "0.29.0")) | Some((_, "0.30.0")) | Some((_, "0.31.0"))
         | Some((_, "0.32.0")) | Some((_, "0.33.0")) | Some((_, "0.34.0")) | Some((_, "0.35.0"))
-        | Some((_, "0.36.0")) | Some((_, "0.37.0")) => {
+        | Some((_, "0.36.0")) | Some((_, "0.37.0")) | Some((_, "0.40.0")) | Some((_, "0.41.0"))
+        | Some((_, "0.42.0")) => {
             print_post_processing(dir);
             cargo_check(dir);
         },
