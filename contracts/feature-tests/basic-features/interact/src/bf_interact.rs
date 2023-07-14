@@ -136,7 +136,7 @@ impl BasicFeaturesInteract {
             )
             .await;
 
-        println!("successfully performed add");
+        println!("successfully performed store_bytes");
     }
 
     async fn print_length(&mut self) {
