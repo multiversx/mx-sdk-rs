@@ -159,28 +159,29 @@ impl MultisigInteract {
         self.set_state().await;
 
         let board = self.board();
-        let mut typed_sc_deploy = self
-            .state
-            .default_multisig()
-            .init(Config::load_config().quorum(), board)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .code(&self.multisig_code)
-            .gas_limit("70,000,000");
+        self.interactor
+            .sc_deploy_use_result(
+                ScDeployStep::new()
+                    .call(
+                        self.state
+                            .default_multisig()
+                            .init(Config::load_config().quorum(), board),
+                    )
+                    .from(&self.wallet_address)
+                    .code(&self.multisig_code)
+                    .gas_limit("5,000,000"),
+                |new_address, tr| {
+                    tr.result
+                        .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));
 
-        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+                    let new_address_bech32 = bech32::encode(&new_address);
+                    println!("new address: {new_address_bech32}");
 
-        let new_deployed_address = typed_sc_deploy.response().new_deployed_address.clone();
-        if let Some(new_address) = new_deployed_address {
-            let new_address_bech32 = bech32::encode(&new_address);
-            println!("new address: {new_address_bech32}");
-
-            let new_address_expr = format!("bech32:{new_address_bech32}");
-            self.state.set_multisig_address(&new_address_expr);
-            return;
-        }
-
-        println!("deploy failed");
+                    let new_address_expr = format!("bech32:{new_address_bech32}");
+                    self.state.set_multisig_address(&new_address_expr);
+                },
+            )
+            .await;
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
