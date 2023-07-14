@@ -59,6 +59,10 @@
 # 15. Write a release announcement in Confluence.
 #
 
+cd vm
+cargo publish || return 1
+cd ..
+
 cd sdk/core
 cargo publish || return 1
 cd ../..
@@ -86,11 +90,6 @@ cd ../..
 cd framework/meta
 cargo publish || return 1
 cd ../..
-
-### depends on sc-meta and sc, but sc-scenario depends on it (at least for now)
-cd vm
-cargo publish || return 1
-cd ..
 
 cd framework/scenario
 cargo publish || return 1
