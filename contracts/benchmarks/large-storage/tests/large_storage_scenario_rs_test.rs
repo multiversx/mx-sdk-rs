@@ -12,5 +12,5 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn large_storage_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/large_storage.scen.json", world());
+    world().run("scenarios/large_storage.scen.json");
 }
