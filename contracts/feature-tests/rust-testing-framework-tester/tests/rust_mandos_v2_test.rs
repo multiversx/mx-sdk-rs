@@ -18,7 +18,7 @@ fn world() -> ScenarioWorld {
 #[test]
 fn tester_deploy_test() {
     let mut world = world();
-    let ic = world.interpreter_context();
+    let code = world.code_expression(WASM_PATH_EXPR);
 
     let owner_address = "address:owner";
     let mut adder_contract =
@@ -34,7 +34,7 @@ fn tester_deploy_test() {
         .sc_deploy_use_result(
             ScDeployStep::new()
                 .from(owner_address)
-                .contract_code(WASM_PATH_EXPR, &ic)
+                .code(code)
                 .call(adder_contract.init())
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok()),

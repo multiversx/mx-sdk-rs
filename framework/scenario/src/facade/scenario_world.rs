@@ -1,3 +1,4 @@
+use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::world_mock::BlockchainState;
 
 use crate::{
@@ -9,6 +10,7 @@ use crate::{
     },
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
+    scenario_model::BytesValue,
     vm_go_tool::run_vm_go_tool,
 };
 use std::path::{Path, PathBuf};
@@ -126,6 +128,12 @@ impl ScenarioWorld {
         InterpreterContext::default()
             .with_dir(self.current_dir.clone())
             .with_allowed_missing_files()
+    }
+
+    /// Convenient way of creating a code expression based on the current context
+    /// (i.e. with the paths resolved, as configured).
+    pub fn code_expression(&self, path: &str) -> BytesValue {
+        BytesValue::interpret_from(path, &self.interpreter_context())
     }
 
     pub fn register_contract_container(

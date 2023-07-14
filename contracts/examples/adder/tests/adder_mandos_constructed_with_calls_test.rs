@@ -2,6 +2,8 @@ use adder::*;
 use multiversx_sc::storage::mappers::SingleValue;
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
+const ADDER_PATH_EXPR: &str = "file:output/adder.wasm";
+
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
@@ -13,9 +15,9 @@ fn world() -> ScenarioWorld {
 #[test]
 fn adder_scenario_constructed_raw() {
     let mut world = world();
-    let ic = world.interpreter_context();
     let owner_address = "address:owner";
     let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let adder_code = world.code_expression(ADDER_PATH_EXPR);
 
     world
         .start_trace()
@@ -27,7 +29,7 @@ fn adder_scenario_constructed_raw() {
         .sc_deploy_use_result(
             ScDeployStep::new()
                 .from(owner_address)
-                .contract_code("file:output/adder.wasm", &ic)
+                .code(adder_code)
                 .call(adder_contract.init(5u32))
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),

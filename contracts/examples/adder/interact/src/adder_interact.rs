@@ -18,7 +18,9 @@ use multiversx_sc_snippets::{
         mandos_system::ScenarioRunner,
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect},
+        scenario_model::{
+            BytesValue, ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect,
+        },
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -58,6 +60,7 @@ async fn main() {
 struct AdderInteract {
     interactor: Interactor,
     wallet_address: Address,
+    adder_code: BytesValue,
     state: State,
 }
 
@@ -69,10 +72,13 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let adder_code =
+            BytesValue::interpret_from("file:../output/adder.wasm", &InterpreterContext::default());
 
         Self {
             interactor,
             wallet_address,
+            adder_code,
             state: State::load_state(),
         }
     }
@@ -101,7 +107,7 @@ impl AdderInteract {
                     .call(self.state.default_adder().init(BigUint::from(0u64)))
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
-                    .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
+                    .code(&self.adder_code)
                     .gas_limit("5,000,000")
                     .expect(TxExpect::ok()),
                 |new_address, tr| {
@@ -133,7 +139,7 @@ impl AdderInteract {
                 .call(self.state.default_adder().init(0u32))
                 .from(&self.wallet_address)
                 .code_metadata(CodeMetadata::all())
-                .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
+                .code(&self.adder_code)
                 .gas_limit("70,000,000")
                 .expect(TxExpect::ok());
 

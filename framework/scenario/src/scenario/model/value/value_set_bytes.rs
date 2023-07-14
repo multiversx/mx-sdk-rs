@@ -102,6 +102,18 @@ impl From<&BytesKey> for BytesValue {
     }
 }
 
+impl From<&BytesValue> for BytesValue {
+    fn from(from: &BytesValue) -> Self {
+        from.clone()
+    }
+}
+
+impl From<(&str, &InterpreterContext)> for BytesValue {
+    fn from(from: (&str, &InterpreterContext)) -> Self {
+        BytesValue::interpret_from(from.0, from.1)
+    }
+}
+
 impl Default for BytesValue {
     fn default() -> Self {
         Self {

@@ -1,6 +1,8 @@
 use adder::*;
 use multiversx_sc_scenario::{scenario_model::*, *};
 
+const ADDER_PATH_EXPR: &str = "file:output/adder.wasm";
+
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
@@ -11,10 +13,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn adder_whitebox() {
-    let adder_whitebox = WhiteboxContract::new("sc:adder", adder::contract_obj);
-
     let mut world = world();
-    let ic = world.interpreter_context();
+    let adder_whitebox = WhiteboxContract::new("sc:adder", adder::contract_obj);
+    let adder_code = world.code_expression(ADDER_PATH_EXPR);
+
     world
         .set_state_step(
             SetStateStep::new()
@@ -23,9 +25,7 @@ fn adder_whitebox() {
         )
         .whitebox_deploy(
             &adder_whitebox,
-            ScDeployStep::new()
-                .from("address:owner")
-                .contract_code("file:output/adder.wasm", &ic),
+            ScDeployStep::new().from("address:owner").code(adder_code),
             |sc| {
                 sc.init(5u32.into());
             },

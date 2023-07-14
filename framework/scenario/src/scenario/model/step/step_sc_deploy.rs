@@ -55,6 +55,18 @@ impl ScDeployStep {
         self
     }
 
+    pub fn code<V>(mut self, expr: V) -> Self
+    where
+        BytesValue: From<V>,
+    {
+        self.tx.contract_code = BytesValue::from(expr);
+        self
+    }
+
+    #[deprecated(
+        since = "0.42.0",
+        note = "Please use method `code` instead. To ease transition, it is also possible to call it with a tuple like so: `.code((expr, context))`"
+    )]
     pub fn contract_code(mut self, expr: &str, context: &InterpreterContext) -> Self {
         self.tx.contract_code = BytesValue::interpret_from(expr, context);
         self

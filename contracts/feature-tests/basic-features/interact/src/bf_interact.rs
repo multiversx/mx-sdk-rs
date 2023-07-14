@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         bech32,
         mandos_system::ScenarioRunner,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{ScCallStep, ScDeployStep, Scenario, TxExpect},
+        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario, TxExpect},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -47,6 +47,7 @@ async fn main() {
 struct BasicFeaturesInteract {
     interactor: Interactor,
     wallet_address: Address,
+    code_expr: BytesValue,
     state: State,
     large_storage_payload: Vec<u8>,
 }
@@ -59,10 +60,15 @@ impl BasicFeaturesInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let code_expr = BytesValue::interpret_from(
+            "file:../output/basic-features-storage-bytes.wasm",
+            &InterpreterContext::default(),
+        );
 
         Self {
             interactor,
             wallet_address,
+            code_expr,
             state: State::load_state(),
             large_storage_payload: Vec::new(),
         }
@@ -101,10 +107,7 @@ impl BasicFeaturesInteract {
                     .call(self.state.default_contract().init())
                     .from(&self.wallet_address)
                     .code_metadata(CodeMetadata::all())
-                    .contract_code(
-                        "file:../output/basic-features-storage-bytes.wasm",
-                        &InterpreterContext::default(),
-                    )
+                    .code(&self.code_expr)
                     .gas_limit("4,000,000")
                     .expect(TxExpect::ok()),
                 |new_address, tr| {

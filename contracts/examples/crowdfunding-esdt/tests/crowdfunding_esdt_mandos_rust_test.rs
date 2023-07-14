@@ -2,21 +2,20 @@ use crowdfunding_esdt::*;
 use multiversx_sc::types::EgldOrEsdtTokenIdentifier;
 use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
 
+const CF_PATH_EXPR: &str = "file:output/crowdfunding-esdt.wasm";
+
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/crowdfunding-esdt");
 
-    blockchain.register_contract(
-        "file:output/crowdfunding-esdt.wasm",
-        crowdfunding_esdt::ContractBuilder,
-    );
+    blockchain.register_contract(CF_PATH_EXPR, crowdfunding_esdt::ContractBuilder);
     blockchain
 }
 
 #[test]
 fn crowdfunding_scenario_rust_test() {
     let mut world = world();
-    let ctx = world.interpreter_context();
+    let cf_code = world.code_expression(CF_PATH_EXPR);
 
     let owner_addr = "address:owner";
     let first_user_addr = "address:user1";
@@ -37,7 +36,7 @@ fn crowdfunding_scenario_rust_test() {
     world.sc_deploy_step(
         ScDeployStep::new()
             .from(owner_addr)
-            .contract_code("file:output/crowdfunding-esdt.wasm", &ctx)
+            .code(cf_code)
             .call(cf_sc.init(
                 2_000u32,
                 deadline,
