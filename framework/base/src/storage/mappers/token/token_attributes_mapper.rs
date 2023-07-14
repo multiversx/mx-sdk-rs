@@ -2,7 +2,7 @@ use core::marker::PhantomData;
 
 use crate::codec::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
-use super::StorageMapper;
+use super::super::StorageMapper;
 use crate::{
     api::{ErrorApiImpl, ManagedTypeApi, StorageMapperApi},
     storage::{storage_clear, storage_get, storage_get_len, storage_set, StorageKey},

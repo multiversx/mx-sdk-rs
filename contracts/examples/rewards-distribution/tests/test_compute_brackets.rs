@@ -9,7 +9,7 @@ multiversx_sc::imports!();
 
 #[test]
 fn test_compute_brackets() {
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut wrapper = BlockchainStateWrapper::new();
 

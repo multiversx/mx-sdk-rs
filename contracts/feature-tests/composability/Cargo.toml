@@ -33,5 +33,5 @@ path = "vault"
 path = "interact"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.41.0"
+version = "0.41.3"
 path = "../../../framework/scenario"

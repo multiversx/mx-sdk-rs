@@ -11,7 +11,7 @@
             "id": "1-check-is-initially-not-paused",
             "tx": {
                 "from": "address:owner",
-                "to": "sc:use-module",
+                "to": "sc:check-pause",
                 "function": "checkPause",
                 "arguments": [],
                 "gasLimit": "30,000,000",
@@ -51,7 +51,7 @@
             "id": "3-check-is-paused",
             "tx": {
                 "from": "address:owner",
-                "to": "sc:use-module",
+                "to": "sc:check-pause",
                 "function": "checkPause",
                 "arguments": [],
                 "gasLimit": "20,000,000",
@@ -91,7 +91,7 @@
             "id": "4-check-has-resumed",
             "tx": {
                 "from": "address:owner",
-                "to": "sc:use-module",
+                "to": "sc:check-pause",
                 "function": "checkPause",
                 "arguments": [],
                 "gasLimit": "20,000,000",

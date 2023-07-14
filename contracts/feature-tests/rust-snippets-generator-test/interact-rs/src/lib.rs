@@ -27,7 +27,7 @@ type ContractType = ContractInfo<rust_snippets_generator_test::Proxy<DebugApi>>;
 #[tokio::main]
 async fn main() {
     env_logger::init();
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut args = std::env::args();
     let _ = args.next();

@@ -1214,7 +1214,7 @@ fn managed_environment_consistency_test() {
 
 #[test]
 fn test_managed_values_standalone_consistency() {
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
@@ -1244,7 +1244,7 @@ fn test_managed_values_standalone_consistency() {
 
 #[test]
 fn test_managed_values_argument_and_return_value_consistency() {
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));
@@ -1281,7 +1281,7 @@ fn test_managed_values_argument_and_return_value_consistency() {
 
 #[test]
 fn test_managed_values_insert_handle_panics() {
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut blockchain_wrapper = BlockchainStateWrapper::new();
     let owner_address = blockchain_wrapper.create_user_account(&rust_biguint!(0u64));

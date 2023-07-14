@@ -15,7 +15,7 @@ mod utils;
 
 #[test]
 fn test_raffle_and_claim() {
-    let _ = DebugApi::dummy();
+    DebugApi::dummy();
 
     let mut wrapper = BlockchainStateWrapper::new();
 

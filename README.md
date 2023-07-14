@@ -26,7 +26,7 @@ The crowdfunding tutorial is a great place to start: https://docs.multiversx.com
 
 # IDE
 
-The framework is designed to be easiest to use with the Elrond IDE VSCode extension: https://marketplace.visualstudio.com/items?itemName=Elrond.vscode-elrond-ide
+The framework is designed to be easiest to use with the IDE VSCode extension: https://marketplace.visualstudio.com/items?itemName=Elrond.vscode-elrond-ide
 
 # Building contracts
 

@@ -6,7 +6,7 @@ use crate::{
 };
 use alloc::{boxed::Box, vec::Vec};
 
-/// Deserializes from Elrond's smart contract call format.
+/// Deserializes from the MultiversX smart contract call format.
 ///
 /// This format consists of the function name, followed by '@', follwed by hex-encoded argument bytes separated by '@' characters.
 /// Example: "funcName@00000@aaaa@1234@@".

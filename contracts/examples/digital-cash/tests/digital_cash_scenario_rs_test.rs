@@ -12,15 +12,23 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-#[ignore] // verify_ed25519 not implemented
 fn claim_egld_rs() {
     world().run("scenarios/claim-egld.scen.json");
 }
 
 #[test]
-#[ignore] // verify_ed25519 not implemented
 fn claim_esdt_rs() {
     world().run("scenarios/claim-esdt.scen.json");
+}
+
+#[test]
+fn claim_fees_rs() {
+    world().run("scenarios/claim-fees.scen.json");
+}
+
+#[test]
+fn claim_multi_esdt_rs() {
+    world().run("scenarios/claim-multi-esdt.scen.json");
 }
 
 #[test]
@@ -46,4 +54,9 @@ fn withdraw_egld_rs() {
 #[test]
 fn withdraw_esdt_rs() {
     world().run("scenarios/withdraw-esdt.scen.json");
+}
+
+#[test]
+fn withdraw_multi_esdt_rs() {
+    world().run("scenarios/withdraw-multi-esdt.scen.json");
 }

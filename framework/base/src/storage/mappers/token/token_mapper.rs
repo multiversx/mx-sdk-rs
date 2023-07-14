@@ -10,7 +10,10 @@ use crate::{
     },
 };
 
+use super::TokenMapperState;
+
 pub(crate) const TOKEN_ID_ALREADY_SET_ERR_MSG: &[u8] = b"Token ID already set";
+pub(crate) const PENDING_ERR_MSG: &[u8] = b"Issue was already called";
 pub(crate) const MUST_SET_TOKEN_ID_ERR_MSG: &[u8] = b"Must issue or set token ID first";
 pub(crate) const INVALID_TOKEN_ID_ERR_MSG: &[u8] = b"Invalid token ID";
 pub(crate) const INVALID_PAYMENT_TOKEN_ERR_MSG: &[u8] = b"Invalid payment token";
@@ -24,6 +27,8 @@ where
     fn is_empty(&self) -> bool {
         storage_get_len(self.get_storage_key()) == 0
     }
+
+    fn get_token_state(&self) -> TokenMapperState<SA>;
 
     fn get_token_id(&self) -> TokenIdentifier<SA>;
 
@@ -95,13 +100,6 @@ where
     }
 }
 
-#[inline]
-pub(crate) fn read_token_id<SA: StorageMapperApi + CallTypeApi>(
-    storage_key: ManagedRef<SA, StorageKey<SA>>,
-) -> TokenIdentifier<SA> {
-    storage_get(storage_key)
-}
-
 pub(crate) fn store_token_id<
     SA: StorageMapperApi + CallTypeApi,
     Mapper: StorageTokenWrapper<SA>,
@@ -109,12 +107,28 @@ pub(crate) fn store_token_id<
     mapper: &Mapper,
     token_id: &TokenIdentifier<SA>,
 ) {
-    if !mapper.is_empty() {
+    if mapper.get_token_state().is_set() {
         SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
     }
     if !token_id.is_valid_esdt_identifier() {
         SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
     }
-
-    storage_set(mapper.get_storage_key(), token_id);
+    storage_set(
+        mapper.get_storage_key(),
+        &TokenMapperState::Token(token_id.clone()),
+    );
+}
+pub(crate) fn check_not_set<SA: StorageMapperApi + CallTypeApi, Mapper: StorageTokenWrapper<SA>>(
+    mapper: &Mapper,
+) {
+    let storage_value: TokenMapperState<SA> = storage_get(mapper.get_storage_key());
+    match storage_value {
+        TokenMapperState::NotSet => {},
+        TokenMapperState::Pending => {
+            SA::error_api_impl().signal_error(PENDING_ERR_MSG);
+        },
+        TokenMapperState::Token(_) => {
+            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
+        },
+    }
 }

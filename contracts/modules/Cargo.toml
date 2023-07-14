@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-modules"
-version = "0.41.0"
+version = "0.41.3"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -9,7 +9,7 @@ readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
-description = "Elrond WebAssembly standard smart contract modules"
+description = "MultiversX WebAssembly standard smart contract modules"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
@@ -17,5 +17,5 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 alloc = ["multiversx-sc/alloc"]
 
 [dependencies.multiversx-sc]
-version = "0.41.0"
+version = "0.41.3"
 path = "../../framework/base"
