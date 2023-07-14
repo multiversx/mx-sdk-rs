@@ -261,25 +261,24 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let mut typed_sc_call = self
-            .state
-            .multisig()
-            .perform_action_endpoint(action_id)
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit(gas_expr);
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        if !typed_sc_call.response().is_success() {
-            println!(
-                "perform action `{action_id}` failed with: {}",
-                typed_sc_call.response().tx_error
-            );
-            return;
-        }
-
-        println!("successfully performed action `{action_id}`");
+        self.interactor
+            .sc_call_use_raw_response(
+                ScCallStep::new()
+                    .call(self.state.multisig().perform_action_endpoint(action_id))
+                    .from(&self.wallet_address)
+                    .gas_limit(gas_expr),
+                |response| {
+                    if !response.is_success() {
+                        println!(
+                            "perform action `{action_id}` failed with: {}",
+                            response.tx_error
+                        );
+                    } else {
+                        println!("successfully performed action `{action_id}`");
+                    }
+                },
+            )
+            .await;
     }
 
     async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: &str) {
@@ -290,11 +289,8 @@ impl MultisigInteract {
             }
             println!("quorum reached for action `{action_id}`");
 
-            let typed_sc_call = self
-                .state
-                .multisig()
-                .perform_action_endpoint(action_id)
-                .into_blockchain_call()
+            let typed_sc_call = ScCallStep::new()
+                .call(self.state.multisig().perform_action_endpoint(action_id))
                 .from(&self.wallet_address)
                 .gas_limit(gas_expr);
 
@@ -342,16 +338,12 @@ impl MultisigInteract {
                 continue;
             }
 
-            let sc_call_step: ScCallStep = self
-                .state
-                .multisig()
-                .sign(action_id)
-                .into_blockchain_call()
+            let typed_sc_call = ScCallStep::new()
+                .call(self.state.multisig().sign(action_id))
                 .from(signer)
-                .gas_limit("15,000,000")
-                .into();
+                .gas_limit("15,000,000");
 
-            steps.push(sc_call_step);
+            steps.push(typed_sc_call);
         }
 
         self.interactor
