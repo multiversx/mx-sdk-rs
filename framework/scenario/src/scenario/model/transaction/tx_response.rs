@@ -25,29 +25,6 @@ pub struct TxResponse {
 }
 
 impl TxResponse {
-    /// Creates a scenario "expect" field based on the real response.
-    ///
-    /// Useful for creating traces that also check the results come out always the same.
-    pub fn to_expect(&self) -> TxExpect {
-        if self.tx_error.is_success() {
-            let mut tx_expect = TxExpect::ok();
-            if self.out.is_empty() {
-                tx_expect = tx_expect.no_result();
-            } else {
-                for raw_result in &self.out {
-                    let result_hex_string = format!("0x{}", hex::encode(raw_result));
-                    tx_expect = tx_expect.result(result_hex_string.as_str());
-                }
-            }
-            tx_expect
-        } else {
-            TxExpect::err(
-                self.tx_error.status,
-                format!("str:{}", self.tx_error.message),
-            )
-        }
-    }
-
     pub fn from_tx_result(tx_result: TxResult) -> Self {
         TxResponse {
             out: tx_result.result_values,
@@ -81,6 +58,29 @@ impl TxResponse {
         }
     }
 
+    /// Creates a scenario "expect" field based on the real response.
+    ///
+    /// Useful for creating traces that also check the results come out always the same.
+    pub fn to_expect(&self) -> TxExpect {
+        if self.tx_error.is_success() {
+            let mut tx_expect = TxExpect::ok();
+            if self.out.is_empty() {
+                tx_expect = tx_expect.no_result();
+            } else {
+                for raw_result in &self.out {
+                    let result_hex_string = format!("0x{}", hex::encode(raw_result));
+                    tx_expect = tx_expect.result(result_hex_string.as_str());
+                }
+            }
+            tx_expect
+        } else {
+            TxExpect::err(
+                self.tx_error.status,
+                format!("str:{}", self.tx_error.message),
+            )
+        }
+    }
+
     fn process_signal_error(&self) -> TxResponseStatus {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SIGNAL_ERROR) {
             let topics = event.topics.as_ref();
@@ -108,8 +108,8 @@ impl TxResponse {
             .iter()
             .find(|scr| scr.nonce != 0 && scr.data.starts_with('@'));
 
-        if out_scr.is_some() {
-            self.out = decode_scr_data_or_panic(&out_scr.unwrap().data);
+        if let Some(out_scr) = out_scr {
+            self.out = decode_scr_data_or_panic(&out_scr.data);
         }
 
         self
@@ -118,7 +118,7 @@ impl TxResponse {
     fn process_new_deployed_address(mut self) -> Self {
         if let Some(event) = self.find_log(LOG_IDENTIFIER_SC_DEPLOY).cloned() {
             let topics = event.topics.as_ref();
-            if let Some(_) = process_topics_error(topics) {
+            if process_topics_error(topics).is_some() {
                 return self;
             }
 
