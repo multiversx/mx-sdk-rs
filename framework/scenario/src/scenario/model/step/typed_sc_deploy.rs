@@ -36,10 +36,6 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         )
     }
 
-    pub fn response(&self) -> &TxResponse {
-        self.sc_deploy_step.response.as_ref().unwrap()
-    }
-
     pub fn from<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,
@@ -87,8 +83,17 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         self
     }
 
+    /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.sc_deploy_step = self.sc_deploy_step.expect(expect);
+        self
+    }
+
+    /// Explicitly states that no tx expect section should be added and no checks should be performed.
+    ///
+    /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
+    pub fn no_expect(mut self) -> Self {
+        self.sc_deploy_step.expect = None;
         self
     }
 
@@ -101,6 +106,11 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
             self.sc_deploy_step.tx.arguments.push(BytesValue::from(arg));
         }
         self
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.sc_deploy_step.response()
     }
 }
 

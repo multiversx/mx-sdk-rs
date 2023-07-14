@@ -116,6 +116,13 @@ impl ScQueryStep {
         self
     }
 
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.response
+            .as_ref()
+            .expect("SC query response not yet available")
+    }
+
     pub fn save_response(&mut self, tx_response: TxResponse) {
         if let Some(expect) = &mut self.expect {
             if expect.build_from_response {

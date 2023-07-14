@@ -43,10 +43,6 @@ impl ScCallStep {
         Self::default()
     }
 
-    pub fn response(&self) -> &TxResponse {
-        self.response.as_ref().unwrap()
-    }
-
     pub fn from<A>(mut self, address: A) -> Self
     where
         AddressValue: From<A>,
@@ -169,6 +165,13 @@ impl ScCallStep {
     pub fn no_expect(mut self) -> Self {
         self.expect = None;
         self
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.response
+            .as_ref()
+            .expect("SC call response not yet available")
     }
 
     pub fn save_response(&mut self, tx_response: TxResponse) {

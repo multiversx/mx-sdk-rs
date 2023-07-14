@@ -44,10 +44,6 @@ impl ScDeployStep {
         Self::default()
     }
 
-    pub fn response(&self) -> &TxResponse {
-        self.response.as_ref().unwrap()
-    }
-
     pub fn from<V>(mut self, expr: V) -> Self
     where
         AddressValue: From<V>,
@@ -125,6 +121,13 @@ impl ScDeployStep {
     pub fn no_expect(mut self) -> Self {
         self.expect = None;
         self
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.response
+            .as_ref()
+            .expect("SC deploy response not yet available")
     }
 
     pub fn save_response(&mut self, response: TxResponse) {
