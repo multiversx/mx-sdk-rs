@@ -20,6 +20,11 @@ fn forward_go() {
 }
 
 #[test]
+fn claim_fees_go() {
+    multiversx_sc_scenario::run_go("scenarios/claim-fees.scen.json");
+}
+
+#[test]
 fn fund_egld_and_esdt_go() {
     world().run("scenarios/fund-egld-and-esdt.scen.json");
 }

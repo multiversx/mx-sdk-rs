@@ -1,20 +1,24 @@
-use crate::codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use crate::{
+    abi::TypeAbi,
+    api::ErrorApiImpl,
+    codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+    storage_clear, storage_get, storage_set,
+};
 
 use super::{
-    token_mapper::{
-        read_token_id, store_token_id, StorageTokenWrapper, TOKEN_ID_ALREADY_SET_ERR_MSG,
-    },
-    StorageMapper,
+    super::StorageMapper,
+    token_mapper::{check_not_set, store_token_id, StorageTokenWrapper, INVALID_TOKEN_ID_ERR_MSG},
+    TokenMapperState,
 };
 use crate::{
-    abi::{TypeAbi, TypeName},
-    api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
+    abi::TypeName,
+    api::{CallTypeApi, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
         BigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
-        ManagedBuffer, ManagedRef, ManagedType, TokenIdentifier,
+        ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
 
@@ -27,7 +31,7 @@ where
     SA: StorageMapperApi + CallTypeApi,
 {
     key: StorageKey<SA>,
-    token_id: TokenIdentifier<SA>,
+    token_state: TokenMapperState<SA>,
 }
 
 impl<SA> StorageMapper<SA> for FungibleTokenMapper<SA>
@@ -36,7 +40,7 @@ where
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         Self {
-            token_id: read_token_id(base_key.as_ref()),
+            token_state: storage_get(base_key.as_ref()),
             key: base_key,
         }
     }
@@ -46,21 +50,33 @@ impl<SA> StorageTokenWrapper<SA> for FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    fn get_storage_key(&self) -> ManagedRef<SA, StorageKey<SA>> {
+    fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
         self.key.as_ref()
     }
 
+    fn get_token_state(&self) -> TokenMapperState<SA> {
+        self.token_state.clone()
+    }
+
     fn get_token_id(&self) -> TokenIdentifier<SA> {
-        self.token_id.clone()
+        if let TokenMapperState::Token(token) = &self.token_state {
+            token.clone()
+        } else {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG)
+        }
     }
 
     fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
-        &self.token_id
+        if let TokenMapperState::Token(token) = &self.token_state {
+            token
+        } else {
+            SA::error_api_impl().signal_error(INVALID_TOKEN_ID_ERR_MSG);
+        }
     }
 
     fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
         store_token_id(self, &token_id);
-        self.token_id = token_id;
+        self.token_state = TokenMapperState::Token(token_id);
     }
 }
 
@@ -68,7 +84,22 @@ impl<SA> FungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
-    /// Important: If you use custom callback, remember to save the token ID in the callback!
+    /// Important: If you use custom callback, remember to save the token ID in the callback and clear the mapper in case of error! Clear is unusable outside this specific case.
+    ///
+    /// #[callback]
+    /// fn my_custom_callback(
+    ///     &self,
+    ///     #[call_result] result: ManagedAsyncCallResult<()>,
+    /// ) {
+    ///      match result {
+    ///     ManagedAsyncCallResult::Ok(token_id) => {
+    ///         self.fungible_token_mapper().set_token_id(token_id);
+    ///     },
+    ///     ManagedAsyncCallResult::Err(_) => {
+    ///         self.fungible_token_mapper().clear();
+    ///     },
+    /// }
+    ///
     /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from multiversx-sc-modules
     /// and pass None for the opt_callback argument
     pub fn issue(
@@ -80,9 +111,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        if !self.is_empty() {
-            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
+        check_not_set(self);
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
@@ -94,6 +123,7 @@ where
             ..Default::default()
         };
 
+        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         system_sc_proxy
             .issue_fungible(
                 issue_cost,
@@ -107,7 +137,22 @@ where
             .call_and_exit();
     }
 
-    /// Important: If you use custom callback, remember to save the token ID in the callback!
+    /// Important: If you use custom callback, remember to save the token ID in the callback and clear the mapper in case of error! Clear is unusable outside this specific case.
+    ///
+    /// #[callback]
+    /// fn my_custom_callback(
+    ///     &self,
+    ///     #[call_result] result: ManagedAsyncCallResult<()>,
+    /// ) {
+    ///      match result {
+    ///     ManagedAsyncCallResult::Ok(token_id) => {
+    ///         self.fungible_token_mapper().set_token_id(token_id);
+    ///     },
+    ///     ManagedAsyncCallResult::Err(_) => {
+    ///         self.fungible_token_mapper().clear();
+    ///     },
+    /// }
+    ///
     /// If you want to use default callbacks, import the default_issue_callbacks::DefaultIssueCallbacksModule from multiversx-sc-modules
     /// and pass None for the opt_callback argument
     pub fn issue_and_set_all_roles(
@@ -118,9 +163,7 @@ where
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
-        if !self.is_empty() {
-            SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
-        }
+        check_not_set(self);
 
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
@@ -128,6 +171,7 @@ where
             None => self.default_callback_closure_obj(&BigUint::zero()),
         };
 
+        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         system_sc_proxy
             .issue_and_set_all_roles(
                 issue_cost,
@@ -139,6 +183,13 @@ where
             .async_call()
             .with_callback(callback)
             .call_and_exit();
+    }
+
+    pub fn clear(&mut self) {
+        let state: TokenMapperState<SA> = storage_get(self.key.as_ref());
+        if state.is_pending() {
+            storage_clear(self.key.as_ref());
+        }
     }
 
     fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {

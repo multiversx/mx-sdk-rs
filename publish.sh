@@ -67,11 +67,11 @@ cd sdk/scenario-format/
 cargo publish || return 1
 cd ../..
 
-cd framework/codec-derive
+cd data/codec-derive
 cargo publish || return 1
 cd ../..
 
-cd framework/codec
+cd data/codec
 cargo publish || return 1
 cd ../..
 

@@ -1,7 +1,7 @@
 /// Not necessarily the last entry in `VERSIONS`.
 ///
 /// Indicates where to stop with the upgrades.
-pub const DEFAULT_LAST_VERSION: &str = "0.41.0";
+pub const DEFAULT_LAST_VERSION: &str = "0.41.3";
 
 /// Known version for the upgrader.
 #[rustfmt::skip]
@@ -32,9 +32,12 @@ pub const VERSIONS: &[&str] = &[
     "0.39.6",
     "0.39.7",
     "0.39.8",
-    "0.41.0",
+    "0.40.0",
     "0.40.1",
     "0.41.0",
+    "0.41.1",
+    "0.41.2",
+    "0.41.3",
 ];
 
 pub struct VersionIterator {

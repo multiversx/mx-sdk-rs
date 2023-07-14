@@ -1,6 +1,6 @@
 use crate::types::VMAddress;
 
-/// Holds the data for a Elrond standard digital token transaction
+/// Holds the data for a MultiversX standard digital token transaction
 #[derive(Clone, Default, Debug)]
 pub struct EsdtInstanceMetadata {
     pub name: Vec<u8>,

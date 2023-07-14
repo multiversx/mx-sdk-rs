@@ -3,7 +3,7 @@ use num_traits::Zero;
 
 use super::EsdtInstanceMetadata;
 
-/// Holds the data for a Elrond standard digital token transaction
+/// Holds the data for a MultiversX standard digital token transaction
 #[derive(Clone, Default, Debug)]
 pub struct EsdtInstance {
     pub nonce: u64,
