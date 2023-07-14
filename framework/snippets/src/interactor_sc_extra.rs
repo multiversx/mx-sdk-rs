@@ -47,7 +47,7 @@ impl Interactor {
     pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScCall<OriginalResult>,
-    ) -> RequestedResult
+    ) -> TypedResponse<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
@@ -55,7 +55,7 @@ impl Interactor {
         self.sc_call(step.as_mut()).await;
         let response = unwrap_response(&step.as_mut().response);
         let typed_response = TypedResponse::from_raw(response);
-        typed_response.result.unwrap()
+        typed_response
     }
 
     pub async fn sc_query_use_raw_response<S, F>(

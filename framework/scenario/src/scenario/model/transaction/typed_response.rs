@@ -6,6 +6,7 @@ where
     T: TopDecodeMulti,
 {
     pub result: Result<T, TxResponseStatus>,
+    pub new_issued_token_identifier: Option<String>,
     pub logs: Vec<Log>,
     pub gas: u64,
     pub refund: u64,
@@ -26,6 +27,7 @@ where
 
         TypedResponse {
             result,
+            new_issued_token_identifier: raw_response.new_issued_token_identifier.clone(),
             logs: raw_response.logs.clone(),
             gas: raw_response.gas,
             refund: raw_response.refund,
