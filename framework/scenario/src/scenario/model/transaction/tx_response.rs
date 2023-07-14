@@ -58,14 +58,20 @@ impl TxResponse {
 
     fn process_out(mut self) -> Self {
         if let Some(first_scr) = self.api_scrs.get(0) {
-            self.out = decode_scr_data_or_panic(first_scr.data.as_str());
+            if let Some(out) = decode_scr_data_or_panic(first_scr.data.as_str()) {
+                self.out = out;
 
-            return self
-        } else if let Some(write_log_logs) = self.find_last_log("writeLog") {
+                return self
+            }
+        }
+
+        if let Some(write_log_logs) = self.find_last_log("writeLog") {
             if let Some(data) = &write_log_logs.data {
                 let decoded_data = String::from_utf8(base64::decode(data).unwrap()).unwrap();
-                self.out = decode_scr_data_or_panic(decoded_data.as_str());
-                return self
+                if let Some(out) = decode_scr_data_or_panic(decoded_data.as_str()) {
+                    self.out = out;
+                    return self
+                }
             }
         }
 
@@ -183,13 +189,17 @@ impl TxResponse {
     }
 }
 
-fn decode_scr_data_or_panic(data: &str) -> Vec<Vec<u8>> {
+fn decode_scr_data_or_panic(data: &str) -> Option<Vec<Vec<u8>>> {
     let mut split = data.split('@');
     let _ = split.next().expect("SCR data should start with '@'");
     let result_code = split.next().expect("missing result code");
-    assert_eq!(result_code, "6f6b", "result code is not 'ok'");
+    if result_code != "6f6b" {
+        return None
+    }
 
-    split
+    let result = split
         .map(|encoded_arg| hex::decode(encoded_arg).expect("error hex-decoding result"))
-        .collect()
+        .collect();
+
+    Some(result)
 }
