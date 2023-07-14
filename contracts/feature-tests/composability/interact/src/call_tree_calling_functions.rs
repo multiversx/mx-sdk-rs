@@ -3,9 +3,7 @@ use std::{cell::RefCell, rc::Rc};
 use forwarder_queue::QueuedCallType;
 use multiversx_sc_snippets::{
     multiversx_sc::types::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, MultiValueEncoded},
-    multiversx_sc_scenario::{
-        api::StaticApi, bech32, num_bigint::BigUint, scenario_model::TxExpect,
-    },
+    multiversx_sc_scenario::{api::StaticApi, bech32, num_bigint::BigUint},
     StepBuffer,
 };
 
@@ -70,8 +68,7 @@ impl ComposabilityInteract {
                             ))
                             .into_blockchain_call()
                             .from(&self.wallet_address)
-                            .gas_limit("70,000,000")
-                            .expect(TxExpect::ok());
+                            .gas_limit("70,000,000");
 
                         steps.push(typed_sc_call);
                     },
@@ -100,8 +97,7 @@ impl ComposabilityInteract {
                             ))
                             .into_blockchain_call()
                             .from(&self.wallet_address)
-                            .gas_limit("70,000,000")
-                            .expect(TxExpect::ok());
+                            .gas_limit("70,000,000");
 
                         steps.push(typed_sc_call);
                     },
@@ -138,8 +134,7 @@ impl ComposabilityInteract {
             .forward_queued_calls()
             .into_blockchain_call()
             .from(&self.wallet_address)
-            .gas_limit("70,000,000")
-            .expect(TxExpect::ok());
+            .gas_limit("70,000,000");
 
         self.interactor.sc_call(typed_sc_call).await;
     }

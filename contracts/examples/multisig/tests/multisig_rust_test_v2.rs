@@ -182,8 +182,7 @@ impl MultisigTestState {
         let output: OptionalValue<Address> = self.world.sc_call_get_result(
             ScCallStep::new()
                 .from(caller)
-                .call(self.multisig.perform_action_endpoint(action_id))
-                .expect(TxExpect::ok()),
+                .call(self.multisig.perform_action_endpoint(action_id)),
         );
         output.into_option()
     }
@@ -212,17 +211,15 @@ impl MultisigTestState {
         ));
 
         let adder_init_args = self.adder.init(0u64).arg_buffer.into_multi_value_encoded();
-        self.world.sc_call_get_result(
-            ScCallStep::new()
-                .from(caller)
-                .call(self.multisig.propose_sc_deploy_from_source(
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(caller).call(
+                self.multisig.propose_sc_deploy_from_source(
                     0u64,
                     &self.adder,
                     CodeMetadata::DEFAULT,
                     adder_init_args,
-                ))
-                .expect(TxExpect::ok()),
-        )
+                ),
+            ))
     }
 
     fn multisig_call_adder_add(&mut self, number: BigUint, caller: &Address, signers: &[&Address]) {
@@ -232,17 +229,15 @@ impl MultisigTestState {
 
     fn multisig_propose_adder_add(&mut self, number: BigUint, caller: &Address) -> usize {
         let adder_call = self.adder.add(number);
-        self.world.sc_call_get_result(
-            ScCallStep::new()
-                .from(caller)
-                .call(self.multisig.propose_transfer_execute(
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(caller).call(
+                self.multisig.propose_transfer_execute(
                     &self.adder.to_address(),
                     0u32,
                     adder_call.endpoint_name,
                     adder_call.arg_buffer.into_multi_value_encoded(),
-                ))
-                .expect(TxExpect::ok()),
-        )
+                ),
+            ))
     }
 
     fn adder_expect_get_sum(&mut self, expected_sum: BigUint, caller: &Address) -> BigUint {

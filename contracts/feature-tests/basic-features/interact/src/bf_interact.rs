@@ -16,7 +16,7 @@ use multiversx_sc_snippets::{
         bech32,
         mandos_system::ScenarioRunner,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario, TxExpect},
+        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -107,8 +107,7 @@ impl BasicFeaturesInteract {
                     .call(self.state.default_contract().init())
                     .from(&self.wallet_address)
                     .code(&self.code_expr)
-                    .gas_limit("4,000,000")
-                    .expect(TxExpect::ok()),
+                    .gas_limit("4,000,000"),
                 |new_address, tr| {
                     tr.result
                         .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));

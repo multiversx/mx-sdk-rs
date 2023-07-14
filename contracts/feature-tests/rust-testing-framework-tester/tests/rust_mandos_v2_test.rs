@@ -35,8 +35,7 @@ fn tester_deploy_test() {
             ScDeployStep::new()
                 .from(owner_address)
                 .code(code)
-                .call(adder_contract.init())
-                .expect(TxExpect::ok()),
+                .call(adder_contract.init()),
             |address, tr: TypedResponse<String>| {
                 assert_eq!(address, adder_contract.to_address());
                 assert_eq!(tr.result.unwrap(), "constructor-result");

@@ -9,7 +9,7 @@ use multiversx_sc_snippets::{
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
-        scenario_model::{ScDeployStep, TxExpect, TypedScDeploy},
+        scenario_model::{ScDeployStep, TypedScDeploy},
     },
     StepBuffer,
 };
@@ -83,8 +83,7 @@ impl ComposabilityInteract {
                 )
                 .from(&self.wallet_address)
                 .code(&self.vault_code)
-                .gas_limit("70,000,000")
-                .expect(TxExpect::ok());
+                .gas_limit("70,000,000");
 
             typed_vault_deploys.push(typed_sc_deploy);
         }
@@ -102,8 +101,7 @@ impl ComposabilityInteract {
                 .call(self.state.default_forwarder_queue_address().init())
                 .from(&self.wallet_address)
                 .code(&self.forw_queue_code)
-                .gas_limit("70,000,000")
-                .expect(TxExpect::ok());
+                .gas_limit("70,000,000");
 
             typed_forwarder_deploys.push(typed_sc_deploy);
         }

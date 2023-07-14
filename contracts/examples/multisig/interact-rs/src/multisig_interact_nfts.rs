@@ -50,8 +50,7 @@ impl MultisigInteract {
             )
             .into_blockchain_call()
             .from(&self.wallet_address)
-            .gas_limit("10,000,000")
-            .expect(TxExpect::ok());
+            .gas_limit("10,000,000");
 
         self.interactor.sc_call(&mut typed_sc_call).await;
 
@@ -122,8 +121,7 @@ impl MultisigInteract {
             )
             .into_blockchain_call()
             .from(&self.wallet_address)
-            .gas_limit("10,000,000")
-            .expect(TxExpect::ok());
+            .gas_limit("10,000,000");
 
         self.interactor.sc_call(&mut typed_sc_call).await;
 

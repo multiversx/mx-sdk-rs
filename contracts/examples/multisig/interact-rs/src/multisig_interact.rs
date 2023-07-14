@@ -166,8 +166,7 @@ impl MultisigInteract {
             .into_blockchain_call()
             .from(&self.wallet_address)
             .code(&self.multisig_code)
-            .gas_limit("70,000,000")
-            .expect(TxExpect::ok());
+            .gas_limit("70,000,000");
 
         self.interactor.sc_deploy(&mut typed_sc_deploy).await;
 
@@ -203,8 +202,7 @@ impl MultisigInteract {
                 )
                 .from(&self.wallet_address)
                 .code(&self.multisig_code)
-                .gas_limit("70,000,000")
-                .expect(TxExpect::ok());
+                .gas_limit("70,000,000");
 
             steps.push(typed_sc_deploy);
         }

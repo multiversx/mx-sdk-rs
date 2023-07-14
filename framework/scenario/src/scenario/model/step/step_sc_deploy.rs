@@ -14,7 +14,7 @@ use crate::multiversx_sc::types::{CodeMetadata, ContractDeploy};
 
 use super::{convert_call_args, TypedScDeploy};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 pub struct ScDeployStep {
     pub id: String,
     pub tx_id: Option<String>,
@@ -23,6 +23,20 @@ pub struct ScDeployStep {
     pub tx: Box<TxDeploy>,
     pub expect: Option<TxExpect>,
     pub response: Option<TxResponse>,
+}
+
+impl Default for ScDeployStep {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            tx_id: Default::default(),
+            explicit_tx_hash: Default::default(),
+            comment: Default::default(),
+            tx: Default::default(),
+            expect: Some(TxExpect::ok()),
+            response: Default::default(),
+        }
+    }
 }
 
 impl ScDeployStep {
@@ -85,11 +99,6 @@ impl ScDeployStep {
         self
     }
 
-    pub fn expect(mut self, expect: TxExpect) -> Self {
-        self.expect = Some(expect);
-        self
-    }
-
     /// Sets following fields based on the smart contract proxy:
     /// - "function"
     /// - "arguments"
@@ -102,6 +111,20 @@ impl ScDeployStep {
             self = self.argument(arg.as_str());
         }
         self.into()
+    }
+
+    /// Adds a custom expect section to the tx.
+    pub fn expect(mut self, expect: TxExpect) -> Self {
+        self.expect = Some(expect);
+        self
+    }
+
+    /// Explicitly states that no tx expect section should be added and no checks should be performed.
+    ///
+    /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
+    pub fn no_expect(mut self) -> Self {
+        self.expect = None;
+        self
     }
 
     pub fn save_response(&mut self, response: TxResponse) {
