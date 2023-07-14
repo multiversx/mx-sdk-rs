@@ -132,6 +132,10 @@ impl ScCallStep {
     /// - "expect"
     ///     - "out"
     ///     - "status" set to 0
+    #[deprecated(
+        since = "0.42.0",
+        note = "Please use `call` followed by `expect`, there is no point in having a method that does both."
+    )]
     pub fn call_expect<CC, ExpectedResult>(
         self,
         contract_call: CC,
@@ -141,8 +145,7 @@ impl ScCallStep {
         CC: ContractCall<StaticApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
-        let typed = self.call(contract_call);
-        typed.expect_value(expected_value)
+        self.call(contract_call).expect_value(expected_value)
     }
 
     pub fn save_response(&mut self, tx_response: TxResponse) {
