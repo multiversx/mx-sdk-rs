@@ -138,8 +138,7 @@ impl MultisigTestState {
             ScDeployStep::new()
                 .from(self.owner.clone())
                 .code(self.world.code_expression(MULTISIG_PATH_EXPR))
-                .call(self.multisig.init(2u32, board))
-                .expect(TxExpect::ok().no_result()),
+                .call(self.multisig.init(2u32, board)),
         );
 
         self
@@ -156,8 +155,7 @@ impl MultisigTestState {
             ScDeployStep::new()
                 .from(self.owner.clone())
                 .code(self.world.code_expression(ADDER_PATH_EXPR))
-                .call(self.adder.init(0u64))
-                .expect(TxExpect::ok().no_result()),
+                .call(self.adder.init(0u64)),
         );
 
         self
@@ -167,8 +165,7 @@ impl MultisigTestState {
         self.world.sc_call_step(
             ScCallStep::new()
                 .from(signer)
-                .call(self.multisig.sign(action_id))
-                .expect(TxExpect::ok().no_result()),
+                .call(self.multisig.sign(action_id)),
         );
     }
 

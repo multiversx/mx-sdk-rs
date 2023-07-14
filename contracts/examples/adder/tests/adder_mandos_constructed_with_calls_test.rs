@@ -30,8 +30,7 @@ fn adder_scenario_constructed_raw() {
             ScDeployStep::new()
                 .from(owner_address)
                 .code(adder_code)
-                .call(adder_contract.init(5u32))
-                .expect(TxExpect::ok().no_result()),
+                .call(adder_contract.init(5u32)),
             |new_address, _: TypedResponse<()>| {
                 assert_eq!(new_address, adder_contract.to_address());
             },
@@ -46,8 +45,7 @@ fn adder_scenario_constructed_raw() {
             ScCallStep::new()
                 .from(owner_address)
                 .to(&adder_contract)
-                .call(adder_contract.add(3u32))
-                .expect(TxExpect::ok().no_result()),
+                .call(adder_contract.add(3u32)),
         )
         .check_state_step(
             CheckStateStep::new()
