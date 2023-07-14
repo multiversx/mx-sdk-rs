@@ -21,20 +21,20 @@ fn adder_mandos_constructed_raw() {
                 .put_account("address:owner", Account::new().nonce(1))
                 .new_address("address:owner", 1, "sc:adder"),
         )
-        .sc_deploy_step(
+        .sc_deploy(
             ScDeployStep::new()
                 .from("address:owner")
                 .code(adder_code)
                 .argument("5")
                 .expect(TxExpect::ok().no_result()),
         )
-        .sc_query_step(
+        .sc_query(
             ScQueryStep::new()
                 .to("sc:adder")
                 .function("getSum")
                 .expect(TxExpect::ok().result("5")),
         )
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from("address:owner")
                 .to("sc:adder")

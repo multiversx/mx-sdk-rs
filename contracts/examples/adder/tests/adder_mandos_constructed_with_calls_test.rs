@@ -35,13 +35,13 @@ fn adder_scenario_constructed_raw() {
                 assert_eq!(new_address, adder_contract.to_address());
             },
         )
-        .sc_query_step(
+        .sc_query(
             ScQueryStep::new()
                 .to(&adder_contract)
                 .call(adder_contract.sum())
                 .expect_value(SingleValue::from(BigUint::from(5u32))),
         )
-        .sc_call_step(
+        .sc_call(
             ScCallStep::new()
                 .from(owner_address)
                 .to(&adder_contract)

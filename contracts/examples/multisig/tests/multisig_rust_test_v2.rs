@@ -134,7 +134,7 @@ impl MultisigTestState {
         .into();
 
         let ic = &self.world.interpreter_context();
-        self.world.sc_deploy_step(
+        self.world.sc_deploy(
             ScDeployStep::new()
                 .from(self.owner.clone())
                 .code(self.world.code_expression(MULTISIG_PATH_EXPR))
@@ -151,7 +151,7 @@ impl MultisigTestState {
                 .put_account(&self.owner, Account::new().nonce(1))
                 .new_address(&self.owner, 1, &self.adder),
         );
-        self.world.sc_deploy_step(
+        self.world.sc_deploy(
             ScDeployStep::new()
                 .from(self.owner.clone())
                 .code(self.world.code_expression(ADDER_PATH_EXPR))
@@ -162,7 +162,7 @@ impl MultisigTestState {
     }
 
     fn multisig_sign(&mut self, action_id: usize, signer: &Address) {
-        self.world.sc_call_step(
+        self.world.sc_call(
             ScCallStep::new()
                 .from(signer)
                 .call(self.multisig.sign(action_id)),
