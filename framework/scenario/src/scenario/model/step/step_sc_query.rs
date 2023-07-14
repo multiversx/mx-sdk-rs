@@ -1,4 +1,5 @@
 use multiversx_sc::types::H256;
+use num_traits::Zero;
 
 use crate::{
     api::StaticApi,
@@ -7,9 +8,10 @@ use crate::{
         types::ContractCall,
     },
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
+    scenario_model::TxResponse,
 };
 
-use super::{format_expect, process_contract_call};
+use super::{process_contract_call, TypedScQuery};
 
 #[derive(Debug, Default, Clone)]
 pub struct ScQueryStep {
@@ -19,6 +21,7 @@ pub struct ScQueryStep {
     pub comment: Option<String>,
     pub tx: Box<TxQuery>,
     pub expect: Option<TxExpect>,
+    pub response: Option<TxResponse>,
 }
 
 impl ScQueryStep {
@@ -53,17 +56,21 @@ impl ScQueryStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<CC>(mut self, contract_call: CC) -> Self
+    pub fn call<CC>(mut self, contract_call: CC) -> TypedScQuery<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
     {
-        let (to_str, function, _, mandos_args) = process_contract_call(contract_call);
+        let (to_str, function, egld_value_expr, mandos_args) = process_contract_call(contract_call);
+        assert!(
+            egld_value_expr.value.is_zero(),
+            "cannot send EGLD value in queries"
+        );
         self = self.to(to_str.as_str());
         self = self.function(function.as_str());
         for arg in mandos_args {
             self = self.argument(arg.as_str());
         }
-        self
+        self.into()
     }
 
     /// Sets following fields based on the smart contract proxy:
@@ -74,16 +81,24 @@ impl ScQueryStep {
     ///     - "out"
     ///     - "status" set to 0
     pub fn call_expect<CC, ExpectedResult>(
-        mut self,
+        self,
         contract_call: CC,
-        expect_value: ExpectedResult,
-    ) -> Self
+        expected_value: ExpectedResult,
+    ) -> TypedScQuery<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
-        self = self.call(contract_call);
-        self = self.expect(format_expect(expect_value));
-        self
+        let typed = self.call(contract_call);
+        typed.expect_value(expected_value)
+    }
+
+    pub fn save_response(&mut self, tx_response: TxResponse) {
+        if let Some(expect) = &mut self.expect {
+            if expect.build_from_response {
+                expect.update_from_response(&tx_response)
+            }
+        }
+        self.response = Some(tx_response);
     }
 }

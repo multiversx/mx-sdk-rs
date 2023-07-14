@@ -39,7 +39,11 @@ impl State {
 
     /// Returns the contract
     pub fn bf_contract(&self) -> BasicFeaturesContract {
-        BasicFeaturesContract::new(self.bf_address.clone().unwrap())
+        BasicFeaturesContract::new(
+            self.bf_address
+                .clone()
+                .expect("basic-features contract not yet deployed"),
+        )
     }
 
     /// Returns the adder contract with default address

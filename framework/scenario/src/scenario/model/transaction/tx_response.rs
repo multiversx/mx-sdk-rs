@@ -1,12 +1,10 @@
-use core::panic;
-
 use crate::multiversx_sc::types::Address;
 use multiversx_chain_vm::tx_mock::TxResult;
 use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
-use super::{Log, TxResponseStatus};
+use super::{Log, TxExpect, TxResponseStatus};
 
 const LOG_IDENTIFIER_SC_DEPLOY: &str = "SCDeploy";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
@@ -26,6 +24,29 @@ pub struct TxResponse {
 }
 
 impl TxResponse {
+    /// Creates a scenario "expect" field based on the real response.
+    ///
+    /// Useful for creating traces that also check the results come out always the same.
+    pub fn to_expect(&self) -> TxExpect {
+        if self.tx_error.is_success() {
+            let mut tx_expect = TxExpect::ok();
+            if self.out.is_empty() {
+                tx_expect = tx_expect.no_result();
+            } else {
+                for raw_result in &self.out {
+                    let result_hex_string = format!("0x{}", hex::encode(raw_result));
+                    tx_expect = tx_expect.result(result_hex_string.as_str());
+                }
+            }
+            tx_expect
+        } else {
+            TxExpect::err(
+                self.tx_error.status,
+                format!("str:{}", self.tx_error.message),
+            )
+        }
+    }
+
     pub fn from_tx_result(tx_result: TxResult) -> Self {
         TxResponse {
             out: tx_result.result_values,
@@ -52,6 +73,13 @@ impl TxResponse {
         response.process()
     }
 
+    pub fn from_raw_results(raw_results: Vec<Vec<u8>>) -> Self {
+        TxResponse {
+            out: raw_results,
+            ..Default::default()
+        }
+    }
+
     fn process(self) -> Self {
         self.process_out().process_new_deployed_address()
     }
@@ -59,10 +87,6 @@ impl TxResponse {
     fn process_out(mut self) -> Self {
         if let Some(first_scr) = self.api_scrs.get(0) {
             self.out = decode_scr_data_or_panic(first_scr.data.as_str());
-        } else {
-            panic!("no smart contract results obtained")
-            // self.tx_error.status = 0; // TODO: Add correct status
-            // self.tx_error.message = "no smart contract results obtained".to_string();
         }
         self
     }
@@ -144,20 +168,20 @@ impl TxResponse {
     }
 
     // Returns the token identifier of the newly issued non-fungible token.
-    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, TxResponseStatus> {
+    pub fn issue_non_fungible_new_token_identifier(&self) -> Result<String, &'static str> {
         let token_identifier_issue_scr: Option<&ApiSmartContractResult> = self
             .api_scrs
             .iter()
             .find(|scr| scr.sender.to_string() == SYSTEM_SC_BECH32 && scr.data.starts_with("@00@"));
 
         if token_identifier_issue_scr.is_none() {
-            panic!("no token identifier issue SCR found");
+            return Err("no token identifier issue SCR found");
         }
 
         let token_identifier_issue_scr = token_identifier_issue_scr.unwrap();
         let encoded_tid = token_identifier_issue_scr.data.split('@').nth(2);
         if encoded_tid.is_none() {
-            panic!("no token identifier found in SCR");
+            return Err("no token identifier found in SCR");
         }
 
         Ok(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap())

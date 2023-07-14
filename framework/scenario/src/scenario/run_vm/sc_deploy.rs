@@ -1,9 +1,5 @@
 use crate::{
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-        types::heap::Address,
-    },
-    scenario::model::{ScDeployStep, TypedScDeploy},
+    multiversx_sc::types::heap::Address, scenario::model::ScDeployStep, scenario_model::TxResponse,
 };
 
 use multiversx_chain_vm::{
@@ -14,6 +10,17 @@ use multiversx_chain_vm::{
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
+    /// Adds a SC deploy step, as specified in the `step` argument, then executes it.
+    ///
+    /// The result of the operation gets saved back in the step's response field.
+    pub fn perform_sc_deploy_update_results(&mut self, step: &mut ScDeployStep) {
+        let (new_address, tx_result) =
+            self.perform_sc_deploy_lambda_and_check(step, execute_current_tx_context_input);
+        let mut response = TxResponse::from_tx_result(tx_result);
+        response.new_deployed_address = Some(new_address);
+        step.save_response(response);
+    }
+
     pub fn perform_sc_deploy_lambda<F>(
         &mut self,
         sc_deploy_step: &ScDeployStep,
@@ -50,37 +57,6 @@ impl ScenarioVMRunner {
             check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
         }
         (new_address, tx_result)
-    }
-
-    /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
-    pub fn perform_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) {
-        let _ = self
-            .perform_sc_deploy_lambda_and_check(sc_deploy_step, execute_current_tx_context_input);
-    }
-
-    /// Adds a SC deploy step, executes it and retrieves the transaction result ("out" field).
-    ///
-    /// The transaction is expected to complete successfully.
-    ///
-    /// It takes the `contract_call` argument separately from the SC call step,
-    /// so we can benefit from type inference in the result.
-    pub fn perform_sc_deploy_get_result<OriginalResult, RequestedResult>(
-        &mut self,
-        typed_sc_deploy: TypedScDeploy<OriginalResult>,
-    ) -> (Address, RequestedResult)
-    where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
-    {
-        let sc_deploy_step: ScDeployStep = typed_sc_deploy.into();
-        let (new_address, tx_result) =
-            self.perform_sc_deploy_lambda(&sc_deploy_step, execute_current_tx_context_input);
-        let mut raw_result = tx_result.result_values;
-        let deser_result =
-            RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
-                .unwrap();
-
-        (new_address, deser_result)
     }
 }
 

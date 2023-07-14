@@ -40,7 +40,11 @@ impl State {
 
     /// Returns the adder contract
     pub fn adder(&self) -> AdderContract {
-        AdderContract::new(self.adder_address.clone().unwrap())
+        AdderContract::new(
+            self.adder_address
+                .clone()
+                .expect("no known adder contract, deploy first"),
+        )
     }
 
     /// Returns the adder contract with default address

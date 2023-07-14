@@ -1,10 +1,15 @@
+use multiversx_chain_vm::tx_mock::result_values_to_string;
+
 use crate::{
     scenario::model::{BytesValue, CheckLogs, CheckValue, CheckValueList, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::TxExpectRaw,
     },
+    scenario_model::Checkable,
 };
+
+use super::TxResponse;
 
 #[derive(Debug, Clone)]
 pub struct TxExpect {
@@ -14,6 +19,7 @@ pub struct TxExpect {
     pub logs: CheckLogs,
     pub gas: CheckValue<U64Value>,
     pub refund: CheckValue<U64Value>,
+    pub build_from_response: bool,
 }
 
 impl TxExpect {
@@ -25,6 +31,7 @@ impl TxExpect {
             logs: CheckLogs::Star,
             gas: CheckValue::Star,
             refund: CheckValue::Star,
+            build_from_response: true,
         }
     }
 
@@ -43,11 +50,13 @@ impl TxExpect {
             logs: CheckLogs::Star,
             gas: CheckValue::Star,
             refund: CheckValue::Star,
+            build_from_response: true,
         }
     }
 
     pub fn no_result(mut self) -> Self {
         self.out = CheckValue::Equal(Vec::new());
+        self.build_from_response = false;
         self
     }
 
@@ -61,7 +70,39 @@ impl TxExpect {
             &InterpreterContext::default(),
         )));
         self.out = CheckValue::Equal(check_results);
+        self.build_from_response = false;
         self
+    }
+
+    fn check_response(&self, tx_response: &TxResponse) {
+        assert!(
+            self.status.check(tx_response.tx_error.status),
+            "result code mismatch. Want: {}. Have: {}. Message: {}",
+            self.status,
+            tx_response.tx_error.status,
+            &tx_response.tx_error.message,
+        );
+
+        assert!(
+            self.out.check(&tx_response.out),
+            "bad out value. Want: [{}]. Have: [{}]",
+            self.out_to_string(),
+            result_values_to_string(&tx_response.out),
+        );
+
+        assert!(
+            self.message.check(tx_response.tx_error.message.as_str()),
+            "result message mismatch. Want: {}. Have: {}.",
+            &self.status,
+            &tx_response.tx_error.message,
+        );
+    }
+
+    pub(crate) fn update_from_response(&mut self, tx_response: &TxResponse) {
+        if self.build_from_response {
+            self.check_response(tx_response);
+            *self = tx_response.to_expect();
+        }
     }
 }
 
@@ -74,6 +115,7 @@ impl InterpretableFrom<TxExpectRaw> for TxExpect {
             message: CheckValue::<BytesValue>::interpret_from(from.message, context),
             gas: CheckValue::<U64Value>::interpret_from(from.gas, context),
             refund: CheckValue::<U64Value>::interpret_from(from.refund, context),
+            build_from_response: false,
         }
     }
 }

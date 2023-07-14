@@ -18,7 +18,7 @@ use multiversx_sc_snippets::{
         mandos_system::ScenarioRunner,
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{IntoBlockchainCall, Scenario, TransferStep, TxExpect},
+        scenario_model::{ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo,
     },
@@ -95,30 +95,27 @@ impl AdderInteract {
     async fn deploy(&mut self) {
         self.set_state().await;
 
-        let mut typed_sc_deploy = self
-            .state
-            .default_adder()
-            .init(BigUint::from(0u64))
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .code_metadata(CodeMetadata::all())
-            .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
-            .gas_limit("70,000,000")
-            .expect(TxExpect::ok());
+        self.interactor
+            .sc_deploy_use_result(
+                ScDeployStep::new()
+                    .call(self.state.default_adder().init(BigUint::from(0u64)))
+                    .from(&self.wallet_address)
+                    .code_metadata(CodeMetadata::all())
+                    .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
+                    .gas_limit("5,000,000")
+                    .expect(TxExpect::ok()),
+                |new_address, tr| {
+                    tr.result
+                        .unwrap_or_else(|err| panic!("deploy failed: {}", err.message));
 
-        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+                    let new_address_bech32 = bech32::encode(&new_address);
+                    println!("new address: {new_address_bech32}");
 
-        let result = typed_sc_deploy.response().new_deployed_address();
-        if result.is_err() {
-            println!("deploy failed: {}", result.err().unwrap());
-            return;
-        }
-
-        let new_address_bech32 = bech32::encode(&result.unwrap());
-        println!("new address: {new_address_bech32}");
-
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_adder_address(&new_address_expr);
+                    let new_address_expr = format!("bech32:{new_address_bech32}");
+                    self.state.set_adder_address(&new_address_expr);
+                },
+            )
+            .await;
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -132,11 +129,8 @@ impl AdderInteract {
 
         let mut steps = Vec::new();
         for _ in 0..*count {
-            let typed_sc_deploy = self
-                .state
-                .default_adder()
-                .init(BigUint::from(0u64))
-                .into_blockchain_call()
+            let typed_sc_deploy = ScDeployStep::new()
+                .call(self.state.default_adder().init(0u32))
                 .from(&self.wallet_address)
                 .code_metadata(CodeMetadata::all())
                 .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
@@ -175,28 +169,35 @@ impl AdderInteract {
     }
 
     async fn add(&mut self, value: u64) {
-        let mut typed_sc_call = self
-            .state
-            .adder()
-            .add(BigUint::from(value))
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("70,000,000")
-            .expect(TxExpect::ok());
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.response().handle_signal_error_event();
-        if result.is_err() {
-            println!("performing add failed with: {}", result.err().unwrap());
-            return;
-        }
+        self.interactor
+            .sc_call_use_result(
+                ScCallStep::new()
+                    .call(self.state.adder().add(value))
+                    .from(&self.wallet_address)
+                    .gas_limit("5,000,000")
+                    .expect(TxExpect::ok()),
+                |tr| {
+                    tr.result.unwrap_or_else(|err| {
+                        panic!("performing add failed with: {}", err.message)
+                    });
+                },
+            )
+            .await;
 
         println!("successfully performed add");
     }
 
     async fn print_sum(&mut self) {
-        let sum: SingleValue<BigUint> = self.interactor.vm_query(self.state.adder().sum()).await;
-        println!("sum: {}", sum.into());
+        self.interactor
+            .sc_query_use_result(
+                ScQueryStep::new()
+                    .call(self.state.adder().sum())
+                    .expect(TxExpect::ok()),
+                |tr| {
+                    let sum: SingleValue<BigUint> = tr.result.unwrap();
+                    println!("sum: {}", sum.into());
+                },
+            )
+            .await;
     }
 }

@@ -32,28 +32,28 @@ impl ScenarioRunner for ScenarioVMRunner {
         self.perform_set_state(step);
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
-        self.perform_sc_call(step);
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
+        self.perform_sc_call_update_results(step);
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         for step in steps {
-            self.perform_sc_call(step);
+            self.perform_sc_call_update_results(step);
         }
     }
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
-        for step in steps {
-            self.perform_sc_deploy(step);
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
+        for step in steps.iter_mut() {
+            self.perform_sc_deploy_update_results(step);
         }
     }
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep) {
-        let _ = self.perform_sc_query(step);
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
+        self.perform_sc_query_update_results(step);
     }
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
-        self.perform_sc_deploy(step);
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
+        self.perform_sc_deploy_update_results(step);
     }
 
     fn run_transfer_step(&mut self, step: &TransferStep) {

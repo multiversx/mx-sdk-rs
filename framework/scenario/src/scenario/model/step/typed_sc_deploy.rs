@@ -1,19 +1,20 @@
 use std::marker::PhantomData;
 
-use multiversx_sc::codec::PanicErrorHandler;
+use multiversx_sc::{codec::PanicErrorHandler, types::ContractDeploy};
 
 use crate::{
+    api::StaticApi,
     multiversx_sc::{
         codec::{CodecFrom, TopEncodeMulti},
         types::{Address, CodeMetadata},
     },
     scenario_format::interpret_trait::InterpreterContext,
-    scenario_model::{TxResponse, TxResponseStatus},
+    scenario_model::{BytesValue, TxResponse, TxResponseStatus},
 };
 
 use crate::scenario::model::{AddressValue, BigUintValue, TxExpect, U64Value};
 
-use super::ScDeployStep;
+use super::{process_contract_deploy, ScDeployStep};
 
 /// `ScDeployStep` with explicit return type.
 #[derive(Default, Debug)]
@@ -75,6 +76,17 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
 
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.sc_deploy_step = self.sc_deploy_step.expect(expect);
+        self
+    }
+
+    /// Sets following fields based on the smart contract proxy:
+    /// - "function"
+    /// - "arguments"
+    pub fn call(mut self, contract_deploy: ContractDeploy<StaticApi, OriginalResult>) -> Self {
+        let (_, mandos_args) = process_contract_deploy(contract_deploy);
+        for arg in mandos_args {
+            self.sc_deploy_step.tx.arguments.push(BytesValue::from(arg));
+        }
         self
     }
 }

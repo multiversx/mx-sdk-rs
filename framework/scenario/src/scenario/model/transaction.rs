@@ -11,6 +11,7 @@ mod tx_response;
 mod tx_response_status;
 mod tx_transfer;
 mod tx_validator_reward;
+mod typed_response;
 
 pub use self::log::*;
 pub use log_check::*;
@@ -24,3 +25,4 @@ pub use tx_response::TxResponse;
 pub use tx_response_status::TxResponseStatus;
 pub use tx_transfer::*;
 pub use tx_validator_reward::*;
+pub use typed_response::TypedResponse;

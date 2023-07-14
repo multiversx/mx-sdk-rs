@@ -24,18 +24,22 @@ fn adder_scenario_constructed_raw() {
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .sc_deploy_step(
+        .sc_deploy_use_result(
             ScDeployStep::new()
                 .from(owner_address)
                 .contract_code("file:output/adder.wasm", &ic)
                 .call(adder_contract.init(5u32))
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
+            |new_address, _: TypedResponse<()>| {
+                assert_eq!(new_address, adder_contract.to_address());
+            },
         )
         .sc_query_step(
             ScQueryStep::new()
                 .to(&adder_contract)
-                .call_expect(adder_contract.sum(), SingleValue::from(BigUint::from(5u32))),
+                .call(adder_contract.sum())
+                .expect_value(SingleValue::from(BigUint::from(5u32))),
         )
         .sc_call_step(
             ScCallStep::new()

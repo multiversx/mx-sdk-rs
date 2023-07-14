@@ -6,10 +6,10 @@ use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     scenario::model::{AddressValue, U64Value},
-    scenario_model::{BigUintValue, BytesValue, TxResponseStatus, TxExpect, TxResponse},
+    scenario_model::{BigUintValue, BytesValue, TxExpect, TxResponse, TxResponseStatus},
 };
 
-use super::ScCallStep;
+use super::{format_expect, ScCallStep};
 
 /// `SCCallStep` with explicit return type.
 #[derive(Default, Debug)]
@@ -32,7 +32,10 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
     }
 
     pub fn response(&self) -> &TxResponse {
-        self.sc_call_step.response.as_ref().unwrap()
+        self.sc_call_step
+            .response
+            .as_ref()
+            .expect("SC call result not yet available")
     }
 
     pub fn from<A>(mut self, address: A) -> Self
@@ -96,6 +99,17 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.sc_call_step = self.sc_call_step.expect(expect);
         self
+    }
+
+    /// Shorthand for creating a tx expect with status "Ok" and the given value.
+    ///
+    /// The given value is type-checked agains the tx return type.
+    pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
+        self.expect(format_expect(expected_value))
     }
 }
 

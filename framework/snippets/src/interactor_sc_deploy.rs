@@ -26,7 +26,7 @@ impl Interactor {
         }
     }
 
-    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) -> String {
+    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) -> String {
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);
 
         let sender_address = &sc_deploy_step.tx.from.value;
@@ -50,9 +50,13 @@ impl Interactor {
 
         let addr = sc_deploy_step.tx.from.clone();
         let nonce = tx.nonce;
-        sc_deploy_step.response = Some(TxResponse::from_network_tx(tx));
+        sc_deploy_step.save_response(TxResponse::from_network_tx(tx));
 
-        let deploy_address = sc_deploy_step.response().new_deployed_address.clone().unwrap();
+        let deploy_address = sc_deploy_step
+            .response()
+            .new_deployed_address
+            .clone()
+            .unwrap();
 
         let set_state_step = SetStateStep::new().new_address(
             addr,

@@ -11,7 +11,9 @@ use crate::multiversx_sc::{
     types::{ContractCall, ManagedArgBuffer},
 };
 
-#[derive(Debug, Default, Clone)]
+use super::TypedScCall;
+
+#[derive(Default)]
 pub struct ScCallStep {
     pub id: String,
     pub tx_id: Option<String>,
@@ -108,7 +110,7 @@ impl ScCallStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<CC>(mut self, contract_call: CC) -> Self
+    pub fn call<CC>(mut self, contract_call: CC) -> TypedScCall<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
     {
@@ -120,7 +122,7 @@ impl ScCallStep {
         for arg in scenario_args {
             self = self.argument(arg.as_str());
         }
-        self
+        self.into()
     }
 
     /// Sets following fields based on the smart contract proxy:
@@ -131,17 +133,25 @@ impl ScCallStep {
     ///     - "out"
     ///     - "status" set to 0
     pub fn call_expect<CC, ExpectedResult>(
-        mut self,
+        self,
         contract_call: CC,
-        expect_value: ExpectedResult,
-    ) -> Self
+        expected_value: ExpectedResult,
+    ) -> TypedScCall<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
         ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
     {
-        self = self.call(contract_call);
-        self = self.expect(format_expect(expect_value));
-        self
+        let typed = self.call(contract_call);
+        typed.expect_value(expected_value)
+    }
+
+    pub fn save_response(&mut self, tx_response: TxResponse) {
+        if let Some(expect) = &mut self.expect {
+            if expect.build_from_response {
+                expect.update_from_response(&tx_response)
+            }
+        }
+        self.response = Some(tx_response);
     }
 }
 
@@ -196,4 +206,32 @@ pub(super) fn format_expect<T: TopEncodeMulti>(t: T) -> TxExpect {
         expect = expect.result(encoded_hex_string.as_str());
     }
     expect
+}
+
+impl Clone for ScCallStep {
+    fn clone(&self) -> Self {
+        Self {
+            id: self.id.clone(),
+            tx_id: self.tx_id.clone(),
+            explicit_tx_hash: self.explicit_tx_hash.clone(),
+            comment: self.comment.clone(),
+            tx: self.tx.clone(),
+            expect: self.expect.clone(),
+            response: self.response.clone(),
+        }
+    }
+}
+
+impl std::fmt::Debug for ScCallStep {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ScCallStep")
+            .field("id", &self.id)
+            .field("tx_id", &self.tx_id)
+            .field("explicit_tx_hash", &self.explicit_tx_hash)
+            .field("comment", &self.comment)
+            .field("tx", &self.tx)
+            .field("expect", &self.expect)
+            .field("response", &self.response)
+            .finish()
+    }
 }

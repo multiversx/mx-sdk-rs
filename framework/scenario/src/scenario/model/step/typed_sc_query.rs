@@ -4,7 +4,7 @@ use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::scenario::model::{AddressValue, BytesValue, TxExpect};
 
-use super::ScQueryStep;
+use super::{format_expect, ScQueryStep};
 
 #[derive(Debug, Default)]
 pub struct TypedScQuery<OriginalResult> {
@@ -52,6 +52,29 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.sc_query_step.expect = Some(expect);
         self
+    }
+
+    /// Shorthand for creating a tx expect with status "Ok" and the given value.
+    ///
+    /// The given value is type-checked agains the tx return type.
+    pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
+        self.expect(format_expect(expected_value))
+    }
+}
+
+impl AsMut<ScQueryStep> for ScQueryStep {
+    fn as_mut(&mut self) -> &mut ScQueryStep {
+        self
+    }
+}
+
+impl<OriginalResult> AsMut<ScQueryStep> for TypedScQuery<OriginalResult> {
+    fn as_mut(&mut self) -> &mut ScQueryStep {
+        &mut self.sc_query_step
     }
 }
 

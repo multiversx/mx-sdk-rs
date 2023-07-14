@@ -12,15 +12,15 @@ pub trait ScenarioRunner {
 
     fn run_set_state_step(&mut self, step: &SetStateStep);
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep);
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep);
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]);
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]);
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]);
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]);
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep);
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep);
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep);
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep);
 
     fn run_transfer_step(&mut self, step: &TransferStep);
 
@@ -32,7 +32,8 @@ pub trait ScenarioRunner {
 
     /// Utility method for running all steps in a scenario.
     fn run_scenario(&mut self, scenario: &Scenario) {
-        for step in &scenario.steps {
+        let mut steps = scenario.steps.clone();
+        for step in steps.iter_mut() {
             match step {
                 Step::ExternalSteps(external_steps_step) => {
                     self.run_external_steps(external_steps_step);

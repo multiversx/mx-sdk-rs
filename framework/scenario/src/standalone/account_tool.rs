@@ -23,10 +23,18 @@ pub async fn retrieve_account_as_scenario_set_state(
     let blockchain = CommunicationProxy::new(api);
     let account = blockchain.get_account(&address).await.unwrap();
 
-    let account_esdt = blockchain.get_account_esdt_tokens(&address).await.unwrap();
-    let account_esdt_roles = blockchain.get_account_esdt_roles(&address).await.unwrap();
-
-    let account_storage = blockchain.get_account_storage_keys(&address).await.unwrap();
+    let account_esdt = blockchain
+        .get_account_esdt_tokens(&address)
+        .await
+        .unwrap_or_else(|err| panic!("failed to retrieve ESDT tokens for address {addr}: {err}"));
+    let account_esdt_roles = blockchain
+        .get_account_esdt_roles(&address)
+        .await
+        .unwrap_or_else(|err| panic!("failed to retrieve ESDT roles for address {addr}: {err}"));
+    let account_storage = blockchain
+        .get_account_storage_keys(&address)
+        .await
+        .unwrap_or_else(|err| panic!("failed to retrieve storage for address {addr}: {err}"));
 
     let addr_pretty = if !hex_encoded {
         if account.code.is_empty() {
