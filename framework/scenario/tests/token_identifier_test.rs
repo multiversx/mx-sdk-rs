@@ -1,6 +1,6 @@
 use multiversx_sc::types::{
-    BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment,
-    TokenIdentifier, ManagedBuffer,
+    BoxedBytes, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedBuffer,
+    TokenIdentifier,
 };
 use multiversx_sc_scenario::{
     managed_egld_token_id, managed_token_id, managed_token_id_wrapped,

@@ -29,7 +29,7 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_tx_hash_legacy(&self) -> ManagedByteArray<Self::Api, 32> {
+    fn get_tx_hash(&self) -> ManagedByteArray<Self::Api, 32> {
         self.blockchain().get_tx_hash()
     }
 

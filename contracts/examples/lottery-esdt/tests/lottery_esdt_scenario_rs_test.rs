@@ -25,6 +25,11 @@ fn buy_more_tickets_than_allowed_rs() {
 }
 
 #[test]
+fn buy_ticket_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/buy-ticket.scen.json", world());
+}
+
+#[test]
 fn buy_ticket_after_deadline_rs() {
     multiversx_sc_scenario::run_rs("scenarios/buy-ticket-after-deadline.scen.json", world());
 }
@@ -73,12 +78,13 @@ fn buy_ticket_wrong_fee_rs() {
 }
 
 #[test]
-fn buy_ticket_simple_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/buy-ticket.scen.json", world());
+#[ignore]
+fn complex_prize_distribution_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/complex-prize-distribution.scen.json", world());
 }
 
 #[test]
-fn determine_winner_different_ticket_holders_winner_acc1_rs() {
+fn determine_winner_different_ticket_holders_winner_acc_1_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json",
         world(),
@@ -98,19 +104,22 @@ fn determine_winner_same_ticket_holder_rs() {
     );
 }
 
-/* NOT SUPPORTED YET
 #[test]
+#[ignore = "NOT SUPPORTED YET"]
 fn determine_winner_split_prize_pool_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/determine-winner-split-prize-pool.scen.json",
         world(),
     );
 }
-*/
-
 #[test]
 fn lottery_init_rs() {
     multiversx_sc_scenario::run_rs("scenarios/lottery-init.scen.json", world());
+}
+
+#[test]
+fn lottery_with_burn_percentage_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/lottery-with-burn-percentage.scen.json", world());
 }
 
 #[test]
@@ -140,6 +149,19 @@ fn start_fixed_deadline_rs() {
 }
 
 #[test]
+fn start_limited_tickets_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/start-limited-tickets.scen.json", world());
+}
+
+#[test]
+fn start_limited_tickets_and_fixed_deadline_rs() {
+    multiversx_sc_scenario::run_rs(
+        "scenarios/start-limited-tickets-and-fixed-deadline.scen.json",
+        world(),
+    );
+}
+
+#[test]
 fn start_limited_tickets_and_fixed_deadline_invalid_deadline_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/start-limited-tickets-and-fixed-deadline-invalid-deadline.scen.json",
@@ -153,19 +175,6 @@ fn start_limited_tickets_and_fixed_deadline_invalid_ticket_price_arg_rs() {
         "scenarios/start-limited-tickets-and-fixed-deadline-invalid-ticket-price-arg.scen.json",
         world(),
     );
-}
-
-#[test]
-fn start_limited_tickets_and_fixed_deadline_valid_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/start-limited-tickets-and-fixed-deadline.scen.json",
-        world(),
-    );
-}
-
-#[test]
-fn start_limited_tickets_simple_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/start-limited-tickets.scen.json", world());
 }
 
 #[test]

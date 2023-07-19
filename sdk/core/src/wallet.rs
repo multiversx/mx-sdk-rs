@@ -30,8 +30,7 @@ pub struct Wallet {
 impl Wallet {
     // GenerateMnemonic will generate a new mnemonic value using the bip39 implementation
     pub fn generate_mnemonic() -> Mnemonic {
-        let mut rng = rand::thread_rng();
-        Mnemonic::generate_in_with(&mut rng, Language::English, 24).unwrap()
+        Mnemonic::generate_in(Language::English, 24).unwrap()
     }
 
     fn seed_from_mnemonic(mnemonic: Mnemonic, password: &str) -> [u8; 64] {

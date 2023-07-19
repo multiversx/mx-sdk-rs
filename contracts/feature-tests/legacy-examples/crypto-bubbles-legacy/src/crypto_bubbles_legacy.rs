@@ -1,4 +1,5 @@
 #![no_std]
+#![allow(deprecated)]
 
 multiversx_sc::imports!();
 
@@ -16,7 +17,7 @@ pub trait CryptoBubbles {
         let payment = self.call_value().egld_value();
         let caller = self.blockchain().get_caller_legacy();
         self.player_balance(&caller)
-            .update(|balance| *balance += &payment);
+            .update(|balance| *balance += &*payment);
 
         self.top_up_event(&caller, &payment);
     }

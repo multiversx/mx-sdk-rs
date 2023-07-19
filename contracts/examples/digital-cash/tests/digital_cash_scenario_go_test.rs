@@ -9,6 +9,11 @@ fn claim_esdt_go() {
 }
 
 #[test]
+fn claim_fees_go() {
+    multiversx_sc_scenario::run_go("scenarios/claim-fees.scen.json");
+}
+
+#[test]
 fn fund_egld_and_esdt_go() {
     multiversx_sc_scenario::run_go("scenarios/fund-egld-and-esdt.scen.json");
 }
@@ -26,4 +31,9 @@ fn withdraw_egld_go() {
 #[test]
 fn withdraw_esdt_go() {
     multiversx_sc_scenario::run_go("scenarios/withdraw-esdt.scen.json");
+}
+
+#[test]
+fn forward_go() {
+    multiversx_sc_scenario::run_go("scenarios/forward.scen.json");
 }
