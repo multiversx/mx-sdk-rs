@@ -1,0 +1,27 @@
+[package]
+name = "multiversx-sc-codec-derive"
+version = "0.17.2"
+edition = "2021"
+
+authors = ["dorin.iancu <dorin.iancu@multiversx.com>", "Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/multiversx/mx-sdk-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.multiversx.com/"
+description = "Macro implementations of multiversx-sc-codec #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+
+[lib]
+name = "multiversx_sc_codec_derive"
+proc-macro = true
+
+[features]
+default = ["syn/full", "syn/parsing", "syn/extra-traits"]
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = "1.0"
+hex = "0.4"

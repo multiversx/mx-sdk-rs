@@ -83,7 +83,7 @@ fn buy_ticket_wrong_fee_rs() {
 }
 
 #[test]
-fn determine_winner_different_ticket_holders_winner_acc1_rs() {
+fn determine_winner_different_ticket_holders_winner_acc_1_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/determine-winner-different-ticket-holders-winner-acc1.scen.json",
         world(),
@@ -104,8 +104,8 @@ fn determine_winner_same_ticket_holder_rs() {
 }
 
 // TODO: un-ignore after the scenario runner supports chaining async calls
-#[ignore]
 #[test]
+#[ignore]
 fn determine_winner_split_prize_pool_rs() {
     multiversx_sc_scenario::run_rs(
         "scenarios/determine-winner-split-prize-pool.scen.json",

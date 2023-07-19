@@ -15,6 +15,15 @@
                         "str:CASHTOKEN-123456": "100"
                     }
                 },
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "100",
+                        "str:CASHTOKEN-445566": "100",
+                        "str:CASHTOKEN-778899": "100"
+                    }
+                },
                 "address:digital_cash_owner_address": {
                     "nonce": "0",
                     "balance": "0"
@@ -34,7 +43,9 @@
             "tx": {
                 "from": "address:digital_cash_owner_address",
                 "contractCode": "file:../output/digital-cash.wasm",
-                "arguments": [],
+                "arguments": [
+                    "10"
+                ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
             },
@@ -43,6 +54,47 @@
                 "status": "0",
                 "gas": "*",
                 "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:the_digital_cash_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:fee": "10"
+                    },
+                    "code": "file:../output/digital-cash.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-123456": "100"
+                    },
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "100",
+                        "str:CASHTOKEN-445566": "100",
+                        "str:CASHTOKEN-778899": "100"
+                    },
+                    "storage": {}
+                },
+                "address:digital_cash_owner_address": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                }
             }
         }
     ]

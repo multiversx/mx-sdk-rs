@@ -9,11 +9,11 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn map_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/map_repeat_struct.scen.json", world());
+fn map_repeat_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/map_repeat.scen.json", world());
 }
 
 #[test]
-fn map_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/map_repeat.scen.json", world());
+fn map_repeat_struct_rs() {
+    multiversx_sc_scenario::run_rs("scenarios/map_repeat_struct.scen.json", world());
 }

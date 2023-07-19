@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{ArgAction, Args, Parser, Subcommand};
+use clap::{arg, ArgAction, Args, Parser, Subcommand};
 
 use super::{CliArgsToRaw, ContractCliAction};
 
@@ -59,6 +59,11 @@ pub enum StandaloneCliAction {
         about = "Creates a contract by a pre-existing template"
     )]
     TemplateList,
+    #[command(
+        name = "test-gen",
+        about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
+    )]
+    TestGen(TestGenArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -155,4 +160,21 @@ impl CliArgsToRaw for TemplateArgs {
     fn to_raw(&self) -> Vec<String> {
         Vec::new()
     }
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TestGenArgs {
+    /// Target directory where to generate contract integration tests.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// Ignore all directories with these names.
+    #[arg(long, verbatim_doc_comment)]
+    #[clap(global = true, default_value = "target")]
+    pub ignore: Vec<String>,
+
+    /// Creates test files if they don't exist.
+    #[arg(long, verbatim_doc_comment)]
+    pub create: bool,
 }

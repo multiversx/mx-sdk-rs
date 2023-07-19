@@ -203,7 +203,7 @@ where
         self.item_is_empty_unchecked_at_address(address, index)
     }
 
-    /// Get item at index from storage.
+    /// Set item at index in storage.
     /// Index must be valid (1 <= index <= count).
     pub fn set(&self, index: usize, item: &T) {
         if index == 0 || index > self.len() {
@@ -277,6 +277,20 @@ where
     /// Provides a forward iterator.
     pub fn iter(&self) -> Iter<SA, T> {
         Iter::new(self)
+    }
+}
+
+impl<'a, SA, T> IntoIterator for &'a VecMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + 'static,
+{
+    type Item = T;
+
+    type IntoIter = Iter<'a, SA, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
     }
 }
 

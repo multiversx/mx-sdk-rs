@@ -9,10 +9,10 @@
                     "nonce": "1",
                     "balance": "0"
                 },
-                "sc:use-module": {
+                "sc:check-pause": {
                     "nonce": "1",
                     "balance": "0",
-                    "code": "file:../../../feature-tests/use-module/output/use-module.wasm",
+                    "code": "file:../../check-pause/output/check-pause.wasm",
                     "owner": "sc:proxy-pause"
                 }
             },
@@ -71,7 +71,7 @@
                 "to": "sc:proxy-pause",
                 "function": "addContracts",
                 "arguments": [
-                    "sc:use-module"
+                    "sc:check-pause"
                 ],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"
@@ -97,7 +97,7 @@
             },
             "expect": {
                 "out": [
-                    "sc:use-module"
+                    "sc:check-pause"
                 ],
                 "status": "",
                 "logs": [],

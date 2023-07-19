@@ -1,0 +1,31 @@
+[package]
+name = "multiversx-sc-codec"
+version = "0.17.2"
+edition = "2021"
+
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
+license = "GPL-3.0-only"
+readme = "README.md"
+repository = "https://github.com/multiversx/mx-sdk-rs"
+homepage = "https://multiversx.com/"
+documentation = "https://docs.multiversx.com/"
+description = "Lightweight binary serializer/deserializer, written especially for MultiversX smart contracts"
+keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
+categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
+
+[features]
+derive = ["multiversx-sc-codec-derive"]
+alloc = []
+
+[dependencies.multiversx-sc-codec-derive]
+path = "../codec-derive"
+version = "=0.17.2"
+optional = true
+
+[dependencies]
+arrayvec = { version = "0.7.1", default-features = false }
+num-bigint = { version = "0.4.2", optional = true } # can only be used in std contexts
+
+[dev-dependencies.multiversx-sc-codec-derive]
+path = "../codec-derive"
+version = "=0.17.2"

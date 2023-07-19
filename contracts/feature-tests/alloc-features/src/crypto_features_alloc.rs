@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 multiversx_sc::imports!();
 
 /// Crypto functions that use the allocator.

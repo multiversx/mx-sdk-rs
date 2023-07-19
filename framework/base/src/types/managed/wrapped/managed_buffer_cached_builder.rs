@@ -64,7 +64,7 @@ where
     }
 
     fn flush_to_managed_buffer(&mut self) {
-        let old_static_cache = core::mem::replace(&mut self.static_cache, None);
+        let old_static_cache = core::mem::take(&mut self.static_cache);
         if let Some(static_cache) = &old_static_cache {
             static_cache.with_buffer_contents(|bytes| {
                 self.managed_buffer.append_bytes(bytes);
@@ -85,8 +85,7 @@ where
     }
 
     pub fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
-        let mut static_cache_mut = core::mem::replace(&mut self.static_cache, None);
-        if let Some(static_cache) = &mut static_cache_mut {
+        if let Some(static_cache) = &mut self.static_cache {
             let success = static_cache.try_extend_from_copy_bytes(item.len(), |dest_slice| {
                 let _ = item.load_slice(0, dest_slice);
             });
@@ -97,7 +96,6 @@ where
         } else {
             self.managed_buffer.append(item);
         }
-        let _ = core::mem::replace(&mut self.static_cache, static_cache_mut);
     }
 
     /// Converts the input to hex and adds it to the current buffer.

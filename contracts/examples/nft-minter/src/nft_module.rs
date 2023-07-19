@@ -25,7 +25,7 @@ pub trait NftModule {
         self.send()
             .esdt_system_sc_proxy()
             .issue_non_fungible(
-                payment_amount,
+                payment_amount.clone_value(),
                 &token_name,
                 &token_ticker,
                 NonFungibleTokenProperties {

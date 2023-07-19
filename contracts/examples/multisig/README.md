@@ -27,14 +27,14 @@ The required guidelines are:
 
 * **No libraries.** Extending the last guideline, our contract has no upstream dependencies other than itself. This minimizes the chance of us misunderstanding or misusing some piece of library code. It also forces us to stay simple and eases auditing and eventually formal verification.
 
-* **Minimal internal state.** Complex applications can be built inside of Elrond smart contracts. Storing minimal internal state allows our contract’s code to be simpler, and to be written in a more functional style, which is easier to test and reason about.
+* **Minimal internal state.** Complex applications can be built inside of MultiversX smart contracts. Storing minimal internal state allows our contract’s code to be simpler, and to be written in a more functional style, which is easier to test and reason about.
 
 * **Uses cold-storage.** The proposer which creates an action or spends from the contract has no special rights or access to the MSC. Authorization is handled by directly signing messages by the board members’ wallets that can be hardware wallets (Trezor; Ledger, etc.) or software wallets.
 
 * **Complete end-to-end testing.** The contract itself is exhaustively unit tested, audited and formally verified.
 
 ## Roles
-* **Deployer** - This is the address that deploys the MSC. By default this address is also the owner of the SC, but the owner can be changed later if required, as this is by default supported by the Elrond protocol itself. This is the address that initially set up the configuration of the SC: board members, quorum, etc. It is important to mention that at deployment a very important configuration parameter is the option to allow the SC to be upgradeable or not. It is recommended for most use cases the SC to be non-upgradeable. Leaving the SC upgradable will give the owner of the SC the possibility to upgrade the SC and bypass the board, defeating the purpose of a MSC. If keeping the SC upgradeable is desired, a possible approach would be to make the owner another MSC, and both SCs could maintain the same board, so an upgrade action would need the approval of the board.
+* **Deployer** - This is the address that deploys the MSC. By default this address is also the owner of the SC, but the owner can be changed later if required, as this is by default supported by the MultiversX protocol itself. This is the address that initially set up the configuration of the SC: board members, quorum, etc. It is important to mention that at deployment a very important configuration parameter is the option to allow the SC to be upgradeable or not. It is recommended for most use cases the SC to be non-upgradeable. Leaving the SC upgradable will give the owner of the SC the possibility to upgrade the SC and bypass the board, defeating the purpose of a MSC. If keeping the SC upgradeable is desired, a possible approach would be to make the owner another MSC, and both SCs could maintain the same board, so an upgrade action would need the approval of the board.
 
 * **Owner** - The deployer is initially the owner of the MSC, but if desired can be changed later by the current owner to a different owner. If the SC is upgradeable, the owner can also upgrade the SC.
 
@@ -79,4 +79,4 @@ MSC is a deployable SC written in Rust and compiled in WASM.
 
 ## Conclusion
 
-Multisig accounts are a critical safety feature for all users of the Elrond ecosystem. Decentralised applications will rely heavily upon multisig security.
+Multisig accounts are a critical safety feature for all users of the MultiversX ecosystem. Decentralised applications will rely heavily upon multisig security.

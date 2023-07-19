@@ -17,7 +17,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn deploy_erc20_and_crowdfunding_rs() {
+fn deploy_erc_20_and_crowdfunding_rs() {
     multiversx_sc_scenario::run_rs("scenarios/deploy_erc20_and_crowdfunding.scen.json", world());
 }
 
