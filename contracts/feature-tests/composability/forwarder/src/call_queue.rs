@@ -54,7 +54,7 @@ pub trait ForwarderQueuedCallModule {
         self.forward_queued_calls_event(
             max_call_depth,
             &self.call_value().egld_value(),
-            &esdt_transfers_multi.into_multi_value(),
+            &esdt_transfers_multi.clone_value().into_multi_value(),
         );
 
         if max_call_depth == 0 {

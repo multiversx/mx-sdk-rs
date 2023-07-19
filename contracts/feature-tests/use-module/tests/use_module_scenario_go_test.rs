@@ -19,8 +19,13 @@ fn use_module_internal_go() {
 }
 
 #[test]
-fn use_module_only_owner_go() {
-    multiversx_sc_scenario::run_go("scenarios/use_module_only_owner.scen.json");
+fn use_module_no_endpoint_go() {
+    multiversx_sc_scenario::run_go("scenarios/use_module_no_endpoint.scen.json");
+}
+
+#[test]
+fn use_module_ongoing_operation_example_go() {
+    multiversx_sc_scenario::run_go("scenarios/use_module_ongoing_operation_example.scen.json");
 }
 
 #[test]
@@ -29,16 +34,11 @@ fn use_module_only_admin_go() {
 }
 
 #[test]
-fn use_module_no_endpoint_go() {
-    multiversx_sc_scenario::run_go("scenarios/use_module_no_endpoint.scen.json");
+fn use_module_only_owner_go() {
+    multiversx_sc_scenario::run_go("scenarios/use_module_only_owner.scen.json");
 }
 
 #[test]
 fn use_module_pause_go() {
     multiversx_sc_scenario::run_go("scenarios/use_module_pause.scen.json");
-}
-
-#[test]
-fn use_module_ongoing_operation_go() {
-    multiversx_sc_scenario::run_go("scenarios/use_module_ongoing_operation_example.scen.json");
 }

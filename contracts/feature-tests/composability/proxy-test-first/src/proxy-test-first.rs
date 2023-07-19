@@ -65,7 +65,7 @@ pub trait ProxyTestFirst {
         let (address, init_result) = self
             .message_me_proxy()
             .init(123)
-            .with_egld_transfer(payment)
+            .with_egld_transfer(payment.clone_value())
             .deploy_contract::<i32>(&code, CodeMetadata::DEFAULT);
         self.set_other_contract(&address);
         init_result + 1
@@ -80,7 +80,7 @@ pub trait ProxyTestFirst {
         self.message_me_proxy()
             .contract(other_contract)
             .init(456)
-            .with_egld_transfer(payment)
+            .with_egld_transfer(payment.clone_value())
             .upgrade_contract(&code, CodeMetadata::DEFAULT);
     }
 
@@ -92,7 +92,7 @@ pub trait ProxyTestFirst {
         self.pay_me_proxy()
             .contract(other_contract)
             .pay_me(0x56)
-            .with_egld_transfer(payment)
+            .with_egld_transfer(payment.clone_value())
             .async_call()
             .call_and_exit()
     }
@@ -105,7 +105,7 @@ pub trait ProxyTestFirst {
         self.pay_me_proxy()
             .contract(other_contract)
             .pay_me_with_result(0x56)
-            .with_egld_transfer(payment)
+            .with_egld_transfer(payment.clone_value())
             .async_call()
             .with_callback(self.callbacks().pay_callback())
             .call_and_exit()

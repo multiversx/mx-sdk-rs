@@ -6,7 +6,9 @@ use std::collections::BTreeMap;
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ContractAbiJson {
-    pub build_info: BuildInfoAbiJson,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub build_info: Option<BuildInfoAbiJson>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub name: String,
@@ -21,7 +23,7 @@ pub struct ContractAbiJson {
 impl From<&ContractAbi> for ContractAbiJson {
     fn from(abi: &ContractAbi) -> Self {
         let mut contract_json = ContractAbiJson {
-            build_info: BuildInfoAbiJson::from(&abi.build_info),
+            build_info: Some(BuildInfoAbiJson::from(&abi.build_info)),
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             constructor: abi.constructors.get(0).map(ConstructorAbiJson::from),

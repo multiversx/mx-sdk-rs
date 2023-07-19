@@ -289,7 +289,7 @@ pub trait KittyOwnership {
         let auto_birth_fee = self.birth_fee().get();
         let caller = self.blockchain().get_caller();
 
-        require!(payment == auto_birth_fee, "Wrong fee!");
+        require!(*payment == auto_birth_fee, "Wrong fee!");
         require!(
             caller == self.kitty_owner(matron_id).get(),
             "Only the owner of the matron can call this function!"

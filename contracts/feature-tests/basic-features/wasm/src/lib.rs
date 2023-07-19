@@ -10,7 +10,7 @@
 // Total number of exported functions: 342
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -124,7 +124,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         get_shard_of_address
         is_smart_contract
         get_state_root_hash
-        get_tx_hash_legacy
+        get_tx_hash
         get_gas_left
         get_cumulated_validator_rewards
         codec_err_finish

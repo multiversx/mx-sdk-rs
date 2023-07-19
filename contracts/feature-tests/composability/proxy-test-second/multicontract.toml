@@ -1,0 +1,7 @@
+[settings]
+main = "proxy-test-second"
+
+# the only purpose of this config is to specify the allocator
+[contracts.proxy-test-second]
+add-unlabelled = true
+allocator = "static64k"

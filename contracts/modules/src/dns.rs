@@ -13,7 +13,7 @@ multiversx_sc::imports!();
 
 /// Standard smart contract module that deals with registering usernames in a DNS contract.
 ///
-/// Elrond usernames/herotags need to be requested by the beneficiary.
+/// MultiversX usernames/herotags need to be requested by the beneficiary.
 /// For a contract, this means that they need an endpoint via which to request a username from the DNS.
 ///
 #[multiversx_sc::module]
@@ -25,7 +25,7 @@ pub trait DnsModule {
     #[only_owner]
     #[endpoint(dnsRegister)]
     fn dns_register(&self, dns_address: ManagedAddress, name: ManagedBuffer) {
-        let payment = self.call_value().egld_value();
+        let payment = self.call_value().egld_value().clone_value();
         self.dns_proxy(dns_address)
             .register(&name)
             .with_egld_transfer(payment)

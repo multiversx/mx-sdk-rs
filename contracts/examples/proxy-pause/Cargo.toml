@@ -9,12 +9,13 @@ publish = false
 path = "src/proxy_pause.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.7"
+version = "0.41.3"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.7"
+version = "0.41.3"
 path = "../../../framework/scenario"
 
-[dev-dependencies.use-module]
-path = "../../feature-tests/use-module"
+[dev-dependencies.check-pause]
+path = "../check-pause"
+

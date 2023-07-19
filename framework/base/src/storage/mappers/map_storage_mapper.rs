@@ -151,6 +151,21 @@ where
     }
 }
 
+impl<'a, SA, K, V> IntoIterator for &'a MapStorageMapper<SA, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: StorageMapper<SA> + StorageClearable,
+{
+    type Item = (K, V);
+
+    type IntoIter = Iter<'a, SA, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 pub struct Iter<'a, SA, K, V>
 where
     SA: StorageMapperApi,
