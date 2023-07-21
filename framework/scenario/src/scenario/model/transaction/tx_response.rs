@@ -127,6 +127,11 @@ impl TxResponse {
 
         if let Some(out_scr) = out_scr {
             self.out = decode_scr_data_or_panic(&out_scr.data);
+        } else if let Some(write_log_logs) = self.find_last_log("writeLog") {
+            if let Some(data) = &write_log_logs.data {
+                let decoded_data = String::from_utf8(base64::decode(data).unwrap()).unwrap();
+                self.out = decode_scr_data_or_panic(decoded_data.as_str());
+            }
         }
 
         self
@@ -174,6 +179,18 @@ impl TxResponse {
             logs.events
                 .iter()
                 .find(|event| event.identifier == log_identifier)
+        } else {
+            None
+        }
+    }
+
+    // Finds last api logs matching the given log identifier.
+    fn find_last_log(&self, log_identifier: &str) -> Option<&Events> {
+        if let Some(logs) = &self.api_logs {
+            logs.events
+                .iter()
+                .filter(|event| event.identifier == log_identifier)
+                .last()
         } else {
             None
         }
