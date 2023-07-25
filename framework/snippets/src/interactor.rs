@@ -1,5 +1,5 @@
 use multiversx_sc_scenario::{
-    mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
+    mandos_system::{run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
     scenario_model::AddressValue,
 };
@@ -9,6 +9,7 @@ use multiversx_sdk::{
     wallet::Wallet,
 };
 use std::{collections::HashMap, path::Path, time::Duration};
+use multiversx_sc_scenario::scenario::run_list::ScenarioRunnerListSafe;
 
 use crate::Sender;
 
@@ -20,8 +21,8 @@ pub struct Interactor {
     pub sender_map: HashMap<Address, Sender>,
 
     pub(crate) waiting_time_ms: u64,
-    pub pre_runners: ScenarioRunnerList,
-    pub post_runners: ScenarioRunnerList,
+    pub pre_runners: ScenarioRunnerListSafe,
+    pub post_runners: ScenarioRunnerListSafe,
 }
 
 impl Interactor {
@@ -33,8 +34,8 @@ impl Interactor {
             network_config,
             sender_map: HashMap::new(),
             waiting_time_ms: 0,
-            pre_runners: ScenarioRunnerList::empty(),
-            post_runners: ScenarioRunnerList::empty(),
+            pre_runners: ScenarioRunnerListSafe::empty(),
+            post_runners: ScenarioRunnerListSafe::empty(),
         }
     }
 
