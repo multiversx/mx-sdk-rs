@@ -26,13 +26,13 @@ const ADDER_WASM_PATH: &str = "../../examples/adder/output/adder.wasm";
 const BASIC_FEATURES_WASM_PATH: &str =
     "../../feature-tests/basic-features/output/basic-features.wasm";
 
-static NFT_TOKEN_ID: &[u8] = b"NFT-123456";
+const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
 const NFT_AMOUNT: u64 = 1;
 const FIRST_NFT_NONCE: u64 = 5;
-static FIRST_ATTRIBUTES: &[u8] = b"FirstAttributes";
+const FIRST_ATTRIBUTES: &[u8] = b"FirstAttributes";
 const FIRST_ROYALTIES: u64 = 1_000;
 const SECOND_ROYALTIES: u64 = 5_000;
-static FIRST_URIS: &[&[u8]] = &[b"FirstUri", b"SecondUri"];
+const FIRST_URIS: &[&[u8]] = &[b"FirstUri", b"SecondUri"];
 
 #[test]
 fn test_add() {
