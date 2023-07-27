@@ -316,7 +316,48 @@ fn test_add_proposer() {
 }
 
 #[test]
-fn test_remove_proposer() {}
+fn test_remove_proposer() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+
+    world.whitebox_query(&multisig_whitebox, |sc| {
+        // check role before
+        let user_role = sc.user_role(managed_address!(&address_expr_to_address(
+            PROPOSER_ADDRESS_EXPR
+        )));
+        assert_eq!(user_role, UserRole::Proposer);
+    });
+
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::RemoveUser(address_expr_to_address(PROPOSER_ADDRESS_EXPR)),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+    );
+
+    world.whitebox_query(&multisig_whitebox, |sc| {
+        // check role after
+        let user_role = sc.user_role(managed_address!(&address_expr_to_address(
+            PROPOSER_ADDRESS_EXPR
+        )));
+        assert_eq!(user_role, UserRole::None);
+
+        let proposers = sc.get_all_proposers().to_vec();
+        assert!(proposers.is_empty());
+    });
+}
 
 #[test]
 fn test_try_remove_all_board_members() {}
