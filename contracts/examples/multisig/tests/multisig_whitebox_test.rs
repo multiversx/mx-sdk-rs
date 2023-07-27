@@ -2,6 +2,7 @@
 
 use std::borrow::Borrow;
 
+use adder::Adder;
 use multisig::{
     multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
     user_role::UserRole, Multisig,
@@ -9,14 +10,16 @@ use multisig::{
 use multiversx_sc::{
     api::ManagedTypeApi,
     codec::multi_types::OptionalValue,
+    storage::mappers::SingleValue,
     types::{
         Address, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec,
     },
 };
 use multiversx_sc_scenario::{
-    managed_address, rust_biguint,
+    managed_address, managed_biguint, rust_biguint,
     scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
+        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
+        SetStateStep, TxExpect, TypedScQuery,
     },
     testing_framework::TxResult,
     DebugApi, ScenarioWorld, WhiteboxContract,
@@ -597,6 +600,61 @@ fn test_transfer_execute_to_user() {
 fn test_transfer_execute_sc_all() {
     let mut world = setup();
     let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+
+    let adder_whitebox = WhiteboxContract::new(ADDER_ADDRESS_EXPR, adder::contract_obj);
+    let adder_code = world.code_expression(ADDER_PATH_EXPR);
+
+    const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
+    const ADDER_ADDRESS_EXPR: &str = "sc:adder";
+    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+
+    world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    world.set_state_step(
+        SetStateStep::new()
+            .put_account(ADDER_OWNER_ADDRESS_EXPR, Account::new().nonce(1))
+            .new_address(ADDER_OWNER_ADDRESS_EXPR, 1, ADDER_ADDRESS_EXPR),
+    );
+
+    world.whitebox_deploy(
+        &adder_whitebox,
+        ScDeployStep::new()
+            .from(ADDER_OWNER_ADDRESS_EXPR)
+            .code(adder_code),
+        |sc| {
+            sc.init(managed_biguint!(5));
+        },
+    );
+
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::SendTransferExecute(CallActionDataRaw {
+            to: address_expr_to_address(ADDER_ADDRESS_EXPR),
+            egld_amount: 0u64.into(),
+            endpoint_name: BoxedBytes::from(&b"add"[..]),
+            arguments: vec![BoxedBytes::from(&[5u8][..])],
+        }),
+        None,
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+    );
+
+    world.whitebox_query(&adder_whitebox, |sc| {
+        let actual_sum = sc.sum().get();
+        let expected_sum = managed_biguint!(10);
+        assert_eq!(actual_sum, expected_sum);
+    });
 }
 
 #[test]
