@@ -15,7 +15,10 @@ use multiversx_sc::{
 };
 use multiversx_sc_scenario::{
     managed_address, rust_biguint,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
+    scenario_model::{
+        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
+    },
+    testing_framework::TxResult,
     DebugApi, ScenarioWorld, WhiteboxContract,
 };
 
@@ -25,7 +28,6 @@ const BOARD_MEMBER_ADDRESS_EXPR: &str = "address:board-member";
 const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
 const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
 const QUORUM_SIZE: usize = 1;
-// const EGLD_TOKEN_ID: &[u8] = b"EGLD";
 
 type RustBigUint = num_bigint::BigUint;
 
@@ -113,7 +115,11 @@ fn test_init() {
     setup();
 }
 
-fn call_propose(world: &mut ScenarioWorld, action: ActionRaw) -> usize {
+fn call_propose(
+    world: &mut ScenarioWorld,
+    action: ActionRaw,
+    expected_message: Option<&str>,
+) -> usize {
     let egld_amount = match &action {
         ActionRaw::SendTransferExecute(call_data) => call_data.egld_amount.clone(),
         ActionRaw::SendAsyncCall(call_data) => call_data.egld_amount.clone(),
@@ -128,11 +134,12 @@ fn call_propose(world: &mut ScenarioWorld, action: ActionRaw) -> usize {
 
     let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
 
-    world.whitebox_call(
+    world.whitebox_call_check(
         &multisig_whitebox,
         ScCallStep::new()
             .from(PROPOSER_ADDRESS_EXPR)
-            .egld_value(amount_rust_biguint),
+            .egld_value(amount_rust_biguint)
+            .no_expect(),
         |sc| {
             action_id = match action {
                 ActionRaw::_Nothing => panic!("Invalid action"),
@@ -200,6 +207,10 @@ fn call_propose(world: &mut ScenarioWorld, action: ActionRaw) -> usize {
                 ),
             }
         },
+        |r| match expected_message {
+            Some(msg) => r.assert_user_error(msg),
+            None => r.assert_ok(),
+        },
     );
 
     action_id
@@ -226,6 +237,7 @@ fn test_add_board_member() {
     let action_id = call_propose(
         &mut world,
         ActionRaw::AddBoardMember(address_expr_to_address(NEW_BOARD_MEMBER_ADDRESS_EXPR)),
+        None,
     );
 
     world.whitebox_call(
@@ -282,6 +294,7 @@ fn test_add_proposer() {
     let action_id = call_propose(
         &mut world,
         ActionRaw::AddProposer(address_expr_to_address(NEW_PROPOSER_ADDRESS_EXPR)),
+        None,
     );
 
     world.whitebox_call(
@@ -333,6 +346,7 @@ fn test_remove_proposer() {
     let action_id = call_propose(
         &mut world,
         ActionRaw::RemoveUser(address_expr_to_address(PROPOSER_ADDRESS_EXPR)),
+        None,
     );
 
     world.whitebox_call(
@@ -369,6 +383,7 @@ fn test_try_remove_all_board_members() {
     let action_id = call_propose(
         &mut world,
         ActionRaw::RemoveUser(address_expr_to_address(BOARD_MEMBER_ADDRESS_EXPR)),
+        None,
     );
 
     world.whitebox_call(
@@ -399,7 +414,7 @@ fn test_change_quorum() {
     let new_quorum_size = 2;
 
     // try change quorum > board size
-    let action_id = call_propose(&mut world, ActionRaw::ChangeQuorum(new_quorum_size));
+    let action_id = call_propose(&mut world, ActionRaw::ChangeQuorum(new_quorum_size), None);
 
     world.whitebox_call(
         &multisig_whitebox,
@@ -472,6 +487,7 @@ fn test_change_quorum() {
     let action_id = call_propose(
         &mut world,
         ActionRaw::AddBoardMember(address_expr_to_address(NEW_BOARD_MEMBER_ADDRESS_EXPR)),
+        None,
     );
 
     world.whitebox_call(
@@ -489,7 +505,7 @@ fn test_change_quorum() {
     );
 
     // change quorum to 2
-    let action_id = call_propose(&mut world, ActionRaw::ChangeQuorum(new_quorum_size));
+    let action_id = call_propose(&mut world, ActionRaw::ChangeQuorum(new_quorum_size), None);
 
     world.whitebox_call(
         &multisig_whitebox,
@@ -510,6 +526,71 @@ fn test_change_quorum() {
 fn test_transfer_execute_to_user() {
     let mut world = setup();
     let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+
+    const NEW_USER_ADDRESS_EXPR: &str = "address:new-user";
+    world.set_state_step(
+        SetStateStep::new().put_account(NEW_USER_ADDRESS_EXPR, Account::new().nonce(1)),
+    );
+
+    const EGLD_AMOUNT: u64 = 100;
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new()
+            .from(PROPOSER_ADDRESS_EXPR)
+            .egld_value(EGLD_AMOUNT),
+        |sc| {
+            sc.deposit();
+        },
+    );
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        MULTISIG_ADDRESS_EXPR,
+        CheckAccount::new().balance(EGLD_AMOUNT.to_string().as_str()),
+    ));
+
+    // failed attempt
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::SendTransferExecute(CallActionDataRaw {
+            to: address_expr_to_address(NEW_USER_ADDRESS_EXPR),
+            egld_amount: rust_biguint!(0),
+            endpoint_name: BoxedBytes::empty(),
+            arguments: Vec::new(),
+        }),
+        Some("proposed action has no effect"),
+    );
+
+    // propose
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::SendTransferExecute(CallActionDataRaw {
+            to: address_expr_to_address(NEW_USER_ADDRESS_EXPR),
+            egld_amount: rust_biguint!(EGLD_AMOUNT),
+            endpoint_name: BoxedBytes::empty(),
+            arguments: Vec::new(),
+        }),
+        None,
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+    );
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        NEW_USER_ADDRESS_EXPR,
+        CheckAccount::new().balance(EGLD_AMOUNT.to_string().as_str()),
+    ));
 }
 
 #[test]
