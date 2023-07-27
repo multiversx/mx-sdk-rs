@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use std::borrow::Borrow;
 
 use multisig::{
@@ -390,19 +392,143 @@ fn test_try_remove_all_board_members() {
 }
 
 #[test]
-fn test_change_quorum() {}
+fn test_change_quorum() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+
+    let new_quorum_size = 2;
+
+    // try change quorum > board size
+    let action_id = call_propose(&mut world, ActionRaw::ChangeQuorum(new_quorum_size));
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call_check(
+        &multisig_whitebox,
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .no_expect(),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+        |r| {
+            r.assert_user_error("quorum cannot exceed board size");
+        },
+    );
+
+    // try discard before unsigning
+    world.whitebox_call_check(
+        &multisig_whitebox,
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .no_expect(),
+        |sc| {
+            sc.discard_action(action_id);
+        },
+        |r| {
+            r.assert_user_error("cannot discard action with valid signatures");
+        },
+    );
+
+    // unsign and discard action
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.unsign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            sc.discard_action(action_id);
+        },
+    );
+
+    // try sign discarded action
+    world.whitebox_call_check(
+        &multisig_whitebox,
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .no_expect(),
+        |sc| {
+            sc.sign(action_id);
+        },
+        |r| {
+            r.assert_user_error("action does not exist");
+        },
+    );
+
+    // add another board member
+    const NEW_BOARD_MEMBER_ADDRESS_EXPR: &str = "address:new-board-member";
+    world.set_state_step(
+        SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
+    );
+
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::AddBoardMember(address_expr_to_address(NEW_BOARD_MEMBER_ADDRESS_EXPR)),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+    );
+
+    // change quorum to 2
+    let action_id = call_propose(&mut world, ActionRaw::ChangeQuorum(new_quorum_size));
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+    );
+}
 
 #[test]
-fn test_transfer_execute_to_user() {}
+fn test_transfer_execute_to_user() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+}
 
 #[test]
-fn test_transfer_execute_sc_all() {}
+fn test_transfer_execute_sc_all() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+}
 
 #[test]
-fn test_async_call_to_sc() {}
+fn test_async_call_to_sc() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+}
 
 #[test]
-fn test_deploy_and_upgrade_from_source() {}
+fn test_deploy_and_upgrade_from_source() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+}
 
 fn address_expr_to_address(address_expr: &str) -> Address {
     AddressValue::from(address_expr).to_address()
