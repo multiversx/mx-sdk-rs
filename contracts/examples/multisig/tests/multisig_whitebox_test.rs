@@ -360,7 +360,34 @@ fn test_remove_proposer() {
 }
 
 #[test]
-fn test_try_remove_all_board_members() {}
+fn test_try_remove_all_board_members() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::RemoveUser(address_expr_to_address(BOARD_MEMBER_ADDRESS_EXPR)),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call_check(
+        &multisig_whitebox,
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .no_expect(),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+        |r| {
+            r.assert_user_error("quorum cannot exceed board size");
+        },
+    );
+}
 
 #[test]
 fn test_change_quorum() {}
