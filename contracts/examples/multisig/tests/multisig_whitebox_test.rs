@@ -210,7 +210,6 @@ fn test_add_board_member() {
 
     const NEW_BOARD_MEMBER_ADDRESS_EXPR: &str = "address:new-board-member";
     world.set_state_step(
-        // change to const
         SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
     );
 
@@ -241,6 +240,7 @@ fn test_add_board_member() {
     );
 
     world.whitebox_query(&multisig_whitebox, |sc| {
+        // check role after
         let user_role = sc.user_role(managed_address!(&address_expr_to_address(
             NEW_BOARD_MEMBER_ADDRESS_EXPR
         )));
@@ -254,6 +254,61 @@ fn test_add_board_member() {
         assert_eq!(
             (board_members.get(1).borrow() as &ManagedAddress<DebugApi>).clone(),
             managed_address!(&address_expr_to_address(NEW_BOARD_MEMBER_ADDRESS_EXPR))
+        );
+    });
+}
+
+#[test]
+fn test_add_proposer() {
+    let mut world = setup();
+    let multisig_whitebox = WhiteboxContract::new(MULTISIG_ADDRESS_EXPR, multisig::contract_obj);
+
+    const NEW_PROPOSER_ADDRESS_EXPR: &str = "address:new-proposer";
+    world.set_state_step(
+        SetStateStep::new().put_account(NEW_PROPOSER_ADDRESS_EXPR, Account::new().nonce(1)),
+    );
+
+    world.whitebox_query(&multisig_whitebox, |sc| {
+        let user_role = sc.user_role(managed_address!(&address_expr_to_address(
+            NEW_PROPOSER_ADDRESS_EXPR
+        )));
+        assert_eq!(user_role, UserRole::None);
+    });
+
+    let action_id = call_propose(
+        &mut world,
+        ActionRaw::AddProposer(address_expr_to_address(NEW_PROPOSER_ADDRESS_EXPR)),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| sc.sign(action_id),
+    );
+
+    world.whitebox_call(
+        &multisig_whitebox,
+        ScCallStep::new().from(BOARD_MEMBER_ADDRESS_EXPR),
+        |sc| {
+            let _ = sc.perform_action_endpoint(action_id);
+        },
+    );
+
+    world.whitebox_query(&multisig_whitebox, |sc| {
+        // check role after
+        let user_role = sc.user_role(managed_address!(&address_expr_to_address(
+            NEW_PROPOSER_ADDRESS_EXPR
+        )));
+        assert_eq!(user_role, UserRole::Proposer);
+
+        let proposers = sc.get_all_proposers().to_vec();
+        assert_eq!(
+            (proposers.get(0).borrow() as &ManagedAddress<DebugApi>).clone(),
+            managed_address!(&address_expr_to_address(PROPOSER_ADDRESS_EXPR))
+        );
+        assert_eq!(
+            (proposers.get(1).borrow() as &ManagedAddress<DebugApi>).clone(),
+            managed_address!(&address_expr_to_address(NEW_PROPOSER_ADDRESS_EXPR))
         );
     });
 }
