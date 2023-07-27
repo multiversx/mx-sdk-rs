@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use multisig::{
     multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
     user_role::UserRole, Multisig,

@@ -1,11 +1,9 @@
 #![allow(deprecated)] // TODO: migrate tests
 
-use std::borrow::Borrow;
-
 use multisig::user_role::UserRole;
 use multisig_blackbox_setup::{CallActionDataRaw, MultisigSetup};
-use multiversx_sc::types::{BoxedBytes, CodeMetadata, ManagedAddress};
-use multiversx_sc_scenario::{managed_address, managed_biguint, rust_biguint, DebugApi};
+use multiversx_sc::types::{BoxedBytes, CodeMetadata};
+use multiversx_sc_scenario::{managed_address, managed_biguint, rust_biguint};
 
 mod multisig_blackbox_setup;
 use adder::Adder;
@@ -13,97 +11,6 @@ use factorial::Factorial;
 use multisig::Multisig;
 
 use crate::multisig_blackbox_setup::{ActionRaw, EGLD_TOKEN_ID};
-
-#[test]
-fn init_test() {
-    let _ = MultisigSetup::new(multisig::contract_obj);
-}
-
-#[test]
-fn add_board_member_test() {
-    let rust_zero = rust_biguint!(0);
-    let mut ms_setup = MultisigSetup::new(multisig::contract_obj);
-    let new_board_member_addr = ms_setup.b_mock.create_user_account(&rust_zero);
-
-    ms_setup
-        .b_mock
-        .execute_query(&ms_setup.ms_wrapper, |sc| {
-            // check role before
-            let user_role = sc.user_role(managed_address!(&new_board_member_addr));
-            assert_eq!(user_role, UserRole::None);
-        })
-        .assert_ok();
-
-    let (action_id, tx_result) =
-        ms_setup.call_propose(ActionRaw::AddBoardMember(new_board_member_addr.clone()));
-    tx_result.assert_ok();
-
-    ms_setup.call_sign(action_id).assert_ok();
-    ms_setup.call_perform_action(action_id).assert_ok();
-
-    let prev_board_memeber_addr = ms_setup.board_member_address.clone();
-    ms_setup
-        .b_mock
-        .execute_query(&ms_setup.ms_wrapper, |sc| {
-            // check role after
-            let user_role = sc.user_role(managed_address!(&new_board_member_addr));
-            assert_eq!(user_role, UserRole::BoardMember);
-
-            let board_members = sc.get_all_board_members().to_vec();
-            assert_eq!(
-                (board_members.get(0).borrow() as &ManagedAddress<DebugApi>).clone(),
-                managed_address!(&prev_board_memeber_addr)
-            );
-            assert_eq!(
-                (board_members.get(1).borrow() as &ManagedAddress<DebugApi>).clone(),
-                managed_address!(&new_board_member_addr)
-            );
-        })
-        .assert_ok();
-}
-
-#[test]
-fn add_proposer_test() {
-    let rust_zero = rust_biguint!(0);
-    let mut ms_setup = MultisigSetup::new(multisig::contract_obj);
-    let new_proposer_addr = ms_setup.b_mock.create_user_account(&rust_zero);
-
-    ms_setup
-        .b_mock
-        .execute_query(&ms_setup.ms_wrapper, |sc| {
-            // check role before
-            let user_role = sc.user_role(managed_address!(&new_proposer_addr));
-            assert_eq!(user_role, UserRole::None);
-        })
-        .assert_ok();
-
-    let (action_id, tx_result) =
-        ms_setup.call_propose(ActionRaw::AddProposer(new_proposer_addr.clone()));
-    tx_result.assert_ok();
-
-    ms_setup.call_sign(action_id).assert_ok();
-    ms_setup.call_perform_action(action_id).assert_ok();
-
-    let prev_proposer_addr = ms_setup.proposer_address.clone();
-    ms_setup
-        .b_mock
-        .execute_query(&ms_setup.ms_wrapper, |sc| {
-            // check role after
-            let user_role = sc.user_role(managed_address!(&new_proposer_addr));
-            assert_eq!(user_role, UserRole::Proposer);
-
-            let proposers = sc.get_all_proposers().to_vec();
-            assert_eq!(
-                (proposers.get(0).borrow() as &ManagedAddress<DebugApi>).clone(),
-                managed_address!(&prev_proposer_addr)
-            );
-            assert_eq!(
-                (proposers.get(1).borrow() as &ManagedAddress<DebugApi>).clone(),
-                managed_address!(&new_proposer_addr)
-            );
-        })
-        .assert_ok();
-}
 
 #[test]
 fn remove_proposer_test() {

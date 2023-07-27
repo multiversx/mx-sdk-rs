@@ -214,6 +214,7 @@ fn test_add_board_member() {
     );
 
     world.whitebox_query(&multisig_whitebox, |sc| {
+        // check role before
         let user_role = sc.user_role(managed_address!(&address_expr_to_address(
             NEW_BOARD_MEMBER_ADDRESS_EXPR
         )));
@@ -269,6 +270,7 @@ fn test_add_proposer() {
     );
 
     world.whitebox_query(&multisig_whitebox, |sc| {
+        // check role before
         let user_role = sc.user_role(managed_address!(&address_expr_to_address(
             NEW_PROPOSER_ADDRESS_EXPR
         )));
@@ -312,6 +314,27 @@ fn test_add_proposer() {
         );
     });
 }
+
+#[test]
+fn test_remove_proposer() {}
+
+#[test]
+fn test_try_remove_all_board_members() {}
+
+#[test]
+fn test_change_quorum() {}
+
+#[test]
+fn test_transfer_execute_to_user() {}
+
+#[test]
+fn test_transfer_execute_sc_all() {}
+
+#[test]
+fn test_async_call_to_sc() {}
+
+#[test]
+fn test_deploy_and_upgrade_from_source() {}
 
 fn address_expr_to_address(address_expr: &str) -> Address {
     AddressValue::from(address_expr).to_address()
