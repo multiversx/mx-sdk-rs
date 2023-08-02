@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::sync::Mutex;
 
 use multiversx_chain_vm::{
     executor::VMHooks,
@@ -13,7 +13,7 @@ use crate::debug_executor::StaticVarData;
 use super::{VMHooksApi, VMHooksApiBackend};
 
 thread_local! {
-    static SINGLE_TX_API_VH_CELL: RefCell<SingleTxApiVMHooksHandler> = RefCell::default();
+    static SINGLE_TX_API_VH_CELL: Mutex<SingleTxApiVMHooksHandler> = Mutex::default();
 
     static SINGLE_TX_API_STATIC_CELL: StaticVarData = StaticVarData::default();
 }
@@ -29,7 +29,7 @@ impl VMHooksApiBackend for SingleTxApiBackend {
         F: FnOnce(&dyn VMHooks) -> R,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
-            let handler = cell.borrow().clone();
+            let handler = cell.lock().unwrap().clone();
             let dispatcher = VMHooksDispatcher::new(Box::new(handler));
             f(&dispatcher)
         })
@@ -49,7 +49,7 @@ pub type SingleTxApi = VMHooksApi<SingleTxApiBackend>;
 impl SingleTxApi {
     pub fn clear_global() {
         SINGLE_TX_API_VH_CELL.with(|cell| {
-            let _ = cell.take();
+            let _ = std::mem::take(&mut *cell.lock().unwrap());
         })
     }
 
@@ -58,7 +58,7 @@ impl SingleTxApi {
         F: FnOnce(&mut SingleTxApiData) -> R,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
-            let mut handler = cell.borrow_mut();
+            let mut handler = cell.lock().unwrap();
             handler.with_mut_data(f)
         })
     }

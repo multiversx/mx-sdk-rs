@@ -4,11 +4,10 @@ use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
 use std::{
-    cell::{Ref, RefCell, RefMut},
     collections::HashMap,
     fmt,
-    rc::Rc,
 };
+use std::sync::{Arc, Mutex, MutexGuard};
 
 pub struct ContractMap {
     contract_objs: HashMap<Vec<u8>, ContractContainerRef>,
@@ -70,19 +69,15 @@ impl Default for ContractMap {
 }
 
 #[derive(Default, Clone, Debug)]
-pub struct ContractMapRef(Rc<RefCell<ContractMap>>);
+pub struct ContractMapRef(Arc<Mutex<ContractMap>>);
 
 impl ContractMapRef {
     pub fn new() -> Self {
-        ContractMapRef(Rc::new(RefCell::new(ContractMap::new())))
+        ContractMapRef(Arc::new(Mutex::new(ContractMap::new())))
     }
 
-    pub fn borrow(&self) -> Ref<ContractMap> {
-        self.0.borrow()
-    }
-
-    pub fn borrow_mut(&self) -> RefMut<ContractMap> {
-        self.0.borrow_mut()
+    pub fn borrow(&self) -> MutexGuard<ContractMap> {
+        self.0.lock().unwrap()
     }
 }
 
