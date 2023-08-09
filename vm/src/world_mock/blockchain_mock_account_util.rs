@@ -16,7 +16,7 @@ impl BlockchainState {
     }
 
     pub fn update_accounts(&mut self, accounts: HashMap<VMAddress, AccountData>) {
-        self.accounts.extend(accounts.into_iter());
+        self.accounts.extend(accounts);
     }
 
     pub fn print_accounts(&self) {

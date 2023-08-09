@@ -16,7 +16,7 @@ fn append_endpoint_name_and_args(
 ) {
     if !endpoint_name.is_empty() {
         args.push(endpoint_name.into_bytes());
-        args.extend(arg_buffer.into_iter());
+        args.extend(arg_buffer);
     }
 }
 
@@ -111,7 +111,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         args: Vec<Vec<u8>>,
     ) -> ! {
         let mut arguments = vec![contract_code, code_metadata.to_vec()];
-        arguments.extend(args.into_iter());
+        arguments.extend(args);
         self.perform_async_call(to, egld_value, UPGRADE_CONTRACT_FUNC_NAME.into(), arguments)
     }
 

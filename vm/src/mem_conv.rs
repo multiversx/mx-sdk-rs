@@ -7,6 +7,7 @@ where
     f(bytes.as_ptr() as MemPtr, bytes.len() as MemLength)
 }
 
+#[allow(clippy::needless_pass_by_ref_mut)]
 pub fn with_mem_ptr_mut<F, R>(bytes: &mut [u8], f: F) -> R
 where
     F: FnOnce(MemPtr, MemLength) -> R,

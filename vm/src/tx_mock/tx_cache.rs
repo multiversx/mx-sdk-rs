@@ -115,8 +115,6 @@ impl TxCache {
     }
 
     pub fn commit_updates(&self, updates: BlockchainUpdate) {
-        self.accounts
-            .borrow_mut()
-            .extend(updates.accounts.into_iter());
+        self.accounts.borrow_mut().extend(updates.accounts);
     }
 }

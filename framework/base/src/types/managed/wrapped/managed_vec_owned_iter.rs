@@ -103,7 +103,6 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    #[allow(clippy::clone_double_ref)]
     fn clone(&self) -> Self {
         let byte_end = self.byte_end;
         Self {

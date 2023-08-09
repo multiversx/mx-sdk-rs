@@ -93,7 +93,6 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    #[allow(clippy::clone_double_ref)]
     fn clone(&self) -> Self {
         Self {
             managed_vec: self.managed_vec,
