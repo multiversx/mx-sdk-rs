@@ -54,7 +54,7 @@ impl TxContextRef {
         // TODO: investigate if we can also destroy the Arc
         // can be done if we can make sure that no more references exist at this point
         // let tx_context = Arc::try_unwrap(self.0).unwrap();
-        std::mem::replace(&mut *self.tx_result_cell.lock().unwrap(), TxResult::default())
+        std::mem::take(&mut *self.tx_result_cell.lock().unwrap())
     }
 
     /// The current method for signalling that the current execution is failed, and with what error.
