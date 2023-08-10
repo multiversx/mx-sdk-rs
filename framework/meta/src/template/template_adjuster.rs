@@ -117,8 +117,8 @@ impl TemplateAdjuster {
                     &self.get_package_name(&new_meta),
                 ),
                 Query::substring(
-                    &self.get_dependecy(&self.metadata.name.clone()),
-                    &self.get_dependecy(&new_template_name),
+                    &self.get_dependecy(&self.metadata.name),
+                    &self.get_dependecy(new_template_name),
                 ),
             ][..],
         );
@@ -137,8 +137,8 @@ impl TemplateAdjuster {
                     &self.get_package_name(&new_wasm),
                 ),
                 Query::substring(
-                    &self.get_dependecy(&self.metadata.name.clone()),
-                    &self.get_dependecy(&new_template_name),
+                    &self.get_dependecy(&self.metadata.name),
+                    &self.get_dependecy(new_template_name),
                 ),
             ][..],
         );
@@ -163,10 +163,10 @@ impl TemplateAdjuster {
         let old_name = self.metadata.name.to_case(Case::Snake);
         let mut new_path = "/".to_owned();
         new_path.push_str(&new_template_name);
-        new_path.push_str("\"");
+        new_path.push('\"');
         let mut old_path = "/".to_owned();
         old_path.push_str(&self.metadata.name);
-        old_path.push_str("\"");
+        old_path.push('\"');
         let mut new_scenarios = "scenarios/".to_owned();
         new_scenarios.push_str(&new_name);
         let mut old_scenarios = "scenarios/".to_owned();
@@ -206,12 +206,12 @@ impl TemplateAdjuster {
     fn get_package_name(&self, template: &str) -> String {
         let mut package = "name = \"".to_owned();
         package.push_str(template);
-        package.push_str("\"");
+        package.push('\"');
         package
     }
     fn get_dependecy(&self, template: &str) -> String {
         let mut dependency = "dependencies.".to_owned();
-        dependency.push_str(&template);
+        dependency.push_str(template);
         dependency
     }
 }
