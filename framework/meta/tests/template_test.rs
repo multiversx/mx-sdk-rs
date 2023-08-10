@@ -32,7 +32,7 @@ async fn test_template_download() {
     let downloader = TemplateDownloader::new(&repo_source, "adder".to_string(), target_dir.clone());
     downloader.template_download();
     downloader.update_dependencies();
-    downloader.rename_trait_to("NewAdder".to_string());
+    downloader.rename_template_to("new-adder".to_string());
     cargo_test(target_dir);
 }
 

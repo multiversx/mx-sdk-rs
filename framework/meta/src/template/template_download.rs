@@ -1,5 +1,4 @@
 use crate::cli_args::TemplateArgs;
-use convert_case::{Case, Casing};
 use std::path::PathBuf;
 
 use super::{
@@ -17,7 +16,7 @@ pub async fn template_download(args: &TemplateArgs) {
     );
     downloader.template_download();
     downloader.update_dependencies();
-    downloader.rename_trait_to(args.template.to_case(Case::UpperCamel));
+    downloader.rename_template_to(args.template.clone());
 }
 
 pub struct TemplateDownloader<'a> {
@@ -35,11 +34,12 @@ impl<'a> TemplateDownloader<'a> {
             .find(|source| source.metadata.name == template_name)
             .unwrap_or_else(|| panic!("Unknown template {template_name}"));
 
+        let metadata = template_source.metadata.clone();
         TemplateDownloader {
             repo_source,
             template_source,
             target_path: target_path.clone(),
-            adjuster: TemplateAdjuster::new(target_path, template_name),
+            adjuster: TemplateAdjuster::new(target_path, metadata),
         }
     }
 
@@ -49,7 +49,7 @@ impl<'a> TemplateDownloader<'a> {
     pub fn update_dependencies(&self) {
         self.adjuster.update_dependencies();
     }
-    pub fn rename_trait_to(&self, new_template_name: String) {
-        self.adjuster.rename_trait_to(new_template_name);
+    pub fn rename_template_to(&self, new_template_name: String) {
+        self.adjuster.rename_template_to(new_template_name);
     }
 }

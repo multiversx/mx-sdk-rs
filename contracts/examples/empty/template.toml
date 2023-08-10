@@ -1,3 +1,5 @@
 name = "empty"
+contract_trait = "EmptyContract"
+src_file = "empty.rs"
 
 rename_pairs = []

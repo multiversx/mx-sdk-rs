@@ -1,60 +1,24 @@
 use std::path::PathBuf;
 
+use super::template_metadata::TemplateMetadata;
 use crate::{cmd::standalone::upgrade::upgrade_common::replace_in_files, CargoTomlContents};
+use convert_case::{Case, Casing};
 use ruplacer::Query;
 use toml::value::Table;
 
-const TEMPLATE_TOML: &str = "./template.toml";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
 
 pub struct TemplateAdjuster {
     pub target_path: PathBuf,
-    pub template_name: String,
-    pub contract_trait: String,
-    pub src_file: String,
-    pub package_name: String,
-    pub rename_pairs: Vec<String>,
+    pub metadata: TemplateMetadata,
 }
-
 impl TemplateAdjuster {
-    pub fn new(target_path: PathBuf, template_name: String) -> Self {
-        let cargo_toml_path = target_path.join(TEMPLATE_TOML);
-        let toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+    pub fn new(target_path: PathBuf, metadata: TemplateMetadata) -> Self {
         Self {
             target_path,
-            template_name,
-            contract_trait: toml
-                .toml_value
-                .get("contract_trait")
-                .expect("missing contract_trait in template.toml")
-                .as_str()
-                .expect("contract_trait not a string value")
-                .to_string(),
-            src_file: toml
-                .toml_value
-                .get("contract_trait")
-                .expect("missing src_file in template.toml")
-                .as_str()
-                .expect("src_file not a string value")
-                .to_string(),
-            package_name: toml
-                .toml_value
-                .get("contract_trait")
-                .expect("missing package_name in template.toml")
-                .as_str()
-                .expect("package_name not a string value")
-                .to_string(),
-            rename_pairs: toml
-                .toml_value
-                .get("rename_pairs")
-                .expect("missing contract_trait in template.toml")
-                .as_array()
-                .expect("package_name not an array value")
-                .iter()
-                .map(|value| value.to_string())
-                .collect(),
+            metadata,
         }
     }
 
@@ -83,7 +47,7 @@ impl TemplateAdjuster {
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         let deps_map = toml.dependencies_mut();
-        remove_paths_from_dependencies(deps_map, &[&self.template_name]);
+        remove_paths_from_dependencies(deps_map, &[&self.metadata.name]);
 
         toml.save_to_file(&cargo_toml_path);
     }
@@ -93,28 +57,90 @@ impl TemplateAdjuster {
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         let deps_map = toml.dependencies_mut();
-        remove_paths_from_dependencies(deps_map, &[&self.template_name]);
+        remove_paths_from_dependencies(deps_map, &[&self.metadata.name]);
 
         toml.save_to_file(&cargo_toml_path);
     }
 
-    pub fn rename_trait_to(&self, new_template_name: String) {
-        let cargo_toml_path = self.target_path.join(TEMPLATE_TOML);
-        let toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+    pub fn rename_template_to(&self, new_name: String) {
+        self.rename_trait_to(&new_name.to_case(Case::UpperCamel));
+        self.rename_cargo_toml_root(&new_name);
+        self.rename_cargo_toml_meta(&new_name);
+        self.rename_cargo_toml_wasm(&new_name);
+    }
 
-        let contract_trait = toml
-            .toml_value
-            .get("contract_trait")
-            .expect("missing contract_trait in template.toml")
-            .as_str()
-            .expect("contract_trait not a string value")
-            .to_string();
-
+    fn rename_trait_to(&self, new_template_name: &String) {
         replace_in_files(
             &self.target_path,
             "*rs",
-            &[Query::substring(&contract_trait, &new_template_name)][..],
+            &[Query::substring(
+                &self.metadata.contract_trait,
+                new_template_name,
+            )][..],
         );
+    }
+
+    fn rename_cargo_toml_root(&self, new_template_name: &String) {
+        replace_in_files(
+            &self.target_path,
+            "*Cargo.toml",
+            &[Query::substring(
+                &self.get_package_name(&self.metadata.name),
+                &self.get_package_name(new_template_name),
+            )][..],
+        );
+    }
+    fn rename_cargo_toml_meta(&self, new_template_name: &String) {
+        let mut old_meta = self.metadata.name.clone();
+        old_meta.push_str("-meta");
+        let mut new_meta = new_template_name.clone();
+        new_meta.push_str("-meta");
+        replace_in_files(
+            &self.target_path,
+            "*Cargo.toml",
+            &[
+                Query::substring(
+                    &self.get_package_name(&old_meta),
+                    &self.get_package_name(&new_meta),
+                ),
+                Query::substring(
+                    &self.get_dependecy(&self.metadata.name.clone()),
+                    &self.get_dependecy(&new_template_name),
+                ),
+            ][..],
+        );
+    }
+    fn rename_cargo_toml_wasm(&self, new_template_name: &String) {
+        let mut old_wasm = self.metadata.name.clone();
+        old_wasm.push_str("-wasm");
+        let mut new_wasm = new_template_name.clone();
+        new_wasm.push_str("-wasm");
+        replace_in_files(
+            &self.target_path,
+            "*Cargo.toml",
+            &[
+                Query::substring(
+                    &self.get_package_name(&old_wasm),
+                    &self.get_package_name(&new_wasm),
+                ),
+                Query::substring(
+                    &self.get_dependecy(&self.metadata.name.clone()),
+                    &self.get_dependecy(&new_template_name),
+                ),
+            ][..],
+        );
+    }
+
+    fn get_package_name(&self, template: &String) -> String {
+        let mut package = "name =\"".to_owned();
+        package.push_str(template);
+        package.push_str("\"");
+        package
+    }
+    fn get_dependecy(&self, template: &String) -> String {
+        let mut dependency = "dependencies.".to_owned();
+        dependency.push_str(&template);
+        dependency
     }
 }
 pub fn remove_paths_from_dependencies(deps_map: &mut Table, ignore_deps: &[&str]) {

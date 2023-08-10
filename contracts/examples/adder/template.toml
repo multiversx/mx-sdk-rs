@@ -1,7 +1,6 @@
+name = "adder"
 contract_trait = "Adder"
 src_file = "adder.rs"
-package_name = "adder"
-
 rename_pairs = [
     [
         "blockchain.set_current_dir_from_workspace(\"contracts/examples/adder\");",
