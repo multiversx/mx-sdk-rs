@@ -9,6 +9,7 @@ use convert_case::{Case, Casing};
 use ruplacer::Query;
 use toml::value::Table;
 
+const TEST_DIRECTORY: &str = "./tests";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
@@ -67,9 +68,11 @@ impl TemplateAdjuster {
 
     pub fn rename_template_to(&self, new_name: String) {
         self.rename_trait_to(&new_name.to_case(Case::UpperCamel));
-        self.rename_cargo_toml_root(&new_name);
-        self.rename_cargo_toml_meta(&new_name);
-        self.rename_cargo_toml_wasm(&new_name);
+        self.rename_in_cargo_toml_root(&new_name);
+        self.rename_in_cargo_toml_meta(&new_name);
+        self.rename_in_cargo_toml_wasm(&new_name);
+        self.rename_in_scenarios(&new_name);
+        self.rename_in_tests(&new_name);
         self.rename_files(&new_name);
     }
 
@@ -84,9 +87,8 @@ impl TemplateAdjuster {
         );
     }
 
-    fn rename_cargo_toml_root(&self, new_template_name: &String) {
-        let mut old_path = self.metadata.src_file.clone();
-        old_path.push_str(".rs");
+    fn rename_in_cargo_toml_root(&self, new_template_name: &String) {
+        let old_path = self.metadata.src_file.clone();
         let mut new_path = new_template_name.to_case(Case::Snake);
         new_path.push_str(".rs");
         replace_in_files(
@@ -101,7 +103,7 @@ impl TemplateAdjuster {
             ][..],
         );
     }
-    fn rename_cargo_toml_meta(&self, new_template_name: &String) {
+    fn rename_in_cargo_toml_meta(&self, new_template_name: &String) {
         let mut old_meta = self.metadata.name.clone();
         old_meta.push_str("-meta");
         let mut new_meta = new_template_name.clone();
@@ -121,7 +123,7 @@ impl TemplateAdjuster {
             ][..],
         );
     }
-    fn rename_cargo_toml_wasm(&self, new_template_name: &String) {
+    fn rename_in_cargo_toml_wasm(&self, new_template_name: &String) {
         let mut old_wasm = self.metadata.name.clone();
         old_wasm.push_str("-wasm");
         let mut new_wasm = new_template_name.clone();
@@ -142,13 +144,61 @@ impl TemplateAdjuster {
         );
     }
 
+    fn rename_in_scenarios(&self, new_template_name: &String) {
+        let mut old_wasm = self.metadata.name.clone();
+        old_wasm.push_str(".wasm");
+        let mut new_wasm = new_template_name.clone();
+        new_wasm.push_str(".wasm");
+        replace_in_files(
+            &self.target_path,
+            "*.scen.json",
+            &[Query::substring(
+                &self.get_package_name(&old_wasm),
+                &self.get_package_name(&new_wasm),
+            )][..],
+        );
+    }
+    fn rename_in_tests(&self, new_template_name: &String) {
+        let new_name = new_template_name.to_case(Case::Snake);
+        let old_name = self.metadata.name.to_case(Case::Snake);
+        let mut new_path = "/".to_owned();
+        new_path.push_str(&new_template_name);
+        new_path.push_str("\"");
+        let mut old_path = "/".to_owned();
+        old_path.push_str(&self.metadata.name);
+        old_path.push_str("\"");
+        let mut new_scenarios = "scenarios/".to_owned();
+        new_scenarios.push_str(&new_name);
+        let mut old_scenarios = "scenarios/".to_owned();
+        old_scenarios.push_str(&old_name);
+        let mut new_package: String = new_name.clone();
+        new_package.push_str("::");
+        let mut old_package: String = old_name.clone();
+        old_package.push_str("::");
+        let mut old_wasm = self.metadata.name.clone();
+        old_wasm.push_str(".wasm");
+        let mut new_wasm = new_template_name.clone();
+        new_wasm.push_str(".wasm");
+        replace_in_files(
+            &self.target_path.join(TEST_DIRECTORY),
+            "*.rs",
+            &[
+                Query::substring(&old_wasm, &new_wasm),
+                Query::substring(&old_package, &new_package),
+                Query::substring(&old_path, &new_path),
+                Query::substring(&old_scenarios, &new_scenarios),
+            ][..],
+        );
+    }
+
     fn rename_files(&self, new_template_name: &String) {
-        let mut new_src_name = new_template_name.to_case(Case::Snake);
+        let new_name = new_template_name.to_case(Case::Snake);
+        let mut new_src_name = new_name.clone();
         new_src_name.push_str(".rs");
 
         let pattern: &[(&str, &str)] = &[
             (&self.metadata.src_file, &new_src_name),
-            (&self.metadata.name, new_template_name),
+            (&self.metadata.name, &new_name),
         ];
         rename_files(&self.target_path, pattern);
     }
