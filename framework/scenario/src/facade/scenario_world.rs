@@ -145,7 +145,7 @@ impl ScenarioWorld {
         self.get_mut_debugger_backend()
             .vm_runner
             .contract_map_ref
-            .borrow()
+            .lock()
             .register_contract(contract_bytes, contract_container);
     }
 

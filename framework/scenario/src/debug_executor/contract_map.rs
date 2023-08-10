@@ -76,7 +76,7 @@ impl ContractMapRef {
         ContractMapRef(Arc::new(Mutex::new(ContractMap::new())))
     }
 
-    pub fn borrow(&self) -> MutexGuard<ContractMap> {
+    pub fn lock(&self) -> MutexGuard<ContractMap> {
         self.0.lock().unwrap()
     }
 }
@@ -98,7 +98,7 @@ impl Executor for ContractMapRef {
         wasm_bytes: &[u8],
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        Ok(Box::new(self.borrow().get_contract(wasm_bytes)))
+        Ok(Box::new(self.lock().get_contract(wasm_bytes)))
     }
 
     fn new_instance_from_cache(

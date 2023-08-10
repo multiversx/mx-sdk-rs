@@ -262,7 +262,7 @@ impl BlockchainStateWrapper {
             .get_mut_debugger_backend()
             .vm_runner
             .contract_map_ref
-            .borrow()
+            .lock()
             .contains_contract(contract_code_expr.value.as_slice());
         if !contains_contract {
             let contract_obj = create_contract_obj_box(obj_builder);
@@ -271,7 +271,7 @@ impl BlockchainStateWrapper {
                 .get_mut_debugger_backend()
                 .vm_runner
                 .contract_map_ref
-                .borrow()
+                .lock()
                 .register_contract(
                     contract_code_expr.value,
                     ContractContainer::new(contract_obj, None, false),

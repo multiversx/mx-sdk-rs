@@ -286,7 +286,7 @@ mod sample_adder {
 
     impl<A> multiversx_sc::contract_base::CallableContract for ContractObj<A>
     where
-        A: multiversx_sc::api::VMApi + Send + Sync,
+        A: multiversx_sc::api::VMApi,
     {
         fn call(&self, fn_name: &str) -> bool {
             EndpointWrappers::call(
@@ -299,7 +299,7 @@ mod sample_adder {
     pub struct ContractBuilder;
 
     impl multiversx_sc::contract_base::CallableContractBuilder for ContractBuilder {
-        fn new_contract_obj<A: multiversx_sc::api::VMApi + Send + Sync>(
+        fn new_contract_obj<A: multiversx_sc::api::VMApi>(
             &self,
         ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract>
         {
