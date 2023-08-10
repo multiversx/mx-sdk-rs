@@ -77,13 +77,19 @@ impl TemplateAdjuster {
     }
 
     fn rename_trait_to(&self, new_template_name: &str) {
+        let new_name = new_template_name.to_case(Case::Snake);
+        let old_name = self.metadata.name.to_case(Case::Snake);
+        let mut new_package: String = new_name.clone();
+        new_package.push_str("::");
+        let mut old_package: String = old_name.clone();
+        old_package.push_str("::");
         replace_in_files(
             &self.target_path,
             "*rs",
-            &[Query::substring(
-                &self.metadata.contract_trait,
-                new_template_name,
-            )][..],
+            &[
+                Query::substring(&self.metadata.contract_trait, new_template_name),
+                Query::substring(&old_package, &new_package),
+            ][..],
         );
     }
 
@@ -171,10 +177,6 @@ impl TemplateAdjuster {
         new_scenarios.push_str(&new_name);
         let mut old_scenarios = "scenarios/".to_owned();
         old_scenarios.push_str(&old_name);
-        let mut new_package: String = new_name.clone();
-        new_package.push_str("::");
-        let mut old_package: String = old_name.clone();
-        old_package.push_str("::");
         let mut old_wasm = self.metadata.name.clone();
         old_wasm.push_str(".wasm");
         let mut new_wasm = new_template_name.to_owned();
@@ -184,7 +186,6 @@ impl TemplateAdjuster {
             "*.rs",
             &[
                 Query::substring(&old_wasm, &new_wasm),
-                Query::substring(&old_package, &new_package),
                 Query::substring(&old_path, &new_path),
                 Query::substring(&old_scenarios, &new_scenarios),
             ][..],
