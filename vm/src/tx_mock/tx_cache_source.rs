@@ -5,7 +5,7 @@ use crate::{
 
 use super::TxCache;
 
-pub trait TxCacheSource {
+pub trait TxCacheSource: Send + Sync {
     fn load_account(&self, address: &VMAddress) -> Option<AccountData>;
 
     fn blockchain_ref(&self) -> &BlockchainState;
