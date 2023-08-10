@@ -1,7 +1,10 @@
 use std::path::PathBuf;
 
 use super::template_metadata::TemplateMetadata;
-use crate::{cmd::standalone::upgrade::upgrade_common::replace_in_files, CargoTomlContents};
+use crate::{
+    cmd::standalone::upgrade::upgrade_common::{rename_files, replace_in_files},
+    CargoTomlContents,
+};
 use convert_case::{Case, Casing};
 use ruplacer::Query;
 use toml::value::Table;
@@ -67,6 +70,7 @@ impl TemplateAdjuster {
         self.rename_cargo_toml_root(&new_name);
         self.rename_cargo_toml_meta(&new_name);
         self.rename_cargo_toml_wasm(&new_name);
+        self.rename_files(&new_name);
     }
 
     fn rename_trait_to(&self, new_template_name: &String) {
@@ -81,13 +85,20 @@ impl TemplateAdjuster {
     }
 
     fn rename_cargo_toml_root(&self, new_template_name: &String) {
+        let mut old_path = self.metadata.src_file.clone();
+        old_path.push_str(".rs");
+        let mut new_path = new_template_name.to_case(Case::Snake);
+        new_path.push_str(".rs");
         replace_in_files(
             &self.target_path,
             "*Cargo.toml",
-            &[Query::substring(
-                &self.get_package_name(&self.metadata.name),
-                &self.get_package_name(new_template_name),
-            )][..],
+            &[
+                Query::substring(
+                    &self.get_package_name(&self.metadata.name),
+                    &self.get_package_name(new_template_name),
+                ),
+                Query::substring(&old_path, &new_path),
+            ][..],
         );
     }
     fn rename_cargo_toml_meta(&self, new_template_name: &String) {
@@ -131,8 +142,19 @@ impl TemplateAdjuster {
         );
     }
 
+    fn rename_files(&self, new_template_name: &String) {
+        let mut new_src_name = new_template_name.to_case(Case::Snake);
+        new_src_name.push_str(".rs");
+
+        let pattern: &[(&str, &str)] = &[
+            (&self.metadata.src_file, &new_src_name),
+            (&self.metadata.name, new_template_name),
+        ];
+        rename_files(&self.target_path, pattern);
+    }
+
     fn get_package_name(&self, template: &String) -> String {
-        let mut package = "name =\"".to_owned();
+        let mut package = "name = \"".to_owned();
         package.push_str(template);
         package.push_str("\"");
         package
