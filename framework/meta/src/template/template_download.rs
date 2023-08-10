@@ -38,8 +38,8 @@ impl<'a> TemplateDownloader<'a> {
         TemplateDownloader {
             repo_source,
             template_source,
-            target_path,
-            adjuster: TemplateAdjuster,
+            target_path: target_path.clone(),
+            adjuster: TemplateAdjuster::new(target_path, template_name),
         }
     }
 
@@ -47,9 +47,9 @@ impl<'a> TemplateDownloader<'a> {
         self.template_source.copy_template(&self.target_path);
     }
     pub fn update_dependencies(&self) {
-        self.adjuster.update_dependencies(&self);
+        self.adjuster.update_dependencies();
     }
     pub fn rename_trait_to(&self, new_template_name: String) {
-        self.adjuster.rename_trait_to(&self, new_template_name);
+        self.adjuster.rename_trait_to(new_template_name);
     }
 }
