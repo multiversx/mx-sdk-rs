@@ -1,9 +1,10 @@
+use crate::{cmd::standalone::upgrade::upgrade_common::replace_in_files, CargoTomlContents};
+use ruplacer::Query;
 use toml::value::Table;
-
-use crate::CargoTomlContents;
 
 use super::TemplateDownloader;
 
+const TEMPLATE_TOML: &str = "./template.toml";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
@@ -53,6 +54,25 @@ impl TemplateAdjuster {
 
     fn template_name(&self, downloader: &TemplateDownloader) -> String {
         downloader.template_source.metadata.name.clone()
+    }
+
+    pub fn rename_trait_to(&self, downloader: &TemplateDownloader, new_template_name: String) {
+        let cargo_toml_path = downloader.target_path.join(TEMPLATE_TOML);
+        let toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+
+        let contract_trait = toml
+            .toml_value
+            .get("contract_trait")
+            .expect("missing contract_trait in template.toml")
+            .as_str()
+            .expect("contract_trait not a string value")
+            .to_string();
+
+        replace_in_files(
+            &downloader.target_path,
+            "*rs",
+            &[Query::substring(&contract_trait, &new_template_name)][..],
+        );
     }
 }
 pub fn remove_paths_from_dependencies(deps_map: &mut Table, ignore_deps: &[&str]) {

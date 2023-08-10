@@ -1,6 +1,6 @@
-use std::path::PathBuf;
-
 use crate::cli_args::TemplateArgs;
+use convert_case::{Case, Casing};
+use std::path::PathBuf;
 
 use super::{
     repo_temp_download::RepoSource,
@@ -16,6 +16,8 @@ pub async fn template_download(args: &TemplateArgs) {
         args.name.clone(),
     );
     downloader.template_download();
+    downloader.update_dependencies();
+    downloader.rename_trait_to(args.template.to_case(Case::UpperCamel));
 }
 
 pub struct TemplateDownloader<'a> {
@@ -43,6 +45,11 @@ impl<'a> TemplateDownloader<'a> {
 
     pub fn template_download(&self) {
         self.template_source.copy_template(&self.target_path);
+    }
+    pub fn update_dependencies(&self) {
         self.adjuster.update_dependencies(&self);
+    }
+    pub fn rename_trait_to(&self, new_template_name: String) {
+        self.adjuster.rename_trait_to(&self, new_template_name);
     }
 }

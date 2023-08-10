@@ -1,4 +1,6 @@
-name = "adder"
+contract_trait = "Adder"
+src_file = "adder.rs"
+package_name = "adder"
 
 rename_pairs = [
     [
