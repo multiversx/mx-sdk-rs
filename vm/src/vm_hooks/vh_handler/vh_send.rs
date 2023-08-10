@@ -217,10 +217,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.tx_hash();
-        let callback_closure_data = self
-            .m_types_lock()
-            .mb_get(callback_closure_handle)
-            .to_vec();
+        let callback_closure_data = self.m_types_lock().mb_get(callback_closure_handle).to_vec();
 
         let call = AsyncCallTxData {
             from: contract_address,

@@ -7,8 +7,8 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
     collections::HashMap,
+    sync::{Arc, Mutex, MutexGuard},
 };
-use std::sync::{Arc, Mutex, MutexGuard};
 
 use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 

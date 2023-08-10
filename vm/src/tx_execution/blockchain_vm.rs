@@ -1,5 +1,4 @@
-use std::{ops::Deref};
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
 use multiversx_chain_vm_executor::Executor;
 

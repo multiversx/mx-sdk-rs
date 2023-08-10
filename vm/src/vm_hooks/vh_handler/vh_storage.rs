@@ -18,8 +18,7 @@ pub trait VMHooksStorageRead: VMHooksHandlerSource {
         dest: RawHandle,
     ) {
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
-        let value =
-            self.storage_read_any_address(&address, self.m_types_lock().mb_get(key_handle));
+        let value = self.storage_read_any_address(&address, self.m_types_lock().mb_get(key_handle));
         self.m_types_lock().mb_set(dest, value);
     }
 }
@@ -29,9 +28,6 @@ pub trait VMHooksStorageWrite: VMHooksHandlerSource + VMHooksManagedTypes {
         let types = self.m_types_lock();
         let key_bytes = types.mb_get(key_handle);
         let value_bytes = types.mb_get(value_handle);
-        self.storage_write(
-            key_bytes,
-            value_bytes
-        );
+        self.storage_write(key_bytes, value_bytes);
     }
 }
