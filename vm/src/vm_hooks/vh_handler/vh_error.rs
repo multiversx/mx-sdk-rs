@@ -14,6 +14,6 @@ pub trait VMHooksError: VMHooksHandlerSource {
 
 pub trait VMHooksErrorManaged: VMHooksManagedTypes + VMHooksError {
     fn signal_error_from_buffer(&self, message_handle: RawHandle) -> ! {
-        self.signal_error(self.m_types_borrow().mb_get(message_handle))
+        self.signal_error(self.m_types_lock().mb_get(message_handle))
     }
 }

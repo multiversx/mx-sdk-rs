@@ -21,7 +21,7 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
 
     fn load_argument_managed_buffer(&self, arg_index: i32, dest: RawHandle) {
         let arg_bytes = self.input_ref().get_argument_vec_u8(arg_index);
-        self.m_types_borrow_mut().mb_set(dest, arg_bytes);
+        self.m_types_lock().mb_set(dest, arg_bytes);
     }
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
@@ -48,6 +48,6 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
 
     fn load_callback_closure_buffer(&self, dest: RawHandle) {
         let closure_data = self.input_ref().promise_callback_closure_data.clone();
-        self.m_types_borrow_mut().mb_set(dest, closure_data);
+        self.m_types_lock().mb_set(dest, closure_data);
     }
 }

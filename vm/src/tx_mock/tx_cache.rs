@@ -2,8 +2,8 @@ use std::{
     cell::{Ref, RefCell},
     collections::HashMap,
     fmt,
-    rc::Rc,
 };
+use std::sync::Arc;
 
 use crate::{
     display_util::address_hex,
@@ -14,7 +14,7 @@ use crate::{
 use super::{BlockchainUpdate, TxCacheSource};
 
 pub struct TxCache {
-    source_ref: Rc<dyn TxCacheSource>,
+    source_ref: Arc<dyn TxCacheSource>,
     pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
     pub(super) new_token_identifiers: RefCell<Option<Vec<String>>>,
 }
@@ -28,7 +28,7 @@ impl fmt::Debug for TxCache {
 }
 
 impl TxCache {
-    pub fn new(source_ref: Rc<dyn TxCacheSource>) -> Self {
+    pub fn new(source_ref: Arc<dyn TxCacheSource>) -> Self {
         TxCache {
             source_ref,
             accounts: RefCell::new(HashMap::new()),
