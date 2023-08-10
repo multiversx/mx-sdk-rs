@@ -20,7 +20,6 @@ const PREFIX_AUTO_GENERATED: &str =
 const NUM_INIT: usize = 1;
 const NUM_ASYNC_CB: usize = 1;
 
-// const VER_1_71: Version = nightly_version(1, 71);
 const VER_1_71: &str = "1.71.0-nightly";
 const FEATURES_PRE_RUSTC_1_71: &str = "
 #![no_std]
@@ -30,7 +29,6 @@ const FEATURES_PRE_RUSTC_1_71: &str = "
 #![feature(alloc_error_handler, lang_items)]
 ";
 
-// const VER_1_73: Version = nightly_version(1, 73);
 const VER_1_73: &str = "1.73.0-nightly";
 const FEATURES_PRE_RUSTC_1_73: &str = "
 #![no_std]
