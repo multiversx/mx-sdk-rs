@@ -79,9 +79,9 @@ impl TemplateAdjuster {
     fn rename_trait_to(&self, new_template_name: &str) {
         let new_name = new_template_name.to_case(Case::Snake);
         let old_name = self.metadata.name.to_case(Case::Snake);
-        let mut new_package: String = new_name.clone();
+        let mut new_package: String = new_name;
         new_package.push_str("::");
-        let mut old_package: String = old_name.clone();
+        let mut old_package: String = old_name;
         old_package.push_str("::");
         replace_in_files(
             &self.target_path,
