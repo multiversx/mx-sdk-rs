@@ -56,6 +56,32 @@ fn test_add() {
         .assert_ok();
 }
 
+#[test]
+fn test_add_spawned_thread() {
+    let handler = std::thread::spawn(|| {
+        let mut wrapper = BlockchainStateWrapper::new();
+        let sc_wrapper = wrapper.create_sc_account(
+            &rust_biguint!(0),
+            None,
+            rust_testing_framework_tester::contract_obj,
+            SC_WASM_PATH,
+        );
+
+        wrapper
+            .execute_query(&sc_wrapper, |sc| {
+                let first = managed_biguint!(1000);
+                let second = managed_biguint!(2000);
+
+                let expected_result = first.clone() + second.clone();
+                let actual_result = sc.sum(first, second);
+                assert_values_eq!(expected_result, actual_result);
+            })
+            .assert_ok();
+    });
+
+    handler.join().unwrap();
+}
+
 #[should_panic]
 #[test]
 fn test_add_wrong_expect() {

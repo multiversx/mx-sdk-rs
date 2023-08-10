@@ -2,33 +2,33 @@ use crate::with_shared::Shareable;
 
 use super::TxContext;
 
-use std::{cell::RefCell, rc::Rc};
+use std::sync::{Arc, Mutex};
 
 thread_local!(
-    static API_STACK: RefCell<TxContextStack> = RefCell::new(TxContextStack::default())
+    static API_STACK: Mutex<TxContextStack> = Mutex::new(TxContextStack::default())
 );
 
 #[derive(Debug, Default)]
-pub struct TxContextStack(Vec<Rc<TxContext>>);
+pub struct TxContextStack(Vec<Arc<TxContext>>);
 
 impl TxContextStack {
-    pub fn static_peek() -> Rc<TxContext> {
+    pub fn static_peek() -> Arc<TxContext> {
         API_STACK.with(|cell| {
-            let stack = cell.borrow();
+            let stack = cell.lock().unwrap();
             stack.0.last().unwrap().clone()
         })
     }
 
-    pub fn static_push(tx_context_rc: Rc<TxContext>) {
+    pub fn static_push(tx_context_arc: Arc<TxContext>) {
         API_STACK.with(|cell| {
-            let mut stack = cell.borrow_mut();
-            stack.0.push(tx_context_rc);
+            let mut stack = cell.lock().unwrap();
+            stack.0.push(tx_context_arc);
         })
     }
 
-    pub fn static_pop() -> Rc<TxContext> {
+    pub fn static_pop() -> Arc<TxContext> {
         API_STACK.with(|cell| {
-            let mut stack = cell.borrow_mut();
+            let mut stack = cell.lock().unwrap();
             stack.0.pop().unwrap()
         })
     }
@@ -40,8 +40,8 @@ impl TxContextStack {
     where
         F: FnOnce() -> R,
     {
-        tx_context_sh.with_shared(|tx_context_rc| {
-            TxContextStack::static_push(tx_context_rc);
+        tx_context_sh.with_shared(|tx_context_arc| {
+            TxContextStack::static_push(tx_context_arc);
 
             let result = f();
 

@@ -3,7 +3,7 @@ use multiversx_sc::api::HandleConstraints;
 
 use crate::debug_executor::StaticVarData;
 
-pub trait VMHooksApiBackend: Clone + 'static {
+pub trait VMHooksApiBackend: Clone + Send + Sync + 'static {
     /// We use a single handle type for all handles.
     type HandleType: HandleConstraints;
 

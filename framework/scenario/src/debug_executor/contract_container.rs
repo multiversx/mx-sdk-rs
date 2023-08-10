@@ -1,5 +1,4 @@
-use std::rc::Rc;
-
+use std::sync::Arc;
 use multiversx_chain_vm::tx_mock::{TxContextRef, TxFunctionName, TxPanic};
 use multiversx_chain_vm_executor::{BreakpointValue, ExecutorError, Instance, MemLength, MemPtr};
 use multiversx_sc::contract_base::CallableContract;
@@ -65,11 +64,11 @@ where
 }
 
 #[derive(Clone)]
-pub struct ContractContainerRef(pub(crate) Rc<ContractContainer>);
+pub struct ContractContainerRef(pub(crate) Arc<ContractContainer>);
 
 impl ContractContainerRef {
     pub fn new(contract_container: ContractContainer) -> Self {
-        ContractContainerRef(Rc::new(contract_container))
+        ContractContainerRef(Arc::new(contract_container))
     }
 }
 
