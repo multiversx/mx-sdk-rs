@@ -168,7 +168,7 @@ impl TemplateAdjuster {
         let new_name = new_template_name.to_case(Case::Snake);
         let old_name = self.metadata.name.to_case(Case::Snake);
         let mut new_path = "/".to_owned();
-        new_path.push_str(&new_template_name);
+        new_path.push_str(new_template_name);
         new_path.push('\"');
         let mut old_path = "/".to_owned();
         old_path.push_str(&self.metadata.name);
