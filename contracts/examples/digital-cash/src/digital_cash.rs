@@ -151,7 +151,6 @@ pub trait DigitalCash {
     fn deposit_fees(&self, address: ManagedAddress) {
         let payment = self.call_value().egld_value().clone_value();
         let caller_address = self.blockchain().get_caller();
-        self.require_signature(&address, &caller_address, signature);
 
         if self.deposit(&address).is_empty() {
             let new_deposit = DepositInfo {
