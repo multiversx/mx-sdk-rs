@@ -17,8 +17,3 @@ fn map_repeat_rs() {
 fn map_repeat_struct_rs() {
     world().run("scenarios/map_repeat_struct.scen.json");
 }
-
-#[test]
-fn map_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/map_repeat_struct.scen.json", world());
-}

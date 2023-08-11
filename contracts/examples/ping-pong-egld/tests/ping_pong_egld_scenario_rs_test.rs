@@ -37,14 +37,6 @@ fn ping_pong_call_ping_before_beginning_rs() {
 }
 
 #[test]
-fn ping_pong_call_ping_before_beginning_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/ping-pong-call-ping-before-beginning.scen.json",
-        world(),
-    );
-}
-
-#[test]
 fn ping_pong_call_ping_second_user_rs() {
     world().run("scenarios/ping-pong-call-ping-second-user.scen.json");
 }
@@ -84,24 +76,6 @@ fn ping_pong_call_pong_all_interrupted_1_rs() {
 #[ignore = "unsupported, relies on gas"]
 fn ping_pong_call_pong_all_interrupted_2_rs() {
     world().run("scenarios/ping-pong-call-pong-all-interrupted-2.scen.json");
-}
-
-#[test]
-#[ignore = "unsupported, relies on gas"]
-fn ping_pong_call_pong_all_interrupted_1_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/ping-pong-call-pong-all-interrupted-1.scen.json",
-        world(),
-    );
-}
-
-#[test]
-#[ignore = "unsupported, relies on gas"]
-fn ping_pong_call_pong_all_interrupted_2_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/ping-pong-call-pong-all-interrupted-2.scen.json",
-        world(),
-    );
 }
 
 #[test]

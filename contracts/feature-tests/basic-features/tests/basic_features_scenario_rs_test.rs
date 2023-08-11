@@ -42,11 +42,6 @@ fn big_uint_from_u_64_rs() {
 }
 
 #[test]
-fn big_uint_from_u_64_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/big_uint_from_u64.scen.json", world());
-}
-
-#[test]
 fn big_uint_sqrt_rs() {
     world().run("scenarios/big_uint_sqrt.scen.json");
 }

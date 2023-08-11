@@ -27,11 +27,6 @@ fn buy_ticket_rs() {
 }
 
 #[test]
-fn buy_ticket_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/buy-ticket.scen.json", world());
-}
-
-#[test]
 fn buy_ticket_after_deadline_rs() {
     world().run("scenarios/buy-ticket-after-deadline.scen.json");
 }
@@ -113,11 +108,6 @@ fn lottery_with_burn_percentage_rs() {
 }
 
 #[test]
-fn lottery_with_burn_percentage_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/lottery-with-burn-percentage.scen.json", world());
-}
-
-#[test]
 fn start_after_announced_winner_rs() {
     world().run("scenarios/start-after-announced-winner.scen.json");
 }
@@ -145,19 +135,6 @@ fn start_limited_tickets_rs() {
 #[test]
 fn start_limited_tickets_and_fixed_deadline_rs() {
     world().run("scenarios/start-limited-tickets-and-fixed-deadline.scen.json");
-}
-
-#[test]
-fn start_limited_tickets_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/start-limited-tickets.scen.json", world());
-}
-
-#[test]
-fn start_limited_tickets_and_fixed_deadline_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/start-limited-tickets-and-fixed-deadline.scen.json",
-        world(),
-    );
 }
 
 #[test]
