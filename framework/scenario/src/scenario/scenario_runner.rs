@@ -7,7 +7,7 @@ use super::model::*;
 /// - calls to a blockchain,
 /// - collecting/exporting the scenario,
 /// - something else.
-pub trait ScenarioRunner {
+pub trait ScenarioRunner: Send + Sync {
     fn run_external_steps(&mut self, step: &ExternalStepsStep);
 
     fn run_set_state_step(&mut self, step: &SetStateStep);
