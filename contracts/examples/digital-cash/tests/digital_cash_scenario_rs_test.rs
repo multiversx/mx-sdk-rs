@@ -37,11 +37,6 @@ fn forward_rs() {
 }
 
 #[test]
-fn claim_fees_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/claim-fees.scen.json", world());
-}
-
-#[test]
 fn fund_egld_and_esdt_rs() {
     world().run("scenarios/fund-egld-and-esdt.scen.json");
 }
@@ -64,9 +59,4 @@ fn withdraw_esdt_rs() {
 #[test]
 fn withdraw_multi_esdt_rs() {
     world().run("scenarios/withdraw-multi-esdt.scen.json");
-}
-
-#[test]
-fn forward_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/forward.scen.json", world());
 }

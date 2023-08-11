@@ -20,8 +20,3 @@ fn linked_list_repeat_rs() {
 fn linked_list_repeat_struct_rs() {
     world().run("scenarios/linked_list_repeat_struct.scen.json");
 }
-
-#[test]
-fn linked_list_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/linked_list_repeat_struct.scen.json", world());
-}

@@ -58,8 +58,3 @@ fn big_float_operator_checks_rs() {
 fn big_float_operators_rs() {
     world().run("scenarios/big_float_operators.scen.json");
 }
-
-#[test]
-fn big_float_operators_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/big_float_operators.scen.json", world());
-}

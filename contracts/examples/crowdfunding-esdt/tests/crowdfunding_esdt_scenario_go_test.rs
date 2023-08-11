@@ -25,26 +25,6 @@ fn generated_sc_err_go() {
 }
 
 #[test]
-fn generated_fund_go() {
-    multiversx_sc_scenario::run_go("scenarios/_generated_fund.scen.json");
-}
-
-#[test]
-fn generated_init_go() {
-    multiversx_sc_scenario::run_go("scenarios/_generated_init.scen.json");
-}
-
-#[test]
-fn generated_query_status_go() {
-    multiversx_sc_scenario::run_go("scenarios/_generated_query_status.scen.json");
-}
-
-#[test]
-fn generated_sc_err_go() {
-    multiversx_sc_scenario::run_go("scenarios/_generated_sc_err.scen.json");
-}
-
-#[test]
 fn crowdfunding_claim_failed_go() {
     world().run("scenarios/crowdfunding-claim-failed.scen.json");
 }

@@ -20,11 +20,6 @@ fn big_float_new_from_frac_go() {
 }
 
 #[test]
-fn big_float_new_from_frac_go() {
-    multiversx_sc_scenario::run_go("scenarios/big_float_new_from_frac.scen.json");
-}
-
-#[test]
 fn big_float_new_from_int_go() {
     world().run("scenarios/big_float_new_from_int.scen.json");
 }
@@ -52,9 +47,4 @@ fn big_float_operator_checks_go() {
 #[test]
 fn big_float_operators_go() {
     world().run("scenarios/big_float_operators.scen.json");
-}
-
-#[test]
-fn big_float_operators_go() {
-    multiversx_sc_scenario::run_go("scenarios/big_float_operators.scen.json");
 }

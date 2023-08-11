@@ -17,8 +17,3 @@ fn set_repeat_rs() {
 fn set_repeat_struct_rs() {
     world().run("scenarios/set_repeat_struct.scen.json");
 }
-
-#[test]
-fn set_repeat_struct_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/set_repeat_struct.scen.json", world());
-}

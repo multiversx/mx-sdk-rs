@@ -66,11 +66,6 @@ fn payable_multiple_rs() {
 }
 
 #[test]
-fn payable_multiple_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/payable_multiple.scen.json", world());
-}
-
-#[test]
 fn payable_token_1_rs() {
     world().run("scenarios/payable_token_1.scen.json");
 }

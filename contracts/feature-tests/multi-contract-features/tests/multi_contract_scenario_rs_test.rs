@@ -44,8 +44,3 @@ fn mcf_external_get_rs() {
 fn mcf_external_pure_rs() {
     world().run("scenarios/mcf-external-pure.scen.json");
 }
-
-#[test]
-fn mcf_external_pure_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mcf-external-pure.scen.json", world());
-}
