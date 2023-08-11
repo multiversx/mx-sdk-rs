@@ -7,7 +7,6 @@ use crate::{
         TopEncodeMultiOutput, TopEncodeOutput,
     },
     types::{
-        heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },

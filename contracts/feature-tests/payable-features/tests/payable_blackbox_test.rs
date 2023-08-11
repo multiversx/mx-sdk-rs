@@ -13,11 +13,12 @@ fn world() -> ScenarioWorld {
 #[test]
 fn payable_multi() {
     let mut world = world();
+    let pf_code = world.code_expression(PF_PATH_EXPR);
 
     world
         .set_state_step(
             SetStateStep::new()
-                .put_account("sc:payable-features", Account::new().code(PF_PATH_EXPR))
+                .put_account("sc:payable-features", Account::new().code(pf_code))
                 .put_account(
                     "address:an-account",
                     Account::new()
