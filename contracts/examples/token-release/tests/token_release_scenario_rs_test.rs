@@ -13,30 +13,30 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn test_add_group_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test-add-group.scen.json", world());
+    world().run("scenarios/test-add-group.scen.json");
 }
 
 #[test]
 fn test_add_user_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test-add-user.scen.json", world());
+    world().run("scenarios/test-add-user.scen.json");
 }
 
 #[test]
 fn test_change_user_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test-change-user.scen.json", world());
+    world().run("scenarios/test-change-user.scen.json");
 }
 
 #[test]
 fn test_claim_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test-claim.scen.json", world());
+    world().run("scenarios/test-claim.scen.json");
 }
 
 #[test]
 fn test_end_setup_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test-end-setup.scen.json", world());
+    world().run("scenarios/test-end-setup.scen.json");
 }
 
 #[test]
 fn test_init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/test-init.scen.json", world());
+    world().run("scenarios/test-init.scen.json");
 }

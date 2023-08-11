@@ -1,6 +1,4 @@
 {
-    "name": "crypto",
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -18,7 +16,7 @@
         },
         {
             "step": "scCall",
-            "id": "4",
+            "id": "verify ok",
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
@@ -32,10 +30,32 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "0x01"
-                ],
+                "out": [],
                 "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "verify fail",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "verify_ed25519_signature",
+                "arguments": [
+                    "0xf2445fdaca6607728fa06e0610062c3468cad6d54f19549916ef577f69c7eb86",
+                    "0x6d65737361676520746f207369676e",
+                    "str:absolutely-invalid-signature"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:invalid signature",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

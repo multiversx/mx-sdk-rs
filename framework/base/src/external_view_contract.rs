@@ -1,12 +1,14 @@
 use crate::{
-    abi::{EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbis, TypeAbi},
+    abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, OutputAbis, TypeAbi},
     api::{
-        const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApi, StorageWriteApiImpl,
+        const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApiImpl, StorageWriteApiImpl,
         VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
     },
     io::load_endpoint_args,
     types::ManagedType,
 };
+
+pub const EXTERNAL_VIEW_CONSTRUCTOR_FLAG: &str = "<external view init>";
 
 /// Implementation of external view contract constructors.
 /// They take 1 Address argument and save it to storage under key `external-view-target-address`.
@@ -34,11 +36,12 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
             "You won't find this constructors' definition in the contract, it gets injected automatically by the framework. See `multiversx_sc::external_view_contract`.",
             ],
         name: "init",
-        rust_method_name: "",
+        rust_method_name: EXTERNAL_VIEW_CONSTRUCTOR_FLAG,
         only_owner: false,
         only_admin: false,
         labels: &[],
         mutability: EndpointMutabilityAbi::Mutable,
+        endpoint_type: EndpointTypeAbi::Init,
         payable_in_tokens: &[],
         inputs: [InputAbi{
             arg_name: "target_contract_address",

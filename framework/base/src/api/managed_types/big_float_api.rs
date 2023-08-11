@@ -3,7 +3,7 @@ use core::cmp::Ordering;
 use super::{HandleTypeInfo, Sign};
 
 /// Definition of the BigFloat type required by the API.
-pub trait BigFloatApi: HandleTypeInfo {
+pub trait BigFloatApiImpl: HandleTypeInfo {
     fn bf_from_parts(
         &self,
         integral_part: i32,

@@ -8,5 +8,5 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn str_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/str_repeat.scen.json", world());
+    world().run("scenarios/str_repeat.scen.json");
 }

@@ -1,5 +1,5 @@
 use crate::{
-    api::{HandleConstraints, StaticVarApi, StaticVarApiImpl},
+    api::{RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -21,15 +21,15 @@ impl StaticVarApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn set_external_view_target_address_handle(&self, _handle: Self::ManagedBufferHandle) {
+    fn set_external_view_target_address_handle(&self, _handle: RawHandle) {
         unreachable!()
     }
 
-    fn get_external_view_target_address_handle(&self) -> Self::ManagedBufferHandle {
+    fn get_external_view_target_address_handle(&self) -> RawHandle {
         unreachable!()
     }
 
-    fn next_handle<H: HandleConstraints>(&self) -> H {
+    fn next_handle(&self) -> RawHandle {
         unreachable!()
     }
 
@@ -41,19 +41,19 @@ impl StaticVarApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn set_call_value_egld_handle(&self, _handle: Self::BigIntHandle) {
+    fn set_call_value_egld_handle(&self, _handle: RawHandle) {
         unreachable!()
     }
 
-    fn get_call_value_egld_handle(&self) -> Self::BigIntHandle {
+    fn get_call_value_egld_handle(&self) -> RawHandle {
         unreachable!()
     }
 
-    fn set_call_value_multi_esdt_handle(&self, _handle: Self::ManagedBufferHandle) {
+    fn set_call_value_multi_esdt_handle(&self, _handle: RawHandle) {
         unreachable!()
     }
 
-    fn get_call_value_multi_esdt_handle(&self) -> Self::ManagedBufferHandle {
+    fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
         unreachable!()
     }
 }

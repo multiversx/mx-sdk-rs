@@ -4,18 +4,27 @@ use super::stg_section::ScenarioTestFn;
 
 pub type WriteTestFn = fn(&str) -> String;
 
-pub const DEFAULT_TEST_GO: &str = "";
-pub const DEFAULT_TEST_RS: &str = "use multiversx_sc_scenario::*;
+pub const WORLD_FN_DECLARATION: &str = "fn world() ->";
+pub const DEFAULT_SETUP_GO: &str = "use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}";
+pub const DEFAULT_SETUP_RS: &str = "use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     todo!()
 }";
 
+pub fn contains_world_fn(s: &str) -> bool {
+    s.contains(WORLD_FN_DECLARATION)
+}
+
 pub fn format_test_fn_rs(scenario_file_name: &str) -> String {
     format!(
         "
 fn {}_rs() {{
-    multiversx_sc_scenario::run_rs(\"scenarios/{}.scen.json\", world());
+    world().run(\"scenarios/{}.scen.json\");
 }}",
         scenario_file_name.to_case(Case::Snake),
         scenario_file_name,
@@ -26,7 +35,7 @@ pub fn format_test_fn_go(scenario_file_name: &str) -> String {
     format!(
         "
 fn {}_go() {{
-    multiversx_sc_scenario::run_go(\"scenarios/{}.scen.json\");
+    world().run(\"scenarios/{}.scen.json\");
 }}",
         scenario_file_name.to_case(Case::Snake),
         scenario_file_name,

@@ -1,4 +1,15 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
+#[test]
+fn panic_after_log_go() {
+    world().run("scenarios/panic-after-log.scen.json");
+}
+
 #[test]
 fn panic_message_go() {
-    multiversx_sc_scenario::run_go("scenarios/panic-message.scen.json");
+    world().run("scenarios/panic-message.scen.json");
 }

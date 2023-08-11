@@ -11,10 +11,10 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn generate_kitty_genes_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/generate-kitty-genes.scen.json", world());
+    world().run("scenarios/generate-kitty-genes.scen.json");
 }
 
 #[test]
 fn init_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/init.scen.json", world());
+    world().run("scenarios/init.scen.json");
 }

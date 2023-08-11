@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-wasm-adapter"
-version = "0.41.3"
+version = "0.42.0"
 edition = "2021"
 
 authors = [
@@ -21,11 +21,6 @@ categories = [
     "development-tools::ffi",
 ]
 
-[features]
-vm-validate-token-identifier = []
-vm-esdt-local-roles = []
-ei-unmanaged-node = []
-
 [dependencies.multiversx-sc]
-version = "=0.41.3"
+version = "=0.42.0"
 path = "../base"

@@ -18,14 +18,16 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     crowdfunding_erc20
     (
-        fund
-        status
-        claim
-        get_target
-        get_deadline
-        get_deposit
-        get_erc20_contract_address
-        get_total_balance
-        callBack
+        init => init
+        fund => fund
+        status => status
+        claim => claim
+        get_target => target
+        get_deadline => deadline
+        get_deposit => deposit
+        get_erc20_contract_address => erc20_contract_address
+        get_total_balance => total_balance
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { crowdfunding_erc20 }

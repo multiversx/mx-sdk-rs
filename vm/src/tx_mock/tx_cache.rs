@@ -5,18 +5,18 @@ use std::{
     rc::Rc,
 };
 
-use multiversx_sc::types::heap::Address;
-
 use crate::{
-    address_hex,
-    world_mock::{AccountData, BlockchainMock},
+    display_util::address_hex,
+    types::VMAddress,
+    world_mock::{AccountData, BlockchainState},
 };
 
-use super::TxCacheSource;
+use super::{BlockchainUpdate, TxCacheSource};
 
 pub struct TxCache {
     source_ref: Rc<dyn TxCacheSource>,
-    pub(super) accounts: RefCell<HashMap<Address, AccountData>>,
+    pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
+    pub(super) new_token_identifiers: RefCell<Option<Vec<String>>>,
 }
 
 impl fmt::Debug for TxCache {
@@ -32,14 +32,15 @@ impl TxCache {
         TxCache {
             source_ref,
             accounts: RefCell::new(HashMap::new()),
+            new_token_identifiers: RefCell::new(None),
         }
     }
 
-    pub fn blockchain_ref(&self) -> &BlockchainMock {
+    pub fn blockchain_ref(&self) -> &BlockchainState {
         self.source_ref.blockchain_ref()
     }
 
-    fn load_account_if_necessary(&self, address: &Address) {
+    fn load_account_if_necessary(&self, address: &VMAddress) {
         let mut accounts_mut = self.accounts.borrow_mut();
         if !accounts_mut.contains_key(address) {
             if let Some(blockchain_account) = self.source_ref.load_account(address) {
@@ -48,7 +49,7 @@ impl TxCache {
         }
     }
 
-    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
@@ -60,7 +61,7 @@ impl TxCache {
         f(account)
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -78,18 +79,18 @@ impl TxCache {
             .insert(account_data.address.clone(), account_data);
     }
 
-    pub fn increase_acount_nonce(&self, address: &Address) {
+    pub fn increase_acount_nonce(&self, address: &VMAddress) {
         self.with_account_mut(address, |account| {
             account.nonce += 1;
         });
     }
 
-    pub fn get_all_accounts(&self) -> Ref<HashMap<Address, AccountData>> {
+    pub fn get_all_accounts(&self) -> Ref<HashMap<VMAddress, AccountData>> {
         self.accounts.borrow()
     }
 
     /// Assumes the nonce has already been increased.
-    pub fn get_new_address(&self, creator_address: &Address) -> Address {
+    pub fn get_new_address(&self, creator_address: &VMAddress) -> VMAddress {
         let current_nonce = self.with_account(creator_address, |account| account.nonce);
         self.blockchain_ref()
             .get_new_address(creator_address.clone(), current_nonce - 1)
@@ -98,9 +99,18 @@ impl TxCache {
             })
     }
 
+    pub fn get_new_token_identifiers(&self) -> Vec<String> {
+        self.blockchain_ref().get_new_token_identifiers()
+    }
+
+    pub fn set_new_token_identifiers(&self, token_identifiers: Vec<String>) {
+        *self.new_token_identifiers.borrow_mut() = Some(token_identifiers);
+    }
+
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         BlockchainUpdate {
             accounts: self.accounts.into_inner(),
+            new_token_identifiers: self.new_token_identifiers.into_inner(),
         }
     }
 
@@ -108,21 +118,5 @@ impl TxCache {
         self.accounts
             .borrow_mut()
             .extend(updates.accounts.into_iter());
-    }
-}
-
-pub struct BlockchainUpdate {
-    accounts: HashMap<Address, AccountData>,
-}
-
-impl BlockchainUpdate {
-    pub fn empty() -> Self {
-        BlockchainUpdate {
-            accounts: HashMap::new(),
-        }
-    }
-
-    pub fn apply(self, blockchain: &mut BlockchainMock) {
-        blockchain.update_accounts(self.accounts);
     }
 }

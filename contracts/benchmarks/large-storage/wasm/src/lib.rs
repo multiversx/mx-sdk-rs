@@ -12,15 +12,16 @@
 #![no_std]
 #![feature(lang_items)]
 
-multiversx_sc_wasm_adapter::allocator!();
+multiversx_sc_wasm_adapter::allocator!(wee_alloc);
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
     large_storage
     (
-        saveStructure
-        savedStructure
+        init => init
+        saveStructure => save_structure
+        savedStructure => structure
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

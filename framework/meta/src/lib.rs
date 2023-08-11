@@ -6,7 +6,6 @@ pub mod ei;
 mod folder_structure;
 mod mxsc_file_json;
 mod print_util;
-pub mod template;
 mod tools;
 
 #[macro_use]

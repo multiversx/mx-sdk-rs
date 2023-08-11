@@ -410,11 +410,14 @@
                     },
                     "username": "str:check.elrond",
                     "storage": {},
-                    "code": ""
+                    "code": "",
+                    "owner": "*"
                 },
                 "address:account_with_defaults": {
                     "esdt": "*",
-                    "storage": "*"
+                    "storage": "*",
+                    "code": "*",
+                    "owner": "*"
                 },
                 "address:smart_contract_address": {
                     "nonce": "0x00",
@@ -439,10 +442,14 @@
                 },
                 "address:smart_contract_address_2": {
                     "storage": "*",
+                    "code": "*",
+                    "owner": "*",
                     "asyncCallData": "``func@arg1@arg2"
                 },
                 "str:account_with_defaults___________": {
-                    "storage": "*"
+                    "storage": "*",
+                    "code": "*",
+                    "owner": "*"
                 },
                 "+": ""
             }

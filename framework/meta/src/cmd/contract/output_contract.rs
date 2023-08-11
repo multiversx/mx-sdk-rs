@@ -3,6 +3,7 @@ mod oc_builder;
 mod oc_config;
 mod oc_global_config;
 mod oc_settings;
+mod oc_validate;
 mod wasm_build;
 mod wasm_clean;
 mod wasm_crate_gen;

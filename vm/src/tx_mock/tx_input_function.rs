@@ -56,12 +56,19 @@ impl TxFunctionName {
     /// The the legacy async central callback name of any smart contract.
     pub const CALLBACK: TxFunctionName = TxFunctionName::from_static("callBack");
 
+    /// Not a real function name (in fact it is an illegal name), just a flag to mark whitebox calls.
+    pub const WHITEBOX_CALL: TxFunctionName = TxFunctionName::from_static("<whitebox-call>");
+
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
     pub fn into_string(self) -> String {
         self.0.into_owned()
+    }
+
+    pub fn into_bytes(self) -> Vec<u8> {
+        self.into_string().into_bytes()
     }
 
     pub fn as_str(&self) -> &str {
