@@ -6,6 +6,7 @@ pub struct TemplateMetadata {
     pub contract_trait: String,
     pub src_file: String,
     pub rename_pairs: Vec<(String, String)>,
+    pub files_include: Vec<String>,
 }
 
 #[cfg(test)]
@@ -21,6 +22,12 @@ mod tests {
             rename_pairs = [
                 ["original", "new"]
             ]
+            files_include = [
+                "/meta",
+                "/src",
+                "/wasm",
+                "/Cargo.toml"
+            ]
         "#,
         )
         .unwrap()
@@ -35,5 +42,10 @@ mod tests {
         assert_eq!(parsed.rename_pairs.len(), 1);
         assert_eq!(parsed.rename_pairs[0].0, "original");
         assert_eq!(parsed.rename_pairs[0].1, "new");
+        assert_eq!(parsed.files_include.len(), 4);
+        assert_eq!(parsed.files_include[0], "/meta");
+        assert_eq!(parsed.files_include[1], "/src");
+        assert_eq!(parsed.files_include[2], "/wasm");
+        assert_eq!(parsed.files_include[3], "/Cargo.toml");
     }
 }

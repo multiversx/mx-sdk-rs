@@ -14,7 +14,7 @@ pub async fn template_download(args: &TemplateArgs) {
         args.template.clone(),
         args.name.clone(),
     );
-    downloader.template_download();
+    downloader.copy_template(&downloader.template_source.metadata.files_include);
     downloader.update_dependencies();
     downloader.rename_template_to(args.template.clone());
 }
@@ -43,8 +43,9 @@ impl<'a> TemplateDownloader<'a> {
         }
     }
 
-    pub fn template_download(&self) {
-        self.template_source.copy_template(&self.target_path);
+    pub fn copy_template(&self, files_to_copy: &[String]) {
+        self.template_source
+            .copy_template(&self.target_path, files_to_copy);
     }
     pub fn update_dependencies(&self) {
         self.adjuster.update_dependencies();
