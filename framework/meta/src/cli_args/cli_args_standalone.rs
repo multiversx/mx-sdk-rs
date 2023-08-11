@@ -55,6 +55,18 @@ pub enum StandaloneCliAction {
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
     )]
+    #[command(name = "new", about = "Creates a contract by a pre-existing template")]
+    Template(TemplateArgs),
+
+    #[command(
+        name = "templates",
+        about = "Creates a contract by a pre-existing template"
+    )]
+    TemplateList,
+    #[command(
+        name = "test-gen",
+        about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
+    )]
     TestGen(TestGenArgs),
 }
 
@@ -135,6 +147,23 @@ pub struct LocalDepsArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TemplateArgs {
+    /// Provide the template you want to clone
+    #[arg(long = "name", verbatim_doc_comment)]
+    pub name: PathBuf,
+
+    /// Provide the he template you want to clone
+    #[arg(long = "template", verbatim_doc_comment)]
+    pub template: String,
+}
+
+impl CliArgsToRaw for TemplateArgs {
+    fn to_raw(&self) -> Vec<String> {
+        Vec::new()
+    }
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
