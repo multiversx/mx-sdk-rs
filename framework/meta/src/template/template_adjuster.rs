@@ -109,6 +109,7 @@ impl TemplateAdjuster {
             ][..],
         );
     }
+
     fn rename_in_cargo_toml_meta(&self, new_template_name: &str) {
         let mut old_meta = self.metadata.name.clone();
         old_meta.push_str("-meta");
@@ -129,6 +130,7 @@ impl TemplateAdjuster {
             ][..],
         );
     }
+
     fn rename_in_cargo_toml_wasm(&self, new_template_name: &str) {
         let mut old_wasm = self.metadata.name.clone();
         old_wasm.push_str("-wasm");
@@ -158,38 +160,40 @@ impl TemplateAdjuster {
         replace_in_files(
             &self.target_path,
             "*.scen.json",
-            &[Query::substring(
-                &self.get_package_name(&old_wasm),
-                &self.get_package_name(&new_wasm),
-            )][..],
+            &[Query::substring(&old_wasm, &new_wasm)][..],
         );
     }
+
     fn rename_in_tests(&self, new_template_name: &str) {
         let new_name = new_template_name.to_case(Case::Snake);
         let old_name = self.metadata.name.to_case(Case::Snake);
+
+        let mut queries = Vec::<Query>::new();
+        for (old, new) in self.metadata.rename_pairs.iter() {
+            queries.push(Query::substring(&old, &new))
+        }
+
         let mut new_path = "/".to_owned();
         new_path.push_str(new_template_name);
         new_path.push('\"');
         let mut old_path = "/".to_owned();
         old_path.push_str(&self.metadata.name);
         old_path.push('\"');
+        queries.push(Query::substring(&old_path, &new_path));
+
         let mut new_scenarios = "scenarios/".to_owned();
         new_scenarios.push_str(&new_name);
         let mut old_scenarios = "scenarios/".to_owned();
         old_scenarios.push_str(&old_name);
+        queries.push(Query::substring(&old_scenarios, &new_scenarios));
+
         let mut old_wasm = self.metadata.name.clone();
         old_wasm.push_str(".wasm");
         let mut new_wasm = new_template_name.to_owned();
         new_wasm.push_str(".wasm");
-        replace_in_files(
-            &self.target_path.join(TEST_DIRECTORY),
-            "*.rs",
-            &[
-                Query::substring(&old_wasm, &new_wasm),
-                Query::substring(&old_path, &new_path),
-                Query::substring(&old_scenarios, &new_scenarios),
-            ][..],
-        );
+        queries.push(Query::substring(&old_wasm, &new_wasm));
+
+        replace_in_files(&self.target_path.join(TEST_DIRECTORY), "*.rs", &queries);
     }
 
     fn rename_files(&self, new_template_name: &str) {
