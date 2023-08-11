@@ -6,7 +6,9 @@ use serde::{
 };
 use std::fmt;
 
+#[derive(Default)]
 pub enum CheckEsdtInstancesRaw {
+    #[default]
     Unspecified,
     Star,
     Equal(Vec<CheckEsdtInstanceRaw>),
@@ -22,11 +24,7 @@ impl CheckEsdtInstancesRaw {
     }
 }
 
-impl Default for CheckEsdtInstancesRaw {
-    fn default() -> Self {
-        CheckEsdtInstancesRaw::Unspecified
-    }
-}
+
 
 impl Serialize for CheckEsdtInstancesRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

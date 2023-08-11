@@ -5,7 +5,9 @@ use serde::{
 };
 use std::fmt;
 
+#[derive(Default)]
 pub enum CheckBytesValueRaw {
+    #[default]
     Unspecified,
     Star,
     Equal(ValueSubTree),
@@ -21,11 +23,7 @@ impl CheckBytesValueRaw {
     }
 }
 
-impl Default for CheckBytesValueRaw {
-    fn default() -> Self {
-        CheckBytesValueRaw::Unspecified
-    }
-}
+
 
 impl Serialize for CheckBytesValueRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

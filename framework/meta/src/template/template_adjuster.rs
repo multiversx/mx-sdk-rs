@@ -170,7 +170,7 @@ impl TemplateAdjuster {
 
         let mut queries = Vec::<Query>::new();
         for (old, new) in self.metadata.rename_pairs.iter() {
-            queries.push(Query::substring(&old, &new))
+            queries.push(Query::substring(old, new))
         }
 
         let mut new_path = "/".to_owned();

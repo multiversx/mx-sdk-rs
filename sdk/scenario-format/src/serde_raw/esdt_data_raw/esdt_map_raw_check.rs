@@ -5,7 +5,9 @@ use serde::{
     Deserialize, Serialize,
 };
 use std::fmt;
+#[derive(Default)]
 pub enum CheckEsdtMapRaw {
+    #[default]
     Unspecified,
     Star,
     Equal(CheckEsdtMapContentsRaw),
@@ -21,11 +23,7 @@ impl CheckEsdtMapRaw {
     }
 }
 
-impl Default for CheckEsdtMapRaw {
-    fn default() -> Self {
-        CheckEsdtMapRaw::Unspecified
-    }
-}
+
 
 impl Serialize for CheckEsdtMapRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

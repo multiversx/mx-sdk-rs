@@ -8,7 +8,9 @@ use std::{fmt, fmt::Write};
 use super::BytesValue;
 
 #[derive(Debug)]
+#[derive(Default)]
 pub enum CheckValue<T: Default> {
+    #[default]
     Star,
     Equal(T),
 }
@@ -22,14 +24,7 @@ where
     }
 }
 
-impl<T> Default for CheckValue<T>
-where
-    T: Default,
-{
-    fn default() -> Self {
-        CheckValue::Star
-    }
-}
+
 
 impl<T> InterpretableFrom<CheckBytesValueRaw> for CheckValue<T>
 where

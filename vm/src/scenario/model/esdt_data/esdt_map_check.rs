@@ -6,17 +6,15 @@ use crate::scenario_format::{
 use super::CheckEsdtMapContents;
 
 #[derive(Debug)]
+#[derive(Default)]
 pub enum CheckEsdtMap {
+    #[default]
     Unspecified,
     Star,
     Equal(CheckEsdtMapContents),
 }
 
-impl Default for CheckEsdtMap {
-    fn default() -> Self {
-        CheckEsdtMap::Unspecified
-    }
-}
+
 
 impl CheckEsdtMap {
     pub fn is_star(&self) -> bool {

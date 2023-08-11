@@ -13,9 +13,11 @@ pub struct CheckLogListRaw {
     pub more_allowed_at_end: bool,
 }
 
+#[derive(Default)]
 pub enum CheckLogsRaw {
     Star,
     List(CheckLogListRaw),
+    #[default]
     Unspecified,
 }
 
@@ -29,11 +31,7 @@ impl CheckLogsRaw {
     }
 }
 
-impl Default for CheckLogsRaw {
-    fn default() -> Self {
-        CheckLogsRaw::Unspecified
-    }
-}
+
 
 impl Serialize for CheckLogsRaw {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
