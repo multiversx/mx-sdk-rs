@@ -137,7 +137,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         _code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> (VMAddress, Vec<Vec<u8>>) {
-        let contract_address = &self.input_ref().to;
+        let contract_address = self.current_address();
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
             from: contract_address.clone(),
