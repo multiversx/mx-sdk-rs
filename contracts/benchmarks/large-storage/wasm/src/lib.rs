@@ -15,7 +15,7 @@
 // TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
-multiversx_sc_wasm_adapter::allocator!(wee_alloc);
+multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
