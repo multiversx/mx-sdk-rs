@@ -13,8 +13,3 @@ fn queue_repeat_go() {
 fn queue_repeat_struct_go() {
     world().run("scenarios/queue_repeat_struct.scen.json");
 }
-
-#[test]
-fn queue_repeat_struct_go() {
-    multiversx_sc_scenario::run_go("scenarios/queue_repeat_struct.scen.json");
-}

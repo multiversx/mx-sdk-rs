@@ -30,11 +30,6 @@ fn big_uint_from_u_64_go() {
 }
 
 #[test]
-fn big_uint_from_u_64_go() {
-    multiversx_sc_scenario::run_go("scenarios/big_uint_from_u64.scen.json");
-}
-
-#[test]
 fn big_uint_sqrt_go() {
     world().run("scenarios/big_uint_sqrt.scen.json");
 }
@@ -77,11 +72,6 @@ fn crypto_ripemd_160_go() {
 #[test]
 fn crypto_sha_256_go() {
     world().run("scenarios/crypto_sha256.scen.json");
-}
-
-#[test]
-fn crypto_sha_256_legacy_managed_go() {
-    multiversx_sc_scenario::run_go("scenarios/crypto_sha256_legacy_managed.scen.json");
 }
 
 #[test]

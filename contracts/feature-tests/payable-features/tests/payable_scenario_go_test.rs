@@ -60,11 +60,6 @@ fn payable_multiple_go() {
 }
 
 #[test]
-fn payable_multiple_go() {
-    multiversx_sc_scenario::run_go("scenarios/payable_multiple.scen.json");
-}
-
-#[test]
 fn payable_token_1_go() {
     world().run("scenarios/payable_token_1.scen.json");
 }
