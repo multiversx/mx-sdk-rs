@@ -1,7 +1,7 @@
 use std::{
     ops::{Deref, DerefMut},
+    sync::Arc,
 };
-use std::sync::Arc;
 
 /// Wraps an object and provides mutable access to it.
 ///

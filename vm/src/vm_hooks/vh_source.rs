@@ -1,7 +1,4 @@
-use std::{
-    fmt::Debug,
-};
-use std::sync::MutexGuard;
+use std::{fmt::Debug, sync::MutexGuard};
 
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},

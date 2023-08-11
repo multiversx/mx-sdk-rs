@@ -131,8 +131,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .current_account_data()
             .esdt
             .get_esdt_balance(token_id_bytes, nonce);
-        self.m_types_lock()
-            .bi_overwrite(dest, esdt_balance.into());
+        self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
     }
 
     #[allow(clippy::too_many_arguments)]

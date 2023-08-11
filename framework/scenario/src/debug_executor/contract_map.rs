@@ -6,8 +6,8 @@ use multiversx_chain_vm_executor::{
 use std::{
     collections::HashMap,
     fmt,
+    sync::{Arc, Mutex, MutexGuard},
 };
-use std::sync::{Arc, Mutex, MutexGuard};
 
 pub struct ContractMap {
     contract_objs: HashMap<Vec<u8>, ContractContainerRef>,

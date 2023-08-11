@@ -79,16 +79,11 @@ pub trait VMHooksBigInt: VMHooksHandlerSource + VMHooksError {
     }
 
     fn bi_set_signed_bytes(&self, destination: RawHandle, bytes: &[u8]) {
-        self.m_types_lock()
-            .bi_set_signed_bytes(destination, bytes);
+        self.m_types_lock().bi_set_signed_bytes(destination, bytes);
     }
 
     fn bi_is_int64(&self, destination_handle: RawHandle) -> i32 {
-        if self
-            .m_types_lock()
-            .bi_to_i64(destination_handle)
-            .is_some()
-        {
+        if self.m_types_lock().bi_to_i64(destination_handle).is_some() {
             1
         } else {
             0

@@ -1,5 +1,4 @@
-use std::{ops::Deref};
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
 use crate::tx_mock::{TxContext, TxResult};
 
@@ -63,7 +62,7 @@ impl TxContextRef {
     pub fn replace_tx_result_with_error(self, tx_panic: TxPanic) {
         let _ = std::mem::replace(
             &mut *self.tx_result_cell.lock().unwrap(),
-            TxResult::from_panic_obj(&tx_panic)
+            TxResult::from_panic_obj(&tx_panic),
         );
     }
 }

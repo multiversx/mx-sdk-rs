@@ -16,7 +16,7 @@ fn append_endpoint_name_and_args(
 ) {
     if !endpoint_name.is_empty() {
         args.push(endpoint_name.into_bytes());
-        args.extend(arg_buffer.into_iter());
+        args.extend(arg_buffer);
     }
 }
 
@@ -111,7 +111,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         args: Vec<Vec<u8>>,
     ) -> ! {
         let mut arguments = vec![contract_code, code_metadata.to_vec()];
-        arguments.extend(args.into_iter());
+        arguments.extend(args);
         self.perform_async_call(to, egld_value, UPGRADE_CONTRACT_FUNC_NAME.into(), arguments)
     }
 
@@ -217,10 +217,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             .mb_to_function_name(endpoint_name_handle);
         let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.tx_hash();
-        let callback_closure_data = self
-            .m_types_lock()
-            .mb_get(callback_closure_handle)
-            .to_vec();
+        let callback_closure_data = self.m_types_lock().mb_get(callback_closure_handle).to_vec();
 
         let call = AsyncCallTxData {
             from: contract_address,

@@ -144,8 +144,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
 
     fn bf_pow(&self, dest: RawHandle, x: RawHandle, exp: i32) {
         let value = self.m_types_lock().bf_get_f64(x);
-        self.m_types_lock()
-            .bf_overwrite(dest, value.powi(exp));
+        self.m_types_lock().bf_overwrite(dest, value.powi(exp));
     }
 
     unary_op_method_big_int_handle!(bf_floor, floor);
@@ -165,22 +164,15 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     }
 
     fn bf_set_bi(&self, dest: RawHandle, bi: RawHandle) {
-        let f64_value = self
-            .m_types_lock()
-            .bi_to_i64(bi)
-            .unwrap()
-            .to_f64()
-            .unwrap();
+        let f64_value = self.m_types_lock().bi_to_i64(bi).unwrap().to_f64().unwrap();
         self.m_types_lock().bf_overwrite(dest, f64_value);
     }
 
     fn bf_get_const_pi(&self, dest: RawHandle) {
-        self.m_types_lock()
-            .bf_overwrite(dest, std::f64::consts::PI);
+        self.m_types_lock().bf_overwrite(dest, std::f64::consts::PI);
     }
 
     fn bf_get_const_e(&self, dest: RawHandle) {
-        self.m_types_lock()
-            .bf_overwrite(dest, std::f64::consts::E);
+        self.m_types_lock().bf_overwrite(dest, std::f64::consts::E);
     }
 }

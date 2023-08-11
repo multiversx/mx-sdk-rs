@@ -1,7 +1,7 @@
 use std::{
-    collections::HashMap
+    collections::HashMap,
+    sync::{Arc, Mutex, MutexGuard},
 };
-use std::sync::{Arc, Mutex, MutexGuard};
 
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxManagedTypes, TxResult},

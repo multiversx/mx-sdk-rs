@@ -39,7 +39,7 @@ impl Eq for BytesKey {}
 
 impl PartialOrd for BytesKey {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.value.partial_cmp(&other.value)
+        Some(self.cmp(other))
     }
 }
 

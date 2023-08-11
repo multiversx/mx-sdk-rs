@@ -54,9 +54,9 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         slice_len: usize,
         dest_handle: RawHandle,
     ) -> i32 {
-        let result =
-            self.m_types_lock()
-                .mb_get_slice(source_handle, starting_position, slice_len);
+        let result = self
+            .m_types_lock()
+            .mb_get_slice(source_handle, starting_position, slice_len);
         if let Ok(slice) = result {
             self.m_types_lock().mb_set(dest_handle, slice);
             0
@@ -71,9 +71,9 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         starting_position: usize,
         source_slice: &[u8],
     ) -> i32 {
-        let result =
-            self.m_types_lock()
-                .mb_set_slice(dest_handle, starting_position, source_slice);
+        let result = self
+            .m_types_lock()
+            .mb_set_slice(dest_handle, starting_position, source_slice);
         if result.is_ok() {
             0
         } else {
