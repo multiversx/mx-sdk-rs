@@ -5,11 +5,14 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            1
+// Endpoints:                            2
 // Async Callback (empty):               1
-// Total number of exported functions:   3
+// Total number of exported functions:   4
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,8 +21,10 @@ multiversx_sc_wasm_adapter::panic_handler_with_message!();
 multiversx_sc_wasm_adapter::endpoints! {
     panic_message_features
     (
-        panicWithMessage
+        init => init
+        panicWithMessage => panic_with_message
+        panicAfterLog => panic_after_log
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

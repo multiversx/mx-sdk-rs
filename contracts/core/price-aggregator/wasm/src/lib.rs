@@ -10,6 +10,9 @@
 // Total number of exported functions:  21
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,26 +21,27 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     multiversx_price_aggregator_sc
     (
-        addOracles
-        removeOracles
-        submit
-        submitBatch
-        latestRoundData
-        latestPriceFeed
-        latestPriceFeedOptional
-        setSubmissionCount
-        getOracles
-        setPairDecimals
-        getPairDecimals
-        submission_count
-        pause
-        unpause
-        isPaused
-        stake
-        unstake
-        voteSlashMember
-        slashMember
+        init => init
+        addOracles => add_oracles
+        removeOracles => remove_oracles
+        submit => submit
+        submitBatch => submit_batch
+        latestRoundData => latest_round_data
+        latestPriceFeed => latest_price_feed
+        latestPriceFeedOptional => latest_price_feed_optional
+        setSubmissionCount => set_submission_count
+        getOracles => get_oracles
+        setPairDecimals => set_pair_decimals
+        getPairDecimals => get_pair_decimals
+        submission_count => submission_count
+        pause => pause_endpoint
+        unpause => unpause_endpoint
+        isPaused => paused_status
+        stake => stake
+        unstake => unstake
+        voteSlashMember => vote_slash_member
+        slashMember => slash_member
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

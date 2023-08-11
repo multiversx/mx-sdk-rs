@@ -10,6 +10,9 @@
 // Total number of exported functions:  10
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,15 +21,16 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     crowdfunding_esdt
     (
-        fund
-        status
-        getCurrentFunds
-        claim
-        getTarget
-        getDeadline
-        getDeposit
-        getCrowdfundingTokenIdentifier
+        init => init
+        fund => fund
+        status => status
+        getCurrentFunds => get_current_funds
+        claim => claim
+        getTarget => target
+        getDeadline => deadline
+        getDeposit => deposit
+        getCrowdfundingTokenIdentifier => cf_token_identifier
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

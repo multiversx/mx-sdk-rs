@@ -1,12 +1,10 @@
 use adder::*;
 use multiversx_sc::types::BigUint;
-use multiversx_sc_scenario::DebugApi;
+use multiversx_sc_scenario::api::SingleTxApi;
 
 #[test]
-fn test_add() {
-    let _ = DebugApi::dummy();
-
-    let adder = adder::contract_obj::<DebugApi>();
+fn adder_unit_test() {
+    let adder = adder::contract_obj::<SingleTxApi>();
 
     adder.init(BigUint::from(5u32));
     assert_eq!(BigUint::from(5u32), adder.sum().get());

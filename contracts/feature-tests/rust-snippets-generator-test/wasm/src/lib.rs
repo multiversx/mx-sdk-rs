@@ -10,6 +10,9 @@
 // Total number of exported functions:  18
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,23 +21,24 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     rust_snippets_generator_test
     (
-        no_arg_no_result_endpoint
-        no_arg_one_result_endpoint
-        one_arg_no_result_endpoint
-        one_arg_one_result_endpoint
-        multi_result
-        nested_result
-        custom_struct
-        optional_type
-        option_type
-        esdt_token_payment
-        egld_or_esdt_payment
-        payable_endpoint
-        managed_buffer
-        multi_value_2
-        multi_value_4
-        complex_multi_values
+        init => init
+        no_arg_no_result_endpoint => no_arg_no_result_endpoint
+        no_arg_one_result_endpoint => no_arg_one_result_endpoint
+        one_arg_no_result_endpoint => one_arg_no_result_endpoint
+        one_arg_one_result_endpoint => one_arg_one_result_endpoint
+        multi_result => multi_result
+        nested_result => nested_result
+        custom_struct => custom_struct
+        optional_type => optional_type
+        option_type => option_type
+        esdt_token_payment => esdt_token_payment
+        egld_or_esdt_payment => egld_or_esdt_payment
+        payable_endpoint => payable_endpoint
+        managed_buffer => managed_buffer
+        multi_value_2 => multi_value_2
+        multi_value_4 => multi_value_4
+        complex_multi_values => complex_multi_values
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

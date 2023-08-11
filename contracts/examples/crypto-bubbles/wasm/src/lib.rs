@@ -10,6 +10,9 @@
 // Total number of exported functions:   8
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,13 +21,14 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     crypto_bubbles
     (
-        topUp
-        withdraw
-        joinGame
-        rewardWinner
-        rewardAndSendToWallet
-        balanceOf
+        init => init
+        topUp => top_up
+        withdraw => withdraw
+        joinGame => join_game
+        rewardWinner => reward_winner
+        rewardAndSendToWallet => reward_and_send_to_wallet
+        balanceOf => player_balance
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

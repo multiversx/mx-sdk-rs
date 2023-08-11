@@ -69,6 +69,8 @@ impl CargoTomlContents {
     pub fn dependencies_table(&self) -> Option<&Table> {
         if let Some(deps) = self.toml_value.get(CARGO_TOML_DEPENDENCIES) {
             deps.as_table()
+        } else if let Some(deps) = self.toml_value.get(CARGO_TOML_DEV_DEPENDENCIES) {
+            deps.as_table()
         } else {
             None
         }

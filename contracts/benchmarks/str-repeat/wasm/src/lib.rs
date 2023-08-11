@@ -10,6 +10,9 @@
 // Total number of exported functions:   5
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!(leaking);
@@ -18,10 +21,11 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     str_repeat
     (
-        repeat
-        getByteArrayLength
-        getByteArray
+        init => init
+        repeat => repeat
+        getByteArrayLength => get_byte_array_length
+        getByteArray => byte_array
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

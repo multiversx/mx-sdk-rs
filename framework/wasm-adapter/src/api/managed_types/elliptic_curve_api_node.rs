@@ -1,4 +1,4 @@
-use multiversx_sc::{api::EllipticCurveApi, types::heap::BoxedBytes};
+use multiversx_sc::{api::EllipticCurveApiImpl, types::heap::BoxedBytes};
 
 extern "C" {
     fn createEC(dataOffset: i32, dataLength: i32) -> i32;
@@ -141,8 +141,8 @@ extern "C" {
 
 }
 
-impl EllipticCurveApi for crate::api::VmApiImpl {
-    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Self::ManagedBufferHandle {
+impl EllipticCurveApiImpl for crate::api::VmApiImpl {
+    fn ec_create_from_name_bytes(&self, name: &[u8]) -> Self::EllipticCurveHandle {
         unsafe { createEC(name.as_ptr() as i32, name.len() as i32) }
     }
 

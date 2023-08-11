@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, use_raw_handle, EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi,
-        HandleTypeInfo, ManagedBufferApi, ManagedTypeApi, StaticVarApi, VMApi,
+        HandleTypeInfo, ManagedBufferApiImpl, ManagedTypeApi, StaticVarApi, VMApi,
     },
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType},
 };
@@ -34,6 +34,8 @@ where
     type BigFloatHandle = <A as HandleTypeInfo>::BigFloatHandle;
 
     type EllipticCurveHandle = <A as HandleTypeInfo>::EllipticCurveHandle;
+
+    type ManagedMapHandle = <A as HandleTypeInfo>::ManagedMapHandle;
 }
 
 impl<A: VMApi> ErrorApi for CallbackArgApiWrapper<A> {

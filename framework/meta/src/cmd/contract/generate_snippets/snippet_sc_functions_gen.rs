@@ -11,27 +11,34 @@ pub(crate) fn write_state_struct_impl(
 ) {
     writeln!(
         file,
-        "impl State {{
+        r#"impl State {{
     async fn new() -> Self {{
         let mut interactor = Interactor::new(GATEWAY).await;
         let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
-        let sc_addr_expr = if SC_ADDRESS == \"\" {{
+        let sc_addr_expr = if SC_ADDRESS == "" {{
             DEFAULT_ADDRESS_EXPR.to_string()
         }} else {{
-            \"bech32:\".to_string() + SC_ADDRESS
+            "bech32:".to_string() + SC_ADDRESS
         }};
+        let contract_code = BytesValue::interpret_from(
+            {},
+            &InterpreterContext::default(),
+        );
         let contract = ContractType::new(sc_addr_expr);
 
         State {{
             interactor,
             wallet_address,
+            contract_code,
             contract,
         }}
-    }}\n"
+    }}
+"#,
+        wasm_output_file_path_expr,
     )
     .unwrap();
 
-    write_deploy_method_impl(file, &abi.constructors[0], wasm_output_file_path_expr);
+    write_deploy_method_impl(file, &abi.constructors[0]);
 
     for endpoint_abi in &abi.endpoints {
         write_endpoint_impl(file, endpoint_abi);
@@ -41,43 +48,31 @@ pub(crate) fn write_state_struct_impl(
     writeln!(file, "}}").unwrap();
 }
 
-fn write_deploy_method_impl(
-    file: &mut File,
-    init_abi: &EndpointAbi,
-    wasm_output_file_path_expr: &str,
-) {
+fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi) {
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
 
     let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-        r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
+        r#"        let (new_address, _) = self
             .interactor
-            .sc_deploy(
-                self.contract
-                    .{}({})
-                    .into_blockchain_call()
+            .sc_deploy_get_result::<_, {}>(
+                ScDeployStep::new()
+                    .call(self.contract.{}({}))
                     .from(&self.wallet_address)
-                    .code_metadata(CodeMetadata::all())
-                    .contract_code({}, &InterpreterContext::default())
-                    .gas_limit(DEFAULT_GAS_LIMIT),
+                    .code(&self.contract_code)
+                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
             )
             .await;
-
-        let new_address = result.new_deployed_address();
+s
         let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {{}}", new_address_bech32);
-        let result_value = result.value();
-"#,
+        println!("new address: {{new_address_bech32}}");"#,
         output_type,
         init_abi.rust_method_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
-        wasm_output_file_path_expr
     )
     .unwrap();
-
-    write_call_results_print(file, &init_abi.outputs);
 
     // close method block brackets
     writeln!(file, "    }}").unwrap();
@@ -93,7 +88,6 @@ fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
     } else {
         write_contract_call(file, endpoint_abi);
     }
-    write_call_results_print(file, &endpoint_abi.outputs);
 
     // close method block brackets
     writeln!(file, "    }}").unwrap();
@@ -167,27 +161,26 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
         ""
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
-        "\n            .egld_value(egld_amount)\n"
+        "\n                    .egld_value(egld_amount)"
     } else {
-        "\n            .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)\n"
+        "\n                    .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)"
     };
 
     let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"        let result: multiversx_sc_snippets::InteractorResult<{}> = self
+        r#"        let response: TypedResponse<{}> = self
             .interactor
-            .sc_call_get_result(
-                self.contract
-                    .{}({})
-                    .into_blockchain_call()
+            .sc_call_use_result(
+                ScCallStep::new()
+                    .call(self.contract.{}({}))
                     .from(&self.wallet_address){}
-                    .gas_limit(DEFAULT_GAS_LIMIT)
-                    .into(),
+                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
             )
             .await;
-        let result_value = result.value();
-"#,
+
+        let result = response.result.unwrap();
+        println!("Result: {{result:?}}");"#,
         output_type,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
@@ -210,10 +203,6 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
     )
     .unwrap();
-}
-
-fn write_call_results_print(file: &mut File, _outputs: &[OutputAbi]) {
-    writeln!(file, r#"        println!("Result: {{:?}}", result_value);"#).unwrap();
 }
 
 fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {

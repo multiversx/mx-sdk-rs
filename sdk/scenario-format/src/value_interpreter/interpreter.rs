@@ -56,7 +56,7 @@ pub fn interpret_string(s: &str, context: &InterpreterContext) -> Vec<u8> {
     }
 
     if let Some(stripped) = s.strip_prefix(SC_ADDR_PREFIX) {
-        return sc_address_expression(stripped);
+        return sc_address_expression(stripped, &context.vm_type);
     }
 
     if let Some(stripped) = s.strip_prefix(FILE_PREFIX) {

@@ -1,7 +1,7 @@
 [package]
 name = "nft-storage-prepay"
 version = "0.0.0"
-authors = [ "Dorin Iancu <dorin.iancu@multiversx.com>",]
+authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 
@@ -10,9 +10,9 @@ path = "src/nft_storage_prepay.rs"
 
 
 [dependencies.multiversx-sc]
-version = "0.41.3"
+version = "0.42.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.41.3"
+version = "0.42.0"
 path = "../../../framework/scenario"

@@ -34,4 +34,10 @@ impl BlockchainRng {
     pub fn fill<T: Fill + ?Sized>(&mut self, dest: &mut T) {
         self.rng.fill(dest);
     }
+
+    pub fn next_bytes(&mut self, length: usize) -> Vec<u8> {
+        let mut bytes = vec![0; length];
+        self.fill(&mut bytes[..]);
+        bytes
+    }
 }

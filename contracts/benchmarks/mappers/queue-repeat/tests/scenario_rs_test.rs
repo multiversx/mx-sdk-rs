@@ -13,7 +13,12 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn queue_repeat_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/queue_repeat.scen.json", world());
+    world().run("scenarios/queue_repeat.scen.json");
+}
+
+#[test]
+fn queue_repeat_struct_rs() {
+    world().run("scenarios/queue_repeat_struct.scen.json");
 }
 
 #[test]

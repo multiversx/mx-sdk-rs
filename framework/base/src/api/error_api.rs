@@ -44,6 +44,8 @@ impl HandleTypeInfo for PanickingErrorApiImpl {
     type BigFloatHandle = i32;
 
     type EllipticCurveHandle = i32;
+
+    type ManagedMapHandle = i32;
 }
 
 /// An error handler that simply panics whenever `signal_error` is called.
@@ -67,4 +69,6 @@ impl HandleTypeInfo for PanickingErrorApi {
     type BigFloatHandle = i32;
 
     type EllipticCurveHandle = i32;
+
+    type ManagedMapHandle = i32;
 }

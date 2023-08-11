@@ -10,6 +10,9 @@
 // Total number of exported functions:   5
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!(static64k);
@@ -18,10 +21,11 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     proxy_test_second
     (
-        payMe
-        payMeWithResult
-        messageMe
+        init => init
+        payMe => pay_me
+        payMeWithResult => pay_me_with_result_endpoint
+        messageMe => message_me
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

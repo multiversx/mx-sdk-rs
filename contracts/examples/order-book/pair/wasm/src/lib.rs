@@ -10,6 +10,9 @@
 // Total number of exported functions:  15
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,20 +21,21 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     order_book_pair
     (
-        createBuyOrder
-        createSellOrder
-        matchOrders
-        cancelOrders
-        cancelAllOrders
-        freeOrders
-        startGlobalOperation
-        stopGlobalOperation
-        getAddressOrderIds
-        getOrderIdCounter
-        getOrderById
-        getFirstTokenId
-        getSecondTokenId
+        init => init
+        createBuyOrder => create_buy_order_endpoint
+        createSellOrder => create_sell_order_endpoint
+        matchOrders => match_orders_endpoint
+        cancelOrders => cancel_orders_endpoint
+        cancelAllOrders => cancel_all_orders_endpoint
+        freeOrders => free_orders_endpoint
+        startGlobalOperation => global_op_start
+        stopGlobalOperation => global_op_stop
+        getAddressOrderIds => get_address_order_ids
+        getOrderIdCounter => order_id_counter
+        getOrderById => orders
+        getFirstTokenId => first_token_id
+        getSecondTokenId => second_token_id
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

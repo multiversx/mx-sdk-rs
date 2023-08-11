@@ -10,6 +10,9 @@
 // Total number of exported functions:  12
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,17 +21,18 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     bonding_curve_contract
     (
-        sellToken
-        buyToken
-        deposit
-        setBondingCurve
-        claim
-        view_buy_price
-        view_sell_price
-        getTokenAvailability
-        setLocalRoles
-        unsetLocalRoles
+        init => init
+        sellToken => sell_token_endpoint
+        buyToken => buy_token_endpoint
+        deposit => deposit_endpoint
+        setBondingCurve => set_bonding_curve_endpoint
+        claim => claim_endpoint
+        view_buy_price => view_buy_price
+        view_sell_price => view_sell_price
+        getTokenAvailability => get_token_availability
+        setLocalRoles => set_local_roles
+        unsetLocalRoles => unset_local_roles
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

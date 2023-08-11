@@ -6,10 +6,10 @@ authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
 publish = false
 
 [lib]
-crate-type = [ "cdylib",]
+crate-type = ["cdylib"]
 
 [workspace]
-members = [".",]
+members = ["."]
 
 [dev-dependencies]
 
@@ -24,5 +24,5 @@ panic = "abort"
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.41.3"
+version = "0.42.0"
 path = "../../../../framework/wasm-adapter"

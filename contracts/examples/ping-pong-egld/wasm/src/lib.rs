@@ -10,6 +10,9 @@
 // Total number of exported functions:  12
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,17 +21,18 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     ping_pong_egld
     (
-        ping
-        pong
-        pongAll
-        getUserAddresses
-        getPingAmount
-        getDeadline
-        getActivationTimestamp
-        getMaxFunds
-        getUserStatus
-        pongAllLastUser
+        init => init
+        ping => ping
+        pong => pong
+        pongAll => pong_all
+        getUserAddresses => get_user_addresses
+        getPingAmount => ping_amount
+        getDeadline => deadline
+        getActivationTimestamp => activation_timestamp
+        getMaxFunds => max_funds
+        getUserStatus => user_status
+        pongAllLastUser => pong_all_last_user
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

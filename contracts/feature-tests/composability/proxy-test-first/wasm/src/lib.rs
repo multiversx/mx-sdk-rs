@@ -10,6 +10,9 @@
 // Total number of exported functions:   8
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!(static64k);
@@ -18,12 +21,14 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     proxy_test_first
     (
-        deploySecondContract
-        upgradeSecondContract
-        forwardToOtherContract
-        forwardToOtherContractWithCallback
-        messageOtherContract
-        messageOtherContractWithCallback
-        callBack
+        init => init
+        deploySecondContract => deploy_second_contract
+        upgradeSecondContract => upgrade_second_contract
+        forwardToOtherContract => forward_to_other_contract
+        forwardToOtherContractWithCallback => forward_to_other_contract_with_callback
+        messageOtherContract => message_other_contract
+        messageOtherContractWithCallback => message_other_contract_with_callback
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { proxy_test_first }

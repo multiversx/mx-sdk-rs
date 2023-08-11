@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::serde_raw::{EsdtInstanceRaw, ValueSubTree};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct EsdtFullRaw {
     #[serde(default)]

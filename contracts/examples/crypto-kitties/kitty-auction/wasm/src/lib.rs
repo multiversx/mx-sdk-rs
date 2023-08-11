@@ -10,6 +10,9 @@
 // Total number of exported functions:  11
 
 #![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -18,15 +21,17 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     kitty_auction
     (
-        setKittyOwnershipContractAddress
-        createAndAuctionGenZeroKitty
-        isUpForAuction
-        getAuctionStatus
-        getCurrentWinningBid
-        createSaleAuction
-        createSiringAuction
-        bid
-        endAuction
-        callBack
+        init => init
+        setKittyOwnershipContractAddress => set_kitty_ownership_contract_address_endpoint
+        createAndAuctionGenZeroKitty => create_and_auction_gen_zero_kitty
+        isUpForAuction => is_up_for_auction
+        getAuctionStatus => get_auction_status
+        getCurrentWinningBid => get_current_winning_bid
+        createSaleAuction => create_sale_auction
+        createSiringAuction => create_siring_auction
+        bid => bid
+        endAuction => end_auction
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { kitty_auction }

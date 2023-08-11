@@ -1,7 +1,10 @@
+use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
+use rustc_version::Version;
 use std::{
     fs::{self, File},
     io::Write,
     path::PathBuf,
+    str::FromStr,
 };
 
 use super::OutputContract;
@@ -12,16 +15,33 @@ const PREFIX_AUTO_GENERATED: &str =
 ////////////////////////////////////////////////////
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
-
 ";
 
 const NUM_INIT: usize = 1;
 const NUM_ASYNC_CB: usize = 1;
 
-const PREFIX_NO_STD: &str = "
+const VER_1_71: &str = "1.71.0-nightly";
+const FEATURES_PRE_RUSTC_1_71: &str = "
 #![no_std]
-#![feature(lang_items)]
 
+// Configuration that works with rustc < 1.71.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
+#![feature(alloc_error_handler, lang_items)]
+";
+
+const VER_1_73: &str = "1.73.0-nightly";
+const FEATURES_PRE_RUSTC_1_73: &str = "
+#![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
+#![feature(lang_items)]
+";
+
+const FEATURES_DEFAULT: &str = "
+#![no_std]
+#![allow(internal_features)]
+#![feature(lang_items)]
 ";
 
 impl OutputContract {
@@ -61,22 +81,14 @@ impl OutputContract {
     }
 
     fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
-        let explicit_endpoint_names = self.endpoint_names();
-        wasm_lib_file
-            .write_all(PREFIX_AUTO_GENERATED.as_bytes())
-            .unwrap();
+        writeln!(wasm_lib_file, "{PREFIX_AUTO_GENERATED}").unwrap();
         self.write_stat_comments(wasm_lib_file);
-        wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
-
+        write_prefix(wasm_lib_file);
         writeln!(wasm_lib_file, "{}", self.allocator_macro_invocation()).unwrap();
         writeln!(wasm_lib_file, "{}", self.panic_handler_macro_invocation()).unwrap();
 
-        let mut all_endpoint_names = explicit_endpoint_names;
-        if self.abi.has_callback {
-            all_endpoint_names.push("callBack".to_string());
-        }
-        for promise_callback in &self.abi.promise_callbacks {
-            all_endpoint_names.push(promise_callback.name.to_string());
+        if self.settings.external_view {
+            write_external_view_init(wasm_lib_file);
         }
 
         let contract_module_name = self.abi.get_crate_name_for_code();
@@ -84,12 +96,10 @@ impl OutputContract {
             self.endpoint_macro_name(),
             wasm_lib_file,
             &contract_module_name,
-            all_endpoint_names.iter(),
+            self.abi.iter_all_exports(),
         );
 
-        if !self.abi.has_callback {
-            write_wasm_empty_callback_macro(wasm_lib_file);
-        }
+        write_async_callback_macro(wasm_lib_file, self.abi.has_callback, &contract_module_name);
     }
 }
 
@@ -121,30 +131,74 @@ impl OutputContract {
     }
 }
 
+fn select_features() -> &'static str {
+    let meta = rustc_version::version_meta().unwrap();
+    if meta.semver < Version::from_str(VER_1_71).unwrap() {
+        FEATURES_PRE_RUSTC_1_71
+    } else if meta.semver < Version::from_str(VER_1_73).unwrap() {
+        FEATURES_PRE_RUSTC_1_73
+    } else {
+        FEATURES_DEFAULT
+    }
+}
+
+fn write_prefix(wasm_lib_file: &mut File) {
+    writeln!(wasm_lib_file, "{}", select_features()).unwrap();
+}
+
 fn write_endpoints_macro<'a, I>(
     full_macro_name: &str,
     wasm_lib_file: &mut File,
     contract_module_name: &str,
-    endpoint_names: I,
+    endpoint_iter: I,
 ) where
-    I: Iterator<Item = &'a String>,
+    I: Iterator<Item = &'a EndpointAbi>,
 {
     writeln!(wasm_lib_file).unwrap();
     writeln!(wasm_lib_file, "{full_macro_name} {{").unwrap();
     writeln!(wasm_lib_file, "    {contract_module_name}").unwrap();
     writeln!(wasm_lib_file, "    (").unwrap();
-    for endpoint_name in endpoint_names {
-        writeln!(wasm_lib_file, "        {endpoint_name}").unwrap();
+    for endpoint in endpoint_iter {
+        if endpoint.rust_method_name == EXTERNAL_VIEW_CONSTRUCTOR_FLAG {
+            continue;
+        }
+        writeln!(
+            wasm_lib_file,
+            "        {} => {}",
+            endpoint.name, endpoint.rust_method_name
+        )
+        .unwrap();
     }
     writeln!(wasm_lib_file, "    )").unwrap();
     writeln!(wasm_lib_file, "}}").unwrap();
 }
 
-fn write_wasm_empty_callback_macro(wasm_lib_file: &mut File) {
+fn write_async_callback_macro(
+    wasm_lib_file: &mut File,
+    has_callback: bool,
+    contract_module_name: &str,
+) {
+    writeln!(wasm_lib_file).unwrap();
+    if has_callback {
+        writeln!(
+            wasm_lib_file,
+            "multiversx_sc_wasm_adapter::async_callback! {{ {contract_module_name} }}"
+        )
+        .unwrap();
+    } else {
+        writeln!(
+            wasm_lib_file,
+            "multiversx_sc_wasm_adapter::async_callback_empty! {{}}",
+        )
+        .unwrap();
+    }
+}
+
+fn write_external_view_init(wasm_lib_file: &mut File) {
     writeln!(wasm_lib_file).unwrap();
     writeln!(
         wasm_lib_file,
-        "multiversx_sc_wasm_adapter::empty_callback! {{}}"
+        "multiversx_sc_wasm_adapter::external_view_init! {{}}",
     )
     .unwrap();
 }

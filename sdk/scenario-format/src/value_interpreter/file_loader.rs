@@ -9,7 +9,13 @@ pub fn load_file(file_path: &str, context: &InterpreterContext) -> Vec<u8> {
     let mut path_buf = context.context_path.clone();
     path_buf.push(file_path);
     path_buf = normalize_path(path_buf);
-    fs::read(&path_buf).unwrap_or_else(|_| missing_file_value(&path_buf))
+    fs::read(&path_buf).unwrap_or_else(|_| {
+        if context.allow_missing_files {
+            missing_file_value(&path_buf)
+        } else {
+            panic!("not found: {path_buf:#?}")
+        }
+    })
 }
 
 fn missing_file_value(path_buf: &Path) -> Vec<u8> {

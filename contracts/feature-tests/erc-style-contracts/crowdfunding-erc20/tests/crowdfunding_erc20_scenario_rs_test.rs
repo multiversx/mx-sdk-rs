@@ -18,26 +18,20 @@ fn world() -> ScenarioWorld {
 
 #[test]
 fn deploy_erc_20_and_crowdfunding_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deploy_erc20_and_crowdfunding.scen.json", world());
+    world().run("scenarios/deploy_erc20_and_crowdfunding.scen.json");
 }
 
 #[test]
 fn fund_with_insufficient_allowance_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/fund_with_insufficient_allowance.scen.json",
-        world(),
-    );
+    world().run("scenarios/fund_with_insufficient_allowance.scen.json");
 }
 
 #[test]
 fn fund_with_sufficient_allowance_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/fund_with_sufficient_allowance.scen.json",
-        world(),
-    );
+    world().run("scenarios/fund_with_sufficient_allowance.scen.json");
 }
 
 #[test]
 fn fund_without_allowance_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/fund_without_allowance.scen.json", world());
+    world().run("scenarios/fund_without_allowance.scen.json");
 }

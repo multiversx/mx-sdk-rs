@@ -2,8 +2,9 @@ use std::collections::HashMap;
 
 use crate::data::{
     account::{Account, AccountResponse},
+    account_storage::AccountStorageResponse,
     address::Address,
-    esdt::{EsdtBalance, EsdtBalanceResponse},
+    esdt::{EsdtBalance, EsdtBalanceResponse, EsdtRolesResponse},
     hyperblock::{HyperBlock, HyperBlockResponse},
     network_config::{NetworkConfig, NetworkConfigResponse},
     network_economics::{NetworkEconomics, NetworkEconomicsResponse},
@@ -28,6 +29,7 @@ pub const METACHAIN_SHARD_ID: u32 = 0xFFFFFFFF;
 const NETWORK_CONFIG_ENDPOINT: &str = "network/config";
 const NETWORK_ECONOMICS_ENDPOINT: &str = "network/economics";
 const ACCOUNT_ENDPOINT: &str = "address/";
+const KEYS_ENDPOINT: &str = "/keys/";
 const COST_TRANSACTION_ENDPOINT: &str = "transaction/cost";
 const SEND_TRANSACTION_ENDPOINT: &str = "transaction/send";
 const SEND_MULTIPLE_TRANSACTIONS_ENDPOINT: &str = "transaction/send-multiple";
@@ -182,6 +184,31 @@ impl CommunicationProxy {
         }
     }
 
+    // get_account_esdt_roles retrieves an all esdt roles of an account from the network
+    pub async fn get_account_esdt_roles(
+        &self,
+        address: &Address,
+    ) -> Result<HashMap<String, Vec<String>>> {
+        if !address.is_valid() {
+            return Err(anyhow!("invalid address"));
+        }
+
+        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str() + "/esdts/roles";
+        let endpoint = self.get_endpoint(endpoint.as_str());
+        let resp = self
+            .client
+            .get(endpoint)
+            .send()
+            .await?
+            .json::<EsdtRolesResponse>()
+            .await?;
+
+        match resp.data {
+            None => Err(anyhow!("{}", resp.error)),
+            Some(b) => Ok(b.roles),
+        }
+    }
+
     // get_account_esdt_tokens retrieves an all esdt token of an account from the network
     pub async fn get_account_esdt_tokens(
         &self,
@@ -204,6 +231,31 @@ impl CommunicationProxy {
         match resp.data {
             None => Err(anyhow!("{}", resp.error)),
             Some(b) => Ok(b.esdts),
+        }
+    }
+
+    // get_account_esdt_tokens retrieves an all esdt token of an account from the network
+    pub async fn get_account_storage_keys(
+        &self,
+        address: &Address,
+    ) -> Result<HashMap<String, String>> {
+        if !address.is_valid() {
+            return Err(anyhow!("invalid address"));
+        }
+
+        let endpoint = ACCOUNT_ENDPOINT.to_string() + address.to_string().as_str() + KEYS_ENDPOINT;
+        let endpoint = self.get_endpoint(endpoint.as_str());
+        let resp = self
+            .client
+            .get(endpoint)
+            .send()
+            .await?
+            .json::<AccountStorageResponse>()
+            .await?;
+
+        match resp.data {
+            None => Err(anyhow!("{}", resp.error)),
+            Some(b) => Ok(b.pairs),
         }
     }
 
