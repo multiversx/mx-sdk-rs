@@ -1,6 +1,6 @@
 # Abstract
 
-Non Fungible Token (NFT) implementation, using the Elrond Rust Framework. This is a very simplistic implementation where each token simply has an ID, an assigned owner, and optionally a "co-owner", also known as "approved account".
+Non Fungible Token (NFT) implementation, using the MultiversX SC Framework. This is a very simplistic implementation where each token simply has an ID, an assigned owner, and optionally a "co-owner", also known as "approved account".
 
 # Deployment
 

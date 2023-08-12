@@ -10,7 +10,7 @@
 // Total number of exported functions:   3
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -18,7 +18,9 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     recursive_caller
     (
-        recursive_send_funds
-        callBack
+        init => init
+        recursive_send_funds => recursive_send_funds
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { recursive_caller }

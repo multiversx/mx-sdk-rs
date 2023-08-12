@@ -20,7 +20,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "upgrade_from_source",
+                "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:forwarder",
                     "sc:vault"

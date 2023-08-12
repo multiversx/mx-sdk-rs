@@ -1,9 +1,6 @@
-use multiversx_sc::api::UPGRADE_CONTRACT_FUNC_NAME;
+use crate::tx_execution::{builtin_function_names::UPGRADE_CONTRACT_FUNC_NAME, BlockchainVMRef};
 
-use crate::{
-    tx_execution::default_execution,
-    tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxResult},
-};
+use crate::tx_mock::{BlockchainUpdate, TxCache, TxFunctionName, TxInput, TxResult};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -14,7 +11,16 @@ impl BuiltinFunction for UpgradeContract {
         UPGRADE_CONTRACT_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute<F>(
+        &self,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+        vm: &BlockchainVMRef,
+        f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() < 2 {
             return (
                 TxResult::from_vm_error("upgradeContract expects at least 2 arguments"),
@@ -50,6 +56,6 @@ impl BuiltinFunction for UpgradeContract {
             ..Default::default()
         };
 
-        default_execution(exec_input, tx_cache)
+        vm.default_execution(exec_input, tx_cache, f)
     }
 }

@@ -79,6 +79,15 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for StorageKey<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<&str> for StorageKey<M> {
+    #[inline]
+    fn from(s: &str) -> Self {
+        StorageKey {
+            buffer: ManagedBuffer::from(s),
+        }
+    }
+}
+
 impl<M, const N: usize> From<ManagedByteArray<M, N>> for StorageKey<M>
 where
     M: ManagedTypeApi + ErrorApi,

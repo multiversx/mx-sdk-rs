@@ -10,7 +10,7 @@
 // Total number of exported functions:   8
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -18,13 +18,14 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     single_value_repeat
     (
-        add
-        count
-        remove
-        add_struct
-        count_struct
-        remove_struct
+        init => init
+        add => add
+        count => count
+        remove => remove
+        add_struct => add_struct
+        count_struct => count_struct
+        remove_struct => remove_struct
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

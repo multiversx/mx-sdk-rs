@@ -12,147 +12,120 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn deploy_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deploy.scen.json", world());
+fn batch_transfer_both_types_rs() {
+    world().run("scenarios/batch_transfer_both_types.scen.json");
+}
+
+#[test]
+fn batch_transfer_both_types_to_sc_rs() {
+    world().run("scenarios/batch_transfer_both_types_to_sc.scen.json");
+}
+
+#[test]
+fn batch_transfer_fungible_rs() {
+    world().run("scenarios/batch_transfer_fungible.scen.json");
+}
+
+#[test]
+fn batch_transfer_fungible_to_sc_rs() {
+    world().run("scenarios/batch_transfer_fungible_to_sc.scen.json");
+}
+
+#[test]
+fn batch_transfer_non_fungible_rs() {
+    world().run("scenarios/batch_transfer_non_fungible.scen.json");
+}
+
+#[test]
+fn batch_transfer_non_fungible_to_sc_rs() {
+    world().run("scenarios/batch_transfer_non_fungible_to_sc.scen.json");
+}
+
+// burn tests
+#[test]
+fn burn_fungible_rs() {
+    world().run("scenarios/burn_fungible.scen.json");
+}
+
+#[test]
+fn burn_non_fungible_rs() {
+    world().run("scenarios/burn_non_fungible.scen.json");
+}
+
+#[test]
+fn create_one_fungible_one_non_fungible_rs() {
+    world().run("scenarios/create_one_fungible_one_non_fungible.scen.json");
 }
 
 // Create token tests
-
 #[test]
-fn create_token_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_token_fungible.scen.json", world());
+fn create_token_fungible_rs() {
+    world().run("scenarios/create_token_fungible.scen.json");
 }
 
 #[test]
-fn create_token_non_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/create_token_non_fungible.scen.json", world());
+fn create_token_non_fungible_rs() {
+    world().run("scenarios/create_token_non_fungible.scen.json");
 }
 
 #[test]
-fn create_two_fungible_same_creator_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/create_two_tokens_both_fungible_same_creator.scen.json",
-        world(),
-    );
+fn create_two_tokens_both_fungible_different_creator_rs() {
+    world().run("scenarios/create_two_tokens_both_fungible_different_creator.scen.json");
 }
 
 #[test]
-fn create_two_fungible_different_creator_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/create_two_tokens_both_fungible_different_creator.scen.json",
-        world(),
-    );
+fn create_two_tokens_both_fungible_same_creator_rs() {
+    world().run("scenarios/create_two_tokens_both_fungible_same_creator.scen.json");
 }
 
 #[test]
-fn create_two_non_fungible_same_creator_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/create_two_tokens_both_non_fungible_same_creator.scen.json",
-        world(),
-    );
+fn create_two_tokens_both_non_fungible_same_creator_rs() {
+    world().run("scenarios/create_two_tokens_both_non_fungible_same_creator.scen.json");
 }
 
 #[test]
-fn create_one_fungible_one_non_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/create_one_fungible_one_non_fungible.scen.json",
-        world(),
-    );
+fn deploy_rs() {
+    world().run("scenarios/deploy.scen.json");
+}
+
+// mint tests
+#[test]
+fn mint_fungible_rs() {
+    world().run("scenarios/mint_fungible.scen.json");
+}
+
+#[test]
+fn mint_non_fungible_rs() {
+    world().run("scenarios/mint_non_fungible.scen.json");
+}
+
+#[test]
+fn mint_not_creator_rs() {
+    world().run("scenarios/mint_not_creator.scen.json");
+}
+
+#[test]
+fn transfer_fungible_not_enough_balance_rs() {
+    world().run("scenarios/transfer_fungible_not_enough_balance.scen.json");
 }
 
 // transfer tests -  to account
 #[test]
-fn transfer_fungible_ok_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_fungible_ok.scen.json", world());
+fn transfer_fungible_ok_rs() {
+    world().run("scenarios/transfer_fungible_ok.scen.json");
 }
 
 #[test]
-fn transfer_fungible_not_enough_balance_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/transfer_fungible_not_enough_balance.scen.json",
-        world(),
-    );
+fn transfer_fungible_ok_to_sc_rs() {
+    world().run("scenarios/transfer_fungible_ok_to_sc.scen.json");
 }
 
 #[test]
-fn transfer_non_fungible_ok_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_non_fungible_ok.scen.json", world());
+fn transfer_non_fungible_ok_rs() {
+    world().run("scenarios/transfer_non_fungible_ok.scen.json");
 }
 
 #[test]
-fn batch_transfer_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/batch_transfer_fungible.scen.json", world());
-}
-
-#[test]
-fn batch_transfer_non_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/batch_transfer_non_fungible.scen.json", world());
-}
-
-#[test]
-fn batch_transfer_both_types_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/batch_transfer_both_types.scen.json", world());
-}
-
-#[test]
-fn transfer_fungible_ok_to_sc_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/transfer_fungible_ok_to_sc.scen.json", world());
-}
-
-#[test]
-fn transfer_non_fungible_ok_to_sc_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/transfer_non_fungible_ok_to_sc.scen.json",
-        world(),
-    );
-}
-
-#[test]
-fn batch_transfer_fungible_to_sc_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/batch_transfer_fungible_to_sc.scen.json", world());
-}
-
-#[test]
-fn batch_transfer_non_fungible_to_sc_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/batch_transfer_non_fungible_to_sc.scen.json",
-        world(),
-    );
-}
-
-#[test]
-fn batch_transfer_both_types_to_sc_test_rs() {
-    multiversx_sc_scenario::run_rs(
-        "scenarios/batch_transfer_both_types_to_sc.scen.json",
-        world(),
-    );
-}
-
-// mint tests
-
-#[test]
-fn mint_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mint_fungible.scen.json", world());
-}
-
-#[test]
-fn mint_non_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mint_non_fungible.scen.json", world());
-}
-
-#[test]
-fn mint_not_creator_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/mint_not_creator.scen.json", world());
-}
-
-// burn tests
-
-#[test]
-fn burn_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/burn_fungible.scen.json", world());
-}
-
-#[test]
-fn burn_non_fungible_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/burn_non_fungible.scen.json", world());
+fn transfer_non_fungible_ok_to_sc_rs() {
+    world().run("scenarios/transfer_non_fungible_ok_to_sc.scen.json");
 }

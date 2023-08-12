@@ -11,7 +11,17 @@ pub trait PanicMessageFeatures {
     fn init(&self) {}
 
     #[endpoint(panicWithMessage)]
-    fn panic_with_message(&self) {
-        panic!("example panic message");
+    fn panic_with_message(&self, some_value: u32) {
+        panic!("example panic message {some_value}");
     }
+
+    /// Logs do not get recorded in case of panic.
+    #[endpoint(panicAfterLog)]
+    fn panic_after_log(&self) {
+        self.before_panic();
+        panic!("panic after log");
+    }
+
+    #[event("before-panic")]
+    fn before_panic(&self);
 }

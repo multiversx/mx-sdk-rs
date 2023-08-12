@@ -8,17 +8,14 @@ publish = false
 [lib]
 path = "src/forwarder_main.rs"
 
-[features]
-ei-unmanaged = ["multiversx-sc/ei-unmanaged"]
-
 [dependencies.vault]
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.39.7"
+version = "0.42.0"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.7"
+version = "0.42.0"
 path = "../../../../framework/scenario"
 

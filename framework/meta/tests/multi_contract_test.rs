@@ -1,5 +1,7 @@
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
-use multiversx_sc_meta::output_contract::{MultiContractConfigSerde, OutputContractConfig};
+use multiversx_sc_meta::cmd::contract::output_contract::{
+    MultiContractConfigSerde, OutputContractGlobalConfig,
+};
 
 fn get_serialized_toml() -> MultiContractConfigSerde {
     toml::from_str(
@@ -27,11 +29,11 @@ fn get_serialized_toml() -> MultiContractConfigSerde {
 
 fn get_contract_abi() -> ContractAbi {
     let endpoints = vec![
-        EndpointAbi::generate_with_name_and_labels("endpoint1", &["label1", "label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint2", &["label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint3", &["label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint4", &["label2"]),
-        EndpointAbi::generate_with_name_and_labels("endpoint5", &[]), // unlabeled endpoint, should end up in main contract
+        EndpointAbi::endpoint_with_name_and_labels("endpoint1", &["label1", "label2"]),
+        EndpointAbi::endpoint_with_name_and_labels("endpoint2", &["label2"]),
+        EndpointAbi::endpoint_with_name_and_labels("endpoint3", &["label2"]),
+        EndpointAbi::endpoint_with_name_and_labels("endpoint4", &["label2"]),
+        EndpointAbi::endpoint_with_name_and_labels("endpoint5", &[]), // unlabeled endpoint, should end up in main contract
     ];
     ContractAbi::generate_with_endpoints(endpoints)
 }
@@ -89,7 +91,7 @@ fn test_output_contract_config() {
     let serde = get_serialized_toml();
     let abi = get_contract_abi();
 
-    let contract_config = OutputContractConfig::load_from_config(&serde, &abi);
+    let contract_config = OutputContractGlobalConfig::load_from_config(&serde, &abi);
 
     assert_eq!(
         contract_config.default_contract_config_name,

@@ -1,5 +1,8 @@
 use crate::{
-    api::{ErrorApi, ManagedTypeApi, StorageWriteApi, StorageWriteApiImpl},
+    api::{
+        const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
+        StorageWriteApi, StorageWriteApiImpl,
+    },
     codec::*,
     contract_base::ExitCodecErrorHandler,
     err_msg,
@@ -94,5 +97,8 @@ pub fn storage_clear<A>(key: ManagedRef<'_, A, StorageKey<A>>)
 where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    A::storage_write_api_impl().storage_store_managed_buffer_clear(key.get_handle());
+    let value_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_CONST_EMPTY);
+    A::managed_type_impl().mb_overwrite(value_handle.clone(), &[]);
+
+    A::storage_write_api_impl().storage_store_managed_buffer_raw(key.get_handle(), value_handle);
 }

@@ -405,6 +405,20 @@ where
     }
 }
 
+impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + 'static,
+{
+    type Item = T;
+
+    type IntoIter = Iter<'a, SA, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 /// An iterator over the elements of a `QueueMapper`.
 ///
 /// This `struct` is created by [`QueueMapper::iter()`]. See its

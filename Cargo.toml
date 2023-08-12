@@ -2,9 +2,10 @@
 resolver = "2"
 
 members = [
+  "data/codec",
+  "data/codec-derive",
+
   "framework/base",
-  "framework/codec",
-  "framework/codec-derive",
   "framework/derive",
   "framework/meta",
   "framework/scenario",
@@ -14,7 +15,6 @@ members = [
   "sdk/core",
   "sdk/scenario-format",
 
-  "tools/test-gen",
   "tools/mxpy-snippet-generator",
 
   "vm",
@@ -39,6 +39,8 @@ members = [
   "contracts/benchmarks/mappers/single-value-repeat/meta",
   "contracts/benchmarks/mappers/vec-repeat",
   "contracts/benchmarks/mappers/vec-repeat/meta",
+  "contracts/benchmarks/large-storage",
+  "contracts/benchmarks/large-storage/meta",
   "contracts/benchmarks/str-repeat",
   "contracts/benchmarks/str-repeat/meta",
   "contracts/benchmarks/send-tx-repeat",
@@ -46,6 +48,7 @@ members = [
 
   "contracts/examples/adder",
   "contracts/examples/adder/meta",
+  "contracts/examples/adder/interact",
   "contracts/examples/esdt-transfer-with-fee",
   "contracts/examples/esdt-transfer-with-fee/meta",
   "contracts/examples/bonding-curve-contract",
@@ -56,6 +59,8 @@ members = [
   "contracts/examples/crypto-bubbles/meta",
   "contracts/examples/crypto-zombies",
   "contracts/examples/crypto-zombies/meta",
+  "contracts/examples/check-pause",
+  "contracts/examples/check-pause/meta",
   "contracts/examples/crypto-kitties/kitty-ownership",
   "contracts/examples/crypto-kitties/kitty-ownership/meta",
   "contracts/examples/crypto-kitties/kitty-genetic-alg",
@@ -74,7 +79,7 @@ members = [
   "contracts/examples/lottery-esdt/meta",
   "contracts/examples/multisig",
   "contracts/examples/multisig/meta",
-  "contracts/examples/multisig/interact-rs",
+  "contracts/examples/multisig/interact",
   "contracts/examples/nft-minter",
   "contracts/examples/nft-minter/meta",
   "contracts/examples/nft-storage-prepay",
@@ -100,9 +105,11 @@ members = [
   "contracts/feature-tests/alloc-features/meta",
   "contracts/feature-tests/basic-features",
   "contracts/feature-tests/basic-features/meta",
+  "contracts/feature-tests/basic-features/interact",
   "contracts/feature-tests/big-float-features",
   "contracts/feature-tests/big-float-features/meta",
   "contracts/feature-tests/composability",
+  "contracts/feature-tests/composability/interact",
   "contracts/feature-tests/composability/esdt-contract-pair",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract/meta",
@@ -114,6 +121,8 @@ members = [
   "contracts/feature-tests/composability/execute-on-dest-esdt-issue-callback/child/meta",
   "contracts/feature-tests/composability/forwarder",
   "contracts/feature-tests/composability/forwarder/meta",
+  "contracts/feature-tests/composability/forwarder-queue",
+  "contracts/feature-tests/composability/forwarder-queue/meta",
   "contracts/feature-tests/composability/forwarder-raw",
   "contracts/feature-tests/composability/forwarder-raw/meta",
   "contracts/feature-tests/composability/local-esdt-and-nft",
@@ -148,8 +157,8 @@ members = [
   "contracts/feature-tests/esdt-system-sc-mock/meta",
   "contracts/feature-tests/formatted-message-features",
   "contracts/feature-tests/formatted-message-features/meta",
-  "contracts/feature-tests/legacy-examples/crypto-bubbles-legacy",
-  "contracts/feature-tests/legacy-examples/crypto-bubbles-legacy/meta",
+  "contracts/feature-tests/managed-map-features",
+  "contracts/feature-tests/managed-map-features/meta",
   "contracts/feature-tests/multi-contract-features",
   "contracts/feature-tests/multi-contract-features/meta",
   "contracts/feature-tests/panic-message-features",
@@ -163,4 +172,3 @@ members = [
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
 ]
-

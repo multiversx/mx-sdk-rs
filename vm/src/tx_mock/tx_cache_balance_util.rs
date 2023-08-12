@@ -1,24 +1,28 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::types::heap::Address;
+use num_bigint::BigUint;
 
-use crate::{tx_mock::TxPanic, world_mock::EsdtInstanceMetadata};
+use crate::{
+    tx_execution::is_system_sc_address, tx_mock::TxPanic, types::VMAddress,
+    world_mock::EsdtInstanceMetadata,
+};
 
 use super::TxCache;
 
 impl TxCache {
-    pub fn subtract_egld_balance(&self, address: &Address, call_value: &BigUint) {
+    pub fn subtract_egld_balance(
+        &self,
+        address: &VMAddress,
+        call_value: &BigUint,
+    ) -> Result<(), TxPanic> {
         self.with_account_mut(address, |account| {
             if call_value > &account.egld_balance {
-                std::panic::panic_any(TxPanic {
-                    status: 10,
-                    message: "failed transfer (insufficient funds)".to_string(),
-                });
+                return Err(TxPanic::vm_error("failed transfer (insufficient funds)"));
             }
             account.egld_balance -= call_value;
+            Ok(())
         })
     }
 
-    pub fn subtract_tx_gas(&self, address: &Address, gas_limit: u64, gas_price: u64) {
+    pub fn subtract_tx_gas(&self, address: &VMAddress, gas_limit: u64, gas_price: u64) {
         self.with_account_mut(address, |account| {
             let gas_cost = BigUint::from(gas_limit) * BigUint::from(gas_price);
             assert!(
@@ -29,44 +33,44 @@ impl TxCache {
         });
     }
 
-    pub fn increase_egld_balance(&self, address: &Address, amount: &BigUint) {
+    pub fn increase_egld_balance(&self, address: &VMAddress, amount: &BigUint) {
         self.with_account_mut(address, |account| {
             account.egld_balance += amount;
         });
     }
 
-    #[allow(clippy::redundant_closure)] // clippy is wrong here, `.unwrap_or_else(panic_insufficient_funds)` won't compile
     pub fn subtract_esdt_balance(
         &self,
-        address: &Address,
+        address: &VMAddress,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
-    ) -> EsdtInstanceMetadata {
+    ) -> Result<EsdtInstanceMetadata, TxPanic> {
         self.with_account_mut(address, |account| {
             let esdt_data_map = &mut account.esdt;
             let esdt_data = esdt_data_map
                 .get_mut_by_identifier(esdt_token_identifier)
-                .unwrap_or_else(|| panic_insufficient_funds());
+                .ok_or_else(err_insufficient_funds)?;
 
             let esdt_instances = &mut esdt_data.instances;
             let esdt_instance = esdt_instances
                 .get_mut_by_nonce(nonce)
-                .unwrap_or_else(|| panic_insufficient_funds());
+                .ok_or_else(err_insufficient_funds)?;
+
             let esdt_balance = &mut esdt_instance.balance;
             if &*esdt_balance < value {
-                panic_insufficient_funds();
+                return Err(err_insufficient_funds());
             }
 
             *esdt_balance -= value;
 
-            esdt_instance.metadata.clone()
+            Ok(esdt_instance.metadata.clone())
         })
     }
 
     pub fn increase_esdt_balance(
         &self,
-        address: &Address,
+        address: &VMAddress,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
@@ -82,23 +86,37 @@ impl TxCache {
         });
     }
 
+    pub fn transfer_egld_balance(
+        &self,
+        from: &VMAddress,
+        to: &VMAddress,
+        value: &BigUint,
+    ) -> Result<(), TxPanic> {
+        if !is_system_sc_address(from) {
+            self.subtract_egld_balance(from, value)?;
+        }
+        if !is_system_sc_address(to) {
+            self.increase_egld_balance(to, value);
+        }
+        Ok(())
+    }
+
     pub fn transfer_esdt_balance(
         &self,
-        from: &Address,
-        to: &Address,
+        from: &VMAddress,
+        to: &VMAddress,
         esdt_token_identifier: &[u8],
         nonce: u64,
         value: &BigUint,
-    ) {
-        let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value);
-
-        self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
+    ) -> Result<(), TxPanic> {
+        if !is_system_sc_address(from) && !is_system_sc_address(to) {
+            let metadata = self.subtract_esdt_balance(from, esdt_token_identifier, nonce, value)?;
+            self.increase_esdt_balance(to, esdt_token_identifier, nonce, value, metadata);
+        }
+        Ok(())
     }
 }
 
-fn panic_insufficient_funds() -> ! {
-    std::panic::panic_any(TxPanic {
-        status: 10,
-        message: "insufficient funds".to_string(),
-    });
+fn err_insufficient_funds() -> TxPanic {
+    TxPanic::vm_error("insufficient funds")
 }

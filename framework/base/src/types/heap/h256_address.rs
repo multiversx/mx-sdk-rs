@@ -6,6 +6,8 @@ use crate::{
 use alloc::{boxed::Box, vec::Vec};
 use core::fmt::Debug;
 
+const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
+
 /// An Address is just a H256 with a different name.
 /// Has a different ABI name than H256.
 ///
@@ -148,6 +150,13 @@ impl Address {
     /// Does not reallocate or copy data, the data on the heap remains untouched.
     pub fn into_boxed_bytes(self) -> BoxedBytes {
         self.0.into_boxed_bytes()
+    }
+
+    pub fn is_smart_contract_address(&self) -> bool {
+        self.as_bytes()
+            .iter()
+            .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
+            .all(|item| item == &0u8)
     }
 }
 

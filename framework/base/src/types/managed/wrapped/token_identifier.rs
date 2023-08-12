@@ -69,9 +69,9 @@ impl<M: ManagedTypeApi> TokenIdentifier<M> {
     pub fn ticker(&self) -> ManagedBuffer<M> {
         let token_id_len = self.buffer.len();
         let ticker_len = M::managed_type_impl().get_token_ticker_len(token_id_len);
-        self.buffer.copy_slice(0, ticker_len).unwrap_or_else(|| {
-            M::error_api_impl().signal_error(err_msg::BAD_TOKEN_TICKER_FORMAT)
-        })
+        self.buffer
+            .copy_slice(0, ticker_len)
+            .unwrap_or_else(|| M::error_api_impl().signal_error(err_msg::BAD_TOKEN_TICKER_FORMAT))
     }
 }
 

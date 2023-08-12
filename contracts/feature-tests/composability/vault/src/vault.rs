@@ -38,7 +38,10 @@ pub trait Vault {
     }
 
     fn esdt_transfers_multi(&self) -> MultiValueEncoded<EsdtTokenPaymentMultiValue> {
-        self.call_value().all_esdt_transfers().into_multi_value()
+        self.call_value()
+            .all_esdt_transfers()
+            .clone_value()
+            .into_multi_value()
     }
 
     #[payable("*")]
@@ -63,7 +66,7 @@ pub trait Vault {
         self.call_counts(ManagedBuffer::from(b"accept_funds_echo_payment"))
             .update(|c| *c += 1);
 
-        (egld_value, esdt_transfers_multi).into()
+        (egld_value.clone_value(), esdt_transfers_multi).into()
     }
 
     #[payable("*")]
@@ -84,7 +87,6 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_funds_with_transfer_exec(
         &self,
-        #[payment_multi] _payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
         token: TokenIdentifier,
         amount: BigUint,
         opt_receive_func: OptionalValue<ManagedBuffer>,
@@ -104,6 +106,44 @@ pub trait Vault {
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
+    #[label("promises-endpoint")]
+    #[payable("*")]
+    #[endpoint]
+    fn retrieve_funds_promises(
+        &self,
+        back_transfers: OptionalValue<u64>,
+        back_transfer_value: OptionalValue<BigUint>,
+    ) {
+        let payment = self.call_value().egld_or_single_esdt();
+        let caller = self.blockchain().get_caller();
+        let endpoint_name = ManagedBuffer::from(b"");
+        let nr_callbacks = match back_transfers.into_option() {
+            Some(nr) => nr,
+            None => sc_panic!("Nr of calls is None"),
+        };
+
+        let value = match back_transfer_value.into_option() {
+            Some(val) => val,
+            None => sc_panic!("Value for parent callback is None"),
+        };
+
+        let return_payment =
+            EgldOrEsdtTokenPayment::new(payment.token_identifier, payment.token_nonce, value);
+
+        self.num_called_retrieve_funds_promises()
+            .update(|c| *c += 1);
+
+        for _ in 0..nr_callbacks {
+            self.num_async_calls_sent_from_child().update(|c| *c += 1);
+
+            self.send()
+                .contract_call::<()>(caller.clone(), endpoint_name.clone())
+                .with_egld_or_single_esdt_transfer(return_payment.clone())
+                .with_gas_limit(self.blockchain().get_gas_left() / 2)
+                .transfer_execute()
+        }
+    }
+
     #[endpoint]
     fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
@@ -111,7 +151,7 @@ pub trait Vault {
 
         if let Some(esdt_token_id) = token.into_esdt_option() {
             self.send()
-                .transfer_esdt_via_async_call(caller, esdt_token_id, nonce, amount);
+                .direct_esdt(&caller, &esdt_token_id, nonce, &amount);
         } else {
             self.send().direct_egld(&caller, &amount);
         }
@@ -131,8 +171,7 @@ pub trait Vault {
             all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
-        self.send()
-            .transfer_multiple_esdt_via_async_call(caller, all_payments);
+        self.send().direct_multi(&caller, &all_payments);
     }
 
     #[payable("*")]
@@ -171,7 +210,7 @@ pub trait Vault {
         }
 
         self.send()
-            .transfer_multiple_esdt_via_async_call(self.blockchain().get_caller(), new_tokens);
+            .direct_multi(&self.blockchain().get_caller(), &new_tokens);
     }
 
     /// TODO: invert token_payment and token_nonce, for consistency.
@@ -207,4 +246,12 @@ pub trait Vault {
     #[view]
     #[storage_mapper("call_counts")]
     fn call_counts(&self, endpoint: ManagedBuffer) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("num_called_retrieve_funds_promises")]
+    fn num_called_retrieve_funds_promises(&self) -> SingleValueMapper<usize>;
+
+    #[view]
+    #[storage_mapper("num_async_calls_sent_from_child")]
+    fn num_async_calls_sent_from_child(&self) -> SingleValueMapper<usize>;
 }

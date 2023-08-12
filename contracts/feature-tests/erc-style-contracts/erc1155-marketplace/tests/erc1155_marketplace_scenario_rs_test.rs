@@ -15,31 +15,31 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn auction_single_token_egld_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/auction_single_token_egld.scen.json", world());
+fn auction_batch_rs() {
+    world().run("scenarios/auction_batch.scen.json");
 }
 
 #[test]
-fn auction_batch_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/auction_batch.scen.json", world());
+fn auction_single_token_egld_rs() {
+    world().run("scenarios/auction_single_token_egld.scen.json");
 }
 
 #[test]
-fn bid_first_egld_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/bid_first_egld.scen.json", world());
+fn bid_first_egld_rs() {
+    world().run("scenarios/bid_first_egld.scen.json");
 }
 
 #[test]
-fn bid_second_egld_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/bid_second_egld.scen.json", world());
+fn bid_second_egld_rs() {
+    world().run("scenarios/bid_second_egld.scen.json");
 }
 
 #[test]
-fn bid_third_egld_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/bid_third_egld.scen.json", world());
+fn bid_third_egld_rs() {
+    world().run("scenarios/bid_third_egld.scen.json");
 }
 
 #[test]
-fn end_auction_test_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/end_auction.scen.json", world());
+fn end_auction_rs() {
+    world().run("scenarios/end_auction.scen.json");
 }

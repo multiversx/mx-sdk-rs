@@ -22,6 +22,8 @@ pub trait VMApi:
     + Clone // TODO: remove
     + PartialEq // for helping derive PartialEq for managed types
     + Eq
+    + Send
+    + Sync
 {
     /// Slightly hacky way of overriding the constructor for external view contracts.
     /// 

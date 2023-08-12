@@ -10,7 +10,8 @@
 // Total number of exported functions:   4
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![allow(internal_features)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -18,9 +19,10 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     adder
     (
-        getSum
-        add
+        init => init
+        getSum => sum
+        add => add
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

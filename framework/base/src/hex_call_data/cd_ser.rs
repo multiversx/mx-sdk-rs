@@ -7,7 +7,7 @@ use alloc::vec::Vec;
 
 use super::SEPARATOR;
 
-/// Serializes to Elrond's smart contract call format.
+/// Serializes to the MultiversX smart contract call format.
 ///
 /// This format consists of the function name, followed by '@', follwed by hex-encoded argument bytes separated by '@' characters.
 /// Example: "funcName@00000@aaaa@1234@@".

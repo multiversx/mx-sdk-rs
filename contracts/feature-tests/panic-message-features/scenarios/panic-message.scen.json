@@ -23,14 +23,16 @@
                 "from": "address:an_account",
                 "to": "sc:panic_features",
                 "function": "panicWithMessage",
-                "arguments": [],
+                "arguments": [
+                    "123"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:panic occurred: example panic message",
+                "message": "str:panic occurred: example panic message 123",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

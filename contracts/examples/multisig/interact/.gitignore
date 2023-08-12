@@ -1,0 +1,8 @@
+# Pem files are used for interactions, but shouldn't be committed
+*.pem
+
+# Temporary storage of deployed contract address, so we can preserve the context between executions.
+state.toml
+
+# Trace file of interactor tooling
+interactor*.scen.json

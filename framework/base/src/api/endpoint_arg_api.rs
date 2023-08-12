@@ -1,8 +1,8 @@
 use crate::{err_msg, types::heap::BoxedBytes};
 
 use super::{
-    const_handles, use_raw_handle, BigIntApi, ErrorApi, ErrorApiImpl, HandleTypeInfo,
-    ManagedBufferApi, ManagedTypeApi, ManagedTypeApiImpl,
+    const_handles, use_raw_handle, BigIntApiImpl, ErrorApi, ErrorApiImpl, HandleTypeInfo,
+    ManagedBufferApiImpl, ManagedTypeApi, ManagedTypeApiImpl,
 };
 
 pub trait EndpointArgumentApi: HandleTypeInfo {
@@ -55,6 +55,7 @@ pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
     }
 
     fn get_argument_u64(&self, arg_index: i32) -> u64 {
+        // TODO: this implementation doesn't work for arguments > i64::MAX, fix it!
         let big_int_temp_1: Self::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
         self.load_argument_big_int_unsigned(arg_index, big_int_temp_1.clone());
         if let Some(value) = Self::managed_type_impl().bi_to_i64(big_int_temp_1) {
