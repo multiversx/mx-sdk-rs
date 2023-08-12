@@ -29,18 +29,11 @@ async fn test_template_download() {
 
     let target_dir = template_temp_path.join("new-adder");
 
-    // let args = TemplateArgs {
-    //     name: target_dir.clone(),
-    //     template: "adder".to_string(),
-    // };
-    let downloader = TemplateDownloader::new(&repo_source, "adder".to_string(), target_dir);
-    downloader.template_download();
-
-    // let _ = TemplateCreator::with_path(template_temp_path)
-    //     .download_contract_template(&args)
-    //     .await;
-
-    // cargo_test(build_dir);
+    let downloader = TemplateDownloader::new(&repo_source, "adder".to_string(), target_dir.clone());
+    downloader.copy_template(&downloader.template_source.metadata.files_include);
+    downloader.update_dependencies();
+    downloader.rename_template_to("new-adder".to_string());
+    cargo_test(target_dir);
 }
 
 pub fn cargo_test(contract_location: PathBuf) {

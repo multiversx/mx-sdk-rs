@@ -17,9 +17,9 @@ pub struct TemplateSource<'a> {
 }
 
 impl<'a> TemplateSource<'a> {
-    pub fn copy_template(&self, target_path: impl AsRef<Path>) {
+    pub fn copy_template(&self, target_path: impl AsRef<Path>, files_to_copy: &[String]) {
         self.repo_temp_dir
-            .copy_repo_dir(&self.source_path, target_path);
+            .copy_files(&self.source_path, target_path, files_to_copy);
     }
 }
 

@@ -1,12 +1,13 @@
 use std::{
     fs::{self, File},
-    io::Write,
+    io::{ErrorKind, Write},
     path::{Path, PathBuf},
 };
 
 const REPOSITORY: &str = "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip";
 const ZIP_NAME: &str = "./master.zip";
 const REPOSITORY_TEMP_DIR_NAME: &str = "mx-sdk-rs-master";
+const WASM_SUBDIR: &str = "wasm";
 
 pub enum RepoSource {
     Downloaded(RepoTempDownload),
@@ -31,9 +32,26 @@ impl RepoSource {
         }
     }
 
-    pub fn copy_repo_dir(&self, path_in_repo: impl AsRef<Path>, target_path: impl AsRef<Path>) {
+    pub fn copy_files(
+        &self,
+        path_in_repo: impl AsRef<Path>,
+        target_path: impl AsRef<Path>,
+        files_to_copy: &[String],
+    ) {
+        // copying recursive files in rust is not easy, reason why in order to copy only specific files the paths need to be created
+
+        fs::create_dir(target_path.as_ref()).unwrap();
+
+        // same as above for the wasm subdirectory
+
+        fs::create_dir(target_path.as_ref().join(WASM_SUBDIR)).unwrap();
+
         let from_path = self.repo_path().join(path_in_repo);
-        copy_dir::copy_dir(from_path, target_path).unwrap();
+        for file in files_to_copy {
+            let from = from_path.join(file);
+            let to = target_path.as_ref().join(file);
+            copy_dir::copy_dir(from, to).unwrap();
+        }
     }
 }
 
@@ -101,7 +119,12 @@ impl RepoTempDownload {
     }
 
     fn delete_temp_folder(&self) {
-        fs::remove_dir_all(self.repository_temp_dir_path()).unwrap();
+        fs::remove_dir_all(self.repository_temp_dir_path()).unwrap_or_else(|error| {
+            // don't throw error if the temp repo doesn't exist
+            if error.kind() != ErrorKind::NotFound {
+                panic!("{:?}", error);
+            }
+        });
     }
 }
 

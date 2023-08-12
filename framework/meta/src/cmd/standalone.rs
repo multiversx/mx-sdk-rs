@@ -2,7 +2,7 @@ mod all;
 mod info;
 mod local_deps;
 pub mod scen_test_gen;
-mod upgrade;
+pub(crate) mod upgrade;
 
 use crate::{
     cli_args::{StandaloneCliAction, StandaloneCliArgs},

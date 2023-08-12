@@ -1,3 +1,15 @@
 name = "empty"
+contract_trait = "EmptyContract"
+src_file = "empty.rs"
 
 rename_pairs = []
+
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "wasm/src",
+    "wasm/Cargo.toml",
+    "Cargo.toml",
+]
