@@ -1,0 +1,206 @@
+{
+    "name": "forward",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "fund-egld-and-esdt.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "forward-fail",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "function": "forward",
+                "arguments": [
+                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
+                    "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440",
+                    "0x443c75ceadb9ec42acff7e1b92e0305182279446c1d6c0502959484c147a0430d3f96f0b988e646f6736d5bf8e4a843d8ba7730d6fa7e60f0ef3edd225ce630f"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:cannot deposit funds without covering the fee cost first",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "deposit-fees-2",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "1,000",
+                "function": "deposit_fees",
+                "arguments": [
+                    "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "forward-ok",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "function": "forward",
+                "arguments": [
+                    "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
+                    "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440",
+                    "0x443c75ceadb9ec42acff7e1b92e0305182279446c1d6c0502959484c147a0430d3f96f0b988e646f6736d5bf8e4a843d8ba7730d6fa7e60f0ef3edd225ce630f"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "deposit-fees-4",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "1,000",
+                "function": "deposit_fees",
+                "arguments": [
+                    "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "forward-ok",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "function": "forward",
+                "arguments": [
+                    "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
+                    "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee",
+                    "0x1ac4f6d4d45836d97ffeda83a66aaea7631a3bb3d4063421ccb2b9de9485bdb4c9bd6e44e003f6a9c9eb74379467238204ff579471d203b1878c3f1530592a02"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:the_digital_cash_contract": {
+                    "nonce": "0",
+                    "balance": "4,040",
+                    "esdt": {
+                        "str:CASHTOKEN-123456": "50",
+                        "str:CASHTOKEN-112233": "50",
+                        "str:CASHTOKEN-445566": "50",
+                        "str:CASHTOKEN-778899": "50"
+                    },
+                    "storage": {
+                        "str:deposit|0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440": {
+                            "0-depositor_address": "address:acc2",
+                            "1-esdt_funds": "u32:0",
+                            "2-egld_funds": "biguint:1,000",
+                            "3-valability": "u64:60",
+                            "4-expiration_round": "u64:10",
+                            "5-fees": {
+                                "0-num_token_to_transfer": "u32:1",
+                                "1-value": "biguint:1,000"
+                            }
+                        },
+                        "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
+                            "0-depositor_address": "address:acc2",
+                            "1-esdt_funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
+                            "2-egld_funds": "biguint:0",
+                            "3-valability": "u64:100",
+                            "4-expiration_round": "u64:16",
+                            "5-fees": {
+                                "0-num_token_to_transfer": "u32:1",
+                                "1-value": "biguint:1,000"
+                            }
+                        },
+                        "str:deposit|0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee": {
+                            "0-depositor_address": "address:acc2",
+                            "1-esdt_funds": "u32:3|nested:str:CASHTOKEN-112233|u64:0|biguint:50|nested:str:CASHTOKEN-445566|u64:0|biguint:50|nested:str:CASHTOKEN-778899|u64:0|biguint:50",
+                            "2-egld_funds": "biguint:0",
+                            "3-valability": "u64:100",
+                            "4-expiration_round": "u64:16",
+                            "5-fees": {
+                                "0-num_token_to_transfer": "u32:3",
+                                "1-value": "biguint:1,000"
+                            }
+                        },
+                        "str:fee": "10",
+                        "str:collected_fees": "40"
+                    },
+                    "code": "file:../output/digital-cash.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "3",
+                    "balance": "998,990",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "7",
+                    "balance": "997,000",
+                    "esdt": {
+                        "str:CASHTOKEN-123456": "50"
+                    },
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "3",
+                    "balance": "999,970",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "50",
+                        "str:CASHTOKEN-445566": "50",
+                        "str:CASHTOKEN-778899": "50"
+                    },
+                    "storage": {}
+                },
+                "address:digital_cash_owner_address": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

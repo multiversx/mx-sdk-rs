@@ -10,18 +10,20 @@
 // Total number of exported functions:   5
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
+multiversx_sc_wasm_adapter::external_view_init! {}
+
 multiversx_sc_wasm_adapter::external_view_endpoints! {
     multi_contract_features
     (
-        external_pure
-        sample_value_external_get
-        sample_value_external_set
+        external_pure => external_pure
+        sample_value_external_get => sample_value_external_get
+        sample_value_external_set => sample_value_external_set
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

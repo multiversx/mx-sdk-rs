@@ -56,13 +56,13 @@ pub struct ActionFullInfo<M: ManagedTypeApi> {
 
 #[cfg(test)]
 mod test {
-    use multiversx_sc_scenario::DebugApi;
+    use multiversx_sc_scenario::api::StaticApi;
 
     use super::Action;
 
     #[test]
     fn test_is_pending() {
-        assert!(!Action::<DebugApi>::Nothing.is_pending());
-        assert!(Action::<DebugApi>::ChangeQuorum(5).is_pending());
+        assert!(!Action::<StaticApi>::Nothing.is_pending());
+        assert!(Action::<StaticApi>::ChangeQuorum(5).is_pending());
     }
 }

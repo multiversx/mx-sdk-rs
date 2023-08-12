@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sdk"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2021"
 
 authors = [
@@ -20,10 +20,10 @@ tokio = { version = "1.24", features = ["full"] }
 reqwest = { version = "0.11.4", features = ["blocking", "json"] }
 serde = { version = "1.0.130", features = ["derive"] }
 serde_json = { version = "1.0.68", features = ["preserve_order"] }
-serde_repr = "0.1.7"
+serde_repr = "0.1.8"
 anyhow = "1.0.44"
-rand = "0.6.0"
-bip39 = "1.0.1"
+rand = "0.8.5"
+bip39 = { version = "2.0.0", features = ["rand"] }
 sha2 = "0.9.8"
 sha3 = "0.9.1"
 hmac = { version = "0.11.0", features = ["std"] }
@@ -33,5 +33,5 @@ ed25519 = "1.2.0"
 pbkdf2 = { version = "0.9.0", default-features = false }
 zeroize = "1.4.2"
 bech32 = "0.9"
-itertools = "0.10.1"
+itertools = "0.10.3"
 pem = "1.0.1"

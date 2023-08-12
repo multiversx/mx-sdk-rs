@@ -1,6 +1,6 @@
 pub const PANIC_OCCURRED: &str = "panic occurred";
+pub const MEM_ALLOC_ERROR: &str = "memory allocation error";
 
-pub const NON_PAYABLE_FUNC_EGLD: &str = "function does not accept EGLD payment";
 pub const NON_PAYABLE_FUNC_ESDT: &str = "function does not accept ESDT payment";
 pub const BAD_TOKEN_PROVIDED: &str = "bad call value token provided";
 pub const BAD_TOKEN_TICKER_FORMAT: &[u8] = b"bad token ticker format";
@@ -39,13 +39,6 @@ pub const VALUE_EXCEEDS_SLICE: &[u8] = b"value exceeds target slice";
 pub const CAST_TO_I64_ERROR: &[u8] = b"cast to i64 error";
 pub const BIG_UINT_EXCEEDS_SLICE: &[u8] = b"big uint as_bytes exceed target slice";
 pub const BIG_UINT_SUB_NEGATIVE: &[u8] = b"cannot subtract because result would be negative";
-pub const DIVISION_BY_0: &str = "division by 0";
-pub const BAD_BOUNDS_LOWER: &str = "bad bounds (lower)";
-
-pub const EXPONENT_IS_POSITIVE: &str = "exponent must be negative";
-pub const NUMBER_IS_NOT_NORMAL: &[u8] =
-    b"number is not normal. It is either infinite, NaN or subnormal";
-pub const CANNOT_COMPARE_VALUES: &[u8] = b"values are not comparable";
 
 pub const DESERIALIZATION_INVALID_BYTE: &str = "call data deserialization error: not a valid byte";
 pub const DESERIALIZATION_NOT_32_BYTES: &str =
@@ -64,5 +57,9 @@ pub static ONLY_USER_ACCOUNT_CALLER: &[u8] = b"Endpoint can only be called by us
 pub const STORAGE_NOT_I64: &[u8] = b"storage not i64";
 pub const STORAGE_NOT_32_BYTES: &[u8] = b"32 bytes of data expected in storage at key";
 
-/// Mirrors the error message from the VM.
-pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcontract";
+/// An additional non-VM status, meant just to signal an error in the debugger infrastructure of in the tests.
+pub const DEBUG_API_ERR_STATUS: u64 = 100;
+pub const DEBUG_API_ERR_HANDLE_STALE: &str =
+    "VMHooksApi misuse: operation called with a handle that does not point to the top context of the call stack";
+pub const DEBUG_API_ERR_HANDLE_CONTEXT_MISMATCH: &str =
+    "VMHooksApi misuse: operation called with handles from 2 different contexts";

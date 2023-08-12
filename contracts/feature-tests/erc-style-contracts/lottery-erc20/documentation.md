@@ -2,7 +2,7 @@
 
 This is a lottery smart contract designed to be used with the erc20 token.
 
-The lottery smart contract is designed to allow anyone to create their very own lottery, directly on the blockchain. Having said that, the purpose of this contract is just to have a bit of fun and show what’s possible on the current version of the Elrond blockchain. We do not endorse gambling and this should never really be used with high sums of erc20 tokens.
+The lottery smart contract is designed to allow anyone to create their very own lottery, directly on the blockchain. Having said that, the purpose of this contract is just to have a bit of fun and show what’s possible on the current version of the MultiversX blockchain. We do not endorse gambling and this should never really be used with high sums of erc20 tokens.
 
 Now that that’s out of the way, there’s not much else to say in this section. It’s just a lottery! You buy tickets and hope to win. The difference between this and the traditional lottery is that you don’t pick some numbers, you just buy a ticket and at the end, one (or more) of the tickets are declared the “winning tickets”.  
 

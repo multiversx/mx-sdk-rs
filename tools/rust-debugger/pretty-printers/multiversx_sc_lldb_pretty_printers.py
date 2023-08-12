@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 import struct
 
-DEBUG_API_TYPE = "multiversx_chain_vm::tx_mock::tx_context_ref::TxContextRef"
+DEBUG_API_TYPE = "multiversx_sc_scenario::api::impl_vh::vm_hooks_api::VMHooksApi<multiversx_sc_scenario::api::impl_vh::debug_api::DebugApiBackend>"
 ANY_NUMBER = "[0-9]+"
 ANY_TYPE = ".*"
 SOME_OR_NONE = "(Some|None)"
@@ -15,7 +15,7 @@ SOME_OR_NONE = "(Some|None)"
 NUM_BIG_INT_TYPE = "num_bigint::bigint::BigInt"
 NUM_BIG_UINT_TYPE = "num_bigint::biguint::BigUint"
 
-# 2. Elrond wasm - Managed basic types
+# 2. SC wasm - Managed basic types
 MOD_PATH = "multiversx_sc::types::managed::basic"
 
 BIG_INT_TYPE = f"{MOD_PATH}::big_int::BigInt<{DEBUG_API_TYPE}>"
@@ -23,7 +23,7 @@ BIG_UINT_TYPE = f"{MOD_PATH}::big_uint::BigUint<{DEBUG_API_TYPE}>"
 BIG_FLOAT_TYPE = f"{MOD_PATH}::big_float::BigFloat<{DEBUG_API_TYPE}>"
 MANAGED_BUFFER_TYPE = f"{MOD_PATH}::managed_buffer::ManagedBuffer<{DEBUG_API_TYPE}>"
 
-# 3. Elrond wasm - Managed wrapped types
+# 3. SC wasm - Managed wrapped types
 MOD_PATH = "multiversx_sc::types::managed::wrapped"
 
 TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::token_identifier::TokenIdentifier<{DEBUG_API_TYPE}>"
@@ -42,15 +42,15 @@ EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE = f"{MOD_PATH}::egld_or_esdt_token_identifier
 MANAGED_VEC_INNER_TYPE_INDEX = 1
 MANAGED_VEC_TYPE = f"{MOD_PATH}::managed_vec::ManagedVec<{DEBUG_API_TYPE}, {ANY_TYPE}>"
 
-# 4. Elrond wasm - Managed multi value types
+# 4. SC wasm - Managed multi value types
 
-# 5. Elrond wasm - heap
+# 5. SC wasm - heap
 MOD_PATH = "multiversx_sc::types::heap"
 
 HEAP_ADDRESS_TYPE = f"{MOD_PATH}::h256_address::Address"
 BOXED_BYTES_TYPE = f"{MOD_PATH}::boxed_bytes::BoxedBytes"
 
-# 6. Elrond codec - Multi-types
+# 6. MultiversX codec - Multi-types
 MOD_PATH = "multiversx_sc_codec::multi_types"
 
 OPTIONAL_VALUE_TYPE = f"{MOD_PATH}::multi_value_optional::OptionalValue<{ANY_TYPE}>::{SOME_OR_NONE}"
@@ -460,12 +460,12 @@ ELROND_WASM_TYPE_HANDLERS = [
     # 1. num_bigint library
     (NUM_BIG_INT_TYPE, NumBigInt),
     (NUM_BIG_UINT_TYPE, NumBigUint),
-    # 2. Elrond wasm - Managed basic types
+    # 2. SC wasm - Managed basic types
     (BIG_INT_TYPE, BigInt),
     (BIG_UINT_TYPE, BigInt),
     (BIG_FLOAT_TYPE, BigFloat),
     (MANAGED_BUFFER_TYPE, ManagedBuffer),
-    # 3. Elrond wasm - Managed wrapped types
+    # 3. SC wasm - Managed wrapped types
     (TOKEN_IDENTIFIER_TYPE, TokenIdentifier),
     (MANAGED_ADDRESS_TYPE, ManagedAddress),
     (MANAGED_BYTE_ARRAY_TYPE, ManagedByteArray),
@@ -473,11 +473,11 @@ ELROND_WASM_TYPE_HANDLERS = [
     (ESDT_TOKEN_PAYMENT_TYPE, EsdtTokenPayment),
     (EGLD_OR_ESDT_TOKEN_IDENTIFIER_TYPE, EgldOrEsdtTokenIdentifier),
     (MANAGED_VEC_TYPE, ManagedVec),
-    # 4. Elrond wasm - Managed multi value types
-    # 5. Elrond wasm - heap
+    # 4. SC wasm - Managed multi value types
+    # 5. SC wasm - heap
     (HEAP_ADDRESS_TYPE, HeapAddress),
     (BOXED_BYTES_TYPE, BoxedBytes),
-    # 6. Elrond codec - Multi-types
+    # 6. MultiversX codec - Multi-types
     (OPTIONAL_VALUE_TYPE, OptionalValue),
 ]
 

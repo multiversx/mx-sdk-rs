@@ -7,10 +7,9 @@ use multiversx_sc::{
         ManagedBuffer, ManagedByteArray, ManagedOption, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
-use multiversx_chain_vm::{
-    api::DebugHandle,
+use multiversx_sc_scenario::{
+    api::{DebugHandle, DebugApi},
     num_bigint::{BigInt as RustBigInt, BigUint as RustBigUint},
-    DebugApi,
 };
 
 macro_rules! push {
@@ -152,7 +151,7 @@ fn main() {
     > = ManagedOption::some(managed_vec_of_addresses.clone());
     push!(to_check, managed_option_of_vec_of_addresses, "ManagedOption::some((1) { [0] = (32) 0x000000000000000000010000000000000000000000000000000000000002ffff })");
 
-    // 5. Elrond wasm - heap
+    // 5. SC wasm - heap
     let heap_address: Address = managed_address.to_address();
     push!(
         to_check,
@@ -174,7 +173,7 @@ fn main() {
         "(3) { [0] = (2) 0x6162, [1] = (4) 0x61626364, [2] = (12) 0x6162636465666768696a6b6c }"
     );
 
-    // 6. Elrond codec - Multi-types
+    // 6. MultiversX codec - Multi-types
     let optional_value_some: OptionalValue<BigUint<DebugApi>> =
         OptionalValue::Some(BigUint::from(42u64));
     push!(to_check, optional_value_some, "OptionalValue::Some(42)");

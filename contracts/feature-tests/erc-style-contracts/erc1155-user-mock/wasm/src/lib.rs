@@ -10,7 +10,7 @@
 // Total number of exported functions:   4
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -18,9 +18,10 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     erc1155_user_mock
     (
-        onERC1155Received
-        onERC1155BatchReceived
+        init => init
+        onERC1155Received => on_erc1155_received
+        onERC1155BatchReceived => on_erc1155_batch_received
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

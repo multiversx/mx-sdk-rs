@@ -12,16 +12,16 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn deploy_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/deploy.scen.json", world());
-}
-
-#[test]
-fn setup_fees_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/setup_fees_and_transfer.scen.json", world());
-}
-
-#[test]
 fn claim_rs() {
-    multiversx_sc_scenario::run_rs("scenarios/claim.scen.json", world());
+    world().run("scenarios/claim.scen.json");
+}
+
+#[test]
+fn deploy_rs() {
+    world().run("scenarios/deploy.scen.json");
+}
+
+#[test]
+fn setup_fees_and_transfer_rs() {
+    world().run("scenarios/setup_fees_and_transfer.scen.json");
 }

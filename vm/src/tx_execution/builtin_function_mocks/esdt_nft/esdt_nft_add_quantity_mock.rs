@@ -1,10 +1,12 @@
-use crate::num_bigint::BigUint;
-use multiversx_sc::{
-    api::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
-    codec::{top_encode_to_vec_u8, TopDecode},
+use num_bigint::BigUint;
+
+use crate::{
+    tx_execution::BlockchainVMRef,
+    types::{top_decode_u64, top_encode_u64},
 };
 
 use crate::{
+    tx_execution::builtin_function_names::ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     tx_mock::{BlockchainUpdate, TxCache, TxInput, TxLog, TxResult},
     world_mock::EsdtInstanceMetadata,
 };
@@ -18,14 +20,23 @@ impl BuiltinFunction for ESDTNftAddQuantity {
         ESDT_NFT_ADD_QUANTITY_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute<F>(
+        &self,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() != 3 {
             let err_result = TxResult::from_vm_error("ESDTNFTAddQuantity expects 3 arguments");
             return (err_result, BlockchainUpdate::empty());
         }
 
         let token_identifier = tx_input.args[0].clone();
-        let nonce = u64::top_decode(tx_input.args[1].as_slice()).unwrap();
+        let nonce = top_decode_u64(tx_input.args[1].as_slice());
         let value = BigUint::from_bytes_be(tx_input.args[2].as_slice());
 
         tx_cache.increase_esdt_balance(
@@ -41,7 +52,7 @@ impl BuiltinFunction for ESDTNftAddQuantity {
             endpoint: ESDT_NFT_ADD_QUANTITY_FUNC_NAME.into(),
             topics: vec![
                 token_identifier.to_vec(),
-                top_encode_to_vec_u8(&nonce).unwrap(),
+                top_encode_u64(nonce),
                 value.to_bytes_be(),
             ],
             data: vec![],

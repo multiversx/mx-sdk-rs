@@ -1,9 +1,15 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
 fn generate_kitty_genes_go() {
-    multiversx_sc_scenario::run_go("scenarios/generate-kitty-genes.scen.json");
+    world().run("scenarios/generate-kitty-genes.scen.json");
 }
 
 #[test]
 fn init_go() {
-    multiversx_sc_scenario::run_go("scenarios/init.scen.json");
+    world().run("scenarios/init.scen.json");
 }

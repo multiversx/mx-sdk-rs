@@ -10,7 +10,7 @@
 // Total number of exported functions:  20
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -18,24 +18,26 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     local_esdt_and_nft
     (
-        issueFungibleToken
-        localMint
-        localBurn
-        nftIssue
-        nftCreate
-        nftAddQuantity
-        nftBurn
-        transferNftViaAsyncCall
-        transfer_nft_and_execute
-        sftIssue
-        setLocalRoles
-        unsetLocalRoles
-        controlChanges
-        getFungibleEsdtBalance
-        getNftBalance
-        getCurrentNftNonce
-        lastIssuedToken
-        lastErrorMessage
-        callBack
+        init => init
+        issueFungibleToken => issue_fungible_token
+        localMint => local_mint
+        localBurn => local_burn
+        nftIssue => nft_issue
+        nftCreate => nft_create
+        nftAddQuantity => nft_add_quantity
+        nftBurn => nft_burn
+        transferNftViaAsyncCall => transfer_nft_via_async_call
+        transfer_nft_and_execute => transfer_nft_and_execute
+        sftIssue => sft_issue
+        setLocalRoles => set_local_roles
+        unsetLocalRoles => unset_local_roles
+        controlChanges => control_changes
+        getFungibleEsdtBalance => get_fungible_esdt_balance
+        getNftBalance => get_nft_balance
+        getCurrentNftNonce => get_current_nft_nonce
+        lastIssuedToken => last_issued_token
+        lastErrorMessage => last_error_message
     )
 }
+
+multiversx_sc_wasm_adapter::async_callback! { local_esdt_and_nft }

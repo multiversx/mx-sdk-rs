@@ -5,35 +5,23 @@ use crate::api::{
     VmApiImpl,
 };
 use multiversx_sc::{
-    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApi, ManagedTypeApi},
-    types::{
-        heap::{Address, Box, H256},
-        BigUint, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
-        ManagedVec, TokenIdentifier,
-    },
+    api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, RawHandle},
+    types::heap::{Address, Box, H256},
 };
 
-#[allow(unused)]
 extern "C" {
     // address utils
     fn getSCAddress(resultOffset: *mut u8);
-    #[cfg(not(feature = "ei-unmanaged-node"))]
-    fn managedSCAddress(resultHandle: i32);
 
-    fn getOwnerAddress(resultOffset: *mut u8);
-    #[cfg(not(feature = "ei-unmanaged-node"))]
+    fn managedSCAddress(resultHandle: i32);
     fn managedOwnerAddress(resultHandle: i32);
 
     fn getCaller(resultOffset: *mut u8);
-    #[cfg(not(feature = "ei-unmanaged-node"))]
+
     fn managedCaller(resultHandle: i32);
 
     fn getShardOfAddress(address_ptr: *const u8) -> i32;
     fn isSmartContract(address_ptr: *const u8) -> i32;
-
-    /// Currently not used.
-    #[allow(dead_code)]
-    fn blockHash(nonce: i64, resultOffset: *mut u8) -> i32;
 
     /// Currently not used.
     #[allow(dead_code)]
@@ -44,10 +32,6 @@ extern "C" {
     fn getBlockNonce() -> i64;
     fn getBlockRound() -> i64;
     fn getBlockEpoch() -> i64;
-    fn getBlockRandomSeed(resultOffset: *mut u8);
-    /// Currently not used.
-    #[allow(dead_code)]
-    fn getStateRootHash(resultOffset: *mut u8);
     fn getPrevBlockTimestamp() -> i64;
     fn getPrevBlockNonce() -> i64;
     fn getPrevBlockRound() -> i64;
@@ -56,17 +40,12 @@ extern "C" {
     fn getOriginalTxHash(resultOffset: *const u8);
 
     // Managed versions of the above
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetPrevBlockRandomSeed(resultHandle: i32);
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetBlockRandomSeed(resultHandle: i32);
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetStateRootHash(resultHandle: i32);
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn managedGetOriginalTxHash(resultHandle: i32);
 
     // big int API
-    fn bigIntSetInt64(destination: i32, value: i64);
     fn bigIntGetExternalBalance(address_ptr: *const u8, dest: i32);
     fn bigIntGetESDTExternalBalance(
         address_ptr: *const u8,
@@ -82,40 +61,6 @@ extern "C" {
         tokenIDOffset: *const u8,
         tokenIDLen: i32,
     ) -> i64;
-    fn getESDTTokenData(
-        address_ptr: *const u8,
-        tokenIDOffset: *const u8,
-        tokenIDLen: i32,
-        nonce: i64,
-        valueOffset: i32,
-        propertiesOffset: *const u8,
-        hashOffset: *const u8,
-        nameOffset: *const u8,
-        attributesOffset: *const u8,
-        creatorOffset: *const u8,
-        royaltiesOffset: i32,
-        urisOffset: *const u8,
-    ) -> i32;
-
-    // helper functions for getESDTTokenData
-    fn getESDTNFTNameLength(
-        address_ptr: *const u8,
-        tokenIDOffset: *const u8,
-        tokenIDLen: i32,
-        nonce: i64,
-    ) -> i32;
-    fn getESDTNFTAttributeLength(
-        address_ptr: *const u8,
-        tokenIDOffset: *const u8,
-        tokenIDLen: i32,
-        nonce: i64,
-    ) -> i32;
-    fn getESDTNFTURILength(
-        address_ptr: *const u8,
-        tokenIDOffset: *const u8,
-        tokenIDLen: i32,
-        nonce: i64,
-    ) -> i32;
 
     fn managedGetESDTTokenData(
         addressHandle: i32,
@@ -138,10 +83,6 @@ extern "C" {
     fn getESDTLocalRoles(tokenhandle: i32) -> i64;
 }
 
-fn esdt_is_frozen(properties_bytes: &[u8; 2]) -> bool {
-    properties_bytes[0] > 0 // token is frozen if the first byte is 1
-}
-
 impl BlockchainApi for VmApiImpl {
     type BlockchainApiImpl = VmApiImpl;
 
@@ -162,7 +103,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_caller_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedCaller(dest);
@@ -179,7 +119,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_sc_address_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedSCAddress(dest);
@@ -187,16 +126,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_owner_address_legacy(&self) -> Address {
-        unsafe {
-            let mut res = Address::zero();
-            getOwnerAddress(res.as_mut_ptr());
-            res
-        }
-    }
-
-    #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_owner_address_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedOwnerAddress(dest);
@@ -238,16 +167,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_state_root_hash_legacy(&self) -> H256 {
-        unsafe {
-            let mut res = H256::zero();
-            getOriginalTxHash(res.as_mut_ptr());
-            res
-        }
-    }
-
-    #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_state_root_hash_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedGetStateRootHash(dest);
@@ -264,7 +183,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_tx_hash_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedGetOriginalTxHash(dest);
@@ -297,16 +215,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_block_random_seed_legacy(&self) -> Box<[u8; 48]> {
-        unsafe {
-            let mut res = [0u8; 48];
-            getBlockRandomSeed(res.as_mut_ptr());
-            Box::new(res)
-        }
-    }
-
-    #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedGetBlockRandomSeed(dest);
@@ -343,7 +251,6 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    #[cfg(not(feature = "ei-unmanaged-node"))]
     fn load_prev_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
         unsafe {
             managedGetPrevBlockRandomSeed(dest);
@@ -385,123 +292,24 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
-    fn load_esdt_token_data_unmanaged<M: ManagedTypeApi>(
+    fn managed_get_esdt_token_data(
         &self,
-        m_address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
+        address_handle: RawHandle,
+        token_id_handle: RawHandle,
         nonce: u64,
-    ) -> EsdtTokenData<M> {
-        use multiversx_sc::{api::BigIntApi, types::heap::BoxedBytes};
-
-        let address = m_address.to_address();
-        let token_bytes = token.to_boxed_bytes();
-        unsafe {
-            let value_handle = self.bi_new_zero();
-            let mut properties_bytes = [0u8; 2]; // always 2 bytes
-            let mut hash = BoxedBytes::allocate(128);
-
-            let name_len = getESDTNFTNameLength(
-                address.as_ref().as_ptr(),
-                token_bytes.as_ptr(),
-                token_bytes.len() as i32,
-                nonce as i64,
-            ) as usize;
-            let mut name_bytes = BoxedBytes::allocate(name_len);
-
-            let attr_len = getESDTNFTAttributeLength(
-                address.as_ref().as_ptr(),
-                token_bytes.as_ptr(),
-                token_bytes.len() as i32,
-                nonce as i64,
-            ) as usize;
-            let mut attr_bytes = BoxedBytes::allocate(attr_len);
-
-            // Current implementation of the underlying API only provides one URI
-            // In the future, this might be extended to multiple URIs per token,
-            // Hence the EsdtTokenData receives a Vec<BoxedBytes>
-            let uris_len = getESDTNFTURILength(
-                address.as_ref().as_ptr(),
-                token_bytes.as_ptr(),
-                token_bytes.len() as i32,
-                nonce as i64,
-            ) as usize;
-            let mut uri_bytes = BoxedBytes::allocate(uris_len);
-
-            let mut creator = Address::zero();
-            let royalties_handle = self.bi_new_zero();
-
-            getESDTTokenData(
-                address.as_ref().as_ptr(),
-                token_bytes.as_ptr(),
-                token_bytes.len() as i32,
-                nonce as i64,
-                value_handle,
-                properties_bytes.as_mut_ptr(),
-                hash.as_mut_ptr(),
-                name_bytes.as_mut_ptr(),
-                attr_bytes.as_mut_ptr(),
-                creator.as_mut_ptr(),
-                royalties_handle,
-                uri_bytes.as_mut_ptr(),
-            );
-
-            // Fungible always have a nonce of 0, so we check nonce to figure out the type
-            let nonce = getCurrentESDTNFTNonce(
-                address.as_ref().as_ptr(),
-                token_bytes.as_ptr(),
-                token_bytes.len() as i32,
-            );
-            let token_type = if nonce == 0 {
-                EsdtTokenType::Fungible
-            } else {
-                EsdtTokenType::NonFungible
-            };
-
-            let frozen = esdt_is_frozen(&properties_bytes);
-
-            let mut uris_vec = ManagedVec::new();
-            uris_vec.push(ManagedBuffer::new_from_bytes(uri_bytes.as_slice()));
-
-            EsdtTokenData {
-                token_type,
-                amount: BigUint::from_raw_handle(value_handle),
-                frozen,
-                hash: ManagedBuffer::new_from_bytes(hash.as_slice()),
-                name: ManagedBuffer::new_from_bytes(name_bytes.as_slice()),
-                attributes: ManagedBuffer::new_from_bytes(attr_bytes.as_slice()),
-                creator: ManagedAddress::from_address(&creator),
-                royalties: BigUint::from_raw_handle(royalties_handle),
-                uris: uris_vec,
-            }
-        }
-    }
-
-    fn load_esdt_token_data<M: ManagedTypeApi>(
-        &self,
-        address: &ManagedAddress<M>,
-        token: &TokenIdentifier<M>,
-        nonce: u64,
-    ) -> EsdtTokenData<M> {
-        use multiversx_sc::api::BigIntApi;
-
-        let managed_token_id = token.as_managed_buffer();
-
-        // initializing outputs
-        // the current version of VM does not set/overwrite them if the token is missing,
-        // which is why we need to initialize them explicitly
-        let value_handle = self.bi_new_zero();
-        let properties_handle = self.mb_new_empty(); // TODO: replace with const_handles::MBUF_TEMPORARY_1 after VM fix
-        let hash_handle = self.mb_new_empty();
-        let name_handle = self.mb_new_empty();
-        let attributes_handle = self.mb_new_empty();
-        let creator_handle = self.mb_new_empty();
-        let royalties_handle = self.bi_new_zero();
-        let uris_handle = self.mb_new_empty();
-
+        value_handle: RawHandle,
+        properties_handle: RawHandle,
+        hash_handle: RawHandle,
+        name_handle: RawHandle,
+        attributes_handle: RawHandle,
+        creator_handle: RawHandle,
+        royalties_handle: RawHandle,
+        uris_handle: RawHandle,
+    ) {
         unsafe {
             managedGetESDTTokenData(
-                address.get_raw_handle(),
-                managed_token_id.get_raw_handle(),
+                address_handle,
+                token_id_handle,
                 nonce as i64,
                 value_handle,
                 properties_handle,
@@ -512,33 +320,6 @@ impl BlockchainApiImpl for VmApiImpl {
                 royalties_handle,
                 uris_handle,
             );
-        }
-
-        let token_type = if nonce == 0 {
-            EsdtTokenType::Fungible
-        } else {
-            EsdtTokenType::NonFungible
-        };
-
-        if self.mb_len(creator_handle) == 0 {
-            self.mb_overwrite(creator_handle, &[0u8; 32][..]);
-        }
-
-        // here we trust Arwen that it always gives us a properties buffer of length 2
-        let mut properties_bytes = [0u8; 2];
-        let _ = self.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
-        let frozen = esdt_is_frozen(&properties_bytes);
-
-        EsdtTokenData {
-            token_type,
-            amount: BigUint::from_raw_handle(value_handle),
-            frozen,
-            hash: ManagedBuffer::from_raw_handle(hash_handle),
-            name: ManagedBuffer::from_raw_handle(name_handle),
-            attributes: ManagedBuffer::from_raw_handle(attributes_handle),
-            creator: ManagedAddress::from_raw_handle(creator_handle),
-            royalties: BigUint::from_raw_handle(royalties_handle),
-            uris: ManagedVec::from_raw_handle(uris_handle),
         }
     }
 

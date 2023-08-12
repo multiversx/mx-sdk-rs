@@ -1,6 +1,11 @@
-use multiversx_sc::{api::CHANGE_OWNER_BUILTIN_FUNC_NAME, codec::TopDecode, types::heap::Address};
+use crate::tx_execution::{
+    builtin_function_names::CHANGE_OWNER_BUILTIN_FUNC_NAME, BlockchainVMRef,
+};
 
-use crate::tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult};
+use crate::{
+    tx_mock::{BlockchainUpdate, TxCache, TxInput, TxResult},
+    types::VMAddress,
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -11,7 +16,16 @@ impl BuiltinFunction for ChangeOwner {
         CHANGE_OWNER_BUILTIN_FUNC_NAME
     }
 
-    fn execute(&self, tx_input: TxInput, tx_cache: TxCache) -> (TxResult, BlockchainUpdate) {
+    fn execute<F>(
+        &self,
+        tx_input: TxInput,
+        tx_cache: TxCache,
+        _vm: &BlockchainVMRef,
+        _f: F,
+    ) -> (TxResult, BlockchainUpdate)
+    where
+        F: FnOnce(),
+    {
         if tx_input.args.len() != 1 {
             return (
                 TxResult::from_vm_error("ChangeOwnerAddress expects 1 argument"),
@@ -19,7 +33,7 @@ impl BuiltinFunction for ChangeOwner {
             );
         }
 
-        let new_owner_address = Address::top_decode(tx_input.args[0].as_slice()).unwrap();
+        let new_owner_address = VMAddress::from_slice(&tx_input.args[0]);
         tx_cache.with_account_mut(&tx_input.to, |account| {
             account.contract_owner = Some(new_owner_address);
         });

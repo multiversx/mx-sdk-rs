@@ -1,0 +1,80 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60": {
+                    "nonce": "481",
+                    "balance": "106274669842530000003",
+                    "esdt": {
+                        "str:CAN-14dc0a": "1000",
+                        "str:CAN-2abf4b": "1000",
+                        "str:CAN-6d39e6": "1000",
+                        "str:CAN-ac1592": "1000"
+                    },
+                    "username": ""
+                }
+            }
+        },
+        {
+            "step": "setState",
+            "newAddresses": [
+                {
+                    "creatorAddress": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
+                    "creatorNonce": "481",
+                    "newAddress": "0x0000000000000000050028600ceb73ac22ec0b6f257aff7bed74dffa3ebfed60"
+                }
+            ]
+        },
+        {
+            "step": "scDeploy",
+            "id": "",
+            "tx": {
+                "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
+                "contractCode": "file:../output/adder.wasm",
+                "arguments": [
+                    "0x00"
+                ],
+                "gasLimit": "70,000,000",
+                "gasPrice": ""
+            },
+            "expect": {
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
+                "to": "0x0000000000000000050028600ceb73ac22ec0b6f257aff7bed74dffa3ebfed60",
+                "function": "add",
+                "arguments": [
+                    "0x07"
+                ],
+                "gasLimit": "70,000,000",
+                "gasPrice": ""
+            },
+            "expect": {
+                "status": "0"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
+                "to": "0x0000000000000000050028600ceb73ac22ec0b6f257aff7bed74dffa3ebfed60",
+                "function": "add",
+                "arguments": [
+                    "0x05"
+                ],
+                "gasLimit": "70,000,000",
+                "gasPrice": ""
+            },
+            "expect": {
+                "status": "0"
+            }
+        }
+    ]
+}

@@ -1,0 +1,7 @@
+[settings]
+main = "rust-testing-framework-tester"
+
+# the only purpose of this config is to specify the allocator
+[contracts.rust-testing-framework-tester]
+add-unlabelled = true
+allocator = "static64k"

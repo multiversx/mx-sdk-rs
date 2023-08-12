@@ -1,7 +1,4 @@
-use crate::{
-    api::{CallValueApi, CallValueApiImpl},
-    types::EsdtTokenType,
-};
+use crate::api::{CallValueApi, CallValueApiImpl};
 
 use super::UncallableApi;
 
@@ -22,39 +19,11 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_single_esdt_value(&self, _dest: Self::BigIntHandle) {
-        unreachable!()
-    }
-
-    fn token(&self) -> Option<Self::ManagedBufferHandle> {
-        unreachable!()
-    }
-
-    fn esdt_token_nonce(&self) -> u64 {
-        unreachable!()
-    }
-
-    fn esdt_token_type(&self) -> EsdtTokenType {
+    fn load_all_esdt_transfers(&self, _dest_handle: Self::ManagedBufferHandle) {
         unreachable!()
     }
 
     fn esdt_num_transfers(&self) -> usize {
-        unreachable!()
-    }
-
-    fn esdt_value_by_index(&self, _index: usize) -> Self::BigIntHandle {
-        unreachable!()
-    }
-
-    fn token_by_index(&self, _index: usize) -> Self::ManagedBufferHandle {
-        unreachable!()
-    }
-
-    fn esdt_token_nonce_by_index(&self, _index: usize) -> u64 {
-        unreachable!()
-    }
-
-    fn esdt_token_type_by_index(&self, _index: usize) -> EsdtTokenType {
         unreachable!()
     }
 }

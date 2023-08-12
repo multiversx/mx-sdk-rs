@@ -1,54 +1,60 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
-fn balanceof_go() {
-    multiversx_sc_scenario::run_go("scenarios/balanceOf.scen.json");
+fn balance_of_go() {
+    world().run("scenarios/balanceOf.scen.json");
 }
 
 #[test]
 fn create_go() {
-    multiversx_sc_scenario::run_go("scenarios/create.scen.json");
+    world().run("scenarios/create.scen.json");
 }
 
 #[test]
 fn exceptions_go() {
-    multiversx_sc_scenario::run_go("scenarios/exceptions.scen.json");
+    world().run("scenarios/exceptions.scen.json");
 }
 
 #[test]
-fn joingame_go() {
-    multiversx_sc_scenario::run_go("scenarios/joinGame.scen.json");
+fn join_game_go() {
+    world().run("scenarios/joinGame.scen.json");
 }
 
 #[test]
-fn rewardandsendtowallet_go() {
-    multiversx_sc_scenario::run_go("scenarios/rewardAndSendToWallet.scen.json");
+fn reward_and_send_to_wallet_go() {
+    world().run("scenarios/rewardAndSendToWallet.scen.json");
 }
 
 #[test]
-fn rewardwinner_go() {
-    multiversx_sc_scenario::run_go("scenarios/rewardWinner.scen.json");
+fn reward_winner_go() {
+    world().run("scenarios/rewardWinner.scen.json");
 }
 
 #[test]
-fn rewardwinner_last_go() {
-    multiversx_sc_scenario::run_go("scenarios/rewardWinner_Last.scen.json");
+fn reward_winner_last_go() {
+    world().run("scenarios/rewardWinner_Last.scen.json");
 }
 
 #[test]
-fn topup_ok_go() {
-    multiversx_sc_scenario::run_go("scenarios/topUp_ok.scen.json");
+fn top_up_ok_go() {
+    world().run("scenarios/topUp_ok.scen.json");
 }
 
 #[test]
-fn topup_withdraw_go() {
-    multiversx_sc_scenario::run_go("scenarios/topUp_withdraw.scen.json");
+fn top_up_withdraw_go() {
+    world().run("scenarios/topUp_withdraw.scen.json");
 }
 
 #[test]
 fn withdraw_ok_go() {
-    multiversx_sc_scenario::run_go("scenarios/withdraw_Ok.scen.json");
+    world().run("scenarios/withdraw_Ok.scen.json");
 }
 
 #[test]
-fn withdraw_toomuch_go() {
-    multiversx_sc_scenario::run_go("scenarios/withdraw_TooMuch.scen.json");
+fn withdraw_too_much_go() {
+    world().run("scenarios/withdraw_TooMuch.scen.json");
 }

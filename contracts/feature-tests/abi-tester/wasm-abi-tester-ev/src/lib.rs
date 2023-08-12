@@ -10,18 +10,20 @@
 // Total number of exported functions:   5
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
+multiversx_sc_wasm_adapter::external_view_init! {}
+
 multiversx_sc_wasm_adapter::external_view_endpoints! {
     abi_tester
     (
-        external_view
-        payable_any_token
-        label_a
+        external_view => external_view
+        payable_any_token => payable_any_token
+        label_a => label_a
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

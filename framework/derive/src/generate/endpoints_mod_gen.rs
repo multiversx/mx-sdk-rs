@@ -82,12 +82,12 @@ fn generate_wasm_endpoints(contract_trait: &ContractTrait) -> Vec<proc_macro2::T
 
 fn generate_wasm_endpoint(
     m: &Method,
-    endpoint_ident: &proc_macro2::TokenStream,
+    _endpoint_ident: &proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
     quote! {
-        pub fn #endpoint_ident<A>()
+        pub fn #fn_ident<A>()
         where
             A: multiversx_sc::api::VMApi,
         {

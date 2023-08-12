@@ -10,7 +10,7 @@
 // Total number of exported functions:   6
 
 #![no_std]
-#![feature(alloc_error_handler, lang_items)]
+#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -18,11 +18,12 @@ multiversx_sc_wasm_adapter::panic_handler!();
 multiversx_sc_wasm_adapter::endpoints! {
     parent
     (
-        deposit
-        deployChildContract
-        executeOnDestIssueToken
-        getChildContractAddress
+        init => init
+        deposit => deposit
+        deployChildContract => deploy_child_contract
+        executeOnDestIssueToken => execute_on_dest_issue_token
+        getChildContractAddress => child_contract_address
     )
 }
 
-multiversx_sc_wasm_adapter::empty_callback! {}
+multiversx_sc_wasm_adapter::async_callback_empty! {}

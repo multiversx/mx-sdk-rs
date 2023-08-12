@@ -1,0 +1,6 @@
+gateway = 'https://testnet-gateway.multiversx.com'
+call_type = "LegacyAsync" # Sync / LegacyAsync / TransferExecute
+# token_id = "CMPT-4e9332"
+token_id = "EGLD"
+token_nonce = 0 # is 0 if fungible
+amount = '50000000000000000'

@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-price-aggregator-sc"
-version = "0.39.7"
+version = "0.42.0"
 authors = [
     "Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>",
     "MultiversX <contact@multiversx.com>",
@@ -10,7 +10,7 @@ readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
-description = "Elrond Price aggregator Smart Contract"
+description = "MultiversX Price aggregator Smart Contract"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 edition = "2021"
@@ -19,15 +19,15 @@ edition = "2021"
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.39.7"
+version = "0.42.0"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.39.7"
+version = "0.42.0"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.39.7"
+version = "0.42.0"
 path = "../../../framework/scenario"
 
 [dependencies]

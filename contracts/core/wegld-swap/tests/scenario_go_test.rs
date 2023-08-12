@@ -1,9 +1,15 @@
+use multiversx_sc_scenario::*;
+
+fn world() -> ScenarioWorld {
+    ScenarioWorld::vm_go()
+}
+
 #[test]
 fn unwrap_egld_go() {
-    multiversx_sc_scenario::run_go("scenarios/unwrap_egld.scen.json");
+    world().run("scenarios/unwrap_egld.scen.json");
 }
 
 #[test]
 fn wrap_egld_go() {
-    multiversx_sc_scenario::run_go("scenarios/wrap_egld.scen.json");
+    world().run("scenarios/wrap_egld.scen.json");
 }
