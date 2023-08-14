@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::folder_structure::RelevantDirectories;
+use crate::folder_structure::{whitelisted_deep_copy, RelevantDirectories};
 
 use super::{repo_temp_download::RepoSource, template_metadata::TemplateMetadata};
 
@@ -17,9 +17,8 @@ pub struct TemplateSource<'a> {
 }
 
 impl<'a> TemplateSource<'a> {
-    pub fn copy_template(&self, target_path: impl AsRef<Path>, files_to_copy: &[String]) {
-        self.repo_temp_dir
-            .copy_files(&self.source_path, target_path, files_to_copy);
+    pub fn copy_template(&self, target_path: impl AsRef<Path>, whitelist: &[String]) {
+        whitelisted_deep_copy(&self.source_path, target_path.as_ref(), whitelist);
     }
 }
 

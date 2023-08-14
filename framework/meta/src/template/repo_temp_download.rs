@@ -7,7 +7,6 @@ use std::{
 const REPOSITORY: &str = "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip";
 const ZIP_NAME: &str = "./master.zip";
 const REPOSITORY_TEMP_DIR_NAME: &str = "mx-sdk-rs-master";
-const WASM_SUBDIR: &str = "wasm";
 
 pub enum RepoSource {
     Downloaded(RepoTempDownload),
@@ -29,28 +28,6 @@ impl RepoSource {
                 repo_temp_download.repository_temp_dir_path()
             },
             RepoSource::LocalPath(local_path) => local_path.clone(),
-        }
-    }
-
-    pub fn copy_files(
-        &self,
-        path_in_repo: impl AsRef<Path>,
-        target_path: impl AsRef<Path>,
-        files_to_copy: &[String],
-    ) {
-        // copying recursive files in rust is not easy, reason why in order to copy only specific files the paths need to be created
-
-        fs::create_dir(target_path.as_ref()).unwrap();
-
-        // same as above for the wasm subdirectory
-
-        fs::create_dir(target_path.as_ref().join(WASM_SUBDIR)).unwrap();
-
-        let from_path = self.repo_path().join(path_in_repo);
-        for file in files_to_copy {
-            let from = from_path.join(file);
-            let to = target_path.as_ref().join(file);
-            copy_dir::copy_dir(from, to).unwrap();
         }
     }
 }

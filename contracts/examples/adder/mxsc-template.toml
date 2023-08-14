@@ -12,7 +12,6 @@ files_include = [
     "scenarios",
     "src",
     "tests",
-    "wasm/src",
     "wasm/Cargo.toml",
     "Cargo.toml",
     "README.md",

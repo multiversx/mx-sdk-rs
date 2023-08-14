@@ -13,22 +13,35 @@ fn test_template_list() {
     let repo_source = RepoSource::from_local_path(workspace_path);
     let mut template_names = template_names_from_repo(&repo_source);
     template_names.sort();
-    assert_eq!(template_names, ["adder".to_string(), "empty".to_string()]);
+    assert_eq!(
+        template_names,
+        [
+            "adder".to_string(),
+            "crypto-zombies".to_string(),
+            "empty".to_string()
+        ]
+    );
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test"), ignore)]
-async fn template_test_adder() {
-    template_test("adder", "new-adder").await;
+fn template_test_adder() {
+    template_test("adder", "new-adder");
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test"), ignore)]
-async fn template_test_empty() {
-    template_test("empty", "new-empty").await;
+fn template_test_crypto_zombies() {
+    template_test("crypto-zombies", "new-crypto-zombies");
 }
 
-async fn template_test(template_name: &str, new_name: &str) {
+#[test]
+#[cfg_attr(not(feature = "template-test"), ignore)]
+fn template_test_empty() {
+    template_test("empty", "new-empty");
+}
+
+fn template_test(template_name: &str, new_name: &str) {
     let workspace_path = find_workspace();
     let repo_source = RepoSource::from_local_path(workspace_path);
 
