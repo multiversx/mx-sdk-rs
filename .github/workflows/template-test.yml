@@ -19,8 +19,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           default: true
-          toolchain: nightly-2022-12-08
+          toolchain: nightly-2023-08-08
       - name: Run template tool test
         run: |
           cd framework/meta
-          cargo test test_template_download --features template-test
+          cargo test --features template-test
