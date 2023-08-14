@@ -220,11 +220,14 @@ impl TemplateAdjuster {
         dependency
     }
 }
+
 pub fn remove_paths_from_dependencies(deps_map: &mut Table, ignore_deps: &[&str]) {
     for (key, value) in deps_map {
         if ignore_deps.contains(&key.as_str()) {
             continue;
         }
-        value.as_table_mut().unwrap().remove("path");
+        if let Some(dep) = value.as_table_mut() {
+            dep.remove("path");
+        }
     }
 }

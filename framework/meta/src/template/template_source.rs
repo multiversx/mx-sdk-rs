@@ -8,7 +8,7 @@ use crate::folder_structure::RelevantDirectories;
 use super::{repo_temp_download::RepoSource, template_metadata::TemplateMetadata};
 
 const TEMPLATES_PATH_IN_REPO: &str = "contracts/examples";
-const TEMPLATE_TOML_FILE_NAME: &str = "template.toml";
+const TEMPLATE_TOML_FILE_NAME: &str = "mxsc-template.toml";
 
 pub struct TemplateSource<'a> {
     pub repo_temp_dir: &'a RepoSource,
