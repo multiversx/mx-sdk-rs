@@ -52,7 +52,8 @@ fn template_test(template_name: &str, new_name: &str) {
     downloader.copy_template(&downloader.template_source.metadata.files_include);
     downloader.update_dependencies();
     downloader.rename_template_to(new_name.to_string());
-    cargo_test(target_dir);
+    build_contract(&target_dir);
+    cargo_test(&target_dir);
 }
 
 fn prepare_target_dir(new_name: &str) -> PathBuf {
@@ -67,7 +68,7 @@ fn prepare_target_dir(new_name: &str) -> PathBuf {
     target_dir
 }
 
-pub fn cargo_test(contract_location: PathBuf) {
+pub fn cargo_test(contract_location: &Path) {
     let workspace_target_dir = find_workspace().join("target");
 
     let exit_status = Command::new("cargo")
@@ -75,6 +76,8 @@ pub fn cargo_test(contract_location: PathBuf) {
             "test",
             "--target-dir",
             workspace_target_dir.to_str().unwrap(),
+            "--features",
+            "multiversx-sc-scenario/run-go-tests"
         ])
         .current_dir(contract_location)
         .spawn()
@@ -83,6 +86,25 @@ pub fn cargo_test(contract_location: PathBuf) {
         .expect("contract test process was not running");
 
     assert!(exit_status.success(), "contract test process failed");
+}
+
+pub fn build_contract(contract_location: &Path) {
+    let workspace_target_dir = find_workspace().join("target");
+
+    let exit_status = Command::new("cargo")
+        .args([
+            "run",
+            "build",
+            "--target-dir",
+            workspace_target_dir.to_str().unwrap(),
+        ])
+        .current_dir(contract_location.join("meta"))
+        .spawn()
+        .expect("failed to spawn contract clean process")
+        .wait()
+        .expect("contract test process was not running");
+
+    assert!(exit_status.success(), "contract build process failed");
 }
 
 /// Finds the workspace by taking the `current_exe` and working its way up.
