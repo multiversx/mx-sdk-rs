@@ -20,7 +20,6 @@ all-features = true
 num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = ["multiversx-sc-codec/alloc"]
 promises = []
-big-float = []
 managed-map = []
 esdt-token-payment-legacy-decode = []
 
