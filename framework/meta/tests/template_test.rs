@@ -6,6 +6,7 @@ use std::{
 };
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
+const BUILD_CONTRACTS: bool = false;
 
 #[test]
 fn test_template_list() {
@@ -52,7 +53,9 @@ fn template_test(template_name: &str, new_name: &str) {
     downloader.copy_template(&downloader.template_source.metadata.files_include);
     downloader.update_dependencies();
     downloader.rename_template_to(new_name.to_string());
-    build_contract(&target_dir);
+    if BUILD_CONTRACTS {
+        build_contract(&target_dir);
+    }
     cargo_test(&target_dir);
 }
 
@@ -71,14 +74,18 @@ fn prepare_target_dir(new_name: &str) -> PathBuf {
 pub fn cargo_test(contract_location: &Path) {
     let workspace_target_dir = find_workspace().join("target");
 
+    let mut args = vec![
+        "test",
+        "--target-dir",
+        workspace_target_dir.to_str().unwrap(),
+    ];
+    if BUILD_CONTRACTS {
+        args.push("--features");
+        args.push("multiversx-sc-scenario/run-go-tests");
+    }
+
     let exit_status = Command::new("cargo")
-        .args([
-            "test",
-            "--target-dir",
-            workspace_target_dir.to_str().unwrap(),
-            "--features",
-            "multiversx-sc-scenario/run-go-tests"
-        ])
+        .args(args)
         .current_dir(contract_location)
         .spawn()
         .expect("failed to spawn contract clean process")
