@@ -72,7 +72,7 @@ impl TemplateAdjuster {
         self.rename_in_cargo_toml_meta(&new_name);
         self.rename_in_cargo_toml_wasm(&new_name);
         self.rename_in_tests(&new_name);
-        self.rename_files(&new_name);
+        self.rename_solution_files(&new_name);
     }
 
     fn rename_trait_to(&self, new_template_name: &str) {
@@ -179,7 +179,7 @@ impl TemplateAdjuster {
         replace_in_files(&self.target_path.join(TEST_DIRECTORY), "*.rs", &queries);
     }
 
-    fn rename_files(&self, new_template_name: &str) {
+    fn rename_solution_files(&self, new_template_name: &str) {
         let new_name = new_template_name.to_case(Case::Snake);
         let new_src_name = Self::get_rs_file(&new_name);
 
