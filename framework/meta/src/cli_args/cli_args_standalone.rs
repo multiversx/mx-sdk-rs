@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use clap::{ArgAction, Args, Parser, Subcommand};
 
 use super::{CliArgsToRaw, ContractCliAction};
@@ -10,12 +12,12 @@ use super::{CliArgsToRaw, ContractCliAction};
     after_help = "
 The MultiversX smart contract Meta crate can be used in two ways:
     A. Import it into a contract's specific meta-crate. 
-       There it will receive access to the contract ABI generator. 
-       Based on that it is able to build the contract and apply various tools.
-       This part also contains the multi-contract config infrastructure.
+        There it will receive access to the contract ABI generator. 
+        Based on that it is able to build the contract and apply various tools.
+        This part also contains the multi-contract config infrastructure.
 
     B. Use it as a standalone tool.
-       It can be used to automatically upgrade contracts from one version to the next.
+        It can be used to automatically upgrade contracts from one version to the next.
 
 You are currently using the standalone tool (B).
 "
@@ -49,6 +51,14 @@ pub enum StandaloneCliAction {
     )]
     LocalDeps(LocalDepsArgs),
 
+    #[command(name = "new", about = "Creates a contract by a pre-existing template")]
+    Template(TemplateArgs),
+
+    #[command(
+        name = "templates",
+        about = "Creates a contract by a pre-existing template"
+    )]
+    TemplateList,
     #[command(
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
@@ -133,6 +143,23 @@ pub struct LocalDepsArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TemplateArgs {
+    /// Provide the template you want to clone
+    #[arg(long = "name", verbatim_doc_comment)]
+    pub name: PathBuf,
+
+    /// Provide the he template you want to clone
+    #[arg(long = "template", verbatim_doc_comment)]
+    pub template: String,
+}
+
+impl CliArgsToRaw for TemplateArgs {
+    fn to_raw(&self) -> Vec<String> {
+        Vec::new()
+    }
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
