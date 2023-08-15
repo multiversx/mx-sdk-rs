@@ -71,7 +71,6 @@ impl TemplateAdjuster {
         self.rename_in_cargo_toml_root(&new_name);
         self.rename_in_cargo_toml_meta(&new_name);
         self.rename_in_cargo_toml_wasm(&new_name);
-        self.rename_in_scenarios(&new_name);
         self.rename_in_tests(&new_name);
         self.rename_files(&new_name);
     }
@@ -79,10 +78,9 @@ impl TemplateAdjuster {
     fn rename_trait_to(&self, new_template_name: &str) {
         let new_name = new_template_name.to_case(Case::Snake);
         let old_name = self.metadata.name.to_case(Case::Snake);
-        let mut new_package: String = new_name;
-        new_package.push_str("::");
-        let mut old_package: String = old_name;
-        old_package.push_str("::");
+        let new_package = format!("{new_name}::");
+        let old_package = format!("{old_name}::");
+
         replace_in_files(
             &self.target_path,
             "*rs",
@@ -95,15 +93,15 @@ impl TemplateAdjuster {
 
     fn rename_in_cargo_toml_root(&self, new_template_name: &str) {
         let old_path = self.metadata.src_file.clone();
-        let mut new_path = new_template_name.to_case(Case::Snake);
-        new_path.push_str(".rs");
+        let new_path = Self::get_rs_file(&new_template_name.to_case(Case::Snake));
+
         replace_in_files(
             &self.target_path,
             "*Cargo.toml",
             &[
                 Query::substring(
-                    &self.get_package_name(&self.metadata.name),
-                    &self.get_package_name(new_template_name),
+                    &Self::get_package_name(&self.metadata.name),
+                    &Self::get_package_name(new_template_name),
                 ),
                 Query::substring(&old_path, &new_path),
             ][..],
@@ -111,56 +109,42 @@ impl TemplateAdjuster {
     }
 
     fn rename_in_cargo_toml_meta(&self, new_template_name: &str) {
-        let mut old_meta = self.metadata.name.clone();
-        old_meta.push_str("-meta");
-        let mut new_meta = new_template_name.to_owned();
-        new_meta.push_str("-meta");
+        let old_meta = format!("{}-meta", self.metadata.name.clone());
+        let new_meta = format!("{}-meta", new_template_name.to_owned());
+
         replace_in_files(
             &self.target_path,
             "*Cargo.toml",
             &[
                 Query::substring(
-                    &self.get_package_name(&old_meta),
-                    &self.get_package_name(&new_meta),
+                    &Self::get_package_name(&old_meta),
+                    &Self::get_package_name(&new_meta),
                 ),
                 Query::substring(
-                    &self.get_dependecy(&self.metadata.name),
-                    &self.get_dependecy(new_template_name),
+                    &Self::get_dependecy(&self.metadata.name),
+                    &Self::get_dependecy(new_template_name),
                 ),
             ][..],
         );
     }
 
     fn rename_in_cargo_toml_wasm(&self, new_template_name: &str) {
-        let mut old_wasm = self.metadata.name.clone();
-        old_wasm.push_str("-wasm");
-        let mut new_wasm = new_template_name.to_owned();
-        new_wasm.push_str("-wasm");
+        let old_wasm = format!("{}-wasm", self.metadata.name.clone());
+        let new_wasm = format!("{}-wasm", new_template_name.to_owned());
+
         replace_in_files(
             &self.target_path,
             "*Cargo.toml",
             &[
                 Query::substring(
-                    &self.get_package_name(&old_wasm),
-                    &self.get_package_name(&new_wasm),
+                    &Self::get_package_name(&old_wasm),
+                    &Self::get_package_name(&new_wasm),
                 ),
                 Query::substring(
-                    &self.get_dependecy(&self.metadata.name),
-                    &self.get_dependecy(new_template_name),
+                    &Self::get_dependecy(&self.metadata.name),
+                    &Self::get_dependecy(new_template_name),
                 ),
             ][..],
-        );
-    }
-
-    fn rename_in_scenarios(&self, new_template_name: &str) {
-        let mut old_wasm = self.metadata.name.clone();
-        old_wasm.push_str(".wasm");
-        let mut new_wasm = new_template_name.to_owned();
-        new_wasm.push_str(".wasm");
-        replace_in_files(
-            &self.target_path,
-            "*.scen.json",
-            &[Query::substring(&old_wasm, &new_wasm)][..],
         );
     }
 
@@ -173,24 +157,23 @@ impl TemplateAdjuster {
             queries.push(Query::substring(old, new))
         }
 
-        let mut new_path = "/".to_owned();
-        new_path.push_str(new_template_name);
-        new_path.push('\"');
-        let mut old_path = "/".to_owned();
-        old_path.push_str(&self.metadata.name);
-        old_path.push('\"');
+        let new_path = Self::as_path(new_template_name);
+        let old_path = Self::as_path(&self.metadata.name);
         queries.push(Query::substring(&old_path, &new_path));
 
-        let mut new_scenarios = "scenarios/".to_owned();
-        new_scenarios.push_str(&new_name);
-        let mut old_scenarios = "scenarios/".to_owned();
-        old_scenarios.push_str(&old_name);
+        let new_scenarios = Self::with_scenario_path(&new_name);
+        let old_scenarios = Self::with_scenario_path(&old_name);
         queries.push(Query::substring(&old_scenarios, &new_scenarios));
 
-        let mut old_wasm = self.metadata.name.clone();
-        old_wasm.push_str(".wasm");
-        let mut new_wasm = new_template_name.to_owned();
-        new_wasm.push_str(".wasm");
+        let old_wasm = Self::get_wasm_file(&self.metadata.name);
+        let new_wasm = Self::get_wasm_file(new_template_name);
+
+        replace_in_files(
+            &self.target_path,
+            "*.scen.json",
+            &[Query::substring(&old_wasm, &new_wasm)][..],
+        );
+
         queries.push(Query::substring(&old_wasm, &new_wasm));
 
         replace_in_files(&self.target_path.join(TEST_DIRECTORY), "*.rs", &queries);
@@ -198,8 +181,7 @@ impl TemplateAdjuster {
 
     fn rename_files(&self, new_template_name: &str) {
         let new_name = new_template_name.to_case(Case::Snake);
-        let mut new_src_name = new_name.clone();
-        new_src_name.push_str(".rs");
+        let new_src_name = Self::get_rs_file(&new_name);
 
         let pattern: &[(&str, &str)] = &[
             (&self.metadata.src_file, &new_src_name),
@@ -208,16 +190,26 @@ impl TemplateAdjuster {
         rename_files(&self.target_path, pattern);
     }
 
-    fn get_package_name(&self, template: &str) -> String {
-        let mut package = "name = \"".to_owned();
-        package.push_str(template);
-        package.push('\"');
-        package
+    fn get_wasm_file(name: &str) -> String {
+        format!("{name}.wasm",)
     }
-    fn get_dependecy(&self, template: &str) -> String {
-        let mut dependency = "dependencies.".to_owned();
-        dependency.push_str(template);
-        dependency
+
+    fn get_rs_file(name: &str) -> String {
+        format!("{name}.rs",)
+    }
+
+    fn with_scenario_path(path: &str) -> String {
+        format!("scenarios/{path}",)
+    }
+
+    fn as_path(name: &str) -> String {
+        format!("/{name}\"")
+    }
+    fn get_package_name(template: &str) -> String {
+        format!("name = \"{template}\"")
+    }
+    fn get_dependecy(template: &str) -> String {
+        format!("dependencies.{template}")
     }
 }
 
