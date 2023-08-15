@@ -6,9 +6,9 @@ use std::{
 /// Will copy an entire folder according to a whitelist of allowed paths.
 ///
 /// The whitelist is expected to contain paths relative from the source path.
-/// 
+///
 /// If a folder is whitelisted, then everything in the folder is considered whitelisted too.
-/// 
+///
 /// The function creates all necessary folder structure in the target, no additional preparation required.
 pub fn whitelisted_deep_copy(source_root: &Path, target_root: &Path, whitelist: &[String]) {
     perform_file_copy(source_root, &PathBuf::new(), target_root, whitelist);
@@ -25,7 +25,7 @@ fn is_whitelisted(path: &Path, whitelist: &[String]) -> bool {
 }
 
 fn create_parent_dir(target: &Path) {
-    fs::create_dir_all(&target.parent().unwrap()).expect("failed to create copy target dir");
+    fs::create_dir_all(target.parent().unwrap()).expect("failed to create copy target dir");
 }
 
 fn perform_file_copy(
