@@ -93,15 +93,15 @@ impl TemplateAdjuster {
 
     fn rename_in_cargo_toml_root(&self, new_template_name: &str) {
         let old_path = self.metadata.src_file.clone();
-        let new_path = Self::get_rs_file(&new_template_name.to_case(Case::Snake));
+        let new_path = rs_file_name(&new_template_name.to_case(Case::Snake));
 
         replace_in_files(
             &self.target_path,
             "*Cargo.toml",
             &[
                 Query::substring(
-                    &Self::get_package_name(&self.metadata.name),
-                    &Self::get_package_name(new_template_name),
+                    &package_name_expr(&self.metadata.name),
+                    &package_name_expr(new_template_name),
                 ),
                 Query::substring(&old_path, &new_path),
             ][..],
@@ -116,13 +116,10 @@ impl TemplateAdjuster {
             &self.target_path,
             "*Cargo.toml",
             &[
+                Query::substring(&package_name_expr(&old_meta), &package_name_expr(&new_meta)),
                 Query::substring(
-                    &Self::get_package_name(&old_meta),
-                    &Self::get_package_name(&new_meta),
-                ),
-                Query::substring(
-                    &Self::get_dependecy(&self.metadata.name),
-                    &Self::get_dependecy(new_template_name),
+                    &dependecy_decl_expr(&self.metadata.name),
+                    &dependecy_decl_expr(new_template_name),
                 ),
             ][..],
         );
@@ -136,13 +133,10 @@ impl TemplateAdjuster {
             &self.target_path,
             "*Cargo.toml",
             &[
+                Query::substring(&package_name_expr(&old_wasm), &package_name_expr(&new_wasm)),
                 Query::substring(
-                    &Self::get_package_name(&old_wasm),
-                    &Self::get_package_name(&new_wasm),
-                ),
-                Query::substring(
-                    &Self::get_dependecy(&self.metadata.name),
-                    &Self::get_dependecy(new_template_name),
+                    &dependecy_decl_expr(&self.metadata.name),
+                    &dependecy_decl_expr(new_template_name),
                 ),
             ][..],
         );
@@ -157,16 +151,16 @@ impl TemplateAdjuster {
             queries.push(Query::substring(old, new))
         }
 
-        let new_path = Self::as_path(new_template_name);
-        let old_path = Self::as_path(&self.metadata.name);
+        let new_path = as_path(new_template_name);
+        let old_path = as_path(&self.metadata.name);
         queries.push(Query::substring(&old_path, &new_path));
 
-        let new_scenarios = Self::with_scenario_path(&new_name);
-        let old_scenarios = Self::with_scenario_path(&old_name);
+        let new_scenarios = scenario_path(&new_name);
+        let old_scenarios = scenario_path(&old_name);
         queries.push(Query::substring(&old_scenarios, &new_scenarios));
 
-        let old_wasm = Self::get_wasm_file(&self.metadata.name);
-        let new_wasm = Self::get_wasm_file(new_template_name);
+        let old_wasm = wasm_file_name(&self.metadata.name);
+        let new_wasm = wasm_file_name(new_template_name);
 
         replace_in_files(
             &self.target_path,
@@ -181,7 +175,7 @@ impl TemplateAdjuster {
 
     fn rename_solution_files(&self, new_template_name: &str) {
         let new_name = new_template_name.to_case(Case::Snake);
-        let new_src_name = Self::get_rs_file(&new_name);
+        let new_src_name = rs_file_name(&new_name);
 
         let pattern: &[(&str, &str)] = &[
             (&self.metadata.src_file, &new_src_name),
@@ -189,28 +183,28 @@ impl TemplateAdjuster {
         ];
         rename_files(&self.target_path, pattern);
     }
+}
 
-    fn get_wasm_file(name: &str) -> String {
-        format!("{name}.wasm",)
-    }
+fn wasm_file_name(name: &str) -> String {
+    format!("{name}.wasm",)
+}
 
-    fn get_rs_file(name: &str) -> String {
-        format!("{name}.rs",)
-    }
+fn rs_file_name(name: &str) -> String {
+    format!("{name}.rs",)
+}
 
-    fn with_scenario_path(path: &str) -> String {
-        format!("scenarios/{path}",)
-    }
+fn scenario_path(path: &str) -> String {
+    format!("scenarios/{path}",)
+}
 
-    fn as_path(name: &str) -> String {
-        format!("/{name}\"")
-    }
-    fn get_package_name(template: &str) -> String {
-        format!("name = \"{template}\"")
-    }
-    fn get_dependecy(template: &str) -> String {
-        format!("dependencies.{template}")
-    }
+fn as_path(name: &str) -> String {
+    format!("/{name}\"")
+}
+fn package_name_expr(template: &str) -> String {
+    format!("name = \"{template}\"")
+}
+fn dependecy_decl_expr(template: &str) -> String {
+    format!("dependencies.{template}")
 }
 
 pub fn remove_paths_from_dependencies(deps_map: &mut Table, ignore_deps: &[&str]) {
