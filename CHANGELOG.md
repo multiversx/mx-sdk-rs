@@ -26,6 +26,20 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.43.0, codec 0.18.1, vm 0.5.0] - 2023-08-16
+- Fixed a rustc compatibility issue when building contracts. The meta crate looks at the rustc version when generating the wasm crate code:
+	- pre-rustc-1.71;
+	- between rustc-1.71 and rustc-1.73;
+	- latest, after rustc-1.73. Also upgraded some dependencies, notably proc-macro2 "1.0.66" and ed25519-dalek "2.0.0".
+- Initial version of the contract template tool in multiversx-sc-meta:
+	- Ability to download and adapt template contracts, to kickstart contract development;
+	- A template mechanism that is customizable on the framework side;
+	- Available templates: adder, empty, crypto-zombies.
+- The Rust debugger is now thread safe.
+- Removed the `big-float` feature of multiversx-sc, because the functionality is already available on mainnet.
+- Arguments `--target-dir-wasm`, `--target-dir-meta`, and `--target-dir-all` in the `multiversx-sc-meta` CLI.
+- Fixed an issue with contract calls and ESDT transfers in the `StaticApi` environment.
+
 ## [sc 0.42.0, codec 0.18.0, vm 0.4.0, scenario-format 0.20.0, sdk 0.2.0] - 2023-07-15
 - Multi-endpoints in multi-contracts:
 	- It is now possible to have multiple versions of the same endpoint in different multi-contract variants.
