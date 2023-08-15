@@ -13,6 +13,9 @@ description = "MultiversX smart contract API"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = ["multiversx-sc-codec/alloc"]
