@@ -10,6 +10,7 @@
 // Total number of exported functions:  27
 
 #![no_std]
+#![allow(internal_features)]
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
