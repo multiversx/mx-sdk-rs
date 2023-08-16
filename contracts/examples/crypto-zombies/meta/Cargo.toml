@@ -1,9 +1,10 @@
 [package]
-name = "cryptozombies-meta"
+name = "crypto-zombies-meta"
 version = "0.0.0"
 edition = "2021"
 publish = false
-[dependencies.cryptozombies]
+
+[dependencies.crypto-zombies]
 path = ".."
 
 [dependencies.multiversx-sc-meta]

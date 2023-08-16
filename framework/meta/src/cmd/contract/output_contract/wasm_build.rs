@@ -35,8 +35,8 @@ impl OutputContract {
         if build_args.locked {
             command.arg("--locked");
         }
-        if let Some(target_dir) = &build_args.target_dir {
-            command.args(["--target-dir", target_dir]);
+        if let Some(target_dir_wasm) = &build_args.target_dir_wasm {
+            command.args(["--target-dir", target_dir_wasm]);
         }
         let rustflags = self.compose_rustflags(build_args);
         if !rustflags.is_empty() {
@@ -77,7 +77,7 @@ impl OutputContract {
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
-        let source_wasm_path = self.wasm_compilation_output_path(&build_args.target_dir);
+        let source_wasm_path = self.wasm_compilation_output_path(&build_args.target_dir_wasm);
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         print_copy_contract(source_wasm_path.as_str(), output_wasm_path.as_str());
         fs::copy(source_wasm_path, output_wasm_path)

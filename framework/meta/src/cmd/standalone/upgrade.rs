@@ -1,7 +1,7 @@
 mod upgrade_0_31;
 mod upgrade_0_32;
 mod upgrade_0_39;
-mod upgrade_common;
+pub(crate) mod upgrade_common;
 mod upgrade_print;
 mod upgrade_selector;
 mod upgrade_versions;
