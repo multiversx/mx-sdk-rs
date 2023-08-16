@@ -49,6 +49,7 @@ pub struct BuildArgs {
 
     /// For the wasm crate, allows specifying the target directory where the Rust compiler will build the intermediary files.
     /// Sharing the same target directory can speed up building multiple contract crates at once.
+    /// Has alias `target-dir` for backwards compatibility.
     #[arg(long = "target-dir-wasm", alias = "target-dir", verbatim_doc_comment)]
     pub target_dir_wasm: Option<String>,
 
@@ -168,7 +169,8 @@ impl CliArgsToRaw for BuildArgs {
 pub struct BuildDbgArgs {
     /// For the wasm crate, allows specifying the target directory where the Rust compiler will build the intermediary files.
     /// Sharing the same target directory can speed up building multiple contract crates at once.
-    #[arg(long = "target-dir-wasm", verbatim_doc_comment)]
+    /// Has alias `target-dir` for backwards compatibility.
+    #[arg(long = "target-dir-wasm", alias = "target-dir", verbatim_doc_comment)]
     pub target_dir_wasm: Option<String>,
 
     /// Generate a twiggy top report after building.
@@ -235,7 +237,8 @@ impl CliArgsToRaw for BuildDbgArgs {
 pub struct TwiggyArgs {
     /// For the wasm crate, allows specifying the target directory where the Rust compiler will build the intermediary files.
     /// Sharing the same target directory can speed up building multiple contract crates at once.
-    #[arg(long = "target-dir-wasm", verbatim_doc_comment)]
+    /// Has alias `target-dir` for backwards compatibility.
+    #[arg(long = "target-dir-wasm", alias = "target-dir", verbatim_doc_comment)]
     pub target_dir_wasm: Option<String>,
 }
 
