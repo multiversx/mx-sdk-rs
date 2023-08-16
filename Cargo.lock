@@ -170,9 +170,9 @@ dependencies = [
 
 [[package]]
 name = "anyhow"
-version = "1.0.73"
+version = "1.0.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f768393e7fabd388fe8409b13faa4d93ab0fef35db1508438dfdb066918bcf38"
+checksum = "8c6f84b74db2535ebae81eede2f39b947dcbf01d093ae5f791e5dd414a1bf289"
 
 [[package]]
 name = "arrayvec"
@@ -2007,7 +2007,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "bitflags 1.3.2",
  "ed25519-dalek",
@@ -2042,7 +2042,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "arrayvec",
  "multiversx-sc",
@@ -2061,7 +2061,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "bitflags 1.3.2",
  "hashbrown 0.13.2",
@@ -2073,7 +2073,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -2082,7 +2082,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.18.0"
+version = "0.18.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -2092,7 +2092,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -2103,7 +2103,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2128,14 +2128,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "base64 0.13.1",
  "bech32",
@@ -2161,7 +2161,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "base64 0.13.1",
  "env_logger",
@@ -2175,7 +2175,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "multiversx-sc",
 ]
@@ -2207,7 +2207,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.42.0"
+version = "0.43.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -3093,9 +3093,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.104"
+version = "1.0.105"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "076066c5f1078eac5b722a31827a8832fe108bed65dfa75e233c89f8206e976c"
+checksum = "693151e1ac27563d6dbcec9dee9fbd5da8539b20fa14ad3752b2e6d363ace360"
 dependencies = [
  "indexmap 2.0.0",
  "itoa",
@@ -3366,18 +3366,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.45"
+version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dedd246497092a89beedfe2c9f176d44c1b672ea6090edc20544ade01fbb7ea0"
+checksum = "d9207952ae1a003f42d3d5e892dac3c6ba42aa6ac0c79a6a91a2b5cb4253e75c"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.45"
+version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d7b1fadccbbc7e19ea64708629f9d8dccd007c260d66485f20a6d41bc1cf4b3"
+checksum = "f1728216d3244de4f14f14f8c15c79be1a7c67867d28d69b719690e2a19fb445"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3903,9 +3903,9 @@ checksum = "d419259aba16b663966e29e6d7c6ecfa0bb8425818bb96f6f1f3c3eb71a6e7b9"
 
 [[package]]
 name = "winnow"
-version = "0.5.10"
+version = "0.5.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5504cc7644f4b593cbc05c4a55bf9bd4e94b867c3c0bd440934174d50482427d"
+checksum = "1e461589e194280efaa97236b73623445efa195aa633fd7004f39805707a9d53"
 dependencies = [
  "memchr",
 ]
