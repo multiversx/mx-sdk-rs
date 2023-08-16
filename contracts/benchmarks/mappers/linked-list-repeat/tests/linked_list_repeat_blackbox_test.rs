@@ -42,14 +42,14 @@ fn linked_list_repeat_blackbox_raw() {
             ScCallStep::new()
                 .from("address:owner")
                 .to("sc:llr")
-                .call(contract.add(5u32, "str:test--"))
+                .call(contract.add(5u32, "test--"))
                 .expect(TxExpect::ok().no_result()),
         )
         .sc_call(
             ScCallStep::new()
                 .from("address:owner")
                 .to("sc:llr")
-                .call(contract.count("str:test--|u32:3"))
+                .call(contract.count("test--\x00\x00\x00\x04"))
                 .expect(TxExpect::ok().result("1")),
         );
 }
