@@ -102,11 +102,22 @@ pub struct AllArgs {
     )]
     #[clap(global = true)]
     pub load_abi_git_version: bool,
+
+    /// For the meta crates, allows specifying the target directory where the Rust compiler will build the intermediary files.
+    /// Sharing the same target directory can speed up building multiple contract crates at once.
+    #[arg(long = "target-dir-meta", verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub target_dir_meta: Option<String>,
 }
 
-impl CliArgsToRaw for AllArgs {
-    fn to_raw(&self) -> Vec<String> {
-        let mut raw = self.command.to_raw();
+impl AllArgs {
+    pub fn to_cargo_run_args(&self) -> Vec<String> {
+        let mut raw = vec!["run".to_string()];
+        if let Some(target_dir_meta) = &self.target_dir_meta {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir_meta.clone());
+        }
+        raw.append(&mut self.command.to_raw());
         if !self.load_abi_git_version {
             raw.push("--no-abi-git-version".to_string());
         }
