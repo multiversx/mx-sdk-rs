@@ -1,6 +1,6 @@
 use benchmark_common::ExampleStruct;
 use linked_list_repeat::ProxyTrait;
-use multiversx_sc::types::TokenIdentifier;
+use multiversx_sc::types::{MultiValueEncoded, TokenIdentifier};
 use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
 
 const WASM_PATH_EXPR: &str = "file:output/linked-list-repeat.wasm";
@@ -37,12 +37,14 @@ fn linked_list_repeat_blackbox_raw() {
     let mut world = setup();
     let mut contract = ContractInfo::<linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
 
+    let num_repeats = 5usize;
+
     world
         .sc_call(
             ScCallStep::new()
                 .from("address:owner")
                 .to("sc:llr")
-                .call(contract.add(5u32, "test--"))
+                .call(contract.add(num_repeats, "test--"))
                 .expect(TxExpect::ok().no_result()),
         )
         .sc_call(
@@ -51,6 +53,19 @@ fn linked_list_repeat_blackbox_raw() {
                 .to("sc:llr")
                 .call(contract.count("test--\x00\x00\x00\x04"))
                 .expect(TxExpect::ok().result("1")),
+        )
+        .sc_query_use_result(
+            ScQueryStep::new().to("sc:llr").call(contract.bench()),
+            |tr: TypedResponse<MultiValueEncoded<StaticApi, String>>| {
+                let result = tr.result.unwrap().into_iter().collect::<Vec<String>>();
+                assert_eq!(result.len(), num_repeats);
+                for (index, item) in result.iter().enumerate() {
+                    let index_str =
+                        String::from_utf8((index as u32).to_be_bytes().to_vec()).unwrap();
+                    let expected = format!("test--{}", index_str);
+                    assert_eq!(item, &expected);
+                }
+            },
         );
 }
 
