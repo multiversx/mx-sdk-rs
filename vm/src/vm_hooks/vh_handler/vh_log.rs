@@ -5,7 +5,7 @@ pub trait VMHooksLog: VMHooksHandlerSource {
         let topics = self.m_types_lock().mb_get_vec_of_bytes(topics_handle);
         let data = self.m_types_lock().mb_get(data_handle).to_vec();
         self.push_tx_log(TxLog {
-            address: self.input_ref().to.clone(),
+            address: self.current_address().clone(),
             endpoint: self.input_ref().func_name.clone(),
             topics,
             data,

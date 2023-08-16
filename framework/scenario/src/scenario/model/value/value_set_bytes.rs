@@ -114,6 +114,12 @@ impl From<(&str, &InterpreterContext)> for BytesValue {
     }
 }
 
+impl From<()> for BytesValue {
+    fn from(_: ()) -> Self {
+        BytesValue::from("")
+    }
+}
+
 impl Default for BytesValue {
     fn default() -> Self {
         Self {

@@ -2,7 +2,7 @@ use multiversx_chain_vm::{
     executor::VMHooks,
     vm_hooks::{StaticApiVMHooksHandler, VMHooksDispatcher, VMHooksHandler},
 };
-use multiversx_sc::api::RawHandle;
+use multiversx_sc::{api::RawHandle, types::Address};
 
 use crate::debug_executor::StaticVarData;
 
@@ -41,6 +41,16 @@ impl VMHooksApiBackend for StaticApiBackend {
 }
 
 pub type StaticApi = VMHooksApi<StaticApiBackend>;
+
+impl StaticApi {
+    /// The static API does not allow interrogating the Tx input,
+    /// but does offer a placeholder for the current ("SC") address, to help with contract calls.
+    ///
+    /// This placeholder then needs to be converted to something useful.
+    pub fn is_current_address_placeholder(address: &Address) -> bool {
+        address.as_array() == StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER.as_array()
+    }
+}
 
 impl std::fmt::Debug for StaticApi {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

@@ -12,11 +12,16 @@ use crate::{
     world_mock::{AccountData, BlockInfo},
 };
 
-/// A simple wrapper around a managed type container RefCell.
+/// A simple wrapper around a managed type container Mutex.
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug, Default)]
 pub struct StaticApiVMHooksHandler(Mutex<TxManagedTypes>);
+
+impl StaticApiVMHooksHandler {
+    pub const CURRENT_ADDRESS_PLACEHOLDER: VMAddress =
+        VMAddress::new(*b"STATIC_API_CURRENT_ADDRESS______");
+}
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
@@ -29,6 +34,10 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
 
     fn input_ref(&self) -> &TxInput {
         panic!("cannot access tx inputs in the StaticApi")
+    }
+
+    fn current_address(&self) -> &VMAddress {
+        &Self::CURRENT_ADDRESS_PLACEHOLDER
     }
 
     fn random_next_bytes(&self, _length: usize) -> Vec<u8> {

@@ -18,6 +18,10 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn input_ref(&self) -> &TxInput;
 
+    fn current_address(&self) -> &VMAddress {
+        &self.input_ref().to
+    }
+
     fn tx_hash(&self) -> H256 {
         self.input_ref().tx_hash.clone()
     }
@@ -32,7 +36,7 @@ pub trait VMHooksHandlerSource: Debug {
     }
 
     fn storage_read(&self, key: &[u8]) -> Vec<u8> {
-        self.storage_read_any_address(&self.input_ref().to, key)
+        self.storage_read_any_address(self.current_address(), key)
     }
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;

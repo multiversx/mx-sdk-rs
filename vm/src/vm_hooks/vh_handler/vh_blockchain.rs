@@ -12,7 +12,7 @@ const ESDT_TOKEN_DATA_FUNC_RESETS_VALUES: bool = false;
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn is_contract_address(&self, address_bytes: &[u8]) -> bool {
         let address = VMAddress::from_slice(address_bytes);
-        address == self.input_ref().to
+        &address == self.current_address()
     }
 
     fn managed_caller(&self, dest_handle: RawHandle) {
@@ -22,7 +22,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
 
     fn managed_sc_address(&self, dest_handle: RawHandle) {
         self.m_types_lock()
-            .mb_set(dest_handle, self.input_ref().to.to_vec());
+            .mb_set(dest_handle, self.current_address().to_vec());
     }
 
     fn managed_owner_address(&self, dest_handle: RawHandle) {

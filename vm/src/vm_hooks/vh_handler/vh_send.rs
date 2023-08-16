@@ -52,7 +52,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) {
-        let contract_address = self.input_ref().to.clone();
+        let contract_address = self.current_address().clone();
 
         let mut args = vec![
             token,
@@ -79,7 +79,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) {
-        let contract_address = self.input_ref().to.clone();
+        let contract_address = self.current_address().clone();
 
         let mut args = vec![to.to_vec(), top_encode_u64(payments.len() as u64)];
 
@@ -209,7 +209,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         _extra_gas_for_callback: u64,
         callback_closure_handle: RawHandle,
     ) {
-        let contract_address = self.input_ref().to.clone();
+        let contract_address = self.current_address().clone();
         let to = self.m_types_lock().mb_to_address(to_handle);
         let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
