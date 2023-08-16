@@ -106,6 +106,14 @@ impl TxCall {
                 .collect(),
         );
 
+        // For some contract calls from == to.
+        // The contract call objects have no "from" field, since that is always part of the execution context.
+        // On the static API there is no execution context, but a placeholder value is provided.
+        // Here we already know the sender, so we can replace the placeholder with the actual value.
+        if StaticApi::is_current_address_placeholder(&contract_call.basic.to.to_address()) {
+            contract_call.basic.to = self.from.value.clone().into();
+        }
+
         for argument in &self.arguments {
             contract_call.push_raw_argument(argument.value.as_slice());
         }

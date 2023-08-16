@@ -6,7 +6,13 @@ const ZERO_32: &[u8] = &[0u8; 32];
 /// Type that holds 32 bytes of data.
 /// Data is kept on the heap to keep wasm size low and avoid copies.
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
-pub struct H256(Box<[u8; 32]>);
+pub struct H256([u8; 32]);
+
+impl H256 {
+    pub const fn new(bytes: [u8; 32]) -> Self {
+        H256(bytes)
+    }
+}
 
 impl From<[u8; 32]> for H256 {
     /// Constructs a hash type from the given bytes array of fixed length.
@@ -15,7 +21,7 @@ impl From<[u8; 32]> for H256 {
     ///
     /// The given bytes are interpreted in big endian order.
     fn from(arr: [u8; 32]) -> Self {
-        H256(Box::new(arr))
+        H256(arr)
     }
 }
 
@@ -27,7 +33,7 @@ impl<'a> From<&'a [u8; 32]> for H256 {
     ///
     /// The given bytes are interpreted in big endian order.
     fn from(bytes: &'a [u8; 32]) -> Self {
-        H256(Box::new(*bytes))
+        H256(*bytes)
     }
 }
 
@@ -39,13 +45,13 @@ impl<'a> From<&'a mut [u8; 32]> for H256 {
     ///
     /// The given bytes are interpreted in big endian order.
     fn from(bytes: &'a mut [u8; 32]) -> Self {
-        H256(Box::new(*bytes))
+        H256(*bytes)
     }
 }
 
 impl From<Box<[u8; 32]>> for H256 {
     fn from(bytes: Box<[u8; 32]>) -> Self {
-        H256(bytes)
+        H256(*bytes)
     }
 }
 
@@ -54,13 +60,13 @@ impl H256 {
         let mut arr = [0u8; 32];
         let len = core::cmp::min(slice.len(), 32);
         arr[..len].copy_from_slice(&slice[..len]);
-        H256(Box::new(arr))
+        H256(arr)
     }
 }
 
 impl From<H256> for [u8; 32] {
     fn from(s: H256) -> Self {
-        *(s.0)
+        s.0
     }
 }
 
@@ -78,14 +84,8 @@ impl AsMut<[u8]> for H256 {
 
 impl H256 {
     /// Returns a new zero-initialized fixed hash.
-    /// Allocates directly in heap.
-    /// Minimal resulting wasm code (14 bytes if not inlined).
     pub fn zero() -> Self {
-        use alloc::alloc::{alloc_zeroed, Layout};
-        unsafe {
-            let ptr = alloc_zeroed(Layout::new::<[u8; 32]>()) as *mut [u8; 32];
-            H256(Box::from_raw(ptr))
-        }
+        H256([0u8; 32])
     }
 
     /// Extracts a byte slice containing the entire fixed hash.
@@ -94,7 +94,7 @@ impl H256 {
     }
 
     pub fn as_array(&self) -> &[u8; 32] {
-        self.0.as_ref()
+        &self.0
     }
 
     pub fn to_vec(&self) -> Vec<u8> {
