@@ -1,5 +1,5 @@
 [package]
-name = "cryptozombies-wasm"
+name = "crypto-zombies-wasm"
 version = "0.0.0"
 authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
 edition = "2021"
@@ -13,7 +13,8 @@ opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
-[dependencies.cryptozombies]
+
+[dependencies.crypto-zombies]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]

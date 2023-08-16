@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use super::OutputContractSettings;
 use crate::cli_args::BuildArgs;
 use multiversx_sc::abi::ContractAbi;
@@ -60,11 +62,25 @@ impl OutputContract {
         self.wasm_crate_name.replace('-', "_")
     }
 
+    pub fn resolve_wasm_target_dir(&self, explicit_target_dir: &Option<String>) -> String {
+        let wasm_crate_path = self.wasm_crate_path();
+        if let Some(explicit_target_dir) = explicit_target_dir {
+            // usually the explicit_target_dir is absolute,
+            // but if it isn't, we need to take the path of the wasm crate into account
+            PathBuf::from(wasm_crate_path)
+                .join(explicit_target_dir)
+                .to_str()
+                .unwrap()
+                .to_string()
+        } else {
+            format!("{}/target", &wasm_crate_path)
+        }
+    }
+
     /// This is where Rust will initially compile the WASM binary.
     pub fn wasm_compilation_output_path(&self, explicit_target_dir: &Option<String>) -> String {
-        let target_dir = explicit_target_dir
-            .clone()
-            .unwrap_or_else(|| format!("{}/target", &self.wasm_crate_path(),));
+        let target_dir = self.resolve_wasm_target_dir(explicit_target_dir);
+
         format!(
             "{}/wasm32-unknown-unknown/release/{}.wasm",
             &target_dir,

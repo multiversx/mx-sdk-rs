@@ -19,6 +19,10 @@ use super::upgrade_print::*;
 
 /// Uses ruplacer.
 pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &[Query]) {
+    if !sc_crate_path.exists() {
+        return;
+    }
+
     let console = Console::default();
     let settings = Settings {
         selected_file_types: vec![file_type.to_string()],
