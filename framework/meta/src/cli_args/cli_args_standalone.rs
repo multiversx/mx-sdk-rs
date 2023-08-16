@@ -102,12 +102,49 @@ pub struct AllArgs {
     )]
     #[clap(global = true)]
     pub load_abi_git_version: bool,
+
+    /// For the meta crates, allows specifying the target directory where the Rust compiler will build the intermediary files.
+    /// Sharing the same target directory can speed up building multiple contract crates at once.
+    #[arg(long = "target-dir-meta", verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub target_dir_meta: Option<String>,
+
+    /// Overrides both the --target-dir-meta and the --target-dir-wasm args.
+    #[arg(long = "target-dir-all", verbatim_doc_comment)]
+    #[clap(global = true)]
+    pub target_dir_all: Option<String>,
 }
 
-impl CliArgsToRaw for AllArgs {
-    fn to_raw(&self) -> Vec<String> {
-        let mut raw = self.command.to_raw();
-        if !self.load_abi_git_version {
+impl AllArgs {
+    pub fn target_dir_all_override(&self) -> Self {
+        let mut result = self.clone();
+        if let Some(target_dir_all) = &self.target_dir_all {
+            result.target_dir_meta = Some(target_dir_all.clone());
+            match &mut result.command {
+                ContractCliAction::Build(build_args) => {
+                    build_args.target_dir_wasm = Some(target_dir_all.clone());
+                },
+                ContractCliAction::BuildDbg(build_args) => {
+                    build_args.target_dir_wasm = Some(target_dir_all.clone());
+                },
+                ContractCliAction::Twiggy(build_args) => {
+                    build_args.target_dir_wasm = Some(target_dir_all.clone());
+                },
+                _ => {},
+            }
+        }
+        result
+    }
+
+    pub fn to_cargo_run_args(&self) -> Vec<String> {
+        let processed = self.target_dir_all_override();
+        let mut raw = vec!["run".to_string()];
+        if let Some(target_dir_meta) = &processed.target_dir_meta {
+            raw.push("--target-dir".to_string());
+            raw.push(target_dir_meta.clone());
+        }
+        raw.append(&mut processed.command.to_raw());
+        if !processed.load_abi_git_version {
             raw.push("--no-abi-git-version".to_string());
         }
         raw

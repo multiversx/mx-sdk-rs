@@ -1,7 +1,7 @@
 use std::{path::Path, process::Command};
 
 use crate::{
-    cli_args::{AllArgs, CliArgsToRaw},
+    cli_args::AllArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories},
     print_util::{print_all_command, print_all_count, print_all_index},
 };
@@ -13,7 +13,7 @@ pub fn call_all_meta(args: &AllArgs) {
         "./"
     };
 
-    perform_call_all_meta(path, args.ignore.as_slice(), args.to_raw());
+    perform_call_all_meta(path, args.ignore.as_slice(), args.to_cargo_run_args());
 }
 
 fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
@@ -45,7 +45,7 @@ pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String])
 
     let exit_status = Command::new("cargo")
         .current_dir(&meta_path)
-        .args(std::iter::once(&"run".to_string()).chain(cargo_run_args.iter()))
+        .args(cargo_run_args)
         .spawn()
         .expect("failed to spawn cargo run process in meta crate")
         .wait()
