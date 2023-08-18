@@ -1,4 +1,7 @@
-use std::path::{Path, PathBuf};
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use super::{RepoTempDownload, RepoVersion};
 
@@ -9,6 +12,7 @@ pub enum RepoSource {
 
 impl RepoSource {
     pub async fn download_from_github(version: RepoVersion, temp_dir_path: PathBuf) -> Self {
+        fs::create_dir_all(&temp_dir_path).unwrap();
         RepoSource::Downloaded(RepoTempDownload::download_from_github(version, temp_dir_path).await)
     }
 

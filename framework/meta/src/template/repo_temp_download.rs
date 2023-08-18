@@ -39,7 +39,7 @@ impl RepoTempDownload {
         if response.len() < 10000 {
             panic!(
                 "Could not download artifact: {}",
-                String::from_utf8_lossy(&response.to_vec())
+                String::from_utf8_lossy(&response)
             );
         }
 
