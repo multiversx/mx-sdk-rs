@@ -180,7 +180,7 @@ impl TemplateAdjuster {
             (&self.metadata.src_file, &new_src_name),
             (&self.metadata.name, &new_name),
         ];
-        rename_files(&self.target.target_path, pattern);
+        rename_files(&self.target.contract_dir(), pattern);
     }
 }
 
