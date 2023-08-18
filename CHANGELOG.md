@@ -26,6 +26,10 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.43.2] - 2023-08-18
+- Template tool tag argument validation bugfix.
+
 ## [sc 0.43.1, vm 0.5.1] - 2023-08-18
 - Template tool improvements:
 	- Ability to specify for which framework version to download (based on git tag). The first allowed version is 0.43.0.
