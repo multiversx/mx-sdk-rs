@@ -35,6 +35,10 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         );
     }
 
+    fn get_shard_of_address(&self, address_bytes: &[u8]) -> i32 {
+        (address_bytes[address_bytes.len() - 1] % 3).into()
+    }
+
     fn is_smart_contract(&self, address_bytes: &[u8]) -> bool {
         VMAddress::from_slice(address_bytes).is_smart_contract_address()
     }
