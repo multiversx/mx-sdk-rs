@@ -218,6 +218,10 @@ pub fn remove_paths_from_deps_map(deps_map: &mut Table, ignore_deps: &[&str]) {
 }
 
 pub fn remove_paths_from_deps(toml: &mut CargoTomlContents, ignore_deps: &[&str]) {
-    remove_paths_from_deps_map(toml.dependencies_mut(), ignore_deps);
-    remove_paths_from_deps_map(toml.dev_dependencies_mut(), ignore_deps);
+    if toml.has_dependencies() {
+        remove_paths_from_deps_map(toml.dependencies_mut(), ignore_deps);
+    }
+    if toml.has_dev_dependencies() {
+        remove_paths_from_deps_map(toml.dev_dependencies_mut(), ignore_deps);
+    }
 }

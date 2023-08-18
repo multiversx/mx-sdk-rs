@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  checks: write
+  pull-requests: write
+
+jobs:
+  template_test:
+    name: Template tool test - current (unreleased) templates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          default: true
+          toolchain: nightly-2023-08-08
+      - name: Run template tool test
+        run: |
+          cd framework/meta
+          cargo test --features template-test-current

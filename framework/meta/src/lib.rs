@@ -8,7 +8,7 @@ mod mxsc_file_json;
 mod print_util;
 pub mod template;
 mod tools;
-mod version_history;
+pub mod version_history;
 
 #[macro_use]
 extern crate lazy_static;

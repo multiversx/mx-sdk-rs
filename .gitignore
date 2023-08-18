@@ -26,7 +26,6 @@ my-vm-tests.sh
 quick.sh
 twiggy*
 template-test
-template-test-current
 
 # Zip output with example wasm binaries
 examples-wasm.zip

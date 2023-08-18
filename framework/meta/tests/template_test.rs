@@ -1,5 +1,8 @@
-use multiversx_sc_meta::template::{
-    template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource,
+use multiversx_sc_meta::{
+    template::{
+        template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
+    },
+    version_history,
 };
 use std::{
     fs,
@@ -7,8 +10,8 @@ use std::{
     process::Command,
 };
 
-const TEMPLATE_TEMP_DIR_NAME: &str = "template-test-current";
-const BUILD_CONTRACTS: bool = false;
+const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
+const BUILD_CONTRACTS: bool = true;
 
 #[test]
 fn test_template_list() {
@@ -45,7 +48,8 @@ fn template_test_current_empty() {
 }
 
 /// Recreates the folder structure in `contracts`, on the same level.
-/// This way, the relative paths are still valid in this case, and we can test the templates with the versions on the current branch.
+/// This way, the relative paths are still valid in this case,
+/// and we can test the templates with the framework version of the current branch.
 fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     let workspace_path = find_workspace();
     let target = ContractCreatorTarget {
@@ -57,14 +61,65 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
 
     prepare_target_dir(&target);
 
-    let downloader = ContractCreator::new(
+    ContractCreator::new(
         &repo_source,
         template_name.to_string(),
         target.clone(),
         true,
-    );
+    )
+    .create_contract();
 
-    downloader.create_contract();
+    if BUILD_CONTRACTS {
+        build_contract(&target);
+    }
+    cargo_test(&target);
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "template-test-released"), ignore)]
+async fn template_test_released_adder() {
+    template_test_released("adder", "released-adder").await;
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "template-test-released"), ignore)]
+async fn template_test_released_crypto_zombies() {
+    template_test_released("crypto-zombies", "released-crypto-zombies").await;
+}
+
+#[tokio::test]
+#[cfg_attr(not(feature = "template-test-released"), ignore)]
+async fn template_test_released_empty() {
+    template_test_released("empty", "released-empty").await;
+}
+
+/// These tests fully replicate the templating process. They
+/// - download the last released version of the repo,
+/// - create proper contracts,
+/// - build the newly created contracts (to wasm)
+/// - run all tests (including Go scenarios) on them.
+async fn template_test_released(template_name: &str, new_name: &str) {
+    let workspace_path = find_workspace();
+    let target = ContractCreatorTarget {
+        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
+        new_name: new_name.to_string(),
+    };
+
+    let repo_source = RepoSource::download_from_github(
+        RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.to_string()),
+        std::env::temp_dir(),
+    )
+    .await;
+
+    prepare_target_dir(&target);
+
+    ContractCreator::new(
+        &repo_source,
+        template_name.to_string(),
+        target.clone(),
+        false,
+    )
+    .create_contract();
 
     if BUILD_CONTRACTS {
         build_contract(&target);
