@@ -216,7 +216,7 @@ fn get_cumulated_validator_rewards_rs() {
 }
 
 #[test]
-fn get_shard_of_address() {
+fn get_shard_of_address_rs() {
     world().run("scenarios/get_shard_of_address.scen.json");
 }
 

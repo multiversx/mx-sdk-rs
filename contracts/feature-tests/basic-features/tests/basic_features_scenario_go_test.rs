@@ -200,6 +200,12 @@ fn get_cumulated_validator_rewards_go() {
 }
 
 #[test]
+#[ignore = "TODO: missing support from scenario-go"]
+fn get_shard_of_address_go() {
+    world().run("scenarios/get_shard_of_address.scen.json");
+}
+
+#[test]
 fn managed_address_array_go() {
     world().run("scenarios/managed_address_array.scen.json");
 }
