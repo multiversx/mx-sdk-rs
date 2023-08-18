@@ -185,16 +185,22 @@ pub struct LocalDepsArgs {
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TemplateArgs {
     /// The new name the contract is to receive.
-    #[arg(long = "name", verbatim_doc_comment)]
-    pub name: PathBuf,
+    /// If missing, the template name will be considered.
+    #[arg(long, verbatim_doc_comment)]
+    pub name: Option<String>,
 
     /// The contract template to clone.
-    #[arg(long = "template", verbatim_doc_comment)]
+    #[arg(long, verbatim_doc_comment)]
     pub template: String,
 
     /// The framework version on which the contracts should be created.
-    #[arg(long = "tag", verbatim_doc_comment)]
+    #[arg(long, verbatim_doc_comment)]
     pub tag: Option<String>,
+
+    /// Target directory where to create the new contract directory.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<PathBuf>,
 }
 
 impl CliArgsToRaw for TemplateArgs {

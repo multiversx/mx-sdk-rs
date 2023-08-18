@@ -1,11 +1,13 @@
-use multiversx_sc_meta::template::{template_names_from_repo, RepoSource, TemplateDownloader};
+use multiversx_sc_meta::template::{
+    template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource,
+};
 use std::{
     fs,
     path::{Path, PathBuf},
     process::Command,
 };
 
-const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
+const TEMPLATE_TEMP_DIR_NAME: &str = "template-test-current";
 const BUILD_CONTRACTS: bool = false;
 
 #[test]
@@ -25,53 +27,61 @@ fn test_template_list() {
 }
 
 #[test]
-#[cfg_attr(not(feature = "template-test"), ignore)]
-fn template_test_adder() {
-    template_test("adder", "new-adder");
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_test_current_adder() {
+    template_test_current("adder", "examples", "new-adder");
 }
 
 #[test]
-#[cfg_attr(not(feature = "template-test"), ignore)]
-fn template_test_crypto_zombies() {
-    template_test("crypto-zombies", "new-crypto-zombies");
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_test_current_crypto_zombies() {
+    template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
 }
 
 #[test]
-#[cfg_attr(not(feature = "template-test"), ignore)]
-fn template_test_empty() {
-    template_test("empty", "new-empty");
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_test_current_empty() {
+    template_test_current("empty", "examples", "new-empty");
 }
 
-fn template_test(template_name: &str, new_name: &str) {
+/// Recreates the folder structure in `contracts`, on the same level.
+/// This way, the relative paths are still valid in this case, and we can test the templates with the versions on the current branch.
+fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     let workspace_path = find_workspace();
+    let target = ContractCreatorTarget {
+        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
+        new_name: new_name.to_string(),
+    };
+
     let repo_source = RepoSource::from_local_path(workspace_path);
 
-    let target_dir = prepare_target_dir(new_name);
+    prepare_target_dir(&target);
 
-    let downloader =
-        TemplateDownloader::new(&repo_source, template_name.to_string(), target_dir.clone());
-    downloader.copy_template(&downloader.template_source.metadata.files_include);
-    downloader.update_dependencies();
-    downloader.rename_template_to(new_name.to_string());
+    let downloader = ContractCreator::new(
+        &repo_source,
+        template_name.to_string(),
+        target.clone(),
+        true,
+    );
+
+    downloader.create_contract();
+
     if BUILD_CONTRACTS {
-        build_contract(&target_dir);
+        build_contract(&target);
     }
-    cargo_test(&target_dir);
+    cargo_test(&target);
 }
 
-fn prepare_target_dir(new_name: &str) -> PathBuf {
-    let template_temp_path = find_workspace().join(TEMPLATE_TEMP_DIR_NAME);
-    fs::create_dir_all(&template_temp_path).unwrap();
+fn prepare_target_dir(target: &ContractCreatorTarget) {
+    fs::create_dir_all(&target.target_path).unwrap();
 
-    let target_dir = template_temp_path.join(new_name);
-    if target_dir.exists() {
-        fs::remove_dir_all(&target_dir).unwrap();
+    let contract_dir = target.contract_dir();
+    if contract_dir.exists() {
+        fs::remove_dir_all(&contract_dir).unwrap();
     }
-
-    target_dir
 }
 
-pub fn cargo_test(contract_location: &Path) {
+pub fn cargo_test(target: &ContractCreatorTarget) {
     let workspace_target_dir = find_workspace().join("target");
 
     let mut args = vec![
@@ -86,7 +96,7 @@ pub fn cargo_test(contract_location: &Path) {
 
     let exit_status = Command::new("cargo")
         .args(args)
-        .current_dir(contract_location)
+        .current_dir(target.contract_dir())
         .spawn()
         .expect("failed to spawn contract clean process")
         .wait()
@@ -95,7 +105,7 @@ pub fn cargo_test(contract_location: &Path) {
     assert!(exit_status.success(), "contract test process failed");
 }
 
-pub fn build_contract(contract_location: &Path) {
+pub fn build_contract(target: &ContractCreatorTarget) {
     let workspace_target_dir = find_workspace().join("target");
 
     let exit_status = Command::new("cargo")
@@ -105,7 +115,7 @@ pub fn build_contract(contract_location: &Path) {
             "--target-dir",
             workspace_target_dir.to_str().unwrap(),
         ])
-        .current_dir(contract_location.join("meta"))
+        .current_dir(target.contract_dir().join("meta"))
         .spawn()
         .expect("failed to spawn contract clean process")
         .wait()
