@@ -31,19 +31,19 @@ fn test_template_list() {
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
-fn template_test_current_adder() {
+fn template_current_adder() {
     template_test_current("adder", "examples", "new-adder");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
-fn template_test_current_crypto_zombies() {
+fn template_current_crypto_zombies() {
     template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
 }
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
-fn template_test_current_empty() {
+fn template_current_empty() {
     template_test_current("empty", "examples", "new-empty");
 }
 
@@ -77,19 +77,19 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
 
 #[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_test_released_adder() {
+async fn template_released_adder() {
     template_test_released("adder", "released-adder").await;
 }
 
 #[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_test_released_crypto_zombies() {
+async fn template_released_crypto_zombies() {
     template_test_released("crypto-zombies", "released-crypto-zombies").await;
 }
 
 #[tokio::test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_test_released_empty() {
+async fn template_released_empty() {
     template_test_released("empty", "released-empty").await;
 }
 
