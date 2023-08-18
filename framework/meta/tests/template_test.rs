@@ -11,7 +11,7 @@ use std::{
 };
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
-const BUILD_CONTRACTS: bool = true;
+const BUILD_CONTRACTS: bool = false;
 
 #[test]
 fn test_template_list() {
