@@ -36,6 +36,12 @@ impl RepoTempDownload {
 
     async fn download_binaries(&self) -> Result<(), reqwest::Error> {
         let response = reqwest::get(self.version.url()).await?.bytes().await?;
+        if response.len() < 10000 {
+            panic!(
+                "Could not download artifact: {}",
+                String::from_utf8_lossy(&response.to_vec())
+            );
+        }
 
         let mut file = match File::create(self.zip_path()) {
             Err(why) => panic!("couldn't create {why}"),
@@ -48,7 +54,8 @@ impl RepoTempDownload {
     fn unzip_binaries(&self) {
         let file = File::open(self.zip_path()).unwrap();
         let mut zip = zip::ZipArchive::new(file).unwrap();
-        zip.extract(Path::new(&self.temp_dir_path)).unwrap();
+        zip.extract(Path::new(&self.temp_dir_path))
+            .expect("Could not unzip artifact");
     }
 
     fn delete_zip(&self) {
