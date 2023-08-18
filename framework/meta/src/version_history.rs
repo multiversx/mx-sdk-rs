@@ -48,13 +48,14 @@ pub const VERSIONS: &[&str] = &[
     "0.43.1",
 ];
 
-/// We started supporting contract templates with version 0.43.1.
+/// We started supporting contract templates with version 0.43.0.
 pub fn template_versions() -> &'static [&'static str] {
     &VERSIONS[33..]
 }
 
 pub fn validate_template_tag(tag: &str) -> bool {
-    template_versions().iter().all(|&tt| tt == tag)
+    let versions = template_versions();
+    versions.iter().any(|&tt| tt == tag)
 }
 
 pub struct VersionIterator {
