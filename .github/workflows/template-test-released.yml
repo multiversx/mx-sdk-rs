@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   template_test:
-    name: Template tool test
+    name: Template tool test - released templates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,4 +23,4 @@ jobs:
       - name: Run template tool test
         run: |
           cd framework/meta
-          cargo test --features template-test
+          cargo test --features template-test-released

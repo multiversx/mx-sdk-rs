@@ -5,7 +5,7 @@ use std::{
 
 use crate::folder_structure::{whitelisted_deep_copy, RelevantDirectories};
 
-use super::{repo_temp_download::RepoSource, template_metadata::TemplateMetadata};
+use super::{template_metadata::TemplateMetadata, RepoSource};
 
 const TEMPLATES_PATH_IN_REPO: &str = "contracts/examples";
 const TEMPLATE_TOML_FILE_NAME: &str = "mxsc-template.toml";
@@ -17,8 +17,12 @@ pub struct TemplateSource<'a> {
 }
 
 impl<'a> TemplateSource<'a> {
-    pub fn copy_template(&self, target_path: impl AsRef<Path>, whitelist: &[String]) {
-        whitelisted_deep_copy(&self.source_path, target_path.as_ref(), whitelist);
+    pub fn copy_template(&self, target_path: impl AsRef<Path>) {
+        whitelisted_deep_copy(
+            &self.source_path,
+            target_path.as_ref(),
+            &self.metadata.files_include,
+        );
     }
 }
 
