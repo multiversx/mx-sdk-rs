@@ -4,44 +4,20 @@ use std::{
     path::{Path, PathBuf},
 };
 
-const REPOSITORY: &str = "https://github.com/multiversx/mx-sdk-rs/archive/refs/heads/master.zip";
-const ZIP_NAME: &str = "./master.zip";
-const REPOSITORY_TEMP_DIR_NAME: &str = "mx-sdk-rs-master";
+use super::RepoVersion;
 
-pub enum RepoSource {
-    Downloaded(RepoTempDownload),
-    LocalPath(PathBuf),
-}
-
-impl RepoSource {
-    pub async fn download_from_github(temp_dir_path: PathBuf) -> Self {
-        RepoSource::Downloaded(RepoTempDownload::download_from_github(temp_dir_path).await)
-    }
-
-    pub fn from_local_path(repo_local_path: impl AsRef<Path>) -> Self {
-        RepoSource::LocalPath(repo_local_path.as_ref().to_path_buf())
-    }
-
-    pub fn repo_path(&self) -> PathBuf {
-        match self {
-            RepoSource::Downloaded(repo_temp_download) => {
-                repo_temp_download.repository_temp_dir_path()
-            },
-            RepoSource::LocalPath(local_path) => local_path.clone(),
-        }
-    }
-}
+const ZIP_NAME: &str = "mx-sdk-rs-download.zip";
 
 pub struct RepoTempDownload {
+    pub version: RepoVersion,
     pub temp_dir_path: PathBuf,
-    pub repo_temp_dir_name: String,
 }
 
 impl RepoTempDownload {
-    pub async fn download_from_github(temp_dir_path: PathBuf) -> Self {
+    pub async fn download_from_github(version: RepoVersion, temp_dir_path: PathBuf) -> Self {
         let tt_download = RepoTempDownload {
+            version,
             temp_dir_path,
-            repo_temp_dir_name: REPOSITORY_TEMP_DIR_NAME.to_string(),
         };
         tt_download.download_binaries().await.unwrap();
         tt_download.delete_temp_folder();
@@ -50,32 +26,16 @@ impl RepoTempDownload {
         tt_download
     }
 
-    pub fn from_local_copy(repo_local_path: &Path, temp_dir_path: PathBuf) -> Self {
-        let tt_download = RepoTempDownload {
-            temp_dir_path,
-            repo_temp_dir_name: REPOSITORY_TEMP_DIR_NAME.to_string(),
-        };
-        tt_download.delete_temp_folder();
-        copy_dir::copy_dir(
-            repo_local_path,
-            tt_download
-                .temp_dir_path
-                .join(&tt_download.repo_temp_dir_name),
-        )
-        .unwrap();
-        tt_download
-    }
-
     fn zip_path(&self) -> PathBuf {
         self.temp_dir_path.join(ZIP_NAME)
     }
 
     pub fn repository_temp_dir_path(&self) -> PathBuf {
-        self.temp_dir_path.join(REPOSITORY_TEMP_DIR_NAME)
+        self.temp_dir_path.join(self.version.temp_dir_name())
     }
 
     async fn download_binaries(&self) -> Result<(), reqwest::Error> {
-        let response = reqwest::get(REPOSITORY).await?.bytes().await?;
+        let response = reqwest::get(self.version.url()).await?.bytes().await?;
 
         let mut file = match File::create(self.zip_path()) {
             Err(why) => panic!("couldn't create {why}"),

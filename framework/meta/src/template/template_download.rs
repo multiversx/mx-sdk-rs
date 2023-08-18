@@ -1,14 +1,17 @@
-use crate::cli_args::TemplateArgs;
+use crate::{
+    cli_args::TemplateArgs,
+    version_history::{validate_template_tag, LAST_TEMPLATE_VERSION},
+};
 use std::path::PathBuf;
 
 use super::{
-    repo_temp_download::RepoSource,
     template_source::{template_sources, TemplateSource},
-    TemplateAdjuster,
+    RepoSource, RepoVersion, TemplateAdjuster,
 };
 
 pub async fn template_download(args: &TemplateArgs) {
-    let repo_temp_download = RepoSource::download_from_github(std::env::temp_dir()).await;
+    let version = get_repo_version(&args.tag);
+    let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir()).await;
     let downloader = TemplateDownloader::new(
         &repo_temp_download,
         args.template.clone(),
@@ -17,6 +20,15 @@ pub async fn template_download(args: &TemplateArgs) {
     downloader.copy_template(&downloader.template_source.metadata.files_include);
     downloader.update_dependencies();
     downloader.rename_template_to(args.template.clone());
+}
+
+pub(crate) fn get_repo_version(args_tag: &Option<String>) -> RepoVersion {
+    if let Some(tag) = args_tag {
+        assert!(validate_template_tag(tag), "invalid template tag");
+        RepoVersion::Tag(tag.clone())
+    } else {
+        RepoVersion::Tag(LAST_TEMPLATE_VERSION.to_string())
+    }
 }
 
 pub struct TemplateDownloader<'a> {

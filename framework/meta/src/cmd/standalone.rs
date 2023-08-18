@@ -30,8 +30,8 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::Template(args)) => {
             template_download(args).await;
         },
-        Some(StandaloneCliAction::TemplateList) => {
-            print_template_names().await;
+        Some(StandaloneCliAction::TemplateList(args)) => {
+            print_template_names(args).await;
         },
         Some(StandaloneCliAction::TestGen(args)) => {
             test_gen_tool(args);
