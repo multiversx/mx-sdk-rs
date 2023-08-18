@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   template_test:
-    name: Template tool test - released contracts
+    name: Template tool test - released templates
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
