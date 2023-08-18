@@ -21,7 +21,8 @@ name = "sc-meta"
 path = "src/main.rs"
 
 [features]
-template-test = []
+template-test-current = []
+template-test-released = []
 
 [dependencies]
 tokio = { version = "1.24", features = ["full"] }

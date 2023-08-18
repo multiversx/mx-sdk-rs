@@ -6,7 +6,7 @@ pub(crate) mod upgrade;
 
 use crate::{
     cli_args::{StandaloneCliAction, StandaloneCliArgs},
-    template::{print_template_names, template_download},
+    template::{create_contract, print_template_names},
 };
 use all::call_all_meta;
 use clap::Parser;
@@ -28,10 +28,10 @@ pub async fn cli_main_standalone() {
             local_deps(args);
         },
         Some(StandaloneCliAction::Template(args)) => {
-            template_download(args).await;
+            create_contract(args).await;
         },
-        Some(StandaloneCliAction::TemplateList) => {
-            print_template_names().await;
+        Some(StandaloneCliAction::TemplateList(args)) => {
+            print_template_names(args).await;
         },
         Some(StandaloneCliAction::TestGen(args)) => {
             test_gen_tool(args);

@@ -58,7 +58,7 @@ pub enum StandaloneCliAction {
         name = "templates",
         about = "Creates a contract by a pre-existing template"
     )]
-    TemplateList,
+    TemplateList(TemplateListArgs),
     #[command(
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
@@ -184,19 +184,36 @@ pub struct LocalDepsArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TemplateArgs {
-    /// Provide the template you want to clone
-    #[arg(long = "name", verbatim_doc_comment)]
-    pub name: PathBuf,
+    /// The new name the contract is to receive.
+    /// If missing, the template name will be considered.
+    #[arg(long, verbatim_doc_comment)]
+    pub name: Option<String>,
 
-    /// Provide the he template you want to clone
-    #[arg(long = "template", verbatim_doc_comment)]
+    /// The contract template to clone.
+    #[arg(long, verbatim_doc_comment)]
     pub template: String,
+
+    /// The framework version on which the contracts should be created.
+    #[arg(long, verbatim_doc_comment)]
+    pub tag: Option<String>,
+
+    /// Target directory where to create the new contract directory.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<PathBuf>,
 }
 
 impl CliArgsToRaw for TemplateArgs {
     fn to_raw(&self) -> Vec<String> {
         Vec::new()
     }
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TemplateListArgs {
+    /// The framework version referred to.
+    #[arg(long = "tag", verbatim_doc_comment)]
+    pub tag: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

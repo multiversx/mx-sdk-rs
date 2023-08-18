@@ -84,12 +84,20 @@ impl CargoTomlContents {
         }
     }
 
+    pub fn has_dependencies(&self) -> bool {
+        self.toml_value.get(CARGO_TOML_DEPENDENCIES).is_some()
+    }
+
     pub fn dependencies_mut(&mut self) -> &mut Table {
         self.toml_value
             .get_mut(CARGO_TOML_DEPENDENCIES)
             .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn has_dev_dependencies(&self) -> bool {
+        self.toml_value.get(CARGO_TOML_DEV_DEPENDENCIES).is_some()
     }
 
     pub fn dev_dependencies_mut(&mut self) -> &mut Table {
