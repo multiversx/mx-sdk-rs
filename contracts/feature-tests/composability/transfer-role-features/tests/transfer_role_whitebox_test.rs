@@ -17,7 +17,8 @@ const USER_ADDRESS_EXPR: &str = "address:user";
 const TRANSFER_ROLE_FEATURES_ADDRESS_EXPR: &str = "sc:transfer-role-features";
 const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "file:output/transfer_role_features.wasm";
 
-const TRANSFER_TOKEN_ID: &str = "str:TRANSFER-123456";
+const TRANSFER_TOKEN_ID_EXPR: &str = "str:TRANSFER-123456";
+const TRANSFER_TOKEN_ID: &[u8] = b"TRANSFER-123456";
 
 const ACCEPT_FUNDS_FUNC_NAME: &[u8] = b"accept_funds";
 const REJECT_FUNDS_FUNC_NAME: &[u8] = b"reject_funds";
@@ -39,18 +40,13 @@ fn test_transfer_role() {
 
     world.set_state_step(
         SetStateStep::new()
-            .put_account(
-                OWNER_ADDRESS_EXPR,
-                Account::new()
-                    .nonce(1)
-                    .esdt_balance(TRANSFER_TOKEN_ID, 0u64),
-            )
+            .put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1))
             .new_address(OWNER_ADDRESS_EXPR, 1, TRANSFER_ROLE_FEATURES_ADDRESS_EXPR)
             .put_account(
                 USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(TRANSFER_TOKEN_ID, 1_000u64),
+                    .esdt_balance(TRANSFER_TOKEN_ID_EXPR, 1_000u64),
             ),
     );
 
@@ -61,15 +57,10 @@ fn test_transfer_role() {
     const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
 
     world.register_contract(VAULT_PATH_EXPR, vault::ContractBuilder);
-    world.set_state_step(
-        SetStateStep::new().put_account(
-            VAULT_ADDRESS_EXPR,
-            Account::new()
-                .nonce(1)
-                .code(vault_code.clone())
-                .esdt_balance(TRANSFER_TOKEN_ID, 0u64),
-        ),
-    );
+    world.set_state_step(SetStateStep::new().put_account(
+        VAULT_ADDRESS_EXPR,
+        Account::new().nonce(1).code(vault_code.clone()),
+    ));
 
     let transfer_role_features_whitebox = WhiteboxContract::new(
         TRANSFER_ROLE_FEATURES_ADDRESS_EXPR,
@@ -121,12 +112,12 @@ fn test_transfer_role() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID, &rust_biguint!(900)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(900)),
     ));
-    // world.check_state_step(CheckStateStep::new().put_account(
-    //     OWNER_ADDRESS_EXPR,
-    //     CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID, &rust_biguint!(100)),
-    // ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        OWNER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(100)),
+    ));
 
     // transfer to user - err, not whitelisted
     world.whitebox_call_check(
@@ -180,12 +171,12 @@ fn test_transfer_role() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID, &rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(800)),
     ));
-    // world.check_state_step(CheckStateStep::new().put_account(
-    //     VAULT_ADDRESS_EXPR,
-    //     CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID, &rust_biguint!(100)),
-    // ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        VAULT_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(100)),
+    ));
 
     // transfer to sc - reject
     world.whitebox_call(
@@ -212,14 +203,14 @@ fn test_transfer_role() {
         },
     );
 
-    // world.check_state_step(CheckStateStep::new().put_account(
-    //     USER_ADDRESS_EXPR,
-    //     CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID, &rust_biguint!(800)),
-    // ));
-    // world.check_state_step(CheckStateStep::new().put_account(
-    //     VAULT_ADDRESS_EXPR,
-    //     CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID, &rust_biguint!(100)),
-    // ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(800)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        VAULT_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(100)),
+    ));
 }
 
 fn address_expr_to_address(address_expr: &str) -> Address {
