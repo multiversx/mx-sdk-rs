@@ -212,9 +212,9 @@ fn dependecy_decl_expr(template: &str) -> String {
     format!("dependencies.{template}")
 }
 
-pub fn remove_paths_from_deps_map(deps_map: &mut Table, ignore_deps: &Vec<String>) {
+pub fn remove_paths_from_deps_map(deps_map: &mut Table, ignore_deps: &[String]) {
     for (key, value) in deps_map {
-        if ignore_deps.contains(&key) {
+        if ignore_deps.contains(key) {
             continue;
         }
         if let Some(dep) = value.as_table_mut() {
@@ -223,7 +223,7 @@ pub fn remove_paths_from_deps_map(deps_map: &mut Table, ignore_deps: &Vec<String
     }
 }
 
-pub fn remove_paths_from_deps(toml: &mut CargoTomlContents, ignore_deps: &Vec<String>) {
+pub fn remove_paths_from_deps(toml: &mut CargoTomlContents, ignore_deps: &[String]) {
     if toml.has_dependencies() {
         remove_paths_from_deps_map(toml.dependencies_mut(), ignore_deps);
     }
