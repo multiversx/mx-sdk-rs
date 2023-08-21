@@ -26,9 +26,10 @@ fn test_nft_update_attributes_and_send() {
     let mut world = world();
 
     let forwarder_code = world.code_expression(FORWARDER_PATH_EXPR);
-    let mut roles = Vec::new();
-    roles.push(String::from("ESDTRoleNFTCreate"));
-    roles.push(String::from("ESDTRoleNFTUpdateAttributes"));
+    let roles = vec![
+        "ESDTRoleNFTCreate".to_string(),
+        "ESDTRoleNFTUpdateAttributes".to_string(),
+    ];
 
     world.set_state_step(
         SetStateStep::new()
