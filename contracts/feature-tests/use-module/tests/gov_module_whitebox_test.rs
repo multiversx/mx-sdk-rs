@@ -1,8 +1,10 @@
-use multiversx_sc::types::Address;
-use multiversx_sc_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule;
+use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
+use multiversx_sc_modules::governance::{
+    governance_configurable::GovernanceConfigurablePropertiesModule, GovernanceModule,
+};
 use multiversx_sc_scenario::{
-    managed_biguint, managed_token_id, rust_biguint,
-    scenario_model::{Account, AddressValue, ScDeployStep, SetStateStep},
+    managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
+    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
     ScenarioWorld, WhiteboxContract,
 };
 
@@ -15,7 +17,7 @@ const VOTING_PERIOD_BLOCKS: u64 = 20;
 const LOCKING_PERIOD_BLOCKS: u64 = 30;
 
 const INITIAL_GOV_TOKEN_BALANCE: u64 = 1_000;
-const _GAS_LIMIT: u64 = 1_000_000;
+const GAS_LIMIT: u64 = 1_000_000;
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
 const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
@@ -96,6 +98,50 @@ fn setup() -> ScenarioWorld {
     world.set_state_step(SetStateStep::new().block_nonce(10));
 
     world
+}
+
+pub fn propose(
+    world: &mut ScenarioWorld,
+    proposer: &Address,
+    gov_token_amount: u64,
+    dest_address: &Address,
+    endpoint_name: &[u8],
+    args: Vec<Vec<u8>>,
+) -> usize {
+    let use_module_whitebox =
+        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
+
+    let mut proposal_id = 0;
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(proposer).esdt_transfer(
+            GOV_TOKEN_ID,
+            0,
+            &rust_biguint!(gov_token_amount),
+        ),
+        |sc| {
+            let mut args_managed = ManagedVec::new();
+            for arg in args {
+                args_managed.push(managed_buffer!(&arg));
+            }
+
+            let mut actions = MultiValueEncoded::new();
+            actions.push(
+                (
+                    GAS_LIMIT,
+                    managed_address!(dest_address),
+                    managed_buffer!(endpoint_name),
+                    args_managed,
+                )
+                    .into(),
+            );
+
+            proposal_id = sc.propose(managed_buffer!(b"change quorum"), actions);
+        },
+    );
+
+    proposal_id
 }
 
 #[test]
