@@ -1,10 +1,13 @@
 use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
 use multiversx_sc_modules::governance::{
-    governance_configurable::GovernanceConfigurablePropertiesModule, GovernanceModule, governance_proposal::VoteType,
+    governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
+    GovernanceModule,
 };
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
+    scenario_model::{
+        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
+    },
     ScenarioWorld, WhiteboxContract,
 };
 
@@ -155,6 +158,8 @@ fn test_change_gov_config() {
     let use_module_whitebox =
         WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
 
+    let mut current_block_nonce = 10;
+
     let proposal_id = propose(
         &mut world,
         &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
@@ -166,6 +171,7 @@ fn test_change_gov_config() {
 
     assert_eq!(proposal_id, 1);
 
+    // vote too early
     world.whitebox_call_check(
         &use_module_whitebox,
         ScCallStep::new()
@@ -179,6 +185,180 @@ fn test_change_gov_config() {
             r.assert_user_error("Proposal is not active");
         },
     );
+
+    current_block_nonce += VOTING_DELAY_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(SECOND_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(999)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+    );
+
+    // try execute before queue
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.execute(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Can only execute queued proposals");
+        },
+    );
+
+    // try queue before voting ends
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.queue(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Can only queue succeeded proposals");
+        },
+    );
+
+    current_block_nonce += VOTING_PERIOD_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+
+    // try queue not enough votes
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.queue(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Can only queue succeeded proposals");
+        },
+    );
+
+    // user 1 vote again
+    world.set_state_step(SetStateStep::new().block_nonce(20));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(FIRST_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+    );
+
+    // owner downvote
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(OWNER_ADDRESS_EXPR).esdt_transfer(
+            GOV_TOKEN_ID,
+            0,
+            rust_biguint!(200),
+        ),
+        |sc| {
+            sc.vote(proposal_id, VoteType::DownVote);
+        },
+    );
+
+    // try queue too many downvotes
+    world.set_state_step(SetStateStep::new().block_nonce(45));
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.queue(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Can only queue succeeded proposals");
+        },
+    );
+
+    // user 1 vote again
+    world.set_state_step(SetStateStep::new().block_nonce(20));
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(FIRST_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200))
+            .no_expect(),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+        |r| {
+            r.assert_user_error("Already voted for this proposal");
+        },
+    );
+
+    // user 3 vote again
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(THIRD_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+    );
+
+    // queue ok
+    current_block_nonce = 45;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.queue(proposal_id);
+        },
+    );
+
+    // try execute too early
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.execute(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Proposal is in timelock status. Try again later");
+        },
+    );
+
+    // execute ok
+    current_block_nonce += LOCKING_PERIOD_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.execute(proposal_id);
+        },
+    );
+
+    // after execution, quorum changed from 1_500 to the proposed 1_000
+    world.whitebox_query(&use_module_whitebox, |sc| {
+        assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
+        assert!(sc.proposals().item_is_empty(1));
+    });
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        FIRST_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(300)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        SECOND_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(1)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        THIRD_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        OWNER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+    ));
 }
 
 #[test]
