@@ -2,7 +2,9 @@ use multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier, ManagedVec};
 use multiversx_sc_modules::staking::StakingModule;
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
-    scenario_model::{Account, AddressValue, ScDeployStep, SetStateStep},
+    scenario_model::{
+        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
+    },
     ScenarioWorld, WhiteboxContract,
 };
 
@@ -93,6 +95,119 @@ fn test_staking_module() {
             );
         },
     );
+
+    // try stake - not a board member
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(EVE_ADDRESS_EXPR)
+            .esdt_transfer(STAKING_TOKEN_ID, 0, rust_biguint!(REQUIRED_STAKE_AMOUNT))
+            .no_expect(),
+        |sc| sc.stake(),
+        |r| {
+            r.assert_user_error("Only whitelisted members can stake");
+        },
+    );
+
+    // stake half and try unstake
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).esdt_transfer(
+            STAKING_TOKEN_ID,
+            0,
+            rust_biguint!(REQUIRED_STAKE_AMOUNT / 2),
+        ),
+        |sc| sc.stake(),
+    );
+
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).no_expect(),
+        |sc| sc.unstake(managed_biguint!(REQUIRED_STAKE_AMOUNT / 4)),
+        |r| {
+            r.assert_user_error("Not enough stake");
+        },
+    );
+
+    // bob and carol stake
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(BOB_ADDRESS_EXPR).esdt_transfer(
+            STAKING_TOKEN_ID,
+            0,
+            rust_biguint!(REQUIRED_STAKE_AMOUNT),
+        ),
+        |sc| sc.stake(),
+    );
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(CAROL_ADDRESS_EXPR).esdt_transfer(
+            STAKING_TOKEN_ID,
+            0,
+            rust_biguint!(REQUIRED_STAKE_AMOUNT),
+        ),
+        |sc| sc.stake(),
+    );
+
+    // try vote slash, not enough stake
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).no_expect(),
+        |sc| sc.vote_slash_member(managed_address!(&address_expr_to_address(BOB_ADDRESS_EXPR))),
+        |r| {
+            r.assert_user_error("Not enough stake");
+        },
+    );
+
+    // try vote slash, slashed address not a board member
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).no_expect(),
+        |sc| sc.vote_slash_member(managed_address!(&address_expr_to_address(EVE_ADDRESS_EXPR))),
+        |r| {
+            r.assert_user_error("Voted user is not a staked board member");
+        },
+    );
+
+    // alice stake over max amount and withdraw surplus
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).esdt_transfer(
+            STAKING_TOKEN_ID,
+            0,
+            rust_biguint!(REQUIRED_STAKE_AMOUNT),
+        ),
+        |sc| {
+            sc.stake();
+            let alice_staked_amount = sc
+                .staked_amount(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .get();
+            assert_eq!(alice_staked_amount, managed_biguint!(1_500_000));
+        },
+    );
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR),
+        |sc| {
+            sc.unstake(managed_biguint!(500_000));
+
+            let alice_staked_amount = sc
+                .staked_amount(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .get();
+            assert_eq!(alice_staked_amount, managed_biguint!(1_000_000));
+        },
+    );
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        ALICE_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(1_000_000)),
+    ));
 }
 
 fn address_expr_to_address(address_expr: &str) -> Address {
