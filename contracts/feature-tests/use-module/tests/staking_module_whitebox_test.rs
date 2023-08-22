@@ -290,6 +290,109 @@ fn test_staking_module() {
                 ))));
         },
     );
+
+    // slash alice
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(BOB_ADDRESS_EXPR),
+        |sc| {
+            sc.slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+
+            assert_eq!(
+                sc.staked_amount(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .get(),
+                managed_biguint!(REQUIRED_STAKE_AMOUNT - SLASH_AMOUNT)
+            );
+            assert_eq!(
+                sc.total_slashed_amount().get(),
+                managed_biguint!(SLASH_AMOUNT)
+            );
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .is_empty());
+        },
+    );
+
+    // alice try vote after slash
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.vote_slash_member(managed_address!(&address_expr_to_address(BOB_ADDRESS_EXPR)));
+        },
+        |r| {
+            r.assert_user_error("Not enough stake");
+        },
+    );
+
+    // alice try unstake the remaining tokens
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.unstake(managed_biguint!(400_000));
+        },
+        |r| {
+            r.assert_user_error("Not enough stake");
+        },
+    );
+
+    // alice remove from board members
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(OWNER_ADDRESS_EXPR),
+        |sc| {
+            // check alice's votes before slash
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    BOB_ADDRESS_EXPR
+                )))
+                .contains(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                ))));
+
+            sc.remove_board_member(&managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+
+            assert_eq!(sc.user_whitelist().len(), 2);
+            assert!(!sc
+                .user_whitelist()
+                .contains(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                ))));
+
+            // alice's vote gets removed
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    BOB_ADDRESS_EXPR
+                )))
+                .is_empty());
+        },
+    );
+
+    // alice unstake ok
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR),
+        |sc| {
+            sc.unstake(managed_biguint!(400_000));
+        },
+    );
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        ALICE_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(
+            STAKING_TOKEN_ID_EXPR,
+            rust_biguint!(INITIAL_BALANCE - SLASH_AMOUNT),
+        ),
+    ));
 }
 
 fn address_expr_to_address(address_expr: &str) -> Address {
