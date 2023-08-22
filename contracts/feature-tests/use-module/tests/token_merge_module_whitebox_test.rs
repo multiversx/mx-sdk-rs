@@ -36,6 +36,24 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
+#[test]
+fn test_token_merge() {}
+
+#[test]
+fn test_partial_split() {}
+
+#[test]
+fn test_custom_attributes() {}
+
 fn address_expr_to_address(address_expr: &str) -> Address {
     AddressValue::from(address_expr).to_address()
+}
+
+fn uris_to_vec(uris: &[&[u8]]) -> Vec<Vec<u8>> {
+    let mut out = Vec::new();
+    for uri in uris {
+        out.push((*uri).to_vec());
+    }
+
+    out
 }
