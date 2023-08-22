@@ -1,0 +1,59 @@
+{
+    "name": "get caller",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_shard_of_address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_shard_of_address",
+                "arguments": ["sc:basic-features"],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scQuery",
+            "id": "get_shard_of_address_query",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "get_shard_of_address",
+                "arguments": ["sc:basic-features"]
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

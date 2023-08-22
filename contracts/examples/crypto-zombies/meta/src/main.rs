@@ -1,3 +1,3 @@
 fn main() {
-    multiversx_sc_meta::cli_main::<cryptozombies::AbiProvider>();
+    multiversx_sc_meta::cli_main::<crypto_zombies::AbiProvider>();
 }

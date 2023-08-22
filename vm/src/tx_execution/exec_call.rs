@@ -20,9 +20,9 @@ use super::BlockchainVMRef;
 ///
 /// It expectes that the stack is properly set up.
 pub fn execute_current_tx_context_input() {
-    let tx_context_rc = TxContextStack::static_peek();
-    let func_name = tx_context_rc.input_ref().func_name.clone();
-    let instance = tx_context_rc.vm_ref.get_contract_instance(&tx_context_rc);
+    let tx_context_arc = TxContextStack::static_peek();
+    let func_name = tx_context_arc.input_ref().func_name.clone();
+    let instance = tx_context_arc.vm_ref.get_contract_instance(&tx_context_arc);
     instance.call(func_name.as_str()).expect("execution error");
 }
 
@@ -49,8 +49,8 @@ impl BlockchainVMRef {
     where
         F: FnOnce(),
     {
-        state.with_shared(|state_rc| {
-            let tx_cache = TxCache::new(state_rc);
+        state.with_shared(|state_arc| {
+            let tx_cache = TxCache::new(state_arc);
             let mut tx_context_sh =
                 Shareable::new(TxContext::new(self.clone(), tx_input, tx_cache));
             TxContextStack::execute_on_vm_stack(&mut tx_context_sh, f);
@@ -87,8 +87,8 @@ impl BlockchainVMRef {
     {
         state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
-        let (tx_result, blockchain_updates) = state.with_shared(|state_rc| {
-            let tx_cache = TxCache::new(state_rc);
+        let (tx_result, blockchain_updates) = state.with_shared(|state_arc| {
+            let tx_cache = TxCache::new(state_arc);
             self.execute_builtin_function_or_default(tx_input, tx_cache, f)
         });
 
@@ -224,8 +224,8 @@ impl BlockchainVMRef {
         async_data: &AsyncCallTxData,
         state: &mut Shareable<BlockchainState>,
     ) -> Result<BlockchainUpdate, TxPanic> {
-        state.with_shared(|state_rc| {
-            let tx_cache = TxCache::new(state_rc);
+        state.with_shared(|state_arc| {
+            let tx_cache = TxCache::new(state_arc);
             tx_cache.subtract_egld_balance(&async_data.from, &async_data.call_value)?;
             tx_cache.insert_account(AccountData {
                 address: async_data.to.clone(),

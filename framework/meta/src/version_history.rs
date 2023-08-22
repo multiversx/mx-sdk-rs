@@ -1,9 +1,14 @@
-/// Not necessarily the last entry in `VERSIONS`.
+/// The last version to be used for upgrades and templates.
 ///
-/// Indicates where to stop with the upgrades.
-pub const DEFAULT_LAST_VERSION: &str = "0.42.0";
+/// Should be edited every time a new version of the framework is released.
+pub const LAST_VERSION: &str = "0.43.2";
 
-/// Known version for the upgrader.
+/// Indicates where to stop with the upgrades.
+pub const LAST_UPGRADE_VERSION: &str = LAST_VERSION;
+
+pub const LAST_TEMPLATE_VERSION: &str = LAST_VERSION;
+
+/// Known versions for the upgrader.
 #[rustfmt::skip]
 pub const VERSIONS: &[&str] = &[
     "0.28.0",
@@ -39,7 +44,20 @@ pub const VERSIONS: &[&str] = &[
     "0.41.2",
     "0.41.3",
     "0.42.0",
+    "0.43.0",
+    "0.43.1",
+    "0.43.2",
 ];
+
+/// We started supporting contract templates with version 0.43.0.
+pub fn template_versions() -> &'static [&'static str] {
+    &VERSIONS[33..]
+}
+
+pub fn validate_template_tag(tag: &str) -> bool {
+    let versions = template_versions();
+    versions.iter().any(|&tt| tt == tag)
+}
 
 pub struct VersionIterator {
     next_version: usize,
@@ -77,5 +95,18 @@ pub fn versions_iter(last_version: String) -> VersionIterator {
     VersionIterator {
         next_version: 1,
         last_version,
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use super::*;
+
+    #[test]
+    fn template_versions_test() {
+        assert_eq!(template_versions()[0], "0.43.0");
+
+        assert!(validate_template_tag("0.43.0"));
+        assert!(!validate_template_tag("0.42.0"));
     }
 }

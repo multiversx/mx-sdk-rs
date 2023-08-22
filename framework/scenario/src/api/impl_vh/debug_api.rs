@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use multiversx_chain_vm::{
     executor::{BreakpointValue, VMHooks},
@@ -80,9 +80,9 @@ pub type DebugApi = VMHooksApi<DebugApiBackend>;
 impl DebugApi {
     pub fn dummy() {
         let tx_context = TxContext::dummy();
-        let tx_context_rc = Rc::new(tx_context);
+        let tx_context_arc = Arc::new(tx_context);
         // TODO: WARNING: this does not clean up after itself, must fix!!!
-        TxContextStack::static_push(tx_context_rc);
+        TxContextStack::static_push(tx_context_arc);
         StaticVarStack::static_push();
     }
 }

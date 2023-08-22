@@ -177,9 +177,15 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.len() == 0
     }
 
-    #[inline]
+    /// Method provided for convenience in tests, not to be used in contracts.
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
         M::managed_type_impl().mb_to_boxed_bytes(self.handle.clone())
+    }
+
+    /// Method provided for convenience in tests, not to be used in contracts.
+    #[cfg(feature = "alloc")]
+    pub fn to_vec(&self) -> alloc::vec::Vec<u8> {
+        self.to_boxed_bytes().into_vec()
     }
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
@@ -469,5 +475,17 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
                 &encode_bytes_as_hex(self.to_boxed_bytes().as_slice()),
             )
             .finish()
+    }
+}
+
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        use crate::contract_base::ErrorHelper;
+
+        let s = alloc::string::String::from_utf8(self.to_boxed_bytes().into_vec())
+            .unwrap_or_else(|err| ErrorHelper::<M>::signal_error_with_message(err.as_bytes()));
+
+        s.fmt(f)
     }
 }

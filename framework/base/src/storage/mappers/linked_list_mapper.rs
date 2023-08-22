@@ -577,10 +577,11 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, T>
+impl<SA, T, U> CodecFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, U>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+    U: CodecFrom<T>,
 {
 }
 

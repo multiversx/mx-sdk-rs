@@ -3,13 +3,11 @@ use crate::{
     types::VMAddress,
     world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };
-use core::cell::RefCell;
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
-    cell::{Ref, RefMut},
     collections::HashMap,
-    rc::Rc,
+    sync::{Arc, Mutex, MutexGuard},
 };
 
 use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
@@ -17,27 +15,27 @@ use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, T
 pub struct TxContext {
     pub vm_ref: BlockchainVMRef,
     pub tx_input_box: Box<TxInput>,
-    pub tx_cache: Rc<TxCache>,
-    pub managed_types: RefCell<TxManagedTypes>,
-    pub tx_result_cell: RefCell<TxResult>,
-    pub b_rng: RefCell<BlockchainRng>,
+    pub tx_cache: Arc<TxCache>,
+    pub managed_types: Mutex<TxManagedTypes>,
+    pub tx_result_cell: Mutex<TxResult>,
+    pub b_rng: Mutex<BlockchainRng>,
 }
 
 impl TxContext {
     pub fn new(vm_ref: BlockchainVMRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
-        let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
+        let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
             vm_ref,
             tx_input_box: Box::new(tx_input),
-            tx_cache: Rc::new(tx_cache),
-            managed_types: RefCell::new(TxManagedTypes::new()),
-            tx_result_cell: RefCell::new(TxResult::empty()),
+            tx_cache: Arc::new(tx_cache),
+            managed_types: Mutex::new(TxManagedTypes::new()),
+            tx_result_cell: Mutex::new(TxResult::empty()),
             b_rng,
         }
     }
 
     pub fn dummy() -> Self {
-        let tx_cache = TxCache::new(Rc::new(BlockchainState::default()));
+        let tx_cache = TxCache::new(Arc::new(BlockchainState::default()));
         let contract_address = VMAddress::from([b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
@@ -58,13 +56,13 @@ impl TxContext {
             ..Default::default()
         };
 
-        let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
+        let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
             vm_ref: BlockchainVMRef::new(Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
-            tx_cache: Rc::new(tx_cache),
-            managed_types: RefCell::new(TxManagedTypes::new()),
-            tx_result_cell: RefCell::new(TxResult::empty()),
+            tx_cache: Arc::new(tx_cache),
+            managed_types: Mutex::new(TxManagedTypes::new()),
+            tx_result_cell: Mutex::new(TxResult::empty()),
             b_rng,
         }
     }
@@ -77,7 +75,7 @@ impl TxContext {
         &self.tx_cache
     }
 
-    pub fn blockchain_cache_rc(&self) -> Rc<TxCache> {
+    pub fn blockchain_cache_arc(&self) -> Arc<TxCache> {
         self.tx_cache.clone()
     }
 
@@ -113,24 +111,20 @@ impl TxContext {
         self.with_account_mut(&self.tx_input_box.to, f)
     }
 
-    pub fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
-        self.managed_types.borrow()
+    pub fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+        self.managed_types.lock().unwrap()
     }
 
-    pub fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
-        self.managed_types.borrow_mut()
-    }
-
-    pub fn result_borrow_mut(&self) -> RefMut<TxResult> {
-        self.tx_result_cell.borrow_mut()
+    pub fn result_lock(&self) -> MutexGuard<TxResult> {
+        self.tx_result_cell.lock().unwrap()
     }
 
     pub fn extract_result(&self) -> TxResult {
-        self.tx_result_cell.replace(TxResult::empty())
+        std::mem::replace(&mut *self.tx_result_cell.lock().unwrap(), TxResult::empty())
     }
 
-    pub fn rng_borrow_mut(&self) -> RefMut<BlockchainRng> {
-        self.b_rng.borrow_mut()
+    pub fn rng_lock(&self) -> MutexGuard<BlockchainRng> {
+        self.b_rng.lock().unwrap()
     }
 
     pub fn create_new_contract(
@@ -158,13 +152,13 @@ impl TxContext {
     }
 
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
-        let tx_cache = Rc::try_unwrap(self.tx_cache).unwrap();
+        let tx_cache = Arc::try_unwrap(self.tx_cache).unwrap();
         tx_cache.into_blockchain_updates()
     }
 
     pub fn into_results(self) -> (TxResult, BlockchainUpdate) {
-        let tx_cache = Rc::try_unwrap(self.tx_cache).unwrap();
-        let tx_result = RefCell::into_inner(self.tx_result_cell);
+        let tx_cache = Arc::try_unwrap(self.tx_cache).unwrap();
+        let tx_result = Mutex::into_inner(self.tx_result_cell).unwrap();
         let blockchain_updates = tx_cache.into_blockchain_updates();
         (tx_result, blockchain_updates)
     }
