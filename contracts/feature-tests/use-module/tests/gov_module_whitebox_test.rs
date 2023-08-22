@@ -1,6 +1,6 @@
 use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
 use multiversx_sc_modules::governance::{
-    governance_configurable::GovernanceConfigurablePropertiesModule, GovernanceModule,
+    governance_configurable::GovernanceConfigurablePropertiesModule, GovernanceModule, governance_proposal::VoteType,
 };
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
@@ -150,7 +150,36 @@ fn test_init() {
 }
 
 #[test]
-fn test_change_gov_config() {}
+fn test_change_gov_config() {
+    let mut world = setup();
+    let use_module_whitebox =
+        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
+
+    let proposal_id = propose(
+        &mut world,
+        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        500,
+        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
+    );
+
+    assert_eq!(proposal_id, 1);
+
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(SECOND_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(999))
+            .no_expect(),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+        |r| {
+            r.assert_user_error("Proposal is not active");
+        },
+    );
+}
 
 #[test]
 fn test_down_veto_gov_config() {}
@@ -161,6 +190,6 @@ fn test_abstain_vote_gov_config() {}
 #[test]
 fn test_gov_cancel_defeated_proposal() {}
 
-fn _address_expr_to_address(address_expr: &str) -> Address {
+fn address_expr_to_address(address_expr: &str) -> Address {
     AddressValue::from(address_expr).to_address()
 }
