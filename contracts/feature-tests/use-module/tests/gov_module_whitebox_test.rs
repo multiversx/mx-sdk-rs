@@ -1,19 +1,29 @@
 use multiversx_sc::types::Address;
-use multiversx_sc_scenario::{scenario_model::AddressValue, ScenarioWorld};
+use multiversx_sc_modules::governance::governance_configurable::GovernanceConfigurablePropertiesModule;
+use multiversx_sc_scenario::{
+    managed_biguint, managed_token_id, rust_biguint,
+    scenario_model::{Account, AddressValue, ScDeployStep, SetStateStep},
+    ScenarioWorld, WhiteboxContract,
+};
 
-const _GOV_TOKEN_ID_EXPR: &str = "str:GOV-123456";
-const _GOV_TOKEN_ID: &[u8] = b"GOV-123456";
-const _QUORUM: u64 = 1_500;
-const _MIN_BALANCE_PROPOSAL: u64 = 500;
-const _VOTING_DELAY_BLOCKS: u64 = 10;
-const _VOTING_PERIOD_BLOCKS: u64 = 20;
-const _LOCKING_PERIOD_BLOCKS: u64 = 30;
+const GOV_TOKEN_ID_EXPR: &str = "str:GOV-123456";
+const GOV_TOKEN_ID: &[u8] = b"GOV-123456";
+const QUORUM: u64 = 1_500;
+const MIN_BALANCE_PROPOSAL: u64 = 500;
+const VOTING_DELAY_BLOCKS: u64 = 10;
+const VOTING_PERIOD_BLOCKS: u64 = 20;
+const LOCKING_PERIOD_BLOCKS: u64 = 30;
 
-const _INITIAL_GOV_TOKEN_BALANCE: u64 = 1_000;
+const INITIAL_GOV_TOKEN_BALANCE: u64 = 1_000;
 const _GAS_LIMIT: u64 = 1_000_000;
 
-const _USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
+const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
 const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
+
+const OWNER_ADDRESS_EXPR: &str = "address:owner";
+const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";
+const SECOND_USER_ADDRESS_EXPR: &str = "address:second-user";
+const THIRD_USER_ADDRESS_EXPR: &str = "address:third-user";
 
 pub struct Payment {
     pub token: Vec<u8>,
@@ -30,8 +40,62 @@ fn world() -> ScenarioWorld {
 }
 
 fn setup() -> ScenarioWorld {
-    // setup
-    world()
+    let mut world = world();
+
+    world.set_state_step(
+        SetStateStep::new()
+            .put_account(
+                OWNER_ADDRESS_EXPR,
+                Account::new()
+                    .nonce(1)
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+            )
+            .new_address(OWNER_ADDRESS_EXPR, 1, USE_MODULE_ADDRESS_EXPR)
+            .put_account(
+                FIRST_USER_ADDRESS_EXPR,
+                Account::new()
+                    .nonce(1)
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+            )
+            .put_account(
+                SECOND_USER_ADDRESS_EXPR,
+                Account::new()
+                    .nonce(1)
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+            )
+            .put_account(
+                THIRD_USER_ADDRESS_EXPR,
+                Account::new()
+                    .nonce(1)
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+            ),
+    );
+
+    // init
+    let use_module_whitebox =
+        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
+    let use_module_code = world.code_expression(USE_MODULE_PATH_EXPR);
+
+    world.whitebox_deploy(
+        &use_module_whitebox,
+        ScDeployStep::new()
+            .from(OWNER_ADDRESS_EXPR)
+            .code(use_module_code),
+        |sc| {
+            sc.init_governance_module(
+                managed_token_id!(GOV_TOKEN_ID),
+                managed_biguint!(QUORUM),
+                managed_biguint!(MIN_BALANCE_PROPOSAL),
+                VOTING_DELAY_BLOCKS,
+                VOTING_PERIOD_BLOCKS,
+                LOCKING_PERIOD_BLOCKS,
+            );
+        },
+    );
+
+    world.set_state_step(SetStateStep::new().block_nonce(10));
+
+    world
 }
 
 #[test]
