@@ -239,7 +239,8 @@ fn test_change_gov_config() {
     );
 
     // user 1 vote again
-    world.set_state_step(SetStateStep::new().block_nonce(20));
+    current_block_nonce = 20;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new()
@@ -264,7 +265,8 @@ fn test_change_gov_config() {
     );
 
     // try queue too many downvotes
-    world.set_state_step(SetStateStep::new().block_nonce(45));
+    current_block_nonce = 45;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
     world.whitebox_call_check(
         &use_module_whitebox,
         ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
@@ -277,7 +279,8 @@ fn test_change_gov_config() {
     );
 
     // user 1 vote again
-    world.set_state_step(SetStateStep::new().block_nonce(20));
+    current_block_nonce = 20;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
     world.whitebox_call_check(
         &use_module_whitebox,
         ScCallStep::new()
@@ -362,7 +365,86 @@ fn test_change_gov_config() {
 }
 
 #[test]
-fn test_down_veto_gov_config() {}
+fn test_down_veto_gov_config() {
+    let mut world = setup();
+    let use_module_whitebox =
+        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
+
+    let mut current_block_nonce = 10;
+
+    let proposal_id = propose(
+        &mut world,
+        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        500,
+        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
+    );
+
+    assert_eq!(proposal_id, 1);
+
+    current_block_nonce += VOTING_DELAY_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(FIRST_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(300)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+    );
+
+    current_block_nonce = 20;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(SECOND_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+    );
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(THIRD_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::DownVetoVote);
+        },
+    );
+
+    // Vote didn't succeed;
+    current_block_nonce = 45;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.queue(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Can only queue succeeded proposals");
+        },
+    );
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        FIRST_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(200)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        SECOND_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        THIRD_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+    ));
+}
 
 #[test]
 fn test_abstain_vote_gov_config() {}
