@@ -543,7 +543,60 @@ fn test_abstain_vote_gov_config() {
 }
 
 #[test]
-fn test_gov_cancel_defeated_proposal() {}
+fn test_gov_cancel_defeated_proposal() {
+    let mut world = setup();
+    let use_module_whitebox =
+        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
+
+    let mut current_block_nonce = 10;
+
+    let proposal_id = propose(
+        &mut world,
+        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        500,
+        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
+    );
+
+    assert_eq!(proposal_id, 1);
+
+    current_block_nonce += VOTING_DELAY_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(SECOND_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(999)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::DownVote);
+        },
+    );
+
+    // try cancel too early
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(SECOND_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.cancel(proposal_id);
+        },
+        |r| {
+            r.assert_user_error("Action may not be cancelled");
+        },
+    );
+
+    current_block_nonce += VOTING_PERIOD_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(SECOND_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.cancel(proposal_id);
+        },
+    );
+}
 
 fn address_expr_to_address(address_expr: &str) -> Address {
     AddressValue::from(address_expr).to_address()
