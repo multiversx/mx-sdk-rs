@@ -447,7 +447,100 @@ fn test_down_veto_gov_config() {
 }
 
 #[test]
-fn test_abstain_vote_gov_config() {}
+fn test_abstain_vote_gov_config() {
+    let mut world = setup();
+    let use_module_whitebox =
+        WhiteboxContract::new(USE_MODULE_ADDRESS_EXPR, use_module::contract_obj);
+
+    let mut current_block_nonce = 10;
+
+    let proposal_id = propose(
+        &mut world,
+        &address_expr_to_address(FIRST_USER_ADDRESS_EXPR),
+        500,
+        &address_expr_to_address(USE_MODULE_ADDRESS_EXPR),
+        b"changeQuorum",
+        vec![1_000u64.to_be_bytes().to_vec()],
+    );
+
+    assert_eq!(proposal_id, 1);
+
+    current_block_nonce += VOTING_DELAY_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(FIRST_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(500)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::UpVote);
+        },
+    );
+
+    current_block_nonce = 20;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(SECOND_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(400)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::DownVote);
+        },
+    );
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new()
+            .from(THIRD_USER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(600)),
+        |sc| {
+            sc.vote(proposal_id, VoteType::AbstainVote);
+        },
+    );
+
+    // Vote didn't succeed;
+    current_block_nonce = 45;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.queue(proposal_id);
+        },
+    );
+
+    // execute ok
+    current_block_nonce += LOCKING_PERIOD_BLOCKS;
+    world.set_state_step(SetStateStep::new().block_nonce(current_block_nonce));
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(FIRST_USER_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.execute(proposal_id);
+        },
+    );
+
+    // after execution, quorum changed from 1_500 to the proposed 1_000
+    world.whitebox_query(&use_module_whitebox, |sc| {
+        assert_eq!(sc.quorum().get(), managed_biguint!(1_000));
+        assert!(sc.proposals().item_is_empty(1));
+    });
+
+    world.check_state_step(CheckStateStep::new().put_account(
+        FIRST_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(0)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        SECOND_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(600)),
+    ));
+    world.check_state_step(CheckStateStep::new().put_account(
+        THIRD_USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(400)),
+    ));
+}
 
 #[test]
 fn test_gov_cancel_defeated_proposal() {}
