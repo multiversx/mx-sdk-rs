@@ -208,6 +208,88 @@ fn test_staking_module() {
         ALICE_ADDRESS_EXPR,
         CheckAccount::new().esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(1_000_000)),
     ));
+
+    // alice vote to slash bob
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(ALICE_ADDRESS_EXPR),
+        |sc| {
+            sc.vote_slash_member(managed_address!(&address_expr_to_address(BOB_ADDRESS_EXPR)));
+
+            assert_eq!(
+                sc.slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    BOB_ADDRESS_EXPR
+                )))
+                .len(),
+                1
+            );
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    BOB_ADDRESS_EXPR
+                )))
+                .contains(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                ))));
+        },
+    );
+
+    // bob vote to slash alice
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(BOB_ADDRESS_EXPR),
+        |sc| {
+            sc.vote_slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+        },
+    );
+
+    // try slash before quorum reached
+    world.whitebox_call_check(
+        &use_module_whitebox,
+        ScCallStep::new().from(BOB_ADDRESS_EXPR).no_expect(),
+        |sc| {
+            sc.slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+        },
+        |r| {
+            r.assert_user_error("Quorum not reached");
+        },
+    );
+
+    // carol vote
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(CAROL_ADDRESS_EXPR),
+        |sc| {
+            sc.vote_slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+
+            assert_eq!(
+                sc.slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .len(),
+                2
+            );
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .contains(&managed_address!(&address_expr_to_address(
+                    BOB_ADDRESS_EXPR
+                ))));
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .contains(&managed_address!(&address_expr_to_address(
+                    CAROL_ADDRESS_EXPR
+                ))));
+        },
+    );
 }
 
 fn address_expr_to_address(address_expr: &str) -> Address {
