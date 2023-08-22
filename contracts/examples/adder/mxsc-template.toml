@@ -1,0 +1,18 @@
+name = "adder"
+contract_trait = "Adder"
+src_file = "adder.rs"
+rename_pairs = [
+    [
+        "blockchain.set_current_dir_from_workspace(\"contracts/examples/adder\");",
+        "// blockchain.set_current_dir_from_workspace(\"relative path to your workspace, if applicable\");",
+    ],
+]
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "wasm/Cargo.toml",
+    "Cargo.toml",
+    "README.md",
+]

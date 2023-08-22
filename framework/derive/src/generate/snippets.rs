@@ -34,7 +34,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
         pub struct ContractBuilder;
 
         impl multiversx_sc::contract_base::CallableContractBuilder for self::ContractBuilder {
-            fn new_contract_obj<A: multiversx_sc::api::VMApi>(
+            fn new_contract_obj<A: multiversx_sc::api::VMApi + Send + Sync>(
                 &self,
             ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract> {
                 multiversx_sc::types::heap::Box::new(ContractObj::<A> {
@@ -64,7 +64,7 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
     quote! {
         impl<A> multiversx_sc::contract_base::CallableContract for ContractObj<A>
         where
-            A: multiversx_sc::api::VMApi,
+            A: multiversx_sc::api::VMApi + Send + Sync,
         {
             fn call(&self, fn_name: &str) -> bool {
                 EndpointWrappers::call(self, fn_name)

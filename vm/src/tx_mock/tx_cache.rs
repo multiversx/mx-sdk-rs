@@ -1,8 +1,7 @@
 use std::{
-    cell::{Ref, RefCell},
     collections::HashMap,
     fmt,
-    rc::Rc,
+    sync::{Arc, Mutex},
 };
 
 use crate::{
@@ -14,9 +13,9 @@ use crate::{
 use super::{BlockchainUpdate, TxCacheSource};
 
 pub struct TxCache {
-    source_ref: Rc<dyn TxCacheSource>,
-    pub(super) accounts: RefCell<HashMap<VMAddress, AccountData>>,
-    pub(super) new_token_identifiers: RefCell<Option<Vec<String>>>,
+    source_ref: Arc<dyn TxCacheSource>,
+    pub(super) accounts: Mutex<HashMap<VMAddress, AccountData>>,
+    pub(super) new_token_identifiers: Mutex<Option<Vec<String>>>,
 }
 
 impl fmt::Debug for TxCache {
@@ -28,11 +27,11 @@ impl fmt::Debug for TxCache {
 }
 
 impl TxCache {
-    pub fn new(source_ref: Rc<dyn TxCacheSource>) -> Self {
+    pub fn new(source_ref: Arc<dyn TxCacheSource>) -> Self {
         TxCache {
             source_ref,
-            accounts: RefCell::new(HashMap::new()),
-            new_token_identifiers: RefCell::new(None),
+            accounts: Mutex::new(HashMap::new()),
+            new_token_identifiers: Mutex::new(None),
         }
     }
 
@@ -41,7 +40,7 @@ impl TxCache {
     }
 
     fn load_account_if_necessary(&self, address: &VMAddress) {
-        let mut accounts_mut = self.accounts.borrow_mut();
+        let mut accounts_mut = self.accounts.lock().unwrap();
         if !accounts_mut.contains_key(address) {
             if let Some(blockchain_account) = self.source_ref.load_account(address) {
                 accounts_mut.insert(address.clone(), blockchain_account);
@@ -54,7 +53,7 @@ impl TxCache {
         F: FnOnce(&AccountData) -> R,
     {
         self.load_account_if_necessary(address);
-        let accounts = self.accounts.borrow();
+        let accounts = self.accounts.lock().unwrap();
         let account = accounts
             .get(address)
             .unwrap_or_else(|| panic!("Account {} not found", address_hex(address)));
@@ -66,7 +65,7 @@ impl TxCache {
         F: FnOnce(&mut AccountData) -> R,
     {
         self.load_account_if_necessary(address);
-        let mut accounts = self.accounts.borrow_mut();
+        let mut accounts = self.accounts.lock().unwrap();
         let account = accounts
             .get_mut(address)
             .unwrap_or_else(|| panic!("Account {} not found", address_hex(address)));
@@ -75,7 +74,8 @@ impl TxCache {
 
     pub fn insert_account(&self, account_data: AccountData) {
         self.accounts
-            .borrow_mut()
+            .lock()
+            .unwrap()
             .insert(account_data.address.clone(), account_data);
     }
 
@@ -83,10 +83,6 @@ impl TxCache {
         self.with_account_mut(address, |account| {
             account.nonce += 1;
         });
-    }
-
-    pub fn get_all_accounts(&self) -> Ref<HashMap<VMAddress, AccountData>> {
-        self.accounts.borrow()
     }
 
     /// Assumes the nonce has already been increased.
@@ -104,19 +100,17 @@ impl TxCache {
     }
 
     pub fn set_new_token_identifiers(&self, token_identifiers: Vec<String>) {
-        *self.new_token_identifiers.borrow_mut() = Some(token_identifiers);
+        *self.new_token_identifiers.lock().unwrap() = Some(token_identifiers);
     }
 
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
         BlockchainUpdate {
-            accounts: self.accounts.into_inner(),
-            new_token_identifiers: self.new_token_identifiers.into_inner(),
+            accounts: self.accounts.into_inner().unwrap(),
+            new_token_identifiers: self.new_token_identifiers.into_inner().unwrap(),
         }
     }
 
     pub fn commit_updates(&self, updates: BlockchainUpdate) {
-        self.accounts
-            .borrow_mut()
-            .extend(updates.accounts.into_iter());
+        self.accounts.lock().unwrap().extend(updates.accounts);
     }
 }

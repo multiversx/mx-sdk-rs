@@ -1,6 +1,6 @@
 use std::{
     ops::{Deref, DerefMut},
-    rc::Rc,
+    sync::Arc,
 };
 
 /// Wraps an object and provides mutable access to it.
@@ -11,7 +11,7 @@ use std::{
 /// All reference-counted pointers are expected to be dropped until that closure finishes.
 pub enum Shareable<T> {
     Owned(T),
-    Shared(Rc<T>),
+    Shared(Arc<T>),
 }
 
 impl<T> Shareable<T> {
@@ -61,19 +61,19 @@ impl<T> DerefMut for Shareable<T> {
 }
 
 impl<T> Shareable<T> {
-    fn get_rc(&self) -> Rc<T> {
-        if let Shareable::Shared(rc) = self {
-            rc.clone()
+    fn get_arc(&self) -> Arc<T> {
+        if let Shareable::Shared(arc) = self {
+            arc.clone()
         } else {
             panic!("invalid ShareableMut state: Shared expected")
         }
     }
 
-    fn wrap_rc_strict(&mut self) {
+    fn wrap_arc_strict(&mut self) {
         unsafe {
             let temp = std::ptr::read(self);
             if let Shareable::Owned(t) = temp {
-                std::ptr::write(self, Shareable::Shared(Rc::new(t)));
+                std::ptr::write(self, Shareable::Shared(Arc::new(t)));
             } else {
                 std::mem::forget(temp);
                 panic!("invalid ShareableMut state: Owned expected")
@@ -81,11 +81,11 @@ impl<T> Shareable<T> {
         }
     }
 
-    fn unwrap_rc_strict(&mut self) {
+    fn unwrap_arc_strict(&mut self) {
         unsafe {
             let temp = std::ptr::read(self);
-            if let Shareable::Shared(rc) = temp {
-                match Rc::try_unwrap(rc) {
+            if let Shareable::Shared(arc) = temp {
+                match Arc::try_unwrap(arc) {
                     Ok(t) => {
                         std::ptr::write(self, Shareable::Owned(t));
                     },
@@ -109,13 +109,13 @@ impl<T> Shareable<T> {
     /// Otherwise the operation will panic.
     pub fn with_shared<F, R>(&mut self, f: F) -> R
     where
-        F: FnOnce(Rc<T>) -> R,
+        F: FnOnce(Arc<T>) -> R,
     {
-        self.wrap_rc_strict();
+        self.wrap_arc_strict();
 
-        let result = f(self.get_rc());
+        let result = f(self.get_arc());
 
-        self.unwrap_rc_strict();
+        self.unwrap_arc_strict();
 
         result
     }
@@ -130,15 +130,15 @@ mod test {
     #[test]
     fn test_shareable_mut_1() {
         let mut s = Shareable::new("test string".to_string());
-        let l = s.with_shared(|s_rc| s_rc.len());
+        let l = s.with_shared(|s_arc| s_arc.len());
         assert_eq!(s.len(), l);
     }
 
     #[test]
     fn test_shareable_mut_2() {
         let mut s = Shareable::new(RefCell::new("test string".to_string()));
-        s.with_shared(|s_rc| {
-            s_rc.borrow_mut().push_str(" ... changed");
+        s.with_shared(|s_arc| {
+            s_arc.borrow_mut().push_str(" ... changed");
         });
         assert_eq!(s.borrow().as_str(), "test string ... changed");
         assert_eq!(s.into_inner().into_inner(), "test string ... changed");
@@ -148,6 +148,6 @@ mod test {
     #[should_panic = "failed to recover Owned ShareableMut from Shared, not all Rc pointers dropped"]
     fn test_shareable_mut_fail() {
         let mut s = Shareable::new("test string".to_string());
-        let _illegally_extracted_rc = s.with_shared(|s_rc| s_rc);
+        let _illegally_extracted_arc = s.with_shared(|s_arc| s_arc);
     }
 }

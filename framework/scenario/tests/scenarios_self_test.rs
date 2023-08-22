@@ -69,7 +69,7 @@ fn set_check_code() {
 #[test]
 #[should_panic]
 fn set_check_esdt_err_rs() {
-    world().run("tests/scenarios-self/set-check/set-check-esdt.err.json");
+    world().run("tests/scenarios-self/set-check/set-check-esdt.err1.json");
 }
 
 #[test]

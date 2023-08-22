@@ -43,7 +43,11 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn get_shard_of_address(&self, address_offset: MemPtr) -> i32 {
-        panic!("Unavailable: get_shard_of_address")
+        unsafe {
+            mem_conv::with_bytes(address_offset, 32, |address_bytes| {
+                self.handler.get_shard_of_address(address_bytes)
+            })
+        }
     }
 
     fn is_smart_contract(&self, address_offset: MemPtr) -> i32 {

@@ -1,7 +1,6 @@
 use std::{
-    cell::{Ref, RefCell, RefMut},
     collections::HashMap,
-    rc::Rc,
+    sync::{Arc, Mutex, MutexGuard},
 };
 
 use crate::{
@@ -19,9 +18,9 @@ use crate::{
 #[derive(Default, Debug)]
 pub struct SingleTxApiData {
     pub tx_input_box: Box<TxInput>,
-    pub accounts: RefCell<HashMap<VMAddress, AccountData>>,
-    pub managed_types: RefCell<TxManagedTypes>,
-    pub tx_result_cell: RefCell<TxResult>,
+    pub accounts: Mutex<HashMap<VMAddress, AccountData>>,
+    pub managed_types: Mutex<TxManagedTypes>,
+    pub tx_result_cell: Mutex<TxResult>,
     pub previous_block_info: BlockInfo,
     pub current_block_info: BlockInfo,
 }
@@ -31,7 +30,7 @@ impl SingleTxApiData {
     where
         F: FnOnce(&mut AccountData) -> R,
     {
-        let mut accounts = self.accounts.borrow_mut();
+        let mut accounts = self.accounts.lock().unwrap();
         let account = accounts
             .entry(address.clone())
             .or_insert(AccountData::new_empty(address.clone()));
@@ -40,26 +39,22 @@ impl SingleTxApiData {
 }
 
 #[derive(Default, Debug, Clone)]
-pub struct SingleTxApiVMHooksHandler(Rc<SingleTxApiData>);
+pub struct SingleTxApiVMHooksHandler(Arc<SingleTxApiData>);
 
 impl SingleTxApiVMHooksHandler {
     pub fn with_mut_data<F, R>(&mut self, f: F) -> R
     where
         F: FnOnce(&mut SingleTxApiData) -> R,
     {
-        let data = Rc::get_mut(&mut self.0)
+        let data = Arc::get_mut(&mut self.0)
             .expect("could not retrieve mutable reference to SingleTxApi data");
         f(data)
     }
 }
 
 impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
-    fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
-        self.0.managed_types.borrow()
-    }
-
-    fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
-        self.0.managed_types.borrow_mut()
+    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+        self.0.managed_types.lock().unwrap()
     }
 
     fn halt_with_error(&self, status: u64, message: &str) -> ! {
@@ -74,8 +69,8 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         panic!("cannot access the random bytes generator in the SingleTxApi")
     }
 
-    fn result_borrow_mut(&self) -> RefMut<TxResult> {
-        self.0.tx_result_cell.borrow_mut()
+    fn result_lock(&self) -> MutexGuard<TxResult> {
+        self.0.tx_result_cell.lock().unwrap()
     }
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {

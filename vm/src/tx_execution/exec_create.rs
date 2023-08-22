@@ -23,8 +23,8 @@ impl BlockchainVMRef {
         state.increase_account_nonce(&tx_input.from);
         state.subtract_tx_gas(&tx_input.from, tx_input.gas_limit, tx_input.gas_price);
 
-        let (tx_result, new_address, blockchain_updates) = state.with_shared(|state_rc| {
-            let tx_cache = TxCache::new(state_rc);
+        let (tx_result, new_address, blockchain_updates) = state.with_shared(|state_arc| {
+            let tx_cache = TxCache::new(state_arc);
 
             self.deploy_contract(tx_input, contract_path.to_vec(), tx_cache, f)
         });

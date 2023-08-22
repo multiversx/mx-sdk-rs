@@ -11,6 +11,12 @@ const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 #[derive(Hash, PartialEq, Eq, Clone, Debug)]
 pub struct VMAddress(H256);
 
+impl VMAddress {
+    pub const fn new(bytes: [u8; 32]) -> Self {
+        VMAddress(H256::new(bytes))
+    }
+}
+
 impl From<H256> for VMAddress {
     fn from(hash: H256) -> Self {
         VMAddress(hash)

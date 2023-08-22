@@ -7,6 +7,7 @@ use num_traits::ToPrimitive;
 use basic_features::BasicFeatures;
 use multiversx_sc::{
     codec::Empty,
+    contract_base::ContractBase,
     err_msg,
     types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
@@ -24,6 +25,14 @@ const SC_WASM_PATH: &str = "output/rust-testing-framework-tester.wasm";
 const ADDER_WASM_PATH: &str = "../../examples/adder/output/adder.wasm";
 const BASIC_FEATURES_WASM_PATH: &str =
     "../../feature-tests/basic-features/output/basic-features.wasm";
+
+const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
+const NFT_AMOUNT: u64 = 1;
+const FIRST_NFT_NONCE: u64 = 5;
+const FIRST_ATTRIBUTES: &[u8] = b"FirstAttributes";
+const FIRST_ROYALTIES: u64 = 1_000;
+const SECOND_ROYALTIES: u64 = 5_000;
+const FIRST_URIS: &[&[u8]] = &[b"FirstUri", b"SecondUri"];
 
 #[test]
 fn test_add() {
@@ -45,6 +54,32 @@ fn test_add() {
             assert_values_eq!(expected_result, actual_result);
         })
         .assert_ok();
+}
+
+#[test]
+fn test_add_spawned_thread() {
+    let handler = std::thread::spawn(|| {
+        let mut wrapper = BlockchainStateWrapper::new();
+        let sc_wrapper = wrapper.create_sc_account(
+            &rust_biguint!(0),
+            None,
+            rust_testing_framework_tester::contract_obj,
+            SC_WASM_PATH,
+        );
+
+        wrapper
+            .execute_query(&sc_wrapper, |sc| {
+                let first = managed_biguint!(1000);
+                let second = managed_biguint!(2000);
+
+                let expected_result = first.clone() + second.clone();
+                let actual_result = sc.sum(first, second);
+                assert_values_eq!(expected_result, actual_result);
+            })
+            .assert_ok();
+    });
+
+    handler.join().unwrap();
 }
 
 #[should_panic]
@@ -616,6 +651,58 @@ fn test_sc_nft() {
         &rust_biguint!(50),
         Some(&nft_attributes),
     );
+}
+
+#[test]
+fn test_over_set_nft() {
+    let rust_zero = rust_biguint!(0);
+    let mut b_mock = BlockchainStateWrapper::new();
+    let user = b_mock.create_user_account(&rust_zero);
+    let sc_wrapper = b_mock.create_sc_account(
+        &rust_zero,
+        None,
+        rust_testing_framework_tester::contract_obj,
+        SC_WASM_PATH,
+    );
+
+    b_mock.set_nft_balance_all_properties(
+        &user,
+        NFT_TOKEN_ID,
+        FIRST_NFT_NONCE,
+        &rust_biguint!(NFT_AMOUNT),
+        &FIRST_ATTRIBUTES.to_vec(),
+        FIRST_ROYALTIES,
+        None,
+        None,
+        None,
+        &uris_to_vec(FIRST_URIS),
+    );
+    b_mock.set_nft_balance_all_properties(
+        &user,
+        NFT_TOKEN_ID,
+        FIRST_NFT_NONCE,
+        &rust_biguint!(NFT_AMOUNT),
+        &FIRST_ATTRIBUTES.to_vec(),
+        SECOND_ROYALTIES,
+        None,
+        None,
+        None,
+        &uris_to_vec(FIRST_URIS),
+    );
+
+    b_mock
+        .execute_tx(&user, &sc_wrapper, &rust_zero, |sc| {
+            let merged_token_data = sc.blockchain().get_esdt_token_data(
+                &managed_address!(&user),
+                &managed_token_id!(NFT_TOKEN_ID),
+                FIRST_NFT_NONCE,
+            );
+            assert_eq!(
+                merged_token_data.royalties,
+                managed_biguint!(SECOND_ROYALTIES)
+            );
+        })
+        .assert_ok();
 }
 
 #[test]
@@ -1582,4 +1669,13 @@ fn dump_state_all_test() {
         .assert_ok();
 
     wrapper.dump_state();
+}
+
+fn uris_to_vec(uris: &[&[u8]]) -> Vec<Vec<u8>> {
+    let mut out = Vec::new();
+    for uri in uris {
+        out.push((*uri).to_vec());
+    }
+
+    out
 }
