@@ -256,7 +256,65 @@ fn test_try_remove_all_board_members() {
 }
 
 #[test]
-fn test_change_quorum() {}
+fn test_change_quorum() {
+    let mut state = MultisigTestState::new();
+    state.deploy();
+
+    let new_quorum = 2;
+    // try change quorum > board size
+    let action_id = state.propose(Action::ChangeQuorum(new_quorum));
+    state.sign(action_id);
+    state.perform_with_expect(action_id, "quorum cannot exceed board size");
+
+    // try discard before unsigning
+    state.world.sc_call(
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .call(state.multisig_contract.discard_action(action_id))
+            .expect(TxExpect::err(
+                4,
+                "str:cannot discard action with valid signatures",
+            )),
+    );
+
+    // unsign and discard action
+    state.world.sc_call(
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .call(state.multisig_contract.unsign(action_id)),
+    );
+
+    state.world.sc_call(
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .call(state.multisig_contract.discard_action(action_id)),
+    );
+
+    // try sign discarded action
+    state.world.sc_call(
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .call(state.multisig_contract.sign(action_id))
+            .expect(TxExpect::err(4, "str:action does not exist")),
+    );
+
+    // add another board member
+    const NEW_BOARD_MEMBER_ADDRESS_EXPR: &str = "address:new-board-member";
+    let new_board_member_address = AddressValue::from(NEW_BOARD_MEMBER_ADDRESS_EXPR).to_address();
+
+    state.world.set_state_step(
+        SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
+    );
+
+    let action_id = state.propose(Action::AddBoardMember(new_board_member_address.clone()));
+    state.sign(action_id);
+    state.perform(action_id);
+
+    // change quorum to 2
+    let action_id = state.propose(Action::ChangeQuorum(new_quorum));
+    state.sign(action_id);
+    state.perform(action_id);
+}
 
 #[test]
 fn test_transfer_execute_to_user() {}
