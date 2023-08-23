@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           15
+// Endpoints:                           16
 // Async Callback (empty):               1
-// Total number of exported functions:  17
+// Total number of exported functions:  18
 
 #![no_std]
 #![allow(internal_features)]
@@ -33,6 +33,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         format_message_one_part => format_message_one_part
         format_message_multiple_parts => format_message_multiple_parts
         format_message_big_int => format_message_big_int
+        format_message_i64 => format_message_i64
         format_message_managed_buffer => format_message_managed_buffer
         format_message_managed_buffer_hex => format_message_managed_buffer_hex
     )
