@@ -7,7 +7,9 @@ use multisig::{
 use multiversx_sc::{codec::multi_types::MultiValueVec, types::Address};
 use multiversx_sc_scenario::{
     api::StaticApi,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep},
+    scenario_model::{
+        Account, AddressValue, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep, TxExpect,
+    },
     ContractInfo, ScenarioWorld,
 };
 
@@ -131,6 +133,15 @@ impl MultisigTestState {
         );
     }
 
+    fn perform_with_expect(&mut self, action_id: usize, err_message: &str) {
+        self.world.sc_call(
+            ScCallStep::new()
+                .from(BOARD_MEMBER_ADDRESS_EXPR)
+                .call(self.multisig_contract.perform_action_endpoint(action_id))
+                .expect(TxExpect::err(4, "str:".to_string() + err_message)),
+        );
+    }
+
     fn sign(&mut self, action_id: usize) {
         self.world.sc_call(
             ScCallStep::new()
@@ -235,7 +246,14 @@ fn test_remove_proposer() {
 }
 
 #[test]
-fn test_try_remove_all_board_members() {}
+fn test_try_remove_all_board_members() {
+    let mut state = MultisigTestState::new();
+    state.deploy();
+
+    let action_id = state.propose(Action::RemoveUser(state.board_member_address.clone()));
+    state.sign(action_id);
+    state.perform_with_expect(action_id, "quorum cannot exceed board size")
+}
 
 #[test]
 fn test_change_quorum() {}
