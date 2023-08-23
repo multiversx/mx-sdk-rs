@@ -182,7 +182,35 @@ fn test_add_board_member() {
 }
 
 #[test]
-fn test_add_proposer() {}
+fn test_add_proposer() {
+    let mut state = MultisigTestState::new();
+    state.deploy();
+
+    const NEW_PROPOSER_ADDRESS_EXPR: &str = "address:new-proposer";
+    let new_proposer_address = AddressValue::from(NEW_PROPOSER_ADDRESS_EXPR).to_address();
+
+    state.world.set_state_step(
+        SetStateStep::new().put_account(NEW_PROPOSER_ADDRESS_EXPR, Account::new().nonce(1)),
+    );
+
+    state.check_user_role(&new_proposer_address, UserRole::None);
+
+    let action_id = state.propose(Action::AddProposer(new_proposer_address.clone()));
+    state.sign(action_id);
+    state.perform(action_id);
+
+    state.check_user_role(&new_proposer_address, UserRole::Proposer);
+
+    state.world.sc_query_use_result(
+        ScQueryStep::new().call(state.multisig_contract.get_all_proposers()),
+        |r| {
+            let proposers: MultiValueVec<Address> = r.result.unwrap();
+            assert_eq!(proposers.len(), 2);
+            assert_eq!(proposers.as_slice()[0], state.proposer_address);
+            assert_eq!(proposers.as_slice()[1], new_proposer_address);
+        },
+    );
+}
 
 #[test]
 fn test_remove_proposer() {}
