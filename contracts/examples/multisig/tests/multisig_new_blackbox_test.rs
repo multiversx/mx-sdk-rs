@@ -213,7 +213,26 @@ fn test_add_proposer() {
 }
 
 #[test]
-fn test_remove_proposer() {}
+fn test_remove_proposer() {
+    let mut state = MultisigTestState::new();
+    state.deploy();
+
+    state.check_user_role(&state.proposer_address.clone(), UserRole::Proposer);
+
+    let action_id = state.propose(Action::RemoveUser(state.proposer_address.clone()));
+    state.sign(action_id);
+    state.perform(action_id);
+
+    state.check_user_role(&state.proposer_address.clone(), UserRole::None);
+
+    state.world.sc_query_use_result(
+        ScQueryStep::new().call(state.multisig_contract.get_all_proposers()),
+        |r| {
+            let proposers: MultiValueVec<Address> = r.result.unwrap();
+            assert_eq!(proposers.len(), 0);
+        },
+    );
+}
 
 #[test]
 fn test_try_remove_all_board_members() {}
