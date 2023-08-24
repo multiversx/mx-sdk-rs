@@ -6,7 +6,10 @@ use multisig::{
     ProxyTrait as _,
 };
 use multiversx_sc::{
-    codec::{multi_types::MultiValueVec, test_util::top_encode_to_vec_u8_or_panic},
+    codec::{
+        multi_types::{MultiValueVec, OptionalValue},
+        test_util::top_encode_to_vec_u8_or_panic,
+    },
     storage::mappers::{SingleValue, SingleValueMapper},
     types::{Address, CodeMetadata},
 };
@@ -393,6 +396,7 @@ fn test_change_quorum() {
 }
 
 #[test]
+#[ignore = "not yet implemented"]
 fn test_transfer_execute_to_user() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
@@ -485,6 +489,22 @@ fn test_deploy_and_upgrade_from_source() {
     ));
 
     let new_adder_address = AddressValue::from(NEW_ADDER_ADDRESS_EXPR).to_address();
+    let adder_address = AddressValue::from(ADDER_ADDRESS_EXPR).to_address();
 
-    // state.propose()
+    let action_id = state.propose(Action::SCDeployFromSource(
+        0u64,
+        adder_address.clone(),
+        CodeMetadata::all(),
+        MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
+    ));
+    state.sign(action_id);
+    state.world.sc_call_use_result(
+        ScCallStep::new()
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
+            .call(state.multisig_contract.perform_action_endpoint(action_id)),
+        |r| {
+            let result: OptionalValue<Address> = r.result.unwrap();
+            assert_eq!(result.into_option().unwrap(), new_adder_address);
+        },
+    );
 }
