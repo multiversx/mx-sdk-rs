@@ -426,6 +426,36 @@ fn test_transfer_execute_to_user() {
         CheckStateStep::new()
             .put_account(MULTISIG_ADDRESS_EXPR, CheckAccount::new().balance(AMOUNT)),
     );
+
+    // failed attempt
+    let new_user_address = AddressValue::from(NEW_USER_ADDRESS_EXPR).to_address();
+
+    state.world.sc_call(
+        ScCallStep::new()
+            .from(PROPOSER_ADDRESS_EXPR)
+            .call(state.multisig_contract.propose_transfer_execute(
+                new_user_address.clone(),
+                0u64,
+                "".to_string(),
+                MultiValueVec::<Vec<u8>>::new(),
+            ))
+            .expect(TxExpect::err(4, "str:proposed action has no effect")),
+    );
+
+    // propose
+    let action_id = state.propose(Action::SendTransferExecute(
+        new_user_address.clone(),
+        AMOUNT.parse().unwrap(),
+        "".to_string(),
+        MultiValueVec::<Vec<u8>>::new(),
+    ));
+    state.sign(action_id);
+    state.perform(action_id);
+
+    state.world.check_state_step(
+        CheckStateStep::new()
+            .put_account(NEW_USER_ADDRESS_EXPR, CheckAccount::new().balance(AMOUNT)),
+    );
 }
 
 #[test]
