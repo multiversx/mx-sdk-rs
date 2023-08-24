@@ -374,6 +374,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "builtin-func-features"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
+name = "builtin-func-features-meta"
+version = "0.0.0"
+dependencies = [
+ "builtin-func-features",
+ "multiversx-sc-meta",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -542,6 +559,7 @@ checksum = "2382f75942f4b3be3690fe4f86365e9c853c1587d6ee58212cebf6e2a9ccd101"
 name = "composability-tests"
 version = "0.0.0"
 dependencies = [
+ "builtin-func-features",
  "forwarder",
  "forwarder-queue",
  "forwarder-raw",
