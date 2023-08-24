@@ -5,7 +5,7 @@ use super::{
         ESDTLocalBurn, ESDTLocalMint, ESDTNftAddQuantity, ESDTNftAddUri, ESDTNftBurn,
         ESDTNftCreate, ESDTNftUpdateAttributes,
     },
-    general::{ChangeOwner, ClaimDeveloperRewards, SetUsername, UpgradeContract, DeleteUsername},
+    general::{ChangeOwner, ClaimDeveloperRewards, DeleteUsername, SetUsername, UpgradeContract},
     transfer::{ESDTMultiTransfer, ESDTNftTransfer, ESDTTransfer},
     BuiltinFunctionEsdtTransferInfo,
 };
