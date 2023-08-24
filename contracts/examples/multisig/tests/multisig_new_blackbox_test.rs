@@ -507,4 +507,53 @@ fn test_deploy_and_upgrade_from_source() {
             assert_eq!(result.into_option().unwrap(), new_adder_address);
         },
     );
+
+    let action_id = state.propose(Action::SendTransferExecute(
+        new_adder_address.clone(),
+        0u64,
+        "add".to_string(),
+        MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
+    ));
+    state.sign(action_id);
+    state.perform(action_id);
+
+    let mut new_adder_contract = AdderContract::new(NEW_ADDER_ADDRESS_EXPR);
+
+    state
+        .world
+        .sc_query_use_result(ScQueryStep::new().call(new_adder_contract.sum()), |r| {
+            let result: SingleValue<BigUint> = r.result.unwrap();
+            let expected_sum = 10u64;
+            assert_eq!(result.into(), expected_sum.into());
+        });
+
+    let factorial_code = state.world.code_expression(FACTORIAL_PATH_EXPR);
+
+    const FACTORIAL_ADDRESS_EXPR: &str = "sc:factorial";
+    const FACTORIAL_PATH_EXPR: &str = "file:test-contracts/factorial.wasm";
+
+    state
+        .world
+        .register_contract(FACTORIAL_PATH_EXPR, factorial::ContractBuilder);
+    state.world.set_state_step(SetStateStep::new().put_account(
+        FACTORIAL_ADDRESS_EXPR,
+        Account::new().nonce(1).code(factorial_code.clone()),
+    ));
+
+    let factorial_address = AddressValue::from(FACTORIAL_ADDRESS_EXPR).to_address();
+
+    let action_id = state.propose(Action::SCUpgradeFromSource(
+        adder_address.clone(),
+        0u64,
+        factorial_address.clone(),
+        CodeMetadata::all(),
+        MultiValueVec::new(),
+    ));
+    state.sign(action_id);
+    state.perform(action_id);
+
+    state.world.check_state_step(
+        CheckStateStep::new()
+            .put_account(ADDER_ADDRESS_EXPR, CheckAccount::new().code(factorial_code)),
+    );
 }
