@@ -29,7 +29,9 @@ const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
 const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
+const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
 const QUORUM_SIZE: usize = 1;
+const STATUS_ERR_CODE_EXPR: u64 = 4;
 
 type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
 type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
@@ -60,7 +62,7 @@ impl MultisigTestState {
                 .new_address(OWNER_ADDRESS_EXPR, 1, MULTISIG_ADDRESS_EXPR)
                 .put_account(
                     PROPOSER_ADDRESS_EXPR,
-                    Account::new().nonce(1).balance("100,000,000"),
+                    Account::new().nonce(1).balance(PROPOSER_BALANCE_EXPR),
                 )
                 .put_account(BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1))
                 .put_account(ADDER_OWNER_ADDRESS_EXPR, Account::new().nonce(1))
@@ -237,7 +239,10 @@ impl MultisigTestState {
             ScCallStep::new()
                 .from(BOARD_MEMBER_ADDRESS_EXPR)
                 .call(self.multisig_contract.perform_action_endpoint(action_id))
-                .expect(TxExpect::err(4, "str:".to_string() + err_message)),
+                .expect(TxExpect::err(
+                    STATUS_ERR_CODE_EXPR,
+                    "str:".to_string() + err_message,
+                )),
         );
     }
 
@@ -369,7 +374,7 @@ fn test_change_quorum() {
             .from(BOARD_MEMBER_ADDRESS_EXPR)
             .call(state.multisig_contract.discard_action(action_id))
             .expect(TxExpect::err(
-                4,
+                STATUS_ERR_CODE_EXPR,
                 "str:cannot discard action with valid signatures",
             )),
     );
@@ -392,7 +397,10 @@ fn test_change_quorum() {
         ScCallStep::new()
             .from(BOARD_MEMBER_ADDRESS_EXPR)
             .call(state.multisig_contract.sign(action_id))
-            .expect(TxExpect::err(4, "str:action does not exist")),
+            .expect(TxExpect::err(
+                STATUS_ERR_CODE_EXPR,
+                "str:action does not exist",
+            )),
     );
 
     // add another board member
@@ -450,7 +458,10 @@ fn test_transfer_execute_to_user() {
                 opt_function.clone(),
                 MultiValueVec::<Vec<u8>>::new(),
             ))
-            .expect(TxExpect::err(4, "str:proposed action has no effect")),
+            .expect(TxExpect::err(
+                STATUS_ERR_CODE_EXPR,
+                "str:proposed action has no effect",
+            )),
     );
 
     // propose
@@ -484,13 +495,11 @@ fn test_transfer_execute_sc_all() {
     state.sign(action_id);
     state.perform(action_id);
 
-    state
-        .world
-        .sc_query_use_result(ScQueryStep::new().call(state.adder_contract.sum()), |r| {
-            let result: SingleValue<BigUint> = r.result.unwrap();
-            let expected_sum = 10u64;
-            assert_eq!(result.into(), expected_sum.into());
-        });
+    state.world.sc_query(
+        ScQueryStep::new()
+            .call(state.adder_contract.sum())
+            .expect_value(SingleValue::from(BigUint::from(10u64))),
+    );
 }
 
 #[test]
@@ -508,13 +517,11 @@ fn test_async_call_to_sc() {
     state.sign(action_id);
     state.perform(action_id);
 
-    state
-        .world
-        .sc_query_use_result(ScQueryStep::new().call(state.adder_contract.sum()), |r| {
-            let result: SingleValue<BigUint> = r.result.unwrap();
-            let expected_sum = 10u64;
-            assert_eq!(result.into(), expected_sum.into());
-        });
+    state.world.sc_query(
+        ScQueryStep::new()
+            .call(state.adder_contract.sum())
+            .expect_value(SingleValue::from(BigUint::from(10u64))),
+    );
 }
 
 #[test]
@@ -539,14 +546,11 @@ fn test_deploy_and_upgrade_from_source() {
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
     );
     state.sign(action_id);
-    state.world.sc_call_use_result(
+    state.world.sc_call(
         ScCallStep::new()
             .from(BOARD_MEMBER_ADDRESS_EXPR)
-            .call(state.multisig_contract.perform_action_endpoint(action_id)),
-        |r| {
-            let result: OptionalValue<Address> = r.result.unwrap();
-            assert_eq!(result.into_option().unwrap(), new_adder_address);
-        },
+            .call(state.multisig_contract.perform_action_endpoint(action_id))
+            .expect_value(OptionalValue::Some(new_adder_address.clone())),
     );
 
     let action_id = state.propose_transfer_execute(
@@ -560,13 +564,11 @@ fn test_deploy_and_upgrade_from_source() {
 
     let mut new_adder_contract = AdderContract::new(NEW_ADDER_ADDRESS_EXPR);
 
-    state
-        .world
-        .sc_query_use_result(ScQueryStep::new().call(new_adder_contract.sum()), |r| {
-            let result: SingleValue<BigUint> = r.result.unwrap();
-            let expected_sum = 10u64;
-            assert_eq!(result.into(), expected_sum.into());
-        });
+    state.world.sc_query(
+        ScQueryStep::new()
+            .call(new_adder_contract.sum())
+            .expect_value(SingleValue::from(BigUint::from(10u64))),
+    );
 
     let factorial_code = state.world.code_expression(FACTORIAL_PATH_EXPR);
 
