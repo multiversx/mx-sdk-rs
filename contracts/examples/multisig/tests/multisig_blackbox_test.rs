@@ -50,8 +50,8 @@ enum Action {
     AddProposer(Address),
     RemoveUser(Address),
     ChangeQuorum(usize),
-    SendTransferExecute(Address, u64, String, MultiValueVec<Vec<u8>>),
-    SendAsyncCall(Address, u64, String, MultiValueVec<Vec<u8>>),
+    SendTransferExecute(Address, u64, OptionalValue<String>, MultiValueVec<Vec<u8>>),
+    SendAsyncCall(Address, u64, OptionalValue<String>, MultiValueVec<Vec<u8>>),
     SCDeployFromSource(u64, Address, CodeMetadata, MultiValueVec<Vec<u8>>),
     SCUpgradeFromSource(Address, u64, Address, CodeMetadata, MultiValueVec<Vec<u8>>),
 }
@@ -396,7 +396,6 @@ fn test_change_quorum() {
 }
 
 #[test]
-#[ignore = "not yet implemented"]
 fn test_transfer_execute_to_user() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
@@ -415,13 +414,6 @@ fn test_transfer_execute_to_user() {
             .call(state.multisig_contract.deposit()),
     );
 
-    state
-        .world
-        .check_state_step(CheckStateStep::new().put_account(
-            PROPOSER_ADDRESS_EXPR,
-            CheckAccount::new().balance("99,999,900"),
-        ));
-
     state.world.check_state_step(
         CheckStateStep::new()
             .put_account(MULTISIG_ADDRESS_EXPR, CheckAccount::new().balance(AMOUNT)),
@@ -429,6 +421,7 @@ fn test_transfer_execute_to_user() {
 
     // failed attempt
     let new_user_address = AddressValue::from(NEW_USER_ADDRESS_EXPR).to_address();
+    let opt_function: OptionalValue<String> = OptionalValue::None;
 
     state.world.sc_call(
         ScCallStep::new()
@@ -436,7 +429,7 @@ fn test_transfer_execute_to_user() {
             .call(state.multisig_contract.propose_transfer_execute(
                 new_user_address.clone(),
                 0u64,
-                "".to_string(),
+                opt_function.clone(),
                 MultiValueVec::<Vec<u8>>::new(),
             ))
             .expect(TxExpect::err(4, "str:proposed action has no effect")),
@@ -446,7 +439,7 @@ fn test_transfer_execute_to_user() {
     let action_id = state.propose(Action::SendTransferExecute(
         new_user_address.clone(),
         AMOUNT.parse().unwrap(),
-        "".to_string(),
+        opt_function,
         MultiValueVec::<Vec<u8>>::new(),
     ));
     state.sign(action_id);
@@ -467,7 +460,7 @@ fn test_transfer_execute_sc_all() {
     let action_id = state.propose(Action::SendTransferExecute(
         adder_contract_address.clone(),
         0u64,
-        "add".to_string(),
+        OptionalValue::Some("add".to_string()),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
     ));
     state.sign(action_id);
@@ -491,7 +484,7 @@ fn test_async_call_to_sc() {
     let action_id = state.propose(Action::SendAsyncCall(
         adder_contract_address.clone(),
         0u64,
-        "add".to_string(),
+        OptionalValue::Some("add".to_string()),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
     ));
     state.sign(action_id);
@@ -541,7 +534,7 @@ fn test_deploy_and_upgrade_from_source() {
     let action_id = state.propose(Action::SendTransferExecute(
         new_adder_address.clone(),
         0u64,
-        "add".to_string(),
+        OptionalValue::Some("add".to_string()),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
     ));
     state.sign(action_id);
