@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use adder::ProxyTrait as _;
 use multisig::{
     multisig_perform::ProxyTrait as _, multisig_propose::ProxyTrait as _, user_role::UserRole,
@@ -10,7 +8,7 @@ use multiversx_sc::{
         multi_types::{MultiValueVec, OptionalValue},
         test_util::top_encode_to_vec_u8_or_panic,
     },
-    storage::mappers::{SingleValue, SingleValueMapper},
+    storage::mappers::SingleValue,
     types::{Address, CodeMetadata},
 };
 use multiversx_sc_scenario::{
@@ -45,20 +43,8 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-enum Action {
-    AddBoardMember(Address),
-    AddProposer(Address),
-    RemoveUser(Address),
-    ChangeQuorum(usize),
-    SendTransferExecute(Address, u64, OptionalValue<String>, MultiValueVec<Vec<u8>>),
-    SendAsyncCall(Address, u64, OptionalValue<String>, MultiValueVec<Vec<u8>>),
-    SCDeployFromSource(u64, Address, CodeMetadata, MultiValueVec<Vec<u8>>),
-    SCUpgradeFromSource(Address, u64, Address, CodeMetadata, MultiValueVec<Vec<u8>>),
-}
-
 struct MultisigTestState {
     world: ScenarioWorld,
-    owner_address: Address,
     proposer_address: Address,
     board_member_address: Address,
     multisig_contract: MultisigContract,
@@ -81,7 +67,6 @@ impl MultisigTestState {
                 .new_address(ADDER_OWNER_ADDRESS_EXPR, 1, ADDER_ADDRESS_EXPR),
         );
 
-        let owner_address = AddressValue::from(OWNER_ADDRESS_EXPR).to_address();
         let proposer_address = AddressValue::from(PROPOSER_ADDRESS_EXPR).to_address();
         let board_member_address = AddressValue::from(BOARD_MEMBER_ADDRESS_EXPR).to_address();
         let multisig_contract = MultisigContract::new(MULTISIG_ADDRESS_EXPR);
@@ -89,7 +74,6 @@ impl MultisigTestState {
 
         Self {
             world,
-            owner_address,
             proposer_address,
             board_member_address,
             multisig_contract,
@@ -117,7 +101,7 @@ impl MultisigTestState {
         self.sign(action_id);
         self.perform(action_id);
 
-        self.check_user_role(&self.proposer_address.clone(), UserRole::Proposer);
+        self.expect_user_role(&self.proposer_address.clone(), UserRole::Proposer);
 
         self
     }
@@ -135,73 +119,109 @@ impl MultisigTestState {
         self
     }
 
-    fn propose(&mut self, action: Action) -> usize {
-        match action {
-            Action::AddBoardMember(board_member_address) => self.world.sc_call_get_result(
-                ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                    self.multisig_contract
-                        .propose_add_board_member(board_member_address),
+    fn propose_add_board_member(&mut self, board_member_address: Address) -> usize {
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract
+                    .propose_add_board_member(board_member_address),
+            ),
+        )
+    }
+
+    fn propose_add_proposer(&mut self, proposer_address: Address) -> usize {
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract
+                    .propose_add_proposer(proposer_address),
+            ),
+        )
+    }
+
+    fn propose_change_quorum(&mut self, new_quorum: usize) -> usize {
+        self.world.sc_call_get_result(
+            ScCallStep::new()
+                .from(PROPOSER_ADDRESS_EXPR)
+                .call(self.multisig_contract.propose_change_quorum(new_quorum)),
+        )
+    }
+
+    fn propose_transfer_execute(
+        &mut self,
+        to: Address,
+        egld_amount: u64,
+        opt_function: OptionalValue<String>,
+        arguments: MultiValueVec<Vec<u8>>,
+    ) -> usize {
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract.propose_transfer_execute(
+                    to,
+                    egld_amount,
+                    opt_function,
+                    arguments,
                 ),
+            ))
+    }
+
+    fn propose_async_call(
+        &mut self,
+        to: Address,
+        egld_amount: u64,
+        opt_function: OptionalValue<String>,
+        arguments: MultiValueVec<Vec<u8>>,
+    ) -> usize {
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract
+                    .propose_async_call(to, egld_amount, opt_function, arguments),
             ),
-            Action::AddProposer(proposer_address) => self.world.sc_call_get_result(
-                ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                    self.multisig_contract
-                        .propose_add_proposer(proposer_address),
+        )
+    }
+
+    fn propose_remove_user(&mut self, user_address: Address) -> usize {
+        self.world.sc_call_get_result(
+            ScCallStep::new()
+                .from(PROPOSER_ADDRESS_EXPR)
+                .call(self.multisig_contract.propose_remove_user(user_address)),
+        )
+    }
+
+    fn propose_sc_deploy_from_source(
+        &mut self,
+        amount: u64,
+        source: Address,
+        code_metadata: CodeMetadata,
+        arguments: MultiValueVec<Vec<u8>>,
+    ) -> usize {
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract.propose_sc_deploy_from_source(
+                    amount,
+                    source,
+                    code_metadata,
+                    arguments,
                 ),
-            ),
-            Action::RemoveUser(user_address) => self.world.sc_call_get_result(
-                ScCallStep::new()
-                    .from(PROPOSER_ADDRESS_EXPR)
-                    .call(self.multisig_contract.propose_remove_user(user_address)),
-            ),
-            Action::ChangeQuorum(new_quorum) => self.world.sc_call_get_result(
-                ScCallStep::new()
-                    .from(PROPOSER_ADDRESS_EXPR)
-                    .call(self.multisig_contract.propose_change_quorum(new_quorum)),
-            ),
-            Action::SendTransferExecute(to, egld_amount, opt_function, arguments) => self
-                .world
-                .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                    self.multisig_contract.propose_transfer_execute(
-                        to,
-                        egld_amount,
-                        opt_function,
-                        arguments,
-                    ),
-                )),
-            Action::SendAsyncCall(to, egld_amount, opt_function, arguments) => self
-                .world
-                .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                    self.multisig_contract.propose_async_call(
-                        to,
-                        egld_amount,
-                        opt_function,
-                        arguments,
-                    ),
-                )),
-            Action::SCDeployFromSource(amount, source, code_metadata, arguments) => self
-                .world
-                .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                    self.multisig_contract.propose_sc_deploy_from_source(
-                        amount,
-                        source,
-                        code_metadata,
-                        arguments,
-                    ),
-                )),
-            Action::SCUpgradeFromSource(sc_address, amount, source, code_metadata, arguments) => {
-                self.world
-                    .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                        self.multisig_contract.propose_sc_upgrade_from_source(
-                            sc_address,
-                            amount,
-                            source,
-                            code_metadata,
-                            arguments,
-                        ),
-                    ))
-            },
-        }
+            ))
+    }
+
+    fn propose_sc_upgrade_from_source(
+        &mut self,
+        sc_address: Address,
+        amount: u64,
+        source: Address,
+        code_metadata: CodeMetadata,
+        arguments: MultiValueVec<Vec<u8>>,
+    ) -> usize {
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract.propose_sc_upgrade_from_source(
+                    sc_address,
+                    amount,
+                    source,
+                    code_metadata,
+                    arguments,
+                ),
+            ))
     }
 
     fn perform(&mut self, action_id: usize) {
@@ -212,7 +232,7 @@ impl MultisigTestState {
         );
     }
 
-    fn perform_with_expect(&mut self, action_id: usize, err_message: &str) {
+    fn perform_and_expect_err(&mut self, action_id: usize, err_message: &str) {
         self.world.sc_call(
             ScCallStep::new()
                 .from(BOARD_MEMBER_ADDRESS_EXPR)
@@ -229,13 +249,11 @@ impl MultisigTestState {
         );
     }
 
-    fn check_user_role(&mut self, user: &Address, expected_user_role: UserRole) {
-        self.world.sc_query_use_result(
-            ScQueryStep::new().call(self.multisig_contract.user_role(user.clone())),
-            |r| {
-                let user_role: UserRole = r.result.unwrap();
-                assert_eq!(user_role, expected_user_role);
-            },
+    fn expect_user_role(&mut self, user: &Address, expected_user_role: UserRole) {
+        self.world.sc_query(
+            ScQueryStep::new()
+                .call(self.multisig_contract.user_role(user.clone()))
+                .expect_value(expected_user_role),
         );
     }
 }
@@ -252,13 +270,13 @@ fn test_add_board_member() {
         SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
     );
 
-    state.check_user_role(&new_board_member_address, UserRole::None);
+    state.expect_user_role(&new_board_member_address, UserRole::None);
 
-    let action_id = state.propose(Action::AddBoardMember(new_board_member_address.clone()));
+    let action_id = state.propose_add_board_member(new_board_member_address.clone());
     state.sign(action_id);
     state.perform(action_id);
 
-    state.check_user_role(&new_board_member_address, UserRole::BoardMember);
+    state.expect_user_role(&new_board_member_address, UserRole::BoardMember);
 
     state.world.sc_query_use_result(
         ScQueryStep::new().call(state.multisig_contract.get_all_board_members()),
@@ -283,13 +301,13 @@ fn test_add_proposer() {
         SetStateStep::new().put_account(NEW_PROPOSER_ADDRESS_EXPR, Account::new().nonce(1)),
     );
 
-    state.check_user_role(&new_proposer_address, UserRole::None);
+    state.expect_user_role(&new_proposer_address, UserRole::None);
 
-    let action_id = state.propose(Action::AddProposer(new_proposer_address.clone()));
+    let action_id = state.propose_add_proposer(new_proposer_address.clone());
     state.sign(action_id);
     state.perform(action_id);
 
-    state.check_user_role(&new_proposer_address, UserRole::Proposer);
+    state.expect_user_role(&new_proposer_address, UserRole::Proposer);
 
     state.world.sc_query_use_result(
         ScQueryStep::new().call(state.multisig_contract.get_all_proposers()),
@@ -307,13 +325,13 @@ fn test_remove_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    state.check_user_role(&state.proposer_address.clone(), UserRole::Proposer);
+    state.expect_user_role(&state.proposer_address.clone(), UserRole::Proposer);
 
-    let action_id = state.propose(Action::RemoveUser(state.proposer_address.clone()));
+    let action_id = state.propose_remove_user(state.proposer_address.clone());
     state.sign(action_id);
     state.perform(action_id);
 
-    state.check_user_role(&state.proposer_address.clone(), UserRole::None);
+    state.expect_user_role(&state.proposer_address.clone(), UserRole::None);
 
     state.world.sc_query_use_result(
         ScQueryStep::new().call(state.multisig_contract.get_all_proposers()),
@@ -329,9 +347,9 @@ fn test_try_remove_all_board_members() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    let action_id = state.propose(Action::RemoveUser(state.board_member_address.clone()));
+    let action_id = state.propose_remove_user(state.board_member_address.clone());
     state.sign(action_id);
-    state.perform_with_expect(action_id, "quorum cannot exceed board size")
+    state.perform_and_expect_err(action_id, "quorum cannot exceed board size")
 }
 
 #[test]
@@ -341,9 +359,9 @@ fn test_change_quorum() {
 
     let new_quorum = 2;
     // try change quorum > board size
-    let action_id = state.propose(Action::ChangeQuorum(new_quorum));
+    let action_id = state.propose_change_quorum(new_quorum);
     state.sign(action_id);
-    state.perform_with_expect(action_id, "quorum cannot exceed board size");
+    state.perform_and_expect_err(action_id, "quorum cannot exceed board size");
 
     // try discard before unsigning
     state.world.sc_call(
@@ -385,12 +403,12 @@ fn test_change_quorum() {
         SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
     );
 
-    let action_id = state.propose(Action::AddBoardMember(new_board_member_address.clone()));
+    let action_id = state.propose_add_board_member(new_board_member_address.clone());
     state.sign(action_id);
     state.perform(action_id);
 
     // change quorum to 2
-    let action_id = state.propose(Action::ChangeQuorum(new_quorum));
+    let action_id = state.propose_change_quorum(new_quorum);
     state.sign(action_id);
     state.perform(action_id);
 }
@@ -436,12 +454,12 @@ fn test_transfer_execute_to_user() {
     );
 
     // propose
-    let action_id = state.propose(Action::SendTransferExecute(
+    let action_id = state.propose_transfer_execute(
         new_user_address.clone(),
         AMOUNT.parse().unwrap(),
         opt_function,
         MultiValueVec::<Vec<u8>>::new(),
-    ));
+    );
     state.sign(action_id);
     state.perform(action_id);
 
@@ -457,12 +475,12 @@ fn test_transfer_execute_sc_all() {
     state.deploy_multisig_contract().deploy_adder_contract();
 
     let adder_contract_address = AddressValue::from(ADDER_ADDRESS_EXPR).to_address();
-    let action_id = state.propose(Action::SendTransferExecute(
+    let action_id = state.propose_transfer_execute(
         adder_contract_address.clone(),
         0u64,
         OptionalValue::Some("add".to_string()),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
-    ));
+    );
     state.sign(action_id);
     state.perform(action_id);
 
@@ -481,12 +499,12 @@ fn test_async_call_to_sc() {
     state.deploy_multisig_contract().deploy_adder_contract();
 
     let adder_contract_address = AddressValue::from(ADDER_ADDRESS_EXPR).to_address();
-    let action_id = state.propose(Action::SendAsyncCall(
+    let action_id = state.propose_async_call(
         adder_contract_address.clone(),
         0u64,
         OptionalValue::Some("add".to_string()),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
-    ));
+    );
     state.sign(action_id);
     state.perform(action_id);
 
@@ -514,12 +532,12 @@ fn test_deploy_and_upgrade_from_source() {
     let new_adder_address = AddressValue::from(NEW_ADDER_ADDRESS_EXPR).to_address();
     let adder_address = AddressValue::from(ADDER_ADDRESS_EXPR).to_address();
 
-    let action_id = state.propose(Action::SCDeployFromSource(
+    let action_id = state.propose_sc_deploy_from_source(
         0u64,
         adder_address.clone(),
         CodeMetadata::all(),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
-    ));
+    );
     state.sign(action_id);
     state.world.sc_call_use_result(
         ScCallStep::new()
@@ -531,12 +549,12 @@ fn test_deploy_and_upgrade_from_source() {
         },
     );
 
-    let action_id = state.propose(Action::SendTransferExecute(
+    let action_id = state.propose_transfer_execute(
         new_adder_address.clone(),
         0u64,
         OptionalValue::Some("add".to_string()),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
-    ));
+    );
     state.sign(action_id);
     state.perform(action_id);
 
@@ -565,13 +583,13 @@ fn test_deploy_and_upgrade_from_source() {
 
     let factorial_address = AddressValue::from(FACTORIAL_ADDRESS_EXPR).to_address();
 
-    let action_id = state.propose(Action::SCUpgradeFromSource(
+    let action_id = state.propose_sc_upgrade_from_source(
         adder_address.clone(),
         0u64,
         factorial_address.clone(),
         CodeMetadata::all(),
         MultiValueVec::new(),
-    ));
+    );
     state.sign(action_id);
     state.perform(action_id);
 
