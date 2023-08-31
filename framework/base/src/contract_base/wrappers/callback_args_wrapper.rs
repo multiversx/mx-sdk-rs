@@ -16,7 +16,7 @@ pub struct CallbackArgApiWrapper<A: VMApi> {
 }
 
 impl<A: VMApi> CallbackArgApiWrapper<A> {
-    pub(super) fn new() -> Self {
+    pub fn new() -> Self {
         CallbackArgApiWrapper {
             _phantom: PhantomData,
         }

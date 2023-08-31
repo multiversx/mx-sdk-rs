@@ -20,7 +20,7 @@ impl<A> CryptoWrapper<A>
 where
     A: CryptoApi,
 {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         CryptoWrapper {
             _phantom: PhantomData,
         }
