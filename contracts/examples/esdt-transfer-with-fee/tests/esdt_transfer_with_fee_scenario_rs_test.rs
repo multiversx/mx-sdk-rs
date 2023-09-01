@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/esdt-transfer-with-fee");
 
     blockchain.register_contract(
-        "file:output/esdt-transfer-with-fee.wasm",
+        "mxsc:output/esdt-transfer-with-fee.mxsc.json",
         esdt_transfer_with_fee::ContractBuilder,
     );
     blockchain

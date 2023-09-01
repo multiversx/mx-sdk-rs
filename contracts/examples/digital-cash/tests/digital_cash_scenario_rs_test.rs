@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/digital-cash");
 
     blockchain.register_contract(
-        "file:output/digital-cash.wasm",
+        "mxsc:output/digital-cash.mxsc.json",
         digital_cash::ContractBuilder,
     );
     blockchain

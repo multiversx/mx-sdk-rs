@@ -388,7 +388,7 @@
                         },
                         "str:fee": "10"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "3",

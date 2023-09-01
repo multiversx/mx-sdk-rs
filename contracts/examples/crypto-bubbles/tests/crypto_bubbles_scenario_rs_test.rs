@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/crypto-bubbles");
 
     blockchain.register_contract(
-        "file:output/crypto-bubbles.wasm",
+        "mxsc:output/crypto-bubbles.mxsc.json",
         crypto_bubbles::ContractBuilder,
     );
     blockchain

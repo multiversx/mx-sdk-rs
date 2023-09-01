@@ -40,7 +40,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "file:../vault/output/vault.wasm"
+                    "mxsc:../vault/output/vault.mxsc.json"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -77,7 +77,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "file:../vault/output/vault.wasm",
+                    "mxsc:../vault/output/vault.mxsc.json",
                     "str:some_argument"
                 ],
                 "gasLimit": "50,000,000",

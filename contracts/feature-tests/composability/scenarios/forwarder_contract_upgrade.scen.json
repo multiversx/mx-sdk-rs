@@ -51,7 +51,7 @@
                 "function": "upgradeVault",
                 "arguments": [
                     "sc:child",
-                    "file:../vault/output/vault.wasm"
+                    "mxsc:../vault/output/vault.mxsc.json"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"

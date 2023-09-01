@@ -5,8 +5,7 @@
             "accounts": {
                 "0x00000000000000006c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
                     "balance": "0",
-                    "code": "mxsc:../output/rust-testing-framework-tester.mxsc.json",
-                    "developerRewards": "0"
+                    "code": "file:../output/rust-testing-framework-tester.wasm"
                 }
             }
         },
@@ -28,7 +27,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../output/rust-testing-framework-tester.mxsc.json",
+                    "code": "file:../output/rust-testing-framework-tester.wasm",
                     "developerRewards": "0"
                 }
             }

@@ -31,7 +31,7 @@
                 "egldValue": "100",
                 "function": "deploySecondContract",
                 "arguments": [
-                    "file:../proxy-test-second/output/proxy-test-second.wasm"
+                    "mxsc:../proxy-test-second/output/proxy-test-second.mxsc.json"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"

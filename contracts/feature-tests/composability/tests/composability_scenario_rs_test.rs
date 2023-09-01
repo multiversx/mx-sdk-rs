@@ -5,34 +5,34 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
-        "file:forwarder-queue/output/forwarder-queue.wasm",
+        "mxsc:forwarder-queue/output/forwarder-queue.mxsc.json",
         forwarder_queue::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:forwarder/output/forwarder.wasm",
+        "mxsc:forwarder/output/forwarder.mxsc.json",
         forwarder::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:forwarder-raw/output/forwarder-raw.wasm",
+        "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
         forwarder_raw::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:promises-features/output/promises-features.wasm",
+        "mxsc:promises-features/output/promises-features.mxsc.json",
         promises_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:proxy-test-first/output/proxy-test-first.wasm",
+        "mxsc:proxy-test-first/output/proxy-test-first.mxsc.json",
         proxy_test_first::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:proxy-test-second/output/proxy-test-second.wasm",
+        "mxsc:proxy-test-second/output/proxy-test-second.mxsc.json",
         proxy_test_second::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:recursive-caller/output/recursive-caller.wasm",
+        "mxsc:recursive-caller/output/recursive-caller.mxsc.json",
         recursive_caller::ContractBuilder,
     );
-    blockchain.register_contract("file:vault/output/vault.wasm", vault::ContractBuilder);
+    blockchain.register_contract("mxsc:vault/output/vault.mxsc.json", vault::ContractBuilder);
     blockchain
 }
 

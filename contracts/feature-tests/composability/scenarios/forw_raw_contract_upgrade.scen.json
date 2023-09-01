@@ -50,7 +50,7 @@
                 "function": "call_upgrade",
                 "arguments": [
                     "sc:child",
-                    "file:../vault/output/vault.wasm",
+                    "mxsc:../vault/output/vault.mxsc.json",
                     "str:upgrade-init-arg"
                 ],
                 "gasLimit": "500,000,000",
