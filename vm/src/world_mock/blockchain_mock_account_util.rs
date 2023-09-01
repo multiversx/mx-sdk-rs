@@ -1,13 +1,10 @@
-use alloc::vec::Vec;
-use multiversx_sc::types::heap::Address;
-
 use std::{collections::HashMap, fmt::Write};
 
-use crate::display_util::address_hex;
+use crate::{display_util::address_hex, types::VMAddress};
 
-use super::{AccountData, BlockchainMock};
+use super::{AccountData, BlockchainState};
 
-impl BlockchainMock {
+impl BlockchainState {
     pub fn add_account(&mut self, acct: AccountData) {
         let address = acct.address.clone();
         self.accounts.insert(address, acct);
@@ -18,8 +15,8 @@ impl BlockchainMock {
         self.add_account(acct);
     }
 
-    pub fn update_accounts(&mut self, accounts: HashMap<Address, AccountData>) {
-        self.accounts.extend(accounts.into_iter());
+    pub fn update_accounts(&mut self, accounts: HashMap<VMAddress, AccountData>) {
+        self.accounts.extend(accounts);
     }
 
     pub fn print_accounts(&self) {
@@ -32,15 +29,19 @@ impl BlockchainMock {
 
     pub fn put_new_address(
         &mut self,
-        creator_address: Address,
+        creator_address: VMAddress,
         creator_nonce: u64,
-        new_address: Address,
+        new_address: VMAddress,
     ) {
         self.new_addresses
             .insert((creator_address, creator_nonce), new_address);
     }
 
-    pub fn get_new_address(&self, creator_address: Address, creator_nonce: u64) -> Option<Address> {
+    pub fn get_new_address(
+        &self,
+        creator_address: VMAddress,
+        creator_nonce: u64,
+    ) -> Option<VMAddress> {
         self.new_addresses
             .get(&(creator_address, creator_nonce))
             .cloned()

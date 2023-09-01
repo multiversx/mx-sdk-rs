@@ -13,6 +13,12 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
+#[ignore = "`internalVMErrors` logs not implemented"]
+#[test]
+fn panic_after_log_rs() {
+    world().run("scenarios/panic-after-log.scen.json");
+}
+
 #[test]
 fn panic_message_rs() {
     world().run("scenarios/panic-message.scen.json");

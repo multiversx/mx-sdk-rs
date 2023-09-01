@@ -11,7 +11,7 @@ pub trait TransactionSpec {
 
     fn to_address(&self) -> &AddressValue;
 
-    fn run_step(&self, step_runner: &mut dyn ScenarioRunner);
+    fn run_step(&mut self, step_runner: &mut dyn ScenarioRunner);
 
     fn set_response(&mut self, tx_response: TxResponse);
 }
@@ -25,12 +25,13 @@ impl TransactionSpec for ScCallStep {
         &self.tx.from
     }
 
-    fn run_step(&self, step_runner: &mut dyn ScenarioRunner) {
-        step_runner.run_sc_call_step(self);
+    fn run_step(&mut self, step_runner: &mut dyn ScenarioRunner) {
+        let mut clone = self.clone();
+        step_runner.run_sc_call_step(&mut clone); // TODO: make mutability uniform
     }
 
-    fn set_response(&mut self, tx_response: TxResponse) {
-        self.response = Some(tx_response);
+    fn set_response(&mut self, response: TxResponse) {
+        self.save_response(response);
     }
 }
 
@@ -43,11 +44,11 @@ impl TransactionSpec for ScDeployStep {
         &self.tx.from
     }
 
-    fn run_step(&self, step_runner: &mut dyn ScenarioRunner) {
+    fn run_step(&mut self, step_runner: &mut dyn ScenarioRunner) {
         step_runner.run_sc_deploy_step(self);
     }
 
-    fn set_response(&mut self, tx_response: TxResponse) {
-        self.response = Some(tx_response);
+    fn set_response(&mut self, response: TxResponse) {
+        self.save_response(response);
     }
 }

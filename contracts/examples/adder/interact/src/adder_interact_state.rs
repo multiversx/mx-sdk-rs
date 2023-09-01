@@ -1,4 +1,4 @@
-use crate::{ContractInfo, DebugApi};
+use crate::{ContractInfo, StaticApi};
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
@@ -12,7 +12,7 @@ const DEFAULT_ADDER_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type AdderContract = ContractInfo<adder::Proxy<DebugApi>>;
+pub type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
 
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
@@ -40,7 +40,11 @@ impl State {
 
     /// Returns the adder contract
     pub fn adder(&self) -> AdderContract {
-        AdderContract::new(self.adder_address.clone().unwrap())
+        AdderContract::new(
+            self.adder_address
+                .clone()
+                .expect("no known adder contract, deploy first"),
+        )
     }
 
     /// Returns the adder contract with default address

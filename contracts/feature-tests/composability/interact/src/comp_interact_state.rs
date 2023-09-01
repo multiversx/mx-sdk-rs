@@ -1,4 +1,4 @@
-use crate::{ContractInfo, DebugApi};
+use crate::{ContractInfo, StaticApi};
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
@@ -12,8 +12,8 @@ const DEFAULT_CONTRACT_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type VaultContract = ContractInfo<vault::Proxy<DebugApi>>;
-pub type ForwarderQueueContract = ContractInfo<forwarder_queue::Proxy<DebugApi>>;
+pub type VaultContract = ContractInfo<vault::Proxy<StaticApi>>;
+pub type ForwarderQueueContract = ContractInfo<forwarder_queue::Proxy<StaticApi>>;
 
 /// Composability Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]

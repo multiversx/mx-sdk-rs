@@ -1,12 +1,11 @@
+use multiversx_sc::types::{heap::Address, ContractCall};
+
 use crate::{
+    api::StaticApi,
     facade::ScenarioWorld,
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-        types::{Address, ContractCall},
-    },
+    multiversx_sc::codec::{CodecFrom, TopEncodeMulti},
     scenario::{model::*, ScenarioRunner},
 };
-use multiversx_chain_vm::DebugApi;
 
 impl ScenarioWorld {
     /// Imports and processes steps from an external scenario file.
@@ -22,15 +21,104 @@ impl ScenarioWorld {
     }
 
     /// Adds a SC call step, then executes it.
-    pub fn sc_call_step(&mut self, step: ScCallStep) -> &mut Self {
-        self.run_sc_call_step(&step);
+    pub fn sc_call<S>(&mut self, mut step: S) -> &mut Self
+    where
+        S: AsMut<ScCallStep>,
+    {
+        self.run_sc_call_step(step.as_mut());
         self
     }
 
-    /// Adds a SC query step, then executes it.
-    pub fn sc_query_step(&mut self, step: ScQueryStep) -> &mut Self {
-        self.run_sc_query_step(&step);
+    pub fn sc_call_use_raw_response<S, F>(&mut self, mut step: S, use_raw_response: F) -> &mut Self
+    where
+        S: AsMut<ScCallStep>,
+        F: FnOnce(&TxResponse),
+    {
+        self.run_sc_call_step(step.as_mut());
+        let response = unwrap_response(&step.as_mut().response);
+        use_raw_response(response);
         self
+    }
+
+    pub fn sc_call_use_result<OriginalResult, RequestedResult, F>(
+        &mut self,
+        step: TypedScCall<OriginalResult>,
+        use_result: F,
+    ) -> &mut Self
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(TypedResponse<RequestedResult>),
+    {
+        self.sc_call_use_raw_response(step, |response| {
+            let typed_response = TypedResponse::from_raw(response);
+            use_result(typed_response);
+        })
+    }
+
+    pub fn sc_call_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        mut step: TypedScCall<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.run_sc_call_step(&mut step.sc_call_step);
+        let response = unwrap_response(&step.sc_call_step.response);
+        let typed_response = TypedResponse::from_raw(response);
+        typed_response.result.expect("SC call failed")
+    }
+
+    /// Adds a SC query step, then executes it.
+    pub fn sc_query<S>(&mut self, mut step: S) -> &mut Self
+    where
+        S: AsMut<ScQueryStep>,
+    {
+        self.run_sc_query_step(step.as_mut());
+        self
+    }
+
+    pub fn sc_query_use_raw_response<S, F>(&mut self, mut step: S, use_raw_response: F) -> &mut Self
+    where
+        S: AsMut<ScQueryStep>,
+        F: FnOnce(&TxResponse),
+    {
+        let base_step = step.as_mut();
+        self.run_sc_query_step(base_step);
+        let response = unwrap_response(&base_step.response);
+        use_raw_response(response);
+        self
+    }
+
+    pub fn sc_query_use_result<OriginalResult, RequestedResult, F>(
+        &mut self,
+        step: TypedScQuery<OriginalResult>,
+        use_result: F,
+    ) -> &mut Self
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(TypedResponse<RequestedResult>),
+    {
+        self.sc_query_use_raw_response(step, |response| {
+            let typed_response = TypedResponse::from_raw(response);
+            use_result(typed_response);
+        })
+    }
+
+    pub fn sc_query_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        mut step: TypedScQuery<OriginalResult>,
+    ) -> RequestedResult
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.run_sc_query_step(&mut step.sc_query_step);
+        let response = unwrap_response(&step.sc_query_step.response);
+        let typed_response = TypedResponse::from_raw(response);
+        typed_response.result.expect("SC query failed")
     }
 
     /// Performs a SC query to a contract, leaves no scenario trace behind.
@@ -40,20 +128,67 @@ impl ScenarioWorld {
     /// Use `mandos_sc_query` to embed the SC query in the resulting scenario.
     pub fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCall<DebugApi>,
+        CC: ContractCall<StaticApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
-        let vm_runner = &mut self.get_mut_contract_debugger_backend().vm_runner;
-        let sc_query_step = ScQueryStep::new().call(contract_call);
-        let tx_result = vm_runner.perform_sc_query(&sc_query_step);
-        let mut raw_result = tx_result.result_values;
-        RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler).unwrap()
+        self.sc_query_get_result(ScQueryStep::new().call(contract_call))
     }
 
     /// Adds a SC deploy step, then executes it.
-    pub fn sc_deploy_step(&mut self, step: ScDeployStep) -> &mut Self {
-        self.run_sc_deploy_step(&step);
+    pub fn sc_deploy<S>(&mut self, mut step: S) -> &mut Self
+    where
+        S: AsMut<ScDeployStep>,
+    {
+        self.run_sc_deploy_step(step.as_mut());
         self
+    }
+
+    pub fn sc_deploy_use_raw_response<S, F>(
+        &mut self,
+        mut step: S,
+        use_raw_response: F,
+    ) -> &mut Self
+    where
+        S: AsMut<ScDeployStep>,
+        F: FnOnce(&TxResponse),
+    {
+        let base_step = step.as_mut();
+        self.run_sc_deploy_step(base_step);
+        let response = unwrap_response(&base_step.response);
+        use_raw_response(response);
+        self
+    }
+
+    pub fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
+        &mut self,
+        step: TypedScDeploy<OriginalResult>,
+        use_result: F,
+    ) -> &mut Self
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(Address, TypedResponse<RequestedResult>),
+    {
+        self.sc_deploy_use_raw_response(step, |response| {
+            let new_address = unwrap_new_address(response);
+            let typed_response = TypedResponse::from_raw(response);
+            use_result(new_address, typed_response);
+        })
+    }
+
+    pub fn sc_deploy_get_result<OriginalResult, RequestedResult>(
+        &mut self,
+        mut step: TypedScDeploy<OriginalResult>,
+    ) -> (Address, RequestedResult)
+    where
+        OriginalResult: TopEncodeMulti,
+        RequestedResult: CodecFrom<OriginalResult>,
+    {
+        self.run_sc_deploy_step(&mut step.sc_deploy_step);
+        let response = unwrap_response(&step.sc_deploy_step.response);
+        let new_address = unwrap_new_address(response);
+        let typed_response = TypedResponse::from_raw(response);
+        (new_address, typed_response.result.unwrap())
     }
 
     /// Adds a simple transfer step, then executes it.
@@ -90,9 +225,7 @@ impl TypedScCallExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.get_mut_contract_debugger_backend()
-            .vm_runner
-            .perform_sc_call_get_result(typed_sc_call)
+        self.sc_call_get_result(typed_sc_call)
     }
 }
 
@@ -105,9 +238,7 @@ impl TypedScDeployExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        self.get_mut_contract_debugger_backend()
-            .vm_runner
-            .perform_sc_deploy_get_result(typed_sc_call)
+        self.sc_deploy_get_result(typed_sc_call)
     }
 }
 
@@ -125,66 +256,17 @@ impl TypedScQueryExecutor for ScenarioWorld {
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let debugger = self.get_mut_contract_debugger_backend();
-        let mut sc_query_step: ScQueryStep = typed_sc_query.into();
-        let tx_result = debugger.vm_runner.perform_sc_query(&sc_query_step);
-
-        let mut tx_expect = TxExpect::ok();
-        for raw_result in &tx_result.result_values {
-            let result_hex_string = format!("0x{}", hex::encode(raw_result));
-            tx_expect = tx_expect.result(result_hex_string.as_str());
-        }
-        sc_query_step = sc_query_step.expect(tx_expect);
-        if let Some(trace) = &mut debugger.trace {
-            trace.run_sc_query_step(&sc_query_step);
-        }
-
-        let mut raw_results = tx_result.result_values;
-        RequestedResult::multi_decode_or_handle_err(&mut raw_results, PanicErrorHandler).unwrap()
+        self.sc_query_get_result(typed_sc_query)
     }
 }
 
-impl ScenarioWorld {
-    #[deprecated(since = "0.39.0", note = "Renamed, use `set_state_step` instead.")]
-    pub fn mandos_set_state(&mut self, step: SetStateStep) -> &mut Self {
-        self.set_state_step(step)
-    }
+fn unwrap_response(opt_response: &Option<TxResponse>) -> &TxResponse {
+    opt_response.as_ref().expect("response not processed")
+}
 
-    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_call_step` instead.")]
-    pub fn mandos_sc_call(&mut self, step: ScCallStep) -> &mut Self {
-        self.sc_call_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_query_step` instead.")]
-    pub fn mandos_sc_query(&mut self, step: ScQueryStep) -> &mut Self {
-        self.sc_query_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `sc_deploy_step` instead.")]
-    pub fn mandos_sc_deploy(&mut self, step: ScDeployStep) -> &mut Self {
-        self.sc_deploy_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `transfer_step` instead.")]
-    pub fn mandos_transfer(&mut self, step: TransferStep) -> &mut Self {
-        self.transfer_step(step)
-    }
-
-    #[deprecated(
-        since = "0.39.0",
-        note = "Renamed, use `validator_reward_step` instead."
-    )]
-    pub fn mandos_validator_reward(&mut self, step: ValidatorRewardStep) -> &mut Self {
-        self.validator_reward_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `check_state_step` instead.")]
-    pub fn mandos_check_state(&mut self, step: CheckStateStep) -> &mut Self {
-        self.check_state_step(step)
-    }
-
-    #[deprecated(since = "0.39.0", note = "Renamed, use `dump_state_step` instead.")]
-    pub fn mandos_dump_state(&mut self) -> &mut Self {
-        self.dump_state_step()
-    }
+fn unwrap_new_address(response: &TxResponse) -> Address {
+    response
+        .new_deployed_address
+        .clone()
+        .expect("missing new address after deploy")
 }

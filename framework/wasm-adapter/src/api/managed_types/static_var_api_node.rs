@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::{const_handles, use_raw_handle, HandleConstraints, StaticVarApi, StaticVarApiImpl},
+    api::{const_handles, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -35,18 +35,18 @@ impl StaticVarApiImpl for VmApiImpl {
         unsafe { f(&mut STATIC_BUFFER) }
     }
 
-    fn set_external_view_target_address_handle(&self, handle: Self::ManagedBufferHandle) {
+    fn set_external_view_target_address_handle(&self, handle: RawHandle) {
         unsafe {
             EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE = handle;
         }
     }
 
-    fn get_external_view_target_address_handle(&self) -> Self::ManagedBufferHandle {
+    fn get_external_view_target_address_handle(&self) -> RawHandle {
         unsafe { EXTERNAL_VIEW_TARGET_ADDRESS_HANDLE }
     }
 
-    fn next_handle<H: HandleConstraints>(&self) -> H {
-        use_raw_handle(next_handle())
+    fn next_handle(&self) -> RawHandle {
+        next_handle()
     }
 
     fn set_num_arguments(&self, num_arguments: i32) {
@@ -59,23 +59,23 @@ impl StaticVarApiImpl for VmApiImpl {
         unsafe { NUM_ARGUMENTS }
     }
 
-    fn set_call_value_egld_handle(&self, handle: Self::BigIntHandle) {
+    fn set_call_value_egld_handle(&self, handle: RawHandle) {
         unsafe {
             CALL_VALUE_EGLD_HANDLE = handle;
         }
     }
 
-    fn get_call_value_egld_handle(&self) -> Self::BigIntHandle {
+    fn get_call_value_egld_handle(&self) -> RawHandle {
         unsafe { CALL_VALUE_EGLD_HANDLE }
     }
 
-    fn set_call_value_multi_esdt_handle(&self, handle: Self::ManagedBufferHandle) {
+    fn set_call_value_multi_esdt_handle(&self, handle: RawHandle) {
         unsafe {
             CALL_VALUE_MULTI_ESDT_HANDLE = handle;
         }
     }
 
-    fn get_call_value_multi_esdt_handle(&self) -> Self::ManagedBufferHandle {
+    fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
         unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
     }
 }

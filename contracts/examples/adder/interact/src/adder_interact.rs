@@ -8,16 +8,18 @@ use adder_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::{
-        storage::mappers::SingleValue,
-        types::{Address, CodeMetadata},
-    },
+    multiversx_sc::{storage::mappers::SingleValue, types::Address},
     multiversx_sc_scenario::{
+        api::StaticApi,
         bech32,
+        mandos_system::ScenarioRunner,
         num_bigint::BigUint,
-        scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::{IntoBlockchainCall, TransferStep, TxExpect},
-        test_wallets, ContractInfo, DebugApi,
+        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
+        scenario_model::{
+            BytesValue, ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect,
+        },
+        standalone::retrieve_account_as_scenario_set_state,
+        test_wallets, ContractInfo,
     },
     tokio, Interactor, StepBuffer,
 };
@@ -26,7 +28,6 @@ const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
 async fn main() {
-    DebugApi::dummy();
     env_logger::init();
 
     let mut adder_interact = AdderInteract::init().await;
@@ -56,6 +57,7 @@ async fn main() {
 struct AdderInteract {
     interactor: Interactor,
     wallet_address: Address,
+    adder_code: BytesValue,
     state: State,
 }
 
@@ -67,39 +69,57 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let adder_code =
+            BytesValue::interpret_from("file:../output/adder.wasm", &InterpreterContext::default());
 
         Self {
             interactor,
             wallet_address,
+            adder_code,
             state: State::load_state(),
         }
     }
 
+    async fn set_state(&mut self) {
+        println!("wallet address: {}", bech32::encode(&self.wallet_address));
+        let scenario_raw = retrieve_account_as_scenario_set_state(
+            Config::load_config().gateway().to_string(),
+            bech32::encode(&self.wallet_address),
+            true,
+        )
+        .await;
+
+        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
+
+        self.interactor.pre_runners.run_scenario(&scenario);
+        self.interactor.post_runners.run_scenario(&scenario);
+    }
+
     async fn deploy(&mut self) {
-        let mut typed_sc_deploy = self
-            .state
-            .default_adder()
-            .init(BigUint::from(0u64))
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .code_metadata(CodeMetadata::all())
-            .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
-            .gas_limit("70,000,000")
-            .expect(TxExpect::ok());
+        self.set_state().await;
 
-        self.interactor.sc_deploy(&mut typed_sc_deploy).await;
+        self.interactor
+            .sc_deploy_use_result(
+                ScDeployStep::new()
+                    .call(self.state.default_adder().init(BigUint::from(0u64)))
+                    .from(&self.wallet_address)
+                    .code(&self.adder_code),
+                |new_address, tr| {
+                    tr.result.unwrap_or_else(|err| {
+                        panic!(
+                            "deploy failed: status: {}, message: {}",
+                            err.status, err.message
+                        )
+                    });
 
-        let result = typed_sc_deploy.response().new_deployed_address();
-        if result.is_err() {
-            println!("deploy failed: {}", result.err().unwrap());
-            return;
-        }
+                    let new_address_bech32 = bech32::encode(&new_address);
+                    println!("new address: {new_address_bech32}");
 
-        let new_address_bech32 = bech32::encode(&result.unwrap());
-        println!("new address: {new_address_bech32}");
-
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_adder_address(&new_address_expr);
+                    let new_address_expr = format!("bech32:{new_address_bech32}");
+                    self.state.set_adder_address(&new_address_expr);
+                },
+            )
+            .await;
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -107,20 +127,17 @@ impl AdderInteract {
             println!("count must be greater than 0");
             return;
         }
+
+        self.set_state().await;
         println!("deploying {count} contracts...");
 
         let mut steps = Vec::new();
         for _ in 0..*count {
-            let typed_sc_deploy = self
-                .state
-                .default_adder()
-                .init(BigUint::from(0u64))
-                .into_blockchain_call()
+            let typed_sc_deploy = ScDeployStep::new()
+                .call(self.state.default_adder().init(0u32))
                 .from(&self.wallet_address)
-                .code_metadata(CodeMetadata::all())
-                .contract_code("file:../output/adder.wasm", &InterpreterContext::default())
-                .gas_limit("70,000,000")
-                .expect(TxExpect::ok());
+                .code(&self.adder_code)
+                .gas_limit("70,000,000");
 
             steps.push(typed_sc_deploy);
         }
@@ -130,14 +147,17 @@ impl AdderInteract {
             .await;
 
         for step in steps.iter() {
-            let result = step.response().new_deployed_address();
-            if result.is_err() {
-                println!("deploy failed: {}", result.err().unwrap());
+            // warning: multi deploy not yet fully supported
+            // only works with last deployed address
+            // will be addressed in future versions
+            let new_deployed_address = step.response().new_deployed_address.clone();
+            if let Some(new_address) = new_deployed_address {
+                let new_address_bech32 = bech32::encode(&new_address);
+                println!("new address: {new_address_bech32}");
+            } else {
+                println!("deploy failed");
                 return;
             }
-
-            let new_address_bech32 = bech32::encode(&result.unwrap());
-            println!("new address: {new_address_bech32}");
         }
     }
 
@@ -154,28 +174,26 @@ impl AdderInteract {
     }
 
     async fn add(&mut self, value: u64) {
-        let mut typed_sc_call = self
-            .state
-            .adder()
-            .add(BigUint::from(value))
-            .into_blockchain_call()
-            .from(&self.wallet_address)
-            .gas_limit("70,000,000")
-            .expect(TxExpect::ok());
-
-        self.interactor.sc_call(&mut typed_sc_call).await;
-
-        let result = typed_sc_call.response().handle_signal_error_event();
-        if result.is_err() {
-            println!("performing add failed with: {}", result.err().unwrap());
-            return;
-        }
+        self.interactor
+            .sc_call(
+                ScCallStep::new()
+                    .call(self.state.adder().add(value))
+                    .from(&self.wallet_address)
+                    .expect(
+                        TxExpect::ok().additional_error_message("performing add failed with: "),
+                    ),
+            )
+            .await;
 
         println!("successfully performed add");
     }
 
     async fn print_sum(&mut self) {
-        let sum: SingleValue<BigUint> = self.interactor.vm_query(self.state.adder().sum()).await;
-        println!("sum: {}", sum.into());
+        self.interactor
+            .sc_query_use_result(ScQueryStep::new().call(self.state.adder().sum()), |tr| {
+                let sum: SingleValue<BigUint> = tr.result.unwrap();
+                println!("sum: {}", sum.into());
+            })
+            .await;
     }
 }

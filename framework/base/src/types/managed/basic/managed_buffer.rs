@@ -1,7 +1,7 @@
 use crate::{
     abi::TypeName,
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApi,
+        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
         ManagedTypeApi, StaticVarApiImpl,
     },
     codec::{
@@ -41,7 +41,8 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn new() -> Self {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         // TODO: remove after VM no longer crashes with "unknown handle":
         M::managed_type_impl().mb_overwrite(new_handle.clone(), &[]);
         ManagedBuffer::from_handle(new_handle)
@@ -49,14 +50,16 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_overwrite(new_handle.clone(), bytes);
         ManagedBuffer::from_handle(new_handle)
     }
 
     #[inline]
     pub fn new_random(nr_bytes: usize) -> Self {
-        let new_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_set_random(new_handle.clone(), nr_bytes);
         ManagedBuffer::from_handle(new_handle)
     }
@@ -174,9 +177,15 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         self.len() == 0
     }
 
-    #[inline]
+    /// Method provided for convenience in tests, not to be used in contracts.
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
         M::managed_type_impl().mb_to_boxed_bytes(self.handle.clone())
+    }
+
+    /// Method provided for convenience in tests, not to be used in contracts.
+    #[cfg(feature = "alloc")]
+    pub fn to_vec(&self) -> alloc::vec::Vec<u8> {
+        self.to_boxed_bytes().into_vec()
     }
 
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
@@ -466,5 +475,17 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
                 &encode_bytes_as_hex(self.to_boxed_bytes().as_slice()),
             )
             .finish()
+    }
+}
+
+#[cfg(feature = "alloc")]
+impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        use crate::contract_base::ErrorHelper;
+
+        let s = alloc::string::String::from_utf8(self.to_boxed_bytes().into_vec())
+            .unwrap_or_else(|err| ErrorHelper::<M>::signal_error_with_message(err.as_bytes()));
+
+        s.fmt(f)
     }
 }

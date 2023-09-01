@@ -3,8 +3,8 @@ use core::{convert::TryInto, marker::PhantomData};
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApi, HandleConstraints, ManagedTypeApi,
-        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
+        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
         CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
@@ -93,7 +93,8 @@ macro_rules! big_int_conv_num {
         impl<M: ManagedTypeApi> From<$num_ty> for BigInt<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
-                let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+                let handle: M::BigIntHandle =
+                    use_raw_handle(M::static_var_api_impl().next_handle());
                 Self::set_value(handle.clone(), value);
                 BigInt::from_handle(handle)
             }
@@ -133,7 +134,7 @@ impl<M: ManagedTypeApi> From<crate::codec::num_bigint::BigInt> for BigInt<M> {
 impl<M: ManagedTypeApi> BigInt<M> {
     #[inline]
     pub fn zero() -> Self {
-        let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         // TODO: seting 0 will no longer be needed once we fix VM handle error
         M::managed_type_impl().bi_set_int64(handle.clone(), 0);
         BigInt::from_handle(handle)
@@ -151,26 +152,31 @@ impl<M: ManagedTypeApi> BigInt<M> {
 
     #[inline]
     pub fn from_signed_bytes_be(bytes: &[u8]) -> Self {
-        let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
-        M::managed_type_impl().bi_set_signed_bytes(handle.clone(), bytes);
+        let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
+        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
+        M::managed_type_impl().mb_to_big_int_signed(mb_handle, handle.clone());
         BigInt::from_handle(handle)
     }
 
     #[inline]
     pub fn to_signed_bytes_be(&self) -> BoxedBytes {
-        M::managed_type_impl().bi_get_signed_bytes(self.handle.clone())
+        let mb_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        M::managed_type_impl().mb_from_big_int_signed(self.handle.clone(), mb_handle.clone());
+        M::managed_type_impl().mb_to_boxed_bytes(mb_handle)
     }
 
     #[inline]
     pub fn from_signed_bytes_be_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
-        let handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+        let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_to_big_int_signed(managed_buffer.handle.clone(), handle.clone());
         BigInt::from_handle(handle)
     }
 
     #[inline]
     pub fn to_signed_bytes_be_buffer(&self) -> ManagedBuffer<M> {
-        let mb_handle: M::ManagedBufferHandle = M::static_var_api_impl().next_handle();
+        let mb_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_from_big_int_signed(self.handle.clone(), mb_handle.clone());
         ManagedBuffer::from_handle(mb_handle)
     }
@@ -179,7 +185,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
 impl<M: ManagedTypeApi> Clone for BigInt<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
-        let clone_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+        let clone_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_set_int64(clone_handle.clone(), 0);
         api.bi_add(
             clone_handle.clone(),
@@ -212,7 +218,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     /// Returns the magnitude of the `BigInt` as a `BigUint`.
     pub fn magnitude(&self) -> BigUint<M> {
         let api = M::managed_type_impl();
-        let result_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_abs(result_handle.clone(), self.handle.clone());
         BigUint::from_handle(result_handle)
     }
@@ -301,7 +307,7 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
 impl<M: ManagedTypeApi> BigInt<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
-        let result_handle: M::BigIntHandle = M::static_var_api_impl().next_handle();
+        let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), exp_handle);
         BigInt::from_handle(result_handle)

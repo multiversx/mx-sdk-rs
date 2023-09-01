@@ -1,16 +1,18 @@
 use crate::{
+    api::StaticApi,
     multiversx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::TxCallRaw,
     },
-    DebugApi,
 };
 
 use super::{tx_interpret_util::interpret_egld_value, TxESDT};
 
-#[derive(Debug, Default, Clone)]
+pub const DEFAULT_GAS_EXPR: &str = "5,000,000";
+
+#[derive(Debug, Clone)]
 pub struct TxCall {
     pub from: AddressValue,
     pub to: AddressValue,
@@ -20,6 +22,21 @@ pub struct TxCall {
     pub arguments: Vec<BytesValue>,
     pub gas_limit: U64Value,
     pub gas_price: U64Value,
+}
+
+impl Default for TxCall {
+    fn default() -> Self {
+        Self {
+            from: Default::default(),
+            to: Default::default(),
+            egld_value: Default::default(),
+            esdt_value: Default::default(),
+            function: Default::default(),
+            arguments: Default::default(),
+            gas_limit: U64Value::from(DEFAULT_GAS_EXPR),
+            gas_price: Default::default(),
+        }
+    }
 }
 
 impl InterpretableFrom<TxCallRaw> for TxCall {
@@ -70,13 +87,16 @@ impl IntoRaw<TxCallRaw> for TxCall {
 }
 
 impl TxCall {
-    pub fn to_contract_call(&self) -> ContractCallWithEgld<DebugApi, ()> {
+    pub fn to_contract_call(&self) -> ContractCallWithEgld<StaticApi, ()> {
         let mut contract_call = ContractCallWithEgld::new(
             (&self.to.value).into(),
             self.function.as_bytes(),
             (&self.egld_value.value).into(),
-        )
-        .convert_to_esdt_transfer_call(
+        );
+
+        contract_call.basic.explicit_gas_limit = self.gas_limit.value;
+
+        contract_call = contract_call.convert_to_esdt_transfer_call(
             self.esdt_value
                 .iter()
                 .map(|esdt| {
@@ -88,6 +108,14 @@ impl TxCall {
                 })
                 .collect(),
         );
+
+        // For some contract calls from == to.
+        // The contract call objects have no "from" field, since that is always part of the execution context.
+        // On the static API there is no execution context, but a placeholder value is provided.
+        // Here we already know the sender, so we can replace the placeholder with the actual value.
+        if StaticApi::is_current_address_placeholder(&contract_call.basic.to.to_address()) {
+            contract_call.basic.to = self.from.value.clone().into();
+        }
 
         for argument in &self.arguments {
             contract_call.push_raw_argument(argument.value.as_slice());

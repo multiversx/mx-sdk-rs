@@ -2,53 +2,29 @@ use std::marker::PhantomData;
 
 use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
-use crate::scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery};
+use crate::{
+    scenario::model::{AddressValue, BytesValue, TxExpect},
+    scenario_model::TxResponse,
+};
 
-use super::ScQueryStep;
+use super::{format_expect, ScQueryStep};
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct TypedScQuery<OriginalResult> {
-    pub id: String,
-    pub tx_id: Option<String>,
-    pub comment: Option<String>,
-    pub tx: Box<TxQuery>,
-    pub expect: Option<TxExpect>,
+    pub sc_query_step: ScQueryStep,
     _return_type: PhantomData<OriginalResult>,
-}
-
-impl<OriginalResult> Default for TypedScQuery<OriginalResult> {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            tx_id: Default::default(),
-            comment: Default::default(),
-            tx: Default::default(),
-            expect: Default::default(),
-            _return_type: PhantomData,
-        }
-    }
 }
 
 impl<OriginalResult> From<TypedScQuery<OriginalResult>> for ScQueryStep {
     fn from(typed: TypedScQuery<OriginalResult>) -> Self {
-        Self {
-            id: typed.id,
-            tx_id: typed.tx_id,
-            comment: typed.comment,
-            tx: typed.tx,
-            expect: typed.expect,
-        }
+        typed.sc_query_step
     }
 }
 
 impl<OriginalResult> From<ScQueryStep> for TypedScQuery<OriginalResult> {
     fn from(untyped: ScQueryStep) -> Self {
         Self {
-            id: untyped.id,
-            tx_id: untyped.tx_id,
-            comment: untyped.comment,
-            tx: untyped.tx,
-            expect: untyped.expect,
+            sc_query_step: untyped,
             _return_type: PhantomData,
         }
     }
@@ -56,7 +32,7 @@ impl<OriginalResult> From<ScQueryStep> for TypedScQuery<OriginalResult> {
 
 impl<OriginalResult> TypedScQuery<OriginalResult> {
     pub fn function(mut self, expr: &str) -> Self {
-        self.tx.function = expr.to_string();
+        self.sc_query_step.tx.function = expr.to_string();
         self
     }
 
@@ -64,7 +40,7 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
     where
         BytesValue: From<A>,
     {
-        self.tx.arguments.push(BytesValue::from(expr));
+        self.sc_query_step.tx.arguments.push(BytesValue::from(expr));
         self
     }
 
@@ -72,13 +48,50 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
     where
         AddressValue: From<A>,
     {
-        self.tx.to = AddressValue::from(address);
+        self.sc_query_step.tx.to = AddressValue::from(address);
         self
     }
 
+    /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
-        self.expect = Some(expect);
+        self.sc_query_step = self.sc_query_step.expect(expect);
         self
+    }
+
+    /// Explicitly states that no tx expect section should be added and no checks should be performed.
+    ///
+    /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
+    pub fn no_expect(mut self) -> Self {
+        self.sc_query_step.expect = None;
+        self
+    }
+
+    /// Shorthand for creating a tx expect with status "Ok" and the given value.
+    ///
+    /// The given value is type-checked agains the tx return type.
+    pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
+        self.expect(format_expect(expected_value))
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.sc_query_step.response()
+    }
+}
+
+impl AsMut<ScQueryStep> for ScQueryStep {
+    fn as_mut(&mut self) -> &mut ScQueryStep {
+        self
+    }
+}
+
+impl<OriginalResult> AsMut<ScQueryStep> for TypedScQuery<OriginalResult> {
+    fn as_mut(&mut self) -> &mut ScQueryStep {
+        &mut self.sc_query_step
     }
 }
 

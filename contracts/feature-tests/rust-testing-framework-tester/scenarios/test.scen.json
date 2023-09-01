@@ -4,9 +4,7 @@
             "step": "setState",
             "accounts": {
                 "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "developerRewards": "0"
+                    "balance": "0"
                 }
             }
         },
@@ -14,7 +12,6 @@
             "step": "setState",
             "accounts": {
                 "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
-                    "nonce": "0",
                     "balance": "0",
                     "code": "mxsc:../output/rust-testing-framework-tester.mxsc.json",
                     "developerRewards": "0"
@@ -39,7 +36,6 @@
             "step": "checkState",
             "accounts": {
                 "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
-                    "nonce": "0",
                     "balance": "0",
                     "esdt": {},
                     "storage": {
@@ -68,17 +64,13 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "message": "str:",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
+                "message": "str:"
             }
         },
         {
             "step": "checkState",
             "accounts": {
                 "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
-                    "nonce": "0",
                     "balance": "0",
                     "esdt": {},
                     "storage": {
@@ -105,10 +97,7 @@
                     "0x33"
                 ],
                 "status": "0",
-                "message": "str:",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
+                "message": "str:"
             }
         }
     ]

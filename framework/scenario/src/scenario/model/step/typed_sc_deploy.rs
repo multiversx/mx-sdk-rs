@@ -1,19 +1,20 @@
 use std::marker::PhantomData;
 
-use multiversx_sc::codec::PanicErrorHandler;
+use multiversx_sc::{codec::PanicErrorHandler, types::ContractDeploy};
 
 use crate::{
+    api::StaticApi,
     multiversx_sc::{
         codec::{CodecFrom, TopEncodeMulti},
         types::{Address, CodeMetadata},
     },
     scenario_format::interpret_trait::InterpreterContext,
-    scenario_model::{TxError, TxResponse},
+    scenario_model::{BytesValue, TxResponse, TxResponseStatus},
 };
 
 use crate::scenario::model::{AddressValue, BigUintValue, TxExpect, U64Value};
 
-use super::ScDeployStep;
+use super::{process_contract_deploy, ScDeployStep};
 
 /// `ScDeployStep` with explicit return type.
 #[derive(Default, Debug)]
@@ -23,20 +24,16 @@ pub struct TypedScDeploy<OriginalResult> {
 }
 
 impl<OriginalResult> TypedScDeploy<OriginalResult> {
-    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxError>
+    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let mut raw_result = self.response().raw_result()?;
+        let mut raw_result = self.response().out.clone();
         Ok(
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap(),
         )
-    }
-
-    pub fn response(&self) -> &TxResponse {
-        self.sc_deploy_step.response.as_ref().unwrap()
     }
 
     pub fn from<A>(mut self, address: A) -> Self
@@ -60,6 +57,19 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         self
     }
 
+    pub fn code<V>(mut self, expr: V) -> Self
+    where
+        BytesValue: From<V>,
+    {
+        self.sc_deploy_step = self.sc_deploy_step.code(expr);
+        self
+    }
+
+    #[deprecated(
+        since = "0.42.0",
+        note = "Please use method `code` instead. To ease transition, it is also possible to call it with a tuple like so: `.code((expr, context))`"
+    )]
+    #[allow(deprecated)]
     pub fn contract_code(mut self, expr: &str, context: &InterpreterContext) -> Self {
         self.sc_deploy_step = self.sc_deploy_step.contract_code(expr, context);
         self
@@ -73,9 +83,34 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         self
     }
 
+    /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.sc_deploy_step = self.sc_deploy_step.expect(expect);
         self
+    }
+
+    /// Explicitly states that no tx expect section should be added and no checks should be performed.
+    ///
+    /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
+    pub fn no_expect(mut self) -> Self {
+        self.sc_deploy_step.expect = None;
+        self
+    }
+
+    /// Sets following fields based on the smart contract proxy:
+    /// - "function"
+    /// - "arguments"
+    pub fn call(mut self, contract_deploy: ContractDeploy<StaticApi, OriginalResult>) -> Self {
+        let (_, mandos_args) = process_contract_deploy(contract_deploy);
+        for arg in mandos_args {
+            self.sc_deploy_step.tx.arguments.push(BytesValue::from(arg));
+        }
+        self
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.sc_deploy_step.response()
     }
 }
 

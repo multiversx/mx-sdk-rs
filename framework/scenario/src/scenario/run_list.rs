@@ -40,35 +40,35 @@ impl ScenarioRunner for ScenarioRunnerList {
         }
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
         for runner in self.list.iter_mut() {
             runner.run_sc_call_step(step);
         }
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         for runner in self.list.iter_mut() {
-            for step in steps {
+            for step in steps.iter_mut() {
                 runner.run_sc_call_step(step);
             }
         }
     }
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
         for runner in self.list.iter_mut() {
-            for step in steps {
+            for step in steps.iter_mut() {
                 runner.run_sc_deploy_step(step);
             }
         }
     }
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep) {
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
         for runner in self.list.iter_mut() {
             runner.run_sc_query_step(step);
         }
     }
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
         for runner in self.list.iter_mut() {
             runner.run_sc_deploy_step(step);
         }

@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-wegld-swap-sc"
-version = "0.41.0"
+version = "0.43.2"
 
 authors = [
     "Dorin Iancu <dorin.iancu@multiversx.com>",
@@ -11,7 +11,7 @@ readme = "README.md"
 repository = "https://github.com/multiversx/mx-sdk-rs"
 homepage = "https://multiversx.com/"
 documentation = "https://docs.multiversx.com/"
-description = "Elrond Price aggregator Smart Contract"
+description = "MultiversX Wrapped EGLD Smart Contract"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 edition = "2021"
@@ -20,13 +20,13 @@ edition = "2021"
 path = "src/wegld.rs"
 
 [dependencies.multiversx-sc]
-version = "0.41.0"
+version = "0.43.2"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.41.0"
+version = "0.43.2"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.41.0"
+version = "0.43.2"
 path = "../../../framework/scenario"

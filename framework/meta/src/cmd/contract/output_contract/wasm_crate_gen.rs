@@ -1,10 +1,11 @@
+use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
+use rustc_version::Version;
 use std::{
     fs::{self, File},
     io::Write,
     path::PathBuf,
+    str::FromStr,
 };
-
-use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
 
 use super::OutputContract;
 
@@ -14,16 +15,33 @@ const PREFIX_AUTO_GENERATED: &str =
 ////////////////////////////////////////////////////
 ////////////////// AUTO-GENERATED //////////////////
 ////////////////////////////////////////////////////
-
 ";
 
 const NUM_INIT: usize = 1;
 const NUM_ASYNC_CB: usize = 1;
 
-const PREFIX_NO_STD: &str = "
+const VER_1_71: &str = "1.71.0-nightly";
+const FEATURES_PRE_RUSTC_1_71: &str = "
 #![no_std]
-#![feature(lang_items)]
 
+// Configuration that works with rustc < 1.71.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
+#![feature(alloc_error_handler, lang_items)]
+";
+
+const VER_1_73: &str = "1.73.0-nightly";
+const FEATURES_PRE_RUSTC_1_73: &str = "
+#![no_std]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
+#![feature(lang_items)]
+";
+
+const FEATURES_DEFAULT: &str = "
+#![no_std]
+#![allow(internal_features)]
+#![feature(lang_items)]
 ";
 
 impl OutputContract {
@@ -63,12 +81,9 @@ impl OutputContract {
     }
 
     fn write_wasm_src_lib_contents(&self, wasm_lib_file: &mut File) {
-        wasm_lib_file
-            .write_all(PREFIX_AUTO_GENERATED.as_bytes())
-            .unwrap();
+        writeln!(wasm_lib_file, "{PREFIX_AUTO_GENERATED}").unwrap();
         self.write_stat_comments(wasm_lib_file);
-        wasm_lib_file.write_all(PREFIX_NO_STD.as_bytes()).unwrap();
-
+        write_prefix(wasm_lib_file);
         writeln!(wasm_lib_file, "{}", self.allocator_macro_invocation()).unwrap();
         writeln!(wasm_lib_file, "{}", self.panic_handler_macro_invocation()).unwrap();
 
@@ -114,6 +129,21 @@ impl OutputContract {
 
         write_stat_comment(wasm_lib_file, "Total number of exported functions:", total);
     }
+}
+
+fn select_features() -> &'static str {
+    let meta = rustc_version::version_meta().unwrap();
+    if meta.semver < Version::from_str(VER_1_71).unwrap() {
+        FEATURES_PRE_RUSTC_1_71
+    } else if meta.semver < Version::from_str(VER_1_73).unwrap() {
+        FEATURES_PRE_RUSTC_1_73
+    } else {
+        FEATURES_DEFAULT
+    }
+}
+
+fn write_prefix(wasm_lib_file: &mut File) {
+    writeln!(wasm_lib_file, "{}", select_features()).unwrap();
 }
 
 fn write_endpoints_macro<'a, I>(

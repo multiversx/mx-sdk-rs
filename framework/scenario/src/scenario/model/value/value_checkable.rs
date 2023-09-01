@@ -13,6 +13,12 @@ impl Checkable<&[u8]> for BytesValue {
     }
 }
 
+impl Checkable<&str> for BytesValue {
+    fn check(&self, value: &str) -> bool {
+        self.check(value.as_bytes())
+    }
+}
+
 impl Checkable<&Vec<u8>> for BytesValue {
     fn check(&self, value: &Vec<u8>) -> bool {
         &self.value == value

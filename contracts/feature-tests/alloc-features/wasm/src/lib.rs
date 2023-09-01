@@ -5,11 +5,12 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           74
+// Endpoints:                           64
 // Async Callback (empty):               1
-// Total number of exported functions:  76
+// Total number of exported functions:  66
 
 #![no_std]
+#![allow(internal_features)]
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!(static64k);
@@ -19,14 +20,6 @@ multiversx_sc_wasm_adapter::endpoints! {
     alloc_features
     (
         init => init
-        compute_sha256_legacy_alloc => compute_sha256_legacy_alloc
-        compute_keccak256_legacy_alloc => compute_keccak256_legacy_alloc
-        compute_ripemd160_legacy => compute_ripemd160_legacy
-        verify_bls_signature_legacy => verify_bls_signature_legacy
-        verify_ed25519_signature_legacy => verify_ed25519_signature_legacy
-        verify_secp256k1_signature_legacy => verify_secp256k1_signature_legacy
-        verify_custom_secp256k1_signature_legacy => verify_custom_secp256k1_signature_legacy
-        compute_secp256k1_der_signature_legacy => compute_secp256k1_der_signature_legacy
         echo_h256 => echo_h256
         echo_boxed_array_u8 => echo_boxed_array_u8
         echo_boxed_bytes => echo_boxed_bytes
@@ -58,8 +51,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         compute_unmarshal_ec => compute_unmarshal_ec
         compute_unmarshal_compressed_ec => compute_unmarshal_compressed_ec
         compute_generate_key_ec => compute_generate_key_ec
-        logLegacyEventA => log_legacy_event_a
-        logLegacyEventB => log_legacy_event_b
         only_owner_legacy => only_owner_legacy
         return_sc_error => return_sc_error
         result_ok => result_ok

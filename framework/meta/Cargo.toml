@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.41.0"
+version = "0.43.2"
 edition = "2021"
 
 authors = [
@@ -20,9 +20,19 @@ categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 name = "sc-meta"
 path = "src/main.rs"
 
+[features]
+template-test-current = []
+template-test-released = []
+
 [dependencies]
+tokio = { version = "1.24", features = ["full"] }
+reqwest = { version = "0.11.4", features = ["blocking", "json"] }
 serde = { version = "1.0", features = ["derive"] }
+tempfile = "3.3.0"
+copy_dir = "0.1.2"
+zip = "0.6.4"
 serde_json = "1.0"
+anyhow = "1.0.44"
 rustc_version = "0.4"
 toml = { version = "0.5.8", features = ["preserve_order"] }
 ruplacer = "0.8.1"
@@ -35,7 +45,7 @@ convert_case = "0.6.0"
 hex = "0.4"
 
 [dependencies.multiversx-sc]
-version = "=0.41.0"
+version = "=0.43.2"
 path = "../base"
-features = ["alloc", "num-bigint", "promises", "big-float"]
+features = ["alloc", "num-bigint", "promises"]
 

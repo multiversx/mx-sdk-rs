@@ -3,18 +3,18 @@ use crate::{
     scenario::{model::*, ScenarioRunner},
 };
 
-use super::scenario_world::Backend::{Debugger, VmGoBackend};
+use super::scenario_world::Backend;
 
 impl ScenarioWorld {
     pub fn for_each_runner_mut<F: FnMut(&mut dyn ScenarioRunner)>(&mut self, mut f: F) {
         match &mut self.backend {
-            Debugger(cd_debugger) => {
+            Backend::Debugger(cd_debugger) => {
                 f(&mut cd_debugger.vm_runner);
                 if let Some(trace) = &mut cd_debugger.trace {
                     f(trace);
                 }
             },
-            VmGoBackend => {
+            Backend::VmGoBackend => {
                 panic!("the VM Go backend does not support step-by-step execution")
             },
         }
@@ -30,23 +30,23 @@ impl ScenarioRunner for ScenarioWorld {
         self.for_each_runner_mut(|runner| runner.run_set_state_step(step));
     }
 
-    fn run_sc_call_step(&mut self, step: &ScCallStep) {
+    fn run_sc_call_step(&mut self, step: &mut ScCallStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_call_step(step));
     }
 
-    fn run_multi_sc_call_step(&mut self, steps: &[ScCallStep]) {
+    fn run_multi_sc_call_step(&mut self, steps: &mut [ScCallStep]) {
         self.for_each_runner_mut(|runner| runner.run_multi_sc_call_step(steps));
     }
 
-    fn run_multi_sc_deploy_step(&mut self, steps: &[ScDeployStep]) {
+    fn run_multi_sc_deploy_step(&mut self, steps: &mut [ScDeployStep]) {
         self.for_each_runner_mut(|runner| runner.run_multi_sc_deploy_step(steps));
     }
 
-    fn run_sc_query_step(&mut self, step: &ScQueryStep) {
+    fn run_sc_query_step(&mut self, step: &mut ScQueryStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_query_step(step));
     }
 
-    fn run_sc_deploy_step(&mut self, step: &ScDeployStep) {
+    fn run_sc_deploy_step(&mut self, step: &mut ScDeployStep) {
         self.for_each_runner_mut(|runner| runner.run_sc_deploy_step(step));
     }
 

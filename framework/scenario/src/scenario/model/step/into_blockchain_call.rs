@@ -1,20 +1,30 @@
-use crate::multiversx_sc::{
-    codec::TopEncodeMulti,
-    types::{
-        ContractCall, ContractCallNoPayment, ContractCallWithEgld,
-        ContractCallWithEgldOrSingleEsdt, ContractCallWithMultiEsdt, ContractDeploy,
+#![allow(deprecated)]
+
+use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
+use crate::{
+    api::StaticApi,
+    multiversx_sc::{
+        codec::TopEncodeMulti,
+        types::{
+            ContractCall, ContractCallNoPayment, ContractCallWithEgld,
+            ContractCallWithEgldOrSingleEsdt, ContractCallWithMultiEsdt, ContractDeploy,
+        },
     },
 };
 
-use multiversx_chain_vm::DebugApi;
-
-use super::{ScCallStep, ScDeployStep, ScQueryStep, TypedScCall, TypedScDeploy, TypedScQuery};
-
-/// Converts a `ContractCall` or `ContractDeploy` into a scenario object that additonally
+/// Converts a [`ContractCall`] or [`ContractDeploy`] into a scenario object that additonally
 /// contains gas costs and transaction-related data.
+#[deprecated(
+    since = "0.42.0",
+    note = "The recommended syntax is a variation of `sc_call` or `sc_deploy` with a scenario step built from the ContractCall."
+)]
 pub trait IntoBlockchainCall {
     type BlockchainCall;
 
+    #[deprecated(
+        since = "0.42.0",
+        note = "The recommended syntax is a variation of `sc_call` or `sc_deploy` with a scenario step built from the ContractCall."
+    )]
     fn into_blockchain_call(self) -> Self::BlockchainCall;
 }
 
@@ -22,7 +32,7 @@ pub trait IntoBlockchainCall {
 // otherwise the orphan rules kick in
 macro_rules! impl_into_blockchain_call_cc {
     ($cc:ident) => {
-        impl<OriginalResult> IntoBlockchainCall for $cc<DebugApi, OriginalResult>
+        impl<OriginalResult> IntoBlockchainCall for $cc<StaticApi, OriginalResult>
         where
             OriginalResult: TopEncodeMulti,
         {
@@ -40,11 +50,11 @@ impl_into_blockchain_call_cc! {ContractCallWithEgld}
 impl_into_blockchain_call_cc! {ContractCallWithEgldOrSingleEsdt}
 impl_into_blockchain_call_cc! {ContractCallWithMultiEsdt}
 
-impl<OriginalResult> IntoBlockchainCall for ContractDeploy<DebugApi, OriginalResult> {
+impl<OriginalResult> IntoBlockchainCall for ContractDeploy<StaticApi, OriginalResult> {
     type BlockchainCall = TypedScDeploy<OriginalResult>;
 
     fn into_blockchain_call(self) -> Self::BlockchainCall {
-        ScDeployStep::new().call(self).into()
+        ScDeployStep::new().call(self)
     }
 }
 
@@ -57,10 +67,10 @@ pub trait IntoVMQuery {
 
 impl<CC> IntoVMQuery for CC
 where
-    CC: ContractCall<DebugApi>,
+    CC: ContractCall<StaticApi>,
 {
     type VMQuery = TypedScQuery<CC::OriginalResult>;
     fn into_vm_query(self) -> Self::VMQuery {
-        ScQueryStep::default().call(self).into()
+        ScQueryStep::default().call(self)
     }
 }

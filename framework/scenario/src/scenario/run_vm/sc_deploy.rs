@@ -1,65 +1,70 @@
 use crate::{
-    multiversx_sc::{
-        codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
-        types::heap::Address,
-    },
-    scenario::model::{ScDeployStep, TypedScDeploy},
+    multiversx_sc::types::heap::Address, scenario::model::ScDeployStep, scenario_model::TxResponse,
 };
 
 use multiversx_chain_vm::{
-    tx_execution::sc_create,
-    tx_mock::{generate_tx_hash_dummy, TxFunctionName, TxInput, TxResult},
-    world_mock::BlockchainMock,
+    tx_execution::execute_current_tx_context_input,
+    tx_mock::{TxFunctionName, TxInput, TxResult},
 };
 
-use super::{check_tx_output, ScenarioVMRunner};
+use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
 impl ScenarioVMRunner {
-    /// Adds a SC deploy step, as specified in the `sc_deploy_step` argument, then executes it.
-    pub fn perform_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) {
-        self.blockchain_mock.with_borrowed(|state| {
-            let (_, _, state) = execute_and_check(state, sc_deploy_step);
-            ((), state)
-        });
+    /// Adds a SC deploy step, as specified in the `step` argument, then executes it.
+    ///
+    /// The result of the operation gets saved back in the step's response field.
+    pub fn perform_sc_deploy_update_results(&mut self, step: &mut ScDeployStep) {
+        let (new_address, tx_result) =
+            self.perform_sc_deploy_lambda_and_check(step, execute_current_tx_context_input);
+        let mut response = TxResponse::from_tx_result(tx_result);
+        response.new_deployed_address = Some(new_address);
+        step.save_response(response);
     }
 
-    /// Adds a SC deploy step, executes it and retrieves the transaction result ("out" field).
-    ///
-    /// The transaction is expected to complete successfully.
-    ///
-    /// It takes the `contract_call` argument separately from the SC call step,
-    /// so we can benefit from type inference in the result.
-    pub fn perform_sc_deploy_get_result<OriginalResult, RequestedResult>(
+    pub fn perform_sc_deploy_lambda<F>(
         &mut self,
-        typed_sc_deploy: TypedScDeploy<OriginalResult>,
-    ) -> (Address, RequestedResult)
+        sc_deploy_step: &ScDeployStep,
+        f: F,
+    ) -> (Address, TxResult)
     where
-        OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        F: FnOnce(),
     {
-        let sc_deploy_step: ScDeployStep = typed_sc_deploy.into();
-        let (tx_result, new_address) = self.blockchain_mock.with_borrowed(|state| {
-            let (tx_result, new_address, state) = execute(state, &sc_deploy_step);
-            ((tx_result, new_address), state)
-        });
+        let tx_input = tx_input_from_deploy(sc_deploy_step);
+        let contract_code = &sc_deploy_step.tx.contract_code.value;
+        let (new_address, tx_result) = self.blockchain_mock.vm.sc_create(
+            tx_input,
+            contract_code,
+            &mut self.blockchain_mock.state,
+            f,
+        );
+        assert!(
+            tx_result.pending_calls.no_calls(),
+            "Async calls from constructors are currently not supported"
+        );
+        (new_address.as_array().into(), tx_result)
+    }
 
-        let mut raw_result = tx_result.result_values;
-        let deser_result =
-            RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
-                .unwrap();
-
-        (new_address, deser_result)
+    pub fn perform_sc_deploy_lambda_and_check<F>(
+        &mut self,
+        sc_deploy_step: &ScDeployStep,
+        f: F,
+    ) -> (Address, TxResult)
+    where
+        F: FnOnce(),
+    {
+        let (new_address, tx_result) = self.perform_sc_deploy_lambda(sc_deploy_step, f);
+        if let Some(tx_expect) = &sc_deploy_step.expect {
+            check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
+        }
+        (new_address, tx_result)
     }
 }
 
-pub(crate) fn execute(
-    state: BlockchainMock,
-    sc_deploy_step: &ScDeployStep,
-) -> (TxResult, Address, BlockchainMock) {
+fn tx_input_from_deploy(sc_deploy_step: &ScDeployStep) -> TxInput {
     let tx = &sc_deploy_step.tx;
-    let tx_input = TxInput {
-        from: tx.from.to_address(),
-        to: Address::zero(),
+    TxInput {
+        from: tx.from.to_vm_address(),
+        to: multiversx_chain_vm::types::VMAddress::zero(),
         egld_value: tx.egld_value.value.clone(),
         esdt_values: Vec::new(),
         func_name: TxFunctionName::INIT,
@@ -70,19 +75,7 @@ pub(crate) fn execute(
             .collect(),
         gas_limit: tx.gas_limit.value,
         gas_price: tx.gas_price.value,
-        tx_hash: generate_tx_hash_dummy(&sc_deploy_step.id),
+        tx_hash: generate_tx_hash(&sc_deploy_step.id, &sc_deploy_step.explicit_tx_hash),
         ..Default::default()
-    };
-    sc_create(tx_input, &tx.contract_code.value, state)
-}
-
-fn execute_and_check(
-    state: BlockchainMock,
-    sc_deploy_step: &ScDeployStep,
-) -> (TxResult, Address, BlockchainMock) {
-    let (tx_result, address, state) = execute(state, sc_deploy_step);
-    if let Some(tx_expect) = &sc_deploy_step.expect {
-        check_tx_output(&sc_deploy_step.id, tx_expect, &tx_result);
     }
-    (tx_result, address, state)
 }

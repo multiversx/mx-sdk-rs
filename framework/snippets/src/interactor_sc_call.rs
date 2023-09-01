@@ -1,10 +1,10 @@
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
+    api::StaticApi,
     multiversx_sc::types::ContractCallWithEgld,
     scenario::ScenarioRunner,
-    scenario_model::{ScCallStep, TxCall, TxResponse},
-    DebugApi,
+    scenario_model::{ScCallStep, SetStateStep, TxCall, TxResponse},
 };
 use multiversx_sdk::data::transaction::Transaction;
 
@@ -17,12 +17,21 @@ impl Interactor {
         let tx_hash = self.launch_sc_call(sc_call_step).await;
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
-        sc_call_step.response = Some(TxResponse::new(tx));
+        sc_call_step.save_response(TxResponse::from_network_tx(tx));
+
+        if let Some(token_identifier) = sc_call_step.response().new_issued_token_identifier.clone()
+        {
+            println!("token identifier: {}", token_identifier);
+            let set_state_step = SetStateStep::new().new_token_identifier(token_identifier);
+
+            self.pre_runners.run_set_state_step(&set_state_step);
+            self.post_runners.run_set_state_step(&set_state_step);
+        }
 
         self.post_runners.run_sc_call_step(sc_call_step);
     }
 
-    async fn launch_sc_call(&mut self, sc_call_step: &ScCallStep) -> String {
+    async fn launch_sc_call(&mut self, sc_call_step: &mut ScCallStep) -> String {
         self.pre_runners.run_sc_call_step(sc_call_step);
 
         let sender_address = &sc_call_step.tx.from.value;
@@ -61,7 +70,7 @@ impl Interactor {
     }
 }
 
-fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<DebugApi, ()>) -> String {
+fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<StaticApi, ()>) -> String {
     let mut result = String::from_utf8(
         contract_call
             .basic

@@ -1,10 +1,9 @@
 use std::{path::Path, process::Command};
 
-use colored::Colorize;
-
 use crate::{
-    cli_args::{AllArgs, CliArgsToRaw},
+    cli_args::AllArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories},
+    print_util::{print_all_command, print_all_count, print_all_index},
 };
 
 pub fn call_all_meta(args: &AllArgs) {
@@ -14,22 +13,22 @@ pub fn call_all_meta(args: &AllArgs) {
         "./"
     };
 
-    perform_call_all_meta(path, args.ignore.as_slice(), args.to_raw());
+    perform_call_all_meta(path, args.ignore.as_slice(), args.to_cargo_run_args());
 }
 
 fn perform_call_all_meta(path: impl AsRef<Path>, ignore: &[String], raw_args: Vec<String>) {
     let dirs = RelevantDirectories::find_all(path, ignore);
     dir_pretty_print(dirs.iter_contract_crates(), "", &|_| {});
 
-    println!(
-        "Found {} contract crates.\n",
-        dirs.iter_contract_crates().count(),
-    );
+    let num_contract_crates = dirs.iter_contract_crates().count();
+    print_all_count(num_contract_crates);
+
     if dirs.is_empty() {
         return;
     }
 
-    for contract_crate in dirs.iter_contract_crates() {
+    for (i, contract_crate) in dirs.iter_contract_crates().enumerate() {
+        print_all_index(i + 1, num_contract_crates);
         call_contract_meta(contract_crate.path.as_path(), raw_args.as_slice());
     }
 }
@@ -42,16 +41,11 @@ pub fn call_contract_meta(contract_crate_path: &Path, cargo_run_args: &[String])
         meta_path.as_path().display()
     );
 
-    println!(
-        "\n{} `cargo run {}` in {}",
-        "Calling".green(),
-        cargo_run_args.join(" "),
-        meta_path.as_path().display(),
-    );
+    print_all_command(meta_path.as_path(), cargo_run_args);
 
     let exit_status = Command::new("cargo")
         .current_dir(&meta_path)
-        .args(std::iter::once(&"run".to_string()).chain(cargo_run_args.iter()))
+        .args(cargo_run_args)
         .spawn()
         .expect("failed to spawn cargo run process in meta crate")
         .wait()

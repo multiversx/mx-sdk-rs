@@ -3,20 +3,20 @@ use core::marker::PhantomData;
 use crate::{
     api::{
         const_handles, use_raw_handle, EndpointArgumentApi, EndpointArgumentApiImpl, ErrorApi,
-        HandleTypeInfo, ManagedBufferApi, ManagedTypeApi, StaticVarApi, VMApi,
+        HandleTypeInfo, ManagedBufferApiImpl, ManagedTypeApi, StaticVarApi, VMApi,
     },
     types::{ManagedArgBuffer, ManagedBuffer, ManagedType},
 };
 
 /// Replaces the EndpointArgumentApi inside a promises callback,
 /// and causes it to read arguments from the callback data instead of the regular tx input.
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct CallbackArgApiWrapper<A: VMApi> {
     _phantom: PhantomData<A>,
 }
 
 impl<A: VMApi> CallbackArgApiWrapper<A> {
-    pub(super) fn new() -> Self {
+    pub fn new() -> Self {
         CallbackArgApiWrapper {
             _phantom: PhantomData,
         }

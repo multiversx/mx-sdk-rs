@@ -1,8 +1,9 @@
 use crate::{mandos_to_erdrs_address, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
+    bech32,
     mandos_system::ScenarioRunner,
-    scenario_model::{ScDeployStep, TxResponse},
+    scenario_model::{ScDeployStep, SetStateStep, TxResponse},
 };
 use multiversx_sdk::data::{address::Address as ErdrsAddress, transaction::Transaction};
 
@@ -25,14 +26,18 @@ impl Interactor {
         }
     }
 
-    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &ScDeployStep) -> String {
+    pub async fn launch_sc_deploy(&mut self, sc_deploy_step: &mut ScDeployStep) -> String {
         self.pre_runners.run_sc_deploy_step(sc_deploy_step);
 
         let sender_address = &sc_deploy_step.tx.from.value;
         let mut transaction = self.sc_deploy_to_blockchain_tx(sc_deploy_step);
         self.set_nonce_and_sign_tx(sender_address, &mut transaction)
             .await;
-        let tx_hash = self.proxy.send_transaction(&transaction).await.unwrap();
+        let tx_hash = self
+            .proxy
+            .send_transaction(&transaction)
+            .await
+            .expect("error sending tx (possible API failure)");
         println!("sc deploy tx hash: {tx_hash}");
         info!("sc deploy tx hash: {}", tx_hash);
 
@@ -47,7 +52,25 @@ impl Interactor {
         let tx_hash = self.launch_sc_deploy(sc_deploy_step).await;
         let tx = self.retrieve_tx_on_network(tx_hash.clone()).await;
 
-        sc_deploy_step.response = Some(TxResponse::new(tx));
+        let addr = sc_deploy_step.tx.from.clone();
+        let nonce = tx.nonce;
+        sc_deploy_step.save_response(TxResponse::from_network_tx(tx));
+
+        let deploy_address = sc_deploy_step
+            .response()
+            .new_deployed_address
+            .clone()
+            .unwrap();
+
+        let set_state_step = SetStateStep::new().new_address(
+            addr,
+            nonce,
+            format!("0x{}", hex::encode(&deploy_address)).as_str(),
+        );
+
+        println!("deploy address: {}", bech32::encode(&deploy_address));
+        self.pre_runners.run_set_state_step(&set_state_step);
+        self.post_runners.run_set_state_step(&set_state_step);
 
         self.post_runners.run_sc_deploy_step(sc_deploy_step);
     }

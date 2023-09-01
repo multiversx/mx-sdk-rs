@@ -12,6 +12,7 @@ use multiversx_sc::{
     contract_base::ProxyObjBase,
     types::{BigInt, ManagedAddress},
 };
+use multiversx_sc_scenario::api::{SingleTxApi, StaticApi};
 
 use crate::module_1::VersionModule;
 
@@ -57,9 +58,7 @@ mod module_1 {
     pub trait EndpointWrappers: VersionModule + multiversx_sc::contract_base::ContractBase {
         #[inline]
         fn call_version(&self) {
-            multiversx_sc::api::CallValueApiImpl::check_not_payable(
-                &Self::Api::call_value_api_impl(),
-            );
+            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let result = self.version();
             multiversx_sc::io::finish_multi::<Self::Api, _>(&result)
         }
@@ -175,9 +174,7 @@ mod sample_adder {
         #[inline]
         fn call_get_sum(&self) {
             <Self::Api as multiversx_sc::api::VMApi>::init_static();
-            multiversx_sc::api::CallValueApiImpl::check_not_payable(
-                &Self::Api::call_value_api_impl(),
-            );
+            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let () = multiversx_sc::io::load_endpoint_args::<Self::Api, ()>(());
             let result = self.get_sum();
             multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
@@ -185,9 +182,7 @@ mod sample_adder {
         #[inline]
         fn call_init(&self) {
             <Self::Api as multiversx_sc::api::VMApi>::init_static();
-            multiversx_sc::api::CallValueApiImpl::check_not_payable(
-                &Self::Api::call_value_api_impl(),
-            );
+            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let (initial_value, ()) = multiversx_sc::io::load_endpoint_args::<
                 Self::Api,
                 (multiversx_sc::types::BigInt<Self::Api>, ()),
@@ -197,9 +192,7 @@ mod sample_adder {
         #[inline]
         fn call_add(&self) {
             <Self::Api as multiversx_sc::api::VMApi>::init_static();
-            multiversx_sc::api::CallValueApiImpl::check_not_payable(
-                &Self::Api::call_value_api_impl(),
-            );
+            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
             let (value, ()) = multiversx_sc::io::load_endpoint_args::<
                 Self::Api,
                 (multiversx_sc::types::BigInt<Self::Api>, ()),
@@ -418,12 +411,9 @@ mod sample_adder {
 
 #[test]
 fn contract_without_macros_basic() {
-    use multiversx_chain_vm::DebugApi;
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let _ = DebugApi::dummy();
-
-    let adder = sample_adder::contract_obj::<DebugApi>();
+    let adder = sample_adder::contract_obj::<SingleTxApi>();
 
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
@@ -444,7 +434,7 @@ fn contract_without_macros_basic() {
     assert!(adder.call("version"));
 
     let mut own_proxy =
-        sample_adder::Proxy::<DebugApi>::new_proxy_obj().contract(ManagedAddress::zero());
+        sample_adder::Proxy::<StaticApi>::new_proxy_obj().contract(ManagedAddress::zero());
     let _ = own_proxy.get_sum();
 
     let _ = multiversx_sc_meta::abi_json::contract_abi::<sample_adder::AbiProvider>();

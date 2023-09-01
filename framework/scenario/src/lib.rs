@@ -1,18 +1,34 @@
 #![allow(clippy::type_complexity)]
 #![feature(exhaustive_patterns)]
 
+pub mod api;
+pub mod bech32;
+pub mod debug_executor;
+pub mod display_util;
 mod facade;
+pub mod managed_test_util;
 pub mod scenario;
+mod scenario_macros;
 pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
-pub mod whitebox;
+
+#[deprecated(
+    since = "0.42.0",
+    note = "Use the blackbox testing framework instead. If needed, it also supports whitebox calls."
+)]
+pub mod whitebox_legacy;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
-pub use whitebox as testing_framework;
+#[allow(deprecated)]
+pub use whitebox_legacy as testing_framework;
 
-pub use multiversx_chain_vm::{self, bech32, num_bigint, DebugApi};
+pub use api::DebugApi;
+pub use multiversx_chain_vm;
+
+/// Re-exporting for convenience.
+pub use num_bigint;
 
 pub use multiversx_sc;
 
@@ -26,7 +42,7 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::{ContractInfo, ScenarioWorld};
+pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract};
 
 use std::path::Path;
 

@@ -15,6 +15,16 @@ fn claim_esdt_go() {
 }
 
 #[test]
+fn claim_fees_go() {
+    world().run("scenarios/claim-fees.scen.json");
+}
+
+#[test]
+fn claim_multi_esdt_go() {
+    world().run("scenarios/claim-multi-esdt.scen.json");
+}
+
+#[test]
 fn forward_go() {
     world().run("scenarios/forward.scen.json");
 }
@@ -37,4 +47,9 @@ fn withdraw_egld_go() {
 #[test]
 fn withdraw_esdt_go() {
     world().run("scenarios/withdraw-esdt.scen.json");
+}
+
+#[test]
+fn withdraw_multi_esdt_go() {
+    world().run("scenarios/withdraw-multi-esdt.scen.json");
 }

@@ -1,0 +1,12 @@
+name = "crypto-zombies"
+contract_trait = "CryptoZombies"
+src_file = "lib.rs"
+rename_pairs = []
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "wasm/Cargo.toml",
+    "Cargo.toml",
+]

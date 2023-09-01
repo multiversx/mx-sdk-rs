@@ -1,19 +1,22 @@
-use crate::{multiversx_sc::types::heap::Address, scenario::model::SetStateStep};
+use crate::scenario::model::SetStateStep;
 
-use multiversx_chain_vm::world_mock::{
-    AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainMock, EsdtData, EsdtInstance,
-    EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
+use multiversx_chain_vm::{
+    types::VMAddress,
+    world_mock::{
+        AccountData, AccountEsdt, BlockInfo as CrateBlockInfo, BlockchainState, EsdtData,
+        EsdtInstance, EsdtInstanceMetadata, EsdtInstances, EsdtRoles,
+    },
 };
 
 use super::ScenarioVMRunner;
 
 impl ScenarioVMRunner {
     pub fn perform_set_state(&mut self, set_state_step: &SetStateStep) {
-        execute(&mut self.blockchain_mock, set_state_step);
+        execute(&mut self.blockchain_mock.state, set_state_step);
     }
 }
 
-fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
+fn execute(state: &mut BlockchainState, set_state_step: &SetStateStep) {
     for (address, account) in set_state_step.accounts.iter() {
         let storage = account
             .storage
@@ -29,7 +32,7 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
         );
 
         state.validate_and_add_account(AccountData {
-            address: address.to_address(),
+            address: address.to_vm_address(),
             nonce: account
                 .nonce
                 .as_ref()
@@ -54,7 +57,7 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
             contract_owner: account
                 .owner
                 .as_ref()
-                .map(|address_value| address_value.value.clone()),
+                .map(|address_value| address_value.to_vm_address()),
             developer_rewards: account
                 .developer_rewards
                 .as_ref()
@@ -68,10 +71,13 @@ fn execute(state: &mut BlockchainMock, set_state_step: &SetStateStep) {
             "field should have SC format"
         );
         state.put_new_address(
-            new_address.creator_address.value.clone(),
+            new_address.creator_address.to_vm_address(),
             new_address.creator_nonce.value,
-            new_address.new_address.value.clone(),
+            new_address.new_address.to_vm_address(),
         )
+    }
+    for new_token_identifier in set_state_step.new_token_identifiers.iter().cloned() {
+        state.put_new_token_identifier(new_token_identifier)
     }
     if let Some(block_info_obj) = &*set_state_step.previous_block_info {
         update_block_info(&mut state.previous_block_info, block_info_obj);
@@ -141,7 +147,7 @@ fn convert_scenario_esdt_instance_to_world_mock(
             creator: scenario_esdt
                 .creator
                 .as_ref()
-                .map(|creator| Address::from_slice(creator.value.as_slice())),
+                .map(|creator| VMAddress::from_slice(creator.value.as_slice())),
             royalties: scenario_esdt
                 .royalties
                 .as_ref()

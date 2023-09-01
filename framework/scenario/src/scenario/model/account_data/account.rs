@@ -123,6 +123,22 @@ impl Account {
 
         self.esdt.get_mut(token_id).unwrap()
     }
+
+    pub fn code<V>(mut self, code_expr: V) -> Self
+    where
+        BytesValue: From<V>,
+    {
+        self.code = Some(BytesValue::from(code_expr));
+        self
+    }
+
+    pub fn owner<V>(mut self, owner_expr: V) -> Self
+    where
+        AddressValue: From<V>,
+    {
+        self.owner = Some(AddressValue::from(owner_expr));
+        self
+    }
 }
 
 impl InterpretableFrom<AccountRaw> for Account {

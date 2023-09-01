@@ -78,11 +78,6 @@ fn crypto_keccak_256_rs() {
 }
 
 #[test]
-fn crypto_keccak_256_legacy_managed_rs() {
-    world().run("scenarios/crypto_keccak256_legacy_managed.scen.json");
-}
-
-#[test]
 #[ignore]
 fn crypto_ripemd_160_rs() {
     world().run("scenarios/crypto_ripemd160.scen.json");
@@ -91,11 +86,6 @@ fn crypto_ripemd_160_rs() {
 #[test]
 fn crypto_sha_256_rs() {
     world().run("scenarios/crypto_sha256.scen.json");
-}
-
-#[test]
-fn crypto_sha_256_legacy_managed_rs() {
-    world().run("scenarios/crypto_sha256_legacy_managed.scen.json");
 }
 
 #[test]
@@ -223,6 +213,11 @@ fn get_caller_rs() {
 #[test]
 fn get_cumulated_validator_rewards_rs() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
+}
+
+#[test]
+fn get_shard_of_address_rs() {
+    world().run("scenarios/get_shard_of_address.scen.json");
 }
 
 #[test]

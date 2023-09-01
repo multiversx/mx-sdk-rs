@@ -19,7 +19,7 @@ pub struct ExternalStepsStep {
     pub path: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Step {
     ExternalSteps(ExternalStepsStep),
     SetState(SetStateStep),
@@ -42,6 +42,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 accounts,
                 new_addresses,
+                new_token_identifiers,
                 block_hashes,
                 previous_block_info,
                 current_block_info,
@@ -60,6 +61,7 @@ impl InterpretableFrom<StepRaw> for Step {
                     .into_iter()
                     .map(|t| NewAddress::interpret_from(t, context))
                     .collect(),
+                new_token_identifiers,
                 block_hashes: block_hashes
                     .into_iter()
                     .map(|t| BytesValue::interpret_from(t, context))
@@ -84,7 +86,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxCall::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
-                response: None,
+                ..Default::default()
             }),
             StepRaw::ScQuery {
                 id,
@@ -99,6 +101,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxQuery::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
+                ..Default::default()
             }),
             StepRaw::ScDeploy {
                 id,
@@ -113,7 +116,7 @@ impl InterpretableFrom<StepRaw> for Step {
                 comment,
                 tx: Box::new(TxDeploy::interpret_from(tx, context)),
                 expect: expect.map(|v| TxExpect::interpret_from(v, context)),
-                response: None,
+                ..Default::default()
             }),
             StepRaw::Transfer {
                 id,
@@ -165,6 +168,7 @@ impl IntoRaw<StepRaw> for Step {
                     .into_iter()
                     .map(|na| na.into_raw())
                     .collect(),
+                new_token_identifiers: s.new_token_identifiers,
                 block_hashes: s.block_hashes.into_iter().map(|bh| bh.original).collect(),
                 previous_block_info: s.previous_block_info.map(|bi| bi.into_raw()),
                 current_block_info: s.current_block_info.map(|bi| bi.into_raw()),

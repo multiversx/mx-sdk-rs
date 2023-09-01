@@ -13,20 +13,8 @@ multiversx_sc::derive_imports!();
 
 // Additionally, we also have to update the interact-rs snippets manually to add relative paths:
 // [dependencies.multiversx-sc-snippets]
-// version = "0.39.2"
+// version = "0.43.2"
 // path = "../../../../framework/snippets"
-
-// [dependencies.multiversx-sc-scenario]
-// version = "0.39.2"
-// path = "../../../../framework/scenario"
-
-// [dependencies.multiversx-chain-vm]
-// version = "0.1.2"
-// path = "../../../../vm"
-
-// [dependencies.multiversx-sdk]
-// version = "0.1.1"
-// path = "../../../../sdk/core"
 
 #[derive(
     TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone,

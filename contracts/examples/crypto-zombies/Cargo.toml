@@ -1,5 +1,5 @@
 [package]
-name = "cryptozombies"
+name = "crypto-zombies"
 version = "0.0.0"
 authors = ["Alin Cruceat <alin.cruceat@multiversx.com>"]
 edition = "2021"
@@ -9,9 +9,9 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies.multiversx-sc]
-version = "0.41.0"
+version = "0.43.2"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.41.0"
+version = "0.43.2"
 path = "../../../framework/scenario"

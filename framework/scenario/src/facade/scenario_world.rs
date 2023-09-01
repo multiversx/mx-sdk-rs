@@ -1,14 +1,18 @@
+use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
+use multiversx_chain_vm::world_mock::BlockchainState;
+
 use crate::{
-    multiversx_chain_vm::world_mock::ContractContainer,
+    api::DebugApi,
+    debug_executor::ContractContainer,
     multiversx_sc::{
         api,
         contract_base::{CallableContractBuilder, ContractAbiProvider},
     },
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
+    scenario_model::BytesValue,
     vm_go_tool::run_vm_go_tool,
 };
-use multiversx_chain_vm::DebugApi;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;
@@ -74,7 +78,15 @@ impl ScenarioWorld {
         }
     }
 
-    pub(super) fn get_mut_contract_debugger_backend(&mut self) -> &mut DebuggerBackend {
+    pub(crate) fn get_debugger_backend(&self) -> &DebuggerBackend {
+        if let Backend::Debugger(debugger) = &self.backend {
+            debugger
+        } else {
+            panic!("operation only available for the contract debugger backend")
+        }
+    }
+
+    pub(crate) fn get_mut_debugger_backend(&mut self) -> &mut DebuggerBackend {
         if let Backend::Debugger(debugger) = &mut self.backend {
             debugger
         } else {
@@ -82,8 +94,20 @@ impl ScenarioWorld {
         }
     }
 
+    pub(crate) fn get_state(&self) -> &BlockchainState {
+        &self.get_debugger_backend().vm_runner.blockchain_mock.state
+    }
+
+    pub(crate) fn get_mut_state(&mut self) -> &mut BlockchainState {
+        &mut self
+            .get_mut_debugger_backend()
+            .vm_runner
+            .blockchain_mock
+            .state
+    }
+
     pub fn start_trace(&mut self) -> &mut Self {
-        self.get_mut_contract_debugger_backend().trace = Some(ScenarioTrace::default());
+        self.get_mut_debugger_backend().trace = Some(ScenarioTrace::default());
         self
     }
 
@@ -106,16 +130,23 @@ impl ScenarioWorld {
             .with_allowed_missing_files()
     }
 
+    /// Convenient way of creating a code expression based on the current context
+    /// (i.e. with the paths resolved, as configured).
+    pub fn code_expression(&self, path: &str) -> BytesValue {
+        BytesValue::interpret_from(path, &self.interpreter_context())
+    }
+
     pub fn register_contract_container(
         &mut self,
         expression: &str,
         contract_container: ContractContainer,
     ) {
         let contract_bytes = interpret_string(expression, &self.interpreter_context());
-        self.get_mut_contract_debugger_backend()
+        self.get_mut_debugger_backend()
             .vm_runner
-            .blockchain_mock
-            .register_contract_container(contract_bytes, contract_container);
+            .contract_map_ref
+            .lock()
+            .register_contract(contract_bytes, contract_container);
     }
 
     /// Links a contract path in a test to a contract implementation.
@@ -179,7 +210,7 @@ impl ScenarioWorld {
 
     /// Exports current scenario to a JSON file, as created.
     pub fn write_scenario_trace<P: AsRef<Path>>(&mut self, file_path: P) {
-        if let Some(trace) = &mut self.get_mut_contract_debugger_backend().trace {
+        if let Some(trace) = &mut self.get_mut_debugger_backend().trace {
             trace.write_scenario_trace(file_path);
         } else {
             panic!("scenario trace no initialized")

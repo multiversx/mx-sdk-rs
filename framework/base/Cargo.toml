@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc"
-version = "0.41.0"
+version = "0.43.2"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -13,11 +13,13 @@ description = "MultiversX smart contract API"
 keywords = ["multiversx", "wasm", "webassembly", "blockchain", "contract"]
 categories = ["no-std", "wasm", "cryptography::cryptocurrencies", "development-tools"]
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = ["multiversx-sc-codec/alloc"]
 promises = []
-big-float = []
 managed-map = []
 esdt-token-payment-legacy-decode = []
 
@@ -31,10 +33,10 @@ version = "0.2"
 default-features = false
 
 [dependencies.multiversx-sc-derive]
-version = "=0.41.0"
+version = "=0.43.2"
 path = "../derive"
 
 [dependencies.multiversx-sc-codec]
-version = "=0.17.1"
+version = "=0.18.1"
 path = "../../data/codec"
 features = ["derive"]

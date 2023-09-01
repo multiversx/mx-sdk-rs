@@ -51,6 +51,17 @@ impl CheckAccount {
         self
     }
 
+    pub fn code<V>(mut self, code_expr: V) -> Self
+    where
+        BytesValue: InterpretableFrom<V>,
+    {
+        self.code = CheckValue::Equal(BytesValue::interpret_from(
+            code_expr,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
     pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
     where
         BytesKey: From<K>,
@@ -137,8 +148,8 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
             esdt: self.esdt.into_raw(),
             username: self.username.into_raw(),
             storage: self.storage.into_raw(),
-            code: self.code.into_raw(),
-            owner: self.owner.into_raw(),
+            code: self.code.into_raw_explicit(), // TODO: convert back to into_raw after VM CI upgrade
+            owner: self.owner.into_raw_explicit(), // TODO: convert back to into_raw after VM CI upgrade
             developer_rewards: self.developer_rewards.into_raw(),
             async_call_data: self.async_call_data.into_raw(),
         }

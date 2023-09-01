@@ -65,11 +65,6 @@ fn crypto_keccak_256_go() {
 }
 
 #[test]
-fn crypto_keccak_256_legacy_managed_go() {
-    world().run("scenarios/crypto_keccak256_legacy_managed.scen.json");
-}
-
-#[test]
 fn crypto_ripemd_160_go() {
     world().run("scenarios/crypto_ripemd160.scen.json");
 }
@@ -77,11 +72,6 @@ fn crypto_ripemd_160_go() {
 #[test]
 fn crypto_sha_256_go() {
     world().run("scenarios/crypto_sha256.scen.json");
-}
-
-#[test]
-fn crypto_sha_256_legacy_managed_go() {
-    world().run("scenarios/crypto_sha256_legacy_managed.scen.json");
 }
 
 #[test]
@@ -207,6 +197,12 @@ fn get_caller_go() {
 #[test]
 fn get_cumulated_validator_rewards_go() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
+}
+
+#[test]
+#[ignore = "TODO: missing support from scenario-go"]
+fn get_shard_of_address_go() {
+    world().run("scenarios/get_shard_of_address.scen.json");
 }
 
 #[test]

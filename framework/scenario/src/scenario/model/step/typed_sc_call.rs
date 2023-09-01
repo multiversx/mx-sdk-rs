@@ -6,10 +6,10 @@ use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
 
 use crate::{
     scenario::model::{AddressValue, U64Value},
-    scenario_model::{BigUintValue, BytesValue, TxError, TxExpect, TxResponse},
+    scenario_model::{BigUintValue, BytesValue, TxExpect, TxResponse, TxResponseStatus},
 };
 
-use super::ScCallStep;
+use super::{format_expect, ScCallStep};
 
 /// `SCCallStep` with explicit return type.
 #[derive(Default, Debug)]
@@ -19,20 +19,16 @@ pub struct TypedScCall<OriginalResult> {
 }
 
 impl<OriginalResult> TypedScCall<OriginalResult> {
-    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxError>
+    pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let mut raw_result = self.response().raw_result()?;
+        let mut raw_result = self.response().out.clone();
         Ok(
             RequestedResult::multi_decode_or_handle_err(&mut raw_result, PanicErrorHandler)
                 .unwrap(),
         )
-    }
-
-    pub fn response(&self) -> &TxResponse {
-        self.sc_call_step.response.as_ref().unwrap()
     }
 
     pub fn from<A>(mut self, address: A) -> Self
@@ -93,9 +89,34 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
         self
     }
 
+    /// Adds a custom expect section to the tx.
     pub fn expect(mut self, expect: TxExpect) -> Self {
         self.sc_call_step = self.sc_call_step.expect(expect);
         self
+    }
+
+    /// Explicitly states that no tx expect section should be added and no checks should be performed.
+    ///
+    /// Note: by default a basic `TxExpect::ok()` is added, which checks that status is 0 and nothing else.
+    pub fn no_expect(mut self) -> Self {
+        self.sc_call_step = self.sc_call_step.no_expect();
+        self
+    }
+
+    /// Shorthand for creating a tx expect with status "Ok" and the given value.
+    ///
+    /// The given value is type-checked agains the tx return type.
+    pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
+    where
+        OriginalResult: TopEncodeMulti,
+        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+    {
+        self.expect(format_expect(expected_value))
+    }
+
+    /// Unwraps the response, if available.
+    pub fn response(&self) -> &TxResponse {
+        self.sc_call_step.response()
     }
 }
 

@@ -1,15 +1,18 @@
-use crate::{display_util::*, num_bigint::BigUint};
-use alloc::vec::Vec;
-use multiversx_sc::types::heap::{Address, H256};
+use num_bigint::BigUint;
 use num_traits::Zero;
+
+use crate::{
+    display_util::*,
+    types::{VMAddress, H256},
+};
 use std::fmt;
 
 use super::TxFunctionName;
 
 #[derive(Clone, Debug)]
 pub struct TxInput {
-    pub from: Address,
-    pub to: Address,
+    pub from: VMAddress,
+    pub to: VMAddress,
     pub egld_value: BigUint,
     pub esdt_values: Vec<TxTokenTransfer>,
     pub func_name: TxFunctionName,
@@ -24,8 +27,8 @@ pub struct TxInput {
 impl Default for TxInput {
     fn default() -> Self {
         TxInput {
-            from: Address::zero(),
-            to: Address::zero(),
+            from: VMAddress::zero(),
+            to: VMAddress::zero(),
             egld_value: BigUint::zero(),
             esdt_values: Vec::new(),
             func_name: TxFunctionName::EMPTY,
@@ -66,7 +69,7 @@ impl TxInput {
 }
 
 /// Models ESDT transfers between accounts.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TxTokenTransfer {
     pub token_identifier: Vec<u8>,
     pub nonce: u64,
@@ -97,5 +100,11 @@ impl TxInput {
         } else {
             self.esdt_values.as_slice()
         }
+    }
+
+    pub fn get_argument_vec_u8(&self, arg_index: i32) -> Vec<u8> {
+        let arg_idx_usize = arg_index as usize;
+        assert!(arg_idx_usize < self.args.len(), "Tx arg index out of range");
+        self.args[arg_idx_usize].clone()
     }
 }

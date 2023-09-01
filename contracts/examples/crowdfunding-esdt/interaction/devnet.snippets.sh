@@ -1,19 +1,25 @@
-ALICE="${USERS}/alice.pem"
+ALICE="./interaction/alice.pem"
+PROJECT="${PWD}"
+PROXY=https://devnet-gateway.multiversx.com
+CHAINID=D
+
 BOB="${USERS}/bob.pem"
 
 ADDRESS=$(mxpy data load --key=address-devnet)
 DEPLOY_TRANSACTION=$(mxpy data load --key=deployTransaction-devnet)
 
-DEPLOY_GAS="80000000"
+DEPLOY_GAS="25000000"
 TARGET=10
-DEADLINE_UNIX_TIMESTAMP=1609452000 # Fri Jan 01 2021 00:00:00 GMT+0200 (Eastern European Standard Time)
+
+DEADLINE_UNIX_TIMESTAMP=$(date -d '2100-05-12 00:00:01' +"%s")
 EGLD_TOKEN_ID=0x45474c44 # "EGLD"
 
 deploy() {
     mxpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} \
           --gas-limit=${DEPLOY_GAS} \
           --arguments ${TARGET} ${DEADLINE_UNIX_TIMESTAMP} ${EGLD_TOKEN_ID} \
-          --outfile="deploy-devnet.interaction.json" --send || return
+          --proxy=${PROXY} --chain=${CHAINID} --send
+          --outfile="deploy-devnet.interaction.json" || return
 
     TRANSACTION=$(mxpy data parse --file="deploy-devnet.interaction.json" --expression="data['emittedTransactionHash']")
     ADDRESS=$(mxpy data parse --file="deploy-devnet.interaction.json" --expression="data['contractAddress']")

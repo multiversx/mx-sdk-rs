@@ -1,4 +1,4 @@
-# Elrond smart contract module - Governance
+# MultiversX smart contract module - Governance
 
 This is a standard smart contract module, that when added to a smart contract offers governance features:
 - proposing actions

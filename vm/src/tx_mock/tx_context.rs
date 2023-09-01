@@ -1,51 +1,42 @@
 use crate::{
-    num_bigint::BigUint,
-    world_mock::{AccountData, AccountEsdt, BlockchainMock},
+    tx_execution::BlockchainVMRef,
+    types::VMAddress,
+    world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };
-use alloc::vec::Vec;
-use core::cell::RefCell;
-use multiversx_sc::types::{heap::Address, LockableStaticBuffer};
+use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{
-    cell::{Ref, RefMut},
     collections::HashMap,
-    rc::Rc,
+    sync::{Arc, Mutex, MutexGuard},
 };
 
-use super::{
-    BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult, TxStaticVars,
-};
+use super::{BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult};
 
-#[derive(Debug)]
 pub struct TxContext {
+    pub vm_ref: BlockchainVMRef,
     pub tx_input_box: Box<TxInput>,
-    pub tx_cache: Rc<TxCache>,
-    pub managed_types: RefCell<TxManagedTypes>,
-    pub lockable_static_buffer_cell: RefCell<LockableStaticBuffer>,
-    pub static_vars_cell: RefCell<TxStaticVars>,
-    pub tx_result_cell: RefCell<TxResult>,
-    pub b_rng: RefCell<BlockchainRng>,
-    pub printed_messages: RefCell<Vec<String>>,
+    pub tx_cache: Arc<TxCache>,
+    pub managed_types: Mutex<TxManagedTypes>,
+    pub tx_result_cell: Mutex<TxResult>,
+    pub b_rng: Mutex<BlockchainRng>,
 }
 
 impl TxContext {
-    pub fn new(tx_input: TxInput, tx_cache: TxCache) -> Self {
-        let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
+    pub fn new(vm_ref: BlockchainVMRef, tx_input: TxInput, tx_cache: TxCache) -> Self {
+        let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
+            vm_ref,
             tx_input_box: Box::new(tx_input),
-            tx_cache: Rc::new(tx_cache),
-            managed_types: RefCell::new(TxManagedTypes::new()),
-            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
-            static_vars_cell: RefCell::new(TxStaticVars::default()),
-            tx_result_cell: RefCell::new(TxResult::empty()),
+            tx_cache: Arc::new(tx_cache),
+            managed_types: Mutex::new(TxManagedTypes::new()),
+            tx_result_cell: Mutex::new(TxResult::empty()),
             b_rng,
-            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
     pub fn dummy() -> Self {
-        let tx_cache = TxCache::new(Rc::new(BlockchainMock::new()));
-        let contract_address = Address::from(&[b'c'; 32]);
+        let tx_cache = TxCache::new(Arc::new(BlockchainState::default()));
+        let contract_address = VMAddress::from([b'c'; 32]);
         tx_cache.insert_account(AccountData {
             address: contract_address.clone(),
             nonce: 0,
@@ -65,16 +56,14 @@ impl TxContext {
             ..Default::default()
         };
 
-        let b_rng = RefCell::new(BlockchainRng::new(&tx_input, &tx_cache));
+        let b_rng = Mutex::new(BlockchainRng::new(&tx_input, &tx_cache));
         TxContext {
+            vm_ref: BlockchainVMRef::new(Box::new(FailingExecutor)),
             tx_input_box: Box::new(tx_input),
-            tx_cache: Rc::new(tx_cache),
-            managed_types: RefCell::new(TxManagedTypes::new()),
-            lockable_static_buffer_cell: RefCell::new(LockableStaticBuffer::new()),
-            static_vars_cell: RefCell::new(TxStaticVars::default()),
-            tx_result_cell: RefCell::new(TxResult::empty()),
+            tx_cache: Arc::new(tx_cache),
+            managed_types: Mutex::new(TxManagedTypes::new()),
+            tx_result_cell: Mutex::new(TxResult::empty()),
             b_rng,
-            printed_messages: RefCell::new(Vec::new()),
         }
     }
 
@@ -86,15 +75,15 @@ impl TxContext {
         &self.tx_cache
     }
 
-    pub fn blockchain_cache_rc(&self) -> Rc<TxCache> {
+    pub fn blockchain_cache_arc(&self) -> Arc<TxCache> {
         self.tx_cache.clone()
     }
 
-    pub fn blockchain_ref(&self) -> &BlockchainMock {
+    pub fn blockchain_ref(&self) -> &BlockchainState {
         self.tx_cache.blockchain_ref()
     }
 
-    pub fn with_account<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,
     {
@@ -108,7 +97,7 @@ impl TxContext {
         self.with_account(&self.tx_input_box.to, f)
     }
 
-    pub fn with_account_mut<R, F>(&self, address: &Address, f: F) -> R
+    pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R
     where
         F: FnOnce(&mut AccountData) -> R,
     {
@@ -122,31 +111,27 @@ impl TxContext {
         self.with_account_mut(&self.tx_input_box.to, f)
     }
 
-    pub fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
-        self.managed_types.borrow()
+    pub fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+        self.managed_types.lock().unwrap()
     }
 
-    pub fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
-        self.managed_types.borrow_mut()
-    }
-
-    pub fn result_borrow_mut(&self) -> RefMut<TxResult> {
-        self.tx_result_cell.borrow_mut()
+    pub fn result_lock(&self) -> MutexGuard<TxResult> {
+        self.tx_result_cell.lock().unwrap()
     }
 
     pub fn extract_result(&self) -> TxResult {
-        self.tx_result_cell.replace(TxResult::empty())
+        std::mem::replace(&mut *self.tx_result_cell.lock().unwrap(), TxResult::empty())
     }
 
-    pub fn rng_borrow_mut(&self) -> RefMut<BlockchainRng> {
-        self.b_rng.borrow_mut()
+    pub fn rng_lock(&self) -> MutexGuard<BlockchainRng> {
+        self.b_rng.lock().unwrap()
     }
 
     pub fn create_new_contract(
         &self,
-        new_address: &Address,
+        new_address: &VMAddress,
         contract_path: Vec<u8>,
-        contract_owner: Address,
+        contract_owner: VMAddress,
     ) {
         assert!(
             !self.tx_cache.blockchain_ref().account_exists(new_address),
@@ -167,7 +152,26 @@ impl TxContext {
     }
 
     pub fn into_blockchain_updates(self) -> BlockchainUpdate {
-        let tx_cache = Rc::try_unwrap(self.tx_cache).unwrap();
+        let tx_cache = Arc::try_unwrap(self.tx_cache).unwrap();
         tx_cache.into_blockchain_updates()
+    }
+
+    pub fn into_results(self) -> (TxResult, BlockchainUpdate) {
+        let tx_cache = Arc::try_unwrap(self.tx_cache).unwrap();
+        let tx_result = Mutex::into_inner(self.tx_result_cell).unwrap();
+        let blockchain_updates = tx_cache.into_blockchain_updates();
+        (tx_result, blockchain_updates)
+    }
+}
+
+impl std::fmt::Debug for TxContext {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("TxContext")
+            .field("tx_input_box", &self.tx_input_box)
+            .field("tx_cache", &self.tx_cache)
+            .field("managed_types", &self.managed_types)
+            .field("tx_result_cell", &self.tx_result_cell)
+            .field("b_rng", &self.b_rng)
+            .finish()
     }
 }
