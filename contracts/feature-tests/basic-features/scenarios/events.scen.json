@@ -38,7 +38,9 @@
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": "0"
+                        "data": [
+                            "0"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -68,7 +70,9 @@
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": "0"
+                        "data": [
+                            "0"
+                        ]
                     },
                     {
                         "address": "*",
@@ -76,7 +80,9 @@
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     },
                     {
                         "address": "sc:basic-features",
@@ -84,7 +90,9 @@
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": "2"
+                        "data": [
+                            "2"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -114,7 +122,9 @@
                         "topics": [
                             "str:event_a"
                         ],
-                        "data": "0"
+                        "data": [
+                            "0"
+                        ]
                     },
                     "+"
                 ],
@@ -151,8 +161,10 @@
                             "str:arg2_an_address_______________s3"
                         ],
                         "data": [
-                            "biguint:1",
-                            "biguint:2"
+                            [
+                                "biguint:1",
+                                "biguint:2"
+                            ]
                         ]
                     }
                 ],
