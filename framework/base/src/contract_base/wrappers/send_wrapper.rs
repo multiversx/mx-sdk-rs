@@ -39,7 +39,7 @@ impl<A> SendWrapper<A>
 where
     A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         SendWrapper {
             _phantom: PhantomData,
         }
