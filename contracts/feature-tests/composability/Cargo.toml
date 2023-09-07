@@ -5,6 +5,9 @@ authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
 publish = false
 
+[dev-dependencies.builtin-func-features]
+path = "builtin-func-features"
+
 [dev-dependencies.forwarder]
 path = "forwarder"
 
