@@ -6,7 +6,6 @@ use crate::{
 };
 use convert_case::{Case, Casing};
 use ruplacer::Query;
-use toml::value::Table;
 
 const TEST_DIRECTORY: &str = "./tests";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
@@ -29,10 +28,7 @@ impl TemplateAdjuster {
         let cargo_toml_path = self.target.contract_dir().join(ROOT_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
-        let non_framework_crate_names = toml.local_dependency_paths(FRAMEWORK_CRATE_NAMES);
-        if !self.keep_paths {
-            remove_paths_from_deps(&mut toml, &non_framework_crate_names);
-        }
+        toml.remove_framework_paths(FRAMEWORK_CRATE_NAMES);
 
         toml.insert_default_workspace();
 
@@ -43,11 +39,7 @@ impl TemplateAdjuster {
         let cargo_toml_path = self.target.contract_dir().join(META_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
-        let mut ignored_crate_names = toml.local_dependency_paths(FRAMEWORK_CRATE_NAMES);
-        ignored_crate_names.push(self.metadata.name.clone());
-        if !self.keep_paths {
-            remove_paths_from_deps(&mut toml, &ignored_crate_names);
-        }
+        toml.remove_framework_paths(FRAMEWORK_CRATE_NAMES);
 
         toml.save_to_file(&cargo_toml_path);
     }
@@ -56,11 +48,7 @@ impl TemplateAdjuster {
         let cargo_toml_path = self.target.contract_dir().join(WASM_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
-        let mut ignored_crate_names = toml.local_dependency_paths(FRAMEWORK_CRATE_NAMES);
-        ignored_crate_names.push(self.metadata.name.clone());
-        if !self.keep_paths {
-            remove_paths_from_deps(&mut toml, &ignored_crate_names);
-        }
+        toml.remove_framework_paths(FRAMEWORK_CRATE_NAMES);
 
         toml.save_to_file(&cargo_toml_path);
     }
@@ -210,24 +198,4 @@ fn package_name_expr(template: &str) -> String {
 }
 fn dependecy_decl_expr(template: &str) -> String {
     format!("dependencies.{template}")
-}
-
-pub fn remove_paths_from_deps_map(deps_map: &mut Table, ignore_deps: &[String]) {
-    for (key, value) in deps_map {
-        if ignore_deps.contains(key) {
-            continue;
-        }
-        if let Some(dep) = value.as_table_mut() {
-            dep.remove("path");
-        }
-    }
-}
-
-pub fn remove_paths_from_deps(toml: &mut CargoTomlContents, ignore_deps: &[String]) {
-    if toml.has_dependencies() {
-        remove_paths_from_deps_map(toml.dependencies_mut(), ignore_deps);
-    }
-    if toml.has_dev_dependencies() {
-        remove_paths_from_deps_map(toml.dev_dependencies_mut(), ignore_deps);
-    }
 }

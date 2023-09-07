@@ -125,6 +125,40 @@ impl CargoTomlContents {
             .insert("workspace".to_string(), workspace);
     }
 
+    pub fn remove_framework_paths(&mut self, ignore_deps: &[&str]) {
+        let keys_to_remove = self.get_keys_to_remove(ignore_deps);
+
+        let deps_map_mut = self.get_corresponding_dependency();
+        for key in keys_to_remove {
+            deps_map_mut.remove(&key);
+        }
+    }
+
+    fn get_corresponding_dependency(&mut self) -> &mut Table {
+        if self.has_dependencies() {
+            self.dependencies_mut()
+        } else {
+            self.dev_dependencies_mut()
+        }
+    }
+    fn get_keys_to_remove<'a>(&self, ignore_deps: &[&str]) -> Vec<String> {
+        let deps_map = &self.dependencies_table();
+        let mut keys_to_remove = Vec::<String>::new();
+        for (key, value) in deps_map.unwrap() {
+            if ignore_deps.contains(&key.as_str()) {
+                continue;
+            }
+
+            if let Some(path) = value.get("path") {
+                let path_str = path.as_str().expect("path is not a string").to_string();
+                if path_str.contains("framework") {
+                    keys_to_remove.push(key.to_string());
+                }
+            }
+        }
+        keys_to_remove
+    }
+
     pub fn local_dependency_paths(&self, ignore_deps: &[&str]) -> Vec<String> {
         let mut result = Vec::new();
         if let Some(deps_map) = self.dependencies_table() {
