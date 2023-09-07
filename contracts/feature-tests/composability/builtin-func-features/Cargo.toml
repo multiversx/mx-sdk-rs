@@ -1,15 +1,12 @@
 [package]
-name = "recursive-caller"
+name = "builtin-func-features"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
 publish = false
 
 [lib]
-path = "src/recursive_caller.rs"
-
-[dependencies.vault]
-path = "../vault"
+path = "src/builtin_func_features.rs"
 
 [dependencies.multiversx-sc]
 version = "0.43.2"

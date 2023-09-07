@@ -91,6 +91,12 @@ pub trait FormattedMessageFeatures {
     }
 
     #[endpoint]
+    fn format_message_i64(&self, x: i64) -> ManagedBuffer {
+        let message = sc_format!("i64: {}", x);
+        message
+    }
+
+    #[endpoint]
     fn format_message_managed_buffer(&self, x: ManagedBuffer) -> ManagedBuffer {
         let message = sc_format!("ManagedBuffer: {}", x);
         message
