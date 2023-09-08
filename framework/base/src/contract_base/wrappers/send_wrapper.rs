@@ -293,7 +293,7 @@ where
     /// So only use as the last call in your endpoint.  
     /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
     /// Note that EGLD can NOT be transfered with this function.
-    /// If amount is 0 continues with the async call without making any transfer
+    /// If amount is 0 returns without error
     pub fn transfer_esdt_non_zero_via_async_call(
         &self,
         to: ManagedAddress<A>,
