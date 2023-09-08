@@ -92,6 +92,17 @@ where
         self.direct_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
 
+    #[inline]
+    pub fn direct_non_zero(
+        &self,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+    ) {
+        self.direct_non_zero_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt_with_gas_limit<D>(
         &self,
@@ -124,6 +135,43 @@ where
                 &endpoint_name.into(),
                 &arguments.into(),
             );
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn direct_non_zero_esdt_with_gas_limit<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        token_identifier: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        gas: u64,
+        endpoint_name: D,
+        arguments: &[ManagedBuffer<A>],
+    ) where
+        D: Into<ManagedBuffer<A>>,
+    {
+        if amount == &0 {
+            if nonce == 0 {
+                let _ = self.send_raw_wrapper().transfer_esdt_execute(
+                    to,
+                    token_identifier,
+                    amount,
+                    gas,
+                    &endpoint_name.into(),
+                    &arguments.into(),
+                );
+            } else {
+                let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+                    to,
+                    token_identifier,
+                    nonce,
+                    amount,
+                    gas,
+                    &endpoint_name.into(),
+                    &arguments.into(),
+                );
+            }
         }
     }
 
@@ -187,6 +235,42 @@ where
                 &endpoint_name.into(),
                 &arguments.into(),
             );
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn direct_non_zero_with_gas_limit<D>(
+        &self,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+        gas: u64,
+        endpoint_name: D,
+        arguments: &[ManagedBuffer<A>],
+    ) where
+        D: Into<ManagedBuffer<A>>,
+    {
+        if amount == &0 {
+            if let Some(esdt_token_identifier) = token.as_esdt_option() {
+                self.direct_esdt_with_gas_limit(
+                    to,
+                    &esdt_token_identifier,
+                    nonce,
+                    amount,
+                    gas,
+                    endpoint_name,
+                    arguments,
+                );
+            } else {
+                let _ = self.send_raw_wrapper().direct_egld_execute(
+                    to,
+                    amount,
+                    gas,
+                    &endpoint_name.into(),
+                    &arguments.into(),
+                );
+            }
         }
     }
 
@@ -292,6 +376,35 @@ where
         );
     }
 
+    pub fn esdt_non_zero_local_mint(
+        &self,
+        token: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+    ) {
+        if amount == &0 {
+            let mut arg_buffer = ManagedArgBuffer::new();
+            let func_name: &str;
+
+            arg_buffer.push_arg(token);
+
+            if nonce == 0 {
+                func_name = ESDT_LOCAL_MINT_FUNC_NAME;
+            } else {
+                func_name = ESDT_NFT_ADD_QUANTITY_FUNC_NAME;
+                arg_buffer.push_arg(nonce);
+            }
+
+            arg_buffer.push_arg(amount);
+
+            let _ = self.call_local_esdt_built_in_function(
+                A::blockchain_api_impl().get_gas_left(),
+                &ManagedBuffer::from(func_name),
+                &arg_buffer,
+            );
+        }
+    }
+
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed"
@@ -315,6 +428,33 @@ where
             &arg_buffer,
         );
     }
+    pub fn esdt_non_zero_local_burn(
+        &self,
+        token: &TokenIdentifier<A>,
+        nonce: u64,
+        amount: &BigUint<A>,
+    ) {
+        if amount == &0 {
+            let mut arg_buffer = ManagedArgBuffer::new();
+            let func_name: &str;
+
+            arg_buffer.push_arg(token);
+            if nonce == 0 {
+                func_name = ESDT_LOCAL_BURN_FUNC_NAME;
+            } else {
+                func_name = ESDT_NFT_BURN_FUNC_NAME;
+                arg_buffer.push_arg(nonce);
+            }
+
+            arg_buffer.push_arg(amount);
+
+            let _ = self.call_local_esdt_built_in_function(
+                A::blockchain_api_impl().get_gas_left(),
+                &ManagedBuffer::from(func_name),
+                &arg_buffer,
+            );
+        }
+    }
 
     /// Allows burning of multiple ESDT tokens at once.
     ///
@@ -322,6 +462,15 @@ where
     pub fn esdt_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
         for payment in payments {
             self.esdt_local_burn(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            );
+        }
+    }
+    pub fn esdt_non_zero_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
+        for payment in payments {
+            self.esdt_non_zero_local_burn(
                 &payment.token_identifier,
                 payment.token_nonce,
                 &payment.amount,
@@ -377,6 +526,50 @@ where
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
+    pub fn esdt_non_zero_nft_create<T: codec::TopEncode>(
+        &self,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
+        royalties: &BigUint<A>,
+        hash: &ManagedBuffer<A>,
+        attributes: &T,
+        uris: &ManagedVec<A, ManagedBuffer<A>>,
+    ) -> u64 {
+        if amount == &0 {
+            let mut arg_buffer = ManagedArgBuffer::new();
+            arg_buffer.push_arg(token);
+            arg_buffer.push_arg(amount);
+            arg_buffer.push_arg(name);
+            arg_buffer.push_arg(royalties);
+            arg_buffer.push_arg(hash);
+            arg_buffer.push_arg(attributes);
+
+            if uris.is_empty() {
+                // at least one URI is required, so we push an empty one
+                arg_buffer.push_arg(codec::Empty);
+            } else {
+                // The API function has the last argument as variadic,
+                // so we top-encode each and send as separate argument
+                for uri in uris {
+                    arg_buffer.push_arg(uri);
+                }
+            }
+
+            let output = self.call_local_esdt_built_in_function(
+                A::blockchain_api_impl().get_gas_left(),
+                &ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
+                &arg_buffer,
+            );
+
+            if let Some(first_result_bytes) = output.try_get(0) {
+                return first_result_bytes.parse_as_u64().unwrap_or_default();
+            }
+        }
+        0
+    }
+
     #[inline]
     pub fn esdt_nft_create_compact<T: codec::TopEncode>(
         &self,
@@ -407,6 +600,47 @@ where
             attributes,
             &empty_vec,
         )
+    }
+
+    #[inline]
+    pub fn esdt_non_zero_nft_create_compact<T: codec::TopEncode>(
+        &self,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        attributes: &T,
+    ) -> u64 {
+        self.esdt_non_zero_nft_create_compact_named(
+            token,
+            amount,
+            &ManagedBuffer::new(),
+            attributes,
+        )
+    }
+
+    pub fn esdt_non_zero_nft_create_compact_named<T: codec::TopEncode>(
+        &self,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
+        attributes: &T,
+    ) -> u64 {
+        if amount == &0 {
+            let big_zero = BigUint::zero();
+            let empty_buffer = ManagedBuffer::new();
+            let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
+
+            self.esdt_nft_create(
+                token,
+                amount,
+                name,
+                &big_zero,
+                &empty_buffer,
+                attributes,
+                &empty_vec,
+            )
+        } else {
+            0
+        }
     }
 
     /// Sends the NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
@@ -451,6 +685,52 @@ where
         } else {
             payment_amount.clone()
         }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn sell_nft_non_zero(
+        &self,
+        nft_id: &TokenIdentifier<A>,
+        nft_nonce: u64,
+        nft_amount: &BigUint<A>,
+        buyer: &ManagedAddress<A>,
+        payment_token: &EgldOrEsdtTokenIdentifier<A>,
+        payment_nonce: u64,
+        payment_amount: &BigUint<A>,
+    ) -> BigUint<A> {
+        if nft_amount == &0 || payment_amount == &0 {
+            let nft_token_data = BlockchainWrapper::<A>::new().get_esdt_token_data(
+                &BlockchainWrapper::<A>::new().get_sc_address(),
+                nft_id,
+                nft_nonce,
+            );
+            let royalties_amount =
+                payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
+
+            let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
+                buyer,
+                nft_id,
+                nft_nonce,
+                nft_amount,
+                0,
+                &ManagedBuffer::new(),
+                &ManagedArgBuffer::new(),
+            );
+
+            if royalties_amount > 0u32 {
+                self.direct(
+                    &nft_token_data.creator,
+                    payment_token,
+                    payment_nonce,
+                    &royalties_amount,
+                );
+
+                return payment_amount.clone() - royalties_amount;
+            } else {
+                return payment_amount.clone();
+            }
+        }
+        payment_amount.clone()
     }
 
     pub fn nft_add_uri(
