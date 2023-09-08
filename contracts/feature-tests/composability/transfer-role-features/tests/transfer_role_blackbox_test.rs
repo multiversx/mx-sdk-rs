@@ -1,9 +1,4 @@
-#![allow(unused)]
-
-use multiversx_sc::{
-    codec::multi_types::MultiValueVec,
-    types::{Address, ContractCallNoPayment},
-};
+use multiversx_sc::{codec::multi_types::MultiValueVec, types::Address};
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario_model::{
@@ -47,7 +42,6 @@ struct TransferRoleTestState {
     owner_address: Address,
     vault_address: Address,
     transfer_role_features_contract: TransferRoleFeaturesContract,
-    vault_contract: VaultContract,
 }
 
 impl TransferRoleTestState {
@@ -75,14 +69,12 @@ impl TransferRoleTestState {
         let vault_address = AddressValue::from(VAULT_ADDRESS_EXPR).to_address();
         let transfer_role_features_contract =
             TransferRoleFeaturesContract::new(TRANSFER_ROLE_FEATURES_ADDRESS_EXPR);
-        let vault_contract = VaultContract::new(VAULT_ADDRESS_EXPR);
 
         Self {
             world,
             owner_address,
             vault_address,
             transfer_role_features_contract,
-            vault_contract,
         }
     }
 
