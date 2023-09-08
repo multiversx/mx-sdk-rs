@@ -279,6 +279,22 @@ where
             .call_and_exit_ignore_callback()
     }
 
+    pub fn transfer_esdt_non_zero_via_async_call(
+        &self,
+        to: ManagedAddress<A>,
+        token: TokenIdentifier<A>,
+        nonce: u64,
+        amount: BigUint<A>,
+    ) -> ! {
+        if amount == 0 {
+            unreachable!()
+        }
+        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
+            .with_esdt_transfer((token, nonce, amount))
+            .async_call()
+            .call_and_exit_ignore_callback()
+    }
+
     pub fn transfer_multiple_esdt_via_async_call(
         &self,
         to: ManagedAddress<A>,
