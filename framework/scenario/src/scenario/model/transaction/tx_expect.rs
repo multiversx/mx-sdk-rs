@@ -1,5 +1,4 @@
-use multiversx_chain_vm::tx_mock::result_values_to_string;
-
+use super::TxResponse;
 use crate::{
     scenario::model::{BytesValue, CheckLogs, CheckValue, CheckValueList, U64Value},
     scenario_format::{
@@ -8,8 +7,9 @@ use crate::{
     },
     scenario_model::Checkable,
 };
+use multiversx_chain_vm::tx_mock::result_values_to_string;
 
-use super::TxResponse;
+const USER_ERROR_CODE: u64 = 4;
 
 #[derive(Debug, Clone)]
 pub struct TxExpect {
@@ -55,6 +55,13 @@ impl TxExpect {
             build_from_response: true,
             additional_error_message: Default::default(),
         }
+    }
+
+    pub fn user_error<E>(err_msg_expr: E) -> Self
+    where
+        BytesValue: From<E>,
+    {
+        Self::err(USER_ERROR_CODE, err_msg_expr)
     }
 
     pub fn no_result(mut self) -> Self {

@@ -31,7 +31,6 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
 const QUORUM_SIZE: usize = 1;
-const STATUS_ERR_CODE_EXPR: u64 = 4;
 
 type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
 type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
@@ -243,10 +242,7 @@ impl MultisigTestState {
             ScCallStep::new()
                 .from(BOARD_MEMBER_ADDRESS_EXPR)
                 .call(self.multisig_contract.perform_action_endpoint(action_id))
-                .expect(TxExpect::err(
-                    STATUS_ERR_CODE_EXPR,
-                    "str:".to_string() + err_message,
-                )),
+                .expect(TxExpect::user_error("str:".to_string() + err_message)),
         );
     }
 
@@ -370,8 +366,7 @@ fn test_change_quorum() {
         ScCallStep::new()
             .from(BOARD_MEMBER_ADDRESS_EXPR)
             .call(state.multisig_contract.discard_action(action_id))
-            .expect(TxExpect::err(
-                STATUS_ERR_CODE_EXPR,
+            .expect(TxExpect::user_error(
                 "str:cannot discard action with valid signatures",
             )),
     );
@@ -394,10 +389,7 @@ fn test_change_quorum() {
         ScCallStep::new()
             .from(BOARD_MEMBER_ADDRESS_EXPR)
             .call(state.multisig_contract.sign(action_id))
-            .expect(TxExpect::err(
-                STATUS_ERR_CODE_EXPR,
-                "str:action does not exist",
-            )),
+            .expect(TxExpect::user_error("str:action does not exist")),
     );
 
     // add another board member
@@ -454,10 +446,7 @@ fn test_transfer_execute_to_user() {
                 OptionalValue::<String>::None,
                 MultiValueVec::<Vec<u8>>::new(),
             ))
-            .expect(TxExpect::err(
-                STATUS_ERR_CODE_EXPR,
-                "str:proposed action has no effect",
-            )),
+            .expect(TxExpect::user_error("str:proposed action has no effect")),
     );
 
     // propose
