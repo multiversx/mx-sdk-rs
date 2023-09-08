@@ -1,0 +1,59 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:user-a": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "address:user-b": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "username": "str:old-name"
+                },
+                "sc:dns#00": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../builtin-func-features/output/builtin-func-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:user-a",
+                "to": "sc:dns#00",
+                "function": "call_delete_user_name",
+                "arguments": [
+                    "address:user-b"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:user-a": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "address:user-b": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "username": ""
+                },
+                "sc:dns#00": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../builtin-func-features/output/builtin-func-features.wasm"
+                }
+            }
+        }
+    ]
+}

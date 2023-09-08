@@ -16,11 +16,6 @@ version = "0.43.2"
 path = "../../../../framework/base"
 features = ["promises"]
 
-[dependencies.multiversx-sc-wasm-adapter]
-version = "0.43.2"
-path = "../../../../framework/wasm-adapter"
-optional = true
-
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.43.2"
 path = "../../../../framework/scenario"
