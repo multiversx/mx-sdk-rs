@@ -152,27 +152,17 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         if amount == &0 {
-            if nonce == 0 {
-                let _ = self.send_raw_wrapper().transfer_esdt_execute(
-                    to,
-                    token_identifier,
-                    amount,
-                    gas,
-                    &endpoint_name.into(),
-                    &arguments.into(),
-                );
-            } else {
-                let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
-                    to,
-                    token_identifier,
-                    nonce,
-                    amount,
-                    gas,
-                    &endpoint_name.into(),
-                    &arguments.into(),
-                );
-            }
+            return;
         }
+        self.direct_esdt_with_gas_limit(
+            to,
+            token_identifier,
+            nonce,
+            amount,
+            gas,
+            endpoint_name,
+            arguments,
+        );
     }
 
     #[inline]
@@ -252,26 +242,9 @@ where
         D: Into<ManagedBuffer<A>>,
     {
         if amount == &0 {
-            if let Some(esdt_token_identifier) = token.as_esdt_option() {
-                self.direct_esdt_with_gas_limit(
-                    to,
-                    &esdt_token_identifier,
-                    nonce,
-                    amount,
-                    gas,
-                    endpoint_name,
-                    arguments,
-                );
-            } else {
-                let _ = self.send_raw_wrapper().direct_egld_execute(
-                    to,
-                    amount,
-                    gas,
-                    &endpoint_name.into(),
-                    &arguments.into(),
-                );
-            }
+            return;
         }
+        self.direct_with_gas_limit(to, token, nonce, amount, gas, endpoint_name, arguments);
     }
 
     pub fn direct_multi(
@@ -383,26 +356,9 @@ where
         amount: &BigUint<A>,
     ) {
         if amount == &0 {
-            let mut arg_buffer = ManagedArgBuffer::new();
-            let func_name: &str;
-
-            arg_buffer.push_arg(token);
-
-            if nonce == 0 {
-                func_name = ESDT_LOCAL_MINT_FUNC_NAME;
-            } else {
-                func_name = ESDT_NFT_ADD_QUANTITY_FUNC_NAME;
-                arg_buffer.push_arg(nonce);
-            }
-
-            arg_buffer.push_arg(amount);
-
-            let _ = self.call_local_esdt_built_in_function(
-                A::blockchain_api_impl().get_gas_left(),
-                &ManagedBuffer::from(func_name),
-                &arg_buffer,
-            );
+            return;
         }
+        self.esdt_local_mint(token, nonce, amount);
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
@@ -435,25 +391,9 @@ where
         amount: &BigUint<A>,
     ) {
         if amount == &0 {
-            let mut arg_buffer = ManagedArgBuffer::new();
-            let func_name: &str;
-
-            arg_buffer.push_arg(token);
-            if nonce == 0 {
-                func_name = ESDT_LOCAL_BURN_FUNC_NAME;
-            } else {
-                func_name = ESDT_NFT_BURN_FUNC_NAME;
-                arg_buffer.push_arg(nonce);
-            }
-
-            arg_buffer.push_arg(amount);
-
-            let _ = self.call_local_esdt_built_in_function(
-                A::blockchain_api_impl().get_gas_left(),
-                &ManagedBuffer::from(func_name),
-                &arg_buffer,
-            );
+            return;
         }
+        self.esdt_local_burn(token, nonce, amount);
     }
 
     /// Allows burning of multiple ESDT tokens at once.
@@ -538,36 +478,10 @@ where
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
         if amount == &0 {
-            let mut arg_buffer = ManagedArgBuffer::new();
-            arg_buffer.push_arg(token);
-            arg_buffer.push_arg(amount);
-            arg_buffer.push_arg(name);
-            arg_buffer.push_arg(royalties);
-            arg_buffer.push_arg(hash);
-            arg_buffer.push_arg(attributes);
-
-            if uris.is_empty() {
-                // at least one URI is required, so we push an empty one
-                arg_buffer.push_arg(codec::Empty);
-            } else {
-                // The API function has the last argument as variadic,
-                // so we top-encode each and send as separate argument
-                for uri in uris {
-                    arg_buffer.push_arg(uri);
-                }
-            }
-
-            let output = self.call_local_esdt_built_in_function(
-                A::blockchain_api_impl().get_gas_left(),
-                &ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
-                &arg_buffer,
-            );
-
-            if let Some(first_result_bytes) = output.try_get(0) {
-                return first_result_bytes.parse_as_u64().unwrap_or_default();
-            }
+            0
+        } else {
+            self.esdt_nft_create(token, amount, name, royalties, hash, attributes, uris)
         }
-        0
     }
 
     #[inline]
@@ -625,21 +539,9 @@ where
         attributes: &T,
     ) -> u64 {
         if amount == &0 {
-            let big_zero = BigUint::zero();
-            let empty_buffer = ManagedBuffer::new();
-            let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
-
-            self.esdt_nft_create(
-                token,
-                amount,
-                name,
-                &big_zero,
-                &empty_buffer,
-                attributes,
-                &empty_vec,
-            )
-        } else {
             0
+        } else {
+            self.esdt_nft_create_compact_named(token, amount, name, attributes)
         }
     }
 
@@ -699,38 +601,18 @@ where
         payment_amount: &BigUint<A>,
     ) -> BigUint<A> {
         if nft_amount == &0 || payment_amount == &0 {
-            let nft_token_data = BlockchainWrapper::<A>::new().get_esdt_token_data(
-                &BlockchainWrapper::<A>::new().get_sc_address(),
-                nft_id,
-                nft_nonce,
-            );
-            let royalties_amount =
-                payment_amount.clone() * nft_token_data.royalties / PERCENTAGE_TOTAL;
-
-            let _ = self.send_raw_wrapper().transfer_esdt_nft_execute(
-                buyer,
+            payment_amount.clone()
+        } else {
+            self.sell_nft(
                 nft_id,
                 nft_nonce,
                 nft_amount,
-                0,
-                &ManagedBuffer::new(),
-                &ManagedArgBuffer::new(),
-            );
-
-            if royalties_amount > 0u32 {
-                self.direct(
-                    &nft_token_data.creator,
-                    payment_token,
-                    payment_nonce,
-                    &royalties_amount,
-                );
-
-                return payment_amount.clone() - royalties_amount;
-            } else {
-                return payment_amount.clone();
-            }
+                buyer,
+                payment_token,
+                payment_nonce,
+                payment_amount,
+            )
         }
-        payment_amount.clone()
     }
 
     pub fn nft_add_uri(
