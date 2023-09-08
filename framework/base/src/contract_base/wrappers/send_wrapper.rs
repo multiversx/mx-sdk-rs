@@ -300,11 +300,9 @@ where
         token: TokenIdentifier<A>,
         nonce: u64,
         amount: BigUint<A>,
-    ) -> ! {
+    ) {
         if amount == 0 {
-            ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-                .async_call()
-                .call_and_exit_ignore_callback()
+            return;
         }
         ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_esdt_transfer((token, nonce, amount))
