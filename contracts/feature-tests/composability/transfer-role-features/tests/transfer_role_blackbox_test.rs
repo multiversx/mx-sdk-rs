@@ -162,8 +162,9 @@ fn test_transfer_role() {
                 "",
                 MultiValueVec::<Vec<u8>>::new(),
             ))
-            // change to TxExpect::user_error
-            .expect(TxExpect::err(4, "str:Destination address not whitelisted")),
+            .expect(TxExpect::user_error(
+                "str:Destination address not whitelisted",
+            )),
     );
 
     // transfer to sc - ok
