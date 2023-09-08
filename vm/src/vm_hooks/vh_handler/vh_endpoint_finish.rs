@@ -11,24 +11,24 @@ pub trait VMHooksEndpointFinish: VMHooksHandlerSource + VMHooksManagedTypes {
     fn finish_slice_u8(&self, slice: &[u8]) {
         let mut v = vec![0u8; slice.len()];
         v.copy_from_slice(slice);
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         tx_result.result_values.push(v)
     }
 
     fn finish_big_int_raw(&self, handle: RawHandle) {
         let bi_bytes = self.bi_get_signed_bytes(handle);
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         tx_result.result_values.push(bi_bytes);
     }
 
     fn finish_big_uint_raw(&self, handle: RawHandle) {
         let bu_bytes = self.bi_get_unsigned_bytes(handle);
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         tx_result.result_values.push(bu_bytes);
     }
 
     fn finish_managed_buffer_raw(&self, handle: RawHandle) {
-        self.finish_slice_u8(self.m_types_borrow().mb_get(handle));
+        self.finish_slice_u8(self.m_types_lock().mb_get(handle));
     }
 
     fn finish_i64(&self, value: i64) {

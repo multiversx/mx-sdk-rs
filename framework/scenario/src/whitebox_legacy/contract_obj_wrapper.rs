@@ -1,4 +1,4 @@
-use std::{collections::HashMap, path::PathBuf, rc::Rc, str::FromStr};
+use std::{collections::HashMap, path::PathBuf, str::FromStr, sync::Arc};
 
 use crate::{
     api::DebugApi,
@@ -261,7 +261,7 @@ impl BlockchainStateWrapper {
             .get_mut_debugger_backend()
             .vm_runner
             .contract_map_ref
-            .borrow()
+            .lock()
             .contains_contract(contract_code_expr.value.as_slice());
         if !contains_contract {
             let contract_obj = create_contract_obj_box(obj_builder);
@@ -270,7 +270,7 @@ impl BlockchainStateWrapper {
                 .get_mut_debugger_backend()
                 .vm_runner
                 .contract_map_ref
-                .borrow_mut()
+                .lock()
                 .register_contract(
                     contract_code_expr.value,
                     ContractContainer::new(contract_obj, None, false),
@@ -719,8 +719,8 @@ impl BlockchainStateWrapper {
         F: FnOnce() -> T,
     {
         let tx_context = TxContext::dummy();
-        let tx_context_rc = Rc::new(tx_context);
-        TxContextStack::static_push(tx_context_rc);
+        let tx_context_arc = Arc::new(tx_context);
+        TxContextStack::static_push(tx_context_arc);
         StaticVarStack::static_push();
         let result = f();
         let _ = TxContextStack::static_pop();

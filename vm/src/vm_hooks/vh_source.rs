@@ -1,7 +1,4 @@
-use std::{
-    cell::{Ref, RefMut},
-    fmt::Debug,
-};
+use std::{fmt::Debug, sync::MutexGuard};
 
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
@@ -11,9 +8,7 @@ use crate::{
 
 /// Abstracts away the borrowing of a managed types structure.
 pub trait VMHooksHandlerSource: Debug {
-    fn m_types_borrow(&self) -> Ref<TxManagedTypes>;
-
-    fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes>;
+    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes>;
 
     fn halt_with_error(&self, status: u64, message: &str) -> !;
 
@@ -23,6 +18,10 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn input_ref(&self) -> &TxInput;
 
+    fn current_address(&self) -> &VMAddress {
+        &self.input_ref().to
+    }
+
     fn tx_hash(&self) -> H256 {
         self.input_ref().tx_hash.clone()
     }
@@ -30,14 +29,14 @@ pub trait VMHooksHandlerSource: Debug {
     /// Random number generator, based on the blockchain randomness source.
     fn random_next_bytes(&self, length: usize) -> Vec<u8>;
 
-    fn result_borrow_mut(&self) -> RefMut<TxResult>;
+    fn result_lock(&self) -> MutexGuard<TxResult>;
 
     fn push_tx_log(&self, tx_log: TxLog) {
-        self.result_borrow_mut().result_logs.push(tx_log);
+        self.result_lock().result_logs.push(tx_log);
     }
 
     fn storage_read(&self, key: &[u8]) -> Vec<u8> {
-        self.storage_read_any_address(&self.input_ref().to, key)
+        self.storage_read_any_address(self.current_address(), key)
     }
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8>;

@@ -4,21 +4,21 @@ use multiversx_sc::{
     codec::TryStaticCast,
     types::ManagedVecItem,
 };
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct DebugHandle {
-    pub(crate) context: Rc<TxContext>,
+    pub(crate) context: Arc<TxContext>,
     raw_handle: RawHandle,
 }
 
 impl DebugHandle {
     pub fn is_on_current_context(&self) -> bool {
-        Rc::ptr_eq(&self.context, &TxContextStack::static_peek())
+        Arc::ptr_eq(&self.context, &TxContextStack::static_peek())
     }
 
     pub fn is_on_same_context(&self, other: &DebugHandle) -> bool {
-        Rc::ptr_eq(&self.context, &other.context)
+        Arc::ptr_eq(&self.context, &other.context)
     }
 
     pub fn assert_current_context(&self) {
@@ -66,7 +66,7 @@ impl PartialEq<RawHandle> for DebugHandle {
 
 impl PartialEq<DebugHandle> for DebugHandle {
     fn eq(&self, other: &DebugHandle) -> bool {
-        Rc::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
+        Arc::ptr_eq(&self.context, &other.context) && self.raw_handle == other.raw_handle
     }
 }
 

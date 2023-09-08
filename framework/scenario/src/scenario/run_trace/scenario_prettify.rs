@@ -37,7 +37,7 @@ impl ScenarioTrace {
                         accounts.push(acc);
                     }
 
-                    for (addr_key, acc) in acc_map_keys.into_iter().zip(accounts.into_iter()) {
+                    for (addr_key, acc) in acc_map_keys.into_iter().zip(accounts) {
                         let pretty_addr_key =
                             addr_key_to_pretty(&self.addr_to_pretty_string_map, addr_key);
                         set_state_step.accounts.insert(pretty_addr_key, acc);
@@ -90,8 +90,7 @@ impl ScenarioTrace {
                         check_accounts.push(acc);
                     }
 
-                    for (addr_key, acc) in acc_map_keys.into_iter().zip(check_accounts.into_iter())
-                    {
+                    for (addr_key, acc) in acc_map_keys.into_iter().zip(check_accounts) {
                         let pretty_addr_key =
                             addr_key_to_pretty(&self.addr_to_pretty_string_map, addr_key);
                         check_state_step

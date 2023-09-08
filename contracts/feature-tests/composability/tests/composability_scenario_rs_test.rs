@@ -5,6 +5,10 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
+        "file:builtin-func-features/output/builtin-func-features.wasm",
+        builtin_func_features::ContractBuilder,
+    );
+    blockchain.register_contract(
         "file:forwarder-queue/output/forwarder-queue.wasm",
         forwarder_queue::ContractBuilder,
     );
@@ -46,6 +50,16 @@ fn promises_multi_transfer_rs() {
 #[ignore = "not yet supported"]
 fn promises_single_transfer_rs() {
     world().run("scenarios-promises/promises_single_transfer.scen.json");
+}
+
+#[test]
+fn builtin_func_delete_user_name_rs() {
+    world().run("scenarios/builtin_func_delete_user_name.scen.json");
+}
+
+#[test]
+fn builtin_func_set_user_name_rs() {
+    world().run("scenarios/builtin_func_set_user_name.scen.json");
 }
 
 #[test]

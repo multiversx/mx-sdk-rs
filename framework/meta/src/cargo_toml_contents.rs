@@ -84,12 +84,45 @@ impl CargoTomlContents {
         }
     }
 
+    pub fn has_dependencies(&self) -> bool {
+        self.toml_value.get(CARGO_TOML_DEPENDENCIES).is_some()
+    }
+
     pub fn dependencies_mut(&mut self) -> &mut Table {
         self.toml_value
             .get_mut(CARGO_TOML_DEPENDENCIES)
             .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn has_dev_dependencies(&self) -> bool {
+        self.toml_value.get(CARGO_TOML_DEV_DEPENDENCIES).is_some()
+    }
+
+    pub fn dev_dependencies_mut(&mut self) -> &mut Table {
+        self.toml_value
+            .get_mut(CARGO_TOML_DEV_DEPENDENCIES)
+            .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
+            .as_table_mut()
+            .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn insert_default_workspace(&mut self) {
+        let array = vec![
+            toml::Value::String(".".to_string()),
+            toml::Value::String("meta".to_string()),
+        ];
+        let members = toml::Value::Array(array);
+        let mut workspace = toml::Value::Table(Table::new());
+        workspace
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml")
+            .insert("members".to_string(), members);
+        self.toml_value
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml")
+            .insert("workspace".to_string(), workspace);
     }
 
     pub fn local_dependency_paths(&self, ignore_deps: &[&str]) -> Vec<String> {

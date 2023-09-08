@@ -10,7 +10,7 @@ pub struct BlockchainMock {
 }
 
 impl BlockchainMock {
-    pub fn new(executor: Box<dyn Executor>) -> Self {
+    pub fn new(executor: Box<dyn Executor + Send + Sync>) -> Self {
         BlockchainMock {
             vm: BlockchainVMRef::new(executor),
             state: Shareable::default(),

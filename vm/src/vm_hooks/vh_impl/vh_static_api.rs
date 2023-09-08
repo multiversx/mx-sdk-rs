@@ -1,4 +1,4 @@
-use std::cell::{Ref, RefCell, RefMut};
+use std::sync::{Mutex, MutexGuard};
 
 use crate::{
     tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
@@ -12,19 +12,20 @@ use crate::{
     world_mock::{AccountData, BlockInfo},
 };
 
-/// A simple wrapper around a managed type container RefCell.
+/// A simple wrapper around a managed type container Mutex.
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug, Default)]
-pub struct StaticApiVMHooksHandler(RefCell<TxManagedTypes>);
+pub struct StaticApiVMHooksHandler(Mutex<TxManagedTypes>);
+
+impl StaticApiVMHooksHandler {
+    pub const CURRENT_ADDRESS_PLACEHOLDER: VMAddress =
+        VMAddress::new(*b"STATIC_API_CURRENT_ADDRESS______");
+}
 
 impl VMHooksHandlerSource for StaticApiVMHooksHandler {
-    fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
-        self.0.borrow()
-    }
-
-    fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
-        self.0.borrow_mut()
+    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+        self.0.lock().unwrap()
     }
 
     fn halt_with_error(&self, status: u64, message: &str) -> ! {
@@ -35,11 +36,15 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
         panic!("cannot access tx inputs in the StaticApi")
     }
 
+    fn current_address(&self) -> &VMAddress {
+        &Self::CURRENT_ADDRESS_PLACEHOLDER
+    }
+
     fn random_next_bytes(&self, _length: usize) -> Vec<u8> {
         panic!("cannot access the random bytes generator in the StaticApi")
     }
 
-    fn result_borrow_mut(&self) -> RefMut<TxResult> {
+    fn result_lock(&self) -> MutexGuard<TxResult> {
         panic!("cannot access tx results in the StaticApi")
     }
 

@@ -4,10 +4,9 @@ use multiversx_chain_vm_executor::{
     CompilationOptions, Executor, ExecutorError, Instance, OpcodeCost,
 };
 use std::{
-    cell::{Ref, RefCell, RefMut},
     collections::HashMap,
     fmt,
-    rc::Rc,
+    sync::{Arc, Mutex, MutexGuard},
 };
 
 pub struct ContractMap {
@@ -70,19 +69,15 @@ impl Default for ContractMap {
 }
 
 #[derive(Default, Clone, Debug)]
-pub struct ContractMapRef(Rc<RefCell<ContractMap>>);
+pub struct ContractMapRef(Arc<Mutex<ContractMap>>);
 
 impl ContractMapRef {
     pub fn new() -> Self {
-        ContractMapRef(Rc::new(RefCell::new(ContractMap::new())))
+        ContractMapRef(Arc::new(Mutex::new(ContractMap::new())))
     }
 
-    pub fn borrow(&self) -> Ref<ContractMap> {
-        self.0.borrow()
-    }
-
-    pub fn borrow_mut(&self) -> RefMut<ContractMap> {
-        self.0.borrow_mut()
+    pub fn lock(&self) -> MutexGuard<ContractMap> {
+        self.0.lock().unwrap()
     }
 }
 
@@ -103,7 +98,7 @@ impl Executor for ContractMapRef {
         wasm_bytes: &[u8],
         _compilation_options: &CompilationOptions,
     ) -> Result<Box<dyn Instance>, ExecutorError> {
-        Ok(Box::new(self.borrow().get_contract(wasm_bytes)))
+        Ok(Box::new(self.lock().get_contract(wasm_bytes)))
     }
 
     fn new_instance_from_cache(
