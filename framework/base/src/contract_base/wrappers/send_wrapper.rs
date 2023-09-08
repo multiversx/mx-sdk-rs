@@ -71,6 +71,9 @@ where
         self.send_raw_wrapper().direct_egld(to, amount, Empty)
     }
 
+    /// Sends EGLD to a given address, directly.
+    /// Used especially for sending EGLD to regular accounts.
+    /// If amount is 0 returns without error
     pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
         if amount == &0 {
             return;
@@ -92,6 +95,9 @@ where
         self.direct_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
 
+    /// Sends either EGLD, ESDT or NFT to the target address,
+    /// depending on the token identifier and nonce
+    /// If amount is 0 returns without error
     #[inline]
     pub fn direct_non_zero(
         &self,
@@ -138,6 +144,7 @@ where
         }
     }
 
+    /// If amount is 0 returns without error
     #[allow(clippy::too_many_arguments)]
     pub fn direct_non_zero_esdt_with_gas_limit<D>(
         &self,
@@ -177,6 +184,7 @@ where
         self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
     }
 
+    /// If amount is 0 returns without error
     pub fn direct_non_zero_esdt_payment(
         &self,
         to: &ManagedAddress<A>,
@@ -228,6 +236,7 @@ where
         }
     }
 
+    /// If amount is 0 returns without error
     #[allow(clippy::too_many_arguments)]
     pub fn direct_non_zero_with_gas_limit<D>(
         &self,
@@ -279,6 +288,12 @@ where
             .call_and_exit_ignore_callback()
     }
 
+    /// Performs a simple ESDT/NFT transfer, but via async call.  
+    /// As with any async call, this immediately terminates the execution of the current call.  
+    /// So only use as the last call in your endpoint.  
+    /// If you want to perform multiple transfers, use `self.send().transfer_multiple_esdt_via_async_call()` instead.  
+    /// Note that EGLD can NOT be transfered with this function.
+    /// If amount is 0 continues with the async call without making any transfer
     pub fn transfer_esdt_non_zero_via_async_call(
         &self,
         to: ManagedAddress<A>,
@@ -367,6 +382,12 @@ where
         );
     }
 
+    /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
+    /// Note that the SC must have the ESDTLocalMint or ESDTNftAddQuantity roles set,
+    /// or this will fail with "action is not allowed"
+    /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
+    /// This function cannot be used for NFTs.
+    /// If amount is 0 returns without error
     pub fn esdt_non_zero_local_mint(
         &self,
         token: &TokenIdentifier<A>,
@@ -402,6 +423,11 @@ where
             &arg_buffer,
         );
     }
+
+    /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
+    /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
+    /// or this will fail with "action is not allowed"
+    /// If amount is 0 returns without error
     pub fn esdt_non_zero_local_burn(
         &self,
         token: &TokenIdentifier<A>,
@@ -426,6 +452,11 @@ where
             );
         }
     }
+
+    /// Allows burning of multiple ESDT tokens at once.
+    ///
+    /// Will execute a synchronous call to the appropriate burn builtin function for each.
+    /// If any of the token amounts is 0 skips that token without throwing error
     pub fn esdt_non_zero_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
         for payment in payments {
             self.esdt_non_zero_local_burn(
@@ -484,6 +515,12 @@ where
         }
     }
 
+    /// Creates a new NFT token of a certain type (determined by `token_identifier`).  
+    /// `attributes` can be any serializable custom struct.  
+    /// This is a built-in function, so the smart contract execution is resumed after.
+    /// Must have ESDTNftCreate role set, or this will fail with "action is not allowed".
+    /// Returns the nonce of the newly created NFT.
+    /// If amount is 0 returns without error
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_non_zero_nft_create<T: codec::TopEncode>(
         &self,
@@ -534,6 +571,7 @@ where
         )
     }
 
+    /// If amount is 0 returns without error
     #[inline]
     pub fn esdt_non_zero_nft_create_compact<T: codec::TopEncode>(
         &self,
@@ -549,6 +587,7 @@ where
         )
     }
 
+    /// If amount is 0 returns without error
     pub fn esdt_non_zero_nft_create_compact_named<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
@@ -607,6 +646,9 @@ where
         }
     }
 
+    /// Sends the NFTs to the buyer address and calculates and sends the required royalties to the NFT creator.
+    /// Returns the payment amount left after sending royalties.
+    /// If the nft_amount or the payment_amount is 0 returns without error
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft_non_zero(
         &self,
