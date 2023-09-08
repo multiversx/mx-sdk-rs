@@ -287,7 +287,9 @@ where
         amount: BigUint<A>,
     ) -> ! {
         if amount == 0 {
-            unreachable!()
+            ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
+                .async_call()
+                .call_and_exit_ignore_callback()
         }
         ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_esdt_transfer((token, nonce, amount))
