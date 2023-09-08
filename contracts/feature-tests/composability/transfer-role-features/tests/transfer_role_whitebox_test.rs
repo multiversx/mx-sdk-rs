@@ -15,7 +15,7 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const USER_ADDRESS_EXPR: &str = "address:user";
 
 const TRANSFER_ROLE_FEATURES_ADDRESS_EXPR: &str = "sc:transfer-role-features";
-const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "file:output/transfer_role_features.wasm";
+const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "file:output/transfer-role-features.wasm";
 
 const TRANSFER_TOKEN_ID_EXPR: &str = "str:TRANSFER-123456";
 const TRANSFER_TOKEN_ID: &[u8] = b"TRANSFER-123456";
@@ -25,7 +25,9 @@ const REJECT_FUNDS_FUNC_NAME: &[u8] = b"reject_funds";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/composability/transfer-role-features");
+    blockchain.set_current_dir_from_workspace(
+        "contracts/composability/feature-tests/transfer-role-features",
+    );
 
     blockchain.register_contract(
         TRANSFER_ROLE_FEATURES_PATH_EXPR,
