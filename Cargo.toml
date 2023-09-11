@@ -110,6 +110,8 @@ members = [
   "contracts/feature-tests/big-float-features/meta",
   "contracts/feature-tests/composability",
   "contracts/feature-tests/composability/interact",
+  "contracts/feature-tests/composability/builtin-func-features",
+  "contracts/feature-tests/composability/builtin-func-features/meta",
   "contracts/feature-tests/composability/esdt-contract-pair",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract",
   "contracts/feature-tests/composability/esdt-contract-pair/first-contract/meta",

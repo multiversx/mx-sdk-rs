@@ -12,4 +12,5 @@ pub const CHANGE_OWNER_BUILTIN_FUNC_NAME: &str = "ChangeOwnerAddress";
 pub const CLAIM_DEVELOPER_REWARDS_FUNC_NAME: &str = "ClaimDeveloperRewards";
 pub const SET_USERNAME_FUNC_NAME: &str = "SetUserName";
 pub const MIGRATE_USERNAME_FUNC_NAME: &str = "migrateUserName";
+pub const DELETE_USERNAME_FUNC_NAME: &str = "DeleteUserName";
 pub const UPGRADE_CONTRACT_FUNC_NAME: &str = "upgradeContract";
