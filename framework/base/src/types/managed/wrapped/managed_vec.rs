@@ -7,7 +7,6 @@ use crate::{
         TopEncodeMultiOutput, TopEncodeOutput,
     },
     types::{
-        heap::{ArgBuffer, BoxedBytes},
         ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType, ManagedVecItem, ManagedVecRef,
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
@@ -648,30 +647,6 @@ where
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
-}
-
-/// For compatibility with the older VM EI.
-#[doc(hidden)]
-pub fn managed_vec_of_buffers_to_arg_buffer<M: ManagedTypeApi>(
-    managed_vec: ManagedVec<M, ManagedBuffer<M>>,
-) -> ArgBuffer {
-    let mut arg_buffer = ArgBuffer::new();
-    for buffer in &managed_vec {
-        arg_buffer.push_argument_bytes(buffer.to_boxed_bytes().as_slice());
-    }
-    arg_buffer
-}
-
-/// For compatibility with the older VM EI.
-#[doc(hidden)]
-pub fn managed_vec_from_slice_of_boxed_bytes<M: ManagedTypeApi>(
-    data: &[BoxedBytes],
-) -> ManagedVec<M, ManagedBuffer<M>> {
-    let mut result = ManagedVec::new();
-    for boxed_bytes in data {
-        result.push(ManagedBuffer::new_from_bytes(boxed_bytes.as_slice()));
-    }
-    result
 }
 
 impl<M, T> core::fmt::Debug for ManagedVec<M, T>

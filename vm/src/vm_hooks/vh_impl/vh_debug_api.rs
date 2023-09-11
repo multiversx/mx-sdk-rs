@@ -1,7 +1,4 @@
-use std::{
-    cell::{Ref, RefMut},
-    rc::Rc,
-};
+use std::sync::{Arc, MutexGuard};
 
 use multiversx_chain_vm_executor::BreakpointValue;
 
@@ -26,25 +23,21 @@ use crate::{
 ///
 /// Implements `VMHooksManagedTypes` and thus can be used as a basis of a minimal static API.
 #[derive(Debug)]
-pub struct DebugApiVMHooksHandler(Rc<TxContext>);
+pub struct DebugApiVMHooksHandler(Arc<TxContext>);
 
 impl DebugApiVMHooksHandler {
-    pub fn new(tx_context_rc: Rc<TxContext>) -> Self {
-        DebugApiVMHooksHandler(tx_context_rc)
+    pub fn new(tx_context_arc: Arc<TxContext>) -> Self {
+        DebugApiVMHooksHandler(tx_context_arc)
     }
 }
 
 impl VMHooksHandlerSource for DebugApiVMHooksHandler {
-    fn m_types_borrow(&self) -> Ref<TxManagedTypes> {
-        self.0.m_types_borrow()
-    }
-
-    fn m_types_borrow_mut(&self) -> RefMut<TxManagedTypes> {
-        self.0.m_types_borrow_mut()
+    fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
+        self.0.m_types_lock()
     }
 
     fn halt_with_error(&self, status: u64, message: &str) -> ! {
-        *self.0.result_borrow_mut() = TxResult::from_panic_obj(&TxPanic::new(status, message));
+        *self.0.result_lock() = TxResult::from_panic_obj(&TxPanic::new(status, message));
         let breakpoint = match status {
             4 => BreakpointValue::SignalError,
             _ => BreakpointValue::ExecutionFailed,
@@ -57,11 +50,11 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
     }
 
     fn random_next_bytes(&self, length: usize) -> Vec<u8> {
-        self.0.rng_borrow_mut().next_bytes(length)
+        self.0.rng_lock().next_bytes(length)
     }
 
-    fn result_borrow_mut(&self) -> RefMut<TxResult> {
-        self.0.result_borrow_mut()
+    fn result_lock(&self) -> MutexGuard<TxResult> {
+        self.0.result_lock()
     }
 
     fn storage_read_any_address(&self, address: &VMAddress, key: &[u8]) -> Vec<u8> {
@@ -106,9 +99,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
     ) -> ! {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         // the cell is no longer needed, since we end in a panic
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         tx_result.all_calls.push(async_call_data.clone());
         tx_result.pending_calls.async_call = Some(async_call_data);
+        drop(tx_result); // this avoid to poison the mutex
         std::panic::panic_any(BreakpointValue::AsyncCall);
     }
 
@@ -121,7 +115,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
     ) -> Vec<Vec<u8>> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data);
-        let tx_cache = TxCache::new(self.0.blockchain_cache_rc());
+        let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
             tx_input,
             tx_cache,
@@ -143,7 +137,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         _code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> (VMAddress, Vec<Vec<u8>>) {
-        let contract_address = &self.input_ref().to;
+        let contract_address = self.current_address();
         let tx_hash = self.tx_hash();
         let tx_input = TxInput {
             from: contract_address.clone(),
@@ -158,7 +152,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
             ..Default::default()
         };
 
-        let tx_cache = TxCache::new(self.0.blockchain_cache_rc());
+        let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         tx_cache.increase_acount_nonce(contract_address);
         let (tx_result, new_address, blockchain_updates) = self.0.vm_ref.deploy_contract(
             tx_input,
@@ -186,7 +180,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
     ) {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
         let tx_input = async_call_tx_input(&async_call_data);
-        let tx_cache = TxCache::new(self.0.blockchain_cache_rc());
+        let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
             tx_input,
             tx_cache,
@@ -195,7 +189,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
 
         match tx_result.result_status {
             0 => {
-                self.0.result_borrow_mut().all_calls.push(async_call_data);
+                self.0.result_lock().all_calls.push(async_call_data);
 
                 let _ = self.sync_call_post_processing(tx_result, blockchain_updates);
             },
@@ -232,7 +226,7 @@ impl DebugApiVMHooksHandler {
     ) -> Vec<Vec<u8>> {
         self.0.blockchain_cache().commit_updates(blockchain_updates);
 
-        self.0.result_borrow_mut().merge_after_sync_call(&tx_result);
+        self.0.result_lock().merge_after_sync_call(&tx_result);
 
         tx_result.result_values
     }

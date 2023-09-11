@@ -14,10 +14,10 @@ use std::convert::TryInto;
 macro_rules! binary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(&self, dest: RawHandle, x: RawHandle, y: RawHandle) {
-            let bf_x = self.m_types_borrow().bf_get_f64(x);
-            let bf_y = self.m_types_borrow().bf_get_f64(y);
+            let bf_x = self.m_types_lock().bf_get_f64(x);
+            let bf_y = self.m_types_lock().bf_get_f64(y);
             let result = bf_x.$rust_op_name(bf_y);
-            self.m_types_borrow_mut().bf_overwrite(dest, result);
+            self.m_types_lock().bf_overwrite(dest, result);
         }
     };
 }
@@ -25,18 +25,18 @@ macro_rules! binary_op_method {
 macro_rules! unary_op_method {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(&self, dest: RawHandle, x: RawHandle) {
-            let bf_x = self.m_types_borrow().bf_get_f64(x);
+            let bf_x = self.m_types_lock().bf_get_f64(x);
             let result = bf_x.$rust_op_name();
-            self.m_types_borrow_mut().bf_overwrite(dest, result);
+            self.m_types_lock().bf_overwrite(dest, result);
         }
     };
 }
 macro_rules! unary_op_method_big_int_handle {
     ($method_name:ident, $rust_op_name:ident) => {
         fn $method_name(&self, dest: RawHandle, x: RawHandle) {
-            let bf_x = self.m_types_borrow().bf_get_f64(x);
+            let bf_x = self.m_types_lock().bf_get_f64(x);
             let result = bf_x.$rust_op_name();
-            self.m_types_borrow_mut()
+            self.m_types_lock()
                 .bi_overwrite(dest, BigInt::from(result as i64));
         }
     };
@@ -57,7 +57,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
             value -= fractional_part;
         }
 
-        let mut managed_types = self.m_types_borrow_mut();
+        let mut managed_types = self.m_types_lock();
         managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
@@ -73,7 +73,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
             f64::from(0)
         };
 
-        let mut managed_types = self.m_types_borrow_mut();
+        let mut managed_types = self.m_types_lock();
         managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
@@ -89,7 +89,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
             f64::from(0)
         };
 
-        let mut managed_types = self.m_types_borrow_mut();
+        let mut managed_types = self.m_types_lock();
         managed_types.big_float_map.insert_new_handle_raw(value)
     }
 
@@ -102,8 +102,8 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     unary_op_method!(bf_neg, neg);
 
     fn bf_cmp(&self, x: RawHandle, y: RawHandle) -> i32 {
-        let bf_x = self.m_types_borrow().bf_get_f64(x);
-        let bf_y = self.m_types_borrow().bf_get_f64(y);
+        let bf_x = self.m_types_lock().bf_get_f64(x);
+        let bf_y = self.m_types_lock().bf_get_f64(y);
         let order_opt = bf_x.partial_cmp(&bf_y);
         match order_opt {
             Some(Ordering::Less) => -1,
@@ -114,7 +114,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     }
 
     fn bf_sign(&self, x: RawHandle) -> i32 {
-        let bf = self.m_types_borrow().bf_get_f64(x);
+        let bf = self.m_types_lock().bf_get_f64(x);
         if !bf.is_normal() {
             self.vm_error(vm_err_msg::NUMBER_IS_NOT_NORMAL)
         }
@@ -129,23 +129,22 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     }
 
     fn bf_clone(&self, dest: RawHandle, x: RawHandle) {
-        let value = self.m_types_borrow().bf_get_f64(x);
-        self.m_types_borrow_mut().bf_overwrite(dest, value);
+        let value = self.m_types_lock().bf_get_f64(x);
+        self.m_types_lock().bf_overwrite(dest, value);
     }
 
     fn bf_sqrt(&self, dest: RawHandle, x: RawHandle) {
-        let bf_x = self.m_types_borrow().bf_get_f64(x);
+        let bf_x = self.m_types_lock().bf_get_f64(x);
         if bf_x < 0f64 {
             self.vm_error(vm_err_msg::BAD_BOUNDS_LOWER);
         }
         let result = bf_x.sqrt();
-        self.m_types_borrow_mut().bf_overwrite(dest, result);
+        self.m_types_lock().bf_overwrite(dest, result);
     }
 
     fn bf_pow(&self, dest: RawHandle, x: RawHandle, exp: i32) {
-        let value = self.m_types_borrow().bf_get_f64(x);
-        self.m_types_borrow_mut()
-            .bf_overwrite(dest, value.powi(exp));
+        let value = self.m_types_lock().bf_get_f64(x);
+        self.m_types_lock().bf_overwrite(dest, value.powi(exp));
     }
 
     unary_op_method_big_int_handle!(bf_floor, floor);
@@ -153,7 +152,7 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
     unary_op_method_big_int_handle!(bf_trunc, trunc);
 
     fn bf_is_bi(&self, x: RawHandle) -> bool {
-        let bf_x = self.m_types_borrow().bf_get_f64(x);
+        let bf_x = self.m_types_lock().bf_get_f64(x);
         let trunc_x = bf_x.trunc();
         let float_trunc_x = trunc_x.to_f64().unwrap();
         bf_x == float_trunc_x
@@ -161,26 +160,19 @@ pub trait VMHooksBigFloat: VMHooksHandlerSource + VMHooksError {
 
     fn bf_set_i64(&self, dest: RawHandle, value: i64) {
         let f64_value = value.to_f64().unwrap();
-        self.m_types_borrow_mut().bf_overwrite(dest, f64_value);
+        self.m_types_lock().bf_overwrite(dest, f64_value);
     }
 
     fn bf_set_bi(&self, dest: RawHandle, bi: RawHandle) {
-        let f64_value = self
-            .m_types_borrow()
-            .bi_to_i64(bi)
-            .unwrap()
-            .to_f64()
-            .unwrap();
-        self.m_types_borrow_mut().bf_overwrite(dest, f64_value);
+        let f64_value = self.m_types_lock().bi_to_i64(bi).unwrap().to_f64().unwrap();
+        self.m_types_lock().bf_overwrite(dest, f64_value);
     }
 
     fn bf_get_const_pi(&self, dest: RawHandle) {
-        self.m_types_borrow_mut()
-            .bf_overwrite(dest, std::f64::consts::PI);
+        self.m_types_lock().bf_overwrite(dest, std::f64::consts::PI);
     }
 
     fn bf_get_const_e(&self, dest: RawHandle) {
-        self.m_types_borrow_mut()
-            .bf_overwrite(dest, std::f64::consts::E);
+        self.m_types_lock().bf_overwrite(dest, std::f64::consts::E);
     }
 }

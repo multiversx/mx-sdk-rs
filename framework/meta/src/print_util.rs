@@ -18,10 +18,11 @@ pub fn print_all_index(contract_crates_index: usize, num_contract_crates: usize)
 
 pub fn print_all_command(meta_path: &Path, cargo_run_args: &[String]) {
     println!(
-        "{} `cargo run {}` in {}",
+        "{} {}\n{} `cargo {}`",
+        "In".green(),
+        meta_path.display(),
         "Calling".green(),
         cargo_run_args.join(" "),
-        meta_path.display(),
     );
 }
 

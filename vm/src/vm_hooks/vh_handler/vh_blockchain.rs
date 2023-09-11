@@ -12,27 +12,31 @@ const ESDT_TOKEN_DATA_FUNC_RESETS_VALUES: bool = false;
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn is_contract_address(&self, address_bytes: &[u8]) -> bool {
         let address = VMAddress::from_slice(address_bytes);
-        address == self.input_ref().to
+        &address == self.current_address()
     }
 
     fn managed_caller(&self, dest_handle: RawHandle) {
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set(dest_handle, self.input_ref().from.to_vec());
     }
 
     fn managed_sc_address(&self, dest_handle: RawHandle) {
-        self.m_types_borrow_mut()
-            .mb_set(dest_handle, self.input_ref().to.to_vec());
+        self.m_types_lock()
+            .mb_set(dest_handle, self.current_address().to_vec());
     }
 
     fn managed_owner_address(&self, dest_handle: RawHandle) {
-        self.m_types_borrow_mut().mb_set(
+        self.m_types_lock().mb_set(
             dest_handle,
             self.current_account_data()
                 .contract_owner
                 .unwrap_or_else(|| panic!("contract owner address not set"))
                 .to_vec(),
         );
+    }
+
+    fn get_shard_of_address(&self, address_bytes: &[u8]) -> i32 {
+        (address_bytes[address_bytes.len() - 1] % 3).into()
     }
 
     fn is_smart_contract(&self, address_bytes: &[u8]) -> bool {
@@ -44,12 +48,12 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             self.is_contract_address(address_bytes),
             "get balance not yet implemented for accounts other than the contract itself"
         );
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .bi_overwrite(dest, self.current_account_data().egld_balance.into());
     }
 
     fn get_tx_hash(&self, dest: RawHandle) {
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set(dest, self.input_ref().tx_hash.to_vec());
     }
 
@@ -74,7 +78,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn get_block_random_seed(&self, dest: RawHandle) {
-        self.m_types_borrow_mut().mb_set(
+        self.m_types_lock().mb_set(
             dest,
             self.get_current_block_info().block_random_seed.to_vec(),
         );
@@ -97,7 +101,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn get_prev_block_random_seed(&self, dest: RawHandle) {
-        self.m_types_borrow_mut().mb_set(
+        self.m_types_lock().mb_set(
             dest,
             self.get_previous_block_info().block_random_seed.to_vec(),
         );
@@ -131,8 +135,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .current_account_data()
             .esdt
             .get_esdt_balance(token_id_bytes, nonce);
-        self.m_types_borrow_mut()
-            .bi_overwrite(dest, esdt_balance.into());
+        self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -150,8 +153,8 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
     ) {
-        let address = VMAddress::from_slice(self.m_types_borrow().mb_get(address_handle));
-        let token_id_bytes = self.m_types_borrow().mb_get(token_id_handle).to_vec();
+        let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
+        let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
         let account = self.account_data(&address);
 
         if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
@@ -202,8 +205,8 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         token_id_handle: RawHandle,
         _nonce: u64,
     ) -> bool {
-        let address = VMAddress::from_slice(self.m_types_borrow().mb_get(address_handle));
-        let token_id_bytes = self.m_types_borrow().mb_get(token_id_handle).to_vec();
+        let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
+        let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
         let account = self.account_data(&address);
         if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
             return esdt_data.frozen;
@@ -213,7 +216,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn get_esdt_local_roles_bits(&self, token_id_handle: RawHandle) -> u64 {
-        let token_id_bytes = self.m_types_borrow().mb_get(token_id_handle).to_vec();
+        let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
         let account = self.current_account_data();
         let mut result = EsdtLocalRoleFlags::NONE;
         if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
@@ -238,7 +241,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         royalties_handle: RawHandle,
         uris_handle: RawHandle,
     ) {
-        let mut m_types = self.m_types_borrow_mut();
+        let mut m_types = self.m_types_lock();
         m_types.bi_overwrite(value_handle, instance.balance.clone().into());
         if esdt_data.frozen {
             m_types.mb_set(properties_handle, vec![1, 0]);
@@ -276,7 +279,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         uris_handle: RawHandle,
     ) {
         if ESDT_TOKEN_DATA_FUNC_RESETS_VALUES {
-            let mut m_types = self.m_types_borrow_mut();
+            let mut m_types = self.m_types_lock();
             m_types.bi_overwrite(value_handle, BigInt::zero());
             m_types.mb_set(properties_handle, vec![0, 0]);
             m_types.mb_set(hash_handle, vec![]);

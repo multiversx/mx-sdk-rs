@@ -16,7 +16,7 @@ fn append_endpoint_name_and_args(
 ) {
     if !endpoint_name.is_empty() {
         args.push(endpoint_name.into_bytes());
-        args.extend(arg_buffer.into_iter());
+        args.extend(arg_buffer);
     }
 }
 
@@ -52,7 +52,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         func_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) {
-        let contract_address = self.input_ref().to.clone();
+        let contract_address = self.current_address().clone();
 
         let mut args = vec![
             token,
@@ -79,7 +79,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name: TxFunctionName,
         arguments: Vec<Vec<u8>>,
     ) {
-        let contract_address = self.input_ref().to.clone();
+        let contract_address = self.current_address().clone();
 
         let mut args = vec![to.to_vec(), top_encode_u64(payments.len() as u64)];
 
@@ -111,7 +111,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         args: Vec<Vec<u8>>,
     ) -> ! {
         let mut arguments = vec![contract_code, code_metadata.to_vec()];
-        arguments.extend(args.into_iter());
+        arguments.extend(args);
         self.perform_async_call(to, egld_value, UPGRADE_CONTRACT_FUNC_NAME.into(), arguments)
     }
 
@@ -123,12 +123,12 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> Result<(), &'static [u8]> {
-        let recipient = self.m_types_borrow().mb_to_address(to_handle);
-        let egld_value = self.m_types_borrow().bu_get(amount_handle);
+        let recipient = self.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.m_types_lock().bu_get(amount_handle);
         let endpoint_name = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         self.perform_transfer_execute(recipient, egld_value, endpoint_name, arg_buffer);
 
@@ -143,14 +143,14 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) {
-        let to = self.m_types_borrow().mb_to_address(to_handle);
+        let to = self.m_types_lock().mb_to_address(to_handle);
         let payments = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_get_vec_of_esdt_payments(payments_handle);
         let endpoint_name = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         if payments.len() == 1 {
             let payment = payments[0].clone();
@@ -186,12 +186,12 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         endpoint_name_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) -> ! {
-        let to = self.m_types_borrow().mb_to_address(to_handle);
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let to = self.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         self.perform_async_call(to, egld_value, endpoint_name, arg_buffer)
     }
@@ -209,18 +209,15 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         _extra_gas_for_callback: u64,
         callback_closure_handle: RawHandle,
     ) {
-        let contract_address = self.input_ref().to.clone();
-        let to = self.m_types_borrow().mb_to_address(to_handle);
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let contract_address = self.current_address().clone();
+        let to = self.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
         let tx_hash = self.tx_hash();
-        let callback_closure_data = self
-            .m_types_borrow()
-            .mb_get(callback_closure_handle)
-            .to_vec();
+        let callback_closure_data = self.m_types_lock().mb_get(callback_closure_handle).to_vec();
 
         let call = AsyncCallTxData {
             from: contract_address,
@@ -238,7 +235,7 @@ pub trait VMHooksSend: VMHooksHandlerSource {
             callback_closure_data,
         };
 
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         tx_result.all_calls.push(promise.call.clone());
         tx_result.pending_calls.promises.push(promise);
     }
@@ -254,19 +251,19 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         new_address_handle: RawHandle,
         result_handle: RawHandle,
     ) {
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
-        let code = self.m_types_borrow().mb_get(code_handle).to_vec();
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let code = self.m_types_lock().mb_get(code_handle).to_vec();
         let code_metadata = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         let (new_address, result) =
             self.perform_deploy(egld_value, code, code_metadata, arg_buffer);
 
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
@@ -281,22 +278,22 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         new_address_handle: RawHandle,
         result_handle: RawHandle,
     ) {
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let source_contract_address = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_address(source_contract_address_handle);
         let source_contract_code = self.account_code(&source_contract_address);
         let code_metadata = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         let (new_address, result) =
             self.perform_deploy(egld_value, source_contract_code, code_metadata, arg_buffer);
 
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set(new_address_handle, new_address.to_vec());
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
@@ -309,16 +306,16 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         code_metadata_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) {
-        let to = self.m_types_borrow().mb_to_address(sc_address_handle);
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let to = self.m_types_lock().mb_to_address(sc_address_handle);
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let source_contract_address = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_address(source_contract_address_handle);
         let source_contract_code = self.account_code(&source_contract_address);
         let code_metadata = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         self.perform_upgrade_contract(
             to,
@@ -338,13 +335,13 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         code_metadata_handle: RawHandle,
         arg_buffer_handle: RawHandle,
     ) {
-        let to = self.m_types_borrow().mb_to_address(sc_address_handle);
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
-        let code = self.m_types_borrow().mb_get(code_handle).to_vec();
+        let to = self.m_types_lock().mb_to_address(sc_address_handle);
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
+        let code = self.m_types_lock().mb_get(code_handle).to_vec();
         let code_metadata = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_code_metadata(code_metadata_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         self.perform_upgrade_contract(to, egld_value, code, code_metadata, arg_buffer)
     }
@@ -358,27 +355,27 @@ pub trait VMHooksSend: VMHooksHandlerSource {
         arg_buffer_handle: RawHandle,
         result_handle: RawHandle,
     ) {
-        let to = self.m_types_borrow().mb_to_address(to_handle);
-        let egld_value = self.m_types_borrow().bu_get(egld_value_handle);
+        let to = self.m_types_lock().mb_to_address(to_handle);
+        let egld_value = self.m_types_lock().bu_get(egld_value_handle);
         let endpoint_name = self
-            .m_types_borrow()
+            .m_types_lock()
             .mb_to_function_name(endpoint_name_handle);
-        let arg_buffer = self.m_types_borrow().mb_get_vec_of_bytes(arg_buffer_handle);
+        let arg_buffer = self.m_types_lock().mb_get_vec_of_bytes(arg_buffer_handle);
 
         let result =
             self.perform_execute_on_dest_context(to, egld_value, endpoint_name, arg_buffer);
 
-        self.m_types_borrow_mut()
+        self.m_types_lock()
             .mb_set_vec_of_bytes(result_handle, result);
     }
 
     fn clean_return_data(&self) {
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         tx_result.result_values.clear();
     }
 
     fn delete_from_return_data(&self, index: usize) {
-        let mut tx_result = self.result_borrow_mut();
+        let mut tx_result = self.result_lock();
         if index > tx_result.result_values.len() {
             return;
         }
