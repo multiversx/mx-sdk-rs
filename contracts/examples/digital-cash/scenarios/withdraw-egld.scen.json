@@ -83,7 +83,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
@@ -206,7 +206,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

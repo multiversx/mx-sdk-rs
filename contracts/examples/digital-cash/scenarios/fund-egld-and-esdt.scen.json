@@ -253,16 +253,8 @@
                 "to": "sc:the_digital_cash_contract",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:CASHTOKEN-112233",
-                        "value": "50"
-                    },
-                    {
-                        "tokenIdentifier": "str:CASHTOKEN-445566",
-                        "value": "50"
-                    },
-                    {
-                        "tokenIdentifier": "str:CASHTOKEN-778899",
-                        "value": "50"
+                        "tokenIdentifier": "str:CASHTOKEN-123456",
+                        "value": "10"
                     }
                 ],
                 "function": "fund",
@@ -432,7 +424,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
