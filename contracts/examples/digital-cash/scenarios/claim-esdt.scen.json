@@ -152,7 +152,7 @@
                             }
                         },
                         "str:fee": "10",
-                        "str:collected_fees": "10"
+                        "str:collectedFees": "10"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
