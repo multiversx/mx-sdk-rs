@@ -178,7 +178,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "7",
+                    "nonce": "8",
                     "balance": "997,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

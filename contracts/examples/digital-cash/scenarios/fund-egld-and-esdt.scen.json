@@ -249,6 +249,34 @@
             "step": "scCall",
             "id": "fund-fail-2",
             "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CASHTOKEN-123456",
+                        "value": "10"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
+                    "u64:100"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:key already used",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fund-fail-3",
+            "tx": {
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
                 "esdtValue": [
@@ -276,7 +304,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:key already used",
+                "message": "str:invalid depositor",
                 "gas": "*",
                 "refund": "*"
             }
@@ -396,7 +424,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

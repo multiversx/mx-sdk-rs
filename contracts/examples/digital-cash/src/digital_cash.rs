@@ -30,6 +30,11 @@ pub trait DigitalCash {
     fn fund(&self, address: ManagedAddress, valability: u64) {
         let deposit_mapper = self.deposit(&address);
         require!(!deposit_mapper.is_empty(), FEES_NOT_COVERED_ERR_MSG);
+        let depositor = deposit_mapper.get().depositor_address;
+        require!(
+            self.blockchain().get_caller() == depositor,
+            "invalid depositor"
+        );
 
         let egld_payment = self.call_value().egld_value().clone_value();
         let esdt_payment = self.call_value().all_esdt_transfers().clone_value();
