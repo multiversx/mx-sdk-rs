@@ -2,7 +2,9 @@ use forwarder::nft::{Color, ForwarderNftModule};
 use multiversx_sc::{contract_base::ContractBase, types::Address};
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
-    scenario_model::{Account, AddressValue, ScCallStep, SetStateStep},
+    scenario_model::{
+        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep,
+    },
     ScenarioWorld, WhiteboxContract,
 };
 
@@ -66,13 +68,15 @@ fn test_nft_update_attributes_and_send() {
         },
     );
 
-    // TODO: implement esdt_nft_balance check
-    // world.check_state_step(
-    //     CheckStateStep::new().put_account(
-    //         USER_ADDRESS_EXPR,
-    //         CheckAccount::new().esdt_nft_balance(token_id_expr, nonce_expr, balance_expr, opt_attributes_expr)
-    //     ),
-    // );
+    world.check_state_step(CheckStateStep::new().put_account(
+        USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_nft_balance_and_attributes(
+            NFT_TOKEN_ID_EXPR,
+            1,
+            "1",
+            Some(original_attributes),
+        ),
+    ));
 
     let new_attributes = Color {
         r: 255,
@@ -97,13 +101,15 @@ fn test_nft_update_attributes_and_send() {
         },
     );
 
-    // TODO: implement esdt_nft_balance check
-    // world.check_state_step(
-    //     CheckStateStep::new().put_account(
-    //         USER_ADDRESS_EXPR,
-    //         CheckAccount::new().esdt_nft_balance(token_id_expr, nonce_expr, balance_expr, opt_attributes_expr)
-    //     ),
-    // );
+    world.check_state_step(CheckStateStep::new().put_account(
+        USER_ADDRESS_EXPR,
+        CheckAccount::new().esdt_nft_balance_and_attributes(
+            NFT_TOKEN_ID_EXPR,
+            1,
+            "1",
+            Some(new_attributes),
+        ),
+    ));
 }
 
 fn address_expr_to_address(address_expr: &str) -> Address {
