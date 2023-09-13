@@ -9,8 +9,6 @@ use super::output_contract::{OutputContract, OutputContractGlobalConfig};
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
 const MULTI_CONTRACT_CONFIG_RELATIVE_PATH: &str = "../multicontract.toml";
-const PROXY_TRAIT_RELATIVE_PATH: &str = "../proxy-trait-rs";
-const PROXY_STRUCT_RELATIVE_PATH: &str = "../proxy-struct-rs";
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
 const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
 const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
@@ -19,8 +17,6 @@ pub struct MetaConfig {
     pub load_abi_git_version: bool,
     pub output_dir: String,
     pub snippets_dir: String,
-    pub proxy_trait_dir: String,
-    pub proxy_struct_dir: String,
     pub original_contract_abi: ContractAbi,
     pub output_contracts: OutputContractGlobalConfig,
 }
@@ -36,8 +32,6 @@ impl MetaConfig {
             load_abi_git_version,
             output_dir: OUTPUT_RELATIVE_PATH.to_string(),
             snippets_dir: SNIPPETS_RELATIVE_PATH.to_string(),
-            proxy_trait_dir: PROXY_TRAIT_RELATIVE_PATH.to_string(),
-            proxy_struct_dir: PROXY_STRUCT_RELATIVE_PATH.to_string(),
             original_contract_abi,
             output_contracts,
         }
