@@ -51,6 +51,17 @@ impl CheckAccount {
         self
     }
 
+    pub fn code<V>(mut self, code_expr: V) -> Self
+    where
+        BytesValue: InterpretableFrom<V>,
+    {
+        self.code = CheckValue::Equal(BytesValue::interpret_from(
+            code_expr,
+            &InterpreterContext::default(),
+        ));
+        self
+    }
+
     pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
     where
         BytesKey: From<K>,

@@ -36,7 +36,7 @@
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "deposit_fees",
+                "function": "depositFees",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60"
                 ],
@@ -135,7 +135,7 @@
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "deposit_fees",
+                "function": "depositFees",
                 "arguments": [
                     "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd"
                 ],
@@ -249,6 +249,34 @@
             "step": "scCall",
             "id": "fund-fail-2",
             "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:CASHTOKEN-123456",
+                        "value": "10"
+                    }
+                ],
+                "function": "fund",
+                "arguments": [
+                    "0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd",
+                    "u64:100"
+                ],
+                "gasLimit": "100,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:key already used",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fund-fail-3",
+            "tx": {
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
                 "esdtValue": [
@@ -276,7 +304,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "str:key already used",
+                "message": "str:invalid depositor",
                 "gas": "*",
                 "refund": "*"
             }
@@ -288,7 +316,7 @@
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "deposit_fees",
+                "function": "depositFees",
                 "arguments": [
                     "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d"
                 ],
@@ -396,7 +424,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "999,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

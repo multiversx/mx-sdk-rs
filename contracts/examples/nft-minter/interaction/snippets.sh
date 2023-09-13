@@ -1,7 +1,7 @@
 ALICE="" # PEM path
 ADDRESS=$(mxpy data load --key=address-devnet)
 DEPLOY_TRANSACTION=$(mxpy data load --key=deployTransaction-devnet)
-PROXY=https://devnet-gateway.elrond.com
+PROXY=https://devnet-gateway.multiversx.com
 CHAIN_ID=D
 
 deploy() {

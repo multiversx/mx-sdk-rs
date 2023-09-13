@@ -1,7 +1,7 @@
 ALICE="${USERS}/alice.pem"
 ADDRESS=$(mxpy data load --key=address-testnet)
 DEPLOY_TRANSACTION=$(mxpy data load --key=deployTransaction-testnet)
-PROXY=https://testnet-api.elrond.com
+PROXY=https://testnet-api.multiversx.com
 
 deploy() {
     mxpy --verbose contract deploy --project=${PROJECT} --recall-nonce --pem=${ALICE} --gas-limit=50000000 --arguments 0 --send --outfile="deploy-testnet.interaction.json" --proxy=${PROXY} --chain=T || return
