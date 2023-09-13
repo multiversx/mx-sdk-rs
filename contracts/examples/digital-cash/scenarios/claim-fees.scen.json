@@ -11,7 +11,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "function": "claim_fees",
+                "function": "claimFees",
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
@@ -40,7 +40,7 @@
             "tx": {
                 "from": "address:digital_cash_owner_address",
                 "to": "sc:the_digital_cash_contract",
-                "function": "claim_fees",
+                "function": "claimFees",
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
@@ -97,7 +97,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "7",
+                    "nonce": "8",
                     "balance": "1,000,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

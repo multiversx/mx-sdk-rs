@@ -152,7 +152,7 @@
                             }
                         },
                         "str:fee": "10",
-                        "str:collected_fees": "10"
+                        "str:collectedFees": "10"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
@@ -165,7 +165,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "2",
+                    "nonce": "3",
                     "balance": "999,990",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

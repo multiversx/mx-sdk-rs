@@ -10,7 +10,9 @@
 // Total number of exported functions:  10
 
 #![no_std]
-#![allow(internal_features)]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -23,10 +25,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         fund => fund
         withdraw => withdraw
         claim => claim
-        claim_fees => claim_fees
-        deposit_fees => deposit_fees
+        claimFees => claim_fees
+        depositFees => deposit_fees
         forward => forward
-        amount => get_amount
+        getAmount => get_amount
         deposit => deposit
     )
 }
