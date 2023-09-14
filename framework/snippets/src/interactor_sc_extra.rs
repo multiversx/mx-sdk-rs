@@ -123,14 +123,15 @@ impl Interactor {
         self
     }
 
-    pub async fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
+    pub async fn sc_deploy_use_result<OriginalResult, RequestedResult, S, F>(
         &mut self,
-        step: TypedScDeploy<OriginalResult>,
+        step: S,
         use_result: F,
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
+        S: AsMut<TypedScDeploy<OriginalResult>>,
         F: FnOnce(Address, TypedResponse<RequestedResult>),
     {
         let (new_address, response) = self.sc_deploy_get_result(step).await;
@@ -138,16 +139,17 @@ impl Interactor {
         self
     }
 
-    pub async fn sc_deploy_get_result<OriginalResult, RequestedResult>(
+    pub async fn sc_deploy_get_result<OriginalResult, RequestedResult, S>(
         &mut self,
-        mut step: TypedScDeploy<OriginalResult>,
+        mut step: S,
     ) -> (Address, TypedResponse<RequestedResult>)
     where
         OriginalResult: TopEncodeMulti,
         RequestedResult: CodecFrom<OriginalResult>,
+        S: AsMut<TypedScDeploy<OriginalResult>>
     {
         self.sc_deploy(step.as_mut()).await;
-        let response = unwrap_response(&step.sc_deploy_step.response);
+        let response = unwrap_response(&step.as_mut().sc_deploy_step.response);
         let new_address = unwrap_new_address(response);
         let response = TypedResponse::from_raw(response);
         (new_address, response)
