@@ -23,7 +23,7 @@ impl<A> SendRawWrapper<A>
 where
     A: CallTypeApi,
 {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         SendRawWrapper {
             _phantom: PhantomData,
         }

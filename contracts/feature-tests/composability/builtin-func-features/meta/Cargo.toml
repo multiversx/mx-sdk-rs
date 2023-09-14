@@ -1,0 +1,12 @@
+[package]
+name = "builtin-func-features-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.builtin-func-features]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.43.3"
+path = "../../../../../framework/meta"

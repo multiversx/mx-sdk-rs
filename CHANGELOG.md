@@ -27,6 +27,11 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
+## [sc 0.43.3, vm 0.5.2] - 2023-09-08
+- Added several new methods in the `SendWrapper`, which perform EGLD & ESDT transfers but don't do anything if the value is zero.
+- Added the `DeleteUsername` builtin function to the VM.
+- Minor fixes in API wrapper constructors.
+
 ## [sc 0.43.2] - 2023-08-18
 - Template tool tag argument validation bugfix.
 

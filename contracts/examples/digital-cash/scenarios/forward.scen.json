@@ -36,7 +36,7 @@
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "deposit_fees",
+                "function": "depositFees",
                 "arguments": [
                     "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440"
                 ],
@@ -82,7 +82,7 @@
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "deposit_fees",
+                "function": "depositFees",
                 "arguments": [
                     "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee"
                 ],
@@ -168,7 +168,7 @@
                             }
                         },
                         "str:fee": "10",
-                        "str:collected_fees": "40"
+                        "str:collectedFees": "40"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
@@ -178,7 +178,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "7",
+                    "nonce": "8",
                     "balance": "997,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"
