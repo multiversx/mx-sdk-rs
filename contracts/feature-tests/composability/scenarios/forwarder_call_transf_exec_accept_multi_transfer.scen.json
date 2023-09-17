@@ -63,8 +63,50 @@
                 "out": [],
                 "status": "0",
                 "message": "",
-                "gas": "*",
-                "refund": "*"
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [                            
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:DirectCall",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "2",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds",
+                        "topics": [
+                            "str:accept_funds",
+                            "0",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ]
             }
         },
         {

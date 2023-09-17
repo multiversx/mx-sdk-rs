@@ -5,7 +5,7 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:forwarder": {
                     "nonce": "1000",
                     "balance": "0",
                     "esdt": {
@@ -24,7 +24,7 @@
             "id": "not-enough",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features",
+                "to": "sc:forwarder",
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
@@ -46,7 +46,7 @@
             "id": "send_esdt-ok",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features",
+                "to": "sc:forwarder",
                 "function": "send_esdt",
                 "arguments": [
                     "address:an_account",
@@ -61,15 +61,20 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "sc:basic-features",
+                        "address": "sc:forwarder",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:SENDESDT",
-                            "",
+                            "0",
                             "200",
                             "address:an_account"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:DirectCall",
+                            "str:ESDTTransfer",
+                            "str:SENDESDT",
+                            "200"
+                        ]
                     }
                 ]
             }
@@ -77,7 +82,7 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:forwarder": {
                     "nonce": "1000",
                     "balance": "0",
                     "esdt": {

@@ -72,7 +72,7 @@
                             "01",
                             "*"
                         ],
-                        "data": ""
+                        "data": []
                     },
                     {
                         "address": "sc:forwarder",
@@ -83,18 +83,27 @@
                             "2",
                             "1"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:ESDTNFTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:NFT-000001",
                             "2",
                             "01",
                             "address:a_user"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:DirectCall",
+                            "str:ESDTNFTTransfer",
+                            "str:NFT-000001",
+                            "2",
+                            "01",
+                            "address:a_user"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -106,7 +115,9 @@
                             "2",
                             "1"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",

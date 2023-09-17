@@ -5,8 +5,8 @@ use multiversx_chain_vm_executor::BreakpointValue;
 use crate::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{
-        async_call_tx_input, AsyncCallTxData, BlockchainUpdate, TxCache, TxContext, TxFunctionName,
-        TxInput, TxManagedTypes, TxPanic, TxResult,
+        async_call_tx_input, AsyncCallTxData, BlockchainUpdate, CallType, TxCache, TxContext,
+        TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -114,7 +114,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         arguments: Vec<Vec<u8>>,
     ) -> Vec<Vec<u8>> {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
-        let tx_input = async_call_tx_input(&async_call_data);
+        let tx_input = async_call_tx_input(&async_call_data, CallType::ExecuteOnDestContext);
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
             tx_input,
@@ -179,7 +179,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         arguments: Vec<Vec<u8>>,
     ) {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
-        let tx_input = async_call_tx_input(&async_call_data);
+        let tx_input = async_call_tx_input(&async_call_data, CallType::DirectCall);
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
             tx_input,

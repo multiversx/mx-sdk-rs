@@ -40,14 +40,16 @@
                 "status": "0",
                 "logs": [
                     {
-                        "address": "*",
+                        "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [
-                            "sc:forwarder",
-                            "sc:vault",
-                            "1000"
+                        "topics": [                            
+                            "1000",
+                            "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:AsyncCall",
+                            "str:accept_funds"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -56,7 +58,22 @@
                             "str:accept_funds",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -64,9 +81,11 @@
                         "topics": [
                             "str:callback_raw"
                         ],
-                        "data": {
-                            "0-status": "nested:0x00"
-                        }
+                        "data": [
+                            {
+                                "0-status": "nested:0x00"
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",

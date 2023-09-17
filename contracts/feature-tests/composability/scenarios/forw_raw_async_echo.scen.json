@@ -45,17 +45,48 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
                         "endpoint": "str:callBack",
                         "topics": [
                             "str:callback_raw"
                         ],
-                        "data": {
-                            "0-status": "nested:0x00",
-                            "1-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            {
+                                "0-status": "nested:0x00",
+                                "1-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",

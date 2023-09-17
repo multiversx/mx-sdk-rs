@@ -6,7 +6,7 @@ use crate::{
 
 use num_bigint::BigUint;
 
-use super::{CallbackPayments, Promise, TxFunctionName};
+use super::{CallType, CallbackPayments, Promise, TxFunctionName};
 
 #[derive(Debug, Clone)]
 pub struct AsyncCallTxData {
@@ -18,7 +18,7 @@ pub struct AsyncCallTxData {
     pub tx_hash: H256,
 }
 
-pub fn async_call_tx_input(async_call: &AsyncCallTxData) -> TxInput {
+pub fn async_call_tx_input(async_call: &AsyncCallTxData, call_type: CallType) -> TxInput {
     TxInput {
         from: async_call.from.clone(),
         to: async_call.to.clone(),
@@ -26,6 +26,7 @@ pub fn async_call_tx_input(async_call: &AsyncCallTxData) -> TxInput {
         esdt_values: Vec::new(),
         func_name: async_call.endpoint_name.clone(),
         args: async_call.arguments.clone(),
+        call_type,
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_call.tx_hash.clone(),
@@ -61,6 +62,7 @@ pub fn async_callback_tx_input(
         esdt_values: Vec::new(),
         func_name: TxFunctionName::CALLBACK,
         args,
+        call_type: CallType::AsyncCallback,
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
@@ -76,7 +78,7 @@ fn extract_callback_payments(
 ) -> CallbackPayments {
     let mut callback_payments = CallbackPayments::default();
     for async_call in &async_result.all_calls {
-        let tx_input = async_call_tx_input(async_call);
+        let tx_input = async_call_tx_input(async_call, CallType::AsyncCall);
         let token_transfers = builtin_functions.extract_token_transfers(&tx_input);
         if &token_transfers.real_recipient == callback_contract_address {
             if !token_transfers.is_empty() {

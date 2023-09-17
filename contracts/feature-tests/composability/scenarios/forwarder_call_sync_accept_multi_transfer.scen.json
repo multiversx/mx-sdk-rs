@@ -76,57 +76,46 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:FWD-TOKEN",
                             "0",
                             "100",
-                            "sc:vault"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
                             "str:FWD-TOKEN",
                             "0",
                             "200",
-                            "sc:vault"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
                             "str:NFT-123456",
                             "1",
                             "1",
-                            "sc:vault"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
                             "str:SFT-456789",
                             "3",
                             "3",
-                            "sc:vault"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:forwarder",
-                        "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
                             "str:SFT-456789",
                             "3",
                             "4",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "5",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "100",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "200",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "3",
+                            "str:SFT-456789",
+                            "3",
+                            "4",
+                            "str:accept_funds"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -150,7 +139,9 @@
                             "3",
                             "4"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",

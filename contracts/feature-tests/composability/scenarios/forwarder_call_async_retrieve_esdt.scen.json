@@ -44,6 +44,21 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:retrieve_funds",
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000"
+                        ]
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:retrieve_funds",
                         "topics": [
@@ -52,18 +67,25 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     },
                     {
                         "address": "sc:vault",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:TEST-TOKENA",
-                            "",
+                            "0",
                             "1000",
                             "sc:forwarder"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:AsyncCall",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -74,7 +96,9 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",

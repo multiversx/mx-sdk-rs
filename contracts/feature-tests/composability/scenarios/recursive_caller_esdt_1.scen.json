@@ -53,18 +53,26 @@
                             "str:REC-TOKEN",
                             "1"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     },
                     {
                         "address": "sc:recursive-caller",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:REC-TOKEN",
                             "",
                             "1",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:AsyncCall",
+                            "str:ESDTTransfer",
+                            "str:REC-TOKEN",
+                            "1",
+                            "str:accept_funds"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -76,7 +84,22 @@
                             "0",
                             "1"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:recursive-caller"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
+                        ]
                     },
                     {
                         "address": "sc:recursive-caller",
@@ -87,7 +110,9 @@
                             "str:REC-TOKEN",
                             "1"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     }
                 ],
                 "gas": "*",

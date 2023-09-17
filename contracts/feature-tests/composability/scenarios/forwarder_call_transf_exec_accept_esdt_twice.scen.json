@@ -49,13 +49,18 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:TEST-TOKENA",
-                            "",
+                            "0",
                             "1000",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:DirectCall",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -67,18 +72,25 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [
+                        "topics": [                            
                             "str:TEST-TOKENA",
-                            "",
+                            "0",
                             "1000",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:DirectCall",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -90,7 +102,9 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",

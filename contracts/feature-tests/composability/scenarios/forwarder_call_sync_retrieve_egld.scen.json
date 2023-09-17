@@ -41,6 +41,21 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:retrieve_funds",
+                            "str:EGLD",
+                            "0",
+                            "1000"
+                        ]
+                    },
+                    {
                         "address": "sc:vault",
                         "endpoint": "str:retrieve_funds",
                         "topics": [
@@ -49,17 +64,24 @@
                             "0",
                             "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     },
                     {
-                        "address": "*",
+                        "address": "sc:vault",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [
-                            "sc:vault",
-                            "sc:forwarder",
-                            "1000"
+                        "topics": [                            
+                            "1000",
+                            "sc:forwarder"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:retrieve_funds",
+                            "str:EGLD",
+                            "0",
+                            "1000"
+                        ]
                     }
                 ],
                 "gas": "*",

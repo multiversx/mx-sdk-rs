@@ -50,17 +50,21 @@
                             "str:EGLD",
                             "1"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     },
                     {
-                        "address": "*",
+                        "address": "sc:recursive-caller",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [
-                            "sc:recursive-caller",
-                            "sc:vault",
-                            "1"
+                        "topics": [                            
+                            "1",
+                            "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:AsyncCall",
+                            "str:accept_funds"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -69,7 +73,22 @@
                             "str:accept_funds",
                             "1"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:recursive-caller"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
+                        ]
                     },
                     {
                         "address": "sc:recursive-caller",
@@ -80,7 +99,9 @@
                             "str:EGLD",
                             "1"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     }
                 ],
                 "gas": "*",

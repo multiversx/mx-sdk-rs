@@ -7,7 +7,7 @@ use crate::{
 };
 use std::fmt;
 
-use super::TxFunctionName;
+use super::{CallType, TxFunctionName};
 
 #[derive(Clone, Debug)]
 pub struct TxInput {
@@ -17,6 +17,7 @@ pub struct TxInput {
     pub esdt_values: Vec<TxTokenTransfer>,
     pub func_name: TxFunctionName,
     pub args: Vec<Vec<u8>>,
+    pub call_type: CallType,
     pub gas_limit: u64,
     pub gas_price: u64,
     pub tx_hash: H256,
@@ -33,6 +34,7 @@ impl Default for TxInput {
             esdt_values: Vec::new(),
             func_name: TxFunctionName::EMPTY,
             args: Vec::new(),
+            call_type: CallType::DirectCall,
             gas_limit: 0,
             gas_price: 0,
             tx_hash: H256::zero(),

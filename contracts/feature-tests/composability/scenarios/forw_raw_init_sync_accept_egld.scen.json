@@ -26,8 +26,8 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
                 "egldValue": "1000",
+                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"

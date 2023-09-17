@@ -42,6 +42,18 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_caller"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
                         "endpoint": "str:call_execute_on_dest_context",
                         "topics": [
                             "str:execute_on_dest_context_result"
@@ -78,12 +90,36 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_caller"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
                         "endpoint": "str:call_execute_on_dest_context_twice",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
                         "data": [
                             "nested:sc:forwarder"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_caller"
                         ]
                     },
                     {
