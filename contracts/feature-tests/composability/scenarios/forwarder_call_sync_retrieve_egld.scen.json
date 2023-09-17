@@ -76,11 +76,8 @@
                             "sc:forwarder"
                         ],
                         "data": [
-                            "str:ExecuteOnDestContext",
-                            "str:retrieve_funds",
-                            "str:EGLD",
-                            "0",
-                            "1000"
+                            "str:BackTransfer",
+                            "0"
                         ]
                     }
                 ],

@@ -76,11 +76,21 @@
                             "sc:forwarder"
                         ],
                         "data": [
-                            "str:AsyncCall",
-                            "str:retrieve_funds",
-                            "str:EGLD",
-                            "0",
-                            "1000"
+                            "str:BackTransfer",
+                            "0"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "1000",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
                         ]
                     },
                     {

@@ -88,7 +88,7 @@
                             "sc:forwarder"
                         ],
                         "data": [
-                            "str:ExecuteOnDestContext",
+                            "str:BackTransfer",
                             "str:ESDTNFTTransfer",
                             "str:NFT-000001",
                             "5",

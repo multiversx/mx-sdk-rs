@@ -77,7 +77,7 @@
                             "sc:vault"
                         ],
                         "data": [
-                            "str:DirectCall",
+                            "str:TransferAndExecute",
                             "str:MultiESDTNFTTransfer",
                             "sc:vault",
                             "2",
@@ -86,7 +86,8 @@
                             "100",
                             "str:FWD-TOKEN",
                             "0",
-                            "200"
+                            "200",
+                            "str:accept_funds"
                         ]
                     },
                     {

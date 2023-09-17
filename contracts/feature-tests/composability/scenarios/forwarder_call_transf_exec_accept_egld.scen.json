@@ -46,7 +46,7 @@
                             "sc:vault"
                         ],
                         "data": [
-                            "str:ExecuteOnDestContext",
+                            "str:TransferAndExecute",
                             "str:accept_funds"
                         ]
                     },

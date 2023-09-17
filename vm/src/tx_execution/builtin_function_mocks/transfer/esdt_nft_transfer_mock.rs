@@ -10,8 +10,9 @@ use crate::{
 use super::{
     super::BuiltinFunction,
     transfer_common::{
-        execute_transfer_builtin_func, extract_transfer_info, push_func_name_if_necessary,
-        push_transfer_bytes, ParsedTransferBuiltinFunCall, RawEsdtTransfer,
+        adjust_call_type, execute_transfer_builtin_func, extract_transfer_info,
+        push_func_name_if_necessary, push_transfer_bytes, ParsedTransferBuiltinFunCall,
+        RawEsdtTransfer,
     },
 };
 
@@ -54,17 +55,18 @@ impl BuiltinFunction for ESDTNftTransfer {
 }
 
 fn build_log(tx_input: &TxInput, call: &ParsedTransferBuiltinFunCall) -> TxLog {
+    let call_type = adjust_call_type(tx_input.call_type, call);
     let mut topics = Vec::new();
     push_transfer_bytes(&call.raw_esdt_transfers, &mut topics);
     topics.push(call.destination.to_vec());
 
     let mut data = Vec::new();
 
-    data.push(tx_input.call_type.to_log_bytes());
+    data.push(call_type.to_log_bytes());
     data.push(ESDT_NFT_TRANSFER_FUNC_NAME.into());
     push_transfer_bytes(&call.raw_esdt_transfers, &mut data);
     data.push(call.destination.to_vec());
-    push_func_name_if_necessary(tx_input.call_type, &call.func_name, &mut data);
+    push_func_name_if_necessary(call_type, &call.func_name, &mut data);
 
     TxLog {
         address: tx_input.from.clone(),

@@ -56,10 +56,11 @@
                             "sc:vault"
                         ],
                         "data": [
-                            "str:DirectCall",
+                            "str:TransferAndExecute",
                             "str:ESDTTransfer",
                             "str:TEST-TOKENA",
-                            "1000"
+                            "1000",
+                            "str:accept_funds"
                         ]
                     },
                     {

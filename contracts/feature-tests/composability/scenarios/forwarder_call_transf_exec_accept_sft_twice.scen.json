@@ -64,12 +64,13 @@
                             "sc:vault"
                         ],
                         "data": [
-                            "str:DirectCall",
+                            "str:TransferAndExecute",
                             "str:ESDTNFTTransfer",
                             "str:NFT-000001",
                             "5",
                             "1",
-                            "sc:vault"
+                            "sc:vault",
+                            "str:accept_funds"
                         ]
                     },
                     {
@@ -96,12 +97,13 @@
                             "sc:vault"
                         ],
                         "data": [
-                            "str:DirectCall",
+                            "str:TransferAndExecute",
                             "str:ESDTNFTTransfer",
                             "str:NFT-000001",
                             "5",
                             "1",
-                            "sc:vault"
+                            "sc:vault",
+                            "str:accept_funds"
                         ]
                     },
                     {

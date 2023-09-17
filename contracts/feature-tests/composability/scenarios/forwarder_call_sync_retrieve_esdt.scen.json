@@ -81,7 +81,7 @@
                             "sc:forwarder"
                         ],
                         "data": [
-                            "str:ExecuteOnDestContext",
+                            "str:BackTransfer",
                             "str:ESDTTransfer",
                             "str:TEST-TOKENA",
                             "1000"

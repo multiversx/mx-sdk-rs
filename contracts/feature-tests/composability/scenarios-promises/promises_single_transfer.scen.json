@@ -92,17 +92,48 @@
                 "logs": [
                     {
                         "address": "sc:promises",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                                                        
+                            "0",
+                            "sc:promises"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:the_one_callback",
+                            "0x00",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:promises",
                         "endpoint": "str:the_one_callback",
                         "topics": [
                             "str:async_call_event_callback",
                             "1001",
                             "1002"
                         ],
-                        "data": {
-                            "0-status": "nested:0x00",
-                            "1-arg1": "biguint:1",
-                            "2-arg2": "biguint:2"
-                        }
+                        "data": [
+                            {
+                                "0-status": "nested:0x00",
+                                "1-arg1": "biguint:1",
+                                "2-arg2": "biguint:2"
+                            }
+                        ]
                     },
                     "+"
                 ],
@@ -156,19 +187,50 @@
                 "logs": [
                     {
                         "address": "sc:promises",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "0",
+                            "sc:promises"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:the_one_callback",
+                            "0x00",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:promises",
                         "endpoint": "str:the_one_callback",
                         "topics": [
                             "str:async_call_event_callback",
                             "1001",
                             "1002"
                         ],
-                        "data": {
-                            "0-status": "nested:0x00",
-                            "1-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            {
+                                "0-status": "nested:0x00",
+                                "1-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",

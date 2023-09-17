@@ -4,7 +4,7 @@ pub enum CallType {
     ExecuteOnDestContext,
     AsyncCall,
     AsyncCallback,
-    // TransferExecute,
+    TransferExecute,
 }
 
 impl CallType {
@@ -18,7 +18,7 @@ impl CallType {
             Self::ExecuteOnDestContext => "ExecuteOnDestContext",
             Self::AsyncCall => "AsyncCall",
             Self::AsyncCallback => "AsyncCallback",
-            // Self::TransferExecute => "DirectCall",
+            Self::TransferExecute => "TransferAndExecute",
         }
     }
 }

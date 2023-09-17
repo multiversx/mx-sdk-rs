@@ -91,6 +91,17 @@ where
     (tx_result, blockchain_updates)
 }
 
+pub(super) fn adjust_call_type(
+    call_type: CallType,
+    call: &ParsedTransferBuiltinFunCall,
+) -> CallType {
+    if call_type == CallType::TransferExecute && call.func_name.is_empty() {
+        CallType::DirectCall
+    } else {
+        call_type
+    }
+}
+
 pub(super) fn push_func_name_if_necessary(
     call_type: CallType,
     func_name: &TxFunctionName,

@@ -77,8 +77,107 @@
                 ],
                 "status": "0",
                 "message": "",
-                "gas": "*",
-                "refund": "*"
+                "logs": [
+                    {
+                        "address": "sc:promises",
+                        "endpoint": "str:MultiESDTNFTTransfer",
+                        "topics": [                            
+                            "str:FWD-TOKEN",
+                            "0",
+                            "500",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "6",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:MultiESDTNFTTransfer",
+                            "sc:vault",
+                            "3",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "500",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "6",
+                            "str:accept_funds_echo_payment"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:accept_funds_echo_payment",
+                        "topics": [
+                            "str:accept_funds",
+                            "0",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "500",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [                            
+                            "",
+                            "sc:promises"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:the_one_callback",
+                            "0x00",
+                            "0",
+                            "str:FWD-TOKEN",
+                            "0",
+                            "500",
+                            "str:NFT-123456",
+                            "1",
+                            "1",
+                            "str:SFT-456789",
+                            "3",
+                            "6"
+                        ]
+                    },
+                    {
+                        "address": "sc:promises",
+                        "endpoint": "str:the_one_callback",
+                        "topics": [
+                            "str:async_call_event_callback",
+                            "2001",
+                            "2002"
+                        ],
+                        "data": [
+                            [
+                                "nested:0x00",
+                                "nested:0",
+                                "nested:str:FWD-TOKEN",
+                                "nested:0",
+                                "nested:500",
+                                "nested:str:NFT-123456",
+                                "nested:1",
+                                "nested:1",
+                                "nested:str:SFT-456789",
+                                "nested:3",
+                                "nested:6"
+                            ]
+                        ]
+                    }
+                ]
             }
         },
         {
