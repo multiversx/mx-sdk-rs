@@ -26,6 +26,10 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.43.4] - 2023-09-18
+- Bugfix in `sc-meta`: fixed `--locked argument` in `all` command.
+- Template fix: added `multiversx.json` files.
+- Testing framework: check NFT balances and attributes.
 
 ## [sc 0.43.3, vm 0.5.2] - 2023-09-08
 - Added several new methods in the `SendWrapper`, which perform EGLD & ESDT transfers but don't do anything if the value is zero.
