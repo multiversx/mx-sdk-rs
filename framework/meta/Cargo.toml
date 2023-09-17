@@ -36,7 +36,7 @@ anyhow = "1.0.44"
 rustc_version = "0.4"
 toml = { version = "0.5.8", features = ["preserve_order"] }
 ruplacer = "0.8.1"
-clap = { version = "4.1.0", features = ["derive", "cargo"] }
+clap = { version = "4.1.0", features = ["derive"] }
 colored = "2.0"
 pathdiff = "0.2.1"
 common-path = "1.0.0"

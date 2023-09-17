@@ -119,6 +119,9 @@ impl BuildArgs {
 impl CliArgsToRaw for BuildArgs {
     fn to_raw(&self) -> Vec<String> {
         let mut raw = Vec::new();
+        if self.locked {
+            raw.push("--locked".to_string());
+        }
         if self.wasm_symbols {
             raw.push("--wasm-symbols".to_string());
         }
