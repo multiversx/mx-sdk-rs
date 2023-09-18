@@ -1,3 +1,5 @@
+use multiversx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
+
 use crate::{
     scenario::model::{
         BigUintValue, BytesKey, BytesValue, CheckEsdt, CheckEsdtInstances, CheckEsdtMap,
@@ -7,6 +9,7 @@ use crate::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::CheckAccountRaw,
     },
+    scenario_model::CheckEsdtData,
 };
 use std::collections::BTreeMap;
 
@@ -94,6 +97,52 @@ impl CheckAccount {
                     }
                 }
             },
+        }
+
+        self
+    }
+
+    pub fn esdt_nft_balance_and_attributes<K, N, V, T>(
+        mut self,
+        token_id_expr: K,
+        nonce_expr: N,
+        balance_expr: V,
+        attributes_expr: Option<T>,
+    ) -> Self
+    where
+        BytesKey: From<K>,
+        U64Value: From<N>,
+        BigUintValue: From<V>,
+        T: TopEncode,
+    {
+        let token_id = BytesKey::from(token_id_expr);
+
+        if let CheckEsdtMap::Unspecified = &self.esdt {
+            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
+
+            if let Some(attributes_expr) = attributes_expr {
+                check_esdt.add_balance_and_attributes_check(
+                    nonce_expr,
+                    balance_expr,
+                    top_encode_to_vec_u8_or_panic(&attributes_expr),
+                );
+            } else {
+                check_esdt.add_balance_and_attributes_check(
+                    nonce_expr,
+                    balance_expr,
+                    Vec::<u8>::new(),
+                );
+            }
+
+            let mut new_esdt_map = BTreeMap::new();
+            let _ = new_esdt_map.insert(token_id, check_esdt);
+
+            let new_check_esdt_map = CheckEsdtMapContents {
+                contents: new_esdt_map,
+                other_esdts_allowed: true,
+            };
+
+            self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
         }
 
         self
