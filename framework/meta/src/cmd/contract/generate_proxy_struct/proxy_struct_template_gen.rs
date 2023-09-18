@@ -6,7 +6,8 @@ pub(crate) fn write_imports(file: &mut File) {
     writeln!(
         file,
         r#"#![allow(clippy::too_many_arguments)]
-#![allow(clippy::type_complexity)]"#
+#![allow(clippy::type_complexity)]
+multiversx_sc::imports!();"#
     )
         .unwrap();
 
@@ -20,18 +21,11 @@ pub(crate) fn write_struct_template(file: &mut File) {
 where
     A: multiversx_sc::api::VMApi + 'static,
 {{
-    pub address: multiversx_sc::types::ManagedOption<
-        A,
-        multiversx_sc::types::ManagedAddress<A>,
-    >,
+    pub address: ManagedOption<A, ManagedAddress<A>>,
 }}
 
 impl<A> Proxy<A>
 where
     A: multiversx_sc::api::VMApi + 'static,
-{{
-    multiversx_sc_wasm_adapter::endpoints_proxy! {{
-"
-    )
-        .unwrap();
+{{").unwrap();
 }

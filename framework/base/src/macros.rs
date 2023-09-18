@@ -158,8 +158,8 @@ macro_rules! sc_format {
 
 /// Equivalent to the `?` operator for SCResult.
 #[deprecated(
-    since = "0.16.0",
-    note = "The `?` operator can now be used on `SCResult`, please use it instead."
+since = "0.16.0",
+note = "The `?` operator can now be used on `SCResult`, please use it instead."
 )]
 #[macro_export]
 macro_rules! sc_try {
@@ -190,8 +190,8 @@ macro_rules! sc_try {
 /// # }
 /// ```
 #[deprecated(
-    since = "0.26.0",
-    note = "Replace with the `#[only_owner]` attribute that can be placed on an endpoint. That one is more compact and shows up in the ABI."
+since = "0.26.0",
+note = "Replace with the `#[only_owner]` attribute that can be placed on an endpoint. That one is more compact and shows up in the ABI."
 )]
 #[macro_export]
 macro_rules! only_owner {
@@ -212,51 +212,44 @@ macro_rules! non_zero_usize {
 
 #[macro_export]
 macro_rules! endpoints_proxy {
-    ($mod_name:ident ( $(
-    ($docs:ident)?
-    $endpoint_name:ident => $method_name:ident$(< $generic:ident >)*( $($arg:ident: $arg_type:ident)* )
-    )* ) ) => {
-        $(
-            #[allow(clippy::too_many_arguments)]
-            #[allow(clippy::type_complexity)]
-            fn $method_name<
-                $($generic: multiversx_sc::codec::CodecInto<multiversx_sc::types::$arg_type<Self::Api>>,)*
-            >(
-                &mut self,
-                $(
-                    $arg: $generic,
-                )*
-            ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, ()> {
-                let ___address___ = self.extract_address();
-                let mut ___contract_call___ = multiversx_sc::types::ContractCallNoPayment::new(
-                    ___address___,
-                    stringify!($endpoint_name),
-                );
+    ($endpoint_name:ident, $address:ident)
+     => {
+        multiversx_sc::types::ContractCallNoPayment::new(
+            $address,
+            stringify!($endpoint_name),
+        );
+    };
+}
 
-                $(
-                    multiversx_sc::types::ContractCall::proxy_arg(&mut ___contract_call___, &$arg);
-                )*
+#[macro_export]
+macro_rules! constructors_proxy {
+    ($opt_address:ident)
+     => {
+        multiversx_sc::types::new_contract_deploy(
+            $opt_address,
+        );
+    };
+}
 
-                ___contract_call___
-            }
-        )*
+#[macro_export]
+macro_rules! extract_opt_address {
+    ($address:expr) => {
+        {
+            core::mem::replace(
+                &mut $address.address,
+                multiversx_sc::types::ManagedOption::none(),
+            )
+        }
+    };
+}
 
-        $(
-            #[allow(clippy::too_many_arguments)]
-            #[allow(clippy::type_complexity)]
-            fn $method_name(
-                &mut self
-            ) -> multiversx_sc::types::ContractCallNoPayment<
-                Self::Api,
-                SingleValueMapper<Self::Api, multiversx_sc::types::BigUint<Self::Api>
-            > {
-                let ___address___ = self.extract_address();
-                let mut ___contract_call___ = multiversx_sc::types::ContractCallNoPayment::new(
-                    ___address___,
-                    stringify!($endpoint_name),
-                );
-                ___contract_call___
-            }
-        )*
+#[macro_export]
+macro_rules! extract_address {
+    ($address:expr)
+     => {
+        {
+            multiversx_sc::extract_opt_address!($address)
+                .unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
+        }
     };
 }

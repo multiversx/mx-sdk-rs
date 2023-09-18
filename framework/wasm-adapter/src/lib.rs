@@ -13,4 +13,3 @@ pub mod error_hook;
 pub mod panic;
 pub mod wasm_alloc;
 mod wasm_macros;
-mod proxy_macro;
