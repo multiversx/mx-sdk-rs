@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            8
+// Endpoints:                            9
 // Async Callback (empty):               1
-// Total number of exported functions:  10
+// Total number of exported functions:  11
 
 #![no_std]
 
@@ -22,13 +22,14 @@ multiversx_sc_wasm_adapter::endpoints! {
     digital_cash
     (
         init => init
+        claimFees => claim_fees
+        getAmount => get_amount
+        pay_fee_and_fund => pay_fee_and_fund
         fund => fund
+        depositFees => deposit_fees
         withdraw => withdraw
         claim => claim
-        claimFees => claim_fees
-        depositFees => deposit_fees
         forward => forward
-        getAmount => get_amount
         deposit => deposit
     )
 }
