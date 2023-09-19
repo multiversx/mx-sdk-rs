@@ -19,8 +19,9 @@ static CANNOT_DEPOSIT_FUNDS_ERR_MSG: &[u8] =
 #[multiversx_sc::contract]
 pub trait DigitalCash {
     #[init]
-    fn init(&self, fee: BigUint) {
+    fn init(&self, fee: BigUint, coin: TokenIdentifier) {
         self.fee().set(fee);
+        self.fee_token().set(coin);
     }
 
     // endpoints
@@ -63,6 +64,7 @@ pub trait DigitalCash {
     #[endpoint]
     fn withdraw(&self, address: ManagedAddress) {
         let deposit_mapper = self.deposit(&address);
+        let accepted_fee_token = self.fee_token().get();
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
         let block_round = self.blockchain().get_block_round();
@@ -72,15 +74,24 @@ pub trait DigitalCash {
             "withdrawal has not been available yet"
         );
 
-        let egld_funds = deposit.egld_funds + deposit.fees.value;
+        let mut egld_funds = deposit.egld_funds;
+        let mut esdt_funds = deposit.esdt_funds;
+
+        if accepted_fee_token == EgldOrEsdtTokenIdentifier::egld() {
+            egld_funds += deposit.fees.value;
+        } else {
+            let esdt_fee = EsdtTokenPayment::new(accepted_fee_token, 0, deposit.fees.value);
+            esdt_funds.push(esdt_fee);
+        }
+
         if egld_funds > 0 {
             self.send()
                 .direct_egld(&deposit.depositor_address, &egld_funds);
         }
 
-        if !deposit.esdt_funds.is_empty() {
+        if !esdt_funds.is_empty() {
             self.send()
-                .direct_multi(&deposit.depositor_address, &deposit.esdt_funds);
+                .direct_multi(&deposit.depositor_address, &esdt_funds);
         }
     }
 
@@ -117,8 +128,7 @@ pub trait DigitalCash {
                 .direct_multi(&caller_address, &deposit.esdt_funds);
         }
         if deposit.fees.value > 0 {
-            self.send()
-                .direct_egld(&deposit.depositor_address, &deposit.fees.value);
+            self.send_fee_to_address(&deposit.fees.value, &deposit.depositor_address);
         }
     }
 
@@ -131,17 +141,22 @@ pub trait DigitalCash {
         }
 
         let caller_address = self.blockchain().get_caller();
-        self.send().direct_egld(&caller_address, &fees);
+        self.send_fee_to_address(&fees, &caller_address);
     }
 
     #[endpoint(depositFees)]
     #[payable("EGLD")]
     fn deposit_fees(&self, address: ManagedAddress) {
-        let payment = self.call_value().egld_value().clone_value();
+        let payment = self.call_value().egld_or_single_esdt();
+        let accepted_fee_token = self.fee_token().get();
+        require!(
+            payment.token_identifier == accepted_fee_token,
+            "Invalid fee token provided"
+        );
         let caller_address = self.blockchain().get_caller();
         let deposit_mapper = self.deposit(&address);
         if !deposit_mapper.is_empty() {
-            deposit_mapper.update(|deposit| deposit.fees.value += payment);
+            deposit_mapper.update(|deposit| deposit.fees.value += payment.amount);
 
             return;
         }
@@ -154,7 +169,7 @@ pub trait DigitalCash {
             expiration_round: 0,
             fees: Fee {
                 num_token_to_transfer: 0,
-                value: payment,
+                value: payment.amount,
             },
         };
         deposit_mapper.set(new_deposit);
@@ -200,14 +215,24 @@ pub trait DigitalCash {
             .update(|collected_fees| *collected_fees += forward_fee);
 
         if forwarded_deposit.fees.value > 0 {
-            self.send().direct_egld(
-                &forwarded_deposit.depositor_address,
+            self.send_fee_to_address(
                 &forwarded_deposit.fees.value,
+                &forwarded_deposit.depositor_address,
             );
         }
     }
 
     // views
+
+    fn send_fee_to_address(&self, fee_amount: &BigUint, address: &ManagedAddress) {
+        let accepted_fee_token = self.fee_token().get();
+        if accepted_fee_token == EgldOrEsdtTokenIdentifier::egld() {
+            self.send().direct_egld(address, fee_amount);
+        } else {
+            self.send()
+                .direct_esdt(address, &accepted_fee_token, 0, fee_amount);
+        }
+    }
 
     #[view(getAmount)]
     fn get_amount(
@@ -273,6 +298,9 @@ pub trait DigitalCash {
 
     #[storage_mapper("fee")]
     fn fee(&self) -> SingleValueMapper<BigUint>;
+
+    #[storage_mapper("feeToken")]
+    fn fee_token(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[storage_mapper("collectedFees")]
     fn collected_fees(&self) -> SingleValueMapper<BigUint>;
