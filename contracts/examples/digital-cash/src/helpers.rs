@@ -82,8 +82,7 @@ pub trait HelpersModule: storage::StorageModule {
         if !deposit_mapper.is_empty() {
             deposit_mapper.update(|deposit| {
                 require!(
-                    deposit.depositor_address,
-                    caller_address,
+                    deposit.depositor_address == caller_address,
                     "invalid depositor address"
                 );
                 deposit.fees.value += payment.amount;
