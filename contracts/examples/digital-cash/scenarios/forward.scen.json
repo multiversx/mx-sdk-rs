@@ -119,7 +119,7 @@
             "expect": {
                 "out": [],
                 "status": "4",
-                "message": "invalid depositor address",
+                "message": "str:invalid depositor address",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
