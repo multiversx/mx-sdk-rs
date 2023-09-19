@@ -44,7 +44,8 @@
                 "from": "address:digital_cash_owner_address",
                 "contractCode": "file:../output/digital-cash.wasm",
                 "arguments": [
-                    "10"
+                    "10",
+                    "str:EGLD"
                 ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
@@ -63,7 +64,8 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:fee": "10"
+                        "str:fee": "10",
+                        "str:feeToken": "str:EGLD"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },

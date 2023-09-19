@@ -414,7 +414,8 @@
                                 "1-value": "biguint:1,000"
                             }
                         },
-                        "str:fee": "10"
+                        "str:fee": "10",
+                        "str:feeToken": "str:EGLD"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },

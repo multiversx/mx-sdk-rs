@@ -168,6 +168,7 @@
                             }
                         },
                         "str:fee": "10",
+                        "str:feeToken": "str:EGLD",
                         "str:collectedFees": "40"
                     },
                     "code": "file:../output/digital-cash.wasm"

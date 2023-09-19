@@ -19,9 +19,9 @@ static CANNOT_DEPOSIT_FUNDS_ERR_MSG: &[u8] =
 #[multiversx_sc::contract]
 pub trait DigitalCash {
     #[init]
-    fn init(&self, fee: BigUint, coin: TokenIdentifier) {
+    fn init(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
         self.fee().set(fee);
-        self.fee_token().set(coin);
+        self.fee_token().set(token);
     }
 
     // endpoints
@@ -80,7 +80,8 @@ pub trait DigitalCash {
         if accepted_fee_token == EgldOrEsdtTokenIdentifier::egld() {
             egld_funds += deposit.fees.value;
         } else {
-            let esdt_fee = EsdtTokenPayment::new(accepted_fee_token, 0, deposit.fees.value);
+            let esdt_fee_token = accepted_fee_token.unwrap_esdt();
+            let esdt_fee = EsdtTokenPayment::new(esdt_fee_token, 0, deposit.fees.value);
             esdt_funds.push(esdt_fee);
         }
 
@@ -229,8 +230,9 @@ pub trait DigitalCash {
         if accepted_fee_token == EgldOrEsdtTokenIdentifier::egld() {
             self.send().direct_egld(address, fee_amount);
         } else {
+            let esdt_fee_token = accepted_fee_token.unwrap_esdt();
             self.send()
-                .direct_esdt(address, &accepted_fee_token, 0, fee_amount);
+                .direct_esdt(address, &esdt_fee_token, 0, fee_amount);
         }
     }
 
@@ -300,7 +302,7 @@ pub trait DigitalCash {
     fn fee(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("feeToken")]
-    fn fee_token(&self) -> SingleValueMapper<TokenIdentifier>;
+    fn fee_token(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
 
     #[storage_mapper("collectedFees")]
     fn collected_fees(&self) -> SingleValueMapper<BigUint>;
