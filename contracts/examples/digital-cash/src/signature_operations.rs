@@ -90,7 +90,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         let fee = self.call_value().egld_or_single_esdt();
         let caller_address = self.blockchain().get_caller();
         self.require_signature(&address, &caller_address, signature);
-        self.update_fees(caller_address, &address, fee);
+        self.update_fees(caller_address, &forward_address, fee);
 
         let new_deposit = self.deposit(&forward_address);
         let fee = self.fee().get();
@@ -104,7 +104,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
             );
             require!(
                 &fee * num_tokens as u64 <= fwd_deposit.fees.value,
-                "cannot forward funds without the owner covering the fee cost first"
+                "cannot deposit funds without covering the fee cost first"
             );
 
             fwd_deposit.fees.num_token_to_transfer += num_tokens;
