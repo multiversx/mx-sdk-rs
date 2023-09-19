@@ -4,11 +4,11 @@ multiversx_sc::derive_imports!();
 use crate::{
     constants::*,
     deposit_info::{DepositInfo, Fee},
-    storage,
+    helpers, storage,
 };
 
 #[multiversx_sc::module]
-pub trait PayFeeAndFund: storage::StorageModule {
+pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint]
     #[payable("*")]
     fn fund(&self, address: ManagedAddress, valability: u64) {
@@ -73,23 +73,5 @@ pub trait PayFeeAndFund: storage::StorageModule {
             },
         };
         deposit_mapper.set(new_deposit);
-    }
-
-    fn get_num_token_transfers(
-        &self,
-        egld_value: &BigUint,
-        esdt_transfers: &ManagedVec<EsdtTokenPayment>,
-    ) -> usize {
-        let mut amount = esdt_transfers.len();
-        if egld_value > &0 {
-            amount += 1;
-        }
-
-        amount
-    }
-
-    fn get_expiration_round(&self, valability: u64) -> u64 {
-        let valability_rounds = valability / SECONDS_PER_ROUND;
-        self.blockchain().get_block_round() + valability_rounds
     }
 }
