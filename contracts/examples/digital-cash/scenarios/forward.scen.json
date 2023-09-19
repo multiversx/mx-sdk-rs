@@ -11,6 +11,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
+                "egldValue": "0",
                 "function": "forward",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
@@ -54,10 +55,11 @@
         },
         {
             "step": "scCall",
-            "id": "forward-ok",
+            "id": "forward-without-fees-ok",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
+                "egldValue": "0",
                 "function": "forward",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
@@ -81,7 +83,7 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "egldValue": "1,000",
+                "egldValue": "500",
                 "function": "depositFees",
                 "arguments": [
                     "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee"
@@ -100,11 +102,37 @@
         },
         {
             "step": "scCall",
-            "id": "forward-ok",
+            "id": "forward-with-fees-fail",
+            "tx": {
+                "from": "address:acc1",
+                "to": "sc:the_digital_cash_contract",
+                "function": "forward",
+                "egldValue": "500",
+                "arguments": [
+                    "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
+                    "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee",
+                    "0x1ac4f6d4d45836d97ffeda83a66aaea7631a3bb3d4063421ccb2b9de9485bdb4c9bd6e44e003f6a9c9eb74379467238204ff579471d203b1878c3f1530592a02"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "invalid depositor address",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "forward-with-fees-ok",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
                 "function": "forward",
+                "egldValue": "500",
                 "arguments": [
                     "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
                     "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee",
@@ -174,7 +202,7 @@
                     "code": "file:../output/digital-cash.wasm"
                 },
                 "address:acc1": {
-                    "nonce": "3",
+                    "nonce": "4",
                     "balance": "998,990",
                     "storage": {}
                 },
