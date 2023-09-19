@@ -227,7 +227,7 @@
                 "address:digital_cash_owner_address": {
                     "nonce": "1",
                     "balance": "0",
-                    "storage": "*"
+                    "storage": {}
                 }
             }
         }
