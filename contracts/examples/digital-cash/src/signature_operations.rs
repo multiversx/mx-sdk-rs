@@ -80,51 +80,55 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
     }
 
     #[endpoint]
+    #[payable("*")]
     fn forward(
         &self,
         address: ManagedAddress,
         forward_address: ManagedAddress,
         signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
-        let deposit_mapper = self.deposit(&forward_address);
-        require!(!deposit_mapper.is_empty(), CANNOT_DEPOSIT_FUNDS_ERR_MSG);
-
+        let fee = self.call_value().egld_or_single_esdt();
         let caller_address = self.blockchain().get_caller();
-        let fee = self.fee().get();
         self.require_signature(&address, &caller_address, signature);
+        self.update_fees(caller_address, &address, fee);
 
-        let mut forwarded_deposit = self.deposit(&address).take();
-        let num_tokens = forwarded_deposit.get_num_tokens();
-        deposit_mapper.update(|deposit| {
+        let new_deposit = self.deposit(&forward_address);
+        let fee = self.fee().get();
+
+        let mut current_deposit = self.deposit(&address).take();
+        let num_tokens = current_deposit.get_num_tokens();
+        new_deposit.update(|fwd_deposit| {
             require!(
-                deposit.egld_funds == BigUint::zero() && deposit.esdt_funds.is_empty(),
+                fwd_deposit.egld_funds == BigUint::zero() && fwd_deposit.esdt_funds.is_empty(),
                 "key already used"
             );
             require!(
-                &fee * num_tokens as u64 <= deposit.fees.value,
+                &fee * num_tokens as u64 <= fwd_deposit.fees.value,
                 "cannot forward funds without the owner covering the fee cost first"
             );
 
-            deposit.fees.num_token_to_transfer += num_tokens;
-            deposit.valability = forwarded_deposit.valability;
-            deposit.expiration_round = self.get_expiration_round(forwarded_deposit.valability);
-            deposit.esdt_funds = forwarded_deposit.esdt_funds;
-            deposit.egld_funds = forwarded_deposit.egld_funds;
+            fwd_deposit.fees.num_token_to_transfer += num_tokens;
+            fwd_deposit.valability = current_deposit.valability;
+            fwd_deposit.expiration_round = self.get_expiration_round(current_deposit.valability);
+            fwd_deposit.esdt_funds = current_deposit.esdt_funds;
+            fwd_deposit.egld_funds = current_deposit.egld_funds;
         });
 
         let forward_fee = &fee * num_tokens as u64;
-        forwarded_deposit.fees.value -= &forward_fee;
+        current_deposit.fees.value -= &forward_fee;
 
         self.collected_fees()
             .update(|collected_fees| *collected_fees += forward_fee);
 
-        if forwarded_deposit.fees.value > 0 {
+        if current_deposit.fees.value > 0 {
             self.send_fee_to_address(
-                &forwarded_deposit.fees.value,
-                &forwarded_deposit.depositor_address,
+                &current_deposit.fees.value,
+                &current_deposit.depositor_address,
             );
         }
     }
+
+    fn make_forward(&self) {}
 
     fn require_signature(
         &self,

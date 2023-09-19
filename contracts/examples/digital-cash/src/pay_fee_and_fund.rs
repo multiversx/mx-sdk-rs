@@ -10,7 +10,8 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     fn pay_fee_and_fund(&self, address: ManagedAddress, valability: u64) {
         let mut payments = self.call_value().all_esdt_transfers().clone_value();
         let fee = EgldOrEsdtTokenPayment::from(payments.get(0));
-        self.update_fees(&address, fee);
+        let caller_address = self.blockchain().get_caller();
+        self.update_fees(caller_address, &address, fee);
 
         payments.remove(0);
 
@@ -36,6 +37,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[payable("EGLD")]
     fn deposit_fees(&self, address: &ManagedAddress) {
         let payment = self.call_value().egld_or_single_esdt();
-        self.update_fees(address, payment);
+        let caller_address = self.blockchain().get_caller();
+        self.update_fees(caller_address, address, payment);
     }
 }

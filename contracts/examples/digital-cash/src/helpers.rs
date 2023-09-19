@@ -71,12 +71,23 @@ pub trait HelpersModule: storage::StorageModule {
         });
     }
 
-    fn update_fees(&self, address: &ManagedAddress, payment: EgldOrEsdtTokenPayment) {
+    fn update_fees(
+        &self,
+        caller_address: ManagedAddress,
+        address: &ManagedAddress,
+        payment: EgldOrEsdtTokenPayment,
+    ) {
         self.check_token_is_accepted_as_fee(&payment.token_identifier);
-        let caller_address = self.blockchain().get_caller();
         let deposit_mapper = self.deposit(address);
         if !deposit_mapper.is_empty() {
-            deposit_mapper.update(|deposit| deposit.fees.value += payment.amount);
+            deposit_mapper.update(|deposit| {
+                require!(
+                    deposit.depositor_address,
+                    caller_address,
+                    "invalid depositor address"
+                );
+                deposit.fees.value += payment.amount;
+            });
             return;
         }
 
