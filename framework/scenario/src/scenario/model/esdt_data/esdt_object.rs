@@ -52,7 +52,8 @@ impl EsdtObject {
         }
     }
 
-    pub fn ovidiu<N, V, T>(
+    #[allow(clippy::too_many_arguments)]
+    pub fn set_token_all_properties<N, V, T>(
         &mut self,
         nonce_expr: N,
         balance_expr: V,

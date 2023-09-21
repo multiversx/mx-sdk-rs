@@ -84,6 +84,7 @@ impl Account {
         self
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_all_properties<K, N, V, T>(
         mut self,
         token_id_expr: K,
@@ -107,7 +108,7 @@ impl Account {
             .get_esdt_data_or_create(&token_id)
             .get_mut_esdt_object();
 
-        esdt_obj_ref.ovidiu(
+        esdt_obj_ref.set_token_all_properties(
             nonce_expr,
             balance_expr,
             opt_attributes_expr,
