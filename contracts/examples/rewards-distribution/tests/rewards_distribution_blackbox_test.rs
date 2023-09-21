@@ -7,16 +7,16 @@ use multiversx_sc::{
     codec::multi_types::MultiValue2,
     storage::mappers::SingleValue,
     types::{
-        Address, BigUint, EgldOrEsdtTokenIdentifier, ManagedVec, MultiValueEncoded, TokenIdentifier,
+        Address, BigUint, EgldOrEsdtTokenIdentifier, ManagedVec, MultiValueEncoded,
+        OperationCompletionStatus, TokenIdentifier,
     },
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
-        SetStateStep, TypedResponse,
+        SetStateStep, TxESDT, TypedResponse,
     },
-    testing_framework::TxTokenTransfer,
     ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
 };
 
@@ -197,20 +197,25 @@ fn test_compute_brackets() {
 fn test_raffle_and_claim() {
     let mut state = RewardsDistributionTestState::new();
 
+    let nft_nonces: [u64; 6] = [1, 2, 3, 4, 5, 6];
+    let nft_payments: Vec<TxESDT> = nft_nonces
+        .iter()
+        .map(|nonce| TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: (*nonce).into(),
+            esdt_value: 1u64.into(),
+        })
+        .collect();
+
+    let mut alice_account = Account::new().nonce(1).balance("2_070_000_000");
+    for nonce in nft_nonces.iter() {
+        alice_account =
+            alice_account.esdt_nft_balance(NFT_TOKEN_ID_EXPR, *nonce, "1", Option::<&[u8]>::None);
+    }
+
     state.world.set_state_step(
         SetStateStep::new()
-            .put_account(
-                ALICE_ADDRESS_EXPR,
-                Account::new()
-                    .nonce(1)
-                    .balance("2_070_000_000")
-                    .esdt_nft_balance(NFT_TOKEN_ID_EXPR, 1, "1", Option::<&[u8]>::None)
-                    .esdt_nft_balance(NFT_TOKEN_ID_EXPR, 2, "1", Option::<&[u8]>::None)
-                    .esdt_nft_balance(NFT_TOKEN_ID_EXPR, 3, "1", Option::<&[u8]>::None)
-                    .esdt_nft_balance(NFT_TOKEN_ID_EXPR, 4, "1", Option::<&[u8]>::None)
-                    .esdt_nft_balance(NFT_TOKEN_ID_EXPR, 5, "1", Option::<&[u8]>::None)
-                    .esdt_nft_balance(NFT_TOKEN_ID_EXPR, 6, "1", Option::<&[u8]>::None),
-            )
+            .put_account(ALICE_ADDRESS_EXPR, alice_account)
             .new_address(OWNER_ADDRESS_EXPR, 1, SEED_NFT_MINTER_ADDRESS_EXPR)
             .new_address(OWNER_ADDRESS_EXPR, 3, REWARDS_DISTRIBUTION_ADDRESS_EXPR),
     );
@@ -228,11 +233,12 @@ fn test_raffle_and_claim() {
     );
 
     // run the raffle
-    // OperationCompletionStatus encoding / decoding ???? to use result
     state.world.sc_call(
         ScCallStep::new()
             .from(ALICE_ADDRESS_EXPR)
-            .call(state.rewards_distribution_contract.raffle()),
+            .tx_hash(&[0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
+            .call(state.rewards_distribution_contract.raffle())
+            .expect_value(OperationCompletionStatus::Completed),
     );
 
     let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
@@ -279,19 +285,7 @@ fn test_raffle_and_claim() {
         );
     }
 
-    let nft_nonces: [u64; 6] = [1, 2, 3, 4, 5, 6];
-    // claim the rewards
-    // TODO: change after multi_esdt_transfer implementation
-    let _nft_payments: Vec<TxTokenTransfer> = nft_nonces
-        .iter()
-        .map(|nonce| TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: *nonce,
-            value: 1u64.into(),
-        })
-        .collect();
-
-    let expected_rewards: [u64; 6] = [289_800, 114_999, 114_999, 289_800, 114_999, 114_999];
+    let expected_rewards = [114_999, 114_999, 114_999, 828_000, 114_999, 114_999];
 
     for (nonce, expected_reward) in std::iter::zip(nft_nonces, expected_rewards) {
         state.world.sc_call_use_result(
@@ -320,12 +314,7 @@ fn test_raffle_and_claim() {
     state.world.sc_call(
         ScCallStep::new()
             .from(ALICE_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 1, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 2, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 3, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 4, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 5, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 6, "1")
+            .multi_esdt_transfer(nft_payments.clone())
             .call(
                 state
                     .rewards_distribution_contract
@@ -367,12 +356,7 @@ fn test_raffle_and_claim() {
     state.world.sc_call(
         ScCallStep::new()
             .from(ALICE_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 1, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 2, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 3, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 4, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 5, "1")
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, 6, "1")
+            .multi_esdt_transfer(nft_payments.clone())
             .call(
                 state
                     .rewards_distribution_contract
