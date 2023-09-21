@@ -11,9 +11,8 @@ use multiversx_sc_modules::token_merge::{
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_token_id, rust_biguint,
     scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep,
+        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TxESDT,
     },
-    testing_framework::TxTokenTransfer,
     ScenarioWorld, WhiteboxContract,
 };
 use use_module::token_merge_mod_impl::{CustomAttributes, TokenMergeModImpl};
@@ -120,26 +119,24 @@ fn test_token_merge() {
     );
 
     // merge two NFTs
-    let _nft_transfers = vec![
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: FIRST_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+    let nft_transfers = vec![
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: FIRST_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: SECOND_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: SECOND_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
     ];
 
-    // TODO: change after multi_esdt_transfer implementation
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
+            .multi_esdt_transfer(nft_transfers.clone()),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -252,26 +249,24 @@ fn test_token_merge() {
     ));
 
     // merge the NFT with fungible
-    let _esdt_transfers = vec![
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: FIRST_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+    let esdt_transfers = vec![
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: FIRST_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
-        TxTokenTransfer {
-            token_identifier: FUNGIBLE_TOKEN_ID.to_vec(),
-            nonce: 0,
-            value: rust_biguint!(FUNGIBLE_AMOUNT),
+        TxESDT {
+            esdt_token_identifier: FUNGIBLE_TOKEN_ID.into(),
+            nonce: 0u64.into(),
+            esdt_value: FUNGIBLE_AMOUNT.into(),
         },
     ];
 
-    // TODO: change after multi_esdt_transfer implementation
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT)
-            .esdt_transfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT),
+            .multi_esdt_transfer(esdt_transfers.clone()),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -319,26 +314,24 @@ fn test_token_merge() {
     ));
 
     // merge NFT with an already merged token
-    let _combined_transfers = vec![
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: SECOND_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+    let combined_transfers = vec![
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: SECOND_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
-        TxTokenTransfer {
-            token_identifier: MERGED_TOKEN_ID.to_vec(),
-            nonce: 2,
-            value: rust_biguint!(NFT_AMOUNT),
+        TxESDT {
+            esdt_token_identifier: MERGED_TOKEN_ID.into(),
+            nonce: 2u64.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
     ];
 
-    // TODO: change after multi_esdt_transfer implementation
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT)
-            .esdt_transfer(MERGED_TOKEN_ID_EXPR, 2, NFT_AMOUNT),
+            .multi_esdt_transfer(combined_transfers.clone()),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -514,32 +507,29 @@ fn test_partial_split() {
     );
 
     // merge 2 NFTs and a fungible token
-    let _esdt_transfers = vec![
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: FIRST_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+    let esdt_transfers = vec![
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: FIRST_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: SECOND_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: SECOND_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
-        TxTokenTransfer {
-            token_identifier: FUNGIBLE_TOKEN_ID.to_vec(),
-            nonce: 0,
-            value: rust_biguint!(FUNGIBLE_AMOUNT),
+        TxESDT {
+            esdt_token_identifier: FUNGIBLE_TOKEN_ID.into(),
+            nonce: 064.into(),
+            esdt_value: FUNGIBLE_AMOUNT.into(),
         },
     ];
 
-    // TODO: change after multi_esdt_transfer implementation
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT)
-            .esdt_transfer(FUNGIBLE_TOKEN_ID_EXPR, 0, FUNGIBLE_AMOUNT),
+            .multi_esdt_transfer(esdt_transfers.clone()),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -735,16 +725,16 @@ fn test_custom_attributes() {
     );
 
     // merge two NFTs
-    let _nft_transfers = vec![
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: FIRST_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+    let nft_transfers = vec![
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: FIRST_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
-        TxTokenTransfer {
-            token_identifier: NFT_TOKEN_ID.to_vec(),
-            nonce: SECOND_NFT_NONCE,
-            value: rust_biguint!(NFT_AMOUNT),
+        TxESDT {
+            esdt_token_identifier: NFT_TOKEN_ID.into(),
+            nonce: SECOND_NFT_NONCE.into(),
+            esdt_value: NFT_AMOUNT.into(),
         },
     ];
 
@@ -753,13 +743,11 @@ fn test_custom_attributes() {
         second: 10u64,
     };
 
-    // TODO: change after multi_esdt_transfer implementation
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, FIRST_NFT_NONCE, NFT_AMOUNT)
-            .esdt_transfer(NFT_TOKEN_ID_EXPR, SECOND_NFT_NONCE, NFT_AMOUNT),
+            .multi_esdt_transfer(nft_transfers.clone()),
         |sc| {
             let merged_token = sc.merge_tokens_custom_attributes_endpoint();
             assert_eq!(
