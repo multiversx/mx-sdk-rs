@@ -90,8 +90,27 @@ impl ScCallStep {
         self
     }
 
+    pub fn multi_esdt_transfer<T>(mut self, tokens: T) -> Self
+    where T: IntoIterator<Item = TxESDT> {
+        if self.tx.egld_value.value > 0u32.into() {
+            panic!("Cannot transfer both EGLD and ESDT");
+        }
+
+        self.tx.esdt_value.extend(tokens);
+
+        self
+    }
+
     pub fn function(mut self, expr: &str) -> Self {
         self.tx.function = expr.to_string();
+        self
+    }
+
+    pub fn tx_hash<T>(mut self, tx_hash_expr: T) -> Self
+    where
+        H256: From<T>,
+    {
+        self.explicit_tx_hash = Some(tx_hash_expr.into());
         self
     }
 
