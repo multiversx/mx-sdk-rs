@@ -520,7 +520,7 @@ fn test_partial_split() {
         },
         TxESDT {
             esdt_token_identifier: FUNGIBLE_TOKEN_ID.into(),
-            nonce: 064.into(),
+            nonce: 0u64.into(),
             esdt_value: FUNGIBLE_AMOUNT.into(),
         },
     ];
