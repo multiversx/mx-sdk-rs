@@ -4,7 +4,7 @@ use multiversx_sc_modules::governance::{
     GovernanceModule,
 };
 use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
+    managed_address, managed_biguint, managed_buffer, managed_token_id,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
     },
@@ -53,26 +53,26 @@ fn setup() -> ScenarioWorld {
                 OWNER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
             )
             .new_address(OWNER_ADDRESS_EXPR, 1, USE_MODULE_ADDRESS_EXPR)
             .put_account(
                 FIRST_USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
             )
             .put_account(
                 SECOND_USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
             )
             .put_account(
                 THIRD_USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(INITIAL_GOV_TOKEN_BALANCE)),
+                    .esdt_balance(GOV_TOKEN_ID_EXPR, INITIAL_GOV_TOKEN_BALANCE),
             ),
     );
 
@@ -121,7 +121,7 @@ pub fn propose(
         ScCallStep::new().from(proposer).esdt_transfer(
             GOV_TOKEN_ID,
             0,
-            &rust_biguint!(gov_token_amount),
+            gov_token_amount,
         ),
         |sc| {
             let mut args_managed = ManagedVec::new();
@@ -176,7 +176,7 @@ fn test_change_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(999))
+            .esdt_transfer(GOV_TOKEN_ID, 0, "999")
             .no_expect(),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
@@ -193,7 +193,7 @@ fn test_change_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(999)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "999"),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         },
@@ -245,7 +245,7 @@ fn test_change_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         },
@@ -257,7 +257,7 @@ fn test_change_gov_config() {
         ScCallStep::new().from(OWNER_ADDRESS_EXPR).esdt_transfer(
             GOV_TOKEN_ID,
             0,
-            rust_biguint!(200),
+            "200",
         ),
         |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
@@ -285,7 +285,7 @@ fn test_change_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200))
+            .esdt_transfer(GOV_TOKEN_ID, 0, "200")
             .no_expect(),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
@@ -300,7 +300,7 @@ fn test_change_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(THIRD_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         },
@@ -348,19 +348,19 @@ fn test_change_gov_config() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         FIRST_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(300)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "300"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         SECOND_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(1)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "1"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         THIRD_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         OWNER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
     ));
 }
 
@@ -390,7 +390,7 @@ fn test_down_veto_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(300)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "300"),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         },
@@ -402,7 +402,7 @@ fn test_down_veto_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         },
@@ -412,7 +412,7 @@ fn test_down_veto_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(THIRD_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(200)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
         |sc| {
             sc.vote(proposal_id, VoteType::DownVetoVote);
         },
@@ -434,15 +434,15 @@ fn test_down_veto_gov_config() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         FIRST_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(200)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "200"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         SECOND_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         THIRD_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "800"),
     ));
 }
 
@@ -472,7 +472,7 @@ fn test_abstain_vote_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(FIRST_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(500)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "500"),
         |sc| {
             sc.vote(proposal_id, VoteType::UpVote);
         },
@@ -484,7 +484,7 @@ fn test_abstain_vote_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(400)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "400"),
         |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
         },
@@ -494,7 +494,7 @@ fn test_abstain_vote_gov_config() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(THIRD_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(600)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "600"),
         |sc| {
             sc.vote(proposal_id, VoteType::AbstainVote);
         },
@@ -530,15 +530,15 @@ fn test_abstain_vote_gov_config() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         FIRST_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(0)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "0"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         SECOND_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(600)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "600"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         THIRD_USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, rust_biguint!(400)),
+        CheckAccount::new().esdt_balance(GOV_TOKEN_ID_EXPR, "400"),
     ));
 }
 
@@ -568,7 +568,7 @@ fn test_gov_cancel_defeated_proposal() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(SECOND_USER_ADDRESS_EXPR)
-            .esdt_transfer(GOV_TOKEN_ID, 0, rust_biguint!(999)),
+            .esdt_transfer(GOV_TOKEN_ID, 0, "999"),
         |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
         },

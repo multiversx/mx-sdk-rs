@@ -1,7 +1,7 @@
 use multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier, ManagedVec};
 use multiversx_sc_modules::staking::StakingModule;
 use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id, rust_biguint,
+    managed_address, managed_biguint, managed_token_id,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
     },
@@ -44,25 +44,25 @@ fn test_staking_module() {
                 ALICE_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(INITIAL_BALANCE)),
+                    .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
             )
             .put_account(
                 BOB_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(INITIAL_BALANCE)),
+                    .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
             )
             .put_account(
                 CAROL_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(INITIAL_BALANCE)),
+                    .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
             )
             .put_account(
                 EVE_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(INITIAL_BALANCE)),
+                    .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
             ),
     );
 
@@ -101,7 +101,7 @@ fn test_staking_module() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(EVE_ADDRESS_EXPR)
-            .esdt_transfer(STAKING_TOKEN_ID, 0, rust_biguint!(REQUIRED_STAKE_AMOUNT))
+            .esdt_transfer(STAKING_TOKEN_ID, 0, REQUIRED_STAKE_AMOUNT)
             .no_expect(),
         |sc| sc.stake(),
         |r| {
@@ -115,7 +115,7 @@ fn test_staking_module() {
         ScCallStep::new().from(ALICE_ADDRESS_EXPR).esdt_transfer(
             STAKING_TOKEN_ID,
             0,
-            rust_biguint!(REQUIRED_STAKE_AMOUNT / 2),
+            REQUIRED_STAKE_AMOUNT / 2,
         ),
         |sc| sc.stake(),
     );
@@ -135,7 +135,7 @@ fn test_staking_module() {
         ScCallStep::new().from(BOB_ADDRESS_EXPR).esdt_transfer(
             STAKING_TOKEN_ID,
             0,
-            rust_biguint!(REQUIRED_STAKE_AMOUNT),
+            REQUIRED_STAKE_AMOUNT,
         ),
         |sc| sc.stake(),
     );
@@ -145,7 +145,7 @@ fn test_staking_module() {
         ScCallStep::new().from(CAROL_ADDRESS_EXPR).esdt_transfer(
             STAKING_TOKEN_ID,
             0,
-            rust_biguint!(REQUIRED_STAKE_AMOUNT),
+            REQUIRED_STAKE_AMOUNT,
         ),
         |sc| sc.stake(),
     );
@@ -176,7 +176,7 @@ fn test_staking_module() {
         ScCallStep::new().from(ALICE_ADDRESS_EXPR).esdt_transfer(
             STAKING_TOKEN_ID,
             0,
-            rust_biguint!(REQUIRED_STAKE_AMOUNT),
+            REQUIRED_STAKE_AMOUNT,
         ),
         |sc| {
             sc.stake();
@@ -206,7 +206,7 @@ fn test_staking_module() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         ALICE_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(STAKING_TOKEN_ID_EXPR, rust_biguint!(1_000_000)),
+        CheckAccount::new().esdt_balance(STAKING_TOKEN_ID_EXPR, "1_000_000"),
     ));
 
     // alice vote to slash bob
@@ -390,7 +390,7 @@ fn test_staking_module() {
         ALICE_ADDRESS_EXPR,
         CheckAccount::new().esdt_balance(
             STAKING_TOKEN_ID_EXPR,
-            rust_biguint!(INITIAL_BALANCE - SLASH_AMOUNT),
+            INITIAL_BALANCE - SLASH_AMOUNT,
         ),
     ));
 }

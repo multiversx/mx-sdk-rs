@@ -1,7 +1,7 @@
 use forwarder::nft::{Color, ForwarderNftModule};
 use multiversx_sc::{contract_base::ContractBase, types::Address};
 use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id, rust_biguint,
+    managed_address, managed_biguint, managed_token_id,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep,
     },
@@ -88,7 +88,7 @@ fn test_nft_update_attributes_and_send() {
         &forwarder_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(NFT_TOKEN_ID, 1, rust_biguint!(1)),
+            .esdt_transfer(NFT_TOKEN_ID, 1, "1"),
         |sc| {
             sc.nft_update_attributes(managed_token_id!(NFT_TOKEN_ID), 1, new_attributes);
 

@@ -9,7 +9,7 @@ use multiversx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
 };
 use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id, rust_biguint,
+    managed_address, managed_biguint, managed_token_id,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TxESDT,
     },
@@ -71,7 +71,7 @@ fn test_token_merge() {
                 USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(FUNGIBLE_TOKEN_ID_EXPR, rust_biguint!(FUNGIBLE_AMOUNT))
+                    .esdt_balance(FUNGIBLE_TOKEN_ID_EXPR, FUNGIBLE_AMOUNT)
                     .esdt_nft_all_properties(
                         NFT_TOKEN_ID_EXPR,
                         FIRST_NFT_NONCE,
@@ -459,7 +459,7 @@ fn test_partial_split() {
                 USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(FUNGIBLE_TOKEN_ID_EXPR, rust_biguint!(FUNGIBLE_AMOUNT))
+                    .esdt_balance(FUNGIBLE_TOKEN_ID_EXPR, FUNGIBLE_AMOUNT)
                     .esdt_nft_all_properties(
                         NFT_TOKEN_ID_EXPR,
                         FIRST_NFT_NONCE,
@@ -677,7 +677,7 @@ fn test_custom_attributes() {
                 USER_ADDRESS_EXPR,
                 Account::new()
                     .nonce(1)
-                    .esdt_balance(FUNGIBLE_TOKEN_ID_EXPR, rust_biguint!(FUNGIBLE_AMOUNT))
+                    .esdt_balance(FUNGIBLE_TOKEN_ID_EXPR, FUNGIBLE_AMOUNT)
                     .esdt_nft_all_properties(
                         NFT_TOKEN_ID_EXPR,
                         FIRST_NFT_NONCE,
