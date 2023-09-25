@@ -52,6 +52,72 @@ impl EsdtObject {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
+    pub fn set_token_all_properties<N, V, T>(
+        &mut self,
+        nonce_expr: N,
+        balance_expr: V,
+        opt_attributes_expr: Option<T>,
+        royalties_expr: N,
+        creator_expr: Option<T>,
+        hash_expr: Option<T>,
+        uris_expr: Vec<T>,
+    ) where
+        U64Value: From<N>,
+        BigUintValue: From<V>,
+        BytesValue: From<T>,
+    {
+        let inst_for_nonce = self.get_or_insert_instance_for_nonce(nonce_expr);
+
+        let balance = BigUintValue::from(balance_expr);
+        if balance.value > 0u64.into() {
+            inst_for_nonce.balance = Some(balance);
+        } else {
+            inst_for_nonce.balance = None;
+        }
+
+        if let Some(attributes) = opt_attributes_expr {
+            let attributes = BytesValue::from(attributes);
+            if !attributes.value.is_empty() {
+                inst_for_nonce.attributes = Some(attributes);
+            } else {
+                inst_for_nonce.attributes = None;
+            }
+        }
+
+        let royalties = U64Value::from(royalties_expr);
+        if royalties.value > 0 {
+            inst_for_nonce.royalties = Some(royalties);
+        } else {
+            inst_for_nonce.royalties = None;
+        }
+
+        if let Some(creator_expr) = creator_expr {
+            let creator = BytesValue::from(creator_expr);
+            if !creator.value.is_empty() {
+                inst_for_nonce.creator = Some(creator);
+            } else {
+                inst_for_nonce.creator = None;
+            }
+        }
+
+        if let Some(hash) = hash_expr {
+            let hash = BytesValue::from(hash);
+            if !hash.value.is_empty() {
+                inst_for_nonce.hash = Some(hash);
+            } else {
+                inst_for_nonce.hash = None;
+            }
+        }
+
+        if !uris_expr.is_empty() {
+            inst_for_nonce.uri = uris_expr
+                .into_iter()
+                .map(|uri| BytesValue::from(uri))
+                .collect();
+        }
+    }
+
     pub fn set_last_nonce<N>(&mut self, last_nonce_expr: N)
     where
         U64Value: From<N>,

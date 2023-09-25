@@ -3,7 +3,7 @@ use multiversx_sc::types::{
 };
 use multiversx_sc_modules::transfer_role_proxy::TransferRoleProxyModule;
 use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
+    managed_address, managed_biguint, managed_buffer, managed_token_id,
     scenario_model::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
     },
@@ -95,7 +95,7 @@ fn test_transfer_role() {
         ScCallStep::new().from(USER_ADDRESS_EXPR).esdt_transfer(
             TRANSFER_TOKEN_ID,
             0,
-            rust_biguint!(100),
+            "100",
         ),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
@@ -114,11 +114,11 @@ fn test_transfer_role() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(900)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, "900"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         OWNER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(100)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, "100"),
     ));
 
     // transfer to user - err, not whitelisted
@@ -126,7 +126,7 @@ fn test_transfer_role() {
         &transfer_role_features_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .esdt_transfer(TRANSFER_TOKEN_ID, 0, rust_biguint!(100))
+            .esdt_transfer(TRANSFER_TOKEN_ID, 0, "100")
             .no_expect(),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
@@ -152,7 +152,7 @@ fn test_transfer_role() {
         ScCallStep::new().from(USER_ADDRESS_EXPR).esdt_transfer(
             TRANSFER_TOKEN_ID,
             0,
-            rust_biguint!(100),
+            "100",
         ),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
@@ -173,11 +173,11 @@ fn test_transfer_role() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, "800"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         VAULT_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(100)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, "100"),
     ));
 
     // transfer to sc - reject
@@ -186,7 +186,7 @@ fn test_transfer_role() {
         ScCallStep::new().from(USER_ADDRESS_EXPR).esdt_transfer(
             TRANSFER_TOKEN_ID,
             0,
-            rust_biguint!(100),
+            "100",
         ),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
@@ -207,11 +207,11 @@ fn test_transfer_role() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         USER_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(800)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, "800"),
     ));
     world.check_state_step(CheckStateStep::new().put_account(
         VAULT_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, &rust_biguint!(100)),
+        CheckAccount::new().esdt_balance(TRANSFER_TOKEN_ID_EXPR, "100"),
     ));
 }
 
