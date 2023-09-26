@@ -61,8 +61,10 @@ pub trait DigitalCash:
                 collected_esdt_fees.push(collected_fee);
             }
         }
-        self.send()
-            .direct_multi(&caller_address, &collected_esdt_fees);
+        if !collected_esdt_fees.is_empty() {
+            self.send()
+                .direct_multi(&caller_address, &collected_esdt_fees);
+        }
     }
 
     #[view(getAmount)]
