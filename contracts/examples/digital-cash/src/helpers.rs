@@ -7,14 +7,13 @@ use crate::{
 };
 #[multiversx_sc::module]
 pub trait HelpersModule: storage::StorageModule {
-    fn send_fee_to_address(&self, fee_amount: &BigUint, address: &ManagedAddress) {
-        let accepted_fee_token = self.fee_token().get();
-        if accepted_fee_token == EgldOrEsdtTokenIdentifier::egld() {
-            self.send().direct_egld(address, fee_amount);
+    fn send_fee_to_address(&self, fee: &EgldOrEsdtTokenPayment, address: &ManagedAddress) {
+        if fee.token_identifier == EgldOrEsdtTokenIdentifier::egld() {
+            self.send().direct_egld(address, &fee.amount);
         } else {
-            let esdt_fee_token = accepted_fee_token.unwrap_esdt();
+            let esdt_fee = fee.clone().unwrap_esdt();
             self.send()
-                .direct_esdt(address, &esdt_fee_token, 0, fee_amount);
+                .direct_esdt(address, &esdt_fee.token_identifier, 0, &esdt_fee.amount);
         }
     }
 
@@ -36,9 +35,13 @@ pub trait HelpersModule: storage::StorageModule {
         self.blockchain().get_block_round() + valability_rounds
     }
 
-    fn check_token_is_accepted_as_fee(&self, token: &EgldOrEsdtTokenIdentifier) {
-        let accepted_fee_token = self.fee_token().get();
-        require!(token == &accepted_fee_token, "Invalid fee token provided");
+    fn get_fee_for_token(&self, token: &EgldOrEsdtTokenIdentifier) -> BigUint {
+        require!(
+            self.whitelisted_fee_tokens().contains(token),
+            "invalid fee toke provided"
+        );
+        let fee_token = self.fee(token);
+        fee_token.get()
     }
 
     fn make_fund(
@@ -49,20 +52,13 @@ pub trait HelpersModule: storage::StorageModule {
         valability: u64,
     ) {
         let deposit_mapper = self.deposit(&address);
-        let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
-        require!(num_tokens > 0, "amount must be greater than 0");
 
-        let fee = self.fee().get();
         deposit_mapper.update(|deposit| {
             require!(
                 deposit.egld_funds == 0 && deposit.esdt_funds.is_empty(),
                 "key already used"
             );
-            require!(
-                fee * num_tokens as u64 <= deposit.fees.value,
-                CANNOT_DEPOSIT_FUNDS_ERR_MSG
-            );
-
+            let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
             deposit.fees.num_token_to_transfer += num_tokens;
             deposit.valability = valability;
             deposit.expiration_round = self.get_expiration_round(valability);
@@ -71,13 +67,26 @@ pub trait HelpersModule: storage::StorageModule {
         });
     }
 
+    fn check_fees_cover_number_of_tokens(
+        &self,
+        num_tokens: usize,
+        fee: BigUint,
+        paid_fee: BigUint,
+    ) {
+        require!(num_tokens > 0, "amount must be greater than 0");
+        require!(
+            fee * num_tokens as u64 <= paid_fee,
+            CANNOT_DEPOSIT_FUNDS_ERR_MSG
+        );
+    }
+
     fn update_fees(
         &self,
         caller_address: ManagedAddress,
         address: &ManagedAddress,
         payment: EgldOrEsdtTokenPayment,
     ) {
-        self.check_token_is_accepted_as_fee(&payment.token_identifier);
+        self.get_fee_for_token(&payment.token_identifier);
         let deposit_mapper = self.deposit(address);
         if !deposit_mapper.is_empty() {
             deposit_mapper.update(|deposit| {
@@ -85,7 +94,11 @@ pub trait HelpersModule: storage::StorageModule {
                     deposit.depositor_address == caller_address,
                     "invalid depositor address"
                 );
-                deposit.fees.value += payment.amount;
+                require!(
+                    deposit.fees.value.token_identifier == payment.token_identifier,
+                    "can only have 1 type of token as fee"
+                );
+                deposit.fees.value.amount += payment.amount;
             });
             return;
         }
@@ -98,7 +111,7 @@ pub trait HelpersModule: storage::StorageModule {
             expiration_round: 0,
             fees: Fee {
                 num_token_to_transfer: 0,
-                value: payment.amount,
+                value: payment,
             },
         };
         deposit_mapper.set(new_deposit);

@@ -7,7 +7,7 @@
         },
         {
             "step": "scCall",
-            "id": "withdraw-esdt-1",
+            "id": "withdraw-egld-fail-1",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -48,7 +48,11 @@
                             "4-expiration_round": "u64:10",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:1",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
@@ -59,7 +63,11 @@
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:1",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
                         "str:deposit|0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d": {
@@ -70,11 +78,20 @@
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:3",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
-                        "str:fee": "10",
-                        "str:feeToken": "str:EGLD"
+                        "str:fee|nested:str:EGLD": "10",
+                        "str:whitelistedFeeTokens|str:.len": "1",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:allTimeFeeTokens|str:.len": "1",
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },
@@ -110,7 +127,7 @@
         },
         {
             "step": "scCall",
-            "id": "withdraw-egld-2",
+            "id": "withdraw-egld-fail-2",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -142,7 +159,7 @@
         },
         {
             "step": "scCall",
-            "id": "withdraw-egld-3",
+            "id": "withdraw-egld-success",
             "tx": {
                 "from": "address:acc1",
                 "to": "sc:the_digital_cash_contract",
@@ -183,7 +200,11 @@
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:1",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
                         "str:deposit|0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d": {
@@ -194,11 +215,20 @@
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:3",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
-                        "str:fee": "10",
-                        "str:feeToken": "str:EGLD"
+                        "str:fee|nested:str:EGLD": "10",
+                        "str:whitelistedFeeTokens|str:.len": "1",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:allTimeFeeTokens|str:.len": "1",
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
                     },
                     "code": "file:../output/digital-cash.wasm"
                 },

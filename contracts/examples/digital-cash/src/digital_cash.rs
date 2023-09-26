@@ -22,19 +22,47 @@ pub trait DigitalCash:
 {
     #[init]
     fn init(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
-        self.fee().set(fee);
-        self.fee_token().set(token);
+        self.fee(&token).set(fee);
+        self.whitelisted_fee_tokens().insert(token.clone());
+        self.all_time_fee_tokens().insert(token);
     }
+
+    #[endpoint(whitelistFeeToken)]
+    #[only_owner]
+    fn whitelist_fee_token(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
+        self.fee(&token).set(fee);
+        self.whitelisted_fee_tokens().insert(token.clone());
+        self.all_time_fee_tokens().insert(token);
+    }
+
+    #[endpoint(blacklistFeeToken)]
+    #[only_owner]
+    fn blacklist_fee_token(&self, token: EgldOrEsdtTokenIdentifier) {
+        self.fee(&token).clear();
+        self.whitelisted_fee_tokens().swap_remove(&token);
+    }
+
     #[endpoint(claimFees)]
     #[only_owner]
     fn claim_fees(&self) {
-        let fees = self.collected_fees().take();
-        if fees == 0 {
-            return;
-        }
-
+        let fee_tokens_mapper = self.all_time_fee_tokens();
+        let fee_tokens = fee_tokens_mapper.iter();
         let caller_address = self.blockchain().get_caller();
-        self.send_fee_to_address(&fees, &caller_address);
+        let mut collected_esdt_fees = ManagedVec::new();
+        for token in fee_tokens {
+            let fee = self.collected_fees(&token).take();
+            if fee == 0 {
+                continue;
+            }
+            if token == EgldOrEsdtTokenIdentifier::egld() {
+                self.send().direct_egld(&caller_address, &fee);
+            } else {
+                let collected_fee = EsdtTokenPayment::new(token.unwrap_esdt(), 0, fee);
+                collected_esdt_fees.push(collected_fee);
+            }
+        }
+        self.send()
+            .direct_multi(&caller_address, &collected_esdt_fees);
     }
 
     #[view(getAmount)]

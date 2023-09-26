@@ -21,7 +21,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[payable("EGLD")]
     fn pay_fee_and_fund_egld(&self, address: ManagedAddress, valability: u64) {
         let mut fund = self.call_value().egld_value().clone_value();
-        let fee_value = self.fee().get();
+        let fee_value = self.fee(&EgldOrEsdtTokenIdentifier::egld()).get();
         require!(fund > fee_value, "payment not covering fees");
 
         fund -= fee_value.clone();
@@ -35,16 +35,22 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
     #[endpoint]
     #[payable("*")]
     fn fund(&self, address: ManagedAddress, valability: u64) {
-        let deposit_mapper = self.deposit(&address);
-        require!(!deposit_mapper.is_empty(), FEES_NOT_COVERED_ERR_MSG);
-        let depositor = deposit_mapper.get().depositor_address;
+        require!(!self.deposit(&address).is_empty(), FEES_NOT_COVERED_ERR_MSG);
+        let deposit_mapper = self.deposit(&address).get();
+        let depositor = deposit_mapper.depositor_address;
         require!(
             self.blockchain().get_caller() == depositor,
             "invalid depositor"
         );
+        let deposited_fee_token = deposit_mapper.fees.value;
+        let fee_amount = self.fee(&deposited_fee_token.token_identifier).get();
         let egld_payment = self.call_value().egld_value().clone_value();
         let esdt_payment = self.call_value().all_esdt_transfers().clone_value();
-        self.make_fund(egld_payment, esdt_payment, address, valability)
+
+        let num_tokens = self.get_num_token_transfers(&egld_payment, &esdt_payment);
+        self.check_fees_cover_number_of_tokens(num_tokens, fee_amount, deposited_fee_token.amount);
+
+        self.make_fund(egld_payment, esdt_payment, address, valability);
     }
 
     #[endpoint(depositFees)]
