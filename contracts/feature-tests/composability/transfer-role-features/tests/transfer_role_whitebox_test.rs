@@ -92,11 +92,9 @@ fn test_transfer_role() {
     // transfer to user - ok
     world.whitebox_call(
         &transfer_role_features_whitebox,
-        ScCallStep::new().from(USER_ADDRESS_EXPR).esdt_transfer(
-            TRANSFER_TOKEN_ID,
-            0,
-            "100",
-        ),
+        ScCallStep::new()
+            .from(USER_ADDRESS_EXPR)
+            .esdt_transfer(TRANSFER_TOKEN_ID, 0, "100"),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID),
@@ -149,11 +147,9 @@ fn test_transfer_role() {
     // transfer to sc - ok
     world.whitebox_call(
         &transfer_role_features_whitebox,
-        ScCallStep::new().from(USER_ADDRESS_EXPR).esdt_transfer(
-            TRANSFER_TOKEN_ID,
-            0,
-            "100",
-        ),
+        ScCallStep::new()
+            .from(USER_ADDRESS_EXPR)
+            .esdt_transfer(TRANSFER_TOKEN_ID, 0, "100"),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID),
@@ -183,11 +179,9 @@ fn test_transfer_role() {
     // transfer to sc - reject
     world.whitebox_call(
         &transfer_role_features_whitebox,
-        ScCallStep::new().from(USER_ADDRESS_EXPR).esdt_transfer(
-            TRANSFER_TOKEN_ID,
-            0,
-            "100",
-        ),
+        ScCallStep::new()
+            .from(USER_ADDRESS_EXPR)
+            .esdt_transfer(TRANSFER_TOKEN_ID, 0, "100"),
         |sc| {
             let payments = ManagedVec::from_single_item(EsdtTokenPayment::new(
                 managed_token_id!(TRANSFER_TOKEN_ID),

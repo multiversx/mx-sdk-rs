@@ -91,7 +91,9 @@ impl ScCallStep {
     }
 
     pub fn multi_esdt_transfer<T>(mut self, tokens: T) -> Self
-    where T: IntoIterator<Item = TxESDT> {
+    where
+        T: IntoIterator<Item = TxESDT>,
+    {
         if self.tx.egld_value.value > 0u32.into() {
             panic!("Cannot transfer both EGLD and ESDT");
         }
