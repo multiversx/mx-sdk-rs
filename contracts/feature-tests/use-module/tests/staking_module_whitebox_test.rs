@@ -388,10 +388,7 @@ fn test_staking_module() {
 
     world.check_state_step(CheckStateStep::new().put_account(
         ALICE_ADDRESS_EXPR,
-        CheckAccount::new().esdt_balance(
-            STAKING_TOKEN_ID_EXPR,
-            INITIAL_BALANCE - SLASH_AMOUNT,
-        ),
+        CheckAccount::new().esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE - SLASH_AMOUNT),
     ));
 }
 

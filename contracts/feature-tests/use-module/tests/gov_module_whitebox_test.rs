@@ -118,11 +118,9 @@ pub fn propose(
 
     world.whitebox_call(
         &use_module_whitebox,
-        ScCallStep::new().from(proposer).esdt_transfer(
-            GOV_TOKEN_ID,
-            0,
-            gov_token_amount,
-        ),
+        ScCallStep::new()
+            .from(proposer)
+            .esdt_transfer(GOV_TOKEN_ID, 0, gov_token_amount),
         |sc| {
             let mut args_managed = ManagedVec::new();
             for arg in args {
@@ -254,11 +252,9 @@ fn test_change_gov_config() {
     // owner downvote
     world.whitebox_call(
         &use_module_whitebox,
-        ScCallStep::new().from(OWNER_ADDRESS_EXPR).esdt_transfer(
-            GOV_TOKEN_ID,
-            0,
-            "200",
-        ),
+        ScCallStep::new()
+            .from(OWNER_ADDRESS_EXPR)
+            .esdt_transfer(GOV_TOKEN_ID, 0, "200"),
         |sc| {
             sc.vote(proposal_id, VoteType::DownVote);
         },

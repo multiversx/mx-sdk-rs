@@ -136,22 +136,20 @@ impl TxResponse {
 
     fn process_out_from_log(&self) -> Option<Vec<Vec<u8>>> {
         if let Some(logs) = &self.api_logs {
-            logs.events
-                .iter()
-                .rev()
-                .find_map(|event| {
-                    if event.identifier == "writeLog" {
-                        if let Some(data) = &event.data {
-                            let decoded_data = String::from_utf8(base64::decode(data).unwrap()).unwrap();
-                            if decoded_data.starts_with('@') {
-                                let out = decode_scr_data_or_panic(decoded_data.as_str());
-                                return Some(out)
-                            }
+            logs.events.iter().rev().find_map(|event| {
+                if event.identifier == "writeLog" {
+                    if let Some(data) = &event.data {
+                        let decoded_data =
+                            String::from_utf8(base64::decode(data).unwrap()).unwrap();
+                        if decoded_data.starts_with('@') {
+                            let out = decode_scr_data_or_panic(decoded_data.as_str());
+                            return Some(out);
                         }
                     }
+                }
 
-                    None
-                })
+                None
+            })
         } else {
             None
         }
@@ -207,8 +205,8 @@ impl TxResponse {
 
 #[cfg(test)]
 mod tests {
-    use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
     use crate::scenario_model::TxResponse;
+    use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
     #[test]
     fn test_with_tx_that_has_sc_result() {
@@ -455,12 +453,17 @@ mod tests {
             }
         "#;
 
-        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data).unwrap().data.unwrap().transaction;
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Vec<Vec<u8>> = vec![
-            hex::decode("0000000c5745474c442d64376336626200000000000000000000000803856446ff9a304b").unwrap(),
-            hex::decode("10").unwrap()
+            hex::decode("0000000c5745474c442d64376336626200000000000000000000000803856446ff9a304b")
+                .unwrap(),
+            hex::decode("10").unwrap(),
         ];
 
         assert_eq!(tx_response.out, expected)
@@ -538,12 +541,16 @@ mod tests {
             }
         "#;
 
-        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data).unwrap().data.unwrap().transaction;
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Vec<Vec<u8>> = vec![
             hex::decode("0a").unwrap(),
-            hex::decode("0218711a00").unwrap()
+            hex::decode("0218711a00").unwrap(),
         ];
 
         assert_eq!(tx_response.out, expected)
@@ -622,12 +629,16 @@ mod tests {
             }
         "#;
 
-        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data).unwrap().data.unwrap().transaction;
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Vec<Vec<u8>> = vec![
             hex::decode("0a").unwrap(),
-            hex::decode("0218711a00").unwrap()
+            hex::decode("0218711a00").unwrap(),
         ];
 
         assert_eq!(tx_response.out, expected)
@@ -750,7 +761,11 @@ mod tests {
             }
         "#;
 
-        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data).unwrap().data.unwrap().transaction;
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Vec<Vec<u8>> = vec![];
@@ -875,7 +890,11 @@ mod tests {
             }
         "#;
 
-        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data).unwrap().data.unwrap().transaction;
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Vec<Vec<u8>> = vec![];
@@ -1000,7 +1019,11 @@ mod tests {
             }
         "#;
 
-        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data).unwrap().data.unwrap().transaction;
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Vec<Vec<u8>> = vec![];
