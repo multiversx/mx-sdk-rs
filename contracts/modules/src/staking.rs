@@ -8,6 +8,8 @@ pub struct TokenAmountPair<M: ManagedTypeApi> {
 }
 
 static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";
+static MINIMUM_BOARD_MEMBERS: usize = 3;
+static MAXIMUM_BOARD_MEMBERS: usize = 100;
 
 #[multiversx_sc::module]
 pub trait StakingModule {
@@ -19,11 +21,23 @@ pub trait StakingModule {
         slash_quorum: usize,
         user_whitelist: &ManagedVec<ManagedAddress>,
     ) {
-        let nr_board_members = user_whitelist.len();
+        for user in user_whitelist {
+            let _ = self.user_whitelist().insert(user);
+        }
+
+        let nr_board_members = self.user_whitelist().len();
         require!(nr_board_members > 0, "No board members");
         require!(
-            slash_quorum <= nr_board_members,
+            nr_board_members <= MAXIMUM_BOARD_MEMBERS,
+            "Too many board members"
+        );
+        require!(
+            slash_quorum < nr_board_members,
             "Quorum higher than total possible board members"
+        );
+        require!(
+            slash_quorum >= 3,
+            "Quorum requires at least 3 board members"
         );
         require!(
             staking_amount > &0 && slash_amount > &0,
@@ -38,10 +52,6 @@ pub trait StakingModule {
         self.required_stake_amount().set(staking_amount);
         self.slash_amount().set(slash_amount);
         self.slash_quorum().set(slash_quorum);
-
-        for user in user_whitelist {
-            let _ = self.user_whitelist().insert(user);
-        }
     }
 
     #[payable("*")]
@@ -102,10 +112,29 @@ pub trait StakingModule {
             .insert(caller);
     }
 
+    #[endpoint(cancelVoteSlashMember)]
+    fn cancel_vote_slash_member(&self, member_to_slash: ManagedAddress) {
+        require!(
+            self.is_staked_board_member(&member_to_slash),
+            "Voted user is not a staked board member"
+        );
+
+        let caller = self.blockchain().get_caller();
+        require!(
+            self.is_staked_board_member(&caller),
+            NOT_ENOUGH_STAKE_ERR_MSG
+        );
+
+        let _ = self
+            .slashing_proposal_voters(&member_to_slash)
+            .swap_remove(&caller);
+    }
+
     #[endpoint(slashMember)]
     fn slash_member(&self, member_to_slash: ManagedAddress) {
         let quorum = self.slash_quorum().get();
         let mut slashing_voters_mapper = self.slashing_proposal_voters(&member_to_slash);
+        require!(quorum >= MINIMUM_BOARD_MEMBERS, "Not enough board members");
         require!(slashing_voters_mapper.len() >= quorum, "Quorum not reached");
 
         let slash_amount = self.slash_amount().get();
@@ -136,8 +165,9 @@ pub trait StakingModule {
         let slash_quorum = self.slash_quorum().get();
         require!(
             nr_board_members > slash_quorum,
-            "remaining number of board members cannot be smaller than the slash quorul"
+            "remaining number of board members must be greater than the slash quorum"
         );
+
         let was_whitelisted = whitelist_mapper.swap_remove(user);
         if !was_whitelisted {
             return;
