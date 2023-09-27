@@ -13,13 +13,15 @@ const STAKING_TOKEN_ID: &[u8] = b"STAKE-123456";
 const INITIAL_BALANCE: u64 = 2_000_000;
 const REQUIRED_STAKE_AMOUNT: u64 = 1_000_000;
 const SLASH_AMOUNT: u64 = 600_000;
-const QUORUM: usize = 2;
+const QUORUM: usize = 3;
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const ALICE_ADDRESS_EXPR: &str = "address:alice";
 const BOB_ADDRESS_EXPR: &str = "address:bob";
 const CAROL_ADDRESS_EXPR: &str = "address:carol";
 const EVE_ADDRESS_EXPR: &str = "address:eve";
+const PAUL_ADDRESS_EXPR: &str = "address:paul";
+const SALLY_ADDRESS_EXPR: &str = "address:sally";
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
 const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
@@ -63,6 +65,18 @@ fn test_staking_module() {
                 Account::new()
                     .nonce(1)
                     .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
+            )
+            .put_account(
+                PAUL_ADDRESS_EXPR,
+                Account::new()
+                    .nonce(1)
+                    .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
+            )
+            .put_account(
+                SALLY_ADDRESS_EXPR,
+                Account::new()
+                    .nonce(1)
+                    .esdt_balance(STAKING_TOKEN_ID_EXPR, INITIAL_BALANCE),
             ),
     );
 
@@ -84,6 +98,12 @@ fn test_staking_module() {
             whitelist.push(managed_address!(&address_expr_to_address(BOB_ADDRESS_EXPR)));
             whitelist.push(managed_address!(&address_expr_to_address(
                 CAROL_ADDRESS_EXPR
+            )));
+            whitelist.push(managed_address!(&address_expr_to_address(
+                PAUL_ADDRESS_EXPR
+            )));
+            whitelist.push(managed_address!(&address_expr_to_address(
+                SALLY_ADDRESS_EXPR
             )));
 
             sc.init_staking_module(
@@ -143,6 +163,26 @@ fn test_staking_module() {
     world.whitebox_call(
         &use_module_whitebox,
         ScCallStep::new().from(CAROL_ADDRESS_EXPR).esdt_transfer(
+            STAKING_TOKEN_ID,
+            0,
+            REQUIRED_STAKE_AMOUNT,
+        ),
+        |sc| sc.stake(),
+    );
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(PAUL_ADDRESS_EXPR).esdt_transfer(
+            STAKING_TOKEN_ID,
+            0,
+            REQUIRED_STAKE_AMOUNT,
+        ),
+        |sc| sc.stake(),
+    );
+
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(SALLY_ADDRESS_EXPR).esdt_transfer(
             STAKING_TOKEN_ID,
             0,
             REQUIRED_STAKE_AMOUNT,
@@ -258,6 +298,39 @@ fn test_staking_module() {
         },
     );
 
+    // paul vote to slash alice
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(PAUL_ADDRESS_EXPR),
+        |sc| {
+            sc.vote_slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+        },
+    );
+
+    // sally vote to slash alice
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(SALLY_ADDRESS_EXPR),
+        |sc| {
+            sc.vote_slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+        },
+    );
+
+    // sally cancels vote to slash alice
+    world.whitebox_call(
+        &use_module_whitebox,
+        ScCallStep::new().from(SALLY_ADDRESS_EXPR),
+        |sc| {
+            sc.cancel_vote_slash_member(managed_address!(&address_expr_to_address(
+                ALICE_ADDRESS_EXPR
+            )));
+        },
+    );
+
     // carol vote
     world.whitebox_call(
         &use_module_whitebox,
@@ -272,7 +345,7 @@ fn test_staking_module() {
                     ALICE_ADDRESS_EXPR
                 )))
                 .len(),
-                2
+                3
             );
             assert!(sc
                 .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
@@ -287,6 +360,20 @@ fn test_staking_module() {
                 )))
                 .contains(&managed_address!(&address_expr_to_address(
                     CAROL_ADDRESS_EXPR
+                ))));
+            assert!(sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .contains(&managed_address!(&address_expr_to_address(
+                    PAUL_ADDRESS_EXPR
+                ))));
+            assert!(!sc
+                .slashing_proposal_voters(&managed_address!(&address_expr_to_address(
+                    ALICE_ADDRESS_EXPR
+                )))
+                .contains(&managed_address!(&address_expr_to_address(
+                    SALLY_ADDRESS_EXPR
                 ))));
         },
     );
@@ -361,7 +448,7 @@ fn test_staking_module() {
                 ALICE_ADDRESS_EXPR
             )));
 
-            assert_eq!(sc.user_whitelist().len(), 2);
+            assert_eq!(sc.user_whitelist().len(), 4);
             assert!(!sc
                 .user_whitelist()
                 .contains(&managed_address!(&address_expr_to_address(
