@@ -5,7 +5,7 @@ use crate::{constants::*, helpers, storage};
 
 #[multiversx_sc::module]
 pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
-    #[endpoint]
+    #[endpoint(payFeeAndFundESDT)]
     #[payable("*")]
     fn pay_fee_and_fund_esdt(&self, address: ManagedAddress, valability: u64) {
         let mut payments = self.call_value().all_esdt_transfers().clone_value();
@@ -17,7 +17,7 @@ pub trait PayFeeAndFund: storage::StorageModule + helpers::HelpersModule {
 
         self.make_fund(0u64.into(), payments, address, valability)
     }
-    #[endpoint]
+    #[endpoint(payFeeAndFundEGLD)]
     #[payable("EGLD")]
     fn pay_fee_and_fund_egld(&self, address: ManagedAddress, valability: u64) {
         let mut fund = self.call_value().egld_value().clone_value();

@@ -26,8 +26,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         blacklistFeeToken => blacklist_fee_token
         claimFees => claim_fees
         getAmount => get_amount
-        pay_fee_and_fund_esdt => pay_fee_and_fund_esdt
-        pay_fee_and_fund_egld => pay_fee_and_fund_egld
+        payFeeAndFundESDT => pay_fee_and_fund_esdt
+        payFeeAndFundEGLD => pay_fee_and_fund_egld
         fund => fund
         depositFees => deposit_fees
         withdraw => withdraw
