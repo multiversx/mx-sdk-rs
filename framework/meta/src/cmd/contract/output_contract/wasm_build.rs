@@ -119,7 +119,8 @@ impl OutputContract {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_wat_path = format!("{output_path}/{}", self.wat_output_name(build_args));
         print_call_wasm2wat(&output_wasm_path, &output_wat_path);
-        post_build::run_wasm2wat(output_wasm_path.as_str(), output_wat_path.as_str());
+        tools::wasm_to_wat(output_wasm_path.as_str(), output_wat_path.as_str())
+            .expect("could not convert wasm to wat");
     }
 
     fn extract_imports(&self, build_args: &BuildArgs, output_path: &str) {
