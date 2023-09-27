@@ -45,6 +45,16 @@ fn whitelist_blacklist_fee_token_go() {
 }
 
 #[test]
+fn pay_fee_and_fund_esdt_go() {
+    world().run("scenarios/pay-fee-and-fund-esdt.scen.json");
+}
+
+#[test]
+fn pay_fee_and_fund_egld_go() {
+    world().run("scenarios/pay-fee-and-fund-egld.scen.json");
+}
+
+#[test]
 fn withdraw_egld_go() {
     world().run("scenarios/withdraw-egld.scen.json");
 }
