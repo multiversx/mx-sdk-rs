@@ -40,6 +40,11 @@ fn set_accounts_go() {
 }
 
 #[test]
+fn whitelist_blacklist_fee_token_go() {
+    world().run("scenarios/whitelist-blacklist-fee-tokens.scen.json");
+}
+
+#[test]
 fn withdraw_egld_go() {
     world().run("scenarios/withdraw-egld.scen.json");
 }

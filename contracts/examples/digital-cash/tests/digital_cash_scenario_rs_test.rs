@@ -47,6 +47,11 @@ fn set_accounts_rs() {
 }
 
 #[test]
+fn whitelist_blacklist_fee_token_rs() {
+    world().run("scenarios/whitelist-blacklist-fee-tokens.scen.json");
+}
+
+#[test]
 fn withdraw_egld_rs() {
     world().run("scenarios/withdraw-egld.scen.json");
 }

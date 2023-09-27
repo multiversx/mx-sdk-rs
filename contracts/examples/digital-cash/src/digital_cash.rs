@@ -22,14 +22,13 @@ pub trait DigitalCash:
 {
     #[init]
     fn init(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
-        self.fee(&token).set(fee);
-        self.whitelisted_fee_tokens().insert(token.clone());
-        self.all_time_fee_tokens().insert(token);
+        self.whitelist_fee_token(fee, token);
     }
 
     #[endpoint(whitelistFeeToken)]
     #[only_owner]
     fn whitelist_fee_token(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {
+        require!(self.fee(&token).is_empty(), "Token already whitelisted");
         self.fee(&token).set(fee);
         self.whitelisted_fee_tokens().insert(token.clone());
         self.all_time_fee_tokens().insert(token);
@@ -38,6 +37,7 @@ pub trait DigitalCash:
     #[endpoint(blacklistFeeToken)]
     #[only_owner]
     fn blacklist_fee_token(&self, token: EgldOrEsdtTokenIdentifier) {
+        require!(!self.fee(&token).is_empty(), "Token is not whitelisted");
         self.fee(&token).clear();
         self.whitelisted_fee_tokens().swap_remove(&token);
     }
