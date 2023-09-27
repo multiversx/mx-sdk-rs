@@ -131,6 +131,11 @@ pub trait StakingModule {
 
     fn remove_board_member(&self, user: &ManagedAddress) {
         let mut whitelist_mapper = self.user_whitelist();
+        let slash_quorum = self.slash_quorum().get();
+        require!(
+            whitelist_mapper.len() > slash_quorum,
+            "remaining number of board members cannot be smaller than the slash quorul"
+        );
         let was_whitelisted = whitelist_mapper.swap_remove(user);
         if !was_whitelisted {
             return;
