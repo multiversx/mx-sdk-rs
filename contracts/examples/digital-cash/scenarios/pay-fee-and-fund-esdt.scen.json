@@ -47,7 +47,7 @@
                 "function": "payFeeAndFundESDT",
                 "esdtValue": [
                     {
-                        "tokenIdentifier": "str:CASHTOKEN-777777",
+                        "tokenIdentifier": "str:CASHTOKEN-778899",
                         "value": "50"
                     },
                     {
@@ -79,15 +79,15 @@
                     "balance": "0",
                     "storage": {
                         "str:deposit|0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60": {
-                            "0-depositor_address": "address:acc1",
-                            "1-esdt_funds": "u32:1|nested:str:CASHTOKEN-123456|u64:0|biguint:50",
+                            "0-depositor_address": "address:acc3",
+                            "1-esdt_funds": "u32:1|nested:str:CASHTOKEN-112233|u64:0|biguint:50",
                             "2-egld_funds": "biguint:0",
                             "3-valability": "u64:100",
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:1",
                                 "1-value": {
-                                    "0-tokenIdentifier": "nested:str:CASHTOKEN-777777",
+                                    "0-tokenIdentifier": "nested:str:CASHTOKEN-778899",
                                     "1-nonce": "u64:0",
                                     "2-amount": "biguint:50"
                                 }
@@ -111,7 +111,7 @@
                     "code": "file:../output/digital-cash.wasm"
                 },
                 "address:acc1": {
-                    "nonce": "1",
+                    "nonce": "0",
                     "balance": "1,000,000",
                     "storage": {}
                 },
