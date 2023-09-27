@@ -137,7 +137,6 @@ impl OutputContract {
         print_extract_imports(&output_imports_json_path);
         let import_names = tools::extract_wasm_imports(&output_wasm_path)
             .expect("error occured while extracting imports from .wasm ");
-        println!("{import_names:?}");
         write_imports_output(output_imports_json_path.as_str(), import_names.as_slice());
         validate_ei(&import_names, &self.settings.check_ei);
     }
