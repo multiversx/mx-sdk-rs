@@ -71,7 +71,7 @@ pub fn print_call_wasm_opt(wasm_path: &str) {
 pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
     println!(
         "{}",
-        format!("Calling wasm2wat on {wasm_path} -> {wat_path} ...").green(),
+        format!("Extracting wat from {wasm_path} to {wat_path} ...").green(),
     );
 }
 
