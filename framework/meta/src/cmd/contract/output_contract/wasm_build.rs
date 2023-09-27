@@ -7,7 +7,7 @@ use crate::{
     ei::EIVersion,
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
-    tools::post_build,
+    tools::{self, post_build},
 };
 
 impl OutputContract {
@@ -134,8 +134,9 @@ impl OutputContract {
             self.imports_json_output_name(build_args)
         );
         print_extract_imports(&output_imports_json_path);
-        let result = post_build::run_wasm_objdump(output_wasm_path.as_str());
-        let import_names = post_build::parse_imports(result.as_str());
+        let import_names = tools::extract_wasm_imports(&output_wasm_path)
+            .expect("error occured while extracting imports from .wasm ");
+        println!("{import_names:?}");
         write_imports_output(output_imports_json_path.as_str(), import_names.as_slice());
         validate_ei(&import_names, &self.settings.check_ei);
     }
