@@ -2301,6 +2301,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "nft-subscription"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-modules",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "nft-subscription-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta",
+ "nft-subscription",
+]
+
+[[package]]
 name = "nibble_vec"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

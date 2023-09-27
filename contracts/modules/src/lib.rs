@@ -15,3 +15,4 @@ pub mod staking;
 pub mod token_merge;
 pub mod transfer_role_proxy;
 pub mod users;
+pub mod subscription;
