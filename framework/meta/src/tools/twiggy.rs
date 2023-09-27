@@ -1,47 +1,12 @@
 use std::process::{Command, Stdio};
 
-use crate::cli_args::BuildArgs;
+pub const TWIGGY_NAME: &str = "twiggy";
 
-const WASM_OPT_NAME: &str = "wasm-opt";
-const TWIGGY_NAME: &str = "twiggy";
-
-pub(crate) fn check_tools_installed(build_args: &mut BuildArgs) {
-    if build_args.wasm_opt && !is_wasm_opt_installed() {
-        println!("Warning: {WASM_OPT_NAME} not installed");
-        build_args.wasm_opt = false;
-    }
-    if build_args.has_twiggy_call() && !is_twiggy_installed() {
-        println!("Warning: {TWIGGY_NAME} not installed");
-        build_args.twiggy_top = false;
-        build_args.twiggy_paths = false;
-        build_args.twiggy_monos = false;
-        build_args.twiggy_dominators = false;
-    }
-}
-
-fn is_wasm_opt_installed() -> bool {
-    Command::new(WASM_OPT_NAME)
-        .args(["--version"])
-        .output()
-        .is_ok()
-}
-
-fn is_twiggy_installed() -> bool {
+pub fn is_twiggy_installed() -> bool {
     Command::new(TWIGGY_NAME)
         .args(["--version"])
         .output()
         .is_ok()
-}
-
-pub(crate) fn run_wasm_opt(output_wasm_path: &str) {
-    let exit_status = Command::new(WASM_OPT_NAME)
-        .args([output_wasm_path, "-Oz", "--output", output_wasm_path])
-        .spawn()
-        .expect("failed to spawn wasm-opt process")
-        .wait()
-        .expect("wasm-opt was not running");
-
-    assert!(exit_status.success(), "wasm-opt process failed");
 }
 
 fn run_with_stdout_file<I, S>(stdout_file_name: &str, args: I)

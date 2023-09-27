@@ -7,7 +7,7 @@ use crate::{
     ei::EIVersion,
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
-    tools::{self, post_build},
+    tools,
 };
 
 impl OutputContract {
@@ -108,7 +108,7 @@ impl OutputContract {
 
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         print_call_wasm_opt(&output_wasm_path);
-        post_build::run_wasm_opt(output_wasm_path.as_str());
+        tools::run_wasm_opt(output_wasm_path.as_str());
     }
 
     fn run_wasm2wat(&self, build_args: &BuildArgs, output_path: &str) {
@@ -173,7 +173,7 @@ impl OutputContract {
             if build_args.twiggy_top {
                 let output_twiggy_top_path =
                     format!("{output_path}/{}", self.twiggy_top_name(build_args));
-                post_build::run_twiggy_top(
+                tools::twiggy::run_twiggy_top(
                     output_wasm_path.as_str(),
                     output_twiggy_top_path.as_str(),
                 );
@@ -181,7 +181,7 @@ impl OutputContract {
             if build_args.twiggy_paths {
                 let output_twiggy_paths_path =
                     format!("{output_path}/{}", self.twiggy_paths_name(build_args));
-                post_build::run_twiggy_paths(
+                tools::twiggy::run_twiggy_paths(
                     output_wasm_path.as_str(),
                     output_twiggy_paths_path.as_str(),
                 );
@@ -189,7 +189,7 @@ impl OutputContract {
             if build_args.twiggy_monos {
                 let output_twiggy_monos_path =
                     format!("{output_path}/{}", self.twiggy_monos_name(build_args));
-                post_build::run_twiggy_monos(
+                tools::twiggy::run_twiggy_monos(
                     output_wasm_path.as_str(),
                     output_twiggy_monos_path.as_str(),
                 );
@@ -197,7 +197,7 @@ impl OutputContract {
             if build_args.twiggy_dominators {
                 let output_twiggy_dominators_path =
                     format!("{output_path}/{}", self.twiggy_dominators_name(build_args));
-                post_build::run_twiggy_dominators(
+                tools::twiggy::run_twiggy_dominators(
                     output_wasm_path.as_str(),
                     output_twiggy_dominators_path.as_str(),
                 );
