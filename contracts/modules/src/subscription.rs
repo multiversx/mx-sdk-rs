@@ -2,9 +2,9 @@ multiversx_sc::imports!();
 
 /// Standard smart contract module for managing a Subscription NFT.
 /// Adaptation of the EIP-5643 for MultiversX, more here https://eips.ethereum.org/EIPS/eip-5643  
-/// 
-/// This standard is an extension of MultiversX NFT standard. 
-/// It proposes an additional interface for NFTs to be used as recurring, expirable subscriptions. 
+///
+/// This standard is an extension of MultiversX NFT standard.
+/// It proposes an additional interface for NFTs to be used as recurring, expirable subscriptions.
 /// The interface includes functions to renew and cancel the subscription.
 ///
 /// It provides functions for:
@@ -33,18 +33,19 @@ pub trait SubscriptionModule {
             time + duration
         };
 
-        self.send().nft_update_attributes(id, nonce, &new_expiration);
+        self.send()
+            .nft_update_attributes(id, nonce, &new_expiration);
         self.subscription_update_event(id.as_managed_buffer(), nonce, new_expiration);
     }
 
-	#[endpoint(cancelSubscription)]
+    #[endpoint(cancelSubscription)]
     fn cancel_subscription(&self, id: &TokenIdentifier, nonce: u64) {
         self.send().nft_update_attributes(id, nonce, &0);
         self.subscription_update_event(id.as_managed_buffer(), nonce, 0);
     }
 
     // @dev should only be called if the nft is owned by the contract
-	#[view(getExpiresAt)]
+    #[view(getExpiresAt)]
     fn expires_at(&self, id: &TokenIdentifier, nonce: u64) -> u64 {
         self.blockchain().get_token_attributes(id, nonce)
     }
