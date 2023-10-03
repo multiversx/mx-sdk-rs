@@ -36,8 +36,8 @@ pub trait StakingModule {
             "Quorum higher than total possible board members"
         );
         require!(
-            slash_quorum >= 3,
-            "Quorum requires at least 3 board members"
+            slash_quorum >= MINIMUM_BOARD_MEMBERS,
+            "Quorum minimum board members requirement not met"
         );
         require!(
             staking_amount > &0 && slash_amount > &0,
@@ -114,11 +114,6 @@ pub trait StakingModule {
 
     #[endpoint(cancelVoteSlashMember)]
     fn cancel_vote_slash_member(&self, member_to_slash: ManagedAddress) {
-        require!(
-            self.is_staked_board_member(&member_to_slash),
-            "Voted user is not a staked board member"
-        );
-
         let caller = self.blockchain().get_caller();
         require!(
             self.is_staked_board_member(&caller),
@@ -134,7 +129,6 @@ pub trait StakingModule {
     fn slash_member(&self, member_to_slash: ManagedAddress) {
         let quorum = self.slash_quorum().get();
         let mut slashing_voters_mapper = self.slashing_proposal_voters(&member_to_slash);
-        require!(quorum >= MINIMUM_BOARD_MEMBERS, "Not enough board members");
         require!(slashing_voters_mapper.len() >= quorum, "Quorum not reached");
 
         let slash_amount = self.slash_amount().get();
@@ -161,14 +155,14 @@ pub trait StakingModule {
     fn remove_board_member(&self, user: &ManagedAddress) {
         let mut whitelist_mapper = self.user_whitelist();
 
-        let nr_board_members = whitelist_mapper.len();
         let slash_quorum = self.slash_quorum().get();
+
+        let was_whitelisted = whitelist_mapper.swap_remove(user);
+        let nr_board_members = whitelist_mapper.len();
         require!(
             nr_board_members > slash_quorum,
             "remaining number of board members must be greater than the slash quorum"
         );
-
-        let was_whitelisted = whitelist_mapper.swap_remove(user);
         if !was_whitelisted {
             return;
         }
