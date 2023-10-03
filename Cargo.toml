@@ -11,6 +11,7 @@ members = [
   "framework/scenario",
   "framework/snippets",
   "framework/wasm-adapter",
+  "framework/testapi",
 
   "sdk/core",
   "sdk/scenario-format",
@@ -175,4 +176,17 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+
+  "contracts/foundry/addercaller",
+  "contracts/foundry/addercaller/meta",
+  "contracts/foundry/callee",
+  "contracts/foundry/callee/meta",
+  "contracts/foundry/caller",
+  "contracts/foundry/caller/meta",
+  "contracts/foundry/foundrylike",
+  "contracts/foundry/foundrylike/meta",
+  "contracts/foundry/test_multisig",
+  "contracts/foundry/test_multisig/meta",
+  "contracts/foundry/test_testapi",
+  "contracts/foundry/test_testapi/meta",
 ]
