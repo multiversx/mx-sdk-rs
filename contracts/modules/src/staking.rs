@@ -115,10 +115,6 @@ pub trait StakingModule {
     #[endpoint(cancelVoteSlashMember)]
     fn cancel_vote_slash_member(&self, member_to_slash: ManagedAddress) {
         let caller = self.blockchain().get_caller();
-        require!(
-            self.is_staked_board_member(&caller),
-            NOT_ENOUGH_STAKE_ERR_MSG
-        );
 
         let _ = self
             .slashing_proposal_voters(&member_to_slash)
@@ -150,6 +146,11 @@ pub trait StakingModule {
     #[inline]
     fn add_board_member(&self, user: ManagedAddress) {
         let _ = self.user_whitelist().insert(user);
+        let nr_board_members = self.user_whitelist().len();
+        require!(
+            nr_board_members <= MAXIMUM_BOARD_MEMBERS,
+            "Too many board members"
+        );
     }
 
     fn remove_board_member(&self, user: &ManagedAddress) {
