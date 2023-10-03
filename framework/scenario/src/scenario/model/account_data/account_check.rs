@@ -11,7 +11,7 @@ use crate::{
     },
     scenario_model::CheckEsdtData,
 };
-use std::collections::BTreeMap;
+use std::collections::{btree_map, BTreeMap};
 
 #[derive(Debug, Default, Clone)]
 pub struct CheckAccount {
@@ -86,7 +86,10 @@ impl CheckAccount {
                 self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
             },
             CheckEsdtMap::Equal(check_esdt_map) => {
-                if check_esdt_map.contents.contains_key(&token_id) {
+                if let btree_map::Entry::Vacant(e) = check_esdt_map.contents.entry(token_id.clone())
+                {
+                    e.insert(CheckEsdt::Short(balance));
+                } else {
                     let prev_entry = check_esdt_map.contents.get_mut(&token_id).unwrap();
                     match prev_entry {
                         CheckEsdt::Short(prev_balance_check) => *prev_balance_check = balance,
