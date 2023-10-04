@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            8
+// Endpoints:                            5
 // Async Callback:                       1
-// Total number of exported functions:  10
+// Total number of exported functions:   7
 
 #![no_std]
 
@@ -24,12 +24,9 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         issue => issue
         mint => mint
+        update_attributes => update_attributes
         renew => renew
         cancel => cancel
-        expires => expires
-        renewSubscription => renew_subscription
-        cancelSubscription => cancel_subscription
-        getExpiresAt => expires_at
     )
 }
 

@@ -26,10 +26,34 @@ pub trait NftSubscription:
 
     #[endpoint]
     fn mint(&self) {
-        self.token_id().nft_create_and_send(
+        let nonce = self.create_subscription_nft(
+            self.token_id().get_token_id_ref(),
+            &BigUint::from(1u8),
+            &ManagedBuffer::new(),
+            &BigUint::from(0u8),
+            &ManagedBuffer::new(),
+            0,
+            ManagedBuffer::from(b"common"),
+            &ManagedVec::new(),
+        );
+        self.send().direct_esdt(
             &self.blockchain().get_caller(),
-            BigUint::from(1u8),
-            &0u64,
+            self.token_id().get_token_id_ref(),
+            nonce,
+            &BigUint::from(1u8),
+        );
+    }
+
+    #[payable("*")]
+    #[endpoint]
+    fn update_attributes(&self, attributes: ManagedBuffer) {
+        let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
+        self.update_subscription_attributes::<ManagedBuffer>(&id, nonce, attributes);
+        self.send().direct_esdt(
+            &self.blockchain().get_caller(),
+            &id,
+            nonce,
+            &BigUint::from(1u8),
         );
     }
 
@@ -37,7 +61,7 @@ pub trait NftSubscription:
     #[endpoint]
     fn renew(&self, duration: u64) {
         let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.renew_subscription(&id, nonce, duration);
+        self.renew_subscription::<ManagedBuffer>(&id, nonce, duration);
         self.send().direct_esdt(
             &self.blockchain().get_caller(),
             &id,
@@ -50,18 +74,13 @@ pub trait NftSubscription:
     #[endpoint]
     fn cancel(&self) {
         let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
-        self.cancel_subscription(&id, nonce);
+        self.cancel_subscription::<ManagedBuffer>(&id, nonce);
         self.send().direct_esdt(
             &self.blockchain().get_caller(),
             &id,
             nonce,
             &BigUint::from(1u8),
         );
-    }
-
-    #[view]
-    fn expires(&self, id: &TokenIdentifier, nonce: u64) -> u64 {
-        self.expires_at(id, nonce)
     }
 
     #[storage_mapper("tokenId")]
