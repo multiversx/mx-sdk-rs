@@ -94,7 +94,7 @@ impl ScenarioWorld {
         }
     }
 
-    pub(crate) fn get_state(&self) -> &BlockchainState {
+    pub fn get_state(&self) -> &BlockchainState {
         &self.get_debugger_backend().vm_runner.blockchain_mock.state
     }
 
