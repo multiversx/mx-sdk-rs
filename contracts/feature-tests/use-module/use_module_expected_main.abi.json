@@ -679,6 +679,17 @@
             "outputs": []
         },
         {
+            "name": "cancelVoteSlashMember",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
             "name": "slashMember",
             "mutability": "mutable",
             "inputs": [
