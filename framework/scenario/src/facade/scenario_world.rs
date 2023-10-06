@@ -111,6 +111,11 @@ impl ScenarioWorld {
         self
     }
 
+    pub fn start_trace_with(&mut self, trace: ScenarioTrace) -> &mut Self {
+        self.get_mut_debugger_backend().trace = Some(trace);
+        self
+    }
+
     /// Tells the tests where the crate lies relative to the workspace.
     /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
