@@ -205,7 +205,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             esdt_instances_check_raw.push(inst_check_raw);
         }
 
-        let mut roles = CheckValueListRaw::Unspecified;
+        let mut roles = CheckValueListRaw::Star;
         let mut check_roles = Vec::new();
         for role in esdt_data.roles.get() {
             let role_str = String::from_utf8(role).unwrap();
