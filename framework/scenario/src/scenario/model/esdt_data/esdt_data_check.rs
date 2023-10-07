@@ -23,7 +23,7 @@ impl InterpretableFrom<CheckEsdtDataRaw> for CheckEsdtData {
             instances: CheckEsdtInstances::interpret_from(from.instances, context),
             last_nonce: CheckValue::<U64Value>::interpret_from(from.last_nonce, context),
             frozen: CheckValue::<U64Value>::interpret_from(from.frozen, context),
-            roles: CheckValueList::Star,
+            roles: CheckValueList::interpret_from(from.roles, context),
         }
     }
 }
@@ -33,7 +33,7 @@ impl IntoRaw<CheckEsdtDataRaw> for CheckEsdtData {
         CheckEsdtDataRaw {
             instances: self.instances.into_raw(),
             last_nonce: self.last_nonce.into_raw(),
-            roles: Vec::new(),
+            roles: self.roles.into_raw(),
             frozen: self.frozen.into_raw(),
         }
     }
