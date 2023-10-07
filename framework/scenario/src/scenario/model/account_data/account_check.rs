@@ -118,35 +118,35 @@ impl CheckAccount {
         BigUintValue: From<V>,
         T: TopEncode,
     {
-        let token_id = BytesKey::from(token_id_expr);
-
-        if let CheckEsdtMap::Unspecified = &self.esdt {
-            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
-
-            if let Some(attributes_expr) = attributes_expr {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    top_encode_to_vec_u8_or_panic(&attributes_expr),
-                );
+        let insert_check_esdt = |map: &mut CheckEsdtMapContents| {
+            let token_id = BytesKey::from(token_id_expr);
+            let attributes_expr = if let Some(attributes_expr) = attributes_expr {
+                top_encode_to_vec_u8_or_panic(&attributes_expr)
             } else {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    Vec::<u8>::new(),
-                );
-            }
-
-            let mut new_esdt_map = BTreeMap::new();
-            let _ = new_esdt_map.insert(token_id, check_esdt);
-
-            let new_check_esdt_map = CheckEsdtMapContents {
-                contents: new_esdt_map,
-                other_esdts_allowed: true,
+                Vec::<u8>::new()
             };
 
-            self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
-        }
+            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
+            check_esdt.add_balance_and_attributes_check(nonce_expr, balance_expr, attributes_expr);
+
+            map.contents.insert(token_id, check_esdt)
+        };
+
+        match &mut self.esdt {
+            CheckEsdtMap::Equal(map) => {
+                insert_check_esdt(map);
+            },
+            _ => {
+                let mut new_map = CheckEsdtMapContents {
+                    contents: BTreeMap::new(),
+                    other_esdts_allowed: true,
+                };
+                
+                insert_check_esdt(&mut new_map);
+
+                self.esdt = CheckEsdtMap::Equal(new_map);
+            },
+        };
 
         self
     }
