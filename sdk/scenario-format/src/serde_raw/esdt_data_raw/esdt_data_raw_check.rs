@@ -14,7 +14,7 @@ pub struct CheckEsdtDataRaw {
     pub last_nonce: CheckBytesValueRaw,
 
     /// Currently not actually checked anywhere?
-    #[serde(default)]
+    #[serde(default = "CheckValueListRaw::as_star")]
     pub roles: CheckValueListRaw,
 
     #[serde(default)]
