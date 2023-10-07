@@ -62,6 +62,19 @@ impl CheckEsdt {
         }
     }
 
+    pub fn add_roles_check(&mut self, roles: Vec<&str>) {
+        self.convert_to_full();
+
+        if let CheckEsdt::Full(prev_esdt_check) = self {
+            prev_esdt_check.roles = CheckValue::Equal(
+                roles
+                    .into_iter()
+                    .map(|role| CheckValue::Equal(BytesValue::from(role)))
+                    .collect(),
+            );
+        }
+    }
+
     pub fn add_balance_check<N, V>(&mut self, nonce_expr: N, balance_expr: V)
     where
         U64Value: InterpretableFrom<N>,

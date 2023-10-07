@@ -204,17 +204,21 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
             esdt_instances_check_raw.push(inst_check_raw);
         }
 
-        let mut roles_as_str = Vec::new();
+        let mut roles = CheckValueListRaw::Unspecified;
+        let mut check_roles = Vec::new();
         for role in esdt_data.roles.get() {
             let role_str = String::from_utf8(role).unwrap();
-            roles_as_str.push(role_str);
+            check_roles.push(CheckBytesValueRaw::Equal(ValueSubTree::Str(role_str)));
+        }
+        if !check_roles.is_empty() {
+            roles = CheckValueListRaw::CheckList(check_roles)
         }
 
         let esdt_check_raw = CheckEsdtDataRaw {
             frozen: CheckBytesValueRaw::Unspecified,
             last_nonce: last_nonce_check,
             instances: CheckEsdtInstancesRaw::Equal(esdt_instances_check_raw),
-            roles: roles_as_str,
+            roles,
         };
 
         let token_id_str = bytes_to_scenario_string_or_hex(token_id);
