@@ -1,3 +1,5 @@
+use multiversx_chain_scenario_format::serde_raw::CheckValueListRaw;
+
 use crate::{
     scenario::model::{CheckValue, U64Value},
     scenario_format::{
@@ -30,10 +32,15 @@ impl InterpretableFrom<CheckEsdtDataRaw> for CheckEsdtData {
 
 impl IntoRaw<CheckEsdtDataRaw> for CheckEsdtData {
     fn into_raw(self) -> CheckEsdtDataRaw {
+        let roles = match self.roles {
+            CheckValue::Star => CheckValueListRaw::Star,
+            CheckValue::Equal(_) => self.roles.into_raw(),
+        };
+
         CheckEsdtDataRaw {
             instances: self.instances.into_raw(),
             last_nonce: self.last_nonce.into_raw(),
-            roles: self.roles.into_raw(),
+            roles,
             frozen: self.frozen.into_raw(),
         }
     }
