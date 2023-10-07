@@ -126,7 +126,10 @@ impl CheckAccount {
                 Vec::<u8>::new()
             };
 
-            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
+            let mut check_esdt = CheckEsdt::Full(CheckEsdtData {
+                roles: CheckValue::Star,
+                ..Default::default()
+            });
             check_esdt.add_balance_and_attributes_check(nonce_expr, balance_expr, attributes_expr);
 
             map.contents.insert(token_id, check_esdt)
@@ -141,7 +144,7 @@ impl CheckAccount {
                     contents: BTreeMap::new(),
                     other_esdts_allowed: true,
                 };
-                
+
                 insert_check_esdt(&mut new_map);
 
                 self.esdt = CheckEsdtMap::Equal(new_map);
