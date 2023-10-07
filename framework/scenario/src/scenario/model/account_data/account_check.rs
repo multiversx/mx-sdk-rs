@@ -126,10 +126,7 @@ impl CheckAccount {
                 Vec::<u8>::new()
             };
 
-            let mut check_esdt = CheckEsdt::Full(CheckEsdtData {
-                roles: CheckValue::Star,
-                ..Default::default()
-            });
+            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
             check_esdt.add_balance_and_attributes_check(nonce_expr, balance_expr, attributes_expr);
 
             map.contents.insert(token_id, check_esdt)
