@@ -12,6 +12,7 @@ mod managed_types;
 mod print_api;
 mod send_api;
 mod storage_api;
+mod test_api;
 pub mod uncallable;
 mod vm_api;
 
@@ -29,4 +30,5 @@ pub use managed_types::*;
 pub use print_api::*;
 pub use send_api::*;
 pub use storage_api::*;
+pub use test_api::*;
 pub use vm_api::VMApi;

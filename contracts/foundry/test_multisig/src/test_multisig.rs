@@ -1,7 +1,5 @@
 #![no_std]
 
-use testapi;
-
 multiversx_sc::imports!();
 
 static OWNER : &[u8; 32]    = b"owner___________________________";
@@ -24,13 +22,13 @@ pub trait TestMultisigContract {
 
     fn init_accounts(&self) {
         let owner = ManagedAddress::from(OWNER);
-        testapi::create_account(&owner,                         0, &BigUint::from(0u64));
-        testapi::create_account(&ManagedAddress::from(ALICE),   0, &BigUint::from(0u64));
-        testapi::create_account(&ManagedAddress::from(BOB),     0, &BigUint::from(0u64));
-        testapi::create_account(&ManagedAddress::from(CHARLIE), 0, &BigUint::from(0u64));
+        self.test_raw().create_account(&owner,                         0, &BigUint::from(0u64));
+        self.test_raw().create_account(&ManagedAddress::from(ALICE),   0, &BigUint::from(0u64));
+        self.test_raw().create_account(&ManagedAddress::from(BOB),     0, &BigUint::from(0u64));
+        self.test_raw().create_account(&ManagedAddress::from(CHARLIE), 0, &BigUint::from(0u64));
     
         let multisig = ManagedAddress::from(MULTISIG);
-        testapi::register_new_address(&owner, 0, &multisig);
+        self.test_raw().register_new_address(&owner, 0, &multisig);
 
     }
 
@@ -42,7 +40,7 @@ pub trait TestMultisigContract {
         init_args.push_arg(ManagedAddress::from(BOB));
         init_args.push_arg(ManagedAddress::from(CHARLIE));
     
-        let multisig = testapi::deploy_contract(
+        let multisig = self.test_raw().deploy_contract(
             &ManagedAddress::from(OWNER),
             5000000000000,
             &BigUint::zero(),
@@ -50,18 +48,18 @@ pub trait TestMultisigContract {
             &init_args,
         );
 
-        testapi::assert( self.get_quorum(&multisig) == 2u32 );
-        testapi::assert( self.get_num_board_members(&multisig) == 3u32 );
+        self.test_raw().assert( self.get_quorum(&multisig) == 2u32 );
+        self.test_raw().assert( self.get_num_board_members(&multisig) == 3u32 );
 
     }
 
     fn get_quorum(&self, multisig: &ManagedAddress) -> BigUint {
-        let bs = testapi::get_storage(&multisig, &ManagedBuffer::from(b"quorum")); 
+        let bs = self.test_raw().get_storage(&multisig, &ManagedBuffer::from(b"quorum")); 
         BigUint::from(bs)
     }
 
     fn get_num_board_members(&self, multisig: &ManagedAddress) -> BigUint {
-        let bs = testapi::get_storage(&multisig, &ManagedBuffer::from(b"num_board_members")); 
+        let bs = self.test_raw().get_storage(&multisig, &ManagedBuffer::from(b"num_board_members")); 
         BigUint::from(bs)
     }
 
@@ -72,7 +70,7 @@ pub trait TestMultisigContract {
         let bob = ManagedAddress::from(BOB);
         
         // make assumptions
-        testapi::assume(value <= self.get_num_board_members(&multisig));
+        self.test_raw().assume(value <= self.get_num_board_members(&multisig));
         
 
         self.change_quorum_propose(&multisig, &alice, &value);
@@ -80,14 +78,14 @@ pub trait TestMultisigContract {
         self.perform_action(&multisig, &alice);
     
         // check the final quorum
-        testapi::assert(value == self.get_quorum(&multisig));
+        self.test_raw().assert(value == self.get_quorum(&multisig));
     }
 
     fn change_quorum_propose(&self, multisig: &ManagedAddress, proposer: &ManagedAddress, value: &BigUint) {
         let mut args = ManagedArgBuffer::new();
         args.push_arg(value);
 
-        testapi::start_prank(&proposer);
+        self.test_raw().start_prank(&proposer);
         let _ = self.send_raw().direct_egld_execute(
             &multisig, 
             &BigUint::from(0u32), 
@@ -95,7 +93,7 @@ pub trait TestMultisigContract {
             &ManagedBuffer::from(b"proposeChangeQuorum"),
             &args,
         );
-        testapi::stop_prank();
+        self.test_raw().stop_prank();
 
     }
 
@@ -103,7 +101,7 @@ pub trait TestMultisigContract {
         let mut args = ManagedArgBuffer::new();
         args.push_arg(1u32);
 
-        testapi::start_prank(signer);
+        self.test_raw().start_prank(signer);
         let _ = self.send_raw().direct_egld_execute(
             &multisig, 
             &BigUint::from(0u32), 
@@ -111,7 +109,7 @@ pub trait TestMultisigContract {
             &ManagedBuffer::from(b"sign"),
             &args,
         );
-        testapi::stop_prank();
+        self.test_raw().stop_prank();
 
     }
 
@@ -119,7 +117,7 @@ pub trait TestMultisigContract {
         let mut args = ManagedArgBuffer::new();
         args.push_arg(1u32);
 
-        testapi::start_prank(performer);
+        self.test_raw().start_prank(performer);
         let _ = self.send_raw().direct_egld_execute(
             &multisig,
             &BigUint::from(0u32), 
@@ -127,7 +125,7 @@ pub trait TestMultisigContract {
             &ManagedBuffer::from(b"performAction"),
             &args,
         );
-        testapi::stop_prank();
+        self.test_raw().stop_prank();
 
     }
     

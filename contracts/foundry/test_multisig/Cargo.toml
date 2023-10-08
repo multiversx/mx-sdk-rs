@@ -19,5 +19,3 @@ path = "../../../framework/base"
 version = "0.43.4"
 path = "../../../framework/scenario"
 
-[dependencies]
-testapi = { version = "0.1.0", path = "../../../framework/testapi" }

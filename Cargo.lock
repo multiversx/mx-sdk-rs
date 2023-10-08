@@ -3657,7 +3657,6 @@ dependencies = [
  "multiversx-sc 0.43.4",
  "multiversx-sc-scenario 0.43.4",
  "num-bigint",
- "testapi",
 ]
 
 [[package]]
@@ -3675,7 +3674,6 @@ dependencies = [
  "multiversx-sc 0.43.4",
  "multiversx-sc-scenario 0.43.4",
  "num-bigint",
- "testapi",
 ]
 
 [[package]]
@@ -3693,7 +3691,6 @@ dependencies = [
  "multiversx-sc 0.43.4",
  "multiversx-sc-scenario 0.43.4",
  "num-bigint",
- "testapi",
 ]
 
 [[package]]
@@ -3702,14 +3699,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc-meta 0.43.4",
  "test_multisig",
-]
-
-[[package]]
-name = "testapi"
-version = "0.1.0"
-dependencies = [
- "multiversx-sc 0.43.4",
- "num-bigint",
 ]
 
 [[package]]

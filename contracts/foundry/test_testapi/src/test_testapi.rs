@@ -1,7 +1,5 @@
 #![no_std]
 
-use testapi;
-
 multiversx_sc::imports!();
 
 #[multiversx_sc::contract]
@@ -10,7 +8,7 @@ pub trait TestTestapi {
     #[init]
     fn init(&self) {
         let alice = ManagedAddress::from(b"alice___________________________");
-        testapi::create_account(&alice, 1, &BigUint::from(0u64));
+        self.test_raw().create_account(&alice, 1, &BigUint::from(0u64));
     
         self.test_set_balance(&alice);
         self.test_set_esdt_balance(&alice);
@@ -23,7 +21,7 @@ pub trait TestTestapi {
         let value = BigUint::from(100000000u64);
 
         // When
-        testapi::set_balance(addr, &value);
+        self.test_raw().set_balance(addr, &value);
 
         // Expect
         let actual = self.blockchain()
@@ -38,7 +36,7 @@ pub trait TestTestapi {
         let token = TokenIdentifier::from("MY_ESDT_TOKEN");
 
         // When
-        testapi::set_esdt_balance(addr, &token, &value);
+        self.test_raw().set_esdt_balance(addr, &token, &value);
 
         // Expect
         let actual = self.blockchain()
@@ -52,7 +50,7 @@ pub trait TestTestapi {
         let value = 1234567890u64;
 
         // When
-        testapi::set_block_timestamp(value);
+        self.test_raw().set_block_timestamp(value);
 
         // Expect
         require!(
@@ -67,10 +65,10 @@ pub trait TestTestapi {
       let value = ManagedBuffer::from(b"a storage value");
       
       // When
-      testapi::set_storage(addr, &key, &value);
+      self.test_raw().set_storage(addr, &key, &value);
 
       // Expect
-      let actual = testapi::get_storage(addr, &key);
+      let actual = self.test_raw().get_storage(addr, &key);
       require!(actual == value, "Actual storage does not match the given value");
     }
     
