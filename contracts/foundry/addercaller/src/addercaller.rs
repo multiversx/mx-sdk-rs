@@ -1,6 +1,6 @@
 // A smart contract to test transfer & execute functions
 // Initialize the contract with the address of the adder
-// The endpoints `call_adder` and `call_adder_esdt` accepts 
+// The endpoints `call_adder` and `call_adder_esdt` accepts
 // tokens in EGLD and ESDT and performs transfer & execute
 // to the adder's `add` endpoint.
 
@@ -12,7 +12,6 @@ multiversx_sc::imports!();
 /// it holds a single variable in storage, which anyone can increment.
 #[multiversx_sc::contract]
 pub trait AdderCaller {
-
     #[storage_mapper("dest")]
     fn dest(&self) -> SingleValueMapper<ManagedAddress>;
 
@@ -23,7 +22,7 @@ pub trait AdderCaller {
 
     #[endpoint]
     #[payable("EGLD")]
-    fn call_adder(&self, value: BigUint)  -> ManagedBuffer {
+    fn call_adder(&self, value: BigUint) -> ManagedBuffer {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(value);
 
@@ -37,13 +36,13 @@ pub trait AdderCaller {
 
         match result {
             Result::Err(e) => sc_panic!(e),
-            Result::Ok(_) => ManagedBuffer::from("added")
+            Result::Ok(_) => ManagedBuffer::from("added"),
         }
     }
 
     #[endpoint]
     #[payable("MYESDT")]
-    fn call_adder_esdt(&self, value: BigUint)  -> ManagedBuffer {
+    fn call_adder_esdt(&self, value: BigUint) -> ManagedBuffer {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(value);
 
@@ -58,9 +57,9 @@ pub trait AdderCaller {
 
         match result {
             Result::Err(e) => sc_panic!(e),
-            Result::Ok(_) => ManagedBuffer::from("added-esdt")
+            Result::Ok(_) => ManagedBuffer::from("added-esdt"),
         }
     }
 }
 
-// 
+//
