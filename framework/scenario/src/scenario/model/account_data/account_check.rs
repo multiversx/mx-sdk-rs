@@ -195,7 +195,7 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
     fn into_raw(self) -> CheckAccountRaw {
         CheckAccountRaw {
             comment: self.comment,
-            nonce: self.nonce.into_raw(),
+            nonce: self.nonce.into_raw_explicit(),
             balance: self.balance.into_raw(),
             esdt: self.esdt.into_raw(),
             username: self.username.into_raw(),
