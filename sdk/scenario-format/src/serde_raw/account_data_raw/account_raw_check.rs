@@ -9,8 +9,7 @@ pub struct CheckAccountRaw {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub comment: Option<String>,
 
-    #[serde(default)]
-    #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
+    #[serde(default = "CheckBytesValueRaw::as_star")]
     pub nonce: CheckBytesValueRaw,
 
     #[serde(default)]

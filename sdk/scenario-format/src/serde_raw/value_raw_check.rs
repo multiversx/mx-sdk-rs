@@ -21,6 +21,10 @@ impl CheckBytesValueRaw {
     pub fn is_unspecified(&self) -> bool {
         matches!(self, CheckBytesValueRaw::Unspecified)
     }
+
+    pub fn as_star() -> Self {
+        Self::Star
+    }
 }
 
 impl Serialize for CheckBytesValueRaw {
