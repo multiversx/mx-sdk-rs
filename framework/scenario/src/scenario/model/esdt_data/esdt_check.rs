@@ -66,12 +66,7 @@ impl CheckEsdt {
         self.convert_to_full();
 
         if let CheckEsdt::Full(prev_esdt_check) = self {
-            prev_esdt_check.roles = CheckValue::Equal(
-                roles
-                    .into_iter()
-                    .map(|role| CheckValue::Equal(BytesValue::from(role)))
-                    .collect(),
-            );
+            prev_esdt_check.roles = roles.into_iter().map(|role| role.into()).collect();
         }
     }
 

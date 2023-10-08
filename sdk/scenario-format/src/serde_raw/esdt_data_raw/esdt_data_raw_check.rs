@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::serde_raw::{CheckBytesValueRaw, CheckEsdtInstancesRaw, CheckValueListRaw};
+use crate::serde_raw::{CheckBytesValueRaw, CheckEsdtInstancesRaw};
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -15,8 +15,8 @@ pub struct CheckEsdtDataRaw {
 
     /// Currently not actually checked anywhere.
     #[serde(default)]
-    #[serde(skip_serializing_if = "CheckValueListRaw::is_unspecified")]
-    pub roles: CheckValueListRaw,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub roles: Vec<String>,
 
     #[serde(default)]
     #[serde(skip_serializing_if = "CheckBytesValueRaw::is_unspecified")]
