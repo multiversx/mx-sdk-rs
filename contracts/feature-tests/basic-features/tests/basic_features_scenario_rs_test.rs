@@ -43,7 +43,17 @@ fn big_uint_from_u_64_rs() {
 
 #[test]
 fn big_uint_sqrt_rs() {
+    world().run("scenarios/big_uint_pow.scen.json");
+}
+
+#[test]
+fn big_uint_pow_rs() {
     world().run("scenarios/big_uint_sqrt.scen.json");
+}
+
+#[test]
+fn big_uint_overflow_rs() {
+    world().run("scenarios/big_uint_overflow.scen.json");
 }
 
 #[test]

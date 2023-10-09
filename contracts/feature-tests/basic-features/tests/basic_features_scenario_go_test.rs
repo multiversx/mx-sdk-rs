@@ -35,6 +35,16 @@ fn big_uint_sqrt_go() {
 }
 
 #[test]
+fn big_uint_pow_go() {
+    world().run("scenarios/big_uint_pow.scen.json");
+}
+
+#[test]
+fn big_uint_overflow_go() {
+    world().run("scenarios/big_uint_overflow.scen.json");
+}
+
+#[test]
 fn big_uint_to_u_64_go() {
     world().run("scenarios/big_uint_to_u64.scen.json");
 }
