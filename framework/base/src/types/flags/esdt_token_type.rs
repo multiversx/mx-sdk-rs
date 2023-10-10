@@ -1,3 +1,5 @@
+use multiversx_sc_derive::ManagedVecItem;
+
 use crate::codec::*;
 
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
@@ -10,7 +12,7 @@ use crate as multiversx_sc; // needed by the TypeAbi generated code
 use crate::derive::TypeAbi;
 
 // Note: In the current implementation, SemiFungible is never returned
-#[derive(Clone, PartialEq, Eq, Debug, TypeAbi)]
+#[derive(Clone, PartialEq, Eq, Debug, TypeAbi, ManagedVecItem)]
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,
