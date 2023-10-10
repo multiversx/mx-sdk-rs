@@ -41,6 +41,7 @@ run-go-tests = []
 
 [dependencies.multiversx-sc]
 version = "=0.43.4"
+features = ["alloc", "num-bigint"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta]
