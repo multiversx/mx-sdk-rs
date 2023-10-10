@@ -5,8 +5,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use colored::Colorize;
-
 use crate::folder_structure::{RelevantDirectories, RelevantDirectory};
 
 use super::{
