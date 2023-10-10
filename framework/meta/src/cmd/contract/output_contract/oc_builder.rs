@@ -57,25 +57,26 @@ impl OutputContractBuilder {
                 multiversx_sc::external_view_contract::external_view_contract_constructor_abi(),
             )
         }
+        let default = OutputContractBuilder::default();
         (
             contract_id.clone(),
             OutputContractBuilder {
                 contract_id: contract_id.clone(),
-                explicit_name: cms.name.clone().unwrap_or_default(),
-                add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
+                explicit_name: cms.name.clone().unwrap_or(default.explicit_name),
+                add_unlabelled: cms.add_unlabelled.unwrap_or(default.add_unlabelled),
                 add_labels: cms.add_labels.iter().cloned().collect(),
                 add_endpoints: cms.add_endpoints.iter().cloned().collect(),
                 collected_endpoints,
                 settings: OutputContractSettings {
-                    external_view: cms.external_view.unwrap_or_default(),
-                    panic_message: cms.panic_message.unwrap_or_default(),
+                    external_view: cms.external_view.unwrap_or(default.settings.external_view),
+                    panic_message: cms.panic_message.unwrap_or(default.settings.panic_message),
                     check_ei: parse_check_ei(&cms.ei),
                     allocator: parse_allocator(&cms.allocator),
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
                     kill_legacy_callback: cms.kill_legacy_callback,
                 },
-                ..Default::default()
+                ..default
             },
         )
     }
