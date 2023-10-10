@@ -13,7 +13,6 @@ use super::{
 };
 
 /// Temporary structure, to help create instances of `OutputContract`. Not publicly exposed.
-#[derive(Default)]
 struct OutputContractBuilder {
     pub contract_id: String,
     pub explicit_name: String,
@@ -23,6 +22,21 @@ struct OutputContractBuilder {
     pub collected_endpoints: Vec<EndpointAbi>,
     endpoint_names: HashSet<String>, // help keep endpoints unique
     pub settings: OutputContractSettings,
+}
+
+impl Default for OutputContractBuilder {
+    fn default() -> Self {
+        Self {
+            contract_id: Default::default(),
+            explicit_name: Default::default(),
+            add_unlabelled: true,
+            add_labels: Default::default(),
+            add_endpoints: Default::default(),
+            collected_endpoints: Default::default(),
+            endpoint_names: Default::default(),
+            settings: Default::default(),
+        }
+    }
 }
 
 impl OutputContractBuilder {
