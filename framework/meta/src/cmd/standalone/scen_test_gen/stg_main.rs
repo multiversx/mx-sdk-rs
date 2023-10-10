@@ -117,9 +117,12 @@ fn process_file(config: ProcessFileConfig, context: ProcessFileContext) {
         context.test_dir.join(file_name)
     };
 
-    let mut file = File::create(file_path.clone()).unwrap();
+    let mut file = File::create(&file_path).unwrap();
     write!(file, "{new_code}").unwrap();
-    print_new_file(&file_path);
+
+    if existing_file_path.is_none() && context.create_flag {
+        print_new_file(&file_path);
+    }
 }
 
 fn find_test_file(test_dir: &Path, suffix: &str) -> Option<PathBuf> {
