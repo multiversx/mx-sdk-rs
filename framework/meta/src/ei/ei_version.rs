@@ -1,7 +1,7 @@
 /// The version of the SC environment interface (EI), it deals with the VM hooks available at a certain point in time.
 ///
 /// It is not tied to the version of the VM, hence the different numbering.
-#[derive(Clone, Copy, Default, PartialEq, Eq)]
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
 pub enum EIVersion {
     /// This is not necessarily the first version of the EI,
     /// but rather the oldest version when we started keeping track of the EI.
