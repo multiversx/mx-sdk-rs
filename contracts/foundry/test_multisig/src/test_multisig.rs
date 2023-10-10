@@ -54,14 +54,14 @@ pub trait TestMultisigContract {
     fn get_quorum(&self, multisig: &ManagedAddress) -> BigUint {
         let bs = self
             .test_raw()
-            .get_storage(&multisig, &ManagedBuffer::from(b"quorum"));
+            .get_storage(multisig, &ManagedBuffer::from(b"quorum"));
         BigUint::from(bs)
     }
 
     fn get_num_board_members(&self, multisig: &ManagedAddress) -> BigUint {
         let bs = self
             .test_raw()
-            .get_storage(&multisig, &ManagedBuffer::from(b"num_board_members"));
+            .get_storage(multisig, &ManagedBuffer::from(b"num_board_members"));
         BigUint::from(bs)
     }
 
@@ -92,9 +92,9 @@ pub trait TestMultisigContract {
         let mut args = ManagedArgBuffer::new();
         args.push_arg(value);
 
-        self.test_raw().start_prank(&proposer);
+        self.test_raw().start_prank(proposer);
         let _ = self.send_raw().direct_egld_execute(
-            &multisig,
+            multisig,
             &BigUint::from(0u32),
             5000000,
             &ManagedBuffer::from(b"proposeChangeQuorum"),
@@ -109,7 +109,7 @@ pub trait TestMultisigContract {
 
         self.test_raw().start_prank(signer);
         let _ = self.send_raw().direct_egld_execute(
-            &multisig,
+            multisig,
             &BigUint::from(0u32),
             5000000,
             &ManagedBuffer::from(b"sign"),
@@ -124,7 +124,7 @@ pub trait TestMultisigContract {
 
         self.test_raw().start_prank(performer);
         let _ = self.send_raw().direct_egld_execute(
-            &multisig,
+            multisig,
             &BigUint::from(0u32),
             5000000,
             &ManagedBuffer::from(b"performAction"),

@@ -89,7 +89,7 @@ pub trait TestAdder {
         let adder = self.adder_address().get();
 
         let mut adder_init_args = ManagedArgBuffer::new();
-        adder_init_args.push_arg(&value); // initial sum
+        adder_init_args.push_arg(value); // initial sum
 
         // start a prank and call 'adder' from 'owner'
         self.test_raw().start_prank(&owner);
@@ -102,9 +102,8 @@ pub trait TestAdder {
         );
         self.test_raw().stop_prank();
 
-        match res {
-            Result::Err(_) => panic!("call failed"),
-            Result::Ok(_) => (),
-        };
+        if res.is_err() {
+            panic!("call failed");
+        }
     }
 }
