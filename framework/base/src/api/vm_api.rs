@@ -1,7 +1,7 @@
 use super::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, LogApi, ManagedTypeApi, PrintApi, SendApi, StorageMapperApi, StorageReadApi,
-    StorageReadApiImpl, StorageWriteApi,
+    StorageReadApiImpl, StorageWriteApi, TestApi,
 };
 
 pub trait VMApi:
@@ -19,6 +19,7 @@ pub trait VMApi:
     + PrintApi
     + CallTypeApi
     + StorageMapperApi
+    + TestApi
     + Clone // TODO: remove
     + PartialEq // for helping derive PartialEq for managed types
     + Eq

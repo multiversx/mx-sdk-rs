@@ -1,0 +1,28 @@
+[package]
+name = "test_multisig-wasm"
+version = "0.0.0"
+edition = "2018"
+publish = false
+authors = [ "you",]
+
+[lib]
+crate-type = [ "cdylib",]
+
+[workspace]
+members = [ ".",]
+
+[dev-dependencies]
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+
+[dependencies.test_multisig]
+path = ".."
+
+[dependencies.multiversx-sc-wasm-adapter]
+version = "0.43.4"
+path = "../../../../framework/wasm-adapter"

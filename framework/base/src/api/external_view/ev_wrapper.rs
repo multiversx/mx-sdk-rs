@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::api::{
     BlockchainApi, CallTypeApi, CallValueApi, CryptoApi, EndpointArgumentApi, EndpointFinishApi,
     ErrorApi, HandleTypeInfo, LogApi, ManagedTypeApi, PrintApi, SendApi, StaticVarApi,
-    StorageMapperApi, StorageWriteApi, VMApi,
+    StorageMapperApi, StorageWriteApi, TestApi, VMApi,
 };
 
 #[derive(Clone)]
@@ -169,6 +169,17 @@ where
 impl<A> CallTypeApi for ExternalViewApi<A> where A: VMApi {}
 
 impl<A> StorageMapperApi for ExternalViewApi<A> where A: VMApi {}
+
+impl<A> TestApi for ExternalViewApi<A>
+where
+    A: VMApi,
+{
+    type TestApiImpl = A::TestApiImpl;
+
+    fn test_api_impl() -> Self::TestApiImpl {
+        A::test_api_impl()
+    }
+}
 
 impl<A> VMApi for ExternalViewApi<A>
 where

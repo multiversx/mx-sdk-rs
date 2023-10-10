@@ -76,7 +76,7 @@ pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
 }
 
 pub fn print_pack_mxsc_file(output_mxsc_path: &str) {
-    println!("{}", format!("Packing {output_mxsc_path} ...").green(),);
+    println!("{}", format!("\nPacking {output_mxsc_path} ...").green(),);
 }
 
 pub fn print_contract_size(size: usize) {
@@ -107,7 +107,7 @@ pub fn print_invalid_vm_hook(import_name: &str, ei_version: &str) {
 }
 
 pub fn print_check_ei_ok() {
-    println!("{}", " OK".green(),);
+    print!("{}", " OK".green(),);
 }
 
 pub fn print_ignore_ei_check() {
