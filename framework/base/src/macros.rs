@@ -202,6 +202,11 @@ macro_rules! only_owner {
     };
 }
 
+#[macro_export]
+macro_rules! allow_multiple_var_args {
+    () => {};
+}
+
 /// Converts usize to NonZeroUsize or returns SCError.
 #[macro_export]
 macro_rules! non_zero_usize {

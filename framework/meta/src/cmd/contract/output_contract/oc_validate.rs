@@ -25,16 +25,47 @@ fn validate_contract_var_args(abi: &ContractAbi) -> Result<(), String> {
 }
 
 fn validate_endpoint_var_args(endpoint_abi: &EndpointAbi) -> Result<(), String> {
-    let mut var_args_encountered = false;
-    for arg in &endpoint_abi.inputs {
-        if arg.multi_arg {
-            var_args_encountered = true;
-        } else if var_args_encountered {
-            return Err(format!(
-                    "Found regular arguments after var-args in method {}. This is not allowed, because it makes it impossible to parse the arguments.",
-                    &endpoint_abi.rust_method_name));
-        }
+    let num_var_args = endpoint_abi
+        .inputs
+        .iter()
+        .filter(|input| input.multi_arg)
+        .count();
+    if num_var_args > 1usize && !endpoint_abi.allow_multiple_var_args {
+        return Err(format!(
+        "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
+        &endpoint_abi.rust_method_name));
     }
-
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use multiversx_sc::abi::{InputAbi, TypeName};
+
+    use super::*;
+
+    #[test]
+    fn validate_endpoint_var_args_test() {
+        let mut endpoint_def = EndpointAbi::default();
+        let var_arg_1 = InputAbi {
+            arg_name: "arg_1",
+            type_name: TypeName::new(),
+            multi_arg: true,
+        };
+        let var_arg_2 = InputAbi {
+            arg_name: "arg_2",
+            type_name: TypeName::new(),
+            multi_arg: true,
+        };
+        endpoint_def.inputs.push(var_arg_1);
+        endpoint_def.inputs.push(var_arg_2);
+
+        assert_eq!(endpoint_def.allow_multiple_var_args, false);
+        assert_eq!(Err(format!(
+        "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
+        &endpoint_def.rust_method_name)), validate_endpoint_var_args(&endpoint_def));
+
+        endpoint_def.allow_multiple_var_args = true;
+        assert_eq!(Ok(()), validate_endpoint_var_args(&endpoint_def));
+    }
 }
