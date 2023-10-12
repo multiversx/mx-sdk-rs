@@ -1,0 +1,15 @@
+[package]
+name = "test_multisig-meta"
+version = "0.0.0"
+edition = "2018"
+publish = false
+authors = [ "you",]
+
+[dev-dependencies]
+
+[dependencies.test_multisig]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.43.4"
+path = "../../../../framework/meta"
