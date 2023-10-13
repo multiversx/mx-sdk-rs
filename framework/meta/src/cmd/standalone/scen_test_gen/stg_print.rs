@@ -29,7 +29,7 @@ pub fn print_no_file(suffix: &str) {
         "{}", format!(
             "No file ending in *_{suffix} found. Use the --create flag to create a new {suffix} file.",
         )
-        .bright_red()
+        .yellow()
     );
 }
 
