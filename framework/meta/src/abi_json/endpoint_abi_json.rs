@@ -99,7 +99,7 @@ pub struct EndpointAbiJson {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub labels: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allow_multiple_var_args: Option<bool>
+    pub allow_multiple_var_args: Option<bool>,
 }
 
 impl From<&EndpointAbi> for EndpointAbiJson {
@@ -122,7 +122,11 @@ impl From<&EndpointAbi> for EndpointAbiJson {
             inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
             outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
             labels: abi.labels.iter().map(|&label| label.to_owned()).collect(),
-            allow_multiple_var_args: if abi.allow_multiple_var_args { Some(true) } else { None }
+            allow_multiple_var_args: if abi.allow_multiple_var_args {
+                Some(true)
+            } else {
+                None
+            },
         }
     }
 }
