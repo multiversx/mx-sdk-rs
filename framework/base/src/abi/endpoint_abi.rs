@@ -47,6 +47,7 @@ pub struct EndpointAbi {
     pub payable_in_tokens: &'static [&'static str],
     pub inputs: Vec<InputAbi>,
     pub outputs: OutputAbis,
+    pub allow_multiple_var_args: bool,
 }
 
 impl EndpointAbi {
