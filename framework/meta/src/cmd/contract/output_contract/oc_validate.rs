@@ -60,7 +60,7 @@ mod tests {
         endpoint_def.inputs.push(var_arg_1);
         endpoint_def.inputs.push(var_arg_2);
 
-        assert_eq!(endpoint_def.allow_multiple_var_args, false);
+        assert!(!endpoint_def.allow_multiple_var_args);
         assert_eq!(Err(format!(
         "Multiple var args found in {}. Use #[allow_multiple_var_args] if you want to enable this feature",
         &endpoint_def.rust_method_name)), validate_endpoint_var_args(&endpoint_def));
