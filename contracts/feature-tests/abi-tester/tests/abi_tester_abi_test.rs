@@ -10,11 +10,7 @@ fn abi_tester_abi_generated_ok() {
 
     // generate ABI
     let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
-        blockchain
-            .current_dir()
-            .join("multicontract.toml")
-            .to_str()
-            .unwrap(),
+        blockchain.current_dir().as_path(),
     );
 
     let main_contract = multi_contract_config.find_contract("abi-tester");
@@ -52,11 +48,7 @@ fn check_multi_contract_config() {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/abi-tester");
 
     let multi_contract_config = multiversx_sc_meta::multi_contract_config::<abi_tester::AbiProvider>(
-        blockchain
-            .current_dir()
-            .join("multicontract.toml")
-            .to_str()
-            .unwrap(),
+        blockchain.current_dir().as_path(),
     );
 
     let ev_contract = multi_contract_config.find_contract("abi-tester-ev");

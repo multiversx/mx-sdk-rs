@@ -2,10 +2,11 @@ use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     fs,
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use super::{
+    oc_global_config::SC_CONFIG_FILE_NAMES,
     oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
     MultiContractConfigSerde, OutputContract, OutputContractGlobalConfig, OutputContractSerde,
     OutputContractSettings,
@@ -288,8 +289,30 @@ impl OutputContractGlobalConfig {
     }
 
     /// The standard way of loading a `multicontract.toml` configuration: read the file if present, use the default config otherwise.
-    pub fn load_from_file_or_default<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Self {
-        Self::load_from_file(path, original_abi)
-            .unwrap_or_else(|| Self::default_config(original_abi))
+    pub fn load_from_files_or_default<I, P>(paths: I, original_abi: &ContractAbi) -> Self
+    where
+        P: AsRef<Path>,
+        I: Iterator<Item = P>,
+    {
+        for path in paths {
+            if let Some(config) = Self::load_from_file(path.as_ref(), original_abi) {
+                return config;
+            }
+        }
+
+        Self::default_config(original_abi)
+    }
+
+    /// The standard way of loading a `multicontract.toml` configuration: read the file if present, use the default config otherwise.
+    pub fn load_from_crate_or_default<P>(contract_crate_path: P, original_abi: &ContractAbi) -> Self
+    where
+        P: AsRef<Path>,
+    {
+        Self::load_from_files_or_default(
+            SC_CONFIG_FILE_NAMES
+                .iter()
+                .map(|name| PathBuf::from(contract_crate_path.as_ref()).join(name)),
+            original_abi,
+        )
     }
 }

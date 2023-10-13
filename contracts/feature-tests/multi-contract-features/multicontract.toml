@@ -1,3 +1,5 @@
+# Keeping one file called `multicontract.toml` to test the backwards compatibility.
+
 [settings]
 main = "multi-contract-main"
 
