@@ -150,7 +150,7 @@ impl IntoRaw<TxExpectRaw> for TxExpect {
             message: self.message.into_raw(),
             logs: self.logs.into_raw(),
             gas: self.gas.into_raw(),
-            refund: self.refund.into_raw(),
+            refund: self.refund.into_raw_explicit(),
         }
     }
 }
