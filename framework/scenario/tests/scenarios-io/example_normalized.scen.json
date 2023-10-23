@@ -237,7 +237,8 @@
                     },
                     "+"
                 ],
-                "gas": "0x1234"
+                "gas": "0x1234",
+                "refund": "*"
             }
         },
         {
@@ -272,7 +273,8 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "status": ""
+                "status": "",
+                "refund": "*"
             }
         },
         {
@@ -289,7 +291,8 @@
             },
             "expect": {
                 "out": [],
-                "status": ""
+                "status": "",
+                "refund": "*"
             }
         },
         {
@@ -326,7 +329,8 @@
             },
             "expect": {
                 "out": [],
-                "status": ""
+                "status": "",
+                "refund": "*"
             }
         },
         {
@@ -364,7 +368,8 @@
             },
             "expect": {
                 "out": [],
-                "status": ""
+                "status": "",
+                "refund": "*"
             }
         },
         {
@@ -391,6 +396,10 @@
                                 {
                                     "nonce": "1023"
                                 }
+                            ],
+                            "roles": [
+                                "role1",
+                                "role2"
                             ]
                         },
                         "str:5-SeveralNFTs": {
@@ -403,6 +412,13 @@
                                     "balance": "3"
                                 }
                             ],
+                            "roles": [
+                                "ESDTRoleLocalMint",
+                                "ESDTRoleLocalBurn",
+                                "ESDTRoleNFTCreate",
+                                "ESDTRoleNFTAddQuantity",
+                                "ESDTRoleNFTBurn"
+                            ],
                             "frozen": "false"
                         },
                         "str:6-ZERO": "0",
@@ -414,6 +430,7 @@
                     "owner": "*"
                 },
                 "address:account_with_defaults": {
+                    "nonce": "*",
                     "esdt": "*",
                     "storage": "*",
                     "code": "*",
@@ -441,12 +458,14 @@
                     "owner": "address:bob"
                 },
                 "address:smart_contract_address_2": {
+                    "nonce": "*",
                     "storage": "*",
                     "code": "*",
                     "owner": "*",
                     "asyncCallData": "``func@arg1@arg2"
                 },
                 "str:account_with_defaults___________": {
+                    "nonce": "*",
                     "storage": "*",
                     "code": "*",
                     "owner": "*"
