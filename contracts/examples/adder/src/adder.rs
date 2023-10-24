@@ -8,7 +8,7 @@ multiversx_sc::imports!();
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]
-    fn sum(&self) -> SingleValueMapper<BigUint>;
+    fn sum(&self) -> SingleValueMapper<Self::Api, BigUint>;
 
     #[init]
     fn init(&self, initial_value: BigUint) {

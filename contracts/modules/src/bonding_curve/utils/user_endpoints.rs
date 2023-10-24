@@ -58,7 +58,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn buy_token<T>(
         &self,
-        requested_amount: BigUint,
+        requested_amount: BaseBigUint,
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) where
@@ -128,7 +128,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         &self,
         caller: &ManagedAddress,
         token: TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         let mut nonces = self.token_details(&token).get().token_nonces;
         let mut total_amount = amount;
@@ -138,7 +138,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             let nonce = nonces.get(0);
             let available_amount = self.nonce_amount(&token, nonce).get();
 
-            let amount_to_send: BigUint;
+            let amount_to_send: BaseBigUint;
             if available_amount <= total_amount {
                 amount_to_send = available_amount.clone();
                 total_amount -= amount_to_send.clone();
@@ -148,10 +148,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&token, nonce)
                     .update(|val| *val -= total_amount.clone());
                 amount_to_send = total_amount.clone();
-                total_amount = BigUint::zero();
+                total_amount = BaseBigUint::zero();
             }
             tokens_to_send.push(EsdtTokenPayment::new(token.clone(), nonce, amount_to_send));
-            if total_amount == BigUint::zero() {
+            if total_amount == BaseBigUint::zero() {
                 break;
             }
         }
@@ -162,7 +162,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             .update(|token_ownership| token_ownership.token_nonces = nonces);
     }
 
-    fn get_buy_price<T>(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint
+    fn get_buy_price<T>(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -177,7 +177,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.compute_buy_price::<T>(&identifier, &amount)
     }
 
-    fn get_sell_price<T>(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint
+    fn get_sell_price<T>(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -203,7 +203,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn get_token_availability(
         &self,
         identifier: TokenIdentifier,
-    ) -> MultiValueEncoded<MultiValue2<u64, BigUint>> {
+    ) -> MultiValueEncoded<MultiValue2<u64, BaseBigUint>> {
         let token_nonces = self.token_details(&identifier).get().token_nonces;
         let mut availability = MultiValueEncoded::new();
 
@@ -219,7 +219,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn check_owned_return_payment_token<T>(
         &self,
         issued_token: &TokenIdentifier,
-        amount: &BigUint,
+        amount: &BaseBigUint,
     ) -> EgldOrEsdtTokenIdentifier
     where
         T: CurveFunction<Self::Api>
@@ -241,7 +241,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             bonding_curve.curve != T::default(),
             "The token price was not set yet!"
         );
-        require!(amount > &BigUint::zero(), "Must pay more than 0 tokens!");
+        require!(amount > &BaseBigUint::zero(), "Must pay more than 0 tokens!");
         bonding_curve.payment_token()
     }
 
@@ -257,7 +257,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         );
     }
 
-    fn compute_buy_price<T>(&self, identifier: &TokenIdentifier, amount: &BigUint) -> BigUint
+    fn compute_buy_price<T>(&self, identifier: &TokenIdentifier, amount: &BaseBigUint) -> BaseBigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode
@@ -279,7 +279,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         function_selector.calculate_price(token_start, amount, arguments)
     }
 
-    fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: &BigUint) -> BigUint
+    fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: &BaseBigUint) -> BaseBigUint
     where
         T: CurveFunction<Self::Api>
             + TopEncode

@@ -11,7 +11,7 @@ use crate::bonding_curve::{
 )]
 pub enum FunctionSelector<M: ManagedTypeApi> {
     Linear(LinearFunction<M>),
-    CustomExample(BigUint<M>),
+    CustomExample(BaseBigUint<M>),
     #[default]
     None,
 }
@@ -19,10 +19,10 @@ pub enum FunctionSelector<M: ManagedTypeApi> {
 impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
     fn calculate_price(
         &self,
-        token_start: &BigUint<M>,
-        amount: &BigUint<M>,
+        token_start: &BaseBigUint<M>,
+        amount: &BaseBigUint<M>,
         arguments: &CurveArguments<M>,
-    ) -> BigUint<M> {
+    ) -> BaseBigUint<M> {
         match &self {
             FunctionSelector::Linear(linear_function) => {
                 linear_function.calculate_price(token_start, amount, arguments)

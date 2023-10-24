@@ -45,7 +45,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     // types::managed::basic
     add_managed_type(substitutions, &quote!(BigFloat));
     add_managed_type(substitutions, &quote!(BigInt));
-    add_managed_type(substitutions, &quote!(BigUint));
+    add_managed_type(substitutions, &quote!(BaseBigUint));
     add_managed_type(substitutions, &quote!(EllipticCurveComponents));
     add_managed_type(substitutions, &quote!(EllipticCurve));
     add_managed_type(substitutions, &quote!(ManagedBuffer));

@@ -93,8 +93,8 @@ impl From<&BigUint> for BigUintValue {
     }
 }
 
-impl<M: ManagedTypeApi> From<crate::multiversx_sc::types::BigUint<M>> for BigUintValue {
-    fn from(from: crate::multiversx_sc::types::BigUint<M>) -> Self {
+impl<M: ManagedTypeApi> From<crate::multiversx_sc::types::BaseBigUint<M>> for BigUintValue {
+    fn from(from: crate::multiversx_sc::types::BaseBigUint<M>) -> Self {
         let value = BigUint::from_bytes_be(from.to_bytes_be().as_slice());
         BigUintValue {
             original: ValueSubTree::Str(value.to_string()),

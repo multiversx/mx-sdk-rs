@@ -19,7 +19,7 @@ static CANNOT_DEPOSIT_FUNDS_ERR_MSG: &[u8] =
 #[multiversx_sc::contract]
 pub trait DigitalCash {
     #[init]
-    fn init(&self, fee: BigUint) {
+    fn init(&self, fee: BaseBigUint) {
         self.fee().set(fee);
     }
 
@@ -149,7 +149,7 @@ pub trait DigitalCash {
         let new_deposit = DepositInfo {
             depositor_address: caller_address,
             esdt_funds: ManagedVec::new(),
-            egld_funds: BigUint::zero(),
+            egld_funds: BaseBigUint::zero(),
             valability: 0,
             expiration_round: 0,
             fees: Fee {
@@ -178,7 +178,7 @@ pub trait DigitalCash {
         let num_tokens = forwarded_deposit.get_num_tokens();
         deposit_mapper.update(|deposit| {
             require!(
-                deposit.egld_funds == BigUint::zero() && deposit.esdt_funds.is_empty(),
+                deposit.egld_funds == BaseBigUint::zero() && deposit.esdt_funds.is_empty(),
                 "key already used"
             );
             require!(
@@ -215,7 +215,7 @@ pub trait DigitalCash {
         address: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         nonce: u64,
-    ) -> BigUint {
+    ) -> BaseBigUint {
         let deposit_mapper = self.deposit(&address);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
 
@@ -230,7 +230,7 @@ pub trait DigitalCash {
             }
         }
 
-        BigUint::zero()
+        BaseBigUint::zero()
     }
 
     // private functions
@@ -242,7 +242,7 @@ pub trait DigitalCash {
 
     fn get_num_token_transfers(
         &self,
-        egld_value: &BigUint,
+        egld_value: &BaseBigUint,
         esdt_transfers: &ManagedVec<EsdtTokenPayment>,
     ) -> usize {
         let mut amount = esdt_transfers.len();
@@ -272,8 +272,8 @@ pub trait DigitalCash {
     fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
 
     #[storage_mapper("fee")]
-    fn fee(&self) -> SingleValueMapper<BigUint>;
+    fn fee(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("collectedFees")]
-    fn collected_fees(&self) -> SingleValueMapper<BigUint>;
+    fn collected_fees(&self) -> SingleValueMapper<BaseBigUint>;
 }

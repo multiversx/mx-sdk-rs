@@ -17,7 +17,7 @@ use crate::{
     esdt::{ESDTSystemSmartContractProxy, FungibleTokenProperties},
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
+        BaseBigUint, CallbackClosure, ContractCall, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
         ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
@@ -104,10 +104,10 @@ where
     /// and pass None for the opt_callback argument
     pub fn issue(
         &self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
-        initial_supply: BigUint<SA>,
+        initial_supply: BaseBigUint<SA>,
         num_decimals: usize,
         opt_callback: Option<CallbackClosure<SA>>,
     ) -> ! {
@@ -157,7 +157,7 @@ where
     /// and pass None for the opt_callback argument
     pub fn issue_and_set_all_roles(
         &self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         num_decimals: usize,
@@ -168,7 +168,7 @@ where
         let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
             Some(cb) => cb,
-            None => self.default_callback_closure_obj(&BigUint::zero()),
+            None => self.default_callback_closure_obj(&BaseBigUint::zero()),
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
@@ -192,7 +192,7 @@ where
         }
     }
 
-    fn default_callback_closure_obj(&self, initial_supply: &BigUint<SA>) -> CallbackClosure<SA> {
+    fn default_callback_closure_obj(&self, initial_supply: &BaseBigUint<SA>) -> CallbackClosure<SA> {
         let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
         let cb_name = if initial_supply > &0 {
             DEFAULT_ISSUE_WITH_INIT_SUPPLY_CALLBACK_NAME
@@ -207,7 +207,7 @@ where
         cb_closure
     }
 
-    pub fn mint(&self, amount: BigUint<SA>) -> EsdtTokenPayment<SA> {
+    pub fn mint(&self, amount: BaseBigUint<SA>) -> EsdtTokenPayment<SA> {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
 
@@ -219,7 +219,7 @@ where
     pub fn mint_and_send(
         &self,
         to: &ManagedAddress<SA>,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
     ) -> EsdtTokenPayment<SA> {
         let payment = self.mint(amount);
         self.send_payment(to, &payment);
@@ -227,14 +227,14 @@ where
         payment
     }
 
-    pub fn burn(&self, amount: &BigUint<SA>) {
+    pub fn burn(&self, amount: &BaseBigUint<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id_ref();
 
         send_wrapper.esdt_local_burn(token_id, 0, amount);
     }
 
-    pub fn get_balance(&self) -> BigUint<SA> {
+    pub fn get_balance(&self) -> BaseBigUint<SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
         let token_id = self.get_token_id_ref();

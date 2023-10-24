@@ -37,8 +37,8 @@ pub trait Storage {
     fn attack_victory_probability(&self) -> SingleValueMapper<u8>;
 
     #[storage_mapper("level_up_fee")]
-    fn level_up_fee(&self) -> SingleValueMapper<BigUint>;
+    fn level_up_fee(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("collected_fees")]
-    fn collected_fees(&self) -> SingleValueMapper<BigUint>;
+    fn collected_fees(&self) -> SingleValueMapper<BaseBigUint>;
 }

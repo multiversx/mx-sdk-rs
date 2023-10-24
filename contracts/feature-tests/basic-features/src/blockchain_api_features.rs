@@ -39,7 +39,7 @@ pub trait BlockchainApiFeatures {
     }
 
     #[endpoint]
-    fn get_cumulated_validator_rewards(&self) -> BigUint {
+    fn get_cumulated_validator_rewards(&self) -> BaseBigUint {
         self.blockchain().get_cumulated_validator_rewards()
     }
 }

@@ -5,8 +5,8 @@ use crate::bonding_curve::utils::structs::CurveArguments;
 pub trait CurveFunction<M: ManagedTypeApi> {
     fn calculate_price(
         &self,
-        token_start: &BigUint<M>,
-        amount: &BigUint<M>,
+        token_start: &BaseBigUint<M>,
+        amount: &BaseBigUint<M>,
         arguments: &CurveArguments<M>,
-    ) -> BigUint<M>;
+    ) -> BaseBigUint<M>;
 }

@@ -23,7 +23,7 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_execu_accept_funds_with_fees(
         &self,
         to: ManagedAddress,
-        percentage_fees: BigUint,
+        percentage_fees: BaseBigUint,
     ) {
         let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
@@ -65,7 +65,7 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_exec_accept_funds_return_values(
         &self,
         to: ManagedAddress,
-    ) -> MultiValue4<u64, u64, BigUint, EgldOrEsdtTokenIdentifier> {
+    ) -> MultiValue4<u64, u64, BaseBigUint, EgldOrEsdtTokenIdentifier> {
         let payment = self.call_value().egld_or_single_esdt();
         let payment_token = payment.token_identifier.clone();
         let gas_left_before = self.blockchain().get_gas_left();
@@ -81,7 +81,7 @@ pub trait ForwarderTransferExecuteModule {
         (
             gas_left_before,
             gas_left_after,
-            BigUint::zero(),
+            BaseBigUint::zero(),
             payment_token,
         )
             .into()
@@ -91,7 +91,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_accept_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -113,7 +113,7 @@ pub trait ForwarderTransferExecuteModule {
     fn forward_transf_exec_reject_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -135,7 +135,7 @@ pub trait ForwarderTransferExecuteModule {
     fn transf_exec_multi_reject_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 

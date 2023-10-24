@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EgldOrEsdtTokenIdentifier},
+    types::{BaseBigUint, EgldOrEsdtTokenIdentifier},
 };
 
 use crate::codec::{
@@ -20,7 +20,7 @@ use super::EsdtTokenPayment;
 pub struct EgldOrEsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub token_nonce: u64,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
@@ -28,14 +28,14 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::egld(),
             token_nonce: 0,
-            amount: BigUint::zero(),
+            amount: BaseBigUint::zero(),
         }
     }
 
     pub fn new(
         token_identifier: EgldOrEsdtTokenIdentifier<M>,
         token_nonce: u64,
-        amount: BigUint<M>,
+        amount: BaseBigUint<M>,
     ) -> Self {
         EgldOrEsdtTokenPayment {
             token_identifier,
@@ -53,16 +53,16 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
         )
     }
 
-    pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>) {
+    pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<M>, u64, BaseBigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 }
 
-impl<M: ManagedTypeApi> From<(EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>)>
+impl<M: ManagedTypeApi> From<(EgldOrEsdtTokenIdentifier<M>, u64, BaseBigUint<M>)>
     for EgldOrEsdtTokenPayment<M>
 {
     #[inline]
-    fn from(value: (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+    fn from(value: (EgldOrEsdtTokenIdentifier<M>, u64, BaseBigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
     }

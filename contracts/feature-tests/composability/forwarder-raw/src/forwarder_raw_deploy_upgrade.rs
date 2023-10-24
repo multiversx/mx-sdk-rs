@@ -11,7 +11,7 @@ pub trait ForwarderRawDeployUpgrade {
         self.send_raw()
             .deploy_contract(
                 self.blockchain().get_gas_left(),
-                &BigUint::zero(),
+                &BaseBigUint::zero(),
                 &code,
                 CodeMetadata::DEFAULT,
                 &args.to_arg_buffer(),
@@ -27,7 +27,7 @@ pub trait ForwarderRawDeployUpgrade {
     ) -> ManagedAddress {
         let (address, _) = self.send_raw().deploy_from_source_contract(
             self.blockchain().get_gas_left(),
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
             &arguments.to_arg_buffer(),
@@ -46,7 +46,7 @@ pub trait ForwarderRawDeployUpgrade {
         self.send_raw().upgrade_contract(
             child_sc_address,
             self.blockchain().get_gas_left(),
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             new_code,
             CodeMetadata::UPGRADEABLE,
             &arguments.to_arg_buffer(),
@@ -63,7 +63,7 @@ pub trait ForwarderRawDeployUpgrade {
         self.send_raw().upgrade_from_source_contract(
             &sc_address,
             self.blockchain().get_gas_left(),
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &source_contract_address,
             CodeMetadata::DEFAULT,
             &arguments.to_arg_buffer(),

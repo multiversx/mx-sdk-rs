@@ -3,7 +3,7 @@ use crate::codec::TopEncodeMulti;
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedAddress, ManagedBuffer,
+        BaseBigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, ManagedAddress, ManagedBuffer,
     },
 };
 
@@ -87,7 +87,7 @@ where
         endpoint_name: N,
         token_identifier: EgldOrEsdtTokenIdentifier<SA>,
         token_nonce: u64,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
     ) -> Self {
         ContractCallWithEgldOrSingleEsdt {
             basic: ContractCallNoPayment::new(to, endpoint_name),

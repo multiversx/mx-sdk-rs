@@ -32,7 +32,7 @@ mod message_me_proxy {
         fn init(&self, init_arg: i32) -> i32;
 
         #[endpoint(messageMe)]
-        fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
+        fn message_me(&self, arg1: i64, arg2: &BaseBigUint, arg3: Vec<u8>, arg4: &ManagedAddress);
     }
 }
 
@@ -118,7 +118,7 @@ pub trait ProxyTestFirst {
             .contract(other_contract)
             .message_me(
                 0x01,
-                &BigUint::from(2u32),
+                &BaseBigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
@@ -133,7 +133,7 @@ pub trait ProxyTestFirst {
             .contract(other_contract)
             .message_me(
                 0x01,
-                &BigUint::from(2u32),
+                &BaseBigUint::from(2u32),
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )

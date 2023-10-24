@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dev-dependencies.vault]
 path = "../vault"
 
@@ -19,6 +22,11 @@ path = "../../../../framework/base"
 version = "0.43.3"
 path = "../../../../contracts/modules"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.transfer-role-features]
+path = "."
+features = ["debug"]

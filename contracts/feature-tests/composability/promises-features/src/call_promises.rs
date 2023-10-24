@@ -6,7 +6,7 @@ pub struct CallbackData<M: ManagedTypeApi> {
     callback_name: ManagedBuffer<M>,
     token_identifier: EgldOrEsdtTokenIdentifier<M>,
     token_nonce: u64,
-    token_amount: BigUint<M>,
+    token_amount: BaseBigUint<M>,
     args: ManagedVec<M, ManagedBuffer<M>>,
 }
 
@@ -35,7 +35,7 @@ pub trait CallPromisesModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         let gas_limit = self.blockchain().get_gas_left() - 20_000_000;
         self.vault_proxy()
@@ -67,7 +67,7 @@ pub trait CallPromisesModule {
         &self,
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] payment: &BigUint,
+        #[indexed] payment: &BaseBigUint,
     );
 
     #[view]
@@ -82,7 +82,7 @@ pub trait CallPromisesModule {
         ManagedBuffer,
         EgldOrEsdtTokenIdentifier,
         u64,
-        BigUint,
+        BaseBigUint,
         MultiValueManagedVec<Self::Api, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);

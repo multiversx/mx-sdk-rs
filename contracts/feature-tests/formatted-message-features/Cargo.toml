@@ -8,10 +8,18 @@ publish = false
 [lib]
 path = "src/formatted_message_features.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.formatted-message-features]
+path = "."
+features = ["debug"]

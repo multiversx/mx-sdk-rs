@@ -88,7 +88,7 @@ pub trait BasicFeatures:
     }
 
     #[endpoint]
-    fn endpoint_with_mutable_arg(&self, mut arg1: BigUint, arg2: u64, arg3: u32) -> BigUint {
+    fn endpoint_with_mutable_arg(&self, mut arg1: BaseBigUint, arg2: u64, arg3: u32) -> BaseBigUint {
         arg1 += arg2;
         arg1 += arg3;
 

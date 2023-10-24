@@ -4,7 +4,7 @@ multiversx_sc::derive_imports!();
 #[derive(TopEncode, TopDecode)]
 pub struct TokenAmountPair<M: ManagedTypeApi> {
     pub token_id: TokenIdentifier<M>,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
 }
 
 static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";
@@ -14,8 +14,8 @@ pub trait StakingModule {
     fn init_staking_module(
         &self,
         staking_token: &EgldOrEsdtTokenIdentifier,
-        staking_amount: &BigUint,
-        slash_amount: &BigUint,
+        staking_amount: &BaseBigUint,
+        slash_amount: &BaseBigUint,
         slash_quorum: usize,
         user_whitelist: &ManagedVec<ManagedAddress>,
     ) {
@@ -62,7 +62,7 @@ pub trait StakingModule {
     }
 
     #[endpoint]
-    fn unstake(&self, unstake_amount: BigUint) {
+    fn unstake(&self, unstake_amount: BaseBigUint) {
         let caller = self.blockchain().get_caller();
         let staked_amount_mapper = self.staked_amount(&caller);
         let staked_amount = staked_amount_mapper.get();
@@ -149,13 +149,13 @@ pub trait StakingModule {
     fn staking_token(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
 
     #[storage_mapper("staking_module:requiredStakeAmount")]
-    fn required_stake_amount(&self) -> SingleValueMapper<BigUint>;
+    fn required_stake_amount(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("staking_module:userWhitelist")]
     fn user_whitelist(&self) -> UnorderedSetMapper<ManagedAddress>;
 
     #[storage_mapper("staking_module:stakedAmount")]
-    fn staked_amount(&self, user: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    fn staked_amount(&self, user: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("staking_module:slashingProposalVoters")]
     fn slashing_proposal_voters(
@@ -167,8 +167,8 @@ pub trait StakingModule {
     fn slash_quorum(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("staking_module:slashAmount")]
-    fn slash_amount(&self) -> SingleValueMapper<BigUint>;
+    fn slash_amount(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("staking_module:totalSlashedAmount")]
-    fn total_slashed_amount(&self) -> SingleValueMapper<BigUint>;
+    fn total_slashed_amount(&self) -> SingleValueMapper<BaseBigUint>;
 }

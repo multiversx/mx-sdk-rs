@@ -55,13 +55,13 @@ pub trait BigFloatWrappedMethods: big_float_methods::BigFloatMethods {
     }
 
     #[endpoint]
-    fn big_float_from_big_uint_1_wrapped(&self, bu: BigUint) -> BigInt {
+    fn big_float_from_big_uint_1_wrapped(&self, bu: BaseBigUint) -> BigInt {
         let number = self.big_float_from_big_uint_1(bu);
         number.to_fixed_point(&BigFloat::from(1))
     }
 
     #[endpoint]
-    fn big_float_from_big_uint_2_wrapped(&self, bu: BigUint) -> BigInt {
+    fn big_float_from_big_uint_2_wrapped(&self, bu: BaseBigUint) -> BigInt {
         let number = self.big_float_from_big_uint_2(bu);
         number.to_fixed_point(&BigFloat::from(1))
     }

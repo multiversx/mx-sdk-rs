@@ -3,7 +3,7 @@ use multiversx_sc::{
     codec,
     codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     derive::ManagedVecItem,
-    types::{BigUint, ManagedType},
+    types::{BaseBigUint, ManagedType},
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -14,7 +14,7 @@ use multiversx_sc_scenario::api::StaticApi;
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
 pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
-    pub big_uint: multiversx_sc::types::BigUint<M>,
+    pub big_uint: multiversx_sc::types::BaseBigUint<M>,
     pub num: u32,
 }
 
@@ -34,7 +34,7 @@ fn struct_with_numbers_static() {
 fn managed_struct_to_bytes_writer() {
     let fortytwo = 42u64;
     let s = ManagedStructWithBigUint::<StaticApi> {
-        big_uint: BigUint::from(fortytwo),
+        big_uint: BaseBigUint::from(fortytwo),
         num: 0x12345,
     };
     let mut arr: [u8; 8] = [0u8;
@@ -56,7 +56,7 @@ fn managed_struct_to_bytes_writer() {
 #[test]
 fn managed_struct_from_bytes_reader() {
     let s = ManagedStructWithBigUint::<StaticApi> {
-        big_uint: BigUint::from(42u64),
+        big_uint: BaseBigUint::from(42u64),
         num: 0x12345,
     };
     let handle_bytes = s.big_uint.get_handle().to_be_bytes();

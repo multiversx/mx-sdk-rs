@@ -7,15 +7,23 @@ publish = false
 
 [lib]
 path = "src/mmap_features.rs"
+
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../../framework/base"
-
 features = ["managed-map"]
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.managed-map-features]
+path = "."
+features = ["debug"]
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"

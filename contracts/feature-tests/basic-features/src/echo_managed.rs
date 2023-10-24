@@ -4,7 +4,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait EchoManagedTypes {
     #[endpoint]
-    fn echo_big_uint(&self, bi: BigUint) -> BigUint {
+    fn echo_big_uint(&self, bi: BaseBigUint) -> BaseBigUint {
         bi
     }
 

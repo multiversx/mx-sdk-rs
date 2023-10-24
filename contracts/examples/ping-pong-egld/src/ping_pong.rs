@@ -32,10 +32,10 @@ pub trait PingPong {
     #[init]
     fn init(
         &self,
-        ping_amount: &BigUint,
+        ping_amount: &BaseBigUint,
         duration_in_seconds: u64,
         opt_activation_timestamp: Option<u64>,
-        max_funds: OptionalValue<BigUint>,
+        max_funds: OptionalValue<BaseBigUint>,
     ) {
         self.ping_amount().set(ping_amount);
         let activation_timestamp =
@@ -176,7 +176,7 @@ pub trait PingPong {
 
     #[view(getPingAmount)]
     #[storage_mapper("pingAmount")]
-    fn ping_amount(&self) -> SingleValueMapper<BigUint>;
+    fn ping_amount(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
@@ -191,7 +191,7 @@ pub trait PingPong {
     /// Optional funding cap.
     #[view(getMaxFunds)]
     #[storage_mapper("maxFunds")]
-    fn max_funds(&self) -> SingleValueMapper<Option<BigUint>>;
+    fn max_funds(&self) -> SingleValueMapper<Option<BaseBigUint>>;
 
     #[storage_mapper("user")]
     fn user_mapper(&self) -> UserMapper;

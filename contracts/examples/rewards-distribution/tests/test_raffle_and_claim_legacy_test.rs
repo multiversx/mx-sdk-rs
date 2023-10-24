@@ -2,7 +2,7 @@
 
 use multiversx_sc::{
     codec::multi_types::MultiValue2,
-    types::{BigUint, EgldOrEsdtTokenIdentifier, MultiValueEncoded, OperationCompletionStatus},
+    types::{BaseBigUint, EgldOrEsdtTokenIdentifier, MultiValueEncoded, OperationCompletionStatus},
 };
 use multiversx_sc_scenario::{
     managed_token_id, rust_biguint,
@@ -108,7 +108,7 @@ fn test_raffle_and_claim() {
         .execute_tx(&alice, &rewards_distribution_sc, &rust_biguint!(0), |sc| {
             // collect the claimable amounts
             let raffle_id = 0;
-            let mut rewards: Vec<BigUint<DebugApi>> = Vec::new();
+            let mut rewards: Vec<BaseBigUint<DebugApi>> = Vec::new();
 
             for nonce in 1u64..=nft_count {
                 let amount = sc.compute_claimable_amount(

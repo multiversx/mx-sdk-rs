@@ -1,6 +1,6 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
+    types::{BaseBigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
 multiversx_sc::derive_imports!();
@@ -8,7 +8,7 @@ multiversx_sc::derive_imports!();
 #[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {
     pub to: ManagedAddress<M>,
-    pub egld_amount: BigUint<M>,
+    pub egld_amount: BaseBigUint<M>,
     pub endpoint_name: ManagedBuffer<M>,
     pub arguments: ManagedVec<M, ManagedBuffer<M>>,
 }
@@ -23,14 +23,14 @@ pub enum Action<M: ManagedTypeApi> {
     SendTransferExecute(CallActionData<M>),
     SendAsyncCall(CallActionData<M>),
     SCDeployFromSource {
-        amount: BigUint<M>,
+        amount: BaseBigUint<M>,
         source: ManagedAddress<M>,
         code_metadata: CodeMetadata,
         arguments: ManagedVec<M, ManagedBuffer<M>>,
     },
     SCUpgradeFromSource {
         sc_address: ManagedAddress<M>,
-        amount: BigUint<M>,
+        amount: BaseBigUint<M>,
         source: ManagedAddress<M>,
         code_metadata: CodeMetadata,
         arguments: ManagedVec<M, ManagedBuffer<M>>,

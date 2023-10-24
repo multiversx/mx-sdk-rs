@@ -8,14 +8,22 @@ publish = false
 [lib]
 path = "src/abi_tester.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../../framework/base"
 features = ["alloc"]
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.abi-tester]
+path = "."
+features = ["debug"]
 
 [dev-dependencies.multiversx-sc-meta]
 version = "0.43.3"

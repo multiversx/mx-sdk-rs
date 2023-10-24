@@ -6,7 +6,7 @@ pub struct CallbackData<M: ManagedTypeApi> {
     callback_name: ManagedBuffer<M>,
     token_identifier: EgldOrEsdtTokenIdentifier<M>,
     token_nonce: u64,
-    token_amount: BigUint<M>,
+    token_amount: BaseBigUint<M>,
     args: ManagedVec<M, ManagedBuffer<M>>,
 }
 
@@ -84,7 +84,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[payable("*")]
     #[endpoint]
-    fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+    fn forward_async_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BaseBigUint) {
         let payment = self.call_value().egld_or_single_esdt();
         let fees = &payment.amount * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = &payment.amount - &fees;
@@ -107,7 +107,7 @@ pub trait ForwarderAsyncCallModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         self.vault_proxy()
             .contract(to)
@@ -136,7 +136,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] payment: &BigUint,
+        #[indexed] payment: &BaseBigUint,
     );
 
     #[endpoint]
@@ -144,7 +144,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: &ManagedAddress,
         token_identifier: &EgldOrEsdtTokenIdentifier,
-        amount: &BigUint,
+        amount: &BaseBigUint,
     ) {
         self.vault_proxy()
             .contract(to.clone())
@@ -163,7 +163,7 @@ pub trait ForwarderAsyncCallModule {
         &self,
         to: &ManagedAddress,
         token_identifier: &EgldOrEsdtTokenIdentifier,
-        cb_amount: &BigUint,
+        cb_amount: &BaseBigUint,
     ) {
         self.vault_proxy()
             .contract(to.clone())
@@ -177,7 +177,7 @@ pub trait ForwarderAsyncCallModule {
     fn send_async_accept_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -208,7 +208,7 @@ pub trait ForwarderAsyncCallModule {
         ManagedBuffer,
         EgldOrEsdtTokenIdentifier,
         u64,
-        BigUint,
+        BaseBigUint,
         MultiValueManagedVec<Self::Api, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);

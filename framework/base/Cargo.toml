@@ -22,6 +22,8 @@ alloc = ["multiversx-sc-codec/alloc"]
 promises = []
 managed-map = []
 esdt-token-payment-legacy-decode = []
+no-debug-api = ["multiversx-sc-imports/no-debug-api"]
+single-tx-api = ["multiversx-sc-imports/single-tx-api"]
 
 [dependencies]
 hashbrown = "0.13.2"
@@ -35,6 +37,10 @@ default-features = false
 [dependencies.multiversx-sc-derive]
 version = "=0.43.3"
 path = "../derive"
+
+[dependencies.multiversx-sc-imports]
+version = "=0.43.3"
+path = "../imports"
 
 [dependencies.multiversx-sc-codec]
 version = "=0.18.1"

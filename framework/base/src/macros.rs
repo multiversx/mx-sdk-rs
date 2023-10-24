@@ -1,39 +1,6 @@
 // Note: Simple macros cannot be placed in multiversx-sc-derive,
 // because Rust "cannot export macro_rules! macros from a `proc-macro` crate type currently".
 
-/// Getting all imports needed for a smart contract.
-#[macro_export]
-macro_rules! imports {
-    () => {
-        use core::ops::{
-            Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-            DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
-            SubAssign,
-        };
-        use multiversx_sc::{
-            abi::TypeAbi,
-            api::{ErrorApiImpl, ManagedTypeApi},
-            arrayvec::ArrayVec,
-            codec::{
-                multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-                TopEncode,
-            },
-            contract_base::{ContractBase, ProxyObjBase},
-            err_msg,
-            esdt::*,
-            io::*,
-            non_zero_usize,
-            non_zero_util::*,
-            require, require_old, sc_error, sc_format, sc_panic, sc_print,
-            storage::mappers::*,
-            types::{
-                SCResult::{Err, Ok},
-                *,
-            },
-        };
-    };
-}
-
 /// Imports required for deriving serialization and TypeAbi.
 #[macro_export]
 macro_rules! derive_imports {

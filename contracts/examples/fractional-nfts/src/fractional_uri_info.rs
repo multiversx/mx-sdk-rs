@@ -6,13 +6,13 @@ use multiversx_sc::contract_base::ManagedSerializer;
 #[derive(TopEncode, TopDecode)]
 pub struct FractionalUriInfo<M: ManagedTypeApi> {
     pub original_payment: EsdtTokenPayment<M>,
-    pub initial_fractional_amount: BigUint<M>,
+    pub initial_fractional_amount: BaseBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> FractionalUriInfo<M> {
     pub fn new(
         original_payment: EsdtTokenPayment<M>,
-        initial_fractional_amount: BigUint<M>,
+        initial_fractional_amount: BaseBigUint<M>,
     ) -> Self {
         Self {
             original_payment,

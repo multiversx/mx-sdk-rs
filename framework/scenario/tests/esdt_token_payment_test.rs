@@ -1,6 +1,6 @@
 use multiversx_sc::{
     codec::{self, DefaultErrorHandler, TopEncode},
-    types::{BigUint, EsdtTokenPayment, TokenIdentifier},
+    types::{BaseBigUint, EsdtTokenPayment, TokenIdentifier},
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -44,7 +44,7 @@ fn esdt_token_payment_backwards_compatibility_decode() {
     let token_payment = EsdtTokenPayment::<StaticApi>::new(
         TokenIdentifier::from("MYTOKEN-12345"),
         0u64,
-        BigUint::from(42u64),
+        BaseBigUint::from(42u64),
     );
 
     let mut bytes = Vec::<u8>::new();
@@ -104,5 +104,5 @@ fn esdt_token_payment_backwards_compatibility_decode_real_data() {
     .unwrap();
     assert_eq!(decoded.token_identifier.to_string(), "ASHEGLDF-265c45");
     assert_eq!(decoded.token_nonce, 1);
-    assert_eq!(decoded.amount, BigUint::from(0x5af3107a4000u64));
+    assert_eq!(decoded.amount, BaseBigUint::from(0x5af3107a4000u64));
 }

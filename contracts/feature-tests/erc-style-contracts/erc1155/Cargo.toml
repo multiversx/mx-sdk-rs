@@ -8,14 +8,22 @@ publish = false
 [lib]
 path = "src/erc1155.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../../../framework/base"
 features = ["alloc"]
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.erc1155]
+path = "."
+features = ["debug"]
 
 [dev-dependencies.erc1155-user-mock]
 path="../erc1155-user-mock"

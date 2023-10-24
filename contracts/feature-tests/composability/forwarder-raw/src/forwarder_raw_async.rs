@@ -27,7 +27,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         &self,
         to: ManagedAddress,
         payment_token: EgldOrEsdtTokenIdentifier,
-        payment_amount: BigUint,
+        payment_amount: BaseBigUint,
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) -> ContractCallWithEgldOrSingleEsdt<Self::Api, ()> {
@@ -148,7 +148,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     fn forward_async_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new();
         for multi_arg in token_payments.into_iter() {
@@ -161,7 +161,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
 
         self.send_raw().async_call_raw(
             &to,
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &ManagedBuffer::from(&b"retrieve_multi_funds_async"[..]),
             &arg_buffer,
         );
@@ -171,7 +171,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     fn forwarder_async_send_and_retrieve_multi_transfer_funds(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_payments = ManagedVec::new();
         for multi_arg in token_payments.into_iter() {

@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/crowdfunding_erc20.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.erc20]
 path = "../erc20"
 
@@ -15,7 +18,12 @@ path = "../erc20"
 version = "0.43.3"
 path = "../../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.crowdfunding-erc20]
+path = "."
+features = ["debug"]
 

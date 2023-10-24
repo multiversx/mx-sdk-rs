@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.kitty]
 version = "0.0.0"
 path = "../common/kitty"
@@ -20,6 +23,11 @@ path = "../kitty-ownership"
 version = "0.43.3"
 path = "../../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.kitty-auction]
+path = "."
+features = ["debug"]

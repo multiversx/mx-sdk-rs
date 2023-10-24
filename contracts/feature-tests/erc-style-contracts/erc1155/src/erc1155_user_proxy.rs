@@ -7,8 +7,8 @@ pub trait Erc1155UserProxy {
         &self,
         operator: ManagedAddress,
         from: ManagedAddress,
-        type_id: BigUint,
-        value: BigUint,
+        type_id: BaseBigUint,
+        value: BaseBigUint,
         data: ManagedBuffer,
     );
 
@@ -17,8 +17,8 @@ pub trait Erc1155UserProxy {
         &self,
         operator: ManagedAddress,
         from: ManagedAddress,
-        type_ids: Vec<BigUint>,
-        values: Vec<BigUint>,
+        type_ids: Vec<BaseBigUint>,
+        values: Vec<BaseBigUint>,
         data: ManagedBuffer,
     );
 }

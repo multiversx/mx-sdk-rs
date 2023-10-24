@@ -8,7 +8,7 @@ use crate::{
     contract_base::ExitCodecErrorHandler,
     err_msg,
     types::{
-        BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
+        BigInt, BaseBigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedSCError, ManagedType,
         SCError, StaticSCError,
     },
 };
@@ -69,7 +69,7 @@ where
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<FA>>()
-            || T::type_eq::<BigUint<FA>>()
+            || T::type_eq::<BaseBigUint<FA>>()
             || T::type_eq::<BigInt<FA>>()
     }
 
@@ -82,7 +82,7 @@ where
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<FA>>() {
             FA::finish_api_impl().finish_managed_buffer_raw(managed_buffer.handle.clone());
             Ok(())
-        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<FA>>() {
+        } else if let Some(big_uint) = value.try_cast_ref::<BaseBigUint<FA>>() {
             FA::finish_api_impl().finish_big_uint_raw(big_uint.handle.clone());
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<FA>>() {

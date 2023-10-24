@@ -14,7 +14,7 @@ pub trait EsdtTransferWithFee {
     fn set_exact_value_fee(
         &self,
         fee_token: TokenIdentifier,
-        fee_amount: BigUint,
+        fee_amount: BaseBigUint,
         token: TokenIdentifier,
     ) {
         self.token_fee(&token)
@@ -118,7 +118,7 @@ pub trait EsdtTransferWithFee {
                 provided
             },
             Fee::Unset => {
-                provided.amount = BigUint::zero();
+                provided.amount = BaseBigUint::zero();
                 provided
             },
         }
@@ -130,5 +130,5 @@ pub trait EsdtTransferWithFee {
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
-    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BigUint>;
+    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BaseBigUint>;
 }

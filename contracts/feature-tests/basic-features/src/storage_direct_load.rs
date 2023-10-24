@@ -13,7 +13,7 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("big_uint")]
-    fn load_big_uint(&self) -> BigUint;
+    fn load_big_uint(&self) -> BaseBigUint;
 
     #[endpoint]
     #[storage_get("big_int")]
@@ -65,11 +65,11 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("map1")]
-    fn load_map1(&self, addr: ManagedAddress) -> BigUint;
+    fn load_map1(&self, addr: ManagedAddress) -> BaseBigUint;
 
     #[endpoint]
     #[storage_get("map2")]
-    fn load_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress) -> BigUint;
+    fn load_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress) -> BaseBigUint;
 
     #[endpoint]
     #[storage_get("map3")]

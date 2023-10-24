@@ -20,7 +20,7 @@ multiversx_sc::derive_imports!();
     TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone,
 )]
 pub struct MyCoolStruct<M: ManagedTypeApi> {
-    pub awesome: BigUint<M>,
+    pub awesome: BaseBigUint<M>,
 }
 
 #[multiversx_sc::contract]
@@ -40,29 +40,29 @@ pub trait PayableFeatures {
     fn one_arg_no_result_endpoint(&self, _arg: u64) {}
 
     #[endpoint]
-    fn one_arg_one_result_endpoint(&self, _arg: u64) -> BigUint {
-        BigUint::zero()
+    fn one_arg_one_result_endpoint(&self, _arg: u64) -> BaseBigUint {
+        BaseBigUint::zero()
     }
 
     #[endpoint]
-    fn multi_result(&self, _arg: TokenIdentifier) -> MultiValueEncoded<BigUint> {
+    fn multi_result(&self, _arg: TokenIdentifier) -> MultiValueEncoded<BaseBigUint> {
         MultiValueEncoded::new()
     }
 
     #[endpoint]
-    fn nested_result(&self, _arg: TokenIdentifier) -> ManagedVec<ManagedVec<BigUint>> {
+    fn nested_result(&self, _arg: TokenIdentifier) -> ManagedVec<ManagedVec<BaseBigUint>> {
         ManagedVec::new()
     }
 
     #[endpoint]
     fn custom_struct(&self, _arg: MyCoolStruct<Self::Api>) -> MyCoolStruct<Self::Api> {
         MyCoolStruct {
-            awesome: BigUint::zero(),
+            awesome: BaseBigUint::zero(),
         }
     }
 
     #[endpoint]
-    fn optional_type(&self, _arg: OptionalValue<BigUint>) -> OptionalValue<TokenIdentifier> {
+    fn optional_type(&self, _arg: OptionalValue<BaseBigUint>) -> OptionalValue<TokenIdentifier> {
         OptionalValue::None
     }
 
@@ -76,7 +76,7 @@ pub trait PayableFeatures {
         EsdtTokenPayment::new(
             TokenIdentifier::from_esdt_bytes(b"COOL-123456"),
             0,
-            BigUint::from(1_000u64),
+            BaseBigUint::from(1_000u64),
         )
     }
 
@@ -98,23 +98,23 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
-    fn multi_value_2(&self, arg: MultiValue2<u64, BigUint>) -> MultiValue2<u64, BigUint> {
+    fn multi_value_2(&self, arg: MultiValue2<u64, BaseBigUint>) -> MultiValue2<u64, BaseBigUint> {
         arg
     }
 
     #[endpoint]
     fn multi_value_4(
         &self,
-        arg: MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, TokenIdentifier>,
-    ) -> MultiValue4<u64, BigUint, MyCoolStruct<Self::Api>, TokenIdentifier> {
+        arg: MultiValue4<u64, BaseBigUint, MyCoolStruct<Self::Api>, TokenIdentifier>,
+    ) -> MultiValue4<u64, BaseBigUint, MyCoolStruct<Self::Api>, TokenIdentifier> {
         arg
     }
 
     #[endpoint]
     fn complex_multi_values(
         &self,
-        arg: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
-    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>> {
+        arg: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
+    ) -> MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>> {
         arg
     }
 }

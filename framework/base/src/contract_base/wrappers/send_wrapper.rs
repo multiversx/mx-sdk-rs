@@ -13,7 +13,7 @@ use crate::{
     codec,
     esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
+        BaseBigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
@@ -73,7 +73,7 @@ where
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
     #[inline]
-    pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
+    pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BaseBigUint<A>) {
         self.send_raw_wrapper().direct_egld(to, amount, Empty)
     }
 
@@ -81,7 +81,7 @@ where
     /// Used especially for sending EGLD to regular accounts.
     ///
     /// If the amount is 0, it returns without error.
-    pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
+    pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BaseBigUint<A>) {
         if amount == &0 {
             return;
         }
@@ -97,7 +97,7 @@ where
         to: &ManagedAddress<A>,
         token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
     ) {
         self.direct_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
@@ -112,7 +112,7 @@ where
         to: &ManagedAddress<A>,
         token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
     ) {
         self.direct_non_zero_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
@@ -126,7 +126,7 @@ where
         to: &ManagedAddress<A>,
         token_identifier: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         gas: u64,
         endpoint_name: D,
         arguments: &[ManagedBuffer<A>],
@@ -166,7 +166,7 @@ where
         to: &ManagedAddress<A>,
         token_identifier: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         gas: u64,
         endpoint_name: D,
         arguments: &[ManagedBuffer<A>],
@@ -195,7 +195,7 @@ where
         to: &ManagedAddress<A>,
         token_identifier: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
     ) {
         self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
     }
@@ -231,7 +231,7 @@ where
         to: &ManagedAddress<A>,
         token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         gas: u64,
         endpoint_name: D,
         arguments: &[ManagedBuffer<A>],
@@ -271,7 +271,7 @@ where
         to: &ManagedAddress<A>,
         token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         gas: u64,
         endpoint_name: D,
         arguments: &[ManagedBuffer<A>],
@@ -312,7 +312,7 @@ where
         to: ManagedAddress<A>,
         token: TokenIdentifier<A>,
         nonce: u64,
-        amount: BigUint<A>,
+        amount: BaseBigUint<A>,
     ) -> ! {
         ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_esdt_transfer((token, nonce, amount))
@@ -334,7 +334,7 @@ where
         to: ManagedAddress<A>,
         token: TokenIdentifier<A>,
         nonce: u64,
-        amount: BigUint<A>,
+        amount: BaseBigUint<A>,
     ) {
         if amount == 0 {
             return;
@@ -402,7 +402,7 @@ where
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     ///
     /// This function cannot be used for NFTs.
-    pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
+    pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BaseBigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new();
         let func_name: &str;
 
@@ -437,7 +437,7 @@ where
         &self,
         token: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
     ) {
         if amount == &0 {
             return;
@@ -449,7 +449,7 @@ where
     ///
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed".
-    pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
+    pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BaseBigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new();
         let func_name: &str;
 
@@ -480,7 +480,7 @@ where
         &self,
         token: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
     ) {
         if amount == &0 {
             return;
@@ -528,9 +528,9 @@ where
     pub fn esdt_nft_create<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         name: &ManagedBuffer<A>,
-        royalties: &BigUint<A>,
+        royalties: &BaseBigUint<A>,
         hash: &ManagedBuffer<A>,
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
@@ -581,9 +581,9 @@ where
     pub fn esdt_non_zero_nft_create<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         name: &ManagedBuffer<A>,
-        royalties: &BigUint<A>,
+        royalties: &BaseBigUint<A>,
         hash: &ManagedBuffer<A>,
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
@@ -602,7 +602,7 @@ where
     pub fn esdt_nft_create_compact<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         attributes: &T,
     ) -> u64 {
         self.esdt_nft_create_compact_named(token, amount, &ManagedBuffer::new(), attributes)
@@ -614,11 +614,11 @@ where
     pub fn esdt_nft_create_compact_named<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         name: &ManagedBuffer<A>,
         attributes: &T,
     ) -> u64 {
-        let big_zero = BigUint::zero();
+        let big_zero = BaseBigUint::zero();
         let empty_buffer = ManagedBuffer::new();
         let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
 
@@ -642,7 +642,7 @@ where
     pub fn esdt_non_zero_nft_create_compact<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         attributes: &T,
     ) -> u64 {
         self.esdt_non_zero_nft_create_compact_named(
@@ -661,7 +661,7 @@ where
     pub fn esdt_non_zero_nft_create_compact_named<T: codec::TopEncode>(
         &self,
         token: &TokenIdentifier<A>,
-        amount: &BigUint<A>,
+        amount: &BaseBigUint<A>,
         name: &ManagedBuffer<A>,
         attributes: &T,
     ) -> u64 {
@@ -680,12 +680,12 @@ where
         &self,
         nft_id: &TokenIdentifier<A>,
         nft_nonce: u64,
-        nft_amount: &BigUint<A>,
+        nft_amount: &BaseBigUint<A>,
         buyer: &ManagedAddress<A>,
         payment_token: &EgldOrEsdtTokenIdentifier<A>,
         payment_nonce: u64,
-        payment_amount: &BigUint<A>,
-    ) -> BigUint<A> {
+        payment_amount: &BaseBigUint<A>,
+    ) -> BaseBigUint<A> {
         let nft_token_data = BlockchainWrapper::<A>::new().get_esdt_token_data(
             &BlockchainWrapper::<A>::new().get_sc_address(),
             nft_id,
@@ -727,12 +727,12 @@ where
         &self,
         nft_id: &TokenIdentifier<A>,
         nft_nonce: u64,
-        nft_amount: &BigUint<A>,
+        nft_amount: &BaseBigUint<A>,
         buyer: &ManagedAddress<A>,
         payment_token: &EgldOrEsdtTokenIdentifier<A>,
         payment_nonce: u64,
-        payment_amount: &BigUint<A>,
-    ) -> BigUint<A> {
+        payment_amount: &BaseBigUint<A>,
+    ) -> BaseBigUint<A> {
         if nft_amount == &0 || payment_amount == &0 {
             payment_amount.clone()
         } else {

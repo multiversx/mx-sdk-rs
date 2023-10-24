@@ -34,7 +34,7 @@ pub trait NonFungibleTokenMapperFeatures:
     #[endpoint]
     fn mapper_nft_create(
         &self,
-        amount: BigUint,
+        amount: BaseBigUint,
         attributes: RgbColor,
     ) -> EsdtTokenPayment<Self::Api> {
         self.non_fungible_token_mapper()
@@ -45,7 +45,7 @@ pub trait NonFungibleTokenMapperFeatures:
     fn mapper_nft_create_and_send(
         &self,
         to: ManagedAddress,
-        amount: BigUint,
+        amount: BaseBigUint,
         attributes: RgbColor,
     ) -> EsdtTokenPayment<Self::Api> {
         self.non_fungible_token_mapper()
@@ -56,7 +56,7 @@ pub trait NonFungibleTokenMapperFeatures:
     fn mapper_nft_add_quantity(
         &self,
         token_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) -> EsdtTokenPayment<Self::Api> {
         self.non_fungible_token_mapper()
             .nft_add_quantity(token_nonce, amount)
@@ -67,20 +67,20 @@ pub trait NonFungibleTokenMapperFeatures:
         &self,
         to: ManagedAddress,
         token_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) -> EsdtTokenPayment<Self::Api> {
         self.non_fungible_token_mapper()
             .nft_add_quantity_and_send(&to, token_nonce, amount)
     }
 
     #[endpoint]
-    fn mapper_nft_burn(&self, token_nonce: u64, amount: BigUint) {
+    fn mapper_nft_burn(&self, token_nonce: u64, amount: BaseBigUint) {
         self.non_fungible_token_mapper()
             .nft_burn(token_nonce, &amount);
     }
 
     #[endpoint]
-    fn mapper_nft_get_balance(&self, token_nonce: u64) -> BigUint {
+    fn mapper_nft_get_balance(&self, token_nonce: u64) -> BaseBigUint {
         self.non_fungible_token_mapper().get_balance(token_nonce)
     }
 

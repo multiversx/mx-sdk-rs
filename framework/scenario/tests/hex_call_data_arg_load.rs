@@ -5,7 +5,7 @@ use multiversx_sc::{
         multi_types::{MultiValue2, MultiValueVec, OptionalValue},
         PanicErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
     },
-    types::{AsyncCallResult, BigUint},
+    types::{AsyncCallResult, BaseBigUint},
     HexCallDataDeserializer,
 };
 use multiversx_sc_scenario::api::StaticApi;
@@ -27,8 +27,8 @@ fn test_simple_args() {
 fn test_simple_managed_arg() {
     let input: &[u8] = b"some_other_func@05";
     let mut de = HexCallDataDeserializer::new(input);
-    let Ok(arg1) = BigUint::<StaticApi>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
-    assert_eq!(arg1, BigUint::from(5u32));
+    let Ok(arg1) = BaseBigUint::<StaticApi>::multi_decode_or_handle_err(&mut de, PanicErrorHandler);
+    assert_eq!(arg1, BaseBigUint::from(5u32));
 
     de.assert_no_more_args(PanicErrorHandler).unwrap();
 }

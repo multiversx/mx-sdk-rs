@@ -73,7 +73,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
     let mut nonce_count = 0;
     let mut nonce_expr = quote! { 0u64 };
     let mut payment_count = 0;
-    let mut payment_expr = quote! { multiversx_sc::types::BigUint::<Self::Api>::zero() };
+    let mut payment_expr = quote! { multiversx_sc::types::BaseBigUint::<Self::Api>::zero() };
     let mut multi_count = 0;
     let mut multi_expr_opt = None;
 

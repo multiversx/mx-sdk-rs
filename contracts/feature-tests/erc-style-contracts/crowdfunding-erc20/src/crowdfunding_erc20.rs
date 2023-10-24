@@ -13,14 +13,14 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: ManagedAddress) {
+    fn init(&self, target: BaseBigUint, deadline: u64, erc20_contract_address: ManagedAddress) {
         self.erc20_contract_address().set(&erc20_contract_address);
         self.target().set(&target);
         self.deadline().set(deadline);
     }
 
     #[endpoint]
-    fn fund(&self, token_amount: BigUint) {
+    fn fund(&self, token_amount: BaseBigUint) {
         require!(
             self.blockchain().get_block_nonce() <= self.deadline().get(),
             "cannot fund after deadline"
@@ -98,7 +98,7 @@ pub trait Crowdfunding {
         &self,
         #[call_result] result: ManagedAsyncCallResult<()>,
         cb_sender: ManagedAddress,
-        cb_amount: BigUint,
+        cb_amount: BaseBigUint,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
@@ -129,7 +129,7 @@ pub trait Crowdfunding {
 
     #[view(get_target)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<BigUint>;
+    fn target(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[view(get_deadline)]
     #[storage_mapper("deadline")]
@@ -137,7 +137,7 @@ pub trait Crowdfunding {
 
     #[view(get_deposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
 
     #[view(get_erc20_contract_address)]
     #[storage_mapper("erc20ContractAddress")]
@@ -145,5 +145,5 @@ pub trait Crowdfunding {
 
     #[view(get_total_balance)]
     #[storage_mapper("erc20Balance")]
-    fn total_balance(&self) -> SingleValueMapper<BigUint>;
+    fn total_balance(&self) -> SingleValueMapper<BaseBigUint>;
 }

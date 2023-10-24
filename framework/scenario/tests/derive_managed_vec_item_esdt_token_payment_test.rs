@@ -3,7 +3,7 @@ use multiversx_sc::{
     codec,
     codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     derive::ManagedVecItem,
-    types::{BigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, TokenIdentifier},
+    types::{BaseBigUint, EsdtTokenPayment, ManagedByteArray, ManagedType, TokenIdentifier},
 };
 use multiversx_sc_scenario::api::StaticApi;
 
@@ -40,7 +40,7 @@ fn struct_to_bytes_writer() {
         token: EsdtTokenPayment::new(
             TokenIdentifier::from("MYTOKEN-12345"),
             0u64,
-            BigUint::from(42u64),
+            BaseBigUint::from(42u64),
         ),
         num: 0x12345,
         eth_address_1: ManagedByteArray::new_from_bytes(&[1u8; 20]),

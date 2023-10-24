@@ -11,7 +11,7 @@ pub trait StorageStoreFeatures {
 
     #[endpoint]
     #[storage_set("big_uint")]
-    fn store_big_uint(&self, bi: BigUint);
+    fn store_big_uint(&self, bi: BaseBigUint);
 
     #[endpoint]
     #[storage_set("big_int")]
@@ -55,11 +55,11 @@ pub trait StorageStoreFeatures {
 
     #[endpoint]
     #[storage_set("map1")]
-    fn store_map1(&self, addr: ManagedAddress, bi: BigUint);
+    fn store_map1(&self, addr: ManagedAddress, bi: BaseBigUint);
 
     #[endpoint]
     #[storage_set("map2")]
-    fn store_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress, bi: &BigUint);
+    fn store_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress, bi: &BaseBigUint);
 
     #[endpoint]
     #[storage_set("map3")]
@@ -71,7 +71,7 @@ pub trait StorageStoreFeatures {
 
     #[endpoint]
     #[storage_set("ELRONDBigUint")]
-    fn store_reserved_big_uint(&self, i: BigUint);
+    fn store_reserved_big_uint(&self, i: BaseBigUint);
 
     #[endpoint]
     #[storage_set("ELRONDreserved")]

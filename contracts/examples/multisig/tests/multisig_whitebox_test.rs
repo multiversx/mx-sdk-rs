@@ -13,7 +13,7 @@ use multiversx_sc::{
     codec::multi_types::OptionalValue,
     storage::mappers::SingleValue,
     types::{
-        Address, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec,
+        Address, BaseBigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec,
     },
 };
 use multiversx_sc_scenario::{
@@ -166,7 +166,7 @@ fn call_propose(
 
                     sc.propose_transfer_execute(
                         managed_address!(&call_data.to),
-                        BigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
+                        BaseBigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
                         opt_endpoint,
                         boxed_bytes_vec_to_managed(call_data.arguments).into(),
                     )
@@ -182,7 +182,7 @@ fn call_propose(
 
                     sc.propose_async_call(
                         managed_address!(&call_data.to),
-                        BigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
+                        BaseBigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
                         opt_endpoint,
                         boxed_bytes_vec_to_managed(call_data.arguments).into(),
                     )
@@ -193,7 +193,7 @@ fn call_propose(
                     code_metadata,
                     arguments,
                 } => sc.propose_sc_deploy_from_source(
-                    BigUint::from_bytes_be(&amount.to_bytes_be()),
+                    BaseBigUint::from_bytes_be(&amount.to_bytes_be()),
                     managed_address!(&source),
                     code_metadata,
                     boxed_bytes_vec_to_managed(arguments).into(),
@@ -206,7 +206,7 @@ fn call_propose(
                     arguments,
                 } => sc.propose_sc_upgrade_from_source(
                     managed_address!(&sc_address),
-                    BigUint::from_bytes_be(&amount.to_bytes_be()),
+                    BaseBigUint::from_bytes_be(&amount.to_bytes_be()),
                     managed_address!(&source),
                     code_metadata,
                     boxed_bytes_vec_to_managed(arguments).into(),

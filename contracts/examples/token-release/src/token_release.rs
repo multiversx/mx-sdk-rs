@@ -32,8 +32,8 @@ pub trait TokenRelease {
     fn add_fixed_amount_group(
         &self,
         group_identifier: ManagedBuffer,
-        group_total_amount: BigUint,
-        period_unlock_amount: BigUint,
+        group_total_amount: BaseBigUint,
+        period_unlock_amount: BaseBigUint,
         release_period: u64,
         release_ticks: u64,
     ) {
@@ -47,11 +47,11 @@ pub trait TokenRelease {
             "The schedule must have at least 1 unlock period"
         );
         require!(
-            group_total_amount > BigUint::zero(),
+            group_total_amount > BaseBigUint::zero(),
             "The schedule must have a positive number of total tokens released"
         );
         require!(
-            &period_unlock_amount * &BigUint::from(release_ticks) == group_total_amount,
+            &period_unlock_amount * &BaseBigUint::from(release_ticks) == group_total_amount,
             "The total number of tokens is invalid"
         );
 
@@ -74,7 +74,7 @@ pub trait TokenRelease {
     fn add_percentage_based_group(
         &self,
         group_identifier: ManagedBuffer,
-        group_total_amount: BigUint,
+        group_total_amount: BaseBigUint,
         period_unlock_percentage: u8,
         release_period: u64,
         release_ticks: u64,
@@ -89,7 +89,7 @@ pub trait TokenRelease {
             "The schedule must have at least 1 unlock period"
         );
         require!(
-            group_total_amount > BigUint::zero(),
+            group_total_amount > BaseBigUint::zero(),
             "The schedule must have a positive number of total tokens released"
         );
         require!(
@@ -217,14 +217,14 @@ pub trait TokenRelease {
     }
 
     #[endpoint(claimTokens)]
-    fn claim_tokens(&self) -> BigUint {
+    fn claim_tokens(&self) -> BaseBigUint {
         self.require_setup_period_ended();
         let token_identifier = self.token_identifier().get();
         let caller = self.blockchain().get_caller();
         let current_claimable_amount = self.get_claimable_tokens(&caller);
 
         require!(
-            current_claimable_amount > BigUint::zero(),
+            current_claimable_amount > BaseBigUint::zero(),
             "This address cannot currently claim any more tokens"
         );
         self.send_tokens(&token_identifier, &caller, &current_claimable_amount);
@@ -242,24 +242,24 @@ pub trait TokenRelease {
     }
 
     #[view]
-    fn get_claimable_tokens(&self, address: &ManagedAddress) -> BigUint {
+    fn get_claimable_tokens(&self, address: &ManagedAddress) -> BaseBigUint {
         let total_claimable_amount = self.calculate_claimable_tokens(address);
         let current_balance = self.claimed_balance(address).get();
         if total_claimable_amount > current_balance {
             total_claimable_amount - current_balance
         } else {
-            BigUint::zero()
+            BaseBigUint::zero()
         }
     }
 
     // private functions
 
-    fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> BigUint {
+    fn calculate_claimable_tokens(&self, address: &ManagedAddress) -> BaseBigUint {
         let starting_timestamp = self.activation_timestamp().get();
         let current_timestamp = self.blockchain().get_block_timestamp();
         let address_groups = self.user_groups(address).get();
 
-        let mut claimable_amount = BigUint::zero();
+        let mut claimable_amount = BaseBigUint::zero();
 
         // Compute the total claimable amount at the time of the request, for all of the user groups
         for group_identifier in address_groups.iter() {
@@ -280,8 +280,8 @@ pub trait TokenRelease {
                     if periods_passed > release_ticks {
                         periods_passed = release_ticks;
                     }
-                    claimable_amount += BigUint::from(periods_passed) * period_unlock_amount
-                        / BigUint::from(users_in_group_no);
+                    claimable_amount += BaseBigUint::from(periods_passed) * period_unlock_amount
+                        / BaseBigUint::from(users_in_group_no);
                 },
                 UnlockType::Percentage {
                     period_unlock_percentage,
@@ -295,11 +295,11 @@ pub trait TokenRelease {
                     if periods_passed > release_ticks {
                         periods_passed = release_ticks;
                     }
-                    claimable_amount += BigUint::from(periods_passed)
+                    claimable_amount += BaseBigUint::from(periods_passed)
                         * &schedule.group_total_amount
                         * (period_unlock_percentage as u64)
                         / PERCENTAGE_TOTAL
-                        / BigUint::from(users_in_group_no);
+                        / BaseBigUint::from(users_in_group_no);
                 },
             }
         }
@@ -311,13 +311,13 @@ pub trait TokenRelease {
         &self,
         token_identifier: &TokenIdentifier,
         address: &ManagedAddress,
-        amount: &BigUint,
+        amount: &BaseBigUint,
     ) {
         self.send()
             .direct_esdt(address, token_identifier, 0, amount);
     }
 
-    fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BigUint) {
+    fn mint_all_tokens(&self, token_identifier: &TokenIdentifier, amount: &BaseBigUint) {
         self.send().esdt_local_mint(token_identifier, 0, amount);
     }
 
@@ -342,7 +342,7 @@ pub trait TokenRelease {
 
     #[view(getTokenTotalSupply)]
     #[storage_mapper("tokenTotalSupply")]
-    fn token_total_supply(&self) -> SingleValueMapper<BigUint>;
+    fn token_total_supply(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("setupPeriodStatus")]
     fn setup_period_status(&self) -> SingleValueMapper<bool>;
@@ -365,5 +365,5 @@ pub trait TokenRelease {
     fn users_in_group(&self, group_identifier: &ManagedBuffer) -> SingleValueMapper<u64>;
 
     #[storage_mapper("claimedBalance")]
-    fn claimed_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    fn claimed_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
 }

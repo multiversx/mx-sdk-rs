@@ -22,7 +22,7 @@ pub trait DistributionModule {
         &self,
         token_id: &EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        total_amount: BigUint,
+        total_amount: BaseBigUint,
     ) {
         if total_amount == 0 {
             return;

@@ -7,6 +7,7 @@ members = [
 
   "framework/base",
   "framework/derive",
+  "framework/imports",
   "framework/meta",
   "framework/scenario",
   "framework/snippets",

@@ -4,7 +4,7 @@ mod user_builtin {
     #[multiversx_sc::proxy]
     pub trait UserBuiltin {
         #[endpoint(SetUserName)]
-        fn set_user_name(&self, name: &BoxedBytes) -> BigUint;
+        fn set_user_name(&self, name: &BoxedBytes) -> BaseBigUint;
     }
 }
 

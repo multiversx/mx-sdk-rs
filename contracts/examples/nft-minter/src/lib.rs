@@ -22,9 +22,9 @@ pub trait NftMinter: nft_module::NftModule {
     fn create_nft(
         &self,
         name: ManagedBuffer,
-        royalties: BigUint,
+        royalties: BaseBigUint,
         uri: ManagedBuffer,
-        selling_price: BigUint,
+        selling_price: BaseBigUint,
         opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
         opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {

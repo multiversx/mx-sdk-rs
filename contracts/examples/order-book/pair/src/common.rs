@@ -18,7 +18,7 @@ pub enum OrderType {
 #[derive(ManagedVecItem, Clone)]
 pub struct Payment<M: ManagedTypeApi> {
     pub token_id: TokenIdentifier<M>,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
 }
 
 #[derive(ManagedVecItem, Clone)]
@@ -36,7 +36,7 @@ pub enum FeeConfigEnum {
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct FeeConfig<M: ManagedTypeApi> {
     pub fee_type: FeeConfigEnum,
-    pub fixed_fee: BigUint<M>,
+    pub fixed_fee: BaseBigUint<M>,
     pub percent_fee: u64,
 }
 
@@ -49,7 +49,7 @@ pub struct DealConfig {
 
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
 pub struct OrderInputParams<M: ManagedTypeApi> {
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
     pub match_provider: ManagedAddress<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
@@ -60,8 +60,8 @@ pub struct Order<M: ManagedTypeApi> {
     pub id: u64,
     pub creator: ManagedAddress<M>,
     pub match_provider: ManagedAddress<M>,
-    pub input_amount: BigUint<M>,
-    pub output_amount: BigUint<M>,
+    pub input_amount: BaseBigUint<M>,
+    pub output_amount: BaseBigUint<M>,
     pub fee_config: FeeConfig<M>,
     pub deal_config: DealConfig,
     pub create_epoch: u64,
@@ -97,11 +97,11 @@ pub trait CommonModule {
         }
     }
 
-    fn rule_of_three(&self, part: &BigUint, total: &BigUint, value: &BigUint) -> BigUint {
+    fn rule_of_three(&self, part: &BaseBigUint, total: &BaseBigUint, value: &BaseBigUint) -> BaseBigUint {
         &(part * value) / total
     }
 
-    fn calculate_fee_amount(&self, amount: &BigUint, fee_config: &FeeConfig<Self::Api>) -> BigUint {
+    fn calculate_fee_amount(&self, amount: &BaseBigUint, fee_config: &FeeConfig<Self::Api>) -> BaseBigUint {
         match fee_config.fee_type {
             FeeConfigEnum::Fixed => fee_config.fixed_fee.clone(),
             FeeConfigEnum::Percent => amount * fee_config.percent_fee / PERCENT_BASE_POINTS,
@@ -110,9 +110,9 @@ pub trait CommonModule {
 
     fn calculate_amount_after_fee(
         &self,
-        amount: &BigUint,
+        amount: &BaseBigUint,
         fee_config: &FeeConfig<Self::Api>,
-    ) -> BigUint {
+    ) -> BaseBigUint {
         amount - &self.calculate_fee_amount(amount, fee_config)
     }
 

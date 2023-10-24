@@ -15,7 +15,13 @@ categories = ["no-std", "wasm", "cryptography::cryptocurrencies"]
 
 [features]
 alloc = ["multiversx-sc/alloc"]
+debug = ["multiversx-sc-scenario"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../framework/base"
+
+[dependencies.multiversx-sc-scenario]
+version = "0.43.3"
+path = "../../framework/scenario"
+optional = true

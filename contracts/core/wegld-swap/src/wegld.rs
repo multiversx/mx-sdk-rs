@@ -54,7 +54,7 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
     }
 
     #[view(getLockedEgldBalance)]
-    fn get_locked_egld_balance(&self) -> BigUint {
+    fn get_locked_egld_balance(&self) -> BaseBigUint {
         self.blockchain()
             .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
     }

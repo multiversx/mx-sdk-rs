@@ -8,11 +8,18 @@ publish = false
 [lib]
 path = "src/nft_storage_prepay.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.nft-storage-prepay]
+path = "."
+features = ["debug"]

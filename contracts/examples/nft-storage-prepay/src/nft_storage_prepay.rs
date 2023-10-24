@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait NftStoragePrepay {
     #[init]
-    fn init(&self, cost_per_byte: BigUint) {
+    fn init(&self, cost_per_byte: BaseBigUint) {
         self.cost_per_byte().set(&cost_per_byte);
     }
 
@@ -13,13 +13,13 @@ pub trait NftStoragePrepay {
 
     #[only_owner]
     #[endpoint(setCostPerByte)]
-    fn set_cost_per_byte(&self, cost_per_byte: BigUint) {
+    fn set_cost_per_byte(&self, cost_per_byte: BaseBigUint) {
         self.cost_per_byte().set(&cost_per_byte);
     }
 
     #[only_owner]
     #[endpoint(reserveFunds)]
-    fn reserve_funds(&self, address: ManagedAddress, file_size: BigUint) {
+    fn reserve_funds(&self, address: ManagedAddress, file_size: BaseBigUint) {
         let storage_cost = self.get_cost_for_size(file_size);
         let mut user_deposit = self.deposit(&address).get();
         require!(
@@ -58,7 +58,7 @@ pub trait NftStoragePrepay {
 
     /// defaults to max amount
     #[endpoint(withdraw)]
-    fn withdraw(&self, opt_amount: OptionalValue<BigUint>) {
+    fn withdraw(&self, opt_amount: OptionalValue<BaseBigUint>) {
         let caller = self.blockchain().get_caller();
         let mut user_deposit = self.deposit(&caller).get();
         let amount = match opt_amount {
@@ -77,14 +77,14 @@ pub trait NftStoragePrepay {
     // views
 
     #[view(getCostForSize)]
-    fn get_cost_for_size(&self, file_size: BigUint) -> BigUint {
+    fn get_cost_for_size(&self, file_size: BaseBigUint) -> BaseBigUint {
         let cost_per_byte = self.cost_per_byte().get();
 
         file_size * cost_per_byte
     }
 
     #[view(getDepositAmount)]
-    fn get_deposit_amount(&self) -> BigUint {
+    fn get_deposit_amount(&self) -> BaseBigUint {
         let caller = self.blockchain().get_caller();
 
         self.deposit(&caller).get()
@@ -94,11 +94,11 @@ pub trait NftStoragePrepay {
 
     #[view(getCostPerByte)]
     #[storage_mapper("costPerByte")]
-    fn cost_per_byte(&self) -> SingleValueMapper<BigUint>;
+    fn cost_per_byte(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("deposit")]
-    fn deposit(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    fn deposit(&self, address: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("totalReserved")]
-    fn total_reserved(&self) -> SingleValueMapper<BigUint>;
+    fn total_reserved(&self) -> SingleValueMapper<BaseBigUint>;
 }

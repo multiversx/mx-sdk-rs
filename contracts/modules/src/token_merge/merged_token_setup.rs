@@ -49,7 +49,7 @@ pub trait MergedTokenSetupModule {
         merged_instances: &MergedTokenInstances<Self::Api>,
         attr_creator: &AttributesCreator,
     ) -> EsdtTokenPayment<Self::Api> {
-        let nft_amount = BigUint::from(NFT_AMOUNT);
+        let nft_amount = BaseBigUint::from(NFT_AMOUNT);
         let empty_buffer = ManagedBuffer::new();
 
         let all_token_data = self.collect_token_data(merged_instances);
@@ -127,8 +127,8 @@ pub trait MergedTokenSetupModule {
     fn get_max_royalties(
         &self,
         all_token_data: &ArrayVec<EsdtTokenData<Self::Api>, MAX_MERGED_TOKENS>,
-    ) -> BigUint {
-        let zero = BigUint::zero();
+    ) -> BaseBigUint {
+        let zero = BaseBigUint::zero();
         let mut max_ref = &zero;
         for token_data in all_token_data {
             if &token_data.royalties > max_ref {

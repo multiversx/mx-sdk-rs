@@ -6,7 +6,7 @@ use crate::{
         *,
     },
     contract_base::ExitCodecErrorHandler,
-    types::{BigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec},
+    types::{BaseBigUint, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
@@ -17,13 +17,13 @@ const DECODE_ATTRIBUTE_ERROR_PREFIX: &[u8] = b"error decoding ESDT attributes: "
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Debug)]
 pub struct EsdtTokenData<M: ManagedTypeApi> {
     pub token_type: EsdtTokenType,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
     pub frozen: bool,
     pub hash: ManagedBuffer<M>,
     pub name: ManagedBuffer<M>,
     pub attributes: ManagedBuffer<M>,
     pub creator: ManagedAddress<M>,
-    pub royalties: BigUint<M>,
+    pub royalties: BaseBigUint<M>,
     pub uris: ManagedVec<M, ManagedBuffer<M>>,
 }
 
@@ -31,13 +31,13 @@ impl<M: ManagedTypeApi> Default for EsdtTokenData<M> {
     fn default() -> Self {
         EsdtTokenData {
             token_type: EsdtTokenType::Fungible,
-            amount: BigUint::zero(),
+            amount: BaseBigUint::zero(),
             frozen: false,
             hash: ManagedBuffer::new(),
             name: ManagedBuffer::new(),
             attributes: ManagedBuffer::new(),
             creator: ManagedAddress::zero(),
-            royalties: BigUint::zero(),
+            royalties: BaseBigUint::zero(),
             uris: ManagedVec::new(),
         }
     }

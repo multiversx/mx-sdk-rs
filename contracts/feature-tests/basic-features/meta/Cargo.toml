@@ -7,6 +7,7 @@ publish = false
 
 [dependencies.basic-features]
 path = ".."
+features = ["wasm"]
 
 [dependencies.multiversx-sc-meta]
 version = "0.43.3"

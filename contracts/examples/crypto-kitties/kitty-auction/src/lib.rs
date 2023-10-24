@@ -10,8 +10,8 @@ pub trait KittyAuction {
     #[init]
     fn init(
         &self,
-        gen_zero_kitty_starting_price: BigUint,
-        gen_zero_kitty_ending_price: BigUint,
+        gen_zero_kitty_starting_price: BaseBigUint,
+        gen_zero_kitty_ending_price: BaseBigUint,
         gen_zero_kitty_auction_duration: u64,
         opt_kitty_ownership_contract_address: OptionalValue<ManagedAddress>,
     ) {
@@ -70,7 +70,7 @@ pub trait KittyAuction {
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(&self, kitty_id: u32) -> BigUint {
+    fn get_current_winning_bid(&self, kitty_id: u32) -> BaseBigUint {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -85,8 +85,8 @@ pub trait KittyAuction {
     fn create_sale_auction(
         &self,
         kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         duration: u64,
     ) {
         let deadline = self.blockchain().get_block_timestamp() + duration;
@@ -118,8 +118,8 @@ pub trait KittyAuction {
     fn create_siring_auction(
         &self,
         kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         duration: u64,
     ) {
         let deadline = self.blockchain().get_block_timestamp() + duration;
@@ -229,8 +229,8 @@ pub trait KittyAuction {
         &self,
         auction_type: AuctionType,
         kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         deadline: u64,
     ) {
         let caller = self.blockchain().get_caller();
@@ -316,8 +316,8 @@ pub trait KittyAuction {
         #[call_result] result: ManagedAsyncCallResult<()>,
         auction_type: AuctionType,
         cb_kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         deadline: u64,
         kitty_owner: ManagedAddress,
     ) {
@@ -418,10 +418,10 @@ pub trait KittyAuction {
     // gen zero kitty
 
     #[storage_mapper("genZeroKittyStartingPrice")]
-    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<BigUint>;
+    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("genZeroKittyEndingPrice")]
-    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<BigUint>;
+    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("genZeroKittyAuctionDuration")]
     fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<u64>;

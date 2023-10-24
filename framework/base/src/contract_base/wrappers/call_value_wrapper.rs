@@ -7,7 +7,7 @@ use crate::{
     },
     err_msg,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
+        BaseBigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
         EsdtTokenPayment, ManagedRef, ManagedVec, TokenIdentifier,
     },
 };
@@ -32,7 +32,7 @@ where
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    pub fn egld_value(&self) -> ManagedRef<'static, A, BigUint<A>> {
+    pub fn egld_value(&self) -> ManagedRef<'static, A, BaseBigUint<A>> {
         let mut call_value_handle: A::BigIntHandle =
             use_raw_handle(A::static_var_api_impl().get_call_value_egld_handle());
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
@@ -86,7 +86,7 @@ where
     /// Returns the token ID and the amount for fungible ESDT transfers.
     ///
     /// The amount cannot be 0, since that would not qualify as an ESDT transfer.
-    pub fn single_fungible_esdt(&self) -> (TokenIdentifier<A>, BigUint<A>) {
+    pub fn single_fungible_esdt(&self) -> (TokenIdentifier<A>, BaseBigUint<A>) {
         let payment = self.single_esdt();
         if payment.token_nonce != 0 {
             A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());
@@ -120,7 +120,7 @@ where
     /// but checks the nonce to be 0 and returns a tuple of just token identifier and amount, for convenience.
     ///
     /// In case no transfer of value happen, it will return a payment of 0 EGLD.
-    pub fn egld_or_single_fungible_esdt(&self) -> (EgldOrEsdtTokenIdentifier<A>, BigUint<A>) {
+    pub fn egld_or_single_fungible_esdt(&self) -> (EgldOrEsdtTokenIdentifier<A>, BaseBigUint<A>) {
         let payment = self.egld_or_single_esdt();
         if payment.token_nonce != 0 {
             A::error_api_impl().signal_error(err_msg::FUNGIBLE_TOKEN_EXPECTED_ERR_MSG.as_bytes());

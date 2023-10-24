@@ -5,7 +5,7 @@ use crate::{
     },
     codec::*,
     types::{
-        BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef,
+        BigInt, BaseBigUint, ManagedAddress, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef,
         ManagedType,
     },
 };
@@ -45,8 +45,8 @@ where
         ManagedBuffer::from_handle(mbuf_handle)
     }
 
-    fn to_big_uint(&self) -> BigUint<A> {
-        BigUint::from_bytes_be_buffer(&self.to_managed_buffer())
+    fn to_big_uint(&self) -> BaseBigUint<A> {
+        BaseBigUint::from_bytes_be_buffer(&self.to_managed_buffer())
     }
 
     fn to_big_int(&self) -> BigInt<A> {
@@ -93,7 +93,7 @@ where
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
+        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BaseBigUint<A>>() || T::type_eq::<BigInt<A>>()
     }
 
     #[inline]

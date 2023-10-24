@@ -31,7 +31,7 @@ pub trait Contract:
     #[endpoint(buyToken)]
     fn buy_token_endpoint(
         &self,
-        requested_amount: BigUint,
+        requested_amount: BaseBigUint,
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) {
@@ -67,12 +67,12 @@ pub trait Contract:
     }
 
     #[view]
-    fn view_buy_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {
+    fn view_buy_price(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint {
         self.get_buy_price::<FunctionSelector<Self::Api>>(amount, identifier)
     }
 
     #[view]
-    fn view_sell_price(&self, amount: BigUint, identifier: TokenIdentifier) -> BigUint {
+    fn view_sell_price(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint {
         self.get_sell_price::<FunctionSelector<Self::Api>>(amount, identifier)
     }
 }

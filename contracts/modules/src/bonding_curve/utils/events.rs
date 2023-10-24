@@ -4,8 +4,8 @@ multiversx_sc::derive_imports!();
 #[multiversx_sc::module]
 pub trait EventsModule {
     #[event("buy-token")]
-    fn buy_token_event(&self, #[indexed] user: &ManagedAddress, amount: &BigUint);
+    fn buy_token_event(&self, #[indexed] user: &ManagedAddress, amount: &BaseBigUint);
 
     #[event("sell-token")]
-    fn sell_token_event(&self, #[indexed] user: &ManagedAddress, amount: &BigUint);
+    fn sell_token_event(&self, #[indexed] user: &ManagedAddress, amount: &BaseBigUint);
 }

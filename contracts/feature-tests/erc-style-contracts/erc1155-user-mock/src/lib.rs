@@ -12,8 +12,8 @@ pub trait Erc1155UserMock {
         &self,
         _operator: ManagedAddress,
         _from: ManagedAddress,
-        _type_id: BigUint,
-        _value: BigUint,
+        _type_id: BaseBigUint,
+        _value: BaseBigUint,
         _data: ManagedBuffer,
     ) {
     }
@@ -23,8 +23,8 @@ pub trait Erc1155UserMock {
         &self,
         _operator: ManagedAddress,
         _from: ManagedAddress,
-        _type_ids: ManagedVec<BigUint>,
-        _values: ManagedVec<BigUint>,
+        _type_ids: ManagedVec<BaseBigUint>,
+        _values: ManagedVec<BaseBigUint>,
         _data: ManagedBuffer,
     ) {
     }

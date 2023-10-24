@@ -153,8 +153,8 @@ pub trait OrdersModule:
 
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = self.rule_of_three(
-            &BigUint::from(penalty_percent),
-            &BigUint::from(PERCENT_BASE_POINTS),
+            &BaseBigUint::from(penalty_percent),
+            &BaseBigUint::from(PERCENT_BASE_POINTS),
             &order.input_amount,
         );
         let amount = &order.input_amount - &penalty_amount;
@@ -201,8 +201,8 @@ pub trait OrdersModule:
         let penalty_count = (epoch - order.create_epoch) / FEE_PENALTY_INCREASE_EPOCHS;
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = self.rule_of_three(
-            &BigUint::from(penalty_percent),
-            &BigUint::from(PERCENT_BASE_POINTS),
+            &BaseBigUint::from(penalty_percent),
+            &BaseBigUint::from(PERCENT_BASE_POINTS),
             &order.input_amount,
         );
         let amount = &order.input_amount - &penalty_amount;
@@ -293,9 +293,9 @@ pub trait OrdersModule:
     fn get_orders_sum_up(
         &self,
         orders: &MultiValueManagedVec<Order<Self::Api>>,
-    ) -> (BigUint, BigUint) {
-        let mut amount_paid = BigUint::zero();
-        let mut amount_requested = BigUint::zero();
+    ) -> (BaseBigUint, BaseBigUint) {
+        let mut amount_paid = BaseBigUint::zero();
+        let mut amount_requested = BaseBigUint::zero();
 
         orders.iter().for_each(|x| {
             amount_paid += &x.input_amount;
@@ -308,9 +308,9 @@ pub trait OrdersModule:
     fn calculate_transfers(
         &self,
         orders: MultiValueManagedVec<Order<Self::Api>>,
-        total_paid: BigUint,
+        total_paid: BaseBigUint,
         token_requested: TokenIdentifier,
-        leftover: BigUint,
+        leftover: BaseBigUint,
     ) -> ManagedVec<Transfer<Self::Api>> {
         let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
 
@@ -318,7 +318,7 @@ pub trait OrdersModule:
             to: self.blockchain().get_caller(),
             payment: Payment {
                 token_id: token_requested.clone(),
-                amount: BigUint::zero(),
+                amount: BaseBigUint::zero(),
             },
         };
 

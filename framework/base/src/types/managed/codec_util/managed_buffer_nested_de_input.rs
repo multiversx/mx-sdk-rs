@@ -9,7 +9,7 @@ use crate::{
     api::ManagedTypeApi,
     types::{
         managed::{preloaded_managed_buffer::PreloadedManagedBuffer, ManagedBufferSizeContext},
-        BigInt, BigUint, ManagedBuffer,
+        BigInt, BaseBigUint, ManagedBuffer,
     },
 };
 
@@ -68,8 +68,8 @@ where
         self.read_managed_buffer_of_size(size, h)
     }
 
-    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigUint<M>, H::HandledErr> {
-        Ok(BigUint::from_bytes_be_buffer(&self.read_managed_buffer(h)?))
+    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BaseBigUint<M>, H::HandledErr> {
+        Ok(BaseBigUint::from_bytes_be_buffer(&self.read_managed_buffer(h)?))
     }
 
     fn read_big_int<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigInt<M>, H::HandledErr> {
@@ -106,7 +106,7 @@ where
     }
 
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BaseBigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     fn read_specialized<T, C, H>(&mut self, context: C, h: H) -> Result<T, H::HandledErr>

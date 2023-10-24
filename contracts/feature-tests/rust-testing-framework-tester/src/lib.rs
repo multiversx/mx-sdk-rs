@@ -12,7 +12,7 @@ pub struct NftDummyAttributes {
 }
 
 pub struct StructWithManagedTypes<M: ManagedTypeApi> {
-    pub big_uint: BigUint<M>,
+    pub big_uint: BaseBigUint<M>,
     pub buffer: ManagedBuffer<M>,
 }
 
@@ -20,17 +20,17 @@ pub struct StructWithManagedTypes<M: ManagedTypeApi> {
 pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[init]
     fn init(&self) -> ManagedBuffer {
-        self.total_value().set(&BigUint::from(1u32));
+        self.total_value().set(&BaseBigUint::from(1u32));
         b"constructor-result".into()
     }
 
     #[endpoint]
-    fn sum(&self, first: BigUint, second: BigUint) -> BigUint {
+    fn sum(&self, first: BaseBigUint, second: BaseBigUint) -> BaseBigUint {
         first + second
     }
 
     #[endpoint]
-    fn sum_sc_result(&self, first: BigUint, second: BigUint) -> BigUint {
+    fn sum_sc_result(&self, first: BaseBigUint, second: BaseBigUint) -> BaseBigUint {
         require!(first > 0 && second > 0, "Non-zero required");
         first + second
     }
@@ -42,20 +42,20 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint]
-    fn get_egld_balance(&self) -> BigUint {
+    fn get_egld_balance(&self) -> BaseBigUint {
         self.blockchain()
             .get_sc_balance(&EgldOrEsdtTokenIdentifier::egld(), 0)
     }
 
     #[endpoint]
-    fn get_esdt_balance(&self, token_id: TokenIdentifier, nonce: u64) -> BigUint {
+    fn get_esdt_balance(&self, token_id: TokenIdentifier, nonce: u64) -> BaseBigUint {
         self.blockchain()
             .get_sc_balance(&EgldOrEsdtTokenIdentifier::esdt(token_id), nonce)
     }
 
     #[payable("EGLD")]
     #[endpoint]
-    fn receive_egld(&self) -> BigUint {
+    fn receive_egld(&self) -> BaseBigUint {
         self.call_value().egld_value().clone_value()
     }
 
@@ -74,7 +74,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[payable("*")]
     #[endpoint]
-    fn receive_esdt(&self) -> (TokenIdentifier, BigUint) {
+    fn receive_esdt(&self) -> (TokenIdentifier, BaseBigUint) {
         let payment = self.call_value().single_esdt();
         (payment.token_identifier, payment.amount)
     }
@@ -109,18 +109,18 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         to: ManagedAddress,
         token_id: TokenIdentifier,
         nft_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         self.send().direct_esdt(&to, &token_id, nft_nonce, &amount);
     }
 
     #[endpoint]
-    fn mint_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn mint_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BaseBigUint) {
         self.send().esdt_local_mint(&token_id, nonce, &amount);
     }
 
     #[endpoint]
-    fn burn_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn burn_esdt(&self, token_id: TokenIdentifier, nonce: u64, amount: BaseBigUint) {
         self.send().esdt_local_burn(&token_id, nonce, &amount);
     }
 
@@ -128,14 +128,14 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     fn create_nft(
         &self,
         token_id: TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
         attributes: NftDummyAttributes,
     ) -> u64 {
         self.send().esdt_nft_create(
             &token_id,
             &amount,
             &ManagedBuffer::new(),
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &ManagedBuffer::new(),
             &attributes,
             &ManagedVec::new(),
@@ -171,29 +171,29 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint]
-    fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BigUint {
+    fn call_other_contract_execute_on_dest(&self, other_sc_address: ManagedAddress) -> BaseBigUint {
         let call_result = self.send_raw().execute_on_dest_context_raw(
             self.blockchain().get_gas_left(),
             &other_sc_address,
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &ManagedBuffer::new_from_bytes(b"getTotalValue"),
             &ManagedArgBuffer::new(),
         );
         if let Some(raw_value) = call_result.try_get(0) {
-            BigUint::from_bytes_be_buffer(&raw_value)
+            BaseBigUint::from_bytes_be_buffer(&raw_value)
         } else {
-            BigUint::zero()
+            BaseBigUint::zero()
         }
     }
 
     #[endpoint]
-    fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BigUint) {
+    fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BaseBigUint) {
         let mut args = ManagedArgBuffer::new();
         args.push_arg(&value);
 
         self.send_raw().async_call_raw(
             &other_sc_address,
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &ManagedBuffer::new_from_bytes(b"add"),
             &args,
         );
@@ -205,26 +205,26 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[endpoint(getTotalValue)]
-    fn get_total_value(&self) -> BigUint {
+    fn get_total_value(&self) -> BaseBigUint {
         self.total_value().get()
     }
 
     #[endpoint]
-    fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BigUint) {
+    fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BaseBigUint) {
         let mut args = ManagedArgBuffer::new();
         args.push_arg(value);
 
         let _ = self.send_raw().execute_on_dest_context_raw(
             self.blockchain().get_gas_left(),
             &other_sc_address,
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &ManagedBuffer::new_from_bytes(b"addValue"),
             &args,
         );
     }
 
     #[endpoint(addValue)]
-    fn add(&self, value: BigUint) {
+    fn add(&self, value: BaseBigUint) {
         let caller = self.blockchain().get_caller();
 
         self.total_value().update(|val| *val += &value);
@@ -236,15 +236,15 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         sc_panic!("Oh no!");
     }
 
-    fn get_val(&self) -> BigUint {
+    fn get_val(&self) -> BaseBigUint {
         self.total_value().get()
     }
 
     #[storage_mapper("totalValue")]
-    fn total_value(&self) -> SingleValueMapper<BigUint>;
+    fn total_value(&self) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("valuePerCaller")]
-    fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BigUint>;
+    fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
 
     #[storage_mapper("callbackExecuted")]
     fn callback_executed(&self) -> SingleValueMapper<bool>;

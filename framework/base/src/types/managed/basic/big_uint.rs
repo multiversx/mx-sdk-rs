@@ -18,15 +18,15 @@ use crate::{
 use super::cast_to_i64::cast_to_i64;
 
 #[repr(transparent)]
-pub struct BigUint<M: ManagedTypeApi> {
+pub struct BaseBigUint<M: ManagedTypeApi> {
     pub(crate) handle: M::BigIntHandle,
 }
 
-impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
+impl<M: ManagedTypeApi> ManagedType<M> for BaseBigUint<M> {
     type OwnHandle = M::BigIntHandle;
 
     fn from_handle(handle: M::BigIntHandle) -> Self {
-        BigUint { handle }
+        BaseBigUint { handle }
     }
 
     fn get_handle(&self) -> M::BigIntHandle {
@@ -38,27 +38,27 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<u128> for BigUint<M> {
+impl<M: ManagedTypeApi> From<u128> for BaseBigUint<M> {
     fn from(value: u128) -> Self {
-        BigUint::from_bytes_be(&value.to_be_bytes()[..])
+        BaseBigUint::from_bytes_be(&value.to_be_bytes()[..])
     }
 }
 
-impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigUint<M> {
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BaseBigUint<M> {
     #[inline]
     fn from(item: ManagedBuffer<M>) -> Self {
-        BigUint::from_bytes_be_buffer(&item)
+        BaseBigUint::from_bytes_be_buffer(&item)
     }
 }
 
-impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigUint<M> {
+impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BaseBigUint<M> {
     #[inline]
     fn from(item: &ManagedBuffer<M>) -> Self {
-        BigUint::from_bytes_be_buffer(item)
+        BaseBigUint::from_bytes_be_buffer(item)
     }
 }
 
-impl<M: ManagedTypeApi> BigUint<M> {
+impl<M: ManagedTypeApi> BaseBigUint<M> {
     pub(crate) fn set_value<T>(handle: M::BigIntHandle, value: T)
     where
         T: TryInto<i64> + num_traits::Unsigned,
@@ -72,7 +72,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         Self::set_value(handle.clone(), value);
-        BigUint::from_handle(handle)
+        BaseBigUint::from_handle(handle)
     }
 
     pub(crate) fn make_temp<T>(handle: RawHandle, value: T) -> M::BigIntHandle
@@ -87,14 +87,14 @@ impl<M: ManagedTypeApi> BigUint<M> {
 
 macro_rules! big_uint_conv_num {
     ($num_ty:ty) => {
-        impl<M: ManagedTypeApi> From<$num_ty> for BigUint<M> {
+        impl<M: ManagedTypeApi> From<$num_ty> for BaseBigUint<M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 Self::new_from_num(value)
             }
         }
 
-        impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigUint<M> {}
+        impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BaseBigUint<M> {}
     };
 }
 
@@ -104,33 +104,33 @@ big_uint_conv_num! {usize}
 big_uint_conv_num! {u16}
 big_uint_conv_num! {u8}
 
-impl<M> CodecFromSelf for BigUint<M> where M: ManagedTypeApi {}
+impl<M> CodecFromSelf for BaseBigUint<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<crate::codec::num_bigint::BigUint> for BigUint<M> {}
+impl<M: ManagedTypeApi> CodecFrom<crate::codec::num_bigint::BigUint> for BaseBigUint<M> {}
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<BigUint<M>> for crate::codec::num_bigint::BigUint {}
+impl<M: ManagedTypeApi> CodecFrom<BaseBigUint<M>> for crate::codec::num_bigint::BigUint {}
 
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> From<&crate::codec::num_bigint::BigUint> for BigUint<M> {
+impl<M: ManagedTypeApi> From<&crate::codec::num_bigint::BigUint> for BaseBigUint<M> {
     fn from(alloc_big_uint: &crate::codec::num_bigint::BigUint) -> Self {
-        BigUint::from_bytes_be(alloc_big_uint.to_bytes_be().as_slice())
+        BaseBigUint::from_bytes_be(alloc_big_uint.to_bytes_be().as_slice())
     }
 }
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> From<crate::codec::num_bigint::BigUint> for BigUint<M> {
+impl<M: ManagedTypeApi> From<crate::codec::num_bigint::BigUint> for BaseBigUint<M> {
     fn from(alloc_big_uint: crate::codec::num_bigint::BigUint) -> Self {
-        BigUint::from(&alloc_big_uint)
+        BaseBigUint::from(&alloc_big_uint)
     }
 }
 #[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> BigUint<M> {
+impl<M: ManagedTypeApi> BaseBigUint<M> {
     pub fn to_alloc(&self) -> crate::codec::num_bigint::BigUint {
         crate::codec::num_bigint::BigUint::from_bytes_be(self.to_bytes_be().as_slice())
     }
 }
 
-impl<M: ManagedTypeApi> Default for BigUint<M> {
+impl<M: ManagedTypeApi> Default for BaseBigUint<M> {
     #[inline]
     fn default() -> Self {
         Self::zero()
@@ -138,12 +138,12 @@ impl<M: ManagedTypeApi> Default for BigUint<M> {
 }
 
 /// More conversions here.
-impl<M: ManagedTypeApi> BigUint<M> {
+impl<M: ManagedTypeApi> BaseBigUint<M> {
     #[inline]
     pub fn zero() -> Self {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bi_set_int64(handle.clone(), 0);
-        BigUint::from_handle(handle)
+        BaseBigUint::from_handle(handle)
     }
 
     #[inline]
@@ -163,7 +163,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         M::managed_type_impl().mb_overwrite(mb_handle.clone(), bytes);
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_to_big_int_unsigned(mb_handle, handle.clone());
-        BigUint::from_handle(handle)
+        BaseBigUint::from_handle(handle)
     }
 
     #[inline]
@@ -178,7 +178,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl()
             .mb_to_big_int_unsigned(managed_buffer.handle.clone(), handle.clone());
-        BigUint::from_handle(handle)
+        BaseBigUint::from_handle(handle)
     }
 
     #[inline]
@@ -190,22 +190,22 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> BigUint<M> {
+impl<M: ManagedTypeApi> BaseBigUint<M> {
     #[inline]
     #[must_use]
     pub fn sqrt(&self) -> Self {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_sqrt(result_handle.clone(), self.handle.clone());
-        BigUint::from_handle(result_handle)
+        BaseBigUint::from_handle(result_handle)
     }
 
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        let big_int_temp_1 = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
+        let big_int_temp_1 = BaseBigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), big_int_temp_1);
-        BigUint::from_handle(result_handle)
+        BaseBigUint::from_handle(result_handle)
     }
 
     #[inline]
@@ -215,7 +215,7 @@ impl<M: ManagedTypeApi> BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> Clone for BigUint<M> {
+impl<M: ManagedTypeApi> Clone for BaseBigUint<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
@@ -225,13 +225,13 @@ impl<M: ManagedTypeApi> Clone for BigUint<M> {
             clone_handle.clone(),
             self.handle.clone(),
         );
-        BigUint::from_handle(clone_handle)
+        BaseBigUint::from_handle(clone_handle)
     }
 }
 
-impl<M: ManagedTypeApi> TryStaticCast for BigUint<M> {}
+impl<M: ManagedTypeApi> TryStaticCast for BaseBigUint<M> {}
 
-impl<M: ManagedTypeApi> TopEncode for BigUint<M> {
+impl<M: ManagedTypeApi> TopEncode for BaseBigUint<M> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
@@ -247,7 +247,7 @@ impl<M: ManagedTypeApi> TopEncode for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
+impl<M: ManagedTypeApi> NestedEncode for BaseBigUint<M> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -257,7 +257,7 @@ impl<M: ManagedTypeApi> NestedEncode for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
+impl<M: ManagedTypeApi> NestedDecode for BaseBigUint<M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -272,7 +272,7 @@ impl<M: ManagedTypeApi> NestedDecode for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
+impl<M: ManagedTypeApi> TopDecode for BaseBigUint<M> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -287,13 +287,13 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
+impl<M: ManagedTypeApi> crate::abi::TypeAbi for BaseBigUint<M> {
     fn type_name() -> TypeName {
         TypeName::from("BigUint")
     }
 }
 
-impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
+impl<M: ManagedTypeApi> SCDisplay for BaseBigUint<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let str_handle: M::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().bi_to_string(self.handle.clone(), str_handle.clone());
@@ -303,9 +303,9 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
     }
 }
 
-impl<M: ManagedTypeApi> core::fmt::Debug for BigUint<M> {
+impl<M: ManagedTypeApi> core::fmt::Debug for BaseBigUint<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("BigUint")
+        f.debug_struct("BaseBigUint")
             .field("handle", &self.handle.clone())
             .field(
                 "hex-value-be",

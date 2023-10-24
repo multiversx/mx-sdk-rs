@@ -146,7 +146,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         );
 
         let mut tokens_to_claim = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
-        let mut egld_to_claim = BigUint::zero();
+        let mut egld_to_claim = BaseBigUint::zero();
         let serializer = ManagedSerializer::new();
         for token in self.owned_tokens(&caller).iter() {
             let nonces = self.token_details(&token).get().token_nonces;
@@ -180,7 +180,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         }
         self.owned_tokens(&caller).clear();
         self.send().direct_multi(&caller, &tokens_to_claim);
-        if egld_to_claim > BigUint::zero() {
+        if egld_to_claim > BaseBigUint::zero() {
             self.send().direct_egld(&caller, &egld_to_claim);
         }
     }
@@ -188,7 +188,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
     fn set_curve_storage<T>(
         &self,
         identifier: &TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
         payment_token_identifier: EgldOrEsdtTokenIdentifier,
     ) where
         T: CurveFunction<Self::Api>
@@ -211,7 +211,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 available_supply: amount.clone(),
                 balance: amount,
             };
-            payment = EgldOrEsdtTokenPayment::new(payment_token_identifier, 0, BigUint::zero());
+            payment = EgldOrEsdtTokenPayment::new(payment_token_identifier, 0, BaseBigUint::zero());
             sell_availability = false;
         } else {
             let bonding_curve: BondingCurve<Self::Api, T> =

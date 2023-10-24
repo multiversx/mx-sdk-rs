@@ -3,7 +3,7 @@ multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct TokenAttributesStruct<M: ManagedTypeApi> {
-    field_biguint: BigUint<M>,
+    field_biguint: BaseBigUint<M>,
     field_u64: u64,
     field_vec_u32: ManagedVec<M, u32>,
 }

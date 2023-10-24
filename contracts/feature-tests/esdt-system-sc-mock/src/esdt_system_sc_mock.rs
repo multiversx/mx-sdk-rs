@@ -17,7 +17,7 @@ pub trait PayableFeatures {
         &self,
         _token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        initial_supply: BigUint,
+        initial_supply: BaseBigUint,
         _num_decimals: usize,
         _token_properties: MultiValueEncoded<MultiValue2<ManagedBuffer, bool>>,
     ) -> TokenIdentifier {

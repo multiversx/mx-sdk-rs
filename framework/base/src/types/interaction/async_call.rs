@@ -1,7 +1,7 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{BaseBigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
 
 #[must_use]
@@ -10,7 +10,7 @@ where
     SA: CallTypeApi + 'static,
 {
     pub(crate) to: ManagedAddress<SA>,
-    pub(crate) egld_payment: BigUint<SA>,
+    pub(crate) egld_payment: BaseBigUint<SA>,
     pub(crate) endpoint_name: ManagedBuffer<SA>,
     pub(crate) arg_buffer: ManagedArgBuffer<SA>,
     pub(crate) callback_call: Option<CallbackClosure<SA>>,

@@ -1,13 +1,13 @@
 use crate::{num_bigint, num_bigint::BigInt};
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{heap::BoxedBytes, BigUint, ManagedType},
+    types::{heap::BoxedBytes, BaseBigUint, ManagedType},
 };
 use std::fmt;
 
 /// Only seems to be used in tests, we can probably remove it.
 pub struct BigUintPrinter<M: ManagedTypeApi> {
-    pub value: BigUint<M>,
+    pub value: BaseBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> fmt::Debug for BigUintPrinter<M> {

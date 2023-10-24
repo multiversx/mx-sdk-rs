@@ -80,7 +80,7 @@ pub trait ForwarderQueue {
         gas_limit: u64,
         endpoint_name: ManagedBuffer,
         token: TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
         let mut payment = ManagedVec::new();
@@ -233,7 +233,7 @@ pub trait ForwarderQueue {
         #[indexed] call_type: &QueuedCallType,
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
     );
 
     #[event("forward_queued_call_esdt")]
@@ -251,7 +251,7 @@ pub trait ForwarderQueue {
         #[indexed] call_type: &QueuedCallType,
         #[indexed] to: &ManagedAddress,
         #[indexed] endpoint_name: &ManagedBuffer,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
     );
 
     #[event("add_queued_call_esdt")]

@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/promises_main.rs"
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
 [dependencies.vault]
 path = "../vault"
 
@@ -16,6 +19,11 @@ version = "0.43.3"
 path = "../../../../framework/base"
 features = ["promises"]
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.promises-features]
+path = "."
+features = ["debug"]

@@ -21,7 +21,7 @@ pub struct Bracket {
 #[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
 pub struct ComputedBracket<M: ManagedTypeApi> {
     pub end_index: u64,
-    pub nft_reward_percent: BigUint<M>,
+    pub nft_reward_percent: BaseBigUint<M>,
 }
 
 #[derive(NestedEncode, NestedDecode)]
@@ -212,7 +212,7 @@ pub trait RewardsDistribution:
             start_index = end_index;
             require!(count > 0, "Invalid bracket");
             let nft_reward_percent =
-                BigUint::from(bracket.bracket_reward_percent) * DIVISION_SAFETY_CONSTANT / count;
+                BaseBigUint::from(bracket.bracket_reward_percent) * DIVISION_SAFETY_CONSTANT / count;
 
             computed_brackets.push(ComputedBracket {
                 end_index,
@@ -249,7 +249,7 @@ pub trait RewardsDistribution:
 
         let caller = self.blockchain().get_caller();
         let mut rewards = ManagedVec::new();
-        let mut total_egld_reward = BigUint::zero();
+        let mut total_egld_reward = BaseBigUint::zero();
 
         for reward_token_pair in reward_tokens.into_iter() {
             let (reward_token_id, reward_token_nonce) = reward_token_pair.into_tuple();
@@ -280,8 +280,8 @@ pub trait RewardsDistribution:
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
         nfts: &ManagedVec<EsdtTokenPayment>,
-    ) -> (BigUint, Option<EsdtTokenPayment>) {
-        let mut total = BigUint::zero();
+    ) -> (BaseBigUint, Option<EsdtTokenPayment>) {
+        let mut total = BaseBigUint::zero();
 
         for raffle_id in raffle_id_start..=raffle_id_end {
             for nft in nfts {
@@ -308,7 +308,7 @@ pub trait RewardsDistribution:
             reward_token_nonce,
             total,
         );
-        (BigUint::zero(), Some(reward_payment))
+        (BaseBigUint::zero(), Some(reward_payment))
     }
 
     fn try_claim(
@@ -340,7 +340,7 @@ pub trait RewardsDistribution:
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
         nft_nonce: u64,
-    ) -> BigUint {
+    ) -> BaseBigUint {
         let nft_reward_percent = self.nft_reward_percent(raffle_id, nft_nonce).get();
         let royalties = self
             .royalties(raffle_id, reward_token_id, reward_token_nonce)
@@ -378,11 +378,11 @@ pub trait RewardsDistribution:
         raffle_id: u64,
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
-    ) -> SingleValueMapper<BigUint>;
+    ) -> SingleValueMapper<BaseBigUint>;
 
     #[view(getNftRewardPercent)]
     #[storage_mapper("nftRewardPercent")]
-    fn nft_reward_percent(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<BigUint>;
+    fn nft_reward_percent(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<BaseBigUint>;
 
     #[view(getWasClaimed)]
     #[storage_mapper("wasClaimed")]

@@ -6,20 +6,20 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
 pub type EsdtTokenDataMultiValue<M> = MultiValue9<
     EsdtTokenType,
-    BigUint<M>,
+    BaseBigUint<M>,
     bool,
     ManagedBuffer<M>,
     ManagedBuffer<M>,
     ManagedBuffer<M>,
     ManagedAddress<M>,
-    BigUint<M>,
+    BaseBigUint<M>,
     ManagedVec<M, ManagedBuffer<M>>,
 >;
 
 #[multiversx_sc::module]
 pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     #[view(getFungibleEsdtBalance)]
-    fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
+    fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BaseBigUint {
         self.blockchain()
             .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
     }
@@ -31,13 +31,13 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
+    fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BaseBigUint) {
         self.send().direct_esdt(to, &token_id, 0, amount);
     }
 
     #[payable("*")]
     #[endpoint]
-    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+    fn send_esdt_with_fees(&self, to: ManagedAddress, percentage_fees: BaseBigUint) {
         let (token_id, payment) = self.call_value().single_fungible_esdt();
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
@@ -50,8 +50,8 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         &self,
         to: &ManagedAddress,
         token_id: TokenIdentifier,
-        amount_first_time: &BigUint,
-        amount_second_time: &BigUint,
+        amount_first_time: &BaseBigUint,
+        amount_second_time: &BaseBigUint,
     ) {
         self.send().direct_esdt(to, &token_id, 0, amount_first_time);
         self.send()
@@ -62,7 +62,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     fn send_esdt_direct_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 
@@ -88,7 +88,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         &self,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        initial_supply: BigUint,
+        initial_supply: BaseBigUint,
     ) {
         let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
@@ -144,12 +144,12 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     }
 
     #[endpoint]
-    fn local_mint(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+    fn local_mint(&self, token_identifier: TokenIdentifier, amount: BaseBigUint) {
         self.send().esdt_local_mint(&token_identifier, 0, &amount);
     }
 
     #[endpoint]
-    fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+    fn local_burn(&self, token_identifier: TokenIdentifier, amount: BaseBigUint) {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
     }
 

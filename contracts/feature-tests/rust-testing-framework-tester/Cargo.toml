@@ -5,6 +5,14 @@ authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 
+[features]
+debug = ["multiversx-sc-scenario"]
+
+[dependencies.multiversx-sc-scenario]
+version = "0.43.3"
+path = "../../../framework/scenario"
+optional = true
+
 [dependencies.multiversx-sc]
 version = "0.43.3"
 path = "../../../framework/base"
@@ -16,9 +24,9 @@ path = "../../examples/adder"
 [dev-dependencies.basic-features]
 path = "../../feature-tests/basic-features"
 
-[dev-dependencies.multiversx-sc-scenario]
-version = "0.43.3"
-path = "../../../framework/scenario"
+[dev-dependencies.rust-testing-framework-tester]
+path = "."
+features = ["debug"]
 
 [dev-dependencies]
 num-bigint = "0.4.2"

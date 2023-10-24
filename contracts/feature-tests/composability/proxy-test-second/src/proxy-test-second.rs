@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait ProxyTestSecond {
     #[storage_set("last_payment")]
-    fn set_last_payment(&self, last_payment: &BigUint);
+    fn set_last_payment(&self, last_payment: &BaseBigUint);
 
     #[storage_set("init_arg")]
     fn set_init_arg(&self, init_arg: i32);
@@ -17,7 +17,7 @@ pub trait ProxyTestSecond {
     fn set_message_me_1(&self, m1: i64);
 
     #[storage_set("message_me_2")]
-    fn set_message_me_2(&self, s2: &BigUint);
+    fn set_message_me_2(&self, s2: &BaseBigUint);
 
     #[storage_set("message_me_3")]
     fn set_message_me_3(&self, s3: &BoxedBytes);
@@ -53,7 +53,7 @@ pub trait ProxyTestSecond {
     }
 
     #[endpoint(messageMe)]
-    fn message_me(&self, arg1: i64, arg2: &BigUint, arg3: &BoxedBytes, arg4: &ManagedAddress) {
+    fn message_me(&self, arg1: i64, arg2: &BaseBigUint, arg3: &BoxedBytes, arg4: &ManagedAddress) {
         self.set_message_me_1(arg1);
         self.set_message_me_2(arg2);
         self.set_message_me_3(arg3);

@@ -1,4 +1,4 @@
-use multiversx_sc::types::{BigInt, BigUint, ManagedBuffer};
+use multiversx_sc::types::{BigInt, BaseBigUint, ManagedBuffer};
 use multiversx_sc_scenario::api::StaticApi;
 
 use basic_features::{big_num_methods::BigIntMethods, big_num_operators::BigIntOperators};
@@ -7,20 +7,20 @@ use basic_features::{big_num_methods::BigIntMethods, big_num_operators::BigIntOp
 fn test_big_uint_zero() {
     let bf = basic_features::contract_obj::<StaticApi>();
     let result = bf.big_uint_zero();
-    assert_eq!(BigUint::zero(), result);
+    assert_eq!(BaseBigUint::zero(), result);
 }
 
 #[test]
 fn test_big_uint_from() {
     let bf = basic_features::contract_obj::<StaticApi>();
     let result = bf.big_uint_from_u64_1(5);
-    assert_eq!(BigUint::from(5u32), result);
+    assert_eq!(BaseBigUint::from(5u32), result);
     let result = bf.big_uint_from_u64_2(5);
-    assert_eq!(BigUint::from(5u32), result);
+    assert_eq!(BaseBigUint::from(5u32), result);
     let result = bf.big_uint_from_managed_buffer(ManagedBuffer::from(&[5u8]));
-    assert_eq!(BigUint::from(5u32), result);
+    assert_eq!(BaseBigUint::from(5u32), result);
     let result = bf.big_uint_from_managed_buffer_ref(&ManagedBuffer::from(&[5u8]));
-    assert_eq!(BigUint::from(5u32), result);
+    assert_eq!(BaseBigUint::from(5u32), result);
 }
 
 #[test]
@@ -41,8 +41,8 @@ fn test_big_int_from() {
 
 fn check_big_uint_bitwise_and(a: u64, b: u64) {
     let bf = basic_features::contract_obj::<StaticApi>();
-    let result = bf.bit_and_big_uint(BigUint::from(a), BigUint::from(b));
-    assert_eq!(BigUint::from(a & b), result);
+    let result = bf.bit_and_big_uint(BaseBigUint::from(a), BaseBigUint::from(b));
+    assert_eq!(BaseBigUint::from(a & b), result);
 }
 
 #[test]
@@ -55,10 +55,10 @@ fn test_big_uint_bitwise_and() {
 
 fn check_big_uint_shift(a: u64, b: usize) {
     let bf = basic_features::contract_obj::<StaticApi>();
-    let result = bf.shl_big_uint(BigUint::from(a), b);
-    assert_eq!(BigUint::from(a << b), result);
-    let result = bf.shr_big_uint(BigUint::from(a), b);
-    assert_eq!(BigUint::from(a >> b), result);
+    let result = bf.shl_big_uint(BaseBigUint::from(a), b);
+    assert_eq!(BaseBigUint::from(a << b), result);
+    let result = bf.shr_big_uint(BaseBigUint::from(a), b);
+    assert_eq!(BaseBigUint::from(a >> b), result);
 }
 
 #[test]

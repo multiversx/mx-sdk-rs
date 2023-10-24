@@ -9,7 +9,7 @@ use crate::{
         try_execute_then_cast, DecodeError, DecodeErrorHandler, TopDecodeInput, TryStaticCast,
     },
     types::{
-        heap::Box, BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
+        heap::Box, BigInt, BaseBigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedType,
     },
 };
 
@@ -55,10 +55,10 @@ where
         BigInt::from_handle(bi_handle)
     }
 
-    fn to_big_uint(&self) -> BigUint<AA> {
+    fn to_big_uint(&self) -> BaseBigUint<AA> {
         let bi_handle: AA::BigIntHandle = use_raw_handle(AA::static_var_api_impl().next_handle());
         AA::argument_api_impl().load_argument_big_int_unsigned(self.arg_index, bi_handle.clone());
-        BigUint::from_handle(bi_handle)
+        BaseBigUint::from_handle(bi_handle)
     }
 }
 
@@ -111,7 +111,7 @@ where
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
         T::type_eq::<ManagedBuffer<AA>>()
-            || T::type_eq::<BigUint<AA>>()
+            || T::type_eq::<BaseBigUint<AA>>()
             || T::type_eq::<BigInt<AA>>()
     }
 

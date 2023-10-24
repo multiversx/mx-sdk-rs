@@ -24,7 +24,7 @@ pub trait LocalEsdtAndEsdtNft {
         &self,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        initial_supply: BigUint,
+        initial_supply: BaseBigUint,
     ) {
         let issue_cost = self.call_value().egld_value();
         let caller = self.blockchain().get_caller();
@@ -54,12 +54,12 @@ pub trait LocalEsdtAndEsdtNft {
     }
 
     #[endpoint(localMint)]
-    fn local_mint(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+    fn local_mint(&self, token_identifier: TokenIdentifier, amount: BaseBigUint) {
         self.send().esdt_local_mint(&token_identifier, 0, &amount);
     }
 
     #[endpoint(localBurn)]
-    fn local_burn(&self, token_identifier: TokenIdentifier, amount: BigUint) {
+    fn local_burn(&self, token_identifier: TokenIdentifier, amount: BaseBigUint) {
         self.send().esdt_local_burn(&token_identifier, 0, &amount);
     }
 
@@ -97,9 +97,9 @@ pub trait LocalEsdtAndEsdtNft {
     fn nft_create(
         &self,
         token_identifier: TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
         name: ManagedBuffer,
-        royalties: BigUint,
+        royalties: BaseBigUint,
         hash: ManagedBuffer,
         color: Color,
         uri: ManagedBuffer,
@@ -119,13 +119,13 @@ pub trait LocalEsdtAndEsdtNft {
     }
 
     #[endpoint(nftAddQuantity)]
-    fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn nft_add_quantity(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BaseBigUint) {
         self.send()
             .esdt_local_mint(&token_identifier, nonce, &amount);
     }
 
     #[endpoint(nftBurn)]
-    fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BigUint) {
+    fn nft_burn(&self, token_identifier: TokenIdentifier, nonce: u64, amount: BaseBigUint) {
         self.send()
             .esdt_local_burn(&token_identifier, nonce, &amount);
     }
@@ -136,7 +136,7 @@ pub trait LocalEsdtAndEsdtNft {
         to: ManagedAddress,
         token_identifier: TokenIdentifier,
         nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         self.send()
             .transfer_esdt_via_async_call(to, token_identifier, nonce, amount);
@@ -148,7 +148,7 @@ pub trait LocalEsdtAndEsdtNft {
         to: ManagedAddress,
         token_identifier: TokenIdentifier,
         nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
@@ -247,13 +247,13 @@ pub trait LocalEsdtAndEsdtNft {
     // views
 
     #[view(getFungibleEsdtBalance)]
-    fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BigUint {
+    fn get_fungible_esdt_balance(&self, token_identifier: &TokenIdentifier) -> BaseBigUint {
         self.blockchain()
             .get_esdt_balance(&self.blockchain().get_sc_address(), token_identifier, 0)
     }
 
     #[view(getNftBalance)]
-    fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BigUint {
+    fn get_nft_balance(&self, token_identifier: &TokenIdentifier, nonce: u64) -> BaseBigUint {
         self.blockchain().get_esdt_balance(
             &self.blockchain().get_sc_address(),
             token_identifier,

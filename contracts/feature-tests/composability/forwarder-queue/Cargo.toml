@@ -10,6 +10,7 @@ path = "src/forwarder_queue.rs"
 
 [features]
 promises = ["multiversx-sc/promises"]
+debug = ["multiversx-sc-scenario"]
 
 [dependencies.vault]
 path = "../vault"
@@ -23,6 +24,11 @@ version = "0.43.3"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.3"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.forwarder-queue]
+path = "."
+features = ["debug"]

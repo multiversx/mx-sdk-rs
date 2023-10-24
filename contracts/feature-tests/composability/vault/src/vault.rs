@@ -58,7 +58,7 @@ pub trait Vault {
     #[endpoint]
     fn accept_funds_echo_payment(
         &self,
-    ) -> MultiValue2<BigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> {
+    ) -> MultiValue2<BaseBigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> {
         let egld_value = self.call_value().egld_value();
         let esdt_transfers_multi = self.esdt_transfers_multi();
         self.accept_funds_event(&egld_value, &esdt_transfers_multi);
@@ -88,7 +88,7 @@ pub trait Vault {
     fn retrieve_funds_with_transfer_exec(
         &self,
         token: TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
         opt_receive_func: OptionalValue<ManagedBuffer>,
     ) {
         let caller = self.blockchain().get_caller();
@@ -112,7 +112,7 @@ pub trait Vault {
     fn retrieve_funds_promises(
         &self,
         back_transfers: OptionalValue<u64>,
-        back_transfer_value: OptionalValue<BigUint>,
+        back_transfer_value: OptionalValue<BaseBigUint>,
     ) {
         let payment = self.call_value().egld_or_single_esdt();
         let caller = self.blockchain().get_caller();
@@ -145,7 +145,7 @@ pub trait Vault {
     }
 
     #[endpoint]
-    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BigUint) {
+    fn retrieve_funds(&self, token: EgldOrEsdtTokenIdentifier, nonce: u64, amount: BaseBigUint) {
         self.retrieve_funds_event(&token, nonce, &amount);
         let caller = self.blockchain().get_caller();
 
@@ -160,7 +160,7 @@ pub trait Vault {
     #[endpoint]
     fn retrieve_multi_funds_async(
         &self,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let caller = self.blockchain().get_caller();
         let mut all_payments = ManagedVec::new();
@@ -196,7 +196,7 @@ pub trait Vault {
                 &payment.token_identifier,
                 &payment.amount,
                 &ManagedBuffer::new(),
-                &BigUint::zero(),
+                &BaseBigUint::zero(),
                 &ManagedBuffer::new(),
                 &Empty,
                 &uris,
@@ -217,14 +217,14 @@ pub trait Vault {
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 
     #[event("reject_funds")]
     fn reject_funds_event(
         &self,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 
@@ -233,7 +233,7 @@ pub trait Vault {
         &self,
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] amount: &BigUint,
+        #[indexed] amount: &BaseBigUint,
     );
 
     #[endpoint]

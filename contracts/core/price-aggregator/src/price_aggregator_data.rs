@@ -13,13 +13,13 @@ pub struct PriceFeed<M: ManagedTypeApi> {
     pub from: ManagedBuffer<M>,
     pub to: ManagedBuffer<M>,
     pub timestamp: u64,
-    pub price: BigUint<M>,
+    pub price: BaseBigUint<M>,
     pub decimals: u8,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, Debug, PartialEq, Eq)]
 pub struct TimestampedPrice<M: ManagedTypeApi> {
-    pub price: BigUint<M>,
+    pub price: BaseBigUint<M>,
     pub timestamp: u64,
     pub decimals: u8,
 }

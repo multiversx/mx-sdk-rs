@@ -1,6 +1,6 @@
 use crate::{
     api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
-    types::{BigUint, ManagedType},
+    types::{BaseBigUint, ManagedType},
 };
 use core::ops::{
     Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
@@ -9,23 +9,23 @@ use core::ops::{
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait<Self> for BigUint<M> {
-            type Output = BigUint<M>;
+        impl<M: ManagedTypeApi> $trait<Self> for BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: BigUint<M>) -> BigUint<M> {
+            fn $method(self, other: BaseBigUint<M>) -> BaseBigUint<M> {
                 M::managed_type_impl().$api_func(
                     self.handle.clone(),
                     self.handle.clone(),
                     other.handle.clone(),
                 );
-                BigUint::from_handle(self.handle.clone())
+                BaseBigUint::from_handle(self.handle.clone())
             }
         }
 
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigUint<M> {
-            type Output = BigUint<M>;
+        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BaseBigUint<M>> for &'a BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
+            fn $method(self, other: &BaseBigUint<M>) -> BaseBigUint<M> {
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(
@@ -33,43 +33,43 @@ macro_rules! binary_operator {
                     self.handle.clone(),
                     other.handle.clone(),
                 );
-                BigUint::from_handle(result_handle)
+                BaseBigUint::from_handle(result_handle)
             }
         }
 
-        impl<'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for BigUint<M> {
-            type Output = BigUint<M>;
+        impl<'b, M: ManagedTypeApi> $trait<&'b BaseBigUint<M>> for BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: &BigUint<M>) -> BigUint<M> {
+            fn $method(self, other: &BaseBigUint<M>) -> BaseBigUint<M> {
                 M::managed_type_impl().$api_func(
                     self.handle.clone(),
                     self.handle.clone(),
                     other.handle.clone(),
                 );
-                BigUint::from_handle(self.handle.clone())
+                BaseBigUint::from_handle(self.handle.clone())
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<u32> for BigUint<M> {
-            type Output = BigUint<M>;
+        impl<M: ManagedTypeApi> $trait<u32> for BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: u32) -> BigUint<M> {
+            fn $method(self, other: u32) -> BaseBigUint<M> {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
                     self.handle.clone(),
                     self.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(self.handle.clone())
+                BaseBigUint::from_handle(self.handle.clone())
             }
         }
 
-        impl<'a, M: ManagedTypeApi> $trait<u32> for &'a BigUint<M> {
-            type Output = BigUint<M>;
+        impl<'a, M: ManagedTypeApi> $trait<u32> for &'a BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: u32) -> BigUint<M> {
+            fn $method(self, other: u32) -> BaseBigUint<M> {
                 let big_int_temp_1 =
-                    BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
+                    BaseBigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(
@@ -77,30 +77,30 @@ macro_rules! binary_operator {
                     self.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(result_handle)
+                BaseBigUint::from_handle(result_handle)
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<u64> for BigUint<M> {
-            type Output = BigUint<M>;
+        impl<M: ManagedTypeApi> $trait<u64> for BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: u64) -> BigUint<M> {
+            fn $method(self, other: u64) -> BaseBigUint<M> {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
                     self.handle.clone(),
                     self.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(self.handle.clone())
+                BaseBigUint::from_handle(self.handle.clone())
             }
         }
 
-        impl<'a, M: ManagedTypeApi> $trait<u64> for &'a BigUint<M> {
-            type Output = BigUint<M>;
+        impl<'a, M: ManagedTypeApi> $trait<u64> for &'a BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, other: u64) -> BigUint<M> {
+            fn $method(self, other: u64) -> BaseBigUint<M> {
                 let big_int_temp_1 =
-                    BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
+                    BaseBigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(
@@ -108,7 +108,7 @@ macro_rules! binary_operator {
                     self.handle.clone(),
                     big_int_temp_1,
                 );
-                BigUint::from_handle(result_handle)
+                BaseBigUint::from_handle(result_handle)
             }
         }
     };
@@ -125,7 +125,7 @@ binary_operator! {BitXor, bitxor, bi_xor}
 
 macro_rules! binary_assign_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait<BigUint<M>> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<BaseBigUint<M>> for BaseBigUint<M> {
             #[inline]
             fn $method(&mut self, other: Self) {
                 M::managed_type_impl().$api_func(
@@ -136,9 +136,9 @@ macro_rules! binary_assign_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<&BigUint<M>> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<&BaseBigUint<M>> for BaseBigUint<M> {
             #[inline]
-            fn $method(&mut self, other: &BigUint<M>) {
+            fn $method(&mut self, other: &BaseBigUint<M>) {
                 M::managed_type_impl().$api_func(
                     self.handle.clone(),
                     self.handle.clone(),
@@ -147,7 +147,7 @@ macro_rules! binary_assign_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<u32> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<u32> for BaseBigUint<M> {
             fn $method(&mut self, other: u32) {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
@@ -158,7 +158,7 @@ macro_rules! binary_assign_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<u64> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<u64> for BaseBigUint<M> {
             fn $method(&mut self, other: u64) {
                 let big_int_temp_1 = Self::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
                 M::managed_type_impl().$api_func(
@@ -182,24 +182,24 @@ binary_assign_operator! {BitXorAssign, bitxor_assign, bi_xor}
 
 macro_rules! shift_traits {
     ($shift_trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $shift_trait<usize> for BigUint<M> {
-            type Output = BigUint<M>;
+        impl<M: ManagedTypeApi> $shift_trait<usize> for BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
             #[inline]
-            fn $method(self, rhs: usize) -> BigUint<M> {
+            fn $method(self, rhs: usize) -> BaseBigUint<M> {
                 M::managed_type_impl().$api_func(self.handle.clone(), self.handle.clone(), rhs);
                 self
             }
         }
 
-        impl<'a, M: ManagedTypeApi> $shift_trait<usize> for &'a BigUint<M> {
-            type Output = BigUint<M>;
+        impl<'a, M: ManagedTypeApi> $shift_trait<usize> for &'a BaseBigUint<M> {
+            type Output = BaseBigUint<M>;
 
-            fn $method(self, rhs: usize) -> BigUint<M> {
+            fn $method(self, rhs: usize) -> BaseBigUint<M> {
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 M::managed_type_impl().$api_func(result_handle.clone(), self.handle.clone(), rhs);
-                BigUint::from_handle(result_handle)
+                BaseBigUint::from_handle(result_handle)
             }
         }
     };
@@ -210,7 +210,7 @@ shift_traits! {Shl, shl, bi_shl}
 
 macro_rules! shift_assign_traits {
     ($shift_assign_trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $shift_assign_trait<usize> for BigUint<M> {
+        impl<M: ManagedTypeApi> $shift_assign_trait<usize> for BaseBigUint<M> {
             #[inline]
             fn $method(&mut self, rhs: usize) {
                 M::managed_type_impl().$api_func(self.handle.clone(), self.handle.clone(), rhs);

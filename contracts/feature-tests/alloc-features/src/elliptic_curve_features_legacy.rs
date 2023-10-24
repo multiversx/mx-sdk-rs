@@ -11,11 +11,11 @@ pub trait EllipticCurveFeatures {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.get_values(),
             None => (
-                BigUint::zero(),
-                BigUint::zero(),
-                BigUint::zero(),
-                BigUint::zero(),
-                BigUint::zero(),
+                BaseBigUint::zero(),
+                BaseBigUint::zero(),
+                BaseBigUint::zero(),
+                BaseBigUint::zero(),
+                BaseBigUint::zero(),
                 0,
             ),
         }
@@ -46,16 +46,16 @@ pub trait EllipticCurveFeatures {
     fn compute_ec_add(
         &self,
         curve_bitsize: u32,
-        x_first_point: BigUint,
-        y_first_point: BigUint,
-        x_second_point: BigUint,
-        y_second_point: BigUint,
-    ) -> MultiValue2<BigUint, BigUint> {
+        x_first_point: BaseBigUint,
+        y_first_point: BaseBigUint,
+        x_second_point: BaseBigUint,
+        y_second_point: BaseBigUint,
+    ) -> MultiValue2<BaseBigUint, BaseBigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec
                 .add(x_first_point, y_first_point, x_second_point, y_second_point)
                 .into(),
-            None => (BigUint::zero(), BigUint::zero()).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero()).into(),
         }
     }
 
@@ -63,12 +63,12 @@ pub trait EllipticCurveFeatures {
     fn compute_ec_double(
         &self,
         curve_bitsize: u32,
-        x_point: BigUint,
-        y_point: BigUint,
-    ) -> MultiValue2<BigUint, BigUint> {
+        x_point: BaseBigUint,
+        y_point: BaseBigUint,
+    ) -> MultiValue2<BaseBigUint, BaseBigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.double(x_point, y_point).into(),
-            None => (BigUint::zero(), BigUint::zero()).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero()).into(),
         }
     }
 
@@ -76,8 +76,8 @@ pub trait EllipticCurveFeatures {
     fn compute_is_on_curve_ec(
         &self,
         curve_bitsize: u32,
-        x_point: BigUint,
-        y_point: BigUint,
+        x_point: BaseBigUint,
+        y_point: BaseBigUint,
     ) -> bool {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.is_on_curve(x_point, y_point),
@@ -89,13 +89,13 @@ pub trait EllipticCurveFeatures {
     fn compute_scalar_mult(
         &self,
         curve_bitsize: u32,
-        x_point: BigUint,
-        y_point: BigUint,
+        x_point: BaseBigUint,
+        y_point: BaseBigUint,
         data: &[u8],
-    ) -> MultiValue2<BigUint, BigUint> {
+    ) -> MultiValue2<BaseBigUint, BaseBigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.scalar_mult_legacy(x_point, y_point, data).into(),
-            None => (BigUint::zero(), BigUint::zero()).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero()).into(),
         }
     }
 
@@ -104,10 +104,10 @@ pub trait EllipticCurveFeatures {
         &self,
         curve_bitsize: u32,
         data: &[u8],
-    ) -> MultiValue2<BigUint, BigUint> {
+    ) -> MultiValue2<BaseBigUint, BaseBigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.scalar_base_mult_legacy(data).into(),
-            None => (BigUint::zero(), BigUint::zero()).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero()).into(),
         }
     }
 
@@ -115,8 +115,8 @@ pub trait EllipticCurveFeatures {
     fn compute_marshal_ec(
         &self,
         curve_bitsize: u32,
-        x_pair: BigUint,
-        y_pair: BigUint,
+        x_pair: BaseBigUint,
+        y_pair: BaseBigUint,
     ) -> BoxedBytes {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.marshal_legacy(x_pair, y_pair),
@@ -128,8 +128,8 @@ pub trait EllipticCurveFeatures {
     fn compute_marshal_compressed_ec(
         &self,
         curve_bitsize: u32,
-        x_pair: BigUint,
-        y_pair: BigUint,
+        x_pair: BaseBigUint,
+        y_pair: BaseBigUint,
     ) -> BoxedBytes {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.marshal_compressed_legacy(x_pair, y_pair),
@@ -142,10 +142,10 @@ pub trait EllipticCurveFeatures {
         &self,
         curve_bitsize: u32,
         data: &[u8],
-    ) -> MultiValue2<BigUint, BigUint> {
+    ) -> MultiValue2<BaseBigUint, BaseBigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.unmarshal_legacy(data).into(),
-            None => (BigUint::zero(), BigUint::zero()).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero()).into(),
         }
     }
 
@@ -154,10 +154,10 @@ pub trait EllipticCurveFeatures {
         &self,
         curve_bitsize: u32,
         data: &[u8],
-    ) -> MultiValue2<BigUint, BigUint> {
+    ) -> MultiValue2<BaseBigUint, BaseBigUint> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.unmarshal_compressed_legacy(data).into(),
-            None => (BigUint::zero(), BigUint::zero()).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero()).into(),
         }
     }
 
@@ -165,10 +165,10 @@ pub trait EllipticCurveFeatures {
     fn compute_generate_key_ec(
         &self,
         curve_bitsize: u32,
-    ) -> MultiValue3<BigUint, BigUint, BoxedBytes> {
+    ) -> MultiValue3<BaseBigUint, BaseBigUint, BoxedBytes> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.generate_key_legacy().into(),
-            None => (BigUint::zero(), BigUint::zero(), BoxedBytes::zeros(0)).into(),
+            None => (BaseBigUint::zero(), BaseBigUint::zero(), BoxedBytes::zeros(0)).into(),
         }
     }
 }

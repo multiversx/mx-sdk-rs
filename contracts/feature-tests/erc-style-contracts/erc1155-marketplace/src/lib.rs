@@ -8,19 +8,19 @@ const PERCENTAGE_TOTAL: u8 = 100;
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct Auction<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    pub min_bid: BigUint<M>,
-    pub max_bid: BigUint<M>,
+    pub min_bid: BaseBigUint<M>,
+    pub max_bid: BaseBigUint<M>,
     pub deadline: u64,
     pub original_owner: ManagedAddress<M>,
-    pub current_bid: BigUint<M>,
+    pub current_bid: BaseBigUint<M>,
     pub current_winner: ManagedAddress<M>,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
 pub struct AuctionArgument<M: ManagedTypeApi> {
     pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    pub min_bid: BigUint<M>,
-    pub max_bid: BigUint<M>,
+    pub min_bid: BaseBigUint<M>,
+    pub max_bid: BaseBigUint<M>,
     pub deadline: u64,
 }
 
@@ -42,8 +42,8 @@ pub trait Erc1155Marketplace {
         &self,
         _operator: ManagedAddress,
         from: ManagedAddress,
-        type_id: BigUint,
-        nft_id: BigUint,
+        type_id: BaseBigUint,
+        nft_id: BaseBigUint,
         args: AuctionArgument<Self::Api>,
     ) {
         require!(
@@ -69,8 +69,8 @@ pub trait Erc1155Marketplace {
         &self,
         _operator: ManagedAddress,
         from: ManagedAddress,
-        type_ids: Vec<BigUint>,
-        nft_ids: Vec<BigUint>,
+        type_ids: Vec<BaseBigUint>,
+        nft_ids: Vec<BaseBigUint>,
         args: AuctionArgument<Self::Api>,
     ) {
         require!(
@@ -138,7 +138,7 @@ pub trait Erc1155Marketplace {
 
     #[payable("*")]
     #[endpoint]
-    fn bid(&self, type_id: BigUint, nft_id: BigUint) {
+    fn bid(&self, type_id: BaseBigUint, nft_id: BaseBigUint) {
         let (payment_token, payment) = self.call_value().egld_or_single_fungible_esdt();
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
@@ -191,7 +191,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[endpoint(endAuction)]
-    fn end_auction(&self, type_id: BigUint, nft_id: BigUint) {
+    fn end_auction(&self, type_id: BaseBigUint, nft_id: BaseBigUint) {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -233,12 +233,12 @@ pub trait Erc1155Marketplace {
     // views
 
     #[view(isUpForAuction)]
-    fn is_up_for_auction(&self, type_id: &BigUint, nft_id: &BigUint) -> bool {
+    fn is_up_for_auction(&self, type_id: &BaseBigUint, nft_id: &BaseBigUint) -> bool {
         !self.auction_for_token(type_id, nft_id).is_empty()
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, type_id: BigUint, nft_id: BigUint) -> Auction<Self::Api> {
+    fn get_auction_status(&self, type_id: BaseBigUint, nft_id: BaseBigUint) -> Auction<Self::Api> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -248,7 +248,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(&self, type_id: BigUint, nft_id: BigUint) -> BigUint {
+    fn get_current_winning_bid(&self, type_id: BaseBigUint, nft_id: BaseBigUint) -> BaseBigUint {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -258,7 +258,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getCurrentWinner)]
-    fn get_current_winner(&self, type_id: BigUint, nft_id: BigUint) -> ManagedAddress {
+    fn get_current_winner(&self, type_id: BaseBigUint, nft_id: BaseBigUint) -> ManagedAddress {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -274,12 +274,12 @@ pub trait Erc1155Marketplace {
     #[allow(clippy::too_many_arguments)]
     fn try_create_auction(
         &self,
-        type_id: &BigUint,
-        nft_id: &BigUint,
+        type_id: &BaseBigUint,
+        nft_id: &BaseBigUint,
         original_owner: &ManagedAddress,
         token: &EgldOrEsdtTokenIdentifier,
-        min_bid: &BigUint,
-        max_bid: &BigUint,
+        min_bid: &BaseBigUint,
+        max_bid: &BaseBigUint,
         deadline: u64,
     ) {
         require!(
@@ -301,12 +301,12 @@ pub trait Erc1155Marketplace {
             max_bid: max_bid.clone(),
             deadline,
             original_owner: original_owner.clone(),
-            current_bid: BigUint::zero(),
+            current_bid: BaseBigUint::zero(),
             current_winner: ManagedAddress::zero(),
         });
     }
 
-    fn async_transfer_token(&self, type_id: BigUint, nft_id: BigUint, to: ManagedAddress) {
+    fn async_transfer_token(&self, type_id: BaseBigUint, nft_id: BaseBigUint, to: ManagedAddress) {
         let sc_own_address = self.blockchain().get_sc_address();
         let token_ownership_contract_address = self.token_ownership_contract_address().get();
 
@@ -316,11 +316,11 @@ pub trait Erc1155Marketplace {
             .call_and_exit()
     }
 
-    fn calculate_cut_amount(&self, total_amount: &BigUint, cut_percentage: u8) -> BigUint {
+    fn calculate_cut_amount(&self, total_amount: &BaseBigUint, cut_percentage: u8) -> BaseBigUint {
         total_amount * cut_percentage as u32 / PERCENTAGE_TOTAL as u32
     }
 
-    fn add_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier, amount: &BigUint) {
+    fn add_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier, amount: &BaseBigUint) {
         let mut mapper = self.get_claimable_funds_mapper();
         let mut total = mapper.get(token_identifier).unwrap_or_default();
         total += amount;
@@ -329,7 +329,7 @@ pub trait Erc1155Marketplace {
 
     fn clear_claimable_funds(&self, token_identifier: &EgldOrEsdtTokenIdentifier) {
         let mut mapper = self.get_claimable_funds_mapper();
-        mapper.insert(token_identifier.clone(), BigUint::zero());
+        mapper.insert(token_identifier.clone(), BaseBigUint::zero());
     }
 
     // proxy
@@ -353,14 +353,14 @@ pub trait Erc1155Marketplace {
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> MapMapper<EgldOrEsdtTokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<EgldOrEsdtTokenIdentifier, BaseBigUint>;
 
     // auction properties for each token
 
     #[storage_mapper("auctionForToken")]
     fn auction_for_token(
         &self,
-        type_id: &BigUint,
-        nft_id: &BigUint,
+        type_id: &BaseBigUint,
+        nft_id: &BaseBigUint,
     ) -> SingleValueMapper<Auction<Self::Api>>;
 }

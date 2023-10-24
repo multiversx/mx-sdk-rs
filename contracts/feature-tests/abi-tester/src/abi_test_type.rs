@@ -1,7 +1,7 @@
 use crate::only_nested::*;
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{BigUint, Box, ManagedBuffer},
+    types::{BaseBigUint, Box, ManagedBuffer},
 };
 multiversx_sc::derive_imports!();
 
@@ -22,7 +22,7 @@ pub struct AbiTestType {
 /// Its only purpose is to test that the ABI generator works fine.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct AbiManagedType<M: ManagedTypeApi> {
-    pub big_uint: BigUint<M>,
+    pub big_uint: BaseBigUint<M>,
     pub integer: i32,
     pub managed_buffer: ManagedBuffer<M>,
 }

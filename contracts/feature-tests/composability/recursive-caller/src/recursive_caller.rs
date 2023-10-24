@@ -19,7 +19,7 @@ pub trait RecursiveCaller {
         &self,
         to: &ManagedAddress,
         token_identifier: &EgldOrEsdtTokenIdentifier,
-        amount: &BigUint,
+        amount: &BaseBigUint,
         counter: u32,
     ) {
         self.recursive_send_funds_event(to, token_identifier, amount, counter);
@@ -43,7 +43,7 @@ pub trait RecursiveCaller {
         &self,
         to: &ManagedAddress,
         token_identifier: &EgldOrEsdtTokenIdentifier,
-        amount: &BigUint,
+        amount: &BaseBigUint,
         counter: u32,
     ) {
         self.recursive_send_funds_callback_event(to, token_identifier, amount, counter);
@@ -62,7 +62,7 @@ pub trait RecursiveCaller {
         &self,
         #[indexed] to: &ManagedAddress,
         #[indexed] token_identifier: &EgldOrEsdtTokenIdentifier,
-        #[indexed] amount: &BigUint,
+        #[indexed] amount: &BaseBigUint,
         counter: u32,
     );
 
@@ -71,7 +71,7 @@ pub trait RecursiveCaller {
         &self,
         #[indexed] to: &ManagedAddress,
         #[indexed] token_identifier: &EgldOrEsdtTokenIdentifier,
-        #[indexed] amount: &BigUint,
+        #[indexed] amount: &BaseBigUint,
         counter: u32,
     );
 }

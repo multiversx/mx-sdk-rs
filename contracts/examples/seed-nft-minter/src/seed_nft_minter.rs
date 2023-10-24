@@ -35,9 +35,9 @@ pub trait SeedNftMinter:
     fn create_nft(
         &self,
         name: ManagedBuffer,
-        royalties: BigUint,
+        royalties: BaseBigUint,
         uri: ManagedBuffer,
-        selling_price: BigUint,
+        selling_price: BaseBigUint,
         opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
         opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
@@ -82,11 +82,11 @@ pub trait SeedNftMinter:
         self.distribute_funds(&token_id, token_nonce, total_amount);
     }
 
-    fn claim_royalties(&self, token_id: &EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BigUint {
+    fn claim_royalties(&self, token_id: &EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BaseBigUint {
         let claim_destination = self.blockchain().get_sc_address();
-        let mut total_amount = BigUint::zero();
+        let mut total_amount = BaseBigUint::zero();
         for address in self.marketplaces().iter() {
-            let results: MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> = self
+            let results: MultiValue2<BaseBigUint, ManagedVec<EsdtTokenPayment>> = self
                 .marketplace_proxy(address)
                 .claim_tokens(&claim_destination, token_id, token_nonce)
                 .execute_on_dest_context();
@@ -132,6 +132,6 @@ mod nft_marketplace_proxy {
             claim_destination: &ManagedAddress,
             token_id: &EgldOrEsdtTokenIdentifier,
             token_nonce: u64,
-        ) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>>;
+        ) -> MultiValue2<BaseBigUint, ManagedVec<EsdtTokenPayment>>;
     }
 }

@@ -5,7 +5,7 @@ use crate::codec::TopEncodeMulti;
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
+        BaseBigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
         EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
     },
 };
@@ -46,7 +46,7 @@ where
     fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
         ContractCallWithEgld {
             basic: self,
-            egld_payment: BigUint::zero(),
+            egld_payment: BaseBigUint::zero(),
         }
     }
 
@@ -56,7 +56,7 @@ where
     }
 
     fn transfer_execute(self) {
-        self.transfer_execute_egld(BigUint::zero());
+        self.transfer_execute_egld(BaseBigUint::zero());
     }
 }
 
@@ -78,7 +78,7 @@ where
     /// Sets payment to be EGLD transfer.
     pub fn with_egld_transfer(
         self,
-        egld_amount: BigUint<SA>,
+        egld_amount: BaseBigUint<SA>,
     ) -> ContractCallWithEgld<SA, OriginalResult> {
         ContractCallWithEgld {
             basic: self,
@@ -109,7 +109,7 @@ where
         self,
         payment_token: TokenIdentifier<SA>,
         payment_nonce: u64,
-        payment_amount: BigUint<SA>,
+        payment_amount: BaseBigUint<SA>,
     ) -> ContractCallWithMultiEsdt<SA, OriginalResult> {
         self.with_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }
@@ -157,7 +157,7 @@ where
         self,
         payment_token: EgldOrEsdtTokenIdentifier<SA>,
         payment_nonce: u64,
-        payment_amount: BigUint<SA>,
+        payment_amount: BaseBigUint<SA>,
     ) -> ContractCallWithEgldOrSingleEsdt<SA, OriginalResult> {
         self.with_egld_or_single_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }

@@ -30,5 +30,5 @@ pub trait StorageLoadFeatures {
     fn load_ser_1(&self) -> StructExampleAlloc;
 
     #[storage_set("slice1")]
-    fn store_slice1(&self, slice: &[BigUint]);
+    fn store_slice1(&self, slice: &[BaseBigUint]);
 }

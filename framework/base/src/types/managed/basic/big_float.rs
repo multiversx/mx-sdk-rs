@@ -4,7 +4,7 @@ use crate::{
     api::{
         use_raw_handle, BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl,
     },
-    types::{BigInt, BigUint, ManagedType},
+    types::{BigInt, BaseBigUint, ManagedType},
 };
 use alloc::string::String;
 
@@ -48,14 +48,14 @@ impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<&BigUint<M>> for BigFloat<M> {
-    fn from(item: &BigUint<M>) -> Self {
+impl<M: ManagedTypeApi> From<&BaseBigUint<M>> for BigFloat<M> {
+    fn from(item: &BaseBigUint<M>) -> Self {
         BigFloat::from_big_uint(item)
     }
 }
 
-impl<M: ManagedTypeApi> From<BigUint<M>> for BigFloat<M> {
-    fn from(item: BigUint<M>) -> Self {
+impl<M: ManagedTypeApi> From<BaseBigUint<M>> for BigFloat<M> {
+    fn from(item: BaseBigUint<M>) -> Self {
         BigFloat::from_big_uint(&item)
     }
 }
@@ -104,7 +104,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     #[inline]
-    pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
+    pub fn from_big_uint(big_uint: &BaseBigUint<M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_uint.handle.clone());

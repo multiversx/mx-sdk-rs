@@ -9,19 +9,19 @@ pub trait BigIntOperators {
         a + b
     }
     #[endpoint]
-    fn add_big_int_big_uint(&self, a: BigInt, b: BigUint) -> BigInt {
+    fn add_big_int_big_uint(&self, a: BigInt, b: BaseBigUint) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_uint_big_int(&self, a: BigUint, b: BigInt) -> BigInt {
+    fn add_big_uint_big_int(&self, a: BaseBigUint, b: BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_int_big_uint_ref(&self, a: &BigInt, b: &BigUint) -> BigInt {
+    fn add_big_int_big_uint_ref(&self, a: &BigInt, b: &BaseBigUint) -> BigInt {
         a + b
     }
     #[endpoint]
-    fn add_big_uint_big_int_ref(&self, a: &BigUint, b: &BigInt) -> BigInt {
+    fn add_big_uint_big_int_ref(&self, a: &BaseBigUint, b: &BigInt) -> BigInt {
         a + b
     }
     #[endpoint]
@@ -29,11 +29,11 @@ pub trait BigIntOperators {
         a + b
     }
     #[endpoint]
-    fn add_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn add_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a + b
     }
     #[endpoint]
-    fn add_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn add_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a + b
     }
     #[endpoint]
@@ -45,11 +45,11 @@ pub trait BigIntOperators {
         a - b
     }
     #[endpoint]
-    fn sub_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn sub_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a - b
     }
     #[endpoint]
-    fn sub_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn sub_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a - b
     }
     #[endpoint]
@@ -61,11 +61,11 @@ pub trait BigIntOperators {
         a * b
     }
     #[endpoint]
-    fn mul_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn mul_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a * b
     }
     #[endpoint]
-    fn mul_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn mul_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a * b
     }
     #[endpoint]
@@ -77,11 +77,11 @@ pub trait BigIntOperators {
         a / b
     }
     #[endpoint]
-    fn div_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn div_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a / b
     }
     #[endpoint]
-    fn div_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn div_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a / b
     }
     #[endpoint]
@@ -93,11 +93,11 @@ pub trait BigIntOperators {
         a % b
     }
     #[endpoint]
-    fn rem_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn rem_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a % b
     }
     #[endpoint]
-    fn rem_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn rem_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a % b
     }
 
@@ -115,13 +115,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn add_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn add_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r += b;
         r
     }
     #[endpoint]
-    fn add_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn add_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r += b;
         r
@@ -139,13 +139,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn sub_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn sub_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r -= b;
         r
     }
     #[endpoint]
-    fn sub_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn sub_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r -= b;
         r
@@ -163,13 +163,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn mul_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn mul_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r *= b;
         r
     }
     #[endpoint]
-    fn mul_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn mul_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r *= b;
         r
@@ -187,13 +187,13 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn div_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn div_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r /= b;
         r
     }
     #[endpoint]
-    fn div_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn div_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r /= b;
         r
@@ -211,117 +211,117 @@ pub trait BigIntOperators {
         r
     }
     #[endpoint]
-    fn rem_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn rem_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r %= b;
         r
     }
     #[endpoint]
-    fn rem_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn rem_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r %= b;
         r
     }
 
     #[endpoint]
-    fn bit_and_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_and_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a & b
     }
     #[endpoint]
-    fn bit_and_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_and_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a & b
     }
     #[endpoint]
-    fn bit_or_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_or_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a | b
     }
     #[endpoint]
-    fn bit_or_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_or_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a | b
     }
     #[endpoint]
-    fn bit_xor_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_xor_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         a ^ b
     }
     #[endpoint]
-    fn bit_xor_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_xor_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         a ^ b
     }
 
     #[endpoint]
-    fn bit_and_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_and_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r &= b;
         r
     }
     #[endpoint]
-    fn bit_and_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_and_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r &= b;
         r
     }
     #[endpoint]
-    fn bit_or_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_or_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r |= b;
         r
     }
     #[endpoint]
-    fn bit_or_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_or_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r |= b;
         r
     }
     #[endpoint]
-    fn bit_xor_assign_big_uint(&self, a: BigUint, b: BigUint) -> BigUint {
+    fn bit_xor_assign_big_uint(&self, a: BaseBigUint, b: BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r ^= b;
         r
     }
     #[endpoint]
-    fn bit_xor_assign_big_uint_ref(&self, a: &BigUint, b: &BigUint) -> BigUint {
+    fn bit_xor_assign_big_uint_ref(&self, a: &BaseBigUint, b: &BaseBigUint) -> BaseBigUint {
         let mut r = a.clone();
         r ^= b;
         r
     }
 
     #[endpoint]
-    fn shr_big_uint(&self, a: BigUint, b: usize) -> BigUint {
+    fn shr_big_uint(&self, a: BaseBigUint, b: usize) -> BaseBigUint {
         a >> b
     }
     #[endpoint]
-    fn shr_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
+    fn shr_big_uint_ref(&self, a: &BaseBigUint, b: usize) -> BaseBigUint {
         a >> b
     }
     #[endpoint]
-    fn shl_big_uint(&self, a: BigUint, b: usize) -> BigUint {
+    fn shl_big_uint(&self, a: BaseBigUint, b: usize) -> BaseBigUint {
         a << b
     }
     #[endpoint]
-    fn shl_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
+    fn shl_big_uint_ref(&self, a: &BaseBigUint, b: usize) -> BaseBigUint {
         a << b
     }
 
     #[endpoint]
-    fn shr_assign_big_uint(&self, a: BigUint, b: usize) -> BigUint {
+    fn shr_assign_big_uint(&self, a: BaseBigUint, b: usize) -> BaseBigUint {
         let mut r = a.clone();
         r >>= b;
         r
     }
     #[endpoint]
-    fn shr_assign_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
+    fn shr_assign_big_uint_ref(&self, a: &BaseBigUint, b: usize) -> BaseBigUint {
         let mut r = a.clone();
         r >>= b;
         r
     }
     #[endpoint]
-    fn shl_assign_big_uint(&self, a: BigUint, b: usize) -> BigUint {
+    fn shl_assign_big_uint(&self, a: BaseBigUint, b: usize) -> BaseBigUint {
         let mut r = a.clone();
         r <<= b;
         r
     }
     #[endpoint]
-    fn shl_assign_big_uint_ref(&self, a: &BigUint, b: usize) -> BigUint {
+    fn shl_assign_big_uint_ref(&self, a: &BaseBigUint, b: usize) -> BaseBigUint {
         let mut r = a.clone();
         r <<= b;
         r

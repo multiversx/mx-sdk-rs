@@ -4,7 +4,7 @@ use core::ops::{
 
 use crate::{
     api::{use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
-    types::{BigInt, BigUint, ManagedType, Sign},
+    types::{BigInt, BaseBigUint, ManagedType, Sign},
 };
 
 macro_rules! binary_operator {
@@ -23,15 +23,15 @@ macro_rules! binary_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<BigUint<M>> for BigInt<M> {
+        impl<M: ManagedTypeApi> $trait<BaseBigUint<M>> for BigInt<M> {
             type Output = BigInt<M>;
 
-            fn $method(self, other: BigUint<M>) -> BigInt<M> {
+            fn $method(self, other: BaseBigUint<M>) -> BigInt<M> {
                 self.$method(BigInt::from_biguint(Sign::Plus, other))
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigUint<M> {
+        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BaseBigUint<M> {
             type Output = BigInt<M>;
 
             fn $method(self, other: BigInt<M>) -> BigInt<M> {
@@ -55,15 +55,15 @@ macro_rules! binary_operator {
             }
         }
 
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigInt<M> {
+        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BaseBigUint<M>> for &'a BigInt<M> {
             type Output = BigInt<M>;
 
-            fn $method(self, other: &BigUint<M>) -> BigInt<M> {
+            fn $method(self, other: &BaseBigUint<M>) -> BigInt<M> {
                 self.$method(&BigInt::from_handle(other.get_handle()))
             }
         }
 
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BigUint<M> {
+        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BaseBigUint<M> {
             type Output = BigInt<M>;
 
             fn $method(self, other: &BigInt<M>) -> BigInt<M> {

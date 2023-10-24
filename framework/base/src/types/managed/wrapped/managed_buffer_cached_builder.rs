@@ -6,7 +6,7 @@ use crate::{
         hex_util::{byte_to_binary_digits, byte_to_hex_digits},
         FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
     },
-    types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
+    types::{BigInt, BaseBigUint, ManagedBuffer, StaticBufferRef},
 };
 
 const HEX_CONVERSION_BUFFER_LEN: usize = 32;
@@ -132,7 +132,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BaseBigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     #[inline]

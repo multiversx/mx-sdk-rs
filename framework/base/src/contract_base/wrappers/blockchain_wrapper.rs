@@ -10,7 +10,7 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
+        BaseBigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
         ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
@@ -121,21 +121,21 @@ where
     #[deprecated(since = "0.41.0", note = "Please use method `get_balance` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
+    pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BaseBigUint<A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance_legacy(handle.clone(), address);
-        BigUint::from_handle(handle)
+        BaseBigUint::from_handle(handle)
     }
 
     #[inline]
-    pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
+    pub fn get_balance(&self, address: &ManagedAddress<A>) -> BaseBigUint<A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
-        BigUint::from_handle(handle)
+        BaseBigUint::from_handle(handle)
     }
 
     #[inline]
-    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
+    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BaseBigUint<A> {
         token.map_ref_or_else(
             || self.get_balance(&self.get_sc_address()),
             |token_identifier| {
@@ -270,7 +270,7 @@ where
         address: &ManagedAddress<A>,
         token_id: &TokenIdentifier<A>,
         nonce: u64,
-    ) -> BigUint<A> {
+    ) -> BaseBigUint<A> {
         let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_esdt_balance(
             address.get_handle(),
@@ -278,7 +278,7 @@ where
             nonce,
             result_handle.clone(),
         );
-        BigUint::from_handle(result_handle)
+        BaseBigUint::from_handle(result_handle)
     }
 
     pub fn get_esdt_token_data(
@@ -331,13 +331,13 @@ where
 
         EsdtTokenData {
             token_type,
-            amount: BigUint::from_raw_handle(value_handle.get_raw_handle()),
+            amount: BaseBigUint::from_raw_handle(value_handle.get_raw_handle()),
             frozen,
             hash: ManagedBuffer::from_raw_handle(hash_handle.get_raw_handle()),
             name: ManagedBuffer::from_raw_handle(name_handle.get_raw_handle()),
             attributes: ManagedBuffer::from_raw_handle(attributes_handle.get_raw_handle()),
             creator: ManagedAddress::from_raw_handle(creator_handle.get_raw_handle()),
-            royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
+            royalties: BaseBigUint::from_raw_handle(royalties_handle.get_raw_handle()),
             uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
         }
     }
@@ -389,7 +389,7 @@ where
 {
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
-    pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
+    pub fn get_cumulated_validator_rewards(&self) -> BaseBigUint<A> {
         let temp_handle_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         let temp_handle_2: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_2);
 
@@ -408,7 +408,7 @@ where
         A::managed_type_impl().mb_to_big_int_unsigned(temp_handle_2, result_handle.clone());
 
         //wrap
-        BigUint::from_handle(result_handle)
+        BaseBigUint::from_handle(result_handle)
     }
 }
 
