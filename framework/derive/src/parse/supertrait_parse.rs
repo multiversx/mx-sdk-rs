@@ -2,7 +2,7 @@ use crate::{model::Supertrait, parse::split_path_last};
 
 pub fn is_contract_base(supertrait: &syn::TypeParamBound) -> bool {
     match supertrait {
-        syn::TypeParamBound::Trait(t) => t.path.segments.last().unwrap().ident == "ContractBase",
+        syn::TypeParamBound::Trait(t) => t.path.segments.last().unwrap().ident.to_string().ends_with("ContractBase"),
         _ => false,
     }
 }

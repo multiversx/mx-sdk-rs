@@ -269,12 +269,10 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT as CONTRACT BASE ///////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    impl<A> multiversx_sc::contract_base::ContractBase for ContractObj<A>
+    impl<A> multiversx_sc::contract_base::ContractBase<A> for ContractObj<A>
     where
         A: multiversx_sc::api::VMApi,
-    {
-        type Api = A;
-    }
+    {}
 
     impl<A> super::module_1::AutoImpl for ContractObj<A> where A: multiversx_sc::api::VMApi {}
 

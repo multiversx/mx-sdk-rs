@@ -392,8 +392,8 @@ pub trait OrdersModule:
 
     #[view(getOrderById)]
     #[storage_mapper("orders")]
-    fn orders(&self, id: u64) -> SingleValueMapper<Order<Self::Api>>;
+    fn orders(&self, id: u64) -> BaseSingleValueMapper<Order<Self::Api>>;
 
     #[storage_mapper("address_order_ids")]
-    fn address_order_ids(&self, address: &ManagedAddress) -> SingleValueMapper<ManagedVec<u64>>;
+    fn address_order_ids(&self, address: &ManagedAddress) -> BaseSingleValueMapper<ManagedVec<u64>>;
 }

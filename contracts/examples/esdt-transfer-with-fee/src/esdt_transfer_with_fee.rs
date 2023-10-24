@@ -126,7 +126,7 @@ pub trait EsdtTransferWithFee {
 
     #[view(getTokenFee)]
     #[storage_mapper("token_fee")]
-    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
+    fn token_fee(&self, token: &TokenIdentifier) -> BaseSingleValueMapper<Fee<Self::Api>>;
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]

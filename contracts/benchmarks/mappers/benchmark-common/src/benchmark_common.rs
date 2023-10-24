@@ -12,9 +12,9 @@ pub trait BenchmarkCommon {
 
     fn use_index_struct(
         &self,
-        base: &ExampleStruct<Self::Api>,
+        base: &ExampleStruct<CurrentApi>,
         index: usize,
-    ) -> ExampleStruct<Self::Api> {
+    ) -> ExampleStruct<CurrentApi> {
         let mut example_struct = base.clone();
         example_struct.first_token_nonce = index as u64;
         example_struct.second_token_nonce = index as u64;

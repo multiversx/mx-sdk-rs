@@ -516,9 +516,9 @@ pub trait GovernanceModule:
 
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]
-    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<BaseBigUint>;
+    fn total_votes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 
     #[view(getTotalDownvotes)]
     #[storage_mapper("governance:totalDownvotes")]
-    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<BaseBigUint>;
+    fn total_downvotes(&self, proposal_id: usize) -> SingleValueMapper<BigUint>;
 }

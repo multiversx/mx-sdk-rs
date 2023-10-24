@@ -378,11 +378,11 @@ pub trait RewardsDistribution:
         raffle_id: u64,
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
-    ) -> SingleValueMapper<BaseBigUint>;
+    ) -> SingleValueMapper<BigUint>;
 
     #[view(getNftRewardPercent)]
     #[storage_mapper("nftRewardPercent")]
-    fn nft_reward_percent(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<BaseBigUint>;
+    fn nft_reward_percent(&self, raffle_id: u64, nft_nonce: u64) -> SingleValueMapper<BigUint>;
 
     #[view(getWasClaimed)]
     #[storage_mapper("wasClaimed")]
@@ -400,7 +400,7 @@ pub trait RewardsDistribution:
 
     #[view(getBrackets)]
     #[storage_mapper("brackets")]
-    fn brackets(&self) -> SingleValueMapper<ManagedVec<Bracket>>;
+    fn brackets(&self) -> BaseSingleValueMapper<ManagedVec<Bracket>>;
 
     #[view(getLastRaffleEpoch)]
     #[storage_mapper("lastRaffleEpoch")]
@@ -417,7 +417,7 @@ pub trait RewardsDistribution:
     fn current_ticket_id(&self) -> SingleValueMapper<u64>;
 
     #[storage_mapper("raffleProgress")]
-    fn raffle_progress(&self) -> SingleValueMapper<Option<RaffleProgress<Self::Api>>>;
+    fn raffle_progress(&self) -> BaseSingleValueMapper<Option<RaffleProgress<Self::Api>>>;
 
     #[proxy]
     fn seed_nft_minter_proxy(&self, address: ManagedAddress) -> seed_nft_minter::Proxy<Self::Api>;

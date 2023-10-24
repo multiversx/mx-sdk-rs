@@ -176,7 +176,7 @@ pub trait PingPong {
 
     #[view(getPingAmount)]
     #[storage_mapper("pingAmount")]
-    fn ping_amount(&self) -> SingleValueMapper<BaseBigUint>;
+    fn ping_amount(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
@@ -191,7 +191,7 @@ pub trait PingPong {
     /// Optional funding cap.
     #[view(getMaxFunds)]
     #[storage_mapper("maxFunds")]
-    fn max_funds(&self) -> SingleValueMapper<Option<BaseBigUint>>;
+    fn max_funds(&self) -> BaseSingleValueMapper<Option<BaseBigUint>>;
 
     #[storage_mapper("user")]
     fn user_mapper(&self) -> UserMapper;

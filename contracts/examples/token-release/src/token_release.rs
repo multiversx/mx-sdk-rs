@@ -342,7 +342,7 @@ pub trait TokenRelease {
 
     #[view(getTokenTotalSupply)]
     #[storage_mapper("tokenTotalSupply")]
-    fn token_total_supply(&self) -> SingleValueMapper<BaseBigUint>;
+    fn token_total_supply(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("setupPeriodStatus")]
     fn setup_period_status(&self) -> SingleValueMapper<bool>;
@@ -355,15 +355,15 @@ pub trait TokenRelease {
     fn group_schedule(
         &self,
         group_identifier: &ManagedBuffer,
-    ) -> SingleValueMapper<Schedule<Self::Api>>;
+    ) -> BaseSingleValueMapper<Schedule<Self::Api>>;
 
     #[storage_mapper("userGroups")]
     fn user_groups(&self, address: &ManagedAddress)
-        -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
+        -> BaseSingleValueMapper<ManagedVec<ManagedBuffer>>;
 
     #[storage_mapper("usersInGroup")]
     fn users_in_group(&self, group_identifier: &ManagedBuffer) -> SingleValueMapper<u64>;
 
     #[storage_mapper("claimedBalance")]
-    fn claimed_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn claimed_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
 }

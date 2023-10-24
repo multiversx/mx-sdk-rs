@@ -30,7 +30,7 @@ pub use multiversx_chain_vm::tx_mock::TxTokenTransfer;
 
 #[derive(Clone)]
 pub struct ContractObjWrapper<
-    CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    CB: ContractBase<DebugApi> + CallableContract + 'static,
     ContractObjBuilder: 'static + Copy + Fn() -> CB,
 > {
     pub(crate) address: Address,
@@ -39,7 +39,7 @@ pub struct ContractObjWrapper<
 
 impl<CB, ContractObjBuilder> ContractObjWrapper<CB, ContractObjBuilder>
 where
-    CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    CB: ContractBase<DebugApi> + CallableContract + 'static,
     ContractObjBuilder: 'static + Copy + Fn() -> CB,
 {
     pub(crate) fn new(address: Address, obj_builder: ContractObjBuilder) -> Self {
@@ -201,7 +201,7 @@ impl BlockchainStateWrapper {
         contract_wasm_path: &str,
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let address = self.address_factory.new_sc_address();
@@ -223,7 +223,7 @@ impl BlockchainStateWrapper {
         contract_wasm_path: &str,
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         if !address.is_smart_contract_address() {
@@ -307,7 +307,7 @@ impl BlockchainStateWrapper {
         obj_builder: ContractObjBuilder,
     ) -> ContractObjWrapper<CB, ContractObjBuilder>
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
     {
         let deployer_vm_address = to_vm_address(deployer);
@@ -335,9 +335,9 @@ impl BlockchainStateWrapper {
         new_builder: NewContractObjBuilder,
     ) -> ContractObjWrapper<NewCB, NewContractObjBuilder>
     where
-        OldCB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        OldCB: ContractBase<DebugApi> + CallableContract + 'static,
         OldContractObjBuilder: 'static + Copy + Fn() -> OldCB,
-        NewCB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        NewCB: ContractBase<DebugApi> + CallableContract + 'static,
         NewContractObjBuilder: 'static + Copy + Fn() -> NewCB,
     {
         ContractObjWrapper::new(old_wrapper.address, new_builder)
@@ -593,7 +593,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) -> TxResult
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
@@ -610,7 +610,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) -> TxResult
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
@@ -636,7 +636,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) -> TxResult
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
@@ -655,7 +655,7 @@ impl BlockchainStateWrapper {
         query_fn: TxFn,
     ) -> TxResult
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
@@ -677,7 +677,7 @@ impl BlockchainStateWrapper {
         tx_fn: TxFn,
     ) -> TxResult
     where
-        CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        CB: ContractBase<DebugApi> + CallableContract + 'static,
         ContractObjBuilder: 'static + Copy + Fn() -> CB,
         TxFn: FnOnce(CB),
     {
@@ -890,7 +890,7 @@ fn create_contract_obj_box<CB, ContractObjBuilder>(
     func: ContractObjBuilder,
 ) -> Box<dyn CallableContract>
 where
-    CB: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    CB: ContractBase<DebugApi> + CallableContract + 'static,
     ContractObjBuilder: 'static + Fn() -> CB,
 {
     let c_base = func();

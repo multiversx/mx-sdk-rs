@@ -241,10 +241,10 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     }
 
     #[storage_mapper("totalValue")]
-    fn total_value(&self) -> SingleValueMapper<BaseBigUint>;
+    fn total_value(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("valuePerCaller")]
-    fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn value_per_caller(&self, caller: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("callbackExecuted")]
     fn callback_executed(&self) -> SingleValueMapper<bool>;

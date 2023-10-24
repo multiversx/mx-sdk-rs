@@ -18,7 +18,11 @@ macro_rules! imports {
                 multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
                 TopEncode,
             },
-            contract_base::{ContractBase, ProxyObjBase},
+            contract_base::{
+                ContractBase, ProxyObjBase, CallValueWrapper, SendWrapper,
+                SendRawWrapper, BlockchainWrapper, CryptoWrapper, ErrorHelper,
+                ManagedSerializer, StorageRawWrapper
+            },
             err_msg,
             esdt::*,
             io::*,
@@ -35,6 +39,7 @@ macro_rules! imports {
         multiversx_sc::api_imports!();
 
         type BigUint = BaseBigUint<CurrentApi>;
+        type SingleValueMapper<T> = BaseSingleValueMapper<CurrentApi, T>;
     };
 }
 

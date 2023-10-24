@@ -15,7 +15,7 @@ fn generate_key_snippet(key_args: &[MethodArgument], identifier: &str) -> proc_m
         })
         .collect();
     quote! {
-        let mut ___key___ = multiversx_sc::storage::StorageKey::<Self::Api>::new(
+        let mut ___key___ = multiversx_sc::storage::StorageKey::<CurrentApi>::new(
             &#id_literal[..],
         );
         #(#key_appends)*
@@ -67,19 +67,21 @@ pub fn generate_setter_impl(m: &Method, identifier: &str) -> proc_macro2::TokenS
 pub fn generate_mapper_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {
     let msig = method_gen::generate_sig_with_attributes(m);
     let key_snippet = generate_key_snippet(m.method_args.as_slice(), identifier);
-    match m.return_type.clone() {
+    let test = match m.return_type.clone() {
         syn::ReturnType::Default => panic!("getter should return some value"),
         syn::ReturnType::Type(_, ty) => {
             quote! {
                 #msig {
                     #key_snippet
-                    <#ty as multiversx_sc::storage::mappers::StorageMapper<Self::Api>>::new(
+                    <#ty as multiversx_sc::storage::mappers::StorageMapper<CurrentApi>>::new(
                         ___key___
                     )
                 }
             }
         },
-    }
+    };
+
+    test
 }
 
 pub fn generate_is_empty_impl(m: &Method, identifier: &str) -> proc_macro2::TokenStream {

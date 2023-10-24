@@ -95,7 +95,7 @@ pub trait CryptoBubbles {
 
     #[view(balanceOf)]
     #[storage_mapper("playerBalance")]
-    fn player_balance(&self, player: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn player_balance(&self, player: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     // Events
 

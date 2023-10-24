@@ -16,7 +16,7 @@ impl ScenarioWorld {
         f: F,
     ) -> &mut Self
     where
-        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
         F: FnOnce(ContractObj),
     {
         self.whitebox_query_check(whitebox_contract, f, |tx_result| {
@@ -31,7 +31,7 @@ impl ScenarioWorld {
         check_result: C,
     ) -> &mut Self
     where
-        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
         F: FnOnce(ContractObj),
         C: FnOnce(TxResult),
     {
@@ -57,7 +57,7 @@ impl ScenarioWorld {
         f: F,
     ) -> &mut Self
     where
-        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
         F: FnOnce(ContractObj),
     {
         self.whitebox_call_check(whitebox_contract, sc_call_step, f, |tx_result| {
@@ -73,7 +73,7 @@ impl ScenarioWorld {
         check_result: C,
     ) -> &mut Self
     where
-        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
         F: FnOnce(ContractObj),
         C: FnOnce(TxResult),
     {
@@ -106,7 +106,7 @@ impl ScenarioWorld {
         f: F,
     ) -> &mut Self
     where
-        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
         F: FnOnce(ContractObj),
     {
         self.whitebox_deploy_check(whitebox_contract, sc_deploy_step, f, |tx_result| {
@@ -122,7 +122,7 @@ impl ScenarioWorld {
         check_result: C,
     ) -> &mut Self
     where
-        ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+        ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
         F: FnOnce(ContractObj),
         C: FnOnce(TxResult),
     {

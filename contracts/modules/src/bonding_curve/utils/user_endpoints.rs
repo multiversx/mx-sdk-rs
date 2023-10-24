@@ -1,8 +1,6 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-use multiversx_sc::contract_base::ManagedSerializer;
-
 use crate::bonding_curve::{
     curves::curve_function::CurveFunction,
     utils::{events, storage, structs::BondingCurve},

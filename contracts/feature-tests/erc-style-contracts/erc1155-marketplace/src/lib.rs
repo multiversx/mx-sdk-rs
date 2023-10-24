@@ -362,5 +362,5 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: &BaseBigUint,
         nft_id: &BaseBigUint,
-    ) -> SingleValueMapper<Auction<Self::Api>>;
+    ) -> BaseSingleValueMapper<Auction<Self::Api>>;
 }

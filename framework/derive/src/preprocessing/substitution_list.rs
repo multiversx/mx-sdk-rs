@@ -13,14 +13,17 @@ pub fn substitutions() -> SubstitutionsMap {
 fn add_managed_type(substitutions: &mut SubstitutionsMap, type_name: &proc_macro2::TokenStream) {
     substitutions.add_substitution(
         quote!(#type_name<Self::Api>), 
-        quote!(#type_name<Self::Api>));
+        quote!(#type_name<CurrentApi>));
+    substitutions.add_substitution(
+        quote!(#type_name<CurrentApi>),
+        quote!(#type_name<CurrentApi>));
     substitutions.add_substitution(
         quote!(#type_name::),
-        quote!(multiversx_sc::types::#type_name::<Self::Api>::),
+        quote!(multiversx_sc::types::#type_name::<CurrentApi>::),
     );
     substitutions.add_substitution(
         quote!(#type_name),
-        quote!(multiversx_sc::types::#type_name<Self::Api>),
+        quote!(multiversx_sc::types::#type_name<CurrentApi>),
     );
 }
 
@@ -32,7 +35,11 @@ fn add_managed_type_with_generics(
         quote!(#type_name<Self::Api, ),
         quote!(#type_name<Self::Api, ),
     );
-    substitutions.add_substitution(quote!(#type_name<), quote!(#type_name<Self::Api, ));
+    substitutions.add_substitution(
+        quote!(#type_name<CurrentApi, ),
+        quote!(#type_name<CurrentApi, ),
+    );
+    substitutions.add_substitution(quote!(#type_name<), quote!(#type_name<CurrentApi, ));
 }
 
 fn add_managed_types(substitutions: &mut SubstitutionsMap) {
@@ -115,7 +122,6 @@ fn add_storage_mappers(substitutions: &mut SubstitutionsMap) {
     add_storage_mapper(substitutions, &quote!(MapStorageMapper));
     add_storage_mapper(substitutions, &quote!(SetMapper));
     add_storage_mapper(substitutions, &quote!(UnorderedSetMapper));
-    add_storage_mapper(substitutions, &quote!(SingleValueMapper));
     add_storage_mapper(substitutions, &quote!(VecMapper));
     add_storage_mapper(substitutions, &quote!(QueueMapper));
     add_storage_mapper(substitutions, &quote!(WhitelistMapper));

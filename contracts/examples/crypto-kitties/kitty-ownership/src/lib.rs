@@ -13,7 +13,7 @@ pub trait KittyOwnership {
     #[init]
     fn init(
         &self,
-        birth_fee: BaseBigUint,
+        birth_fee: BigUint,
         opt_gene_science_contract_address: OptionalValue<ManagedAddress>,
         opt_kitty_auction_contract_address: OptionalValue<ManagedAddress>,
     ) {
@@ -592,7 +592,7 @@ pub trait KittyOwnership {
 
     #[view(birthFee)]
     #[storage_mapper("birthFee")]
-    fn birth_fee(&self) -> SingleValueMapper<BaseBigUint>;
+    fn birth_fee(&self) -> SingleValueMapper<BigUint>;
 
     // storage - Kitties
 

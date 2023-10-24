@@ -269,11 +269,11 @@ pub trait DigitalCash {
 
     #[view]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
+    fn deposit(&self, donor: &ManagedAddress) -> BaseSingleValueMapper<DepositInfo<Self::Api>>;
 
     #[storage_mapper("fee")]
-    fn fee(&self) -> SingleValueMapper<BaseBigUint>;
+    fn fee(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("collectedFees")]
-    fn collected_fees(&self) -> SingleValueMapper<BaseBigUint>;
+    fn collected_fees(&self) -> SingleValueMapper<BigUint>;
 }

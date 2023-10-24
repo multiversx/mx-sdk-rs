@@ -9,7 +9,7 @@ pub trait SimpleErc20Token {
     /// Total number of tokens in existence.
     #[view(totalSupply)]
     #[storage_mapper("totalSupply")]
-    fn total_supply(&self) -> SingleValueMapper<BaseBigUint>;
+    fn total_supply(&self) -> SingleValueMapper<BigUint>;
 
     /// Gets the balance of the specified address.
     ///
@@ -19,7 +19,7 @@ pub trait SimpleErc20Token {
     ///
     #[view(balanceOf)]
     #[storage_mapper("balance")]
-    fn token_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn token_balance(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     /// The amount of tokens that an owner allowed to a spender.
     ///
@@ -34,14 +34,14 @@ pub trait SimpleErc20Token {
         &self,
         owner: &ManagedAddress,
         spender: &ManagedAddress,
-    ) -> SingleValueMapper<BaseBigUint>;
+    ) -> SingleValueMapper<BigUint>;
 
     // FUNCTIONALITY
 
     /// Constructor, is called immediately after the contract is created
     /// Will set the fixed global token supply and give all the supply to the creator.
     #[init]
-    fn init(&self, total_supply: &BaseBigUint) {
+    fn init(&self, total_supply: &BigUint) {
         let creator = self.blockchain().get_caller();
 
         // save total supply
@@ -53,7 +53,7 @@ pub trait SimpleErc20Token {
     }
 
     /// This method is private, deduplicates logic from transfer and transferFrom.
-    fn perform_transfer(&self, sender: ManagedAddress, recipient: ManagedAddress, amount: BaseBigUint) {
+    fn perform_transfer(&self, sender: ManagedAddress, recipient: ManagedAddress, amount: BigUint) {
         // check if enough funds & decrease sender balance
         self.token_balance(&sender).update(|balance| {
             require!(amount <= *balance, "insufficient funds");

@@ -462,10 +462,10 @@ pub trait Erc1155 {
     // last valid id
 
     #[storage_mapper("lastValidTypeId")]
-    fn last_valid_type_id(&self) -> SingleValueMapper<BaseBigUint>;
+    fn last_valid_type_id(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("lastValidTokenIdForType")]
-    fn last_valid_nft_id_for_type(&self, type_id: &BaseBigUint) -> SingleValueMapper<BaseBigUint>;
+    fn last_valid_nft_id_for_type(&self, type_id: &BaseBigUint) -> SingleValueMapper<BigUint>;
 
     // check if an operator is approved. Default is false.
 

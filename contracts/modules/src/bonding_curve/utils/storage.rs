@@ -18,5 +18,5 @@ pub trait StorageModule {
     fn owned_tokens(&self, owner: &ManagedAddress) -> SetMapper<TokenIdentifier>;
 
     #[storage_mapper("nonce_amount")]
-    fn nonce_amount(&self, identifier: &TokenIdentifier, nonce: u64) -> SingleValueMapper<BaseBigUint>;
+    fn nonce_amount(&self, identifier: &TokenIdentifier, nonce: u64) -> SingleValueMapper<BigUint>;
 }

@@ -94,11 +94,11 @@ pub trait NftStoragePrepay {
 
     #[view(getCostPerByte)]
     #[storage_mapper("costPerByte")]
-    fn cost_per_byte(&self) -> SingleValueMapper<BaseBigUint>;
+    fn cost_per_byte(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("deposit")]
-    fn deposit(&self, address: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn deposit(&self, address: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("totalReserved")]
-    fn total_reserved(&self) -> SingleValueMapper<BaseBigUint>;
+    fn total_reserved(&self) -> SingleValueMapper<BigUint>;
 }

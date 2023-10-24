@@ -7,7 +7,7 @@ use crate::{scenario_model::AddressKey, DebugApi};
 /// For this reason it references the concrete SC type explicitly.
 pub struct WhiteboxContract<ContractObj>
 where
-    ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
 {
     pub address_expr: AddressKey,
     pub contract_obj_builder: fn() -> ContractObj,
@@ -15,7 +15,7 @@ where
 
 impl<ContractObj> WhiteboxContract<ContractObj>
 where
-    ContractObj: ContractBase<Api = DebugApi> + CallableContract + 'static,
+    ContractObj: ContractBase<DebugApi> + CallableContract + 'static,
 {
     pub fn new<A: Into<AddressKey>>(
         address_expr: A,

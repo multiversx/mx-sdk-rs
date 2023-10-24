@@ -40,9 +40,6 @@ where
     }
 }
 
-impl<A> ContractBase for UniversalContractObj<A>
+impl<A> ContractBase<A> for UniversalContractObj<A>
 where
-    A: VMApi,
-{
-    type Api = A;
-}
+    A: VMApi, {}

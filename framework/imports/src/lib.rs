@@ -2,10 +2,9 @@ use proc_macro::TokenStream;
 use quote::quote;
 
 #[proc_macro]
-pub fn api_imports(sc_crate_name: TokenStream) -> TokenStream {
-    let crate_name = proc_macro2::TokenStream::from(sc_crate_name);
+pub fn api_imports(_item: TokenStream) -> TokenStream {
     let vm_api = quote! {multiversx_sc_wasm_adapter::api::VmApiImpl};
-    let uncallable_api = quote! {#crate_name::api::uncallable::UncallableApi};
+    let uncallable_api = quote! {multiversx_sc::api::uncallable::UncallableApi};
     let debug_api = quote! {multiversx_sc_scenario::DebugApi};
     let single_tx_api = quote! {multiversx_sc_scenario::api::SingleTxApi};
 

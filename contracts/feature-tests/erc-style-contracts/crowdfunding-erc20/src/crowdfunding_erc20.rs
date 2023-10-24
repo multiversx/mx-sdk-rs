@@ -129,7 +129,7 @@ pub trait Crowdfunding {
 
     #[view(get_target)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<BaseBigUint>;
+    fn target(&self) -> SingleValueMapper<BigUint>;
 
     #[view(get_deadline)]
     #[storage_mapper("deadline")]
@@ -137,7 +137,7 @@ pub trait Crowdfunding {
 
     #[view(get_deposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[view(get_erc20_contract_address)]
     #[storage_mapper("erc20ContractAddress")]
@@ -145,5 +145,5 @@ pub trait Crowdfunding {
 
     #[view(get_total_balance)]
     #[storage_mapper("erc20Balance")]
-    fn total_balance(&self) -> SingleValueMapper<BaseBigUint>;
+    fn total_balance(&self) -> SingleValueMapper<BigUint>;
 }

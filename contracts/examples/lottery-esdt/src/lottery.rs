@@ -363,7 +363,7 @@ pub trait Lottery {
     fn lottery_info(
         &self,
         lottery_name: &ManagedBuffer,
-    ) -> SingleValueMapper<LotteryInfo<Self::Api>>;
+    ) -> BaseSingleValueMapper<LotteryInfo<Self::Api>>;
 
     #[view(getLotteryWhitelist)]
     #[storage_mapper("lotteryWhitelist")]
@@ -384,5 +384,5 @@ pub trait Lottery {
     fn burn_percentage_for_lottery(
         &self,
         lottery_name: &ManagedBuffer,
-    ) -> SingleValueMapper<BaseBigUint>;
+    ) -> SingleValueMapper<BigUint>;
 }

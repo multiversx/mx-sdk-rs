@@ -11,12 +11,7 @@ pub fn contract_object_def() -> proc_macro2::TokenStream {
 
 pub fn impl_contract_base() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> multiversx_sc::contract_base::ContractBase for ContractObj<A>
-        where
-            A: multiversx_sc::api::VMApi,
-        {
-            type Api = A;
-        }
+        impl multiversx_sc::contract_base::ContractBase<CurrentApi> for ContractObj<CurrentApi> {}
     }
 }
 
@@ -49,7 +44,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
 #[allow(dead_code)]
 pub fn impl_auto_impl() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> AutoImpl for ContractObj<A> where
+        impl AutoImpl for ContractObj<CurrentApi> where
             A: multiversx_sc::contract_base::ContractBase
                 + multiversx_sc::api::ErrorApi
                 + multiversx_sc::api::EndpointArgumentApi
@@ -62,10 +57,7 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
 
 pub fn impl_callable_contract() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> multiversx_sc::contract_base::CallableContract for ContractObj<A>
-        where
-            A: multiversx_sc::api::VMApi + Send + Sync,
-        {
+        impl multiversx_sc::contract_base::CallableContract for ContractObj<CurrentApi> {
             fn call(&self, fn_name: &str) -> bool {
                 EndpointWrappers::call(self, fn_name)
             }

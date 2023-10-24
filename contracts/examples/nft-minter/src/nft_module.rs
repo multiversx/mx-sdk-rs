@@ -201,5 +201,5 @@ pub trait NftModule {
     fn nft_token_id(&self) -> SingleValueMapper<TokenIdentifier>;
 
     #[storage_mapper("priceTag")]
-    fn price_tag(&self, nft_nonce: u64) -> SingleValueMapper<PriceTag<Self::Api>>;
+    fn price_tag(&self, nft_nonce: u64) -> BaseSingleValueMapper<PriceTag<Self::Api>>;
 }

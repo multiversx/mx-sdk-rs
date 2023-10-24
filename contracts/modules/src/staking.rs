@@ -149,13 +149,13 @@ pub trait StakingModule {
     fn staking_token(&self) -> SingleValueMapper<EgldOrEsdtTokenIdentifier>;
 
     #[storage_mapper("staking_module:requiredStakeAmount")]
-    fn required_stake_amount(&self) -> SingleValueMapper<BaseBigUint>;
+    fn required_stake_amount(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("staking_module:userWhitelist")]
     fn user_whitelist(&self) -> UnorderedSetMapper<ManagedAddress>;
 
     #[storage_mapper("staking_module:stakedAmount")]
-    fn staked_amount(&self, user: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn staked_amount(&self, user: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("staking_module:slashingProposalVoters")]
     fn slashing_proposal_voters(
@@ -167,8 +167,8 @@ pub trait StakingModule {
     fn slash_quorum(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("staking_module:slashAmount")]
-    fn slash_amount(&self) -> SingleValueMapper<BaseBigUint>;
+    fn slash_amount(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("staking_module:totalSlashedAmount")]
-    fn total_slashed_amount(&self) -> SingleValueMapper<BaseBigUint>;
+    fn total_slashed_amount(&self) -> SingleValueMapper<BigUint>;
 }

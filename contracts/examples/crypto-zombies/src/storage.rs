@@ -15,7 +15,7 @@ pub trait Storage {
 
     #[view]
     #[storage_mapper("zombies")]
-    fn zombies(&self, id: &usize) -> SingleValueMapper<Zombie<Self::Api>>;
+    fn zombies(&self, id: &usize) -> BaseSingleValueMapper<Zombie<Self::Api>>;
 
     #[view]
     #[storage_mapper("zombie_owner")]
@@ -37,8 +37,8 @@ pub trait Storage {
     fn attack_victory_probability(&self) -> SingleValueMapper<u8>;
 
     #[storage_mapper("level_up_fee")]
-    fn level_up_fee(&self) -> SingleValueMapper<BaseBigUint>;
+    fn level_up_fee(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("collected_fees")]
-    fn collected_fees(&self) -> SingleValueMapper<BaseBigUint>;
+    fn collected_fees(&self) -> SingleValueMapper<BigUint>;
 }

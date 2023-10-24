@@ -54,5 +54,5 @@ pub trait DistributionModule {
 
     #[view(getDistributionRules)]
     #[storage_mapper("distributionRules")]
-    fn distribution_rules(&self) -> SingleValueMapper<ManagedVec<Distribution<Self::Api>>>;
+    fn distribution_rules(&self) -> BaseSingleValueMapper<ManagedVec<Distribution<Self::Api>>>;
 }

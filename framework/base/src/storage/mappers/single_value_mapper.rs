@@ -18,7 +18,7 @@ use crate::{
 use storage_get_from_address::storage_get_len_from_address;
 
 /// Manages a single serializable item in storage.
-pub struct SingleValueMapper<SA, T>
+pub struct BaseSingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
@@ -28,14 +28,14 @@ where
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for BaseSingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     #[inline]
     fn new(base_key: StorageKey<SA>) -> Self {
-        SingleValueMapper {
+        BaseSingleValueMapper {
             key: base_key,
             _phantom_api: PhantomData,
             _phantom_item: PhantomData,
@@ -43,7 +43,7 @@ where
     }
 }
 
-impl<SA, T> SingleValueMapper<SA, T>
+impl<SA, T> BaseSingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -129,7 +129,7 @@ where
     }
 }
 
-impl<SA, T> TopEncodeMulti for SingleValueMapper<SA, T>
+impl<SA, T> TopEncodeMulti for BaseSingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -143,7 +143,7 @@ where
     }
 }
 
-/// Intermediary type for deserializing the result of an endpoint that returns a `SingleValueMapper`.
+/// Intermediary type for deserializing the result of an endpoint that returns a `BaseSingleValueMapper`.
 ///
 /// Necessary because we cannot implement `CodecFrom` directly on `T`.
 pub struct SingleValue<T: TopDecode>(T);
@@ -181,14 +181,14 @@ impl<T: TopDecode> SingleValue<T> {
     }
 }
 
-impl<SA, T> !CodecFromSelf for SingleValueMapper<SA, T>
+impl<SA, T> !CodecFromSelf for BaseSingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
 }
 
-impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T>> for SingleValue<R>
+impl<SA, T, R> CodecFrom<BaseSingleValueMapper<SA, T>> for SingleValue<R>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -196,14 +196,14 @@ where
 {
 }
 
-impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
+impl<SA, T> CodecFrom<BaseSingleValueMapper<SA, T>> for PlaceholderOutput
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
 }
 
-impl<SA, T> TypeAbi for SingleValueMapper<SA, T>
+impl<SA, T> TypeAbi for BaseSingleValueMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,

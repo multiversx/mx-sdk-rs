@@ -47,11 +47,7 @@ pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 
 fn impl_auto_impl(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl<A> #module_path AutoImpl for ContractObj<A>
-        where
-            A: multiversx_sc::api::VMApi,
-        {
-        }
+        impl #module_path AutoImpl for ContractObj<CurrentApi> {}
     }
 }
 
@@ -82,11 +78,7 @@ pub fn auto_impl_inheritance(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 
 fn impl_endpoint_wrappers(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl<A> #module_path EndpointWrappers for ContractObj<A>
-        where
-            A: multiversx_sc::api::VMApi,
-        {
-        }
+        impl #module_path EndpointWrappers for ContractObj<CurrentApi> {}
     }
 }
 

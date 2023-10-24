@@ -17,7 +17,7 @@ pub trait MultiContractFeatures {
 
     #[view]
     #[storage_mapper("sample-value")]
-    fn sample_value(&self) -> SingleValueMapper<BaseBigUint>;
+    fn sample_value(&self) -> SingleValueMapper<BigUint>;
 
     #[view(sample_value)]
     #[label("alt-impl")]

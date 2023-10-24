@@ -20,7 +20,7 @@ pub use map_storage_mapper::MapStorageMapper;
 pub use mapper::{StorageClearable, StorageMapper};
 pub use queue_mapper::QueueMapper;
 pub use set_mapper::SetMapper;
-pub use single_value_mapper::{SingleValue, SingleValueMapper};
+pub use single_value_mapper::{SingleValue, BaseSingleValueMapper};
 pub use token::*;
 pub use unique_id_mapper::{UniqueId, UniqueIdMapper};
 pub use unordered_set_mapper::UnorderedSetMapper;

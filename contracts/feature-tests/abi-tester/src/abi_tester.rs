@@ -109,7 +109,7 @@ pub trait AbiTester {
 
     #[view]
     #[storage_mapper("sample_storage_mapper")]
-    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInSingleValueMapper>;
+    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInBaseSingleValueMapper>;
 
     #[view]
     fn item_for_vec(&self) -> Vec<OnlyShowsUpAsNestedInVec> {

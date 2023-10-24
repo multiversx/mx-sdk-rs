@@ -370,7 +370,7 @@ pub trait PriceAggregator:
         &self,
         from: &ManagedBuffer,
         to: &ManagedBuffer,
-    ) -> SingleValueMapper<Option<u8>>;
+    ) -> BaseSingleValueMapper<Option<u8>>;
 
     #[view]
     #[storage_mapper("submission_count")]

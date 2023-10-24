@@ -418,10 +418,10 @@ pub trait KittyAuction {
     // gen zero kitty
 
     #[storage_mapper("genZeroKittyStartingPrice")]
-    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<BaseBigUint>;
+    fn gen_zero_kitty_starting_price(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("genZeroKittyEndingPrice")]
-    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<BaseBigUint>;
+    fn gen_zero_kitty_ending_price(&self) -> SingleValueMapper<BigUint>;
 
     #[storage_mapper("genZeroKittyAuctionDuration")]
     fn gen_zero_kitty_auction_duration(&self) -> SingleValueMapper<u64>;
@@ -429,5 +429,5 @@ pub trait KittyAuction {
     // auction
 
     #[storage_mapper("auction")]
-    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Auction<Self::Api>>;
+    fn auction(&self, kitty_id: u32) -> BaseSingleValueMapper<Auction<Self::Api>>;
 }

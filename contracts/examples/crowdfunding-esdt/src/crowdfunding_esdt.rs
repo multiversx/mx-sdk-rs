@@ -13,7 +13,7 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BaseBigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
+    fn init(&self, target: BigUint, deadline: u64, token_identifier: EgldOrEsdtTokenIdentifier) {
         require!(target > 0, "Target must be more than 0");
         self.target().set(target);
 
@@ -101,7 +101,7 @@ pub trait Crowdfunding {
 
     #[view(getTarget)]
     #[storage_mapper("target")]
-    fn target(&self) -> SingleValueMapper<BaseBigUint>;
+    fn target(&self) -> SingleValueMapper<BigUint>;
 
     #[view(getDeadline)]
     #[storage_mapper("deadline")]
@@ -109,7 +109,7 @@ pub trait Crowdfunding {
 
     #[view(getDeposit)]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BaseBigUint>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<BigUint>;
 
     #[view(getCrowdfundingTokenIdentifier)]
     #[storage_mapper("tokenIdentifier")]

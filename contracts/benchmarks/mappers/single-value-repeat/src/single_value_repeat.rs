@@ -30,7 +30,7 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
         }
     }
 
-    fn item_at(&self, key: &ManagedBuffer, index: usize) -> SingleValueMapper<ManagedBuffer> {
+    fn item_at(&self, key: &ManagedBuffer, index: usize) -> BaseSingleValueMapper<ManagedBuffer>; {
         self.bench(self.append_index(key, index))
     }
 
@@ -72,7 +72,7 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
         &self,
         key: &ExampleStruct<Self::Api>,
         index: usize,
-    ) -> SingleValueMapper<ExampleStruct<Self::Api>> {
+    ) -> BaseSingleValueMapper<ExampleStruct<Self::Api>> {
         self.bench_struct(self.use_index_struct(key, index))
     }
 
@@ -80,5 +80,5 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
     fn bench_struct(
         &self,
         key: ExampleStruct<Self::Api>,
-    ) -> SingleValueMapper<ExampleStruct<Self::Api>>;
+    ) -> BaseSingleValueMapper<ExampleStruct<Self::Api>>;
 }
