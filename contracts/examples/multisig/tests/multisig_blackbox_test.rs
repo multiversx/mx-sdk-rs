@@ -155,15 +155,19 @@ impl MultisigTestState {
         egld_amount: u64,
         contract_call: ContractCallNoPayment<StaticApi, ()>,
     ) -> usize {
-        self.world
-            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
                 self.multisig_contract.propose_transfer_execute(
                     to,
                     egld_amount,
-                    contract_call.endpoint_name,
-                    contract_call.arg_buffer.into_multi_value_encoded(),
+                    contract_call.function_call.function_name,
+                    contract_call
+                        .function_call
+                        .arg_buffer
+                        .into_multi_value_encoded(),
                 ),
-            ))
+            ),
+        )
     }
 
     fn propose_async_call(
@@ -172,15 +176,19 @@ impl MultisigTestState {
         egld_amount: u64,
         contract_call: ContractCallNoPayment<StaticApi, ()>,
     ) -> usize {
-        self.world
-            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
                 self.multisig_contract.propose_async_call(
                     to,
                     egld_amount,
-                    contract_call.endpoint_name,
-                    contract_call.arg_buffer.into_multi_value_encoded(),
+                    contract_call.function_call.function_name,
+                    contract_call
+                        .function_call
+                        .arg_buffer
+                        .into_multi_value_encoded(),
                 ),
-            ))
+            ),
+        )
     }
 
     fn propose_remove_user(&mut self, user_address: Address) -> usize {

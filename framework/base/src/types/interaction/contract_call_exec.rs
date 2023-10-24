@@ -32,8 +32,8 @@ where
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
         let mut result = ManagedBufferCachedBuilder::default();
-        result.append_managed_buffer(&self.basic.endpoint_name);
-        for arg in self.basic.arg_buffer.raw_arg_iter() {
+        result.append_managed_buffer(&self.basic.function_call.function_name);
+        for arg in self.basic.function_call.arg_buffer.raw_arg_iter() {
             result.append_bytes(b"@");
             SCLowerHex::fmt(&*arg, &mut result);
         }
@@ -44,8 +44,8 @@ where
         AsyncCall {
             to: self.basic.to,
             egld_payment: self.egld_payment,
-            endpoint_name: self.basic.endpoint_name,
-            arg_buffer: self.basic.arg_buffer,
+            endpoint_name: self.basic.function_call.function_name,
+            arg_buffer: self.basic.function_call.arg_buffer,
             callback_call: None,
         }
     }
@@ -55,8 +55,8 @@ where
         super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
-            endpoint_name: self.basic.endpoint_name,
-            arg_buffer: self.basic.arg_buffer,
+            endpoint_name: self.basic.function_call.function_name,
+            arg_buffer: self.basic.function_call.arg_buffer,
             explicit_gas_limit: self.basic.explicit_gas_limit,
             extra_gas_for_callback: 0,
             callback_call: None,
@@ -73,8 +73,8 @@ where
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.egld_payment,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.basic.function_call.function_name,
+            &self.basic.function_call.arg_buffer,
         );
 
         SendRawWrapper::<SA>::new().clean_return_data();
@@ -89,8 +89,8 @@ where
         let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
             &self.basic.to,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.basic.function_call.function_name,
+            &self.basic.function_call.arg_buffer,
         );
 
         SendRawWrapper::<SA>::new().clean_return_data();
@@ -106,8 +106,8 @@ where
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.egld_payment,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.basic.function_call.function_name,
+            &self.basic.function_call.arg_buffer,
         );
 
         SendRawWrapper::<SA>::new().clean_return_data();
@@ -139,8 +139,8 @@ where
             &self.to,
             &egld_payment,
             gas_limit,
-            &self.endpoint_name,
-            &self.arg_buffer,
+            &self.function_call.function_name,
+            &self.function_call.arg_buffer,
         );
     }
 
@@ -154,8 +154,8 @@ where
                 &payment.token_identifier,
                 &payment.amount,
                 gas_limit,
-                &self.endpoint_name,
-                &self.arg_buffer,
+                &self.function_call.function_name,
+                &self.function_call.arg_buffer,
             );
         } else {
             // non-fungible/semi-fungible ESDT
@@ -165,8 +165,8 @@ where
                 payment.token_nonce,
                 &payment.amount,
                 gas_limit,
-                &self.endpoint_name,
-                &self.arg_buffer,
+                &self.function_call.function_name,
+                &self.function_call.arg_buffer,
             );
         }
     }
@@ -180,8 +180,8 @@ where
             &self.to,
             &payments,
             gas_limit,
-            &self.endpoint_name,
-            &self.arg_buffer,
+            &self.function_call.function_name,
+            &self.function_call.arg_buffer,
         );
     }
 

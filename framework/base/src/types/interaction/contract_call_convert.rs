@@ -10,7 +10,8 @@ use crate::{
 };
 
 use super::{
-    contract_call_no_payment::ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer,
+    contract_call_no_payment::ContractCallNoPayment, ContractCallWithEgld, FunctionCall,
+    ManagedArgBuffer,
 };
 
 impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
@@ -39,16 +40,18 @@ where
             let mut new_arg_buffer = ManagedArgBuffer::new();
             new_arg_buffer.push_arg(&payment.token_identifier);
             new_arg_buffer.push_arg(&payment.amount);
-            if !self.basic.endpoint_name.is_empty() {
-                new_arg_buffer.push_arg(&self.basic.endpoint_name);
+            if !self.basic.function_call.function_name.is_empty() {
+                new_arg_buffer.push_arg(&self.basic.function_call.function_name);
             }
 
             ContractCallWithEgld {
                 basic: ContractCallNoPayment {
                     _phantom: PhantomData,
                     to: self.basic.to,
-                    endpoint_name: ESDT_TRANSFER_FUNC_NAME.into(),
-                    arg_buffer: new_arg_buffer.concat(self.basic.arg_buffer),
+                    function_call: FunctionCall {
+                        function_name: ESDT_TRANSFER_FUNC_NAME.into(),
+                        arg_buffer: new_arg_buffer.concat(self.basic.function_call.arg_buffer),
+                    },
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
@@ -66,8 +69,8 @@ where
             new_arg_buffer.push_arg(payment.token_nonce);
             new_arg_buffer.push_arg(&payment.amount);
             new_arg_buffer.push_arg(&self.basic.to);
-            if !self.basic.endpoint_name.is_empty() {
-                new_arg_buffer.push_arg(&self.basic.endpoint_name);
+            if !self.basic.function_call.function_name.is_empty() {
+                new_arg_buffer.push_arg(&self.basic.function_call.function_name);
             }
 
             // nft transfer is sent to self, sender = receiver
@@ -77,8 +80,10 @@ where
                 basic: ContractCallNoPayment {
                     _phantom: PhantomData,
                     to: recipient_addr,
-                    endpoint_name: ESDT_NFT_TRANSFER_FUNC_NAME.into(),
-                    arg_buffer: new_arg_buffer.concat(self.basic.arg_buffer),
+                    function_call: FunctionCall {
+                        function_name: ESDT_NFT_TRANSFER_FUNC_NAME.into(),
+                        arg_buffer: new_arg_buffer.concat(self.basic.function_call.arg_buffer),
+                    },
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
@@ -100,8 +105,8 @@ where
             new_arg_buffer.push_arg(payment.token_nonce);
             new_arg_buffer.push_arg(payment.amount);
         }
-        if !self.basic.endpoint_name.is_empty() {
-            new_arg_buffer.push_arg(self.basic.endpoint_name);
+        if !self.basic.function_call.function_name.is_empty() {
+            new_arg_buffer.push_arg(self.basic.function_call.function_name);
         }
 
         // multi transfer is sent to self, sender = receiver
@@ -111,8 +116,10 @@ where
             basic: ContractCallNoPayment {
                 _phantom: PhantomData,
                 to: recipient_addr,
-                endpoint_name: ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
-                arg_buffer: new_arg_buffer.concat(self.basic.arg_buffer),
+                function_call: FunctionCall {
+                    function_name: ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
+                    arg_buffer: new_arg_buffer.concat(self.basic.function_call.arg_buffer),
+                },
                 explicit_gas_limit: self.basic.explicit_gas_limit,
                 _return_type: PhantomData,
             },

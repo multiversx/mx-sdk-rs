@@ -14,6 +14,7 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
+use multiversx_sc_codec::TopEncodeMulti;
 
 #[derive(Debug, Default, Clone)]
 #[repr(transparent)]
@@ -180,6 +181,11 @@ where
             ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
         );
         self.push_arg_raw(encoded_buffer);
+    }
+
+    pub fn push_multi_arg<T: TopEncodeMulti>(&mut self, arg: &T) {
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let Ok(()) = arg.multi_encode_or_handle_err(self, h);
     }
 }
 

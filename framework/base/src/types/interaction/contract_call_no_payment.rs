@@ -13,7 +13,7 @@ use crate::{
 use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
-    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, ManagedArgBuffer,
+    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, FunctionCall, ManagedArgBuffer,
 };
 
 /// Holds metadata for calling another contract, without payments.
@@ -29,8 +29,7 @@ where
 {
     pub(super) _phantom: PhantomData<SA>,
     pub to: ManagedAddress<SA>,
-    pub endpoint_name: ManagedBuffer<SA>,
-    pub arg_buffer: ManagedArgBuffer<SA>,
+    pub function_call: FunctionCall<SA>,
     pub explicit_gas_limit: u64,
     pub(super) _return_type: PhantomData<OriginalResult>,
 }
@@ -68,8 +67,10 @@ where
         ContractCallNoPayment {
             _phantom: PhantomData,
             to,
-            endpoint_name: endpoint_name.into(),
-            arg_buffer: ManagedArgBuffer::new(),
+            function_call: FunctionCall {
+                function_name: endpoint_name.into(),
+                arg_buffer: ManagedArgBuffer::new(),
+            },
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             _return_type: PhantomData,
         }
