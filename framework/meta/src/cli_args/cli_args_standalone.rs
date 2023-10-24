@@ -4,6 +4,7 @@ use clap::{ArgAction, Args, Parser, Subcommand};
 
 use super::{CliArgsToRaw, ContractCliAction};
 
+
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
 #[command(
@@ -78,16 +79,19 @@ pub struct InfoArgs {
     pub ignore: Vec<String>,
 }
 
+
+
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TestArgs {
     /// Target directory where to generate contract integration tests.
     /// Will be current directory if not specified.
-    #[arg(long, verbatim_doc_comment)]
+    #[arg(short, long, verbatim_doc_comment)]
     pub path: Option<String>,
 
-    /// This arg can differentiate between types of tests to be ran (go, scenario, all)
-    #[arg(long, verbatim_doc_comment)]
-    pub test_type: Option<String>,
+    /// This arg can differentiate between types of tests to be ran (go, scenario, all).
+    /// Default value will be "rust" if not specified.
+    #[arg(short, long, default_value = "rust", verbatim_doc_comment)]
+    pub test_type: String,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]

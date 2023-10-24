@@ -1,59 +1,34 @@
-use std::{
-    env, path,
-    process::{Command, ExitStatus},
-};
+use std::process::Command;
 
 use crate::cli_args::TestArgs;
 
-// fn run_cargo_test(features: Option<&str>) -> ExitStatus {
-//     let mut cargo_test = Command::new("cargo");
-//     cargo_test.arg("test");
+pub fn test(test_args: &TestArgs) {
+    let path = test_args.path.as_deref().unwrap_or("./");
+    let mut program = "cargo";
+    let mut args = Vec::new();
 
-//     if let Some(features) = features {
-//         cargo_test.arg("--features").arg(features);
-//     }
+    match test_args.test_type.as_str() {
+        "scenario" => {
+            program = "run-scenarios";
+            args.extend(["./"]);
+        },
+        "go" => {
+            args.extend(["test", "--features", "multiversx-sc-scenario/run-go-tests"]);
+        },
+        "rust" => {
+            args.extend(["test"]);
+        },
+        _ => {
+            panic!("Unrecognised test argument");
+        },
+    }
 
-//     cargo_test.status().expect("Failed to run 'cargo test'")
-// }
-
-pub fn test(args: &TestArgs) {
-    let path = if let Some(some_path) = &args.path {
-        some_path.as_str()
-    } else {
-        "./"
-    };
-
-    let status = Command::new("cargo")
-        .args(&["test", "--features", "multiversx-sc-scenario/run-go-tests"])
+    let status = Command::new(program)
+        .args(args.clone())
         .current_dir(path)
         .status()
-        .expect("Failed to run 'cargo test'");    
-
+        .expect(&format!("Failed to run program: {program} {:?}", args));
 
     println!("process finished with: {status}");
-
-    // assert!(status.success());
-
-    // let mut cargo_test = Command::new("cargo");
-    // cargo_test.arg("test");
-    // cargo_test.arg("--features").arg("multiversx-sc-scenario/run-go-tests");
-
-    // cargo_test.current_dir(&path);
-
-    // cargo_test.status().expect("");
+    assert!(status.success());
 }
-
-// fn main() {
-//     let args: Vec<String> = env::args().collect();
-
-//     if args.len() < 2 || args[1] != "test" {
-//         eprintln!("Invalid or missing subcommand. Usage: sc-meta test [--go]");
-//         std::process::exit(1);
-//     }
-
-//     if args.len() > 2 && args[2] == "--go" {
-//         run_cargo_test(Some("multiversx-sc-scenario/run-go-tests")); //wasm file exists
-//     } else {
-//         run_cargo_test(None);
-//     }
-// }

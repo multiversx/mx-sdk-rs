@@ -39,7 +39,6 @@ pub async fn cli_main_standalone() {
             test_gen_tool(args);
         },
         Some(StandaloneCliAction::Test(args)) => {
-            //
             test(args)
         }
         None => {},
