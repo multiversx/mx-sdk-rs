@@ -101,6 +101,7 @@ pub const EI_1_3_NAMES: &[&str] = &[
     "managedGetPrevBlockRandomSeed",
     "managedGetReturnData",
     "managedGetMultiESDTCallValue",
+    "ManagedGetBackTransfers",
     "managedGetESDTBalance",
     "managedGetESDTTokenData",
     "managedAsyncCall",

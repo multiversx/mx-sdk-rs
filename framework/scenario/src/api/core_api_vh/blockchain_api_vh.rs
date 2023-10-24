@@ -212,6 +212,16 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         });
     }
 
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle)
+        });
+    }
+
     fn check_esdt_frozen(
         &self,
         address_handle: Self::ManagedBufferHandle,

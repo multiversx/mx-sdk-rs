@@ -199,6 +199,13 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         }
     }
 
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    ) {
+    }
+
     fn check_esdt_frozen(
         &self,
         address_handle: RawHandle,

@@ -76,6 +76,8 @@ extern "C" {
         urisHandle: i32,
     );
 
+    fn managedGetBackTransfers(esdtTransfersValueHandle: i32, callValueHandle: i32);
+
     fn managedIsESDTFrozen(addressHandle: i32, tokenIDHandle: i32, nonce: i64) -> i32;
     fn managedIsESDTPaused(tokenIDHandle: i32) -> i32;
     fn managedIsESDTLimitedTransfer(tokenIDHandle: i32) -> i32;
@@ -320,6 +322,16 @@ impl BlockchainApiImpl for VmApiImpl {
                 royalties_handle,
                 uris_handle,
             );
+        }
+    }
+
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    ) {
+        unsafe {
+            managedGetBackTransfers(address_handle, token_id_handle);
         }
     }
 
