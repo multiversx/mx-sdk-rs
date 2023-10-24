@@ -1,0 +1,16 @@
+[package]
+name = "multiversx-sc-imports"
+version = "0.43.3"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0.66"
+quote = "1.0.33"
+
+[features]
+no-debug-api = []
+single-tx-api = []
+

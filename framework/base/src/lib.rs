@@ -38,7 +38,7 @@ pub mod non_zero_util;
 pub mod storage;
 pub mod types;
 
-pub use multiversx_sc_imports::imports;
+pub use multiversx_sc_imports::api_imports;
 
 pub use hex_call_data::*;
 pub use hex_literal;
