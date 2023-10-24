@@ -61,6 +61,8 @@ pub enum StandaloneCliAction {
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
     )]
     TestGen(TestGenArgs),
+    #[command(name = "test", about = "Runs cargo test")]
+    Test(TestArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -74,6 +76,18 @@ pub struct InfoArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TestArgs {
+    /// Target directory where to generate contract integration tests.
+    /// Will be current directory if not specified.
+    #[arg(long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// This arg can differentiate between types of tests to be ran (go, scenario, all)
+    #[arg(long, verbatim_doc_comment)]
+    pub test_type: Option<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
