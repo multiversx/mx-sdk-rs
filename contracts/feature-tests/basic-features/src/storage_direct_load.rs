@@ -81,9 +81,9 @@ pub trait StorageLoadFeatures {
         use multiversx_sc::api::{
             StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
         };
-        let value_handle: <<Self as ContractBase>::Api as HandleTypeInfo>::ManagedBufferHandle =
-            use_raw_handle(Self::Api::static_var_api_impl().next_handle());
-        Self::Api::storage_read_api_impl().storage_load_from_address(
+        let value_handle: <CurrentApi as HandleTypeInfo>::ManagedBufferHandle =
+            use_raw_handle(CurrentApi::static_var_api_impl().next_handle());
+        CurrentApi::storage_read_api_impl().storage_load_from_address(
             address.get_handle(),
             key.get_handle(),
             value_handle.clone(),

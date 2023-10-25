@@ -3,7 +3,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait ChangeOwnerModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint(changeOwnerAddress)]
     fn change_owner(

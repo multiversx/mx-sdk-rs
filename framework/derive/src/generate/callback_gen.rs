@@ -46,11 +46,11 @@ pub fn generate_callback_selector_and_main(
         } else {
             let cb_selector_body = callback_selector_body(match_arms, module_calls);
             let cb_main_body = quote! {
-                if let Some(___cb_closure___) = multiversx_sc::types::CallbackClosureForDeser::storage_load_and_clear::<Self::Api>() {
+                if let Some(___cb_closure___) = multiversx_sc::types::CallbackClosureForDeser::storage_load_and_clear::<CurrentApi>() {
                     if let multiversx_sc::types::CallbackSelectorResult::NotProcessed(_) =
                         self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
                         multiversx_sc::api::ErrorApiImpl::signal_error(
-                            &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
+                            &<CurrentApi as multiversx_sc::api::ErrorApi>::error_api_impl(),
                             err_msg::CALLBACK_BAD_FUNC,
                         );
                     }

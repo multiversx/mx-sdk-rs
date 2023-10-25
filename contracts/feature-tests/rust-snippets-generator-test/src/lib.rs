@@ -55,7 +55,7 @@ pub trait PayableFeatures {
     }
 
     #[endpoint]
-    fn custom_struct(&self, _arg: MyCoolStruct<Self::Api>) -> MyCoolStruct<Self::Api> {
+    fn custom_struct(&self, _arg: MyCoolStruct<CurrentApi>) -> MyCoolStruct<CurrentApi> {
         MyCoolStruct {
             awesome: BaseBigUint::zero(),
         }
@@ -93,7 +93,7 @@ pub trait PayableFeatures {
     fn managed_buffer(
         &self,
         _arg: Option<ManagedBuffer>,
-    ) -> MultiValueEncoded<ManagedVec<MyCoolStruct<Self::Api>>> {
+    ) -> MultiValueEncoded<ManagedVec<MyCoolStruct<CurrentApi>>> {
         MultiValueEncoded::new()
     }
 
@@ -105,8 +105,8 @@ pub trait PayableFeatures {
     #[endpoint]
     fn multi_value_4(
         &self,
-        arg: MultiValue4<u64, BaseBigUint, MyCoolStruct<Self::Api>, TokenIdentifier>,
-    ) -> MultiValue4<u64, BaseBigUint, MyCoolStruct<Self::Api>, TokenIdentifier> {
+        arg: MultiValue4<u64, BaseBigUint, MyCoolStruct<CurrentApi>, TokenIdentifier>,
+    ) -> MultiValue4<u64, BaseBigUint, MyCoolStruct<CurrentApi>, TokenIdentifier> {
         arg
     }
 

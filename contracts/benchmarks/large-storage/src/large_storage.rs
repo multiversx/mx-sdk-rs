@@ -32,5 +32,5 @@ pub trait LargeStorageBenchmark {
 
     #[view(savedStructure)]
     #[storage_mapper("savedStructure")]
-    fn structure(&self) -> BaseSingleValueMapper<Structure<Self::Api>>;
+    fn structure(&self) -> SingleValueMapper<Structure<CurrentApi>>;
 }

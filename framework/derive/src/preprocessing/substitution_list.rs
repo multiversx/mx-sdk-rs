@@ -97,9 +97,13 @@ fn add_storage_mapper_single_generic_arg(
 ) {
     substitutions.add_substitution(
         quote!(#mapper_name<Self::Api>),
-        quote!(#mapper_name<Self::Api>),
+        quote!(#mapper_name<CurrentApi>),
     );
-    substitutions.add_substitution(quote!(#mapper_name), quote!(#mapper_name<Self::Api>));
+    substitutions.add_substitution(
+        quote!(#mapper_name<CurrentApi>),
+        quote!(#mapper_name<CurrentApi>),
+    );
+    substitutions.add_substitution(quote!(#mapper_name), quote!(#mapper_name<CurrentApi>));
 }
 
 fn add_storage_mapper(

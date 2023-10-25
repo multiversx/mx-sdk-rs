@@ -13,11 +13,11 @@ pub trait TransferRoleProxyModule {
         &self,
         original_caller: ManagedAddress,
         dest: ManagedAddress,
-        payments: PaymentsVec<Self::Api>,
+        payments: PaymentsVec<CurrentApi>,
         data: ManagedBuffer,
     ) -> ! {
         let contract_call =
-            ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, data, payments.clone());
+            ContractCallWithMultiEsdt::<CurrentApi, ()>::new(dest, data, payments.clone());
 
         self.execute_async_call(original_caller, payments, contract_call, None);
     }
@@ -25,8 +25,8 @@ pub trait TransferRoleProxyModule {
     fn transfer_to_contract_typed_call<T>(
         &self,
         original_caller: ManagedAddress,
-        contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
-        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
+        contract_call: ContractCallWithMultiEsdt<CurrentApi, T>,
+        opt_custom_callback: Option<CallbackClosure<CurrentApi>>,
     ) -> !
     where
         T: TopEncodeMulti,
@@ -43,13 +43,13 @@ pub trait TransferRoleProxyModule {
         &self,
         original_caller: ManagedAddress,
         dest: ManagedAddress,
-        payments: PaymentsVec<Self::Api>,
+        payments: PaymentsVec<CurrentApi>,
         endpoint_name: ManagedBuffer,
-        args: ManagedArgBuffer<Self::Api>,
-        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
+        args: ManagedArgBuffer<CurrentApi>,
+        opt_custom_callback: Option<CallbackClosure<CurrentApi>>,
     ) -> ! {
         let contract_call =
-            ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, endpoint_name, payments.clone())
+            ContractCallWithMultiEsdt::<CurrentApi, ()>::new(dest, endpoint_name, payments.clone())
                 .with_raw_arguments(args);
 
         self.execute_async_call(
@@ -63,9 +63,9 @@ pub trait TransferRoleProxyModule {
     fn execute_async_call<T>(
         &self,
         original_caller: ManagedAddress,
-        initial_payments: PaymentsVec<Self::Api>,
-        contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
-        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
+        initial_payments: PaymentsVec<CurrentApi>,
+        contract_call: ContractCallWithMultiEsdt<CurrentApi, T>,
+        opt_custom_callback: Option<CallbackClosure<CurrentApi>>,
     ) -> !
     where
         T: TopEncodeMulti,
@@ -102,7 +102,7 @@ pub trait TransferRoleProxyModule {
     fn transfer_callback(
         &self,
         original_caller: ManagedAddress,
-        initial_payments: ManagedVec<EsdtTokenPayment<Self::Api>>,
+        initial_payments: ManagedVec<EsdtTokenPayment<CurrentApi>>,
         #[call_result] result: ManagedAsyncCallResult<MultiValueEncoded<ManagedBuffer>>,
     ) -> MultiValueEncoded<ManagedBuffer> {
         match result {

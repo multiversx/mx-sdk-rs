@@ -61,7 +61,7 @@ pub trait BasicFeatures:
     + storage_mapper_map::MapMapperFeatures
     + storage_mapper_map_storage::MapStorageMapperFeatures
     + storage_mapper_set::SetMapperFeatures
-    + storage_mapper_single::BaseSingleValueMapperFeatures
+    + storage_mapper_single::SingleValueMapperFeatures
     + storage_mapper_vec::VecMapperFeatures
     + storage_mapper_token_attributes::TokenAttributesMapperFeatures
     + storage_mapper_whitelist::StorageMapperWhitelistFeatures

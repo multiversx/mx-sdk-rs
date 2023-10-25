@@ -11,7 +11,7 @@ pub trait GovernanceEventsModule {
         #[indexed] proposal_id: usize,
         #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
-        proposal: &GovernanceProposal<Self::Api>,
+        proposal: &GovernanceProposal<CurrentApi>,
     );
 
     #[event("upVoteCast")]
@@ -60,7 +60,7 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] address: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        payment: &EsdtTokenPayment<Self::Api>,
+        payment: &EsdtTokenPayment<CurrentApi>,
     );
 
     #[event("userClaimDepositedTokens")]
@@ -68,6 +68,6 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] address: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        payment: &EsdtTokenPayment<Self::Api>,
+        payment: &EsdtTokenPayment<CurrentApi>,
     );
 }

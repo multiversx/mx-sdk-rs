@@ -9,7 +9,7 @@ fn check_printed_and_clear(expected: &str) {
 
 #[test]
 fn test_print_ascii() {
-    let fmf = formatted_message_features::contract_obj::<StaticApi>();
+    let fmf = formatted_message_features::contract_obj();
 
     fmf.print_message(5);
     check_printed_and_clear("Printing x: 5");
@@ -26,7 +26,7 @@ fn test_print_ascii() {
 
 #[test]
 fn test_print_binary() {
-    let fmf = formatted_message_features::contract_obj::<StaticApi>();
+    let fmf = formatted_message_features::contract_obj();
 
     fmf.print_message_binary(12);
     check_printed_and_clear("Printing x: 1100");
@@ -43,7 +43,7 @@ fn test_print_binary() {
 
 #[test]
 fn test_print_hex() {
-    let fmf = formatted_message_features::contract_obj::<StaticApi>();
+    let fmf = formatted_message_features::contract_obj();
 
     fmf.print_message_hex(0);
     check_printed_and_clear("Printing x: 0");
@@ -63,7 +63,7 @@ fn test_print_hex() {
 
 #[test]
 fn test_print_codecs() {
-    let fmf = formatted_message_features::contract_obj::<StaticApi>();
+    let fmf = formatted_message_features::contract_obj();
 
     fmf.print_message_codec(0);
     check_printed_and_clear("Printing x: ");

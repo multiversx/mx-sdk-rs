@@ -19,7 +19,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait DnsModule {
     #[proxy]
-    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::Api>;
+    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<CurrentApi>;
 
     #[payable("EGLD")]
     #[only_owner]

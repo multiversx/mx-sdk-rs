@@ -60,7 +60,7 @@ pub trait KittyAuction {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, kitty_id: u32) -> Auction<Self::Api> {
+    fn get_auction_status(&self, kitty_id: u32) -> Auction<CurrentApi> {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -406,7 +406,7 @@ pub trait KittyAuction {
     // proxy
 
     #[proxy]
-    fn kitty_ownership_proxy(&self, to: ManagedAddress) -> kitty_ownership::Proxy<Self::Api>;
+    fn kitty_ownership_proxy(&self, to: ManagedAddress) -> kitty_ownership::Proxy<CurrentApi>;
 
     // storage
 
@@ -429,5 +429,5 @@ pub trait KittyAuction {
     // auction
 
     #[storage_mapper("auction")]
-    fn auction(&self, kitty_id: u32) -> BaseSingleValueMapper<Auction<Self::Api>>;
+    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Auction<CurrentApi>>;
 }

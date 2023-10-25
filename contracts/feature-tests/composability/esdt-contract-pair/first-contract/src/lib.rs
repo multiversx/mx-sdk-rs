@@ -128,7 +128,7 @@ pub trait FirstContract {
         amount: &BaseBigUint,
         to: &ManagedAddress,
         func_name: &ManagedBuffer,
-        args: &ManagedVec<Self::Api, ManagedBuffer>,
+        args: &ManagedVec<CurrentApi, ManagedBuffer>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(esdt_token_identifier);

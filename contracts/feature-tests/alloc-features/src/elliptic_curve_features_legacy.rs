@@ -7,7 +7,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait EllipticCurveFeatures {
     #[endpoint]
-    fn compute_get_values(&self, curve_bitsize: u32) -> EllipticCurveComponents<Self::Api> {
+    fn compute_get_values(&self, curve_bitsize: u32) -> EllipticCurveComponents<CurrentApi> {
         match EllipticCurve::from_bitsize(curve_bitsize) {
             Some(ec) => ec.get_values(),
             None => (
@@ -22,7 +22,7 @@ pub trait EllipticCurveFeatures {
     }
 
     #[endpoint]
-    fn compute_create_ec(&self, curve: &str) -> EllipticCurveComponents<Self::Api> {
+    fn compute_create_ec(&self, curve: &str) -> EllipticCurveComponents<CurrentApi> {
         EllipticCurve::from_name_str(curve).get_values()
     }
 

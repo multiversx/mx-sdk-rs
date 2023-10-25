@@ -13,7 +13,7 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
 
     #[payable("EGLD")]
     #[endpoint(wrapEgld)]
-    fn wrap_egld(&self) -> EsdtTokenPayment<Self::Api> {
+    fn wrap_egld(&self) -> EsdtTokenPayment<CurrentApi> {
         self.require_not_paused();
 
         let payment_amount = self.call_value().egld_value();

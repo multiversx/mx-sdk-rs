@@ -87,5 +87,5 @@ pub trait ZombieFeeding:
             .call_and_exit();
     }
     #[proxy]
-    fn kitty_proxy(&self, to: ManagedAddress) -> crypto_kitties_proxy::Proxy<Self::Api>;
+    fn kitty_proxy(&self, to: ManagedAddress) -> crypto_kitties_proxy::Proxy<CurrentApi>;
 }

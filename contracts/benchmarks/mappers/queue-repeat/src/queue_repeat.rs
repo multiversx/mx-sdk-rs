@@ -35,7 +35,7 @@ pub trait QueueRepeat: benchmark_common::BenchmarkCommon {
     fn bench(&self) -> QueueMapper<ManagedBuffer>;
 
     #[endpoint]
-    fn add_struct(&self, num_repeats: usize, value: ExampleStruct<Self::Api>) {
+    fn add_struct(&self, num_repeats: usize, value: ExampleStruct<CurrentApi>) {
         let mut bench = self.bench_struct();
         for i in 0..num_repeats {
             bench.push_back(self.use_index_struct(&value, i));
@@ -43,7 +43,7 @@ pub trait QueueRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[endpoint]
-    fn count_struct(&self, value: ExampleStruct<Self::Api>) -> usize {
+    fn count_struct(&self, value: ExampleStruct<CurrentApi>) -> usize {
         self.bench_struct().iter().filter(|v| *v == value).count()
     }
 
@@ -57,5 +57,5 @@ pub trait QueueRepeat: benchmark_common::BenchmarkCommon {
 
     #[view]
     #[storage_mapper("bench_struct")]
-    fn bench_struct(&self) -> QueueMapper<ExampleStruct<Self::Api>>;
+    fn bench_struct(&self) -> QueueMapper<ExampleStruct<CurrentApi>>;
 }

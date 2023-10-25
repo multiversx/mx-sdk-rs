@@ -4,7 +4,7 @@ multiversx_sc::imports!();
 pub trait ForwarderRawCommon {
     #[view]
     #[storage_mapper("callback_args")]
-    fn callback_args(&self) -> VecMapper<ManagedVec<Self::Api, ManagedBuffer>>;
+    fn callback_args(&self) -> VecMapper<ManagedVec<CurrentApi, ManagedBuffer>>;
 
     #[view]
     #[storage_mapper("callback_payments")]
@@ -44,8 +44,8 @@ pub trait ForwarderRawCommon {
     }
 
     #[event("execute_on_dest_context_result")]
-    fn execute_on_dest_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
+    fn execute_on_dest_context_result(&self, result: ManagedVec<CurrentApi, ManagedBuffer>);
 
     #[event("execute_on_same_context_result")]
-    fn execute_on_same_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
+    fn execute_on_same_context_result(&self, result: ManagedVec<CurrentApi, ManagedBuffer>);
 }

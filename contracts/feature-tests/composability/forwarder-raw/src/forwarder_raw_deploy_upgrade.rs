@@ -7,7 +7,7 @@ pub trait ForwarderRawDeployUpgrade {
         &self,
         code: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
-    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+    ) -> MultiValue2<ManagedAddress, ManagedVec<CurrentApi, ManagedBuffer>> {
         self.send_raw()
             .deploy_contract(
                 self.blockchain().get_gas_left(),

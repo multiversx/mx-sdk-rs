@@ -6,7 +6,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait MultisigEventsModule {
     #[event("startPerformAction")]
-    fn start_perform_action_event(&self, data: &ActionFullInfo<Self::Api>);
+    fn start_perform_action_event(&self, data: &ActionFullInfo<CurrentApi>);
 
     #[event("performChangeUser")]
     fn perform_change_user_event(

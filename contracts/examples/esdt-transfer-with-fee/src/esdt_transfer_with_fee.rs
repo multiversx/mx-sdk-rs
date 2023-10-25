@@ -87,9 +87,9 @@ pub trait EsdtTransferWithFee {
 
     fn get_payment_after_fees(
         &self,
-        fee: Fee<Self::Api>,
-        payment: &EsdtTokenPayment<Self::Api>,
-    ) -> EsdtTokenPayment<Self::Api> {
+        fee: Fee<CurrentApi>,
+        payment: &EsdtTokenPayment<CurrentApi>,
+    ) -> EsdtTokenPayment<CurrentApi> {
         let mut new_payment = payment.clone();
         let fee_payment = self.calculate_fee(&fee, payment.clone());
 
@@ -107,9 +107,9 @@ pub trait EsdtTransferWithFee {
 
     fn calculate_fee(
         &self,
-        fee: &Fee<Self::Api>,
-        mut provided: EsdtTokenPayment<Self::Api>,
-    ) -> EsdtTokenPayment<Self::Api> {
+        fee: &Fee<CurrentApi>,
+        mut provided: EsdtTokenPayment<CurrentApi>,
+    ) -> EsdtTokenPayment<CurrentApi> {
         match fee {
             Fee::ExactValue(requested) => requested.clone(),
             Fee::Percentage(percentage) => {
@@ -126,7 +126,7 @@ pub trait EsdtTransferWithFee {
 
     #[view(getTokenFee)]
     #[storage_mapper("token_fee")]
-    fn token_fee(&self, token: &TokenIdentifier) -> BaseSingleValueMapper<Fee<Self::Api>>;
+    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<CurrentApi>>;
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]

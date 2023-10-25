@@ -213,7 +213,7 @@ pub trait PriceAggregator:
 
     fn create_new_round(
         &self,
-        token_pair: TokenPair<Self::Api>,
+        token_pair: TokenPair<CurrentApi>,
         mut submissions: MapMapper<ManagedAddress, BaseBigUint>,
         decimals: u8,
     ) {
@@ -252,7 +252,7 @@ pub trait PriceAggregator:
     }
 
     #[view(latestRoundData)]
-    fn latest_round_data(&self) -> MultiValueEncoded<PriceFeed<Self::Api>> {
+    fn latest_round_data(&self) -> MultiValueEncoded<PriceFeed<CurrentApi>> {
         self.require_not_paused();
         require!(!self.rounds().is_empty(), "no completed rounds");
 
@@ -307,9 +307,9 @@ pub trait PriceAggregator:
 
     fn make_price_feed(
         &self,
-        token_pair: TokenPair<Self::Api>,
-        round_values: VecMapper<TimestampedPrice<Self::Api>>,
-    ) -> PriceFeed<Self::Api> {
+        token_pair: TokenPair<CurrentApi>,
+        round_values: VecMapper<TimestampedPrice<CurrentApi>>,
+    ) -> PriceFeed<CurrentApi> {
         let round_id = round_values.len();
         let last_price = round_values.get(round_id);
 
@@ -332,7 +332,7 @@ pub trait PriceAggregator:
         result
     }
 
-    fn clear_submissions(&self, token_pair: &TokenPair<Self::Api>) {
+    fn clear_submissions(&self, token_pair: &TokenPair<CurrentApi>) {
         if let Some(mut pair_submission_mapper) = self.submissions().get(token_pair) {
             pair_submission_mapper.clear();
         }
@@ -370,7 +370,7 @@ pub trait PriceAggregator:
         &self,
         from: &ManagedBuffer,
         to: &ManagedBuffer,
-    ) -> BaseSingleValueMapper<Option<u8>>;
+    ) -> SingleValueMapper<Option<u8>>;
 
     #[view]
     #[storage_mapper("submission_count")]
@@ -382,22 +382,22 @@ pub trait PriceAggregator:
     #[storage_mapper("rounds")]
     fn rounds(
         &self,
-    ) -> MapStorageMapper<TokenPair<Self::Api>, VecMapper<TimestampedPrice<Self::Api>>>;
+    ) -> MapStorageMapper<TokenPair<CurrentApi>, VecMapper<TimestampedPrice<CurrentApi>>>;
 
     #[storage_mapper("first_submission_timestamp")]
     fn first_submission_timestamp(
         &self,
-        token_pair: &TokenPair<Self::Api>,
+        token_pair: &TokenPair<CurrentApi>,
     ) -> SingleValueMapper<u64>;
 
     #[storage_mapper("last_submission_timestamp")]
     fn last_submission_timestamp(
         &self,
-        token_pair: &TokenPair<Self::Api>,
+        token_pair: &TokenPair<CurrentApi>,
     ) -> SingleValueMapper<u64>;
 
     #[storage_mapper("submissions")]
     fn submissions(
         &self,
-    ) -> MapStorageMapper<TokenPair<Self::Api>, MapMapper<ManagedAddress, BaseBigUint>>;
+    ) -> MapStorageMapper<TokenPair<CurrentApi>, MapMapper<ManagedAddress, BaseBigUint>>;
 }

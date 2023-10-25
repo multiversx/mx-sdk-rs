@@ -176,7 +176,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 
         let mut uris = ManagedVec::new();
         uris.push(uri);
-        let token_nonce = self.send().esdt_nft_create::<ComplexAttributes<Self::Api>>(
+        let token_nonce = self.send().esdt_nft_create::<ComplexAttributes<CurrentApi>>(
             &token_identifier,
             &amount,
             &name,
@@ -192,7 +192,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             token_nonce,
         );
 
-        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<Self::Api>>();
+        let decoded_attr = token_info.decode_attributes::<ComplexAttributes<CurrentApi>>();
 
         require!(
             orig_attr.biguint == decoded_attr.biguint

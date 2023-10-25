@@ -39,7 +39,7 @@ pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
         .map(|supertrait| {
             let module_path = &supertrait.module_path;
             quote! {
-                + #module_path ProxyTrait
+                + #module_path ProxyTrait<A>
             }
         })
         .collect()
@@ -47,7 +47,7 @@ pub fn proxy_supertrait_decl(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 
 fn impl_auto_impl(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl #module_path AutoImpl for ContractObj<CurrentApi> {}
+        impl #module_path AutoImpl for ContractObj {}
     }
 }
 
@@ -78,7 +78,7 @@ pub fn auto_impl_inheritance(supertraits: &[Supertrait]) -> Vec<proc_macro2::Tok
 
 fn impl_endpoint_wrappers(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl #module_path EndpointWrappers for ContractObj<CurrentApi> {}
+        impl #module_path EndpointWrappers for ContractObj {}
     }
 }
 
@@ -126,7 +126,7 @@ pub fn function_selector_module_calls(supertraits: &[Supertrait]) -> Vec<proc_ma
 
 fn impl_proxy_trait(module_path: &ModulePath) -> proc_macro2::TokenStream {
     quote! {
-        impl<A> #module_path ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+        impl<A> #module_path ProxyTrait<A> for Proxy<A> where A: multiversx_sc::api::VMApi {}
     }
 }
 

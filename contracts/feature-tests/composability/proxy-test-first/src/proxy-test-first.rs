@@ -39,10 +39,10 @@ mod message_me_proxy {
 #[multiversx_sc::contract]
 pub trait ProxyTestFirst {
     #[proxy]
-    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<Self::Api>;
+    fn pay_me_proxy(&self) -> pay_me_proxy::Proxy<CurrentApi>;
 
     #[proxy]
-    fn message_me_proxy(&self) -> message_me_proxy::Proxy<Self::Api>;
+    fn message_me_proxy(&self) -> message_me_proxy::Proxy<CurrentApi>;
 
     #[storage_get("other_contract")]
     fn get_other_contract(&self) -> ManagedAddress;

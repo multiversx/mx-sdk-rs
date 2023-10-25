@@ -4,7 +4,7 @@ use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_factorial() {
-    let factorial = factorial::contract_obj::<StaticApi>();
+    let factorial = factorial::contract_obj();
 
     assert_eq!(
         BaseBigUint::<StaticApi>::from(1u32),

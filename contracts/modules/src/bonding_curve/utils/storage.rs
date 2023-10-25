@@ -9,7 +9,7 @@ pub trait StorageModule {
     fn token_details(
         &self,
         token: &TokenIdentifier,
-    ) -> SingleValueMapper<TokenOwnershipData<Self::Api>>;
+    ) -> SingleValueMapper<TokenOwnershipData<CurrentApi>>;
 
     #[storage_mapper("bonding_curve")]
     fn bonding_curve(&self, token: &TokenIdentifier) -> SingleValueMapper<ManagedBuffer>;

@@ -30,7 +30,7 @@ pub trait ForwarderQueue {
 
     #[view]
     #[storage_mapper("queued_calls")]
-    fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
+    fn queued_calls(&self) -> LinkedListMapper<QueuedCall<CurrentApi>>;
 
     #[endpoint]
     #[payable("*")]

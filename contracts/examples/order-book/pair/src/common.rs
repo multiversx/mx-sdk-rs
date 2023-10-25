@@ -80,10 +80,10 @@ pub trait CommonModule {
     fn new_order(
         &self,
         id: u64,
-        payment: Payment<Self::Api>,
-        params: OrderInputParams<Self::Api>,
+        payment: Payment<CurrentApi>,
+        params: OrderInputParams<CurrentApi>,
         order_type: OrderType,
-    ) -> Order<Self::Api> {
+    ) -> Order<CurrentApi> {
         Order {
             id,
             creator: self.blockchain().get_caller(),
@@ -101,7 +101,7 @@ pub trait CommonModule {
         &(part * value) / total
     }
 
-    fn calculate_fee_amount(&self, amount: &BaseBigUint, fee_config: &FeeConfig<Self::Api>) -> BaseBigUint {
+    fn calculate_fee_amount(&self, amount: &BaseBigUint, fee_config: &FeeConfig<CurrentApi>) -> BaseBigUint {
         match fee_config.fee_type {
             FeeConfigEnum::Fixed => fee_config.fixed_fee.clone(),
             FeeConfigEnum::Percent => amount * fee_config.percent_fee / PERCENT_BASE_POINTS,
@@ -111,7 +111,7 @@ pub trait CommonModule {
     fn calculate_amount_after_fee(
         &self,
         amount: &BaseBigUint,
-        fee_config: &FeeConfig<Self::Api>,
+        fee_config: &FeeConfig<CurrentApi>,
     ) -> BaseBigUint {
         amount - &self.calculate_fee_amount(amount, fee_config)
     }

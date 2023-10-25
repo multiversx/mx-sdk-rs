@@ -102,7 +102,7 @@ pub trait FungibleTokenMapperFeatures:
     }
 
     #[endpoint]
-    fn mint_fungible(&self, amount: BaseBigUint) -> EsdtTokenPayment<Self::Api> {
+    fn mint_fungible(&self, amount: BaseBigUint) -> EsdtTokenPayment<CurrentApi> {
         self.fungible_token_mapper().mint(amount)
     }
 
@@ -111,7 +111,7 @@ pub trait FungibleTokenMapperFeatures:
         &self,
         to: ManagedAddress,
         amount: BaseBigUint,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment<CurrentApi> {
         self.fungible_token_mapper().mint_and_send(&to, amount)
     }
 

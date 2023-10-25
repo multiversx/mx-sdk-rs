@@ -15,7 +15,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 #[multiversx_sc::module]
 pub trait ForwarderAsyncCallModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint]
     fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
@@ -198,7 +198,7 @@ pub trait ForwarderAsyncCallModule {
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
+    fn callback_data(&self) -> VecMapper<CallbackData<CurrentApi>>;
 
     #[view]
     fn callback_data_at_index(
@@ -209,7 +209,7 @@ pub trait ForwarderAsyncCallModule {
         EgldOrEsdtTokenIdentifier,
         u64,
         BaseBigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
+        MultiValueManagedVec<CurrentApi, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);
         (

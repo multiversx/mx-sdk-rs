@@ -16,7 +16,7 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 #[multiversx_sc::contract]
 pub trait Lottery {
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<CurrentApi>;
 
     #[init]
     fn init(&self, erc20_contract_address: ManagedAddress) {
@@ -375,11 +375,11 @@ pub trait Lottery {
     // storage
 
     #[storage_set("lotteryInfo")]
-    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<Self::Api>);
+    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<CurrentApi>);
 
     #[view(lotteryInfo)]
     #[storage_get("lotteryInfo")]
-    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::Api>;
+    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<CurrentApi>;
 
     #[storage_is_empty("lotteryInfo")]
     fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;

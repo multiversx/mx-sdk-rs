@@ -5,7 +5,7 @@ use basic_features::token_identifier_features::TokenIdentifierFeatures;
 
 #[test]
 fn test_token_identifier_egld() {
-    let bf = basic_features::contract_obj::<StaticApi>();
+    let bf = basic_features::contract_obj();
     let result = bf.token_identifier_egld();
     assert_eq!(EgldOrEsdtTokenIdentifier::egld(), result);
 }
@@ -14,7 +14,7 @@ fn test_token_identifier_egld() {
 /// For a complete suite of test cases, see `multiversx-sc-scenario/tests/managed_token_identifier_test.rs`.
 #[test]
 fn test_token_identifier_is_valid() {
-    let bf = basic_features::contract_obj::<StaticApi>();
+    let bf = basic_features::contract_obj();
     let result = bf.token_identifier_is_valid_1(EgldOrEsdtTokenIdentifier::esdt(
         TokenIdentifier::from(&b"ALC-6258d2"[..]),
     ));

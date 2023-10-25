@@ -14,7 +14,7 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn echo_call_value(
         &self,
-    ) -> MultiValue2<BaseBigUint, ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>> {
+    ) -> MultiValue2<BaseBigUint, ManagedVec<CurrentApi, EsdtTokenPayment<CurrentApi>>> {
         (
             self.call_value().egld_value().clone_value(),
             self.call_value().all_esdt_transfers().clone_value(),
@@ -26,8 +26,8 @@ pub trait PayableFeatures {
     #[payable("*")]
     fn payment_multiple(
         &self,
-        #[payment_multi] payments: ManagedRef<'static, ManagedVec<EsdtTokenPayment<Self::Api>>>,
-    ) -> ManagedVec<EsdtTokenPayment<Self::Api>> {
+        #[payment_multi] payments: ManagedRef<'static, ManagedVec<EsdtTokenPayment<CurrentApi>>>,
+    ) -> ManagedVec<EsdtTokenPayment<CurrentApi>> {
         payments.clone_value()
     }
 

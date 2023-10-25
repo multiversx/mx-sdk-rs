@@ -140,7 +140,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     fn marketplace_proxy(
         &self,
         sc_address: ManagedAddress,
-    ) -> nft_marketplace_proxy::Proxy<Self::Api>;
+    ) -> nft_marketplace_proxy::Proxy<CurrentApi>;
 }
 
 mod nft_marketplace_proxy {

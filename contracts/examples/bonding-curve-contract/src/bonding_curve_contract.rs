@@ -24,7 +24,7 @@ pub trait Contract:
     #[payable("*")]
     #[endpoint(sellToken)]
     fn sell_token_endpoint(&self) {
-        self.sell_token::<FunctionSelector<Self::Api>>();
+        self.sell_token::<FunctionSelector<CurrentApi>>();
     }
 
     #[payable("*")]
@@ -35,7 +35,7 @@ pub trait Contract:
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) {
-        self.buy_token::<FunctionSelector<Self::Api>>(
+        self.buy_token::<FunctionSelector<CurrentApi>>(
             requested_amount,
             requested_token,
             requested_nonce,
@@ -45,17 +45,17 @@ pub trait Contract:
     #[endpoint(deposit)]
     #[payable("*")]
     fn deposit_endpoint(&self, payment_token: OptionalValue<TokenIdentifier>) {
-        self.deposit::<FunctionSelector<Self::Api>>(payment_token)
+        self.deposit::<FunctionSelector<CurrentApi>>(payment_token)
     }
 
     #[endpoint(setBondingCurve)]
     fn set_bonding_curve_endpoint(
         &self,
         identifier: TokenIdentifier,
-        function: FunctionSelector<Self::Api>,
+        function: FunctionSelector<CurrentApi>,
         sell_availability: bool,
     ) {
-        self.set_bonding_curve::<FunctionSelector<Self::Api>>(
+        self.set_bonding_curve::<FunctionSelector<CurrentApi>>(
             identifier,
             function,
             sell_availability,
@@ -63,16 +63,16 @@ pub trait Contract:
     }
     #[endpoint(claim)]
     fn claim_endpoint(&self) {
-        self.claim::<FunctionSelector<Self::Api>>();
+        self.claim::<FunctionSelector<CurrentApi>>();
     }
 
     #[view]
     fn view_buy_price(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint {
-        self.get_buy_price::<FunctionSelector<Self::Api>>(amount, identifier)
+        self.get_buy_price::<FunctionSelector<CurrentApi>>(amount, identifier)
     }
 
     #[view]
     fn view_sell_price(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint {
-        self.get_sell_price::<FunctionSelector<Self::Api>>(amount, identifier)
+        self.get_sell_price::<FunctionSelector<CurrentApi>>(amount, identifier)
     }
 }

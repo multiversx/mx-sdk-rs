@@ -1,3 +1,4 @@
+use proc_macro2::TokenStream;
 use quote::ToTokens;
 
 use super::util::*;
@@ -56,24 +57,26 @@ pub fn generate_proxy_method_sig(
         syn::ReturnType::Default => quote! { () },
         syn::ReturnType::Type(_, ty) => quote! { #ty },
     };
+
     let result = quote! {
         fn #method_name #generics (
             &mut self,
             #(#arg_decl),*
-        ) -> #proxy_return_struct_path<Self::Api, #ret_tok>
+        ) -> #proxy_return_struct_path<A, #ret_tok>
         #generics_where
     };
-    result
+
+    result.to_string().replace("CurrentApi", "A").parse().unwrap()
 }
 
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
     let mut token_count = 0;
     let mut token_expr =
-        quote! { multiversx_sc::types::EgldOrEsdtTokenIdentifier::<Self::Api>::egld() };
+        quote! { multiversx_sc::types::EgldOrEsdtTokenIdentifier::<A>::egld() };
     let mut nonce_count = 0;
     let mut nonce_expr = quote! { 0u64 };
     let mut payment_count = 0;
-    let mut payment_expr = quote! { multiversx_sc::types::BaseBigUint::<Self::Api>::zero() };
+    let mut payment_expr = quote! { multiversx_sc::types::BaseBigUint::<A>::zero() };
     let mut multi_count = 0;
     let mut multi_expr_opt = None;
 
@@ -278,10 +281,12 @@ pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
         supertrait_gen::proxy_supertrait_decl(contract.supertraits.as_slice());
     let proxy_methods_impl = generate_method_impl(contract);
     quote! {
-        pub trait ProxyTrait:
-            multiversx_sc::contract_base::ProxyObjBase
+        pub trait ProxyTrait<A>:
+            multiversx_sc::contract_base::ProxyObjBase<A>
             + Sized
             #(#proxy_supertrait_decl)*
+        where
+            A: multiversx_sc::api::VMApi
         {
             #(#proxy_methods_impl)*
         }

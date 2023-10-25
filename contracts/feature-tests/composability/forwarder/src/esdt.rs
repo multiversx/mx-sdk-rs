@@ -169,7 +169,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         address: ManagedAddress,
         token_id: TokenIdentifier,
         nonce: u64,
-    ) -> EsdtTokenDataMultiValue<Self::Api> {
+    ) -> EsdtTokenDataMultiValue<CurrentApi> {
         let token_data = self
             .blockchain()
             .get_esdt_token_data(&address, &token_id, nonce);

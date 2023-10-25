@@ -47,7 +47,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         function: T,
         sell_availability: bool,
     ) where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -71,7 +71,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         self.bonding_curve(&identifier).update(|buffer| {
             let serializer = ManagedSerializer::new();
 
-            let mut bonding_curve: BondingCurve<Self::Api, T> =
+            let mut bonding_curve: BondingCurve<CurrentApi, T> =
                 serializer.top_decode_from_managed_buffer(buffer);
             bonding_curve.curve = function;
             bonding_curve.sell_availability = sell_availability;
@@ -81,7 +81,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn deposit<T>(&self, payment_token: OptionalValue<TokenIdentifier>)
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -128,7 +128,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn claim<T>(&self)
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -143,7 +143,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             "You have nothing to claim"
         );
 
-        let mut tokens_to_claim = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
+        let mut tokens_to_claim = ManagedVec::<CurrentApi, EsdtTokenPayment<CurrentApi>>::new();
         let mut egld_to_claim = BaseBigUint::zero();
         let serializer = ManagedSerializer::new();
         for token in self.owned_tokens(&caller).iter() {
@@ -158,7 +158,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
                 self.nonce_amount(&token, nonce).clear();
             }
 
-            let bonding_curve: BondingCurve<Self::Api, T> =
+            let bonding_curve: BondingCurve<CurrentApi, T> =
                 serializer.top_decode_from_managed_buffer(&self.bonding_curve(&token).get());
 
             if let Some(esdt_token_identifier) =
@@ -189,7 +189,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
         amount: BaseBigUint,
         payment_token_identifier: EgldOrEsdtTokenIdentifier,
     ) where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -212,7 +212,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             payment = EgldOrEsdtTokenPayment::new(payment_token_identifier, 0, BaseBigUint::zero());
             sell_availability = false;
         } else {
-            let bonding_curve: BondingCurve<Self::Api, T> =
+            let bonding_curve: BondingCurve<CurrentApi, T> =
                 serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
             payment = bonding_curve.payment;

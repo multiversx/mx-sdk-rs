@@ -36,7 +36,7 @@ pub trait NonFungibleTokenMapperFeatures:
         &self,
         amount: BaseBigUint,
         attributes: RgbColor,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment<CurrentApi> {
         self.non_fungible_token_mapper()
             .nft_create(amount, &attributes)
     }
@@ -47,7 +47,7 @@ pub trait NonFungibleTokenMapperFeatures:
         to: ManagedAddress,
         amount: BaseBigUint,
         attributes: RgbColor,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment<CurrentApi> {
         self.non_fungible_token_mapper()
             .nft_create_and_send(&to, amount, &attributes)
     }
@@ -57,7 +57,7 @@ pub trait NonFungibleTokenMapperFeatures:
         &self,
         token_nonce: u64,
         amount: BaseBigUint,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment<CurrentApi> {
         self.non_fungible_token_mapper()
             .nft_add_quantity(token_nonce, amount)
     }
@@ -68,7 +68,7 @@ pub trait NonFungibleTokenMapperFeatures:
         to: ManagedAddress,
         token_nonce: u64,
         amount: BaseBigUint,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment<CurrentApi> {
         self.non_fungible_token_mapper()
             .nft_add_quantity_and_send(&to, token_nonce, amount)
     }

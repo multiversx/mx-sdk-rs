@@ -191,7 +191,7 @@ pub trait PingPong {
     /// Optional funding cap.
     #[view(getMaxFunds)]
     #[storage_mapper("maxFunds")]
-    fn max_funds(&self) -> BaseSingleValueMapper<Option<BaseBigUint>>;
+    fn max_funds(&self) -> SingleValueMapper<Option<BaseBigUint>>;
 
     #[storage_mapper("user")]
     fn user_mapper(&self) -> UserMapper;

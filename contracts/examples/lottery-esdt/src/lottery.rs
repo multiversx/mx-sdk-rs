@@ -363,7 +363,7 @@ pub trait Lottery {
     fn lottery_info(
         &self,
         lottery_name: &ManagedBuffer,
-    ) -> BaseSingleValueMapper<LotteryInfo<Self::Api>>;
+    ) -> SingleValueMapper<LotteryInfo<CurrentApi>>;
 
     #[view(getLotteryWhitelist)]
     #[storage_mapper("lotteryWhitelist")]

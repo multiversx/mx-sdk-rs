@@ -38,7 +38,7 @@ pub trait AbiTester {
 
     #[endpoint]
     #[only_owner]
-    fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
+    fn take_managed_type(&self, _arg: AbiManagedType<CurrentApi>) {}
 
     #[endpoint]
     #[output_name("multi-result-1")]
@@ -87,8 +87,8 @@ pub trait AbiTester {
     fn managed_address_vs_byte_array(
         &self,
         address: ManagedAddress,
-        byte_array: ManagedByteArray<Self::Api, 32>,
-    ) -> MultiValue2<ManagedAddress, ManagedByteArray<Self::Api, 32>> {
+        byte_array: ManagedByteArray<CurrentApi, 32>,
+    ) -> MultiValue2<ManagedAddress, ManagedByteArray<CurrentApi, 32>> {
         (address, byte_array).into()
     }
 
@@ -98,18 +98,18 @@ pub trait AbiTester {
     }
 
     #[endpoint]
-    fn esdt_token_payment(&self) -> EsdtTokenPayment<Self::Api> {
+    fn esdt_token_payment(&self) -> EsdtTokenPayment<CurrentApi> {
         unreachable!()
     }
 
     #[endpoint]
-    fn esdt_token_data(&self) -> EsdtTokenData<Self::Api> {
+    fn esdt_token_data(&self) -> EsdtTokenData<CurrentApi> {
         unreachable!()
     }
 
     #[view]
     #[storage_mapper("sample_storage_mapper")]
-    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInBaseSingleValueMapper>;
+    fn sample_storage_mapper(&self) -> SingleValueMapper<OnlyShowsUpAsNestedInSingleValueMapper>;
 
     #[view]
     fn item_for_vec(&self) -> Vec<OnlyShowsUpAsNestedInVec> {

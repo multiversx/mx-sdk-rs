@@ -1,11 +1,10 @@
 use adder::*;
 use multiversx_sc::types::BaseBigUint;
-use multiversx_sc_scenario::api::SingleTxApi;
 
 #[test]
 #[cfg_attr(not(feature = "single-tx-api"), ignore)]
 fn adder_unit_test() {
-    let adder = adder::contract_obj::<SingleTxApi>();
+    let adder = adder::contract_obj();
 
     adder.init(BaseBigUint::from(5u32));
     assert_eq!(BaseBigUint::from(5u32), adder.sum().get());

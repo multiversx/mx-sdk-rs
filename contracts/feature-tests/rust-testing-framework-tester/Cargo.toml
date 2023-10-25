@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["multiversx-sc-scenario", "vault/debug", "adder/debug", "basic-features/debug", "forwarder/debug"]
 
 [dependencies.multiversx-sc-scenario]
 version = "0.43.3"

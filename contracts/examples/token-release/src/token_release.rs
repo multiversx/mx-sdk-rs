@@ -355,11 +355,11 @@ pub trait TokenRelease {
     fn group_schedule(
         &self,
         group_identifier: &ManagedBuffer,
-    ) -> BaseSingleValueMapper<Schedule<Self::Api>>;
+    ) -> SingleValueMapper<Schedule<CurrentApi>>;
 
     #[storage_mapper("userGroups")]
     fn user_groups(&self, address: &ManagedAddress)
-        -> BaseSingleValueMapper<ManagedVec<ManagedBuffer>>;
+        -> SingleValueMapper<ManagedVec<ManagedBuffer>>;
 
     #[storage_mapper("usersInGroup")]
     fn users_in_group(&self, group_identifier: &ManagedBuffer) -> SingleValueMapper<u64>;

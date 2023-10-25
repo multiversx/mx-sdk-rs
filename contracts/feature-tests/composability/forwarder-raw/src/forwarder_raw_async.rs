@@ -30,7 +30,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         payment_amount: BaseBigUint,
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
-    ) -> ContractCallWithEgldOrSingleEsdt<Self::Api, ()> {
+    ) -> ContractCallWithEgldOrSingleEsdt<CurrentApi, ()> {
         self.send()
             .contract_call(to, endpoint_name)
             .with_raw_arguments(args.to_arg_buffer())
@@ -180,7 +180,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             all_payments.push(EsdtTokenPayment::new(token_identifier, token_nonce, amount));
         }
 
-        ContractCallWithMultiEsdt::<Self::Api, ()>::new(
+        ContractCallWithMultiEsdt::<CurrentApi, ()>::new(
             to,
             "burn_and_create_retrive_async",
             all_payments,

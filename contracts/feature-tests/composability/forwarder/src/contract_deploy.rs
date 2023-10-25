@@ -3,7 +3,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait DeployContractModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint]
     fn deploy_contract(

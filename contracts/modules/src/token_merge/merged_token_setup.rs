@@ -46,9 +46,9 @@ pub trait MergedTokenSetupModule {
     fn create_merged_token<AttributesCreator: MergedTokenAttributesCreator<ScType = Self>>(
         &self,
         merged_token_id: TokenIdentifier,
-        merged_instances: &MergedTokenInstances<Self::Api>,
+        merged_instances: &MergedTokenInstances<CurrentApi>,
         attr_creator: &AttributesCreator,
-    ) -> EsdtTokenPayment<Self::Api> {
+    ) -> EsdtTokenPayment<CurrentApi> {
         let nft_amount = BaseBigUint::from(NFT_AMOUNT);
         let empty_buffer = ManagedBuffer::new();
 
@@ -74,9 +74,9 @@ pub trait MergedTokenSetupModule {
 
     fn create_uri_for_merged_token(
         &self,
-        merged_instances: &MergedTokenInstances<Self::Api>,
+        merged_instances: &MergedTokenInstances<CurrentApi>,
     ) -> ManagedBuffer {
-        let mut tokens_list = ManagedVec::<Self::Api, _>::new();
+        let mut tokens_list = ManagedVec::<CurrentApi, _>::new();
         for inst in merged_instances.get_instances() {
             tokens_list.push(inst.clone());
         }
@@ -89,8 +89,8 @@ pub trait MergedTokenSetupModule {
 
     fn collect_token_data(
         &self,
-        merged_instances: &MergedTokenInstances<Self::Api>,
-    ) -> ArrayVec<EsdtTokenData<Self::Api>, MAX_MERGED_TOKENS> {
+        merged_instances: &MergedTokenInstances<CurrentApi>,
+    ) -> ArrayVec<EsdtTokenData<CurrentApi>, MAX_MERGED_TOKENS> {
         let mut all_token_data = ArrayVec::new();
         let own_sc_address = self.blockchain().get_sc_address();
         for inst in merged_instances.get_instances() {
@@ -109,7 +109,7 @@ pub trait MergedTokenSetupModule {
 
     fn require_all_parts_same_creator(
         &self,
-        all_token_data: &ArrayVec<EsdtTokenData<Self::Api>, MAX_MERGED_TOKENS>,
+        all_token_data: &ArrayVec<EsdtTokenData<CurrentApi>, MAX_MERGED_TOKENS>,
     ) {
         if all_token_data.is_empty() {
             return;
@@ -126,7 +126,7 @@ pub trait MergedTokenSetupModule {
 
     fn get_max_royalties(
         &self,
-        all_token_data: &ArrayVec<EsdtTokenData<Self::Api>, MAX_MERGED_TOKENS>,
+        all_token_data: &ArrayVec<EsdtTokenData<CurrentApi>, MAX_MERGED_TOKENS>,
     ) -> BaseBigUint {
         let zero = BaseBigUint::zero();
         let mut max_ref = &zero;

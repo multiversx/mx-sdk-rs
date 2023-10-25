@@ -88,7 +88,7 @@ pub trait DigitalCash {
     fn claim(
         &self,
         address: ManagedAddress,
-        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        signature: ManagedByteArray<CurrentApi, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let deposit_mapper = self.deposit(&address);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
@@ -165,7 +165,7 @@ pub trait DigitalCash {
         &self,
         address: ManagedAddress,
         forward_address: ManagedAddress,
-        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        signature: ManagedByteArray<CurrentApi, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let deposit_mapper = self.deposit(&forward_address);
         require!(!deposit_mapper.is_empty(), CANNOT_DEPOSIT_FUNDS_ERR_MSG);
@@ -257,7 +257,7 @@ pub trait DigitalCash {
         &self,
         address: &ManagedAddress,
         caller_address: &ManagedAddress,
-        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        signature: ManagedByteArray<CurrentApi, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let addr = address.as_managed_buffer();
         let message = caller_address.as_managed_buffer();
@@ -269,7 +269,7 @@ pub trait DigitalCash {
 
     #[view]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> BaseSingleValueMapper<DepositInfo<Self::Api>>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<CurrentApi>>;
 
     #[storage_mapper("fee")]
     fn fee(&self) -> SingleValueMapper<BigUint>;

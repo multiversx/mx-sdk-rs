@@ -97,12 +97,12 @@ macro_rules! require_old {
 macro_rules! sc_panic {
     ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
-            multiversx_sc::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+            multiversx_sc::types::ManagedBufferCachedBuilder::<CurrentApi>::new_from_slice(&[]);
         multiversx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
-        multiversx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message(___buffer___.into_managed_buffer());
+        multiversx_sc::contract_base::ErrorHelper::<CurrentApi>::signal_error_with_message(___buffer___.into_managed_buffer());
     }};
     ($msg:expr $(,)?) => {
-        multiversx_sc::contract_base::ErrorHelper::<Self::Api>::signal_error_with_message($msg);
+        multiversx_sc::contract_base::ErrorHelper::<CurrentApi>::signal_error_with_message($msg);
     };
 }
 
@@ -144,10 +144,10 @@ macro_rules! require {
 macro_rules! sc_print {
     ($msg:tt, $($arg:expr),* $(,)?) => {{
         let mut ___buffer___ =
-            <<Self::Api as multiversx_sc::api::PrintApi>::PrintApiImpl as multiversx_sc::api::PrintApiImpl>::Buffer::default();
+            <<CurrentApi as multiversx_sc::api::PrintApi>::PrintApiImpl as multiversx_sc::api::PrintApiImpl>::Buffer::default();
         multiversx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),*);
-        <<Self::Api as multiversx_sc::api::PrintApi>::PrintApiImpl as multiversx_sc::api::PrintApiImpl>::print_buffer(
-            &<Self::Api as multiversx_sc::api::PrintApi>::print_api_impl(),
+        <<CurrentApi as multiversx_sc::api::PrintApi>::PrintApiImpl as multiversx_sc::api::PrintApiImpl>::print_buffer(
+            &<CurrentApi as multiversx_sc::api::PrintApi>::print_api_impl(),
             ___buffer___,
         );
     }};
@@ -157,7 +157,7 @@ macro_rules! sc_print {
 macro_rules! sc_format {
     ($msg:tt, $($arg:expr),+ $(,)?) => {{
         let mut ___buffer___ =
-            multiversx_sc::types::ManagedBufferCachedBuilder::<Self::Api>::new_from_slice(&[]);
+            multiversx_sc::types::ManagedBufferCachedBuilder::<CurrentApi>::new_from_slice(&[]);
         multiversx_sc::derive::format_receiver_args!(___buffer___, $msg, $($arg),+);
         ___buffer___.into_managed_buffer()
     }};

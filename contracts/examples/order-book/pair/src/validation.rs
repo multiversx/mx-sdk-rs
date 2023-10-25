@@ -13,7 +13,7 @@ use super::{
 
 #[multiversx_sc::module]
 pub trait ValidationModule: common::CommonModule {
-    fn require_valid_order_input_amount(&self, params: &OrderInputParams<Self::Api>) {
+    fn require_valid_order_input_amount(&self, params: &OrderInputParams<CurrentApi>) {
         require!(params.amount != BaseBigUint::zero(), "Amout cannot be zero");
         require!(
             self.calculate_fee_amount(
@@ -28,14 +28,14 @@ pub trait ValidationModule: common::CommonModule {
         );
     }
 
-    fn require_valid_order_input_match_provider(&self, params: &OrderInputParams<Self::Api>) {
+    fn require_valid_order_input_match_provider(&self, params: &OrderInputParams<CurrentApi>) {
         require!(
             !params.match_provider.clone().is_zero(),
             "Match address cannot be zero"
         );
     }
 
-    fn require_valid_order_input_fee_config(&self, params: &OrderInputParams<Self::Api>) {
+    fn require_valid_order_input_fee_config(&self, params: &OrderInputParams<CurrentApi>) {
         match params.fee_config.fee_type.clone() {
             FeeConfigEnum::Fixed => {
                 require!(
@@ -55,21 +55,21 @@ pub trait ValidationModule: common::CommonModule {
         require!(amount_after_fee != 0, "Amount after fee cannot be zero");
     }
 
-    fn require_valid_order_input_deal_config(&self, params: &OrderInputParams<Self::Api>) {
+    fn require_valid_order_input_deal_config(&self, params: &OrderInputParams<CurrentApi>) {
         require!(
             params.deal_config.match_provider_percent < PERCENT_BASE_POINTS,
             "Bad deal config"
         );
     }
 
-    fn require_valid_order_input_params(&self, params: &OrderInputParams<Self::Api>) {
+    fn require_valid_order_input_params(&self, params: &OrderInputParams<CurrentApi>) {
         self.require_valid_order_input_amount(params);
         self.require_valid_order_input_match_provider(params);
         self.require_valid_order_input_fee_config(params);
         self.require_valid_order_input_deal_config(params);
     }
 
-    fn require_valid_buy_payment(&self) -> Payment<Self::Api> {
+    fn require_valid_buy_payment(&self) -> Payment<CurrentApi> {
         let (token_id, amount) = self.call_value().single_fungible_esdt();
         let second_token_id = self.second_token_id().get();
         require!(
@@ -80,7 +80,7 @@ pub trait ValidationModule: common::CommonModule {
         Payment { token_id, amount }
     }
 
-    fn require_valid_sell_payment(&self) -> Payment<Self::Api> {
+    fn require_valid_sell_payment(&self) -> Payment<CurrentApi> {
         let (token_id, amount) = self.call_value().single_fungible_esdt();
         let first_token_id = self.first_token_id().get();
         require!(
@@ -108,7 +108,7 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_match_provider_empty_or_caller(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
+        orders: &MultiValueManagedVec<Order<CurrentApi>>,
     ) {
         let caller = &self.blockchain().get_caller();
 

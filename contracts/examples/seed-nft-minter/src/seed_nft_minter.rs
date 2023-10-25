@@ -24,7 +24,7 @@ pub trait SeedNftMinter:
     fn init(
         &self,
         marketplaces: ManagedVec<ManagedAddress>,
-        distribution: ManagedVec<Distribution<Self::Api>>,
+        distribution: ManagedVec<Distribution<CurrentApi>>,
     ) {
         self.marketplaces().extend(&marketplaces);
         self.init_distribution(distribution);
@@ -118,7 +118,7 @@ pub trait SeedNftMinter:
     fn marketplace_proxy(
         &self,
         sc_address: ManagedAddress,
-    ) -> nft_marketplace_proxy::Proxy<Self::Api>;
+    ) -> nft_marketplace_proxy::Proxy<CurrentApi>;
 }
 
 mod nft_marketplace_proxy {

@@ -45,8 +45,8 @@ pub trait EchoManagedTypes {
     fn echo_tuple_into_multiresult(
         &self,
         addr: ManagedAddress,
-        vec: ManagedVec<Self::Api, ManagedBuffer>,
-    ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
+        vec: ManagedVec<CurrentApi, ManagedBuffer>,
+    ) -> MultiValue2<ManagedAddress, ManagedVec<CurrentApi, ManagedBuffer>> {
         (addr, vec).into()
     }
 
@@ -76,8 +76,8 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_varags_managed_eager(
         &self,
-        m: MultiValueManagedVec<Self::Api, u32>,
-    ) -> MultiValue2<usize, MultiValueManagedVec<Self::Api, u32>> {
+        m: MultiValueManagedVec<CurrentApi, u32>,
+    ) -> MultiValue2<usize, MultiValueManagedVec<CurrentApi, u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }

@@ -14,7 +14,7 @@ mod dns_mock {
     #[multiversx_sc::contract]
     pub trait DnsMock {
         #[proxy]
-        fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<Self::Api>;
+        fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<CurrentApi>;
 
         #[payable("EGLD")]
         #[endpoint]

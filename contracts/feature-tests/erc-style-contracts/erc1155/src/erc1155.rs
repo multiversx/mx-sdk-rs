@@ -424,7 +424,7 @@ pub trait Erc1155 {
     fn erc1155_user_proxy(
         &self,
         sc_address: ManagedAddress,
-    ) -> erc1155_user_proxy::Proxy<Self::Api>;
+    ) -> erc1155_user_proxy::Proxy<CurrentApi>;
 
     // storage
 

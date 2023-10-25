@@ -2,10 +2,8 @@ use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::world_mock::BlockchainState;
 
 use crate::{
-    api::DebugApi,
     debug_executor::ContractContainer,
     multiversx_sc::{
-        api,
         contract_base::{CallableContractBuilder, ContractAbiProvider},
     },
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
@@ -157,7 +155,7 @@ impl ScenarioWorld {
     ) {
         self.register_contract_container(
             expression,
-            ContractContainer::new(contract_builder.new_contract_obj::<DebugApi>(), None, false),
+            ContractContainer::new(contract_builder.new_contract_obj(), None, false),
         )
     }
 
@@ -193,9 +191,9 @@ impl ScenarioWorld {
         );
         let sub_contract = multi_contract_config.find_contract(sub_contract_name);
         let contract_obj = if sub_contract.settings.external_view {
-            contract_builder.new_contract_obj::<api::ExternalViewApi<DebugApi>>()
+            contract_builder.new_contract_obj()
         } else {
-            contract_builder.new_contract_obj::<DebugApi>()
+            contract_builder.new_contract_obj()
         };
 
         self.register_contract_container(

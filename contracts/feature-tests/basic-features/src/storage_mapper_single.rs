@@ -2,7 +2,7 @@ multiversx_sc::imports!();
 
 /// Storage mapper test.
 #[multiversx_sc::module]
-pub trait BaseSingleValueMapperFeatures {
+pub trait SingleValueMapperFeatures {
     #[view]
     #[storage_mapper("my_single_value_mapper")]
     fn map_my_single_value_mapper(&self) -> SingleValueMapper<BigInt>;

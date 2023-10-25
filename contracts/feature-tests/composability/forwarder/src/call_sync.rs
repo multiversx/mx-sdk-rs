@@ -5,7 +5,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 #[multiversx_sc::module]
 pub trait ForwarderSyncCallModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint]
     #[payable("*")]
@@ -51,7 +51,7 @@ pub trait ForwarderSyncCallModule {
     }
 
     #[event("echo_arguments_sync_result")]
-    fn execute_on_dest_context_result_event(&self, result: &ManagedVec<Self::Api, ManagedBuffer>);
+    fn execute_on_dest_context_result_event(&self, result: &ManagedVec<CurrentApi, ManagedBuffer>);
 
     #[endpoint]
     #[payable("*")]

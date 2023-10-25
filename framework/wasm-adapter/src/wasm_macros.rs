@@ -72,7 +72,7 @@ macro_rules! endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$method_name::<multiversx_sc_wasm_adapter::api::VmApiImpl>();
+                $mod_name::endpoints::$method_name();
             }
         )*
     };
@@ -85,7 +85,7 @@ macro_rules! external_view_endpoints {
             #[allow(non_snake_case)]
             #[no_mangle]
             fn $endpoint_name() {
-                $mod_name::endpoints::$method_name::<multiversx_sc_wasm_adapter::multiversx_sc::api::ExternalViewApi<multiversx_sc_wasm_adapter::api::VmApiImpl>>();
+                $mod_name::endpoints::$method_name();
             }
         )*
     };

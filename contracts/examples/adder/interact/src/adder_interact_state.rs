@@ -12,7 +12,7 @@ const DEFAULT_ADDER_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
+pub type AdderContract = ContractInfo<StaticApi, adder::Proxy<StaticApi>>;
 
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]

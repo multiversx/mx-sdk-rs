@@ -16,8 +16,8 @@ pub struct NewRoundEvent<M: ManagedTypeApi> {
 pub trait EventsModule {
     fn emit_new_round_event(
         &self,
-        token_pair: &TokenPair<Self::Api>,
-        price_feed: &TimestampedPrice<Self::Api>,
+        token_pair: &TokenPair<CurrentApi>,
+        price_feed: &TimestampedPrice<CurrentApi>,
     ) {
         let epoch = self.blockchain().get_block_epoch();
         self.new_round_event(
@@ -40,6 +40,6 @@ pub trait EventsModule {
         #[indexed] from: &ManagedBuffer,
         #[indexed] to: &ManagedBuffer,
         #[indexed] epoch: u64,
-        new_round_event: &NewRoundEvent<Self::Api>,
+        new_round_event: &NewRoundEvent<CurrentApi>,
     );
 }

@@ -17,8 +17,8 @@ pub trait MergedTokenAttributesCreator {
     fn get_merged_token_attributes(
         &self,
         sc: &Self::ScType,
-        merged_token_id: &TokenIdentifier<<Self::ScType as ContractBase>::Api>,
-        merged_token_raw_attributes: &MergedTokenInstances<<Self::ScType as ContractBase>::Api>,
+        merged_token_id: &TokenIdentifier<CurrentApi>,
+        merged_token_raw_attributes: &MergedTokenInstances<CurrentApi>,
     ) -> Self::AttributesType;
 }
 
@@ -57,8 +57,8 @@ where
     fn get_merged_token_attributes(
         &self,
         _sc: &Self::ScType,
-        _merged_token_id: &TokenIdentifier<<Self::ScType as ContractBase>::Api>,
-        _merged_token_raw_attributes: &MergedTokenInstances<<Self::ScType as ContractBase>::Api>,
+        _merged_token_id: &TokenIdentifier<CurrentApi>,
+        _merged_token_raw_attributes: &MergedTokenInstances<CurrentApi>,
     ) -> Self::AttributesType {
         Empty
     }

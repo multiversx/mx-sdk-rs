@@ -125,8 +125,8 @@ pub trait RewardsDistribution:
 
     fn try_advance_bracket(
         &self,
-        bracket: &mut ComputedBracket<Self::Api>,
-        computed_brackets: &mut ManagedVec<ComputedBracket<Self::Api>>,
+        bracket: &mut ComputedBracket<CurrentApi>,
+        computed_brackets: &mut ManagedVec<ComputedBracket<CurrentApi>>,
         ticket: u64,
     ) {
         while ticket > bracket.end_index {
@@ -166,7 +166,7 @@ pub trait RewardsDistribution:
         ticket_from_storage(position, loaded_id)
     }
 
-    fn new_raffle(&self) -> RaffleProgress<Self::Api> {
+    fn new_raffle(&self) -> RaffleProgress<CurrentApi> {
         self.require_new_raffle_period();
 
         let raffle_id = self.raffle_id().update(|raffle_id| {
@@ -198,7 +198,7 @@ pub trait RewardsDistribution:
         &self,
         brackets: ManagedVec<Bracket>,
         ticket_count: u64,
-    ) -> ManagedVec<ComputedBracket<Self::Api>> {
+    ) -> ManagedVec<ComputedBracket<CurrentApi>> {
         require!(ticket_count > 0, "No tickets");
 
         let mut computed_brackets = ManagedVec::new();
@@ -400,7 +400,7 @@ pub trait RewardsDistribution:
 
     #[view(getBrackets)]
     #[storage_mapper("brackets")]
-    fn brackets(&self) -> BaseSingleValueMapper<ManagedVec<Bracket>>;
+    fn brackets(&self) -> SingleValueMapper<ManagedVec<Bracket>>;
 
     #[view(getLastRaffleEpoch)]
     #[storage_mapper("lastRaffleEpoch")]
@@ -417,10 +417,10 @@ pub trait RewardsDistribution:
     fn current_ticket_id(&self) -> SingleValueMapper<u64>;
 
     #[storage_mapper("raffleProgress")]
-    fn raffle_progress(&self) -> BaseSingleValueMapper<Option<RaffleProgress<Self::Api>>>;
+    fn raffle_progress(&self) -> SingleValueMapper<Option<RaffleProgress<CurrentApi>>>;
 
     #[proxy]
-    fn seed_nft_minter_proxy(&self, address: ManagedAddress) -> seed_nft_minter::Proxy<Self::Api>;
+    fn seed_nft_minter_proxy(&self, address: ManagedAddress) -> seed_nft_minter::Proxy<CurrentApi>;
 }
 
 fn ticket_to_storage(position: u64, ticket_id: u64) -> u64 {

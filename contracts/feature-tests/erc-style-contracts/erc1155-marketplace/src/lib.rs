@@ -44,7 +44,7 @@ pub trait Erc1155Marketplace {
         from: ManagedAddress,
         type_id: BaseBigUint,
         nft_id: BaseBigUint,
-        args: AuctionArgument<Self::Api>,
+        args: AuctionArgument<CurrentApi>,
     ) {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -71,7 +71,7 @@ pub trait Erc1155Marketplace {
         from: ManagedAddress,
         type_ids: Vec<BaseBigUint>,
         nft_ids: Vec<BaseBigUint>,
-        args: AuctionArgument<Self::Api>,
+        args: AuctionArgument<CurrentApi>,
     ) {
         require!(
             self.blockchain().get_caller() == self.token_ownership_contract_address().get(),
@@ -238,7 +238,7 @@ pub trait Erc1155Marketplace {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, type_id: BaseBigUint, nft_id: BaseBigUint) -> Auction<Self::Api> {
+    fn get_auction_status(&self, type_id: BaseBigUint, nft_id: BaseBigUint) -> Auction<CurrentApi> {
         require!(
             self.is_up_for_auction(&type_id, &nft_id),
             "Token is not up for auction"
@@ -335,7 +335,7 @@ pub trait Erc1155Marketplace {
     // proxy
 
     #[proxy]
-    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<Self::Api>;
+    fn erc1155_proxy(&self, to: ManagedAddress) -> erc1155::Proxy<CurrentApi>;
 
     // storage
 
@@ -362,5 +362,5 @@ pub trait Erc1155Marketplace {
         &self,
         type_id: &BaseBigUint,
         nft_id: &BaseBigUint,
-    ) -> BaseSingleValueMapper<Auction<Self::Api>>;
+    ) -> SingleValueMapper<Auction<CurrentApi>>;
 }

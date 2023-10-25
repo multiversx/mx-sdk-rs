@@ -67,6 +67,6 @@ pub trait MacroFeaturesLegacy {
     #[endpoint]
     fn result_echo_3(&self, arg: Option<String>) -> String {
         let result: SCResult<String> = arg.ok_or("option argument is none").into();
-        result.unwrap_or_signal_error::<Self::Api>()
+        result.unwrap_or_signal_error::<CurrentApi>()
     }
 }

@@ -10,7 +10,7 @@ use crate::bonding_curve::{
 pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     fn sell_token<T>(&self)
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -26,7 +26,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             self.bonding_curve(&offered_token).update(|buffer| {
                 let serializer = ManagedSerializer::new();
 
-                let mut bonding_curve: BondingCurve<Self::Api, T> =
+                let mut bonding_curve: BondingCurve<CurrentApi, T> =
                     serializer.top_decode_from_managed_buffer(buffer);
 
                 require!(
@@ -60,7 +60,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         requested_token: TokenIdentifier,
         requested_nonce: OptionalValue<u64>,
     ) where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -77,7 +77,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         let calculated_price = self.bonding_curve(&requested_token).update(|buffer| {
             let serializer = ManagedSerializer::new();
 
-            let mut bonding_curve: BondingCurve<Self::Api, T> =
+            let mut bonding_curve: BondingCurve<CurrentApi, T> =
                 serializer.top_decode_from_managed_buffer(buffer);
 
             let price = self.compute_buy_price::<T>(&requested_token, &requested_amount);
@@ -130,7 +130,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
     ) {
         let mut nonces = self.token_details(&token).get().token_nonces;
         let mut total_amount = amount;
-        let mut tokens_to_send = ManagedVec::<Self::Api, EsdtTokenPayment<Self::Api>>::new();
+        let mut tokens_to_send = ManagedVec::<CurrentApi, EsdtTokenPayment<CurrentApi>>::new();
         loop {
             require!(!nonces.is_empty(), "Insufficient balance");
             let nonce = nonces.get(0);
@@ -162,7 +162,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn get_buy_price<T>(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -177,7 +177,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn get_sell_price<T>(&self, amount: BaseBigUint, identifier: TokenIdentifier) -> BaseBigUint
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -220,7 +220,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         amount: &BaseBigUint,
     ) -> EgldOrEsdtTokenIdentifier
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -232,7 +232,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.check_token_exists(issued_token);
 
         let serializer = ManagedSerializer::new();
-        let bonding_curve: BondingCurve<Self::Api, T> =
+        let bonding_curve: BondingCurve<CurrentApi, T> =
             serializer.top_decode_from_managed_buffer(&self.bonding_curve(issued_token).get());
 
         require!(
@@ -257,7 +257,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_buy_price<T>(&self, identifier: &TokenIdentifier, amount: &BaseBigUint) -> BaseBigUint
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -267,7 +267,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             + Default,
     {
         let serializer = ManagedSerializer::new();
-        let bonding_curve: BondingCurve<Self::Api, T> =
+        let bonding_curve: BondingCurve<CurrentApi, T> =
             serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
         let arguments = &bonding_curve.arguments;
@@ -279,7 +279,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
     fn compute_sell_price<T>(&self, identifier: &TokenIdentifier, amount: &BaseBigUint) -> BaseBigUint
     where
-        T: CurveFunction<Self::Api>
+        T: CurveFunction<CurrentApi>
             + TopEncode
             + TopDecode
             + NestedEncode
@@ -289,7 +289,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             + Default,
     {
         let serializer = ManagedSerializer::new();
-        let bonding_curve: BondingCurve<Self::Api, T> =
+        let bonding_curve: BondingCurve<CurrentApi, T> =
             serializer.top_decode_from_managed_buffer(&self.bonding_curve(identifier).get());
 
         let arguments = &bonding_curve.arguments;

@@ -11,7 +11,7 @@ const DEFAULT_CONTRACT_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type BasicFeaturesContract = ContractInfo<basic_features::Proxy<StaticApi>>;
+pub type BasicFeaturesContract = ContractInfo<StaticApi, basic_features::Proxy<StaticApi>>;
 
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]

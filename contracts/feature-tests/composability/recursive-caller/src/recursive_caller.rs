@@ -6,10 +6,10 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait RecursiveCaller {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[proxy]
-    fn self_proxy(&self) -> self::Proxy<Self::Api>;
+    fn self_proxy(&self) -> self::Proxy<CurrentApi>;
 
     #[init]
     fn init(&self) {}

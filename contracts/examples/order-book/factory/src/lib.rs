@@ -17,7 +17,7 @@ pub trait Factory {
     }
 
     #[endpoint(createPair)]
-    fn create_pair(&self, token_id_pair: TokenIdPair<Self::Api>) -> ManagedAddress {
+    fn create_pair(&self, token_id_pair: TokenIdPair<CurrentApi>) -> ManagedAddress {
         require!(self.get_pair(&token_id_pair).is_none(), "Already has pair");
 
         let mut arguments = ManagedArgBuffer::new();
@@ -37,7 +37,7 @@ pub trait Factory {
     }
 
     #[view(getPair)]
-    fn get_pair(&self, token_id_pair: &TokenIdPair<Self::Api>) -> Option<ManagedAddress> {
+    fn get_pair(&self, token_id_pair: &TokenIdPair<CurrentApi>) -> Option<ManagedAddress> {
         let opt_address = self.pairs().get(token_id_pair);
 
         if opt_address.is_none() {
@@ -54,5 +54,5 @@ pub trait Factory {
     fn pair_template_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     #[storage_mapper("pairs")]
-    fn pairs(&self) -> MapMapper<TokenIdPair<Self::Api>, ManagedAddress>;
+    fn pairs(&self) -> MapMapper<TokenIdPair<CurrentApi>, ManagedAddress>;
 }

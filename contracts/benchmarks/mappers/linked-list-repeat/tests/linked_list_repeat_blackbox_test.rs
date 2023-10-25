@@ -35,7 +35,7 @@ fn setup() -> ScenarioWorld {
 #[test]
 fn linked_list_repeat_blackbox_raw() {
     let mut world = setup();
-    let mut contract = ContractInfo::<linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
+    let mut contract = ContractInfo::<StaticApi, linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
 
     let num_repeats = 5usize;
 
@@ -72,7 +72,7 @@ fn linked_list_repeat_blackbox_raw() {
 #[test]
 fn linked_list_repeat_struct_blackbox_raw() {
     let mut world = setup();
-    let mut contract = ContractInfo::<linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
+    let mut contract = ContractInfo::<StaticApi, linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
 
     let mut example = ExampleStruct {
         first_token_id: TokenIdentifier::from_esdt_bytes(b"str:TESTTOK-1234"),

@@ -4,7 +4,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait CallPromisesDirectModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint]
     #[payable("*")]
@@ -68,6 +68,6 @@ pub trait CallPromisesDirectModule {
         &self,
         #[indexed] arg1: usize,
         #[indexed] arg2: usize,
-        arguments: &ManagedVec<Self::Api, ManagedBuffer>,
+        arguments: &ManagedVec<CurrentApi, ManagedBuffer>,
     );
 }
