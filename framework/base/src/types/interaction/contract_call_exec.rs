@@ -44,8 +44,7 @@ where
         AsyncCall {
             to: self.basic.to,
             egld_payment: self.egld_payment,
-            endpoint_name: self.basic.function_call.function_name,
-            arg_buffer: self.basic.function_call.arg_buffer,
+            function_call: self.basic.function_call,
             callback_call: None,
         }
     }
@@ -55,8 +54,7 @@ where
         super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
-            endpoint_name: self.basic.function_call.function_name,
-            arg_buffer: self.basic.function_call.arg_buffer,
+            function_call: self.basic.function_call,
             explicit_gas_limit: self.basic.explicit_gas_limit,
             extra_gas_for_callback: 0,
             callback_call: None,
