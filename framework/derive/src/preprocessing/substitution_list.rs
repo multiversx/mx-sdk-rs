@@ -82,6 +82,7 @@ fn add_managed_types(substitutions: &mut SubstitutionsMap) {
     add_managed_type_with_generics(substitutions, &quote!(PreloadedManagedBuffer));
     add_managed_type(substitutions, &quote!(RandomnessSource));
     add_managed_type(substitutions, &quote!(TokenIdentifier));
+    add_managed_type(substitutions, &quote!(FunctionCall));
 }
 
 fn add_storage_mapper_single_generic_arg(

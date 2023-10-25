@@ -168,6 +168,10 @@ where
     pub fn into_multi_value_encoded(self) -> MultiValueEncoded<M, ManagedBuffer<M>> {
         self.data.into()
     }
+
+    pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
+        self.data
+    }
 }
 
 impl<M> ManagedArgBuffer<M>

@@ -162,4 +162,8 @@ where
     ) -> ContractCallWithEgldOrSingleEsdt<SA, OriginalResult> {
         self.with_egld_or_single_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }
+
+    pub fn into_function_call(self) -> FunctionCall<SA> {
+        self.function_call
+    }
 }

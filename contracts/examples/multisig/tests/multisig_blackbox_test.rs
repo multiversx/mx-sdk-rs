@@ -9,7 +9,7 @@ use multiversx_sc::{
         test_util::top_encode_to_vec_u8_or_panic,
     },
     storage::mappers::SingleValue,
-    types::{Address, CodeMetadata, ContractCallNoPayment},
+    types::{Address, CodeMetadata, ContractCallNoPayment, FunctionCall},
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -155,19 +155,14 @@ impl MultisigTestState {
         egld_amount: u64,
         contract_call: ContractCallNoPayment<StaticApi, ()>,
     ) -> usize {
-        self.world.sc_call_get_result(
-            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
                 self.multisig_contract.propose_transfer_execute(
                     to,
                     egld_amount,
-                    contract_call.function_call.function_name,
-                    contract_call
-                        .function_call
-                        .arg_buffer
-                        .into_multi_value_encoded(),
+                    contract_call.into_function_call(),
                 ),
-            ),
-        )
+            ))
     }
 
     fn propose_async_call(
@@ -176,19 +171,14 @@ impl MultisigTestState {
         egld_amount: u64,
         contract_call: ContractCallNoPayment<StaticApi, ()>,
     ) -> usize {
-        self.world.sc_call_get_result(
-            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+        self.world
+            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
                 self.multisig_contract.propose_async_call(
                     to,
                     egld_amount,
-                    contract_call.function_call.function_name,
-                    contract_call
-                        .function_call
-                        .arg_buffer
-                        .into_multi_value_encoded(),
+                    contract_call.into_function_call(),
                 ),
-            ),
-        )
+            ))
     }
 
     fn propose_remove_user(&mut self, user_address: Address) -> usize {
@@ -451,8 +441,7 @@ fn test_transfer_execute_to_user() {
             .call(state.multisig_contract.propose_transfer_execute(
                 new_user_address.clone(),
                 0u64,
-                OptionalValue::<String>::None,
-                MultiValueVec::<Vec<u8>>::new(),
+                FunctionCall::empty(),
             ))
             .expect(TxExpect::user_error("str:proposed action has no effect")),
     );
@@ -465,8 +454,7 @@ fn test_transfer_execute_to_user() {
                 state.multisig_contract.propose_transfer_execute(
                     new_user_address.clone(),
                     AMOUNT.parse::<u64>().unwrap(),
-                    OptionalValue::<String>::None,
-                    MultiValueVec::<Vec<u8>>::new(),
+                    FunctionCall::empty(),
                 ),
             ));
     state.sign(action_id);
