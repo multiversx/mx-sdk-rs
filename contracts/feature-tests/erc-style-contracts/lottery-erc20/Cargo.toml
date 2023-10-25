@@ -9,7 +9,7 @@ publish = false
 path = "src/lottery.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.erc20]
 path = "../erc20"

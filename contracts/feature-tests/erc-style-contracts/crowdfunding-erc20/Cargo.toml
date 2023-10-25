@@ -9,7 +9,7 @@ publish = false
 path = "src/crowdfunding_erc20.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.erc20]
 path = "../erc20"

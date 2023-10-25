@@ -1,9 +1,9 @@
 use multiversx_sc::types::{BigInt, BaseBigUint, ManagedBuffer};
-use multiversx_sc_scenario::api::StaticApi;
 
 use basic_features::{big_num_methods::BigIntMethods, big_num_operators::BigIntOperators};
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_big_uint_zero() {
     let bf = basic_features::contract_obj();
     let result = bf.big_uint_zero();
@@ -11,6 +11,7 @@ fn test_big_uint_zero() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_big_uint_from() {
     let bf = basic_features::contract_obj();
     let result = bf.big_uint_from_u64_1(5);
@@ -24,6 +25,7 @@ fn test_big_uint_from() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_big_int_zero() {
     let bf = basic_features::contract_obj();
     let result = bf.big_int_zero();
@@ -31,6 +33,7 @@ fn test_big_int_zero() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_big_int_from() {
     let bf = basic_features::contract_obj();
     let result = bf.big_int_from_i64_1(5);
@@ -46,6 +49,7 @@ fn check_big_uint_bitwise_and(a: u64, b: u64) {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_big_uint_bitwise_and() {
     check_big_uint_bitwise_and(1, 1);
     check_big_uint_bitwise_and(5, 7);
@@ -62,6 +66,7 @@ fn check_big_uint_shift(a: u64, b: usize) {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_big_uint_bitwise_shift() {
     check_big_uint_shift(1, 3);
     check_big_uint_shift(256, 0);

@@ -9,7 +9,8 @@ publish = false
 path = "src/alloc_features_main.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+static-api = ["debug", "multiversx-sc/static-api"]
+debug = ["dep:multiversx-sc-scenario", "esdt-system-sc-mock/debug"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"
@@ -27,3 +28,4 @@ features = ["debug"]
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"
+features = ["debug"]

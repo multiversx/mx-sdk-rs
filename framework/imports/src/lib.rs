@@ -7,11 +7,14 @@ pub fn api_imports(_item: TokenStream) -> TokenStream {
     let uncallable_api = quote! {multiversx_sc::api::uncallable::UncallableApi};
     let debug_api = quote! {multiversx_sc_scenario::DebugApi};
     let single_tx_api = quote! {multiversx_sc_scenario::api::SingleTxApi};
+    let static_api = quote! {multiversx_sc_scenario::api::SingleTxApi};
 
     let used_debug_api = if cfg!(feature = "single-tx-api") {
         single_tx_api
+    } else if cfg!(feature = "static-api") {
+        static_api
     } else if cfg!(feature = "no-debug-api") {
-        uncallable_api
+        debug_api
     } else {
         debug_api
     };

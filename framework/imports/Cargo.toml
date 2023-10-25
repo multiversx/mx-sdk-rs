@@ -13,4 +13,5 @@ quote = "1.0.33"
 [features]
 no-debug-api = []
 single-tx-api = []
+static-api = []
 

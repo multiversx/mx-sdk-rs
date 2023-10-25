@@ -9,7 +9,7 @@ publish = false
 path = "src/recursive_caller.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.vault]
 path = "../vault"

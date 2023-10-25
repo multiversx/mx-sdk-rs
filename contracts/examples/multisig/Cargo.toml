@@ -9,7 +9,7 @@ publish = false
 path = "src/multisig.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"
@@ -30,13 +30,16 @@ features = ["debug"]
 
 [dev-dependencies.adder]
 path = "../adder"
+features = ["debug"]
 
 [dev-dependencies.factorial]
 path = "../factorial"
+features = ["debug"]
 
 [dev-dependencies.multiversx-wegld-swap-sc]
 version = "0.43.3"
 path = "../../core/wegld-swap"
+features = ["debug"]
 
 [dev-dependencies]
 num-bigint = "0.4.2"

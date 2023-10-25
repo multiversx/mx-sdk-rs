@@ -9,7 +9,7 @@ publish = false
 path = "src/map_repeat.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.benchmark-common]
 path = "../benchmark-common"

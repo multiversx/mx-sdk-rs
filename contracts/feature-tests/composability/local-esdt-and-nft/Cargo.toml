@@ -9,7 +9,7 @@ publish = false
 path = "src/lib.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"

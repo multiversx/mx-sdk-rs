@@ -2,6 +2,7 @@ use multiversx_sc::types::SparseArray;
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn sparse_array_test() {
     let mut array = SparseArray::<StaticApi, 100>::new(5);
     assert_eq!(array.len(), 5);

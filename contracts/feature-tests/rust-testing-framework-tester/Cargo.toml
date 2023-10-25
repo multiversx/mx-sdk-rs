@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [features]
-debug = ["multiversx-sc-scenario", "vault/debug", "adder/debug", "basic-features/debug", "forwarder/debug"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.multiversx-sc-scenario]
 version = "0.43.3"
@@ -20,9 +20,11 @@ features = [ "alloc" ]
 
 [dev-dependencies.adder]
 path = "../../examples/adder"
+features = ["debug"]
 
 [dev-dependencies.basic-features]
 path = "../../feature-tests/basic-features"
+features = ["debug"]
 
 [dev-dependencies.rust-testing-framework-tester]
 path = "."
@@ -35,6 +37,8 @@ hex = "0.4"
 
 [dev-dependencies.forwarder]
 path = "../composability/forwarder"
+features = ["debug"]
 
 [dev-dependencies.vault]
 path = "../composability/vault"
+features = ["debug"]

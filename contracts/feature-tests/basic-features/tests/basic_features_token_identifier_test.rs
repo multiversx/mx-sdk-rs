@@ -4,6 +4,7 @@ use multiversx_sc_scenario::{api::StaticApi, *};
 use basic_features::token_identifier_features::TokenIdentifierFeatures;
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_token_identifier_egld() {
     let bf = basic_features::contract_obj();
     let result = bf.token_identifier_egld();
@@ -13,6 +14,7 @@ fn test_token_identifier_egld() {
 /// This just tests the contract syntax.
 /// For a complete suite of test cases, see `multiversx-sc-scenario/tests/managed_token_identifier_test.rs`.
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_token_identifier_is_valid() {
     let bf = basic_features::contract_obj();
     let result = bf.token_identifier_is_valid_1(EgldOrEsdtTokenIdentifier::esdt(
@@ -30,6 +32,7 @@ fn test_token_identifier_is_valid() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_token_identifier_compare() {
     let token_id = TokenIdentifier::<StaticApi>::from(&b"ALC-6258d2"[..]);
     let esdt_token_id = EgldOrEsdtTokenIdentifier::esdt(token_id.clone());

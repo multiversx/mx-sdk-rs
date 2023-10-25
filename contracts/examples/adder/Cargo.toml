@@ -10,7 +10,7 @@ path = "src/adder.rs"
 
 [features]
 wasm = ["multiversx-sc-wasm-adapter", "multiversx-sc/no-debug-api"]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 single-tx-api = ["multiversx-sc/single-tx-api"]
 
 [dependencies.multiversx-sc]

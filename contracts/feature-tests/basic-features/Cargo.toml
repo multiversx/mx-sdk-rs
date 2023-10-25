@@ -10,7 +10,7 @@ path = "src/basic_features_main.rs"
 
 [features]
 wasm = ["multiversx-sc/no-debug-api"]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"
@@ -28,5 +28,7 @@ features = ["debug"]
 [dependencies.multiversx-sc-modules]
 version = "0.43.3"
 path = "../../../contracts/modules"
+
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"
+features = ["debug"]

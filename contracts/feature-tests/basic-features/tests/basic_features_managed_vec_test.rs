@@ -1,9 +1,9 @@
 use multiversx_sc::types::{BaseBigUint, ManagedVec};
-use multiversx_sc_scenario::{api::StaticApi, *};
 
 use basic_features::managed_vec_features::ManagedVecFeatures;
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_managed_vec_new() {
     let bf = basic_features::contract_obj();
     let result = bf.managed_vec_new();
@@ -11,6 +11,7 @@ fn test_managed_vec_new() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_managed_vec_eq() {
     let bf = basic_features::contract_obj();
 
@@ -34,6 +35,7 @@ fn test_managed_vec_eq() {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn test_managed_vec_set() {
     let bf = basic_features::contract_obj();
 

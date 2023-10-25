@@ -3,6 +3,7 @@ use multiversx_sc::types::BaseBigUint;
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
+#[cfg(feature = "single-tx-api")]
 fn test_factorial() {
     let factorial = factorial::contract_obj();
 

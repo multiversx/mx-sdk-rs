@@ -29,20 +29,20 @@ pub struct Payment {
 
 pub struct GovSetup<GovBuilder>
 where
-    GovBuilder: 'static + Copy + Fn() -> use_module::ContractObj<DebugApi>,
+    GovBuilder: 'static + Copy + Fn() -> use_module::ContractObj,
 {
     pub b_mock: BlockchainStateWrapper,
     pub owner: Address,
     pub first_user: Address,
     pub second_user: Address,
     pub third_user: Address,
-    pub gov_wrapper: ContractObjWrapper<use_module::ContractObj<DebugApi>, GovBuilder>,
+    pub gov_wrapper: ContractObjWrapper<use_module::ContractObj, GovBuilder>,
     pub current_block: u64,
 }
 
 impl<GovBuilder> GovSetup<GovBuilder>
 where
-    GovBuilder: 'static + Copy + Fn() -> use_module::ContractObj<DebugApi>,
+    GovBuilder: 'static + Copy + Fn() -> use_module::ContractObj,
 {
     pub fn new(gov_builder: GovBuilder) -> Self {
         let rust_zero = rust_biguint!(0);

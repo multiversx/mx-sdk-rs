@@ -9,7 +9,7 @@ publish = false
 path = "src/token_release.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"

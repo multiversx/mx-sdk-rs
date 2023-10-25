@@ -20,7 +20,7 @@ edition = "2021"
 path = "src/wegld.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"

@@ -9,7 +9,7 @@ publish = false
 path = "src/forwarder_main.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario", "vault/debug"]
 
 [dependencies.vault]
 path = "../vault"

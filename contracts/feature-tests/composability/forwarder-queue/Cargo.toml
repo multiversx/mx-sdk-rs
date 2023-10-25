@@ -10,7 +10,7 @@ path = "src/forwarder_queue.rs"
 
 [features]
 promises = ["multiversx-sc/promises"]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.vault]
 path = "../vault"

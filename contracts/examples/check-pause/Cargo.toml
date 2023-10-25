@@ -9,7 +9,7 @@ publish = false
 path = "src/check_pause.rs"
 
 [features]
-debug = ["multiversx-sc-scenario", "multiversx-sc-modules/debug"]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [dev-dependencies]
 num-bigint = "0.4.2"

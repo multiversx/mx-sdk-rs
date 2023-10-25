@@ -6,7 +6,7 @@ edition = "2021"
 publish = false
 
 [features]
-debug = ["multiversx-sc-scenario", "multiversx-sc-modules/debug"]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [lib]
 path = "src/bonding_curve_contract.rs"

@@ -9,7 +9,7 @@ publish = false
 path = "src/lib.rs"
 
 [features]
-debug = ["multiversx-sc-scenario"]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.erc1155]
 path = "../erc1155"

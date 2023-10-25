@@ -24,6 +24,7 @@ managed-map = []
 esdt-token-payment-legacy-decode = []
 no-debug-api = ["multiversx-sc-imports/no-debug-api"]
 single-tx-api = ["multiversx-sc-imports/single-tx-api"]
+static-api = ["multiversx-sc-imports/static-api"]
 
 [dependencies]
 hashbrown = "0.13.2"

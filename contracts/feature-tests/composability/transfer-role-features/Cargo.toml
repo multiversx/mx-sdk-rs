@@ -9,10 +9,11 @@ publish = false
 path = "src/lib.rs"
 
 [features]
-debug = ["multiversx-sc-scenario", "vault/debug", "multiversx-sc-modules/debug"]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [dev-dependencies.vault]
 path = "../vault"
+features = ["debug"]
 
 [dependencies.multiversx-sc]
 version = "0.43.3"
