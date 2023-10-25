@@ -9,5 +9,5 @@ publish = false
 path = ".."
 
 [dependencies.multiversx-sc-meta]
-version = "0.43.4"
+version = "0.43.5"
 path = "../../../../../framework/meta"
