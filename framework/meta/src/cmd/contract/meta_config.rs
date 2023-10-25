@@ -2,7 +2,7 @@ use std::fs;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::{cli_args::BuildArgs, tools::post_build::check_tools_installed, CargoTomlContents};
+use crate::{cli_args::BuildArgs, tools::check_tools_installed, CargoTomlContents};
 
 use super::output_contract::{OutputContract, OutputContractGlobalConfig};
 

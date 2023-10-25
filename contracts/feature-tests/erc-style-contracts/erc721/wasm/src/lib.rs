@@ -10,7 +10,9 @@
 // Total number of exported functions:  10
 
 #![no_std]
-#![allow(internal_features)]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();

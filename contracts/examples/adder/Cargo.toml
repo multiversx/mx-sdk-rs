@@ -14,16 +14,16 @@ debug = ["dep:multiversx-sc-scenario"]
 single-tx-api = ["multiversx-sc/single-tx-api"]
 
 [dependencies.multiversx-sc]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/wasm-adapter"
 optional = true
 
 [dependencies.multiversx-sc-scenario]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/scenario"
 optional = true
 

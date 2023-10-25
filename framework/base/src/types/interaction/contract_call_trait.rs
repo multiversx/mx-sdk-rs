@@ -32,6 +32,18 @@ where
             endpoint_arg.multi_encode_or_handle_err(&mut self.get_mut_basic().arg_buffer, h);
     }
 
+    /// Serializes and pushes a value to the arguments buffer.
+    ///
+    /// Accepts multi-values, so it might effectively be adding more than one raw argument.
+    ///
+    /// Warning: this method serializes any serializable type,
+    /// but does no type checking against the destination endpoint ABI.
+    /// Only use for raw calls, built without a proxy.
+    fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
+        self.proxy_arg(arg);
+        self
+    }
+
     /// For cases where we build the contract call by hand.
     ///
     /// No serialization occurs, just direct conversion to ManagedBuffer.

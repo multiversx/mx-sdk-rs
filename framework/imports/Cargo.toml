@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-imports"
-version = "0.43.3"
+version = "0.43.5"
 edition = "2021"
 
 [lib]

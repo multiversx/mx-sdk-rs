@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_biguint, managed_buffer,
     scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
-    ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
+    ContractInfo, ScenarioWorld, WhiteboxContract,
 };
 
 const DECIMALS: u8 = 0;

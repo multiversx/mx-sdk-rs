@@ -12,15 +12,15 @@ path = "src/multisig.rs"
 debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
 
 [dependencies.multiversx-sc]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../contracts/modules"
 
 [dependencies.multiversx-sc-scenario]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/scenario"
 optional = true
 
@@ -37,7 +37,7 @@ path = "../factorial"
 features = ["debug"]
 
 [dev-dependencies.multiversx-wegld-swap-sc]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../core/wegld-swap"
 features = ["debug"]
 

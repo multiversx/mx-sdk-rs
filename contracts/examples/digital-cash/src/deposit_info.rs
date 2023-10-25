@@ -25,8 +25,8 @@ where
     }
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Default)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct Fee<M: ManagedTypeApi> {
     pub num_token_to_transfer: usize,
-    pub value: BaseBigUint<M>,
+    pub value: EgldOrEsdtTokenPayment<M>
 }

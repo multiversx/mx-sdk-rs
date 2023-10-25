@@ -9,5 +9,5 @@ path = ".."
 features = ["wasm"]
 
 [dependencies.multiversx-sc-meta]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../../framework/meta"

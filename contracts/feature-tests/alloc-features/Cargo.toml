@@ -13,12 +13,12 @@ static-api = ["debug", "multiversx-sc/static-api"]
 debug = ["dep:multiversx-sc-scenario", "esdt-system-sc-mock/debug"]
 
 [dependencies.multiversx-sc]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/base"
 features = ["alloc"]
 
 [dependencies.multiversx-sc-scenario]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../framework/scenario"
 optional = true
 

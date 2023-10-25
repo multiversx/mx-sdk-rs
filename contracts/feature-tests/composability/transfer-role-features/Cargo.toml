@@ -16,15 +16,15 @@ path = "../vault"
 features = ["debug"]
 
 [dependencies.multiversx-sc]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-scenario]
-version = "0.43.3"
+version = "0.43.5"
 path = "../../../../framework/scenario"
 optional = true
 

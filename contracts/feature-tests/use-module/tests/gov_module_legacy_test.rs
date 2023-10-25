@@ -8,7 +8,6 @@ use multiversx_sc_modules::governance::{
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, managed_token_id, rust_biguint,
     testing_framework::{BlockchainStateWrapper, ContractObjWrapper, TxResult},
-    DebugApi,
 };
 
 static GOV_TOKEN_ID: &[u8] = b"GOV-123456";
