@@ -36,7 +36,7 @@ pub trait VecRepeat: benchmark_common::BenchmarkCommon {
     fn bench(&self) -> VecMapper<ManagedBuffer>;
 
     #[endpoint]
-    fn add_struct(&self, num_repeats: usize, value: ExampleStruct<Self::Api>) {
+    fn add_struct(&self, num_repeats: usize, value: ExampleStruct<CurrentApi>) {
         let mut bench = self.bench_struct();
         for i in 0..num_repeats {
             bench.push(&self.use_index_struct(&value, i));
@@ -44,7 +44,7 @@ pub trait VecRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[endpoint]
-    fn count_struct(&self, value: ExampleStruct<Self::Api>) -> usize {
+    fn count_struct(&self, value: ExampleStruct<CurrentApi>) -> usize {
         let bench = self.bench_struct();
         (1..=bench.len()).filter(|&i| bench.get(i) == value).count()
     }
@@ -59,5 +59,5 @@ pub trait VecRepeat: benchmark_common::BenchmarkCommon {
 
     #[view]
     #[storage_mapper("bench_struct")]
-    fn bench_struct(&self) -> VecMapper<ExampleStruct<Self::Api>>;
+    fn bench_struct(&self) -> VecMapper<ExampleStruct<CurrentApi>>;
 }

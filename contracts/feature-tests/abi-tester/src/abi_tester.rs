@@ -38,7 +38,7 @@ pub trait AbiTester {
 
     #[endpoint]
     #[only_owner]
-    fn take_managed_type(&self, _arg: AbiManagedType<Self::Api>) {}
+    fn take_managed_type(&self, _arg: AbiManagedType<CurrentApi>) {}
 
     #[endpoint]
     #[output_name("multi-result-1")]
@@ -87,8 +87,8 @@ pub trait AbiTester {
     fn managed_address_vs_byte_array(
         &self,
         address: ManagedAddress,
-        byte_array: ManagedByteArray<Self::Api, 32>,
-    ) -> MultiValue2<ManagedAddress, ManagedByteArray<Self::Api, 32>> {
+        byte_array: ManagedByteArray<CurrentApi, 32>,
+    ) -> MultiValue2<ManagedAddress, ManagedByteArray<CurrentApi, 32>> {
         (address, byte_array).into()
     }
 
@@ -98,12 +98,12 @@ pub trait AbiTester {
     }
 
     #[endpoint]
-    fn esdt_token_payment(&self) -> EsdtTokenPayment<Self::Api> {
+    fn esdt_token_payment(&self) -> EsdtTokenPayment<CurrentApi> {
         unreachable!()
     }
 
     #[endpoint]
-    fn esdt_token_data(&self) -> EsdtTokenData<Self::Api> {
+    fn esdt_token_data(&self) -> EsdtTokenData<CurrentApi> {
         unreachable!()
     }
 
@@ -170,7 +170,7 @@ pub trait AbiTester {
     fn external_view(&self) {}
 
     #[event("payable-event")]
-    fn payable_event(&self, #[indexed] token: &TokenIdentifier, amount: &BigUint);
+    fn payable_event(&self, #[indexed] token: &TokenIdentifier, amount: &BaseBigUint);
 
     #[event("address-h256-event")]
     fn address_h256_event(&self, #[indexed] address: &Address, #[indexed] h256: &H256);

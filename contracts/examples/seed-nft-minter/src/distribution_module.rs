@@ -13,7 +13,7 @@ pub struct Distribution<M: ManagedTypeApi> {
 
 #[multiversx_sc::module]
 pub trait DistributionModule {
-    fn init_distribution(&self, distribution: ManagedVec<Distribution<Self::Api>>) {
+    fn init_distribution(&self, distribution: ManagedVec<Distribution<CurrentApi>>) {
         self.validate_distribution(&distribution);
         self.distribution_rules().set(distribution);
     }
@@ -22,7 +22,7 @@ pub trait DistributionModule {
         &self,
         token_id: &EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        total_amount: BigUint,
+        total_amount: BaseBigUint,
     ) {
         if total_amount == 0 {
             return;
@@ -41,7 +41,7 @@ pub trait DistributionModule {
         }
     }
 
-    fn validate_distribution(&self, distribution: &ManagedVec<Distribution<Self::Api>>) {
+    fn validate_distribution(&self, distribution: &ManagedVec<Distribution<CurrentApi>>) {
         let index_total: u64 = distribution
             .iter()
             .map(|distribution| distribution.percentage)
@@ -54,5 +54,5 @@ pub trait DistributionModule {
 
     #[view(getDistributionRules)]
     #[storage_mapper("distributionRules")]
-    fn distribution_rules(&self) -> SingleValueMapper<ManagedVec<Distribution<Self::Api>>>;
+    fn distribution_rules(&self) -> SingleValueMapper<ManagedVec<Distribution<CurrentApi>>>;
 }

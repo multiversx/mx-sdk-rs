@@ -1,6 +1,6 @@
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedBuffer},
+    types::{BaseBigUint, ManagedBuffer},
 };
 
 multiversx_sc::derive_imports!();
@@ -9,7 +9,7 @@ multiversx_sc::derive_imports!();
     NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Debug, Clone,
 )]
 pub struct ExampleStructManaged<M: ManagedTypeApi> {
-    pub big_uint: BigUint<M>,
+    pub big_uint: BaseBigUint<M>,
     pub int: u32,
     pub bytes: ManagedBuffer<M>,
 }

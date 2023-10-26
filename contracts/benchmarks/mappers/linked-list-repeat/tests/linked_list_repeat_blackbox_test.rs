@@ -35,7 +35,7 @@ fn setup() -> ScenarioWorld {
 #[test]
 fn linked_list_repeat_blackbox_raw() {
     let mut world = setup();
-    let mut contract = ContractInfo::<linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
+    let mut contract = ContractInfo::<StaticApi, linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
 
     let num_repeats = 5usize;
 
@@ -72,15 +72,15 @@ fn linked_list_repeat_blackbox_raw() {
 #[test]
 fn linked_list_repeat_struct_blackbox_raw() {
     let mut world = setup();
-    let mut contract = ContractInfo::<linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
+    let mut contract = ContractInfo::<StaticApi, linked_list_repeat::Proxy<StaticApi>>::new("sc:llr");
 
     let mut example = ExampleStruct {
         first_token_id: TokenIdentifier::from_esdt_bytes(b"str:TESTTOK-1234"),
         first_token_nonce: 0,
-        first_token_amount: multiversx_sc::types::BigUint::from(1_000_000_000_000_000_000u64),
+        first_token_amount: multiversx_sc::types::BaseBigUint::from(1_000_000_000_000_000_000u64),
         second_token_id: TokenIdentifier::from_esdt_bytes(b"str:TESTTOK-2345"),
         second_token_nonce: 0,
-        second_token_amount: multiversx_sc::types::BigUint::from(1_000_000_000_000_000_000u64),
+        second_token_amount: multiversx_sc::types::BaseBigUint::from(1_000_000_000_000_000_000u64),
     };
     world.sc_call(
         ScCallStep::new()

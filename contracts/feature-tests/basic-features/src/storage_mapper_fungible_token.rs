@@ -9,7 +9,7 @@ pub trait FungibleTokenMapperFeatures:
     fn issue_fungible_default_callback(
         &self,
         token_ticker: ManagedBuffer,
-        initial_supply: BigUint,
+        initial_supply: BaseBigUint,
     ) {
         let payment_amount = self.call_value().egld_value();
         self.fungible_token_mapper().issue(
@@ -24,7 +24,7 @@ pub trait FungibleTokenMapperFeatures:
 
     #[payable("EGLD")]
     #[endpoint]
-    fn issue_fungible_custom_callback(&self, token_ticker: ManagedBuffer, initial_supply: BigUint) {
+    fn issue_fungible_custom_callback(&self, token_ticker: ManagedBuffer, initial_supply: BaseBigUint) {
         let payment = self.call_value().egld_value();
         let cb = if initial_supply > 0 {
             FungibleTokenMapperFeatures::callbacks(self).custom_issue_non_zero_supply_cb()
@@ -102,7 +102,7 @@ pub trait FungibleTokenMapperFeatures:
     }
 
     #[endpoint]
-    fn mint_fungible(&self, amount: BigUint) -> EsdtTokenPayment<Self::Api> {
+    fn mint_fungible(&self, amount: BaseBigUint) -> EsdtTokenPayment<CurrentApi> {
         self.fungible_token_mapper().mint(amount)
     }
 
@@ -110,18 +110,18 @@ pub trait FungibleTokenMapperFeatures:
     fn mint_and_send_fungible(
         &self,
         to: ManagedAddress,
-        amount: BigUint,
-    ) -> EsdtTokenPayment<Self::Api> {
+        amount: BaseBigUint,
+    ) -> EsdtTokenPayment<CurrentApi> {
         self.fungible_token_mapper().mint_and_send(&to, amount)
     }
 
     #[endpoint]
-    fn burn_fungible(&self, amount: BigUint) {
+    fn burn_fungible(&self, amount: BaseBigUint) {
         self.fungible_token_mapper().burn(&amount);
     }
 
     #[endpoint]
-    fn get_balance_fungible(&self) -> BigUint {
+    fn get_balance_fungible(&self) -> BaseBigUint {
         self.fungible_token_mapper().get_balance()
     }
 

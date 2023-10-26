@@ -13,7 +13,7 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("big_uint")]
-    fn load_big_uint(&self) -> BigUint;
+    fn load_big_uint(&self) -> BaseBigUint;
 
     #[endpoint]
     #[storage_get("big_int")]
@@ -65,11 +65,11 @@ pub trait StorageLoadFeatures {
 
     #[endpoint]
     #[storage_get("map1")]
-    fn load_map1(&self, addr: ManagedAddress) -> BigUint;
+    fn load_map1(&self, addr: ManagedAddress) -> BaseBigUint;
 
     #[endpoint]
     #[storage_get("map2")]
-    fn load_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress) -> BigUint;
+    fn load_map2(&self, addr1: &ManagedAddress, addr2: &ManagedAddress) -> BaseBigUint;
 
     #[endpoint]
     #[storage_get("map3")]
@@ -81,9 +81,9 @@ pub trait StorageLoadFeatures {
         use multiversx_sc::api::{
             StaticVarApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
         };
-        let value_handle: <<Self as ContractBase>::Api as HandleTypeInfo>::ManagedBufferHandle =
-            use_raw_handle(Self::Api::static_var_api_impl().next_handle());
-        Self::Api::storage_read_api_impl().storage_load_from_address(
+        let value_handle: <CurrentApi as HandleTypeInfo>::ManagedBufferHandle =
+            use_raw_handle(CurrentApi::static_var_api_impl().next_handle());
+        CurrentApi::storage_read_api_impl().storage_load_from_address(
             address.get_handle(),
             key.get_handle(),
             value_handle.clone(),

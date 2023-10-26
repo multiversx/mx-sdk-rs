@@ -22,7 +22,7 @@ fn tester_deploy_test() {
 
     let owner_address = "address:owner";
     let mut adder_contract =
-        ContractInfo::<rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
+        ContractInfo::<StaticApi, rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
 
     world
         .start_trace()
@@ -52,7 +52,7 @@ fn tester_deploy_test_spawned_thread() {
 
         let owner_address = "address:owner";
         let mut adder_contract =
-            ContractInfo::<rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
+            ContractInfo::<StaticApi, rust_testing_framework_tester::Proxy<StaticApi>>::new("sc:contract");
 
         world
             .start_trace()

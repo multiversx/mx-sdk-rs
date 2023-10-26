@@ -4,17 +4,17 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait CryptoFeatures {
     #[endpoint]
-    fn compute_sha256(&self, input: ManagedBuffer) -> ManagedByteArray<Self::Api, 32> {
+    fn compute_sha256(&self, input: ManagedBuffer) -> ManagedByteArray<CurrentApi, 32> {
         self.crypto().sha256(&input)
     }
 
     #[endpoint]
-    fn compute_keccak256(&self, input: ManagedBuffer) -> ManagedByteArray<Self::Api, 32> {
+    fn compute_keccak256(&self, input: ManagedBuffer) -> ManagedByteArray<CurrentApi, 32> {
         self.crypto().keccak256(&input)
     }
 
     #[endpoint]
-    fn compute_ripemd160(&self, input: ManagedBuffer) -> ManagedByteArray<Self::Api, 20> {
+    fn compute_ripemd160(&self, input: ManagedBuffer) -> ManagedByteArray<CurrentApi, 20> {
         self.crypto().ripemd160(&input)
     }
 

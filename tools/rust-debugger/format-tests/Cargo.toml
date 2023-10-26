@@ -15,6 +15,7 @@ path = "../../../framework/base"
 [dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
 
 [dependencies.multiversx-chain-vm]
 version = "0.5.2"

@@ -22,8 +22,8 @@ mod module_1 {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT TRAIT /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub trait VersionModule: multiversx_sc::contract_base::ContractBase + Sized {
-        fn version(&self) -> BigInt<Self::Api>;
+    pub trait VersionModule: multiversx_sc::contract_base::ContractBase<CurrentApi> + Sized {
+        fn version(&self) -> BigInt<CurrentApi>;
 
         fn some_async(&self);
 
@@ -33,13 +33,13 @@ mod module_1 {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// AUTO-IMPLEMENTED METHODS ///////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub trait AutoImpl: multiversx_sc::contract_base::ContractBase {}
+    pub trait AutoImpl: multiversx_sc::contract_base::ContractBase<CurrentApi> {}
 
     impl<C> VersionModule for C
     where
         C: AutoImpl,
     {
-        fn version(&self) -> BigInt<Self::Api> {
+        fn version(&self) -> BigInt<CurrentApi> {
             BigInt::from(100)
         }
 
@@ -50,22 +50,19 @@ mod module_1 {
         fn callback(&self) {}
     }
 
-    impl<A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<A> where
-        A: multiversx_sc::api::VMApi
-    {
-    }
+    impl AutoImpl for multiversx_sc::contract_base::UniversalContractObj<CurrentApi> {}
 
-    pub trait EndpointWrappers: VersionModule + multiversx_sc::contract_base::ContractBase {
+    pub trait EndpointWrappers: VersionModule + multiversx_sc::contract_base::ContractBase<CurrentApi> {
         #[inline]
         fn call_version(&self) {
-            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
+            multiversx_sc::io::call_value_init::not_payable::<CurrentApi>();
             let result = self.version();
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result)
+            multiversx_sc::io::finish_multi::<CurrentApi, _>(&result)
         }
 
         fn call_some_async(&self) {
             self.some_async();
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&())
+            multiversx_sc::io::finish_multi::<CurrentApi, _>(&())
         }
 
         fn call(&self, fn_name: &str) -> bool {
@@ -86,10 +83,7 @@ mod module_1 {
         }
     }
 
-    impl<A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<A> where
-        A: multiversx_sc::api::VMApi
-    {
-    }
+    impl EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<CurrentApi> {}
 
     pub struct AbiProvider {}
 
@@ -101,10 +95,13 @@ mod module_1 {
         }
     }
 
-    pub trait ProxyTrait: multiversx_sc::contract_base::ProxyObjBase + Sized {
+    pub trait ProxyTrait<A>: multiversx_sc::contract_base::ProxyObjBase<A> + Sized
+    where
+        A: multiversx_sc::api::VMApi
+    {
         fn version(
             &mut self,
-        ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
+        ) -> multiversx_sc::types::ContractCallNoPayment<A, BigInt<A>> {
             let ___address___ = self.extract_address();
             multiversx_sc::types::ContractCallNoPayment::new(___address___, "version")
         }
@@ -118,30 +115,30 @@ mod sample_adder {
     //////// CONTRACT TRAIT /////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
     pub trait Adder:
-        super::module_1::VersionModule + multiversx_sc::contract_base::ContractBase + Sized
+        super::module_1::VersionModule + multiversx_sc::contract_base::ContractBase<CurrentApi> + Sized
     {
-        fn init(&self, initial_value: &BigInt<Self::Api>) {
+        fn init(&self, initial_value: &BigInt<CurrentApi>) {
             self.set_sum(initial_value);
         }
-        fn add(&self, value: BigInt<Self::Api>) -> SCResult<()> {
+        fn add(&self, value: BigInt<CurrentApi>) -> SCResult<()> {
             let mut sum = self.get_sum();
             sum.add_assign(value);
             self.set_sum(&sum);
             Ok(())
         }
-        fn get_sum(&self) -> BigInt<Self::Api>;
-        fn set_sum(&self, sum: &BigInt<Self::Api>);
+        fn get_sum(&self) -> BigInt<CurrentApi>;
+        fn set_sum(&self, sum: &BigInt<CurrentApi>);
         fn add_version(&self) -> SCResult<()> {
             self.add(self.version())
         }
         fn callback(&self);
-        fn callbacks(&self) -> self::CallbackProxyObj<Self::Api>;
+        fn callbacks(&self) -> self::CallbackProxyObj<CurrentApi>;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// AUTO-IMPLEMENTED METHODS ///////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub trait AutoImpl: multiversx_sc::contract_base::ContractBase {}
+    pub trait AutoImpl: multiversx_sc::contract_base::ContractBase<CurrentApi> {}
 
     // impl<C> super::module_1::AutoImpl for C where C: AutoImpl {}
 
@@ -149,56 +146,53 @@ mod sample_adder {
     where
         C: AutoImpl + super::module_1::AutoImpl,
     {
-        fn get_sum(&self) -> BigInt<Self::Api> {
-            let mut ___key___ = multiversx_sc::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
+        fn get_sum(&self) -> BigInt<CurrentApi> {
+            let mut ___key___ = multiversx_sc::storage::StorageKey::<CurrentApi>::new(&b"sum"[..]);
             multiversx_sc::storage_get(multiversx_sc::types::ManagedRef::new(&___key___))
         }
-        fn set_sum(&self, sum: &BigInt<Self::Api>) {
-            let mut ___key___ = multiversx_sc::storage::StorageKey::<Self::Api>::new(&b"sum"[..]);
+        fn set_sum(&self, sum: &BigInt<CurrentApi>) {
+            let mut ___key___ = multiversx_sc::storage::StorageKey::<CurrentApi>::new(&b"sum"[..]);
             multiversx_sc::storage_set(multiversx_sc::types::ManagedRef::new(&___key___), &sum);
         }
         fn callback(&self) {}
-        fn callbacks(&self) -> self::CallbackProxyObj<Self::Api> {
-            <self::CallbackProxyObj::<Self::Api> as multiversx_sc::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
+        fn callbacks(&self) -> self::CallbackProxyObj<CurrentApi> {
+            <self::CallbackProxyObj::<CurrentApi> as multiversx_sc::contract_base::CallbackProxyObjBase>::new_cb_proxy_obj()
         }
     }
 
-    impl<A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<A> where
-        A: multiversx_sc::api::VMApi
-    {
-    }
+    impl AutoImpl for multiversx_sc::contract_base::UniversalContractObj<CurrentApi> {}
 
     pub trait EndpointWrappers:
-        Adder + multiversx_sc::contract_base::ContractBase + super::module_1::EndpointWrappers
+        Adder + multiversx_sc::contract_base::ContractBase<CurrentApi> + super::module_1::EndpointWrappers
     {
         #[inline]
         fn call_get_sum(&self) {
-            <Self::Api as multiversx_sc::api::VMApi>::init_static();
-            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
-            let () = multiversx_sc::io::load_endpoint_args::<Self::Api, ()>(());
+            <CurrentApi as multiversx_sc::api::VMApi>::init_static();
+            multiversx_sc::io::call_value_init::not_payable::<CurrentApi>();
+            let () = multiversx_sc::io::load_endpoint_args::<CurrentApi, ()>(());
             let result = self.get_sum();
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
+            multiversx_sc::io::finish_multi::<CurrentApi, _>(&result);
         }
         #[inline]
         fn call_init(&self) {
-            <Self::Api as multiversx_sc::api::VMApi>::init_static();
-            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
+            <CurrentApi as multiversx_sc::api::VMApi>::init_static();
+            multiversx_sc::io::call_value_init::not_payable::<CurrentApi>();
             let (initial_value, ()) = multiversx_sc::io::load_endpoint_args::<
-                Self::Api,
-                (multiversx_sc::types::BigInt<Self::Api>, ()),
+                CurrentApi,
+                (multiversx_sc::types::BigInt<CurrentApi>, ()),
             >(("initial_value", ()));
             self.init(&initial_value);
         }
         #[inline]
         fn call_add(&self) {
-            <Self::Api as multiversx_sc::api::VMApi>::init_static();
-            multiversx_sc::io::call_value_init::not_payable::<Self::Api>();
+            <CurrentApi as multiversx_sc::api::VMApi>::init_static();
+            multiversx_sc::io::call_value_init::not_payable::<CurrentApi>();
             let (value, ()) = multiversx_sc::io::load_endpoint_args::<
-                Self::Api,
-                (multiversx_sc::types::BigInt<Self::Api>, ()),
+                CurrentApi,
+                (multiversx_sc::types::BigInt<CurrentApi>, ()),
             >(("value", ()));
             let result = self.add(value);
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
+            multiversx_sc::io::finish_multi::<CurrentApi, _>(&result);
         }
 
         fn call(&self, fn_name: &str) -> bool {
@@ -230,24 +224,23 @@ mod sample_adder {
         }
     }
 
-    impl<A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<A> where
-        A: multiversx_sc::api::VMApi
-    {
-    }
+    impl EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<CurrentApi> {}
 
-    pub trait ProxyTrait:
-        multiversx_sc::contract_base::ProxyObjBase + super::module_1::ProxyTrait
+    pub trait ProxyTrait<A>:
+        multiversx_sc::contract_base::ProxyObjBase<A> + super::module_1::ProxyTrait<A>
+    where
+        A: multiversx_sc::api::VMApi
     {
         fn get_sum(
             &mut self,
-        ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, BigInt<Self::Api>> {
+        ) -> multiversx_sc::types::ContractCallNoPayment<A, BigInt<A>> {
             let ___address___ = self.extract_address();
             multiversx_sc::types::ContractCallNoPayment::new(___address___, "get_sum")
         }
         fn add(
             &mut self,
-            amount: &BigInt<Self::Api>,
-        ) -> multiversx_sc::types::ContractCallNoPayment<Self::Api, ()> {
+            amount: &BigInt<A>,
+        ) -> multiversx_sc::types::ContractCallNoPayment<A, ()> {
             let ___address___ = self.extract_address();
             let mut ___contract_call___ =
                 multiversx_sc::types::ContractCallNoPayment::new(___address___, "add");
@@ -259,38 +252,25 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT ////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub struct ContractObj<A>
-    where
-        A: multiversx_sc::api::VMApi,
-    {
-        _phantom: core::marker::PhantomData<A>,
-    }
+    pub struct ContractObj;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT as CONTRACT BASE ///////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    impl<A> multiversx_sc::contract_base::ContractBase for ContractObj<A>
-    where
-        A: multiversx_sc::api::VMApi,
-    {
-        type Api = A;
-    }
+    impl multiversx_sc::contract_base::ContractBase<CurrentApi> for ContractObj {}
 
-    impl<A> super::module_1::AutoImpl for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl super::module_1::AutoImpl for ContractObj {}
 
-    impl<A> AutoImpl for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl AutoImpl for ContractObj {}
 
-    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl super::module_1::EndpointWrappers for ContractObj {}
 
-    impl<A> EndpointWrappers for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl EndpointWrappers for ContractObj {}
 
-    impl<A> multiversx_sc::contract_base::CallableContract for ContractObj<A>
-    where
-        A: multiversx_sc::api::VMApi,
-    {
+    impl multiversx_sc::contract_base::CallableContract for ContractObj {
         fn call(&self, fn_name: &str) -> bool {
             EndpointWrappers::call(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &multiversx_sc::contract_base::UniversalContractObj::<CurrentApi>::new(),
                 fn_name,
             )
         }
@@ -299,13 +279,11 @@ mod sample_adder {
     pub struct ContractBuilder;
 
     impl multiversx_sc::contract_base::CallableContractBuilder for ContractBuilder {
-        fn new_contract_obj<A: multiversx_sc::api::VMApi>(
+        fn new_contract_obj(
             &self,
         ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract>
         {
-            multiversx_sc::types::heap::Box::new(ContractObj::<A> {
-                _phantom: core::marker::PhantomData,
-            })
+            multiversx_sc::types::heap::Box::new(ContractObj)
         }
     }
 
@@ -319,13 +297,8 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_obj<A>() -> ContractObj<A>
-    where
-        A: multiversx_sc::api::VMApi,
-    {
-        ContractObj {
-            _phantom: core::marker::PhantomData,
-        }
+    pub fn contract_obj() -> ContractObj {
+        ContractObj
     }
 
     pub struct Proxy<A>
@@ -336,19 +309,17 @@ mod sample_adder {
             multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
     }
 
-    impl<A> multiversx_sc::contract_base::ProxyObjBase for Proxy<A>
+    impl<A> multiversx_sc::contract_base::ProxyObjBase<A> for Proxy<A>
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
-        type Api = A;
-
         fn new_proxy_obj() -> Self {
             Proxy {
                 address: multiversx_sc::types::ManagedOption::none(),
             }
         }
 
-        fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self {
+        fn contract(mut self, address: multiversx_sc::types::ManagedAddress<A>) -> Self {
             self.address = multiversx_sc::types::ManagedOption::some(address);
             self
         }
@@ -356,8 +327,8 @@ mod sample_adder {
         fn extract_opt_address(
             &mut self,
         ) -> multiversx_sc::types::ManagedOption<
-            Self::Api,
-            multiversx_sc::types::ManagedAddress<Self::Api>,
+            A,
+            multiversx_sc::types::ManagedAddress<A>,
         > {
             core::mem::replace(
                 &mut self.address,
@@ -365,7 +336,7 @@ mod sample_adder {
             )
         }
 
-        fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<Self::Api> {
+        fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<A> {
             let address = core::mem::replace(
                 &mut self.address,
                 multiversx_sc::types::ManagedOption::none(),
@@ -374,9 +345,9 @@ mod sample_adder {
         }
     }
 
-    impl<A> super::module_1::ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<A> super::module_1::ProxyTrait<A> for Proxy<A> where A: multiversx_sc::api::VMApi {}
 
-    impl<A> ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<A> ProxyTrait<A> for Proxy<A> where A: multiversx_sc::api::VMApi {}
 
     pub struct CallbackProxyObj<A>
     where
@@ -399,9 +370,9 @@ mod sample_adder {
     }
 
     pub trait CallbackProxy: multiversx_sc::contract_base::CallbackProxyObjBase + Sized {
-        fn my_callback(self, caller: &Address) -> multiversx_sc::types::CallbackClosure<Self::Api> {
+        fn my_callback(self, caller: &Address) -> multiversx_sc::types::CallbackClosure<CurrentApi> {
             let mut ___callback_call___ =
-                multiversx_sc::types::new_callback_call::<Self::Api>("my_callback");
+                multiversx_sc::types::new_callback_call::<CurrentApi>("my_callback");
             ___callback_call___.push_endpoint_arg(caller);
             ___callback_call___
         }
@@ -410,10 +381,11 @@ mod sample_adder {
 }
 
 #[test]
+#[cfg_attr(not(feature = "static-api"), ignore)]
 fn contract_without_macros_basic() {
     use sample_adder::{Adder, EndpointWrappers, ProxyTrait};
 
-    let adder = sample_adder::contract_obj::<SingleTxApi>();
+    let adder = sample_adder::contract_obj();
 
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());

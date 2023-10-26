@@ -125,10 +125,10 @@ pub trait FirstContract {
     fn call_esdt_second_contract(
         &self,
         esdt_token_identifier: &TokenIdentifier,
-        amount: &BigUint,
+        amount: &BaseBigUint,
         to: &ManagedAddress,
         func_name: &ManagedBuffer,
-        args: &ManagedVec<Self::Api, ManagedBuffer>,
+        args: &ManagedVec<CurrentApi, ManagedBuffer>,
     ) {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(esdt_token_identifier);
@@ -140,7 +140,7 @@ pub trait FirstContract {
 
         self.send_raw().async_call_raw(
             to,
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &ManagedBuffer::from(ESDT_TRANSFER_STRING),
             &arg_buffer,
         );

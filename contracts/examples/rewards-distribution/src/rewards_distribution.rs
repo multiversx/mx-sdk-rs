@@ -21,7 +21,7 @@ pub struct Bracket {
 #[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
 pub struct ComputedBracket<M: ManagedTypeApi> {
     pub end_index: u64,
-    pub nft_reward_percent: BigUint<M>,
+    pub nft_reward_percent: BaseBigUint<M>,
 }
 
 #[derive(NestedEncode, NestedDecode)]
@@ -125,8 +125,8 @@ pub trait RewardsDistribution:
 
     fn try_advance_bracket(
         &self,
-        bracket: &mut ComputedBracket<Self::Api>,
-        computed_brackets: &mut ManagedVec<ComputedBracket<Self::Api>>,
+        bracket: &mut ComputedBracket<CurrentApi>,
+        computed_brackets: &mut ManagedVec<ComputedBracket<CurrentApi>>,
         ticket: u64,
     ) {
         while ticket > bracket.end_index {
@@ -166,7 +166,7 @@ pub trait RewardsDistribution:
         ticket_from_storage(position, loaded_id)
     }
 
-    fn new_raffle(&self) -> RaffleProgress<Self::Api> {
+    fn new_raffle(&self) -> RaffleProgress<CurrentApi> {
         self.require_new_raffle_period();
 
         let raffle_id = self.raffle_id().update(|raffle_id| {
@@ -198,7 +198,7 @@ pub trait RewardsDistribution:
         &self,
         brackets: ManagedVec<Bracket>,
         ticket_count: u64,
-    ) -> ManagedVec<ComputedBracket<Self::Api>> {
+    ) -> ManagedVec<ComputedBracket<CurrentApi>> {
         require!(ticket_count > 0, "No tickets");
 
         let mut computed_brackets = ManagedVec::new();
@@ -212,7 +212,7 @@ pub trait RewardsDistribution:
             start_index = end_index;
             require!(count > 0, "Invalid bracket");
             let nft_reward_percent =
-                BigUint::from(bracket.bracket_reward_percent) * DIVISION_SAFETY_CONSTANT / count;
+                BaseBigUint::from(bracket.bracket_reward_percent) * DIVISION_SAFETY_CONSTANT / count;
 
             computed_brackets.push(ComputedBracket {
                 end_index,
@@ -249,7 +249,7 @@ pub trait RewardsDistribution:
 
         let caller = self.blockchain().get_caller();
         let mut rewards = ManagedVec::new();
-        let mut total_egld_reward = BigUint::zero();
+        let mut total_egld_reward = BaseBigUint::zero();
 
         for reward_token_pair in reward_tokens.into_iter() {
             let (reward_token_id, reward_token_nonce) = reward_token_pair.into_tuple();
@@ -280,8 +280,8 @@ pub trait RewardsDistribution:
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
         nfts: &ManagedVec<EsdtTokenPayment>,
-    ) -> (BigUint, Option<EsdtTokenPayment>) {
-        let mut total = BigUint::zero();
+    ) -> (BaseBigUint, Option<EsdtTokenPayment>) {
+        let mut total = BaseBigUint::zero();
 
         for raffle_id in raffle_id_start..=raffle_id_end {
             for nft in nfts {
@@ -308,7 +308,7 @@ pub trait RewardsDistribution:
             reward_token_nonce,
             total,
         );
-        (BigUint::zero(), Some(reward_payment))
+        (BaseBigUint::zero(), Some(reward_payment))
     }
 
     fn try_claim(
@@ -340,7 +340,7 @@ pub trait RewardsDistribution:
         reward_token_id: &EgldOrEsdtTokenIdentifier,
         reward_token_nonce: u64,
         nft_nonce: u64,
-    ) -> BigUint {
+    ) -> BaseBigUint {
         let nft_reward_percent = self.nft_reward_percent(raffle_id, nft_nonce).get();
         let royalties = self
             .royalties(raffle_id, reward_token_id, reward_token_nonce)
@@ -417,10 +417,10 @@ pub trait RewardsDistribution:
     fn current_ticket_id(&self) -> SingleValueMapper<u64>;
 
     #[storage_mapper("raffleProgress")]
-    fn raffle_progress(&self) -> SingleValueMapper<Option<RaffleProgress<Self::Api>>>;
+    fn raffle_progress(&self) -> SingleValueMapper<Option<RaffleProgress<CurrentApi>>>;
 
     #[proxy]
-    fn seed_nft_minter_proxy(&self, address: ManagedAddress) -> seed_nft_minter::Proxy<Self::Api>;
+    fn seed_nft_minter_proxy(&self, address: ManagedAddress) -> seed_nft_minter::Proxy<CurrentApi>;
 }
 
 fn ticket_to_storage(position: u64, ticket_id: u64) -> u64 {

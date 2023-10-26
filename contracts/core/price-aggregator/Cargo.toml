@@ -18,6 +18,9 @@ edition = "2021"
 [lib]
 path = "src/lib.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
+
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../framework/base"
@@ -26,9 +29,14 @@ path = "../../../framework/base"
 version = "0.43.5"
 path = "../../../contracts/modules"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.multiversx-price-aggregator-sc]
+path = "."
+features = ["debug"]
 
 [dependencies]
 arrayvec = { version = "0.7.1", default-features = false }

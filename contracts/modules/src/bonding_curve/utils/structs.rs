@@ -5,12 +5,12 @@ multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct CurveArguments<M: ManagedTypeApi> {
-    pub available_supply: BigUint<M>,
-    pub balance: BigUint<M>,
+    pub available_supply: BaseBigUint<M>,
+    pub balance: BaseBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> CurveArguments<M> {
-    pub fn first_token_available(&self) -> BigUint<M> {
+    pub fn first_token_available(&self) -> BaseBigUint<M> {
         &self.available_supply - &self.balance
     }
 }

@@ -6,7 +6,7 @@ use crate::{
         ESDT_TRANSFER_FUNC_NAME,
     },
     contract_base::BlockchainWrapper,
-    types::{BigUint, EsdtTokenPayment, ManagedVec},
+    types::{BaseBigUint, EsdtTokenPayment, ManagedVec},
 };
 
 use super::{
@@ -52,7 +52,7 @@ where
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
-                egld_payment: BigUint::zero(),
+                egld_payment: BaseBigUint::zero(),
             }
         } else {
             // NFT
@@ -82,7 +82,7 @@ where
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
-                egld_payment: BigUint::zero(),
+                egld_payment: BaseBigUint::zero(),
             }
         }
     }
@@ -116,7 +116,7 @@ where
                 explicit_gas_limit: self.basic.explicit_gas_limit,
                 _return_type: PhantomData,
             },
-            egld_payment: BigUint::zero(),
+            egld_payment: BaseBigUint::zero(),
         }
     }
 }

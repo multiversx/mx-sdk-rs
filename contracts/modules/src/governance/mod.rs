@@ -70,7 +70,7 @@ pub trait GovernanceModule:
 
         let caller = self.blockchain().get_caller();
         let mut proposal = self.proposals().get(proposal_id);
-        let mut fees_to_send = ManagedVec::<Self::Api, FeeEntry<Self::Api>>::new();
+        let mut fees_to_send = ManagedVec::<CurrentApi, FeeEntry<CurrentApi>>::new();
         let mut i = 0;
         while i < proposal.fees.entries.len() {
             if proposal.fees.entries.get(i).depositor_addr == caller {
@@ -110,7 +110,7 @@ pub trait GovernanceModule:
     fn propose(
         &self,
         description: ManagedBuffer,
-        actions: MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>>,
+        actions: MultiValueEncoded<GovernanceActionAsMultiArg<CurrentApi>>,
     ) -> usize {
         self.require_caller_not_self();
 
@@ -398,7 +398,7 @@ pub trait GovernanceModule:
     fn get_proposal_actions(
         &self,
         proposal_id: usize,
-    ) -> MultiValueEncoded<GovernanceActionAsMultiArg<Self::Api>> {
+    ) -> MultiValueEncoded<GovernanceActionAsMultiArg<CurrentApi>> {
         if !self.proposal_exists(proposal_id) {
             return MultiValueEncoded::new();
         }
@@ -471,7 +471,7 @@ pub trait GovernanceModule:
 
     fn total_gas_needed(
         &self,
-        actions: &ArrayVec<GovernanceAction<Self::Api>, MAX_GOVERNANCE_PROPOSAL_ACTIONS>,
+        actions: &ArrayVec<GovernanceAction<CurrentApi>, MAX_GOVERNANCE_PROPOSAL_ACTIONS>,
     ) -> u64 {
         let mut total = 0;
         for action in actions {
@@ -495,7 +495,7 @@ pub trait GovernanceModule:
     // storage - general
 
     #[storage_mapper("governance:proposals")]
-    fn proposals(&self) -> VecMapper<GovernanceProposal<Self::Api>>;
+    fn proposals(&self) -> VecMapper<GovernanceProposal<CurrentApi>>;
 
     /// Not stored under "proposals", as that would require deserializing the whole struct
     #[storage_mapper("governance:proposalStartBlock")]
@@ -512,7 +512,7 @@ pub trait GovernanceModule:
     fn proposal_votes(
         &self,
         proposal_id: ProposalId,
-    ) -> SingleValueMapper<ProposalVotes<Self::Api>>;
+    ) -> SingleValueMapper<ProposalVotes<CurrentApi>>;
 
     #[view(getTotalVotes)]
     #[storage_mapper("governance:totalVotes")]

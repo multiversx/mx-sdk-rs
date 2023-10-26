@@ -32,8 +32,8 @@ const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
 const QUORUM_SIZE: usize = 1;
 
-type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
-type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
+type MultisigContract = ContractInfo<StaticApi, multisig::Proxy<StaticApi>>;
+type AdderContract = ContractInfo<StaticApi, adder::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

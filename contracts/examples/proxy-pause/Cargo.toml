@@ -8,13 +8,21 @@ publish = false
 [lib]
 path = "src/proxy_pause.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.proxy-pause]
+path = "."
+features = ["debug"]
 
 [dev-dependencies.check-pause]
 path = "../check-pause"

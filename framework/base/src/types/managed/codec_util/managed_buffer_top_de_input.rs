@@ -5,7 +5,7 @@ use alloc::boxed::Box;
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer},
+    types::{BigInt, BaseBigUint, ManagedBuffer},
 };
 
 use super::ManagedBufferNestedDecodeInput;
@@ -43,7 +43,7 @@ where
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BaseBigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     #[inline]
@@ -54,7 +54,7 @@ where
     {
         if let Some(result) = try_execute_then_cast(|| self.clone()) {
             Ok(result)
-        } else if let Some(result) = try_execute_then_cast(|| BigUint::from_bytes_be_buffer(&self))
+        } else if let Some(result) = try_execute_then_cast(|| BaseBigUint::from_bytes_be_buffer(&self))
         {
             Ok(result)
         } else if let Some(result) =

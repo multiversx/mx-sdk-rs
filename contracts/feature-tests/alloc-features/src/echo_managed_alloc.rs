@@ -22,7 +22,7 @@ pub trait EchoManagedTypesWithAlloc {
     }
 
     #[endpoint]
-    fn echo_varags_big_uint(&self, m: MultiValueVec<BigUint>) -> MultiValueVec<BigUint> {
+    fn echo_varags_big_uint(&self, m: MultiValueVec<BaseBigUint>) -> MultiValueVec<BaseBigUint> {
         m.into_vec().into()
     }
 }

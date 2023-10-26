@@ -2,7 +2,7 @@ use crate::codec::{EncodeError, EncodeErrorHandler, TopEncodeOutput, TryStaticCa
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigInt, BigUint, ManagedBuffer},
+    types::{BigInt, BaseBigUint, ManagedBuffer},
 };
 
 impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
@@ -14,7 +14,7 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BaseBigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     #[inline]
@@ -26,7 +26,7 @@ impl<M: ManagedTypeApi> TopEncodeOutput for &mut ManagedBuffer<M> {
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
             *self = managed_buffer.clone();
             Ok(())
-        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<M>>() {
+        } else if let Some(big_uint) = value.try_cast_ref::<BaseBigUint<M>>() {
             *self = big_uint.to_bytes_be_buffer();
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<M>>() {

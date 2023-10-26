@@ -8,7 +8,7 @@ macro_rules! rust_biguint {
 #[macro_export]
 macro_rules! managed_biguint {
     ($value:expr) => {{
-        multiversx_sc::types::BigUint::from($value as u64)
+        multiversx_sc::types::BaseBigUint::from($value as u64)
     }};
 }
 

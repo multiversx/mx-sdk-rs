@@ -1,4 +1,6 @@
+use std::marker::PhantomData;
 use std::ops::{Deref, DerefMut};
+use multiversx_sc::api::VMApi;
 
 use crate::multiversx_sc::{
     api::ManagedTypeApi,
@@ -11,12 +13,13 @@ use crate::scenario::model::{AddressKey, AddressValue};
 
 /// Bundles a representation of a contract with the contract proxy,
 /// so that it can be easily called in the context of a blockchain mock.
-pub struct ContractInfo<P: ProxyObjBase> {
+pub struct ContractInfo<Api: VMApi, P: ProxyObjBase<Api>> {
     pub scenario_address_expr: AddressKey,
     proxy_inst: P,
+    _phantom: PhantomData<Api>
 }
 
-impl<P: ProxyObjBase> ContractInfo<P> {
+impl<Api: VMApi, P: ProxyObjBase<Api>> ContractInfo<Api, P> {
     pub fn new<A>(address_expr: A) -> Self
     where
         AddressKey: From<A>,
@@ -26,6 +29,7 @@ impl<P: ProxyObjBase> ContractInfo<P> {
         ContractInfo {
             scenario_address_expr: mandos_address_expr,
             proxy_inst,
+            _phantom: PhantomData
         }
     }
 
@@ -34,38 +38,38 @@ impl<P: ProxyObjBase> ContractInfo<P> {
     }
 }
 
-impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressKey {
-    fn from(from: &ContractInfo<P>) -> Self {
+impl<Api: VMApi, P: ProxyObjBase<Api>> From<&ContractInfo<Api, P>> for AddressKey {
+    fn from(from: &ContractInfo<Api, P>) -> Self {
         from.scenario_address_expr.clone()
     }
 }
 
-impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressKey {
-    fn from(from: ContractInfo<P>) -> Self {
+impl<Api: VMApi, P: ProxyObjBase<Api>> From<ContractInfo<Api, P>> for AddressKey {
+    fn from(from: ContractInfo<Api, P>) -> Self {
         from.scenario_address_expr
     }
 }
 
-impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressValue {
-    fn from(from: &ContractInfo<P>) -> Self {
+impl<Api: VMApi, P: ProxyObjBase<Api>> From<&ContractInfo<Api, P>> for AddressValue {
+    fn from(from: &ContractInfo<Api, P>) -> Self {
         AddressValue::from(&from.scenario_address_expr)
     }
 }
 
-impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressValue {
-    fn from(from: ContractInfo<P>) -> Self {
+impl<Api: VMApi, P: ProxyObjBase<Api>> From<ContractInfo<Api, P>> for AddressValue {
+    fn from(from: ContractInfo<Api, P>) -> Self {
         AddressValue::from(&from.scenario_address_expr)
     }
 }
 
-impl<P: ProxyObjBase> Deref for ContractInfo<P> {
+impl<Api: VMApi, P: ProxyObjBase<Api>> Deref for ContractInfo<Api, P> {
     type Target = P;
     fn deref(&self) -> &Self::Target {
         &self.proxy_inst
     }
 }
 
-impl<P: ProxyObjBase> DerefMut for ContractInfo<P> {
+impl<Api: VMApi, P: ProxyObjBase<Api>> DerefMut for ContractInfo<Api, P> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         let proxy_inst = core::mem::replace(&mut self.proxy_inst, P::new_proxy_obj());
         let proxy_inst = proxy_inst.contract(self.scenario_address_expr.value.clone().into());
@@ -74,7 +78,7 @@ impl<P: ProxyObjBase> DerefMut for ContractInfo<P> {
     }
 }
 
-impl<P: ProxyObjBase> TopEncode for ContractInfo<P> {
+impl<Api: VMApi, P: ProxyObjBase<Api>> TopEncode for ContractInfo<Api, P> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -86,7 +90,7 @@ impl<P: ProxyObjBase> TopEncode for ContractInfo<P> {
     }
 }
 
-impl<P: ProxyObjBase> CodecFrom<ContractInfo<P>> for Address {}
-impl<P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for Address {}
-impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
-impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
+impl<Api: VMApi, P: ProxyObjBase<Api>> CodecFrom<ContractInfo<Api, P>> for Address {}
+impl<Api: VMApi, P: ProxyObjBase<Api>> CodecFrom<&ContractInfo<Api, P>> for Address {}
+impl<M: ManagedTypeApi + VMApi, P: ProxyObjBase<M>> CodecFrom<ContractInfo<M, P>> for ManagedAddress<M> {}
+impl<M: ManagedTypeApi + VMApi, P: ProxyObjBase<M>> CodecFrom<&ContractInfo<M, P>> for ManagedAddress<M> {}

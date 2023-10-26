@@ -12,7 +12,7 @@ const DEFAULT_MULTISIG_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
+pub type MultisigContract = ContractInfo<StaticApi, multisig::Proxy<StaticApi>>;
 
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]

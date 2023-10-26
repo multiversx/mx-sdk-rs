@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{SingleValueMapper, StorageMapper};
+use super::{BaseSingleValueMapper, StorageMapper};
 use crate::{
     api::{ErrorApiImpl, StorageMapperApi},
     codec::NestedEncode,
@@ -8,7 +8,7 @@ use crate::{
     types::ManagedAddress,
 };
 
-type FlagMapper<SA> = SingleValueMapper<SA, bool>;
+type FlagMapper<SA> = BaseSingleValueMapper<SA, bool>;
 
 static ITEM_NOT_WHITELISTED_ERR_MSG: &[u8] = b"Item not whitelisted";
 

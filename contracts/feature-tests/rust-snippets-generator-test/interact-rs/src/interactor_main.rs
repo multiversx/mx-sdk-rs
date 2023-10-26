@@ -25,7 +25,7 @@ const DEFAULT_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;
 
-type ContractType = ContractInfo<rust_snippets_generator_test::Proxy<StaticApi>>;
+type ContractType = ContractInfo<StaticApi, rust_snippets_generator_test::Proxy<StaticApi>>;
 
 #[tokio::main]
 async fn main() {

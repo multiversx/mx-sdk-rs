@@ -56,7 +56,7 @@ pub trait MultisigStateModule {
     }
 
     #[storage_mapper("action_data")]
-    fn action_mapper(&self) -> VecMapper<Action<Self::Api>>;
+    fn action_mapper(&self) -> VecMapper<Action<CurrentApi>>;
 
     /// The index of the last proposed action.
     /// 0 means that no action was ever proposed yet.
@@ -68,7 +68,7 @@ pub trait MultisigStateModule {
     /// Serialized action data of an action with index.
     #[label("multisig-external-view")]
     #[view(getActionData)]
-    fn get_action_data(&self, action_id: usize) -> Action<Self::Api> {
+    fn get_action_data(&self, action_id: usize) -> Action<CurrentApi> {
         self.action_mapper().get(action_id)
     }
 

@@ -5,7 +5,7 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 #[multiversx_sc::module]
 pub trait ForwarderSyncCallModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint]
     #[payable("*")]
@@ -51,7 +51,7 @@ pub trait ForwarderSyncCallModule {
     }
 
     #[event("echo_arguments_sync_result")]
-    fn execute_on_dest_context_result_event(&self, result: &ManagedVec<Self::Api, ManagedBuffer>);
+    fn execute_on_dest_context_result_event(&self, result: &ManagedVec<CurrentApi, ManagedBuffer>);
 
     #[endpoint]
     #[payable("*")]
@@ -59,7 +59,7 @@ pub trait ForwarderSyncCallModule {
         let payment = self.call_value().egld_or_single_esdt();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        let result: MultiValue2<BigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> = self
+        let result: MultiValue2<BaseBigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> = self
             .vault_proxy()
             .contract(to)
             .accept_funds_echo_payment()
@@ -73,7 +73,7 @@ pub trait ForwarderSyncCallModule {
 
     #[payable("*")]
     #[endpoint]
-    fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BigUint) {
+    fn forward_sync_accept_funds_with_fees(&self, to: ManagedAddress, percentage_fees: BaseBigUint) {
         let (token_id, payment) = self.call_value().egld_or_single_fungible_esdt();
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
@@ -89,7 +89,7 @@ pub trait ForwarderSyncCallModule {
     #[event("accept_funds_sync_result")]
     fn accept_funds_sync_result_event(
         &self,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 
@@ -116,7 +116,7 @@ pub trait ForwarderSyncCallModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         self.vault_proxy()
             .contract(to)
@@ -130,7 +130,7 @@ pub trait ForwarderSyncCallModule {
         &self,
         to: ManagedAddress,
         token: TokenIdentifier,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         let payments = self.call_value().all_esdt_transfers();
 
@@ -153,7 +153,7 @@ pub trait ForwarderSyncCallModule {
     fn forward_sync_accept_funds_multi_transfer(
         &self,
         to: ManagedAddress,
-        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BaseBigUint>>,
     ) {
         let mut all_token_payments = ManagedVec::new();
 

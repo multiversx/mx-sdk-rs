@@ -8,13 +8,21 @@ publish = false
 [lib]
 path = "src/crowdfunding_esdt.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.crowdfunding-esdt]
+path = "."
+features = ["debug"]
 
 [dev-dependencies]
 num-bigint = "0.4.2"

@@ -7,7 +7,7 @@ use crate::{
     contract_base::{ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec},
+    types::{BaseBigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec},
 };
 
 use super::ManagedArgBuffer;
@@ -24,7 +24,7 @@ where
 {
     _phantom: PhantomData<SA>,
     pub to: ManagedOption<SA, ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
-    pub egld_payment: BigUint<SA>,
+    pub egld_payment: BaseBigUint<SA>,
     pub explicit_gas_limit: u64,
     pub arg_buffer: ManagedArgBuffer<SA>,
     _return_type: PhantomData<OriginalResult>,
@@ -48,7 +48,7 @@ where
     SA: CallTypeApi + 'static,
 {
     fn default() -> Self {
-        let zero = BigUint::zero();
+        let zero = BaseBigUint::zero();
         let arg_buffer = ManagedArgBuffer::new();
         ContractDeploy {
             _phantom: PhantomData,
@@ -70,7 +70,7 @@ where
         Self::default()
     }
 
-    pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA>) -> Self {
+    pub fn with_egld_transfer(mut self, payment_amount: BaseBigUint<SA>) -> Self {
         self.egld_payment = payment_amount;
         self
     }

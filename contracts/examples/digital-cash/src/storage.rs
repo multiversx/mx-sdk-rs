@@ -7,7 +7,7 @@ use crate::deposit_info::*;
 pub trait StorageModule {
     #[view]
     #[storage_mapper("deposit")]
-    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<Self::Api>>;
+    fn deposit(&self, donor: &ManagedAddress) -> SingleValueMapper<DepositInfo<CurrentApi>>;
 
     #[storage_mapper("fee")]
     fn fee(&self, token: &EgldOrEsdtTokenIdentifier) -> SingleValueMapper<BigUint>;

@@ -1,6 +1,6 @@
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
+    types::{BaseBigUint, EsdtTokenPaymentMultiValue, EsdtTokenType, ManagedVecItem, TokenIdentifier},
 };
 
 use crate as multiversx_sc; // needed by the codec and TypeAbi generated code
@@ -17,12 +17,12 @@ use crate::{
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     #[inline]
-    pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
+    pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BaseBigUint<M>) -> Self {
         EsdtTokenPayment {
             token_identifier,
             token_nonce,
@@ -45,14 +45,14 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 
     #[inline]
-    pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
+    pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BaseBigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 }
 
-impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for EsdtTokenPayment<M> {
+impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BaseBigUint<M>)> for EsdtTokenPayment<M> {
     #[inline]
-    fn from(value: (TokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+    fn from(value: (TokenIdentifier<M>, u64, BaseBigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
     }
@@ -106,7 +106,7 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         Ok(EsdtTokenPayment {
             token_identifier: TokenIdentifier::<M>::dep_decode_or_handle_err(input, h)?,
             token_nonce: <u64>::dep_decode_or_handle_err(input, h)?,
-            amount: BigUint::<M>::dep_decode_or_handle_err(input, h)?,
+            amount: BaseBigUint::<M>::dep_decode_or_handle_err(input, h)?,
         })
     }
 

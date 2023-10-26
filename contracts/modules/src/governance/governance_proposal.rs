@@ -28,7 +28,7 @@ pub enum GovernanceProposalStatus {
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, TypeAbi)]
 pub struct ProposalFees<M: ManagedTypeApi> {
-    pub total_amount: BigUint<M>,
+    pub total_amount: BaseBigUint<M>,
     pub entries: ManagedVec<M, FeeEntry<M>>,
 }
 
@@ -68,10 +68,10 @@ pub struct GovernanceProposal<M: ManagedTypeApi> {
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct ProposalVotes<M: ManagedTypeApi> {
-    pub up_votes: BigUint<M>,
-    pub down_votes: BigUint<M>,
-    pub down_veto_votes: BigUint<M>,
-    pub abstain_votes: BigUint<M>,
+    pub up_votes: BaseBigUint<M>,
+    pub down_votes: BaseBigUint<M>,
+    pub down_veto_votes: BaseBigUint<M>,
+    pub abstain_votes: BaseBigUint<M>,
 }
 
 impl<M: ManagedTypeApi> Default for ProposalVotes<M> {
@@ -83,29 +83,29 @@ impl<M: ManagedTypeApi> Default for ProposalVotes<M> {
 impl<M: ManagedTypeApi> ProposalVotes<M> {
     pub fn new() -> Self {
         ProposalVotes {
-            up_votes: BigUint::zero(),
-            down_votes: BigUint::zero(),
-            down_veto_votes: BigUint::zero(),
-            abstain_votes: BigUint::zero(),
+            up_votes: BaseBigUint::zero(),
+            down_votes: BaseBigUint::zero(),
+            down_veto_votes: BaseBigUint::zero(),
+            abstain_votes: BaseBigUint::zero(),
         }
     }
 
-    pub fn get_total_votes(&self) -> BigUint<M> {
+    pub fn get_total_votes(&self) -> BaseBigUint<M> {
         &self.up_votes + &self.down_votes + &self.down_veto_votes + &self.abstain_votes
     }
-    pub fn get_up_votes_percentage(&self) -> BigUint<M> {
+    pub fn get_up_votes_percentage(&self) -> BaseBigUint<M> {
         let total_votes = self.get_total_votes();
         &self.up_votes / &total_votes
     }
-    pub fn get_down_votes_percentage(&self) -> BigUint<M> {
+    pub fn get_down_votes_percentage(&self) -> BaseBigUint<M> {
         let total_votes = self.get_total_votes();
         &self.down_votes / &total_votes
     }
-    pub fn get_down_veto_votes_percentage(&self) -> BigUint<M> {
+    pub fn get_down_veto_votes_percentage(&self) -> BaseBigUint<M> {
         let total_votes = self.get_total_votes();
         &self.down_veto_votes / &total_votes
     }
-    pub fn get_abstain_votes_percentage(&self) -> BigUint<M> {
+    pub fn get_abstain_votes_percentage(&self) -> BaseBigUint<M> {
         let total_votes = self.get_total_votes();
         &self.abstain_votes / &total_votes
     }

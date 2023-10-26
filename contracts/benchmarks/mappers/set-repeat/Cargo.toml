@@ -8,14 +8,21 @@ publish = false
 [lib]
 path = "src/set_repeat.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
+
 [dependencies.benchmark-common]
 path = "../benchmark-common"
-
 
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.set-repeat]
+path = "."
+features = ["debug"]

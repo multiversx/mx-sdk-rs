@@ -1,7 +1,7 @@
 use multiversx_sc::{
     hex_literal::hex,
     types::{
-        BigInt, BigUint, EgldOrEsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
+        BigInt, BaseBigUint, EgldOrEsdtTokenIdentifier, ManagedAddress, ManagedBuffer,
         ManagedByteArray, ManagedVec, TokenIdentifier,
     },
 };
@@ -9,8 +9,8 @@ use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_big_uint_format() {
-    let s = format!("{:?}", BigUint::<StaticApi>::from(0x1234u32));
-    assert_eq!("BigUint { handle: -100, hex-value-be: \"1234\" }", s);
+    let s = format!("{:?}", BaseBigUint::<StaticApi>::from(0x1234u32));
+    assert_eq!("BaseBigUint { handle: -100, hex-value-be: \"1234\" }", s);
 }
 
 #[test]
@@ -64,11 +64,11 @@ fn test_managed_address_pretty() {
 
 #[test]
 fn test_managed_vec_format_biguint() {
-    let mut mv = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
-    mv.push(BigUint::from(1u32));
-    mv.push(BigUint::from(2u32));
+    let mut mv = ManagedVec::<StaticApi, BaseBigUint<StaticApi>>::new();
+    mv.push(BaseBigUint::from(1u32));
+    mv.push(BaseBigUint::from(2u32));
     let s = format!("{:?}", &mv);
-    assert_eq!("[BigUint { handle: -101, hex-value-be: \"01\" }, BigUint { handle: -102, hex-value-be: \"02\" }]", s);
+    assert_eq!("[BaseBigUint { handle: -101, hex-value-be: \"01\" }, BaseBigUint { handle: -102, hex-value-be: \"02\" }]", s);
 }
 
 #[test]

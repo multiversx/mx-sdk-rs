@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 /// Contains all events that can be emitted by the contract.
 #[multiversx_sc::module]
 pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
-    fn propose_action(&self, action: Action<Self::Api>) -> usize {
+    fn propose_action(&self, action: Action<CurrentApi>) -> usize {
         let (caller_id, caller_role) = self.get_caller_id_and_role();
         require!(
             caller_role.can_propose(),
@@ -50,10 +50,10 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn prepare_call_data(
         &self,
         to: ManagedAddress,
-        egld_amount: BigUint,
+        egld_amount: BaseBigUint,
         opt_function: OptionalValue<ManagedBuffer>,
         arguments: MultiValueEncoded<ManagedBuffer>,
-    ) -> CallActionData<Self::Api> {
+    ) -> CallActionData<CurrentApi> {
         require!(
             egld_amount > 0 || opt_function.is_some(),
             "proposed action has no effect"
@@ -79,7 +79,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn propose_transfer_execute(
         &self,
         to: ManagedAddress,
-        egld_amount: BigUint,
+        egld_amount: BaseBigUint,
         opt_function: OptionalValue<ManagedBuffer>,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> usize {
@@ -96,7 +96,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn propose_async_call(
         &self,
         to: ManagedAddress,
-        egld_amount: BigUint,
+        egld_amount: BaseBigUint,
         opt_function: OptionalValue<ManagedBuffer>,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) -> usize {
@@ -107,7 +107,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     #[endpoint(proposeSCDeployFromSource)]
     fn propose_sc_deploy_from_source(
         &self,
-        amount: BigUint,
+        amount: BaseBigUint,
         source: ManagedAddress,
         code_metadata: CodeMetadata,
         arguments: MultiValueEncoded<ManagedBuffer>,
@@ -124,7 +124,7 @@ pub trait MultisigProposeModule: crate::multisig_state::MultisigStateModule {
     fn propose_sc_upgrade_from_source(
         &self,
         sc_address: ManagedAddress,
-        amount: BigUint,
+        amount: BaseBigUint,
         source: ManagedAddress,
         code_metadata: CodeMetadata,
         arguments: MultiValueEncoded<ManagedBuffer>,

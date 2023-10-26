@@ -15,7 +15,7 @@ pub trait Storage {
 
     #[view]
     #[storage_mapper("zombies")]
-    fn zombies(&self, id: &usize) -> SingleValueMapper<Zombie<Self::Api>>;
+    fn zombies(&self, id: &usize) -> SingleValueMapper<Zombie<CurrentApi>>;
 
     #[view]
     #[storage_mapper("zombie_owner")]

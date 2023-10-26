@@ -8,10 +8,18 @@ publish = false
 [lib]
 path = "src/esdt_transfer_with_fee.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
+
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.esdt-transfer-with-fee]
+path = "."
+features = ["debug"]

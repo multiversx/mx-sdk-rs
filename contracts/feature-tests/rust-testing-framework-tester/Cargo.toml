@@ -5,6 +5,14 @@ authors = ["Dorin Iancu <dorin.iancu@multiversx.com>"]
 edition = "2021"
 publish = false
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
+
+[dependencies.multiversx-sc-scenario]
+version = "0.43.5"
+path = "../../../framework/scenario"
+optional = true
+
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../framework/base"
@@ -12,13 +20,15 @@ features = [ "alloc" ]
 
 [dev-dependencies.adder]
 path = "../../examples/adder"
+features = ["debug"]
 
 [dev-dependencies.basic-features]
 path = "../../feature-tests/basic-features"
+features = ["debug"]
 
-[dev-dependencies.multiversx-sc-scenario]
-version = "0.43.5"
-path = "../../../framework/scenario"
+[dev-dependencies.rust-testing-framework-tester]
+path = "."
+features = ["debug"]
 
 [dev-dependencies]
 num-bigint = "0.4.2"
@@ -27,6 +37,8 @@ hex = "0.4"
 
 [dev-dependencies.forwarder]
 path = "../composability/forwarder"
+features = ["debug"]
 
 [dev-dependencies.vault]
 path = "../composability/vault"
+features = ["debug"]

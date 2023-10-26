@@ -6,7 +6,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::module]
 pub trait MultisigEventsModule {
     #[event("startPerformAction")]
-    fn start_perform_action_event(&self, data: &ActionFullInfo<Self::Api>);
+    fn start_perform_action_event(&self, data: &ActionFullInfo<CurrentApi>);
 
     #[event("performChangeUser")]
     fn perform_change_user_event(
@@ -29,7 +29,7 @@ pub trait MultisigEventsModule {
         &self,
         #[indexed] action_id: usize,
         #[indexed] to: &ManagedAddress,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] gas: u64,
         #[indexed] endpoint: &ManagedBuffer,
         #[indexed] arguments: &MultiValueManagedVec<ManagedBuffer>,
@@ -40,7 +40,7 @@ pub trait MultisigEventsModule {
         &self,
         #[indexed] action_id: usize,
         #[indexed] to: &ManagedAddress,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] gas: u64,
         #[indexed] endpoint: &ManagedBuffer,
         #[indexed] arguments: &MultiValueManagedVec<ManagedBuffer>,
@@ -50,7 +50,7 @@ pub trait MultisigEventsModule {
     fn perform_deploy_from_source_event(
         &self,
         #[indexed] action_id: usize,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] source_address: &ManagedAddress,
         #[indexed] code_metadata: CodeMetadata,
         #[indexed] gas: u64,
@@ -62,7 +62,7 @@ pub trait MultisigEventsModule {
         &self,
         #[indexed] action_id: usize,
         #[indexed] target_address: &ManagedAddress,
-        #[indexed] egld_value: &BigUint,
+        #[indexed] egld_value: &BaseBigUint,
         #[indexed] source_address: &ManagedAddress,
         #[indexed] code_metadata: CodeMetadata,
         #[indexed] gas: u64,

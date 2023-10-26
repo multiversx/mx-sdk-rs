@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedOption,
+        BigInt, BaseBigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedOption,
         ManagedType, TokenIdentifier,
     },
 };
@@ -36,7 +36,7 @@ where
 
 #[test]
 fn test_some() {
-    test_some_for_value(|| BigUint::<StaticApi>::from(1u32));
+    test_some_for_value(|| BaseBigUint::<StaticApi>::from(1u32));
     test_some_for_value(|| BigInt::<StaticApi>::from(2i32));
     test_some_for_value(|| ManagedBuffer::<StaticApi>::from(&b"3abc"[..]));
     test_some_for_value(|| ManagedByteArray::<StaticApi, 4>::from(&[4u8; 4]));
@@ -46,7 +46,7 @@ fn test_some() {
 
 #[test]
 fn test_none() {
-    test_none_for_type::<StaticApi, BigUint<StaticApi>>();
+    test_none_for_type::<StaticApi, BaseBigUint<StaticApi>>();
     test_none_for_type::<StaticApi, BigInt<StaticApi>>();
     test_none_for_type::<StaticApi, ManagedBuffer<StaticApi>>();
     test_none_for_type::<StaticApi, ManagedByteArray<StaticApi, 4>>();
@@ -57,13 +57,13 @@ fn test_none() {
 #[test]
 fn test_unwrap() {
     assert_eq!(
-        ManagedOption::some(BigUint::<StaticApi>::from(1u32))
-            .unwrap_or_else(BigUint::<StaticApi>::zero),
-        BigUint::<StaticApi>::from(1u32)
+        ManagedOption::some(BaseBigUint::<StaticApi>::from(1u32))
+            .unwrap_or_else(BaseBigUint::<StaticApi>::zero),
+        BaseBigUint::<StaticApi>::from(1u32)
     );
     assert_eq!(
-        ManagedOption::none().unwrap_or_else(BigUint::<StaticApi>::zero),
-        BigUint::<StaticApi>::zero()
+        ManagedOption::none().unwrap_or_else(BaseBigUint::<StaticApi>::zero),
+        BaseBigUint::<StaticApi>::zero()
     );
 }
 
@@ -71,18 +71,18 @@ fn test_unwrap() {
 fn test_map() {
     // example BigInt -> BigUint
     assert_eq!(
-        ManagedOption::some(BigUint::<StaticApi>::from(1u32)).map(BigInt::<StaticApi>::from),
+        ManagedOption::some(BaseBigUint::<StaticApi>::from(1u32)).map(BigInt::<StaticApi>::from),
         ManagedOption::some(BigInt::<StaticApi>::from(1i32))
     );
     assert_eq!(
-        ManagedOption::<StaticApi, BigUint::<StaticApi>>::none().map(BigInt::<StaticApi>::from),
+        ManagedOption::<StaticApi, BaseBigUint::<StaticApi>>::none().map(BigInt::<StaticApi>::from),
         ManagedOption::none()
     );
 
     // example BigUint -> BigInt (magnitude)
     assert_eq!(
         ManagedOption::some(BigInt::<StaticApi>::from(-1i32)).map(|x| x.magnitude()),
-        ManagedOption::some(BigUint::<StaticApi>::from(1u32))
+        ManagedOption::some(BaseBigUint::<StaticApi>::from(1u32))
     );
     assert_eq!(
         ManagedOption::none().map(|x: BigInt<StaticApi>| x.magnitude()),
@@ -92,7 +92,7 @@ fn test_map() {
     // BigInt::into_big_uint is actually related
     assert_eq!(
         BigInt::<StaticApi>::from(1i32).into_big_uint(),
-        ManagedOption::some(BigUint::<StaticApi>::from(1u32))
+        ManagedOption::some(BaseBigUint::<StaticApi>::from(1u32))
     );
     assert_eq!(
         BigInt::<StaticApi>::from(-1i32).into_big_uint(),

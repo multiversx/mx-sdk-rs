@@ -14,7 +14,7 @@ pub trait EsdtTransferWithFee {
     fn set_exact_value_fee(
         &self,
         fee_token: TokenIdentifier,
-        fee_amount: BigUint,
+        fee_amount: BaseBigUint,
         token: TokenIdentifier,
     ) {
         self.token_fee(&token)
@@ -87,9 +87,9 @@ pub trait EsdtTransferWithFee {
 
     fn get_payment_after_fees(
         &self,
-        fee: Fee<Self::Api>,
-        payment: &EsdtTokenPayment<Self::Api>,
-    ) -> EsdtTokenPayment<Self::Api> {
+        fee: Fee<CurrentApi>,
+        payment: &EsdtTokenPayment<CurrentApi>,
+    ) -> EsdtTokenPayment<CurrentApi> {
         let mut new_payment = payment.clone();
         let fee_payment = self.calculate_fee(&fee, payment.clone());
 
@@ -107,9 +107,9 @@ pub trait EsdtTransferWithFee {
 
     fn calculate_fee(
         &self,
-        fee: &Fee<Self::Api>,
-        mut provided: EsdtTokenPayment<Self::Api>,
-    ) -> EsdtTokenPayment<Self::Api> {
+        fee: &Fee<CurrentApi>,
+        mut provided: EsdtTokenPayment<CurrentApi>,
+    ) -> EsdtTokenPayment<CurrentApi> {
         match fee {
             Fee::ExactValue(requested) => requested.clone(),
             Fee::Percentage(percentage) => {
@@ -118,7 +118,7 @@ pub trait EsdtTransferWithFee {
                 provided
             },
             Fee::Unset => {
-                provided.amount = BigUint::zero();
+                provided.amount = BaseBigUint::zero();
                 provided
             },
         }
@@ -126,9 +126,9 @@ pub trait EsdtTransferWithFee {
 
     #[view(getTokenFee)]
     #[storage_mapper("token_fee")]
-    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<Self::Api>>;
+    fn token_fee(&self, token: &TokenIdentifier) -> SingleValueMapper<Fee<CurrentApi>>;
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
-    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BigUint>;
+    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BaseBigUint>;
 }

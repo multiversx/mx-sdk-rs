@@ -8,6 +8,8 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.kitty]
 version = "0.0.0"
@@ -21,6 +23,11 @@ path = "../common/random"
 version = "0.43.5"
 path = "../../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.kitty-genetic-alg]
+path = "."
+features = ["debug"]

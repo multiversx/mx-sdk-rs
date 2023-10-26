@@ -12,8 +12,8 @@ const DEFAULT_CONTRACT_ADDRESS: &str =
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type VaultContract = ContractInfo<vault::Proxy<StaticApi>>;
-pub type ForwarderQueueContract = ContractInfo<forwarder_queue::Proxy<StaticApi>>;
+pub type VaultContract = ContractInfo<StaticApi, vault::Proxy<StaticApi>>;
+pub type ForwarderQueueContract = ContractInfo<StaticApi, forwarder_queue::Proxy<StaticApi>>;
 
 /// Composability Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]

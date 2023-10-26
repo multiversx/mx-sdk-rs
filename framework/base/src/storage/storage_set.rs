@@ -6,7 +6,7 @@ use crate::{
     codec::*,
     contract_base::ExitCodecErrorHandler,
     err_msg,
-    types::{BigInt, BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
+    types::{BigInt, BaseBigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
 
 use super::StorageKey;
@@ -47,7 +47,7 @@ where
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BigUint<A>>() || T::type_eq::<BigInt<A>>()
+        T::type_eq::<ManagedBuffer<A>>() || T::type_eq::<BaseBigUint<A>>() || T::type_eq::<BigInt<A>>()
     }
 
     #[inline]
@@ -59,7 +59,7 @@ where
         if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<A>>() {
             self.set_managed_buffer(managed_buffer);
             Ok(())
-        } else if let Some(big_uint) = value.try_cast_ref::<BigUint<A>>() {
+        } else if let Some(big_uint) = value.try_cast_ref::<BaseBigUint<A>>() {
             self.set_managed_buffer(&big_uint.to_bytes_be_buffer());
             Ok(())
         } else if let Some(big_int) = value.try_cast_ref::<BigInt<A>>() {

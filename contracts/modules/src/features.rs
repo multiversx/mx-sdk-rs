@@ -14,7 +14,7 @@ pub const FEATURE_OFF: u8 = 2;
 #[multiversx_sc::module]
 pub trait FeaturesModule {
     #[storage_mapper("feat:")]
-    fn feature_flag(&self, feature_name: &FeatureName<Self::Api>) -> SingleValueMapper<u8>;
+    fn feature_flag(&self, feature_name: &FeatureName<CurrentApi>) -> SingleValueMapper<u8>;
 
     fn check_feature_on(&self, feature_name: &'static [u8], default: bool) {
         let flag = self.feature_flag(&FeatureName(feature_name.into())).get();

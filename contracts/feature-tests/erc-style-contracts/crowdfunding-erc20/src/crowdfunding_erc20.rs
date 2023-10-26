@@ -13,14 +13,14 @@ pub enum Status {
 #[multiversx_sc::contract]
 pub trait Crowdfunding {
     #[init]
-    fn init(&self, target: BigUint, deadline: u64, erc20_contract_address: ManagedAddress) {
+    fn init(&self, target: BaseBigUint, deadline: u64, erc20_contract_address: ManagedAddress) {
         self.erc20_contract_address().set(&erc20_contract_address);
         self.target().set(&target);
         self.deadline().set(deadline);
     }
 
     #[endpoint]
-    fn fund(&self, token_amount: BigUint) {
+    fn fund(&self, token_amount: BaseBigUint) {
         require!(
             self.blockchain().get_block_nonce() <= self.deadline().get(),
             "cannot fund after deadline"
@@ -98,7 +98,7 @@ pub trait Crowdfunding {
         &self,
         #[call_result] result: ManagedAsyncCallResult<()>,
         cb_sender: ManagedAddress,
-        cb_amount: BigUint,
+        cb_amount: BaseBigUint,
     ) {
         match result {
             ManagedAsyncCallResult::Ok(()) => {
@@ -123,7 +123,7 @@ pub trait Crowdfunding {
     // proxy
 
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<CurrentApi>;
 
     // storage
 

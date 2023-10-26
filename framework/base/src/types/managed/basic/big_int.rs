@@ -12,7 +12,7 @@ use crate::{
         TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
-    types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
+    types::{heap::BoxedBytes, BaseBigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -81,9 +81,9 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<BigUint<M>> for BigInt<M> {
+impl<M: ManagedTypeApi> From<BaseBigUint<M>> for BigInt<M> {
     #[inline]
-    fn from(item: BigUint<M>) -> Self {
+    fn from(item: BaseBigUint<M>) -> Self {
         BigInt::from_handle(item.get_handle())
     }
 }
@@ -197,7 +197,7 @@ impl<M: ManagedTypeApi> Clone for BigInt<M> {
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {
-    pub fn from_biguint(sign: Sign, unsigned: BigUint<M>) -> Self {
+    pub fn from_biguint(sign: Sign, unsigned: BaseBigUint<M>) -> Self {
         let api = M::managed_type_impl();
         if sign.is_minus() {
             api.bi_neg(unsigned.handle.clone(), unsigned.handle.clone());
@@ -216,25 +216,25 @@ impl<M: ManagedTypeApi> BigInt<M> {
     }
 
     /// Returns the magnitude of the `BigInt` as a `BigUint`.
-    pub fn magnitude(&self) -> BigUint<M> {
+    pub fn magnitude(&self) -> BaseBigUint<M> {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         api.bi_abs(result_handle.clone(), self.handle.clone());
-        BigUint::from_handle(result_handle)
+        BaseBigUint::from_handle(result_handle)
     }
 
     /// Convert this `BigInt` into its `Sign` and `BigUint` magnitude,
     /// the reverse of `BigInt::from_biguint`.
-    pub fn to_parts(self) -> (Sign, BigUint<M>) {
+    pub fn to_parts(self) -> (Sign, BaseBigUint<M>) {
         (self.sign(), self.magnitude())
     }
 
     /// Converts this `BigInt` into a `BigUint`, if it's not negative.
-    pub fn into_big_uint(self) -> ManagedOption<M, BigUint<M>> {
+    pub fn into_big_uint(self) -> ManagedOption<M, BaseBigUint<M>> {
         if let Sign::Minus = self.sign() {
             ManagedOption::none()
         } else {
-            ManagedOption::some(BigUint::from_handle(self.handle))
+            ManagedOption::some(BaseBigUint::from_handle(self.handle))
         }
     }
 }
@@ -308,7 +308,7 @@ impl<M: ManagedTypeApi> BigInt<M> {
     #[must_use]
     pub fn pow(&self, exp: u32) -> Self {
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        let exp_handle = BigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
+        let exp_handle = BaseBigUint::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, exp);
         M::managed_type_impl().bi_pow(result_handle.clone(), self.handle.clone(), exp_handle);
         BigInt::from_handle(result_handle)
     }

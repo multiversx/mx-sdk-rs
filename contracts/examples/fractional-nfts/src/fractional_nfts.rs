@@ -49,7 +49,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     #[endpoint(fractionalizeNFT)]
     fn fractionalize_nft(
         &self,
-        initial_fractional_amount: BigUint,
+        initial_fractional_amount: BaseBigUint,
         name: ManagedBuffer,
         attributes: ManagedBuffer,
     ) {
@@ -140,7 +140,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     fn marketplace_proxy(
         &self,
         sc_address: ManagedAddress,
-    ) -> nft_marketplace_proxy::Proxy<Self::Api>;
+    ) -> nft_marketplace_proxy::Proxy<CurrentApi>;
 }
 
 mod nft_marketplace_proxy {
@@ -154,6 +154,6 @@ mod nft_marketplace_proxy {
             claim_destination: &ManagedAddress,
             token_id: &EgldOrEsdtTokenIdentifier,
             token_nonce: u64,
-        ) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>>;
+        ) -> MultiValue2<BaseBigUint, ManagedVec<EsdtTokenPayment>>;
     }
 }

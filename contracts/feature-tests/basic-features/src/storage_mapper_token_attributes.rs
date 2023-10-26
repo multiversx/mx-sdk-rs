@@ -3,7 +3,7 @@ multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi)]
 pub struct TokenAttributesStruct<M: ManagedTypeApi> {
-    field_biguint: BigUint<M>,
+    field_biguint: BaseBigUint<M>,
     field_u64: u64,
     field_vec_u32: ManagedVec<M, u32>,
 }
@@ -18,7 +18,7 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-        attributes: &TokenAttributesStruct<Self::Api>,
+        attributes: &TokenAttributesStruct<CurrentApi>,
     ) {
         self.token_attributes()
             .set(token_id, token_nonce, attributes)
@@ -29,7 +29,7 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-        attributes: &TokenAttributesStruct<Self::Api>,
+        attributes: &TokenAttributesStruct<CurrentApi>,
     ) {
         self.token_attributes()
             .update(token_id, token_nonce, attributes)
@@ -40,25 +40,25 @@ pub trait TokenAttributesMapperFeatures {
         &self,
         token_id: &TokenIdentifier,
         token_nonce: u64,
-    ) -> TokenAttributesStruct<Self::Api> {
+    ) -> TokenAttributesStruct<CurrentApi> {
         self.token_attributes()
-            .get_attributes::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, token_nonce)
+            .get_attributes::<TokenAttributesStruct<CurrentApi>, CurrentApi>(token_id, token_nonce)
     }
 
     #[endpoint]
     fn token_attributes_get_nonce(
         &self,
         token_id: &TokenIdentifier,
-        attributes: TokenAttributesStruct<Self::Api>,
+        attributes: TokenAttributesStruct<CurrentApi>,
     ) -> u64 {
         self.token_attributes()
-            .get_nonce::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, &attributes)
+            .get_nonce::<TokenAttributesStruct<CurrentApi>, CurrentApi>(token_id, &attributes)
     }
 
     #[endpoint]
     fn token_attributes_clear(&self, token_id: &TokenIdentifier, token_nonce: u64) {
         self.token_attributes()
-            .clear::<TokenAttributesStruct<Self::Api>, Self::Api>(token_id, token_nonce)
+            .clear::<TokenAttributesStruct<CurrentApi>, CurrentApi>(token_id, token_nonce)
     }
 
     #[endpoint]

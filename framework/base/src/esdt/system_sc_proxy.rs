@@ -6,7 +6,7 @@ use hex_literal::hex;
 use crate::{
     api::{CallTypeApi, SendApi},
     types::{
-        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
+        BaseBigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
         EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
     },
 };
@@ -53,10 +53,10 @@ where
     /// which causes it to issue a new fungible ESDT token.
     pub fn issue_fungible(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
-        initial_supply: &BigUint<SA>,
+        initial_supply: &BaseBigUint<SA>,
         properties: FungibleTokenProperties,
     ) -> ContractCallWithEgld<SA, ()> {
         self.issue(
@@ -84,12 +84,12 @@ where
     /// which causes it to issue a new non-fungible ESDT token.
     pub fn issue_non_fungible(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
         properties: NonFungibleTokenProperties,
     ) -> ContractCallWithEgld<SA, ()> {
-        let zero = BigUint::zero();
+        let zero = BaseBigUint::zero();
         self.issue(
             issue_cost,
             EsdtTokenType::NonFungible,
@@ -115,12 +115,12 @@ where
     /// which causes it to issue a new semi-fungible ESDT token.
     pub fn issue_semi_fungible(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
         properties: SemiFungibleTokenProperties,
     ) -> ContractCallWithEgld<SA, ()> {
-        let zero = BigUint::zero();
+        let zero = BaseBigUint::zero();
         self.issue(
             issue_cost,
             EsdtTokenType::SemiFungible,
@@ -146,12 +146,12 @@ where
     /// which causes it to register a new Meta ESDT token.
     pub fn register_meta_esdt(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
         properties: MetaTokenProperties,
     ) -> ContractCallWithEgld<SA, ()> {
-        let zero = BigUint::zero();
+        let zero = BaseBigUint::zero();
         self.issue(
             issue_cost,
             EsdtTokenType::Meta,
@@ -175,7 +175,7 @@ where
 
     pub fn issue_and_set_all_roles(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         token_type: EsdtTokenType,
@@ -205,11 +205,11 @@ where
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_type: EsdtTokenType,
         token_display_name: &ManagedBuffer<SA>,
         token_ticker: &ManagedBuffer<SA>,
-        initial_supply: &BigUint<SA>,
+        initial_supply: &BaseBigUint<SA>,
         properties: TokenProperties,
     ) -> ContractCallWithEgld<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
@@ -263,7 +263,7 @@ where
     pub fn mint(
         self,
         token_identifier: &TokenIdentifier<SA>,
-        amount: &BigUint<SA>,
+        amount: &BaseBigUint<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("mint")
             .argument(token_identifier)
@@ -275,7 +275,7 @@ where
     pub fn burn(
         self,
         token_identifier: &TokenIdentifier<SA>,
-        amount: &BigUint<SA>,
+        amount: &BaseBigUint<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
         self.esdt_system_sc_call_no_args("ESDTBurn")
             .argument(token_identifier)

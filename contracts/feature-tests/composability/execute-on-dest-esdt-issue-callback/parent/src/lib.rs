@@ -8,7 +8,7 @@ const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;
 #[multiversx_sc::contract]
 pub trait Parent {
     #[proxy]
-    fn child_proxy(&self, to: ManagedAddress) -> child::Proxy<Self::Api>;
+    fn child_proxy(&self, to: ManagedAddress) -> child::Proxy<CurrentApi>;
 
     #[init]
     fn init(&self) {}
@@ -21,7 +21,7 @@ pub trait Parent {
     fn deploy_child_contract(&self, code: ManagedBuffer) {
         let (child_contract_address, _) = self.send_raw().deploy_contract(
             self.blockchain().get_gas_left(),
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &code,
             CodeMetadata::DEFAULT,
             &ManagedArgBuffer::new(),
@@ -36,7 +36,7 @@ pub trait Parent {
         &self,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        initial_supply: BigUint,
+        initial_supply: BaseBigUint,
     ) {
         let issue_cost = self.call_value().egld_value();
         let child_contract_adress = self.child_contract_address().get();

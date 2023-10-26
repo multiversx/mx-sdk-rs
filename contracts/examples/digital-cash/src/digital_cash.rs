@@ -15,10 +15,10 @@ use constants::*;
 
 #[multiversx_sc::contract]
 pub trait DigitalCash:
-    pay_fee_and_fund::PayFeeAndFund
-    + signature_operations::SignatureOperationsModule
-    + helpers::HelpersModule
-    + storage::StorageModule
+pay_fee_and_fund::PayFeeAndFund
++ signature_operations::SignatureOperationsModule
++ helpers::HelpersModule
++ storage::StorageModule
 {
     #[init]
     fn init(&self, fee: BigUint, token: EgldOrEsdtTokenIdentifier) {

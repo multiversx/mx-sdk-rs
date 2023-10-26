@@ -15,7 +15,7 @@ const FORWARDER_PATH_EXPR: &str = "file:output/forwarder.wasm";
 const NFT_TOKEN_ID_EXPR: &str = "str:COOL-123456";
 const NFT_TOKEN_ID: &[u8] = b"COOL-123456";
 
-type ForwarderContract = ContractInfo<forwarder::Proxy<StaticApi>>;
+type ForwarderContract = ContractInfo<StaticApi, forwarder::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

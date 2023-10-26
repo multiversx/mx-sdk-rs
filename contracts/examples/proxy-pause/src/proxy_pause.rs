@@ -48,7 +48,7 @@ pub trait PauseProxy {
 
     fn for_each_contract<F>(&self, f: F)
     where
-        F: Fn(pause_proxy::Proxy<Self::Api>),
+        F: Fn(pause_proxy::Proxy<CurrentApi>),
     {
         for contract_address in self.contracts().iter() {
             f(self.pausable_contract().contract(contract_address));
@@ -83,5 +83,5 @@ pub trait PauseProxy {
     fn contracts(&self) -> SetMapper<ManagedAddress>;
 
     #[proxy]
-    fn pausable_contract(&self) -> pause_proxy::Proxy<Self::Api>;
+    fn pausable_contract(&self) -> pause_proxy::Proxy<CurrentApi>;
 }

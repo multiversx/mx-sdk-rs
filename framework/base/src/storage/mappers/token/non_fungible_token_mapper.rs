@@ -21,7 +21,7 @@ use crate::{
     },
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCall, ContractCallWithEgld, EsdtTokenData,
+        BaseBigUint, CallbackClosure, ContractCall, ContractCallWithEgld, EsdtTokenData,
         EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
         TokenIdentifier,
     },
@@ -108,7 +108,7 @@ where
     pub fn issue(
         &self,
         token_type: EsdtTokenType,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         num_decimals: usize,
@@ -161,7 +161,7 @@ where
     pub fn issue_and_set_all_roles(
         &self,
         token_type: EsdtTokenType,
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         num_decimals: usize,
@@ -212,7 +212,7 @@ where
     }
 
     fn nft_issue(
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
     ) -> ContractCallWithEgld<SA, ()> {
@@ -226,7 +226,7 @@ where
     }
 
     fn sft_issue(
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
     ) -> ContractCallWithEgld<SA, ()> {
@@ -240,7 +240,7 @@ where
     }
 
     fn meta_issue(
-        issue_cost: BigUint<SA>,
+        issue_cost: BaseBigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         num_decimals: usize,
@@ -261,7 +261,7 @@ where
 
     pub fn nft_create<T: TopEncode>(
         &self,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
         attributes: &T,
     ) -> EsdtTokenPayment<SA> {
         let send_wrapper = SendWrapper::<SA>::new();
@@ -274,7 +274,7 @@ where
 
     pub fn nft_create_named<T: TopEncode>(
         &self,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
         name: &ManagedBuffer<SA>,
         attributes: &T,
     ) -> EsdtTokenPayment<SA> {
@@ -290,7 +290,7 @@ where
     pub fn nft_create_and_send<T: TopEncode>(
         &self,
         to: &ManagedAddress<SA>,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
         attributes: &T,
     ) -> EsdtTokenPayment<SA> {
         let payment = self.nft_create(amount, attributes);
@@ -302,7 +302,7 @@ where
     pub fn nft_create_and_send_named<T: TopEncode>(
         &self,
         to: &ManagedAddress<SA>,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
         name: &ManagedBuffer<SA>,
         attributes: &T,
     ) -> EsdtTokenPayment<SA> {
@@ -312,7 +312,7 @@ where
         payment
     }
 
-    pub fn nft_add_quantity(&self, token_nonce: u64, amount: BigUint<SA>) -> EsdtTokenPayment<SA> {
+    pub fn nft_add_quantity(&self, token_nonce: u64, amount: BaseBigUint<SA>) -> EsdtTokenPayment<SA> {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id();
 
@@ -325,7 +325,7 @@ where
         &self,
         to: &ManagedAddress<SA>,
         token_nonce: u64,
-        amount: BigUint<SA>,
+        amount: BaseBigUint<SA>,
     ) -> EsdtTokenPayment<SA> {
         let payment = self.nft_add_quantity(token_nonce, amount);
         self.send_payment(to, &payment);
@@ -339,7 +339,7 @@ where
         send_wrapper.nft_update_attributes(token_id, token_nonce, new_attributes);
     }
 
-    pub fn nft_burn(&self, token_nonce: u64, amount: &BigUint<SA>) {
+    pub fn nft_burn(&self, token_nonce: u64, amount: &BaseBigUint<SA>) {
         let send_wrapper = SendWrapper::<SA>::new();
         let token_id = self.get_token_id_ref();
 
@@ -354,7 +354,7 @@ where
         b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
     }
 
-    pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
+    pub fn get_balance(&self, token_nonce: u64) -> BaseBigUint<SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
         let token_id = self.get_token_id_ref();

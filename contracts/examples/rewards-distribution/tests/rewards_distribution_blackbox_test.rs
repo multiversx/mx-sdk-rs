@@ -3,14 +3,8 @@ mod utils;
 
 use std::iter::zip;
 
-use multiversx_sc::{
-    codec::multi_types::MultiValue2,
-    storage::mappers::SingleValue,
-    types::{
-        Address, BigUint, EgldOrEsdtTokenIdentifier, ManagedVec, MultiValueEncoded,
-        OperationCompletionStatus, TokenIdentifier,
-    },
-};
+multiversx_sc::imports!();
+
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario_model::{
@@ -35,8 +29,8 @@ const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "file:output/rewards-distribution.w
 const SEED_NFT_MINTER_ADDRESS_EXPR: &str = "sc:seed-nft-minter";
 const SEED_NFT_MINTER_PATH_EXPR: &str = "file:../seed-nft-minter/output/seed-nft-minter.wasm";
 
-type RewardsDistributionContract = ContractInfo<rewards_distribution::Proxy<StaticApi>>;
-type SeedNFTMinterContract = ContractInfo<mock_seed_nft_minter::Proxy<StaticApi>>;
+type RewardsDistributionContract = ContractInfo<StaticApi, rewards_distribution::Proxy<StaticApi>>;
+type SeedNFTMinterContract = ContractInfo<StaticApi, mock_seed_nft_minter::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -58,7 +52,7 @@ struct RewardsDistributionTestState {
     seed_nft_minter_address: Address,
     seed_nft_minter_contract: SeedNFTMinterContract,
     rewards_distribution_contract: RewardsDistributionContract,
-    rewards_distribution_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
+    rewards_distribution_whitebox: WhiteboxContract<ContractObj>,
 }
 
 impl RewardsDistributionTestState {
@@ -241,7 +235,7 @@ fn test_raffle_and_claim() {
             .expect_value(OperationCompletionStatus::Completed),
     );
 
-    let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
+    let mut rewards: Vec<BaseBigUint<StaticApi>> = Vec::new();
     // post-raffle reward amount frequency checksstate
     for nonce in 1u64..=10_000u64 {
         state.world.sc_call_use_result(
@@ -255,7 +249,7 @@ fn test_raffle_and_claim() {
                         nonce,
                     ),
             ),
-            |r: TypedResponse<BigUint<StaticApi>>| rewards.push(r.result.unwrap()),
+            |r: TypedResponse<BaseBigUint<StaticApi>>| rewards.push(r.result.unwrap()),
         );
     }
 
@@ -299,7 +293,7 @@ fn test_raffle_and_claim() {
                         nonce,
                     ),
             ),
-            |r: TypedResponse<BigUint<StaticApi>>| {
+            |r: TypedResponse<BaseBigUint<StaticApi>>| {
                 assert_eq!(r.result.unwrap().to_u64().unwrap(), expected_reward);
             },
         );

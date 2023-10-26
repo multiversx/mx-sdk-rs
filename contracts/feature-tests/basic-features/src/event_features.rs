@@ -22,7 +22,7 @@ pub trait EventFeatures {
     #[event("event_b")]
     fn event_b(
         &self,
-        #[indexed] arg1: &BigUint,
+        #[indexed] arg1: &BaseBigUint,
         #[indexed] arg2: &ManagedAddress,
         data: ManagedVec<ManagedBuffer>,
     );
@@ -30,7 +30,7 @@ pub trait EventFeatures {
     #[endpoint(logEventB)]
     fn log_event_b(
         &self,
-        arg1: &BigUint,
+        arg1: &BaseBigUint,
         arg2: &ManagedAddress,
         data: MultiValueManagedVec<ManagedBuffer>,
     ) {

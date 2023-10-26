@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/use_module.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
+
 [dependencies.multiversx-sc-modules]
 version = "0.43.5"
 path = "../../../contracts/modules"
@@ -16,9 +19,14 @@ path = "../../../contracts/modules"
 version = "0.43.5"
 path = "../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.use-module]
+path = "."
+features = ["debug"]
 
 [dev-dependencies.multiversx-sc-meta]
 version = "0.43.5"

@@ -6,7 +6,7 @@ use crate::{
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
         CodecFromSelf,
     },
-    types::BigUint,
+    types::BaseBigUint,
 };
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
@@ -19,7 +19,7 @@ use crate::derive::TypeAbi;
     TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug,
 )]
 pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {
-    Egld(BigUint<M>),
+    Egld(BaseBigUint<M>),
     MultiEsdt(ManagedVec<M, EsdtTokenPayment<M>>),
 }
 

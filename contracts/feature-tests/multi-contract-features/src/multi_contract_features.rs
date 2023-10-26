@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait MultiContractFeatures {
     #[init]
-    fn default_init(&self, sample_value: BigUint) {
+    fn default_init(&self, sample_value: BaseBigUint) {
         self.sample_value().set(sample_value);
     }
 
@@ -33,7 +33,7 @@ pub trait MultiContractFeatures {
 
     #[view]
     #[label("mcs-external-view")]
-    fn sample_value_external_get(&self) -> BigUint {
+    fn sample_value_external_get(&self) -> BaseBigUint {
         self.sample_value().get()
     }
 
@@ -41,7 +41,7 @@ pub trait MultiContractFeatures {
     /// Designed to check what happens if we try to write to storage from an external view.
     #[endpoint]
     #[label("mcs-external-view")]
-    fn sample_value_external_set(&self, sample_value: BigUint) {
+    fn sample_value_external_set(&self, sample_value: BaseBigUint) {
         self.sample_value().set(sample_value);
     }
 

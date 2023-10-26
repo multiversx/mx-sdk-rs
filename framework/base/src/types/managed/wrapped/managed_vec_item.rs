@@ -3,7 +3,7 @@ use core::{borrow::Borrow, mem::MaybeUninit};
 use crate::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
+        BigInt, BaseBigUint, EllipticCurve, ManagedAddress, ManagedBuffer, ManagedByteArray,
         ManagedRef, ManagedType, ManagedVec, TokenIdentifier,
     },
 };
@@ -190,7 +190,7 @@ macro_rules! impl_managed_type {
 }
 
 impl_managed_type! {ManagedBuffer}
-impl_managed_type! {BigUint}
+impl_managed_type! {BaseBigUint}
 impl_managed_type! {BigInt}
 impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}

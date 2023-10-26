@@ -3,7 +3,7 @@ use crate::codec::TopEncodeMulti;
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
+        BaseBigUint, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -78,7 +78,7 @@ where
         self,
         payment_token: TokenIdentifier<SA>,
         payment_nonce: u64,
-        payment_amount: BigUint<SA>,
+        payment_amount: BaseBigUint<SA>,
     ) -> Self {
         self.with_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }

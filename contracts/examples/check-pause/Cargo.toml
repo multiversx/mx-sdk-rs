@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/check_pause.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario", "multiversx-sc-modules/debug"]
+
 [dev-dependencies]
 num-bigint = "0.4.2"
 
@@ -19,7 +22,12 @@ path = "../../../framework/base"
 version = "0.43.5"
 path = "../../../contracts/modules"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.check-pause]
+path = "."
+features = ["debug"]
 

@@ -6,7 +6,7 @@ use crate::{
         HandleConstraints, ManagedBufferApiImpl, RawHandle, SendApiImpl, StaticVarApiImpl,
     },
     types::{
-        BigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        BaseBigUint, CodeMetadata, EsdtTokenPayment, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
         ManagedType, ManagedVec, TokenIdentifier,
     },
 };
@@ -41,7 +41,7 @@ where
         );
     }
 
-    pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, egld_value: &BigUint<A>, data: D)
+    pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, egld_value: &BaseBigUint<A>, data: D)
     where
         D: Into<ManagedBuffer<A>>,
     {
@@ -61,7 +61,7 @@ where
     pub fn direct_egld_execute(
         &self,
         to: &ManagedAddress<A>,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -79,7 +79,7 @@ where
         &self,
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -101,7 +101,7 @@ where
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
         nonce: u64,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -135,7 +135,7 @@ where
     pub fn async_call_raw(
         &self,
         to: &ManagedAddress<A>,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ! {
@@ -151,7 +151,7 @@ where
     pub fn create_async_call_raw(
         &self,
         to: &ManagedAddress<A>,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
         success_callback: &'static str,
@@ -182,7 +182,7 @@ where
     pub fn deploy_contract(
         &self,
         gas: u64,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         code: &ManagedBuffer<A>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -212,7 +212,7 @@ where
     pub fn deploy_from_source_contract(
         &self,
         gas: u64,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         source_contract_address: &ManagedAddress<A>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -240,7 +240,7 @@ where
         &self,
         sc_address: &ManagedAddress<A>,
         gas: u64,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         source_contract_address: &ManagedAddress<A>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -264,7 +264,7 @@ where
         &self,
         sc_address: &ManagedAddress<A>,
         gas: u64,
-        egld_value: &BigUint<A>,
+        egld_value: &BaseBigUint<A>,
         code: &ManagedBuffer<A>,
         code_metadata: CodeMetadata,
         arg_buffer: &ManagedArgBuffer<A>,
@@ -286,7 +286,7 @@ where
         &self,
         gas: u64,
         address: &ManagedAddress<A>,
-        value: &BigUint<A>,
+        value: &BaseBigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
@@ -306,7 +306,7 @@ where
         &self,
         gas: u64,
         address: &ManagedAddress<A>,
-        value: &BigUint<A>,
+        value: &BaseBigUint<A>,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {

@@ -1,7 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{BaseBigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
 };
 
 /// Will be renamed to `AsyncCall` and `AsyncCall` to `AsyncCallLegacy` when the promises end up on the mainnet.
@@ -11,7 +11,7 @@ where
     SA: CallTypeApi + 'static,
 {
     pub(crate) to: ManagedAddress<SA>,
-    pub(crate) egld_payment: BigUint<SA>,
+    pub(crate) egld_payment: BaseBigUint<SA>,
     pub(crate) endpoint_name: ManagedBuffer<SA>,
     pub(crate) arg_buffer: ManagedArgBuffer<SA>,
     pub(crate) explicit_gas_limit: u64,

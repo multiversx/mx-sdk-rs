@@ -89,6 +89,7 @@ dependencies = [
  "hex-literal",
  "multiversx-sc-codec",
  "multiversx-sc-derive",
+ "multiversx-sc-imports",
  "num-traits",
 ]
 
@@ -119,6 +120,14 @@ dependencies = [
  "quote",
  "radix_trie",
  "syn",
+]
+
+[[package]]
+name = "multiversx-sc-imports"
+version = "0.43.3"
+dependencies = [
+ "proc-macro2",
+ "quote",
 ]
 
 [[package]]

@@ -23,12 +23,12 @@ pub trait CryptoBubbles {
 
     /// player withdraws funds
     #[endpoint]
-    fn withdraw(&self, amount: &BigUint) {
+    fn withdraw(&self, amount: &BaseBigUint) {
         self.transfer_back_to_player_wallet(&self.blockchain().get_caller(), amount)
     }
 
     /// server calls withdraw on behalf of the player
-    fn transfer_back_to_player_wallet(&self, player: &ManagedAddress, amount: &BigUint) {
+    fn transfer_back_to_player_wallet(&self, player: &ManagedAddress, amount: &BaseBigUint) {
         self.player_balance(player).update(|balance| {
             require!(
                 amount <= balance,
@@ -46,9 +46,9 @@ pub trait CryptoBubbles {
     /// player joins game
     fn add_player_to_game_state_change(
         &self,
-        game_index: &BigUint,
+        game_index: &BaseBigUint,
         player: &ManagedAddress,
-        bet: &BigUint,
+        bet: &BaseBigUint,
     ) {
         self.player_balance(player).update(|balance| {
             require!(bet <= balance, "insufficient funds to join game");
@@ -62,7 +62,7 @@ pub trait CryptoBubbles {
     // player tops up + joins a game
     #[payable("EGLD")]
     #[endpoint(joinGame)]
-    fn join_game(&self, game_index: BigUint) {
+    fn join_game(&self, game_index: BaseBigUint) {
         let bet = self.call_value().egld_value();
         let player = self.blockchain().get_caller();
         self.top_up();
@@ -72,7 +72,7 @@ pub trait CryptoBubbles {
     // owner transfers prize into winner SC account
     #[only_owner]
     #[endpoint(rewardWinner)]
-    fn reward_winner(&self, game_index: &BigUint, winner: &ManagedAddress, prize: &BigUint) {
+    fn reward_winner(&self, game_index: &BaseBigUint, winner: &ManagedAddress, prize: &BaseBigUint) {
         self.player_balance(winner)
             .update(|balance| *balance += prize);
 
@@ -83,9 +83,9 @@ pub trait CryptoBubbles {
     #[endpoint(rewardAndSendToWallet)]
     fn reward_and_send_to_wallet(
         &self,
-        game_index: &BigUint,
+        game_index: &BaseBigUint,
         winner: &ManagedAddress,
-        prize: &BigUint,
+        prize: &BaseBigUint,
     ) {
         self.reward_winner(game_index, winner, prize);
         self.transfer_back_to_player_wallet(winner, prize);
@@ -100,24 +100,24 @@ pub trait CryptoBubbles {
     // Events
 
     #[event("top_up")]
-    fn top_up_event(&self, #[indexed] player: &ManagedAddress, amount: &BigUint);
+    fn top_up_event(&self, #[indexed] player: &ManagedAddress, amount: &BaseBigUint);
 
     #[event("withdraw")]
-    fn withdraw_event(&self, #[indexed] player: &ManagedAddress, amount: &BigUint);
+    fn withdraw_event(&self, #[indexed] player: &ManagedAddress, amount: &BaseBigUint);
 
     #[event("player_joins_game")]
     fn player_joins_game_event(
         &self,
-        #[indexed] game_index: &BigUint,
+        #[indexed] game_index: &BaseBigUint,
         #[indexed] player: &ManagedAddress,
-        bet: &BigUint,
+        bet: &BaseBigUint,
     );
 
     #[event("reward_winner")]
     fn reward_winner_event(
         &self,
-        #[indexed] game_index: &BigUint,
+        #[indexed] game_index: &BaseBigUint,
         #[indexed] winner: &ManagedAddress,
-        prize: &BigUint,
+        prize: &BaseBigUint,
     );
 }

@@ -11,7 +11,7 @@ pub trait GovernanceEventsModule {
         #[indexed] proposal_id: usize,
         #[indexed] proposer: &ManagedAddress,
         #[indexed] start_block: u64,
-        proposal: &GovernanceProposal<Self::Api>,
+        proposal: &GovernanceProposal<CurrentApi>,
     );
 
     #[event("upVoteCast")]
@@ -19,7 +19,7 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] up_voter: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        nr_votes: &BigUint,
+        nr_votes: &BaseBigUint,
     );
 
     #[event("downVoteCast")]
@@ -27,7 +27,7 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] down_voter: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        nr_downvotes: &BigUint,
+        nr_downvotes: &BaseBigUint,
     );
 
     #[event("downVetoVoteCast")]
@@ -35,7 +35,7 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] down_veto_voter: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        nr_downvotes: &BigUint,
+        nr_downvotes: &BaseBigUint,
     );
 
     #[event("abstainVoteCast")]
@@ -43,7 +43,7 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] abstain_voter: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        nr_downvotes: &BigUint,
+        nr_downvotes: &BaseBigUint,
     );
 
     #[event("proposalCanceled")]
@@ -60,7 +60,7 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] address: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        payment: &EsdtTokenPayment<Self::Api>,
+        payment: &EsdtTokenPayment<CurrentApi>,
     );
 
     #[event("userClaimDepositedTokens")]
@@ -68,6 +68,6 @@ pub trait GovernanceEventsModule {
         &self,
         #[indexed] address: &ManagedAddress,
         #[indexed] proposal_id: ProposalId,
-        payment: &EsdtTokenPayment<Self::Api>,
+        payment: &EsdtTokenPayment<CurrentApi>,
     );
 }

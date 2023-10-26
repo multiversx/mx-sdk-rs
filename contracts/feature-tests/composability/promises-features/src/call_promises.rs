@@ -6,14 +6,14 @@ pub struct CallbackData<M: ManagedTypeApi> {
     callback_name: ManagedBuffer<M>,
     token_identifier: EgldOrEsdtTokenIdentifier<M>,
     token_nonce: u64,
-    token_amount: BigUint<M>,
+    token_amount: BaseBigUint<M>,
     args: ManagedVec<M, ManagedBuffer<M>>,
 }
 
 #[multiversx_sc::module]
 pub trait CallPromisesModule {
     #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+    fn vault_proxy(&self) -> vault::Proxy<CurrentApi>;
 
     #[endpoint]
     #[payable("*")]
@@ -35,7 +35,7 @@ pub trait CallPromisesModule {
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,
         token_nonce: u64,
-        amount: BigUint,
+        amount: BaseBigUint,
     ) {
         let gas_limit = self.blockchain().get_gas_left() - 20_000_000;
         self.vault_proxy()
@@ -67,12 +67,12 @@ pub trait CallPromisesModule {
         &self,
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
-        #[indexed] payment: &BigUint,
+        #[indexed] payment: &BaseBigUint,
     );
 
     #[view]
     #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
+    fn callback_data(&self) -> VecMapper<CallbackData<CurrentApi>>;
 
     #[view]
     fn callback_data_at_index(
@@ -82,8 +82,8 @@ pub trait CallPromisesModule {
         ManagedBuffer,
         EgldOrEsdtTokenIdentifier,
         u64,
-        BigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
+        BaseBigUint,
+        MultiValueManagedVec<CurrentApi, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);
         (

@@ -4,7 +4,7 @@ use multiversx_sc_scenario::api::DebugApi;
 #[test]
 fn test_function_selector() {
     DebugApi::dummy();
-    let use_module = use_module::contract_obj::<DebugApi>();
+    let use_module = use_module::contract_obj();
 
     assert!(!use_module.call("invalid_endpoint"));
 

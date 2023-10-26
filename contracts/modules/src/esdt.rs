@@ -71,17 +71,17 @@ pub trait EsdtModule {
         }
     }
 
-    fn mint(&self, token_nonce: u64, amount: &BigUint) {
+    fn mint(&self, token_nonce: u64, amount: &BaseBigUint) {
         let token_id = self.token_id().get();
         self.send().esdt_local_mint(&token_id, token_nonce, amount);
     }
 
-    fn burn(&self, token_nonce: u64, amount: &BigUint) {
+    fn burn(&self, token_nonce: u64, amount: &BaseBigUint) {
         let token_id = self.token_id().get();
         self.send().esdt_local_burn(&token_id, token_nonce, amount);
     }
 
-    fn nft_create<T: TopEncode>(&self, amount: &BigUint, attributes: &T) -> u64 {
+    fn nft_create<T: TopEncode>(&self, amount: &BaseBigUint, attributes: &T) -> u64 {
         let token_id = self.token_id().get();
         let empty_buffer = ManagedBuffer::new();
         let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
@@ -90,7 +90,7 @@ pub trait EsdtModule {
             &token_id,
             amount,
             &empty_buffer,
-            &BigUint::zero(),
+            &BaseBigUint::zero(),
             &empty_buffer,
             &attributes,
             &empty_vec,

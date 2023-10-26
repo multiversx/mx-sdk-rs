@@ -2,7 +2,7 @@ use core::fmt::Debug;
 use multiversx_sc::{
     api::ManagedTypeApi,
     types::{
-        BigInt, BigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef, ManagedType,
+        BigInt, BaseBigUint, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef, ManagedType,
         TokenIdentifier,
     },
 };
@@ -25,7 +25,7 @@ where
 
 #[test]
 fn test_managed_ref() {
-    test_managed_ref_for_type(BigUint::<StaticApi>::from(1u32));
+    test_managed_ref_for_type(BaseBigUint::<StaticApi>::from(1u32));
     test_managed_ref_for_type(BigInt::<StaticApi>::from(2i32));
     test_managed_ref_for_type(ManagedBuffer::<StaticApi>::from(&b"3abc"[..]));
     test_managed_ref_for_type(ManagedByteArray::<StaticApi, 4>::from(&[4u8; 4]));
@@ -35,7 +35,7 @@ fn test_managed_ref() {
 
 #[test]
 fn test_managed_ref_clone() {
-    let obj = BigUint::<StaticApi>::from(7u32);
+    let obj = BaseBigUint::<StaticApi>::from(7u32);
     let obj_ref = obj.as_ref();
     assert_eq!(obj.get_handle(), obj_ref.get_handle());
 
@@ -47,12 +47,12 @@ fn test_managed_ref_clone() {
 #[test]
 fn test_managed_ref_eq() {
     assert_eq!(
-        BigUint::<StaticApi>::from(1u32).as_ref(),
-        BigUint::<StaticApi>::from(1u32).as_ref()
+        BaseBigUint::<StaticApi>::from(1u32).as_ref(),
+        BaseBigUint::<StaticApi>::from(1u32).as_ref()
     );
 
     assert_ne!(
-        BigUint::<StaticApi>::from(1u32).as_ref(),
-        BigUint::<StaticApi>::from(2u32).as_ref()
+        BaseBigUint::<StaticApi>::from(1u32).as_ref(),
+        BaseBigUint::<StaticApi>::from(2u32).as_ref()
     );
 }

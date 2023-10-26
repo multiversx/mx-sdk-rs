@@ -38,8 +38,8 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     fn add_struct(
         &self,
         num_repeats: usize,
-        key: ExampleStruct<Self::Api>,
-        value: ExampleStruct<Self::Api>,
+        key: ExampleStruct<CurrentApi>,
+        value: ExampleStruct<CurrentApi>,
     ) {
         let mut bench = self.bench_struct();
         for i in 0..num_repeats {
@@ -48,13 +48,13 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[endpoint]
-    fn count_struct(&self, value: ExampleStruct<Self::Api>) -> usize {
+    fn count_struct(&self, value: ExampleStruct<CurrentApi>) -> usize {
         let bench = self.bench_struct();
         bench.iter().filter(|(_, v)| *v == value).count()
     }
 
     #[endpoint]
-    fn remove_struct(&self, num_repeats: usize, key: ExampleStruct<Self::Api>) {
+    fn remove_struct(&self, num_repeats: usize, key: ExampleStruct<CurrentApi>) {
         let mut bench = self.bench_struct();
         for i in 1..=num_repeats {
             bench.remove(&self.use_index_struct(&key, i));
@@ -62,5 +62,5 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[storage_mapper("bench_struct")]
-    fn bench_struct(&self) -> MapMapper<ExampleStruct<Self::Api>, ExampleStruct<Self::Api>>;
+    fn bench_struct(&self) -> MapMapper<ExampleStruct<CurrentApi>, ExampleStruct<CurrentApi>>;
 }

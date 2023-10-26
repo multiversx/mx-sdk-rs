@@ -36,8 +36,8 @@ pub trait GovernanceConfigurablePropertiesModule {
     fn init_governance_module(
         &self,
         governance_token_id: TokenIdentifier,
-        quorum: BigUint,
-        min_token_balance_for_proposal: BigUint,
+        quorum: BaseBigUint,
+        min_token_balance_for_proposal: BaseBigUint,
         voting_delay_in_blocks: u64,
         voting_period_in_blocks: u64,
         lock_time_after_voting_ends_in_blocks: u64,
@@ -63,14 +63,14 @@ pub trait GovernanceConfigurablePropertiesModule {
     // i.e. only by proposing and executing an action with the SC as dest and the respective func name
 
     #[endpoint(changeQuorum)]
-    fn change_quorum(&self, new_value: BigUint) {
+    fn change_quorum(&self, new_value: BaseBigUint) {
         self.require_caller_self();
 
         self.try_change_quorum(new_value);
     }
 
     #[endpoint(changeMinTokenBalanceForProposing)]
-    fn change_min_token_balance_for_proposing(&self, new_value: BigUint) {
+    fn change_min_token_balance_for_proposing(&self, new_value: BaseBigUint) {
         self.require_caller_self();
 
         self.try_change_min_token_balance_for_proposing(new_value);
@@ -109,13 +109,13 @@ pub trait GovernanceConfigurablePropertiesModule {
         );
     }
 
-    fn try_change_quorum(&self, new_value: BigUint) {
+    fn try_change_quorum(&self, new_value: BaseBigUint) {
         require!(new_value != 0, "Quorum can't be set to 0");
 
         self.quorum().set(&new_value);
     }
 
-    fn try_change_min_token_balance_for_proposing(&self, new_value: BigUint) {
+    fn try_change_min_token_balance_for_proposing(&self, new_value: BaseBigUint) {
         require!(
             new_value != 0,
             "Min token balance for proposing can't be set to 0"

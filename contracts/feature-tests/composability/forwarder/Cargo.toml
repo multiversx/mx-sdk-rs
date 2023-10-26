@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/forwarder_main.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario", "vault/debug"]
+
 [dependencies.vault]
 path = "../vault"
 
@@ -15,7 +18,12 @@ path = "../vault"
 version = "0.43.5"
 path = "../../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.forwarder]
+path = "."
+features = ["debug"]
 

@@ -5,7 +5,7 @@ use crate::{
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
+    types::{BaseBigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};
@@ -132,7 +132,7 @@ where
         }
     }
 
-    pub(super) fn transfer_execute_egld(self, egld_payment: BigUint<SA>) {
+    pub(super) fn transfer_execute_egld(self, egld_payment: BaseBigUint<SA>) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
         let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
@@ -187,7 +187,7 @@ where
 
     pub(super) fn transfer_execute_esdt(self, payments: ManagedVec<SA, EsdtTokenPayment<SA>>) {
         match payments.len() {
-            0 => self.transfer_execute_egld(BigUint::zero()),
+            0 => self.transfer_execute_egld(BaseBigUint::zero()),
             1 => self.transfer_execute_single_esdt(payments.get(0)),
             _ => self.transfer_execute_multi_esdt(payments),
         }

@@ -12,7 +12,7 @@ const ROYALTIES_MAX: u32 = 10_000; // 100%
 pub struct PriceTag<M: ManagedTypeApi> {
     pub token: EgldOrEsdtTokenIdentifier<M>,
     pub nonce: u64,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
 }
 
 #[multiversx_sc::module]
@@ -71,7 +71,7 @@ pub trait NftModule:
             &caller,
             &nft_token_id,
             nft_nonce,
-            &BigUint::from(NFT_AMOUNT),
+            &BaseBigUint::from(NFT_AMOUNT),
         );
 
         self.distribute_funds(
@@ -88,7 +88,7 @@ pub trait NftModule:
     fn get_nft_price(
         &self,
         nft_nonce: u64,
-    ) -> OptionalValue<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>> {
+    ) -> OptionalValue<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BaseBigUint>> {
         if self.price_tag(nft_nonce).is_empty() {
             // NFT was already sold
             OptionalValue::None
@@ -105,10 +105,10 @@ pub trait NftModule:
     fn create_nft_with_attributes<T: TopEncode>(
         &self,
         name: ManagedBuffer,
-        royalties: BigUint,
+        royalties: BaseBigUint,
         attributes: T,
         uri: ManagedBuffer,
-        selling_price: BigUint,
+        selling_price: BaseBigUint,
         token_used_as_payment: EgldOrEsdtTokenIdentifier,
         token_used_as_payment_nonce: u64,
     ) -> u64 {
@@ -127,7 +127,7 @@ pub trait NftModule:
         let uris = ManagedVec::from_single_item(uri);
         let nft_nonce = self.send().esdt_nft_create(
             &nft_token_id,
-            &BigUint::from(NFT_AMOUNT),
+            &BaseBigUint::from(NFT_AMOUNT),
             &name,
             &royalties,
             attributes_hash,
@@ -155,5 +155,5 @@ pub trait NftModule:
     fn nft_token_id(&self) -> NonFungibleTokenMapper;
 
     #[storage_mapper("priceTag")]
-    fn price_tag(&self, nft_nonce: u64) -> SingleValueMapper<PriceTag<Self::Api>>;
+    fn price_tag(&self, nft_nonce: u64) -> SingleValueMapper<PriceTag<CurrentApi>>;
 }

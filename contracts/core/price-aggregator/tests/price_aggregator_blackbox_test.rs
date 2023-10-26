@@ -12,7 +12,7 @@ use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_biguint, managed_buffer,
     scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
-    ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
+    ContractInfo, ScenarioWorld, WhiteboxContract,
 };
 
 const DECIMALS: u8 = 0;
@@ -27,7 +27,7 @@ const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
 
-type PriceAggregatorContract = ContractInfo<multiversx_price_aggregator_sc::Proxy<StaticApi>>;
+type PriceAggregatorContract = ContractInfo<StaticApi, multiversx_price_aggregator_sc::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -45,7 +45,7 @@ struct PriceAggregatorTestState {
     world: ScenarioWorld,
     oracles: Vec<AddressValue>,
     price_aggregator_contract: PriceAggregatorContract,
-    price_aggregator_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
+    price_aggregator_whitebox: WhiteboxContract<ContractObj>,
 }
 
 impl PriceAggregatorTestState {

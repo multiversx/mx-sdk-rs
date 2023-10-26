@@ -1,14 +1,14 @@
 use multiversx_sc::{
     codec::multi_types::MultiValue5,
-    types::{BigUint, MultiValueEncoded},
+    types::{BaseBigUint, MultiValueEncoded},
 };
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 fn test_multi_value_encoded_1() {
-    let mut multi_value_1 = MultiValueEncoded::<StaticApi, BigUint<StaticApi>>::new();
+    let mut multi_value_1 = MultiValueEncoded::<StaticApi, BaseBigUint<StaticApi>>::new();
     for i in 20u64..=30u64 {
-        multi_value_1.push(BigUint::from(i));
+        multi_value_1.push(BaseBigUint::from(i));
     }
     assert_eq!(multi_value_1.len(), 11);
 }

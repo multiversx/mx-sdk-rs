@@ -24,8 +24,8 @@ pub trait PriceAggregator:
     fn init(
         &self,
         staking_token: EgldOrEsdtTokenIdentifier,
-        staking_amount: BigUint,
-        slash_amount: BigUint,
+        staking_amount: BaseBigUint,
+        slash_amount: BaseBigUint,
         slash_quorum: usize,
         submission_count: usize,
         oracles: MultiValueEncoded<ManagedAddress>,
@@ -85,7 +85,7 @@ pub trait PriceAggregator:
         from: ManagedBuffer,
         to: ManagedBuffer,
         submission_timestamp: u64,
-        price: BigUint,
+        price: BaseBigUint,
         decimals: u8,
     ) {
         self.require_not_paused();
@@ -107,7 +107,7 @@ pub trait PriceAggregator:
         from: ManagedBuffer,
         to: ManagedBuffer,
         submission_timestamp: u64,
-        price: BigUint,
+        price: BaseBigUint,
         decimals: u8,
     ) {
         let token_pair = TokenPair { from, to };
@@ -173,7 +173,7 @@ pub trait PriceAggregator:
     #[endpoint(submitBatch)]
     fn submit_batch(
         &self,
-        submissions: MultiValueEncoded<MultiValue5<ManagedBuffer, ManagedBuffer, u64, BigUint, u8>>,
+        submissions: MultiValueEncoded<MultiValue5<ManagedBuffer, ManagedBuffer, u64, BaseBigUint, u8>>,
     ) {
         self.require_not_paused();
         self.require_is_oracle();
@@ -213,8 +213,8 @@ pub trait PriceAggregator:
 
     fn create_new_round(
         &self,
-        token_pair: TokenPair<Self::Api>,
-        mut submissions: MapMapper<ManagedAddress, BigUint>,
+        token_pair: TokenPair<CurrentApi>,
+        mut submissions: MapMapper<ManagedAddress, BaseBigUint>,
         decimals: u8,
     ) {
         let submissions_len = submissions.len();
@@ -224,7 +224,7 @@ pub trait PriceAggregator:
                 "submission list capacity exceeded"
             );
 
-            let mut submissions_vec = ArrayVec::<BigUint, SUBMISSION_LIST_MAX_LEN>::new();
+            let mut submissions_vec = ArrayVec::<BaseBigUint, SUBMISSION_LIST_MAX_LEN>::new();
             for submission_value in submissions.values() {
                 submissions_vec.push(submission_value);
             }
@@ -252,7 +252,7 @@ pub trait PriceAggregator:
     }
 
     #[view(latestRoundData)]
-    fn latest_round_data(&self) -> MultiValueEncoded<PriceFeed<Self::Api>> {
+    fn latest_round_data(&self) -> MultiValueEncoded<PriceFeed<CurrentApi>> {
         self.require_not_paused();
         require!(!self.rounds().is_empty(), "no completed rounds");
 
@@ -269,7 +269,7 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> SCResult<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
+    ) -> SCResult<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BaseBigUint, u8>> {
         require_old!(self.not_paused(), PAUSED_ERROR_MSG);
 
         let token_pair = TokenPair { from, to };
@@ -294,7 +294,7 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
+    ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BaseBigUint, u8>> {
         self.latest_price_feed(from, to).ok().into()
     }
 
@@ -307,9 +307,9 @@ pub trait PriceAggregator:
 
     fn make_price_feed(
         &self,
-        token_pair: TokenPair<Self::Api>,
-        round_values: VecMapper<TimestampedPrice<Self::Api>>,
-    ) -> PriceFeed<Self::Api> {
+        token_pair: TokenPair<CurrentApi>,
+        round_values: VecMapper<TimestampedPrice<CurrentApi>>,
+    ) -> PriceFeed<CurrentApi> {
         let round_id = round_values.len();
         let last_price = round_values.get(round_id);
 
@@ -332,7 +332,7 @@ pub trait PriceAggregator:
         result
     }
 
-    fn clear_submissions(&self, token_pair: &TokenPair<Self::Api>) {
+    fn clear_submissions(&self, token_pair: &TokenPair<CurrentApi>) {
         if let Some(mut pair_submission_mapper) = self.submissions().get(token_pair) {
             pair_submission_mapper.clear();
         }
@@ -382,22 +382,22 @@ pub trait PriceAggregator:
     #[storage_mapper("rounds")]
     fn rounds(
         &self,
-    ) -> MapStorageMapper<TokenPair<Self::Api>, VecMapper<TimestampedPrice<Self::Api>>>;
+    ) -> MapStorageMapper<TokenPair<CurrentApi>, VecMapper<TimestampedPrice<CurrentApi>>>;
 
     #[storage_mapper("first_submission_timestamp")]
     fn first_submission_timestamp(
         &self,
-        token_pair: &TokenPair<Self::Api>,
+        token_pair: &TokenPair<CurrentApi>,
     ) -> SingleValueMapper<u64>;
 
     #[storage_mapper("last_submission_timestamp")]
     fn last_submission_timestamp(
         &self,
-        token_pair: &TokenPair<Self::Api>,
+        token_pair: &TokenPair<CurrentApi>,
     ) -> SingleValueMapper<u64>;
 
     #[storage_mapper("submissions")]
     fn submissions(
         &self,
-    ) -> MapStorageMapper<TokenPair<Self::Api>, MapMapper<ManagedAddress, BigUint>>;
+    ) -> MapStorageMapper<TokenPair<CurrentApi>, MapMapper<ManagedAddress, BaseBigUint>>;
 }

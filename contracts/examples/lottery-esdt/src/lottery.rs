@@ -22,13 +22,13 @@ pub trait Lottery {
         &self,
         lottery_name: ManagedBuffer,
         token_identifier: EgldOrEsdtTokenIdentifier,
-        ticket_price: BigUint,
+        ticket_price: BaseBigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
-        opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<BaseBigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -48,13 +48,13 @@ pub trait Lottery {
         &self,
         lottery_name: ManagedBuffer,
         token_identifier: EgldOrEsdtTokenIdentifier,
-        ticket_price: BigUint,
+        ticket_price: BaseBigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
-        opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<BaseBigUint>,
     ) {
         self.start_lottery(
             lottery_name,
@@ -74,13 +74,13 @@ pub trait Lottery {
         &self,
         lottery_name: ManagedBuffer,
         token_identifier: EgldOrEsdtTokenIdentifier,
-        ticket_price: BigUint,
+        ticket_price: BaseBigUint,
         opt_total_tickets: Option<usize>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<usize>,
         opt_prize_distribution: ManagedOption<ManagedVec<u8>>,
         opt_whitelist: ManagedOption<ManagedVec<ManagedAddress>>,
-        opt_burn_percentage: OptionalValue<BigUint>,
+        opt_burn_percentage: OptionalValue<BaseBigUint>,
     ) {
         require!(!lottery_name.is_empty(), "Name can't be empty!");
 
@@ -156,7 +156,7 @@ pub trait Lottery {
             deadline,
             max_entries_per_user,
             prize_distribution,
-            prize_pool: BigUint::zero(),
+            prize_pool: BaseBigUint::zero(),
         };
 
         self.lottery_info(&lottery_name).set(&info);
@@ -209,7 +209,7 @@ pub trait Lottery {
         &self,
         lottery_name: &ManagedBuffer,
         token_identifier: &EgldOrEsdtTokenIdentifier,
-        payment: &BigUint,
+        payment: &BaseBigUint,
     ) {
         let info_mapper = self.lottery_info(lottery_name);
         let mut info = info_mapper.get();
@@ -285,7 +285,7 @@ pub trait Lottery {
             let winner_address = ticket_holders_mapper.get(winning_ticket_id);
             let prize = self.calculate_percentage_of(
                 &total_prize,
-                &BigUint::from(info.prize_distribution.get(i)),
+                &BaseBigUint::from(info.prize_distribution.get(i)),
             );
 
             self.send()
@@ -352,7 +352,7 @@ pub trait Lottery {
         rand_numbers
     }
 
-    fn calculate_percentage_of(&self, value: &BigUint, percentage: &BigUint) -> BigUint {
+    fn calculate_percentage_of(&self, value: &BaseBigUint, percentage: &BaseBigUint) -> BaseBigUint {
         value * percentage / PERCENTAGE_TOTAL
     }
 
@@ -363,7 +363,7 @@ pub trait Lottery {
     fn lottery_info(
         &self,
         lottery_name: &ManagedBuffer,
-    ) -> SingleValueMapper<LotteryInfo<Self::Api>>;
+    ) -> SingleValueMapper<LotteryInfo<CurrentApi>>;
 
     #[view(getLotteryWhitelist)]
     #[storage_mapper("lotteryWhitelist")]

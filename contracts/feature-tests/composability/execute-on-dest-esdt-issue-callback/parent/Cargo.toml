@@ -8,6 +8,8 @@ publish = false
 [lib]
 path = "src/lib.rs"
 
+[features]
+debug = ["dep:multiversx-sc-scenario"]
 
 [dependencies.child]
 path = "../child"
@@ -16,7 +18,12 @@ path = "../child"
 version = "0.43.5"
 path = "../../../../../framework/base"
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../../../framework/scenario"
+optional = true
+
+[dev-dependencies.parent]
+path = "."
+features = ["debug"]
 

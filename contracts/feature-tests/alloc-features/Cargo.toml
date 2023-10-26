@@ -8,14 +8,24 @@ publish = false
 [lib]
 path = "src/alloc_features_main.rs"
 
+[features]
+static-api = ["debug", "multiversx-sc/static-api"]
+debug = ["dep:multiversx-sc-scenario", "esdt-system-sc-mock/debug"]
+
 [dependencies.multiversx-sc]
 version = "0.43.5"
 path = "../../../framework/base"
 features = ["alloc"]
 
-[dev-dependencies.multiversx-sc-scenario]
+[dependencies.multiversx-sc-scenario]
 version = "0.43.5"
 path = "../../../framework/scenario"
+optional = true
+
+[dev-dependencies.alloc-features]
+path = "."
+features = ["debug"]
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"
+features = ["debug"]

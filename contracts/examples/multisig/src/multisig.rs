@@ -53,7 +53,7 @@ pub trait Multisig:
     /// - (number of signers followed by) list of signer addresses.
     #[label("multisig-external-view")]
     #[view(getPendingActionFullInfo)]
-    fn get_pending_action_full_info(&self) -> MultiValueEncoded<ActionFullInfo<Self::Api>> {
+    fn get_pending_action_full_info(&self) -> MultiValueEncoded<ActionFullInfo<CurrentApi>> {
         let mut result = MultiValueEncoded::new();
         let action_last_index = self.get_action_last_index();
         let action_mapper = self.action_mapper();

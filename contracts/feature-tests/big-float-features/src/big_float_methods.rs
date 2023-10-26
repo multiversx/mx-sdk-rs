@@ -23,12 +23,12 @@ pub trait BigFloatMethods {
     }
 
     #[endpoint]
-    fn big_float_from_big_uint_1(&self, bi: BigUint) -> BigFloat {
+    fn big_float_from_big_uint_1(&self, bi: BaseBigUint) -> BigFloat {
         BigFloat::from_big_uint(&bi)
     }
 
     #[endpoint]
-    fn big_float_from_big_uint_2(&self, bi: BigUint) -> BigFloat {
+    fn big_float_from_big_uint_2(&self, bi: BaseBigUint) -> BigFloat {
         BigFloat::from(bi)
     }
 

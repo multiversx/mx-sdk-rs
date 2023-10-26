@@ -9,7 +9,7 @@ pub trait SendTxRepeat {
 
     #[payable("EGLD")]
     #[endpoint]
-    fn repeat(&self, to: ManagedAddress, amount: BigUint, times: usize) {
+    fn repeat(&self, to: ManagedAddress, amount: BaseBigUint, times: usize) {
         for _ in 0..times {
             self.send().direct_egld(&to, &amount);
         }

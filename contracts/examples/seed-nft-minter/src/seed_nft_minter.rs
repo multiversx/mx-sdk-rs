@@ -24,7 +24,7 @@ pub trait SeedNftMinter:
     fn init(
         &self,
         marketplaces: ManagedVec<ManagedAddress>,
-        distribution: ManagedVec<Distribution<Self::Api>>,
+        distribution: ManagedVec<Distribution<CurrentApi>>,
     ) {
         self.marketplaces().extend(&marketplaces);
         self.init_distribution(distribution);
@@ -35,9 +35,9 @@ pub trait SeedNftMinter:
     fn create_nft(
         &self,
         name: ManagedBuffer,
-        royalties: BigUint,
+        royalties: BaseBigUint,
         uri: ManagedBuffer,
-        selling_price: BigUint,
+        selling_price: BaseBigUint,
         opt_token_used_as_payment: OptionalValue<TokenIdentifier>,
         opt_token_used_as_payment_nonce: OptionalValue<u64>,
     ) {
@@ -82,11 +82,11 @@ pub trait SeedNftMinter:
         self.distribute_funds(&token_id, token_nonce, total_amount);
     }
 
-    fn claim_royalties(&self, token_id: &EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BigUint {
+    fn claim_royalties(&self, token_id: &EgldOrEsdtTokenIdentifier, token_nonce: u64) -> BaseBigUint {
         let claim_destination = self.blockchain().get_sc_address();
-        let mut total_amount = BigUint::zero();
+        let mut total_amount = BaseBigUint::zero();
         for address in self.marketplaces().iter() {
-            let results: MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> = self
+            let results: MultiValue2<BaseBigUint, ManagedVec<EsdtTokenPayment>> = self
                 .marketplace_proxy(address)
                 .claim_tokens(&claim_destination, token_id, token_nonce)
                 .execute_on_dest_context();
@@ -118,7 +118,7 @@ pub trait SeedNftMinter:
     fn marketplace_proxy(
         &self,
         sc_address: ManagedAddress,
-    ) -> nft_marketplace_proxy::Proxy<Self::Api>;
+    ) -> nft_marketplace_proxy::Proxy<CurrentApi>;
 }
 
 mod nft_marketplace_proxy {
@@ -132,6 +132,6 @@ mod nft_marketplace_proxy {
             claim_destination: &ManagedAddress,
             token_id: &EgldOrEsdtTokenIdentifier,
             token_nonce: u64,
-        ) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>>;
+        ) -> MultiValue2<BaseBigUint, ManagedVec<EsdtTokenPayment>>;
     }
 }

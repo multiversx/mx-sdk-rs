@@ -24,5 +24,5 @@ pub trait UniqueIdMapperFeatures {
 
     #[view]
     #[storage_mapper("unique_id_mapper")]
-    fn unique_id_mapper(&self) -> UniqueIdMapper<Self::Api>;
+    fn unique_id_mapper(&self) -> UniqueIdMapper<CurrentApi>;
 }

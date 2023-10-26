@@ -10,8 +10,8 @@ pub trait KittyAuction {
     #[init]
     fn init(
         &self,
-        gen_zero_kitty_starting_price: BigUint,
-        gen_zero_kitty_ending_price: BigUint,
+        gen_zero_kitty_starting_price: BaseBigUint,
+        gen_zero_kitty_ending_price: BaseBigUint,
         gen_zero_kitty_auction_duration: u64,
         opt_kitty_ownership_contract_address: OptionalValue<ManagedAddress>,
     ) {
@@ -60,7 +60,7 @@ pub trait KittyAuction {
     }
 
     #[view(getAuctionStatus)]
-    fn get_auction_status(&self, kitty_id: u32) -> Auction<Self::Api> {
+    fn get_auction_status(&self, kitty_id: u32) -> Auction<CurrentApi> {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -70,7 +70,7 @@ pub trait KittyAuction {
     }
 
     #[view(getCurrentWinningBid)]
-    fn get_current_winning_bid(&self, kitty_id: u32) -> BigUint {
+    fn get_current_winning_bid(&self, kitty_id: u32) -> BaseBigUint {
         require!(
             self.is_up_for_auction(kitty_id),
             "Kitty is not up for auction!"
@@ -85,8 +85,8 @@ pub trait KittyAuction {
     fn create_sale_auction(
         &self,
         kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         duration: u64,
     ) {
         let deadline = self.blockchain().get_block_timestamp() + duration;
@@ -118,8 +118,8 @@ pub trait KittyAuction {
     fn create_siring_auction(
         &self,
         kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         duration: u64,
     ) {
         let deadline = self.blockchain().get_block_timestamp() + duration;
@@ -229,8 +229,8 @@ pub trait KittyAuction {
         &self,
         auction_type: AuctionType,
         kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         deadline: u64,
     ) {
         let caller = self.blockchain().get_caller();
@@ -316,8 +316,8 @@ pub trait KittyAuction {
         #[call_result] result: ManagedAsyncCallResult<()>,
         auction_type: AuctionType,
         cb_kitty_id: u32,
-        starting_price: BigUint,
-        ending_price: BigUint,
+        starting_price: BaseBigUint,
+        ending_price: BaseBigUint,
         deadline: u64,
         kitty_owner: ManagedAddress,
     ) {
@@ -406,7 +406,7 @@ pub trait KittyAuction {
     // proxy
 
     #[proxy]
-    fn kitty_ownership_proxy(&self, to: ManagedAddress) -> kitty_ownership::Proxy<Self::Api>;
+    fn kitty_ownership_proxy(&self, to: ManagedAddress) -> kitty_ownership::Proxy<CurrentApi>;
 
     // storage
 
@@ -429,5 +429,5 @@ pub trait KittyAuction {
     // auction
 
     #[storage_mapper("auction")]
-    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Auction<Self::Api>>;
+    fn auction(&self, kitty_id: u32) -> SingleValueMapper<Auction<CurrentApi>>;
 }

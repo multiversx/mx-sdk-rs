@@ -1,18 +1,18 @@
 use multiversx_sc::types::{
-    BigInt, BigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedVec,
+    BigInt, BaseBigUint, BoxedBytes, ManagedAddress, ManagedBuffer, ManagedVec,
 };
 use multiversx_sc_scenario::{api::StaticApi, managed_test_util::check_managed_top_encode_decode};
 
 #[test]
 fn test_big_uint_serialization() {
-    check_managed_top_encode_decode(BigUint::<StaticApi>::from(5u32), &[5u8]);
+    check_managed_top_encode_decode(BaseBigUint::<StaticApi>::from(5u32), &[5u8]);
 }
 
 #[test]
 fn test_vec_of_big_uint_serialization() {
     let v = vec![
-        BigUint::<StaticApi>::from(5u32),
-        BigUint::<StaticApi>::from(6u32),
+        BaseBigUint::<StaticApi>::from(5u32),
+        BaseBigUint::<StaticApi>::from(6u32),
     ];
 
     check_managed_top_encode_decode(v, &[0, 0, 0, 1, 5, 0, 0, 0, 1, 6]);

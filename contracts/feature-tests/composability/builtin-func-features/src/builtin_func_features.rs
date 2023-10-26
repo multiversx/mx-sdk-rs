@@ -8,7 +8,7 @@ multiversx_sc::imports!();
 #[multiversx_sc::contract]
 pub trait BuiltinFuncFeatures {
     #[proxy]
-    fn builtin_func_proxy(&self, to: ManagedAddress) -> builtin_func_proxy::Proxy<Self::Api>;
+    fn builtin_func_proxy(&self, to: ManagedAddress) -> builtin_func_proxy::Proxy<CurrentApi>;
 
     #[init]
     fn init(&self) {}

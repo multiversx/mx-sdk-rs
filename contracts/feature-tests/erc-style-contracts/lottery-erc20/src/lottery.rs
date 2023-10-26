@@ -16,7 +16,7 @@ const THIRTY_DAYS_IN_SECONDS: u64 = 60 * 60 * 24 * 30;
 #[multiversx_sc::contract]
 pub trait Lottery {
     #[proxy]
-    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<Self::Api>;
+    fn erc20_proxy(&self, to: ManagedAddress) -> erc20::Proxy<CurrentApi>;
 
     #[init]
     fn init(&self, erc20_contract_address: ManagedAddress) {
@@ -27,7 +27,7 @@ pub trait Lottery {
     fn start(
         &self,
         lottery_name: BoxedBytes,
-        ticket_price: BigUint,
+        ticket_price: BaseBigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -49,7 +49,7 @@ pub trait Lottery {
     fn create_lottery_pool(
         &self,
         lottery_name: BoxedBytes,
-        ticket_price: BigUint,
+        ticket_price: BaseBigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -71,7 +71,7 @@ pub trait Lottery {
     fn start_lottery(
         &self,
         lottery_name: BoxedBytes,
-        ticket_price: BigUint,
+        ticket_price: BaseBigUint,
         opt_total_tickets: Option<u32>,
         opt_deadline: Option<u64>,
         opt_max_entries_per_user: Option<u32>,
@@ -126,7 +126,7 @@ pub trait Lottery {
             prize_distribution,
             whitelist,
             current_ticket_number: 0u32,
-            prize_pool: BigUint::zero(),
+            prize_pool: BaseBigUint::zero(),
             queued_tickets: 0u32,
         };
 
@@ -134,7 +134,7 @@ pub trait Lottery {
     }
 
     #[endpoint]
-    fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BigUint) {
+    fn buy_ticket(&self, lottery_name: BoxedBytes, token_amount: BaseBigUint) {
         match self.status(&lottery_name) {
             Status::Inactive => sc_panic!("Lottery is currently inactive."),
             Status::Running => self.update_after_buy_ticket(&lottery_name, token_amount),
@@ -186,7 +186,7 @@ pub trait Lottery {
         Status::Running
     }
 
-    fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes, token_amount: BigUint) {
+    fn update_after_buy_ticket(&self, lottery_name: &BoxedBytes, token_amount: BaseBigUint) {
         let info = self.get_lottery_info(lottery_name);
         let caller = self.blockchain().get_caller();
 
@@ -228,7 +228,7 @@ pub trait Lottery {
         self.set_lottery_info(lottery_name, &info);
     }
 
-    fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: BigUint) {
+    fn reduce_prize_pool(&self, lottery_name: &BoxedBytes, value: BaseBigUint) {
         let mut info = self.get_lottery_info(lottery_name);
         info.prize_pool -= value;
 
@@ -263,7 +263,7 @@ pub trait Lottery {
         let winner_address = self.get_ticket_holder(lottery_name, winning_ticket_id);
 
         let prize = if current_winning_ticket_index != 0 {
-            BigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
+            BaseBigUint::from(info.prize_distribution[current_winning_ticket_index] as u32)
                 * &info.prize_pool
                 / PERCENTAGE_TOTAL as u32
         } else {
@@ -375,11 +375,11 @@ pub trait Lottery {
     // storage
 
     #[storage_set("lotteryInfo")]
-    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<Self::Api>);
+    fn set_lottery_info(&self, lottery_name: &BoxedBytes, lottery_info: &LotteryInfo<CurrentApi>);
 
     #[view(lotteryInfo)]
     #[storage_get("lotteryInfo")]
-    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<Self::Api>;
+    fn get_lottery_info(&self, lottery_name: &BoxedBytes) -> LotteryInfo<CurrentApi>;
 
     #[storage_is_empty("lotteryInfo")]
     fn is_empty_lottery_info(&self, lottery_name: &BoxedBytes) -> bool;

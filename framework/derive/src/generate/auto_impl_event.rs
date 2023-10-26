@@ -30,7 +30,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
         }
     } else {
         quote! {
-            let ___data_buffer___ = multiversx_sc::types::ManagedBuffer::<Self::Api>::new();
+            let ___data_buffer___ = multiversx_sc::types::ManagedBuffer::<CurrentApi>::new();
         }
     };
 
@@ -38,7 +38,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
     let event_identifier_literal = byte_slice_literal(event_identifier.as_bytes());
     quote! {
         #msig {
-            let mut ___topic_accumulator___ = multiversx_sc::log_util::event_topic_accumulator::<Self::Api>(
+            let mut ___topic_accumulator___ = multiversx_sc::log_util::event_topic_accumulator::<CurrentApi>(
                 #event_identifier_literal,
             );
             #(#topic_push_snippets)*

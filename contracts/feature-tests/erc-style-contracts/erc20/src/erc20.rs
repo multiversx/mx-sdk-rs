@@ -76,7 +76,7 @@ pub trait SimpleErc20Token {
     /// * `to` The address to transfer to.
     ///
     #[endpoint]
-    fn transfer(&self, to: ManagedAddress, amount: BigUint) {
+    fn transfer(&self, to: ManagedAddress, amount: BaseBigUint) {
         // the sender is the caller
         let sender = self.blockchain().get_caller();
         self.perform_transfer(sender, to, amount)
@@ -91,7 +91,7 @@ pub trait SimpleErc20Token {
     /// * `amount` the amount of tokens to be transferred.
     ///
     #[endpoint(transferFrom)]
-    fn transfer_from(&self, sender: ManagedAddress, recipient: ManagedAddress, amount: BigUint) {
+    fn transfer_from(&self, sender: ManagedAddress, recipient: ManagedAddress, amount: BaseBigUint) {
         // get caller
         let caller = self.blockchain().get_caller();
 
@@ -114,7 +114,7 @@ pub trait SimpleErc20Token {
     /// * `amount` The amount of tokens to be spent.
     ///
     #[endpoint]
-    fn approve(&self, spender: ManagedAddress, amount: BigUint) {
+    fn approve(&self, spender: ManagedAddress, amount: BaseBigUint) {
         // sender is the caller
         let caller = self.blockchain().get_caller();
 
@@ -132,7 +132,7 @@ pub trait SimpleErc20Token {
         &self,
         #[indexed] sender: &ManagedAddress,
         #[indexed] recipient: &ManagedAddress,
-        amount: &BigUint,
+        amount: &BaseBigUint,
     );
 
     #[event("approve")]
@@ -140,6 +140,6 @@ pub trait SimpleErc20Token {
         &self,
         #[indexed] sender: &ManagedAddress,
         #[indexed] recipient: &ManagedAddress,
-        amount: &BigUint,
+        amount: &BaseBigUint,
     );
 }

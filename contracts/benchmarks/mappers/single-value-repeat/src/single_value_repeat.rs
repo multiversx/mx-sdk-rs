@@ -41,8 +41,8 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
     fn add_struct(
         &self,
         num_repeats: usize,
-        key: ExampleStruct<Self::Api>,
-        value: ExampleStruct<Self::Api>,
+        key: ExampleStruct<CurrentApi>,
+        value: ExampleStruct<CurrentApi>,
     ) {
         for i in 0..num_repeats {
             self.struct_at(&key, i).set(&value);
@@ -53,8 +53,8 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
     fn count_struct(
         &self,
         num_repeats: usize,
-        key: ExampleStruct<Self::Api>,
-        value: ExampleStruct<Self::Api>,
+        key: ExampleStruct<CurrentApi>,
+        value: ExampleStruct<CurrentApi>,
     ) -> usize {
         (0..num_repeats)
             .filter(|&i| self.struct_at(&key, i).get() == value)
@@ -62,7 +62,7 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[endpoint]
-    fn remove_struct(&self, num_repeats: usize, key: ExampleStruct<Self::Api>) {
+    fn remove_struct(&self, num_repeats: usize, key: ExampleStruct<CurrentApi>) {
         for i in 1..=num_repeats {
             self.struct_at(&key, i).clear();
         }
@@ -70,15 +70,15 @@ pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {
 
     fn struct_at(
         &self,
-        key: &ExampleStruct<Self::Api>,
+        key: &ExampleStruct<CurrentApi>,
         index: usize,
-    ) -> SingleValueMapper<ExampleStruct<Self::Api>> {
+    ) -> SingleValueMapper<ExampleStruct<CurrentApi>> {
         self.bench_struct(self.use_index_struct(key, index))
     }
 
     #[storage_mapper("bench_struct")]
     fn bench_struct(
         &self,
-        key: ExampleStruct<Self::Api>,
-    ) -> SingleValueMapper<ExampleStruct<Self::Api>>;
+        key: ExampleStruct<CurrentApi>,
+    ) -> SingleValueMapper<ExampleStruct<CurrentApi>>;
 }

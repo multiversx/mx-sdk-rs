@@ -48,7 +48,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
     fn claim(
         &self,
         address: ManagedAddress,
-        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        signature: ManagedByteArray<CurrentApi, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let deposit_mapper = self.deposit(&address);
         require!(!deposit_mapper.is_empty(), NON_EXISTENT_KEY_ERR_MSG);
@@ -90,7 +90,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         &self,
         address: ManagedAddress,
         forward_address: ManagedAddress,
-        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        signature: ManagedByteArray<CurrentApi, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let paid_fee = self.call_value().egld_or_single_esdt();
         let caller_address = self.blockchain().get_caller();
@@ -138,7 +138,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         &self,
         address: &ManagedAddress,
         caller_address: &ManagedAddress,
-        signature: ManagedByteArray<Self::Api, ED25519_SIGNATURE_BYTE_LEN>,
+        signature: ManagedByteArray<CurrentApi, ED25519_SIGNATURE_BYTE_LEN>,
     ) {
         let addr = address.as_managed_buffer();
         let message = caller_address.as_managed_buffer();

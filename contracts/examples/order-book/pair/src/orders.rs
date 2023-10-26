@@ -16,8 +16,8 @@ pub trait OrdersModule:
 {
     fn create_order(
         &self,
-        payment: Payment<Self::Api>,
-        params: OrderInputParams<Self::Api>,
+        payment: Payment<CurrentApi>,
+        params: OrderInputParams<CurrentApi>,
         order_type: OrderType,
     ) {
         let caller = &self.blockchain().get_caller();
@@ -74,7 +74,7 @@ pub trait OrdersModule:
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+        let mut order_ids_not_empty: MultiValueManagedVec<CurrentApi, u64> =
             MultiValueManagedVec::new();
         for order in order_ids.iter() {
             if !self.orders(order).is_empty() {
@@ -83,7 +83,7 @@ pub trait OrdersModule:
         }
 
         let mut orders = MultiValueManagedVec::new();
-        let mut final_caller_orders: ManagedVec<Self::Api, u64> = ManagedVec::new();
+        let mut final_caller_orders: ManagedVec<CurrentApi, u64> = ManagedVec::new();
         for order_id in order_ids_not_empty.iter() {
             let order = self.cancel_order(order_id, caller, first_token_id, second_token_id, epoch);
 
@@ -113,7 +113,7 @@ pub trait OrdersModule:
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+        let mut order_ids_not_empty: MultiValueManagedVec<CurrentApi, u64> =
             MultiValueManagedVec::new();
         for order in order_ids.iter() {
             if !self.orders(order).is_empty() {
@@ -137,7 +137,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> Order<Self::Api> {
+    ) -> Order<CurrentApi> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -153,8 +153,8 @@ pub trait OrdersModule:
 
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = self.rule_of_three(
-            &BigUint::from(penalty_percent),
-            &BigUint::from(PERCENT_BASE_POINTS),
+            &BaseBigUint::from(penalty_percent),
+            &BaseBigUint::from(PERCENT_BASE_POINTS),
             &order.input_amount,
         );
         let amount = &order.input_amount - &penalty_amount;
@@ -190,7 +190,7 @@ pub trait OrdersModule:
         first_token_id: &TokenIdentifier,
         second_token_id: &TokenIdentifier,
         epoch: u64,
-    ) -> Order<Self::Api> {
+    ) -> Order<CurrentApi> {
         let order = self.orders(order_id).get();
 
         let token_id = match &order.order_type {
@@ -201,8 +201,8 @@ pub trait OrdersModule:
         let penalty_count = (epoch - order.create_epoch) / FEE_PENALTY_INCREASE_EPOCHS;
         let penalty_percent = penalty_count * FEE_PENALTY_INCREASE_PERCENT;
         let penalty_amount = self.rule_of_three(
-            &BigUint::from(penalty_percent),
-            &BigUint::from(PERCENT_BASE_POINTS),
+            &BaseBigUint::from(penalty_percent),
+            &BaseBigUint::from(PERCENT_BASE_POINTS),
             &order.input_amount,
         );
         let amount = &order.input_amount - &penalty_amount;
@@ -220,7 +220,7 @@ pub trait OrdersModule:
         order
     }
 
-    fn load_orders(&self, order_ids: &ManagedVec<u64>) -> MultiValueManagedVec<Order<Self::Api>> {
+    fn load_orders(&self, order_ids: &ManagedVec<u64>) -> MultiValueManagedVec<Order<CurrentApi>> {
         let mut orders_vec = MultiValueManagedVec::new();
         for order in order_ids.iter() {
             if !self.orders(order).is_empty() {
@@ -233,9 +233,9 @@ pub trait OrdersModule:
 
     fn create_transfers(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
-    ) -> ManagedVec<Transfer<Self::Api>> {
-        let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
+        orders: &MultiValueManagedVec<Order<CurrentApi>>,
+    ) -> ManagedVec<Transfer<CurrentApi>> {
+        let mut transfers: ManagedVec<CurrentApi, Transfer<CurrentApi>> = ManagedVec::new();
         let first_token_id = self.first_token_id().get();
         let second_token_id = self.second_token_id().get();
 
@@ -277,9 +277,9 @@ pub trait OrdersModule:
 
     fn get_orders_with_type(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
+        orders: &MultiValueManagedVec<Order<CurrentApi>>,
         order_type: OrderType,
-    ) -> MultiValueManagedVec<Order<Self::Api>> {
+    ) -> MultiValueManagedVec<Order<CurrentApi>> {
         let mut orders_vec = MultiValueManagedVec::new();
         for order in orders.iter() {
             if order.order_type == order_type {
@@ -292,10 +292,10 @@ pub trait OrdersModule:
 
     fn get_orders_sum_up(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
-    ) -> (BigUint, BigUint) {
-        let mut amount_paid = BigUint::zero();
-        let mut amount_requested = BigUint::zero();
+        orders: &MultiValueManagedVec<Order<CurrentApi>>,
+    ) -> (BaseBigUint, BaseBigUint) {
+        let mut amount_paid = BaseBigUint::zero();
+        let mut amount_requested = BaseBigUint::zero();
 
         orders.iter().for_each(|x| {
             amount_paid += &x.input_amount;
@@ -307,18 +307,18 @@ pub trait OrdersModule:
 
     fn calculate_transfers(
         &self,
-        orders: MultiValueManagedVec<Order<Self::Api>>,
-        total_paid: BigUint,
+        orders: MultiValueManagedVec<Order<CurrentApi>>,
+        total_paid: BaseBigUint,
         token_requested: TokenIdentifier,
-        leftover: BigUint,
-    ) -> ManagedVec<Transfer<Self::Api>> {
-        let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
+        leftover: BaseBigUint,
+    ) -> ManagedVec<Transfer<CurrentApi>> {
+        let mut transfers: ManagedVec<CurrentApi, Transfer<CurrentApi>> = ManagedVec::new();
 
         let mut match_provider_transfer = Transfer {
             to: self.blockchain().get_caller(),
             payment: Payment {
                 token_id: token_requested.clone(),
-                amount: BigUint::zero(),
+                amount: BaseBigUint::zero(),
             },
         };
 
@@ -351,7 +351,7 @@ pub trait OrdersModule:
         transfers
     }
 
-    fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
+    fn execute_transfers(&self, transfers: ManagedVec<Transfer<CurrentApi>>) {
         for transfer in &transfers {
             if transfer.payment.amount > 0 {
                 self.send().direct_esdt(
@@ -392,7 +392,7 @@ pub trait OrdersModule:
 
     #[view(getOrderById)]
     #[storage_mapper("orders")]
-    fn orders(&self, id: u64) -> SingleValueMapper<Order<Self::Api>>;
+    fn orders(&self, id: u64) -> SingleValueMapper<Order<CurrentApi>>;
 
     #[storage_mapper("address_order_ids")]
     fn address_order_ids(&self, address: &ManagedAddress) -> SingleValueMapper<ManagedVec<u64>>;

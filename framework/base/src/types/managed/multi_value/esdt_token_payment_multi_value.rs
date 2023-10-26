@@ -6,7 +6,7 @@ use crate::codec::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
-    types::{BigUint, EsdtTokenPayment, ManagedVecItem, TokenIdentifier},
+    types::{BaseBigUint, EsdtTokenPayment, ManagedVecItem, TokenIdentifier},
 };
 
 /// Thin wrapper around EsdtTokenPayment, which has different I/O behaviour:
@@ -86,7 +86,7 @@ where
     {
         let token_identifier = TokenIdentifier::multi_decode_or_handle_err(input, h)?;
         let token_nonce = u64::multi_decode_or_handle_err(input, h)?;
-        let amount = BigUint::multi_decode_or_handle_err(input, h)?;
+        let amount = BaseBigUint::multi_decode_or_handle_err(input, h)?;
         Ok(EsdtTokenPayment::new(token_identifier, token_nonce, amount).into())
     }
 }
@@ -103,7 +103,7 @@ where
     M: ManagedTypeApi,
 {
     fn type_name() -> TypeName {
-        MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
+        MultiValue3::<TokenIdentifier<M>, u64, BaseBigUint<M>>::type_name()
     }
 
     fn is_variadic() -> bool {

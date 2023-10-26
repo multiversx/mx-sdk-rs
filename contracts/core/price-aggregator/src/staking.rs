@@ -6,7 +6,7 @@ multiversx_sc::derive_imports!();
 #[derive(TopEncode, TopDecode)]
 pub struct TokenAmountPair<M: ManagedTypeApi> {
     pub token_id: EgldOrEsdtTokenIdentifier<M>,
-    pub amount: BigUint<M>,
+    pub amount: BaseBigUint<M>,
 }
 
 static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";
@@ -16,8 +16,8 @@ pub trait StakingModule {
     fn init_staking_module(
         &self,
         staking_token: &EgldOrEsdtTokenIdentifier,
-        staking_amount: &BigUint,
-        slash_amount: &BigUint,
+        staking_amount: &BaseBigUint,
+        slash_amount: &BaseBigUint,
         slash_quorum: usize,
         user_whitelist: &ManagedVec<ManagedAddress>,
     ) {
@@ -64,7 +64,7 @@ pub trait StakingModule {
     }
 
     #[endpoint]
-    fn unstake(&self, unstake_amount: BigUint) {
+    fn unstake(&self, unstake_amount: BaseBigUint) {
         let caller = self.blockchain().get_caller();
         let staked_amount_mapper = self.staked_amount(&caller);
         let staked_amount = staked_amount_mapper.get();

@@ -15,7 +15,7 @@ pub trait Child {
         &self,
         token_display_name: ManagedBuffer,
         token_ticker: ManagedBuffer,
-        initial_supply: BigUint,
+        initial_supply: BaseBigUint,
     ) {
         let issue_cost = self.call_value().egld_value();
         self.send()

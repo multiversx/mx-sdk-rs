@@ -16,7 +16,7 @@ mod managed_buffer;
 pub use big_float::BigFloat;
 pub use big_int::BigInt;
 pub use big_int_sign::Sign;
-pub use big_uint::BigUint;
+pub use big_uint::BaseBigUint;
 pub use elliptic_curve::{EllipticCurve, EllipticCurveComponents};
 pub use managed_buffer::ManagedBuffer;
 

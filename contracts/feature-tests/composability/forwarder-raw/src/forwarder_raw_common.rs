@@ -4,16 +4,16 @@ multiversx_sc::imports!();
 pub trait ForwarderRawCommon {
     #[view]
     #[storage_mapper("callback_args")]
-    fn callback_args(&self) -> VecMapper<ManagedVec<Self::Api, ManagedBuffer>>;
+    fn callback_args(&self) -> VecMapper<ManagedVec<CurrentApi, ManagedBuffer>>;
 
     #[view]
     #[storage_mapper("callback_payments")]
-    fn callback_payments(&self) -> VecMapper<(EgldOrEsdtTokenIdentifier, u64, BigUint)>;
+    fn callback_payments(&self) -> VecMapper<(EgldOrEsdtTokenIdentifier, u64, BaseBigUint)>;
 
     #[view]
     fn callback_payments_triples(
         &self,
-    ) -> MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint>> {
+    ) -> MultiValueEncoded<MultiValue3<EgldOrEsdtTokenIdentifier, u64, BaseBigUint>> {
         let mut result = MultiValueEncoded::new();
         for payment_tuple in self.callback_payments().iter() {
             result.push(payment_tuple.into());
@@ -39,13 +39,13 @@ pub trait ForwarderRawCommon {
     fn callback_payment_at_index(
         &self,
         index: usize,
-    ) -> MultiValue3<EgldOrEsdtTokenIdentifier, u64, BigUint> {
+    ) -> MultiValue3<EgldOrEsdtTokenIdentifier, u64, BaseBigUint> {
         self.callback_payments().get(index).into()
     }
 
     #[event("execute_on_dest_context_result")]
-    fn execute_on_dest_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
+    fn execute_on_dest_context_result(&self, result: ManagedVec<CurrentApi, ManagedBuffer>);
 
     #[event("execute_on_same_context_result")]
-    fn execute_on_same_context_result(&self, result: ManagedVec<Self::Api, ManagedBuffer>);
+    fn execute_on_same_context_result(&self, result: ManagedVec<CurrentApi, ManagedBuffer>);
 }

@@ -4,7 +4,7 @@ mod user_builtin {
     #[multiversx_sc::proxy]
     pub trait UserBuiltin {
         #[endpoint(SetUserName)]
-        fn set_user_name(&self, name: &BoxedBytes) -> BigUint;
+        fn set_user_name(&self, name: &BoxedBytes) -> BaseBigUint;
     }
 }
 
@@ -14,7 +14,7 @@ mod dns_mock {
     #[multiversx_sc::contract]
     pub trait DnsMock {
         #[proxy]
-        fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<Self::Api>;
+        fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<CurrentApi>;
 
         #[payable("EGLD")]
         #[endpoint]

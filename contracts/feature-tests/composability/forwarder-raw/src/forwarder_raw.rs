@@ -51,5 +51,5 @@ pub trait ForwarderRaw:
     }
 
     #[event("callback_raw")]
-    fn callback_raw_event(&self, arguments: &ManagedVec<Self::Api, ManagedBuffer>);
+    fn callback_raw_event(&self, arguments: &ManagedVec<CurrentApi, ManagedBuffer>);
 }

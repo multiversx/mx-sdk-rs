@@ -20,7 +20,7 @@ const USER_ADDRESS_EXPR: &str = "address:user";
 const VAULT_ADDRESS_EXPR: &str = "sc:vault";
 const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
 
-type TransferRoleFeaturesContract = ContractInfo<transfer_role_features::Proxy<StaticApi>>;
+type TransferRoleFeaturesContract = ContractInfo<StaticApi, transfer_role_features::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

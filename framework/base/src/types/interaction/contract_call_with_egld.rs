@@ -2,7 +2,7 @@ use crate::codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer},
+    types::{BaseBigUint, ManagedAddress, ManagedBuffer},
 };
 
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall};
@@ -21,7 +21,7 @@ where
     SA: CallTypeApi + 'static,
 {
     pub basic: ContractCallNoPayment<SA, OriginalResult>,
-    pub egld_payment: BigUint<SA>,
+    pub egld_payment: BaseBigUint<SA>,
 }
 
 impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgld<SA, OriginalResult>
@@ -59,7 +59,7 @@ where
     pub fn new<N: Into<ManagedBuffer<SA>>>(
         to: ManagedAddress<SA>,
         endpoint_name: N,
-        egld_payment: BigUint<SA>,
+        egld_payment: BaseBigUint<SA>,
     ) -> Self {
         ContractCallWithEgld {
             basic: ContractCallNoPayment::new(to, endpoint_name),

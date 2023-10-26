@@ -22,7 +22,7 @@ const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const SECOND_USER_ADDRESS_EXPR: &str = "address:second-user";
 
-type CrowdfundingESDTContract = ContractInfo<crowdfunding_esdt::Proxy<StaticApi>>;
+type CrowdfundingESDTContract = ContractInfo<StaticApi, crowdfunding_esdt::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

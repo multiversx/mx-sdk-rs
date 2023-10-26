@@ -9,7 +9,7 @@ use multiversx_sc::{
     codec::Empty,
     contract_base::ContractBase,
     err_msg,
-    types::{Address, BigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
+    types::{Address, BaseBigUint, EsdtLocalRole, EsdtTokenPayment, ManagedVec, TokenIdentifier},
 };
 use multiversx_sc_scenario::{
     api::DebugApi, assert_values_eq, managed_address, managed_biguint, managed_buffer,
@@ -1196,7 +1196,7 @@ fn test_async_call() {
     wrapper
         .execute_query(&adder_wrapper, |sc| {
             let current_sum = sc.sum().get();
-            let expected_sum = BigUint::from(10u32);
+            let expected_sum = BaseBigUint::from(10u32);
             assert_eq!(current_sum, expected_sum);
         })
         .assert_ok();
@@ -1287,11 +1287,11 @@ fn managed_environment_consistency_test() {
         ADDER_WASM_PATH,
     );
 
-    let first_var = wrapper.execute_in_managed_environment(|| BigUint::<DebugApi>::from(1u32));
+    let first_var = wrapper.execute_in_managed_environment(|| BaseBigUint::<DebugApi>::from(1u32));
     wrapper
         .execute_query(&adder_wrapper, |_sc| {
-            let second_var = BigUint::from(2u32);
-            let third_var = BigUint::from(3u32);
+            let second_var = BaseBigUint::from(2u32);
+            let third_var = BaseBigUint::from(3u32);
             let sum = first_var + second_var;
             assert_eq!(sum, third_var);
         })
@@ -1353,7 +1353,7 @@ fn test_managed_values_argument_and_return_value_consistency() {
             &basic_features_wrapper,
             &rust_biguint!(0u64),
             |sc| {
-                let dummy: BigUint<DebugApi> = managed_biguint!(100u64);
+                let dummy: BaseBigUint<DebugApi> = managed_biguint!(100u64);
                 assert_eq!(dummy.to_u64().unwrap(), 100);
 
                 // 'argument' was created in the top-level context
@@ -1389,7 +1389,7 @@ fn test_managed_values_insert_handle_panics() {
             &basic_features_wrapper,
             &rust_biguint!(0u64),
             |_sc| {
-                let mut vec: ManagedVec<DebugApi, BigUint<DebugApi>> = ManagedVec::new();
+                let mut vec: ManagedVec<DebugApi, BaseBigUint<DebugApi>> = ManagedVec::new();
                 // this should panic because we're pushing the handle's value, which discards the context
                 vec.push(item);
             },
