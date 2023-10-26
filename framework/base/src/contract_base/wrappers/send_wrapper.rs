@@ -15,6 +15,7 @@ use crate::{
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        TxBase,
     },
 };
 
@@ -68,6 +69,11 @@ where
         endpoint_name: impl Into<ManagedBuffer<A>>,
     ) -> ContractCallNoPayment<A, R> {
         ContractCallNoPayment::new(to, endpoint_name)
+    }
+
+    #[inline]
+    pub fn tx(&self) -> TxBase<A> {
+        TxBase::new()
     }
 
     /// Sends EGLD to a given address, directly.
