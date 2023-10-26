@@ -186,6 +186,41 @@ impl CheckAccount {
         self
     }
 
+    pub fn esdt_nft_last_nonce<K>(mut self, token_id_expr: K, last_nonce: u64) -> Self
+    where
+        BytesKey: From<K>,
+    {
+        let insert_check_esdt = |map: &mut CheckEsdtMapContents| {
+            let token_id = BytesKey::from(token_id_expr);
+
+            map.contents
+                .entry(token_id)
+                .and_modify(|check_esdt| check_esdt.add_last_nonce_check(last_nonce))
+                .or_insert(CheckEsdt::Full(CheckEsdtData {
+                    last_nonce: CheckValue::Equal(last_nonce.into()),
+                    ..Default::default()
+                }));
+        };
+
+        match &mut self.esdt {
+            CheckEsdtMap::Equal(map) => {
+                insert_check_esdt(map);
+            },
+            _ => {
+                let mut new_map = CheckEsdtMapContents {
+                    contents: BTreeMap::new(),
+                    other_esdts_allowed: true,
+                };
+
+                insert_check_esdt(&mut new_map);
+
+                self.esdt = CheckEsdtMap::Equal(new_map);
+            },
+        };
+
+        self
+    }
+
     pub fn check_storage(mut self, key: &str, value: &str) -> Self {
         let mut details = match self.storage {
             CheckStorage::Star => CheckStorageDetails::default(),
