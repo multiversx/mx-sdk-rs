@@ -62,11 +62,11 @@ impl CheckEsdt {
         }
     }
 
-    pub fn add_roles_check(&mut self, roles: Vec<&str>) {
+    pub fn add_roles_check(&mut self, roles: Vec<String>) {
         self.convert_to_full();
 
         if let CheckEsdt::Full(prev_esdt_check) = self {
-            prev_esdt_check.roles = roles.into_iter().map(|role| role.into()).collect();
+            prev_esdt_check.roles = roles;
         }
     }
 

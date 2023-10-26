@@ -151,6 +151,41 @@ impl CheckAccount {
         self
     }
 
+    pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
+    where
+        BytesKey: From<K>,
+    {
+        let insert_check_esdt = |map: &mut CheckEsdtMapContents| {
+            let token_id = BytesKey::from(token_id_expr);
+
+            map.contents
+                .entry(token_id)
+                .and_modify(|check_esdt| check_esdt.add_roles_check(roles.clone()))
+                .or_insert(CheckEsdt::Full(CheckEsdtData {
+                    roles,
+                    ..Default::default()
+                }));
+        };
+
+        match &mut self.esdt {
+            CheckEsdtMap::Equal(map) => {
+                insert_check_esdt(map);
+            },
+            _ => {
+                let mut new_map = CheckEsdtMapContents {
+                    contents: BTreeMap::new(),
+                    other_esdts_allowed: true,
+                };
+
+                insert_check_esdt(&mut new_map);
+
+                self.esdt = CheckEsdtMap::Equal(new_map);
+            },
+        };
+
+        self
+    }
+
     pub fn check_storage(mut self, key: &str, value: &str) -> Self {
         let mut details = match self.storage {
             CheckStorage::Star => CheckStorageDetails::default(),
