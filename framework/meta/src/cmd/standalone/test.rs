@@ -25,7 +25,13 @@ pub fn test(test_args: &TestArgs) {
         args.extend(["test"]);
     }
 
-    println!("{}", format!("Executing {program} {:?} ...", args).green());
+    let args_str = args.join(" ");
+
+    println!(
+        "{}\n{}",
+        format!("Running tests in {path} ...").green(),
+        format!("Executing {program} {args_str} ...").green()
+    );
 
     let status = Command::new(program)
         .args(args.clone())
@@ -34,9 +40,8 @@ pub fn test(test_args: &TestArgs) {
         .unwrap_or_else(|_| {
             panic!(
                 "{}",
-                format!("Failed to run program: {program} {:?}", args)
+                format!("Failed to run program: {program} {args_str}")
                     .bright_red()
-                    .to_string()
             )
         });
 
