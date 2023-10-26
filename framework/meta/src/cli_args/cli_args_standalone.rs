@@ -88,10 +88,16 @@ pub struct TestArgs {
     #[arg(short, long, verbatim_doc_comment)]
     pub path: Option<String>,
 
-    /// This arg can differentiate between types of tests to be ran (go, scenario, all).
-    /// Default value will be "rust" if not specified.
-    #[arg(short, long, default_value = "rust", verbatim_doc_comment)]
-    pub test_type: String,
+    /// This arg runs rust and go tests.
+    /// Default value will be "false" if not specified.
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub go: bool,
+
+    /// This arg runs scenarios.
+    /// Default value will be "false" if not specified.
+    /// If scen and go are both specified, scen overrides the go argument.
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub scen: bool
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
