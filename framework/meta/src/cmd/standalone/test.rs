@@ -17,7 +17,7 @@ pub fn test(test_args: &TestArgs) {
         args.extend(["./"]);
 
         if go {
-            println!("{}", format!("If scen parameter is true, it will override the go parameter. Executing scenarios...").yellow());
+            println!("{}", "If scen parameter is true, it will override the go parameter. Executing scenarios...".yellow());
         }
     } else if go {
         args.extend(["test", "--features", "multiversx-sc-scenario/run-go-tests"]);
@@ -31,7 +31,14 @@ pub fn test(test_args: &TestArgs) {
         .args(args.clone())
         .current_dir(path)
         .status()
-        .expect(&format!("Failed to run program: {program} {:?}", args).bright_red());
+        .unwrap_or_else(|_| {
+            panic!(
+                "{}",
+                format!("Failed to run program: {program} {:?}", args)
+                    .bright_red()
+                    .to_string()
+            )
+        });
 
     println!("Process finished with: {status}");
     assert!(status.success());
