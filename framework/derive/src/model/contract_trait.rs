@@ -1,5 +1,4 @@
 use super::{Method, PublicRole, Supertrait, TraitProperties};
-
 /// Models a contract or module trait.
 pub struct ContractTrait {
     pub docs: Vec<String>,
@@ -14,6 +13,12 @@ pub struct ContractTrait {
 
     pub methods: Vec<Method>,
     pub trait_attributes: TraitProperties,
+}
+
+#[derive(Clone, Debug)]
+pub struct EsdtAttribute {
+    pub ticker: String,
+    pub ty: String, 
 }
 
 impl ContractTrait {

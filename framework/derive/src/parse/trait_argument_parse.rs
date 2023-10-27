@@ -21,6 +21,7 @@ fn process_trait_attribute(
     process_only_owner_argument(attr, trait_arg_metadata)
         || process_only_admin_argument(attr, trait_arg_metadata)
         || process_allow_multiple_var_args_argument(attr, trait_arg_metadata)
+        || process_esdt_attribute_argument(attr, trait_arg_metadata)
 }
 
 fn process_only_owner_argument(attr: &syn::Attribute, arg_metadata: &mut TraitProperties) -> bool {
@@ -46,6 +47,17 @@ fn process_allow_multiple_var_args_argument(
     let has_attr = is_allow_multiple_var_args_prop(attr);
     if has_attr {
         arg_metadata.allow_multiple_var_args = true;
+    }
+    has_attr
+}
+
+fn process_esdt_attribute_argument(
+    attr: &syn::Attribute,
+    arg_metadata: &mut TraitProperties,
+) -> bool {
+    let (has_attr, esdt_attribute) = is_esdt_attribute_prop(attr);
+    if has_attr {
+        arg_metadata.esdt_attribute.push(esdt_attribute.unwrap());
     }
     has_attr
 }
