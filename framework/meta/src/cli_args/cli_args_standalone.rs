@@ -4,7 +4,6 @@ use clap::{ArgAction, Args, Parser, Subcommand};
 
 use super::{CliArgsToRaw, ContractCliAction};
 
-
 /// Parsed arguments of the meta crate CLI.
 #[derive(Default, PartialEq, Eq, Debug, Parser)]
 #[command(
@@ -79,8 +78,6 @@ pub struct InfoArgs {
     pub ignore: Vec<String>,
 }
 
-
-
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct TestArgs {
     /// Target directory where to generate contract integration tests.
@@ -97,7 +94,7 @@ pub struct TestArgs {
     /// Default value will be "false" if not specified.
     /// If scen and go are both specified, scen overrides the go argument.
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
-    pub scen: bool
+    pub scen: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
