@@ -2,6 +2,7 @@ mod all;
 mod info;
 mod local_deps;
 pub mod scen_test_gen;
+pub mod test;
 pub(crate) mod upgrade;
 
 use crate::{
@@ -13,6 +14,7 @@ use clap::Parser;
 use info::call_info;
 use local_deps::local_deps;
 use scen_test_gen::test_gen_tool;
+use test::test;
 use upgrade::upgrade_sc;
 
 /// Entry point in the program when calling it as a standalone tool.
@@ -36,6 +38,7 @@ pub async fn cli_main_standalone() {
         Some(StandaloneCliAction::TestGen(args)) => {
             test_gen_tool(args);
         },
+        Some(StandaloneCliAction::Test(args)) => test(args),
         None => {},
     }
 }
