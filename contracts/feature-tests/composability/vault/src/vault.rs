@@ -104,6 +104,9 @@ pub trait Vault {
                 &ManagedArgBuffer::new(),
             )
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
+
+        let (egld_transfer, esdt_transfers) = self.blockchain().get_back_transfers();
+        self.back_transfers_event(&egld_transfer, &esdt_transfers.into_multi_value());
     }
 
     #[allow_multiple_var_args]
@@ -214,7 +217,6 @@ pub trait Vault {
             .direct_multi(&self.blockchain().get_caller(), &new_tokens);
     }
 
-    /// TODO: invert token_payment and token_nonce, for consistency.
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,
@@ -235,6 +237,13 @@ pub trait Vault {
         #[indexed] token: &EgldOrEsdtTokenIdentifier,
         #[indexed] nonce: u64,
         #[indexed] amount: &BigUint,
+    );
+
+    #[event("back_tranfers")]
+    fn back_transfers_event(
+        &self,
+        #[indexed] egld_value: &BigUint,
+        #[indexed] multi_esdt: &MultiValueEncoded<EsdtTokenPaymentMultiValue>,
     );
 
     #[endpoint]
