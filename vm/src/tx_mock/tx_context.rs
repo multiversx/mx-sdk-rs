@@ -10,8 +10,9 @@ use std::{
     sync::{Arc, Mutex, MutexGuard},
 };
 
-
-use super::{BlockchainRng, BlockchainUpdate, BackTransfers, TxCache, TxInput, TxManagedTypes, TxResult};
+use super::{
+    BackTransfers, BlockchainRng, BlockchainUpdate, TxCache, TxInput, TxManagedTypes, TxResult,
+};
 
 pub struct TxContext {
     pub vm_ref: BlockchainVMRef,
@@ -117,6 +118,10 @@ impl TxContext {
 
     pub fn m_types_lock(&self) -> MutexGuard<TxManagedTypes> {
         self.managed_types.lock().unwrap()
+    }
+
+    pub fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+        self.back_transfers.lock().unwrap()
     }
 
     pub fn result_lock(&self) -> MutexGuard<TxResult> {
