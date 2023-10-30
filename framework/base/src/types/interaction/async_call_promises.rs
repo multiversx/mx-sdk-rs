@@ -1,8 +1,10 @@
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{BigUint, CallbackClosure, ManagedAddress, ManagedBuffer},
 };
+
+use super::FunctionCall;
 
 /// Will be renamed to `AsyncCall` and `AsyncCall` to `AsyncCallLegacy` when the promises end up on the mainnet.
 #[must_use]
@@ -12,8 +14,7 @@ where
 {
     pub(crate) to: ManagedAddress<SA>,
     pub(crate) egld_payment: BigUint<SA>,
-    pub(crate) endpoint_name: ManagedBuffer<SA>,
-    pub(crate) arg_buffer: ManagedArgBuffer<SA>,
+    pub(crate) function_call: FunctionCall<SA>,
     pub(crate) explicit_gas_limit: u64,
     pub(crate) extra_gas_for_callback: u64,
     pub(crate) callback_call: Option<CallbackClosure<SA>>,
@@ -56,8 +57,8 @@ where
         SendRawWrapper::<SA>::new().create_async_call_raw(
             &self.to,
             &self.egld_payment,
-            &self.endpoint_name,
-            &self.arg_buffer,
+            &self.function_call.function_name,
+            &self.function_call.arg_buffer,
             callback_name,
             callback_name,
             self.explicit_gas_limit,

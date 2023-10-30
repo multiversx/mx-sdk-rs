@@ -1,19 +1,22 @@
+# Keeping one file called `multicontract.toml` to test the backwards compatibility.
+
 [settings]
 main = "multi-contract-main"
 
 [contracts.multi-contract-main]
 # main contract can have any id and any name
 name = "multi-contract-features"
-add-unlabelled = true
 
 [contracts.multi-contract-features-view]
 # name is optional, if missing this ^^^ id will be used
 external-view = true
+add-unlabelled = false
 add-labels = ["mcs-external-view"]
 
 [contracts.multi-contract-example-feature]
-add-unlabelled = true
+add-unlabelled = true # optional here, since the default is true
 features = ["example_feature"]
 
 [contracts.multi-contract-alt-impl]
+add-unlabelled = false
 add-labels = ["alt-impl"]

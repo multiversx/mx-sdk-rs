@@ -164,6 +164,9 @@ impl std::fmt::Debug for OutputContract {
             .field("main", &self.main)
             .field("config_name", &self.contract_id)
             .field("public_name", &self.contract_name)
+            .field("num-constructors", &self.abi.constructors.len())
+            .field("num-endpoints", &self.abi.endpoints.len())
+            .field("settings", &self.settings)
             .finish()
     }
 }

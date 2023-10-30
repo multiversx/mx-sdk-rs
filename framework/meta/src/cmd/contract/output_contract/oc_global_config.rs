@@ -1,5 +1,13 @@
 use super::{oc_validate::validate_output_contract, OutputContract};
 
+/// Allowed file names for the SC config.
+///
+/// The current preferred name is `sc-config.toml`.
+///
+/// `multicontract.toml` is the legacy name.
+/// Was changed because the config file broadened in scope, beyond multi-contract build.
+pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.toml"];
+
 /// An entire project configuration.
 ///
 /// It can contain one or several output contracts.

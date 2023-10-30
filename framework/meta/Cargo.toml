@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.43.3"
+version = "0.43.5"
 edition = "2021"
 
 authors = [
@@ -36,16 +36,18 @@ anyhow = "1.0.44"
 rustc_version = "0.4"
 toml = { version = "0.5.8", features = ["preserve_order"] }
 ruplacer = "0.8.1"
-clap = { version = "4.1.0", features = ["derive", "cargo"] }
+clap = { version = "4.1.0", features = ["derive"] }
 colored = "2.0"
 pathdiff = "0.2.1"
 common-path = "1.0.0"
 lazy_static = "1.4.0"
 convert_case = "0.6.0"
 hex = "0.4"
+wasmparser = "0.113.1"
+wasmprinter = "0.2.67"
 
 [dependencies.multiversx-sc]
-version = "=0.43.3"
+version = "=0.43.5"
 path = "../base"
 features = ["alloc", "num-bigint", "promises"]
 

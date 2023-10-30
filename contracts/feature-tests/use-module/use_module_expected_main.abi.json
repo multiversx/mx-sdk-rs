@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.43.3"
+            "version": "0.43.5"
         }
     },
     "docs": [
@@ -669,6 +669,17 @@
         },
         {
             "name": "voteSlashMember",
+            "mutability": "mutable",
+            "inputs": [
+                {
+                    "name": "member_to_slash",
+                    "type": "Address"
+                }
+            ],
+            "outputs": []
+        },
+        {
+            "name": "cancelVoteSlashMember",
             "mutability": "mutable",
             "inputs": [
                 {

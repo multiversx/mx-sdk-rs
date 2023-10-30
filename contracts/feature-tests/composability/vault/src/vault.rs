@@ -106,6 +106,7 @@ pub trait Vault {
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
+    #[allow_multiple_var_args]
     #[label("promises-endpoint")]
     #[payable("*")]
     #[endpoint]

@@ -3,6 +3,8 @@ mod meta_abi;
 mod meta_config;
 pub mod output_contract;
 
+use std::path::Path;
+
 use crate::cli_args::{ContractCliAction, ContractCliArgs};
 use clap::Parser;
 use meta_config::MetaConfig;
@@ -39,16 +41,16 @@ fn process_original_abi<AbiObj: ContractAbiProvider>(cli_args: &ContractCliArgs)
     meta_config
 }
 
-pub fn multi_contract_config<AbiObj: ContractAbiProvider>(
-    multi_contract_config_toml_path: &str,
-) -> OutputContractGlobalConfig {
+pub fn multi_contract_config<AbiObj>(contract_crate_path: &Path) -> OutputContractGlobalConfig
+where
+    AbiObj: ContractAbiProvider,
+{
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
 
-    let output_contracts = OutputContractGlobalConfig::load_from_file(
-        multi_contract_config_toml_path,
+    let output_contracts = OutputContractGlobalConfig::load_from_crate_or_default(
+        contract_crate_path,
         &original_contract_abi,
-    )
-    .unwrap_or_else(|| panic!("could not find file {multi_contract_config_toml_path}"));
+    );
     output_contracts.validate_output_contracts();
     output_contracts
 }

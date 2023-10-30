@@ -12,6 +12,7 @@ pub mod ongoing_operation;
 pub mod only_admin;
 pub mod pause;
 pub mod staking;
+pub mod subscription;
 pub mod token_merge;
 pub mod transfer_role_proxy;
 pub mod users;

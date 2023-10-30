@@ -82,6 +82,8 @@ members = [
   "contracts/examples/multisig/interact",
   "contracts/examples/nft-minter",
   "contracts/examples/nft-minter/meta",
+  "contracts/examples/nft-subscription",
+  "contracts/examples/nft-subscription/meta",
   "contracts/examples/nft-storage-prepay",
   "contracts/examples/nft-storage-prepay/meta",
   "contracts/examples/order-book/factory",

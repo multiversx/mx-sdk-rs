@@ -11,6 +11,7 @@ fn generate_endpoint_snippet(
     only_admin: bool,
     mutability: EndpointMutabilityMetadata,
     endpoint_type: EndpointTypeMetadata,
+    allow_multiple_var_args: bool,
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
     let rust_method_name = m.name.to_string();
@@ -65,6 +66,7 @@ fn generate_endpoint_snippet(
             inputs: multiversx_sc::types::heap::Vec::new(),
             outputs: multiversx_sc::types::heap::Vec::new(),
             labels: &[ #(#label_names),* ],
+            allow_multiple_var_args: #allow_multiple_var_args,
         };
         #(#input_snippets)*
         #output_snippet
@@ -84,6 +86,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     false,
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::Init,
+                    m.is_allow_multiple_var_args(),
                 );
                 Some(quote! {
                     #endpoint_def
@@ -98,6 +101,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     endpoint_metadata.only_admin,
                     endpoint_metadata.mutability.clone(),
                     EndpointTypeMetadata::Endpoint,
+                    endpoint_metadata.allow_multiple_var_args,
                 );
                 Some(quote! {
                     #endpoint_def
@@ -112,6 +116,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     false,
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::PromisesCallback,
+                    m.is_allow_multiple_var_args(),
                 );
                 Some(quote! {
                     #endpoint_def

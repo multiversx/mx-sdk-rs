@@ -1,0 +1,6 @@
+[settings]
+main = "lottery-erc20"
+
+# the only purpose of this config is to specify the allocator
+[contracts.lottery-erc20]
+allocator = "static64k"

@@ -54,16 +54,15 @@ pub enum StandaloneCliAction {
     #[command(name = "new", about = "Creates a contract by a pre-existing template")]
     Template(TemplateArgs),
 
-    #[command(
-        name = "templates",
-        about = "Creates a contract by a pre-existing template"
-    )]
+    #[command(name = "templates", about = "Lists all pre-existing templates")]
     TemplateList(TemplateListArgs),
     #[command(
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
     )]
     TestGen(TestGenArgs),
+    #[command(name = "test", about = "Runs cargo test")]
+    Test(TestArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -77,6 +76,25 @@ pub struct InfoArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TestArgs {
+    /// Target directory where to generate contract integration tests.
+    /// Will be current directory if not specified.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// This arg runs rust and go tests.
+    /// Default value will be "false" if not specified.
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub go: bool,
+
+    /// This arg runs scenarios.
+    /// Default value will be "false" if not specified.
+    /// If scen and go are both specified, scen overrides the go argument.
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub scen: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
