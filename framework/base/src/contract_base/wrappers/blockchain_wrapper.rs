@@ -343,10 +343,11 @@ where
         }
     }
 
-    pub fn get_back_transfers() -> (BigUint<A>, ManagedVec<A, EsdtTokenPayment<A>>) {
-        let managed_api_impl = A::managed_type_impl();
-        let esdt_transfer_value_handle = managed_api_impl.mb_new_empty();
-        let call_value_handle = managed_api_impl.mb_new_empty();
+    pub fn get_back_transfers(&self) -> (BigUint<A>, ManagedVec<A, EsdtTokenPayment<A>>) {
+        let esdt_transfer_value_handle: A::BigIntHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
+        let call_value_handle: A::BigIntHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
 
         A::blockchain_api_impl().managed_get_back_transfers(
             esdt_transfer_value_handle.get_raw_handle(),
