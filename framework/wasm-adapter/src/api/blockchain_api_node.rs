@@ -331,7 +331,7 @@ impl BlockchainApiImpl for VmApiImpl {
         call_value_handle: RawHandle,
     ) {
         unsafe {
-            managedGetBackTransfers(address_handle, token_id_handle);
+            managedGetBackTransfers(esdt_transfer_value_handle, call_value_handle);
         }
     }
 

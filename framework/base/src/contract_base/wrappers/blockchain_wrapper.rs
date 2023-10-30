@@ -1,7 +1,5 @@
 use core::marker::PhantomData;
 
-use multiversx_sc_codec::Vec;
-
 use crate::{
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, BlockchainApi, BlockchainApiImpl, ErrorApi,
@@ -345,7 +343,7 @@ where
         }
     }
 
-    pub fn get_back_transfers() -> ManagedVec<A, EsdtTokenPayment<A>> {
+    pub fn get_back_transfers() -> (BigUint<A>, ManagedVec<A, EsdtTokenPayment<A>>) {
         let managed_api_impl = A::managed_type_impl();
         let esdt_transfer_value_handle = managed_api_impl.mb_new_empty();
         let call_value_handle = managed_api_impl.mb_new_empty();
@@ -355,8 +353,12 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle())
+        (
+            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        )
     }
+
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
     pub fn get_token_attributes<T: TopDecode>(
         &self,
