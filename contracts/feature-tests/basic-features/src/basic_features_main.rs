@@ -18,6 +18,7 @@ pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
+pub mod small_num_overflow_test_ops;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_fungible_token;
