@@ -197,7 +197,6 @@ fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::To
 }
 
 fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
-    // println!("{}", "yabbadabbadooo");
     contract
         .trait_attributes
         .esdt_attribute
@@ -205,8 +204,12 @@ fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2
         .map(|esdt_attr| {
             let attr = esdt_attr.clone();
             let (ticker, ty) = (attr.ticker, attr.ty);
+
+            // let trim = ty.trim_matches('"');
             quote! {
-                contract_abi.esdt_attributes.push(multiversx_sc::abi::EsdtAttribute {ticker: multiversx_sc::types::heap::String::from(#ticker), ty: multiversx_sc::types::heap::String::from(#ty)});
+
+                // let esdt_attr = multiversx_sc::abi::EsdtAttributeAbi::get_type::<syn::Type::Slice(#trim)>(#ticker);
+                contract_abi.esdt_attributes.push(multiversx_sc::abi::EsdtAttributeAbi::get_type::<#ty>(#ticker));
             }
         })
         .collect()

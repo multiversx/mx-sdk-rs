@@ -4,14 +4,25 @@ use alloc::{string::String, vec::Vec};
 // #[derive(Clone, Debug)]
 // pub struct EsdtAttribute {
 //     pub ticker: String,
-//     pub ty: String,
+//     pub ty: TypeName,
 // }
 
 #[derive(Clone, Debug)]
-pub struct EsdtAttribute {
-    pub ticker: String,
+pub struct EsdtAttributeAbi {
+    pub ticker: &'static str,
     pub ty: TypeName,
 }
+
+impl EsdtAttributeAbi {
+    pub fn get_type<T: TypeAbi>(arg_name: &'static str) -> EsdtAttributeAbi{
+        EsdtAttributeAbi {
+            ticker: arg_name,
+            ty: T::type_name(),
+        }
+    }
+}
+
+
 
 #[derive(Debug, Default, Clone)]
 pub struct ContractAbi {
@@ -24,7 +35,7 @@ pub struct ContractAbi {
     pub events: Vec<EventAbi>,
     pub has_callback: bool,
     pub type_descriptions: TypeDescriptionContainerImpl,
-    pub esdt_attributes: Vec<EsdtAttribute>,
+    pub esdt_attributes: Vec<EsdtAttributeAbi>,
 }
 
 impl ContractAbi {

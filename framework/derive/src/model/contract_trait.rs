@@ -16,18 +16,17 @@ pub struct ContractTrait {
     pub trait_attributes: TraitProperties,
 }
 
-#[derive(Clone, Debug)]
-pub struct EsdtAttribute {
-    pub ticker: String,
-    pub ty: String, //make this TypeAbi/TypeName
-}
-
 // #[derive(Clone, Debug)]
 // pub struct EsdtAttribute {
 //     pub ticker: String,
-//     pub ty: proc_macro2::TokenStream,
+//     pub ty: String,
 // }
 
+#[derive(Clone, Debug)]
+pub struct EsdtAttribute {
+    pub ticker: &'static str,
+    pub ty: String,
+}
 
 impl ContractTrait {
     pub fn callback_count(&self) -> usize {

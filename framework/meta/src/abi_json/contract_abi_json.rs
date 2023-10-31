@@ -29,11 +29,11 @@ pub struct EsdtAttributeJson {
     pub ty: TypeName,
 }
 
-impl From<&EsdtAttribute> for EsdtAttributeJson {
-    fn from(attr: &EsdtAttribute) -> Self {
+impl From<&EsdtAttributeAbi> for EsdtAttributeJson {
+    fn from(attr: &EsdtAttributeAbi) -> Self {
         let attr_clone = attr.clone();
         EsdtAttributeJson {
-            ticker: attr_clone.ticker,
+            ticker: attr_clone.ticker.to_owned(),
             ty: attr_clone.ty,
         }
     }
