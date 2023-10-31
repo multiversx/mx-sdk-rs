@@ -1,6 +1,18 @@
 use super::*;
 use alloc::{string::String, vec::Vec};
 
+// #[derive(Clone, Debug)]
+// pub struct EsdtAttribute {
+//     pub ticker: String,
+//     pub ty: String,
+// }
+
+#[derive(Clone, Debug)]
+pub struct EsdtAttribute {
+    pub ticker: String,
+    pub ty: TypeName,
+}
+
 #[derive(Debug, Default, Clone)]
 pub struct ContractAbi {
     pub build_info: BuildInfoAbi,
@@ -12,6 +24,7 @@ pub struct ContractAbi {
     pub events: Vec<EventAbi>,
     pub has_callback: bool,
     pub type_descriptions: TypeDescriptionContainerImpl,
+    pub esdt_attributes: Vec<EsdtAttribute>,
 }
 
 impl ContractAbi {
@@ -24,6 +37,8 @@ impl ContractAbi {
             .extend_from_slice(other.promise_callbacks.as_slice());
         self.has_callback |= other.has_callback;
         self.type_descriptions.insert_all(&other.type_descriptions);
+        self.esdt_attributes
+            .extend_from_slice(&other.esdt_attributes.as_slice());
     }
 
     /// A type can provide more than 1 type descripions.

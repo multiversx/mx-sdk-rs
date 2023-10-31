@@ -20,6 +20,23 @@ pub struct ContractAbiJson {
     pub events: Vec<EventAbiJson>,
     pub has_callback: bool,
     pub types: BTreeMap<String, TypeDescriptionJson>,
+    pub esdt_attributes: Vec<EsdtAttributeJson>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct EsdtAttributeJson {
+    pub ticker: String,
+    pub ty: TypeName,
+}
+
+impl From<&EsdtAttribute> for EsdtAttributeJson {
+    fn from(attr: &EsdtAttribute) -> Self {
+        let attr_clone = attr.clone();
+        EsdtAttributeJson {
+            ticker: attr_clone.ticker,
+            ty: attr_clone.ty,
+        }
+    }
 }
 
 impl From<&ContractAbi> for ContractAbiJson {
@@ -38,6 +55,11 @@ impl From<&ContractAbi> for ContractAbiJson {
             events: abi.events.iter().map(EventAbiJson::from).collect(),
             has_callback: abi.has_callback,
             types: BTreeMap::new(),
+            esdt_attributes: abi
+                .esdt_attributes
+                .iter()
+                .map(EsdtAttributeJson::from)
+                .collect(),
         };
         for (type_name, type_description) in abi.type_descriptions.0.iter() {
             if type_description.contents.is_specified() {

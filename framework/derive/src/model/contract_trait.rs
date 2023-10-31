@@ -1,4 +1,5 @@
 use super::{Method, PublicRole, Supertrait, TraitProperties};
+
 /// Models a contract or module trait.
 pub struct ContractTrait {
     pub docs: Vec<String>,
@@ -18,8 +19,15 @@ pub struct ContractTrait {
 #[derive(Clone, Debug)]
 pub struct EsdtAttribute {
     pub ticker: String,
-    pub ty: String, 
+    pub ty: String, //make this TypeAbi/TypeName
 }
+
+// #[derive(Clone, Debug)]
+// pub struct EsdtAttribute {
+//     pub ticker: String,
+//     pub ty: proc_macro2::TokenStream,
+// }
+
 
 impl ContractTrait {
     pub fn callback_count(&self) -> usize {

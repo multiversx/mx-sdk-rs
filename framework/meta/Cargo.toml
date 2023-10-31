@@ -25,6 +25,7 @@ template-test-current = []
 template-test-released = []
 
 [dependencies]
+proc-macro2 = "1.0.66"
 tokio = { version = "1.24", features = ["full"] }
 reqwest = { version = "0.11.4", features = ["blocking", "json"] }
 serde = { version = "1.0", features = ["derive"] }

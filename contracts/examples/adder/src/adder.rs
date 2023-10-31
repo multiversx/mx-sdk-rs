@@ -6,6 +6,8 @@ multiversx_sc::imports!();
 /// it holds a single variable in storage, which anyone can increment.
 #[multiversx_sc::contract]
 #[esdt_attribute("dummy", BigUint)]
+#[esdt_attribute("USDC", u64)]
+#[esdt_attribute("TREN", ManagedBuffer)]
 pub trait Adder {
     #[view(getSum)]
     #[storage_mapper("sum")]

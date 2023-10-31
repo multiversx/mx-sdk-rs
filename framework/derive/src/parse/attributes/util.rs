@@ -1,5 +1,5 @@
 use crate::model::EsdtAttribute;
-use proc_macro2::{Literal, TokenStream, TokenTree};
+use proc_macro2::{Group,TokenTree};
 
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
     if let Some(first_seg) = attr.path.segments.first() {
@@ -19,34 +19,34 @@ pub(super) fn is_attribute_with_one_type_arg(
     attr: &syn::Attribute,
     name: &str,
 ) -> (bool, Option<EsdtAttribute>) {
-    if let Some(first_seg) = attr.path.segments.first() {
+    let attr_path = &attr.path;
+    if let Some(first_seg) = attr_path.segments.first() {
         if first_seg.ident == name {
-            //get esdt arg from attribute somehow
-
-            let input_tokens = attr.clone().tokens;
-            println!("{:#?}", input_tokens);
-            let mut tokens = input_tokens.clone().into_iter();
-
-            let stream = match tokens.next() {
-                Some(proc_macro2::TokenTree::Group(group)) => group.stream(),
-                _ => panic!("Expected group as first token"),
+            let tokens = attr.tokens.clone();
+            let group = match syn::parse2::<Group>(tokens) {
+                Ok(group) => group.stream(),
+                _ => panic!("Expected a group as attribute argument"),
             };
 
-            let mut iter = stream.into_iter();
+            let mut iter = group.into_iter();
 
             let first_literal = match iter.next() {
                 Some(TokenTree::Literal(literal)) => literal,
-                _ => panic!("Expected literal as first token"),
+                _ => panic!("Expected a literal as the first token in the attribute argument"),
             };
 
-            // Extract the symbol from the literal
-            let symbol = first_literal.to_string();
-            let trim = symbol.trim_matches('\"').to_string();
+            // let mut first_literal;
+            // first_literal = match iter.next() {
+            //     Some(TokenTree::Literal(literal)) => LitStr::from(literal),
+            //     _ => panic!("Expected a literal as the first token in the attribute argument"),
+            // };
 
-            // Skip the first Punct
+            let symbol = first_literal.to_string().trim_matches('\"').to_string();
+            // let symbol = first_literal.value().trim_matches('\"').to_string();
+
             let _ = match iter.next() {
                 Some(TokenTree::Punct(punct)) => punct,
-                _ => panic!("Expected a Punct as the second token"),
+                _ => panic!("Expected a punctuation token after the literal"),
             };
 
             let mut chosen_type = String::new();
@@ -63,22 +63,92 @@ pub(super) fn is_attribute_with_one_type_arg(
                 }
             }
 
-            println!("First Literal: {:?}", trim);
-            println!("Type: {}", chosen_type);
+            if symbol.is_empty() {
+                panic!("Ticker field can't be empty");
+            }
 
             let esdt_attribute = EsdtAttribute {
-                ticker: trim,
+                ticker: symbol,
                 ty: chosen_type,
             };
 
-            println!("Esdt Attribute: {:#?}", esdt_attribute);
+            println!("{:#?}", esdt_attribute);
 
-            return (true, Option::Some(esdt_attribute));
+            return (true, Some(esdt_attribute));
         }
-    };
+    }
 
-    (false, Option::None)
+    (false, None)
 }
+
+// pub(super) fn is_attribute_with_one_type_arg(
+//     attr: &syn::Attribute,
+//     name: &str,
+// ) -> (bool, Option<EsdtAttribute>) {
+//     if let Some(first_seg) = attr.path.segments.first() {
+//         if first_seg.ident == name {
+//             //get esdt arg from attribute somehow
+
+//             let input_tokens = attr.clone().tokens;
+//             println!("{:#?}", input_tokens);
+//             let mut tokens = input_tokens.clone().into_iter();
+
+//             let stream = match tokens.next() {
+//                 Some(proc_macro2::TokenTree::Group(group)) => group.stream(),
+//                 _ => panic!("Expected group as first token"),
+//             };
+
+//             let mut iter = stream.into_iter();
+
+//             let first_literal = match iter.next() {
+//                 Some(TokenTree::Literal(literal)) => literal,
+//                 _ => panic!("Expected literal as first token"),
+//             };
+
+//             // Extract the symbol from the literal
+//             let symbol = first_literal.to_string();
+//             let trim = symbol.trim_matches('\"').to_string();
+
+//             // Skip the first Punct
+//             let _ = match iter.next() {
+//                 Some(TokenTree::Punct(punct)) => punct,
+//                 _ => panic!("Expected punct as the second token"),
+//             };
+
+//             let mut chosen_type = String::new();
+
+//             while let Some(token) = iter.next() {
+//                 match token {
+//                     TokenTree::Punct(punct) => {
+//                         chosen_type.push(punct.as_char());
+//                     },
+//                     TokenTree::Ident(ident) => {
+//                         chosen_type.push_str(&ident.to_string());
+//                     },
+//                     _ => break,
+//                 }
+//             }
+
+//             println!("First Literal: {:?}", trim);
+//             println!("Type: {}", chosen_type);
+
+//             if trim.is_empty() {
+//                 panic!("Ticker field can't be empty")
+//             }
+
+//             let esdt_attribute = EsdtAttribute {
+//                 ticker: trim,
+//                 ty: chosen_type,
+//             };
+
+//             println!("Esdt Attribute: {:#?}", esdt_attribute);
+
+//             return (true, Option::Some(esdt_attribute));
+//         }
+//     };
+
+//     (false, Option::None)
+// }
 
 pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
     let result_str: String;
