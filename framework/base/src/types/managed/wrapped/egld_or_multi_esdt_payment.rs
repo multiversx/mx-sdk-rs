@@ -24,3 +24,12 @@ pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {
 }
 
 impl<M> CodecFromSelf for EgldOrMultiEsdtPayment<M> where M: ManagedTypeApi {}
+
+impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
+    pub fn is_empty(&self) -> bool {
+        match self {
+            EgldOrMultiEsdtPayment::Egld(egld_value) => egld_value == &0u32,
+            EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => esdt_payments.is_empty(),
+        }
+    }
+}

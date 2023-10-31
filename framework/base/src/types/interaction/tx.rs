@@ -4,13 +4,16 @@ use multiversx_sc_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
+    contract_base::BlockchainWrapper,
     types::{
         BigUint, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
         MultiEsdtPayment,
     },
 };
 
-use super::{AsyncCall, ExplicitGas, FunctionCall, TxData, TxFrom, TxGas, TxPayment, TxTo};
+use super::{
+    AsyncCall, ExplicitGas, FunctionCall, TxData, TxFrom, TxGas, TxPayment, TxTo, TxToSpecified,
+};
 
 pub struct Tx<Api, From, To, Payment, Gas, Data>
 where
@@ -38,6 +41,7 @@ where
     Gas: TxGas,
     Data: TxData<Api>,
 {
+    /// TODO: does nothing, delete, added for easier copy-paste.
     #[inline]
     pub fn nothing(self) -> Tx<Api, From, To, Payment, Gas, Data> {
         Tx {
@@ -53,12 +57,12 @@ where
 
 pub type TxBase<Api> = Tx<Api, (), (), (), (), ()>;
 
-impl<Api> TxBase<Api>
+impl<Api> Default for TxBase<Api>
 where
     Api: CallTypeApi + 'static,
 {
     #[inline]
-    pub fn new() -> Self {
+    fn default() -> Self {
         Tx {
             _phantom: PhantomData,
             from: (),
@@ -70,6 +74,16 @@ where
     }
 }
 
+impl<Api> TxBase<Api>
+where
+    Api: CallTypeApi + 'static,
+{
+    #[inline]
+    pub fn new() -> Self {
+        Self::default()
+    }
+}
+
 impl<Api, To, Payment, Gas, Data> Tx<Api, (), To, Payment, Gas, Data>
 where
     Api: CallTypeApi + 'static,
@@ -78,7 +92,6 @@ where
     Gas: TxGas,
     Data: TxData<Api>,
 {
-    #[inline]
     pub fn from<From>(self, from: From) -> Tx<Api, From, To, Payment, Gas, Data>
     where
         From: TxFrom<Api>,
@@ -102,7 +115,6 @@ where
     Gas: TxGas,
     Data: TxData<Api>,
 {
-    #[inline]
     pub fn to<To>(self, to: To) -> Tx<Api, From, To, Payment, Gas, Data>
     where
         To: TxTo<Api>,
@@ -116,6 +128,11 @@ where
             data: self.data,
         }
     }
+
+    pub fn to_caller(self) -> Tx<Api, From, ManagedAddress<Api>, Payment, Gas, Data> {
+        let caller = BlockchainWrapper::<Api>::new().get_caller();
+        self.to(caller)
+    }
 }
 
 impl<Api, From, To, Gas, Data> Tx<Api, From, To, (), Gas, Data>
@@ -126,11 +143,7 @@ where
     Gas: TxGas,
     Data: TxData<Api>,
 {
-    #[inline]
-    pub fn with_egld_transfer(
-        self,
-        egld_amount: BigUint<Api>,
-    ) -> Tx<Api, From, To, EgldPayment<Api>, Gas, Data> {
+    pub fn egld(self, egld_amount: BigUint<Api>) -> Tx<Api, From, To, EgldPayment<Api>, Gas, Data> {
         Tx {
             _phantom: PhantomData,
             from: self.from,
@@ -150,15 +163,56 @@ where
     Gas: TxGas,
     Data: TxData<Api>,
 {
+    /// Adds a single ESDT token transfer to a transaction.
+    ///
+    /// Since this is the first ESDT payment, a single payment tx is produced. Can be called again for multiple payments.
+    pub fn esdt<P: Into<EsdtTokenPayment<Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Api, From, To, EsdtTokenPayment<Api>, Gas, Data> {
+        Tx {
+            _phantom: PhantomData,
+            from: self.from,
+            to: self.to,
+            payment: payment.into(),
+            gas: self.gas,
+            data: self.data,
+        }
+    }
+
+    /// Adds a collection of ESDT payments to a transaction.
+    pub fn multi_esdt(
+        self,
+        payments: MultiEsdtPayment<Api>, // TODO: references
+    ) -> Tx<Api, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+        Tx {
+            _phantom: PhantomData,
+            from: self.from,
+            to: self.to,
+            payment: payments,
+            gas: self.gas,
+            data: self.data,
+        }
+    }
+}
+
+impl<Api, From, To, Gas, Data> Tx<Api, From, To, EsdtTokenPayment<Api>, Gas, Data>
+where
+    Api: CallTypeApi + 'static,
+    From: TxFrom<Api>,
+    To: TxTo<Api>,
+    Gas: TxGas,
+    Data: TxData<Api>,
+{
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
-    #[inline]
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Api>>>(
         self,
         payment: P,
     ) -> Tx<Api, From, To, MultiEsdtPayment<Api>, Gas, Data> {
         let mut payments = ManagedVec::new();
+        payments.push(self.payment);
         payments.push(payment.into());
         Tx {
             _phantom: PhantomData,
@@ -182,7 +236,6 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
-    #[inline]
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Api>>>(
         mut self,
         payment: P,
@@ -223,9 +276,9 @@ where
     Gas: TxGas,
 {
     #[inline]
-    pub fn call<F: Into<FunctionCall<Api>>>(
+    pub fn call<FC: Into<FunctionCall<Api>>>(
         self,
-        call: F,
+        call: FC,
     ) -> Tx<Api, From, To, Payment, Gas, FunctionCall<Api>> {
         Tx {
             _phantom: PhantomData,
@@ -268,17 +321,20 @@ where
     }
 }
 
-impl<Api, From, Payment, Gas> Tx<Api, From, ManagedAddress<Api>, Payment, Gas, FunctionCall<Api>>
+impl<Api, From, To, Payment, Gas> Tx<Api, From, To, Payment, Gas, FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
     From: TxFrom<Api>,
+    To: TxToSpecified<Api>,
     Payment: TxPayment<Api>,
     Gas: TxGas,
 {
     pub fn normalize_tx(
         self,
     ) -> Tx<Api, From, ManagedAddress<Api>, EgldPayment<Api>, Gas, FunctionCall<Api>> {
-        let result = self.payment.convert_tx_data(&self.from, self.to, self.data);
+        let result = self
+            .payment
+            .convert_tx_data(&self.from, self.to.into_address(), self.data);
         Tx {
             _phantom: PhantomData,
             from: self.from,
@@ -290,9 +346,10 @@ where
     }
 }
 
-impl<Api, Payment> Tx<Api, (), ManagedAddress<Api>, Payment, (), FunctionCall<Api>>
+impl<Api, To, Payment> Tx<Api, (), To, Payment, (), FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
+    To: TxToSpecified<Api>,
     Payment: TxPayment<Api>,
 {
     pub fn async_call(self) -> AsyncCall<Api> {
@@ -306,9 +363,10 @@ where
     }
 }
 
-impl<Api, Payment> Tx<Api, (), ManagedAddress<Api>, Payment, ExplicitGas, FunctionCall<Api>>
+impl<Api, To, Payment> Tx<Api, (), To, Payment, ExplicitGas, FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
+    To: TxToSpecified<Api>,
     Payment: TxPayment<Api>,
 {
     #[cfg(feature = "promises")]
@@ -323,5 +381,42 @@ where
             extra_gas_for_callback: 0,
             callback_call: None,
         }
+    }
+}
+
+impl<Api, From, To, Payment, Gas, FC> Tx<Api, From, To, Payment, Gas, FC>
+where
+    Api: CallTypeApi + 'static,
+    From: TxFrom<Api>,
+    To: TxToSpecified<Api>,
+    Payment: TxPayment<Api>,
+    Gas: TxGas,
+    FC: TxData<Api> + Into<FunctionCall<Api>>,
+{
+    pub fn transfer_execute(self) {
+        if self.payment.is_no_payment() && self.data.is_no_call() {
+            return;
+        }
+
+        let gas_limit = self.gas.resolve_gas::<Api>();
+        self.payment.perform_transfer_execute(
+            self.to.to_address_ref(),
+            gas_limit,
+            self.data.into(),
+        );
+    }
+}
+
+impl<Api, From, To, Payment, Gas> Tx<Api, From, To, Payment, Gas, ()>
+where
+    Api: CallTypeApi + 'static,
+    From: TxFrom<Api>,
+    To: TxToSpecified<Api>,
+    Payment: TxPayment<Api>,
+    Gas: TxGas,
+{
+    /// Syntactic sugar, only allowed for simple transfers.
+    pub fn transfer(self) {
+        self.transfer_execute()
     }
 }
