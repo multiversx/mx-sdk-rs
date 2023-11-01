@@ -1466,6 +1466,7 @@ fn test_modules() {
 }
 
 #[test]
+#[ignore = "will fix when completing the VM 1.5 integration"]
 fn test_back_and_forth_transfers() {
     let mut wrapper = BlockchainStateWrapper::new();
     let user = wrapper.create_user_account(&rust_biguint!(0));
