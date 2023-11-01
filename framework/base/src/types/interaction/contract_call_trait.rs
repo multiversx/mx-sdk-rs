@@ -1,4 +1,7 @@
+use multiversx_sc_codec::NestedDecode;
+
 use crate::codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
+
 
 use crate::{api::CallTypeApi, types::ManagedBuffer};
 
@@ -91,6 +94,24 @@ where
         RequestedResult: TopDecodeMulti,
     {
         self.into_normalized().execute_on_dest_context()
+    }
+
+    /// Executes immediately, synchronously, and returns contract call result.
+    /// Only works if the target contract is in the same shard.
+    #[inline]
+    fn execute_on_dest_context_with_back_transfers<RequestedResult, BackTransfers>(
+        self,
+    ) -> (
+        RequestedResult,
+        BackTransfers,
+    )
+    where
+        RequestedResult: TopDecodeMulti + NestedDecode,
+        BackTransfers: TopDecodeMulti + NestedDecode,
+    {
+        let (result, back_transfers) = self.into_normalized().execute_on_dest_context_with_back_transfers();
+
+        (result, back_transfers)
     }
 
     /// Executes immediately, synchronously.

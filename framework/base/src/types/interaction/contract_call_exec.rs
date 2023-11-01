@@ -1,14 +1,21 @@
-use crate::codec::TopDecodeMulti;
+use crate::{
+    api::{use_raw_handle, StaticVarApiImpl},
+    codec::TopDecodeMulti,
+};
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
+    types::{
+        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType,
+        ManagedVec,
+    },
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};
+use crate::api::managed_types::handles::HandleConstraints;
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -28,6 +35,24 @@ where
         } else {
             self.basic.explicit_gas_limit
         }
+    }
+
+    #[inline]
+    pub fn get_back_transfers(&self) -> (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>) {
+        let esdt_transfer_value_handle: SA::BigIntHandle =
+            use_raw_handle(SA::static_var_api_impl().next_handle());
+        let call_value_handle: SA::BigIntHandle =
+            use_raw_handle(SA::static_var_api_impl().next_handle());
+
+        SA::blockchain_api_impl().managed_get_back_transfers(
+            esdt_transfer_value_handle.get_raw_handle(),
+            call_value_handle.get_raw_handle(),
+        );
+
+        (
+            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        )
     }
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
@@ -78,6 +103,27 @@ where
         SendRawWrapper::<SA>::new().clean_return_data();
 
         decode_result(raw_result)
+    }
+
+    pub(super) fn execute_on_dest_context_with_back_transfers<RequestedResult, BackTransfers>(
+        self,
+    ) -> (RequestedResult, BackTransfers)
+    where
+        RequestedResult: TopDecodeMulti,
+        BackTransfers: TopDecodeMulti,
+    {
+        let (raw_result, back_transfers) = SendRawWrapper::<SA>::new()
+            .execute_on_dest_context_with_back_transfers_raw(
+                self.resolve_gas_limit(),
+                &self.basic.to,
+                &self.egld_payment,
+                &self.basic.function_call.function_name,
+                &self.basic.function_call.arg_buffer,
+            );
+
+        SendRawWrapper::<SA>::new().clean_return_data();
+
+        (decode_result(raw_result), decode_back_transfers(back_transfers))
     }
 
     pub(super) fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult
@@ -201,7 +247,21 @@ where
 {
     let mut loader = ManagedResultArgLoader::new(raw_result);
     let arg_id = ArgId::from(&b"sync result"[..]);
-    let h = ArgErrorHandler::<SA>::from(arg_id);
+    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
     let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
+    result
+}
+
+fn decode_back_transfers<SA, BackTransfers>(
+    back_transfers: (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>),
+) -> BackTransfers
+where
+    SA: CallTypeApi + 'static,
+    BackTransfers: TopDecodeMulti,
+{
+    let mut loader = ManagedResultArgLoader::new(back_transfers);
+    let arg_id = ArgId::from(&b"sync result"[..]);
+    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
+    let Ok(result) = BackTransfers::multi_decode_or_handle_err(&mut loader, h);
     result
 }
