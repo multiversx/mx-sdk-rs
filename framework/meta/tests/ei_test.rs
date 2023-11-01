@@ -66,7 +66,13 @@ pub const EI_1_2_ADDED_NAMES: &[&str] = &[
 ];
 
 /// Planned to be released with VM 1.5.
-pub const EI_1_3_ADDED_NAMES: &[&str] = &["managedCreateAsyncCall", "managedGetCallbackClosure"];
+pub const EI_1_3_ADDED_NAMES: &[&str] = &[
+    "managedCreateAsyncCall",
+    "managedGetBackTransfers",
+    "managedGetCallbackClosure",
+    "managedGetCodeMetadata",
+    "managedIsBuiltinFunction",
+];
 
 fn list_to_set<'a>(list: &[&'a str]) -> HashSet<&'a str> {
     let mut set = HashSet::new();

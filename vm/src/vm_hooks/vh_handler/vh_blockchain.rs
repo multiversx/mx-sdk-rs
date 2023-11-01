@@ -199,6 +199,20 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         }
     }
 
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    ) {
+        let back_transfers = self.back_transfers_lock();
+        let mut m_types = self.m_types_lock();
+        m_types.bi_overwrite(call_value_handle, back_transfers.call_value.clone().into());
+        m_types.mb_set_vec_of_esdt_payments(
+            esdt_transfer_value_handle,
+            &back_transfers.esdt_transfers,
+        );
+    }
+
     fn check_esdt_frozen(
         &self,
         address_handle: RawHandle,

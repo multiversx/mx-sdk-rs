@@ -214,7 +214,6 @@ pub trait Vault {
             .direct_multi(&self.blockchain().get_caller(), &new_tokens);
     }
 
-    /// TODO: invert token_payment and token_nonce, for consistency.
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,

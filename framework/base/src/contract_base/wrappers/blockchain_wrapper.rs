@@ -10,8 +10,9 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType,
-        ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier,
+        BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenPayment,
+        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec,
+        TokenIdentifier,
     },
 };
 
@@ -340,6 +341,23 @@ where
             royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
             uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
         }
+    }
+
+    pub fn get_back_transfers(&self) -> (BigUint<A>, ManagedVec<A, EsdtTokenPayment<A>>) {
+        let esdt_transfer_value_handle: A::BigIntHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
+        let call_value_handle: A::BigIntHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
+
+        A::blockchain_api_impl().managed_get_back_transfers(
+            esdt_transfer_value_handle.get_raw_handle(),
+            call_value_handle.get_raw_handle(),
+        );
+
+        (
+            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        )
     }
 
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.

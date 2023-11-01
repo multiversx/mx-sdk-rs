@@ -1,7 +1,7 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
 use crate::{
-    tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata, H256},
     world_mock::{AccountData, BlockInfo},
 };
@@ -46,6 +46,8 @@ pub trait VMHooksHandlerSource: Debug {
     fn get_previous_block_info(&self) -> &BlockInfo;
 
     fn get_current_block_info(&self) -> &BlockInfo;
+
+    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers>;
 
     /// For ownership reasons, needs to return a clone.
     ///
