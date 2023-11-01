@@ -38,7 +38,6 @@ pub(super) fn is_attribute_with_one_type_arg(
                 _ => panic!("Expected a literal as the first token in the attribute argument"),
             };
 
-            // let symbol = first_literal.trim_matches('\"');
             let symbol = first_literal.as_str();
 
             let _ = match iter.next() {
@@ -46,15 +45,15 @@ pub(super) fn is_attribute_with_one_type_arg(
                 _ => panic!("Expected a punctuation token after the literal"),
             };
 
-            let mut chosen_type = String::new();
+            let mut chosen_type = proc_macro2::TokenStream::new();
 
             while let Some(token) = iter.next() {
                 match token {
                     TokenTree::Punct(punct) => {
-                        chosen_type.push(punct.as_char());
+                        chosen_type.extend(quote! { #punct });
                     },
                     TokenTree::Ident(ident) => {
-                        chosen_type.push_str(&ident.to_string());
+                        chosen_type.extend(quote! { #ident });
                     },
                     _ => break,
                 }
@@ -64,16 +63,10 @@ pub(super) fn is_attribute_with_one_type_arg(
                 panic!("Ticker field can't be empty");
             }
 
-            // let type_result: Result<syn::Type, syn::Error> = syn::parse_str(&chosen_type);
-
-            // println!("{:#?}", type_result.unwrap());
-
             let esdt_attribute = EsdtAttribute {
                 ticker: symbol,
                 ty: chosen_type,
             };
-
-            println!("{:#?}", esdt_attribute);
 
             return (true, Some(esdt_attribute));
         }

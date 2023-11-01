@@ -203,12 +203,8 @@ fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2
         .iter()
         .map(|esdt_attr| {
             let attr = esdt_attr.clone();
-            let (ticker, ty) = (attr.ticker, attr.ty);
-
-            // let trim = ty.trim_matches('"');
+            let (ticker, ty) = attr.into_tuple();
             quote! {
-
-                // let esdt_attr = multiversx_sc::abi::EsdtAttributeAbi::get_type::<syn::Type::Slice(#trim)>(#ticker);
                 contract_abi.esdt_attributes.push(multiversx_sc::abi::EsdtAttributeAbi::get_type::<#ty>(#ticker));
             }
         })
