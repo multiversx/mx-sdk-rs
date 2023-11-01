@@ -33,12 +33,12 @@ pub(super) fn is_attribute_with_one_type_arg(
             let first_literal = match iter.next() {
                 Some(TokenTree::Literal(literal)) => {
                     let literal_string = literal.to_string();
-                    &*Box::leak(Box::new(literal_string.trim_matches('\"').to_string()))
+                    literal_string.trim_matches('\"').to_string()
                 },
                 _ => panic!("Expected a literal as the first token in the attribute argument"),
             };
 
-            let symbol = first_literal.as_str();
+            let symbol: &'static str = Box::leak(Box::new(first_literal));
 
             let _ = match iter.next() {
                 Some(TokenTree::Punct(punct)) => punct,
@@ -47,7 +47,7 @@ pub(super) fn is_attribute_with_one_type_arg(
 
             let mut chosen_type = proc_macro2::TokenStream::new();
 
-            while let Some(token) = iter.next() {
+            for token in &mut iter {
                 match token {
                     TokenTree::Punct(punct) => {
                         chosen_type.extend(quote! { #punct });

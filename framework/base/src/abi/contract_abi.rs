@@ -49,7 +49,7 @@ impl ContractAbi {
         self.has_callback |= other.has_callback;
         self.type_descriptions.insert_all(&other.type_descriptions);
         self.esdt_attributes
-            .extend_from_slice(&other.esdt_attributes.as_slice());
+            .extend_from_slice(other.esdt_attributes.as_slice());
     }
 
     /// A type can provide more than 1 type descripions.
