@@ -15,10 +15,10 @@ pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bo
     false
 }
 
-pub(super) fn is_attribute_with_one_type_arg(
+pub(super) fn get_attribute_with_one_type_arg(
     attr: &syn::Attribute,
     name: &str,
-) -> (bool, Option<EsdtAttribute>) {
+) -> Option<EsdtAttribute> {
     let attr_path = &attr.path;
     if let Some(first_seg) = attr_path.segments.first() {
         if first_seg.ident == name {
@@ -68,11 +68,11 @@ pub(super) fn is_attribute_with_one_type_arg(
                 ty: chosen_type,
             };
 
-            return (true, Some(esdt_attribute));
+            return Some(esdt_attribute);
         }
     }
 
-    (false, None)
+    None
 }
 
 pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {

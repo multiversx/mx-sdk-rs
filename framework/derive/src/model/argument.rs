@@ -64,4 +64,3 @@ pub struct TraitProperties {
     pub allow_multiple_var_args: bool,
     pub esdt_attribute: Vec<EsdtAttribute>,
 }
-

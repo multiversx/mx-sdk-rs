@@ -40,8 +40,7 @@ pub fn test(test_args: &TestArgs) {
         .unwrap_or_else(|_| {
             panic!(
                 "{}",
-                format!("Failed to run program: {program} {args_str}")
-                    .bright_red()
+                format!("Failed to run program: {program} {args_str}").bright_red()
             )
         });
 

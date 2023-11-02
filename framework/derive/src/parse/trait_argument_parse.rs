@@ -55,9 +55,10 @@ fn process_esdt_attribute_argument(
     attr: &syn::Attribute,
     arg_metadata: &mut TraitProperties,
 ) -> bool {
-    let (has_attr, esdt_attribute) = is_esdt_attribute_prop(attr);
-    if has_attr {
-        arg_metadata.esdt_attribute.push(esdt_attribute.unwrap());
+    if let Some(esdt_attribute) = get_esdt_attribute_prop(attr) {
+        arg_metadata.esdt_attribute.push(esdt_attribute);
+        true
+    } else {
+        false
     }
-    has_attr
 }

@@ -451,5 +451,18 @@
             ]
         }
     },
-    "esdtAttributes": []
+    "esdtAttributes": [
+        {
+            "ticker": "TICKER-1",
+            "ty": "BigUint"
+        },
+        {
+            "ticker": "TICKER-2",
+            "ty": "bytes"
+        },
+        {
+            "ticker": "TICKER-3",
+            "ty": "u32"
+        }
+    ]
 }

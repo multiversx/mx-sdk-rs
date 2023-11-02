@@ -24,6 +24,9 @@ multiversx_sc::imports!();
 /// - GovernanceModule
 /// - PauseModule
 #[multiversx_sc::contract]
+#[esdt_attribute("TICKER-1", BigUint)]
+#[esdt_attribute("TICKER-2", ManagedBuffer)]
+#[esdt_attribute("TICKER-3", u32)]
 pub trait UseModule:
     ContractBase
     + contract_base_full_path_mod::ContractBaseFullPathTestModule

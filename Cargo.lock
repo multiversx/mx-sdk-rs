@@ -2129,7 +2129,6 @@ dependencies = [
  "lazy_static",
  "multiversx-sc",
  "pathdiff",
- "proc-macro2",
  "reqwest",
  "ruplacer",
  "rustc_version",

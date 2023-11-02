@@ -1,12 +1,6 @@
 use super::*;
 use alloc::{string::String, vec::Vec};
 
-// #[derive(Clone, Debug)]
-// pub struct EsdtAttribute {
-//     pub ticker: String,
-//     pub ty: TypeName,
-// }
-
 #[derive(Clone, Debug)]
 pub struct EsdtAttributeAbi {
     pub ticker: &'static str,
@@ -14,15 +8,13 @@ pub struct EsdtAttributeAbi {
 }
 
 impl EsdtAttributeAbi {
-    pub fn get_type<T: TypeAbi>(arg_name: &'static str) -> EsdtAttributeAbi{
+    pub fn get_type<T: TypeAbi>(arg_name: &'static str) -> EsdtAttributeAbi {
         EsdtAttributeAbi {
             ticker: arg_name,
             ty: T::type_name(),
         }
     }
 }
-
-
 
 #[derive(Debug, Default, Clone)]
 pub struct ContractAbi {
