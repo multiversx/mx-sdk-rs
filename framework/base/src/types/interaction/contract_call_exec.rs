@@ -105,12 +105,11 @@ where
         decode_result(raw_result)
     }
 
-    pub(super) fn execute_on_dest_context_with_back_transfers<RequestedResult, BackTransfers>(
+    pub(super) fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (RequestedResult, BackTransfers)
+    ) -> (RequestedResult,  (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>))
     where
         RequestedResult: TopDecodeMulti,
-        BackTransfers: TopDecodeMulti,
     {
         let (raw_result, back_transfers) = SendRawWrapper::<SA>::new()
             .execute_on_dest_context_with_back_transfers_raw(
@@ -123,7 +122,7 @@ where
 
         SendRawWrapper::<SA>::new().clean_return_data();
 
-        (decode_result(raw_result), decode_back_transfers(back_transfers))
+        (decode_result(raw_result), back_transfers)
     }
 
     pub(super) fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult
@@ -249,19 +248,5 @@ where
     let arg_id = ArgId::from(&b"sync result"[..]);
     let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
     let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
-    result
-}
-
-fn decode_back_transfers<SA, BackTransfers>(
-    back_transfers: (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>),
-) -> BackTransfers
-where
-    SA: CallTypeApi + 'static,
-    BackTransfers: TopDecodeMulti,
-{
-    let mut loader = ManagedResultArgLoader::new(back_transfers);
-    let arg_id = ArgId::from(&b"sync result"[..]);
-    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
-    let Ok(result) = BackTransfers::multi_decode_or_handle_err(&mut loader, h);
     result
 }

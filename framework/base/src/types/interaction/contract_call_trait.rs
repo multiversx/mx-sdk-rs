@@ -3,6 +3,7 @@ use multiversx_sc_codec::NestedDecode;
 use crate::codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
 
 
+use crate::types::{BigUint, ManagedVec, EsdtTokenPayment};
 use crate::{api::CallTypeApi, types::ManagedBuffer};
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
@@ -99,15 +100,14 @@ where
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     #[inline]
-    fn execute_on_dest_context_with_back_transfers<RequestedResult, BackTransfers>(
+    fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
     ) -> (
         RequestedResult,
-        BackTransfers,
+        (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>),
     )
     where
         RequestedResult: TopDecodeMulti + NestedDecode,
-        BackTransfers: TopDecodeMulti + NestedDecode,
     {
         let (result, back_transfers) = self.into_normalized().execute_on_dest_context_with_back_transfers();
 
