@@ -2,7 +2,7 @@ use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario_model::{
-        Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TransferStep,
+        Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep,
     },
     ContractInfo, ScenarioWorld,
 };

@@ -4,6 +4,7 @@
 mod call_promise_direct;
 mod call_promises;
 pub mod call_sync_bt;
+mod call_promises_bt;
 
 multiversx_sc::imports!();
 
@@ -13,6 +14,7 @@ pub trait PromisesFeatures:
     call_promises::CallPromisesModule
     + call_promise_direct::CallPromisesDirectModule
     + call_sync_bt::BackTransfersFeatureModule
+    + call_promises_bt::CallPromisesBackTransfersModule
 {
     #[init]
     fn init(&self) {}
