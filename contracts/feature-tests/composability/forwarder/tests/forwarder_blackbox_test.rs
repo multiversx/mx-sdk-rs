@@ -47,7 +47,7 @@ impl ForwarderTestState {
                     FORWARDER_ADDRESS_EXPR,
                     Account::new()
                         .nonce(1)
-                        .code(forwarder_code.clone())
+                        .code(forwarder_code)
                         .esdt_roles(NFT_TOKEN_ID_EXPR, roles),
                 ),
         );

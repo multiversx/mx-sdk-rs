@@ -1,17 +1,9 @@
 multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct CallbackData<M: ManagedTypeApi> {
-    callback_name: ManagedBuffer<M>,
-    token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    token_nonce: u64,
-    token_amount: BigUint<M>,
-    args: ManagedVec<M, ManagedBuffer<M>>,
-}
+use crate::common::{self, CallbackData};
 
 #[multiversx_sc::module]
-pub trait CallPromisesModule {
+pub trait CallPromisesModule: common::CommonModule {
     #[proxy]
     fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
 
@@ -60,44 +52,5 @@ pub trait CallPromisesModule {
             token_amount: payment,
             args: ManagedVec::new(),
         });
-    }
-
-    #[event("retrieve_funds_callback")]
-    fn retrieve_funds_callback_event(
-        &self,
-        #[indexed] token: &EgldOrEsdtTokenIdentifier,
-        #[indexed] nonce: u64,
-        #[indexed] payment: &BigUint,
-    );
-
-    #[view]
-    #[storage_mapper("callback_data")]
-    fn callback_data(&self) -> VecMapper<CallbackData<Self::Api>>;
-
-    #[view]
-    fn callback_data_at_index(
-        &self,
-        index: usize,
-    ) -> MultiValue5<
-        ManagedBuffer,
-        EgldOrEsdtTokenIdentifier,
-        u64,
-        BigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
-    > {
-        let cb_data = self.callback_data().get(index);
-        (
-            cb_data.callback_name,
-            cb_data.token_identifier,
-            cb_data.token_nonce,
-            cb_data.token_amount,
-            cb_data.args.into(),
-        )
-            .into()
-    }
-
-    #[endpoint]
-    fn clear_callback_data(&self) {
-        self.callback_data().clear();
     }
 }
