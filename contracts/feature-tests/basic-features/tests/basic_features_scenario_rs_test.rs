@@ -360,6 +360,11 @@ fn storage_mapper_fungible_token_rs() {
 }
 
 #[test]
+fn storage_mapper_address_to_id_rs() {
+    world().run("scenarios/storage_mapper_address_to_id.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_rs() {
     world().run("scenarios/storage_mapper_linked_list.scen.json");
 }
