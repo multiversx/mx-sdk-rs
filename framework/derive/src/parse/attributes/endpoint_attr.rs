@@ -28,6 +28,10 @@ pub fn is_allow_multiple_var_args(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_ALLOW_MULTIPLE_VAR_ARGS)
 }
 
+pub fn is_upgrade(attr: &syn::Attribute) -> bool {
+    is_attribute_with_no_args(attr, ATTR_UPGRADE)
+}
+
 #[derive(Clone, Debug)]
 pub struct EndpointAttribute {
     pub endpoint_name: Option<syn::Ident>,

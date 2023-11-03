@@ -1,3 +1,4 @@
+
 use crate::model::{Method, MethodImpl, MethodPayableMetadata, PublicRole, TraitProperties};
 
 use super::{
@@ -12,7 +13,7 @@ use super::{
     process_init_attribute, process_label_names_attribute, process_only_admin_attribute,
     process_only_owner_attribute, process_only_user_account_attribute,
     process_output_names_attribute, process_payable_attribute, process_promises_callback_attribute,
-    process_view_attribute,
+    process_view_attribute, process_upgrade_attribute
 };
 pub struct MethodAttributesPass1 {
     pub method_name: String,
@@ -96,6 +97,7 @@ fn process_attribute_first_pass(
         || process_allow_multiple_var_args_attribute(attr, first_pass_data)
 }
 
+
 fn process_attributes_second_pass(
     attrs: &[syn::Attribute],
     first_pass_data: &MethodAttributesPass1,
@@ -116,6 +118,7 @@ fn process_attribute_second_pass(
 ) -> bool {
     process_init_attribute(attr, first_pass_data, method)
         || process_endpoint_attribute(attr, first_pass_data, method)
+        || process_upgrade_attribute(attr, first_pass_data, method)
         || process_view_attribute(attr, first_pass_data, method)
         || process_external_view_attribute(attr, first_pass_data, method)
         || process_callback_raw_attribute(attr, method)

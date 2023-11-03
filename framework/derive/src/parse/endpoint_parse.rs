@@ -1,12 +1,12 @@
 use crate::model::{
     CallbackMetadata, EndpointMetadata, EndpointMutabilityMetadata, InitMetadata, Method,
-    PublicRole,
+    PublicRole, MethodPayableMetadata,
 };
 
 use super::{
     attributes::{
         is_allow_multiple_var_args, is_callback_raw, is_init, is_only_admin, is_only_owner,
-        is_only_user_account, CallbackAttribute, EndpointAttribute, ExternalViewAttribute,
+        is_only_user_account, is_upgrade, CallbackAttribute, EndpointAttribute, ExternalViewAttribute,
         LabelAttribute, OutputNameAttribute, PromisesCallbackAttribute, ViewAttribute,
     },
     MethodAttributesPass1,
@@ -14,7 +14,7 @@ use super::{
 
 fn check_single_role(method: &Method) {
     assert!(matches!(method.public_role, PublicRole::Private),
-		"Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`."
+		"Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`, `#[upgrade]`."
 	);
 }
 
@@ -33,6 +33,23 @@ pub fn process_init_attribute(
     } else {
         false
     }
+}
+
+pub fn process_upgrade_attribute(attr: &syn::Attribute, first_pass_data: &MethodAttributesPass1, method: &mut Method) -> bool {
+    let has_attr = is_upgrade(attr);
+    if has_attr {
+        method.name = proc_macro2::Ident::new("upgrade", proc_macro2::Span::call_site());
+        let pass_1_data = MethodAttributesPass1 {
+            method_name: method.name.to_string(),
+            payable: MethodPayableMetadata::NotPayable,
+            only_owner: first_pass_data.only_owner,
+            only_admin: first_pass_data.only_admin,
+            only_user_account: first_pass_data.only_user_account,
+            allow_multiple_var_args: first_pass_data.allow_multiple_var_args,
+        };
+        return process_endpoint_attribute(attr, &pass_1_data, method);
+    }
+    false
 }
 
 pub fn process_allow_multiple_var_args_attribute(
@@ -79,6 +96,8 @@ pub fn process_only_user_account_attribute(
     }
     is_only_user_account
 }
+
+
 
 pub fn process_endpoint_attribute(
     attr: &syn::Attribute,
