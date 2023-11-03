@@ -28,6 +28,7 @@ pub fn perform_test_gen_all(path: impl AsRef<Path>, ignore: &[String], create: b
 
 fn perform_test_gen(contract_dir: &RelevantDirectory, create: bool) {
     let contract_dir_path = &contract_dir.path;
+
     let scenarios_dir = contract_dir_path.join(SCENARIOS_DIR_NAME);
     if !scenarios_dir.is_dir() {
         print_no_folder(contract_dir_path, SCENARIOS_DIR_NAME);
@@ -88,9 +89,11 @@ struct ProcessFileContext<'a> {
 }
 
 fn process_file(config: ProcessFileConfig, context: ProcessFileContext) {
-    let existing_file_path = find_test_file(context.test_dir, config.suffix);
+    let suffix = config.suffix;
+    let existing_file_path = find_test_file(context.test_dir, suffix);
 
     if existing_file_path.is_none() && !context.create_flag {
+        print_no_file(suffix);
         return;
     }
 
@@ -113,8 +116,13 @@ fn process_file(config: ProcessFileConfig, context: ProcessFileContext) {
         let file_name = format!("{}_{}", context.crate_name, config.suffix);
         context.test_dir.join(file_name)
     };
-    let mut file = File::create(file_path).unwrap();
+
+    let mut file = File::create(&file_path).unwrap();
     write!(file, "{new_code}").unwrap();
+
+    if existing_file_path.is_none() && context.create_flag {
+        print_new_file(&file_path);
+    }
 }
 
 fn find_test_file(test_dir: &Path, suffix: &str) -> Option<PathBuf> {

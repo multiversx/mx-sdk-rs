@@ -21,6 +21,7 @@ num-bigint = ["multiversx-sc-codec/num-bigint"]
 alloc = ["multiversx-sc-codec/alloc"]
 promises = []
 managed-map = []
+back-transfers = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]

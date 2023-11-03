@@ -1,7 +1,7 @@
 use std::sync::{Mutex, MutexGuard};
 
 use crate::{
-    tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata},
     vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
@@ -66,6 +66,10 @@ impl VMHooksHandlerSource for StaticApiVMHooksHandler {
 
     fn get_current_block_info(&self) -> &BlockInfo {
         panic!("cannot access the block info in the StaticApi")
+    }
+
+    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+        panic!("cannot access the back transfers in the StaticApi")
     }
 
     fn account_data(&self, _address: &VMAddress) -> AccountData {
