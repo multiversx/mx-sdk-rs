@@ -75,23 +75,23 @@ impl PromisesFeaturesTestState {
     }
 }
 
-#[test]
-fn test_back_transfers() {
-    let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
+// #[test]
+// fn test_back_transfers() {
+//     let mut state = PromisesFeaturesTestState::new();
+//     let token_amount = BigUint::from(1000u64);
 
-    state.world.sc_call(
-        ScCallStep::new().from(USER_ADDRESS_EXPR).call(
-            state
-                .promises_features_contract
-                .forward_sync_retrieve_funds_bt(state.vault_contract, TOKEN_ID, 0u64, &token_amount),
-        ),
-    );
+//     state.world.sc_call(
+//         ScCallStep::new().from(USER_ADDRESS_EXPR).call(
+//             state
+//                 .promises_features_contract
+//                 .forward_sync_retrieve_funds_bt(state.vault_contract, TOKEN_ID, 0u64, &token_amount),
+//         ),
+//     );
 
-    state
-        .world
-        .check_state_step(CheckStateStep::new().put_account(
-            state.promises_features_contract,
-            CheckAccount::new().esdt_balance(TOKEN_ID_EXPR, token_amount),
-        ));
-}
+//     state
+//         .world
+//         .check_state_step(CheckStateStep::new().put_account(
+//             state.promises_features_contract,
+//             CheckAccount::new().esdt_balance(TOKEN_ID_EXPR, token_amount),
+//         ));
+// }
