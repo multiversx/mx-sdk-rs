@@ -302,49 +302,6 @@ where
         ManagedVec::from_raw_handle(result_handle)
     }
 
-    pub fn execute_on_dest_context_with_back_transfers_raw(
-        &self,
-        gas: u64,
-        address: &ManagedAddress<A>,
-        value: &BigUint<A>,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
-    ) -> (
-        ManagedVec<A, ManagedBuffer<A>>,
-        (BigUint<A>, ManagedVec<A, EsdtTokenPayment<A>>),
-    ) {
-        // -> ManagedVec<A, ManagedBuffer<A>> {
-
-        let result_handle = A::static_var_api_impl().next_handle();
-        A::send_api_impl().execute_on_dest_context_raw(
-            gas,
-            address.get_handle().get_raw_handle(),
-            value.get_handle().get_raw_handle(),
-            endpoint_name.get_handle().get_raw_handle(),
-            arg_buffer.get_handle().get_raw_handle(),
-            result_handle,
-        );
-        let result = ManagedVec::from_raw_handle(result_handle);
-
-        let esdt_transfer_value_handle: A::BigIntHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-        let call_value_handle: A::BigIntHandle =
-            use_raw_handle(A::static_var_api_impl().next_handle());
-
-        A::blockchain_api_impl().managed_get_back_transfers(
-            esdt_transfer_value_handle.get_raw_handle(),
-            call_value_handle.get_raw_handle(),
-        );
-
-        (
-            result,
-            (
-                BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
-                ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
-            ),
-        )
-    }
-
     pub fn execute_on_same_context_raw(
         &self,
         gas: u64,

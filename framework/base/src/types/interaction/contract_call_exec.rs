@@ -105,29 +105,6 @@ where
         decode_result(raw_result)
     }
 
-    pub(super) fn execute_on_dest_context_with_back_transfers<RequestedResult>(
-        self,
-    ) -> (
-        RequestedResult,
-        (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>),
-    )
-    where
-        RequestedResult: TopDecodeMulti,
-    {
-        let (raw_result, back_transfers) = SendRawWrapper::<SA>::new()
-            .execute_on_dest_context_with_back_transfers_raw(
-                self.resolve_gas_limit(),
-                &self.basic.to,
-                &self.egld_payment,
-                &self.basic.function_call.function_name,
-                &self.basic.function_call.arg_buffer,
-            );
-
-        SendRawWrapper::<SA>::new().clean_return_data();
-
-        (decode_result(raw_result), back_transfers)
-    }
-
     pub(super) fn execute_on_dest_context_readonly<RequestedResult>(self) -> RequestedResult
     where
         RequestedResult: TopDecodeMulti,

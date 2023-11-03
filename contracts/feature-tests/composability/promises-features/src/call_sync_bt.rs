@@ -20,8 +20,10 @@ pub trait BackTransfersFeatureModule {
             .retrieve_funds(token, token_nonce, amount)
             .execute_on_dest_context_with_back_transfers::<()>();
 
-        let (egld_transfer, esdt_transfers) = back_transfers;
-        self.back_transfers_event(&egld_transfer, &esdt_transfers.into_multi_value());
+        self.back_transfers_event(
+            &back_transfers.total_egld_amount,
+            &back_transfers.esdt_payments.into_multi_value(),
+        );
     }
 
     #[event("back_tranfers")]

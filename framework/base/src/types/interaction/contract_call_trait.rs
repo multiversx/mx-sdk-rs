@@ -1,10 +1,7 @@
-use multiversx_sc_codec::NestedDecode;
-
-use crate::codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
-
 use crate::{
     api::CallTypeApi,
-    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedVec},
+    codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti},
+    types::ManagedBuffer,
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
@@ -101,18 +98,16 @@ where
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     #[inline]
+    #[cfg(feature = "back-transfers")]
     fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (
-        RequestedResult,
-        (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>),
-    )
+    ) -> (RequestedResult, super::BackTransfers<SA>)
     where
-        RequestedResult: TopDecodeMulti + NestedDecode,
+        RequestedResult: TopDecodeMulti,
     {
-        let (result, back_transfers) = self
-            .into_normalized()
-            .execute_on_dest_context_with_back_transfers();
+        let result = self.execute_on_dest_context();
+        let back_transfers =
+            crate::contract_base::BlockchainWrapper::<SA>::new().get_back_transfers();
 
         (result, back_transfers)
     }

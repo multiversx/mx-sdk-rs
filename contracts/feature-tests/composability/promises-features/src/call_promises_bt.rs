@@ -29,7 +29,8 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
 
     #[promises_callback]
     fn retrieve_funds_back_transfers_callback(&self) {
-        let (egld_transfer, esdt_transfers) = self.blockchain().get_back_transfers();
+        let back_transfers = self.blockchain().get_back_transfers();
+        let egld_transfer = back_transfers.total_egld_amount;
 
         if egld_transfer != BigUint::zero() {
             let egld_token_id = EgldOrEsdtTokenIdentifier::egld();
@@ -44,7 +45,7 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
             });
         }
 
-        for esdt_transfer in &esdt_transfers {
+        for esdt_transfer in &back_transfers.esdt_payments {
             let (token, nonce, payment) = esdt_transfer.into_tuple();
             let esdt_token_id = EgldOrEsdtTokenIdentifier::esdt(token);
             self.retrieve_funds_callback_event(&esdt_token_id, nonce, &payment);
