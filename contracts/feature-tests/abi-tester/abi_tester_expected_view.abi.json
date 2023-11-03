@@ -480,6 +480,18 @@
         {
             "ticker": "TICKER-3",
             "ty": "u32"
+        },
+        {
+            "ticker": "STRUCT-1",
+            "ty": "AbiEnum"
+        },
+        {
+            "ticker": "STRUCT-2",
+            "ty": "AbiManagedType"
+        },
+        {
+            "ticker": "OnlyInEsdt",
+            "ty": "OnlyShowsUpInEsdtAttr"
         }
     ]
 }

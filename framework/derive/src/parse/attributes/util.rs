@@ -1,5 +1,5 @@
 use crate::model::EsdtAttribute;
-use proc_macro2::{Group, TokenTree};
+use proc_macro2::TokenTree;
 
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
     if let Some(first_seg) = attr.path.segments.first() {
@@ -22,23 +22,20 @@ pub(super) fn get_attribute_with_one_type_arg(
     let attr_path = &attr.path;
     if let Some(first_seg) = attr_path.segments.first() {
         if first_seg.ident == name {
-            let tokens = attr.tokens.clone();
-            let group = match syn::parse2::<Group>(tokens) {
-                Ok(group) => group.stream(),
+            let mut tokens = attr.tokens.clone().into_iter();
+            let group = match tokens.next() {
+                Some(TokenTree::Group(group_val)) => group_val,
                 _ => panic!("Expected a group as attribute argument"),
             };
 
-            let mut iter = group.into_iter();
+            let mut iter = group.stream().into_iter();
 
             let first_literal = match iter.next() {
-                Some(TokenTree::Literal(literal)) => {
-                    let literal_string = literal.to_string();
-                    literal_string.trim_matches('\"').to_string()
-                },
+                Some(TokenTree::Literal(literal)) => literal.to_string(),
                 _ => panic!("Expected a literal as the first token in the attribute argument"),
             };
 
-            let symbol: &'static str = Box::leak(Box::new(first_literal));
+            let symbol = first_literal.trim_matches('\"').to_string();
 
             let _ = match iter.next() {
                 Some(TokenTree::Punct(punct)) => punct,

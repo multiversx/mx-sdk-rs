@@ -33,3 +33,6 @@ pub struct AbiManagedVecItem {
     pub value1: u32,
     pub value2: u32,
 }
+
+#[derive(TypeAbi)]
+pub struct OnlyShowsUpInEsdtAttr {}

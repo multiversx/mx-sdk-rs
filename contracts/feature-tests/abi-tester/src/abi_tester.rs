@@ -19,6 +19,9 @@ use only_nested::*;
 #[esdt_attribute("TICKER-1", BigUint)]
 #[esdt_attribute("TICKER-2", ManagedBuffer)]
 #[esdt_attribute("TICKER-3", u32)]
+#[esdt_attribute("STRUCT-1", AbiEnum)]
+#[esdt_attribute("STRUCT-2", AbiManagedType<Self::Api>)]
+#[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]

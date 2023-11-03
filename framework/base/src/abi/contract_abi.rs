@@ -8,7 +8,7 @@ pub struct EsdtAttributeAbi {
 }
 
 impl EsdtAttributeAbi {
-    pub fn get_type<T: TypeAbi>(arg_name: &'static str) -> EsdtAttributeAbi {
+    pub fn new<T: TypeAbi>(arg_name: &'static str) -> EsdtAttributeAbi {
         EsdtAttributeAbi {
             ticker: arg_name,
             ty: T::type_name(),

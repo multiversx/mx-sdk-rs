@@ -18,14 +18,8 @@ pub struct ContractTrait {
 
 #[derive(Clone, Debug)]
 pub struct EsdtAttribute {
-    pub ticker: &'static str,
+    pub ticker: String,
     pub ty: proc_macro2::TokenStream,
-}
-
-impl EsdtAttribute {
-    pub fn into_tuple(self) -> (&'static str, proc_macro2::TokenStream) {
-        (self.ticker, self.ty)
-    }
 }
 
 impl ContractTrait {
