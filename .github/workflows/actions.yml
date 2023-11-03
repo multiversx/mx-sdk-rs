@@ -13,9 +13,10 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v2.3.0
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@01a7c1f10c5dd623ea621bf92dcfe9fa1903873a
     with:
       rust-toolchain: nightly-2023-05-26
+      vmtools-repository: "https://github.com/multiversx/mx-chain-vm-v1_4-go/archive/{TAG}.tar.gz"
       vmtools-version: v1.4.89
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
