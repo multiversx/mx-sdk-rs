@@ -2,10 +2,11 @@ use std::{ffi::OsStr, fs, process::Command};
 
 use super::OutputContract;
 use crate::{
-    abi_json::ContractAbiJson,
+    abi_json::{ContractAbiJson, EsdtAttributeJson},
     cli_args::BuildArgs,
     ei::EIVersion,
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
+    esdt_attr_file_json::create_new_esdt_attr_file,
     print_util::*,
     tools,
 };
@@ -74,6 +75,14 @@ impl OutputContract {
         self.extract_imports(build_args, output_path);
         self.run_twiggy(build_args, output_path);
         self.pack_mxsc_file(build_args, output_path);
+        self.print_esdt_attributes_files(output_path);
+    }
+
+    fn print_esdt_attributes_files(&self, output_path: &str) {
+        for esdt_attr in &self.abi.esdt_attributes {
+            let json = EsdtAttributeJson::from(esdt_attr);
+            create_new_esdt_attr_file(&json, &output_path, json.ticker.as_str());
+        }
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -98,6 +107,7 @@ impl OutputContract {
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
         };
+
         save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
     }
 

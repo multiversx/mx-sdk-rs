@@ -9,6 +9,7 @@ mod print_util;
 pub mod template;
 mod tools;
 pub mod version_history;
+pub mod esdt_attr_file_json;
 
 #[macro_use]
 extern crate lazy_static;
