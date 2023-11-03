@@ -14,7 +14,7 @@ pub trait BackTransfersFeatureModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        let (_result, back_transfers) = self.vault_proxy()
+        let ((), back_transfers) = self.vault_proxy()
         .contract(to)
         .retrieve_funds(token, token_nonce, amount)
         .execute_on_dest_context_with_back_transfers::<()>();
