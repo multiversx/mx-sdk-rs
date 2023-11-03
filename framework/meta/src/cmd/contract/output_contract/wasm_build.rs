@@ -81,7 +81,7 @@ impl OutputContract {
     fn print_esdt_attributes_files(&self, output_path: &str) {
         for esdt_attr in &self.abi.esdt_attributes {
             let json = EsdtAttributeJson::from(esdt_attr);
-            create_new_esdt_attr_file(&json, &output_path, json.ticker.as_str());
+            create_new_esdt_attr_file(&json, output_path, json.ticker.as_str());
         }
     }
 
