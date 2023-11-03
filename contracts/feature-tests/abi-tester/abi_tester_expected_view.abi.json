@@ -101,23 +101,23 @@
     ],
     "esdtAttributes": [
         {
-            "ticker": "TICKER-1",
+            "ticker": "TICKER1",
             "type": "BigUint"
         },
         {
-            "ticker": "TICKER-2",
+            "ticker": "TICKER2",
             "type": "bytes"
         },
         {
-            "ticker": "TICKER-3",
+            "ticker": "TICKER3",
             "type": "u32"
         },
         {
-            "ticker": "STRUCT-1",
+            "ticker": "STRUCT1",
             "type": "AbiEnum"
         },
         {
-            "ticker": "STRUCT-2",
+            "ticker": "STRUCT2",
             "type": "AbiManagedType"
         },
         {

@@ -1002,6 +1002,20 @@
             ]
         }
     ],
+    "esdtAttributes": [
+        {
+            "ticker": "INMODULE",
+            "type": "u32"
+        },
+        {
+            "ticker": "TICKER1",
+            "type": "BigUint"
+        },
+        {
+            "ticker": "TICKER2",
+            "type": "bytes"
+        }
+    ],
     "hasCallback": true,
     "types": {
         "EsdtTokenPayment": {
@@ -1206,19 +1220,5 @@
                 }
             ]
         }
-    },
-    "esdtAttributes": [
-        {
-            "ticker": "TICKER-1",
-            "ty": "BigUint"
-        },
-        {
-            "ticker": "TICKER-2",
-            "ty": "bytes"
-        },
-        {
-            "ticker": "TICKER-3",
-            "ty": "u32"
-        }
-    ]
+    }
 }
