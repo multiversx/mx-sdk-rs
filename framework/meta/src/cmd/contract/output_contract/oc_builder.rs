@@ -190,6 +190,7 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
         events: original_abi.events.clone(),
         has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
+        esdt_attributes: original_abi.esdt_attributes.clone(),
     }
 }
 

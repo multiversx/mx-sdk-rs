@@ -98,6 +98,7 @@ impl OutputContract {
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
         };
+
         save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
     }
 

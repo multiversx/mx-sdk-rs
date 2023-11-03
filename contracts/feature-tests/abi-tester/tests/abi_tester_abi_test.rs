@@ -1,6 +1,10 @@
 use std::{fs, fs::File, io::Write};
 
-use multiversx_sc_meta::abi_json;
+use multiversx_sc::contract_base::ContractAbiProvider;
+use multiversx_sc_meta::{
+    abi_json::{self, EsdtAttributeAbiJson},
+    esdt_attr_file_json::serialize_esdt_attribute_json,
+};
 use multiversx_sc_scenario::ScenarioWorld;
 
 #[test]
@@ -39,6 +43,26 @@ fn abi_tester_abi_generated_ok() {
     assert_eq!(
         view_contract_abi_json,
         fs::read_to_string("./abi_tester_expected_view.abi.json").unwrap()
+    );
+}
+
+#[test]
+fn abi_tester_esdt_attr_abi_generated_ok() {
+    let original_abi = abi_tester::AbiProvider::abi();
+    let esdt_attr = original_abi
+        .esdt_attributes
+        .iter()
+        .find(|esdt_attr| esdt_attr.ticker == "OnlyInEsdt")
+        .unwrap();
+    let esdt_attr_abi = EsdtAttributeAbiJson::new(esdt_attr);
+    let esdt_attr_abi_string = serialize_esdt_attribute_json(&esdt_attr_abi);
+
+    let mut file = File::create("abi_tester_generated_esdt_attr.esdt-abi.json").unwrap();
+    file.write_all(esdt_attr_abi_string.as_bytes()).unwrap();
+
+    assert_eq!(
+        esdt_attr_abi_string,
+        fs::read_to_string("./abi_tester_expected_esdt_attr.esdt-abi.json").unwrap()
     );
 }
 
