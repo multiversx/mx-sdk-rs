@@ -107,7 +107,10 @@ where
 
     pub(super) fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (RequestedResult,  (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>))
+    ) -> (
+        RequestedResult,
+        (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>),
+    )
     where
         RequestedResult: TopDecodeMulti,
     {

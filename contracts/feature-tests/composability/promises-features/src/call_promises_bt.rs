@@ -1,7 +1,7 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-use crate::common::{CallbackData, self};
+use crate::common::{self, CallbackData};
 
 #[multiversx_sc::module]
 pub trait CallPromisesBackTransfersModule: common::CommonModule {
@@ -58,5 +58,4 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
             });
         }
     }
-
 }

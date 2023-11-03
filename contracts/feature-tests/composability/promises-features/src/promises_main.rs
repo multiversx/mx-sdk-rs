@@ -3,8 +3,8 @@
 
 mod call_promise_direct;
 mod call_promises;
-pub mod call_sync_bt;
 mod call_promises_bt;
+pub mod call_sync_bt;
 mod common;
 
 multiversx_sc::imports!();

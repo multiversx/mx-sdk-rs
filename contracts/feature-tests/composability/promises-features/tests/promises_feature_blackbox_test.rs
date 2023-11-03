@@ -1,9 +1,7 @@
 use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::{
     api::StaticApi,
-    scenario_model::{
-        Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep,
-    },
+    scenario_model::{Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep},
     ContractInfo, ScenarioWorld,
 };
 
@@ -52,13 +50,13 @@ impl PromisesFeaturesTestState {
                 .put_account(USER_ADDRESS_EXPR, Account::new().nonce(1))
                 .put_account(
                     PROMISES_FEATURE_ADDRESS_EXPR,
-                    Account::new().nonce(1).code(promises_feature_code.clone()),
+                    Account::new().nonce(1).code(promises_feature_code),
                 )
                 .put_account(
                     VAULT_ADDRESS_EXPR,
                     Account::new()
                         .nonce(1)
-                        .code(vault_code.clone())
+                        .code(vault_code)
                         .esdt_balance(TOKEN_ID_EXPR, "1000"),
                 ),
         );
@@ -85,7 +83,12 @@ fn test_back_transfers() {
         ScCallStep::new().from(USER_ADDRESS_EXPR).call(
             state
                 .promises_features_contract
-                .forward_sync_retrieve_funds_bt(state.vault_contract, TOKEN_ID, 0u64, &token_amount),
+                .forward_sync_retrieve_funds_bt(
+                    state.vault_contract,
+                    TOKEN_ID,
+                    0u64,
+                    &token_amount,
+                ),
         ),
     );
 

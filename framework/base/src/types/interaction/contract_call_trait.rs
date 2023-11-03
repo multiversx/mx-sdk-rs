@@ -2,9 +2,10 @@ use multiversx_sc_codec::NestedDecode;
 
 use crate::codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
 
-
-use crate::types::{BigUint, ManagedVec, EsdtTokenPayment};
-use crate::{api::CallTypeApi, types::ManagedBuffer};
+use crate::{
+    api::CallTypeApi,
+    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedVec},
+};
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
 
@@ -109,7 +110,9 @@ where
     where
         RequestedResult: TopDecodeMulti + NestedDecode,
     {
-        let (result, back_transfers) = self.into_normalized().execute_on_dest_context_with_back_transfers();
+        let (result, back_transfers) = self
+            .into_normalized()
+            .execute_on_dest_context_with_back_transfers();
 
         (result, back_transfers)
     }

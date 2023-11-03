@@ -398,7 +398,7 @@ fn test_change_quorum() {
         SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
     );
 
-    let action_id = state.propose_add_board_member(new_board_member_address.clone());
+    let action_id = state.propose_add_board_member(new_board_member_address);
     state.sign(action_id);
     state.perform(action_id);
 
@@ -452,7 +452,7 @@ fn test_transfer_execute_to_user() {
             .world
             .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
                 state.multisig_contract.propose_transfer_execute(
-                    new_user_address.clone(),
+                    new_user_address,
                     AMOUNT.parse::<u64>().unwrap(),
                     FunctionCall::empty(),
                 ),
@@ -532,7 +532,7 @@ fn test_deploy_and_upgrade_from_source() {
 
     let adder_call = state.adder_contract.add(5u64);
 
-    let action_id = state.propose_transfer_execute(new_adder_address.clone(), 0u64, adder_call);
+    let action_id = state.propose_transfer_execute(new_adder_address, 0u64, adder_call);
     state.sign(action_id);
     state.perform(action_id);
 
@@ -561,7 +561,7 @@ fn test_deploy_and_upgrade_from_source() {
     let action_id = state.propose_sc_upgrade_from_source(
         state.adder_address.clone(),
         0u64,
-        factorial_address.clone(),
+        factorial_address,
         CodeMetadata::all(),
         MultiValueVec::new(),
     );

@@ -14,14 +14,14 @@ pub trait BackTransfersFeatureModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        let ((), back_transfers) = self.vault_proxy()
-        .contract(to)
-        .retrieve_funds(token, token_nonce, amount)
-        .execute_on_dest_context_with_back_transfers::<()>();
+        let ((), back_transfers) = self
+            .vault_proxy()
+            .contract(to)
+            .retrieve_funds(token, token_nonce, amount)
+            .execute_on_dest_context_with_back_transfers::<()>();
 
-    let (egld_transfer, esdt_transfers) = back_transfers;
-    self.back_transfers_event(&egld_transfer, &esdt_transfers.into_multi_value());
-
+        let (egld_transfer, esdt_transfers) = back_transfers;
+        self.back_transfers_event(&egld_transfer, &esdt_transfers.into_multi_value());
     }
 
     #[event("back_tranfers")]
