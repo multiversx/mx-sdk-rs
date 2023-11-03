@@ -206,6 +206,7 @@ fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2
             let ty = &esdt_attr.ty;
             quote! {
                 contract_abi.esdt_attributes.push(multiversx_sc::abi::EsdtAttributeAbi::new::<#ty>(#ticker));
+                contract_abi.add_type_descriptions::<#ty>();
             }
         })
         .collect()

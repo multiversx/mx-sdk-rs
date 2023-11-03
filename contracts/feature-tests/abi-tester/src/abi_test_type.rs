@@ -35,4 +35,6 @@ pub struct AbiManagedVecItem {
 }
 
 #[derive(TypeAbi)]
-pub struct OnlyShowsUpInEsdtAttr {}
+pub struct OnlyShowsUpInEsdtAttr {
+    pub field: OnlyShowsUpAsNested10,
+}

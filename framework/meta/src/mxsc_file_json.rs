@@ -27,5 +27,3 @@ pub fn save_mxsc_file_json(mxsc_file_json: &MxscFileJson, path: impl AsRef<Path>
     let mut mxsc_file = File::create(path).unwrap();
     write!(mxsc_file, "{mxsc_file_string}").unwrap();
 }
-
-

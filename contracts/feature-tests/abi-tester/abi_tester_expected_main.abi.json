@@ -422,6 +422,32 @@
             ]
         }
     ],
+    "esdtAttributes": [
+        {
+            "ticker": "TICKER-1",
+            "type": "BigUint"
+        },
+        {
+            "ticker": "TICKER-2",
+            "type": "bytes"
+        },
+        {
+            "ticker": "TICKER-3",
+            "type": "u32"
+        },
+        {
+            "ticker": "STRUCT-1",
+            "type": "AbiEnum"
+        },
+        {
+            "ticker": "STRUCT-2",
+            "type": "AbiManagedType"
+        },
+        {
+            "ticker": "OnlyInEsdt",
+            "type": "OnlyShowsUpInEsdtAttr"
+        }
+    ],
     "hasCallback": false,
     "types": {
         "AbiEnum": {
@@ -724,6 +750,12 @@
                 "Tests that the ABI generator also fetches types that only appear as fields."
             ]
         },
+        "OnlyShowsUpAsNested10": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
         "OnlyShowsUpAsNestedInArray": {
             "type": "struct",
             "docs": [
@@ -789,32 +821,15 @@
                     "type": "()"
                 }
             ]
+        },
+        "OnlyShowsUpInEsdtAttr": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field",
+                    "type": "OnlyShowsUpAsNested10"
+                }
+            ]
         }
-    },
-    "esdtAttributes": [
-        {
-            "ticker": "TICKER-1",
-            "ty": "BigUint"
-        },
-        {
-            "ticker": "TICKER-2",
-            "ty": "bytes"
-        },
-        {
-            "ticker": "TICKER-3",
-            "ty": "u32"
-        },
-        {
-            "ticker": "STRUCT-1",
-            "ty": "AbiEnum"
-        },
-        {
-            "ticker": "STRUCT-2",
-            "ty": "AbiManagedType"
-        },
-        {
-            "ticker": "OnlyInEsdt",
-            "ty": "OnlyShowsUpInEsdtAttr"
-        }
-    ]
+    }
 }

@@ -1,21 +1,6 @@
 use super::*;
 use alloc::{string::String, vec::Vec};
 
-#[derive(Clone, Debug)]
-pub struct EsdtAttributeAbi {
-    pub ticker: &'static str,
-    pub ty: TypeName,
-}
-
-impl EsdtAttributeAbi {
-    pub fn new<T: TypeAbi>(arg_name: &'static str) -> EsdtAttributeAbi {
-        EsdtAttributeAbi {
-            ticker: arg_name,
-            ty: T::type_name(),
-        }
-    }
-}
-
 #[derive(Debug, Default, Clone)]
 pub struct ContractAbi {
     pub build_info: BuildInfoAbi,
@@ -25,9 +10,9 @@ pub struct ContractAbi {
     pub endpoints: Vec<EndpointAbi>,
     pub promise_callbacks: Vec<EndpointAbi>,
     pub events: Vec<EventAbi>,
+    pub esdt_attributes: Vec<EsdtAttributeAbi>,
     pub has_callback: bool,
     pub type_descriptions: TypeDescriptionContainerImpl,
-    pub esdt_attributes: Vec<EsdtAttributeAbi>,
 }
 
 impl ContractAbi {
