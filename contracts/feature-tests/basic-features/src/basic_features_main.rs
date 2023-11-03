@@ -20,6 +20,7 @@ pub mod managed_vec_features;
 pub mod non_zero_features;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
+pub mod storage_mapper_address_to_id;
 pub mod storage_mapper_fungible_token;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
@@ -56,6 +57,7 @@ pub trait BasicFeatures:
     + storage_raw_api_features::StorageRawApiFeatures
     + storage_direct_load::StorageLoadFeatures
     + storage_direct_store::StorageStoreFeatures
+    + storage_mapper_address_to_id::AddressToIdMapperFeatures
     + storage_mapper_linked_list::LinkedListMapperFeatures
     + storage_mapper_queue::QueueMapperFeatures
     + storage_mapper_map::MapMapperFeatures

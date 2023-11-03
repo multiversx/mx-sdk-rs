@@ -46,6 +46,10 @@ pub struct OnlyShowsUpAsNested09;
 
 /// Tests that the ABI generator also fetches types that only appear as fields.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+pub struct OnlyShowsUpAsNested10;
+
+/// Tests that the ABI generator also fetches types that only appear as fields.
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
 pub struct OnlyShowsUpAsNestedInSingleValueMapper;
 
 /// Tests that the ABI generator also fetches types that only appear as fields.

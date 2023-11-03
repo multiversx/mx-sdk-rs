@@ -196,6 +196,22 @@ fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::To
 			.collect()
 }
 
+fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
+    contract
+        .trait_attributes
+        .esdt_attribute
+        .iter()
+        .map(|esdt_attr| {
+            let ticker = &esdt_attr.ticker;
+            let ty = &esdt_attr.ty;
+            quote! {
+                contract_abi.esdt_attributes.push(multiversx_sc::abi::EsdtAttributeAbi::new::<#ty>(#ticker));
+                contract_abi.add_type_descriptions::<#ty>();
+            }
+        })
+        .collect()
+}
+
 fn generate_abi_method_body(
     contract: &ContractTrait,
     is_contract_main: bool,
@@ -207,6 +223,11 @@ fn generate_abi_method_body(
     let has_callbacks = has_callback(contract);
     let supertrait_snippets: Vec<proc_macro2::TokenStream> = if is_contract_main {
         generate_supertrait_snippets(contract)
+    } else {
+        Vec::new()
+    };
+    let esdt_attributes = if !&contract.trait_attributes.esdt_attribute.is_empty() {
+        generate_esdt_attribute_snippets(contract)
     } else {
         Vec::new()
     };
@@ -229,10 +250,12 @@ fn generate_abi_method_body(
             events: multiversx_sc::types::heap::Vec::new(),
             has_callback: #has_callbacks,
             type_descriptions: <multiversx_sc::abi::TypeDescriptionContainerImpl as multiversx_sc::abi::TypeDescriptionContainer>::new(),
+            esdt_attributes: multiversx_sc::types::heap::Vec::new(),
         };
         #(#endpoint_snippets)*
         #(#event_snippets)*
         #(#supertrait_snippets)*
+        #(#esdt_attributes)*
         contract_abi
     }
 }

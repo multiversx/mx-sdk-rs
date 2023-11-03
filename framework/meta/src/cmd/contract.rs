@@ -36,7 +36,8 @@ fn process_original_abi<AbiObj: ContractAbiProvider>(cli_args: &ContractCliArgs)
     let input_abi = <AbiObj as ContractAbiProvider>::abi();
     let mut meta_config = MetaConfig::create(input_abi, cli_args.load_abi_git_version);
     meta_config.output_contracts.validate_output_contracts();
-    meta_config.write_abi();
+    meta_config.write_contract_abis();
+    meta_config.write_esdt_attribute_abis();
     meta_config.generate_wasm_crates();
     meta_config
 }
