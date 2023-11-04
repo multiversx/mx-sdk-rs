@@ -1960,7 +1960,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.5.2"
+version = "0.6.0"
 dependencies = [
  "bitflags 1.3.2",
  "ed25519-dalek",
@@ -1984,7 +1984,7 @@ checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "arrayvec",
  "multiversx-sc",
@@ -2003,7 +2003,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "bitflags 1.3.2",
  "hashbrown 0.13.2",
@@ -2034,7 +2034,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -2045,7 +2045,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "anyhow",
  "clap",
@@ -2072,14 +2072,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "base64 0.13.1",
  "bech32",
@@ -2105,7 +2105,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "base64 0.13.1",
  "env_logger",
@@ -2119,7 +2119,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "multiversx-sc",
 ]
@@ -2151,7 +2151,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.43.5"
+version = "0.44.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
