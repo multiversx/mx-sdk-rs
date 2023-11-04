@@ -1964,7 +1964,6 @@ dependencies = [
 name = "multiversx-sc-meta"
 version = "0.44.0"
 dependencies = [
- "anyhow",
  "clap",
  "colored",
  "common-path",
