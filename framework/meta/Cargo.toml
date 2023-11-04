@@ -30,12 +30,12 @@ reqwest = { version = "0.11.4", features = ["blocking", "json"] }
 serde = { version = "1.0", features = ["derive"] }
 tempfile = "3.3.0"
 copy_dir = "0.1.2"
-zip = "0.6.4"
+zip = { version = "0.6.4", features = ["deflate"], default-features = false }
 serde_json = "1.0"
 anyhow = "1.0.44"
 rustc_version = "0.4"
 toml = { version = "0.5.8", features = ["preserve_order"] }
-ruplacer = "0.8.1"
+ruplacer = { version = "0.8.1", default-features = false }
 clap = { version = "4.1.0", features = ["derive"] }
 colored = "2.0"
 pathdiff = "0.2.1"
@@ -43,8 +43,8 @@ common-path = "1.0.0"
 lazy_static = "1.4.0"
 convert_case = "0.6.0"
 hex = "0.4"
-wasmparser = "0.113.1"
-wasmprinter = "0.2.67"
+wasmparser = "0.116.0"
+wasmprinter = "0.2.71"
 
 [dependencies.multiversx-sc]
 version = "=0.44.0"
