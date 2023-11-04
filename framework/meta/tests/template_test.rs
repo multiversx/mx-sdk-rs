@@ -1,5 +1,5 @@
 use multiversx_sc_meta::{
-    template::{
+    cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
     version_history,

@@ -3,9 +3,9 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::folder_structure::{whitelisted_deep_copy, RelevantDirectories};
+use crate::folder_structure::RelevantDirectories;
 
-use super::{template_metadata::TemplateMetadata, RepoSource};
+use super::{copy_util::whitelisted_deep_copy, template_metadata::TemplateMetadata, RepoSource};
 
 const TEMPLATES_PATH_IN_REPO: &str = "contracts/examples";
 const TEMPLATE_TOML_FILE_NAME: &str = "mxsc-template.toml";

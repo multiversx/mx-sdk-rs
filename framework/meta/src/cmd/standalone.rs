@@ -1,19 +1,19 @@
 mod all;
 mod info;
 mod local_deps;
+mod print_util;
 pub mod scen_test_gen;
+pub mod template;
 pub mod test;
 pub(crate) mod upgrade;
 
-use crate::{
-    cli_args::{StandaloneCliAction, StandaloneCliArgs},
-    template::{create_contract, print_template_names},
-};
+use crate::cli_args::{StandaloneCliAction, StandaloneCliArgs};
 use all::call_all_meta;
 use clap::Parser;
 use info::call_info;
 use local_deps::local_deps;
 use scen_test_gen::test_gen_tool;
+use template::{create_contract, print_template_names};
 use test::test;
 use upgrade::upgrade_sc;
 
