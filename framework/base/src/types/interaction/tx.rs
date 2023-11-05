@@ -12,12 +12,14 @@ use crate::{
 };
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, TxData, TxFrom, TxGas, TxPayment, TxTo, TxToSpecified,
+    AsyncCall, ExplicitGas, FunctionCall, TxData, TxEnvironemnt, TxFrom, TxGas, TxPayment, TxTo,
+    TxToSpecified, TxFromSpecified,
 };
 
-pub struct Tx<Api, From, To, Payment, Gas, Data>
+pub struct Tx<Api, Env, From, To, Payment, Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Payment: TxPayment<Api>,
@@ -25,6 +27,7 @@ where
     Data: TxData<Api>,
 {
     pub(super) _phantom: PhantomData<Api>,
+    pub env: Env,
     pub from: From,
     pub to: To,
     pub payment: Payment,
@@ -32,9 +35,10 @@ where
     pub data: Data,
 }
 
-impl<Api, From, To, Payment, Gas, Data> Tx<Api, From, To, Payment, Gas, Data>
+impl<Api, Env, From, To, Payment, Gas, Data> Tx<Api, Env, From, To, Payment, Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Payment: TxPayment<Api>,
@@ -43,9 +47,10 @@ where
 {
     /// TODO: does nothing, delete, added for easier copy-paste.
     #[inline]
-    pub fn nothing(self) -> Tx<Api, From, To, Payment, Gas, Data> {
+    pub fn nothing(self) -> Tx<Api, Env, From, To, Payment, Gas, Data> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
@@ -55,7 +60,28 @@ where
     }
 }
 
-pub type TxBase<Api> = Tx<Api, (), (), (), (), ()>;
+pub type TxBaseWithEnv<Api, Env> = Tx<Api, Env, (), (), (), (), ()>;
+
+impl<Api, Env> TxBaseWithEnv<Api, Env>
+where
+    Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
+{
+    #[inline]
+    pub fn new_with_env(env: Env) -> Self {
+        Tx {
+            _phantom: PhantomData,
+            env,
+            from: (),
+            to: (),
+            payment: (),
+            gas: (),
+            data: (),
+        }
+    }
+}
+
+pub type TxBase<Api> = Tx<Api, (), (), (), (), (), ()>;
 
 impl<Api> Default for TxBase<Api>
 where
@@ -63,14 +89,7 @@ where
 {
     #[inline]
     fn default() -> Self {
-        Tx {
-            _phantom: PhantomData,
-            from: (),
-            to: (),
-            payment: (),
-            gas: (),
-            data: (),
-        }
+        Self::new_with_env(())
     }
 }
 
@@ -84,20 +103,24 @@ where
     }
 }
 
-impl<Api, To, Payment, Gas, Data> Tx<Api, (), To, Payment, Gas, Data>
+impl<Api, Env, To, Payment, Gas, Data> Tx<Api, Env, (), To, Payment, Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     To: TxTo<Api>,
     Payment: TxPayment<Api>,
     Gas: TxGas,
     Data: TxData<Api>,
 {
-    pub fn from<From>(self, from: From) -> Tx<Api, From, To, Payment, Gas, Data>
+    pub fn from<From>(self, from: From) -> Tx<Api, Env, From, To, Payment, Gas, Data>
     where
-        From: TxFrom<Api>,
+        From: TxFromSpecified<Api>,
     {
+        let mut env = self.env;
+        env.annotate_from(&from);
         Tx {
             _phantom: PhantomData,
+            env,
             from,
             to: self.to,
             payment: self.payment,
@@ -107,20 +130,24 @@ where
     }
 }
 
-impl<Api, From, Payment, Gas, Data> Tx<Api, From, (), Payment, Gas, Data>
+impl<Api, Env, From, Payment, Gas, Data> Tx<Api, Env, From, (), Payment, Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     Payment: TxPayment<Api>,
     Gas: TxGas,
     Data: TxData<Api>,
 {
-    pub fn to<To>(self, to: To) -> Tx<Api, From, To, Payment, Gas, Data>
+    pub fn to<To>(self, to: To) -> Tx<Api, Env, From, To, Payment, Gas, Data>
     where
-        To: TxTo<Api>,
+        To: TxToSpecified<Api>,
     {
+        let mut env = self.env;
+        env.annotate_to(&to);
         Tx {
             _phantom: PhantomData,
+            env,
             from: self.from,
             to,
             payment: self.payment,
@@ -129,23 +156,28 @@ where
         }
     }
 
-    pub fn to_caller(self) -> Tx<Api, From, ManagedAddress<Api>, Payment, Gas, Data> {
+    pub fn to_caller(self) -> Tx<Api, Env, From, ManagedAddress<Api>, Payment, Gas, Data> {
         let caller = BlockchainWrapper::<Api>::new().get_caller();
         self.to(caller)
     }
 }
 
-impl<Api, From, To, Gas, Data> Tx<Api, From, To, (), Gas, Data>
+impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, (), Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Gas: TxGas,
     Data: TxData<Api>,
 {
-    pub fn egld(self, egld_amount: BigUint<Api>) -> Tx<Api, From, To, EgldPayment<Api>, Gas, Data> {
+    pub fn egld(
+        self,
+        egld_amount: BigUint<Api>,
+    ) -> Tx<Api, Env, From, To, EgldPayment<Api>, Gas, Data> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: EgldPayment { value: egld_amount },
@@ -155,9 +187,10 @@ where
     }
 }
 
-impl<Api, From, To, Gas, Data> Tx<Api, From, To, (), Gas, Data>
+impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, (), Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Gas: TxGas,
@@ -169,9 +202,10 @@ where
     pub fn esdt<P: Into<EsdtTokenPayment<Api>>>(
         self,
         payment: P,
-    ) -> Tx<Api, From, To, EsdtTokenPayment<Api>, Gas, Data> {
+    ) -> Tx<Api, Env, From, To, EsdtTokenPayment<Api>, Gas, Data> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: payment.into(),
@@ -184,9 +218,10 @@ where
     pub fn multi_esdt(
         self,
         payments: MultiEsdtPayment<Api>, // TODO: references
-    ) -> Tx<Api, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+    ) -> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: payments,
@@ -196,9 +231,10 @@ where
     }
 }
 
-impl<Api, From, To, Gas, Data> Tx<Api, From, To, EsdtTokenPayment<Api>, Gas, Data>
+impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, EsdtTokenPayment<Api>, Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Gas: TxGas,
@@ -210,12 +246,13 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Api>>>(
         self,
         payment: P,
-    ) -> Tx<Api, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+    ) -> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data> {
         let mut payments = ManagedVec::new();
         payments.push(self.payment);
         payments.push(payment.into());
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: payments,
@@ -225,9 +262,10 @@ where
     }
 }
 
-impl<Api, From, To, Gas, Data> Tx<Api, From, To, MultiEsdtPayment<Api>, Gas, Data>
+impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Gas: TxGas,
@@ -239,15 +277,16 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Api>>>(
         mut self,
         payment: P,
-    ) -> Tx<Api, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+    ) -> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data> {
         self.payment.push(payment.into());
         self
     }
 }
 
-impl<Api, From, To, Payment, Data> Tx<Api, From, To, Payment, (), Data>
+impl<Api, Env, From, To, Payment, Data> Tx<Api, Env, From, To, Payment, (), Data>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Payment: TxPayment<Api>,
@@ -255,9 +294,13 @@ where
 {
     /// Sets an explicit gas limit to the call.
     #[inline]
-    pub fn with_gas_limit(self, gas_limit: u64) -> Tx<Api, From, To, Payment, ExplicitGas, Data> {
+    pub fn with_gas_limit(
+        self,
+        gas_limit: u64,
+    ) -> Tx<Api, Env, From, To, Payment, ExplicitGas, Data> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
@@ -267,9 +310,10 @@ where
     }
 }
 
-impl<Api, From, To, Payment, Gas> Tx<Api, From, To, Payment, Gas, ()>
+impl<Api, Env, From, To, Payment, Gas> Tx<Api, Env, From, To, Payment, Gas, ()>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Payment: TxPayment<Api>,
@@ -279,9 +323,10 @@ where
     pub fn call<FC: Into<FunctionCall<Api>>>(
         self,
         call: FC,
-    ) -> Tx<Api, From, To, Payment, Gas, FunctionCall<Api>> {
+    ) -> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
@@ -294,9 +339,10 @@ where
     pub fn function_name<N: Into<ManagedBuffer<Api>>>(
         self,
         function_name: N,
-    ) -> Tx<Api, From, To, Payment, Gas, FunctionCall<Api>> {
+    ) -> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>> {
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
@@ -306,9 +352,10 @@ where
     }
 }
 
-impl<Api, From, To, Payment, Gas> Tx<Api, From, To, Payment, Gas, FunctionCall<Api>>
+impl<Api, Env, From, To, Payment, Gas> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxTo<Api>,
     Payment: TxPayment<Api>,
@@ -321,9 +368,10 @@ where
     }
 }
 
-impl<Api, From, To, Payment, Gas> Tx<Api, From, To, Payment, Gas, FunctionCall<Api>>
+impl<Api, Env, From, To, Payment, Gas> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
+    Env: TxEnvironemnt<Api>,
     From: TxFrom<Api>,
     To: TxToSpecified<Api>,
     Payment: TxPayment<Api>,
@@ -331,12 +379,13 @@ where
 {
     pub fn normalize_tx(
         self,
-    ) -> Tx<Api, From, ManagedAddress<Api>, EgldPayment<Api>, Gas, FunctionCall<Api>> {
+    ) -> Tx<Api, Env, From, ManagedAddress<Api>, EgldPayment<Api>, Gas, FunctionCall<Api>> {
         let result = self
             .payment
-            .convert_tx_data(&self.from, self.to.into_address(), self.data);
+            .convert_tx_data(&self.from, self.to.into_value(), self.data);
         Tx {
             _phantom: PhantomData,
+            env: self.env,
             from: self.from,
             to: result.to,
             payment: result.egld_payment,
@@ -346,7 +395,7 @@ where
     }
 }
 
-impl<Api, To, Payment> Tx<Api, (), To, Payment, (), FunctionCall<Api>>
+impl<Api, To, Payment> Tx<Api, (), (), To, Payment, (), FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
     To: TxToSpecified<Api>,
@@ -363,7 +412,7 @@ where
     }
 }
 
-impl<Api, To, Payment> Tx<Api, (), To, Payment, ExplicitGas, FunctionCall<Api>>
+impl<Api, To, Payment> Tx<Api, (), (), To, Payment, ExplicitGas, FunctionCall<Api>>
 where
     Api: CallTypeApi + 'static,
     To: TxToSpecified<Api>,
@@ -384,7 +433,7 @@ where
     }
 }
 
-impl<Api, From, To, Payment, Gas, FC> Tx<Api, From, To, Payment, Gas, FC>
+impl<Api, From, To, Payment, Gas, FC> Tx<Api, (), From, To, Payment, Gas, FC>
 where
     Api: CallTypeApi + 'static,
     From: TxFrom<Api>,
@@ -399,15 +448,15 @@ where
         }
 
         let gas_limit = self.gas.resolve_gas::<Api>();
-        self.payment.perform_transfer_execute(
-            self.to.to_address_ref(),
-            gas_limit,
-            self.data.into(),
-        );
+
+        self.to.with_value_ref(|to| {
+            self.payment
+                .perform_transfer_execute(to, gas_limit, self.data.into());
+        });
     }
 }
 
-impl<Api, From, To, Payment, Gas> Tx<Api, From, To, Payment, Gas, ()>
+impl<Api, From, To, Payment, Gas> Tx<Api, (), From, To, Payment, Gas, ()>
 where
     Api: CallTypeApi + 'static,
     From: TxFrom<Api>,

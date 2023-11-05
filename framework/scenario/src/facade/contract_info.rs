@@ -1,5 +1,10 @@
 use std::ops::{Deref, DerefMut};
 
+use multiversx_sc::{
+    api::CallTypeApi,
+    types::{AnnotatedValue, ManagedBuffer, TxFrom, TxFromSpecified, TxTo, TxToSpecified},
+};
+
 use crate::multiversx_sc::{
     api::ManagedTypeApi,
     codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
@@ -90,3 +95,49 @@ impl<P: ProxyObjBase> CodecFrom<ContractInfo<P>> for Address {}
 impl<P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for Address {}
 impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
 impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
+
+impl<Api, P> AnnotatedValue<Api, ManagedAddress<Api>> for &ContractInfo<P>
+where
+    Api: CallTypeApi,
+    P: ProxyObjBase,
+{
+    fn annotation(&self) -> ManagedBuffer<Api> {
+        self.scenario_address_expr.original.as_str().into()
+    }
+
+    fn into_value(self) -> ManagedAddress<Api> {
+        (&self.scenario_address_expr.value).into()
+    }
+
+    fn with_value_ref<F: FnOnce(&ManagedAddress<Api>)>(&self, f: F) {
+        let ma: ManagedAddress<Api> = (&self.scenario_address_expr.value).into();
+        f(&ma);
+    }
+}
+impl<P, Api> TxFrom<Api> for &ContractInfo<P>
+where
+    Api: CallTypeApi,
+    P: ProxyObjBase,
+{
+    fn resolve_address(&self) -> ManagedAddress<Api> {
+        (&self.scenario_address_expr.value).into()
+    }
+}
+impl<P, Api> TxFromSpecified<Api> for &ContractInfo<P>
+where
+    Api: CallTypeApi,
+    P: ProxyObjBase,
+{
+}
+impl<P, Api> TxTo<Api> for &ContractInfo<P>
+where
+    Api: CallTypeApi,
+    P: ProxyObjBase,
+{
+}
+impl<P, Api> TxToSpecified<Api> for &ContractInfo<P>
+where
+    Api: CallTypeApi,
+    P: ProxyObjBase,
+{
+}

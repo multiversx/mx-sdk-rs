@@ -6,13 +6,13 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{
-        ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
     types::{EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, MultiValueEncoded},
 };
 
-use super::ManagedArgBuffer;
+use super::{ContractCallNoPayment, ManagedArgBuffer};
 
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
@@ -66,6 +66,15 @@ where
 {
     fn from(_: ()) -> Self {
         FunctionCall::empty()
+    }
+}
+
+impl<Api, R> From<ContractCallNoPayment<Api, R>> for FunctionCall<Api>
+where
+    Api: CallTypeApi,
+{
+    fn from(ccnp: ContractCallNoPayment<Api, R>) -> Self {
+        ccnp.function_call
     }
 }
 

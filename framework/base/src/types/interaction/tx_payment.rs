@@ -136,7 +136,7 @@ where
         if self.token_nonce == 0 {
             convert_tx_data_fungible(self, to, fc)
         } else {
-            convert_tx_data_nft(self, from.to_address(), to, fc)
+            convert_tx_data_nft(self, from.resolve_address(), to, fc)
         }
     }
 
@@ -170,7 +170,7 @@ where
         match self.len() {
             0 => ().convert_tx_data(from, to, fc),
             1 => self.get(0).convert_tx_data(from, to, fc),
-            _ => convert_tx_data_multi(self, from.to_address(), to, fc),
+            _ => convert_tx_data_multi(self, from.resolve_address(), to, fc),
         }
     }
 
