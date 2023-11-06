@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            3
+// Endpoints:                            4
 // Async Callback (empty):               1
-// Total number of exported functions:   5
+// Total number of exported functions:   6
 
 #![no_std]
 
@@ -22,6 +22,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     proxy_test_second
     (
         init => init
+        upgrade => upgrade
         payMe => pay_me
         payMeWithResult => pay_me_with_result_endpoint
         messageMe => message_me

@@ -79,7 +79,7 @@ pub trait ProxyTestFirst {
 
         self.message_me_proxy()
             .contract(other_contract)
-            .init(456)
+            .init(456) // TODO: upgrade proxy
             .with_egld_transfer(payment.clone_value())
             .upgrade_contract(&code, CodeMetadata::DEFAULT);
     }
