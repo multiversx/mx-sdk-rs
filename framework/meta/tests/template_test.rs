@@ -1,5 +1,5 @@
 use multiversx_sc_meta::{
-    template::{
+    cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
     version_history,
@@ -75,22 +75,22 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     cargo_test(&target);
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_released_adder() {
-    template_test_released("adder", "released-adder").await;
+fn template_released_adder() {
+    template_test_released("adder", "released-adder");
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_released_crypto_zombies() {
-    template_test_released("crypto-zombies", "released-crypto-zombies").await;
+fn template_released_crypto_zombies() {
+    template_test_released("crypto-zombies", "released-crypto-zombies");
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_released_empty() {
-    template_test_released("empty", "released-empty").await;
+fn template_released_empty() {
+    template_test_released("empty", "released-empty");
 }
 
 /// These tests fully replicate the templating process. They
@@ -98,7 +98,7 @@ async fn template_released_empty() {
 /// - create proper contracts,
 /// - build the newly created contracts (to wasm)
 /// - run all tests (including Go scenarios) on them.
-async fn template_test_released(template_name: &str, new_name: &str) {
+fn template_test_released(template_name: &str, new_name: &str) {
     let workspace_path = find_workspace();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
@@ -112,8 +112,7 @@ async fn template_test_released(template_name: &str, new_name: &str) {
     let repo_source = RepoSource::download_from_github(
         RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.to_string()),
         temp_dir_path,
-    )
-    .await;
+    );
 
     prepare_target_dir(&target);
 

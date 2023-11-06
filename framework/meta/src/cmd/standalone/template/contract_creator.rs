@@ -9,9 +9,9 @@ use super::{
 };
 
 /// Creates a new contract on disk, from a template, given a name.
-pub async fn create_contract(args: &TemplateArgs) {
+pub fn create_contract(args: &TemplateArgs) {
     let version = get_repo_version(&args.tag);
-    let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir()).await;
+    let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir());
     let target = target_from_args(args);
 
     let creator = ContractCreator::new(&repo_temp_download, args.template.clone(), target, false);
