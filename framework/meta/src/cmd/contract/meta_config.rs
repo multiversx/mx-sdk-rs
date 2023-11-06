@@ -8,7 +8,6 @@ use super::output_contract::{OutputContract, OutputContractGlobalConfig};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
-const MULTI_CONTRACT_CONFIG_RELATIVE_PATH: &str = "../multicontract.toml";
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
 const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
 const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
@@ -23,10 +22,8 @@ pub struct MetaConfig {
 
 impl MetaConfig {
     pub fn create(original_contract_abi: ContractAbi, load_abi_git_version: bool) -> MetaConfig {
-        let output_contracts = OutputContractGlobalConfig::load_from_file_or_default(
-            MULTI_CONTRACT_CONFIG_RELATIVE_PATH,
-            &original_contract_abi,
-        );
+        let output_contracts =
+            OutputContractGlobalConfig::load_from_crate_or_default("..", &original_contract_abi);
 
         MetaConfig {
             load_abi_git_version,

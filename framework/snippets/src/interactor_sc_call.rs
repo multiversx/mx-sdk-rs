@@ -74,12 +74,13 @@ fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<StaticApi, ()>)
     let mut result = String::from_utf8(
         contract_call
             .basic
-            .endpoint_name
+            .function_call
+            .function_name
             .to_boxed_bytes()
             .into_vec(),
     )
     .unwrap();
-    for argument in contract_call.basic.arg_buffer.raw_arg_iter() {
+    for argument in contract_call.basic.function_call.arg_buffer.raw_arg_iter() {
         result.push('@');
         result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
     }

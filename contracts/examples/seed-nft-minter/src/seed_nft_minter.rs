@@ -30,6 +30,7 @@ pub trait SeedNftMinter:
         self.init_distribution(distribution);
     }
 
+    #[allow_multiple_var_args]
     #[only_owner]
     #[endpoint(createNft)]
     fn create_nft(

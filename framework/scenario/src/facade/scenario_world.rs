@@ -185,12 +185,8 @@ impl ScenarioWorld {
         Abi: ContractAbiProvider,
         B: CallableContractBuilder,
     {
-        let multi_contract_config = multiversx_sc_meta::multi_contract_config::<Abi>(
-            self.current_dir
-                .join("multicontract.toml")
-                .to_str()
-                .unwrap(),
-        );
+        let multi_contract_config =
+            multiversx_sc_meta::multi_contract_config::<Abi>(self.current_dir.as_path());
         let sub_contract = multi_contract_config.find_contract(sub_contract_name);
         let contract_obj = if sub_contract.settings.external_view {
             contract_builder.new_contract_obj::<api::ExternalViewApi<DebugApi>>()

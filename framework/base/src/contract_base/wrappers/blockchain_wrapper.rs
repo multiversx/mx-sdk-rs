@@ -342,6 +342,29 @@ where
         }
     }
 
+    /// Retrieves back-transfers from the VM, after a contract call.
+    ///
+    /// Works after:
+    /// - synchronous calls
+    /// - asynchronous calls too, in callbacks.
+    #[cfg(feature = "back-transfers")]
+    pub fn get_back_transfers(&self) -> crate::types::BackTransfers<A> {
+        let esdt_transfer_value_handle: A::BigIntHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
+        let call_value_handle: A::BigIntHandle =
+            use_raw_handle(A::static_var_api_impl().next_handle());
+
+        A::blockchain_api_impl().managed_get_back_transfers(
+            esdt_transfer_value_handle.get_raw_handle(),
+            call_value_handle.get_raw_handle(),
+        );
+
+        crate::types::BackTransfers {
+            total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+            esdt_payments: ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        }
+    }
+
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
     pub fn get_token_attributes<T: TopDecode>(
         &self,

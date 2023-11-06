@@ -24,6 +24,10 @@ pub fn is_proxy(attr: &syn::Attribute) -> bool {
     is_attribute_with_no_args(attr, ATTR_PROXY)
 }
 
+pub fn is_allow_multiple_var_args(attr: &syn::Attribute) -> bool {
+    is_attribute_with_no_args(attr, ATTR_ALLOW_MULTIPLE_VAR_ARGS)
+}
+
 #[derive(Clone, Debug)]
 pub struct EndpointAttribute {
     pub endpoint_name: Option<syn::Ident>,

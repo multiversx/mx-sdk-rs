@@ -3,10 +3,11 @@ main = "forwarder-raw"
 
 [contracts.forwarder-raw]
 name = "forwarder-raw"
-add-unlabelled = true
 
 [contracts.forwarder-raw-init-async-call]
+add-unlabelled = false
 add-labels = ["init-async-call"]
 
 [contracts.forwarder-raw-init-sync-call]
+add-unlabelled = false
 add-labels = ["init-sync-call"]

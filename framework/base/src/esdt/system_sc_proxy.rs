@@ -362,7 +362,7 @@ where
     }
 
     /// The manager of an ESDT token may wipe out a single NFT held by a frozen Account.
-    /// This operation is similar to burning the quantity, but the Account must have been frozen beforehand, 
+    /// This operation is similar to burning the quantity, but the Account must have been frozen beforehand,
     /// and it must be done by the token manager.
     /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
     pub fn wipe_nft(

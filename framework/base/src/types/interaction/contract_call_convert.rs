@@ -1,17 +1,12 @@
 use core::marker::PhantomData;
 
 use crate::{
-    api::{
-        CallTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
-        ESDT_TRANSFER_FUNC_NAME,
-    },
+    api::CallTypeApi,
     contract_base::BlockchainWrapper,
     types::{BigUint, EsdtTokenPayment, ManagedVec},
 };
 
-use super::{
-    contract_call_no_payment::ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer,
-};
+use super::{contract_call_no_payment::ContractCallNoPayment, ContractCallWithEgld};
 
 impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
@@ -36,40 +31,20 @@ where
     ) -> Self {
         if payment.token_nonce == 0 {
             // fungible ESDT
-            let mut new_arg_buffer = ManagedArgBuffer::new();
-            new_arg_buffer.push_arg(&payment.token_identifier);
-            new_arg_buffer.push_arg(&payment.amount);
-            if !self.basic.endpoint_name.is_empty() {
-                new_arg_buffer.push_arg(&self.basic.endpoint_name);
-            }
-
             ContractCallWithEgld {
                 basic: ContractCallNoPayment {
                     _phantom: PhantomData,
                     to: self.basic.to,
-                    endpoint_name: ESDT_TRANSFER_FUNC_NAME.into(),
-                    arg_buffer: new_arg_buffer.concat(self.basic.arg_buffer),
+                    function_call: self
+                        .basic
+                        .function_call
+                        .convert_to_single_transfer_fungible_call(payment),
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
                 egld_payment: BigUint::zero(),
             }
         } else {
-            // NFT
-            // `ESDTNFTTransfer` takes 4 arguments:
-            // arg0 - token identifier
-            // arg1 - nonce
-            // arg2 - quantity to transfer
-            // arg3 - destination address
-            let mut new_arg_buffer = ManagedArgBuffer::new();
-            new_arg_buffer.push_arg(&payment.token_identifier);
-            new_arg_buffer.push_arg(payment.token_nonce);
-            new_arg_buffer.push_arg(&payment.amount);
-            new_arg_buffer.push_arg(&self.basic.to);
-            if !self.basic.endpoint_name.is_empty() {
-                new_arg_buffer.push_arg(&self.basic.endpoint_name);
-            }
-
             // nft transfer is sent to self, sender = receiver
             let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
 
@@ -77,8 +52,10 @@ where
                 basic: ContractCallNoPayment {
                     _phantom: PhantomData,
                     to: recipient_addr,
-                    endpoint_name: ESDT_NFT_TRANSFER_FUNC_NAME.into(),
-                    arg_buffer: new_arg_buffer.concat(self.basic.arg_buffer),
+                    function_call: self
+                        .basic
+                        .function_call
+                        .convert_to_single_transfer_nft_call(&self.basic.to, payment),
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
@@ -91,19 +68,6 @@ where
         self,
         payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
-        let mut new_arg_buffer = ManagedArgBuffer::new();
-        new_arg_buffer.push_arg(self.basic.to);
-        new_arg_buffer.push_arg(payments.len());
-
-        for payment in payments.into_iter() {
-            new_arg_buffer.push_arg(payment.token_identifier);
-            new_arg_buffer.push_arg(payment.token_nonce);
-            new_arg_buffer.push_arg(payment.amount);
-        }
-        if !self.basic.endpoint_name.is_empty() {
-            new_arg_buffer.push_arg(self.basic.endpoint_name);
-        }
-
         // multi transfer is sent to self, sender = receiver
         let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
 
@@ -111,8 +75,10 @@ where
             basic: ContractCallNoPayment {
                 _phantom: PhantomData,
                 to: recipient_addr,
-                endpoint_name: ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
-                arg_buffer: new_arg_buffer.concat(self.basic.arg_buffer),
+                function_call: self
+                    .basic
+                    .function_call
+                    .convert_to_multi_transfer_esdt_call(&self.basic.to, payments),
                 explicit_gas_limit: self.basic.explicit_gas_limit,
                 _return_type: PhantomData,
             },

@@ -341,6 +341,11 @@ fn storage_mapper_fungible_token_go() {
 }
 
 #[test]
+fn storage_mapper_address_to_id_go() {
+    world().run("scenarios/storage_mapper_address_to_id.scen.json");
+}
+
+#[test]
 fn storage_mapper_linked_list_go() {
     world().run("scenarios/storage_mapper_linked_list.scen.json");
 }

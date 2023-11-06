@@ -49,5 +49,6 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
             multi_arg: false,
         }].to_vec(),
         outputs: OutputAbis::new(),
+        allow_multiple_var_args: false
     }
 }

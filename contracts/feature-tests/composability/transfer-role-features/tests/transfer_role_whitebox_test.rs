@@ -59,10 +59,10 @@ fn test_transfer_role() {
     const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
 
     world.register_contract(VAULT_PATH_EXPR, vault::ContractBuilder);
-    world.set_state_step(SetStateStep::new().put_account(
-        VAULT_ADDRESS_EXPR,
-        Account::new().nonce(1).code(vault_code.clone()),
-    ));
+    world.set_state_step(
+        SetStateStep::new()
+            .put_account(VAULT_ADDRESS_EXPR, Account::new().nonce(1).code(vault_code)),
+    );
 
     let transfer_role_features_whitebox = WhiteboxContract::new(
         TRANSFER_ROLE_FEATURES_ADDRESS_EXPR,

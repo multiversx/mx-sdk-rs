@@ -23,3 +23,19 @@ pub fn print_processing(test_file_path: &Path) {
         .green()
     );
 }
+
+pub fn print_no_file(suffix: &str) {
+    println!(
+        "{}", format!(
+            "No file ending in *_{suffix} found. Use the --create flag to create a new {suffix} file.",
+        )
+        .yellow()
+    );
+}
+
+pub fn print_new_file(file_path: &Path) {
+    println!(
+        "{}",
+        format!("File {} has been created", file_path.display()).green()
+    );
+}

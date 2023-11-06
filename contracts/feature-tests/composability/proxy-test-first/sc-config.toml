@@ -1,7 +1,6 @@
 [settings]
-main = "lottery-erc20"
+main = "proxy-test-first"
 
 # the only purpose of this config is to specify the allocator
-[contracts.lottery-erc20]
-add-unlabelled = true
+[contracts.proxy-test-first]
 allocator = "static64k"

@@ -18,13 +18,14 @@ pub struct ContractAbiJson {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub promises_callback_names: Vec<String>,
     pub events: Vec<EventAbiJson>,
+    pub esdt_attributes: Vec<EsdtAttributeJson>,
     pub has_callback: bool,
     pub types: BTreeMap<String, TypeDescriptionJson>,
 }
 
 impl From<&ContractAbi> for ContractAbiJson {
     fn from(abi: &ContractAbi) -> Self {
-        let mut contract_json = ContractAbiJson {
+        ContractAbiJson {
             build_info: Some(BuildInfoAbiJson::from(&abi.build_info)),
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
@@ -37,18 +38,29 @@ impl From<&ContractAbi> for ContractAbiJson {
                 .collect(),
             events: abi.events.iter().map(EventAbiJson::from).collect(),
             has_callback: abi.has_callback,
-            types: BTreeMap::new(),
-        };
-        for (type_name, type_description) in abi.type_descriptions.0.iter() {
-            if type_description.contents.is_specified() {
-                contract_json.types.insert(
-                    type_name.clone(),
-                    TypeDescriptionJson::from(type_description),
-                );
-            }
+            types: convert_type_descriptions_to_json(&abi.type_descriptions),
+            esdt_attributes: abi
+                .esdt_attributes
+                .iter()
+                .map(EsdtAttributeJson::from)
+                .collect(),
         }
-        contract_json
     }
+}
+
+pub fn convert_type_descriptions_to_json(
+    type_descriptions: &TypeDescriptionContainerImpl,
+) -> BTreeMap<String, TypeDescriptionJson> {
+    let mut types = BTreeMap::new();
+    for (type_name, type_description) in type_descriptions.0.iter() {
+        if type_description.contents.is_specified() {
+            types.insert(
+                type_name.clone(),
+                TypeDescriptionJson::from(type_description),
+            );
+        }
+    }
+    types
 }
 
 pub fn serialize_abi_to_json(abi_json: &ContractAbiJson) -> String {

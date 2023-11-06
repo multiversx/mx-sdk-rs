@@ -3,6 +3,7 @@ mod cargo_toml_contents;
 pub mod cli_args;
 pub mod cmd;
 pub mod ei;
+pub mod esdt_attr_file_json;
 mod folder_structure;
 mod mxsc_file_json;
 mod print_util;
