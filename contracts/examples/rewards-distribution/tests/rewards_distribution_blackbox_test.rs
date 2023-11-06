@@ -154,7 +154,7 @@ fn test_compute_brackets() {
             Account::new()
                 .nonce(1)
                 .owner(OWNER_ADDRESS_EXPR)
-                .code(rewards_distribution_code.clone())
+                .code(rewards_distribution_code)
                 .balance("0"),
         ),
     );
@@ -356,7 +356,7 @@ fn test_raffle_and_claim() {
     state.world.sc_call(
         ScCallStep::new()
             .from(ALICE_ADDRESS_EXPR)
-            .multi_esdt_transfer(nft_payments.clone())
+            .multi_esdt_transfer(nft_payments)
             .call(
                 state
                     .rewards_distribution_contract

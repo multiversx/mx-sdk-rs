@@ -11,9 +11,12 @@ pub enum RepoSource {
 }
 
 impl RepoSource {
-    pub async fn download_from_github(version: RepoVersion, temp_dir_path: PathBuf) -> Self {
+    pub fn download_from_github(version: RepoVersion, temp_dir_path: PathBuf) -> Self {
         fs::create_dir_all(&temp_dir_path).unwrap();
-        RepoSource::Downloaded(RepoTempDownload::download_from_github(version, temp_dir_path).await)
+        RepoSource::Downloaded(RepoTempDownload::download_from_github(
+            version,
+            temp_dir_path,
+        ))
     }
 
     pub fn from_local_path(repo_local_path: impl AsRef<Path>) -> Self {

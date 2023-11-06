@@ -37,7 +37,8 @@ impl CargoTomlContents {
     }
 
     pub fn save_to_file<P: AsRef<Path>>(&self, path: P) {
-        let cargo_toml_content_str = self.toml_value.to_string();
+        let cargo_toml_content_str =
+            toml::to_string_pretty(&self.toml_value).expect("failed to format Cargo.toml contents");
         let mut file = std::fs::File::create(path).expect("failed to create Cargo.toml file");
         file.write_all(cargo_toml_content_str.as_bytes())
             .expect("failed to write Cargo.toml contents to file");

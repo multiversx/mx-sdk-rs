@@ -1,14 +1,21 @@
-use crate::codec::TopDecodeMulti;
+use crate::{
+    api::{use_raw_handle, StaticVarApiImpl},
+    codec::TopDecodeMulti,
+};
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
+    types::{
+        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType,
+        ManagedVec,
+    },
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};
+use crate::api::managed_types::handles::HandleConstraints;
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -28,6 +35,24 @@ where
         } else {
             self.basic.explicit_gas_limit
         }
+    }
+
+    #[inline]
+    pub fn get_back_transfers(&self) -> (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>) {
+        let esdt_transfer_value_handle: SA::BigIntHandle =
+            use_raw_handle(SA::static_var_api_impl().next_handle());
+        let call_value_handle: SA::BigIntHandle =
+            use_raw_handle(SA::static_var_api_impl().next_handle());
+
+        SA::blockchain_api_impl().managed_get_back_transfers(
+            esdt_transfer_value_handle.get_raw_handle(),
+            call_value_handle.get_raw_handle(),
+        );
+
+        (
+            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        )
     }
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
@@ -201,7 +226,7 @@ where
 {
     let mut loader = ManagedResultArgLoader::new(raw_result);
     let arg_id = ArgId::from(&b"sync result"[..]);
-    let h = ArgErrorHandler::<SA>::from(arg_id);
+    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
     let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
     result
 }
