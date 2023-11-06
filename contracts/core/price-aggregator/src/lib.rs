@@ -48,6 +48,39 @@ pub trait PriceAggregator:
     }
 
     #[only_owner]
+    #[endpoint(changeAmounts)]
+    fn change_amounts(&self, staking_amount: BigUint, slash_amount: BigUint) {
+        require!(
+            staking_amount > 0 && slash_amount > 0,
+            "Staking and slash amount cannot be 0"
+        );
+        require!(
+            slash_amount <= staking_amount,
+            "Slash amount cannot be higher than required stake"
+        );
+
+        let user_whitelist = self.user_whitelist();
+        let slash_quorum = self.slash_quorum().get();
+
+        let mut users_owning_new_amount = 0;
+        for user in user_whitelist.iter() {
+            if staking_amount < self.staked_amount(&user).get() {
+                users_owning_new_amount += 1;
+            }
+            if users_owning_new_amount > slash_quorum {
+                break;
+            }
+        }
+
+        require!(
+            users_owning_new_amount > slash_quorum,
+            "New staking amount is too big compared to members staked amount"
+        );
+        self.required_stake_amount().set(staking_amount);
+        self.slash_amount().set(slash_amount);
+    }
+
+    #[only_owner]
     #[endpoint(addOracles)]
     fn add_oracles(&self, oracles: MultiValueEncoded<ManagedAddress>) {
         let mut oracle_mapper = self.oracle_status();
