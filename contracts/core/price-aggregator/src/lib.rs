@@ -5,16 +5,17 @@ multiversx_sc::imports!();
 mod events;
 pub mod median;
 pub mod price_aggregator_data;
-pub mod staking;
 
+use multiversx_sc_modules::staking;
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
+const SUBMISSION_LIST_MIN_LEN: usize = 3;
 const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
 pub const MAX_ROUND_DURATION_SECONDS: u64 = 1_800; // 30 minutes
-static PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
-static PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
-static WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
+const PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
+const PAIR_DECIMALS_NOT_CONFIGURED_ERROR: &[u8] = b"pair decimals not configured";
+const WRONG_NUMBER_OF_DECIMALS_ERROR: &[u8] = b"wrong number of decimals";
 
 #[multiversx_sc::contract]
 pub trait PriceAggregator:
@@ -204,7 +205,7 @@ pub trait PriceAggregator:
 
     fn require_valid_submission_count(&self, submission_count: usize) {
         require!(
-            submission_count >= 1
+            submission_count >= SUBMISSION_LIST_MIN_LEN
                 && submission_count <= self.oracle_status().len()
                 && submission_count <= SUBMISSION_LIST_MAX_LEN,
             "Invalid submission count"

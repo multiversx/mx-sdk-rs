@@ -1,13 +1,12 @@
 use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
-    staking::ProxyTrait as _,
     ContractObj, PriceAggregator, ProxyTrait as _, MAX_ROUND_DURATION_SECONDS,
 };
 use multiversx_sc::{
     codec::multi_types::MultiValueVec,
     types::{Address, EgldOrEsdtTokenIdentifier},
 };
-use multiversx_sc_modules::pause::ProxyTrait;
+use multiversx_sc_modules::{pause::ProxyTrait, staking::ProxyTrait as _};
 use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_biguint, managed_buffer,

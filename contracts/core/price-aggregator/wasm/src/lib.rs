@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           19
+// Endpoints:                           20
 // Async Callback (empty):               1
-// Total number of exported functions:  21
+// Total number of exported functions:  22
 
 #![no_std]
 
@@ -40,6 +40,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         stake => stake
         unstake => unstake
         voteSlashMember => vote_slash_member
+        cancelVoteSlashMember => cancel_vote_slash_member
         slashMember => slash_member
     )
 }
