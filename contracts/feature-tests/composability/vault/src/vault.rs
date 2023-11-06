@@ -15,6 +15,7 @@ pub trait Vault {
     }
 
     #[upgrade]
+    #[label("upgrade")]
     fn upgrade(
         &self,
         opt_arg_to_echo: OptionalValue<ManagedBuffer>,

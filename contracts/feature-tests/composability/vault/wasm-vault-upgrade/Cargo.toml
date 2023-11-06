@@ -1,5 +1,5 @@
 [package]
-name = "vault-promises-wasm"
+name = "vault-upgrade-wasm"
 version = "0.0.0"
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
