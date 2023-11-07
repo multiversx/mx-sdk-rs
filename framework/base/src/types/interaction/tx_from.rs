@@ -1,45 +1,46 @@
 use crate::{api::CallTypeApi, contract_base::BlockchainWrapper, types::ManagedAddress};
 
-use super::AnnotatedValue;
+use super::{AnnotatedValue, TxEnv};
 
-pub trait TxFrom<Api>
+pub trait TxFrom<Env>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api>;
+    fn resolve_address(&self, env: &Env) -> ManagedAddress<Env::Api>;
 }
 
-pub trait TxFromSpecified<Api>: TxFrom<Api> + AnnotatedValue<Api, ManagedAddress<Api>>
+pub trait TxFromSpecified<Env>:
+    TxFrom<Env> + AnnotatedValue<Env, ManagedAddress<Env::Api>>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
 }
 
-impl<Api> TxFrom<Api> for ()
+impl<Env> TxFrom<Env> for ()
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api> {
-        BlockchainWrapper::<Api>::new().get_sc_address()
+    fn resolve_address(&self, env: &Env) -> ManagedAddress<Env::Api> {
+        env.resolve_sender_address()
     }
 }
 
-impl<Api> TxFrom<Api> for ManagedAddress<Api>
+impl<Env> TxFrom<Env> for ManagedAddress<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api> {
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         self.clone()
     }
 }
-impl<Api> TxFromSpecified<Api> for ManagedAddress<Api> where Api: CallTypeApi {}
+impl<Env> TxFromSpecified<Env> for ManagedAddress<Env::Api> where Env: TxEnv {}
 
-impl<Api> TxFrom<Api> for &ManagedAddress<Api>
+impl<Env> TxFrom<Env> for &ManagedAddress<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api> {
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         (*self).clone()
     }
 }
-impl<Api> TxFromSpecified<Api> for &ManagedAddress<Api> where Api: CallTypeApi {}
+impl<Env> TxFromSpecified<Env> for &ManagedAddress<Env::Api> where Env: TxEnv {}

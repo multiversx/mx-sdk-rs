@@ -5,46 +5,46 @@ use crate::{
     types::{ManagedAddress, ManagedBuffer},
 };
 
-use super::{AnnotatedValue, TxFrom, TxFromSpecified, TxTo, TxToSpecified};
+use super::{AnnotatedValue, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified};
 
 const SC_PREFIX: &str = "sc:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ScExpr<'a>(pub &'a str);
 
-impl<'a, Api> AnnotatedValue<Api, ManagedAddress<Api>> for ScExpr<'a>
+impl<'a, Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for ScExpr<'a>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn annotation(&self) -> ManagedBuffer<Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         let mut result = ManagedBuffer::new_from_bytes(SC_PREFIX.as_bytes());
         result.append_bytes(self.0.as_bytes());
         result
     }
 
-    fn into_value(self) -> ManagedAddress<Api> {
+    fn into_value(self) -> ManagedAddress<Env::Api> {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
     }
 
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Api>)>(&self, f: F) {
+    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
         let expr: [u8; 32] = self.eval_to_array();
         let ma = expr.into();
         f(&ma);
     }
 }
-impl<'a, Api> TxFrom<Api> for ScExpr<'a>
+impl<'a, Env> TxFrom<Env> for ScExpr<'a>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api> {
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
     }
 }
-impl<'a, Api> TxFromSpecified<Api> for ScExpr<'a> where Api: CallTypeApi {}
-impl<'a, Api> TxTo<Api> for ScExpr<'a> where Api: CallTypeApi {}
-impl<'a, Api> TxToSpecified<Api> for ScExpr<'a> where Api: CallTypeApi {}
+impl<'a, Env> TxFromSpecified<Env> for ScExpr<'a> where Env: TxEnv {}
+impl<'a, Env> TxTo<Env> for ScExpr<'a> where Env: TxEnv {}
+impl<'a, Env> TxToSpecified<Env> for ScExpr<'a> where Env: TxEnv {}
 
 impl<'a> ScExpr<'a> {
     pub const fn eval_to_array(&self) -> [u8; 32] {

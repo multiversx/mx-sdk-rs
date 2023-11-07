@@ -1,23 +1,23 @@
 use crate::{api::ManagedTypeApi, types::ManagedAddress};
 
-use super::AnnotatedValue;
+use super::{AnnotatedValue, TxEnv};
 
-pub trait TxTo<Api>
+pub trait TxTo<Env>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
 }
 
-impl<Api> TxTo<Api> for () where Api: ManagedTypeApi {}
+impl<Env> TxTo<Env> for () where Env: TxEnv {}
 
-pub trait TxToSpecified<Api>: TxTo<Api> + AnnotatedValue<Api, ManagedAddress<Api>>
+pub trait TxToSpecified<Env>: TxTo<Env> + AnnotatedValue<Env, ManagedAddress<Env::Api>>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
 }
 
-impl<Api> TxTo<Api> for ManagedAddress<Api> where Api: ManagedTypeApi {}
-impl<Api> TxToSpecified<Api> for ManagedAddress<Api> where Api: ManagedTypeApi {}
+impl<Env> TxTo<Env> for ManagedAddress<Env::Api> where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for ManagedAddress<Env::Api> where Env: TxEnv {}
 
-impl<Api> TxTo<Api> for &ManagedAddress<Api> where Api: ManagedTypeApi {}
-impl<Api> TxToSpecified<Api> for &ManagedAddress<Api> where Api: ManagedTypeApi {}
+impl<Env> TxTo<Env> for &ManagedAddress<Env::Api> where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for &ManagedAddress<Env::Api> where Env: TxEnv {}

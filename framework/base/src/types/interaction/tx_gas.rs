@@ -1,33 +1,31 @@
 use crate::api::{BlockchainApiImpl, CallTypeApi};
 
-use super::contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
+use super::{contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, TxEnv};
 
-pub trait TxGas {
-    fn resolve_gas<Api>(&self) -> u64
-    where
-        Api: CallTypeApi + 'static;
+pub trait TxGas<Env>
+where
+    Env: TxEnv,
+{
+    fn resolve_gas(&self, env: &Env) -> u64;
 }
 
-impl TxGas for () {
-    fn resolve_gas<Api>(&self) -> u64
-    where
-        Api: CallTypeApi + 'static,
-    {
-        let mut gas_left = Api::blockchain_api_impl().get_gas_left();
-        if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
-            gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;
-        }
-        gas_left
+impl<Env> TxGas<Env> for ()
+where
+    Env: TxEnv,
+{
+    fn resolve_gas(&self, env: &Env) -> u64 {
+        env.default_gas()
     }
 }
 
 pub struct ExplicitGas(pub u64);
 
-impl TxGas for ExplicitGas {
-    fn resolve_gas<Api>(&self) -> u64
-    where
-        Api: CallTypeApi + 'static,
-    {
+impl<Env> TxGas<Env> for ExplicitGas
+where
+    Env: TxEnv,
+{
+    #[inline]
+    fn resolve_gas(&self, _env: &Env) -> u64 {
         self.0
     }
 }

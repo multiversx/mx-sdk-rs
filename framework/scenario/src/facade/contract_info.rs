@@ -1,8 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
-use multiversx_sc::{
-    api::CallTypeApi,
-    types::{AnnotatedValue, ManagedBuffer, TxFrom, TxFromSpecified, TxTo, TxToSpecified},
+use multiversx_sc::types::{
+    AnnotatedValue, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified,
 };
 
 use crate::multiversx_sc::{
@@ -96,48 +95,48 @@ impl<P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for Address {}
 impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
 impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
 
-impl<Api, P> AnnotatedValue<Api, ManagedAddress<Api>> for &ContractInfo<P>
+impl<Env, P> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &ContractInfo<P>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
     P: ProxyObjBase,
 {
-    fn annotation(&self) -> ManagedBuffer<Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self.scenario_address_expr.original.as_str().into()
     }
 
-    fn into_value(self) -> ManagedAddress<Api> {
+    fn into_value(self) -> ManagedAddress<Env::Api> {
         (&self.scenario_address_expr.value).into()
     }
 
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Api>)>(&self, f: F) {
-        let ma: ManagedAddress<Api> = (&self.scenario_address_expr.value).into();
+    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
+        let ma: ManagedAddress<Env::Api> = (&self.scenario_address_expr.value).into();
         f(&ma);
     }
 }
-impl<P, Api> TxFrom<Api> for &ContractInfo<P>
+impl<P, Env> TxFrom<Env> for &ContractInfo<P>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
     P: ProxyObjBase,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api> {
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         (&self.scenario_address_expr.value).into()
     }
 }
-impl<P, Api> TxFromSpecified<Api> for &ContractInfo<P>
+impl<P, Env> TxFromSpecified<Env> for &ContractInfo<P>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
     P: ProxyObjBase,
 {
 }
-impl<P, Api> TxTo<Api> for &ContractInfo<P>
+impl<P, Env> TxTo<Env> for &ContractInfo<P>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
     P: ProxyObjBase,
 {
 }
-impl<P, Api> TxToSpecified<Api> for &ContractInfo<P>
+impl<P, Env> TxToSpecified<Env> for &ContractInfo<P>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
     P: ProxyObjBase,
 {
 }

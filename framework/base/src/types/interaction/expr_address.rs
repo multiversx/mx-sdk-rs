@@ -5,44 +5,44 @@ use crate::{
     types::{ManagedAddress, ManagedBuffer},
 };
 
-use super::{AnnotatedValue, TxFrom, TxFromSpecified};
+use super::{AnnotatedValue, TxEnv, TxFrom, TxFromSpecified};
 
 const ADDRESS_PREFIX: &str = "address:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct AddressExpr(pub &'static str);
 
-impl<Api> AnnotatedValue<Api, ManagedAddress<Api>> for AddressExpr
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for AddressExpr
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn annotation(&self) -> ManagedBuffer<Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         let mut result = ManagedBuffer::new_from_bytes(ADDRESS_PREFIX.as_bytes());
         result.append_bytes(self.0.as_bytes());
         result
     }
 
-    fn into_value(self) -> ManagedAddress<Api> {
+    fn into_value(self) -> ManagedAddress<Env::Api> {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
     }
 
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Api>)>(&self, f: F) {
+    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
         let expr: [u8; 32] = self.eval_to_array();
         let ma = expr.into();
         f(&ma);
     }
 }
-impl<Api> TxFrom<Api> for AddressExpr
+impl<Env> TxFrom<Env> for AddressExpr
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
-    fn resolve_address(&self) -> ManagedAddress<Api> {
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
     }
 }
-impl<Api> TxFromSpecified<Api> for AddressExpr where Api: CallTypeApi {}
+impl<Env> TxFromSpecified<Env> for AddressExpr where Env: TxEnv {}
 
 impl AddressExpr {
     pub const fn eval_to_array(&self) -> [u8; 32] {

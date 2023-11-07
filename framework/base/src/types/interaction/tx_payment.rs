@@ -1,13 +1,15 @@
+use num_traits::Zero;
+
 use crate::{
     api::{CallTypeApi, ManagedTypeApi},
     contract_base::SendRawWrapper,
     types::{
-        EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment, EsdtTokenPayment,
+        BigUint, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment, EsdtTokenPayment,
         ManagedAddress, MultiEsdtPayment,
     },
 };
 
-use super::{FunctionCall, TxFrom};
+use super::{FunctionCall, TxEnv, TxFrom};
 
 /// Temporary structure for returning a normalized transfer.
 pub struct PaymentConversionResult<Api>
@@ -19,32 +21,34 @@ where
     pub fc: FunctionCall<Api>,
 }
 
-pub trait TxPayment<Api>
+pub trait TxPayment<Env>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool;
 
     fn convert_tx_data<From>(
         self,
+        env: &Env,
         from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>;
+        From: TxFrom<Env>;
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     );
 }
 
-impl<Api> TxPayment<Api> for ()
+impl<Env> TxPayment<Env> for ()
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool {
         true
@@ -52,12 +56,13 @@ where
 
     fn convert_tx_data<From>(
         self,
+        _env: &Env,
         _from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>,
+        From: TxFrom<Env>,
     {
         PaymentConversionResult {
             to,
@@ -68,17 +73,19 @@ where
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     ) {
-        EgldPayment::no_payment().perform_transfer_execute(to, gas_limit, fc);
+        EgldPayment::no_payment().perform_transfer_execute(env, to, gas_limit, fc);
+        // perform_transfer_execute_egld(BigUint::zero(), to, gas_limit, fc);
     }
 }
 
-impl<Api> TxPayment<Api> for EgldPayment<Api>
+impl<Env> TxPayment<Env> for EgldPayment<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool {
         self.value == 0u32
@@ -86,12 +93,13 @@ where
 
     fn convert_tx_data<From>(
         self,
+        _env: &Env,
         _from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>,
+        From: TxFrom<Env>,
     {
         PaymentConversionResult {
             to,
@@ -102,11 +110,12 @@ where
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        _env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     ) {
-        let _ = SendRawWrapper::<Api>::new().direct_egld_execute(
+        let _ = SendRawWrapper::<Env::Api>::new().direct_egld_execute(
             to,
             &self.value,
             gas_limit,
@@ -116,9 +125,9 @@ where
     }
 }
 
-impl<Api> TxPayment<Api> for EsdtTokenPayment<Api>
+impl<Env> TxPayment<Env> for EsdtTokenPayment<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool {
         self.amount == 0u32
@@ -126,33 +135,35 @@ where
 
     fn convert_tx_data<From>(
         self,
+        env: &Env,
         from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>,
+        From: TxFrom<Env>,
     {
         if self.token_nonce == 0 {
             convert_tx_data_fungible(self, to, fc)
         } else {
-            convert_tx_data_nft(self, from.resolve_address(), to, fc)
+            convert_tx_data_nft(self, from.resolve_address(env), to, fc)
         }
     }
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     ) {
-        MultiEsdtPayment::from_single_item(self).perform_transfer_execute(to, gas_limit, fc)
+        MultiEsdtPayment::from_single_item(self).perform_transfer_execute(env, to, gas_limit, fc);
     }
 }
 
-impl<Api> TxPayment<Api> for MultiEsdtPayment<Api>
+impl<Env> TxPayment<Env> for MultiEsdtPayment<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool {
         self.is_empty()
@@ -160,27 +171,29 @@ where
 
     fn convert_tx_data<From>(
         self,
+        env: &Env,
         from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>,
+        From: TxFrom<Env>,
     {
         match self.len() {
-            0 => ().convert_tx_data(from, to, fc),
-            1 => self.get(0).convert_tx_data(from, to, fc),
-            _ => convert_tx_data_multi(self, from.resolve_address(), to, fc),
+            0 => ().convert_tx_data(env, from, to, fc),
+            1 => self.get(0).convert_tx_data(env, from, to, fc),
+            _ => convert_tx_data_multi(self, from.resolve_address(env), to, fc),
         }
     }
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        _env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     ) {
-        let _ = SendRawWrapper::<Api>::new().multi_esdt_transfer_execute(
+        let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
             to,
             &self,
             gas_limit,
@@ -190,9 +203,9 @@ where
     }
 }
 
-impl<Api> TxPayment<Api> for EgldOrEsdtTokenPayment<Api>
+impl<Env> TxPayment<Env> for EgldOrEsdtTokenPayment<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool {
         self.amount == 0u32
@@ -200,39 +213,41 @@ where
 
     fn convert_tx_data<From>(
         self,
+        env: &Env,
         from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>,
+        From: TxFrom<Env>,
     {
         self.map_egld_or_esdt(
             (to, fc),
-            |(to, fc), amount| EgldPayment::from(amount).convert_tx_data(from, to, fc),
-            |(to, fc), esdt_payment| esdt_payment.convert_tx_data(from, to, fc),
+            |(to, fc), amount| EgldPayment::from(amount).convert_tx_data(env, from, to, fc),
+            |(to, fc), esdt_payment| esdt_payment.convert_tx_data(env, from, to, fc),
         )
     }
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     ) {
         self.map_egld_or_esdt(
             (to, fc),
             |(to, fc), amount| {
-                EgldPayment::from(amount).perform_transfer_execute(to, gas_limit, fc)
+                EgldPayment::from(amount).perform_transfer_execute(env, to, gas_limit, fc)
             },
-            |(to, fc), esdt_payment| esdt_payment.perform_transfer_execute(to, gas_limit, fc),
+            |(to, fc), esdt_payment| esdt_payment.perform_transfer_execute(env, to, gas_limit, fc),
         )
     }
 }
 
-impl<Api> TxPayment<Api> for EgldOrMultiEsdtPayment<Api>
+impl<Env> TxPayment<Env> for EgldOrMultiEsdtPayment<Env::Api>
 where
-    Api: CallTypeApi,
+    Env: TxEnv,
 {
     fn is_no_payment(&self) -> bool {
         self.is_empty()
@@ -240,35 +255,37 @@ where
 
     fn convert_tx_data<From>(
         self,
+        env: &Env,
         from: &From,
-        to: ManagedAddress<Api>,
-        fc: FunctionCall<Api>,
-    ) -> PaymentConversionResult<Api>
+        to: ManagedAddress<Env::Api>,
+        fc: FunctionCall<Env::Api>,
+    ) -> PaymentConversionResult<Env::Api>
     where
-        From: TxFrom<Api>,
+        From: TxFrom<Env>,
     {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                EgldPayment::from(egld_amount).convert_tx_data(from, to, fc)
+                EgldPayment::from(egld_amount).convert_tx_data(env, from, to, fc)
             },
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
-                multi_esdt_payment.convert_tx_data(from, to, fc)
+                multi_esdt_payment.convert_tx_data(env, from, to, fc)
             },
         }
     }
 
     fn perform_transfer_execute(
         self,
-        to: &ManagedAddress<Api>,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
-        fc: FunctionCall<Api>,
+        fc: FunctionCall<Env::Api>,
     ) {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                EgldPayment::from(egld_amount).perform_transfer_execute(to, gas_limit, fc)
+                EgldPayment::from(egld_amount).perform_transfer_execute(env, to, gas_limit, fc)
             },
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
-                multi_esdt_payment.perform_transfer_execute(to, gas_limit, fc)
+                multi_esdt_payment.perform_transfer_execute(env, to, gas_limit, fc)
             },
         }
     }

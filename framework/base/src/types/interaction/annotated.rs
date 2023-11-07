@@ -3,47 +3,49 @@ use crate::{
     types::{ManagedAddress, ManagedBuffer},
 };
 
-pub trait AnnotatedValue<Api, T>
+use super::TxEnv;
+
+pub trait AnnotatedValue<Env, T>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
-    fn annotation(&self) -> ManagedBuffer<Api>;
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api>;
 
     fn into_value(self) -> T;
 
     fn with_value_ref<F: FnOnce(&T)>(&self, f: F);
 }
 
-impl<Api> AnnotatedValue<Api, ManagedAddress<Api>> for ManagedAddress<Api>
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for ManagedAddress<Env::Api>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
-    fn annotation(&self) -> ManagedBuffer<Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self.hex_expr()
     }
 
-    fn into_value(self) -> ManagedAddress<Api> {
+    fn into_value(self) -> ManagedAddress<Env::Api> {
         self
     }
 
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Api>)>(&self, f: F) {
+    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
         f(self)
     }
 }
 
-impl<Api> AnnotatedValue<Api, ManagedAddress<Api>> for &ManagedAddress<Api>
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &ManagedAddress<Env::Api>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
-    fn annotation(&self) -> crate::types::ManagedBuffer<Api> {
+    fn annotation(&self, _env: &Env) -> crate::types::ManagedBuffer<Env::Api> {
         self.hex_expr()
     }
 
-    fn into_value(self) -> ManagedAddress<Api> {
+    fn into_value(self) -> ManagedAddress<Env::Api> {
         self.clone()
     }
 
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Api>)>(&self, f: F) {
+    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
         f(self)
     }
 }

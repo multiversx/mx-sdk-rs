@@ -1,8 +1,8 @@
 use std::path::PathBuf;
 
 use multiversx_sc::types::{
-    AnnotatedValue, FunctionCall, ManagedAddress, Tx, TxBaseWithEnv, TxEnvironemnt,
-    TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+    AnnotatedValue, FunctionCall, ManagedAddress, Tx, TxBaseWithEnv, TxEnv, TxFromSpecified, TxGas,
+    TxPayment, TxToSpecified,
 };
 
 use crate::{api::StaticApi, facade::ScenarioWorld, scenario_model::ScCallStep};
@@ -14,23 +14,34 @@ pub struct ScenarioTxEnvironment {
     pub to_annotation: Option<String>,
 }
 
-impl TxEnvironemnt<StaticApi> for ScenarioTxEnvironment {
+impl TxEnv for ScenarioTxEnvironment {
+    type Api = StaticApi;
+
     fn annotate_from<From>(&mut self, to: &From)
     where
-        From: AnnotatedValue<StaticApi, ManagedAddress<StaticApi>>,
+        From: AnnotatedValue<ScenarioTxEnvironment, ManagedAddress<StaticApi>>,
     {
-        self.from_annotation = Some(to.annotation().to_string())
+        self.from_annotation = Some(to.annotation(self).to_string())
     }
 
     fn annotate_to<To>(&mut self, to: &To)
     where
-        To: AnnotatedValue<StaticApi, ManagedAddress<StaticApi>>,
+        To: AnnotatedValue<ScenarioTxEnvironment, ManagedAddress<StaticApi>>,
     {
-        self.to_annotation = Some(to.annotation().to_string())
+        self.to_annotation = Some(to.annotation(self).to_string())
+    }
+
+    fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
+        panic!("Explicit sender address expected")
+    }
+
+    fn default_gas(&self) -> u64 {
+        // TODO: annotate
+        5_000_000
     }
 }
 
-pub type TxScenarioBase = TxBaseWithEnv<StaticApi, ScenarioTxEnvironment>;
+pub type TxScenarioBase = TxBaseWithEnv<ScenarioTxEnvironment>;
 
 pub trait ScenarioTx {
     fn run_as_scenario_step(self, world: &mut ScenarioWorld);
@@ -58,12 +69,12 @@ impl ScenarioWorld {
 }
 
 impl<From, To, Payment, Gas> ScenarioTx
-    for Tx<StaticApi, ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>>
+    for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>>
 where
-    From: TxFromSpecified<StaticApi>,
-    To: TxToSpecified<StaticApi>,
-    Payment: TxPayment<StaticApi>,
-    Gas: TxGas,
+    From: TxFromSpecified<ScenarioTxEnvironment>,
+    To: TxToSpecified<ScenarioTxEnvironment>,
+    Payment: TxPayment<ScenarioTxEnvironment>,
+    Gas: TxGas<ScenarioTxEnvironment>,
 {
     fn run_as_scenario_step(self, world: &mut ScenarioWorld) {
         let mut step = ScCallStep::new()

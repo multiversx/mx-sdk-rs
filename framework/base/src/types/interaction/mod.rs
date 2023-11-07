@@ -1,3 +1,5 @@
+#![allow(unused)] // TEMP
+
 mod annotated;
 mod async_call;
 mod async_call_promises;
@@ -19,7 +21,8 @@ mod function_call;
 mod managed_arg_buffer;
 mod tx;
 mod tx_data;
-mod tx_environment;
+mod tx_env;
+mod tx_env_sc;
 mod tx_from;
 mod tx_gas;
 mod tx_payment;
@@ -46,8 +49,11 @@ pub use function_call::FunctionCall;
 pub use managed_arg_buffer::ManagedArgBuffer;
 pub use tx::*;
 pub use tx_data::*;
-pub use tx_environment::*;
+pub use tx_env::*;
+pub use tx_env_sc::*;
 pub use tx_from::*;
 pub use tx_gas::*;
 pub use tx_payment::*;
 pub use tx_to::*;
+
+pub type TxScBase<Api> = TxBaseWithEnv<TxScEnv<Api>>;

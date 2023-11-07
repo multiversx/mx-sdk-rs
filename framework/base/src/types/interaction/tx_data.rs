@@ -4,39 +4,39 @@ use crate::{
     types::{ManagedBuffer, ManagedBufferCachedBuilder},
 };
 
-use super::FunctionCall;
+use super::{FunctionCall, TxEnv};
 
-pub trait TxData<Api>
+pub trait TxData<Env>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
     fn is_no_call(&self) -> bool;
 
-    fn to_call_data_string(&self) -> ManagedBuffer<Api>;
+    fn to_call_data_string(&self) -> ManagedBuffer<Env::Api>;
 }
 
-impl<Api> TxData<Api> for ()
+impl<Env> TxData<Env> for ()
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
     fn is_no_call(&self) -> bool {
         true
     }
 
-    fn to_call_data_string(&self) -> ManagedBuffer<Api> {
+    fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
         ManagedBuffer::new()
     }
 }
 
-impl<Api> TxData<Api> for FunctionCall<Api>
+impl<Env> TxData<Env> for FunctionCall<Env::Api>
 where
-    Api: ManagedTypeApi,
+    Env: TxEnv,
 {
     fn is_no_call(&self) -> bool {
         self.is_empty()
     }
 
-    fn to_call_data_string(&self) -> ManagedBuffer<Api> {
+    fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
         let mut result = ManagedBufferCachedBuilder::default();
         result.append_managed_buffer(&self.function_name);
         for arg in self.arg_buffer.raw_arg_iter() {

@@ -12,21 +12,19 @@ use crate::{
 };
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, TxData, TxEnvironemnt, TxFrom, TxGas, TxPayment, TxTo,
-    TxToSpecified, TxFromSpecified,
+    AsyncCall, ExplicitGas, FunctionCall, TxData, TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment,
+    TxScEnv, TxTo, TxToSpecified,
 };
 
-pub struct Tx<Api, Env, From, To, Payment, Gas, Data>
+pub struct Tx<Env, From, To, Payment, Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
-    pub(super) _phantom: PhantomData<Api>,
     pub env: Env,
     pub from: From,
     pub to: To,
@@ -35,21 +33,19 @@ where
     pub data: Data,
 }
 
-impl<Api, Env, From, To, Payment, Gas, Data> Tx<Api, Env, From, To, Payment, Gas, Data>
+impl<Env, From, To, Payment, Gas, Data> Tx<Env, From, To, Payment, Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
     /// TODO: does nothing, delete, added for easier copy-paste.
     #[inline]
-    pub fn nothing(self) -> Tx<Api, Env, From, To, Payment, Gas, Data> {
+    pub fn nothing(self) -> Tx<Env, From, To, Payment, Gas, Data> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -60,17 +56,15 @@ where
     }
 }
 
-pub type TxBaseWithEnv<Api, Env> = Tx<Api, Env, (), (), (), (), ()>;
+pub type TxBaseWithEnv<Env> = Tx<Env, (), (), (), (), ()>;
 
-impl<Api, Env> TxBaseWithEnv<Api, Env>
+impl<Env> TxBaseWithEnv<Env>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
+    Env: TxEnv,
 {
     #[inline]
     pub fn new_with_env(env: Env) -> Self {
         Tx {
-            _phantom: PhantomData,
             env,
             from: (),
             to: (),
@@ -81,45 +75,35 @@ where
     }
 }
 
-pub type TxBase<Api> = Tx<Api, (), (), (), (), (), ()>;
+// impl Default for TxBaseWithEnv<()> {
+//     #[inline]
+//     fn default() -> Self {
+//         Self::new_with_env(())
+//     }
+// }
 
-impl<Api> Default for TxBase<Api>
-where
-    Api: CallTypeApi + 'static,
-{
-    #[inline]
-    fn default() -> Self {
-        Self::new_with_env(())
-    }
-}
+// impl TxBaseWithEnv<()> {
+//     #[inline]
+//     pub fn new() -> Self {
+//         Self::default()
+//     }
+// }
 
-impl<Api> TxBase<Api>
+impl<Env, To, Payment, Gas, Data> Tx<Env, (), To, Payment, Gas, Data>
 where
-    Api: CallTypeApi + 'static,
+    Env: TxEnv,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
-    #[inline]
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
-impl<Api, Env, To, Payment, Gas, Data> Tx<Api, Env, (), To, Payment, Gas, Data>
-where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    To: TxTo<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
-{
-    pub fn from<From>(self, from: From) -> Tx<Api, Env, From, To, Payment, Gas, Data>
+    pub fn from<From>(self, from: From) -> Tx<Env, From, To, Payment, Gas, Data>
     where
-        From: TxFromSpecified<Api>,
+        From: TxFromSpecified<Env>,
     {
         let mut env = self.env;
         env.annotate_from(&from);
         Tx {
-            _phantom: PhantomData,
             env,
             from,
             to: self.to,
@@ -130,23 +114,21 @@ where
     }
 }
 
-impl<Api, Env, From, Payment, Gas, Data> Tx<Api, Env, From, (), Payment, Gas, Data>
+impl<Env, From, Payment, Gas, Data> Tx<Env, From, (), Payment, Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
-    pub fn to<To>(self, to: To) -> Tx<Api, Env, From, To, Payment, Gas, Data>
+    pub fn to<To>(self, to: To) -> Tx<Env, From, To, Payment, Gas, Data>
     where
-        To: TxToSpecified<Api>,
+        To: TxToSpecified<Env>,
     {
         let mut env = self.env;
         env.annotate_to(&to);
         Tx {
-            _phantom: PhantomData,
             env,
             from: self.from,
             to,
@@ -156,27 +138,25 @@ where
         }
     }
 
-    pub fn to_caller(self) -> Tx<Api, Env, From, ManagedAddress<Api>, Payment, Gas, Data> {
-        let caller = BlockchainWrapper::<Api>::new().get_caller();
+    pub fn to_caller(self) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data> {
+        let caller = BlockchainWrapper::<Env::Api>::new().get_caller();
         self.to(caller)
     }
 }
 
-impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, (), Gas, Data>
+impl<Env, From, To, Gas, Data> Tx<Env, From, To, (), Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
     pub fn egld(
         self,
-        egld_amount: BigUint<Api>,
-    ) -> Tx<Api, Env, From, To, EgldPayment<Api>, Gas, Data> {
+        egld_amount: BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EgldPayment<Env::Api>, Gas, Data> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -187,24 +167,22 @@ where
     }
 }
 
-impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, (), Gas, Data>
+impl<Env, From, To, Gas, Data> Tx<Env, From, To, (), Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
     /// Adds a single ESDT token transfer to a transaction.
     ///
     /// Since this is the first ESDT payment, a single payment tx is produced. Can be called again for multiple payments.
-    pub fn esdt<P: Into<EsdtTokenPayment<Api>>>(
+    pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Api, Env, From, To, EsdtTokenPayment<Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -217,10 +195,9 @@ where
     /// Adds a collection of ESDT payments to a transaction.
     pub fn multi_esdt(
         self,
-        payments: MultiEsdtPayment<Api>, // TODO: references
-    ) -> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+        payments: MultiEsdtPayment<Env::Api>, // TODO: references
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -231,27 +208,25 @@ where
     }
 }
 
-impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, EsdtTokenPayment<Api>, Gas, Data>
+impl<Env, From, To, Gas, Data> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
-    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Api>>>(
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data> {
         let mut payments = ManagedVec::new();
         payments.push(self.payment);
         payments.push(payment.into());
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -262,44 +237,38 @@ where
     }
 }
 
-impl<Api, Env, From, To, Gas, Data> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data>
+impl<Env, From, To, Gas, Data> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Gas: TxGas,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
 {
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
-    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Api>>>(
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
-    ) -> Tx<Api, Env, From, To, MultiEsdtPayment<Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data> {
         self.payment.push(payment.into());
         self
     }
 }
 
-impl<Api, Env, From, To, Payment, Data> Tx<Api, Env, From, To, Payment, (), Data>
+impl<Env, From, To, Payment, Data> Tx<Env, From, To, Payment, (), Data>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Payment: TxPayment<Api>,
-    Data: TxData<Api>,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Data: TxData<Env>,
 {
     /// Sets an explicit gas limit to the call.
     #[inline]
-    pub fn with_gas_limit(
-        self,
-        gas_limit: u64,
-    ) -> Tx<Api, Env, From, To, Payment, ExplicitGas, Data> {
+    pub fn with_gas_limit(self, gas_limit: u64) -> Tx<Env, From, To, Payment, ExplicitGas, Data> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -310,22 +279,20 @@ where
     }
 }
 
-impl<Api, Env, From, To, Payment, Gas> Tx<Api, Env, From, To, Payment, Gas, ()>
+impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, ()>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
 {
     #[inline]
-    pub fn call<FC: Into<FunctionCall<Api>>>(
+    pub fn call<FC: Into<FunctionCall<Env::Api>>>(
         self,
         call: FC,
-    ) -> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>> {
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -336,12 +303,11 @@ where
     }
 
     #[inline]
-    pub fn function_name<N: Into<ManagedBuffer<Api>>>(
+    pub fn function_name<N: Into<ManagedBuffer<Env::Api>>>(
         self,
         function_name: N,
-    ) -> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>> {
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>> {
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: self.to,
@@ -352,14 +318,13 @@ where
     }
 }
 
-impl<Api, Env, From, To, Payment, Gas> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>>
+impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxTo<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
 {
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
@@ -368,23 +333,22 @@ where
     }
 }
 
-impl<Api, Env, From, To, Payment, Gas> Tx<Api, Env, From, To, Payment, Gas, FunctionCall<Api>>
+impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>>
 where
-    Api: CallTypeApi + 'static,
-    Env: TxEnvironemnt<Api>,
-    From: TxFrom<Api>,
-    To: TxToSpecified<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxToSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
 {
     pub fn normalize_tx(
         self,
-    ) -> Tx<Api, Env, From, ManagedAddress<Api>, EgldPayment<Api>, Gas, FunctionCall<Api>> {
-        let result = self
-            .payment
-            .convert_tx_data(&self.from, self.to.into_value(), self.data);
+    ) -> Tx<Env, From, ManagedAddress<Env::Api>, EgldPayment<Env::Api>, Gas, FunctionCall<Env::Api>>
+    {
+        let result =
+            self.payment
+                .convert_tx_data(&self.env, &self.from, self.to.into_value(), self.data);
         Tx {
-            _phantom: PhantomData,
             env: self.env,
             from: self.from,
             to: result.to,
@@ -392,80 +356,5 @@ where
             gas: self.gas,
             data: result.fc,
         }
-    }
-}
-
-impl<Api, To, Payment> Tx<Api, (), (), To, Payment, (), FunctionCall<Api>>
-where
-    Api: CallTypeApi + 'static,
-    To: TxToSpecified<Api>,
-    Payment: TxPayment<Api>,
-{
-    pub fn async_call(self) -> AsyncCall<Api> {
-        let normalized = self.normalize_tx();
-        AsyncCall {
-            to: normalized.to,
-            egld_payment: normalized.payment.value,
-            function_call: normalized.data,
-            callback_call: None,
-        }
-    }
-}
-
-impl<Api, To, Payment> Tx<Api, (), (), To, Payment, ExplicitGas, FunctionCall<Api>>
-where
-    Api: CallTypeApi + 'static,
-    To: TxToSpecified<Api>,
-    Payment: TxPayment<Api>,
-{
-    #[cfg(feature = "promises")]
-    pub fn async_call_promise(self) -> super::AsyncCallPromises<Api> {
-        let explicit_gas_limit = self.gas.0;
-        let normalized = self.normalize_tx();
-        super::AsyncCallPromises {
-            to: normalized.to,
-            egld_payment: normalized.payment.value,
-            function_call: normalized.data,
-            explicit_gas_limit,
-            extra_gas_for_callback: 0,
-            callback_call: None,
-        }
-    }
-}
-
-impl<Api, From, To, Payment, Gas, FC> Tx<Api, (), From, To, Payment, Gas, FC>
-where
-    Api: CallTypeApi + 'static,
-    From: TxFrom<Api>,
-    To: TxToSpecified<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
-    FC: TxData<Api> + Into<FunctionCall<Api>>,
-{
-    pub fn transfer_execute(self) {
-        if self.payment.is_no_payment() && self.data.is_no_call() {
-            return;
-        }
-
-        let gas_limit = self.gas.resolve_gas::<Api>();
-
-        self.to.with_value_ref(|to| {
-            self.payment
-                .perform_transfer_execute(to, gas_limit, self.data.into());
-        });
-    }
-}
-
-impl<Api, From, To, Payment, Gas> Tx<Api, (), From, To, Payment, Gas, ()>
-where
-    Api: CallTypeApi + 'static,
-    From: TxFrom<Api>,
-    To: TxToSpecified<Api>,
-    Payment: TxPayment<Api>,
-    Gas: TxGas,
-{
-    /// Syntactic sugar, only allowed for simple transfers.
-    pub fn transfer(self) {
-        self.transfer_execute()
     }
 }

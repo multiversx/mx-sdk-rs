@@ -14,7 +14,7 @@ use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
     ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, FunctionCall, ManagedArgBuffer,
-    Tx,
+    Tx, TxScEnv,
 };
 
 /// Holds metadata for calling another contract, without payments.
@@ -168,7 +168,7 @@ where
         self.function_call
     }
 
-    pub fn tx(self) -> Tx<SA, (), (), (), (), (), FunctionCall<SA>> {
-        Tx::new().call(self.function_call)
+    pub fn tx(self) -> Tx<TxScEnv<SA>, (), (), (), (), FunctionCall<SA>> {
+        Tx::new_tx_from_sc().call(self.function_call)
     }
 }
