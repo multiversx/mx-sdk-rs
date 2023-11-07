@@ -47,6 +47,12 @@ fn template_current_empty() {
     template_test_current("empty", "examples", "new-empty");
 }
 
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_ping_pong_egld() {
+    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
+}
+
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
