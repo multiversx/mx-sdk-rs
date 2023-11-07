@@ -165,7 +165,7 @@ impl TemplateAdjuster {
 
         replace_in_files(
             &self.target.contract_dir(),
-            "*.step.json",
+            "*.steps.json",
             &[Query::substring(&old_wasm, &new_wasm)][..],
         );
 
