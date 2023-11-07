@@ -24,7 +24,8 @@ fn test_template_list() {
         [
             "adder".to_string(),
             "crypto-zombies".to_string(),
-            "empty".to_string()
+            "empty".to_string(),
+            "ping-pong-egld".to_string(),
         ]
     );
 }
