@@ -15,7 +15,7 @@ pub const DECIMALS: u8 = 0;
 pub const EGLD_TICKER: &[u8] = b"EGLD";
 pub const NR_ORACLES: usize = 4;
 pub const SLASH_AMOUNT: u64 = 10;
-pub const SLASH_QUORUM: usize = 2;
+pub const SLASH_QUORUM: usize = 3;
 pub const STAKE_AMOUNT: u64 = 20;
 pub const SUBMISSION_COUNT: usize = 3;
 pub const USD_TICKER: &[u8] = b"USDC";
@@ -389,6 +389,14 @@ fn test_price_aggregator_slashing() {
         &price_aggregator_whitebox,
         ScCallStep::new()
             .from(&oracles[2])
+            .argument(BytesValue::from(oracles[1].to_address().as_bytes())),
+        |sc| sc.call_vote_slash_member(),
+    );
+
+    world.whitebox_call(
+        &price_aggregator_whitebox,
+        ScCallStep::new()
+            .from(&oracles[3])
             .argument(BytesValue::from(oracles[1].to_address().as_bytes())),
         |sc| sc.call_vote_slash_member(),
     );

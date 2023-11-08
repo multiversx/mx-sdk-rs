@@ -21,7 +21,7 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
 const PRICE_AGGREGATOR_PATH_EXPR: &str = "file:output/multiversx-price-aggregator-sc.wasm";
 const SLASH_AMOUNT: u64 = 10;
-const SLASH_QUORUM: usize = 2;
+const SLASH_QUORUM: usize = 3;
 const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
@@ -368,6 +368,7 @@ fn test_price_aggregator_slashing() {
 
     state.vote_slash_member(&state.oracles[0].clone(), state.oracles[1].to_address());
     state.vote_slash_member(&state.oracles[2].clone(), state.oracles[1].to_address());
+    state.vote_slash_member(&state.oracles[3].clone(), state.oracles[1].to_address());
 
     state.world.sc_call(
         ScCallStep::new().from(&state.oracles[0]).call(
