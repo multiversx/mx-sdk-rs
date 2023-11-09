@@ -15,6 +15,7 @@ use crate::{
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        Tx,
     },
 };
 
@@ -314,10 +315,10 @@ where
         nonce: u64,
         amount: BigUint<A>,
     ) -> ! {
-        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-            .with_esdt_transfer((token, nonce, amount))
-            .async_call()
-            .call_and_exit_ignore_callback()
+        Tx::new_tx_from_sc()
+            .to(to)
+            .esdt((token, nonce, amount))
+            .async_call_and_exit()
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
@@ -339,10 +340,7 @@ where
         if amount == 0 {
             return;
         }
-        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-            .with_esdt_transfer((token, nonce, amount))
-            .async_call()
-            .call_and_exit_ignore_callback()
+        self.transfer_esdt_via_async_call(to, token, nonce, amount)
     }
 
     /// Sends multiple ESDT tokens to a target address, via an async call.
@@ -351,10 +349,10 @@ where
         to: ManagedAddress<A>,
         payments: ManagedVec<A, EsdtTokenPayment<A>>,
     ) -> ! {
-        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-            .with_multi_token_transfer(payments)
-            .async_call()
-            .call_and_exit_ignore_callback()
+        Tx::new_tx_from_sc()
+            .to(to)
+            .multi_esdt(payments)
+            .async_call_and_exit()
     }
 
     /// Creates a call to the `ClaimDeveloperRewards` builtin function.

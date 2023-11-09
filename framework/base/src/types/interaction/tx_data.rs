@@ -15,6 +15,12 @@ where
     fn to_call_data_string(&self) -> ManagedBuffer<Env::Api>;
 }
 
+pub trait TxDataFunctionCall<Env>: TxData<Env> + Into<FunctionCall<Env::Api>>
+where
+    Env: TxEnv,
+{
+}
+
 impl<Env> TxData<Env> for ()
 where
     Env: TxEnv,
@@ -27,6 +33,7 @@ where
         ManagedBuffer::new()
     }
 }
+impl<Env> TxDataFunctionCall<Env> for () where Env: TxEnv {}
 
 impl<Env> TxData<Env> for FunctionCall<Env::Api>
 where
@@ -46,3 +53,4 @@ where
         result.into_managed_buffer()
     }
 }
+impl<Env> TxDataFunctionCall<Env> for FunctionCall<Env::Api> where Env: TxEnv {}

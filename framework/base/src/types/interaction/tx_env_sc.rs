@@ -69,45 +69,7 @@ where
     }
 }
 
-impl<Api, To, Payment> Tx<TxScEnv<Api>, (), To, Payment, (), FunctionCall<Api>>
-where
-    Api: CallTypeApi,
-    To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
-{
-    pub fn async_call(self) -> AsyncCall<Api> {
-        let normalized = self.normalize_tx();
-        AsyncCall {
-            to: normalized.to,
-            egld_payment: normalized.payment.value,
-            function_call: normalized.data,
-            callback_call: None,
-        }
-    }
-}
-
-impl<Api, To, Payment> Tx<TxScEnv<Api>, (), To, Payment, ExplicitGas, FunctionCall<Api>>
-where
-    Api: CallTypeApi,
-    To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
-{
-    #[cfg(feature = "promises")]
-    pub fn async_call_promise(self) -> super::AsyncCallPromises<Api> {
-        let explicit_gas_limit = self.gas.0;
-        let normalized = self.normalize_tx();
-        super::AsyncCallPromises {
-            to: normalized.to,
-            egld_payment: normalized.payment.value,
-            function_call: normalized.data,
-            explicit_gas_limit,
-            extra_gas_for_callback: 0,
-            callback_call: None,
-        }
-    }
-}
-
-impl<Api, From, To, Payment, Gas, FC> Tx<TxScEnv<Api>, From, To, Payment, Gas, FC>
+impl<Api, From, To, Payment, Gas, FC> Tx<TxScEnv<Api>, From, To, Payment, Gas, FC, ()>
 where
     Api: CallTypeApi,
     From: TxFrom<TxScEnv<Api>>,
@@ -130,7 +92,7 @@ where
     }
 }
 
-impl<Api, From, To, Payment, Gas> Tx<TxScEnv<Api>, From, To, Payment, Gas, ()>
+impl<Api, From, To, Payment, Gas> Tx<TxScEnv<Api>, From, To, Payment, Gas, (), ()>
 where
     Api: CallTypeApi,
     From: TxFrom<TxScEnv<Api>>,

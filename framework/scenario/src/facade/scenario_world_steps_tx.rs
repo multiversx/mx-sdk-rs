@@ -69,7 +69,7 @@ impl ScenarioWorld {
 }
 
 impl<From, To, Payment, Gas> ScenarioTx
-    for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>>
+    for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>, ()>
 where
     From: TxFromSpecified<ScenarioTxEnvironment>,
     To: TxToSpecified<ScenarioTxEnvironment>,
@@ -85,6 +85,6 @@ where
             step = step.argument(arg.to_vec());
         }
 
-        world.sc_call(step);
+        world.sc_call(&mut step);
     }
 }

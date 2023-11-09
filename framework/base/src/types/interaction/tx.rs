@@ -12,11 +12,12 @@ use crate::{
 };
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, TxData, TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment,
-    TxScEnv, TxTo, TxToSpecified,
+    AsyncCall, ExplicitGas, FunctionCall, TxCallback, TxData, TxDataFunctionCall, TxEnv, TxFrom,
+    TxFromSpecified, TxGas, TxPayment, TxScEnv, TxTo, TxToSpecified,
 };
 
-pub struct Tx<Env, From, To, Payment, Gas, Data>
+#[must_use]
+pub struct Tx<Env, From, To, Payment, Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -24,6 +25,7 @@ where
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     pub env: Env,
     pub from: From,
@@ -31,9 +33,10 @@ where
     pub payment: Payment,
     pub gas: Gas,
     pub data: Data,
+    pub callback: Callback,
 }
 
-impl<Env, From, To, Payment, Gas, Data> Tx<Env, From, To, Payment, Gas, Data>
+impl<Env, From, To, Payment, Gas, Data, Callback> Tx<Env, From, To, Payment, Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -41,10 +44,11 @@ where
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     /// TODO: does nothing, delete, added for easier copy-paste.
     #[inline]
-    pub fn nothing(self) -> Tx<Env, From, To, Payment, Gas, Data> {
+    pub fn nothing(self) -> Tx<Env, From, To, Payment, Gas, Data, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -52,11 +56,12 @@ where
             payment: self.payment,
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 }
 
-pub type TxBaseWithEnv<Env> = Tx<Env, (), (), (), (), ()>;
+pub type TxBaseWithEnv<Env> = Tx<Env, (), (), (), (), (), ()>;
 
 impl<Env> TxBaseWithEnv<Env>
 where
@@ -71,6 +76,7 @@ where
             payment: (),
             gas: (),
             data: (),
+            callback: (),
         }
     }
 }
@@ -89,15 +95,16 @@ where
 //     }
 // }
 
-impl<Env, To, Payment, Gas, Data> Tx<Env, (), To, Payment, Gas, Data>
+impl<Env, To, Payment, Gas, Data, Callback> Tx<Env, (), To, Payment, Gas, Data, Callback>
 where
     Env: TxEnv,
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
-    pub fn from<From>(self, from: From) -> Tx<Env, From, To, Payment, Gas, Data>
+    pub fn from<From>(self, from: From) -> Tx<Env, From, To, Payment, Gas, Data, Callback>
     where
         From: TxFromSpecified<Env>,
     {
@@ -110,19 +117,21 @@ where
             payment: self.payment,
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 }
 
-impl<Env, From, Payment, Gas, Data> Tx<Env, From, (), Payment, Gas, Data>
+impl<Env, From, Payment, Gas, Data, Callback> Tx<Env, From, (), Payment, Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
-    pub fn to<To>(self, to: To) -> Tx<Env, From, To, Payment, Gas, Data>
+    pub fn to<To>(self, to: To) -> Tx<Env, From, To, Payment, Gas, Data, Callback>
     where
         To: TxToSpecified<Env>,
     {
@@ -135,27 +144,31 @@ where
             payment: self.payment,
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 
-    pub fn to_caller(self) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data> {
+    pub fn to_caller(
+        self,
+    ) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data, Callback> {
         let caller = BlockchainWrapper::<Env::Api>::new().get_caller();
         self.to(caller)
     }
 }
 
-impl<Env, From, To, Gas, Data> Tx<Env, From, To, (), Gas, Data>
+impl<Env, From, To, Gas, Data, Callback> Tx<Env, From, To, (), Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     pub fn egld(
         self,
         egld_amount: BigUint<Env::Api>,
-    ) -> Tx<Env, From, To, EgldPayment<Env::Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, EgldPayment<Env::Api>, Gas, Data, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -163,17 +176,19 @@ where
             payment: EgldPayment { value: egld_amount },
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 }
 
-impl<Env, From, To, Gas, Data> Tx<Env, From, To, (), Gas, Data>
+impl<Env, From, To, Gas, Data, Callback> Tx<Env, From, To, (), Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     /// Adds a single ESDT token transfer to a transaction.
     ///
@@ -181,7 +196,7 @@ where
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -189,6 +204,7 @@ where
             payment: payment.into(),
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 
@@ -196,7 +212,7 @@ where
     pub fn multi_esdt(
         self,
         payments: MultiEsdtPayment<Env::Api>, // TODO: references
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -204,17 +220,20 @@ where
             payment: payments,
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 }
 
-impl<Env, From, To, Gas, Data> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data>
+impl<Env, From, To, Gas, Data, Callback>
+    Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     /// Adds a single ESDT token transfer to a contract call.
     ///
@@ -222,7 +241,7 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, Callback> {
         let mut payments = ManagedVec::new();
         payments.push(self.payment);
         payments.push(payment.into());
@@ -233,17 +252,20 @@ where
             payment: payments,
             gas: self.gas,
             data: self.data,
+            callback: self.callback,
         }
     }
 }
 
-impl<Env, From, To, Gas, Data> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data>
+impl<Env, From, To, Gas, Data, Callback>
+    Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     /// Adds a single ESDT token transfer to a contract call.
     ///
@@ -251,23 +273,27 @@ where
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data> {
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, Callback> {
         self.payment.push(payment.into());
         self
     }
 }
 
-impl<Env, From, To, Payment, Data> Tx<Env, From, To, Payment, (), Data>
+impl<Env, From, To, Payment, Data, Callback> Tx<Env, From, To, Payment, (), Data, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Data: TxData<Env>,
+    Callback: TxCallback<Env>,
 {
     /// Sets an explicit gas limit to the call.
     #[inline]
-    pub fn with_gas_limit(self, gas_limit: u64) -> Tx<Env, From, To, Payment, ExplicitGas, Data> {
+    pub fn with_gas_limit(
+        self,
+        gas_limit: u64,
+    ) -> Tx<Env, From, To, Payment, ExplicitGas, Data, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -275,23 +301,25 @@ where
             payment: self.payment,
             gas: ExplicitGas(gas_limit),
             data: self.data,
+            callback: self.callback,
         }
     }
 }
 
-impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, ()>
+impl<Env, From, To, Payment, Gas, Callback> Tx<Env, From, To, Payment, Gas, (), Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
+    Callback: TxCallback<Env>,
 {
     #[inline]
     pub fn call<FC: Into<FunctionCall<Env::Api>>>(
         self,
         call: FC,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>> {
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -299,6 +327,7 @@ where
             payment: self.payment,
             gas: self.gas,
             data: call.into(),
+            callback: self.callback,
         }
     }
 
@@ -306,7 +335,7 @@ where
     pub fn function_name<N: Into<ManagedBuffer<Env::Api>>>(
         self,
         function_name: N,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>> {
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, Callback> {
         Tx {
             env: self.env,
             from: self.from,
@@ -314,17 +343,20 @@ where
             payment: self.payment,
             gas: self.gas,
             data: FunctionCall::new(function_name),
+            callback: self.callback,
         }
     }
 }
 
-impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>>
+impl<Env, From, To, Payment, Gas, Callback>
+    Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
+    Callback: TxCallback<Env>,
 {
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
@@ -333,21 +365,62 @@ where
     }
 }
 
-impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>>
+impl<Env, From, To, Payment, Gas, Data> Tx<Env, From, To, Payment, Gas, Data, ()>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+{
+    #[inline]
+    pub fn callback<Callback>(
+        self,
+        callback: Callback,
+    ) -> Tx<Env, From, To, Payment, Gas, Data, Callback>
+    where
+        Callback: TxCallback<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            callback,
+        }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, FC, Callback> Tx<Env, From, To, Payment, Gas, FC, Callback>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxToSpecified<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
+    FC: TxDataFunctionCall<Env>,
+    Callback: TxCallback<Env>,
 {
     pub fn normalize_tx(
         self,
-    ) -> Tx<Env, From, ManagedAddress<Env::Api>, EgldPayment<Env::Api>, Gas, FunctionCall<Env::Api>>
-    {
-        let result =
-            self.payment
-                .convert_tx_data(&self.env, &self.from, self.to.into_value(), self.data);
+    ) -> Tx<
+        Env,
+        From,
+        ManagedAddress<Env::Api>,
+        EgldPayment<Env::Api>,
+        Gas,
+        FunctionCall<Env::Api>,
+        Callback,
+    > {
+        let result = self.payment.convert_tx_data(
+            &self.env,
+            &self.from,
+            self.to.into_value(),
+            self.data.into(),
+        );
         Tx {
             env: self.env,
             from: self.from,
@@ -355,6 +428,7 @@ where
             payment: result.egld_payment,
             gas: self.gas,
             data: result.fc,
+            callback: self.callback,
         }
     }
 }

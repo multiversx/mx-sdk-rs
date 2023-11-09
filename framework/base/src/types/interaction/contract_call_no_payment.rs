@@ -168,7 +168,7 @@ where
         self.function_call
     }
 
-    pub fn tx(self) -> Tx<TxScEnv<SA>, (), (), (), (), FunctionCall<SA>> {
+    pub fn tx(self) -> Tx<TxScEnv<SA>, (), (), (), (), FunctionCall<SA>, ()> {
         Tx::new_tx_from_sc().call(self.function_call)
     }
 }
