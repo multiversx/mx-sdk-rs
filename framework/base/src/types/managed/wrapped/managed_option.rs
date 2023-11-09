@@ -75,6 +75,8 @@ where
 
     /// Assumes that value is Some and unwraps without checking.
     ///
+    /// # Safety
+    ///
     /// Must always be called under an `if` checking `.is_some()`, otherwise will lead to undefined behaviour.
     pub unsafe fn unwrap_no_check(self) -> T {
         T::from_handle(self.handle)
