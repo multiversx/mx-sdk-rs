@@ -8,8 +8,8 @@ use std::{
 use super::{
     oc_global_config::SC_CONFIG_FILE_NAMES,
     oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
-    MultiContractConfigSerde, ContractVariant, ContractVariantGlobalConfig, ContractVariantSerde,
-    ContractVariantSettings,
+    ContractVariant, ContractVariantGlobalConfig, ContractVariantProfile, ContractVariantSerde,
+    ContractVariantSettings, MultiContractConfigSerde,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -75,6 +75,7 @@ impl ContractVariantBuilder {
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
                     kill_legacy_callback: cms.kill_legacy_callback,
+                    contract_variant_profile: cms.contract_variant_profile.clone().unwrap_or(default.settings.contract_variant_profile),
                 },
                 ..default
             },

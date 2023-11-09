@@ -8,6 +8,8 @@ pub use oc_parse_stack_size::*;
 
 use crate::ei::EIVersion;
 
+use super::ContractVariantProfile;
+
 /// Collection of flags, specified in the multicontract config.
 #[derive(Clone, PartialEq, Eq, Debug)]
 pub struct ContractVariantSettings {
@@ -31,6 +33,8 @@ pub struct ContractVariantSettings {
 
     /// Forcibly remove the original contrct legacy callback.
     pub kill_legacy_callback: bool,
+
+    pub contract_variant_profile: ContractVariantProfile
 }
 
 impl Default for ContractVariantSettings {
@@ -43,6 +47,7 @@ impl Default for ContractVariantSettings {
             stack_size: DEFAULT_STACK_SIZE,
             features: Default::default(),
             kill_legacy_callback: false,
+            contract_variant_profile: Default::default()
         }
     }
 }
