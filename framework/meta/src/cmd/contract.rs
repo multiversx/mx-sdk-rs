@@ -9,7 +9,7 @@ use crate::cli_args::{ContractCliAction, ContractCliArgs};
 use clap::Parser;
 use meta_config::MetaConfig;
 use multiversx_sc::contract_base::ContractAbiProvider;
-use output_contract::OutputContractGlobalConfig;
+use output_contract::ContractVariantGlobalConfig;
 
 /// Entry point in the program from the contract meta crates.
 pub fn cli_main<AbiObj: ContractAbiProvider>() {
@@ -42,13 +42,13 @@ fn process_original_abi<AbiObj: ContractAbiProvider>(cli_args: &ContractCliArgs)
     meta_config
 }
 
-pub fn multi_contract_config<AbiObj>(contract_crate_path: &Path) -> OutputContractGlobalConfig
+pub fn multi_contract_config<AbiObj>(contract_crate_path: &Path) -> ContractVariantGlobalConfig
 where
     AbiObj: ContractAbiProvider,
 {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
 
-    let output_contracts = OutputContractGlobalConfig::load_from_crate_or_default(
+    let output_contracts = ContractVariantGlobalConfig::load_from_crate_or_default(
         contract_crate_path,
         &original_contract_abi,
     );

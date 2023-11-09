@@ -1,6 +1,6 @@
 use std::{ffi::OsStr, fs, process::Command};
 
-use super::OutputContract;
+use super::ContractVariant;
 use crate::{
     abi_json::ContractAbiJson,
     cli_args::BuildArgs,
@@ -10,7 +10,7 @@ use crate::{
     tools,
 };
 
-impl OutputContract {
+impl ContractVariant {
     pub fn build_contract(&self, build_args: &BuildArgs, output_path: &str) {
         let mut command = self.compose_build_command(build_args);
 
@@ -166,7 +166,7 @@ fn validate_ei(import_names: &[String], check_ei: &Option<EIVersion>) {
     }
 }
 
-impl OutputContract {
+impl ContractVariant {
     fn run_twiggy(&self, build_args: &BuildArgs, output_path: &str) {
         if build_args.has_twiggy_call() {
             let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));

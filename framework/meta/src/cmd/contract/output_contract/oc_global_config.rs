@@ -1,4 +1,4 @@
-use super::{oc_validate::validate_output_contract, OutputContract};
+use super::{oc_validate::validate_output_contract, ContractVariant};
 
 /// Allowed file names for the SC config.
 ///
@@ -12,13 +12,13 @@ pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.tom
 ///
 /// It can contain one or several output contracts.
 #[derive(Debug)]
-pub struct OutputContractGlobalConfig {
+pub struct ContractVariantGlobalConfig {
     pub default_contract_config_name: String,
-    pub contracts: Vec<OutputContract>,
+    pub contracts: Vec<ContractVariant>,
 }
 
-impl OutputContractGlobalConfig {
-    pub fn main_contract(&self) -> &OutputContract {
+impl ContractVariantGlobalConfig {
+    pub fn main_contract(&self) -> &ContractVariant {
         self.contracts
             .iter()
             .find(|contract| contract.main)
@@ -30,7 +30,7 @@ impl OutputContractGlobalConfig {
             })
     }
 
-    pub fn main_contract_mut(&mut self) -> &mut OutputContract {
+    pub fn main_contract_mut(&mut self) -> &mut ContractVariant {
         self.contracts
             .iter_mut()
             .find(|contract| contract.main)
@@ -42,30 +42,30 @@ impl OutputContractGlobalConfig {
             })
     }
 
-    pub fn secondary_contracts(&self) -> impl Iterator<Item = &OutputContract> {
+    pub fn secondary_contracts(&self) -> impl Iterator<Item = &ContractVariant> {
         self.contracts.iter().filter(move |contract| !contract.main)
     }
 
-    pub fn secondary_contracts_mut(&mut self) -> impl Iterator<Item = &mut OutputContract> {
+    pub fn secondary_contracts_mut(&mut self) -> impl Iterator<Item = &mut ContractVariant> {
         self.contracts
             .iter_mut()
             .filter(move |contract| !contract.main)
     }
 
-    pub fn get_contract_by_id(&self, contract_id: String) -> Option<&OutputContract> {
+    pub fn get_contract_by_id(&self, contract_id: String) -> Option<&ContractVariant> {
         self.contracts
             .iter()
             .find(|contract| contract.contract_id == contract_id)
     }
 
-    pub fn get_contract_by_name(&self, contract_name: String) -> Option<&OutputContract> {
+    pub fn get_contract_by_name(&self, contract_name: String) -> Option<&ContractVariant> {
         self.contracts
             .iter()
             .find(|contract| contract.contract_name == contract_name)
     }
 
     /// Yields the contract with the given public name.
-    pub fn find_contract(&self, contract_name: &str) -> &OutputContract {
+    pub fn find_contract(&self, contract_name: &str) -> &ContractVariant {
         self.contracts
             .iter()
             .find(|contract| contract.contract_name == contract_name)

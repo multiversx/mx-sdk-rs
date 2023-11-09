@@ -1,8 +1,8 @@
 use std::process::Command;
 
-use super::OutputContract;
+use super::ContractVariant;
 
-impl OutputContract {
+impl ContractVariant {
     /// Runs `cargo update` in the corresponding wasm crate.
     pub fn cargo_update(&self) {
         let exit_status = Command::new("cargo")

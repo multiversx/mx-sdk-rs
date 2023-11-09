@@ -4,7 +4,7 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{cli_args::BuildArgs, tools::check_tools_installed, CargoTomlContents};
 
-use super::output_contract::{OutputContract, OutputContractGlobalConfig};
+use super::output_contract::{ContractVariant, ContractVariantGlobalConfig};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
@@ -17,13 +17,13 @@ pub struct MetaConfig {
     pub output_dir: String,
     pub snippets_dir: String,
     pub original_contract_abi: ContractAbi,
-    pub output_contracts: OutputContractGlobalConfig,
+    pub output_contracts: ContractVariantGlobalConfig,
 }
 
 impl MetaConfig {
     pub fn create(original_contract_abi: ContractAbi, load_abi_git_version: bool) -> MetaConfig {
         let output_contracts =
-            OutputContractGlobalConfig::load_from_crate_or_default("..", &original_contract_abi);
+            ContractVariantGlobalConfig::load_from_crate_or_default("..", &original_contract_abi);
 
         MetaConfig {
             load_abi_git_version,
@@ -66,7 +66,7 @@ impl MetaConfig {
 }
 
 fn secondary_contract_cargo_toml(
-    secondary_contract: &OutputContract,
+    secondary_contract: &ContractVariant,
     main_cargo_toml_contents: &CargoTomlContents,
 ) -> CargoTomlContents {
     let mut cargo_toml_contents = main_cargo_toml_contents.clone();

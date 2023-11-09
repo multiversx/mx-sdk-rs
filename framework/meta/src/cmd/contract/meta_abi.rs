@@ -8,9 +8,9 @@ use crate::{
     esdt_attr_file_json::create_new_esdt_attr_file,
 };
 
-use super::{meta_config::MetaConfig, output_contract::OutputContract};
+use super::{meta_config::MetaConfig, output_contract::ContractVariant};
 
-fn write_contract_abi(output_contract: &OutputContract, git_version: &str, output_path: &str) {
+fn write_contract_abi(output_contract: &ContractVariant, git_version: &str, output_path: &str) {
     let mut abi_json = ContractAbiJson::from(&output_contract.abi);
     if let Some(build_info) = &mut abi_json.build_info {
         build_info.contract_crate.git_version = git_version.to_string();
