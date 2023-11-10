@@ -1,15 +1,15 @@
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 
-use super::OutputContract;
+use super::ContractVariant;
 
-pub fn validate_output_contract(output_contract: &OutputContract) -> Result<(), String> {
-    check_single_constructor(output_contract)?;
-    validate_contract_var_args(&output_contract.abi)?;
+pub fn validate_contract_variant(contract_variant: &ContractVariant) -> Result<(), String> {
+    check_single_constructor(contract_variant)?;
+    validate_contract_var_args(&contract_variant.abi)?;
     Ok(())
 }
 
-fn check_single_constructor(output_contract: &OutputContract) -> Result<(), String> {
-    match output_contract.abi.constructors.len() {
+fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), String> {
+    match contract_variant.abi.constructors.len() {
             0 => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
             1 => Ok(()),
             _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),

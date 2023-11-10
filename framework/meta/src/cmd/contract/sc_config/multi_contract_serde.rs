@@ -6,14 +6,14 @@ pub struct MultiContractConfigSerde {
     #[serde(default)]
     pub settings: MultiContractGeneralSettingsSerde,
     #[serde(default)]
-    pub contracts: HashMap<String, OutputContractSerde>,
+    pub contracts: HashMap<String, ContractVariantSerde>,
     #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
     pub labels_for_contracts: HashMap<String, Vec<String>>,
 }
 
 #[derive(Deserialize, Debug)]
-pub struct OutputContractSerde {
+pub struct ContractVariantSerde {
     pub name: Option<String>,
 
     #[serde(default)]

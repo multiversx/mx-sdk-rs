@@ -8,12 +8,12 @@ use std::{
 use super::{
     oc_global_config::SC_CONFIG_FILE_NAMES,
     oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
-    MultiContractConfigSerde, OutputContract, OutputContractGlobalConfig, OutputContractSerde,
-    OutputContractSettings,
+    MultiContractConfigSerde, ContractVariant, ScConfig, ContractVariantSerde,
+    ContractVariantSettings,
 };
 
-/// Temporary structure, to help create instances of `OutputContract`. Not publicly exposed.
-struct OutputContractBuilder {
+/// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
+struct ContractVariantBuilder {
     pub contract_id: String,
     pub explicit_name: String,
     pub add_unlabelled: bool,
@@ -21,10 +21,10 @@ struct OutputContractBuilder {
     pub add_endpoints: BTreeSet<String>,
     pub collected_endpoints: Vec<EndpointAbi>,
     endpoint_names: HashSet<String>, // help keep endpoints unique
-    pub settings: OutputContractSettings,
+    pub settings: ContractVariantSettings,
 }
 
-impl Default for OutputContractBuilder {
+impl Default for ContractVariantBuilder {
     fn default() -> Self {
         Self {
             contract_id: Default::default(),
@@ -39,16 +39,16 @@ impl Default for OutputContractBuilder {
     }
 }
 
-impl OutputContractBuilder {
+impl ContractVariantBuilder {
     fn new(id: String) -> Self {
-        OutputContractBuilder {
+        ContractVariantBuilder {
             contract_id: id.clone(),
             explicit_name: id,
             ..Default::default()
         }
     }
 
-    fn map_from_config(kvp: (&String, &OutputContractSerde)) -> (String, OutputContractBuilder) {
+    fn map_from_config(kvp: (&String, &ContractVariantSerde)) -> (String, ContractVariantBuilder) {
         let (contract_id, cms) = kvp;
         let external_view = cms.external_view.unwrap_or_default();
         let mut collected_endpoints = Vec::new();
@@ -57,17 +57,17 @@ impl OutputContractBuilder {
                 multiversx_sc::external_view_contract::external_view_contract_constructor_abi(),
             )
         }
-        let default = OutputContractBuilder::default();
+        let default = ContractVariantBuilder::default();
         (
             contract_id.clone(),
-            OutputContractBuilder {
+            ContractVariantBuilder {
                 contract_id: contract_id.clone(),
                 explicit_name: cms.name.clone().unwrap_or(default.explicit_name),
                 add_unlabelled: cms.add_unlabelled.unwrap_or(default.add_unlabelled),
                 add_labels: cms.add_labels.iter().cloned().collect(),
                 add_endpoints: cms.add_endpoints.iter().cloned().collect(),
                 collected_endpoints,
-                settings: OutputContractSettings {
+                settings: ContractVariantSettings {
                     external_view: cms.external_view.unwrap_or(default.settings.external_view),
                     panic_message: cms.panic_message.unwrap_or(default.settings.panic_message),
                     check_ei: parse_check_ei(&cms.ei),
@@ -98,14 +98,14 @@ impl OutputContractBuilder {
 }
 
 fn process_labels_for_contracts(
-    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    contract_builders: &mut HashMap<String, ContractVariantBuilder>,
     labels_for_contracts: &HashMap<String, Vec<String>>,
 ) {
     for (label, targets) in labels_for_contracts {
         for target in targets {
             contract_builders
                 .entry(target.clone())
-                .or_insert_with(|| OutputContractBuilder::new(target.clone()))
+                .or_insert_with(|| ContractVariantBuilder::new(target.clone()))
                 .add_labels
                 .insert(label.clone());
         }
@@ -124,7 +124,7 @@ fn endpoint_matches_labels(endpoint_abi: &EndpointAbi, labels: &BTreeSet<String>
 }
 
 fn collect_unlabelled_endpoints(
-    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    contract_builders: &mut HashMap<String, ContractVariantBuilder>,
     original_abi: &ContractAbi,
 ) {
     for builder in contract_builders.values_mut() {
@@ -139,7 +139,7 @@ fn collect_unlabelled_endpoints(
 }
 
 fn collect_labelled_endpoints(
-    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    contract_builders: &mut HashMap<String, ContractVariantBuilder>,
     original_abi: &ContractAbi,
 ) {
     for builder in contract_builders.values_mut() {
@@ -152,7 +152,7 @@ fn collect_labelled_endpoints(
 }
 
 fn collect_add_endpoints(
-    contract_builders: &mut HashMap<String, OutputContractBuilder>,
+    contract_builders: &mut HashMap<String, ContractVariantBuilder>,
     original_abi: &ContractAbi,
 ) {
     for builder in contract_builders.values_mut() {
@@ -164,7 +164,7 @@ fn collect_add_endpoints(
     }
 }
 
-fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi) -> ContractAbi {
+fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAbi) -> ContractAbi {
     let mut constructors = Vec::new();
     let mut endpoints = Vec::new();
     let mut promise_callbacks = Vec::new();
@@ -198,10 +198,10 @@ fn default_wasm_crate_name(contract_name: &str) -> String {
     format!("{contract_name}-wasm")
 }
 
-fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) -> OutputContract {
+fn build_contract(builder: ContractVariantBuilder, original_abi: &ContractAbi) -> ContractVariant {
     let contract_name = builder.wasm_name().clone();
     let wasm_crate_name = default_wasm_crate_name(&contract_name);
-    OutputContract {
+    ContractVariant {
         main: false,
         settings: builder.settings.clone(),
         contract_id: builder.contract_id.clone(),
@@ -212,7 +212,7 @@ fn build_contract(builder: OutputContractBuilder, original_abi: &ContractAbi) ->
 }
 
 fn set_main_contract_flag(
-    contracts: &mut [OutputContract],
+    contracts: &mut [ContractVariant],
     default_contract_config_name_opt: &Option<String>,
 ) {
     if let Some(default_contract_config_name) = default_contract_config_name_opt {
@@ -236,7 +236,7 @@ fn set_main_contract_flag(
     }
 }
 
-fn validate_output_contracts(contracts: &[OutputContract]) {
+fn validate_contract_variants(contracts: &[ContractVariant]) {
     for contract in contracts {
         if contract.main {
             assert!(
@@ -247,27 +247,27 @@ fn validate_output_contracts(contracts: &[OutputContract]) {
     }
 }
 
-impl OutputContractGlobalConfig {
-    /// Assembles an `OutputContractConfig` from a raw config object that was loaded via Serde.
+impl ScConfig {
+    /// Assembles an `ContractVariantConfig` from a raw config object that was loaded via Serde.
     ///
     /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
     pub fn load_from_config(config: &MultiContractConfigSerde, original_abi: &ContractAbi) -> Self {
-        let mut contract_builders: HashMap<String, OutputContractBuilder> = config
+        let mut contract_builders: HashMap<String, ContractVariantBuilder> = config
             .contracts
             .iter()
-            .map(OutputContractBuilder::map_from_config)
+            .map(ContractVariantBuilder::map_from_config)
             .collect();
         collect_unlabelled_endpoints(&mut contract_builders, original_abi);
         collect_labelled_endpoints(&mut contract_builders, original_abi);
         collect_add_endpoints(&mut contract_builders, original_abi);
         process_labels_for_contracts(&mut contract_builders, &config.labels_for_contracts);
-        let mut contracts: Vec<OutputContract> = contract_builders
+        let mut contracts: Vec<ContractVariant> = contract_builders
             .into_values()
             .map(|builder| build_contract(builder, original_abi))
             .collect();
         set_main_contract_flag(&mut contracts, &config.settings.main);
-        validate_output_contracts(&contracts);
-        OutputContractGlobalConfig {
+        validate_contract_variants(&contracts);
+        ScConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
             contracts,
         }
@@ -279,11 +279,11 @@ impl OutputContractGlobalConfig {
     pub fn default_config(original_abi: &ContractAbi) -> Self {
         let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
         let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
-        OutputContractGlobalConfig {
+        ScConfig {
             default_contract_config_name: default_contract_config_name.clone(),
-            contracts: vec![OutputContract {
+            contracts: vec![ContractVariant {
                 main: true,
-                settings: OutputContractSettings::default(),
+                settings: ContractVariantSettings::default(),
                 contract_id: default_contract_config_name.clone(),
                 contract_name: default_contract_config_name,
                 wasm_crate_name,

@@ -4,7 +4,7 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{cli_args::BuildArgs, tools::check_tools_installed, CargoTomlContents};
 
-use super::output_contract::{OutputContract, OutputContractGlobalConfig};
+use super::sc_config::{ContractVariant, ScConfig};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
@@ -17,20 +17,20 @@ pub struct MetaConfig {
     pub output_dir: String,
     pub snippets_dir: String,
     pub original_contract_abi: ContractAbi,
-    pub output_contracts: OutputContractGlobalConfig,
+    pub sc_config: ScConfig,
 }
 
 impl MetaConfig {
     pub fn create(original_contract_abi: ContractAbi, load_abi_git_version: bool) -> MetaConfig {
-        let output_contracts =
-            OutputContractGlobalConfig::load_from_crate_or_default("..", &original_contract_abi);
+        let sc_config =
+            ScConfig::load_from_crate_or_default("..", &original_contract_abi);
 
         MetaConfig {
             load_abi_git_version,
             output_dir: OUTPUT_RELATIVE_PATH.to_string(),
             snippets_dir: SNIPPETS_RELATIVE_PATH.to_string(),
             original_contract_abi,
-            output_contracts,
+            sc_config,
         }
     }
 
@@ -44,21 +44,21 @@ impl MetaConfig {
     }
 
     fn create_wasm_crate_dirs(&self) {
-        for output_contract in &self.output_contracts.contracts {
-            output_contract.create_wasm_crate_dir();
+        for contract_variant in &self.sc_config.contracts {
+            contract_variant.create_wasm_crate_dir();
         }
     }
 
     /// Cargo.toml files for secondary contracts are generated from the main contract Cargo.toml,
     /// by changing the package name.
     pub fn generate_cargo_toml_for_secondary_contracts(&mut self) {
-        let main_contract = self.output_contracts.main_contract_mut();
+        let main_contract = self.sc_config.main_contract_mut();
 
         let main_cargo_toml_contents =
             CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
         main_contract.wasm_crate_name = main_cargo_toml_contents.package_name();
 
-        for secondary_contract in self.output_contracts.secondary_contracts() {
+        for secondary_contract in self.sc_config.secondary_contracts() {
             secondary_contract_cargo_toml(secondary_contract, &main_cargo_toml_contents)
                 .save_to_file(secondary_contract.cargo_toml_path());
         }
@@ -66,7 +66,7 @@ impl MetaConfig {
 }
 
 fn secondary_contract_cargo_toml(
-    secondary_contract: &OutputContract,
+    secondary_contract: &ContractVariant,
     main_cargo_toml_contents: &CargoTomlContents,
 ) -> CargoTomlContents {
     let mut cargo_toml_contents = main_cargo_toml_contents.clone();
@@ -80,16 +80,16 @@ fn secondary_contract_cargo_toml(
 
 impl MetaConfig {
     fn generate_wasm_src_lib(&self) {
-        for output_contract in &self.output_contracts.contracts {
-            output_contract.generate_wasm_src_lib_file();
+        for contract_variant in &self.sc_config.contracts {
+            contract_variant.generate_wasm_src_lib_file();
         }
     }
 
     pub fn build(&mut self, mut build_args: BuildArgs) {
         check_tools_installed(&mut build_args);
 
-        for output_contract in &self.output_contracts.contracts {
-            output_contract.build_contract(&build_args, self.output_dir.as_str());
+        for contract_variant in &self.sc_config.contracts {
+            contract_variant.build_contract(&build_args, self.output_dir.as_str());
         }
     }
 
@@ -100,15 +100,15 @@ impl MetaConfig {
     }
 
     fn clean_contract_crates(&self) {
-        for output_contract in &self.output_contracts.contracts {
-            output_contract.cargo_clean();
+        for contract_variant in &self.sc_config.contracts {
+            contract_variant.cargo_clean();
         }
     }
 
     /// Updates the Cargo.lock on all wasm crates.
     pub fn update(&self) {
-        for output_contract in &self.output_contracts.contracts {
-            output_contract.cargo_update();
+        for contract_variant in &self.sc_config.contracts {
+            contract_variant.cargo_update();
         }
     }
 
@@ -125,7 +125,7 @@ impl MetaConfig {
             return true;
         }
 
-        self.output_contracts
+        self.sc_config
             .secondary_contracts()
             .any(|contract| contract.wasm_crate_dir_name().as_str() == dir_name)
     }

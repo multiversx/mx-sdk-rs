@@ -10,7 +10,7 @@ use crate::ei::EIVersion;
 
 /// Collection of flags, specified in the multicontract config.
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct OutputContractSettings {
+pub struct ContractVariantSettings {
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
 
@@ -33,9 +33,9 @@ pub struct OutputContractSettings {
     pub kill_legacy_callback: bool,
 }
 
-impl Default for OutputContractSettings {
+impl Default for ContractVariantSettings {
     fn default() -> Self {
-        OutputContractSettings {
+        ContractVariantSettings {
             external_view: Default::default(),
             panic_message: Default::default(),
             check_ei: Some(EIVersion::default()),
