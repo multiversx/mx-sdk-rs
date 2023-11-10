@@ -22,6 +22,7 @@ mod managed_arg_buffer;
 mod tx;
 mod tx_async_call;
 mod tx_async_call_promises;
+mod tx_async_te;
 mod tx_callback;
 mod tx_data;
 mod tx_env;
