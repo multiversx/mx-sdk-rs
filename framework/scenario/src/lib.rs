@@ -42,7 +42,7 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract};
+pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract, WithTxResult};
 
 use std::path::Path;
 

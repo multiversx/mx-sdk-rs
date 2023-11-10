@@ -2,16 +2,21 @@ use std::path::PathBuf;
 
 use multiversx_sc::types::{
     AnnotatedValue, FunctionCall, ManagedAddress, Tx, TxBaseWithEnv, TxEnv, TxFromSpecified, TxGas,
-    TxPayment, TxToSpecified,
+    TxPayment, TxRunnableCallback, TxToSpecified,
 };
 
-use crate::{api::StaticApi, facade::ScenarioWorld, scenario_model::ScCallStep};
+use crate::{
+    api::StaticApi,
+    facade::ScenarioWorld,
+    scenario_model::{ScCallStep, TxResponse},
+};
 
 #[derive(Default, Debug, Clone)]
 pub struct ScenarioTxEnvironment {
     pub context_path: PathBuf,
     pub from_annotation: Option<String>,
     pub to_annotation: Option<String>,
+    pub response: Option<TxResponse>,
 }
 
 impl TxEnv for ScenarioTxEnvironment {
@@ -68,23 +73,27 @@ impl ScenarioWorld {
     }
 }
 
-impl<From, To, Payment, Gas> ScenarioTx
-    for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>, ()>
+impl<From, To, Payment, Gas, Callback> ScenarioTx
+    for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>, Callback>
 where
     From: TxFromSpecified<ScenarioTxEnvironment>,
     To: TxToSpecified<ScenarioTxEnvironment>,
     Payment: TxPayment<ScenarioTxEnvironment>,
     Gas: TxGas<ScenarioTxEnvironment>,
+    Callback: TxRunnableCallback<ScenarioTxEnvironment>,
 {
     fn run_as_scenario_step(self, world: &mut ScenarioWorld) {
+        let mut env = self.env;
         let mut step = ScCallStep::new()
-            .from(self.env.from_annotation.unwrap().as_str())
-            .to(self.env.to_annotation.unwrap().as_str())
+            .from(env.from_annotation.as_ref().unwrap().as_str())
+            .to(env.to_annotation.as_ref().unwrap().as_str())
             .function(self.data.function_name.to_string().as_str());
         for arg in self.data.arg_buffer.iter_buffers() {
             step = step.argument(arg.to_vec());
         }
 
         world.sc_call(&mut step);
+        env.response = step.response;
+        self.callback.run_callback(&env);
     }
 }

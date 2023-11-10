@@ -81,20 +81,6 @@ where
     }
 }
 
-// impl Default for TxBaseWithEnv<()> {
-//     #[inline]
-//     fn default() -> Self {
-//         Self::new_with_env(())
-//     }
-// }
-
-// impl TxBaseWithEnv<()> {
-//     #[inline]
-//     pub fn new() -> Self {
-//         Self::default()
-//     }
-// }
-
 impl<Env, To, Payment, Gas, Data, Callback> Tx<Env, (), To, Payment, Gas, Data, Callback>
 where
     Env: TxEnv,
