@@ -8,8 +8,8 @@ use std::{
 use super::{
     oc_global_config::SC_CONFIG_FILE_NAMES,
     oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
-    ContractVariant, ContractVariantGlobalConfig, ContractVariantProfile, ContractVariantSerde,
-    ContractVariantSettings, MultiContractConfigSerde,
+    MultiContractConfigSerde, ContractVariant, ScConfig, ContractVariantSerde,
+    ContractVariantSettings,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -237,7 +237,7 @@ fn set_main_contract_flag(
     }
 }
 
-fn validate_output_contracts(contracts: &[ContractVariant]) {
+fn validate_contract_variants(contracts: &[ContractVariant]) {
     for contract in contracts {
         if contract.main {
             assert!(
@@ -248,7 +248,7 @@ fn validate_output_contracts(contracts: &[ContractVariant]) {
     }
 }
 
-impl ContractVariantGlobalConfig {
+impl ScConfig {
     /// Assembles an `ContractVariantConfig` from a raw config object that was loaded via Serde.
     ///
     /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
@@ -267,8 +267,8 @@ impl ContractVariantGlobalConfig {
             .map(|builder| build_contract(builder, original_abi))
             .collect();
         set_main_contract_flag(&mut contracts, &config.settings.main);
-        validate_output_contracts(&contracts);
-        ContractVariantGlobalConfig {
+        validate_contract_variants(&contracts);
+        ScConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
             contracts,
         }
@@ -280,7 +280,7 @@ impl ContractVariantGlobalConfig {
     pub fn default_config(original_abi: &ContractAbi) -> Self {
         let default_contract_config_name = original_abi.build_info.contract_crate.name.to_string();
         let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
-        ContractVariantGlobalConfig {
+        ScConfig {
             default_contract_config_name: default_contract_config_name.clone(),
             contracts: vec![ContractVariant {
                 main: true,

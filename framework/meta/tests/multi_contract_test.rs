@@ -1,6 +1,6 @@
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
-use multiversx_sc_meta::cmd::contract::output_contract::{
-    MultiContractConfigSerde, ContractVariantGlobalConfig,
+use multiversx_sc_meta::cmd::contract::sc_config::{
+    MultiContractConfigSerde, ScConfig,
 };
 
 fn get_serialized_toml() -> MultiContractConfigSerde {
@@ -88,11 +88,11 @@ fn test_serialize_multi_contract() {
 }
 
 #[test]
-fn test_output_contract_config() {
+fn test_sc_config() {
     let serde = get_serialized_toml();
     let abi = get_contract_abi();
 
-    let contract_config = ContractVariantGlobalConfig::load_from_config(&serde, &abi);
+    let contract_config = ScConfig::load_from_config(&serde, &abi);
 
     assert_eq!(
         contract_config.default_contract_config_name,

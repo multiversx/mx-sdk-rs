@@ -1,4 +1,4 @@
-use super::{oc_validate::validate_output_contract, ContractVariant};
+use super::{oc_validate::validate_contract_variant, ContractVariant};
 
 /// Allowed file names for the SC config.
 ///
@@ -10,21 +10,21 @@ pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.tom
 
 /// An entire project configuration.
 ///
-/// It can contain one or several output contracts.
+/// It can contain one or several contract variants.
 #[derive(Debug)]
-pub struct ContractVariantGlobalConfig {
+pub struct ScConfig {
     pub default_contract_config_name: String,
     pub contracts: Vec<ContractVariant>,
 }
 
-impl ContractVariantGlobalConfig {
+impl ScConfig {
     pub fn main_contract(&self) -> &ContractVariant {
         self.contracts
             .iter()
             .find(|contract| contract.main)
             .unwrap_or_else(|| {
                 panic!(
-                    "Could not find default contract '{}' among the output contracts.",
+                    "Could not find default contract '{}' among the contract variants.",
                     self.default_contract_config_name
                 )
             })
@@ -36,7 +36,7 @@ impl ContractVariantGlobalConfig {
             .find(|contract| contract.main)
             .unwrap_or_else(|| {
                 panic!(
-                    "Could not find default contract '{}' among the output contracts.",
+                    "Could not find default contract '{}' among the contract variants.",
                     self.default_contract_config_name
                 )
             })
@@ -69,13 +69,13 @@ impl ContractVariantGlobalConfig {
         self.contracts
             .iter()
             .find(|contract| contract.contract_name == contract_name)
-            .unwrap_or_else(|| panic!("output contract {contract_name} not found"))
+            .unwrap_or_else(|| panic!("contract variant {contract_name} not found"))
     }
 
-    pub fn validate_output_contracts(&self) {
+    pub fn validate_contract_variants(&self) {
         for contract in &self.contracts {
-            validate_output_contract(contract).unwrap_or_else(|err| {
-                panic!("Invalid output contract {}: {err}", contract.contract_name)
+            validate_contract_variant(contract).unwrap_or_else(|err| {
+                panic!("Invalid contract variant {}: {err}", contract.contract_name)
             });
         }
     }
