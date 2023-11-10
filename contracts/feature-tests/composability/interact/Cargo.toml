@@ -10,9 +10,9 @@ name = "interact"
 path = "src/comp_interact_main.rs"
 
 [dependencies]
-clap = { version = "4.1.0", features = ["derive", "cargo"] }
+clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.7.2"
+toml = "0.8.6"
 
 [dependencies.vault]
 path = "../vault"
