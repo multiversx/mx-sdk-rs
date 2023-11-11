@@ -5,12 +5,14 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            8
+// Endpoints:                           12
 // Async Callback (empty):               1
-// Total number of exported functions:  10
+// Total number of exported functions:  14
 
 #![no_std]
-#![allow(internal_features)]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -20,13 +22,17 @@ multiversx_sc_wasm_adapter::endpoints! {
     digital_cash
     (
         init => init
+        whitelistFeeToken => whitelist_fee_token
+        blacklistFeeToken => blacklist_fee_token
+        claimFees => claim_fees
+        getAmount => get_amount
+        payFeeAndFundESDT => pay_fee_and_fund_esdt
+        payFeeAndFundEGLD => pay_fee_and_fund_egld
         fund => fund
+        depositFees => deposit_fees
         withdraw => withdraw
         claim => claim
-        claim_fees => claim_fees
-        deposit_fees => deposit_fees
         forward => forward
-        amount => get_amount
         deposit => deposit
     )
 }

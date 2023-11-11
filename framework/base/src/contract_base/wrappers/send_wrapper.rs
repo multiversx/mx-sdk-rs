@@ -65,7 +65,7 @@ where
     pub fn contract_call<R>(
         &self,
         to: ManagedAddress<A>,
-        endpoint_name: ManagedBuffer<A>,
+        endpoint_name: impl Into<ManagedBuffer<A>>,
     ) -> ContractCallNoPayment<A, R> {
         ContractCallNoPayment::new(to, endpoint_name)
     }
@@ -375,10 +375,8 @@ where
         child_sc_address: ManagedAddress<A>,
         new_owner: &ManagedAddress<A>,
     ) -> ContractCallNoPayment<A, ()> {
-        let mut contract_call =
-            ContractCallNoPayment::new(child_sc_address, CHANGE_OWNER_BUILTIN_FUNC_NAME);
-        contract_call.proxy_arg(&new_owner);
-        contract_call
+        self.contract_call(child_sc_address, CHANGE_OWNER_BUILTIN_FUNC_NAME)
+            .argument(&new_owner)
     }
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.

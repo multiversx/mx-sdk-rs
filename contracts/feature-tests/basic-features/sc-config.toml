@@ -1,0 +1,9 @@
+[settings]
+main = "basic-features"
+
+[contracts.basic-features]
+
+[contracts.basic-features-storage-bytes]
+add-unlabelled = false
+add-endpoints = ["init", "load_bytes", "store_bytes"]
+kill_legacy_callback = true

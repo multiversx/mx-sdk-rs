@@ -5,6 +5,7 @@ use crate::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::{CheckEsdtRaw, ValueSubTree},
     },
+    scenario_model::BytesValue,
 };
 use num_bigint::BigUint;
 
@@ -93,6 +94,54 @@ impl CheckEsdt {
                         esdt_instance_check.push(CheckEsdtInstance {
                             nonce,
                             balance: CheckValue::Equal(balance),
+                            ..Default::default()
+                        });
+                    }
+                },
+            }
+        }
+    }
+
+    pub fn add_balance_and_attributes_check<N, V, T>(
+        &mut self,
+        nonce_expr: N,
+        balance_expr: V,
+        attributes_expr: T,
+    ) where
+        U64Value: From<N>,
+        BigUintValue: From<V>,
+        BytesValue: From<T>,
+    {
+        let nonce = U64Value::from(nonce_expr);
+        let balance = BigUintValue::from(balance_expr);
+        let attributes = BytesValue::from(attributes_expr);
+
+        self.convert_to_full();
+
+        if let CheckEsdt::Full(prev_esdt_check) = self {
+            match &mut prev_esdt_check.instances {
+                CheckEsdtInstances::Star => {
+                    let new_instances_check = vec![CheckEsdtInstance {
+                        nonce,
+                        balance: CheckValue::Equal(balance),
+                        attributes: CheckValue::Equal(attributes),
+                        ..Default::default()
+                    }];
+
+                    prev_esdt_check.instances = CheckEsdtInstances::Equal(new_instances_check);
+                },
+                CheckEsdtInstances::Equal(esdt_instance_check) => {
+                    if let Some(i) = esdt_instance_check
+                        .iter()
+                        .position(|item| item.nonce.value == nonce.value)
+                    {
+                        esdt_instance_check[i].balance = CheckValue::Equal(balance);
+                        esdt_instance_check[i].attributes = CheckValue::Equal(attributes);
+                    } else {
+                        esdt_instance_check.push(CheckEsdtInstance {
+                            nonce,
+                            balance: CheckValue::Equal(balance),
+                            attributes: CheckValue::Equal(attributes),
                             ..Default::default()
                         });
                     }

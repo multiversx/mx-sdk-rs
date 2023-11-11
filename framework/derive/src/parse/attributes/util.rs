@@ -1,3 +1,6 @@
+use crate::model::EsdtAttribute;
+use proc_macro2::TokenTree;
+
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
     if let Some(first_seg) = attr.path.segments.first() {
         if first_seg.ident == name {
@@ -10,6 +13,63 @@ pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bo
     };
 
     false
+}
+
+pub(super) fn get_attribute_with_one_type_arg(
+    attr: &syn::Attribute,
+    name: &str,
+) -> Option<EsdtAttribute> {
+    let attr_path = &attr.path;
+    if let Some(first_seg) = attr_path.segments.first() {
+        if first_seg.ident == name {
+            let mut tokens = attr.tokens.clone().into_iter();
+            let group = match tokens.next() {
+                Some(TokenTree::Group(group_val)) => group_val,
+                _ => panic!("Expected a group as attribute argument"),
+            };
+
+            let mut iter = group.stream().into_iter();
+
+            let first_literal = match iter.next() {
+                Some(TokenTree::Literal(literal)) => literal.to_string(),
+                _ => panic!("Expected a literal as the first token in the attribute argument"),
+            };
+
+            let symbol = first_literal.trim_matches('\"').to_string();
+
+            let _ = match iter.next() {
+                Some(TokenTree::Punct(punct)) => punct,
+                _ => panic!("Expected a punctuation token after the literal"),
+            };
+
+            let mut chosen_type = proc_macro2::TokenStream::new();
+
+            for token in &mut iter {
+                match token {
+                    TokenTree::Punct(punct) => {
+                        chosen_type.extend(quote! { #punct });
+                    },
+                    TokenTree::Ident(ident) => {
+                        chosen_type.extend(quote! { #ident });
+                    },
+                    _ => break,
+                }
+            }
+
+            if symbol.is_empty() {
+                panic!("Ticker field can't be empty");
+            }
+
+            let esdt_attribute = EsdtAttribute {
+                ticker: symbol,
+                ty: chosen_type,
+            };
+
+            return Some(esdt_attribute);
+        }
+    }
+
+    None
 }
 
 pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {

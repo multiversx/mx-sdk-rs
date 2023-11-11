@@ -3,10 +3,10 @@ mod cargo_toml_contents;
 pub mod cli_args;
 pub mod cmd;
 pub mod ei;
-mod folder_structure;
+pub mod esdt_attr_file_json;
+pub mod folder_structure;
 mod mxsc_file_json;
 mod print_util;
-pub mod template;
 mod tools;
 pub mod version_history;
 
@@ -14,7 +14,4 @@ pub mod version_history;
 extern crate lazy_static;
 
 pub use cargo_toml_contents::CargoTomlContents;
-pub use cmd::{
-    contract::{cli_main, multi_contract_config},
-    standalone::cli_main_standalone,
-};
+pub use cmd::contract::{cli_main, multi_contract_config};

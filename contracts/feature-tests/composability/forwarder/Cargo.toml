@@ -12,10 +12,10 @@ path = "src/forwarder_main.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.43.3"
+version = "0.44.0"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.43.3"
+version = "0.44.0"
 path = "../../../../framework/scenario"
 

@@ -1,4 +1,4 @@
-#[derive(Default, Clone, PartialEq, Eq)]
+#[derive(Default, Clone, Debug, PartialEq, Eq)]
 pub enum ContractAllocator {
     /// No allocation is allowed. Any attempt causes `signalError` to be thrown.
     #[default]

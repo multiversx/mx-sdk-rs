@@ -183,15 +183,6 @@ where
     ) -> ContractCallWithEgld<SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
-        let mut contract_call = ContractCallWithEgld::new(
-            esdt_system_sc_address,
-            ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
-            issue_cost,
-        );
-
-        contract_call.proxy_arg(&token_display_name);
-        contract_call.proxy_arg(&token_ticker);
-
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
             EsdtTokenType::NonFungible => "NFT",
@@ -199,10 +190,16 @@ where
             EsdtTokenType::Meta => "META",
             EsdtTokenType::Invalid => "",
         };
-        contract_call.proxy_arg(&token_type_name);
-        contract_call.proxy_arg(&num_decimals);
 
-        contract_call
+        ContractCallWithEgld::new(
+            esdt_system_sc_address,
+            ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
+            issue_cost,
+        )
+        .argument(&token_display_name)
+        .argument(&token_ticker)
+        .argument(&token_type_name)
+        .argument(&num_decimals)
     }
 
     /// Deduplicates code from all the possible issue functions
@@ -268,12 +265,9 @@ where
         token_identifier: &TokenIdentifier<SA>,
         amount: &BigUint<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("mint");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(amount);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("mint")
+            .argument(token_identifier)
+            .argument(amount)
     }
 
     /// Produces a contract call to the ESDT system SC,
@@ -283,31 +277,22 @@ where
         token_identifier: &TokenIdentifier<SA>,
         amount: &BigUint<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("ESDTBurn");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(amount);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("ESDTBurn")
+            .argument(token_identifier)
+            .argument(amount)
     }
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
     pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("pause");
-
-        contract_call.proxy_arg(token_identifier);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("pause")
+            .argument(token_identifier)
     }
 
     /// The reverse operation of `pause`.
     pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("unPause");
-
-        contract_call.proxy_arg(token_identifier);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("unPause")
+            .argument(token_identifier)
     }
 
     /// The manager of an ESDT token may freeze the tokens held by a specific account.
@@ -318,12 +303,9 @@ where
         token_identifier: &TokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("freeze");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(address);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("freeze")
+            .argument(token_identifier)
+            .argument(address)
     }
 
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
@@ -332,12 +314,9 @@ where
         token_identifier: &TokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("unFreeze");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(address);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("unFreeze")
+            .argument(token_identifier)
+            .argument(address)
     }
 
     /// The manager of an ESDT token may wipe out all the tokens held by a frozen account.
@@ -349,12 +328,53 @@ where
         token_identifier: &TokenIdentifier<SA>,
         address: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("wipe");
+        self.esdt_system_sc_call_no_args("wipe")
+            .argument(token_identifier)
+            .argument(address)
+    }
 
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(address);
+    /// The manager of an ESDT token may freeze the NFT held by a specific Account.
+    /// As a consequence, no NFT can be transferred to or from the frozen Account.
+    /// Freezing and unfreezing a single NFT of an Account are operations designed to help token managers to comply with regulations.
+    pub fn freeze_nft(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        nft_nonce: u64,
+        address: &ManagedAddress<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
+        self.esdt_system_sc_call_no_args("freezeSingleNFT")
+            .argument(token_identifier)
+            .argument(&nft_nonce)
+            .argument(address)
+    }
 
-        contract_call
+    /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
+    pub fn unfreeze_nft(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        nft_nonce: u64,
+        address: &ManagedAddress<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
+        self.esdt_system_sc_call_no_args("unFreezeSingleNFT")
+            .argument(token_identifier)
+            .argument(&nft_nonce)
+            .argument(address)
+    }
+
+    /// The manager of an ESDT token may wipe out a single NFT held by a frozen Account.
+    /// This operation is similar to burning the quantity, but the Account must have been frozen beforehand,
+    /// and it must be done by the token manager.
+    /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
+    pub fn wipe_nft(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        nft_nonce: u64,
+        address: &ManagedAddress<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
+        self.esdt_system_sc_call_no_args("wipeSingleNFT")
+            .argument(token_identifier)
+            .argument(&nft_nonce)
+            .argument(address)
     }
 
     /// This function converts an SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
@@ -364,12 +384,9 @@ where
         token_identifier: &TokenIdentifier<SA>,
         num_decimals: usize,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("changeSFTToMetaESDT");
-
-        contract_call.proxy_arg(&token_identifier);
-        contract_call.proxy_arg(&num_decimals);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("changeSFTToMetaESDT")
+            .argument(&token_identifier)
+            .argument(&num_decimals)
     }
 
     /// This function can be called only if canSetSpecialRoles was set to true.
@@ -382,10 +399,10 @@ where
         token_identifier: &TokenIdentifier<SA>,
         roles_iter: RoleIter,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("setSpecialRole");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(address);
+        let mut contract_call = self
+            .esdt_system_sc_call_no_args("setSpecialRole")
+            .argument(token_identifier)
+            .argument(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
                 contract_call.push_raw_argument(role.as_role_name());
@@ -405,10 +422,10 @@ where
         token_identifier: &TokenIdentifier<SA>,
         roles_iter: RoleIter,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("unSetSpecialRole");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(address);
+        let mut contract_call = self
+            .esdt_system_sc_call_no_args("unSetSpecialRole")
+            .argument(token_identifier)
+            .argument(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
                 contract_call.push_raw_argument(role.as_role_name());
@@ -423,12 +440,9 @@ where
         token_identifier: &TokenIdentifier<SA>,
         new_owner: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("transferOwnership");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(new_owner);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("transferOwnership")
+            .argument(token_identifier)
+            .argument(new_owner)
     }
 
     pub fn transfer_nft_create_role(
@@ -437,13 +451,10 @@ where
         old_creator: &ManagedAddress<SA>,
         new_creator: &ManagedAddress<SA>,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("transferNFTCreateRole");
-
-        contract_call.proxy_arg(token_identifier);
-        contract_call.proxy_arg(old_creator);
-        contract_call.proxy_arg(new_creator);
-
-        contract_call
+        self.esdt_system_sc_call_no_args("transferNFTCreateRole")
+            .argument(token_identifier)
+            .argument(old_creator)
+            .argument(new_creator)
     }
 
     pub fn control_changes(
@@ -451,8 +462,9 @@ where
         token_identifier: &TokenIdentifier<SA>,
         property_arguments: &TokenPropertyArguments,
     ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self.esdt_system_sc_call_no_args("controlChanges");
-        contract_call.proxy_arg(token_identifier);
+        let mut contract_call = self
+            .esdt_system_sc_call_no_args("controlChanges")
+            .argument(token_identifier);
         append_token_property_arguments(&mut contract_call, property_arguments);
         contract_call
     }

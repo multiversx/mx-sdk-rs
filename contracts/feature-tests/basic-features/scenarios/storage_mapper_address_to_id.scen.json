@@ -1,0 +1,209 @@
+{
+    "name": "storage",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:extra-instance": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_id_or_insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_get_id_or_insert",
+                "arguments": [
+                    "address:an_account"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_id",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_get_id",
+                "arguments": [
+                    "address:an_account"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_id_non_zero",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_get_id_non_zero",
+                "arguments": [
+                    "address:an_account"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_get_address",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1|address:an_account"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "contains",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_contains",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove_by_id",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_remove_by_id",
+                "arguments": [
+                    "1"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1|address:an_account"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_set",
+                "arguments": [
+                    "address:an_account"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "remove_by_address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "address_to_id_mapper_remove_by_address",
+                "arguments": [
+                    "address:an_account"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

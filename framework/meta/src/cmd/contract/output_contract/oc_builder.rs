@@ -2,17 +2,17 @@ use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     fs,
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 use super::{
+    oc_global_config::SC_CONFIG_FILE_NAMES,
     oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
     MultiContractConfigSerde, OutputContract, OutputContractGlobalConfig, OutputContractSerde,
     OutputContractSettings,
 };
 
 /// Temporary structure, to help create instances of `OutputContract`. Not publicly exposed.
-#[derive(Default)]
 struct OutputContractBuilder {
     pub contract_id: String,
     pub explicit_name: String,
@@ -22,6 +22,21 @@ struct OutputContractBuilder {
     pub collected_endpoints: Vec<EndpointAbi>,
     endpoint_names: HashSet<String>, // help keep endpoints unique
     pub settings: OutputContractSettings,
+}
+
+impl Default for OutputContractBuilder {
+    fn default() -> Self {
+        Self {
+            contract_id: Default::default(),
+            explicit_name: Default::default(),
+            add_unlabelled: true,
+            add_labels: Default::default(),
+            add_endpoints: Default::default(),
+            collected_endpoints: Default::default(),
+            endpoint_names: Default::default(),
+            settings: Default::default(),
+        }
+    }
 }
 
 impl OutputContractBuilder {
@@ -42,25 +57,26 @@ impl OutputContractBuilder {
                 multiversx_sc::external_view_contract::external_view_contract_constructor_abi(),
             )
         }
+        let default = OutputContractBuilder::default();
         (
             contract_id.clone(),
             OutputContractBuilder {
                 contract_id: contract_id.clone(),
-                explicit_name: cms.name.clone().unwrap_or_default(),
-                add_unlabelled: cms.add_unlabelled.unwrap_or_default(),
+                explicit_name: cms.name.clone().unwrap_or(default.explicit_name),
+                add_unlabelled: cms.add_unlabelled.unwrap_or(default.add_unlabelled),
                 add_labels: cms.add_labels.iter().cloned().collect(),
                 add_endpoints: cms.add_endpoints.iter().cloned().collect(),
                 collected_endpoints,
                 settings: OutputContractSettings {
-                    external_view: cms.external_view.unwrap_or_default(),
-                    panic_message: cms.panic_message.unwrap_or_default(),
+                    external_view: cms.external_view.unwrap_or(default.settings.external_view),
+                    panic_message: cms.panic_message.unwrap_or(default.settings.panic_message),
                     check_ei: parse_check_ei(&cms.ei),
                     allocator: parse_allocator(&cms.allocator),
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
                     kill_legacy_callback: cms.kill_legacy_callback,
                 },
-                ..Default::default()
+                ..default
             },
         )
     }
@@ -174,6 +190,7 @@ fn build_contract_abi(builder: OutputContractBuilder, original_abi: &ContractAbi
         events: original_abi.events.clone(),
         has_callback,
         type_descriptions: original_abi.type_descriptions.clone(),
+        esdt_attributes: original_abi.esdt_attributes.clone(),
     }
 }
 
@@ -288,8 +305,30 @@ impl OutputContractGlobalConfig {
     }
 
     /// The standard way of loading a `multicontract.toml` configuration: read the file if present, use the default config otherwise.
-    pub fn load_from_file_or_default<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Self {
-        Self::load_from_file(path, original_abi)
-            .unwrap_or_else(|| Self::default_config(original_abi))
+    pub fn load_from_files_or_default<I, P>(paths: I, original_abi: &ContractAbi) -> Self
+    where
+        P: AsRef<Path>,
+        I: Iterator<Item = P>,
+    {
+        for path in paths {
+            if let Some(config) = Self::load_from_file(path.as_ref(), original_abi) {
+                return config;
+            }
+        }
+
+        Self::default_config(original_abi)
+    }
+
+    /// The standard way of loading a `multicontract.toml` configuration: read the file if present, use the default config otherwise.
+    pub fn load_from_crate_or_default<P>(contract_crate_path: P, original_abi: &ContractAbi) -> Self
+    where
+        P: AsRef<Path>,
+    {
+        Self::load_from_files_or_default(
+            SC_CONFIG_FILE_NAMES
+                .iter()
+                .map(|name| PathBuf::from(contract_crate_path.as_ref()).join(name)),
+            original_abi,
+        )
     }
 }

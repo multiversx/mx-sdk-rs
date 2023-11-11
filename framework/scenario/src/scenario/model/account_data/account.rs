@@ -84,6 +84,43 @@ impl Account {
         self
     }
 
+    #[allow(clippy::too_many_arguments)]
+    pub fn esdt_nft_all_properties<K, N, V, T>(
+        mut self,
+        token_id_expr: K,
+        nonce_expr: N,
+        balance_expr: V,
+        opt_attributes_expr: Option<T>,
+        royalties_expr: N,
+        creator_expr: Option<T>,
+        hash_expr: Option<T>,
+        uris_expr: Vec<T>,
+    ) -> Self
+    where
+        BytesKey: From<K>,
+        U64Value: From<N>,
+        BigUintValue: From<V>,
+        BytesValue: From<T>,
+    {
+        let token_id = BytesKey::from(token_id_expr);
+
+        let esdt_obj_ref = self
+            .get_esdt_data_or_create(&token_id)
+            .get_mut_esdt_object();
+
+        esdt_obj_ref.set_token_all_properties(
+            nonce_expr,
+            balance_expr,
+            opt_attributes_expr,
+            royalties_expr,
+            creator_expr,
+            hash_expr,
+            uris_expr,
+        );
+
+        self
+    }
+
     pub fn esdt_nft_last_nonce<K, N>(mut self, token_id_expr: K, last_nonce_expr: N) -> Self
     where
         BytesKey: From<K>,

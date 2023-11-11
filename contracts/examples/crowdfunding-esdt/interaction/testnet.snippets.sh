@@ -3,7 +3,7 @@ BOB="${USERS}/bob.pem"
 
 ADDRESS=$(mxpy data load --key=address-testnet)
 DEPLOY_TRANSACTION=$(mxpy data load --key=deployTransaction-testnet)
-PROXY=https://testnet-api.elrond.com
+PROXY=https://testnet-api.multiversx.com
 
 DEPLOY_GAS="80000000"
 TARGET=10

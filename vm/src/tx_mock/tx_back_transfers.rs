@@ -1,6 +1,6 @@
 use num_bigint::BigUint;
 
-use super::{TxContext, TxResult, TxTokenTransfer};
+use super::{TxResult, TxTokenTransfer};
 
 #[derive(Default)]
 pub struct BackTransfers {
@@ -15,6 +15,10 @@ impl BackTransfers {
         }
 
         for call in &result.all_calls {}
+    }
+
+    pub fn empty() -> Self {
+        BackTransfers::default()
     }
 }
 

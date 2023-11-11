@@ -1,10 +1,14 @@
+use multiversx_sc_codec::{
+    DecodeError, DecodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+};
+
 use crate::{
     abi::{
         ExplicitEnumVariantDescription, TypeAbi, TypeContents, TypeDescription,
         TypeDescriptionContainer, TypeName,
     },
     api::ManagedTypeApi,
-    codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+    codec::{CodecFrom, EncodeErrorHandler},
     types::ManagedBuffer,
 };
 
@@ -37,13 +41,33 @@ impl OperationCompletionStatus {
     }
 }
 
-impl TopEncodeMulti for OperationCompletionStatus {
-    fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
+impl TopEncode for OperationCompletionStatus {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, _h: H) -> Result<(), H::HandledErr>
     where
-        O: TopEncodeMultiOutput,
+        O: TopEncodeOutput,
         H: EncodeErrorHandler,
     {
-        output.push_single_value(&self.output_bytes(), h)
+        output.set_slice_u8(self.output_bytes());
+        Ok(())
+    }
+}
+
+impl TopDecode for OperationCompletionStatus {
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let mut buffer = [0u8; 16];
+        input.into_max_size_buffer(&mut buffer, h)?;
+
+        if buffer.starts_with(COMPLETED_STR.as_bytes()) {
+            Ok(OperationCompletionStatus::Completed)
+        } else if buffer.starts_with(INTERRUPTED_STR.as_bytes()) {
+            Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas)
+        } else {
+            Err(h.handle_error(DecodeError::INVALID_VALUE))
+        }
     }
 }
 
@@ -83,6 +107,8 @@ impl TypeAbi for OperationCompletionStatus {
 
 #[cfg(test)]
 mod tests {
+    use multiversx_sc_codec::test_util::check_top_encode_decode;
+
     use super::*;
 
     #[test]
@@ -91,5 +117,17 @@ mod tests {
         assert!(!OperationCompletionStatus::Completed.is_interrupted());
         assert!(!OperationCompletionStatus::InterruptedBeforeOutOfGas.is_completed());
         assert!(OperationCompletionStatus::InterruptedBeforeOutOfGas.is_interrupted());
+    }
+
+    #[test]
+    fn test_codec_decode_operation_completion() {
+        check_top_encode_decode(
+            OperationCompletionStatus::Completed,
+            COMPLETED_STR.as_bytes(),
+        );
+        check_top_encode_decode(
+            OperationCompletionStatus::InterruptedBeforeOutOfGas,
+            INTERRUPTED_STR.as_bytes(),
+        );
     }
 }

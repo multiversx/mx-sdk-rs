@@ -120,6 +120,10 @@ impl TxContext {
         self.managed_types.lock().unwrap()
     }
 
+    pub fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+        self.back_transfers.lock().unwrap()
+    }
+
     pub fn result_lock(&self) -> MutexGuard<TxResult> {
         self.tx_result_cell.lock().unwrap()
     }

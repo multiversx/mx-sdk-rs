@@ -90,8 +90,29 @@ impl ScCallStep {
         self
     }
 
+    pub fn multi_esdt_transfer<T>(mut self, tokens: T) -> Self
+    where
+        T: IntoIterator<Item = TxESDT>,
+    {
+        if self.tx.egld_value.value > 0u32.into() {
+            panic!("Cannot transfer both EGLD and ESDT");
+        }
+
+        self.tx.esdt_value.extend(tokens);
+
+        self
+    }
+
     pub fn function(mut self, expr: &str) -> Self {
         self.tx.function = expr.to_string();
+        self
+    }
+
+    pub fn tx_hash<T>(mut self, tx_hash_expr: T) -> Self
+    where
+        H256: From<T>,
+    {
+        self.explicit_tx_hash = Some(tx_hash_expr.into());
         self
     }
 
@@ -213,13 +234,14 @@ where
     let function = String::from_utf8(
         normalized_cc
             .basic
-            .endpoint_name
+            .function_call
+            .function_name
             .to_boxed_bytes()
             .into_vec(),
     )
     .unwrap();
     let egld_value_expr = BigUintValue::from(normalized_cc.egld_payment);
-    let scenario_args = convert_call_args(&normalized_cc.basic.arg_buffer);
+    let scenario_args = convert_call_args(&normalized_cc.basic.function_call.arg_buffer);
     (to_str, function, egld_value_expr, scenario_args)
 }
 
