@@ -8,8 +8,8 @@ use std::{
 use super::{
     oc_global_config::SC_CONFIG_FILE_NAMES,
     oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
-    MultiContractConfigSerde, ContractVariant, ScConfig, ContractVariantSerde,
-    ContractVariantSettings,
+    ContractVariant, ContractVariantSerde, ContractVariantSettings, MultiContractConfigSerde,
+    ScConfig,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -75,7 +75,10 @@ impl ContractVariantBuilder {
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
                     kill_legacy_callback: cms.kill_legacy_callback,
-                    contract_variant_profile: cms.contract_variant_profile.clone().unwrap_or(default.settings.contract_variant_profile),
+                    contract_variant_profile: cms
+                        .contract_variant_profile
+                        .clone()
+                        .unwrap_or(default.settings.contract_variant_profile),
                 },
                 ..default
             },
@@ -138,6 +141,15 @@ fn collect_unlabelled_endpoints(
         }
     }
 }
+
+// fn collect_contract_profile(
+//     contract_builders: &mut HashMap<String, ContractVariantBuilder>,
+// ) {
+//     //all scs are supposed to have main sc_config's profile
+//     for builder in contract_builders.values_mut() {
+//         builder.settings = contract.settings
+//     }
+// }
 
 fn collect_labelled_endpoints(
     contract_builders: &mut HashMap<String, ContractVariantBuilder>,
@@ -267,6 +279,10 @@ impl ScConfig {
             .map(|builder| build_contract(builder, original_abi))
             .collect();
         set_main_contract_flag(&mut contracts, &config.settings.main);
+        // //maybe collect contract variant profile? it's already here
+        // //
+
+        // collect_contract_profile(&mut contract_builders, &config);
         validate_contract_variants(&contracts);
         ScConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),

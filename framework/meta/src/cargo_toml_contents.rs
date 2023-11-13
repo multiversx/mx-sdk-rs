@@ -6,6 +6,8 @@ use std::{
 
 use toml::{value::Table, Value};
 
+use crate::cmd::contract::sc_config::ContractVariant;
+
 pub const CARGO_TOML_DEPENDENCIES: &str = "dependencies";
 pub const CARGO_TOML_DEV_DEPENDENCIES: &str = "dev-dependencies";
 
@@ -29,10 +31,23 @@ impl CargoTomlContents {
             String::from_utf8(cargo_toml_content).expect("error decoding Cargo.toml utf-8");
         let toml_value = cargo_toml_content_str
             .parse::<toml::Value>()
-            .expect("failed to parse Cargo.toml toml format");
+            // .expect("failed to parse Cargo.toml toml format")
+            .unwrap_or_else(|e| {
+                panic!(
+                    "failed to parse Cargo.toml toml format, path:{}, error: {e}",
+                    path_ref.display()
+                )
+            });
         CargoTomlContents {
             path: path_ref.to_owned(),
             toml_value,
+        }
+    }
+
+    pub fn new() -> Self {
+        CargoTomlContents {
+            path: PathBuf::new(),
+            toml_value: toml::Value::Table(Table::new()),
         }
     }
 
@@ -54,6 +69,19 @@ impl CargoTomlContents {
             .expect("package name not a string value")
             .to_string()
     }
+
+    pub fn package_edition(&self) -> String {
+        self.toml_value
+            .get("package")
+            .expect("missing package in Cargo.toml")
+            .get("edition")
+            .expect("missing package name in Cargo.toml")
+            .as_str()
+            .expect("package name not a string value")
+            .to_string()
+    }
+
+    pub fn add_deps(&mut self, crate_name: String, adapter_version: String, adapter_path: String) {}
 
     /// Assumes that a package section already exists.
     pub fn change_package_name(&mut self, new_package_name: String) {
@@ -107,6 +135,74 @@ impl CargoTomlContents {
             .unwrap_or_else(|| panic!("no dependencies found in crate {}", self.path.display()))
             .as_table_mut()
             .expect("malformed crate Cargo.toml")
+    }
+
+    pub fn add_lib(&mut self) {
+        let mut value = toml::map::Map::new();
+        value.insert(
+            "crate-type".to_string(),
+            Value::String("cdylib".to_string()),
+        );
+
+        self.toml_value
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml")
+            .insert("lib".to_string(), toml::Value::Table(value));
+    }
+
+    //maybe create another function change_package_info(params)
+    //just like change_package_name for keeping the same structure
+    pub fn add_package_info(
+        &mut self,
+        name: String,
+        version: String,
+        current_edition: String,
+        publish: bool,
+    ) {
+        let mut value = toml::map::Map::new();
+        value.insert("name".to_string(), Value::String(name));
+        value.insert("version".to_string(), Value::String(version));
+        value.insert("edition".to_string(), Value::String(current_edition));
+        value.insert("publish".to_string(), Value::Boolean(publish));
+
+        self.toml_value
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml / add_package")
+            .insert("package".to_string(), toml::Value::Table(value));
+    }
+
+    pub fn add_contract_variant_profile(&mut self, contract: &ContractVariant) {
+        // contract variant profile
+        //  codegen_units: u8,
+        //  opt_level: String,
+        //  lto: bool,
+        //  debug: bool,
+        //  panic: String,
+
+        //turn struct into value/map/whatever
+        let contract_profile = contract.settings.contract_variant_profile.clone();
+
+        let mut profile_props = toml::map::Map::new();
+        profile_props.insert(
+            "codegen-units".to_string(),
+            Value::Integer(contract_profile.codegen_units.into()),
+        );
+        profile_props.insert(
+            "opt-level".to_string(),
+            Value::String(contract_profile.opt_level),
+        );
+        profile_props.insert("lto".to_string(), Value::Boolean(contract_profile.lto));
+        profile_props.insert("debug".to_string(), Value::Boolean(contract_profile.debug));
+        profile_props.insert("panic".to_string(), Value::String(contract_profile.panic));
+
+        //get key name from contract.name [contracts.<contract_name>.profile]
+        let key = format!("contracts.{}.profile", contract.contract_name);
+
+        //insert into toml
+        self.toml_value
+            .as_table_mut()
+            .expect("malformed package in Cargo.toml")
+            .insert(key, toml::Value::Table(profile_props));
     }
 
     pub fn insert_default_workspace(&mut self) {

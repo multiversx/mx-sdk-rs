@@ -1,0 +1,21 @@
+[package]
+name = "{contract variant name}-wasm" # ok
+version = "0.0.0"
+edition = "{sc-crate.edition}" # from sc Cargo.toml
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+
+[profile.release]
+... from sc-config.toml
+
+[dependencies.{sc-crate.name}] # from sc Cargo.toml
+path = ".."
+
+[dependencies.multiversx-sc-wasm-adapter]
+version = "{sc-crate.dependencies.multiversx-sc.version}"
+path = "{sc-crate.dependencies.multiversx-sc.path - "base" + "wasm-adapter"}" 
+
+[workspace]
+members = ["."]

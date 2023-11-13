@@ -1,0 +1,21 @@
+[package]
+name = "multisig-view-wasm"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = "cdylib"
+
+[workspace]
+members = [
+    ".",
+    "meta",
+]
+
+["contracts.multisig-view.profile"]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"

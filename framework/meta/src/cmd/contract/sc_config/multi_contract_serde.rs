@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+// add this to cargo
 // const LIB = r"[lib]
 // crate-type = ["cdylib"]";
 
@@ -55,7 +56,6 @@ pub struct ContractVariantSerde {
     #[serde(default)]
     pub kill_legacy_callback: bool,
 
-    // #[serde()]
     #[serde(default)]
     pub contract_variant_profile: Option<ContractVariantProfile>
 }

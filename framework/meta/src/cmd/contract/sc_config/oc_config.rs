@@ -58,6 +58,10 @@ impl ContractVariant {
         format!("{}/Cargo.toml", &self.wasm_crate_path())
     }
 
+    pub fn some_other_test_path(&self) -> String {
+        format!("{}/test-Cargo.toml", &self.wasm_crate_path())
+    }
+
     pub fn wasm_crate_name_snake_case(&self) -> String {
         self.wasm_crate_name.replace('-', "_")
     }
