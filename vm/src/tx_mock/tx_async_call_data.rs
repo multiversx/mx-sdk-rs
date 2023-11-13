@@ -42,6 +42,15 @@ fn result_status_bytes(result_status: u64) -> Vec<u8> {
     }
 }
 
+fn real_recipient(
+    async_data: &AsyncCallTxData,
+    builtin_functions: &BuiltinFunctionContainer,
+) -> VMAddress {
+    let tx_input = async_call_tx_input(async_data, CallType::AsyncCall);
+    let transfers = builtin_functions.extract_token_transfers(&tx_input);
+    transfers.real_recipient
+}
+
 pub fn async_callback_tx_input(
     async_data: &AsyncCallTxData,
     async_result: &TxResult,
@@ -56,7 +65,7 @@ pub fn async_callback_tx_input(
     let callback_payments =
         extract_callback_payments(&async_data.from, async_result, builtin_functions);
     TxInput {
-        from: async_data.to.clone(),
+        from: real_recipient(async_data, builtin_functions),
         to: async_data.from.clone(),
         egld_value: 0u32.into(),
         esdt_values: Vec::new(),
