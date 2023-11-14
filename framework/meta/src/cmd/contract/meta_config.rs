@@ -37,7 +37,7 @@ impl MetaConfig {
     pub fn generate_wasm_crates(&mut self) {
         self.remove_unexpected_wasm_crates();
         self.create_wasm_crate_dirs();
-        self.generate_cargo_toml_for_all_contracts();
+        self.generate_cargo_toml_for_all_wasm_crates();
         self.generate_wasm_src_lib();
         copy_to_wasm_unmanaged_ei();
     }
@@ -49,9 +49,9 @@ impl MetaConfig {
     }
 
     //create a struct for cargo toml with all the fields
-    /// Cargo.toml files for all contracts are generated from the main contract Cargo.toml,
+    /// Cargo.toml files for all wasm crates are generated from the main contract Cargo.toml,
     /// by changing the package name.
-    pub fn generate_cargo_toml_for_all_contracts(&mut self) {
+    pub fn generate_cargo_toml_for_all_wasm_crates(&mut self) {
 
         let main_cargo_toml_contents = CargoTomlContents::load_from_file("../Cargo.toml");
 
@@ -109,7 +109,7 @@ fn contract_cargo_toml(
     }
 
     //insert default workspace
-    cargo_toml_contents.insert_default_workspace();
+    cargo_toml_contents.add_workspace(&["."]);
 
     cargo_toml_contents
 }

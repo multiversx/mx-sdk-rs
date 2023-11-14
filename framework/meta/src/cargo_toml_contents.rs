@@ -100,6 +100,7 @@ impl CargoTomlContents {
             }
         }
 
+        //if path is missing then don't print at all
         panic!("could not find multiversx-sc dependency path in cargo toml")
     }
 
@@ -123,7 +124,7 @@ impl CargoTomlContents {
         );
         adapter_deps.insert(
             "path".to_string(),
-            toml::Value::String(adapter_path.replace("base", "wasm-adapter")),
+            toml::Value::String(change_from_base_to_adapter_path(adapter_path)),
         );
 
         let mut toml_table_adapter = toml::map::Map::new();
@@ -256,14 +257,19 @@ impl CargoTomlContents {
             .insert("profile".to_string(), toml::Value::Table(toml_table));
     }
 
-    pub fn insert_default_workspace(&mut self) {
-        let array = vec![toml::Value::String(".".to_string())];
-        let members = toml::Value::Array(array);
-        let mut workspace = toml::Value::Table(Table::new());
+    pub fn add_workspace(&mut self, members: &[&str]) {
+        let array: Vec<toml::Value> = members
+            .iter()
+            .map(|s| toml::Value::String(s.to_string()))
+            .collect();
+        let members_toml = toml::Value::Array(array);
+
+        let mut workspace = toml::Value::Table(toml::map::Map::new());
         workspace
             .as_table_mut()
             .expect("malformed package in Cargo.toml")
-            .insert("members".to_string(), members);
+            .insert("members".to_string(), members_toml);
+
         self.toml_value
             .as_table_mut()
             .expect("malformed package in Cargo.toml")
@@ -311,4 +317,18 @@ fn is_dep_path_above(dep: &Value) -> bool {
     }
 
     false
+}
+
+fn change_from_base_to_adapter_path(base_path: &String) -> String {
+    format!("../{}", base_path.replace("base", "wasm-adapter"))
+}
+
+mod tests {
+
+    #[test]
+    fn test_change_from_base_to_adapter_path() {
+        let base_path = "../../../framework/base".to_string();
+        let adapter_path = "../../../../framework/wasm-adapter".to_string();
+        assert_eq!(super::change_from_base_to_adapter_path(&base_path), adapter_path);
+    }
 }
