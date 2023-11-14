@@ -28,6 +28,13 @@ fn should_execute_sc_call(tx_input: &TxInput) -> bool {
 }
 
 fn should_add_transfer_value_log(tx_input: &TxInput) -> bool {
+    if tx_input.call_type == CallType::AsyncCallback
+        && !tx_input.callback_payments.esdt_values.is_empty()
+    {
+        // edge case in the VM
+        return false;
+    }
+
     if tx_input.call_type != CallType::DirectCall {
         return true;
     }
@@ -43,13 +50,16 @@ fn create_transfer_value_log(tx_input: &TxInput) -> TxLog {
     ];
     data.append(&mut tx_input.args.clone());
 
+    let egld_value = if tx_input.call_type == CallType::AsyncCallback {
+        &tx_input.callback_payments.egld_value
+    } else {
+        &tx_input.egld_value
+    };
+
     TxLog {
         address: tx_input.from.clone(),
         endpoint: "transferValueOnly".into(),
-        topics: vec![
-            top_encode_big_uint(&tx_input.egld_value),
-            tx_input.to.to_vec(),
-        ],
+        topics: vec![top_encode_big_uint(egld_value), tx_input.to.to_vec()],
         data,
     }
 }
