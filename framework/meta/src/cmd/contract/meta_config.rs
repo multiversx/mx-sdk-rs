@@ -51,15 +51,11 @@ impl MetaConfig {
 
     //create a struct for cargo toml with all the fields
     pub fn generate_cargo_toml_for_all_contracts(&mut self) {
-        //get sc_config toml
-        let mut sc_config_cargo_toml_contents =
-            CargoTomlContents::load_from_file("../sc-config.toml");
-        let mut main_cargo_toml_contents = CargoTomlContents::load_from_file("../Cargo.toml");
+
+        let main_cargo_toml_contents = CargoTomlContents::load_from_file("../Cargo.toml");
 
         let current_edition = main_cargo_toml_contents.package_edition();
-        let adapter_version = "".to_string();
-        let adapter_path = "".to_string();
-        // let mut deps = main_cargo_toml_contents.dependencies_mut();
+        let (adapter_version, adapter_path) = main_cargo_toml_contents.get_adapter_dependencies();
 
         let mut new_cargo = CargoTomlContents::new();
 
@@ -74,17 +70,14 @@ impl MetaConfig {
         //add lib part
         new_cargo.add_lib();
 
-        //insert default workspace
-        new_cargo.insert_default_workspace();
-
         //generate toml for every contract from sc_config
         for contract in self.sc_config.contracts.iter() {
             contract_cargo_toml(
                 contract,
                 &new_cargo,
                 main_cargo_toml_contents.package_name(),
-                adapter_version,
-                adapter_path,
+                &adapter_version,
+                &adapter_path,
             )
             .save_to_file(contract.some_other_test_path())
         }
@@ -99,8 +92,6 @@ impl MetaConfig {
             CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
         main_contract.wasm_crate_name = main_cargo_toml_contents.package_name();
 
-        //this should generate toml based on sc_config, not main contract
-        //should generate main contract toml also
         for secondary_contract in self.sc_config.secondary_contracts() {
             secondary_contract_cargo_toml(secondary_contract, &main_cargo_toml_contents)
                 .save_to_file(secondary_contract.cargo_toml_path());
@@ -112,8 +103,8 @@ fn contract_cargo_toml(
     contract: &ContractVariant,
     sc_config_cargo_toml_contents: &CargoTomlContents,
     crate_name: String,
-    adapter_version: String,
-    adapter_path: String,
+    adapter_version: &String,
+    adapter_path: &String,
 ) -> CargoTomlContents {
     let mut cargo_toml_contents = sc_config_cargo_toml_contents.clone();
 
@@ -130,6 +121,10 @@ fn contract_cargo_toml(
         cargo_toml_contents
             .change_features_for_parent_crate_dep(contract.settings.features.as_slice());
     }
+
+    //insert default workspace
+    cargo_toml_contents.insert_default_workspace();
+
     cargo_toml_contents
 }
 
@@ -137,12 +132,9 @@ fn secondary_contract_cargo_toml(
     secondary_contract: &ContractVariant,
     main_cargo_toml_contents: &CargoTomlContents,
 ) -> CargoTomlContents {
-    //add lib side and get profile from sc_config
     let mut cargo_toml_contents = main_cargo_toml_contents.clone();
     cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name.clone());
 
-    //cargo_toml_contents.add_lib(); //adds top lib part
-    //cargo_toml_contents.add_contract_variant_profile(secondary_contract); //writes profile in cargo, adds name
     if !secondary_contract.settings.features.is_empty() {
         cargo_toml_contents
             .change_features_for_parent_crate_dep(secondary_contract.settings.features.as_slice());

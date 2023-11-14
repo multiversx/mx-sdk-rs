@@ -142,15 +142,6 @@ fn collect_unlabelled_endpoints(
     }
 }
 
-// fn collect_contract_profile(
-//     contract_builders: &mut HashMap<String, ContractVariantBuilder>,
-// ) {
-//     //all scs are supposed to have main sc_config's profile
-//     for builder in contract_builders.values_mut() {
-//         builder.settings = contract.settings
-//     }
-// }
-
 fn collect_labelled_endpoints(
     contract_builders: &mut HashMap<String, ContractVariantBuilder>,
     original_abi: &ContractAbi,
@@ -279,10 +270,6 @@ impl ScConfig {
             .map(|builder| build_contract(builder, original_abi))
             .collect();
         set_main_contract_flag(&mut contracts, &config.settings.main);
-        // //maybe collect contract variant profile? it's already here
-        // //
-
-        // collect_contract_profile(&mut contract_builders, &config);
         validate_contract_variants(&contracts);
         ScConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),

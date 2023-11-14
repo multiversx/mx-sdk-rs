@@ -31,7 +31,6 @@ impl CargoTomlContents {
             String::from_utf8(cargo_toml_content).expect("error decoding Cargo.toml utf-8");
         let toml_value = cargo_toml_content_str
             .parse::<toml::Value>()
-            // .expect("failed to parse Cargo.toml toml format")
             .unwrap_or_else(|e| {
                 panic!(
                     "failed to parse Cargo.toml toml format, path:{}, error: {e}",
@@ -81,7 +80,69 @@ impl CargoTomlContents {
             .to_string()
     }
 
-    pub fn add_deps(&mut self, crate_name: String, adapter_version: String, adapter_path: String) {}
+    pub fn mvx_dependency_version(&self) -> String {
+        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned(); 
+
+        if let Value::Table(table) = toml_value {
+            if let Some(version) = table.get("version") {
+                return version.to_string().replace("\"", "");
+            }
+
+        }
+        panic!("could not find multiversx-sc dependency version in cargo toml")
+    }
+
+    pub fn mvx_dependency_path(&self) -> String {
+        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned(); 
+
+        if let Value::Table(table) = toml_value {
+            if let Some(path) = table.get("path") {
+                return path.to_string().replace("\"", "");
+            }
+        }
+
+        panic!("could not find multiversx-sc dependency path in cargo toml")
+    }
+
+    pub fn get_adapter_dependencies(&self) -> (String, String) {
+        (self.mvx_dependency_version(), self.mvx_dependency_path())
+    }
+
+    pub fn add_deps(
+        &mut self,
+        crate_name: String,
+        adapter_version: &String,
+        adapter_path: &String,
+    ) {
+        let mut crate_deps = toml::map::Map::new();
+        crate_deps.insert("path".to_string(), toml::Value::String("..".to_string()));
+
+        let mut adapter_deps = toml::map::Map::new();
+        adapter_deps.insert(
+            "version".to_string(),
+            toml::Value::String(adapter_version.to_string()),
+        );
+        adapter_deps.insert(
+            "path".to_string(),
+            toml::Value::String(adapter_path.replace("base", "wasm-adapter")),
+        );
+
+        let mut toml_table_adapter = toml::map::Map::new();
+        toml_table_adapter.insert("multiversx-sc-wasm-adapter".to_string(), toml::Value::Table(adapter_deps));
+
+        let mut toml_table_crate = toml::map::Map::new();
+        toml_table_crate.insert(crate_name, toml::Value::Table(crate_deps));
+
+        toml_table_crate.extend(toml_table_adapter);
+
+        self.toml_value
+            .as_table_mut()
+            .expect("add deps cargo toml error wasm adapter")
+            .insert(
+                "dependencies".to_string(),
+                toml::Value::Table(toml_table_crate),
+            );
+    }
 
     /// Assumes that a package section already exists.
     pub fn change_package_name(&mut self, new_package_name: String) {
@@ -150,8 +211,6 @@ impl CargoTomlContents {
             .insert("lib".to_string(), toml::Value::Table(value));
     }
 
-    //maybe create another function change_package_info(params)
-    //just like change_package_name for keeping the same structure
     pub fn add_package_info(
         &mut self,
         name: String,
@@ -172,14 +231,6 @@ impl CargoTomlContents {
     }
 
     pub fn add_contract_variant_profile(&mut self, contract: &ContractVariant) {
-        // contract variant profile
-        //  codegen_units: u8,
-        //  opt_level: String,
-        //  lto: bool,
-        //  debug: bool,
-        //  panic: String,
-
-        //turn struct into value/map/whatever
         let contract_profile = contract.settings.contract_variant_profile.clone();
 
         let mut profile_props = toml::map::Map::new();
@@ -195,14 +246,14 @@ impl CargoTomlContents {
         profile_props.insert("debug".to_string(), Value::Boolean(contract_profile.debug));
         profile_props.insert("panic".to_string(), Value::String(contract_profile.panic));
 
-        //get key name from contract.name [contracts.<contract_name>.profile]
-        let key = format!("contracts.{}.profile", contract.contract_name);
-
-        //insert into toml
+        let mut toml_table = toml::map::Map::new();
+        toml_table.insert("release".to_string(), toml::Value::Table(profile_props));
+        
         self.toml_value
             .as_table_mut()
             .expect("malformed package in Cargo.toml")
-            .insert(key, toml::Value::Table(profile_props));
+            .insert("profile".to_string(), toml::Value::Table(toml_table));
+
     }
 
     pub fn insert_default_workspace(&mut self) {

@@ -1,10 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-// add this to cargo
-// const LIB = r"[lib]
-// crate-type = ["cdylib"]";
-
 #[derive(Deserialize, Debug)]
 pub struct MultiContractConfigSerde {
     #[serde(default)]
