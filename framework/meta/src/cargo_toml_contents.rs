@@ -81,19 +81,18 @@ impl CargoTomlContents {
     }
 
     pub fn mvx_dependency_version(&self) -> String {
-        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned(); 
+        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(version) = table.get("version") {
                 return version.to_string().replace("\"", "");
             }
-
         }
         panic!("could not find multiversx-sc dependency version in cargo toml")
     }
 
     pub fn mvx_dependency_path(&self) -> String {
-        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned(); 
+        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(path) = table.get("path") {
@@ -128,7 +127,10 @@ impl CargoTomlContents {
         );
 
         let mut toml_table_adapter = toml::map::Map::new();
-        toml_table_adapter.insert("multiversx-sc-wasm-adapter".to_string(), toml::Value::Table(adapter_deps));
+        toml_table_adapter.insert(
+            "multiversx-sc-wasm-adapter".to_string(),
+            toml::Value::Table(adapter_deps),
+        );
 
         let mut toml_table_crate = toml::map::Map::new();
         toml_table_crate.insert(crate_name, toml::Value::Table(crate_deps));
@@ -200,10 +202,9 @@ impl CargoTomlContents {
 
     pub fn add_lib(&mut self) {
         let mut value = toml::map::Map::new();
-        value.insert(
-            "crate-type".to_string(),
-            Value::String("cdylib".to_string()),
-        );
+        let array = vec![toml::Value::String("cdylib".to_string())];
+        let members = toml::Value::Array(array);
+        value.insert("crate-type".to_string(), members);
 
         self.toml_value
             .as_table_mut()
@@ -248,19 +249,15 @@ impl CargoTomlContents {
 
         let mut toml_table = toml::map::Map::new();
         toml_table.insert("release".to_string(), toml::Value::Table(profile_props));
-        
+
         self.toml_value
             .as_table_mut()
             .expect("malformed package in Cargo.toml")
             .insert("profile".to_string(), toml::Value::Table(toml_table));
-
     }
 
     pub fn insert_default_workspace(&mut self) {
-        let array = vec![
-            toml::Value::String(".".to_string()),
-            toml::Value::String("meta".to_string()),
-        ];
+        let array = vec![toml::Value::String(".".to_string())];
         let members = toml::Value::Array(array);
         let mut workspace = toml::Value::Table(Table::new());
         workspace

@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [lib]
-crate-type = "cdylib"
+crate-type = ["cdylib"]
 
 [profile.release]
 codegen-units = 1
@@ -22,7 +22,4 @@ version = "0.44.0"
 path = "../../../framework/wasm-adapter"
 
 [workspace]
-members = [
-    ".",
-    "meta",
-]
+members = ["."]
