@@ -38,7 +38,6 @@ impl MetaConfig {
         self.remove_unexpected_wasm_crates();
         self.create_wasm_crate_dirs();
         self.generate_cargo_toml_for_all_contracts();
-        self.generate_cargo_toml_for_secondary_contracts();
         self.generate_wasm_src_lib();
         copy_to_wasm_unmanaged_ei();
     }
@@ -50,6 +49,8 @@ impl MetaConfig {
     }
 
     //create a struct for cargo toml with all the fields
+    /// Cargo.toml files for all contracts are generated from the main contract Cargo.toml,
+    /// by changing the package name.
     pub fn generate_cargo_toml_for_all_contracts(&mut self) {
 
         let main_cargo_toml_contents = CargoTomlContents::load_from_file("../Cargo.toml");
@@ -79,22 +80,7 @@ impl MetaConfig {
                 &adapter_version,
                 &adapter_path,
             )
-            .save_to_file(contract.some_other_test_path())
-        }
-    }
-
-    /// Cargo.toml files for secondary contracts are generated from the main contract Cargo.toml,
-    /// by changing the package name.
-    pub fn generate_cargo_toml_for_secondary_contracts(&mut self) {
-        let main_contract = self.sc_config.main_contract_mut();
-
-        let main_cargo_toml_contents =
-            CargoTomlContents::load_from_file(main_contract.cargo_toml_path());
-        main_contract.wasm_crate_name = main_cargo_toml_contents.package_name();
-
-        for secondary_contract in self.sc_config.secondary_contracts() {
-            secondary_contract_cargo_toml(secondary_contract, &main_cargo_toml_contents)
-                .save_to_file(secondary_contract.cargo_toml_path());
+            .save_to_file(contract.cargo_toml_path())
         }
     }
 }
@@ -125,20 +111,6 @@ fn contract_cargo_toml(
     //insert default workspace
     cargo_toml_contents.insert_default_workspace();
 
-    cargo_toml_contents
-}
-
-fn secondary_contract_cargo_toml(
-    secondary_contract: &ContractVariant,
-    main_cargo_toml_contents: &CargoTomlContents,
-) -> CargoTomlContents {
-    let mut cargo_toml_contents = main_cargo_toml_contents.clone();
-    cargo_toml_contents.change_package_name(secondary_contract.wasm_crate_name.clone());
-
-    if !secondary_contract.settings.features.is_empty() {
-        cargo_toml_contents
-            .change_features_for_parent_crate_dep(secondary_contract.settings.features.as_slice());
-    }
     cargo_toml_contents
 }
 
