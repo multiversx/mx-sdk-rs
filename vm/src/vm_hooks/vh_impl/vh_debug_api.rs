@@ -183,7 +183,11 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         arguments: Vec<Vec<u8>>,
     ) {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
-        let tx_input = async_call_tx_input(&async_call_data, CallType::DirectCall);
+        let mut tx_input = async_call_tx_input(&async_call_data, CallType::DirectCall);
+        if self.is_back_transfer(&tx_input) {
+            tx_input.call_type = CallType::BackTransfer;
+        }
+
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
         let (tx_result, blockchain_updates) = self.0.vm_ref.execute_builtin_function_or_default(
             tx_input,
@@ -232,6 +236,13 @@ impl DebugApiVMHooksHandler {
 
         self.0.result_lock().merge_after_sync_call(&tx_result);
 
+        let contract_address = &self.0.input_ref().to;
+        let builtin_functions = &self.0.vm_ref.builtin_functions;
+        let current_back_transfers =
+            BackTransfers::new_from_result(contract_address, &tx_result, builtin_functions);
+
+        self.back_transfers_lock().merge(&current_back_transfers);
+
         tx_result.result_values
     }
 
@@ -239,6 +250,17 @@ impl DebugApiVMHooksHandler {
         if key.starts_with(STORAGE_RESERVED_PREFIX) {
             self.vm_error("cannot write to storage under reserved key");
         }
+    }
+
+    fn is_back_transfer(&self, tx_input: &TxInput) -> bool {
+        let caller_address = &self.0.input_ref().from;
+        if !caller_address.is_smart_contract_address() {
+            return false;
+        }
+
+        let builtin_functions = &self.0.vm_ref.builtin_functions;
+        let token_transfers = builtin_functions.extract_token_transfers(tx_input);
+        &token_transfers.real_recipient == caller_address
     }
 }
 

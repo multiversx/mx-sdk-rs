@@ -5,6 +5,7 @@ pub enum CallType {
     AsyncCall,
     AsyncCallback,
     TransferExecute,
+    BackTransfer,
 }
 
 impl CallType {
@@ -19,6 +20,7 @@ impl CallType {
             Self::AsyncCall => "AsyncCall",
             Self::AsyncCallback => "AsyncCallback",
             Self::TransferExecute => "TransferAndExecute",
+            Self::BackTransfer => "BackTransfer",
         }
     }
 }
