@@ -6,7 +6,7 @@ use std::{
 
 use toml::{value::Table, Value};
 
-use crate::cmd::contract::sc_config::ContractVariant;
+use crate::cmd::contract::sc_config::ContractVariantProfile;
 
 pub const CARGO_TOML_DEPENDENCIES: &str = "dependencies";
 pub const CARGO_TOML_DEV_DEPENDENCIES: &str = "dev-dependencies";
@@ -85,34 +85,33 @@ impl CargoTomlContents {
 
         if let Value::Table(table) = toml_value {
             if let Some(version) = table.get("version") {
-                return version.to_string().replace("\"", "");
+                return version.to_string().replace('\"', "");
             }
         }
         panic!("could not find multiversx-sc dependency version in cargo toml")
     }
 
-    pub fn mvx_dependency_path(&self) -> String {
+    pub fn mvx_dependency_path(&self) -> Option<String> {
         let toml_value = self.dependency("multiversx-sc").unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(path) = table.get("path") {
-                return path.to_string().replace("\"", "");
+                return Option::Some(path.to_string().replace('\"', ""));
             }
         }
 
-        //if path is missing then don't print at all
-        panic!("could not find multiversx-sc dependency path in cargo toml")
+        Option::None
     }
 
-    pub fn get_adapter_dependencies(&self) -> (String, String) {
+    pub fn get_adapter_dependencies(&self) -> (String, Option<String>) {
         (self.mvx_dependency_version(), self.mvx_dependency_path())
     }
 
     pub fn add_deps(
         &mut self,
-        crate_name: String,
+        crate_name: &String,
         adapter_version: &String,
-        adapter_path: &String,
+        adapter_path: &Option<String>,
     ) {
         let mut crate_deps = toml::map::Map::new();
         crate_deps.insert("path".to_string(), toml::Value::String("..".to_string()));
@@ -122,10 +121,15 @@ impl CargoTomlContents {
             "version".to_string(),
             toml::Value::String(adapter_version.to_string()),
         );
-        adapter_deps.insert(
-            "path".to_string(),
-            toml::Value::String(change_from_base_to_adapter_path(adapter_path)),
-        );
+
+        if adapter_path.is_some() {
+            adapter_deps.insert(
+                "path".to_string(),
+                toml::Value::String(change_from_base_to_adapter_path(
+                    adapter_path.to_owned().unwrap().as_str(),
+                )),
+            );
+        }
 
         let mut toml_table_adapter = toml::map::Map::new();
         toml_table_adapter.insert(
@@ -134,7 +138,7 @@ impl CargoTomlContents {
         );
 
         let mut toml_table_crate = toml::map::Map::new();
-        toml_table_crate.insert(crate_name, toml::Value::Table(crate_deps));
+        toml_table_crate.insert(crate_name.to_string(), toml::Value::Table(crate_deps));
 
         toml_table_crate.extend(toml_table_adapter);
 
@@ -215,13 +219,13 @@ impl CargoTomlContents {
 
     pub fn add_package_info(
         &mut self,
-        name: String,
+        name: &String,
         version: String,
         current_edition: String,
         publish: bool,
     ) {
         let mut value = toml::map::Map::new();
-        value.insert("name".to_string(), Value::String(name));
+        value.insert("name".to_string(), Value::String(name.to_string()));
         value.insert("version".to_string(), Value::String(version));
         value.insert("edition".to_string(), Value::String(current_edition));
         value.insert("publish".to_string(), Value::Boolean(publish));
@@ -232,9 +236,7 @@ impl CargoTomlContents {
             .insert("package".to_string(), toml::Value::Table(value));
     }
 
-    pub fn add_contract_variant_profile(&mut self, contract: &ContractVariant) {
-        let contract_profile = contract.settings.contract_variant_profile.clone();
-
+    pub fn add_contract_variant_profile(&mut self, contract_profile: &ContractVariantProfile) {
         let mut profile_props = toml::map::Map::new();
         profile_props.insert(
             "codegen-units".to_string(),
@@ -242,11 +244,14 @@ impl CargoTomlContents {
         );
         profile_props.insert(
             "opt-level".to_string(),
-            Value::String(contract_profile.opt_level),
+            Value::String(contract_profile.opt_level.to_owned()),
         );
         profile_props.insert("lto".to_string(), Value::Boolean(contract_profile.lto));
         profile_props.insert("debug".to_string(), Value::Boolean(contract_profile.debug));
-        profile_props.insert("panic".to_string(), Value::String(contract_profile.panic));
+        profile_props.insert(
+            "panic".to_string(),
+            Value::String(contract_profile.panic.to_owned()),
+        );
 
         let mut toml_table = toml::map::Map::new();
         toml_table.insert("release".to_string(), toml::Value::Table(profile_props));
@@ -319,16 +324,22 @@ fn is_dep_path_above(dep: &Value) -> bool {
     false
 }
 
-fn change_from_base_to_adapter_path(base_path: &String) -> String {
-    format!("../{}", base_path.replace("base", "wasm-adapter"))
+fn change_from_base_to_adapter_path(base_path: &str) -> String {
+    format!(
+        "../{}",
+        base_path.to_string().replace("base", "wasm-adapter")
+    )
 }
 
 mod tests {
 
     #[test]
     fn test_change_from_base_to_adapter_path() {
-        let base_path = "../../../framework/base".to_string();
+        let base_path = "../../../framework/base";
         let adapter_path = "../../../../framework/wasm-adapter".to_string();
-        assert_eq!(super::change_from_base_to_adapter_path(&base_path), adapter_path);
+        assert_eq!(
+            super::change_from_base_to_adapter_path(base_path),
+            adapter_path
+        );
     }
 }

@@ -14,12 +14,12 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.multisig]
+[dependencies.multisig-wasm]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
 version = "0.44.0"
-path = "../../../framework/wasm-adapter"
+path = "../../../../framework/wasm-adapter"
 
 [workspace]
 members = ["."]

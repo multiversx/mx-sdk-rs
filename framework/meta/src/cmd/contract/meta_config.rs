@@ -4,7 +4,10 @@ use multiversx_sc::abi::ContractAbi;
 
 use crate::{cli_args::BuildArgs, tools::check_tools_installed, CargoTomlContents};
 
-use super::sc_config::{ContractVariant, ScConfig};
+use super::{
+    sc_config::{ContractVariant, ScConfig},
+    wasm_cargo_toml_data::WasmCargoTomlData,
+};
 
 const OUTPUT_RELATIVE_PATH: &str = "../output";
 const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
@@ -48,70 +51,50 @@ impl MetaConfig {
         }
     }
 
-    //create a struct for cargo toml with all the fields
     /// Cargo.toml files for all wasm crates are generated from the main contract Cargo.toml,
     /// by changing the package name.
     pub fn generate_cargo_toml_for_all_wasm_crates(&mut self) {
-
         let main_cargo_toml_contents = CargoTomlContents::load_from_file("../Cargo.toml");
+        let mut cargo_toml_data = WasmCargoTomlData::default();
+        cargo_toml_data.change_package_edition(&main_cargo_toml_contents);
+        cargo_toml_data.change_adapter_dependencies(&main_cargo_toml_contents);
 
-        let current_edition = main_cargo_toml_contents.package_edition();
-        let (adapter_version, adapter_path) = main_cargo_toml_contents.get_adapter_dependencies();
-
-        let mut new_cargo = CargoTomlContents::new();
-
-        //add package category with name, version, edition and publish
-        new_cargo.add_package_info(
-            "config".to_string(),
-            "0.0.0".to_string(),
-            current_edition,
-            false,
-        );
-
-        //add lib part
-        new_cargo.add_lib();
-
-        //generate toml for every contract from sc_config
         for contract in self.sc_config.contracts.iter() {
-            contract_cargo_toml(
-                contract,
-                &new_cargo,
-                main_cargo_toml_contents.package_name(),
-                &adapter_version,
-                &adapter_path,
-            )
-            .save_to_file(contract.cargo_toml_path())
+            cargo_toml_data.change_package_name(&contract.wasm_crate_name);
+            cargo_toml_data.change_profile(&contract.settings.contract_variant_profile);
+            generate_cargo_toml(&cargo_toml_data, contract).save_to_file(contract.cargo_toml_path());
         }
     }
 }
 
-fn contract_cargo_toml(
-    contract: &ContractVariant,
-    sc_config_cargo_toml_contents: &CargoTomlContents,
-    crate_name: String,
-    adapter_version: &String,
-    adapter_path: &String,
-) -> CargoTomlContents {
-    let mut cargo_toml_contents = sc_config_cargo_toml_contents.clone();
+fn generate_cargo_toml(cargo_toml_data: &WasmCargoTomlData, contract: &ContractVariant) -> CargoTomlContents {
+    let mut new_cargo = CargoTomlContents::new();
 
-    //change package name
-    cargo_toml_contents.change_package_name(contract.wasm_crate_name.clone());
+    new_cargo.add_package_info(
+        &cargo_toml_data.name,
+        "0.0.0".to_string(),
+        cargo_toml_data.edition.clone(),
+        false,
+    );
 
-    //writes profile in cargo
-    cargo_toml_contents.add_contract_variant_profile(contract);
+    //add lib
+    new_cargo.add_lib();
+
+    //add profile
+    new_cargo.add_contract_variant_profile(&cargo_toml_data.profile);
 
     //add deps
-    cargo_toml_contents.add_deps(crate_name, adapter_version, adapter_path);
+    new_cargo.add_deps(&cargo_toml_data.name, &cargo_toml_data.framework_version, &cargo_toml_data.framework_path);
 
+    //check features
     if !contract.settings.features.is_empty() {
-        cargo_toml_contents
-            .change_features_for_parent_crate_dep(contract.settings.features.as_slice());
+        new_cargo.change_features_for_parent_crate_dep(contract.settings.features.as_slice());
     }
 
     //insert default workspace
-    cargo_toml_contents.add_workspace(&["."]);
+    new_cargo.add_workspace(&["."]);
 
-    cargo_toml_contents
+    new_cargo
 }
 
 impl MetaConfig {

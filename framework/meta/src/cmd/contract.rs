@@ -2,6 +2,7 @@ mod generate_snippets;
 mod meta_abi;
 mod meta_config;
 pub mod sc_config;
+pub mod wasm_cargo_toml_data;
 
 use std::path::Path;
 
