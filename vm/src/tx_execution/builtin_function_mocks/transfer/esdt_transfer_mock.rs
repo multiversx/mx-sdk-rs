@@ -59,11 +59,12 @@ fn build_log(tx_input: &TxInput, call: &ParsedTransferBuiltinFunCall) -> TxLog {
     push_transfer_bytes(&call.raw_esdt_transfers, &mut topics);
     topics.push(call.destination.to_vec());
 
-    let mut data = Vec::new();
-    data.push(call_type.to_log_bytes());
-    data.push(ESDT_TRANSFER_FUNC_NAME.into());
-    data.push(call.raw_esdt_transfers[0].token_identifier.clone());
-    data.push(call.raw_esdt_transfers[0].value_bytes.clone());
+    let mut data = vec![
+        call_type.to_log_bytes(),
+        ESDT_TRANSFER_FUNC_NAME.into(),
+        call.raw_esdt_transfers[0].token_identifier.clone(),
+        call.raw_esdt_transfers[0].value_bytes.clone(),
+    ];
     push_func_name_if_necessary(call_type, &call.func_name, &mut data);
 
     TxLog {
