@@ -58,16 +58,22 @@ impl MetaConfig {
         let mut cargo_toml_data = WasmCargoTomlData::default();
         cargo_toml_data.change_package_edition(&main_cargo_toml_contents);
         cargo_toml_data.change_adapter_dependencies(&main_cargo_toml_contents);
+        let crate_name = main_cargo_toml_contents.package_name();
 
         for contract in self.sc_config.contracts.iter() {
             cargo_toml_data.change_package_name(&contract.wasm_crate_name);
             cargo_toml_data.change_profile(&contract.settings.contract_variant_profile);
-            generate_cargo_toml(&cargo_toml_data, contract).save_to_file(contract.cargo_toml_path());
+            generate_cargo_toml(&cargo_toml_data, contract, &crate_name)
+                .save_to_file(contract.cargo_toml_path());
         }
     }
 }
 
-fn generate_cargo_toml(cargo_toml_data: &WasmCargoTomlData, contract: &ContractVariant) -> CargoTomlContents {
+fn generate_cargo_toml(
+    cargo_toml_data: &WasmCargoTomlData,
+    contract: &ContractVariant,
+    crate_name: &String,
+) -> CargoTomlContents {
     let mut new_cargo = CargoTomlContents::new();
 
     new_cargo.add_package_info(
@@ -84,7 +90,11 @@ fn generate_cargo_toml(cargo_toml_data: &WasmCargoTomlData, contract: &ContractV
     new_cargo.add_contract_variant_profile(&cargo_toml_data.profile);
 
     //add deps
-    new_cargo.add_deps(&cargo_toml_data.name, &cargo_toml_data.framework_version, &cargo_toml_data.framework_path);
+    new_cargo.add_deps(
+        crate_name,
+        &cargo_toml_data.framework_version,
+        &cargo_toml_data.framework_path,
+    );
 
     //check features
     if !contract.settings.features.is_empty() {

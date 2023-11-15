@@ -14,7 +14,7 @@ lto = true
 debug = false
 panic = "abort"
 
-[dependencies.multisig-view-wasm]
+[dependencies.multisig]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
