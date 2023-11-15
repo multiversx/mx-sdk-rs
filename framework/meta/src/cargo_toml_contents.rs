@@ -19,6 +19,8 @@ const AUTO_GENERATED: &str =
 
 ";
 
+const FRAMEWORK_NAME_BASE: &str = "multiversx-sc";
+
 /// Contains an in-memory representation of a Cargo.toml file.
 ///
 /// Implementation notes:
@@ -62,12 +64,8 @@ impl CargoTomlContents {
     }
 
     pub fn save_to_file<P: AsRef<Path>>(&self, path: P) {
-        let cargo_toml_content_str =
-            toml::to_string_pretty(&self.toml_value).expect("failed to format Cargo.toml contents");
+        let cargo_toml_content_str = &self.to_string_pretty();
         let mut file = std::fs::File::create(path).expect("failed to create Cargo.toml file");
-        if self.prepend_auto_generated_comment {
-            let _ = file.write(AUTO_GENERATED.as_bytes());
-        }
         file.write_all(cargo_toml_content_str.as_bytes())
             .expect("failed to write Cargo.toml contents to file");
     }
@@ -95,74 +93,26 @@ impl CargoTomlContents {
     }
 
     pub fn mvx_dependency_version(&self) -> String {
-        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned();
+        let toml_value = self.dependency(FRAMEWORK_NAME_BASE).unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(version) = table.get("version") {
-                return version.to_string().replace('\"', "");
+                return remove_quotes(version);
             }
         }
         panic!("could not find multiversx-sc dependency version in cargo toml")
     }
 
     pub fn mvx_dependency_path(&self) -> Option<String> {
-        let toml_value = self.dependency("multiversx-sc").unwrap().to_owned();
+        let toml_value = self.dependency(FRAMEWORK_NAME_BASE).unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(path) = table.get("path") {
-                return Option::Some(path.to_string().replace('\"', ""));
+                return Option::Some(remove_quotes(path));
             }
         }
 
         Option::None
-    }
-
-    pub fn get_adapter_dependencies(&self) -> (String, Option<String>) {
-        (self.mvx_dependency_version(), self.mvx_dependency_path())
-    }
-
-    pub fn add_deps(
-        &mut self,
-        crate_name: &String,
-        adapter_version: &String,
-        adapter_path: &Option<String>,
-    ) {
-        let mut crate_deps = toml::map::Map::new();
-        crate_deps.insert("path".to_string(), toml::Value::String("..".to_string()));
-
-        let mut adapter_deps = toml::map::Map::new();
-        adapter_deps.insert(
-            "version".to_string(),
-            toml::Value::String(adapter_version.to_string()),
-        );
-
-        if adapter_path.is_some() {
-            adapter_deps.insert(
-                "path".to_string(),
-                toml::Value::String(change_from_base_to_adapter_path(
-                    adapter_path.to_owned().unwrap().as_str(),
-                )),
-            );
-        }
-
-        let mut toml_table_adapter = toml::map::Map::new();
-        toml_table_adapter.insert(
-            "multiversx-sc-wasm-adapter".to_string(),
-            toml::Value::Table(adapter_deps),
-        );
-
-        let mut toml_table_crate = toml::map::Map::new();
-        toml_table_crate.insert(crate_name.to_string(), toml::Value::Table(crate_deps));
-
-        toml_table_crate.extend(toml_table_adapter);
-
-        self.toml_value
-            .as_table_mut()
-            .expect("add deps cargo toml error wasm adapter")
-            .insert(
-                "dependencies".to_string(),
-                toml::Value::Table(toml_table_crate),
-            );
     }
 
     /// Assumes that a package section already exists.
@@ -326,7 +276,7 @@ impl CargoTomlContents {
         }
     }
 
-    pub fn as_string(&self) -> String {
+    pub fn to_string_pretty(&self) -> String {
         let toml_string =
             toml::to_string_pretty(&self.toml_value).expect("failed to format Cargo.toml contents");
         if self.prepend_auto_generated_comment {
@@ -348,11 +298,15 @@ fn is_dep_path_above(dep: &Value) -> bool {
     false
 }
 
-fn change_from_base_to_adapter_path(base_path: &str) -> String {
+pub fn change_from_base_to_adapter_path(base_path: &str) -> String {
     format!(
         "../{}",
         base_path.to_string().replace("base", "wasm-adapter")
     )
+}
+
+fn remove_quotes(var: &Value) -> String {
+    var.to_string().replace('\"', "")
 }
 
 mod tests {

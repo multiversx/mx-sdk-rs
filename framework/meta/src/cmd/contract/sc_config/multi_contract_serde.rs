@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
@@ -61,7 +61,7 @@ pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct ContractVariantProfile {
     pub codegen_units: u8,
     pub opt_level: String,

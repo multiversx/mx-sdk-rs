@@ -160,24 +160,6 @@ impl ContractVariant {
         }
         result
     }
-
-    pub fn from(
-        main: bool,
-        contract_id: String,
-        contract_name: String,
-        wasm_crate_name: String,
-        settings: ContractVariantSettings,
-        abi: ContractAbi,
-    ) -> ContractVariant {
-        ContractVariant {
-            main,
-            contract_id,
-            contract_name,
-            wasm_crate_name,
-            settings,
-            abi,
-        }
-    }
 }
 
 impl std::fmt::Debug for ContractVariant {
