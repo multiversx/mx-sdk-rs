@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           20
+// Endpoints:                           21
 // Async Callback (empty):               1
-// Total number of exported functions:  22
+// Total number of exported functions:  23
 
 #![no_std]
 
@@ -22,6 +22,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     multiversx_price_aggregator_sc
     (
         init => init
+        changeAmounts => change_amounts
         addOracles => add_oracles
         removeOracles => remove_oracles
         submit => submit

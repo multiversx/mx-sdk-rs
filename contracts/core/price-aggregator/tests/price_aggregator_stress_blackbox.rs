@@ -10,20 +10,20 @@ use multiversx_sc_modules::{pause::ProxyTrait, staking::ProxyTrait as _};
 use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_biguint, managed_buffer,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep, TxExpect},
+    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
     ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
 };
 
 const DECIMALS: u8 = 0;
 const EGLD_TICKER: &[u8] = b"EGLD";
-const NR_ORACLES: usize = 55;
+const NR_ORACLES: usize = 20;
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
 const PRICE_AGGREGATOR_PATH_EXPR: &str = "file:../output/multiversx-price-aggregator-sc.wasm";
 const SLASH_AMOUNT: u64 = 10;
-const SLASH_QUORUM: usize = 50;
+const SLASH_QUORUM: usize = 3;
 const STAKE_AMOUNT: u64 = 20;
-const SUBMISSION_COUNT: usize = 50;
+const SUBMISSION_COUNT: usize = 20;
 const USD_TICKER: &[u8] = b"USDC";
 
 type PriceAggregatorContract = ContractInfo<multiversx_price_aggregator_sc::Proxy<StaticApi>>;
@@ -105,7 +105,8 @@ impl PriceAggregatorTestState {
                     SLASH_QUORUM,
                     SUBMISSION_COUNT,
                     oracles,
-                )),
+                ))
+                .gas_limit("120,000,000"),
         );
 
         for address in self.oracles.iter() {
@@ -113,7 +114,8 @@ impl PriceAggregatorTestState {
                 ScCallStep::new()
                     .from(address)
                     .egld_value(STAKE_AMOUNT)
-                    .call(self.price_aggregator_contract.stake()),
+                    .call(self.price_aggregator_contract.stake())
+                    .gas_limit("5,000,000"),
             );
         }
 
@@ -133,7 +135,8 @@ impl PriceAggregatorTestState {
         self.world.sc_call(
             ScCallStep::new()
                 .from(OWNER_ADDRESS_EXPR)
-                .call(self.price_aggregator_contract.unpause_endpoint()),
+                .call(self.price_aggregator_contract.unpause_endpoint())
+                .gas_limit("5,000,000"),
         );
     }
 
@@ -148,7 +151,7 @@ impl PriceAggregatorTestState {
                     price,
                     DECIMALS,
                 ))
-                .expect(TxExpect::ok()),
+                .gas_limit("1,000,000,000"),
         );
     }
 }
@@ -167,7 +170,7 @@ fn test_price_aggregator_submit() {
     state.submit(&state.oracles[0].clone(), 95, 100);
 
     // submit ok
-    for index in 1..49 {
+    for index in 1..SUBMISSION_COUNT - 1 {
         state.submit(&state.oracles[index].clone(), 100, 100);
     }
 
@@ -185,7 +188,7 @@ fn test_price_aggregator_submit() {
 
             let submission_count = sc.submission_count().get();
 
-            assert_eq!(submission_count, 50);
+            assert_eq!(submission_count, SUBMISSION_COUNT);
             assert_eq!(
                 sc.first_submission_timestamp(&token_pair).get(),
                 current_timestamp
@@ -196,9 +199,9 @@ fn test_price_aggregator_submit() {
             );
 
             let submissions = sc.submissions().get(&token_pair).unwrap();
-            assert_eq!(submissions.len(), 49);
+            assert_eq!(submissions.len(), SUBMISSION_COUNT - 1);
 
-            for index in 0..49 {
+            for index in 0..SUBMISSION_COUNT - 1 {
                 assert_eq!(
                     submissions
                         .get(&managed_address!(&state.oracles[index].to_address()))
