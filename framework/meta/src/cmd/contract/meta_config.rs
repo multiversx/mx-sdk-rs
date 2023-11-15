@@ -76,6 +76,9 @@ fn generate_cargo_toml(
 ) -> CargoTomlContents {
     let mut new_cargo = CargoTomlContents::new();
 
+    //add auto-generated
+    // new_cargo.add_auto_generated();
+
     new_cargo.add_package_info(
         &cargo_toml_data.name,
         "0.0.0".to_string(),
