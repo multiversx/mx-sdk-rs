@@ -16,14 +16,14 @@ use multiversx_sc_scenario::{
 
 const DECIMALS: u8 = 0;
 const EGLD_TICKER: &[u8] = b"EGLD";
-const NR_ORACLES: usize = 20;
+const NR_ORACLES: usize = 50;
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
 const PRICE_AGGREGATOR_PATH_EXPR: &str = "file:../output/multiversx-price-aggregator-sc.wasm";
 const SLASH_AMOUNT: u64 = 10;
 const SLASH_QUORUM: usize = 3;
 const STAKE_AMOUNT: u64 = 20;
-const SUBMISSION_COUNT: usize = 20;
+const SUBMISSION_COUNT: usize = 50;
 const USD_TICKER: &[u8] = b"USDC";
 
 type PriceAggregatorContract = ContractInfo<multiversx_price_aggregator_sc::Proxy<StaticApi>>;
@@ -151,7 +151,7 @@ impl PriceAggregatorTestState {
                     price,
                     DECIMALS,
                 ))
-                .gas_limit("1,000,000,000"),
+                .gas_limit("7,000,000"),
         );
     }
 }
