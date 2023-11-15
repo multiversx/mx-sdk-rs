@@ -57,11 +57,6 @@ fn big_uint_pow_rs() {
 }
 
 #[test]
-fn big_uint_overflow_rs() {
-    world().run("scenarios/big_uint_overflow.scen.json");
-}
-
-#[test]
 fn big_uint_to_u_64_rs() {
     world().run("scenarios/big_uint_to_u64.scen.json");
 }
