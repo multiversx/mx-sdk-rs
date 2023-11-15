@@ -5,8 +5,8 @@ use multiversx_chain_vm_executor::BreakpointValue;
 use crate::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{
-        async_call_tx_input, AsyncCallTxData, BlockchainUpdate, TxCache, TxContext, TxFunctionName,
-        TxInput, TxManagedTypes, TxPanic, TxResult,
+        async_call_tx_input, AsyncCallTxData, BackTransfers, BlockchainUpdate, TxCache, TxContext,
+        TxFunctionName, TxInput, TxManagedTypes, TxPanic, TxResult,
     },
     types::{VMAddress, VMCodeMetadata},
     vm_err_msg,
@@ -77,6 +77,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
 
     fn get_current_block_info(&self) -> &BlockInfo {
         &self.0.blockchain_ref().current_block_info
+    }
+
+    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+        self.0.back_transfers_lock()
     }
 
     fn account_data(&self, address: &VMAddress) -> AccountData {

@@ -52,10 +52,7 @@ impl TransferRoleTestState {
             SetStateStep::new()
                 .put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1))
                 .new_address(OWNER_ADDRESS_EXPR, 1, TRANSFER_ROLE_FEATURES_ADDRESS_EXPR)
-                .put_account(
-                    VAULT_ADDRESS_EXPR,
-                    Account::new().nonce(1).code(vault_code.clone()),
-                )
+                .put_account(VAULT_ADDRESS_EXPR, Account::new().nonce(1).code(vault_code))
                 .put_account(
                     USER_ADDRESS_EXPR,
                     Account::new()

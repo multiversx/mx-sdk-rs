@@ -1,7 +1,6 @@
 [settings]
-main = "proxy-test-first"
+main = "rust-testing-framework-tester"
 
 # the only purpose of this config is to specify the allocator
-[contracts.proxy-test-first]
-add-unlabelled = true
+[contracts.rust-testing-framework-tester]
 allocator = "static64k"

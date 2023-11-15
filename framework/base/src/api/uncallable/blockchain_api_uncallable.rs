@@ -126,6 +126,14 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn managed_get_back_transfers(
+        &self,
+        _esdt_transfer_value_handle: RawHandle,
+        _call_value_handle: RawHandle,
+    ) {
+        unreachable!()
+    }
+
     fn check_esdt_frozen(
         &self,
         _address_handle: Self::ManagedBufferHandle,

@@ -9,6 +9,7 @@
 // Async Callback:                       1
 // Total number of exported functions: 362
 
+
 #![no_std]
 
 // Configuration that works with rustc < 1.73.0.
@@ -257,6 +258,14 @@ multiversx_sc_wasm_adapter::endpoints! {
         store_reserved_i64 => store_reserved_i64
         store_reserved_big_uint => store_reserved_big_uint
         store_reserved_vec_u8 => store_reserved_vec_u8
+        address_to_id_mapper_get_id => address_to_id_mapper_get_id
+        address_to_id_mapper_get_id_non_zero => address_to_id_mapper_get_id_non_zero
+        address_to_id_mapper_get_address => address_to_id_mapper_get_address
+        address_to_id_mapper_contains => address_to_id_mapper_contains
+        address_to_id_mapper_set => address_to_id_mapper_set
+        address_to_id_mapper_get_id_or_insert => address_to_id_mapper_get_id_or_insert
+        address_to_id_mapper_remove_by_id => address_to_id_mapper_remove_by_id
+        address_to_id_mapper_remove_by_address => address_to_id_mapper_remove_by_address
         getListMapper => list_mapper
         listMapperPushBack => list_mapper_push_back
         listMapperPushFront => list_mapper_push_front

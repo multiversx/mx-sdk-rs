@@ -9,7 +9,7 @@ pub use oc_parse_stack_size::*;
 use crate::ei::EIVersion;
 
 /// Collection of flags, specified in the multicontract config.
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Debug)]
 pub struct OutputContractSettings {
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
