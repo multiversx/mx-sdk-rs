@@ -192,7 +192,7 @@ fn copy_to_wasm_unmanaged_ei() {
 
 mod tests {
     #[cfg(test)]
-    use crate::cmd::contract::sc_config::{ContractVariant, ContractVariantProfile};
+    use crate::cmd::contract::sc_config::ContractVariantProfile;
 
     #[test]
     fn test_generate_cargo() {
