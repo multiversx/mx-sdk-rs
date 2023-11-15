@@ -30,7 +30,7 @@ pub trait SmallIntOverflow {
 
     #[endpoint]
     #[allow(arithmetic_overflow)]
-    fn u64(&self) -> u64 {
+    fn no_overflow_u64(&self) -> u64 {
         u64::MAX + 1
     }
     #[endpoint]
