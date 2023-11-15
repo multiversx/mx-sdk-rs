@@ -75,7 +75,7 @@
                             "address:acc1",
                             "0x4000000"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:crypto_bubbles",

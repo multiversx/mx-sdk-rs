@@ -48,7 +48,7 @@
                             "address:acc1",
                             "0x10"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:crypto_bubbles",

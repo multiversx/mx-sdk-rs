@@ -62,7 +62,7 @@
                             "1",
                             "0"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:recursive-caller",
@@ -93,7 +93,7 @@
                             "1",
                             "0"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:recursive-caller",
