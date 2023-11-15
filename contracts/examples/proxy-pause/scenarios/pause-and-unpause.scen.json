@@ -22,7 +22,6 @@
                     "false"
                 ],
                 "status": "",
-                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
@@ -41,7 +40,6 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
@@ -62,7 +60,6 @@
                     "true"
                 ],
                 "status": "",
-                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
@@ -81,7 +78,6 @@
             "expect": {
                 "out": [],
                 "status": "",
-                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
@@ -102,7 +98,6 @@
                     "false"
                 ],
                 "status": "",
-                "logs": [],
                 "gas": "*",
                 "refund": "*"
             }
