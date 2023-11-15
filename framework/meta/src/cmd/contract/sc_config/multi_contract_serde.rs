@@ -53,7 +53,7 @@ pub struct ContractVariantSerde {
     pub kill_legacy_callback: bool,
 
     #[serde(default)]
-    pub contract_variant_profile: Option<ContractVariantProfile>
+    pub contract_variant_profile: Option<ContractVariantProfile>,
 }
 
 #[derive(Deserialize, Default, Debug)]

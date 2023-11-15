@@ -49,10 +49,8 @@ where
 {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
 
-    let sc_config = ScConfig::load_from_crate_or_default(
-        contract_crate_path,
-        &original_contract_abi,
-    );
+    let sc_config =
+        ScConfig::load_from_crate_or_default(contract_crate_path, &original_contract_abi);
     sc_config.validate_contract_variants();
     sc_config
 }

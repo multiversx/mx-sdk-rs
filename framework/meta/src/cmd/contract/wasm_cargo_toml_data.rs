@@ -9,6 +9,7 @@ pub struct WasmCargoTomlData {
     pub profile: ContractVariantProfile,
     pub framework_version: String,
     pub framework_path: Option<String>,
+    pub contract_features: Vec<String>,
 }
 
 impl WasmCargoTomlData {
@@ -28,5 +29,27 @@ impl WasmCargoTomlData {
 
     pub fn change_profile(&mut self, contract_profile: &ContractVariantProfile) {
         self.profile = contract_profile.to_owned()
+    }
+
+    pub fn change_contract_features(&mut self, features: &Vec<String>) {
+        self.contract_features = features.to_owned()
+    }
+
+    pub fn from(
+        name: String,
+        edition: String,
+        profile: ContractVariantProfile,
+        framework_version: String,
+        framework_path: Option<String>,
+        contract_features: Vec<String>,
+    ) -> WasmCargoTomlData {
+        WasmCargoTomlData {
+            name,
+            edition,
+            profile,
+            framework_version,
+            framework_path,
+            contract_features,
+        }
     }
 }

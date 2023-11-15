@@ -34,7 +34,7 @@ pub struct ContractVariantSettings {
     /// Forcibly remove the original contrct legacy callback.
     pub kill_legacy_callback: bool,
 
-    pub contract_variant_profile: ContractVariantProfile
+    pub contract_variant_profile: ContractVariantProfile,
 }
 
 impl Default for ContractVariantSettings {
@@ -47,7 +47,7 @@ impl Default for ContractVariantSettings {
             stack_size: DEFAULT_STACK_SIZE,
             features: Default::default(),
             kill_legacy_callback: false,
-            contract_variant_profile: Default::default()
+            contract_variant_profile: Default::default(),
         }
     }
 }
