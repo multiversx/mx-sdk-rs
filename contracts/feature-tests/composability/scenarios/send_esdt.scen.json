@@ -63,7 +63,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [                            
+                        "topics": [
                             "str:SENDESDT",
                             "0",
                             "200",

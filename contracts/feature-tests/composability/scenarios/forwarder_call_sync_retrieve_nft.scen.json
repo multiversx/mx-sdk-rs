@@ -53,7 +53,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "",
                             "sc:vault"
                         ],
@@ -81,7 +81,7 @@
                     {
                         "address": "sc:vault",
                         "endpoint": "str:ESDTNFTTransfer",
-                        "topics": [                            
+                        "topics": [
                             "str:NFT-000001",
                             "5",
                             "01",

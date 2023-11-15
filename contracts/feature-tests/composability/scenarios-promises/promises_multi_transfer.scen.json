@@ -81,7 +81,7 @@
                     {
                         "address": "sc:promises",
                         "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [                            
+                        "topics": [
                             "str:FWD-TOKEN",
                             "0",
                             "500",
@@ -133,7 +133,7 @@
                     {
                         "address": "sc:vault",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "",
                             "sc:promises"
                         ],

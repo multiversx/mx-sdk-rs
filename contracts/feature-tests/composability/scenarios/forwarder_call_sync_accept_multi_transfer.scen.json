@@ -76,7 +76,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [                            
+                        "topics": [
                             "str:FWD-TOKEN",
                             "0",
                             "100",

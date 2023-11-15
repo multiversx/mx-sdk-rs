@@ -60,7 +60,7 @@
                     {
                         "address": "sc:recursive-caller",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [                            
+                        "topics": [
                             "str:REC-TOKEN",
                             "",
                             "1",
@@ -91,7 +91,7 @@
                     {
                         "address": "sc:vault",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:recursive-caller"
                         ],

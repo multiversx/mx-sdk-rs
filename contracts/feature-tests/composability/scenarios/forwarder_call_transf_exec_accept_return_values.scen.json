@@ -46,7 +46,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "1000",
                             "sc:vault"
                         ],

@@ -12,6 +12,7 @@
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
                 "function": "claimFees",
+                "arguments": [],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
@@ -41,6 +42,7 @@
                 "from": "address:digital_cash_owner_address",
                 "to": "sc:the_digital_cash_contract",
                 "function": "claimFees",
+                "arguments": [],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },

@@ -49,7 +49,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:ESDTTransfer",
-                        "topics": [                            
+                        "topics": [
                             "str:TEST-TOKENA",
                             "0",
                             "1000",
@@ -80,7 +80,7 @@
                     {
                         "address": "sc:vault",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:forwarder"
                         ],

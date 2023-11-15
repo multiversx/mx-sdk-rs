@@ -43,7 +43,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:vault"
                         ],
@@ -91,7 +91,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:vault"
                         ],
@@ -113,7 +113,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:vault"
                         ],

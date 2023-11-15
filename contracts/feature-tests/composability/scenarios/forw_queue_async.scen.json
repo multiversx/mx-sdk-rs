@@ -36,6 +36,7 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0"
             }
         },
@@ -46,10 +47,12 @@
                 "from": "address:a_user",
                 "to": "sc:forwarder-queue",
                 "function": "forward_queued_calls",
+                "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "0",
                 "logs": [
                     {

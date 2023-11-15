@@ -57,7 +57,7 @@
                     {
                         "address": "sc:recursive-caller",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "1",
                             "sc:vault"
                         ],
@@ -80,7 +80,7 @@
                     {
                         "address": "sc:vault",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:recursive-caller"
                         ],
