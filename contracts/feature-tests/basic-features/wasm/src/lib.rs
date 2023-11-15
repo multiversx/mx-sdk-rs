@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          340
+// Endpoints:                          360
 // Async Callback:                       1
-// Total number of exported functions: 342
+// Total number of exported functions: 362
 
 #![no_std]
 
@@ -357,6 +357,26 @@ multiversx_sc_wasm_adapter::endpoints! {
         unique_id_mapper_set => unique_id_mapper_set
         unique_id_mapper => unique_id_mapper
         managed_struct_eq => managed_struct_eq
+        usize => usize
+        u8 => u8
+        u16 => u16
+        u32 => u32
+        u64 => u64
+        usize_overflow => usize_overflow
+        u8_overflow => u8_overflow
+        u16_overflow => u16_overflow
+        u32_overflow => u32_overflow
+        u64_overflow => u64_overflow
+        isize => isize
+        i8 => i8
+        i16 => i16
+        i32 => i32
+        i64 => i64
+        isize_overflow => isize_overflow
+        i8_overflow => i8_overflow
+        i16_overflow => i16_overflow
+        i32_overflow => i32_overflow
+        i64_overflow => i64_overflow
         token_identifier_egld => token_identifier_egld
         token_identifier_is_valid_1 => token_identifier_is_valid_1
         token_identifier_is_valid_2 => token_identifier_is_valid_2

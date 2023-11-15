@@ -37,6 +37,11 @@ fn big_uint_eq_u_64_rs() {
 }
 
 #[test]
+fn small_num_overflow_rs() {
+    world().run("scenarios/small_num_overflow.scen.json");
+}
+
+#[test]
 fn big_uint_from_u_64_rs() {
     world().run("scenarios/big_uint_from_u64.scen.json");
 }
