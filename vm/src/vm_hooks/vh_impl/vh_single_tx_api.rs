@@ -97,8 +97,8 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         panic!("cannot access back transfers in the SingleTxApi")
     }
 
-    fn account_data(&self, address: &VMAddress) -> AccountData {
-        self.0.with_account_mut(address, |account| account.clone())
+    fn account_data(&self, address: &VMAddress) -> Option<AccountData> {
+        Some(self.0.with_account_mut(address, |account| account.clone()))
     }
 
     fn account_code(&self, _address: &VMAddress) -> Vec<u8> {
