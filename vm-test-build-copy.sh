@@ -61,6 +61,7 @@ build_and_copy_composability() {
 }
 
 build_and_copy ./contracts/feature-tests/composability/forwarder         $VM_REPO_PATH/test/features/composability/forwarder
+build_and_copy ./contracts/feature-tests/composability/forwarder-queue   $VM_REPO_PATH/test/features/composability/forwarder-queue
 build_and_copy ./contracts/feature-tests/composability/forwarder-raw     $VM_REPO_PATH/test/features/composability/forwarder-raw
 build_and_copy ./contracts/feature-tests/composability/proxy-test-first  $VM_REPO_PATH/test/features/composability/proxy-test-first
 build_and_copy ./contracts/feature-tests/composability/proxy-test-second $VM_REPO_PATH/test/features/composability/proxy-test-second
