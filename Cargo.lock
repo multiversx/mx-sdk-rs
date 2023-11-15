@@ -1990,6 +1990,7 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
+ "rand",
 ]
 
 [[package]]

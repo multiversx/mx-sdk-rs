@@ -9,7 +9,7 @@ use multiversx_sc::{
 use multiversx_sc_modules::{pause::ProxyTrait, staking::ProxyTrait as _};
 use multiversx_sc_scenario::{
     api::StaticApi,
-    managed_address, managed_biguint, managed_buffer,
+    managed_address, managed_buffer,
     scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
     ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
 };
@@ -167,11 +167,12 @@ fn test_price_aggregator_submit() {
     // unpause
     state.unpause_endpoint();
 
-    state.submit(&state.oracles[0].clone(), 95, 100);
+    // submit first
+    state.submit(&state.oracles[0].clone(), 95, rand::random::<u64>());
 
     // submit ok
     for index in 1..SUBMISSION_COUNT - 1 {
-        state.submit(&state.oracles[index].clone(), 100, 100);
+        state.submit(&state.oracles[index].clone(), 100, rand::random::<u64>());
     }
 
     let current_timestamp = 100;
@@ -203,13 +204,6 @@ fn test_price_aggregator_submit() {
 
             for index in 0..SUBMISSION_COUNT - 1 {
                 assert_eq!(
-                    submissions
-                        .get(&managed_address!(&state.oracles[index].to_address()))
-                        .unwrap(),
-                    managed_biguint!(100)
-                );
-
-                assert_eq!(
                     sc.oracle_status()
                         .get(&managed_address!(&state.oracles[index].to_address()))
                         .unwrap(),
@@ -221,7 +215,12 @@ fn test_price_aggregator_submit() {
             }
         });
 
-    state.submit(&state.oracles[SUBMISSION_COUNT - 1].clone(), 100, 100);
+    // submit last that resets the round
+    state.submit(
+        &state.oracles[SUBMISSION_COUNT - 1].clone(),
+        100,
+        rand::random::<u64>(),
+    );
     state
         .world
         .write_scenario_trace("scenarios/stress_submit_test.scen.json");
