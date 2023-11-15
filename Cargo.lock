@@ -1327,8 +1327,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be4136b2a15dd319360be1c07d9933517ccf0be8f16bf62a3bee4f0d618df427"
 dependencies = [
  "cfg-if",
+ "js-sys",
  "libc",
  "wasi",
+ "wasm-bindgen",
 ]
 
 [[package]]
@@ -1987,6 +1989,7 @@ name = "multiversx-price-aggregator-sc"
 version = "0.44.0"
 dependencies = [
  "arrayvec",
+ "getrandom",
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
