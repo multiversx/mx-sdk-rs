@@ -183,7 +183,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         arguments: Vec<Vec<u8>>,
     ) {
         let async_call_data = self.create_async_call_data(to, egld_value, func_name, arguments);
-        let mut tx_input = async_call_tx_input(&async_call_data, CallType::DirectCall);
+        let mut tx_input = async_call_tx_input(&async_call_data, CallType::TransferExecute);
         if self.is_back_transfer(&tx_input) {
             tx_input.call_type = CallType::BackTransfer;
         }
