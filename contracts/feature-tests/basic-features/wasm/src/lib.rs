@@ -5,10 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          360
+// Endpoints:                          368
 // Async Callback:                       1
-// Total number of exported functions: 362
-
+// Total number of exported functions: 370
 
 #![no_std]
 
