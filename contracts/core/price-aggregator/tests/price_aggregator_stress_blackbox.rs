@@ -220,6 +220,8 @@ fn test_price_aggregator_submit() {
                 );
             }
         });
+
+    state.submit(&state.oracles[SUBMISSION_COUNT - 1].clone(), 100, 100);
     state
         .world
         .write_scenario_trace("scenarios/stress_submit_test.scen.json");

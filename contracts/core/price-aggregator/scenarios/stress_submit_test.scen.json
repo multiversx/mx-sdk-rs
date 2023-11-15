@@ -2354,6 +2354,29 @@
                 "status": "0",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "",
+            "tx": {
+                "from": "address:oracle50",
+                "to": "sc:price-aggregator",
+                "function": "submit",
+                "arguments": [
+                    "0x45474c44",
+                    "0x55534443",
+                    "0x64",
+                    "0x64",
+                    "0x"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": ""
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "refund": "*"
+            }
         }
     ]
 }
