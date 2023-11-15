@@ -95,7 +95,7 @@
             },
             "expect": {
                 "out": [
-                    "0x80"
+                    "-2"
                 ],
                 "status": "0",
                 "logs": "*",
@@ -179,7 +179,7 @@
             },
             "expect": {
                 "out": [
-                    "0x8000"
+                    "-2"
                 ],
                 "status": "0",
                 "logs": "*",
@@ -263,7 +263,7 @@
             },
             "expect": {
                 "out": [
-                    "0x80000000"
+                    "-2"
                 ],
                 "status": "0",
                 "logs": "*",
@@ -347,7 +347,91 @@
             },
             "expect": {
                 "out": [
-                    "0x8000000000000000"
+                    "-2"
+                ],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "usize",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "usize",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:panic occurred",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "usize_overflow",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "usize_overflow",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "isize",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "isize",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "status": "4",
+                "message": "str:panic occurred",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "isize_overflow",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "isize_overflow",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "-2"
                 ],
                 "status": "0",
                 "logs": "*",

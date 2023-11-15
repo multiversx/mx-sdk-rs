@@ -61,55 +61,55 @@ pub trait SmallIntOverflow {
     #[endpoint]
     #[allow(arithmetic_overflow)]
     fn isize(&self) -> isize {
-        isize::MAX + 1
+        isize::MAX + isize::MAX
     }
 
     #[endpoint]
     #[allow(arithmetic_overflow)]
     fn i8(&self) -> i8 {
-        i8::MAX + 1
+        i8::MAX + i8::MAX
     }
 
     #[endpoint]
     #[allow(arithmetic_overflow)]
     fn i16(&self) -> i16 {
-        i16::MAX + 1
+        i16::MAX + i16::MAX
     }
 
     #[endpoint]
     #[allow(arithmetic_overflow)]
     fn i32(&self) -> i32 {
-        i32::MAX + 1
+        i32::MAX + i32::MAX
     }
 
     #[endpoint]
     #[allow(arithmetic_overflow)]
     fn i64(&self) -> i64 {
-        i64::MAX + 1
+        i64::MAX + i64::MAX
     }
 
     #[endpoint]
     fn isize_overflow(&self) -> isize {
-        isize::MAX.wrapping_add(1)
+        isize::MAX.wrapping_add(isize::MAX)
     }
 
     #[endpoint]
     fn i8_overflow(&self) -> i8 {
-        i8::MAX.wrapping_add(1)
+        i8::MAX.wrapping_add(i8::MAX)
     }
 
     #[endpoint]
     fn i16_overflow(&self) -> i16 {
-        i16::MAX.wrapping_add(1)
+        i16::MAX.wrapping_add(i16::MAX)
     }
 
     #[endpoint]
     fn i32_overflow(&self) -> i32 {
-        i32::MAX.wrapping_add(1)
+        i32::MAX.wrapping_add(i32::MAX)
     }
 
     #[endpoint]
     fn i64_overflow(&self) -> i64 {
-        i64::MAX.wrapping_add(1)
+        i64::MAX.wrapping_add(i64::MAX)
     }
 }
