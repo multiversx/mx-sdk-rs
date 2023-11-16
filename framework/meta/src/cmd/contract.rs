@@ -2,6 +2,8 @@ mod generate_snippets;
 mod meta_abi;
 mod meta_config;
 pub mod sc_config;
+pub mod wasm_cargo_toml_data;
+pub mod wasm_cargo_toml_generate;
 
 use std::path::Path;
 
@@ -48,10 +50,8 @@ where
 {
     let original_contract_abi = <AbiObj as ContractAbiProvider>::abi();
 
-    let sc_config = ScConfig::load_from_crate_or_default(
-        contract_crate_path,
-        &original_contract_abi,
-    );
+    let sc_config =
+        ScConfig::load_from_crate_or_default(contract_crate_path, &original_contract_abi);
     sc_config.validate_contract_variants();
     sc_config
 }

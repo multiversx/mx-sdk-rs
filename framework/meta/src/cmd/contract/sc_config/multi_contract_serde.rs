@@ -51,9 +51,33 @@ pub struct ContractVariantSerde {
 
     #[serde(default)]
     pub kill_legacy_callback: bool,
+
+    #[serde(default)]
+    pub contract_variant_profile: Option<ContractVariantProfile>,
 }
 
 #[derive(Deserialize, Default, Debug)]
 pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
+}
+
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+pub struct ContractVariantProfile {
+    pub codegen_units: u8,
+    pub opt_level: String,
+    pub lto: bool,
+    pub debug: bool,
+    pub panic: String,
+}
+
+impl Default for ContractVariantProfile {
+    fn default() -> ContractVariantProfile {
+        ContractVariantProfile {
+            codegen_units: 1u8,
+            opt_level: "z".to_owned(),
+            lto: true,
+            debug: false,
+            panic: "abort".to_owned(),
+        }
+    }
 }
