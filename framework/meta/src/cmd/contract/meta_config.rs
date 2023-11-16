@@ -14,6 +14,7 @@ const SNIPPETS_RELATIVE_PATH: &str = "../interact-rs";
 const WASM_LIB_PATH: &str = "../wasm/src/lib.rs";
 const WASM_NO_MANAGED_EI: &str = "wasm-no-managed-ei";
 const WASM_NO_MANAGED_EI_LIB_PATH: &str = "../wasm-no-managed-ei/src/lib.rs";
+const FRAMEWORK_NAME_BASE: &str = "multiversx-sc";
 
 pub struct MetaConfig {
     pub load_abi_git_version: bool,
@@ -62,8 +63,8 @@ impl MetaConfig {
                 name: contract.wasm_crate_name.clone(),
                 edition: main_cargo_toml_contents.package_edition(),
                 profile: contract.settings.contract_variant_profile.clone(),
-                framework_version: main_cargo_toml_contents.mvx_dependency_version(),
-                framework_path: main_cargo_toml_contents.mvx_dependency_path(),
+                framework_version: main_cargo_toml_contents.dependency_version(FRAMEWORK_NAME_BASE),
+                framework_path: main_cargo_toml_contents.dependency_path(FRAMEWORK_NAME_BASE),
                 contract_features: contract.settings.features.clone(),
             };
             generate_wasm_cargo_toml(&cargo_toml_data, crate_name.as_str())

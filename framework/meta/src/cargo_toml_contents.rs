@@ -19,8 +19,6 @@ const AUTO_GENERATED: &str =
 
 ";
 
-const FRAMEWORK_NAME_BASE: &str = "multiversx-sc";
-
 /// Contains an in-memory representation of a Cargo.toml file.
 ///
 /// Implementation notes:
@@ -33,7 +31,7 @@ pub struct CargoTomlContents {
     pub toml_value: toml::Value,
     pub prepend_auto_generated_comment: bool,
 }
-//add bool => if bool true => attach auto generated
+
 impl CargoTomlContents {
     pub fn load_from_file<P: AsRef<Path>>(path: P) -> Self {
         let path_ref = path.as_ref();
@@ -92,8 +90,8 @@ impl CargoTomlContents {
             .to_string()
     }
 
-    pub fn mvx_dependency_version(&self) -> String {
-        let toml_value = self.dependency(FRAMEWORK_NAME_BASE).unwrap().to_owned();
+    pub fn dependency_version(&self, crate_name: &str) -> String {
+        let toml_value = self.dependency(crate_name).unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(version) = table.get("version") {
@@ -103,8 +101,8 @@ impl CargoTomlContents {
         panic!("could not find multiversx-sc dependency version in cargo toml")
     }
 
-    pub fn mvx_dependency_path(&self) -> Option<String> {
-        let toml_value = self.dependency(FRAMEWORK_NAME_BASE).unwrap().to_owned();
+    pub fn dependency_path(&self, crate_name: &str) -> Option<String> {
+        let toml_value = self.dependency(crate_name).unwrap().to_owned();
 
         if let Value::Table(table) = toml_value {
             if let Some(path) = table.get("path") {
@@ -169,9 +167,9 @@ impl CargoTomlContents {
             .expect("malformed crate Cargo.toml")
     }
 
-    pub fn add_lib(&mut self) {
+    pub fn add_crate_type(&mut self, crate_type: &str) {
         let mut value = toml::map::Map::new();
-        let array = vec![toml::Value::String("cdylib".to_string())];
+        let array = vec![toml::Value::String(crate_type.to_string())];
         let members = toml::Value::Array(array);
         value.insert("crate-type".to_string(), members);
 

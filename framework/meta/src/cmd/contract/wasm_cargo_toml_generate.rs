@@ -2,6 +2,7 @@ use super::wasm_cargo_toml_data::WasmCargoTomlData;
 use crate::{cargo_toml_contents::change_from_base_to_adapter_path, CargoTomlContents};
 
 const WASM_ADAPTER: &str = "multiversx-sc-wasm-adapter";
+const CDYLIB_CRATE_TYPE: &str = "cdylib";
 
 pub fn generate_wasm_cargo_toml(
     cargo_toml_data: &WasmCargoTomlData,
@@ -9,6 +10,10 @@ pub fn generate_wasm_cargo_toml(
 ) -> CargoTomlContents {
     let mut new_cargo = CargoTomlContents::new();
 
+    //set cargo toml prepend auto generate status
+    new_cargo.prepend_auto_generated_comment = true;
+
+    //add package info
     new_cargo.add_package_info(
         &cargo_toml_data.name,
         "0.0.0".to_string(),
@@ -16,11 +21,8 @@ pub fn generate_wasm_cargo_toml(
         false,
     );
 
-    //set cargo toml prepend auto generate status
-    new_cargo.prepend_auto_generated_comment = true;
-
-    //add lib
-    new_cargo.add_lib();
+    //add crate type
+    new_cargo.add_crate_type(CDYLIB_CRATE_TYPE);
 
     //add profile
     new_cargo.add_contract_variant_profile(&cargo_toml_data.profile);
