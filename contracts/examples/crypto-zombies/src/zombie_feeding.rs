@@ -55,10 +55,10 @@ pub trait ZombieFeeding:
     }
 
     #[endpoint]
-    fn feed_on_kitty(&self, zombie_id: usize, kitty_id: usize) {
+    fn feed_on_kitty(&self, zombie_id: usize, kitty_id: u32) {
         let crypto_kitties_sc_address = self.crypto_kitties_sc_address().get();
         self.kitty_proxy(crypto_kitties_sc_address)
-            .get_kitty_by_id_endpoint(kitty_id as u32)
+            .get_kitty_by_id_endpoint(kitty_id)
             .async_call()
             .with_callback(self.callbacks().get_kitty_callback(zombie_id))
             .call_and_exit();
