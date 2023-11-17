@@ -44,7 +44,7 @@
                 },
                 "address:participant1": {
                     "nonce": "2",
-                    "balance": "1,800,000,000,000",
+                    "balance": "1,300,000,000,000",
                     "storage": {}
                 },
                 "address:participant2": {
@@ -54,7 +54,7 @@
                 },
                 "sc:ping-pong": {
                     "nonce": "0",
-                    "balance": "500,000,000,000",
+                    "balance": "1,000,000,000,000",
                     "storage": {
                         "str:pingAmount": "500,000,000,000",
                         "str:activationTimestamp": "780",

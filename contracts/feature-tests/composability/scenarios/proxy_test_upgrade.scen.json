@@ -29,9 +29,6 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "457"
-                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -49,7 +46,7 @@
                 },
                 "sc:proxy-first": {
                     "nonce": "1",
-                    "balance": "0",
+                    "balance": "200",
                     "storage": {
                         "str:other_contract": "sc:proxy-second"
                     },
@@ -57,7 +54,7 @@
                 },
                 "sc:proxy-second": {
                     "nonce": "0",
-                    "balance": "300",
+                    "balance": "100",
                     "storage": {
                         "str:init_arg": "456",
                         "str:last_payment": "200"

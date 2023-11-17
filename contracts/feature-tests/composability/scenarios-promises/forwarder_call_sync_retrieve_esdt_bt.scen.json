@@ -29,7 +29,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_sync_retrieve_funds",
+                "function": "forward_sync_retrieve_funds_bt",
                 "arguments": [
                     "sc:vault",
                     "str:TEST-TOKENA",
@@ -89,7 +89,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_sync_retrieve_funds",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt",
                         "topics": [
                             "str:back_tranfers",
                             "0",
