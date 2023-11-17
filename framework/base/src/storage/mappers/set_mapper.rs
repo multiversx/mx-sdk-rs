@@ -103,6 +103,36 @@ where
         self.get_node_id(value) != NULL_ENTRY
     }
 
+    pub fn next(&self, value: &T) -> Option<T> {
+        let node_id = self.get_node_id(value);
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+
+        let next_node_id = self.queue_mapper.get_node(node_id).next;
+
+        self.queue_mapper.get_value_option(next_node_id)
+    }
+
+    pub fn previous(&self, value: &T) -> Option<T> {
+        let node_id = self.get_node_id(value);
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+
+        let next_node_id = self.queue_mapper.get_node(node_id).previous;
+
+        self.queue_mapper.get_value_option(next_node_id)
+    }
+
+    pub fn front(&self) -> Option<T> {
+        self.queue_mapper.front()
+    }
+
+    pub fn back(&self) -> Option<T> {
+        self.queue_mapper.back()
+    }
+
     /// Adds a value to the set.
     ///
     /// If the set did not have this value present, `true` is returned.
@@ -142,6 +172,11 @@ where
     /// The iterator element type is `&'a T`.
     pub fn iter(&self) -> Iter<SA, T> {
         self.queue_mapper.iter()
+    }
+
+    pub fn iter_from(&self, value: &T) -> Iter<SA, T> {
+        let node_id = self.get_node_id(value);
+        self.queue_mapper.iter_from_node_id(node_id)
     }
 
     /// Checks the internal consistency of the collection. Used for unit tests.

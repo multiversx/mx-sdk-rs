@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          368
+// Endpoints:                          373
 // Async Callback:                       1
-// Total number of exported functions: 370
+// Total number of exported functions: 375
 
 #![no_std]
 
@@ -310,6 +310,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         set_mapper_insert => set_mapper_insert
         set_mapper_contains => set_mapper_contains
         set_mapper_remove => set_mapper_remove
+        set_mapper_front => set_mapper_front
+        set_mapper_back => set_mapper_back
+        set_mapper_next => set_mapper_next
+        set_mapper_previous => set_mapper_previous
+        set_mapper_iter_from_and_count => set_mapper_iter_from_and_count
         map_my_single_value_mapper => map_my_single_value_mapper
         my_single_value_mapper_increment_1 => my_single_value_mapper_increment_1
         my_single_value_mapper_increment_2 => my_single_value_mapper_increment_2
@@ -369,7 +374,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         no_overflow_u8 => no_overflow_u8
         no_overflow_u16 => no_overflow_u16
         no_overflow_u32 => no_overflow_u32
-        u64 => u64
+        no_overflow_u64 => no_overflow_u64
         overflow_usize => overflow_usize
         overflow_u8 => overflow_u8
         overflow_u16 => overflow_u16

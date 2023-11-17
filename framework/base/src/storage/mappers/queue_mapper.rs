@@ -130,7 +130,7 @@ where
         storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
     }
 
-    fn get_node(&self, node_id: u32) -> Node {
+    pub fn get_node(&self, node_id: u32) -> Node {
         storage_get(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
@@ -153,14 +153,14 @@ where
         );
     }
 
-    fn get_value(&self, node_id: u32) -> T {
+    pub fn get_value(&self, node_id: u32) -> T {
         storage_get(
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_ref(),
         )
     }
 
-    fn get_value_option(&self, node_id: u32) -> Option<T> {
+    pub fn get_value_option(&self, node_id: u32) -> Option<T> {
         if node_id == NULL_ENTRY {
             return None;
         }
@@ -333,6 +333,10 @@ where
         Iter::new(self)
     }
 
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T> {
+        Iter::new_from_node_id(self, node_id)
+    }
+
     /// Runs several checks in order to verify that both forwards and backwards iteration
     /// yields the same node entries and that the number of items in the queue is correct.
     /// Used for unit testing.
@@ -442,6 +446,10 @@ where
             node_id: queue.get_info().front,
             queue,
         }
+    }
+
+    fn new_from_node_id(queue: &'a QueueMapper<SA, T>, node_id: u32) -> Iter<'a, SA, T> {
+        Iter { node_id, queue }
     }
 }
 
