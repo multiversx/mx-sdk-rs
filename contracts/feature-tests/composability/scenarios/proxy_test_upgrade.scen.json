@@ -56,7 +56,7 @@
                     "nonce": "0",
                     "balance": "100",
                     "storage": {
-                        "str:init_arg": "123",
+                        "str:init_arg": "456",
                         "str:last_payment": "100"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
