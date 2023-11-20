@@ -1,5 +1,7 @@
+use alloc::string::ToString;
+
 use crate::{
-    abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, OutputAbis, TypeAbi},
+    abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, TypeAbi},
     api::{
         const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApiImpl, StorageWriteApiImpl,
         VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
@@ -29,26 +31,26 @@ where
 
 /// The definition for the external view
 pub fn external_view_contract_constructor_abi() -> EndpointAbi {
-    EndpointAbi {
-        docs: &[
+    let mut endpoint_abi = EndpointAbi::new(
+        &[
             "The external view init prepares a contract that looks in another contract's storage.",
             "It takes a single argument, the other contract's address",
             "You won't find this constructors' definition in the contract, it gets injected automatically by the framework. See `multiversx_sc::external_view_contract`.",
             ],
-        name: "init",
-        rust_method_name: EXTERNAL_VIEW_CONSTRUCTOR_FLAG,
-        only_owner: false,
-        only_admin: false,
-        labels: &[],
-        mutability: EndpointMutabilityAbi::Mutable,
-        endpoint_type: EndpointTypeAbi::Init,
-        payable_in_tokens: &[],
-        inputs: [InputAbi{
-            arg_name: "target_contract_address",
-            type_name: crate::types::heap::Address::type_name(),
-            multi_arg: false,
-        }].to_vec(),
-        outputs: OutputAbis::new(),
-        allow_multiple_var_args: false
-    }
+        "init",
+        EXTERNAL_VIEW_CONSTRUCTOR_FLAG,
+        false,
+        false,
+        EndpointMutabilityAbi::Mutable,
+        EndpointTypeAbi::Init,
+        &[],
+        &[],
+        false
+    );
+    endpoint_abi.inputs.push(InputAbi {
+        arg_name: "target_contract_address".to_string(),
+        type_name: crate::types::heap::Address::type_name(),
+        multi_arg: false,
+    });
+    endpoint_abi
 }

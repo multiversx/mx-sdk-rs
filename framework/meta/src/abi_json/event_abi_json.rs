@@ -5,9 +5,12 @@ use serde::{Deserialize, Serialize};
 pub struct EventInputAbiJson {
     #[serde(rename = "name")]
     pub arg_name: String,
+
     #[serde(rename = "type")]
     pub type_name: String,
+
     /// Bool that is only serialized when true
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub indexed: Option<bool>,
 }
@@ -24,6 +27,7 @@ impl From<&EventInputAbi> for EventInputAbiJson {
 
 #[derive(Serialize, Deserialize)]
 pub struct EventAbiJson {
+    #[serde(default)]
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub docs: Vec<String>,
     pub identifier: String,

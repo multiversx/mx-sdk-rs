@@ -65,12 +65,12 @@ mod tests {
     fn validate_endpoint_var_args_number_test() {
         let mut endpoint_def = EndpointAbi::default();
         let var_arg_1 = InputAbi {
-            arg_name: "arg_1",
+            arg_name: "arg_1".to_string(),
             type_name: TypeName::new(),
             multi_arg: true,
         };
         let var_arg_2 = InputAbi {
-            arg_name: "arg_2",
+            arg_name: "arg_2".to_string(),
             type_name: TypeName::new(),
             multi_arg: true,
         };
@@ -90,12 +90,12 @@ mod tests {
     fn validate_endpoint_var_args_order_test() {
         let mut endpoint_def = EndpointAbi::default();
         let arg = InputAbi {
-            arg_name: "arg_1",
+            arg_name: "arg_1".to_string(),
             type_name: TypeName::new(),
             multi_arg: false,
         };
         let var_arg_1 = InputAbi {
-            arg_name: "arg_2",
+            arg_name: "arg_2".to_string(),
             type_name: TypeName::new(),
             multi_arg: true,
         };
