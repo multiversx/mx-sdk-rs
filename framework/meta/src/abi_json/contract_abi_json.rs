@@ -20,6 +20,7 @@ pub struct ContractAbiJson {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub constructor: Option<ConstructorAbiJson>,
 
+    #[serde(default)]
     pub endpoints: Vec<EndpointAbiJson>,
 
     #[serde(default)]
@@ -30,8 +31,13 @@ pub struct ContractAbiJson {
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub events: Vec<EventAbiJson>,
 
+    #[serde(default)]
     pub esdt_attributes: Vec<EsdtAttributeJson>,
+
+    #[serde(default)]
     pub has_callback: bool,
+
+    #[serde(default)]
     pub types: BTreeMap<String, TypeDescriptionJson>,
 }
 
@@ -87,4 +93,16 @@ pub fn serialize_abi_to_json(abi_json: &ContractAbiJson) -> String {
 
 pub fn deserialize_abi_from_json(input: &str) -> Result<ContractAbiJson, String> {
     serde_json::from_str(input).map_err(|err| err.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    const MINIMAL_ABI_JSON: &str = r#"{
+        "name": "Minimal"
+    }"#;
+
+    #[test]
+    fn decode_minimal_contract_abi() {
+        super::deserialize_abi_from_json(MINIMAL_ABI_JSON).unwrap();
+    }
 }
