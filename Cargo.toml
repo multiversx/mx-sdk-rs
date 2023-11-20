@@ -4,6 +4,7 @@ resolver = "2"
 members = [
   "data/codec",
   "data/codec-derive",
+  "data/human-readable",
 
   "framework/base",
   "framework/derive",
