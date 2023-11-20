@@ -19,6 +19,7 @@ pub struct ContractAbi {
 }
 
 impl ContractAbi {
+    /// Used in code generation.
     pub fn new(build_info: BuildInfoAbi, docs: &[&str], name: &str, has_callback: bool) -> Self {
         ContractAbi {
             build_info,

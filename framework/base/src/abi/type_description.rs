@@ -23,6 +23,7 @@ impl TypeDescription {
 }
 
 impl TypeDescription {
+    /// Used in code generation.
     pub fn new(docs: &[&str], name: String, contents: TypeContents) -> Self {
         TypeDescription {
             docs: docs.iter().map(|s| s.to_string()).collect(),
@@ -55,6 +56,9 @@ pub struct EnumVariantDescription {
 }
 
 impl EnumVariantDescription {
+    /// Used in code generation.
+    ///
+    /// TODO: builder pattern for more elegant code.
     pub fn new(
         docs: &[&str],
         name: &str,
@@ -78,6 +82,7 @@ pub struct StructFieldDescription {
 }
 
 impl StructFieldDescription {
+    /// Used in code generation.
     pub fn new(docs: &[&str], name: &str, field_type: String) -> Self {
         Self {
             docs: docs.iter().map(|s| s.to_string()).collect(),
@@ -99,6 +104,7 @@ pub struct ExplicitEnumVariantDescription {
 }
 
 impl ExplicitEnumVariantDescription {
+    /// Used in code generation.
     pub fn new(docs: &[&str], name: &str) -> Self {
         Self {
             docs: docs.iter().map(|s| s.to_string()).collect(),

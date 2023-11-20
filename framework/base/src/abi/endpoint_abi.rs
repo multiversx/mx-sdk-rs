@@ -54,6 +54,9 @@ pub struct EndpointAbi {
 }
 
 impl EndpointAbi {
+    /// Used in code generation.
+    ///
+    /// TODO: replace with builder pattern to gt rid of the too many arguments.
     #[allow(clippy::too_many_arguments)]
     pub fn new(
         docs: &[&str],

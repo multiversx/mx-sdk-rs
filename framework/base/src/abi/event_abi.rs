@@ -19,6 +19,7 @@ pub struct EventAbi {
 }
 
 impl EventAbi {
+    /// Used in code generation.
     pub fn new(docs: &[&str], identifier: &str) -> Self {
         EventAbi {
             docs: docs.iter().map(|s| s.to_string()).collect(),
@@ -27,6 +28,7 @@ impl EventAbi {
         }
     }
 
+    /// Used in code generation.
     pub fn add_input<T: TypeAbi>(&mut self, arg_name: &str, indexed: bool) {
         self.inputs.push(EventInputAbi {
             arg_name: arg_name.to_string(),
