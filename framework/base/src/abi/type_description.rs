@@ -1,4 +1,7 @@
-use alloc::{string::String, vec::Vec};
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
 
 #[derive(Clone, Debug)]
 pub struct TypeDescription {
@@ -33,7 +36,7 @@ impl TypeContents {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct EnumVariantDescription {
     pub docs: &'static [&'static str],
     pub name: &'static str,
@@ -41,11 +44,21 @@ pub struct EnumVariantDescription {
     pub fields: Vec<StructFieldDescription>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StructFieldDescription {
     pub docs: &'static [&'static str],
-    pub name: &'static str,
+    pub name: String,
     pub field_type: String,
+}
+
+impl StructFieldDescription {
+    pub fn new(docs: &'static [&'static str], name: &str, field_type: String) -> Self {
+        Self {
+            docs,
+            name: name.to_string(),
+            field_type,
+        }
+    }
 }
 
 /// An explicit enum is an enum that gets serialized by name instead of discriminant.
