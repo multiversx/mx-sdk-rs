@@ -20,7 +20,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "egldValue": "200",
+                "egldValue": "0",
                 "function": "upgradeSecondContract",
                 "arguments": [
                     "file:../proxy-test-second/output/proxy-test-second.wasm"
@@ -40,13 +40,13 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "2",
-                    "balance": "0",
+                    "balance": "200",
                     "storage": {},
                     "code": ""
                 },
                 "sc:proxy-first": {
                     "nonce": "1",
-                    "balance": "200",
+                    "balance": "0",
                     "storage": {
                         "str:other_contract": "sc:proxy-second"
                     },
@@ -56,8 +56,8 @@
                     "nonce": "0",
                     "balance": "100",
                     "storage": {
-                        "str:init_arg": "456",
-                        "str:last_payment": "200"
+                        "str:init_arg": "123",
+                        "str:last_payment": "100"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }

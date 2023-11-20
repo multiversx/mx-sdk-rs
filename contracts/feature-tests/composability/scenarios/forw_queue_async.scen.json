@@ -71,9 +71,8 @@
                         "address": "*",
                         "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "sc:forwarder-queue",
-                            "sc:vault",
-                            "1000"
+                            "1000",
+                            "sc:vault"
                         ],
                         "data": "*"
                     },
