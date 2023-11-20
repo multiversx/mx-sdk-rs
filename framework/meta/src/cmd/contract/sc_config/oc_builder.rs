@@ -94,8 +94,8 @@ impl ContractVariantBuilder {
     }
 
     fn collect_endpoint(&mut self, endpoint_abi: &EndpointAbi) {
-        if !self.endpoint_names.contains(endpoint_abi.name) {
-            self.endpoint_names.insert(endpoint_abi.name.to_string());
+        if !self.endpoint_names.contains(&endpoint_abi.name) {
+            self.endpoint_names.insert(endpoint_abi.name.clone());
             self.collected_endpoints.push(endpoint_abi.clone());
         }
     }
@@ -124,7 +124,7 @@ fn endpoint_matches_labels(endpoint_abi: &EndpointAbi, labels: &BTreeSet<String>
     endpoint_abi
         .labels
         .iter()
-        .any(|&endpoint_label| labels.contains(endpoint_label))
+        .any(|endpoint_label| labels.contains(endpoint_label))
 }
 
 fn collect_unlabelled_endpoints(
@@ -161,7 +161,7 @@ fn collect_add_endpoints(
 ) {
     for builder in contract_builders.values_mut() {
         for endpoint_abi in original_abi.iter_all_exports() {
-            if builder.add_endpoints.contains(endpoint_abi.name) {
+            if builder.add_endpoints.contains(&endpoint_abi.name) {
                 builder.collect_endpoint(endpoint_abi);
             }
         }
@@ -186,8 +186,8 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
         && !builder.settings.kill_legacy_callback;
     ContractAbi {
         build_info: original_abi.build_info.clone(),
-        docs: original_abi.docs,
-        name: original_abi.name,
+        docs: original_abi.docs.clone(),
+        name: original_abi.name.clone(),
         constructors,
         endpoints,
         promise_callbacks,

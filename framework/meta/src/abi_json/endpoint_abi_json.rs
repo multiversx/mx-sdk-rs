@@ -42,7 +42,7 @@ pub struct OutputAbiJson {
 impl From<&OutputAbi> for OutputAbiJson {
     fn from(abi: &OutputAbi) -> Self {
         OutputAbiJson {
-            output_name: abi.output_name.into(),
+            output_name: abi.output_name.clone(),
             type_name: abi.type_name.clone(),
             multi_result: if abi.multi_result { Some(true) } else { None },
         }
@@ -142,7 +142,7 @@ impl From<&EndpointAbi> for EndpointAbiJson {
                 .collect(),
             inputs: abi.inputs.iter().map(InputAbiJson::from).collect(),
             outputs: abi.outputs.iter().map(OutputAbiJson::from).collect(),
-            labels: abi.labels.iter().map(|&label| label.to_owned()).collect(),
+            labels: abi.labels.clone(),
             allow_multiple_var_args: if abi.allow_multiple_var_args {
                 Some(true)
             } else {

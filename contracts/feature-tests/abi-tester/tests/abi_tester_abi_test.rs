@@ -100,8 +100,8 @@ fn abi_deserialization_check() {
         assert_eq!(
             variants[0],
             EnumVariantDescription {
-                docs: &[],
-                name: "",
+                docs: vec![],
+                name: "Nothing".to_string(),
                 discriminant: 0,
                 fields: vec![]
             }

@@ -70,7 +70,7 @@ impl From<&TypeDescription> for TypeDescriptionJson {
 impl TypeDescriptionJson {
     pub fn to_type_description(&self, name: &str) -> TypeDescription {
         TypeDescription {
-            docs: &[],
+            docs: self.docs.clone(),
             name: name.to_string(),
             contents: match self.content_type.as_str() {
                 TYPE_DESCRIPTION_JSON_TYPE_STRUCT => TypeContents::Struct(
@@ -116,7 +116,7 @@ impl From<&StructFieldDescription> for StructFieldDescriptionJson {
 impl StructFieldDescriptionJson {
     pub fn to_struct_field_description(&self) -> StructFieldDescription {
         StructFieldDescription {
-            docs: &[],
+            docs: self.docs.clone(),
             name: self.name.clone(),
             field_type: self.field_type.clone(),
         }
@@ -169,9 +169,9 @@ impl From<&ExplicitEnumVariantDescription> for EnumVariantDescriptionJson {
 impl EnumVariantDescriptionJson {
     pub fn to_enum_variant_description(&self) -> EnumVariantDescription {
         EnumVariantDescription {
-            docs: &[],
+            docs: self.docs.clone(),
             discriminant: self.discriminant.unwrap_or_default(),
-            name: "",
+            name: self.name.clone(),
             fields: self
                 .fields
                 .iter()

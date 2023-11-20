@@ -52,11 +52,11 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                         #(#struct_field_snippets)*
                         accumulator.insert(
                             type_name.clone(),
-                            multiversx_sc::abi::TypeDescription {
-                                docs: &[ #(#type_docs),* ],
-                                name: type_name,
-                                contents: multiversx_sc::abi::TypeContents::Struct(field_descriptions),
-                            },
+                            multiversx_sc::abi::TypeDescription::new(
+                                &[ #(#type_docs),* ],
+                                type_name,
+                                multiversx_sc::abi::TypeContents::Struct(field_descriptions),
+                            ),
                         );
                     }
                 }
@@ -74,12 +74,12 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     quote! {
                         let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#variant_field_snippets)*
-                        variant_descriptions.push(multiversx_sc::abi::EnumVariantDescription {
-                            docs: &[ #(#variant_docs),* ],
-                            discriminant: #variant_index,
-                            name: #variant_name_str,
-                            fields: field_descriptions,
-                        });
+                        variant_descriptions.push(multiversx_sc::abi::EnumVariantDescription::new(
+                            &[ #(#variant_docs),* ],
+                            #variant_name_str,
+                            #variant_index,
+                            field_descriptions,
+                        ));
                     }
                 })
                 .collect();
@@ -92,11 +92,11 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                         #(#enum_variant_snippets)*
                         accumulator.insert(
                             type_name.clone(),
-                            multiversx_sc::abi::TypeDescription {
-                                docs: &[ #(#type_docs),* ],
-                                name: type_name,
-                                contents: multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
-                            },
+                            multiversx_sc::abi::TypeDescription::new(
+                                &[ #(#type_docs),* ],
+                                type_name,
+                                multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
+                            ),
                         );
                     }
                 }
