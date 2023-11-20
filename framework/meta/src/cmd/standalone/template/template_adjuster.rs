@@ -10,7 +10,6 @@ use toml::value::Table;
 const TEST_DIRECTORY: &str = "./tests";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
-const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
 
 pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
@@ -20,7 +19,6 @@ pub struct TemplateAdjuster {
 impl TemplateAdjuster {
     pub fn update_dependencies(&self) {
         self.update_dependencies_root();
-        self.update_dependencies_wasm();
         self.update_dependencies_meta();
     }
 
@@ -39,17 +37,6 @@ impl TemplateAdjuster {
 
     fn update_dependencies_meta(&self) {
         let cargo_toml_path = self.target.contract_dir().join(META_CARGO_TOML);
-        let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
-
-        if !self.keep_paths {
-            remove_paths_from_deps(&mut toml, &[&self.metadata.name]);
-        }
-
-        toml.save_to_file(&cargo_toml_path);
-    }
-
-    fn update_dependencies_wasm(&self) {
-        let cargo_toml_path = self.target.contract_dir().join(WASM_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
