@@ -28,8 +28,12 @@ build_and_copy_with_scenarios() {
    rm -rf $vm_contract_path/scenarios
    cp $contract_path/output/*.wasm \
       $vm_contract_path/output
-   cp -R $contract_path/scenarios \
-      $vm_contract_path
+
+   # copying scenarios ...
+   rsync -av \
+      --exclude *_generated* \
+      $contract_path/scenarios/ \
+      $vm_contract_path/scenarios/
 }
 
 # building all contracts takes a lot of time, only the ones for the wasm-vm tests are built below
