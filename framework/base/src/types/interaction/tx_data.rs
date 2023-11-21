@@ -104,7 +104,7 @@ where
     }
 
     fn get_code(&self) -> ManagedBuffer<Env::Api> {
-        self.code
+        self.code.clone()
     }
 
     fn get_metadata(&self) -> CodeMetadata {
@@ -112,7 +112,7 @@ where
     }
 
     fn get_args(&self) -> ManagedArgBuffer<Env::Api> {
-        self.arg_buffer
+        self.arg_buffer.clone()
     }
 }
 

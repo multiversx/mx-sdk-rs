@@ -437,13 +437,19 @@ where
             env: self.env,
             from: self.from,
             to: self.to,
-            payment: self.payment,
+            payment: self.payment, //this should be egld payment only
             gas: self.gas,
             data: TxDataDeploy::new(code, metadata, arg_buffer),
             callback: self.callback,
         }
     }
+}
 
+impl<Env, Gas> Tx<Env, (), (), EgldPayment<Env::Api>, Gas, TxDataDeploy<Env>, ()>
+where
+    Env: TxEnv,
+    Gas: TxGas<Env>,
+{
     pub fn execute_deploy(
         &self,
     ) -> (
@@ -453,7 +459,7 @@ where
         let wrap = SendRawWrapper::<Env::Api>::new();
         wrap.deploy_contract(
             self.gas.resolve_gas(&self.env),
-            &self.payment,
+            &self.payment.value,
             &self.data.get_code(),
             self.data.get_metadata(),
             &self.data.get_args(),
