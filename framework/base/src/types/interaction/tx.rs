@@ -4,7 +4,7 @@ use multiversx_sc_codec::TopEncodeMulti;
 
 use crate::{
     api::CallTypeApi,
-    contract_base::BlockchainWrapper,
+    contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
         BigUint, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
         MultiEsdtPayment,
@@ -418,3 +418,58 @@ where
         }
     }
 }
+
+// impl<Env, From, To, Payment, Gas> Tx<Env, From, To, EgldPayment<Env>, Gas, (), ()>
+// where
+//     Env: TxEnv,
+//     From: TxFrom<Env>,
+//     To: TxTo<Env>,
+//     Payment: TxPayment<Env>,
+//     Gas: TxGas<Env>,
+// {
+//     pub fn deploy(self) -> Tx<Env, From, To, Payment, Gas, Data, Callback>, 
+//     where Data:TxData<Env>, Callback: TxCallBack<Env> {
+//         Tx {
+//             env: self.env,
+//             from: self.from,
+//             to: self.to,
+//             payment: self.payment,
+//             gas: self.gas,
+//             data: TxData::Deploy,
+//             callback: self.callback,
+//         }
+//     }
+// }
+
+// impl <Env, From, To, Payment, Gas> Tx<Env, From, To, EgldPayment<Env>, Gas, (), ()> {
+//     pub fn execute_deploy(
+//         &self,
+//         code: ManagedBuffer,
+//         code_metadata: CodeMetadata,
+//         arg_buffer: &ManagedArgBuffer<A>,
+//     ) -> (ManagedAddress<A>, ManagedVec<A, ManagedBuffer<A>>) {
+//         let wrap = SendRawWrapper<Env>::new();
+//         wrap.deploy_contract(self.gas, self.payment, &code, code_metadata, arg_buffer)
+//     }
+// }
+//imagine deploy function, how it should look like and what it should contain
+
+// impl<Env> TxData<Env>
+// where
+//     Env: TxEnv,
+// {
+// fn deploy(
+//     &self,
+//     env: &Env,
+//     gas: u64,
+//     egld_value_handle: RawHandle,
+//     code_handle: RawHandle,
+//     code_metadata_handle: RawHandle,
+//     arg_buffer_handle: RawHandle,
+//     new_address_handle: RawHandle,
+//     result_handle: RawHandle,
+// ) {
+
+//         crate::api::send_api::deploy_contract(env)
+//     }
+// }
