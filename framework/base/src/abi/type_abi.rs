@@ -1,5 +1,5 @@
 use super::*;
-use alloc::vec::Vec;
+use alloc::{string::ToString, vec::Vec};
 
 pub trait TypeAbi {
     fn type_name() -> TypeName {
@@ -15,7 +15,7 @@ pub trait TypeAbi {
         accumulator.insert(
             type_name,
             TypeDescription {
-                docs: &[],
+                docs: Vec::new(),
                 name: Self::type_name(),
                 contents: TypeContents::NotSpecified,
             },
@@ -43,7 +43,7 @@ pub trait TypeAbi {
             ""
         };
         result.push(OutputAbi {
-            output_name,
+            output_name: output_name.to_string(),
             type_name: Self::type_name(),
             multi_result: Self::is_variadic(),
         });

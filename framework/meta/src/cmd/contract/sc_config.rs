@@ -11,7 +11,7 @@ mod wasm_update;
 
 pub use multi_contract_serde::*;
 pub use oc_builder::*;
-pub use oc_config::OutputContract;
-pub use oc_global_config::OutputContractGlobalConfig;
-pub use oc_settings::OutputContractSettings;
+pub use oc_config::ContractVariant;
+pub use oc_global_config::ScConfig;
+pub use oc_settings::ContractVariantSettings;
 pub use wasm_build::*;

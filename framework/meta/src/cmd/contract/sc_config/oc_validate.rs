@@ -1,16 +1,16 @@
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 
-use super::OutputContract;
+use super::ContractVariant;
 
-pub fn validate_output_contract(output_contract: &OutputContract) -> Result<(), String> {
-    check_single_constructor(output_contract)?;
-    validate_contract_var_args(&output_contract.abi)?;
+pub fn validate_contract_variant(contract_variant: &ContractVariant) -> Result<(), String> {
+    check_single_constructor(contract_variant)?;
+    validate_contract_var_args(&contract_variant.abi)?;
     Ok(())
 }
 
-fn check_single_constructor(output_contract: &OutputContract) -> Result<(), String> {
-    match output_contract.abi.constructors.len() {
-        0 => if has_upgrade(output_contract) {
+fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), String> {
+    match contract_variant.abi.constructors.len() {
+        0 => if has_upgrade(contract_variant) {
             Ok(())
         } else {
             Err("Missing constructor. Add a method annotated with `#[init]`.".to_string())
@@ -20,8 +20,8 @@ fn check_single_constructor(output_contract: &OutputContract) -> Result<(), Stri
     }
 }
 
-fn has_upgrade(output_contract: &OutputContract) -> bool {
-    output_contract
+fn has_upgrade(contract_variant: &ContractVariant) -> bool {
+    contract_variant
         .abi
         .endpoints
         .iter()
@@ -77,12 +77,12 @@ mod tests {
     fn validate_endpoint_var_args_number_test() {
         let mut endpoint_def = EndpointAbi::default();
         let var_arg_1 = InputAbi {
-            arg_name: "arg_1",
+            arg_name: "arg_1".to_string(),
             type_name: TypeName::new(),
             multi_arg: true,
         };
         let var_arg_2 = InputAbi {
-            arg_name: "arg_2",
+            arg_name: "arg_2".to_string(),
             type_name: TypeName::new(),
             multi_arg: true,
         };
@@ -102,12 +102,12 @@ mod tests {
     fn validate_endpoint_var_args_order_test() {
         let mut endpoint_def = EndpointAbi::default();
         let arg = InputAbi {
-            arg_name: "arg_1",
+            arg_name: "arg_1".to_string(),
             type_name: TypeName::new(),
             multi_arg: false,
         };
         let var_arg_1 = InputAbi {
-            arg_name: "arg_2",
+            arg_name: "arg_2".to_string(),
             type_name: TypeName::new(),
             multi_arg: true,
         };
