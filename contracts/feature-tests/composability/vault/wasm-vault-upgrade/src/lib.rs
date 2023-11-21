@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            4
+// Endpoints:                            1
 // Async Callback (empty):               1
-// Total number of exported functions:   6
+// Total number of exported functions:   3
 
 #![no_std]
 
@@ -15,17 +15,13 @@
 // TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
-multiversx_sc_wasm_adapter::allocator!(static64k);
+multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
-    proxy_test_second
+    vault
     (
-        init => init
         upgrade => upgrade
-        payMe => pay_me
-        payMeWithResult => pay_me_with_result_endpoint
-        messageMe => message_me
     )
 }
 
