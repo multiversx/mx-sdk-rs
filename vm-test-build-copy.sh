@@ -31,7 +31,6 @@ build_and_copy_with_scenarios() {
 
    # copying scenarios ...
    rsync -av \
-      --exclude *_generated* \
       $contract_path/scenarios/ \
       $vm_contract_path/scenarios/
 }
