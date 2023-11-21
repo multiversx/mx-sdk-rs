@@ -32,7 +32,7 @@ impl TemplateAdjuster {
             remove_paths_from_deps(&mut toml, &[]);
         }
 
-        toml.insert_default_workspace();
+        toml.add_workspace(&[".", "meta"]);
 
         toml.save_to_file(&cargo_toml_path);
     }

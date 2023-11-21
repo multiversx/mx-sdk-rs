@@ -1,6 +1,9 @@
 use std::{fs, fs::File, io::Write};
 
-use multiversx_sc::contract_base::ContractAbiProvider;
+use multiversx_sc::{
+    abi::{EnumVariantDescription, TypeContents},
+    contract_base::ContractAbiProvider,
+};
 use multiversx_sc_meta::{
     abi_json::{self, EsdtAttributeAbiJson},
     esdt_attr_file_json::serialize_esdt_attribute_json,
@@ -81,4 +84,29 @@ fn check_multi_contract_config() {
         ev_contract.endpoint_names(),
         vec!["external_view", "payable_any_token", "label_a"]
     );
+}
+
+#[test]
+fn abi_deserialization_check() {
+    let main_json = fs::read_to_string("./abi_tester_expected_main.abi.json").unwrap();
+    let main_abi = multiversx_sc_meta::abi_json::deserialize_abi_from_json(&main_json).unwrap();
+    let abi_enum_type = main_abi
+        .types
+        .get("AbiEnum")
+        .unwrap()
+        .to_type_description("AbiEnum");
+    if let TypeContents::Enum(variants) = abi_enum_type.contents {
+        assert_eq!(variants.len(), 4);
+        assert_eq!(
+            variants[0],
+            EnumVariantDescription {
+                docs: vec![],
+                name: "Nothing".to_string(),
+                discriminant: 0,
+                fields: vec![]
+            }
+        );
+    } else {
+        panic!("wrong AbiEnum type contents")
+    }
 }

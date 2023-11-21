@@ -1,13 +1,13 @@
 use std::path::PathBuf;
 
-use super::OutputContractSettings;
+use super::ContractVariantSettings;
 use crate::cli_args::BuildArgs;
 use multiversx_sc::abi::ContractAbi;
 
 /// Represents a contract created by the framework when building.
 ///
 /// It might have only some of the endpoints written by the developer and maybe some other function.
-pub struct OutputContract {
+pub struct ContractVariant {
     /// If it is the main contract, then the wasm crate is called just `wasm`,
     ///and the wasm `Cargo.toml` is provided by the dev.
     pub main: bool,
@@ -28,13 +28,13 @@ pub struct OutputContract {
     pub wasm_crate_name: String,
 
     /// Collection of flags, specified in the multicontract config.
-    pub settings: OutputContractSettings,
+    pub settings: ContractVariantSettings,
 
     /// Filtered and processed ABI of the output contract.
     pub abi: ContractAbi,
 }
 
-impl OutputContract {
+impl ContractVariant {
     pub fn public_name_snake_case(&self) -> String {
         self.contract_name.replace('-', "_")
     }
@@ -56,6 +56,10 @@ impl OutputContract {
 
     pub fn cargo_toml_path(&self) -> String {
         format!("{}/Cargo.toml", &self.wasm_crate_path())
+    }
+
+    pub fn some_other_test_path(&self) -> String {
+        format!("{}/test-Cargo.toml", &self.wasm_crate_path())
     }
 
     pub fn wasm_crate_name_snake_case(&self) -> String {
@@ -158,9 +162,9 @@ impl OutputContract {
     }
 }
 
-impl std::fmt::Debug for OutputContract {
+impl std::fmt::Debug for ContractVariant {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("OutputContract")
+        f.debug_struct("ContractVariant")
             .field("main", &self.main)
             .field("config_name", &self.contract_id)
             .field("public_name", &self.contract_name)

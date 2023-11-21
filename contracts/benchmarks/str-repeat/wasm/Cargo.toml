@@ -1,7 +1,6 @@
 [package]
 name = "str-repeat-wasm"
 version = "0.0.0"
-authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
 publish = false
 

@@ -8,9 +8,11 @@ pub use oc_parse_stack_size::*;
 
 use crate::ei::EIVersion;
 
+use super::ContractVariantProfile;
+
 /// Collection of flags, specified in the multicontract config.
 #[derive(Clone, PartialEq, Eq, Debug)]
-pub struct OutputContractSettings {
+pub struct ContractVariantSettings {
     /// External view contracts are just readers of data from another contract.
     pub external_view: bool,
 
@@ -31,11 +33,13 @@ pub struct OutputContractSettings {
 
     /// Forcibly remove the original contrct legacy callback.
     pub kill_legacy_callback: bool,
+
+    pub contract_variant_profile: ContractVariantProfile,
 }
 
-impl Default for OutputContractSettings {
+impl Default for ContractVariantSettings {
     fn default() -> Self {
-        OutputContractSettings {
+        ContractVariantSettings {
             external_view: Default::default(),
             panic_message: Default::default(),
             check_ei: Some(EIVersion::default()),
@@ -43,6 +47,7 @@ impl Default for OutputContractSettings {
             stack_size: DEFAULT_STACK_SIZE,
             features: Default::default(),
             kill_legacy_callback: false,
+            contract_variant_profile: Default::default(),
         }
     }
 }
