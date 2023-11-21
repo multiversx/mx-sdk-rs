@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -84,6 +83,19 @@
                             "0x03e8"
                         ],
                         "data": "*"
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:forwarder-queue"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
+                        ]
                     }
                 ],
                 "gas": "*",
