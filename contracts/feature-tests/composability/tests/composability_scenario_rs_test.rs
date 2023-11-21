@@ -438,18 +438,6 @@ fn forwarder_send_esdt_multi_transfer_rs() {
 }
 
 #[test]
-#[ignore]
-fn forwarder_send_twice_egld_rs() {
-    world().run("scenarios/forwarder_send_twice_egld.scen.json");
-}
-
-#[test]
-#[ignore]
-fn forwarder_send_twice_esdt_rs() {
-    world().run("scenarios/forwarder_send_twice_esdt.scen.json");
-}
-
-#[test]
 fn forwarder_sync_echo_rs() {
     world().run("scenarios/forwarder_sync_echo.scen.json");
 }
