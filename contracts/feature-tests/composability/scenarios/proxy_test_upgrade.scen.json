@@ -20,7 +20,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:proxy-first",
-                "egldValue": "0",
+                "egldValue": "200",
                 "function": "upgradeSecondContract",
                 "arguments": [
                     "file:../proxy-test-second/output/proxy-test-second.wasm"
@@ -29,6 +29,9 @@
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [
+                    "457"
+                ],
                 "status": "0",
                 "message": "",
                 "gas": "*",
@@ -40,7 +43,7 @@
             "accounts": {
                 "address:a_user": {
                     "nonce": "2",
-                    "balance": "200",
+                    "balance": "0",
                     "storage": {},
                     "code": ""
                 },
@@ -54,10 +57,10 @@
                 },
                 "sc:proxy-second": {
                     "nonce": "0",
-                    "balance": "100",
+                    "balance": "300",
                     "storage": {
                         "str:init_arg": "456",
-                        "str:last_payment": "100"
+                        "str:last_payment": "200"
                     },
                     "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
                 }
