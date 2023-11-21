@@ -6,14 +6,15 @@ use crate::{
     api::CallTypeApi,
     contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
-        BigUint, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
-        MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer,
+        ManagedVec, MultiEsdtPayment,
     },
 };
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, TxCallback, TxData, TxDataFunctionCall, TxEnv, TxFrom,
-    TxFromSpecified, TxGas, TxPayment, TxScEnv, TxTo, TxToSpecified,
+    AsyncCall, ExplicitGas, FunctionCall, ManagedArgBuffer, TxCallback, TxData, TxDataDeploy,
+    TxDataFunctionCall, TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxScEnv, TxTo,
+    TxToSpecified,
 };
 
 #[must_use]
@@ -419,6 +420,47 @@ where
     }
 }
 
+impl<Env, Payment, Gas, Data> Tx<Env, (), (), Payment, Gas, Data, ()>
+where
+    Env: TxEnv,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+{
+    pub fn deploy(
+        self,
+        code: ManagedBuffer<Env::Api>,
+        metadata: CodeMetadata,
+        arg_buffer: ManagedArgBuffer<Env::Api>,
+    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: TxDataDeploy::new(code, metadata, arg_buffer),
+            callback: self.callback,
+        }
+    }
+
+    pub fn execute_deploy(
+        &self,
+    ) -> (
+        ManagedAddress<Env::Api>,
+        ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+    ) {
+        let wrap = SendRawWrapper::<Env::Api>::new();
+        wrap.deploy_contract(
+            self.gas.resolve_gas(&self.env),
+            &self.payment,
+            &self.data.get_code(),
+            self.data.get_metadata(),
+            &self.data.get_args(),
+        )
+    }
+}
+
 // impl<Env, From, To, Payment, Gas> Tx<Env, From, To, EgldPayment<Env>, Gas, (), ()>
 // where
 //     Env: TxEnv,
@@ -427,7 +469,7 @@ where
 //     Payment: TxPayment<Env>,
 //     Gas: TxGas<Env>,
 // {
-//     pub fn deploy(self) -> Tx<Env, From, To, Payment, Gas, Data, Callback>, 
+//     pub fn deploy(self) -> Tx<Env, From, To, Payment, Gas, Data, Callback>,
 //     where Data:TxData<Env>, Callback: TxCallBack<Env> {
 //         Tx {
 //             env: self.env,
