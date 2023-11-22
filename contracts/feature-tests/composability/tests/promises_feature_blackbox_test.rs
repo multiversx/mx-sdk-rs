@@ -9,7 +9,7 @@ use promises_features::call_sync_bt::ProxyTrait;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const PROMISES_FEATURE_ADDRESS_EXPR: &str = "sc:promises-feature";
-const PROMISES_FEATURES_PATH_EXPR: &str = "file:output/promises-feature.wasm";
+const PROMISES_FEATURES_PATH_EXPR: &str = "file:promises-features/output/promises-feature.wasm";
 const VAULT_ADDRESS_EXPR: &str = "sc:vault";
 const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
 
@@ -21,7 +21,7 @@ type VaultContract = ContractInfo<vault::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/composability/promises-feature");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
         PROMISES_FEATURES_PATH_EXPR,

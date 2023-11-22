@@ -512,6 +512,7 @@ dependencies = [
  "forwarder",
  "forwarder-queue",
  "forwarder-raw",
+ "multiversx-sc",
  "multiversx-sc-scenario",
  "promises-features",
  "proxy-test-first",
@@ -2440,7 +2441,6 @@ name = "promises-features"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "multiversx-sc-scenario",
  "vault",
 ]
 
