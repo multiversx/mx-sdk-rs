@@ -74,7 +74,6 @@ impl PromisesFeaturesTestState {
 }
 
 #[test]
-#[ignore = "waiting for vm1.5"]
 fn test_back_transfers() {
     let mut state = PromisesFeaturesTestState::new();
     let token_amount = BigUint::from(1000u64);

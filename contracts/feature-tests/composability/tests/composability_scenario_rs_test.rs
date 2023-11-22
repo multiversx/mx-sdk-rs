@@ -75,7 +75,6 @@ fn builtin_func_set_user_name_rs() {
 }
 
 #[test]
-#[ignore = "pending integration in VM 1.5"]
 fn forw_queue_async_rs() {
     world().run("scenarios/forw_queue_async.scen.json");
 }
