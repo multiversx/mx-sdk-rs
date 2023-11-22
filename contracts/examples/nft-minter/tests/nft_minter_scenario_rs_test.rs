@@ -7,6 +7,7 @@ fn world() -> ScenarioWorld {
     blockchain.register_contract("file:output/nft-minter.wasm", nft_minter::ContractBuilder);
     blockchain
 }
+
 #[test]
 fn buy_nft_rs() {
     world().run("scenarios/buy_nft.scen.json");
