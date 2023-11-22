@@ -8,3 +8,4 @@ pub mod network_economics;
 pub mod network_status;
 pub mod transaction;
 pub mod vm;
+pub mod types;

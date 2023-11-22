@@ -1,7 +1,17 @@
+extern crate rustc_serialize as serialize;
+
+use std::str;
 use super::address::Address;
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::collections::HashMap;
+use rustc_serialize::base64::FromBase64;
+use rustc_serialize::hex::ToHex;
+use multiversx_sc::codec::{TopDecode, TopEncode};
+use multiversx_sc::types::{ManagedBuffer, ManagedVec, ManagedVecItem, MultiValueEncoded};
+use multiversx_sc_codec::{DecodeError, TopDecodeMulti, TopEncodeMulti};
+use multiversx_sc_scenario::DebugApi;
+use crate::data::types::native::NativeConvertible;
 
 #[derive(Serialize_repr, Deserialize_repr, Debug, Clone)]
 #[repr(u8)]
@@ -31,6 +41,29 @@ pub struct VmValueRequest {
     pub caller: Address,
     pub value: String,
     pub args: Vec<String>,
+}
+
+impl VmValueRequest {
+    pub fn push_managed_arg<E: TopEncode>(
+        &mut self,
+        arg: E
+    ) {
+        let mut managed_buffer: ManagedBuffer<DebugApi> = ManagedBuffer::new();
+        let _ = arg.top_encode(&mut managed_buffer);
+        self.args.push(managed_buffer.to_boxed_bytes().as_slice().to_hex())
+    }
+
+    pub fn push_multi_managed_arg<E: TopEncodeMulti>(
+        &mut self,
+        arg: E
+    ) {
+        let mut buffers: ManagedVec<DebugApi, ManagedBuffer<DebugApi>> = ManagedVec::new();
+        let _ = arg.multi_encode(&mut buffers).unwrap();
+
+        for buffer in buffers.into_iter() {
+            self.push_managed_arg(buffer);
+        }
+    }
 }
 
 // LogEntryApi is a wrapper over vmcommon's LogEntry
@@ -94,6 +127,32 @@ pub struct VMOutputApi {
     pub deleted_accounts: Option<Vec<String>>,
     pub touched_accounts: Option<Vec<String>>,
     pub logs: Option<Vec<LogEntryApi>>,
+}
+
+impl VMOutputApi {
+    pub fn get_parsed_return_data<D: TopDecode + NativeConvertible>(&self, index: usize) -> Result<D::Native, DecodeError> {
+        let data_to_parse: String = self.return_data[index].clone();
+        let hex_data_to_parse = data_to_parse.as_bytes().from_base64().unwrap();
+
+        let result = D::top_decode(hex_data_to_parse);
+
+        result.map(|e| e.to_native())
+    }
+
+    pub fn get_parsed_return_data_multi_in_range<D: TopDecodeMulti + NativeConvertible>(&self, from: usize, to: usize) -> Result<D::Native, DecodeError> {
+        let datas_to_parse = self.return_data[from..to].to_vec();
+        let mut hex_datas_to_parse: Vec<Vec<u8>> = datas_to_parse.into_iter().map(|data| {
+            data.as_bytes().from_base64().unwrap()
+        }).collect();
+
+        let multi_value_result = D::multi_decode(&mut hex_datas_to_parse);
+
+        multi_value_result.map(|e| e.to_native())
+    }
+
+    pub fn get_parsed_return_data_var_args<D: TopDecode + ManagedVecItem + NativeConvertible>(&self, from: usize) -> Result<Vec<D::Native>, DecodeError> {
+        self.get_parsed_return_data_multi_in_range::<MultiValueEncoded<DebugApi, D>>(from, self.return_data.len())
+    }
 }
 
 // VmValuesResponseData follows the format of the data field in an API response for a VM values query
