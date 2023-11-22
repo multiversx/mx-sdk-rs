@@ -35,6 +35,11 @@ fn should_add_transfer_value_log(tx_input: &TxInput) -> bool {
         return false;
     }
 
+    if tx_input.call_type == CallType::UpgradeFromSource {
+        // already handled in upgradeContract builtin function
+        return false;
+    }
+
     if tx_input.call_type != CallType::DirectCall {
         return true;
     }
@@ -43,11 +48,8 @@ fn should_add_transfer_value_log(tx_input: &TxInput) -> bool {
     tx_input.from.is_smart_contract_address() && !tx_input.egld_value.is_zero()
 }
 
-fn create_transfer_value_log(tx_input: &TxInput) -> TxLog {
-    let mut data = vec![
-        tx_input.call_type.to_log_bytes(),
-        tx_input.func_name.to_bytes(),
-    ];
+pub(crate) fn create_transfer_value_log(tx_input: &TxInput, call_type: CallType) -> TxLog {
+    let mut data = vec![call_type.to_log_bytes(), tx_input.func_name.to_bytes()];
     data.append(&mut tx_input.args.clone());
 
     let egld_value = if tx_input.call_type == CallType::AsyncCallback {
@@ -82,7 +84,7 @@ impl BlockchainVMRef {
         }
 
         let transfer_value_log = if should_add_transfer_value_log(&tx_input) {
-            Some(create_transfer_value_log(&tx_input))
+            Some(create_transfer_value_log(&tx_input, tx_input.call_type))
         } else {
             None
         };

@@ -36,7 +36,19 @@ fn world() -> ScenarioWorld {
         "file:recursive-caller/output/recursive-caller.wasm",
         recursive_caller::ContractBuilder,
     );
-    blockchain.register_contract("file:vault/output/vault.wasm", vault::ContractBuilder);
+
+    let vault_sc_config =
+        meta::multi_contract_config::<vault::AbiProvider>(&blockchain.current_dir().join("vault"));
+    blockchain.register_contract_variant(
+        "file:vault/output/vault.wasm",
+        vault::ContractBuilder,
+        vault_sc_config.find_contract("vault"),
+    );
+    blockchain.register_contract_variant(
+        "file:vault/output/vault-upgrade.wasm",
+        vault::ContractBuilder,
+        vault_sc_config.find_contract("vault-upgrade"),
+    );
     blockchain
 }
 
@@ -109,13 +121,11 @@ fn forw_raw_contract_deploy_rs() {
 }
 
 #[test]
-#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forw_raw_contract_upgrade_rs() {
     world().run("scenarios/forw_raw_contract_upgrade.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forw_raw_contract_upgrade_self_rs() {
     world().run("scenarios/forw_raw_contract_upgrade_self.scen.json");
 }
@@ -367,7 +377,6 @@ fn forwarder_contract_deploy_rs() {
 }
 
 #[test]
-#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forwarder_contract_upgrade_rs() {
     world().run("scenarios/forwarder_contract_upgrade.scen.json");
 }
