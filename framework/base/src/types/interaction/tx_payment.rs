@@ -11,6 +11,8 @@ use crate::{
 
 use super::{FunctionCall, TxEnv, TxFrom};
 
+
+
 /// Temporary structure for returning a normalized transfer.
 pub struct PaymentConversionResult<Api>
 where
@@ -24,6 +26,7 @@ where
 pub trait TxPayment<Env>
 where
     Env: TxEnv,
+    Self: Clone
 {
     fn is_no_payment(&self) -> bool;
 

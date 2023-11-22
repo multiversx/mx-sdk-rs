@@ -1,9 +1,8 @@
-use core::marker::PhantomData;
-
+use alloc::boxed::Box;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use crate::{
-    api::CallTypeApi,
+    api::{self, CallTypeApi, ManagedTypeApi},
     contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
         BigUint, CodeMetadata, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer,
@@ -437,17 +436,33 @@ where
             env: self.env,
             from: self.from,
             to: self.to,
-            payment: self.payment, //this should be egld payment only
+            payment: self.payment, //this should be egld payment and () only
             gas: self.gas,
-            data: TxDataDeploy::new(code, metadata, arg_buffer),
+            data: TxDataDeploy {
+                code,
+                metadata,
+                arg_buffer,
+            },
             callback: self.callback,
         }
     }
 }
 
-impl<Env, Gas> Tx<Env, (), (), EgldPayment<Env::Api>, Gas, TxDataDeploy<Env>, ()>
+
+pub trait TxEgldOnlyPayment<Env>: TxPayment<Env>
 where
     Env: TxEnv,
+    Self: Clone,
+{
+}
+impl<Env> TxEgldOnlyPayment<Env> for EgldPayment<Env::Api> where Env: TxEnv {}
+
+impl<Env> TxEgldOnlyPayment<Env> for () where Env: TxEnv {}
+
+impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()>
+where
+    Env: TxEnv,
+    Payment: TxEgldOnlyPayment<Env>,
     Gas: TxGas<Env>,
 {
     pub fn execute_deploy(
@@ -456,68 +471,100 @@ where
         ManagedAddress<Env::Api>,
         ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) {
+        let result = self.payment.clone().convert_tx_data(
+            &self.env,
+            &self.from,
+            ManagedAddress::<Env::Api>::default(),
+            FunctionCall {
+                function_name: "deploy".into(),
+                arg_buffer: self.data.arg_buffer.clone(),
+            },
+        ).egld_payment.value;
         let wrap = SendRawWrapper::<Env::Api>::new();
         wrap.deploy_contract(
             self.gas.resolve_gas(&self.env),
-            &self.payment.value,
-            &self.data.get_code(),
-            self.data.get_metadata(),
-            &self.data.get_args(),
+            &result,
+            &self.data.code,
+            self.data.metadata,
+            &self.data.arg_buffer,
         )
     }
 }
 
-// impl<Env, From, To, Payment, Gas> Tx<Env, From, To, EgldPayment<Env>, Gas, (), ()>
+
+// impl<Env> TxPayment<Env> for dyn TxEgldOnlyPayment<Env>
 // where
 //     Env: TxEnv,
-//     From: TxFrom<Env>,
-//     To: TxTo<Env>,
-//     Payment: TxPayment<Env>,
+// {
+//     fn is_no_payment(&self) -> bool {
+//         todo!()
+//     }
+//     fn convert_tx_data<From>(
+//         self,
+//         env: &Env,
+//         from: &From,
+//         to: ManagedAddress<<Env as TxEnv>::Api>,
+//         fc: FunctionCall<<Env as TxEnv>::Api>,
+//     ) -> super::PaymentConversionResult<<Env as TxEnv>::Api>
+//     where
+//         From: TxFrom<Env>,
+//     {
+//         todo!()
+//     }
+//     fn perform_transfer_execute(
+//         self,
+//         env: &Env,
+//         to: &ManagedAddress<<Env as TxEnv>::Api>,
+//         gas_limit: u64,
+//         fc: FunctionCall<<Env as TxEnv>::Api>,
+//     ) {
+//         todo!()
+//     }
+// }
+
+//replace with txegldonlypayment
+// impl<Env, Gas> Tx<Env, (), (), EgldPayment<Env::Api>, Gas, TxDataDeploy<Env>, ()>
+// where
+//     Env: TxEnv,
 //     Gas: TxGas<Env>,
 // {
-//     pub fn deploy(self) -> Tx<Env, From, To, Payment, Gas, Data, Callback>,
-//     where Data:TxData<Env>, Callback: TxCallBack<Env> {
-//         Tx {
-//             env: self.env,
-//             from: self.from,
-//             to: self.to,
-//             payment: self.payment,
-//             gas: self.gas,
-//             data: TxData::Deploy,
-//             callback: self.callback,
-//         }
-//     }
-// }
-
-// impl <Env, From, To, Payment, Gas> Tx<Env, From, To, EgldPayment<Env>, Gas, (), ()> {
 //     pub fn execute_deploy(
 //         &self,
-//         code: ManagedBuffer,
-//         code_metadata: CodeMetadata,
-//         arg_buffer: &ManagedArgBuffer<A>,
-//     ) -> (ManagedAddress<A>, ManagedVec<A, ManagedBuffer<A>>) {
-//         let wrap = SendRawWrapper<Env>::new();
-//         wrap.deploy_contract(self.gas, self.payment, &code, code_metadata, arg_buffer)
+//     ) -> (
+//         ManagedAddress<Env::Api>,
+//         ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+//     ) {
+//         let wrap = SendRawWrapper::<Env::Api>::new();
+//         wrap.deploy_contract(
+//             self.gas.resolve_gas(&self.env),
+//             &self.payment.value,
+//             &self.data.code,
+//             self.data.metadata,
+//             &self.data.arg_buffer,
+//         )
 //     }
 // }
-//imagine deploy function, how it should look like and what it should contain
 
-// impl<Env> TxData<Env>
+// impl<Env, Gas> Tx<Env, (), (), (), Gas, TxDataDeploy<Env>, ()>
 // where
 //     Env: TxEnv,
+//     Gas: TxGas<Env>,
 // {
-// fn deploy(
-//     &self,
-//     env: &Env,
-//     gas: u64,
-//     egld_value_handle: RawHandle,
-//     code_handle: RawHandle,
-//     code_metadata_handle: RawHandle,
-//     arg_buffer_handle: RawHandle,
-//     new_address_handle: RawHandle,
-//     result_handle: RawHandle,
-// ) {
-
-//         crate::api::send_api::deploy_contract(env)
+//     pub fn execute_deploy(
+//         &self,
+//     ) -> (
+//         ManagedAddress<Env::Api>,
+//         ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+//     ) {
+//         let wrap = SendRawWrapper::<Env::Api>::new();
+//         wrap.deploy_contract(
+//             self.gas.resolve_gas(&self.env),
+//             &BigUint::zero(),
+//             &self.data.code,
+//             self.data.metadata,
+//             &self.data.arg_buffer,
+//         )
 //     }
 // }
+
+
