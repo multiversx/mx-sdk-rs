@@ -21,7 +21,7 @@
                 "to": "sc:ping-pong",
                 "function": "pongAll",
                 "arguments": [],
-                "gasLimit": "6,500,000",
+                "gasLimit": "6,100,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -44,7 +44,7 @@
                 },
                 "address:participant1": {
                     "nonce": "2",
-                    "balance": "1,800,000,000,000",
+                    "balance": "1,300,000,000,000",
                     "storage": {}
                 },
                 "address:participant2": {
@@ -54,19 +54,18 @@
                 },
                 "sc:ping-pong": {
                     "nonce": "0",
-                    "balance": "500,000,000,000",
+                    "balance": "1,000,000,000,000",
                     "storage": {
                         "str:pingAmount": "500,000,000,000",
                         "str:activationTimestamp": "780",
                         "str:deadline": "123,780",
                         "str:user_address_to_id|address:participant1": "1",
                         "str:user_id_to_address|0x0000001": "address:participant1",
-                        "str:userStatus|0x0000001": "2",
+                        "str:userStatus|0x0000001": "1",
                         "str:user_address_to_id|address:participant2": "2",
                         "str:user_id_to_address|0x0000002": "address:participant2",
                         "str:userStatus|0x0000002": "1",
-                        "str:user_count": "2",
-                        "str:pongAllLastUser": "1"
+                        "str:user_count": "2"
                     },
                     "code": "file:../output/ping-pong-egld.wasm"
                 }

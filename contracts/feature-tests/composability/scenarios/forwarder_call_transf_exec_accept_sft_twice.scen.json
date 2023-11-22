@@ -63,7 +63,15 @@
                             "01",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:TransferAndExecute",
+                            "str:ESDTNFTTransfer",
+                            "str:NFT-000001",
+                            "5",
+                            "1",
+                            "sc:vault",
+                            "str:accept_funds"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -75,7 +83,9 @@
                             "5",
                             "1"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -86,7 +96,15 @@
                             "01",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:TransferAndExecute",
+                            "str:ESDTNFTTransfer",
+                            "str:NFT-000001",
+                            "5",
+                            "1",
+                            "sc:vault",
+                            "str:accept_funds"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -98,7 +116,9 @@
                             "5",
                             "1"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",

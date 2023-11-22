@@ -24,7 +24,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [ "str:alternative init" ],
+                "out": [
+                    "str:alternative init"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",
@@ -36,10 +38,13 @@
             "id": "alt impl query",
             "tx": {
                 "to": "sc:mcf-alt-impl",
-                "function": "sample_value"
+                "function": "sample_value",
+                "arguments": []
             },
             "expect": {
-                "out": [ "str:alternative message instead of sample value" ],
+                "out": [
+                    "str:alternative message instead of sample value"
+                ],
                 "status": "",
                 "logs": [],
                 "gas": "*",

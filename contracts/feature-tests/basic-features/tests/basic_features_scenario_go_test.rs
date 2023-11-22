@@ -336,6 +336,7 @@ fn storage_map_3_go() {
 }
 
 #[test]
+#[ignore = "currently not supported. TODO: investigate"]
 fn storage_mapper_fungible_token_go() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
 }

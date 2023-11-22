@@ -12,5 +12,7 @@ pub struct CheckLogRaw {
     #[serde(skip_serializing_if = "CheckValueListRaw::is_unspecified")]
     pub topics: CheckValueListRaw,
 
-    pub data: CheckBytesValueRaw,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "CheckValueListRaw::is_unspecified")]
+    pub data: CheckValueListRaw,
 }

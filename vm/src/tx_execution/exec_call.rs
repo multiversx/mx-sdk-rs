@@ -1,8 +1,8 @@
 use crate::{
     tx_mock::{
         async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
-        AsyncCallTxData, BlockchainUpdate, Promise, TxCache, TxContext, TxContextStack, TxInput,
-        TxPanic, TxResult, TxResultCalls,
+        AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext, TxContextStack,
+        TxInput, TxPanic, TxResult, TxResultCalls,
     },
     types::VMAddress,
     with_shared::Shareable,
@@ -105,7 +105,7 @@ impl BlockchainVMRef {
         state: &mut Shareable<BlockchainState>,
     ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&async_data.to) {
-            let async_input = async_call_tx_input(&async_data);
+            let async_input = async_call_tx_input(&async_data, CallType::AsyncCall);
 
             let async_result = self.sc_call_with_async_and_callback(
                 async_input,
@@ -188,7 +188,7 @@ impl BlockchainVMRef {
         state: &mut Shareable<BlockchainState>,
     ) -> (TxResult, TxResult) {
         if state.accounts.contains_key(&promise.call.to) {
-            let async_input = async_call_tx_input(&promise.call);
+            let async_input = async_call_tx_input(&promise.call, CallType::AsyncCall);
             let async_result = self.sc_call_with_async_and_callback(
                 async_input,
                 state,

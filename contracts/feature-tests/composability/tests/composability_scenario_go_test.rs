@@ -4,20 +4,17 @@ fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
 }
 
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 #[test]
 fn promises_multi_transfer_go() {
     world().run("scenarios-promises/promises_multi_transfer.scen.json");
 }
 
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 #[test]
 fn promises_single_transfer_go() {
     world().run("scenarios-promises/promises_single_transfer.scen.json");
 }
 
 #[test]
-#[ignore = "waiting for VM 1.5"]
 fn builtin_func_delete_user_name_go() {
     world().run("scenarios/builtin_func_delete_user_name.scen.json");
 }
@@ -48,7 +45,6 @@ fn forw_raw_async_echo_go() {
 }
 
 #[test]
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_async_send_and_retrieve_multi_transfer_funds_go() {
     world().run("scenarios/forw_raw_async_send_and_retrieve_multi_transfer_funds.scen.json");
 }
@@ -64,7 +60,6 @@ fn forw_raw_builtin_nft_local_mint_via_sync_call_go() {
 }
 
 #[test]
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_call_async_retrieve_multi_transfer_go() {
     world().run("scenarios/forw_raw_call_async_retrieve_multi_transfer.scen.json");
 }
@@ -100,7 +95,6 @@ fn forw_raw_direct_multi_esdt_go() {
 }
 
 #[test]
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forw_raw_init_async_go() {
     world().run("scenarios/forw_raw_init_async.scen.json");
 }
@@ -206,7 +200,6 @@ fn forwarder_call_async_retrieve_egld_go() {
 }
 
 #[test]
-#[ignore = "currently compatible with VM 1.5, not with VM 1.4"]
 fn forwarder_call_async_retrieve_esdt_go() {
     world().run("scenarios/forwarder_call_async_retrieve_esdt.scen.json");
 }
@@ -394,16 +387,6 @@ fn forwarder_retrieve_funds_with_accept_func_go() {
 #[test]
 fn forwarder_send_esdt_multi_transfer_go() {
     world().run("scenarios/forwarder_send_esdt_multi_transfer.scen.json");
-}
-
-#[test]
-fn forwarder_send_twice_egld_go() {
-    world().run("scenarios/forwarder_send_twice_egld.scen.json");
-}
-
-#[test]
-fn forwarder_send_twice_esdt_go() {
-    world().run("scenarios/forwarder_send_twice_esdt.scen.json");
 }
 
 #[test]

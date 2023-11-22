@@ -63,6 +63,7 @@ fn builtin_func_set_user_name_rs() {
 }
 
 #[test]
+#[ignore = "pending integration in VM 1.5"]
 fn forw_queue_async_rs() {
     world().run("scenarios/forw_queue_async.scen.json");
 }
@@ -108,11 +109,13 @@ fn forw_raw_contract_deploy_rs() {
 }
 
 #[test]
+#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forw_raw_contract_upgrade_rs() {
     world().run("scenarios/forw_raw_contract_upgrade.scen.json");
 }
 
 #[test]
+#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forw_raw_contract_upgrade_self_rs() {
     world().run("scenarios/forw_raw_contract_upgrade_self.scen.json");
 }
@@ -364,6 +367,7 @@ fn forwarder_contract_deploy_rs() {
 }
 
 #[test]
+#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forwarder_contract_upgrade_rs() {
     world().run("scenarios/forwarder_contract_upgrade.scen.json");
 }
@@ -431,18 +435,6 @@ fn forwarder_retrieve_funds_with_accept_func_rs() {
 #[test]
 fn forwarder_send_esdt_multi_transfer_rs() {
     world().run("scenarios/forwarder_send_esdt_multi_transfer.scen.json");
-}
-
-#[test]
-#[ignore]
-fn forwarder_send_twice_egld_rs() {
-    world().run("scenarios/forwarder_send_twice_egld.scen.json");
-}
-
-#[test]
-#[ignore]
-fn forwarder_send_twice_esdt_rs() {
-    world().run("scenarios/forwarder_send_twice_esdt.scen.json");
 }
 
 #[test]

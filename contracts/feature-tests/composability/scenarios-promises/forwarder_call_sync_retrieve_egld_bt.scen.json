@@ -26,7 +26,7 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "forward_sync_retrieve_funds",
+                "function": "forward_sync_retrieve_funds_bt",
                 "arguments": [
                     "sc:vault",
                     "str:EGLD",
@@ -43,7 +43,7 @@
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "0",
                             "sc:vault"
                         ],
@@ -71,7 +71,7 @@
                     {
                         "address": "sc:vault",
                         "endpoint": "str:transferValueOnly",
-                        "topics": [                            
+                        "topics": [
                             "1000",
                             "sc:forwarder"
                         ],
@@ -82,7 +82,7 @@
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:forward_sync_retrieve_funds",
+                        "endpoint": "str:forward_sync_retrieve_funds_bt",
                         "topics": [
                             "str:back_tranfers",
                             "1000"
