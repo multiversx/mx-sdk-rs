@@ -1,6 +1,6 @@
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::world_mock::BlockchainState;
-
+use multiversx_sc_meta::find_workspace::find_workspace;
 use crate::{
     api::DebugApi,
     debug_executor::ContractContainer,
@@ -222,18 +222,3 @@ impl ScenarioWorld {
     }
 }
 
-/// Finds the workspace by taking the `current_exe` and working its way up.
-/// Works in debug mode too.
-pub fn find_workspace() -> PathBuf {
-    let current_exe = std::env::current_exe().unwrap();
-    let mut path = current_exe.as_path();
-    while !is_target(path) {
-        path = path.parent().unwrap();
-    }
-
-    path.parent().unwrap().into()
-}
-
-fn is_target(path_buf: &Path) -> bool {
-    path_buf.file_name().unwrap() == "target"
-}

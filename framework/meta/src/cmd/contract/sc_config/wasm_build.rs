@@ -5,6 +5,7 @@ use crate::{
     abi_json::ContractAbiJson,
     cli_args::BuildArgs,
     ei::EIVersion,
+    find_workspace::{find_workspace, print_searching_for_workspace},
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
     tools,
@@ -37,6 +38,9 @@ impl ContractVariant {
         }
         if let Some(target_dir_wasm) = &build_args.target_dir_wasm {
             command.args(["--target-dir", target_dir_wasm]);
+        } else {
+            print_searching_for_workspace();
+            command.args(["--target-dir", find_workspace().to_str().unwrap()]);
         }
         let rustflags = self.compose_rustflags(build_args);
         if !rustflags.is_empty() {

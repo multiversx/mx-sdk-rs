@@ -1,13 +1,11 @@
+use std::{fs, process::Command};
+
 use multiversx_sc_meta::{
     cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
+    find_workspace::find_workspace,
     version_history,
-};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    process::Command,
 };
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
@@ -180,22 +178,4 @@ pub fn build_contract(target: &ContractCreatorTarget) {
         .expect("contract test process was not running");
 
     assert!(exit_status.success(), "contract build process failed");
-}
-
-/// Finds the workspace by taking the `current_exe` and working its way up.
-/// Works in debug mode too.
-///
-/// TODO: duplicated code from scenario_world. De-duplicate after dependencies are reorganized.
-pub fn find_workspace() -> PathBuf {
-    let current_exe = std::env::current_exe().unwrap();
-    let mut path = current_exe.as_path();
-    while !is_target(path) {
-        path = path.parent().unwrap();
-    }
-
-    path.parent().unwrap().into()
-}
-
-fn is_target(path_buf: &Path) -> bool {
-    path_buf.file_name().unwrap() == "target"
 }
