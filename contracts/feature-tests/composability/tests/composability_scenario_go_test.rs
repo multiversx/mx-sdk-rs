@@ -4,15 +4,6 @@ fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
 }
 
-#[test]
-fn promises_multi_transfer_go() {
-    world().run("scenarios-promises/promises_multi_transfer.scen.json");
-}
-
-#[test]
-fn promises_single_transfer_go() {
-    world().run("scenarios-promises/promises_single_transfer.scen.json");
-}
 
 #[test]
 fn builtin_func_delete_user_name_go() {
@@ -250,13 +241,28 @@ fn forwarder_call_sync_retrieve_egld_go() {
 }
 
 #[test]
+fn forwarder_call_sync_retrieve_egld_bt_go() {
+    world().run("scenarios/forwarder_call_sync_retrieve_egld_bt.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_esdt_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_esdt.scen.json");
 }
 
 #[test]
+fn forwarder_call_sync_retrieve_esdt_bt_go() {
+    world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_nft_go() {
     world().run("scenarios/forwarder_call_sync_retrieve_nft.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_nft_bt_go() {
+    world().run("scenarios/forwarder_call_sync_retrieve_nft_bt.scen.json");
 }
 
 #[test]
@@ -402,6 +408,57 @@ fn forwarder_tranfer_esdt_with_fees_go() {
 #[test]
 fn forwarder_validate_token_identifier_go() {
     world().run("scenarios/forwarder_validate_token_identifier.scen.json");
+}
+
+#[test]
+fn promises_call_async_accept_egld_go() {
+    world().run("scenarios/promises_call_async_accept_egld.scen.json");
+}
+
+#[test]
+fn promises_call_async_accept_esdt_go() {
+    world().run("scenarios/promises_call_async_accept_esdt.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_call_async_retrieve_egld_go() {
+    world().run("scenarios/promises_call_async_retrieve_egld.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_call_async_retrieve_esdt_go() {
+    world().run("scenarios/promises_call_async_retrieve_esdt.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_call_callback_directly_go() {
+    world().run("scenarios/promises_call_callback_directly.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_multi_transfer_go() {
+    world().run("scenarios/promises_multi_transfer.scen.json");
+}
+
+#[test]
+fn promises_single_transfer_go() {
+    world().run("scenarios/promises_single_transfer.scen.json");
+}
+
+#[test]
+#[ignore = "gas"]
+fn promises_single_transfer_gas_1_go() {
+    world().run("scenarios/promises_single_transfer_gas1.scen.json");
+}
+
+#[test]
+#[ignore = "gas"]
+fn promises_single_transfer_gas_2_go() {
+    world().run("scenarios/promises_single_transfer_gas2.scen.json");
 }
 
 #[test]

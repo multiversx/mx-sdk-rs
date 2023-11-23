@@ -53,6 +53,10 @@ impl TxFunctionName {
     /// The constructor name of any smart contract.
     pub const INIT: TxFunctionName = TxFunctionName::from_static("init");
 
+    /// Gets called exactly once when upgrading to a new version of a smart contract.
+    /// Can be viewed as an "upgrade constructor".
+    pub const UPGRADE: TxFunctionName = TxFunctionName::from_static("upgrade");
+
     /// The the legacy async central callback name of any smart contract.
     pub const CALLBACK: TxFunctionName = TxFunctionName::from_static("callBack");
 

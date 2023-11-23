@@ -36,21 +36,22 @@ fn world() -> ScenarioWorld {
         "file:recursive-caller/output/recursive-caller.wasm",
         recursive_caller::ContractBuilder,
     );
-    blockchain.register_contract("file:vault/output/vault.wasm", vault::ContractBuilder);
+
+    let vault_sc_config =
+        meta::multi_contract_config::<vault::AbiProvider>(&blockchain.current_dir().join("vault"));
+    blockchain.register_contract_variant(
+        "file:vault/output/vault.wasm",
+        vault::ContractBuilder,
+        vault_sc_config.find_contract("vault"),
+    );
+    blockchain.register_contract_variant(
+        "file:vault/output/vault-upgrade.wasm",
+        vault::ContractBuilder,
+        vault_sc_config.find_contract("vault-upgrade"),
+    );
     blockchain
 }
 
-#[test]
-#[ignore = "not yet supported"]
-fn promises_multi_transfer_rs() {
-    world().run("scenarios-promises/promises_multi_transfer.scen.json");
-}
-
-#[test]
-#[ignore = "not yet supported"]
-fn promises_single_transfer_rs() {
-    world().run("scenarios-promises/promises_single_transfer.scen.json");
-}
 
 #[test]
 fn builtin_func_delete_user_name_rs() {
@@ -63,7 +64,6 @@ fn builtin_func_set_user_name_rs() {
 }
 
 #[test]
-#[ignore = "pending integration in VM 1.5"]
 fn forw_queue_async_rs() {
     world().run("scenarios/forw_queue_async.scen.json");
 }
@@ -109,13 +109,11 @@ fn forw_raw_contract_deploy_rs() {
 }
 
 #[test]
-#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forw_raw_contract_upgrade_rs() {
     world().run("scenarios/forw_raw_contract_upgrade.scen.json");
 }
 
 #[test]
-#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forw_raw_contract_upgrade_self_rs() {
     world().run("scenarios/forw_raw_contract_upgrade_self.scen.json");
 }
@@ -297,13 +295,28 @@ fn forwarder_call_sync_retrieve_egld_rs() {
 }
 
 #[test]
+fn forwarder_call_sync_retrieve_egld_bt_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_egld_bt.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_esdt_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_esdt.scen.json");
 }
 
 #[test]
+fn forwarder_call_sync_retrieve_esdt_bt_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_esdt_bt.scen.json");
+}
+
+#[test]
 fn forwarder_call_sync_retrieve_nft_rs() {
     world().run("scenarios/forwarder_call_sync_retrieve_nft.scen.json");
+}
+
+#[test]
+fn forwarder_call_sync_retrieve_nft_bt_rs() {
+    world().run("scenarios/forwarder_call_sync_retrieve_nft_bt.scen.json");
 }
 
 #[test]
@@ -367,7 +380,6 @@ fn forwarder_contract_deploy_rs() {
 }
 
 #[test]
-#[ignore = "TODO: upgrade endpoint mechanism in Rust VM"]
 fn forwarder_contract_upgrade_rs() {
     world().run("scenarios/forwarder_contract_upgrade.scen.json");
 }
@@ -450,6 +462,58 @@ fn forwarder_tranfer_esdt_with_fees_rs() {
 #[test]
 fn forwarder_validate_token_identifier_rs() {
     world().run("scenarios/forwarder_validate_token_identifier.scen.json");
+}
+
+#[test]
+fn promises_call_async_accept_egld_rs() {
+    world().run("scenarios/promises_call_async_accept_egld.scen.json");
+}
+
+#[test]
+fn promises_call_async_accept_esdt_rs() {
+    world().run("scenarios/promises_call_async_accept_esdt.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_call_async_retrieve_egld_rs() {
+    world().run("scenarios/promises_call_async_retrieve_egld.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_call_async_retrieve_esdt_rs() {
+    world().run("scenarios/promises_call_async_retrieve_esdt.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_call_callback_directly_rs() {
+    world().run("scenarios/promises_call_callback_directly.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_multi_transfer_rs() {
+    world().run("scenarios/promises_multi_transfer.scen.json");
+}
+
+#[test]
+#[ignore = "TODO"]
+fn promises_single_transfer_rs() {
+    world().run("scenarios/promises_single_transfer.scen.json");
+}
+
+#[test]
+#[ignore = "gas"]
+fn promises_single_transfer_gas_1_rs() {
+    world().run("scenarios/promises_single_transfer_gas1.scen.json");
+}
+
+#[test]
+#[ignore = "gas"]
+fn promises_single_transfer_gas_2_rs() {
+    world().run("scenarios/promises_single_transfer_gas2.scen.json");
 }
 
 #[test]

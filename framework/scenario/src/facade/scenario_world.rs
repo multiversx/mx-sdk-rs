@@ -1,5 +1,6 @@
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::world_mock::BlockchainState;
+use multiversx_sc_meta::cmd::contract::sc_config::ContractVariant;
 
 use crate::{
     api::DebugApi,
@@ -187,8 +188,22 @@ impl ScenarioWorld {
     {
         let multi_contract_config =
             multiversx_sc_meta::multi_contract_config::<Abi>(self.current_dir.as_path());
-        let sub_contract = multi_contract_config.find_contract(sub_contract_name);
-        let contract_obj = if sub_contract.settings.external_view {
+        let contract_variant = multi_contract_config.find_contract(sub_contract_name);
+        self.register_contract_variant(expression, contract_builder, contract_variant);
+    }
+
+    /// Links a contract path in a test to a multi-contract output.
+    ///
+    /// This simulates the effects of building such a contract with only part of the endpoints.
+    pub fn register_contract_variant<B>(
+        &mut self,
+        expression: &str,
+        contract_builder: B,
+        contract_variant: &ContractVariant,
+    ) where
+        B: CallableContractBuilder,
+    {
+        let contract_obj = if contract_variant.settings.external_view {
             contract_builder.new_contract_obj::<api::ExternalViewApi<DebugApi>>()
         } else {
             contract_builder.new_contract_obj::<DebugApi>()
@@ -198,8 +213,8 @@ impl ScenarioWorld {
             expression,
             ContractContainer::new(
                 contract_obj,
-                Some(sub_contract.all_exported_function_names()),
-                sub_contract.settings.panic_message,
+                Some(contract_variant.all_exported_function_names()),
+                contract_variant.settings.panic_message,
             ),
         );
     }

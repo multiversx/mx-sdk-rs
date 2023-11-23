@@ -5,8 +5,8 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn test_subscription_go() {
-    world().run("scenarios/test_subscription.scen.json");
+fn init_go() {
+    world().run("scenarios/init.scen.json");
 }
 
 #[test]
@@ -15,6 +15,6 @@ fn mint_nft_go() {
 }
 
 #[test]
-fn init_go() {
-    world().run("scenarios/init.scen.json");
+fn test_subscription_go() {
+    world().run("scenarios/test_subscription.scen.json");
 }
