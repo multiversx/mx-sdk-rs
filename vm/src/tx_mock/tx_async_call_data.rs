@@ -127,7 +127,7 @@ pub fn async_promise_tx_input(
         gas_limit: 1000,
         gas_price: 0,
         tx_hash: promise.call.tx_hash.clone(),
-        promise_callback_closure_data: promise.callback_closure_data.clone(),
+        promise_callback_closure_data: Some(promise.callback_closure_data.clone()),
         ..Default::default()
     }
 }

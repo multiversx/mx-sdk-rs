@@ -52,7 +52,6 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-
 #[test]
 fn builtin_func_delete_user_name_rs() {
     world().run("scenarios/builtin_func_delete_user_name.scen.json");
@@ -487,7 +486,6 @@ fn promises_call_async_retrieve_esdt_rs() {
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_callback_directly_rs() {
     world().run("scenarios/promises_call_callback_directly.scen.json");
 }
