@@ -1,6 +1,3 @@
-use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
-use multiversx_chain_vm::world_mock::BlockchainState;
-use multiversx_sc_meta::find_workspace::find_workspace;
 use crate::{
     api::DebugApi,
     debug_executor::ContractContainer,
@@ -13,6 +10,9 @@ use crate::{
     scenario_model::BytesValue,
     vm_go_tool::run_vm_go_tool,
 };
+use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
+use multiversx_chain_vm::world_mock::BlockchainState;
+use multiversx_sc_meta::find_workspace::find_workspace;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;
@@ -221,4 +221,3 @@ impl ScenarioWorld {
         self.write_scenario_trace(file_path);
     }
 }
-

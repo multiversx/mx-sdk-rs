@@ -1,8 +1,7 @@
+use colored::Colorize;
 use std::path::{Path, PathBuf};
 
-use colored::Colorize;
-
-/// Finds the workspace by taking the `current_exe` and working its way up.
+/// Finds the workspace by searching for the workspace argument into the project's cargo.
 /// Works in debug mode too.
 ///
 pub fn find_workspace() -> PathBuf {
@@ -19,10 +18,10 @@ pub fn find_workspace() -> PathBuf {
 }
 
 pub fn print_searching_for_workspace() {
-    println!(
-        "{}",
-        format!("No --target-dir specified. Searching for workspace ...").yellow()
-    );
+    let to_show = "No --target-dir specified. Searching for workspace ..."
+        .to_string()
+        .yellow();
+    println!("{to_show}");
 }
 
 pub fn print_found_workspace(path: &Path) {
