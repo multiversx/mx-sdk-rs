@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::{process::Command, path::Path};
 
 use colored::Colorize;
 
@@ -89,3 +89,11 @@ pub fn print_check_ei_ok() {
 pub fn print_ignore_ei_check() {
     println!("{}", "EI version check explicitly ignored".yellow(),);
 }
+
+pub fn print_workspace_target_dir(path: &Path) {
+    println!(
+        "{}",
+        format!("Using workspace target directory: {} ...", path.display()).green()
+    );
+}
+
