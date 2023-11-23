@@ -101,35 +101,22 @@ fn extract_callback_payments(
     callback_payments
 }
 
-pub fn async_promise_tx_input(
-    address: &VMAddress,
+pub fn async_promise_callback_tx_input(
     promise: &Promise,
     async_result: &TxResult,
+    builtin_functions: &BuiltinFunctionContainer,
 ) -> TxInput {
-    let mut args: Vec<Vec<u8>> = Vec::new();
-    let serialized_bytes = async_result.result_status.to_be_bytes().to_vec();
-    args.push(serialized_bytes);
     let callback_name = if async_result.result_status == 0 {
-        args.extend_from_slice(async_result.result_values.as_slice());
         promise.success_callback.clone()
     } else {
-        args.push(async_result.result_message.clone().into_bytes());
         promise.error_callback.clone()
     };
 
-    TxInput {
-        from: promise.call.from.clone(),
-        to: address.clone(),
-        egld_value: 0u32.into(),
-        esdt_values: Vec::new(),
-        func_name: callback_name,
-        args,
-        gas_limit: 1000,
-        gas_price: 0,
-        tx_hash: promise.call.tx_hash.clone(),
-        promise_callback_closure_data: Some(promise.callback_closure_data.clone()),
-        ..Default::default()
-    }
+    let mut callback_input =
+        async_callback_tx_input(&promise.call, async_result, builtin_functions);
+    callback_input.func_name = callback_name;
+    callback_input.promise_callback_closure_data = Some(promise.callback_closure_data.clone());
+    callback_input
 }
 
 pub fn merge_results(mut original: TxResult, mut new: TxResult) -> TxResult {
