@@ -4,7 +4,7 @@ use multiversx_sc_meta::{
     cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
-    find_workspace::find_workspace,
+    find_workspace::{find_workspace, find_current_workspace},
     version_history,
 };
 
@@ -13,7 +13,7 @@ const BUILD_CONTRACTS: bool = true;
 
 #[test]
 fn test_template_list() {
-    let workspace_path = find_workspace();
+    let workspace_path = find_current_workspace().unwrap();
     let repo_source = RepoSource::from_local_path(workspace_path);
     let mut template_names = template_names_from_repo(&repo_source);
     template_names.sort();
@@ -49,7 +49,7 @@ fn template_current_empty() {
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
 fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
-    let workspace_path = find_workspace();
+    let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
         new_name: new_name.to_string(),
@@ -97,7 +97,7 @@ fn template_released_empty() {
 /// - build the newly created contracts (to wasm)
 /// - run all tests (including Go scenarios) on them.
 fn template_test_released(template_name: &str, new_name: &str) {
-    let workspace_path = find_workspace();
+    let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
         new_name: new_name.to_string(),
@@ -138,7 +138,7 @@ fn prepare_target_dir(target: &ContractCreatorTarget) {
 }
 
 pub fn cargo_test(target: &ContractCreatorTarget) {
-    let workspace_target_dir = find_workspace().join("target");
+    let workspace_target_dir = find_current_workspace().unwrap().join("target");
 
     let mut args = vec![
         "test",
@@ -162,7 +162,7 @@ pub fn cargo_test(target: &ContractCreatorTarget) {
 }
 
 pub fn build_contract(target: &ContractCreatorTarget) {
-    let workspace_target_dir = find_workspace().join("target");
+    let workspace_target_dir = find_current_workspace().unwrap().join("target");
 
     let exit_status = Command::new("cargo")
         .args([

@@ -12,7 +12,7 @@ use crate::{
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 use multiversx_chain_vm::world_mock::BlockchainState;
-use multiversx_sc_meta::find_workspace::find_workspace;
+use multiversx_sc_meta::find_workspace::find_current_workspace;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;
@@ -114,7 +114,7 @@ impl ScenarioWorld {
     /// Tells the tests where the crate lies relative to the workspace.
     /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
-        let mut path = find_workspace();
+        let mut path = find_current_workspace().unwrap();
         path.push(relative_path);
         self.current_dir = path;
         self
