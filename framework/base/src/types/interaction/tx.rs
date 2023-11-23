@@ -426,23 +426,72 @@ where
     Gas: TxGas<Env>,
     Data: TxData<Env>,
 {
-    pub fn deploy(
-        self,
-        code: ManagedBuffer<Env::Api>,
-        metadata: CodeMetadata,
-        arg_buffer: ManagedArgBuffer<Env::Api>,
-    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
+    pub fn deploy(self) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
-            payment: self.payment, //this should be egld payment and () only
+            payment: self.payment,
             gas: self.gas,
-            data: TxDataDeploy {
-                code,
-                metadata,
-                arg_buffer,
-            },
+            data: TxDataDeploy::default(),
+            callback: self.callback,
+        }
+    }
+}
+
+impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()>
+where
+    Env: TxEnv,
+    Payment: TxPayment<Env> + TxEgldOnlyPayment<Env>,
+    Gas: TxGas<Env>,
+{
+    pub fn code(
+        self,
+        code: ManagedBuffer<Env::Api>,
+    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
+        let mut data_deploy = self.data;
+        data_deploy.code = code;
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: data_deploy,
+            callback: self.callback,
+        }
+    }
+
+    pub fn code_metadata(
+        self,
+        code_metadata: CodeMetadata,
+    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
+        let mut data_deploy = self.data;
+        data_deploy.metadata = code_metadata;
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: data_deploy,
+            callback: self.callback,
+        }
+    }
+
+    pub fn arguments(
+        self,
+        arg_buffer: ManagedArgBuffer<Env::Api>,
+    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
+        let mut data_deploy = self.data;
+        data_deploy.arg_buffer = arg_buffer;
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: data_deploy,
             callback: self.callback,
         }
     }
@@ -494,4 +543,3 @@ where
         )
     }
 }
-

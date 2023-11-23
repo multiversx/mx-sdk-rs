@@ -21,6 +21,19 @@ where
     pub arg_buffer: ManagedArgBuffer<Env::Api>,
 }
 
+impl<Env> Default for TxDataDeploy<Env>
+where
+    Env: TxEnv,
+{
+    fn default() -> TxDataDeploy<Env> {
+        TxDataDeploy {
+            code: ManagedBuffer::new(),
+            metadata: CodeMetadata::DEFAULT,
+            arg_buffer: ManagedArgBuffer::new(),
+        }
+    }
+}
+
 impl<Env> TxData<Env> for TxDataDeploy<Env>
 where
     Env: TxEnv,
