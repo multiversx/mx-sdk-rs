@@ -19,5 +19,17 @@ pub trait Adder {
     #[endpoint]
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
+        let (_, _) = self
+            .tx()
+            // .esdt(EsdtTokenPayment::new(TokenIdentifier::from(""), 0u64, BigUint::zero()))
+            .egld(BigUint::from(5u64))
+            .deploy(
+                ManagedBuffer::new(),
+                CodeMetadata::DEFAULT,
+                ManagedArgBuffer::new(),
+            )
+            .execute_deploy();
     }
+
+    
 }
