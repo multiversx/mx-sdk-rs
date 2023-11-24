@@ -1,6 +1,7 @@
 use crate::{
     tx_execution::{builtin_function_names::ESDT_MULTI_TRANSFER_FUNC_NAME, BlockchainVMRef},
-    types::top_decode_u64,
+    tx_mock::TxLog,
+    types::{top_decode_u64, top_encode_u64},
 };
 
 use crate::{
@@ -12,7 +13,8 @@ use crate::{
 use super::{
     super::BuiltinFunction,
     transfer_common::{
-        execute_transfer_builtin_func, extract_transfer_info, ParsedTransferBuiltinFunCall,
+        adjust_call_type, execute_transfer_builtin_func, extract_transfer_info,
+        push_func_name_if_necessary, push_transfer_bytes, ParsedTransferBuiltinFunCall,
         RawEsdtTransfer,
     },
 };
@@ -44,13 +46,37 @@ impl BuiltinFunction for ESDTMultiTransfer {
     {
         match try_parse_input(&tx_input) {
             Ok(parsed_tx) => {
-                execute_transfer_builtin_func(vm, parsed_tx, self.name(), tx_input, tx_cache, f)
+                let log = build_log(&tx_input, &parsed_tx);
+                execute_transfer_builtin_func(vm, parsed_tx, tx_input, tx_cache, log, f)
             },
             Err(message) => {
                 let err_result = TxResult::from_vm_error(message);
                 (err_result, BlockchainUpdate::empty())
             },
         }
+    }
+}
+
+fn build_log(tx_input: &TxInput, call: &ParsedTransferBuiltinFunCall) -> TxLog {
+    let call_type = adjust_call_type(tx_input.call_type, call);
+    let mut topics = Vec::new();
+    push_transfer_bytes(&call.raw_esdt_transfers, &mut topics);
+    topics.push(call.destination.to_vec());
+
+    let mut data = vec![
+        call_type.to_log_bytes(),
+        ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
+        call.destination.to_vec(),
+        top_encode_u64(call.raw_esdt_transfers.len() as u64),
+    ];
+    push_transfer_bytes(&call.raw_esdt_transfers, &mut data);
+    push_func_name_if_necessary(call_type, &call.func_name, &mut data);
+
+    TxLog {
+        address: tx_input.from.clone(),
+        endpoint: ESDT_MULTI_TRANSFER_FUNC_NAME.into(),
+        topics,
+        data,
     }
 }
 

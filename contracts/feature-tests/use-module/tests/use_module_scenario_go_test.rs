@@ -10,6 +10,7 @@ fn use_module_claim_developer_rewards_go() {
 }
 
 #[test]
+#[ignore = "uses multi-level async"]
 fn use_module_dns_register_go() {
     world().run("scenarios/use_module_dns_register.scen.json");
 }

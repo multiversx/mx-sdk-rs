@@ -52,13 +52,14 @@ pub trait VMHooksHandlerSource: Debug {
     /// For ownership reasons, needs to return a clone.
     ///
     /// Can be optimized, but is not a priority right now.
-    fn account_data(&self, address: &VMAddress) -> AccountData;
+    fn account_data(&self, address: &VMAddress) -> Option<AccountData>;
 
     /// For ownership reasons, needs to return a clone.
     ///
     /// Can be optimized, but is not a priority right now.
     fn current_account_data(&self) -> AccountData {
         self.account_data(&self.input_ref().to)
+            .expect("missing current account")
     }
 
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;

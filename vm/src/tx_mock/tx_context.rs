@@ -95,6 +95,14 @@ impl TxContext {
         self.tx_cache.with_account(address, f)
     }
 
+    pub fn with_account_or_else<R, F, Else>(&self, address: &VMAddress, f: F, or_else: Else) -> R
+    where
+        F: FnOnce(&AccountData) -> R,
+        Else: FnOnce() -> R,
+    {
+        self.tx_cache.with_account_or_else(address, f, or_else)
+    }
+
     pub fn with_contract_account<R, F>(&self, f: F) -> R
     where
         F: FnOnce(&AccountData) -> R,

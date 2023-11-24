@@ -1,0 +1,137 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:a_user",
+                "to": "sc:forwarder",
+                "function": "forward_promise_retrieve_funds",
+                "arguments": [
+                    "sc:vault",
+                    "str:EGLD",
+                    "0",
+                    "1000"
+                ],
+                "gasLimit": "60,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:AsyncCall",
+                            "str:retrieve_funds",
+                            "str:EGLD",
+                            "0",
+                            "1000"
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:retrieve_funds",
+                        "topics": [
+                            "str:retrieve_funds",
+                            "str:EGLD",
+                            "0",
+                            "1000"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "1000",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:BackTransfer",
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "1000",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:retrieve_funds_callback",
+                            "0x00"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:retrieve_funds_callback",
+                        "topics": [
+                            "str:retrieve_funds_callback",
+                            "str:EGLD",
+                            "0",
+                            "1000"
+                        ],
+                        "data": [
+                            ""
+                        ]
+                    }
+                ],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:a_user": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "sc:vault": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../vault/output/vault.wasm"
+                },
+                "sc:forwarder": {
+                    "nonce": "0",
+                    "balance": "1000",
+                    "storage": "*",
+                    "code": "file:../promises-features/output/promises-features.wasm"
+                }
+            }
+        }
+    ]
+}
