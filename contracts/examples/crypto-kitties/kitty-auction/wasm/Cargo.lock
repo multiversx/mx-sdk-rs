@@ -118,7 +118,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.45.0"
+version = "0.45.1"
 dependencies = [
  "bitflags",
  "hashbrown",
@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.18.1"
+version = "0.18.2"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -138,7 +138,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.18.1"
+version = "0.18.2"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -148,7 +148,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.45.0"
+version = "0.45.1"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -159,7 +159,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.45.0"
+version = "0.45.1"
 dependencies = [
  "multiversx-sc",
 ]
