@@ -369,7 +369,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         no_overflow_u8 => no_overflow_u8
         no_overflow_u16 => no_overflow_u16
         no_overflow_u32 => no_overflow_u32
-        u64 => u64
+        no_overflow_u64 => no_overflow_u64
         overflow_usize => overflow_usize
         overflow_u8 => overflow_u8
         overflow_u16 => overflow_u16
