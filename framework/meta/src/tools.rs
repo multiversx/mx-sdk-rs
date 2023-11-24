@@ -1,3 +1,4 @@
+pub mod find_workspace;
 mod git_describe;
 pub mod twiggy;
 mod wasm_imports;

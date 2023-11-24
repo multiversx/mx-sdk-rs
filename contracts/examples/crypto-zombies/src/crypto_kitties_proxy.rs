@@ -1,4 +1,3 @@
-
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 

@@ -14,6 +14,7 @@ use crate::{
     scenario_model::BytesValue,
     vm_go_tool::run_vm_go_tool,
 };
+use multiversx_sc_meta::find_workspace::find_current_workspace;
 use std::path::{Path, PathBuf};
 
 use super::debugger_backend::DebuggerBackend;
@@ -115,7 +116,7 @@ impl ScenarioWorld {
     /// Tells the tests where the crate lies relative to the workspace.
     /// This ensures that the paths are set correctly, including in debug mode.
     pub fn set_current_dir_from_workspace(&mut self, relative_path: &str) -> &mut Self {
-        let mut path = find_workspace();
+        let mut path = find_current_workspace().unwrap();
         path.push(relative_path);
         self.current_dir = path;
         self
@@ -235,20 +236,4 @@ impl ScenarioWorld {
     pub fn write_mandos_trace<P: AsRef<Path>>(&mut self, file_path: P) {
         self.write_scenario_trace(file_path);
     }
-}
-
-/// Finds the workspace by taking the `current_exe` and working its way up.
-/// Works in debug mode too.
-pub fn find_workspace() -> PathBuf {
-    let current_exe = std::env::current_exe().unwrap();
-    let mut path = current_exe.as_path();
-    while !is_target(path) {
-        path = path.parent().unwrap();
-    }
-
-    path.parent().unwrap().into()
-}
-
-fn is_target(path_buf: &Path) -> bool {
-    path_buf.file_name().unwrap() == "target"
 }
