@@ -1,10 +1,9 @@
 use crate::{
     tx_mock::{
-        async_call_tx_input, async_callback_tx_input, async_promise_tx_input, merge_results,
-        AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext, TxContextStack,
-        TxInput, TxPanic, TxResult, TxResultCalls,
+        async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
+        merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
+        TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
     },
-    types::VMAddress,
     with_shared::Shareable,
     world_mock::{AccountData, AccountEsdt, BlockchainState},
 };
@@ -148,7 +147,6 @@ impl BlockchainVMRef {
         F: FnOnce(),
     {
         // main call
-        let contract_address = tx_input.to.clone();
         let mut tx_result = self.execute_sc_call_lambda(tx_input, state, f);
 
         // take & clear pending calls
@@ -172,7 +170,7 @@ impl BlockchainVMRef {
         // the promises are also reset
         for promise in pending_calls.promises {
             let (async_result, callback_result) =
-                self.execute_promise_call_and_callback(&contract_address, &promise, state);
+                self.execute_promise_call_and_callback(&promise, state);
 
             tx_result = merge_results(tx_result, async_result.clone());
             tx_result = merge_results(tx_result, callback_result.clone());
@@ -183,7 +181,6 @@ impl BlockchainVMRef {
 
     pub fn execute_promise_call_and_callback(
         &self,
-        address: &VMAddress,
         promise: &Promise,
         state: &mut Shareable<BlockchainState>,
     ) -> (TxResult, TxResult) {
@@ -194,17 +191,7 @@ impl BlockchainVMRef {
                 state,
                 execute_current_tx_context_input,
             );
-
-            let callback_input = async_promise_tx_input(address, promise, &async_result);
-            let callback_result = self.execute_sc_call_lambda(
-                callback_input,
-                state,
-                execute_current_tx_context_input,
-            );
-            assert!(
-                callback_result.pending_calls.promises.is_empty(),
-                "successive promises currently not supported"
-            );
+            let callback_result = self.execute_promises_callback(&async_result, promise, state);
             (async_result, callback_result)
         } else {
             let result = self.insert_ghost_account(&promise.call, state);
@@ -216,6 +203,26 @@ impl BlockchainVMRef {
                 Err(err) => (TxResult::from_panic_obj(&err), TxResult::empty()),
             }
         }
+    }
+
+    fn execute_promises_callback(
+        &self,
+        async_result: &TxResult,
+        promise: &Promise,
+        state: &mut Shareable<BlockchainState>,
+    ) -> TxResult {
+        if !promise.has_callback() {
+            return TxResult::empty();
+        }
+        let callback_input =
+            async_promise_callback_tx_input(promise, async_result, &self.builtin_functions);
+        let callback_result =
+            self.execute_sc_call_lambda(callback_input, state, execute_current_tx_context_input);
+        assert!(
+            callback_result.pending_calls.promises.is_empty(),
+            "successive promises currently not supported"
+        );
+        callback_result
     }
 
     /// When calling a contract that is unknown to the state, we insert a ghost account.

@@ -52,7 +52,6 @@ fn world() -> ScenarioWorld {
     blockchain
 }
 
-
 #[test]
 fn builtin_func_delete_user_name_rs() {
     world().run("scenarios/builtin_func_delete_user_name.scen.json");
@@ -475,31 +474,27 @@ fn promises_call_async_accept_esdt_rs() {
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_async_retrieve_egld_rs() {
     world().run("scenarios/promises_call_async_retrieve_egld.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_async_retrieve_esdt_rs() {
     world().run("scenarios/promises_call_async_retrieve_esdt.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_call_callback_directly_rs() {
     world().run("scenarios/promises_call_callback_directly.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
 fn promises_multi_transfer_rs() {
     world().run("scenarios/promises_multi_transfer.scen.json");
 }
 
 #[test]
-#[ignore = "TODO"]
+#[ignore = "gas"]
 fn promises_single_transfer_rs() {
     world().run("scenarios/promises_single_transfer.scen.json");
 }

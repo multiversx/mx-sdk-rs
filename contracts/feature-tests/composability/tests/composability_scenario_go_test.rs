@@ -4,7 +4,6 @@ fn world() -> ScenarioWorld {
     ScenarioWorld::vm_go()
 }
 
-
 #[test]
 fn builtin_func_delete_user_name_go() {
     world().run("scenarios/builtin_func_delete_user_name.scen.json");

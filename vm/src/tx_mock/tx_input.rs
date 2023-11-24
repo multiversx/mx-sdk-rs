@@ -21,7 +21,7 @@ pub struct TxInput {
     pub gas_limit: u64,
     pub gas_price: u64,
     pub tx_hash: H256,
-    pub promise_callback_closure_data: Vec<u8>,
+    pub promise_callback_closure_data: Option<Vec<u8>>,
     pub callback_payments: CallbackPayments,
 }
 
@@ -38,7 +38,7 @@ impl Default for TxInput {
             gas_limit: 0,
             gas_price: 0,
             tx_hash: H256::zero(),
-            promise_callback_closure_data: Vec::new(),
+            promise_callback_closure_data: None,
             callback_payments: Default::default(),
         }
     }

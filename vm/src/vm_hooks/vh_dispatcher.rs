@@ -697,12 +697,9 @@ impl VMHooks for VMHooksDispatcher {
         );
     }
 
-    fn managed_get_back_transfers(
-        &self,
-        esdt_transfer_value_handle: i32,
-        call_value_handle: i32,
-    ) {
-        self.handler.managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle);
+    fn managed_get_back_transfers(&self, esdt_transfer_value_handle: i32, call_value_handle: i32) {
+        self.handler
+            .managed_get_back_transfers(esdt_transfer_value_handle, call_value_handle);
     }
 
     fn managed_async_call(
