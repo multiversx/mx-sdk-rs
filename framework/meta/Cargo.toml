@@ -26,6 +26,10 @@ standalone = ["ruplacer", "reqwest", "zip", "copy_dir", "pathdiff", "common-path
 template-test-current = []
 template-test-released = []
 
+# no other way to have a default feature in bin at the moment
+# contract meta crates should add `default-features = false`
+default = ["standalone"]
+
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
