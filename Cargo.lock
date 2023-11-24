@@ -751,21 +751,12 @@ dependencies = [
 
 [[package]]
 name = "ed25519"
-version = "1.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91cff35c70bba8a626e3185d8cd48cc11b5437e1a5bcd15b9b5fa3c64b6dfee7"
-dependencies = [
- "signature 1.6.4",
-]
-
-[[package]]
-name = "ed25519"
 version = "2.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "115531babc129696a58c64a4fef0a8bf9e9698629fb97e9e40767d235cfbcd53"
 dependencies = [
  "pkcs8",
- "signature 2.1.0",
+ "signature",
 ]
 
 [[package]]
@@ -775,7 +766,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7277392b266383ef8396db7fdeb1e77b6c52fed775f5df15bb24f35b72156980"
 dependencies = [
  "curve25519-dalek",
- "ed25519 2.2.3",
+ "ed25519",
  "serde",
  "sha2 0.10.8",
  "zeroize",
@@ -2017,7 +2008,6 @@ dependencies = [
  "base64 0.13.1",
  "bech32",
  "bip39",
- "ed25519 1.5.3",
  "hex",
  "hmac",
  "itertools",
@@ -3019,12 +3009,6 @@ checksum = "d8229b473baa5980ac72ef434c4415e70c4b5e71b423043adb4ba059f89c99a1"
 dependencies = [
  "libc",
 ]
-
-[[package]]
-name = "signature"
-version = "1.6.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74233d3b3b2f6d4b006dc19dee745e73e2a6bfb6f93607cd3b02bd5b00797d7c"
 
 [[package]]
 name = "signature"
