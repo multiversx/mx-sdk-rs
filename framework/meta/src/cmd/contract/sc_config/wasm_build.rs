@@ -5,7 +5,7 @@ use crate::{
     abi_json::ContractAbiJson,
     cli_args::BuildArgs,
     ei::EIVersion,
-    find_workspace::find_workspace,
+    find_workspace::find_current_workspace,
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
     tools,
@@ -38,7 +38,7 @@ impl ContractVariant {
         }
         if let Some(target_dir_wasm) = &build_args.target_dir_wasm {
             command.args(["--target-dir", target_dir_wasm]); ///////
-        } else if let Some(workspace) = find_workspace(&std::env::current_dir().unwrap()) {
+        } else if let Some(workspace) = find_current_workspace() {
             print_workspace_target_dir(&workspace);
             command.args(["--target-dir", workspace.join("target").to_str().unwrap()]);
         }

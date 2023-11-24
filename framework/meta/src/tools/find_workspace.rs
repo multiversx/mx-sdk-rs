@@ -21,3 +21,7 @@ pub fn find_workspace(path: &Path) -> Option<PathBuf> {
 
     None
 }
+
+pub fn find_current_workspace() -> Option<PathBuf> {
+    find_workspace(&std::env::current_dir().unwrap())
+}
