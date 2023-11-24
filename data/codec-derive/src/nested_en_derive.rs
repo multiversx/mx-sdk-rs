@@ -4,7 +4,7 @@ use quote::quote;
 
 pub fn dep_encode_snippet(value: &proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     quote! {
-        codec::NestedEncode::dep_encode_or_handle_err(&#value, dest, h)?;
+        codec::NestedEncode::dep_encode_or_handle_err(&#value, __dest__, __h__)?;
     }
 }
 
@@ -26,7 +26,7 @@ fn variant_dep_encode_snippets(
             });
             quote! {
                 #name::#variant_ident #local_var_declarations => {
-                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
+                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, __dest__, __h__)?;
                     #(#variant_field_snippets)*
                 },
             }
@@ -44,7 +44,7 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
             });
             quote! {
                 impl #impl_generics codec::NestedEncode for #name #ty_generics #where_clause {
-                    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> core::result::Result<(), H::HandledErr>
+                    fn dep_encode_or_handle_err<O, H>(&self, __dest__: &mut O, __h__: H) -> core::result::Result<(), H::HandledErr>
                     where
                         O: codec::NestedEncodeOutput,
                         H: codec::EncodeErrorHandler,
@@ -64,7 +64,7 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
             quote! {
                 impl #impl_generics codec::NestedEncode for #name #ty_generics #where_clause {
-                    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> core::result::Result<(), H::HandledErr>
+                    fn dep_encode_or_handle_err<O, H>(&self, __dest__: &mut O, __h__: H) -> core::result::Result<(), H::HandledErr>
                     where
                         O: codec::NestedEncodeOutput,
                         H: codec::EncodeErrorHandler,
