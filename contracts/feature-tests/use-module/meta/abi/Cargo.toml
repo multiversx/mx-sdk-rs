@@ -15,3 +15,4 @@ path = "../../../../framework/base"
 [dependencies.multiversx-sc-meta]
 version = "0.45.0"
 path = "../../../../framework/meta"
+default-features = false
