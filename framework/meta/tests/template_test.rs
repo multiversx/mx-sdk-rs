@@ -4,7 +4,7 @@ use multiversx_sc_meta::{
     cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
-    find_workspace::{find_workspace, find_current_workspace},
+    find_workspace::find_current_workspace,
     version_history,
 };
 
@@ -22,7 +22,8 @@ fn test_template_list() {
         [
             "adder".to_string(),
             "crypto-zombies".to_string(),
-            "empty".to_string()
+            "empty".to_string(),
+            "ping-pong-egld".to_string(),
         ]
     );
 }
@@ -43,6 +44,12 @@ fn template_current_crypto_zombies() {
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_empty() {
     template_test_current("empty", "examples", "new-empty");
+}
+
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_ping_pong_egld() {
+    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
 }
 
 /// Recreates the folder structure in `contracts`, on the same level.

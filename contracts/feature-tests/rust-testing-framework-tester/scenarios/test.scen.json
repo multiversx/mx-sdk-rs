@@ -57,8 +57,7 @@
                 "arguments": [
                     "0x32"
                 ],
-                "gasLimit": "100000000",
-                "gasPrice": "0"
+                "gasLimit": "100000000"
             },
             "expect": {
                 "out": [],

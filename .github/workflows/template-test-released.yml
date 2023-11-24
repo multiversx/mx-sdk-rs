@@ -45,12 +45,6 @@ jobs:
           which wasm2wat
           which run-scenarios
 
-      - name: Install libtinfo5
-        if: inputs.install-libtinfo5
-        run: |
-          sudo apt update
-          sudo apt install -y libtinfo5
-
       - name: Run template tool test
         run: |
           cd framework/meta

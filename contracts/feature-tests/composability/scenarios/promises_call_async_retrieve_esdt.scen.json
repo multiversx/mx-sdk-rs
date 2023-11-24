@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -11,15 +10,15 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
+                    "esdt": {
+                        "str:TEST-TOKENA": "1000"
+                    },
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "esdt": {
-                        "str:FWD-TOKEN": "1000"
-                    },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }
         },
@@ -29,13 +28,14 @@
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
-                "function": "send_funds_twice",
+                "function": "forward_promise_retrieve_funds",
                 "arguments": [
                     "sc:vault",
-                    "str:FWD-TOKEN",
-                    "1"
+                    "str:TEST-TOKENA",
+                    "0",
+                    "1000"
                 ],
-                "gasLimit": "100,000,000",
+                "gasLimit": "70,000,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -44,49 +44,60 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:ESDTTransfer",
+                        "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "str:FWD-TOKEN",
                             "",
-                            "1",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:AsyncCall",
+                            "str:retrieve_funds",
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000"
+                        ]
                     },
                     {
                         "address": "sc:vault",
-                        "endpoint": "str:accept_funds",
+                        "endpoint": "str:retrieve_funds",
                         "topics": [
-                            "str:accept_funds",
+                            "str:retrieve_funds",
+                            "str:TEST-TOKENA",
                             "0",
-                            "str:FWD-TOKEN",
-                            "0",
-                            "1"
+                            "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
+                    },
+                    {
+                        "address": "sc:vault",
+                        "endpoint": "str:ESDTTransfer",
+                        "topics": [
+                            "str:TEST-TOKENA",
+                            "0",
+                            "1000",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:BackTransfer",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:ESDTTransfer",
+                        "endpoint": "str:retrieve_funds_callback",
                         "topics": [
-                            "str:FWD-TOKEN",
-                            "",
-                            "1",
-                            "sc:vault"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:vault",
-                        "endpoint": "str:accept_funds",
-                        "topics": [
-                            "str:accept_funds",
+                            "str:retrieve_funds_callback",
+                            "str:TEST-TOKENA",
                             "0",
-                            "str:FWD-TOKEN",
-                            "0",
-                            "1"
+                            "1000"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -105,22 +116,17 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "esdt": {
-                        "str:FWD-TOKEN": "2"
-                    },
-                    "storage": {
-                        "str:call_counts|nested:str:accept_funds": "2"
-                    },
+                    "storage": {},
                     "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "esdt": {
-                        "str:FWD-TOKEN": "998"
+                        "str:TEST-TOKENA": "1000"
                     },
-                    "storage": {},
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "storage": "*",
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }
         }

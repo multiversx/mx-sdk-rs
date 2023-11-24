@@ -155,48 +155,38 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     ) {
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
-        let account = self.account_data(&address);
 
-        if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
-            if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
-                self.set_esdt_data_values(
-                    esdt_data,
-                    instance,
-                    value_handle,
-                    properties_handle,
-                    hash_handle,
-                    name_handle,
-                    attributes_handle,
-                    creator_handle,
-                    royalties_handle,
-                    uris_handle,
-                )
-            } else {
-                // missing nonce
-                self.reset_esdt_data_values(
-                    value_handle,
-                    properties_handle,
-                    hash_handle,
-                    name_handle,
-                    attributes_handle,
-                    creator_handle,
-                    royalties_handle,
-                    uris_handle,
-                );
+        if let Some(account) = self.account_data(&address) {
+            if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
+                if let Some(instance) = esdt_data.instances.get_by_nonce(nonce) {
+                    self.set_esdt_data_values(
+                        esdt_data,
+                        instance,
+                        value_handle,
+                        properties_handle,
+                        hash_handle,
+                        name_handle,
+                        attributes_handle,
+                        creator_handle,
+                        royalties_handle,
+                        uris_handle,
+                    );
+                    return;
+                }
             }
-        } else {
-            // missing token identifier
-            self.reset_esdt_data_values(
-                value_handle,
-                properties_handle,
-                hash_handle,
-                name_handle,
-                attributes_handle,
-                creator_handle,
-                royalties_handle,
-                uris_handle,
-            );
         }
+
+        // missing account/token identifier/nonce
+        self.reset_esdt_data_values(
+            value_handle,
+            properties_handle,
+            hash_handle,
+            name_handle,
+            attributes_handle,
+            creator_handle,
+            royalties_handle,
+            uris_handle,
+        );
     }
 
     fn managed_get_back_transfers(
@@ -221,9 +211,10 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     ) -> bool {
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
         let token_id_bytes = self.m_types_lock().mb_get(token_id_handle).to_vec();
-        let account = self.account_data(&address);
-        if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
-            return esdt_data.frozen;
+        if let Some(account) = self.account_data(&address) {
+            if let Some(esdt_data) = account.esdt.get_by_identifier(token_id_bytes.as_slice()) {
+                return esdt_data.frozen;
+            }
         }
 
         false

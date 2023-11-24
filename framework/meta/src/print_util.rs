@@ -1,4 +1,4 @@
-use std::{process::Command, path::Path};
+use std::{path::Path, process::Command};
 
 use colored::Colorize;
 
@@ -96,4 +96,3 @@ pub fn print_workspace_target_dir(path: &Path) {
         format!("Using workspace target directory: {} ...", path.display()).green()
     );
 }
-

@@ -26,3 +26,4 @@ pub(super) static ATTR_STORAGE_CLEAR: &str = "storage_clear";
 pub(super) static ATTR_PROXY: &str = "proxy";
 pub(super) static ATTR_LABEL: &str = "label";
 pub(super) static ATTR_ALLOW_MULTIPLE_VAR_ARGS: &str = "allow_multiple_var_args";
+pub(super) static ATTR_UPGRADE: &str = "upgrade";

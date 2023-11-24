@@ -35,6 +35,11 @@ fn big_uint_sqrt_go() {
 }
 
 #[test]
+fn big_uint_pow_go() {
+    world().run("scenarios/big_uint_pow.scen.json");
+}
+
+#[test]
 fn big_uint_to_u_64_go() {
     world().run("scenarios/big_uint_to_u64.scen.json");
 }
@@ -336,6 +341,7 @@ fn storage_map_3_go() {
 }
 
 #[test]
+#[ignore = "currently not supported. TODO: investigate"]
 fn storage_mapper_fungible_token_go() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
 }

@@ -47,7 +47,9 @@
                             "str:top_up",
                             "address:acc1"
                         ],
-                        "data": "0x0100"
+                        "data": [
+                            "0x0100"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -77,7 +79,9 @@
                             "str:top_up",
                             "address:acc2"
                         ],
-                        "data": "0x0100"
+                        "data": [
+                            "0x0100"
+                        ]
                     }
                 ],
                 "gas": "*",

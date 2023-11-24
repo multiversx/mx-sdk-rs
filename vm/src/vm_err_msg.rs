@@ -11,3 +11,6 @@ pub const NUMBER_IS_NOT_NORMAL: &str =
 pub const CANNOT_COMPARE_VALUES: &str = "values are not comparable";
 
 pub const ERROR_SIGNALLED_BY_SMARTCONTRACT: &str = "error signalled by smartcontract";
+
+pub const ERROR_NO_CALLBACK_CLOSURE: &str =
+    "no callback for closure, cannot call callback directly";
