@@ -2,7 +2,10 @@ use std::fs;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::{cli_args::BuildArgs, tools::check_tools_installed, CargoTomlContents};
+use crate::{
+    cli_args::BuildArgs, find_workspace::find_current_workspace,
+    print_util::print_workspace_target_dir, tools::check_tools_installed, CargoTomlContents,
+};
 
 use super::{
     sc_config::ScConfig, wasm_cargo_toml_data::WasmCargoTomlData,
@@ -82,6 +85,7 @@ impl MetaConfig {
 
     pub fn build(&mut self, mut build_args: BuildArgs) {
         check_tools_installed(&mut build_args);
+        adjust_target_dir_wasm(&mut build_args);
 
         for contract_variant in &self.sc_config.contracts {
             contract_variant.build_contract(&build_args, self.output_dir.as_str());
@@ -143,6 +147,20 @@ impl MetaConfig {
                     });
                 }
             }
+        }
+    }
+}
+
+fn adjust_target_dir_wasm(build_args: &mut BuildArgs) {
+    if build_args.target_dir_wasm.is_some() {
+        return;
+    }
+
+    if let Some(workspace) = find_current_workspace() {
+        let target = workspace.join("target").canonicalize().unwrap();
+        if let Some(target_str) = target.as_os_str().to_str() {
+            build_args.target_dir_wasm = Some(target_str.to_string());
+            print_workspace_target_dir(target_str);
         }
     }
 }
