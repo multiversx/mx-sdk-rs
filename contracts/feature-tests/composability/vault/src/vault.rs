@@ -14,6 +14,19 @@ pub trait Vault {
         opt_arg_to_echo
     }
 
+    #[upgrade]
+    #[label("upgrade")]
+    fn upgrade(
+        &self,
+        opt_arg_to_echo: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<&'static str, OptionalValue<ManagedBuffer>> {
+        self.upgraded_event();
+        ("upgraded", opt_arg_to_echo).into()
+    }
+
+    #[event("upgraded")]
+    fn upgraded_event(&self);
+
     #[endpoint]
     fn echo_arguments(
         &self,

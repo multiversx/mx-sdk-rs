@@ -9,8 +9,8 @@
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm",
                     "owner": "sc:forwarder"
                 },
-                "sc:vault": {
-                    "code": "file:../vault/output/vault.wasm"
+                "sc:reference": {
+                    "code": "file:../vault/output/vault-upgrade.wasm"
                 }
             }
         },
@@ -23,13 +23,15 @@
                 "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:forwarder",
-                    "sc:vault"
+                    "sc:reference"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": []
+                "out": [
+                    "str:upgraded"
+                ]
             }
         },
         {
@@ -39,11 +41,11 @@
                     "nonce": "*"
                 },
                 "sc:forwarder": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "file:../vault/output/vault-upgrade.wasm",
                     "owner": "sc:forwarder"
                 },
-                "sc:vault": {
-                    "code": "file:../vault/output/vault.wasm"
+                "sc:reference": {
+                    "code": "file:../vault/output/vault-upgrade.wasm"
                 }
             }
         }

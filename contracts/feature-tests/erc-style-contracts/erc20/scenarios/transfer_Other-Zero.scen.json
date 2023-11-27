@@ -46,7 +46,9 @@
                             "address:account_1",
                             "address:account_7"
                         ],
-                        "data": "0"
+                        "data": [
+                            "0"
+                        ]
                     }
                 ],
                 "gas": "*",

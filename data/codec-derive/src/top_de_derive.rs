@@ -61,7 +61,7 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 let mut nested_buffer = top_input.into_nested_buffer();
                 let result = #name #field_dep_decode_snippets ;
                 if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
-                    return core::result::Result::Err(h.handle_error(codec::DecodeError::INPUT_TOO_LONG));
+                    return core::result::Result::Err(__h__.handle_error(codec::DecodeError::INPUT_TOO_LONG));
                 }
                 core::result::Result::Ok(result)
             }
@@ -75,9 +75,9 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 // fieldless enums are special, they can be top-decoded as u8 directly
                 let top_decode_arms = fieldless_enum_match_arm_result_ok(name, data_enum);
                 quote! {
-                    match <u8 as codec::TopDecode>::top_decode_or_handle_err(top_input, h)? {
+                    match <u8 as codec::TopDecode>::top_decode_or_handle_err(top_input, __h__)? {
                         #(#top_decode_arms)*
-                        _ => core::result::Result::Err(h.handle_error(codec::DecodeError::INVALID_VALUE)),
+                        _ => core::result::Result::Err(__h__.handle_error(codec::DecodeError::INVALID_VALUE)),
                     }
                 }
             } else {
@@ -86,15 +86,15 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
 
                 quote! {
                     let mut nested_buffer = top_input.into_nested_buffer();
-                    let result = match <u8 as codec::NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, h)? {
+                    let result = match <u8 as codec::NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, __h__)? {
                         #(#variant_dep_decode_snippets)*
                         _ => core::result::Result::Err(
-                            h.handle_error(codec::DecodeError::INVALID_VALUE),
+                            __h__.handle_error(codec::DecodeError::INVALID_VALUE),
                         ),
                     };
                     if !codec::NestedDecodeInput::is_depleted(&nested_buffer) {
                         return core::result::Result::Err(
-                            h.handle_error(codec::DecodeError::INPUT_TOO_LONG),
+                            __h__.handle_error(codec::DecodeError::INPUT_TOO_LONG),
                         );
                     }
                     result
@@ -113,7 +113,7 @@ pub fn top_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl #impl_generics codec::TopDecode for #name #ty_generics #where_clause {
-            fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> core::result::Result<Self, H::HandledErr>
+            fn top_decode_or_handle_err<I, H>(top_input: I, __h__: H) -> core::result::Result<Self, H::HandledErr>
             where
                 I: codec::TopDecodeInput,
                 H: codec::DecodeErrorHandler,
@@ -134,7 +134,7 @@ pub fn top_decode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl #impl_generics codec::TopDecode for #name #ty_generics #where_clause {
-            fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> core::result::Result<Self, H::HandledErr>
+            fn top_decode_or_handle_err<I, H>(top_input: I, __h__: H) -> core::result::Result<Self, H::HandledErr>
             where
                 I: codec::TopDecodeInput,
                 H: codec::DecodeErrorHandler,

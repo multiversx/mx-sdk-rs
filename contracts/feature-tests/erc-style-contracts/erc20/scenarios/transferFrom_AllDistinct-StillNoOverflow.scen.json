@@ -49,7 +49,9 @@
                             "address:coin_holder_1",
                             "address:account_2"
                         ],
-                        "data": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6"
+                        "data": [
+                            "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff6"
+                        ]
                     }
                 ],
                 "gas": "*",

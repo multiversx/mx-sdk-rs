@@ -98,6 +98,34 @@ fn test_into_vec() {
 }
 
 #[test]
+fn test_take_u64() {
+    let mut vec = Vec::<u64>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
+    for i in 20u64..=30u64 {
+        managed_vec.push(i);
+        vec.push(i);
+    }
+
+    assert_eq!(managed_vec.len(), 11);
+    assert_eq!(managed_vec.take(4), 24u64);
+    assert_eq!(managed_vec.len(), 10);
+}
+
+#[test]
+fn test_take_biguint() {
+    let mut vec = Vec::<BigUint<StaticApi>>::new();
+    let mut managed_vec = ManagedVec::<StaticApi, BigUint<StaticApi>>::new();
+    for i in 20u64..=30u64 {
+        let biguint = BigUint::<StaticApi>::from(i);
+        managed_vec.push(biguint.clone());
+        vec.push(biguint);
+    }
+    assert_eq!(managed_vec.len(), 11);
+    assert_eq!(managed_vec.take(4), BigUint::<StaticApi>::from(24u64));
+    assert_eq!(managed_vec.len(), 10);
+}
+
+#[test]
 fn test_sort_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();

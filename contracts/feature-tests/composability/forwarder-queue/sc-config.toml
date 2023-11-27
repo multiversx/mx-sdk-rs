@@ -8,3 +8,4 @@ name = "forwarder-queue"
 name = "forwarder-queue-promises"
 add-labels = ["promises-callback"]
 features = ["promises"]
+ei = "1.3"

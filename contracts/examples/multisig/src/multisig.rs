@@ -41,6 +41,11 @@ pub trait Multisig:
         self.quorum().set(quorum);
     }
 
+    #[upgrade]
+    fn upgrade(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {
+        self.init(quorum, board)
+    }
+
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol.
     #[payable("*")]
     #[endpoint]

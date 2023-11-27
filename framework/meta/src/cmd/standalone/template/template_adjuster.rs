@@ -32,7 +32,7 @@ impl TemplateAdjuster {
             remove_paths_from_deps(&mut toml, &[]);
         }
 
-        toml.insert_default_workspace();
+        toml.add_workspace(&[".", "meta"]);
 
         toml.save_to_file(&cargo_toml_path);
     }
@@ -160,6 +160,12 @@ impl TemplateAdjuster {
         replace_in_files(
             &self.target.contract_dir(),
             "*.scen.json",
+            &[Query::substring(&old_wasm, &new_wasm)][..],
+        );
+
+        replace_in_files(
+            &self.target.contract_dir(),
+            "*.steps.json",
             &[Query::substring(&old_wasm, &new_wasm)][..],
         );
 

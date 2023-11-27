@@ -7,6 +7,9 @@ pub trait Factorial {
     #[init]
     fn init(&self) {}
 
+    #[upgrade]
+    fn upgrade(&self) {}
+
     #[endpoint]
     fn factorial(&self, value: BigUint) -> BigUint {
         let one = BigUint::from(1u32);
