@@ -8,9 +8,13 @@ pub fn process_contract(
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     let new_input = trait_preprocessing(input);
-    let args_input = parse_macro_input!(args as syn::AttributeArgs);
-    let proc_input = &parse_macro_input!(new_input as syn::ItemTrait);
+    // let args_input = parse_macro_input!(args as syn::AttributeArgs);
 
+    println!("process_contract args are: {:#?}", args);
+    let args_input = parse_macro_input!(args as syn::MetaList);
+
+    println!("process_contract args_input are: {:#?}", args_input);
+    let proc_input = &parse_macro_input!(new_input as syn::ItemTrait);
     let contract = parse_contract_trait(args_input, proc_input);
     validate_contract(&contract);
 

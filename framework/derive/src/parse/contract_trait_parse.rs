@@ -1,5 +1,6 @@
 use super::{
-    attributes::extract_doc, method_parse::process_method, parse_util::validate_attribute_args,
+    attributes::extract_doc, method_parse::process_method, 
+    parse_util::validate_attribute_args,
     supertrait_parse::parse_supertrait,
 };
 use crate::{

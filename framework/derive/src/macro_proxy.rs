@@ -11,7 +11,10 @@ pub fn process_proxy(
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     let new_input = trait_preprocessing(input);
-    let args_input = parse_macro_input!(args as syn::AttributeArgs);
+
+    let args_input = parse_macro_input!(args as syn::MetaList);
+
+    // let args_input = parse_macro_input!(args as syn::AttributeArgs);
     let proc_input = parse_macro_input!(new_input as syn::ItemTrait);
 
     let contract = parse_contract_trait(args_input, &proc_input);
