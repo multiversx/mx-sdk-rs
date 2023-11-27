@@ -6,7 +6,7 @@ pub struct PayableAttribute {
 
 impl PayableAttribute {
     pub fn parse(attr: &syn::Attribute) -> Option<PayableAttribute> {
-        if let Some(first_seg) = attr.path.segments.first() {
+        if let Some(first_seg) = attr.path().segments.first() {
             if first_seg.ident == ATTR_PAYABLE {
                 Some(PayableAttribute {
                     identifier: extract_token_identifier(attr),
@@ -23,7 +23,7 @@ impl PayableAttribute {
 /// Current implementation only works with 1 token name.
 /// Might be extended in the future.
 fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
-    let mut iter = attr.clone().tokens.into_iter();
+    let mut iter = attr.clone().parse_args().into_iter();
     let result_str = match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
             assert!(

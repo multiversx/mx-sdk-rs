@@ -23,7 +23,7 @@ pub struct MethodAttributesPass1 {
     pub allow_multiple_var_args: bool,
 }
 
-pub fn process_method(m: &syn::TraitItemMethod, trait_attributes: &TraitProperties) -> Method {
+pub fn process_method(m: &syn::TraitItemFn, trait_attributes: &TraitProperties) -> Method {
     let method_args = extract_method_args(m);
 
     let implementation = if let Some(body) = m.default.clone() {

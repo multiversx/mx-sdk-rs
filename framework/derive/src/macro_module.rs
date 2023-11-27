@@ -8,8 +8,14 @@ pub fn process_module(
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
     let new_input = trait_preprocessing(input);
+    println!("args are: {:#?}", args);
     let args_input = parse_macro_input!(args as syn::AttributeArgs);
     let proc_input = &parse_macro_input!(new_input as syn::ItemTrait);
+
+    // let attribute = match syn::parse::<syn::Attribute>(args.clone()) {
+    //     Ok(val) => {},
+    //     Err(err) => {},
+    // };
 
     let contract = parse_contract_trait(args_input, proc_input);
     validate_contract(&contract);

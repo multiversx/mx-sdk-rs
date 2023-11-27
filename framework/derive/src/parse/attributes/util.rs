@@ -2,10 +2,10 @@ use crate::model::EsdtAttribute;
 use proc_macro2::TokenTree;
 
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
-    if let Some(first_seg) = attr.path.segments.first() {
+    if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == name {
             assert!(
-                attr.path.segments.len() == 1,
+                attr.path().segments.len() == 1,
                 "no arguments allowed for attribute `{name}`"
             );
             return true;
@@ -19,10 +19,10 @@ pub(super) fn get_attribute_with_one_type_arg(
     attr: &syn::Attribute,
     name: &str,
 ) -> Option<EsdtAttribute> {
-    let attr_path = &attr.path;
+    let attr_path = &attr.path();
     if let Some(first_seg) = attr_path.segments.first() {
         if first_seg.ident == name {
-            let mut tokens = attr.tokens.clone().into_iter();
+            let mut tokens = attr.parse_args().clone().into_iter();
             let group = match tokens.next() {
                 Some(TokenTree::Group(group_val)) => group_val,
                 _ => panic!("Expected a group as attribute argument"),
@@ -74,7 +74,7 @@ pub(super) fn get_attribute_with_one_type_arg(
 
 pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
     let result_str: String;
-    let mut iter = attr.clone().tokens.into_iter();
+    let mut iter = attr.clone().parse_args().into_iter();
     match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
             assert!(
@@ -107,7 +107,7 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
 }
 
 pub(super) fn is_attr_one_string_arg(attr: &syn::Attribute, attr_name: &str) -> Option<String> {
-    if let Some(first_seg) = attr.path.segments.first() {
+    if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == attr_name {
             Some(attr_one_string_arg(attr))
         } else {
@@ -119,7 +119,7 @@ pub(super) fn is_attr_one_string_arg(attr: &syn::Attribute, attr_name: &str) -> 
 }
 
 fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::TokenTree> {
-    let mut iter = attr.clone().tokens.into_iter();
+    let mut iter = attr.clone().parse_args().into_iter();
     let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
             assert!(
@@ -147,7 +147,7 @@ pub(super) fn is_attr_with_one_opt_token_tree_arg(
     attr: &syn::Attribute,
     attr_name: &str,
 ) -> Option<Option<proc_macro2::TokenTree>> {
-    if let Some(first_seg) = attr.path.segments.first() {
+    if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == attr_name {
             Some(attr_one_opt_token_tree_arg(attr))
         } else {

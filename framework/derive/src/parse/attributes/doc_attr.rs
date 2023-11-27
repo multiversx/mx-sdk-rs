@@ -10,14 +10,14 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
     attrs
         .iter()
         .filter(|attr| {
-            if let Some(first_seg) = attr.path.segments.first() {
+            if let Some(first_seg) = attr.path().segments.first() {
                 first_seg.ident == ATTR_DOC
             } else {
                 false
             }
         })
         .map(|attr| {
-            let mut tokens_iter = attr.clone().tokens.into_iter();
+            let mut tokens_iter = attr.clone().parse_args().into_iter();
 
             // checking punctuation, the first token is '='
             if let Some(proc_macro2::TokenTree::Punct(punct)) = tokens_iter.next() {
