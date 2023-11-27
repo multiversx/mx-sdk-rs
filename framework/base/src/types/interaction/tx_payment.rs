@@ -79,7 +79,6 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         EgldPayment::no_payment().perform_transfer_execute(env, to, gas_limit, fc);
-        // perform_transfer_execute_egld(BigUint::zero(), to, gas_limit, fc);
     }
 }
 
