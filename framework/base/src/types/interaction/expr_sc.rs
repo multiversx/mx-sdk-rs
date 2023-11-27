@@ -88,22 +88,4 @@ pub mod tests {
             b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x001234567890123456789012",
         );
     }
-
-    // #[test]
-    // fn test_sc_address() {
-    //     let context = InterpreterContext::default();
-    //     assert_eq!(
-    //         b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00a_____________________".to_vec(),
-    //         interpret_string("sc:a", &context)
-    //     );
-    //     assert_eq!(
-    //         b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x001234567890123456789012".to_vec(),
-    //         interpret_string("sc:12345678901234567890120s", &context)
-    //     );
-    //     // trims excess
-    //     assert_eq!(
-    //         b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x001234567890123456789012".to_vec(),
-    //         interpret_string("sc:12345678901234567890120sx", &context)
-    //     );
-    // }
 }
