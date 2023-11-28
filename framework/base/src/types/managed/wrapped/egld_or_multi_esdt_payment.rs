@@ -38,7 +38,7 @@ impl<M: ManagedTypeApi> multiversx_sc::abi::TypeAbi for EgldOrMultiEsdtPayment<M
             let inner_biguint =
                 multiversx_sc::abi::StructFieldDescription::new(&[], "", <BigUint<M>>::type_name());
             let mut inner_vec =
-                multiversx_sc::types::Vec::<multiversx_sc::abi::StructFieldDescription>::new();
+                crate::types::heap::Vec::<multiversx_sc::abi::StructFieldDescription>::new();
             inner_vec.push(inner_biguint);
 
             field_descriptions.push(multiversx_sc::abi::EnumVariantDescription::new(
@@ -50,7 +50,7 @@ impl<M: ManagedTypeApi> multiversx_sc::abi::TypeAbi for EgldOrMultiEsdtPayment<M
             <BigUint<M>>::provide_type_descriptions(accumulator);
 
             let mut inner_vec_managed =
-                multiversx_sc::types::Vec::<multiversx_sc::abi::StructFieldDescription>::new();
+            crate::types::heap::Vec::<multiversx_sc::abi::StructFieldDescription>::new();
             let inner_vec_managed_struct = multiversx_sc::abi::StructFieldDescription::new(
                 &[],
                 "",

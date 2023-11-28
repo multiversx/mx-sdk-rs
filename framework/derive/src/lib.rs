@@ -27,11 +27,14 @@ pub fn contract(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
+    println!(" args {}", args.clone());
+    println!(" input {}", input.clone());
     println!(
         "//// CONTRACT //// {}",
         macro_contract::process_contract(args.clone(), input.clone())
     );
     macro_contract::process_contract(args, input)
+    // proc_macro::TokenStream::new()
 }
 
 #[proc_macro_attribute]

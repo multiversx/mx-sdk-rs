@@ -4,5 +4,3 @@ pub fn validate_attribute_args(args: syn::MetaList) {
         "No arguments expected in contract, module or proxy annotation."
     );
 }
-
-

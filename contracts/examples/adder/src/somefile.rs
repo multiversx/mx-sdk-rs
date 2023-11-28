@@ -1,3 +1,32 @@
+#![feature(prelude_import)]
+#![no_std]
+#[prelude_import]
+use core::prelude::rust_2021::*;
+#[macro_use]
+extern crate core;
+#[macro_use]
+extern crate compiler_builtins;
+use core::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+    DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
+    SubAssign,
+};
+use multiversx_sc::{
+    abi::TypeAbi, api::{ErrorApiImpl, ManagedTypeApi},
+    arrayvec::ArrayVec,
+    codec::{
+        multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode,
+        TopDecode, TopEncode,
+    },
+    contract_base::{ContractBase, ProxyObjBase},
+    err_msg, esdt::*, io::*, non_zero_usize, non_zero_util::*, require, require_old,
+    sc_error, sc_format, sc_panic, sc_print, storage::mappers::*,
+    types::{
+        SCResult::{Err, Ok},
+        *,
+    },
+};
+
 //// TYPE ABI ////
 impl multiversx_sc::abi::TypeAbi for EsdtLocalRole {
     fn type_name() -> multiversx_sc::abi::TypeName {
@@ -542,3 +571,12 @@ impl<M: ManagedTypeApi> multiversx_sc::abi::TypeAbi for EsdtTokenPayment<M> {
         }
     }
 }
+
+/// One of the simplest smart contracts possible,
+/// it holds a single variable in storage, which anyone can increment.
+pub trait Adder {
+    #[init]
+    fn init(&self) {}
+}
+
+
