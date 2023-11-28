@@ -27,6 +27,10 @@ pub fn contract(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
+    // println!("macro contract: {}", macro_contract::process_contract(args.clone(), input.clone()));
+
+    println!("macro contract args are {}", args.clone());
+    println!("macro contract input is {}", input.clone());
     macro_contract::process_contract(args, input)
 }
 
@@ -35,6 +39,11 @@ pub fn module(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
+    println!(
+        "module {}",
+        macro_module::process_module(args.clone(), input.clone())
+    );
+
     macro_module::process_module(args, input)
 }
 
@@ -43,19 +52,25 @@ pub fn proxy(
     args: proc_macro::TokenStream,
     input: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
+    println!(
+        "proxy {}",
+        macro_proxy::process_proxy(args.clone(), input.clone())
+    );
     macro_proxy::process_proxy(args, input)
 }
 
 #[proc_macro_derive(TypeAbi)]
 pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse(input).unwrap();
-
+    println!("type abi {}", type_abi_derive::type_abi_derive(&ast));
     type_abi_derive::type_abi_derive(&ast)
 }
 
 #[proc_macro_derive(ManagedVecItem)]
 pub fn managed_vec_item_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse(input).unwrap();
+
+    println!("managed vec item {}", managed_vec_item_derive::managed_vec_item_derive(&ast));
 
     managed_vec_item_derive::managed_vec_item_derive(&ast)
 }

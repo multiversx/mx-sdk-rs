@@ -11,18 +11,30 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
         .iter()
         .filter(|attr| {
             if let Some(first_seg) = attr.path().segments.first() {
+                println!("first seg is {:#?}", first_seg);
                 first_seg.ident == ATTR_DOC
             } else {
                 false
             }
         })
         .map(|attr| {
-            let mut tokens_iter = attr.clone().parse_args().into_iter();
+            //this doesn't work
+            //"expected parentheses: #[doc(...)]",
+            let mut tokens_iter = attr.clone().parse_args().into_iter(); 
+
+
+            println!("this the attribute {:#?}", attr);
+            println!("this the token iter {:#?}", tokens_iter);
+            println!(
+                "this the parse args {:#?}",
+                attr.clone().parse_args::<proc_macro2::TokenTree>()
+            );
 
             // checking punctuation, the first token is '='
             if let Some(proc_macro2::TokenTree::Punct(punct)) = tokens_iter.next() {
                 assert_eq!(punct.as_char(), '=');
             } else {
+                println!("shit popped here {:#?}", tokens_iter.next());
                 panic!("malformed doc attribute");
             }
 
@@ -45,6 +57,7 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                 // also unescape escaped single and double quotes
                 message_slice.replace("\\\"", "\"").replace("\\'", "'")
             } else {
+                println!("shit actually popped here {:#?}", tokens_iter.next());
                 panic!("malformed doc attribute");
             }
         })
