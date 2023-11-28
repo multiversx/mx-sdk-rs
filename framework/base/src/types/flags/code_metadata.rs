@@ -14,7 +14,7 @@ const PAYABLE_BY_SC_STRING: &[u8] = b"PayableBySC";
 const DEFAULT_STRING: &[u8] = b"Default";
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, PartialEq, Debug, Clone)]
     pub struct CodeMetadata: u16 {
         const DEFAULT = 0;
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
@@ -26,19 +26,19 @@ bitflags! {
 
 impl CodeMetadata {
     pub fn is_upgradeable(&self) -> bool {
-        *self & CodeMetadata::UPGRADEABLE != CodeMetadata::DEFAULT
+        self.bits() & CodeMetadata::UPGRADEABLE.bits() != CodeMetadata::DEFAULT.bits()
     }
 
     pub fn is_payable(&self) -> bool {
-        *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
+        self.bits() & CodeMetadata::PAYABLE.bits() != CodeMetadata::DEFAULT.bits()
     }
 
     pub fn is_payable_by_sc(&self) -> bool {
-        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
+        self.bits() & CodeMetadata::PAYABLE_BY_SC.bits() != CodeMetadata::DEFAULT.bits()
     }
 
     pub fn is_readable(&self) -> bool {
-        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
+        self.bits() & CodeMetadata::READABLE.bits() != CodeMetadata::DEFAULT.bits()
     }
 
     #[inline]

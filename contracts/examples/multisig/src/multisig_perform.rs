@@ -208,7 +208,7 @@ pub trait MultisigPerformModule:
                     action_id,
                     &amount,
                     &source,
-                    code_metadata,
+                    code_metadata.clone(),
                     gas_left,
                     arguments.as_multi(),
                 );
@@ -234,7 +234,7 @@ pub trait MultisigPerformModule:
                     &sc_address,
                     &amount,
                     &source,
-                    code_metadata,
+                    code_metadata.clone(),
                     gas_left,
                     arguments.as_multi(),
                 );
