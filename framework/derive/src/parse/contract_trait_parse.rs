@@ -1,6 +1,5 @@
 use super::{
-    attributes::extract_doc, method_parse::process_method, 
-    parse_util::validate_attribute_args,
+    attributes::extract_doc, method_parse::process_method, parse_util::validate_attribute_args,
     supertrait_parse::parse_supertrait,
 };
 use crate::{
@@ -8,10 +7,7 @@ use crate::{
     parse::{is_contract_base, process_trait_arguments},
 };
 
-pub fn parse_contract_trait(
-    args: syn::MetaList,
-    contract_trait: &syn::ItemTrait,
-) -> ContractTrait {
+pub fn parse_contract_trait(args: syn::MetaList, contract_trait: &syn::ItemTrait) -> ContractTrait {
     validate_attribute_args(args);
 
     let docs = extract_doc(contract_trait.attrs.as_slice());

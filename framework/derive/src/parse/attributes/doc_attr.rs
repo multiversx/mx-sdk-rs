@@ -2,7 +2,7 @@ use super::{attr_names::*, util::*};
 
 /// unlike the others, this is standard Rust,
 /// all doc comments get automatically transformed into "doc" attributes
-static ATTR_DOC: &str = "doc";
+static ATTR_DOC: &str = "[doc]";
 
 /// Doc comments are actually syntactic sugar for doc attributes,
 /// so extracting doc comments means parsing "doc" attributes.
@@ -18,7 +18,8 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
         })
         .map(|attr| {
             let mut tokens_iter;
-            let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.clone().parse_args();
+            let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.parse_args();
+
             match tokens {
                 Ok(val) => tokens_iter = val.into_iter(),
                 Err(err) => panic!("failed to parse arguments: {}", err),
