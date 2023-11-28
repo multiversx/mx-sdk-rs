@@ -24,7 +24,7 @@ bitflags! {
 
 impl EsdtLocalRoleFlags {
     pub fn has_role(&self, role: &EsdtLocalRole) -> bool {
-        *self & role.to_flag() != EsdtLocalRoleFlags::NONE
+        self.bits() & role.to_flag().bits() != EsdtLocalRoleFlags::NONE.bits()
     }
 
     pub fn iter_roles(&self) -> impl Iterator<Item = &EsdtLocalRole> {
