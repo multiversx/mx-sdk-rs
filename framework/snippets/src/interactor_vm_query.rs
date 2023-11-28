@@ -1,4 +1,5 @@
 use crate::{address_h256_to_erdrs, Interactor};
+use base64::{engine::general_purpose, Engine as _};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -43,7 +44,11 @@ impl Interactor {
             .data
             .return_data
             .iter()
-            .map(|result| base64::decode(result).expect("query result base64 decode error"))
+            .map(|result| {
+                general_purpose::STANDARD
+                    .decode(result)
+                    .expect("query result base64 decode error")
+            })
             .collect();
         step.save_response(TxResponse::from_raw_results(raw_results));
 

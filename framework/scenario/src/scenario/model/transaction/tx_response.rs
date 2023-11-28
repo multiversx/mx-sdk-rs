@@ -4,6 +4,8 @@ use multiversx_sdk::data::transaction::{
     ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork,
 };
 
+use base64::{engine::general_purpose, Engine as _};
+
 use super::{
     decode_scr_data_or_panic, is_out_scr, process_topics_error, Log, TxExpect, TxResponseStatus,
 };
@@ -108,7 +110,10 @@ impl TxResponse {
                 return TxResponseStatus::signal_error(&error);
             }
 
-            let error_raw = base64::decode(topics.unwrap().get(1).unwrap()).unwrap();
+            let error_raw = general_purpose::STANDARD
+                .decode(topics.unwrap().get(1).unwrap())
+                .unwrap();
+
             let error = String::from_utf8(error_raw).unwrap();
             return TxResponseStatus::signal_error(&error);
         }
@@ -140,7 +145,9 @@ impl TxResponse {
                 if event.identifier == "writeLog" {
                     if let Some(data) = &event.data {
                         let decoded_data =
-                            String::from_utf8(base64::decode(data).unwrap()).unwrap();
+                            String::from_utf8(general_purpose::STANDARD.decode(data).unwrap())
+                                .unwrap();
+
                         if decoded_data.starts_with('@') {
                             let out = decode_scr_data_or_panic(decoded_data.as_str());
                             return Some(out);
@@ -162,7 +169,10 @@ impl TxResponse {
                 return self;
             }
 
-            let address_raw = base64::decode(topics.unwrap().get(0).unwrap()).unwrap();
+            let address_raw = general_purpose::STANDARD
+                .decode(topics.unwrap().get(0).unwrap())
+                .unwrap();
+
             let address: Address = Address::from_slice(address_raw.as_slice());
             self.new_deployed_address = Some(address);
         }

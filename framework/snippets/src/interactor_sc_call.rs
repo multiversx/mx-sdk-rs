@@ -1,4 +1,5 @@
 use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
+use base64::{engine::general_purpose, Engine as _};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -51,7 +52,14 @@ impl Interactor {
         let data = if contract_call_tx_data.is_empty() {
             None
         } else {
-            Some(base64::encode(contract_call_tx_data))
+            Some(
+                String::from_utf8(
+                    general_purpose::STANDARD
+                        .encode(contract_call_tx_data)
+                        .into(),
+                )
+                .unwrap(),
+            )
         };
 
         Transaction {
