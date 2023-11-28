@@ -23,7 +23,13 @@ impl PayableAttribute {
 /// Current implementation only works with 1 token name.
 /// Might be extended in the future.
 fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
-    let mut iter = attr.clone().parse_args().into_iter();
+    let mut iter;
+    let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.clone().parse_args();
+    match tokens {
+        Ok(val) => iter = val.into_iter(),
+        Err(err) => panic!("failed to parse arguments: {}", err),
+    }
+
     let result_str = match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
             assert!(

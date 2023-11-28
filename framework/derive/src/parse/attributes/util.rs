@@ -22,8 +22,14 @@ pub(super) fn get_attribute_with_one_type_arg(
     let attr_path = &attr.path();
     if let Some(first_seg) = attr_path.segments.first() {
         if first_seg.ident == name {
-            let mut tokens = attr.parse_args().clone().into_iter();
-            let group = match tokens.next() {
+            let mut tokens_iter;
+            let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.clone().parse_args();
+            match tokens {
+                Ok(val) => tokens_iter = val.into_iter(),
+                Err(err) => panic!("failed to parse arguments: {}", err),
+            }
+
+            let group = match tokens_iter.next() {
                 Some(TokenTree::Group(group_val)) => group_val,
                 _ => panic!("Expected a group as attribute argument"),
             };
@@ -74,7 +80,14 @@ pub(super) fn get_attribute_with_one_type_arg(
 
 pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
     let result_str: String;
-    let mut iter = attr.clone().parse_args().into_iter();
+
+    let mut iter;
+    let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.clone().parse_args();
+    match tokens {
+        Ok(val) => iter = val.into_iter(),
+        Err(err) => panic!("failed to parse arguments: {}", err),
+    }
+
     match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
             assert!(
@@ -119,7 +132,13 @@ pub(super) fn is_attr_one_string_arg(attr: &syn::Attribute, attr_name: &str) -> 
 }
 
 fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::TokenTree> {
-    let mut iter = attr.clone().parse_args().into_iter();
+    let mut iter;
+    let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.clone().parse_args();
+    match tokens {
+        Ok(val) => iter = val.into_iter(),
+        Err(err) => panic!("failed to parse arguments: {}", err),
+    }
+
     let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
         Some(proc_macro2::TokenTree::Group(group)) => {
             assert!(
