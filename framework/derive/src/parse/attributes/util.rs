@@ -132,32 +132,50 @@ pub(super) fn is_attr_one_string_arg(attr: &syn::Attribute, attr_name: &str) -> 
 }
 
 fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::TokenTree> {
-    let mut iter;
-    let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.clone().parse_args();
-    match tokens {
-        Ok(val) => iter = val.into_iter(),
-        Err(err) => panic!("failed to parse arguments: {}", err),
-    }
+    //it can be only Meta::Path == "endpoint" (or other macro) and can exist without paren
+    //OR Meta::List(path + paren delimiter + only one token)
+    //maybe use a different parser than parse_args(), manually create one
+    println!("attribute is {:#?}", attr);
 
-    let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
-        Some(proc_macro2::TokenTree::Group(group)) => {
+    match attr.clone().meta {
+        syn::Meta::Path(val) => {
+            let mut iter = val.segments.into_iter();
+            let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
+                Some(syn::PathSegment {
+                    ident: val,
+                    arguments: syn::PathArguments::None,
+                }) => Some(proc_macro2::TokenTree::Ident(val)),
+                Some(_) => panic!("unexpected attribute argument tokens"),
+                None => None,
+            };
+
+            arg_token_tree
+        },
+        syn::Meta::List(val) => {
             assert!(
-                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
+                val.delimiter == syn::MacroDelimiter::Paren(syn::token::Paren::default()),
                 "attribute paranthesis expected"
             );
-            let mut iter2 = group.stream().into_iter();
-            match iter2.next() {
-                Some(token_tree) => Some(token_tree),
-                _ => panic!("attribute argument expected"),
-            }
+
+            assert!(
+                !val.tokens.is_empty(),
+                "attribute needs to have at least one argument"
+            );
+
+            let mut iter = val.tokens.into_iter();
+            let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
+                Some(proc_macro2::TokenTree::Ident(ident)) => {
+                    Some(proc_macro2::TokenTree::Ident(ident))
+                },
+                Some(_) => panic!("unexpected attribute argument tokens"),
+                None => None,
+            };
+
+            assert!(iter.next().is_none(), "too many tokens in attribute");
+            arg_token_tree
         },
-        Some(_) => panic!("unexpected attribute argument tokens"),
-        None => None,
-    };
-
-    assert!(iter.next().is_none(), "too many tokens in attribute");
-
-    arg_token_tree
+        syn::Meta::NameValue(_) => panic!("unexpected attribute argument tokens"),
+    }
 }
 
 /// Finds a method attribute with given name and 1 single optional argument.
