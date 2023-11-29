@@ -1,8 +1,10 @@
+use quote::ToTokens;
+
 use super::{attr_names::*, util::*};
 
 /// unlike the others, this is standard Rust,
 /// all doc comments get automatically transformed into "doc" attributes
-static ATTR_DOC: &str = "[doc]";
+static ATTR_DOC: &str = "doc";
 
 /// Doc comments are actually syntactic sugar for doc attributes,
 /// so extracting doc comments means parsing "doc" attributes.
@@ -16,43 +18,25 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                 false
             }
         })
-        .map(|attr| {
-            let mut tokens_iter;
-            let tokens: Result<proc_macro2::TokenStream, syn::Error> = attr.parse_args();
-
-            match tokens {
-                Ok(val) => tokens_iter = val.into_iter(),
-                Err(err) => panic!("failed to parse arguments: {}", err),
-            }
-
-            // checking punctuation, the first token is '='
-            if let Some(proc_macro2::TokenTree::Punct(punct)) = tokens_iter.next() {
-                assert_eq!(punct.as_char(), '=');
-            } else {
-                panic!("malformed doc attribute, the first token should be '='");
-            }
-
-            if let Some(proc_macro2::TokenTree::Literal(lit)) = tokens_iter.next() {
-                let lit_str = lit.to_string();
-                let mut message_slice = lit_str.as_str();
-
-                // the useful part of the message is between quotes
-                assert!(
-                    message_slice.starts_with('\"') && message_slice.ends_with('\"'),
-                    "malformed doc attribute: string literal expected"
-                );
-                message_slice = &message_slice[1..message_slice.len() - 1];
-
-                // most doc comments start with a space, so remove that too
-                if message_slice.starts_with(' ') {
-                    message_slice = &message_slice[1..];
+        .map(|attr| match attr.meta.clone() {
+            syn::Meta::Path(_) => panic!("wrong format. expected name value, received path"),
+            syn::Meta::List(_) => panic!("wrong format. expected name value, received list"),
+            syn::Meta::NameValue(meta_name_value) => {
+                if let syn::Expr::Lit(lit_str) = meta_name_value.value {
+                    if meta_name_value.path.is_ident("doc") {
+                        let value = lit_str.lit;
+                        value
+                            .to_token_stream()
+                            .to_string()
+                            .trim_matches('\"')
+                            .to_string()
+                    } else {
+                        panic!("Attribute doesn't have the 'doc' identifier");
+                    }
+                } else {
+                    panic!("Value is not a string literal");
                 }
-
-                // also unescape escaped single and double quotes
-                message_slice.replace("\\\"", "\"").replace("\\'", "'")
-            } else {
-                panic!("malformed doc attribute");
-            }
+            },
         })
         .collect()
 }
