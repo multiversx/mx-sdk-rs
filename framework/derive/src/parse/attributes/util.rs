@@ -142,9 +142,9 @@ fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::Tok
             let mut iter = val.segments.into_iter();
             let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
                 Some(syn::PathSegment {
-                    ident: val,
+                    ident: _,
                     arguments: syn::PathArguments::None,
-                }) => Some(proc_macro2::TokenTree::Ident(val)),
+                }) => None,
                 Some(_) => panic!("unexpected attribute argument tokens"),
                 None => None,
             };
