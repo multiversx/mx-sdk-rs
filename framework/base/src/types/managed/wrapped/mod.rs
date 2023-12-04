@@ -17,7 +17,9 @@ mod managed_vec_ref_iter;
 pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token_identifier;
+mod fixed_point_biguint;
 
+pub use fixed_point_biguint::FixedPoint;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
 pub use egld_or_multi_esdt_payment::EgldOrMultiEsdtPayment;
