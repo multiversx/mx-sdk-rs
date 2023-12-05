@@ -107,7 +107,7 @@ pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
                         !literal.to_string().trim_matches('"').trim().is_empty(),
                         "the argument can not be an empty string or whitespace"
                     );
-                    literal.to_string()
+                    literal.to_string().trim_matches('\"').to_string()
                 },
                 Some(_) => {
                     panic!("unexpected attribute argument tokens: attribute has to be a string")

@@ -25,11 +25,15 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                 if let syn::Expr::Lit(lit_str) = meta_name_value.value {
                     if meta_name_value.path.is_ident("doc") {
                         let value = lit_str.lit;
-                        value
+                        if let Some(tuple) = value
                             .to_token_stream()
                             .to_string()
-                            .trim_matches('\"')
-                            .to_string()
+                            .split_once(char::is_whitespace)
+                        {
+                            tuple.1.trim_matches('\"').to_string()
+                        } else {
+                            String::new()
+                        }
                     } else {
                         panic!("Attribute doesn't have the 'doc' identifier");
                     }

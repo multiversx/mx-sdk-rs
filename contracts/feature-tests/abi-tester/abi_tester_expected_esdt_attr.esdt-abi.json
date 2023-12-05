@@ -7,7 +7,7 @@
         "OnlyShowsUpAsNested10": {
             "type": "struct",
             "docs": [
-                " Tests that the ABI generator also fetches types that only appear as fields."
+                "Tests that the ABI generator also fetches types that only appear as fields."
             ]
         },
         "OnlyShowsUpInEsdtAttr": {
