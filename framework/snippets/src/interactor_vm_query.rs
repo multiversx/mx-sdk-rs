@@ -1,5 +1,4 @@
 use crate::{address_h256_to_erdrs, Interactor};
-use base64::{engine::general_purpose, Engine as _};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -7,7 +6,7 @@ use multiversx_sc_scenario::{
     multiversx_sc::{codec::CodecFrom, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
-use multiversx_sdk::data::vm::VmValueRequest;
+use multiversx_sdk::{data::vm::VmValueRequest, utils::base64_decode};
 
 impl Interactor {
     pub async fn sc_query<S>(&mut self, mut step: S) -> &mut Self
@@ -40,16 +39,7 @@ impl Interactor {
 
         info!("{:#?}", result);
 
-        let raw_results: Vec<Vec<u8>> = result
-            .data
-            .return_data
-            .iter()
-            .map(|result| {
-                general_purpose::STANDARD
-                    .decode(result)
-                    .expect("query result base64 decode error")
-            })
-            .collect();
+        let raw_results: Vec<Vec<u8>> = result.data.return_data.iter().map(base64_decode).collect();
         step.save_response(TxResponse::from_raw_results(raw_results));
 
         self.pre_runners.run_sc_query_step(step);

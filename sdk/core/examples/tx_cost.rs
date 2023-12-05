@@ -1,7 +1,7 @@
 use multiversx_sdk::{
     blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
-    utils::base64_encode
+    utils::base64_encode,
 };
 
 #[tokio::main]

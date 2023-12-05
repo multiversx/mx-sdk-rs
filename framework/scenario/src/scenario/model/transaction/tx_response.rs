@@ -5,8 +5,6 @@ use multiversx_sdk::{
     utils::base64_decode,
 };
 
-use base64::{engine::general_purpose, Engine as _};
-
 use super::{
     decode_scr_data_or_panic, is_out_scr, process_topics_error, Log, TxExpect, TxResponseStatus,
 };
@@ -165,9 +163,7 @@ impl TxResponse {
                 return self;
             }
 
-            let address_raw = general_purpose::STANDARD
-                .decode(topics.unwrap().get(0).unwrap())
-                .unwrap();
+            let address_raw = base64_decode(topics.unwrap().get(0).unwrap());
 
             let address: Address = Address::from_slice(address_raw.as_slice());
             self.new_deployed_address = Some(address);
