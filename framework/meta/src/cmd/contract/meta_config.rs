@@ -65,7 +65,7 @@ impl MetaConfig {
             let cargo_toml_data = WasmCargoTomlData {
                 name: contract.wasm_crate_name.clone(),
                 edition: main_cargo_toml_contents.package_edition(),
-                profile: contract.settings.contract_variant_profile.clone(),
+                profile: contract.settings.profile.clone(),
                 framework_version: main_cargo_toml_contents.dependency_version(FRAMEWORK_NAME_BASE),
                 framework_path: main_cargo_toml_contents.dependency_path(FRAMEWORK_NAME_BASE),
                 contract_features: contract.settings.features.clone(),
@@ -199,7 +199,7 @@ opt-level = \"z\"
 lto = true
 debug = false
 panic = \"abort\"
-overflow-checks = true
+overflow-checks = false
 
 [dependencies.test-crate-name]
 path = \"..\"
