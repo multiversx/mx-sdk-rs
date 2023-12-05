@@ -68,6 +68,7 @@ pub struct ContractVariantProfile {
     pub lto: bool,
     pub debug: bool,
     pub panic: String,
+    pub overflow_checks: bool,
 }
 
 impl Default for ContractVariantProfile {
@@ -78,6 +79,7 @@ impl Default for ContractVariantProfile {
             lto: true,
             debug: false,
             panic: "abort".to_owned(),
+            overflow_checks: true,
         }
     }
 }

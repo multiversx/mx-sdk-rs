@@ -199,6 +199,7 @@ opt-level = \"z\"
 lto = true
 debug = false
 panic = \"abort\"
+overflow-checks = true
 
 [dependencies.test-crate-name]
 path = \"..\"
