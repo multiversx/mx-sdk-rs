@@ -26,19 +26,19 @@ bitflags! {
 
 impl CodeMetadata {
     pub fn is_upgradeable(&self) -> bool {
-        self.bits() & CodeMetadata::UPGRADEABLE.bits() != CodeMetadata::DEFAULT.bits()
+        *self & CodeMetadata::UPGRADEABLE != CodeMetadata::DEFAULT
     }
 
     pub fn is_payable(&self) -> bool {
-        self.bits() & CodeMetadata::PAYABLE.bits() != CodeMetadata::DEFAULT.bits()
+        *self & CodeMetadata::PAYABLE != CodeMetadata::DEFAULT
     }
 
     pub fn is_payable_by_sc(&self) -> bool {
-        self.bits() & CodeMetadata::PAYABLE_BY_SC.bits() != CodeMetadata::DEFAULT.bits()
+        *self & CodeMetadata::PAYABLE_BY_SC != CodeMetadata::DEFAULT
     }
 
     pub fn is_readable(&self) -> bool {
-        self.bits() & CodeMetadata::READABLE.bits() != CodeMetadata::DEFAULT.bits()
+        *self & CodeMetadata::READABLE != CodeMetadata::DEFAULT
     }
 
     #[inline]
