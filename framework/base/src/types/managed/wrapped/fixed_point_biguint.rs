@@ -41,6 +41,19 @@ impl<M: ManagedTypeApi, const DECIMALS: usize> From<BigUint<M>> for FixedPoint<M
 //     }
 // }
 
+pub trait Convert<M: ManagedTypeApi, const OTHER_DECIMALS: usize, const DECIMALS: usize> {
+    fn convert_from(other: FixedPoint<M, OTHER_DECIMALS>) -> FixedPoint<M, DECIMALS>;
+}
+impl<M: ManagedTypeApi, const DECIMALS: usize, const OTHER_DECIMALS: usize>
+    Convert<M, OTHER_DECIMALS, DECIMALS> for FixedPoint<M, DECIMALS>
+{
+    fn convert_from(other: FixedPoint<M, OTHER_DECIMALS>) -> FixedPoint<M, DECIMALS> {
+        FixedPoint::<M, DECIMALS>::from(
+            other.data / FixedPoint::<M, OTHER_DECIMALS>::scaling_factor(),
+        )
+    }
+}
+
 impl<M: ManagedTypeApi, const DECIMALS: usize> Add<FixedPoint<M, DECIMALS>>
     for FixedPoint<M, DECIMALS>
 {
