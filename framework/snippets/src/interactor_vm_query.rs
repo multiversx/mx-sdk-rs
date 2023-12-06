@@ -1,5 +1,4 @@
 use crate::{address_h256_to_erdrs, Interactor};
-use base64::{engine::general_purpose, Engine as _};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,

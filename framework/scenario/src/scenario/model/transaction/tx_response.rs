@@ -5,8 +5,6 @@ use multiversx_sdk::{
     utils::base64_decode,
 };
 
-use base64::{engine::general_purpose, Engine as _};
-
 use super::{
     decode_scr_data_or_panic, is_out_scr, process_topics_error, Log, TxExpect, TxResponseStatus,
 };
