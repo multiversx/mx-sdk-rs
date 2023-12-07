@@ -17,8 +17,12 @@ impl<M: ManagedTypeApi, const DECIMALS: usize> FixedPoint<M, DECIMALS> {
         &self.data / &Self::scaling_factor()
     }
 
-    pub fn data(&self) -> &BigUint<M> {
+    pub fn into_raw_units(&self) -> &BigUint<M> {
         &self.data
+    }
+
+    pub fn from_raw_units(data: BigUint<M>) -> Self {
+        FixedPoint { data }
     }
 }
 
@@ -48,8 +52,9 @@ impl<M: ManagedTypeApi, const DECIMALS: usize, const OTHER_DECIMALS: usize>
     Convert<M, OTHER_DECIMALS, DECIMALS> for FixedPoint<M, DECIMALS>
 {
     fn convert_from(other: FixedPoint<M, OTHER_DECIMALS>) -> FixedPoint<M, DECIMALS> {
-        FixedPoint::<M, DECIMALS>::from(
-            other.data / FixedPoint::<M, OTHER_DECIMALS>::scaling_factor(),
+        FixedPoint::<M, DECIMALS>::from_raw_units(
+            other.data / FixedPoint::<M, OTHER_DECIMALS>::scaling_factor()
+                * FixedPoint::<M, DECIMALS>::scaling_factor(),
         )
     }
 }
@@ -60,7 +65,7 @@ impl<M: ManagedTypeApi, const DECIMALS: usize> Add<FixedPoint<M, DECIMALS>>
     type Output = Self;
 
     fn add(self, other: FixedPoint<M, DECIMALS>) -> Self::Output {
-        FixedPoint::<M, DECIMALS>::from((self.data + other.data) / &Self::scaling_factor())
+        FixedPoint::<M, DECIMALS>::from_raw_units(self.data + other.data)
     }
 }
 
@@ -70,10 +75,11 @@ impl<M: ManagedTypeApi, const DECIMALS: usize> Sub<FixedPoint<M, DECIMALS>>
     type Output = Self;
 
     fn sub(self, other: FixedPoint<M, DECIMALS>) -> Self::Output {
-        FixedPoint::<M, DECIMALS>::from((self.data - other.data) / &Self::scaling_factor())
+        FixedPoint::<M, DECIMALS>::from_raw_units(self.data - other.data)
     }
 }
 
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl<M: ManagedTypeApi, const DECIMALS: usize, const OTHER_DECIMALS: usize>
     Mul<FixedPoint<M, OTHER_DECIMALS>> for FixedPoint<M, DECIMALS>
 where
@@ -82,13 +88,11 @@ where
     type Output = FixedPoint<M, { DECIMALS + OTHER_DECIMALS }>;
 
     fn mul(self, other: FixedPoint<M, OTHER_DECIMALS>) -> Self::Output {
-        FixedPoint::<M, { DECIMALS + OTHER_DECIMALS }>::from(
-            self.data * other.data
-                / FixedPoint::<M, { DECIMALS + OTHER_DECIMALS }>::scaling_factor(),
-        )
+        FixedPoint::<M, { DECIMALS + OTHER_DECIMALS }>::from_raw_units(self.data * other.data)
     }
 }
 
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl<M: ManagedTypeApi, const DECIMALS: usize, const OTHER_DECIMALS: usize>
     Div<FixedPoint<M, OTHER_DECIMALS>> for FixedPoint<M, DECIMALS>
 where
@@ -97,11 +101,7 @@ where
     type Output = FixedPoint<M, { DECIMALS - OTHER_DECIMALS }>;
 
     fn div(self, other: FixedPoint<M, OTHER_DECIMALS>) -> Self::Output {
-        FixedPoint::<M, { DECIMALS - OTHER_DECIMALS }>::from(
-            self.data
-                / other.data
-                / FixedPoint::<M, { DECIMALS - OTHER_DECIMALS }>::scaling_factor(),
-        )
+        FixedPoint::<M, { DECIMALS - OTHER_DECIMALS }>::from_raw_units(self.data / other.data)
     }
 }
 

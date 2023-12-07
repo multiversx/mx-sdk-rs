@@ -15,7 +15,7 @@ fn test_addition() {
         addition,
         FixedPoint::<StaticApi, 2usize>::from(BigUint::from(6u64))
     );
-    assert_eq!(addition.data(), &BigUint::from(600u64));
+    assert_eq!(addition.into_raw_units(), &BigUint::from(600u64));
     assert_eq!(addition.trunc(), BigUint::from(6u64));
 
     let subtraction = addition - fixed;
