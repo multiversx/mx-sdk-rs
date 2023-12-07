@@ -3,7 +3,7 @@
 use bitflags::bitflags;
 
 bitflags! {
-    #[derive(Default, PartialEq, Debug)]
+    #[derive(Default, PartialEq, Debug, Clone, Copy)]
     pub struct VMCodeMetadata: u16 {
         const DEFAULT = 0;
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte
@@ -15,19 +15,19 @@ bitflags! {
 
 impl VMCodeMetadata {
     pub fn is_upgradeable(&self) -> bool {
-        self.bits() & VMCodeMetadata::UPGRADEABLE.bits() != VMCodeMetadata::DEFAULT.bits()
+        *self & VMCodeMetadata::UPGRADEABLE != VMCodeMetadata::DEFAULT
     }
 
     pub fn is_payable(&self) -> bool {
-        self.bits() & VMCodeMetadata::PAYABLE.bits() != VMCodeMetadata::DEFAULT.bits()
+        *self & VMCodeMetadata::PAYABLE != VMCodeMetadata::DEFAULT
     }
 
     pub fn is_payable_by_sc(&self) -> bool {
-        self.bits() & VMCodeMetadata::PAYABLE_BY_SC.bits() != VMCodeMetadata::DEFAULT.bits()
+        *self & VMCodeMetadata::PAYABLE_BY_SC != VMCodeMetadata::DEFAULT
     }
 
     pub fn is_readable(&self) -> bool {
-        self.bits() & VMCodeMetadata::READABLE.bits() != VMCodeMetadata::DEFAULT.bits()
+        *self & VMCodeMetadata::READABLE != VMCodeMetadata::DEFAULT
     }
 
     pub fn to_byte_array(&self) -> [u8; 2] {

@@ -4,7 +4,7 @@ use super::EsdtLocalRole;
 use bitflags::bitflags;
 
 bitflags! {
-    #[derive(PartialEq)]
+    #[derive(PartialEq, Clone, Copy)]
     pub struct EsdtLocalRoleFlags: u64 {
         const NONE                  = 0b00000000;
         const MINT                  = 0b00000001;
@@ -20,7 +20,7 @@ bitflags! {
 
 impl EsdtLocalRoleFlags {
     pub fn has_role(&self, role: &EsdtLocalRole) -> bool {
-        self.bits() & role.to_flag().bits() != EsdtLocalRoleFlags::NONE.bits()
+        *self & role.to_flag() != EsdtLocalRoleFlags::NONE
     }
 
     pub fn iter_roles(&self) -> impl Iterator<Item = &EsdtLocalRole> {
