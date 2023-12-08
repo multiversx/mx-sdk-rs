@@ -33,6 +33,7 @@ impl Decimals for NumDecimals {
 
 pub type NumDecimals = usize;
 
+#[derive(Clone, Debug)]
 pub struct ConstDecimals<const DECIMALS: NumDecimals>;
 
 impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
