@@ -92,15 +92,13 @@ where
     ) -> FixedPoint<M, ConstDecimals<DECIMALS>> {
         match DECIMALS.cmp(&FROM_DECIMALS) {
             Ordering::Less => {
-                todo!()
-                // let delta_scaling_factor = scaling_factor(DECIMALS) - scaling_factor(OTHER_DECIMALS);
-                // FixedPoint::const_decimals_from_raw(self.data * delta_scaling_factor)
+                let delta_scaling_factor = scaling_factor(FROM_DECIMALS) - scaling_factor(DECIMALS);
+                FixedPoint::const_decimals_from_raw(value.data * delta_scaling_factor)
             },
             Ordering::Equal => FixedPoint::const_decimals_from_raw(value.data),
             Ordering::Greater => {
-                todo!()
-                // let delta_scaling_factor = scaling_factor(DECIMALS) - scaling_factor(OTHER_DECIMALS);
-                // FixedPoint::const_decimals_from_raw(self.data * delta_scaling_factor)
+                let delta_scaling_factor = scaling_factor(DECIMALS) - scaling_factor(FROM_DECIMALS);
+                FixedPoint::const_decimals_from_raw(value.data * delta_scaling_factor)
             },
         }
     }
@@ -123,33 +121,19 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<FixedPoint<M, NumDecim
     fn from(value: FixedPoint<M, NumDecimals>) -> Self {
         match DECIMALS.cmp(&value.decimals) {
             Ordering::Less => {
-                todo!()
-                // let delta_scaling_factor = scaling_factor(DECIMALS) - scaling_factor(OTHER_DECIMALS);
-                // FixedPoint::const_decimals_from_raw(self.data * delta_scaling_factor)
+                let delta_scaling_factor =
+                    scaling_factor(value.decimals) - scaling_factor(DECIMALS);
+                FixedPoint::const_decimals_from_raw(value.data * delta_scaling_factor)
             },
             Ordering::Equal => unreachable!(),
             Ordering::Greater => {
-                todo!()
-                // let delta_scaling_factor = scaling_factor(DECIMALS) - scaling_factor(OTHER_DECIMALS);
-                // FixedPoint::const_decimals_from_raw(self.data * delta_scaling_factor)
+                let delta_scaling_factor =
+                    scaling_factor(DECIMALS) - scaling_factor(value.decimals);
+                FixedPoint::const_decimals_from_raw(value.data * delta_scaling_factor)
             },
         }
     }
 }
-
-// pub trait Convert<M: ManagedTypeApi, const OTHER_DECIMALS: NumDecimals, const DECIMALS: NumDecimals> {
-//     fn convert_from(other: FixedPoint<M, OTHER_DECIMALS>) -> FixedPoint<M, DECIMALS>;
-// }
-// impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-//     Convert<M, OTHER_DECIMALS, DECIMALS> for FixedPoint<M, DECIMALS>
-// {
-//     fn convert_from(other: FixedPoint<M, OTHER_DECIMALS>) -> FixedPoint<M, DECIMALS> {
-//         FixedPoint::<M, DECIMALS>::from_raw_units(
-//             other.data / FixedPoint::<M, OTHER_DECIMALS>::scaling_factor()
-//                 * FixedPoint::<M, DECIMALS>::scaling_factor(),
-//         )
-//     }
-// }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Add<FixedPoint<M, ConstDecimals<DECIMALS>>>
     for FixedPoint<M, ConstDecimals<DECIMALS>>
@@ -206,9 +190,15 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<FixedPoint<M, D2>>
             .num_decimals()
             .cmp(&other.decimals.num_decimals())
         {
-            Ordering::Less => todo!(),
+            Ordering::Less => {
+                let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
+                &self.data * &scaling_factor(diff_decimals) == other.data
+            },
             Ordering::Equal => self.data == other.data,
-            Ordering::Greater => todo!(),
+            Ordering::Greater => {
+                let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
+                &other.data * &scaling_factor(diff_decimals) == self.data
+            },
         }
     }
 }
