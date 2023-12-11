@@ -7,6 +7,15 @@ main = "multi-contract-main"
 # main contract can have any id and any name
 name = "multi-contract-features"
 
+[contracts.multi-contract-main.profile]
+# these are just the defaults, checking that parsing works fine
+codegen-units = 1  
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = false
+
 [contracts.multi-contract-features-view]
 # name is optional, if missing this ^^^ id will be used
 external-view = true
