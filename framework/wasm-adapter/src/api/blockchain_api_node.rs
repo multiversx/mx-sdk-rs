@@ -1,11 +1,8 @@
-use crate::{
-    api::{
-        managed_types::managed_buffer_api_node::{
-            unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
-        },
-        VmApiImpl,
+use crate::api::{
+    managed_types::managed_buffer_api_node::{
+        unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
     },
-    error_hook,
+    VmApiImpl,
 };
 use multiversx_sc::{
     api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, RawHandle},
