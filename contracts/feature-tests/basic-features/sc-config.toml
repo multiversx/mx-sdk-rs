@@ -1,7 +1,8 @@
 [settings]
 main = "basic-features"
 
-[contracts.basic-features]
+[contracts.basic-features.profile]
+overflow-checks = true # needed for overflow tests
 
 [contracts.basic-features-storage-bytes]
 add-unlabelled = false

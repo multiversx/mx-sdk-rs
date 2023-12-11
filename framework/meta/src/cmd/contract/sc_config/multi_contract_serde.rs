@@ -53,7 +53,7 @@ pub struct ContractVariantSerde {
     pub kill_legacy_callback: bool,
 
     #[serde(default)]
-    pub contract_variant_profile: Option<ContractVariantProfile>,
+    pub profile: Option<ContractVariantProfileSerde>,
 }
 
 #[derive(Deserialize, Default, Debug)]
@@ -61,23 +61,26 @@ pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
 }
 
-#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-pub struct ContractVariantProfile {
-    pub codegen_units: u8,
-    pub opt_level: String,
-    pub lto: bool,
-    pub debug: bool,
-    pub panic: String,
-}
+#[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq)]
+pub struct ContractVariantProfileSerde {
+    #[serde(default)]
+    #[serde(rename = "codegen-units")]
+    pub codegen_units: Option<u8>,
 
-impl Default for ContractVariantProfile {
-    fn default() -> ContractVariantProfile {
-        ContractVariantProfile {
-            codegen_units: 1u8,
-            opt_level: "z".to_owned(),
-            lto: true,
-            debug: false,
-            panic: "abort".to_owned(),
-        }
-    }
+    #[serde(default)]
+    #[serde(rename = "opt-level")]
+    pub opt_level: Option<String>,
+
+    #[serde(default)]
+    pub lto: Option<bool>,
+
+    #[serde(default)]
+    pub debug: Option<bool>,
+
+    #[serde(default)]
+    pub panic: Option<String>,
+
+    #[serde(default)]
+    #[serde(rename = "overflow-checks")]
+    pub overflow_checks: Option<bool>,
 }
