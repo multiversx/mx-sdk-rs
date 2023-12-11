@@ -30,7 +30,7 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                             .to_string()
                             .split_once(char::is_whitespace)
                         {
-                            tuple.1.replace('\\', "").trim_matches('\"').to_string()
+                            remove_backslashes(tuple.1)
                         } else {
                             String::new()
                         }
@@ -43,6 +43,10 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
             },
         })
         .collect()
+}
+
+fn remove_backslashes(input: &str) -> String {
+    input.replace("\\\"", "\"").replace("\\'", "'").to_string()
 }
 
 pub struct OutputNameAttribute {

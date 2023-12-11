@@ -40,7 +40,6 @@ fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
 
 pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let type_docs = extract_doc(ast.attrs.as_slice());
-    // let type_docs = Vec::<String>::new();
     let type_description_impl = match &ast.data {
         syn::Data::Struct(data_struct) => {
             let struct_field_snippets = fields_snippets(&data_struct.fields);
