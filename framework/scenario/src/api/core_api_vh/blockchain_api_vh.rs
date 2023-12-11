@@ -265,6 +265,6 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
             vh.get_esdt_local_roles(token_id_handle.get_raw_handle_unchecked())
         });
 
-        multiversx_sc::types::EsdtLocalRoleFlags::from_bits(result as u64).unwrap()
+        multiversx_sc::types::EsdtLocalRoleFlags::from_bits_retain(result as u64)
     }
 }
