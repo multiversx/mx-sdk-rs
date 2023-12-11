@@ -30,7 +30,7 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
                             .to_string()
                             .split_once(char::is_whitespace)
                         {
-                            tuple.1.trim_matches('\"').to_string()
+                            tuple.1.replace('\\', "").trim_matches('\"').to_string()
                         } else {
                             String::new()
                         }
