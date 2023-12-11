@@ -10,9 +10,9 @@ name = "interact"
 path = "src/comp_interact_main.rs"
 
 [dependencies]
-clap = { version = "4.1.0", features = ["derive", "cargo"] }
+clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.7.2"
+toml = "0.8.6"
 
 [dependencies.vault]
 path = "../vault"
@@ -24,9 +24,9 @@ path = "../forwarder-queue"
 path = "../promises-features"
 
 [dependencies.multiversx-sc-modules]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/snippets"

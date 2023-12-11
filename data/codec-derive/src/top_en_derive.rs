@@ -12,13 +12,13 @@ pub fn variant_top_encode_snippets(
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_index_u8 = variant_index as u8;
+            let discriminant_u8 = variant_index as u8;
             let variant_ident = &variant.ident;
             if variant.fields.is_empty() {
                 // top-encode discriminant directly
                 quote! {
                     #name::#variant_ident =>
-                        codec::TopEncode::top_encode_or_handle_err(&#variant_index_u8, output, h),
+                        codec::TopEncode::top_encode_or_handle_err(&#discriminant_u8, output, __h__),
                 }
             } else {
                 // dep-encode to buffer first
@@ -29,11 +29,11 @@ pub fn variant_top_encode_snippets(
                 });
                 quote! {
                     #name::#variant_ident #local_var_declarations => {
-                        let mut buffer = output.start_nested_encode();
-                        let dest = &mut buffer;
-                        codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, dest, h)?;
+                        let mut __buffer__ = output.start_nested_encode();
+                        let __dest__ = &mut __buffer__;
+                        codec::NestedEncode::dep_encode_or_handle_err(&#discriminant_u8, __dest__, __h__)?;
                         #(#variant_field_snippets)*
-                        output.finalize_nested_encode(buffer);
+                        output.finalize_nested_encode(__buffer__);
                         core::result::Result::Ok(())
                     },
                 }
@@ -51,10 +51,10 @@ fn top_encode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
                 dep_encode_snippet(&self_field_expr(index, field))
             });
             quote! {
-                let mut buffer = output.start_nested_encode();
-                let dest = &mut buffer;
+                let mut __buffer__ = output.start_nested_encode();
+                let __dest__ = &mut __buffer__;
                 #(#field_dep_encode_snippets)*
-                output.finalize_nested_encode(buffer);
+                output.finalize_nested_encode(__buffer__);
                 core::result::Result::Ok(())
             }
         },
@@ -82,7 +82,7 @@ pub fn top_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
-            fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> core::result::Result<(), H::HandledErr>
+            fn top_encode_or_handle_err<O, H>(&self, output: O, __h__: H) -> core::result::Result<(), H::HandledErr>
             where
                 O: codec::TopEncodeOutput,
                 H: codec::EncodeErrorHandler,
@@ -101,7 +101,7 @@ pub fn top_encode_or_default_impl(ast: &syn::DeriveInput) -> TokenStream {
 
     let gen = quote! {
         impl #impl_generics codec::TopEncode for #name #ty_generics #where_clause {
-            fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> core::result::Result<(), H::HandledErr>
+            fn top_encode_or_handle_err<O, H>(&self, output: O, __h__: H) -> core::result::Result<(), H::HandledErr>
             where
                 O: codec::TopEncodeOutput,
                 H: codec::EncodeErrorHandler,

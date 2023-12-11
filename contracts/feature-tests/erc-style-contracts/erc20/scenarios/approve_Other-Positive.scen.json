@@ -46,7 +46,9 @@
                             "address:account_1",
                             "address:account_2"
                         ],
-                        "data": "0x2a"
+                        "data": [
+                            "0x2a"
+                        ]
                     }
                 ],
                 "gas": "*",

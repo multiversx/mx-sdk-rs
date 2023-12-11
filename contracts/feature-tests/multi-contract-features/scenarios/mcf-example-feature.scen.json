@@ -17,7 +17,8 @@
             "id": "example_feature_message",
             "tx": {
                 "to": "sc:mcf-example-feature",
-                "function": "example_feature_message"
+                "function": "example_feature_message",
+                "arguments": []
             },
             "expect": {
                 "out": [
@@ -30,7 +31,8 @@
             "id": "example_feature_message",
             "tx": {
                 "to": "sc:mcf",
-                "function": "example_feature_message"
+                "function": "example_feature_message",
+                "arguments": []
             },
             "expect": {
                 "out": [

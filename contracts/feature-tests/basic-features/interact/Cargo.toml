@@ -10,13 +10,13 @@ name = "basic-features-interact"
 path = "src/bf_interact.rs"
 
 [dependencies]
-clap = { version = "4.1.0", features = ["derive", "cargo"] }
+clap = { version = "4.4.7", features = ["derive"] }
 serde = { version = "1.0", features = ["derive"] }
-toml = "0.7.2"
+toml = "0.8.6"
 
 [dependencies.basic-features]
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/snippets"

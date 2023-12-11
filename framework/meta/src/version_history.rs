@@ -1,7 +1,7 @@
 /// The last version to be used for upgrades and templates.
 ///
 /// Should be edited every time a new version of the framework is released.
-pub const LAST_VERSION: &str = "0.44.0";
+pub const LAST_VERSION: &str = "0.45.1";
 
 /// Indicates where to stop with the upgrades.
 pub const LAST_UPGRADE_VERSION: &str = LAST_VERSION;
@@ -51,6 +51,8 @@ pub const VERSIONS: &[&str] = &[
     "0.43.4",
     "0.43.5",
     "0.44.0",
+    "0.45.0",
+    "0.45.1",
 ];
 
 /// We started supporting contract templates with version 0.43.0.

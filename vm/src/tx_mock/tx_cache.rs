@@ -52,12 +52,23 @@ impl TxCache {
     where
         F: FnOnce(&AccountData) -> R,
     {
+        self.with_account_or_else(address, f, || {
+            panic!("Account {} not found", address_hex(address))
+        })
+    }
+
+    pub fn with_account_or_else<R, F, Else>(&self, address: &VMAddress, f: F, or_else: Else) -> R
+    where
+        F: FnOnce(&AccountData) -> R,
+        Else: FnOnce() -> R,
+    {
         self.load_account_if_necessary(address);
         let accounts = self.accounts.lock().unwrap();
-        let account = accounts
-            .get(address)
-            .unwrap_or_else(|| panic!("Account {} not found", address_hex(address)));
-        f(account)
+        if let Some(account) = accounts.get(address) {
+            f(account)
+        } else {
+            or_else()
+        }
     }
 
     pub fn with_account_mut<R, F>(&self, address: &VMAddress, f: F) -> R

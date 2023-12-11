@@ -686,7 +686,7 @@ impl BlockchainStateWrapper {
             .to(sc_wrapper.address_ref())
             .function(TxFunctionName::WHITEBOX_CALL.as_str())
             .egld_value(egld_payment)
-            .gas_limit(u64::MAX)
+            .gas_limit("100,000,000")
             .no_expect();
 
         sc_call_step.explicit_tx_hash = Some(H256::zero());

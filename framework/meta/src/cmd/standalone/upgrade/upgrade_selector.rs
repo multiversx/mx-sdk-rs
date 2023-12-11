@@ -8,6 +8,7 @@ use super::{
     upgrade_0_31::upgrade_to_31_0,
     upgrade_0_32::upgrade_to_32_0,
     upgrade_0_39::{postprocessing_after_39_0, upgrade_to_39_0},
+    upgrade_0_45::upgrade_to_45_0,
     upgrade_common::{cargo_check, version_bump_in_cargo_toml},
     upgrade_print::*,
 };
@@ -75,6 +76,9 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
         Some((_, "0.39.0")) => {
             upgrade_to_39_0(dir);
         },
+        Some((_, "0.45.0")) => {
+            upgrade_to_45_0(dir);
+        },
         Some((from_version, to_version)) => {
             version_bump_in_cargo_toml(&dir.path, from_version, to_version);
         },
@@ -87,7 +91,7 @@ fn upgrade_post_processing(dir: &RelevantDirectory) {
         Some((_, "0.28.0")) | Some((_, "0.29.0")) | Some((_, "0.30.0")) | Some((_, "0.31.0"))
         | Some((_, "0.32.0")) | Some((_, "0.33.0")) | Some((_, "0.34.0")) | Some((_, "0.35.0"))
         | Some((_, "0.36.0")) | Some((_, "0.37.0")) | Some((_, "0.40.0")) | Some((_, "0.41.0"))
-        | Some((_, "0.42.0")) | Some((_, "0.43.0")) => {
+        | Some((_, "0.42.0")) | Some((_, "0.43.0")) | Some((_, "0.44.0")) | Some((_, "0.45.1")) => {
             print_post_processing(dir);
             cargo_check(dir);
         },

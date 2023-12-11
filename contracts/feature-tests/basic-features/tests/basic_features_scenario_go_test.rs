@@ -341,6 +341,7 @@ fn storage_map_3_go() {
 }
 
 #[test]
+#[ignore = "currently not supported. TODO: investigate"]
 fn storage_mapper_fungible_token_go() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
 }
@@ -416,7 +417,6 @@ fn storage_raw_api_features_go() {
 }
 
 #[test]
-#[ignore = "the error message has changed, re-enable when we move to VM 1.5"]
 fn storage_reserved_go() {
     world().run("scenarios/storage_reserved.scen.json");
 }

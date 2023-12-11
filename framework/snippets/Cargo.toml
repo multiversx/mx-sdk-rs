@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.44.0"
+version = "0.45.1"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -16,15 +16,15 @@ categories = ["cryptography::cryptocurrencies"]
 [dependencies]
 tokio = { version = "1.24", features = ["full"] }
 hex = "0.4"
-base64 = "0.13.0"
+base64 = "0.21.5"
 log = "0.4.17"
-env_logger = "0.8.4"
+env_logger = "0.10"
 futures = "0.3"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.44.0"
+version = "=0.45.1"
 path = "../scenario"
 
 [dependencies.multiversx-sdk]
-version = "=0.2.0"
+version = "=0.3.0"
 path = "../../sdk/core"
