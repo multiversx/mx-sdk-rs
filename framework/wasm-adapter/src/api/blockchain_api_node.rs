@@ -359,14 +359,13 @@ impl BlockchainApiImpl for VmApiImpl {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> multiversx_sc::types::EsdtLocalRoleFlags {
-        match multiversx_sc::types::EsdtLocalRoleFlags::from_bits(unsafe {
+        multiversx_sc::types::EsdtLocalRoleFlags::from_bits(unsafe {
             getESDTLocalRoles(token_id_handle)
         } as u64)
-        {
-            Some(flags) => flags,
-            None => error_hook::signal_error(
+        .unwrap_or_else(|| {
+            error_hook::signal_error(
                 alloc::format!("no local esdt role flags found for {token_id_handle}").as_bytes(),
-            ),
-        }
+            )
+        })
     }
 }
