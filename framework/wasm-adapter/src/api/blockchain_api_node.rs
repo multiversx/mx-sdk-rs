@@ -1,8 +1,11 @@
-use crate::api::{
-    managed_types::managed_buffer_api_node::{
-        unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
+use crate::{
+    api::{
+        managed_types::managed_buffer_api_node::{
+            unsafe_buffer_load_address, unsafe_buffer_load_token_identifier,
+        },
+        VmApiImpl,
     },
-    VmApiImpl,
+    error_hook,
 };
 use multiversx_sc::{
     api::{BlockchainApi, BlockchainApiImpl, ManagedBufferApiImpl, RawHandle},
@@ -356,9 +359,14 @@ impl BlockchainApiImpl for VmApiImpl {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> multiversx_sc::types::EsdtLocalRoleFlags {
-        multiversx_sc::types::EsdtLocalRoleFlags::from_bits(unsafe {
+        match multiversx_sc::types::EsdtLocalRoleFlags::from_bits(unsafe {
             getESDTLocalRoles(token_id_handle)
         } as u64)
-        .unwrap()
+        {
+            Some(flags) => flags,
+            None => error_hook::signal_error(
+                alloc::format!("no local esdt role flags found for {token_id_handle}").as_bytes(),
+            ),
+        }
     }
 }
