@@ -46,7 +46,10 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
 }
 
 fn remove_backslashes(input: &str) -> String {
-    input.replace("\\\"", "\"").replace("\\'", "'").to_string()
+    input
+        .trim_matches('\"')
+        .replace("\\\"", "\"")
+        .replace("\\'", "'")
 }
 
 pub struct OutputNameAttribute {

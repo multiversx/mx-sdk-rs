@@ -24,4 +24,3 @@ pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {
 }
 
 impl<M> CodecFromSelf for EgldOrMultiEsdtPayment<M> where M: ManagedTypeApi {}
-

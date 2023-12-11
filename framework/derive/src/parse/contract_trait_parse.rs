@@ -10,7 +10,7 @@ use crate::{
 pub fn parse_contract_trait(
     args: proc_macro::TokenStream,
     contract_trait: &syn::ItemTrait,
-) -> ContractTrait{
+) -> ContractTrait {
     validate_attribute_args(args);
 
     let docs = extract_doc(contract_trait.attrs.as_slice());
