@@ -9,6 +9,7 @@ bitflags! {
     /// There is another near-identical implementation in the framework, used for communicating with the VM.
     ///
     /// It might be a good idea to move it to some "common ground" crate, between the framework and the VM.
+    #[derive(PartialEq, Clone, Copy)]
     pub struct EsdtLocalRoleFlags: u64 {
         const NONE                  = 0b00000000;
         const MINT                  = 0b00000001;
