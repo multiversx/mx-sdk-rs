@@ -75,5 +75,3 @@ build_and_copy ./contracts/feature-tests/composability/vault             $VM_REP
 rm -f $VM_REPO_PATH/test/features/composability/scenarios/*
 cp -R contracts/feature-tests/composability/scenarios \
    $VM_REPO_PATH/test/features/composability
-cp -R contracts/feature-tests/composability/scenarios-promises \
-   $VM_REPO_PATH/test/features/composability

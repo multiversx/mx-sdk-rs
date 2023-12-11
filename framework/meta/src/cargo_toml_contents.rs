@@ -213,6 +213,10 @@ impl CargoTomlContents {
             "panic".to_string(),
             Value::String(contract_profile.panic.to_owned()),
         );
+        profile_props.insert(
+            "overflow-checks".to_string(),
+            Value::Boolean(contract_profile.overflow_checks),
+        );
 
         let mut toml_table = toml::map::Map::new();
         toml_table.insert("release".to_string(), toml::Value::Table(profile_props));
