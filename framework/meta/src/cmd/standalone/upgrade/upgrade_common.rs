@@ -15,7 +15,7 @@ use crate::{
     CargoTomlContents,
 };
 
-use super::upgrade_print::*;
+use super::{upgrade_print::*, upgrade_settings::UpgradeSettings};
 
 /// Uses ruplacer.
 pub(crate) fn replace_in_files(sc_crate_path: &Path, file_type: &str, queries: &[Query]) {
@@ -200,7 +200,11 @@ pub fn re_generate_wasm_crate(dir: &RelevantDirectory) {
     );
 }
 
-pub fn cargo_check(dir: &RelevantDirectory) {
+pub fn cargo_check(dir: &RelevantDirectory, settings: &UpgradeSettings) {
+    if settings.no_check {
+        return;
+    }
+
     print_cargo_check(dir);
 
     let result = Command::new("cargo")
