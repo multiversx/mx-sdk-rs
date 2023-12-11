@@ -1801,7 +1801,7 @@ dependencies = [
 name = "multiversx-chain-vm"
 version = "0.7.0"
 dependencies = [
- "bitflags 1.3.2",
+ "bitflags 2.4.1",
  "ed25519-dalek",
  "hex",
  "hex-literal",
@@ -1846,7 +1846,7 @@ dependencies = [
 name = "multiversx-sc"
 version = "0.45.1"
 dependencies = [
- "bitflags 1.3.2",
+ "bitflags 2.4.1",
  "hashbrown 0.14.2",
  "hex-literal",
  "multiversx-sc-codec",
