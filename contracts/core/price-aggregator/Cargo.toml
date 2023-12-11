@@ -32,3 +32,5 @@ path = "../../../framework/scenario"
 
 [dependencies]
 arrayvec = { version = "0.7.1", default-features = false }
+rand = { version = "0.8.5" }
+getrandom = { version = "0.2", features = ["js"] }
