@@ -36,19 +36,19 @@ fn test_fixed_point_biguint() {
         FixedPoint::<StaticApi, ConstDecimals<2usize>>::from(BigUint::from(5u64))
     );
 
-    let fixed_4: FixedPoint<StaticApi, NumDecimals> = FixedPoint {
-        data: BigUint::from(100u64), // 1 * 10^2
-        decimals: 2usize,            // 10^2
-    };
+    let fixed_4: FixedPoint<StaticApi, NumDecimals> =
+        FixedPoint::from_raw_units(BigUint::from(100u64), 2usize);
     let fixed_5 = fixed_4.rescale(8usize);
     assert_eq!(
         fixed_5,
         FixedPoint::from_raw_units(BigUint::from(100000000u64), 8usize)
-    ); //works
+    );
 
-    // let fixed_6: FixedPoint<StaticApi, ConstDecimals<2usize>> =
-    //     FixedPoint::from(BigUint::from(1500u64)); //15 * 10^2
-    // let fixed_7 = fixed_6.rescale(ConstDecimals<2usize>);
-    // assert_eq!(fixed_7, FixedPoint::from_raw_units(BigUint::from(150u64), 1usize));
-
+    let fixed_6: FixedPoint<StaticApi, ConstDecimals<2usize>> =
+        FixedPoint::from(BigUint::from(1500u64));
+    let fixed_7 = fixed_6.rescale_const::<8>();
+    assert_eq!(
+        fixed_7,
+        FixedPoint::<StaticApi, ConstDecimals<8>>::from(BigUint::from(1500u64))
+    );
 }

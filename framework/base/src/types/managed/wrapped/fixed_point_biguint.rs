@@ -4,7 +4,6 @@ use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Sub},
 };
-// use std::println;
 
 fn scaling_factor<M: ManagedTypeApi>(num_decimals: NumDecimals) -> BigUint<M> {
     // TODO: cache
@@ -42,8 +41,8 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
 
 #[derive(Debug, Clone)]
 pub struct FixedPoint<M: ManagedTypeApi, D: Decimals> {
-    pub data: BigUint<M>,
-    pub decimals: D,
+    data: BigUint<M>,
+    decimals: D,
 }
 
 impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
@@ -62,8 +61,10 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
     }
+}
 
-    pub fn rescale(self, scale_to: D) -> Self {
+impl<M: ManagedTypeApi> FixedPoint<M, NumDecimals> {
+    pub fn rescale(self, scale_to: NumDecimals) -> FixedPoint<M, NumDecimals> {
         let from_num_decimals = self.decimals.num_decimals();
         let scale_to_num_decimals = scale_to.num_decimals();
 
@@ -76,6 +77,34 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
                 FixedPoint::from_raw_units(&self.data * &scaling_factor(delta_decimals), scale_to)
+            },
+        }
+    }
+}
+
+impl<const DECIMALS: NumDecimals, M: ManagedTypeApi> FixedPoint<M, ConstDecimals<DECIMALS>> {
+    pub fn rescale_const<const N: NumDecimals>(self) -> FixedPoint<M, ConstDecimals<N>>
+    where
+        M: ManagedTypeApi,
+    {
+        let from_num_decimals = self.decimals.num_decimals();
+        let scale_to_num_decimals = N.num_decimals();
+
+        match from_num_decimals.cmp(&scale_to_num_decimals) {
+            Ordering::Less => {
+                let delta_decimals = scale_to_num_decimals - from_num_decimals;
+                FixedPoint::from_raw_units(
+                    &self.data * &scaling_factor(delta_decimals),
+                    ConstDecimals::<N>,
+                )
+            },
+            Ordering::Equal => FixedPoint::from_raw_units(self.data, ConstDecimals::<N>),
+            Ordering::Greater => {
+                let delta_decimals = from_num_decimals - scale_to_num_decimals;
+                FixedPoint::from_raw_units(
+                    &self.data * &scaling_factor(delta_decimals),
+                    ConstDecimals::<N>,
+                )
             },
         }
     }
