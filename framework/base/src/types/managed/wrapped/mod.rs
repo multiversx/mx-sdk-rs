@@ -25,7 +25,7 @@ pub use egld_or_multi_esdt_payment::EgldOrMultiEsdtPayment;
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::{EsdtTokenPayment, MultiEsdtPayment};
-pub use fixed_point_biguint::{FixedPoint, ConstDecimals, NumDecimals};
+pub use fixed_point_biguint::{ConstDecimals, FixedPoint, NumDecimals};
 pub use managed_address::ManagedAddress;
 pub use managed_buffer_cached_builder::ManagedBufferCachedBuilder;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
