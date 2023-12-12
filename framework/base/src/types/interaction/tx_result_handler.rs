@@ -6,20 +6,21 @@ use crate::{
 
 use super::{FunctionCall, TxEnv};
 
-pub trait TxCallback<Env>
+pub trait TxResultHandler<Env>
 where
     Env: TxEnv,
 {
 }
 
-pub trait TxRunnableCallback<Env>: TxCallback<Env>
+pub trait TxRunnableCallback<Env>: TxResultHandler<Env>
 where
     Env: TxEnv,
 {
     fn run_callback(self, env: &Env);
 }
 
-impl<Env> TxCallback<Env> for () where Env: TxEnv {}
+impl<Env> TxResultHandler<Env> for () where Env: TxEnv {}
+
 impl<Env> TxRunnableCallback<Env> for ()
 where
     Env: TxEnv,

@@ -94,6 +94,6 @@ where
 
         world.sc_call(&mut step);
         env.response = step.response;
-        self.callback.run_callback(&env);
+        self.result_handler.run_callback(&env);
     }
 }

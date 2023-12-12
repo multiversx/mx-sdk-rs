@@ -22,7 +22,7 @@ where
     Api: CallTypeApi,
 {
     pub fn with_callback(mut self, callback_call: CallbackClosure<Api>) -> Self {
-        self.callback = Some(callback_call);
+        self.result_handler = Some(callback_call);
         self
     }
 }

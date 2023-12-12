@@ -1,4 +1,4 @@
-use multiversx_sc::types::{TxCallback, TxRunnableCallback};
+use multiversx_sc::types::{TxResultHandler, TxRunnableCallback};
 
 use crate::scenario_model::TxResponse;
 
@@ -8,7 +8,7 @@ pub struct WithTxResult<F>(pub F)
 where
     F: FnOnce(&TxResponse);
 
-impl<F> TxCallback<ScenarioTxEnvironment> for WithTxResult<F> where F: FnOnce(&TxResponse) {}
+impl<F> TxResultHandler<ScenarioTxEnvironment> for WithTxResult<F> where F: FnOnce(&TxResponse) {}
 impl<F> TxRunnableCallback<ScenarioTxEnvironment> for WithTxResult<F>
 where
     F: FnOnce(&TxResponse),
