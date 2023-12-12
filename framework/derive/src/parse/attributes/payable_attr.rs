@@ -6,7 +6,7 @@ pub struct PayableAttribute {
 
 impl PayableAttribute {
     pub fn parse(attr: &syn::Attribute) -> Option<PayableAttribute> {
-        if let Some(first_seg) = attr.path.segments.first() {
+        if let Some(first_seg) = attr.path().segments.first() {
             if first_seg.ident == ATTR_PAYABLE {
                 Some(PayableAttribute {
                     identifier: extract_token_identifier(attr),
@@ -23,35 +23,33 @@ impl PayableAttribute {
 /// Current implementation only works with 1 token name.
 /// Might be extended in the future.
 fn extract_token_identifier(attr: &syn::Attribute) -> Option<String> {
-    let mut iter = attr.clone().tokens.into_iter();
-    let result_str = match iter.next() {
-        Some(proc_macro2::TokenTree::Group(group)) => {
-            assert!(
-                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
-                "payable token name must be specified in parantheses"
-            );
-            let mut iter2 = group.stream().into_iter();
-            match iter2.next() {
-                Some(proc_macro2::TokenTree::Literal(lit)) => {
-                    let str_val = lit.to_string();
-                    assert!(
-                        str_val.starts_with('\"') && str_val.ends_with('\"'),
-                        "string literal expected as attribute argument"
-                    );
-                    let substr = &str_val[1..str_val.len() - 1];
-                    Some(substr.to_string())
-                },
-                _ => panic!("literal expected as event identifier"),
-            }
+    match attr.meta.clone() {
+        syn::Meta::Path(_) => {
+            panic!("attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")]")
         },
-        None => None,
-        _ => panic!("unexpected payable attribute format"),
-    };
+        syn::Meta::List(list) => {
+            let mut iter = list.tokens.into_iter();
+            let ticker = match iter.next() {
+                Some(proc_macro2::TokenTree::Literal(literal)) => {
+                    let clean = literal.to_string().trim_matches('\"').trim().to_string();
+                    assert!(
+                        !clean.is_empty(),
+                        "ticker can not be empty. attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")"
+                    );
+                    clean
+                },
+                Some(_) => panic!("expected a string as argument"),
+                None => panic!("argument can not be empty. attribute needs 1 string argument: Replace with #[payable(\"*\")] or #[payable(\"EGLD\")"),
+            };
 
-    assert!(
-        iter.next().is_none(),
-        "event too many tokens in event attribute"
-    );
-
-    result_str
+            assert!(
+                iter.next().is_none(),
+                "too many tokens in attribute argument"
+            );
+            Some(ticker)
+        },
+        syn::Meta::NameValue(_) => panic!(
+            "attribute can not be name value. attribute needs 1 string argument: \"*\" or \"EGLD\""
+        ),
+    }
 }
