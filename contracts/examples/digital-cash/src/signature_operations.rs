@@ -3,7 +3,7 @@ multiversx_sc::derive_imports!();
 
 use crate::{constants::*, helpers, storage};
 
-pub use multiversx_sc::api::{ED25519_KEY_BYTE_LEN, ED25519_SIGNATURE_BYTE_LEN};
+pub use multiversx_sc::api::ED25519_SIGNATURE_BYTE_LEN;
 
 #[multiversx_sc::module]
 pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersModule {
