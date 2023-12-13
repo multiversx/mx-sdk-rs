@@ -5,11 +5,14 @@ use crate::{
 };
 use convert_case::{Case, Casing};
 use ruplacer::Query;
+use rustc_version::Version;
 use toml::value::Table;
 
 const TEST_DIRECTORY: &str = "./tests";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
+const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
+const TARGET_VERSION_0_45_1: Version = Version::new(0, 45, 1);
 
 pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
@@ -17,9 +20,10 @@ pub struct TemplateAdjuster {
     pub keep_paths: bool,
 }
 impl TemplateAdjuster {
-    pub fn update_dependencies(&self) {
+    pub fn update_dependencies(&self, args_tag: String) {
         self.update_dependencies_root();
         self.update_dependencies_meta();
+        self.update_dependencies_wasm(args_tag);
     }
 
     fn update_dependencies_root(&self) {
@@ -37,6 +41,23 @@ impl TemplateAdjuster {
 
     fn update_dependencies_meta(&self) {
         let cargo_toml_path = self.target.contract_dir().join(META_CARGO_TOML);
+        let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+
+        if !self.keep_paths {
+            remove_paths_from_deps(&mut toml, &[&self.metadata.name]);
+        }
+
+        toml.save_to_file(&cargo_toml_path);
+    }
+
+    fn update_dependencies_wasm(&self, args_tag: String) {
+        if is_version_at_least_0_45_1(args_tag) {
+            println!(">>>>>>>>>>>>YES");
+            return;
+        }
+        println!(">>>>>>>>>>>>YESSSSSSS");
+
+        let cargo_toml_path = self.target.contract_dir().join(WASM_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {
@@ -174,6 +195,13 @@ impl TemplateAdjuster {
             (&self.metadata.name, &new_name),
         ];
         rename_files(&self.target.contract_dir(), pattern);
+    }
+}
+
+fn is_version_at_least_0_45_1(args_tag: String) -> bool {
+    match Version::parse(&args_tag) {
+        Ok(version) => version >= TARGET_VERSION_0_45_1,
+        Err(_error) => false,
     }
 }
 

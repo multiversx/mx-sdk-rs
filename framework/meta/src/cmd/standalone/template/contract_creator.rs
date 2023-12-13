@@ -11,12 +11,13 @@ use super::{
 /// Creates a new contract on disk, from a template, given a name.
 pub fn create_contract(args: &TemplateArgs) {
     let version = get_repo_version(&args.tag);
+    let version_tag: String = version.get_tag();
     let repo_temp_download = RepoSource::download_from_github(version, std::env::temp_dir());
     let target = target_from_args(args);
 
     let creator = ContractCreator::new(&repo_temp_download, args.template.clone(), target, false);
 
-    creator.create_contract();
+    creator.create_contract(version_tag);
 }
 
 fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
@@ -71,9 +72,9 @@ impl<'a> ContractCreator<'a> {
         }
     }
 
-    pub fn create_contract(&self) {
+    pub fn create_contract(&self, args_tag: String) {
         self.copy_template();
-        self.update_dependencies();
+        self.update_dependencies(args_tag);
         self.rename_template();
     }
 
@@ -82,8 +83,8 @@ impl<'a> ContractCreator<'a> {
             .copy_template(self.target.contract_dir());
     }
 
-    pub fn update_dependencies(&self) {
-        self.adjuster.update_dependencies();
+    pub fn update_dependencies(&self, args_tag: String) {
+        self.adjuster.update_dependencies(args_tag);
     }
 
     pub fn rename_template(&self) {
