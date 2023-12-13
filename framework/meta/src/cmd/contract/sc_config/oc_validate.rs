@@ -10,10 +10,22 @@ pub fn validate_contract_variant(contract_variant: &ContractVariant) -> Result<(
 
 fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), String> {
     match contract_variant.abi.constructors.len() {
-            0 => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
-            1 => Ok(()),
-            _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
-        }
+        0 => if has_upgrade(contract_variant) {
+            Ok(())
+        } else {
+            Err("Missing constructor. Add a method annotated with `#[init]`.".to_string())
+        },
+        1 => Ok(()),
+        _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
+    }
+}
+
+fn has_upgrade(contract_variant: &ContractVariant) -> bool {
+    contract_variant
+        .abi
+        .endpoints
+        .iter()
+        .any(|endpoint| endpoint.name == "upgrade")
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.

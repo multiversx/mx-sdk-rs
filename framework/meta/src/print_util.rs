@@ -89,3 +89,10 @@ pub fn print_check_ei_ok() {
 pub fn print_ignore_ei_check() {
     println!("{}", "EI version check explicitly ignored".yellow(),);
 }
+
+pub fn print_workspace_target_dir(target_path_str: &str) {
+    println!(
+        "{}",
+        format!("Using workspace target directory: {target_path_str} ...").green()
+    );
+}

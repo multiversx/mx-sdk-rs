@@ -11,7 +11,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "egldValue": "0",
                 "function": "forward",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
@@ -59,7 +58,6 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "egldValue": "0",
                 "function": "forward",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
@@ -106,8 +104,8 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "function": "forward",
                 "egldValue": "500",
+                "function": "forward",
                 "arguments": [
                     "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
                     "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
@@ -131,8 +129,8 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "function": "forward",
                 "egldValue": "500",
+                "function": "forward",
                 "arguments": [
                     "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
                     "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee",

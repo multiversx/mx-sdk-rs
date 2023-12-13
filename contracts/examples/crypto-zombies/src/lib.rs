@@ -3,6 +3,7 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
+mod crypto_kitties_proxy;
 mod storage;
 mod zombie;
 mod zombie_attack;

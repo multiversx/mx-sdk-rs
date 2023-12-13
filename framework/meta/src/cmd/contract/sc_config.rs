@@ -9,9 +9,10 @@ mod wasm_clean;
 mod wasm_crate_gen;
 mod wasm_update;
 
-pub use multi_contract_serde::*;
-pub use oc_builder::*;
+pub use multi_contract_serde::{
+    ContractVariantProfileSerde, ContractVariantSerde, MultiContractConfigSerde,
+    MultiContractGeneralSettingsSerde,
+};
 pub use oc_config::ContractVariant;
 pub use oc_global_config::ScConfig;
-pub use oc_settings::ContractVariantSettings;
-pub use wasm_build::*;
+pub use oc_settings::{ContractVariantProfile, ContractVariantSettings};

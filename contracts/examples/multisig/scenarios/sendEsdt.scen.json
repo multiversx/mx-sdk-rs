@@ -192,7 +192,7 @@
                             "3",
                             "10"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:multisig",
@@ -201,31 +201,28 @@
                             "str:FUNG-TOKEN",
                             "0",
                             "1000",
-                            "address:esdt-owner"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:multisig",
-                        "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
                             "str:NFT-123456",
                             "1",
                             "1",
-                            "address:esdt-owner"
-                        ],
-                        "data": ""
-                    },
-                    {
-                        "address": "sc:multisig",
-                        "endpoint": "str:MultiESDTNFTTransfer",
-                        "topics": [
                             "str:SFT-456789",
                             "3",
                             "10",
                             "address:esdt-owner"
                         ],
-                        "data": ""
+                        "data": "*"
+                    },
+                    {
+                        "address": "address:esdt-owner",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "",
+                            "sc:multisig"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
+                        ]
                     },
                     {
                         "address": "sc:multisig",
@@ -233,7 +230,7 @@
                         "topics": [
                             "str:asyncCallSuccess"
                         ],
-                        "data": ""
+                        "data": "*"
                     }
                 ],
                 "gas": "*",

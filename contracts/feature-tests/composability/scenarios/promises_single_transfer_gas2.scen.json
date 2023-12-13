@@ -21,7 +21,7 @@
         },
         {
             "step": "scCall",
-            "txId": "2",
+            "id": "2",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:promises",
@@ -42,6 +42,20 @@
                 "status": "0",
                 "logs": [
                     {
+                        "address": "sc:vault",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:promises"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:the_one_callback",
+                            "0x05",
+                            "str:not enough gas"
+                        ]
+                    },
+                    {
                         "address": "sc:promises",
                         "endpoint": "str:the_one_callback",
                         "topics": [
@@ -49,10 +63,12 @@
                             "1001",
                             "1002"
                         ],
-                        "data": {
-                            "0-status": "biguint:5",
-                            "1-message": "nested:str:not enough gas"
-                        }
+                        "data": [
+                            {
+                                "0-status": "biguint:5",
+                                "1-message": "nested:str:not enough gas"
+                            }
+                        ]
                     },
                     "+"
                 ],

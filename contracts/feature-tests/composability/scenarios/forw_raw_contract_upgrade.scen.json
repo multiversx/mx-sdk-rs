@@ -8,6 +8,9 @@
                 "sc:forwarder": {
                     "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 },
+                "sc:reference": {
+                    "code": "file:../vault/output/vault-upgrade.wasm"
+                },
                 "sc:child": {
                     "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder"
@@ -16,27 +19,28 @@
         },
         {
             "step": "scCall",
-            "id": "upgrade-vault-to-forwarder",
+            "id": "upgrade-vault-from-source",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:child",
-                    "sc:forwarder"
+                    "sc:reference"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": []
+                "out": "*",
+                "status": ""
             }
         },
         {
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "file:../vault/output/vault-upgrade.wasm"
                 },
                 "+": ""
             }
@@ -58,6 +62,7 @@
             },
             "expect": {
                 "out": [
+                    "str:upgraded",
                     "str:upgrade-init-arg"
                 ]
             }

@@ -51,7 +51,9 @@
                             "str:REC-TOKEN",
                             "1"
                         ],
-                        "data": "2"
+                        "data": [
+                            "2"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -62,7 +64,7 @@
                             "1",
                             "0"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:recursive-caller",
@@ -72,7 +74,9 @@
                             "str:REC-TOKEN",
                             "1"
                         ],
-                        "data": "2"
+                        "data": [
+                            "2"
+                        ]
                     },
                     {
                         "address": "sc:recursive-caller",
@@ -82,7 +86,9 @@
                             "str:REC-TOKEN",
                             "1"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     },
                     {
                         "address": "sc:vault",
@@ -93,7 +99,7 @@
                             "1",
                             "0"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:recursive-caller",
@@ -103,7 +109,9 @@
                             "str:REC-TOKEN",
                             "1"
                         ],
-                        "data": "1"
+                        "data": [
+                            "1"
+                        ]
                     }
                 ],
                 "gas": "*",

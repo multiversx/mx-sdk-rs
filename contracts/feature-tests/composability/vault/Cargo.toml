@@ -10,10 +10,10 @@ path = "src/vault.rs"
 
 
 [dependencies.multiversx-sc]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/base"
 features = ["promises"]
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/scenario"

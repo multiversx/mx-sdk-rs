@@ -42,6 +42,11 @@ fn big_uint_from_u_64_rs() {
 }
 
 #[test]
+fn big_uint_pow_rs() {
+    world().run("scenarios/big_uint_pow.scen.json");
+}
+
+#[test]
 fn big_uint_sqrt_rs() {
     world().run("scenarios/big_uint_sqrt.scen.json");
 }
@@ -299,6 +304,11 @@ fn sc_properties_rs() {
 }
 
 #[test]
+fn small_num_overflow_rs() {
+    world().run("scenarios/small_num_overflow.scen.json");
+}
+
+#[test]
 fn storage_big_int_rs() {
     world().run("scenarios/storage_big_int.scen.json");
 }
@@ -354,14 +364,14 @@ fn storage_map_3_rs() {
 }
 
 #[test]
-#[ignore]
-fn storage_mapper_fungible_token_rs() {
-    world().run("scenarios/storage_mapper_fungible_token.scen.json");
+fn storage_mapper_address_to_id_rs() {
+    world().run("scenarios/storage_mapper_address_to_id.scen.json");
 }
 
 #[test]
-fn storage_mapper_address_to_id_rs() {
-    world().run("scenarios/storage_mapper_address_to_id.scen.json");
+#[ignore]
+fn storage_mapper_fungible_token_rs() {
+    world().run("scenarios/storage_mapper_fungible_token.scen.json");
 }
 
 #[test]

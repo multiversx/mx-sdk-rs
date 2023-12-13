@@ -1,7 +1,7 @@
 use num_bigint::{BigInt, BigUint};
 use num_traits::ToPrimitive;
 
-use crate::vm_hooks::VMHooksHandlerSource;
+use crate::{vm_err_msg::ERROR_NO_CALLBACK_CLOSURE, vm_hooks::VMHooksHandlerSource};
 
 use crate::types::RawHandle;
 
@@ -47,7 +47,10 @@ pub trait VMHooksEndpointArgument: VMHooksHandlerSource + VMHooksManagedTypes {
     }
 
     fn load_callback_closure_buffer(&self, dest: RawHandle) {
-        let closure_data = self.input_ref().promise_callback_closure_data.clone();
-        self.m_types_lock().mb_set(dest, closure_data);
+        if let Some(closure_data) = &self.input_ref().promise_callback_closure_data {
+            self.m_types_lock().mb_set(dest, closure_data.clone());
+        } else {
+            self.vm_error(ERROR_NO_CALLBACK_CLOSURE);
+        }
     }
 }

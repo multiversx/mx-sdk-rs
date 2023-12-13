@@ -27,7 +27,6 @@
                 "out": [],
                 "status": "4",
                 "message": "str:Not enough balance for id",
-                "logs": "*",
                 "gas": "*",
                 "refund": "*"
             }

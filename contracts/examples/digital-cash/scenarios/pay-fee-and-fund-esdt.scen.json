@@ -11,7 +11,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
-                "function": "payFeeAndFundESDT",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:CASHTOKEN-445566",
@@ -22,6 +21,7 @@
                         "value": "50"
                     }
                 ],
+                "function": "payFeeAndFundESDT",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
                     "u64:100"
@@ -44,7 +44,6 @@
             "tx": {
                 "from": "address:acc3",
                 "to": "sc:the_digital_cash_contract",
-                "function": "payFeeAndFundESDT",
                 "esdtValue": [
                     {
                         "tokenIdentifier": "str:CASHTOKEN-778899",
@@ -55,6 +54,7 @@
                         "value": "50"
                     }
                 ],
+                "function": "payFeeAndFundESDT",
                 "arguments": [
                     "0xdb474a3a065d3f0c0a62ae680ef6435e48eb482899d2ae30ff7a3a4b0ef19c60",
                     "u64:100"

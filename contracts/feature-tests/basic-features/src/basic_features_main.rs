@@ -18,6 +18,7 @@ pub mod managed_address_features;
 pub mod managed_buffer_features;
 pub mod managed_vec_features;
 pub mod non_zero_features;
+pub mod small_num_overflow_test_ops;
 pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_address_to_id;
@@ -71,6 +72,7 @@ pub trait BasicFeatures:
     + storage_mapper_non_fungible_token::NonFungibleTokenMapperFeatures
     + storage_mapper_unique_id_mapper::UniqueIdMapperFeatures
     + struct_eq::StructEquals
+    + small_num_overflow_test_ops::SmallIntOverflow
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule

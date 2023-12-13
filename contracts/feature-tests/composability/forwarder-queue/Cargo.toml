@@ -15,14 +15,14 @@ promises = ["multiversx-sc/promises"]
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/scenario"

@@ -11,7 +11,7 @@ pub struct CheckLog {
     pub address: CheckValue<BytesValue>,
     pub endpoint: CheckValue<BytesValue>,
     pub topics: CheckValueList,
-    pub data: CheckValue<BytesValue>,
+    pub data: CheckValueList,
 }
 
 impl InterpretableFrom<CheckLogRaw> for CheckLog {
@@ -20,7 +20,7 @@ impl InterpretableFrom<CheckLogRaw> for CheckLog {
             address: CheckValue::<BytesValue>::interpret_from(from.address, context),
             endpoint: CheckValue::<BytesValue>::interpret_from(from.endpoint, context),
             topics: CheckValueList::interpret_from(from.topics, context),
-            data: CheckValue::<BytesValue>::interpret_from(from.data, context),
+            data: CheckValueList::interpret_from(from.data, context),
         }
     }
 }

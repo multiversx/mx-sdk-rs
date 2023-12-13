@@ -12,10 +12,7 @@ path = "src/promises_main.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.44.0"
+version = "0.45.1"
 path = "../../../../framework/base"
 features = ["promises", "back-transfers"]
 
-[dev-dependencies.multiversx-sc-scenario]
-version = "0.44.0"
-path = "../../../../framework/scenario"

@@ -229,6 +229,12 @@ where
         self.buffer.append(&part_after.buffer);
     }
 
+    pub fn take(&mut self, index: usize) -> T {
+        let item = unsafe { self.get_unsafe(index) };
+        self.remove(index);
+        item
+    }
+
     /// New `ManagedVec` instance with 1 element in it.
     pub fn from_single_item(item: T) -> Self {
         let mut result = ManagedVec::new();
