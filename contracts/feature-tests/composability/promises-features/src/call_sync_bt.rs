@@ -21,7 +21,7 @@ pub trait BackTransfersFeatureModule {
             .execute_on_dest_context_with_back_transfers::<()>();
 
         require!(
-            back_transfers.esdt_payments.len() == 1,
+            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
             "Only one ESDT payment expected"
         );
 
@@ -46,7 +46,7 @@ pub trait BackTransfersFeatureModule {
             .execute_on_dest_context_with_back_transfers::<()>();
 
         require!(
-            back_transfers.esdt_payments.len() == 1,
+            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
             "Only one ESDT payment expected"
         );
 
@@ -62,7 +62,7 @@ pub trait BackTransfersFeatureModule {
             .execute_on_dest_context_with_back_transfers::<()>();
 
         require!(
-            back_transfers.esdt_payments.len() == 1,
+            back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
             "Only one ESDT payment expected"
         );
 
