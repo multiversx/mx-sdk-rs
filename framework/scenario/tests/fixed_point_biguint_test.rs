@@ -1,7 +1,7 @@
 #![allow(clippy::generic_const_exprs)]
 #![feature(generic_const_exprs)]
 
-use multiversx_sc::types::{BigUint, ConstDecimals, FixedPoint, NumDecimals};
+use multiversx_sc::types::{BigFloat, BigUint, ConstDecimals, FixedPoint, NumDecimals};
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
@@ -58,5 +58,21 @@ pub fn test_fixed_point_biguint() {
     assert_eq!(
         fixed_9,
         FixedPoint::<StaticApi, ConstDecimals<3>>::const_decimals_from_raw(BigUint::from(500u64))
+    );
+
+    let float_1 = BigFloat::<StaticApi>::from_frac(3i64, 2i64);
+    let fixed_float_1 = FixedPoint::<StaticApi, ConstDecimals<1>>::from_big_float(
+        float_1.clone(),
+        ConstDecimals::<1>,
+    );
+    let fixed_float_2 = FixedPoint::<StaticApi, NumDecimals>::from_big_float(float_1, 1usize);
+
+    assert_eq!(
+        fixed_float_1,
+        FixedPoint::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(BigUint::from(15u64))
+    );
+    assert_eq!(
+        fixed_float_2,
+        FixedPoint::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(15u64), 1usize)
     );
 }

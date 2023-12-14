@@ -1,4 +1,7 @@
-use crate::{api::ManagedTypeApi, types::BigUint};
+use crate::{
+    api::ManagedTypeApi,
+    types::{BigFloat, BigInt, BigUint},
+};
 
 use core::{
     cmp::Ordering,
@@ -80,6 +83,36 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
                 FixedPoint::from_raw_units(&self.data * &scaling_factor(delta_decimals), scale_to)
             },
         }
+    }
+
+    pub fn to_big_float(&self) -> BigFloat<M> {
+        BigFloat::from_big_uint(&self.data)
+    }
+
+    pub fn to_big_int(self) -> BigInt<M> {
+        BigInt::from_biguint(crate::types::Sign::Plus, self.data)
+    }
+
+    pub fn from_big_int<T: Decimals>(big_int: BigInt<M>, num_decimals: T) -> FixedPoint<M, T> {
+        FixedPoint::from_raw_units(
+            big_int
+                .into_big_uint()
+                .unwrap_or_sc_panic("failed to cast BigInt to BigUint"),
+            num_decimals,
+        )
+    }
+
+    pub fn from_big_float<T: Decimals>(
+        big_float: BigFloat<M>,
+        num_decimals: T,
+    ) -> FixedPoint<M, T> {
+        let scaling_factor = num_decimals.scaling_factor();
+        let magnitude = big_float.magnitude();
+
+        let scaled = &BigFloat::from(scaling_factor) * &magnitude;
+        let fixed_big_int = scaled.trunc();
+
+        FixedPoint::<M, T>::from_big_int(fixed_big_int, num_decimals)
     }
 }
 
