@@ -163,7 +163,7 @@ impl TxResponse {
                 return self;
             }
 
-            let address_raw = base64_decode(topics.unwrap().get(0).unwrap());
+            let address_raw = base64_decode(topics.unwrap().first().unwrap());
 
             let address: Address = Address::from_slice(address_raw.as_slice());
             self.new_deployed_address = Some(address);

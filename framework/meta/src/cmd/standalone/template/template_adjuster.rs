@@ -12,7 +12,7 @@ const TEST_DIRECTORY: &str = "./tests";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
-const TARGET_VERSION_0_45_1: Version = Version::new(0, 45, 1);
+const TARGET_VERSION_0_45_0: Version = Version::new(0, 45, 0);
 
 pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
@@ -51,11 +51,9 @@ impl TemplateAdjuster {
     }
 
     fn update_dependencies_wasm(&self, args_tag: String) {
-        if is_version_at_least_0_45_1(args_tag) {
-            println!(">>>>>>>>>>>>YES");
+        if is_version_at_least_0_45_0(args_tag) {
             return;
         }
-        println!(">>>>>>>>>>>>YESSSSSSS");
 
         let cargo_toml_path = self.target.contract_dir().join(WASM_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
@@ -198,9 +196,9 @@ impl TemplateAdjuster {
     }
 }
 
-fn is_version_at_least_0_45_1(args_tag: String) -> bool {
+fn is_version_at_least_0_45_0(args_tag: String) -> bool {
     match Version::parse(&args_tag) {
-        Ok(version) => version >= TARGET_VERSION_0_45_1,
+        Ok(version) => version >= TARGET_VERSION_0_45_0,
         Err(_error) => false,
     }
 }

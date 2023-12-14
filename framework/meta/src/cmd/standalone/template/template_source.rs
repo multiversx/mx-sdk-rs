@@ -28,7 +28,7 @@ impl<'a> TemplateSource<'a> {
 
 pub fn template_sources(repo_temp_dir: &RepoSource) -> Vec<TemplateSource<'_>> {
     let templates_path = repo_temp_dir.repo_path().join(TEMPLATES_PATH_IN_REPO);
-    let dirs = RelevantDirectories::find_all(&templates_path, &[]);
+    let dirs = RelevantDirectories::find_all(templates_path, &[]);
     let mut sources = Vec::new();
     for dir in dirs.iter_contract_crates() {
         let template_metadata_path = dir.path.join(TEMPLATE_TOML_FILE_NAME);
