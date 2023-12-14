@@ -32,7 +32,7 @@ pub trait BackTransfersFeatureModule {
     }
 
     #[endpoint]
-    fn forward_sync_retrieve_funds_multi_call_bt(
+    fn forward_sync_retrieve_funds_bt_twice(
         &self,
         to: ManagedAddress,
         token: EgldOrEsdtTokenIdentifier,

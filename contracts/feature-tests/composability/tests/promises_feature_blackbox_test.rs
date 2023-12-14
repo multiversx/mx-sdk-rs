@@ -110,7 +110,7 @@ fn test_multi_call_back_transfers() {
         ScCallStep::new().from(USER_ADDRESS_EXPR).call(
             state
                 .promises_features_contract
-                .forward_sync_retrieve_funds_multi_call_bt(
+                .forward_sync_retrieve_funds_bt_twice(
                     vault_address.clone(),
                     TOKEN_ID,
                     0u64,
