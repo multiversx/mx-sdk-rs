@@ -1,3 +1,7 @@
+use multiversx_sc_codec::{
+    derive::{TopDecode, TopEncode, NestedEncode, NestedDecode},
+    TopEncode, TopEncodeOutput, NestedEncode, NestedDecode, NestedEncodeOutput, EncodeErrorHandler
+};
 use crate::{
     api::ManagedTypeApi,
     types::{BigFloat, BigInt, BigUint},
@@ -46,6 +50,11 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
 pub struct FixedPoint<M: ManagedTypeApi, D: Decimals> {
     data: BigUint<M>,
     decimals: D,
+}
+
+pub struct FixedPointNumDecimals<M: ManagedTypeApi> {
+    data: BigUint<M>,
+    decimals: NumDecimals,
 }
 
 impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
@@ -122,6 +131,53 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> FixedPoint<M, ConstDecimals
             data,
             decimals: ConstDecimals,
         }
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
+    for FixedPoint<M, ConstDecimals<DECIMALS>>
+{
+    #[inline]
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: multiversx_sc_codec::TopEncodeOutput,
+        H: multiversx_sc_codec::EncodeErrorHandler,
+    {
+        self.data.top_encode_or_handle_err(output, h)
+    }
+}
+
+impl<M: ManagedTypeApi> NestedEncode for FixedPointNumDecimals<M> {
+    fn dep_encode_or_handle_err<O, H>(
+        &self,
+        dest: &mut O,
+        h: H,
+    ) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        NestedEncode::dep_encode_or_handle_err(&self.data, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&self.decimals, dest, h)?;
+        
+        Result::Ok(())
+    }
+}
+
+impl<M: ManagedTypeApi> TopEncode for FixedPoint<M, NumDecimals> {
+    #[inline]
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        let mut buffer = output.start_nested_encode();
+        let dest = &mut buffer;
+        NestedEncode::dep_encode_or_handle_err(&self.data, dest, h)?;
+        NestedEncode::dep_encode_or_handle_err(&self.decimals, dest, h)?;
+
+        output.finalize_nested_encode(buffer);
+        Result::Ok(())
     }
 }
 
