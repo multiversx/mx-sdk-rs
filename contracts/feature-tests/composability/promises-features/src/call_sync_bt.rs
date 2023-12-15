@@ -16,8 +16,8 @@ pub trait BackTransfersFeatureModule {
     ) {
         let ((), back_transfers) = self
             .vault_proxy()
-            .contract(to.clone())
-            .retrieve_funds(token.clone(), token_nonce, amount.clone())
+            .contract(to)
+            .retrieve_funds(token, token_nonce, amount)
             .execute_on_dest_context_with_back_transfers::<()>();
 
         require!(
