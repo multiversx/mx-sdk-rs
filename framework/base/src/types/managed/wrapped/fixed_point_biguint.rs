@@ -1,10 +1,10 @@
-use multiversx_sc_codec::{
-    derive::{TopDecode, TopEncode, NestedEncode, NestedDecode},
-    TopEncode, TopEncodeOutput, NestedEncode, NestedDecode, NestedEncodeOutput, EncodeErrorHandler
-};
 use crate::{
     api::ManagedTypeApi,
     types::{BigFloat, BigInt, BigUint},
+};
+use multiversx_sc_codec::{
+    DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 use core::{
@@ -140,31 +140,42 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
-        O: multiversx_sc_codec::TopEncodeOutput,
-        H: multiversx_sc_codec::EncodeErrorHandler,
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
     {
         self.data.top_encode_or_handle_err(output, h)
     }
 }
 
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
+    for FixedPoint<M, ConstDecimals<DECIMALS>>
+{
+    #[inline]
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(FixedPoint::const_decimals_from_raw(
+            BigUint::top_decode_or_handle_err(input, h)?,
+        ))
+    }
+}
+
 impl<M: ManagedTypeApi> NestedEncode for FixedPointNumDecimals<M> {
-    fn dep_encode_or_handle_err<O, H>(
-        &self,
-        dest: &mut O,
-        h: H,
-    ) -> Result<(), H::HandledErr>
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
         NestedEncode::dep_encode_or_handle_err(&self.data, dest, h)?;
         NestedEncode::dep_encode_or_handle_err(&self.decimals, dest, h)?;
-        
+
         Result::Ok(())
     }
 }
 
-impl<M: ManagedTypeApi> TopEncode for FixedPoint<M, NumDecimals> {
+impl<M: ManagedTypeApi> TopEncode for FixedPointNumDecimals<M> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
@@ -181,6 +192,70 @@ impl<M: ManagedTypeApi> TopEncode for FixedPoint<M, NumDecimals> {
     }
 }
 
+impl<M: ManagedTypeApi> TopEncode for FixedPoint<M, NumDecimals> {
+    #[inline]
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        let encoded = FixedPointNumDecimals {
+            data: self.data.clone(),
+            decimals: self.decimals,
+        };
+        encoded.top_encode_or_handle_err(output, h)
+    }
+}
+
+impl<M: ManagedTypeApi> NestedDecode for FixedPointNumDecimals<M> {
+    #[inline]
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Result::Ok(FixedPointNumDecimals {
+            data: <BigUint<M> as NestedDecode>::dep_decode_or_handle_err(input, h)?,
+            decimals: <NumDecimals as NestedDecode>::dep_decode_or_handle_err(input, h)?,
+        })
+    }
+}
+
+impl<M: ManagedTypeApi> TopDecode for FixedPointNumDecimals<M> {
+    #[inline]
+    fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        let mut nested_buffer = top_input.into_nested_buffer();
+        let result = FixedPointNumDecimals {
+            data: <BigUint<M> as NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, h)?,
+            decimals: <NumDecimals as NestedDecode>::dep_decode_or_handle_err(
+                &mut nested_buffer,
+                h,
+            )?,
+        };
+        if !NestedDecodeInput::is_depleted(&nested_buffer) {
+            return Result::Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
+        }
+        Result::Ok(result)
+    }
+}
+
+impl<M: ManagedTypeApi> TopDecode for FixedPoint<M, NumDecimals> {
+    #[inline]
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok(FixedPoint::from(
+            FixedPointNumDecimals::<M>::top_decode_or_handle_err(input, h)?,
+        ))
+    }
+}
+
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
     for FixedPoint<M, ConstDecimals<DECIMALS>>
 {
@@ -189,6 +264,15 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
         FixedPoint {
             data: &value * &decimals.scaling_factor(),
             decimals,
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> From<FixedPointNumDecimals<M>> for FixedPoint<M, NumDecimals> {
+    fn from(value: FixedPointNumDecimals<M>) -> Self {
+        FixedPoint {
+            data: value.data,
+            decimals: value.decimals,
         }
     }
 }
