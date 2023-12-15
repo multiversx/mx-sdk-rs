@@ -8,6 +8,8 @@ use super::{
     ContractCreatorTarget, RepoSource, RepoVersion, TemplateAdjuster,
 };
 
+const VERSION_0_43_0: usize = 33;
+
 /// Creates a new contract on disk, from a template, given a name.
 pub fn create_contract(args: &TemplateArgs) {
     let version = get_repo_version(&args.tag);
@@ -31,7 +33,10 @@ fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
 
 pub(crate) fn get_repo_version(args_tag: &Option<String>) -> RepoVersion {
     if let Some(tag) = args_tag {
-        assert!(validate_template_tag(tag), "invalid template tag");
+        assert!(
+            validate_template_tag(VERSION_0_43_0, tag),
+            "invalid template tag"
+        );
         RepoVersion::Tag(tag.clone())
     } else {
         RepoVersion::Tag(LAST_TEMPLATE_VERSION.to_string())
@@ -73,17 +78,17 @@ impl<'a> ContractCreator<'a> {
     }
 
     pub fn create_contract(&self, args_tag: String) {
-        self.copy_template();
-        self.update_dependencies(args_tag);
+        self.copy_template(&args_tag);
+        self.update_dependencies(&args_tag);
         self.rename_template();
     }
 
-    pub fn copy_template(&self) {
+    pub fn copy_template(&self, args_tag: &str) {
         self.template_source
-            .copy_template(self.target.contract_dir());
+            .copy_template(self.target.contract_dir(), args_tag);
     }
 
-    pub fn update_dependencies(&self, args_tag: String) {
+    pub fn update_dependencies(&self, args_tag: &str) {
         self.adjuster.update_dependencies(args_tag);
     }
 

@@ -1,7 +1,12 @@
 use std::{
-    fs::{self},
+    fs::{self, OpenOptions},
+    io::{BufWriter, Write},
     path::{Path, PathBuf},
 };
+
+use crate::version_history::validate_template_tag;
+
+const VERSION_0_44_0: usize = 39;
 
 /// Will copy an entire folder according to a whitelist of allowed paths.
 ///
@@ -10,8 +15,14 @@ use std::{
 /// If a folder is whitelisted, then everything in the folder is considered whitelisted too.
 ///
 /// The function creates all necessary folder structure in the target, no additional preparation required.
-pub fn whitelisted_deep_copy(source_root: &Path, target_root: &Path, whitelist: &[String]) {
+pub fn whitelisted_deep_copy(
+    source_root: &Path,
+    target_root: &Path,
+    whitelist: &[String],
+    args_tag: &str,
+) {
     perform_file_copy(source_root, &PathBuf::new(), target_root, whitelist);
+    create_multiversx_json_file(target_root, args_tag);
 }
 
 fn is_whitelisted(path: &Path, whitelist: &[String]) -> bool {
@@ -70,6 +81,28 @@ fn perform_file_copy(
             )
         });
     }
+}
+
+fn create_multiversx_json_file(target_root: &Path, args_tag: &str) {
+    if validate_template_tag(VERSION_0_44_0, args_tag) {
+        return;
+    }
+
+    let file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(target_root.join("multiversx.json"))
+        .expect("Failed to open multiversx.json file");
+
+    let mut writer = BufWriter::new(file);
+
+    writer
+        .write_all(
+            br#"{
+        "language": "rust"
+}"#,
+        )
+        .unwrap();
 }
 
 #[cfg(test)]

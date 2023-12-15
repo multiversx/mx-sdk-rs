@@ -1,18 +1,18 @@
 use super::{template_metadata::TemplateMetadata, ContractCreatorTarget};
 use crate::{
     cmd::standalone::upgrade::upgrade_common::{rename_files, replace_in_files},
+    version_history::validate_template_tag,
     CargoTomlContents,
 };
 use convert_case::{Case, Casing};
 use ruplacer::Query;
-use rustc_version::Version;
 use toml::value::Table;
 
 const TEST_DIRECTORY: &str = "./tests";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
-const TARGET_VERSION_0_45_0: Version = Version::new(0, 45, 0);
+const VERSION_0_45_0: usize = 40;
 
 pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
@@ -20,7 +20,7 @@ pub struct TemplateAdjuster {
     pub keep_paths: bool,
 }
 impl TemplateAdjuster {
-    pub fn update_dependencies(&self, args_tag: String) {
+    pub fn update_dependencies(&self, args_tag: &str) {
         self.update_dependencies_root();
         self.update_dependencies_meta();
         self.update_dependencies_wasm(args_tag);
@@ -50,8 +50,8 @@ impl TemplateAdjuster {
         toml.save_to_file(&cargo_toml_path);
     }
 
-    fn update_dependencies_wasm(&self, args_tag: String) {
-        if is_version_at_least_0_45_0(args_tag) {
+    fn update_dependencies_wasm(&self, args_tag: &str) {
+        if validate_template_tag(VERSION_0_45_0, args_tag) {
             return;
         }
 
@@ -193,13 +193,6 @@ impl TemplateAdjuster {
             (&self.metadata.name, &new_name),
         ];
         rename_files(&self.target.contract_dir(), pattern);
-    }
-}
-
-fn is_version_at_least_0_45_0(args_tag: String) -> bool {
-    match Version::parse(&args_tag) {
-        Ok(version) => version >= TARGET_VERSION_0_45_0,
-        Err(_error) => false,
     }
 }
 
