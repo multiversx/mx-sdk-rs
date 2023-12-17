@@ -239,10 +239,7 @@ impl DebugApiVMHooksHandler {
 
         let contract_address = &self.0.input_ref().to;
         let builtin_functions = &self.0.vm_ref.builtin_functions;
-        let current_back_transfers =
-            BackTransfers::new_from_result(contract_address, &tx_result, builtin_functions);
-
-        self.back_transfers_lock().merge(&current_back_transfers);
+        self.back_transfers_lock().new_from_result(contract_address, &tx_result, builtin_functions);
 
         tx_result.result_values
     }
