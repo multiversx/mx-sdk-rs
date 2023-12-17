@@ -1,7 +1,10 @@
 #![allow(clippy::generic_const_exprs)]
 #![feature(generic_const_exprs)]
 
-use multiversx_sc::types::{BigFloat, BigUint, ConstDecimals, FixedPoint, NumDecimals};
+use multiversx_sc::{
+    codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
+    types::{BigFloat, BigUint, ConstDecimals, FixedPoint, NumDecimals},
+};
 use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
@@ -75,4 +78,29 @@ pub fn test_fixed_point_biguint() {
         fixed_float_2,
         FixedPoint::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(15u64), 1usize)
     );
+}
+
+#[test]
+fn encode_decode_test() {
+    let fixed_struct: FixedPoint<StaticApi, NumDecimals> =
+        FixedPoint::from_raw_units(BigUint::from(1u64), 1usize);
+
+    #[rustfmt::skip]
+	let nested_bytes = &[
+		/* BigUint */ 0, 0, 0, 0x01, 0x01,  
+		/* usize */ 0, 0, 0, 0x01, 
+	];
+
+    check_dep_encode_decode(fixed_struct.clone(), nested_bytes);
+    check_top_encode_decode(fixed_struct, nested_bytes);
+
+    let fixed_const: FixedPoint<StaticApi, ConstDecimals<1>> =
+        FixedPoint::const_decimals_from_raw(BigUint::from(1u64));
+
+    #[rustfmt::skip]
+    let bytes = &[
+        /* BigUint */ 0x01,
+    ];
+
+    check_top_encode_decode(fixed_const, bytes);
 }
