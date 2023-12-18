@@ -1802,7 +1802,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-scenario-format"
-version = "0.21.0"
+version = "0.21.1"
 dependencies = [
  "bech32",
  "hex",
@@ -1815,7 +1815,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-chain-vm"
-version = "0.7.0"
+version = "0.7.1"
 dependencies = [
  "bitflags 2.4.1",
  "ed25519-dalek",
@@ -1839,7 +1839,7 @@ checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "arrayvec",
  "getrandom",
@@ -1860,7 +1860,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "bitflags 2.4.1",
  "hashbrown",
@@ -1872,7 +1872,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec"
-version = "0.18.2"
+version = "0.18.3"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
@@ -1881,7 +1881,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-codec-derive"
-version = "0.18.2"
+version = "0.18.3"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1891,7 +1891,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1902,7 +1902,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "clap",
  "colored",
@@ -1927,14 +1927,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "base64",
  "bech32",
@@ -1960,7 +1960,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "base64",
  "env_logger",
@@ -1974,14 +1974,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "anyhow",
  "base64",
@@ -2005,7 +2005,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.45.1"
+version = "0.45.2"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",

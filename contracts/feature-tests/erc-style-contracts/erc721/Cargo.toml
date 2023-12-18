@@ -10,9 +10,9 @@ path = "src/erc721.rs"
 
 
 [dependencies.multiversx-sc]
-version = "0.45.1"
+version = "0.45.2"
 path = "../../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.45.1"
+version = "0.45.2"
 path = "../../../../framework/scenario"
