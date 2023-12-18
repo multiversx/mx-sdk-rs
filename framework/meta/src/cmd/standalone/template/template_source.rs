@@ -17,11 +17,12 @@ pub struct TemplateSource<'a> {
 }
 
 impl<'a> TemplateSource<'a> {
-    pub fn copy_template(&self, target_path: impl AsRef<Path>) {
+    pub fn copy_template(&self, target_path: impl AsRef<Path>, args_tag: &str) {
         whitelisted_deep_copy(
             &self.source_path,
             target_path.as_ref(),
             &self.metadata.files_include,
+            args_tag,
         );
     }
 }
