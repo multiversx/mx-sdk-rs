@@ -22,7 +22,7 @@ impl<'a> TemplateSource<'a> {
             &self.source_path,
             target_path.as_ref(),
             &self.metadata.files_include,
-            args_tag
+            args_tag,
         );
     }
 }

@@ -1,14 +1,12 @@
 use crate::{
     cli_args::TemplateArgs,
-    version_history::{validate_template_tag, LAST_TEMPLATE_VERSION},
+    version_history::{validate_template_tag, LAST_TEMPLATE_VERSION, TEMPLATE_VERSIONS},
 };
 
 use super::{
     template_source::{template_sources, TemplateSource},
     ContractCreatorTarget, RepoSource, RepoVersion, TemplateAdjuster,
 };
-
-const VERSION_0_43_0: usize = 33;
 
 /// Creates a new contract on disk, from a template, given a name.
 pub fn create_contract(args: &TemplateArgs) {
@@ -34,7 +32,7 @@ fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
 pub(crate) fn get_repo_version(args_tag: &Option<String>) -> RepoVersion {
     if let Some(tag) = args_tag {
         assert!(
-            validate_template_tag(VERSION_0_43_0, tag),
+            validate_template_tag(tag, TEMPLATE_VERSIONS),
             "invalid template tag"
         );
         RepoVersion::Tag(tag.clone())
