@@ -47,12 +47,12 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
 }
 
 #[derive(Debug, Clone)]
-pub struct FixedPoint<M: ManagedTypeApi, D: Decimals> {
+pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
     data: BigUint<M>,
     decimals: D,
 }
 
-impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
+impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     pub fn trunc(&self) -> BigUint<M> {
         &self.data / &self.decimals.scaling_factor()
     }
@@ -62,14 +62,14 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
     }
 
     pub fn from_raw_units(data: BigUint<M>, decimals: D) -> Self {
-        FixedPoint { data, decimals }
+        ManagedDecimal { data, decimals }
     }
 
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
     }
 
-    pub fn rescale<T: Decimals>(self, scale_to: T) -> FixedPoint<M, T>
+    pub fn rescale<T: Decimals>(self, scale_to: T) -> ManagedDecimal<M, T>
     where
         M: ManagedTypeApi,
     {
@@ -79,12 +79,18 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
-                FixedPoint::from_raw_units(&self.data * &scaling_factor(delta_decimals), scale_to)
+                ManagedDecimal::from_raw_units(
+                    &self.data * &scaling_factor(delta_decimals),
+                    scale_to,
+                )
             },
-            Ordering::Equal => FixedPoint::from_raw_units(self.data, scale_to),
+            Ordering::Equal => ManagedDecimal::from_raw_units(self.data, scale_to),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
-                FixedPoint::from_raw_units(&self.data * &scaling_factor(delta_decimals), scale_to)
+                ManagedDecimal::from_raw_units(
+                    &self.data * &scaling_factor(delta_decimals),
+                    scale_to,
+                )
             },
         }
     }
@@ -97,8 +103,8 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
         BigInt::from_biguint(crate::types::Sign::Plus, self.data)
     }
 
-    pub fn from_big_int<T: Decimals>(big_int: BigInt<M>, num_decimals: T) -> FixedPoint<M, T> {
-        FixedPoint::from_raw_units(
+    pub fn from_big_int<T: Decimals>(big_int: BigInt<M>, num_decimals: T) -> ManagedDecimal<M, T> {
+        ManagedDecimal::from_raw_units(
             big_int
                 .into_big_uint()
                 .unwrap_or_sc_panic("failed to cast BigInt to BigUint"),
@@ -109,20 +115,20 @@ impl<M: ManagedTypeApi, D: Decimals> FixedPoint<M, D> {
     pub fn from_big_float<T: Decimals>(
         big_float: BigFloat<M>,
         num_decimals: T,
-    ) -> FixedPoint<M, T> {
+    ) -> ManagedDecimal<M, T> {
         let scaling_factor = num_decimals.scaling_factor();
         let magnitude = big_float.magnitude();
 
         let scaled = &BigFloat::from(scaling_factor) * &magnitude;
         let fixed_big_int = scaled.trunc();
 
-        FixedPoint::<M, T>::from_big_int(fixed_big_int, num_decimals)
+        ManagedDecimal::<M, T>::from_big_int(fixed_big_int, num_decimals)
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> FixedPoint<M, ConstDecimals<DECIMALS>> {
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
     pub fn const_decimals_from_raw(data: BigUint<M>) -> Self {
-        FixedPoint {
+        ManagedDecimal {
             data,
             decimals: ConstDecimals,
         }
@@ -130,7 +136,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> FixedPoint<M, ConstDecimals
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
-    for FixedPoint<M, ConstDecimals<DECIMALS>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -143,7 +149,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopEncode
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
-    for FixedPoint<M, ConstDecimals<DECIMALS>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     #[inline]
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
@@ -151,13 +157,13 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(FixedPoint::const_decimals_from_raw(
+        Ok(ManagedDecimal::const_decimals_from_raw(
             BigUint::top_decode_or_handle_err(input, h)?,
         ))
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncode for FixedPoint<M, NumDecimals> {
+impl<M: ManagedTypeApi> NestedEncode for ManagedDecimal<M, NumDecimals> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -170,7 +176,7 @@ impl<M: ManagedTypeApi> NestedEncode for FixedPoint<M, NumDecimals> {
     }
 }
 
-impl<M: ManagedTypeApi> TopEncode for FixedPoint<M, NumDecimals> {
+impl<M: ManagedTypeApi> TopEncode for ManagedDecimal<M, NumDecimals> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
@@ -187,21 +193,21 @@ impl<M: ManagedTypeApi> TopEncode for FixedPoint<M, NumDecimals> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedDecode for FixedPoint<M, NumDecimals> {
+impl<M: ManagedTypeApi> NestedDecode for ManagedDecimal<M, NumDecimals> {
     #[inline]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        Result::Ok(FixedPoint::from_raw_units(
+        Result::Ok(ManagedDecimal::from_raw_units(
             <BigUint<M> as NestedDecode>::dep_decode_or_handle_err(input, h)?,
             <NumDecimals as NestedDecode>::dep_decode_or_handle_err(input, h)?,
         ))
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for FixedPoint<M, NumDecimals> {
+impl<M: ManagedTypeApi> TopDecode for ManagedDecimal<M, NumDecimals> {
     #[inline]
     fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -209,7 +215,7 @@ impl<M: ManagedTypeApi> TopDecode for FixedPoint<M, NumDecimals> {
         H: DecodeErrorHandler,
     {
         let mut nested_buffer = top_input.into_nested_buffer();
-        let result = FixedPoint::from_raw_units(
+        let result = ManagedDecimal::from_raw_units(
             <BigUint<M> as NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, h)?,
             <NumDecimals as NestedDecode>::dep_decode_or_handle_err(&mut nested_buffer, h)?,
         );
@@ -221,67 +227,69 @@ impl<M: ManagedTypeApi> TopDecode for FixedPoint<M, NumDecimals> {
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
-    for FixedPoint<M, ConstDecimals<DECIMALS>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     fn from(value: BigUint<M>) -> Self {
         let decimals = ConstDecimals;
-        FixedPoint {
+        ManagedDecimal {
             data: &value * &decimals.scaling_factor(),
             decimals,
         }
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Add<FixedPoint<M, ConstDecimals<DECIMALS>>>
-    for FixedPoint<M, ConstDecimals<DECIMALS>>
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Add<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = Self;
 
-    fn add(self, other: FixedPoint<M, ConstDecimals<DECIMALS>>) -> Self::Output {
-        FixedPoint::const_decimals_from_raw(self.data + other.data)
+    fn add(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
+        ManagedDecimal::const_decimals_from_raw(self.data + other.data)
     }
 }
 
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<FixedPoint<M, ConstDecimals<DECIMALS>>>
-    for FixedPoint<M, ConstDecimals<DECIMALS>>
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, ConstDecimals<DECIMALS>>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     type Output = Self;
 
-    fn sub(self, other: FixedPoint<M, ConstDecimals<DECIMALS>>) -> Self::Output {
-        FixedPoint::const_decimals_from_raw(self.data - other.data)
+    fn sub(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
+        ManagedDecimal::const_decimals_from_raw(self.data - other.data)
     }
 }
 
 #[allow(clippy::suspicious_arithmetic_impl)]
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-    Mul<FixedPoint<M, ConstDecimals<OTHER_DECIMALS>>> for FixedPoint<M, ConstDecimals<DECIMALS>>
+    Mul<ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 where
     [(); DECIMALS + OTHER_DECIMALS]:,
 {
-    type Output = FixedPoint<M, ConstDecimals<{ DECIMALS + OTHER_DECIMALS }>>;
+    type Output = ManagedDecimal<M, ConstDecimals<{ DECIMALS + OTHER_DECIMALS }>>;
 
-    fn mul(self, other: FixedPoint<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
-        FixedPoint::const_decimals_from_raw(self.data * other.data)
+    fn mul(self, other: ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
+        ManagedDecimal::const_decimals_from_raw(self.data * other.data)
     }
 }
 
 #[allow(clippy::suspicious_arithmetic_impl)]
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-    Div<FixedPoint<M, ConstDecimals<OTHER_DECIMALS>>> for FixedPoint<M, ConstDecimals<DECIMALS>>
+    Div<ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>>
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 where
     [(); DECIMALS - OTHER_DECIMALS]:,
 {
-    type Output = FixedPoint<M, ConstDecimals<{ DECIMALS - OTHER_DECIMALS }>>;
+    type Output = ManagedDecimal<M, ConstDecimals<{ DECIMALS - OTHER_DECIMALS }>>;
 
-    fn div(self, other: FixedPoint<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
-        FixedPoint::const_decimals_from_raw(self.data / other.data)
+    fn div(self, other: ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
+        ManagedDecimal::const_decimals_from_raw(self.data / other.data)
     }
 }
 
-impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<FixedPoint<M, D2>>
-    for FixedPoint<M, D1>
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, D2>>
+    for ManagedDecimal<M, D1>
 {
-    fn eq(&self, other: &FixedPoint<M, D2>) -> bool {
+    fn eq(&self, other: &ManagedDecimal<M, D2>) -> bool {
         match self
             .decimals
             .num_decimals()
