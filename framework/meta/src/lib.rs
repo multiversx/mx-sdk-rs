@@ -10,6 +10,7 @@ mod print_util;
 mod tools;
 pub use tools::find_workspace;
 pub mod version_history;
+pub mod version;
 
 #[macro_use]
 extern crate lazy_static;
