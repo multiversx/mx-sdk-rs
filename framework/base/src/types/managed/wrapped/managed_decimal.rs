@@ -69,6 +69,23 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         self.decimals.num_decimals()
     }
 
+    pub fn log<T: Decimals>(self, target_base: f64, precision: T) -> ManagedDecimal<M, T> {
+        let num_decimals = f64::from(precision.num_decimals() as u32);
+        let number = f64::from(self.data.to_u64().unwrap() as u32);
+
+        assert!(number >= 1f64 && target_base >= 1f64, "wrong input");
+
+        println!("number log10 {:#?}", number.log10());
+        println!("base log10 {:#?}", target_base.log10());
+
+        let precise = (number.log10() * num_decimals / target_base.log10())
+            .trunc()
+            .round() as u64;
+
+        println!("precise is {:#?}", precise);
+        ManagedDecimal::from_raw_units(BigUint::<M>::from(precise), precision)
+    }
+
     pub fn rescale<T: Decimals>(self, scale_to: T) -> ManagedDecimal<M, T>
     where
         M: ManagedTypeApi,

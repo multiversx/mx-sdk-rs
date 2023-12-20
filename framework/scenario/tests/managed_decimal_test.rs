@@ -108,3 +108,19 @@ fn test_encode_decode() {
 
     check_top_encode_decode(fixed_const, bytes);
 }
+
+#[test]
+fn logarithm_test() {
+    let fixed =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(10u64), 1usize);
+
+    let fixed_const = ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(
+        BigUint::from(10u64),
+    );
+
+    let log2_fixed = fixed.log(2f64, 10_000usize);
+    println!("log2 is {:#?}", log2_fixed);
+
+    let log2_const = fixed_const.log(2f64, ConstDecimals::<10_000>);
+    println!("log2 const is {:#?}", log2_const);
+}

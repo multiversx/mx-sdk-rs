@@ -199,7 +199,6 @@ impl<M: ManagedTypeApi> core::fmt::Display for TokenIdentifier<M> {
 
 impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        use crate::alloc::string::ToString;
         f.debug_tuple("TokenIdentifier")
             .field(&self.to_string())
             .finish()
