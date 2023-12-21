@@ -1,3 +1,5 @@
+use alloc::string::ToString;
+
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{HandleConstraints, ManagedTypeApi},

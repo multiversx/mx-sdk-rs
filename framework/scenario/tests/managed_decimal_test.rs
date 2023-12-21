@@ -119,8 +119,19 @@ fn logarithm_test() {
     );
 
     let log2_fixed = fixed.log(2f64, 10_000usize);
-    println!("log2 is {:#?}", log2_fixed);
+    assert_eq!(
+        log2_fixed,
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
+            BigUint::from(33219u64),
+            10_000usize
+        )
+    );
 
     let log2_const = fixed_const.log(2f64, ConstDecimals::<10_000>);
-    println!("log2 const is {:#?}", log2_const);
+    assert_eq!(
+        log2_const,
+        ManagedDecimal::<StaticApi, ConstDecimals::<10_000>>::const_decimals_from_raw(
+            BigUint::from(33219u64)
+        )
+    );
 }

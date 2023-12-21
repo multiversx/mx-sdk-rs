@@ -75,14 +75,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
 
         assert!(number >= 1f64 && target_base >= 1f64, "wrong input");
 
-        println!("number log10 {:#?}", number.log10());
-        println!("base log10 {:#?}", target_base.log10());
-
         let precise = (number.log10() * num_decimals / target_base.log10())
             .trunc()
             .round() as u64;
 
-        println!("precise is {:#?}", precise);
         ManagedDecimal::from_raw_units(BigUint::<M>::from(precise), precision)
     }
 
