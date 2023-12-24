@@ -1,12 +1,16 @@
 mod build_info_abi_json;
 mod contract_abi_json;
 mod endpoint_abi_json;
+mod esdt_attribute_abi_json;
+mod esdt_attribute_json;
 mod event_abi_json;
 mod type_abi_json;
 
 pub use build_info_abi_json::{BuildInfoAbiJson, RustcAbiJson};
 pub use contract_abi_json::*;
 pub use endpoint_abi_json::*;
+pub use esdt_attribute_abi_json::EsdtAttributeAbiJson;
+pub use esdt_attribute_json::EsdtAttributeJson;
 pub use event_abi_json::*;
 use multiversx_sc::{abi::ContractAbi, contract_base::ContractAbiProvider};
 pub use type_abi_json::*;

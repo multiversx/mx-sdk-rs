@@ -1,4 +1,3 @@
-#[tokio::main]
-async fn main() {
-    multiversx_sc_meta::cli_main_standalone().await;
+fn main() {
+    multiversx_sc_meta::cmd::standalone::cli_main_standalone();
 }

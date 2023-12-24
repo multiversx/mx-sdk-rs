@@ -1,0 +1,11 @@
+[settings]
+main = "main"
+
+[contracts.main]
+name = "forwarder-queue"
+
+[contracts.promises]
+name = "forwarder-queue-promises"
+add-labels = ["promises-callback"]
+features = ["promises"]
+ei = "1.3"

@@ -34,6 +34,12 @@ pub trait ProxyTestSecond {
         init_arg + 1
     }
 
+    #[upgrade]
+    #[payable("EGLD")]
+    fn upgrade(&self, init_arg: i32) -> i32 {
+        self.init(init_arg)
+    }
+
     #[payable("EGLD")]
     #[endpoint(payMe)]
     fn pay_me(&self, arg1: i64) {

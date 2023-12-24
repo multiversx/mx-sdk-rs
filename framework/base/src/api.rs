@@ -8,7 +8,7 @@ mod endpoint_finish_api;
 mod error_api;
 mod external_view;
 mod log_api;
-mod managed_types;
+pub(crate) mod managed_types;
 mod print_api;
 mod send_api;
 mod storage_api;

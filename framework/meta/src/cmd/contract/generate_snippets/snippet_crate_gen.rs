@@ -69,7 +69,7 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.43.5"
+version = "0.45.2"
 
 # [workspace]
 

@@ -13,7 +13,7 @@ fn test_contract_call_multi_esdt() {
     let cc = tx.tx.to_contract_call();
 
     assert_eq!(
-        cc.basic.endpoint_name.to_vec(),
+        cc.basic.function_call.function_name.to_vec(),
         ESDT_MULTI_TRANSFER_FUNC_NAME.as_bytes().to_vec(),
     );
     assert_eq!(

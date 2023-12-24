@@ -1,0 +1,18 @@
+name = "ping-pong-egld"
+contract_trait = "PingPong"
+src_file = "ping_pong.rs"
+rename_pairs = [
+    [
+        "blockchain.set_current_dir_from_workspace(\"contracts/examples/ping-pong-egld\");",
+        "// blockchain.set_current_dir_from_workspace(\"relative path to your workspace, if applicable\");",
+    ],
+]
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "Cargo.toml",
+    "README.md",
+    "multiversx.json",
+]

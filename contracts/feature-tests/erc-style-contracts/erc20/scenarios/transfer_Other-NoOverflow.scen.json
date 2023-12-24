@@ -46,7 +46,9 @@
                             "address:account_1",
                             "address:account_2"
                         ],
-                        "data": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        "data": [
+                            "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        ]
                     }
                 ],
                 "gas": "*",

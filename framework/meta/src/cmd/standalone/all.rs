@@ -1,10 +1,9 @@
-use std::{path::Path, process::Command};
-
+use super::print_util::{print_all_command, print_all_count, print_all_index};
 use crate::{
     cli_args::AllArgs,
     folder_structure::{dir_pretty_print, RelevantDirectories},
-    print_util::{print_all_command, print_all_count, print_all_index},
 };
+use std::{path::Path, process::Command};
 
 pub fn call_all_meta(args: &AllArgs) {
     let path = if let Some(some_path) = &args.path {

@@ -11,6 +11,7 @@ fn generate_endpoint_snippet(
     only_admin: bool,
     mutability: EndpointMutabilityMetadata,
     endpoint_type: EndpointTypeMetadata,
+    allow_multiple_var_args: bool,
 ) -> proc_macro2::TokenStream {
     let endpoint_docs = &m.docs;
     let rust_method_name = m.name.to_string();
@@ -53,19 +54,18 @@ fn generate_endpoint_snippet(
     let endpoint_type_tokens = endpoint_type.to_tokens();
 
     quote! {
-        let mut endpoint_abi = multiversx_sc::abi::EndpointAbi{
-            docs: &[ #(#endpoint_docs),* ],
-            name: #endpoint_name,
-            rust_method_name: #rust_method_name,
-            only_owner: #only_owner,
-            only_admin: #only_admin,
-            mutability: #mutability_tokens,
-            endpoint_type: #endpoint_type_tokens,
-            payable_in_tokens: &[ #(#payable_in_tokens),* ],
-            inputs: multiversx_sc::types::heap::Vec::new(),
-            outputs: multiversx_sc::types::heap::Vec::new(),
-            labels: &[ #(#label_names),* ],
-        };
+        let mut endpoint_abi = multiversx_sc::abi::EndpointAbi::new(
+            &[ #(#endpoint_docs),* ],
+            #endpoint_name,
+            #rust_method_name,
+            #only_owner,
+            #only_admin,
+            #mutability_tokens,
+            #endpoint_type_tokens,
+            &[ #(#payable_in_tokens),* ],
+            &[ #(#label_names),* ],
+            #allow_multiple_var_args,
+        );
         #(#input_snippets)*
         #output_snippet
     }
@@ -84,6 +84,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     false,
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::Init,
+                    m.is_allow_multiple_var_args(),
                 );
                 Some(quote! {
                     #endpoint_def
@@ -98,6 +99,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     endpoint_metadata.only_admin,
                     endpoint_metadata.mutability.clone(),
                     EndpointTypeMetadata::Endpoint,
+                    endpoint_metadata.allow_multiple_var_args,
                 );
                 Some(quote! {
                     #endpoint_def
@@ -112,6 +114,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     false,
                     EndpointMutabilityMetadata::Mutable,
                     EndpointTypeMetadata::PromisesCallback,
+                    m.is_allow_multiple_var_args(),
                 );
                 Some(quote! {
                     #endpoint_def
@@ -142,11 +145,10 @@ fn generate_event_snippet(m: &Method, event_name: &str) -> proc_macro2::TokenStr
         .collect();
 
     quote! {
-        let mut event_abi = multiversx_sc::abi::EventAbi{
-            docs: &[ #(#event_docs),* ],
-            identifier: #event_name,
-            inputs: multiversx_sc::types::heap::Vec::new(),
-        };
+        let mut event_abi = multiversx_sc::abi::EventAbi::new(
+            &[ #(#event_docs),* ],
+            #event_name,
+        );
         #(#input_snippets)*
     }
 }
@@ -191,6 +193,22 @@ fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::To
 			.collect()
 }
 
+fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
+    contract
+        .trait_attributes
+        .esdt_attribute
+        .iter()
+        .map(|esdt_attr| {
+            let ticker = &esdt_attr.ticker;
+            let ty = &esdt_attr.ty;
+            quote! {
+                contract_abi.esdt_attributes.push(multiversx_sc::abi::EsdtAttributeAbi::new::<#ty>(#ticker));
+                contract_abi.add_type_descriptions::<#ty>();
+            }
+        })
+        .collect()
+}
+
 fn generate_abi_method_body(
     contract: &ContractTrait,
     is_contract_main: bool,
@@ -205,10 +223,15 @@ fn generate_abi_method_body(
     } else {
         Vec::new()
     };
+    let esdt_attributes = if !&contract.trait_attributes.esdt_attribute.is_empty() {
+        generate_esdt_attribute_snippets(contract)
+    } else {
+        Vec::new()
+    };
 
     quote! {
-        let mut contract_abi = multiversx_sc::abi::ContractAbi {
-            build_info: multiversx_sc::abi::BuildInfoAbi {
+        let mut contract_abi = multiversx_sc::abi::ContractAbi::new(
+            multiversx_sc::abi::BuildInfoAbi {
                 contract_crate: multiversx_sc::abi::ContractCrateBuildAbi {
                     name: env!("CARGO_PKG_NAME"),
                     version: env!("CARGO_PKG_VERSION"),
@@ -216,18 +239,14 @@ fn generate_abi_method_body(
                 },
                 framework: multiversx_sc::abi::FrameworkBuildAbi::create(),
             },
-            docs: &[ #(#contract_docs),* ],
-            name: #contract_name,
-            constructors: multiversx_sc::types::heap::Vec::new(),
-            endpoints: multiversx_sc::types::heap::Vec::new(),
-            promise_callbacks: multiversx_sc::types::heap::Vec::new(),
-            events: multiversx_sc::types::heap::Vec::new(),
-            has_callback: #has_callbacks,
-            type_descriptions: <multiversx_sc::abi::TypeDescriptionContainerImpl as multiversx_sc::abi::TypeDescriptionContainer>::new(),
-        };
+            &[ #(#contract_docs),* ],
+            #contract_name,
+            #has_callbacks,
+        );
         #(#endpoint_snippets)*
         #(#event_snippets)*
         #(#supertrait_snippets)*
+        #(#esdt_attributes)*
         contract_abi
     }
 }

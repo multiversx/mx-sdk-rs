@@ -333,6 +333,50 @@ where
             .argument(address)
     }
 
+    /// The manager of an ESDT token may freeze the NFT held by a specific Account.
+    /// As a consequence, no NFT can be transferred to or from the frozen Account.
+    /// Freezing and unfreezing a single NFT of an Account are operations designed to help token managers to comply with regulations.
+    pub fn freeze_nft(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        nft_nonce: u64,
+        address: &ManagedAddress<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
+        self.esdt_system_sc_call_no_args("freezeSingleNFT")
+            .argument(token_identifier)
+            .argument(&nft_nonce)
+            .argument(address)
+    }
+
+    /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
+    pub fn unfreeze_nft(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        nft_nonce: u64,
+        address: &ManagedAddress<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
+        self.esdt_system_sc_call_no_args("unFreezeSingleNFT")
+            .argument(token_identifier)
+            .argument(&nft_nonce)
+            .argument(address)
+    }
+
+    /// The manager of an ESDT token may wipe out a single NFT held by a frozen Account.
+    /// This operation is similar to burning the quantity, but the Account must have been frozen beforehand,
+    /// and it must be done by the token manager.
+    /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
+    pub fn wipe_nft(
+        self,
+        token_identifier: &TokenIdentifier<SA>,
+        nft_nonce: u64,
+        address: &ManagedAddress<SA>,
+    ) -> ContractCallNoPayment<SA, ()> {
+        self.esdt_system_sc_call_no_args("wipeSingleNFT")
+            .argument(token_identifier)
+            .argument(&nft_nonce)
+            .argument(address)
+    }
+
     /// This function converts an SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn change_sft_to_meta_esdt(

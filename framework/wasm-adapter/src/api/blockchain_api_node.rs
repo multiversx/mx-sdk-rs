@@ -76,6 +76,8 @@ extern "C" {
         urisHandle: i32,
     );
 
+    fn managedGetBackTransfers(esdtTransfersValueHandle: i32, callValueHandle: i32);
+
     fn managedIsESDTFrozen(addressHandle: i32, tokenIDHandle: i32, nonce: i64) -> i32;
     fn managedIsESDTPaused(tokenIDHandle: i32) -> i32;
     fn managedIsESDTLimitedTransfer(tokenIDHandle: i32) -> i32;
@@ -323,6 +325,16 @@ impl BlockchainApiImpl for VmApiImpl {
         }
     }
 
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    ) {
+        unsafe {
+            managedGetBackTransfers(esdt_transfer_value_handle, call_value_handle);
+        }
+    }
+
     fn check_esdt_frozen(
         &self,
         address_handle: Self::ManagedBufferHandle,
@@ -344,10 +356,8 @@ impl BlockchainApiImpl for VmApiImpl {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> multiversx_sc::types::EsdtLocalRoleFlags {
-        unsafe {
-            multiversx_sc::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
-                token_id_handle,
-            ) as u64)
-        }
+        multiversx_sc::types::EsdtLocalRoleFlags::from_bits_retain(unsafe {
+            getESDTLocalRoles(token_id_handle)
+        } as u64)
     }
 }

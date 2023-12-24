@@ -51,6 +51,9 @@ pub struct Struct {
     pub another_byte: u8,
     pub uint_32: u32,
     pub uint_64: u64,
+    buffer: bool, // used to occur in derive implementation
+    dest: bool,   // used to occur in derive implementation
+    h: bool,      // used to occur in derive implementation
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
@@ -78,6 +81,9 @@ enum EnumWithEverything {
         another_byte: u8,
         uint_32: u32,
         uint_64: u64,
+        buffer: bool, // used to occur in derive implementation
+        dest: bool,   // used to occur in derive implementation
+        h: bool,      // used to occur in derive implementation
     },
 }
 

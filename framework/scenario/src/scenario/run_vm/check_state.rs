@@ -51,10 +51,11 @@ fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
             let actual_code = account.contract_path.as_ref().unwrap_or(default_value);
             assert!(
                 expected_account.code.check(actual_code),
-                "bad account code. Address: {}. Want: {}. Have: {}",
+                "bad account code. Address: {}. Want: {}. Have: {} ({} bytes)",
                 expected_address,
                 expected_account.code,
-                std::str::from_utf8(actual_code.as_slice()).unwrap()
+                hex::encode(actual_code),
+                actual_code.len(),
             );
 
             assert!(

@@ -1,30 +1,6 @@
-use std::{path::Path, process::Command};
+use std::process::Command;
 
 use colored::Colorize;
-
-pub fn print_all_count(num_contract_crates: usize) {
-    println!(
-        "\n{}",
-        format!("Found {num_contract_crates} contract crates.").truecolor(128, 128, 128),
-    );
-}
-
-pub fn print_all_index(contract_crates_index: usize, num_contract_crates: usize) {
-    println!(
-        "\n{}",
-        format!("({contract_crates_index}/{num_contract_crates})").truecolor(128, 128, 128),
-    );
-}
-
-pub fn print_all_command(meta_path: &Path, cargo_run_args: &[String]) {
-    println!(
-        "{} {}\n{} `cargo {}`",
-        "In".green(),
-        meta_path.display(),
-        "Calling".green(),
-        cargo_run_args.join(" "),
-    );
-}
 
 pub fn format_command(command: &Command) -> String {
     let mut result = String::new();
@@ -112,4 +88,11 @@ pub fn print_check_ei_ok() {
 
 pub fn print_ignore_ei_check() {
     println!("{}", "EI version check explicitly ignored".yellow(),);
+}
+
+pub fn print_workspace_target_dir(target_path_str: &str) {
+    println!(
+        "{}",
+        format!("Using workspace target directory: {target_path_str} ...").green()
+    );
 }

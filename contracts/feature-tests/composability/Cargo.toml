@@ -32,6 +32,11 @@ path = "recursive-caller"
 [dev-dependencies.vault]
 path = "vault"
 
+[dependencies.multiversx-sc]
+version = "0.45.2"
+path = "../../../framework/base"
+features = ["promises", "back-transfers"]
+
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.43.5"
+version = "0.45.2"
 path = "../../../framework/scenario"

@@ -1,7 +1,7 @@
-use crate::codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti};
-
 use crate::{
-    api::CallTypeApi, contract_base::ExitCodecErrorHandler, err_msg, types::ManagedBuffer,
+    api::CallTypeApi,
+    codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti},
+    types::ManagedBuffer,
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
@@ -27,9 +27,10 @@ where
     /// Used by the generated proxies to add arguments to a call.
     #[doc(hidden)]
     fn proxy_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) =
-            endpoint_arg.multi_encode_or_handle_err(&mut self.get_mut_basic().arg_buffer, h);
+        self.get_mut_basic()
+            .function_call
+            .arg_buffer
+            .push_multi_arg(endpoint_arg);
     }
 
     /// Serializes and pushes a value to the arguments buffer.
@@ -48,12 +49,15 @@ where
     ///
     /// No serialization occurs, just direct conversion to ManagedBuffer.
     fn push_raw_argument<RawArg: Into<ManagedBuffer<SA>>>(&mut self, raw_arg: RawArg) {
-        self.get_mut_basic().arg_buffer.push_arg_raw(raw_arg.into())
+        self.get_mut_basic()
+            .function_call
+            .arg_buffer
+            .push_arg_raw(raw_arg.into())
     }
 
     /// For cases where we build the contract call by hand.
     fn with_raw_arguments(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
-        self.get_mut_basic().arg_buffer = raw_argument_buffer;
+        self.get_mut_basic().function_call.arg_buffer = raw_argument_buffer;
         self
     }
 
@@ -89,6 +93,23 @@ where
         RequestedResult: TopDecodeMulti,
     {
         self.into_normalized().execute_on_dest_context()
+    }
+
+    /// Executes immediately, synchronously, and returns contract call result.
+    /// Only works if the target contract is in the same shard.
+    #[inline]
+    #[cfg(feature = "back-transfers")]
+    fn execute_on_dest_context_with_back_transfers<RequestedResult>(
+        self,
+    ) -> (RequestedResult, super::BackTransfers<SA>)
+    where
+        RequestedResult: TopDecodeMulti,
+    {
+        let result = self.execute_on_dest_context();
+        let back_transfers =
+            crate::contract_base::BlockchainWrapper::<SA>::new().get_back_transfers();
+
+        (result, back_transfers)
     }
 
     /// Executes immediately, synchronously.
