@@ -135,3 +135,46 @@ fn logarithm_test() {
         )
     );
 }
+
+#[test]
+fn nth_root_test() {
+    let fixed =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(567u64), 1usize);
+
+    let fifth_root = fixed.clone().root(5f64, 100usize);
+    let fifth_root_higher_prec = fixed.root(5f64, 100_000usize);
+
+    assert_eq!(
+        fifth_root,
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(355u64), 100usize)
+    );
+    assert_eq!(
+        fifth_root_higher_prec,
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
+            BigUint::from(355399u64),
+            100_000usize
+        )
+    );
+
+    let const_fixed: ManagedDecimal<StaticApi, ConstDecimals<2>> =
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::const_decimals_from_raw(BigUint::from(
+            876u64,
+        ));
+
+    let seventh_root_var = const_fixed.clone().root(7f64, 10_000usize);
+    let seventh_root_const = const_fixed.root(7f64, ConstDecimals::<10_000>);
+
+    assert_eq!(
+        seventh_root_var,
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
+            BigUint::from(26324u64),
+            10_000usize
+        )
+    );
+    assert_eq!(
+        seventh_root_const,
+        ManagedDecimal::<StaticApi, ConstDecimals::<10_000>>::const_decimals_from_raw(
+            BigUint::from(26324u64)
+        )
+    );
+}
