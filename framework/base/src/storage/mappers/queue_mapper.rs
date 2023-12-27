@@ -10,8 +10,8 @@ use crate::{
         multi_encode_iter_or_handle_err, CodecFrom, DecodeDefault, EncodeDefault,
         EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get, storage_set, StorageKey},
-    types::{ManagedType, MultiValueEncoded},
+    storage::{storage_get, storage_get_from_address, storage_set, StorageKey},
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
 
@@ -122,6 +122,10 @@ where
         name_key
     }
 
+    fn get_info_from_address(&self, address: &ManagedAddress<SA>) -> QueueMapperInfo {
+        storage_get_from_address(address.as_ref(), self.base_key.as_ref())
+    }
+
     fn get_info(&self) -> QueueMapperInfo {
         storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
@@ -132,6 +136,14 @@ where
 
     pub fn get_node(&self, node_id: u32) -> Node {
         storage_get(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
+    }
+
+    pub fn get_node_from_address(&self, address: &ManagedAddress<SA>, node_id: u32) -> Node {
+        storage_get_from_address(
+            address.as_ref(),
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
         )
@@ -160,11 +172,30 @@ where
         )
     }
 
+    pub fn get_value_from_address(&self, address: &ManagedAddress<SA>, node_id: u32) -> T {
+        storage_get_from_address(
+            address.as_ref(),
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
+    }
+
     pub fn get_value_option(&self, node_id: u32) -> Option<T> {
         if node_id == NULL_ENTRY {
             return None;
         }
         Some(self.get_value(node_id))
+    }
+
+    pub fn get_value_from_address_option(
+        &self,
+        address: &ManagedAddress<SA>,
+        node_id: u32,
+    ) -> Option<T> {
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+        Some(self.get_value_from_address(address, node_id))
     }
 
     fn set_value(&mut self, node_id: u32, value: &T) {
@@ -188,6 +219,10 @@ where
     /// This operation should compute in *O*(1) time.
     pub fn is_empty(&self) -> bool {
         self.get_info().len == 0
+    }
+
+    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
+        self.get_info_from_address(address).len == 0
     }
 
     /// Returns the length of the `Queue`.
@@ -270,10 +305,18 @@ where
         self.get_value_option(self.get_info().front)
     }
 
+    pub fn front_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.get_value_from_address_option(address, self.get_info_from_address(address).front)
+    }
+
     /// Provides a copy to the back element, or `None` if the queue is
     /// empty.
     pub fn back(&self) -> Option<T> {
         self.get_value_option(self.get_info().back)
+    }
+
+    pub fn back_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.get_value_from_address_option(address, self.get_info_from_address(address).back)
     }
 
     /// Removes the last element from a queue and returns it, or `None` if
@@ -331,6 +374,10 @@ where
     /// Provides a forward iterator.
     pub fn iter(&self) -> Iter<SA, T> {
         Iter::new(self)
+    }
+
+    pub fn iter_from_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
+        Iter::new_from_address(self, address)
     }
 
     pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T> {
@@ -407,6 +454,74 @@ where
             true
         }
     }
+
+    /// Same functionality as the normal version of this function, the only difference being that the check
+    /// is done on an external queue mapper whose info is taken from a different address
+    pub fn check_internal_consistency_from_address(&self, address: &ManagedAddress<SA>) -> bool {
+        let info = self.get_info_from_address(address);
+        let mut front = info.front;
+        let mut back = info.back;
+        if info.len == 0 {
+            // if the queue is empty, both ends should point to null entries
+            if front != NULL_ENTRY {
+                return false;
+            }
+            if back != NULL_ENTRY {
+                return false;
+            }
+            true
+        } else {
+            // if the queue is non-empty, both ends should point to non-null entries
+            if front == NULL_ENTRY {
+                return false;
+            }
+            if back == NULL_ENTRY {
+                return false;
+            }
+
+            // the node before the first and the one after the last should both be null
+            if self.get_node_from_address(address, front).previous != NULL_ENTRY {
+                return false;
+            }
+            if self.get_node_from_address(address, back).next != NULL_ENTRY {
+                return false;
+            }
+
+            // iterate forwards
+            let mut forwards = Vec::new();
+            while front != NULL_ENTRY {
+                forwards.push(front);
+                front = self.get_node_from_address(address, front).next;
+            }
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+
+            // iterate backwards
+            let mut backwards = Vec::new();
+            while back != NULL_ENTRY {
+                backwards.push(back);
+                back = self.get_node_from_address(address, back).previous;
+            }
+            if backwards.len() != info.len as usize {
+                return false;
+            }
+
+            // check that both iterations match element-wise
+            let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
+            if forwards != backwards_reversed {
+                return false;
+            }
+
+            // check that the node IDs are unique
+            forwards.sort_unstable();
+            forwards.dedup();
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+            true
+        }
+    }
 }
 
 impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, T>
@@ -444,6 +559,16 @@ where
     fn new(queue: &'a QueueMapper<SA, T>) -> Iter<'a, SA, T> {
         Iter {
             node_id: queue.get_info().front,
+            queue,
+        }
+    }
+
+    fn new_from_address(
+        queue: &'a QueueMapper<SA, T>,
+        address: &ManagedAddress<SA>,
+    ) -> Iter<'a, SA, T> {
+        Iter {
+            node_id: queue.get_info_from_address(address).front,
             queue,
         }
     }

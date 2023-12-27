@@ -53,7 +53,7 @@ pub trait SetMapperFeatures {
     fn set_mapper_iter_from_and_count(&self, item: u32) -> u32 {
         let set_mapper = self.set_mapper();
         let mut count = 0;
-        for _element in set_mapper.iter_from(&item) {
+        for _element in set_mapper.iter_from_value(&item) {
             count += 1;
         }
 

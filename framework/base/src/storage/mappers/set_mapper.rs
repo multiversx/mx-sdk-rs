@@ -9,8 +9,8 @@ use crate::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get, storage_set, StorageKey},
-    types::{ManagedType, MultiValueEncoded},
+    storage::{storage_get, storage_get_from_address, storage_set, StorageKey},
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
 const NULL_ENTRY: u32 = 0;
@@ -72,6 +72,14 @@ where
         )
     }
 
+    fn get_node_id_from_address(&self, address: &ManagedAddress<SA>, value: &T) -> u32 {
+        storage_get_from_address(
+            address.as_ref(),
+            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
+                .as_ref(),
+        )
+    }
+
     fn set_node_id(&self, value: &T, node_id: u32) {
         storage_set(
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
@@ -93,6 +101,10 @@ where
         self.queue_mapper.is_empty()
     }
 
+    pub fn is_empty_at_address(&self) -> bool {
+        self.queue_mapper.is_empty()
+    }
+
     /// Returns the number of elements in the set.
     pub fn len(&self) -> usize {
         self.queue_mapper.len()
@@ -101,6 +113,10 @@ where
     /// Returns `true` if the set contains a value.
     pub fn contains(&self, value: &T) -> bool {
         self.get_node_id(value) != NULL_ENTRY
+    }
+
+    pub fn contains_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> bool {
+        self.get_node_id_from_address(address, value) != NULL_ENTRY
     }
 
     pub fn next(&self, value: &T) -> Option<T> {
@@ -114,23 +130,61 @@ where
         self.queue_mapper.get_value_option(next_node_id)
     }
 
+    pub fn next_from_address(&self, address: &ManagedAddress<SA>, value: &T) -> Option<T> {
+        let node_id = self.get_node_id_from_address(address, value);
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+
+        let next_node_id = self
+            .queue_mapper
+            .get_node_from_address(address, node_id)
+            .next;
+
+        self.queue_mapper
+            .get_value_from_address_option(address, next_node_id)
+    }
+
     pub fn previous(&self, value: &T) -> Option<T> {
         let node_id = self.get_node_id(value);
         if node_id == NULL_ENTRY {
             return None;
         }
 
-        let next_node_id = self.queue_mapper.get_node(node_id).previous;
+        let previous_node_id = self.queue_mapper.get_node(node_id).previous;
 
-        self.queue_mapper.get_value_option(next_node_id)
+        self.queue_mapper.get_value_option(previous_node_id)
+    }
+
+    pub fn previous_from_address(&self, address: &ManagedAddress<SA>, value: &T) -> Option<T> {
+        let node_id = self.get_node_id_from_address(address, value);
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+
+        let next_node_id = self
+            .queue_mapper
+            .get_node_from_address(address, node_id)
+            .previous;
+
+        self.queue_mapper
+            .get_value_from_address_option(address, next_node_id)
     }
 
     pub fn front(&self) -> Option<T> {
         self.queue_mapper.front()
     }
 
+    pub fn front_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.queue_mapper.front_from_address(address)
+    }
+
     pub fn back(&self) -> Option<T> {
         self.queue_mapper.back()
+    }
+
+    pub fn back_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.queue_mapper.back_from_address(address)
     }
 
     /// Adds a value to the set.
@@ -174,14 +228,32 @@ where
         self.queue_mapper.iter()
     }
 
-    pub fn iter_from(&self, value: &T) -> Iter<SA, T> {
+    pub fn iter_from_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
+        self.queue_mapper.iter_from_address(address)
+    }
+
+    pub fn iter_from_value(&self, value: &T) -> Iter<SA, T> {
         let node_id = self.get_node_id(value);
+        self.queue_mapper.iter_from_node_id(node_id)
+    }
+
+    pub fn iter_from_value_at_address(
+        &self,
+        address: &ManagedAddress<SA>,
+        value: &T,
+    ) -> Iter<SA, T> {
+        let node_id = self.get_node_id_from_address(address, value);
         self.queue_mapper.iter_from_node_id(node_id)
     }
 
     /// Checks the internal consistency of the collection. Used for unit tests.
     pub fn check_internal_consistency(&self) -> bool {
         self.queue_mapper.check_internal_consistency()
+    }
+
+    pub fn check_internal_consistency_from_address(&self, address: &ManagedAddress<SA>) -> bool {
+        self.queue_mapper
+            .check_internal_consistency_from_address(address)
     }
 }
 
