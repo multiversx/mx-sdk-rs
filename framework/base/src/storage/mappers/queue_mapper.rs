@@ -122,7 +122,7 @@ where
         name_key
     }
 
-    fn get_info_from_address(&self, address: &ManagedAddress<SA>) -> QueueMapperInfo {
+    fn get_info_at_address(&self, address: &ManagedAddress<SA>) -> QueueMapperInfo {
         storage_get_from_address(address.as_ref(), self.base_key.as_ref())
     }
 
@@ -141,7 +141,7 @@ where
         )
     }
 
-    pub fn get_node_from_address(&self, address: &ManagedAddress<SA>, node_id: u32) -> Node {
+    pub fn get_node_at_address(&self, address: &ManagedAddress<SA>, node_id: u32) -> Node {
         storage_get_from_address(
             address.as_ref(),
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
@@ -172,7 +172,7 @@ where
         )
     }
 
-    pub fn get_value_from_address(&self, address: &ManagedAddress<SA>, node_id: u32) -> T {
+    pub fn get_value_at_address(&self, address: &ManagedAddress<SA>, node_id: u32) -> T {
         storage_get_from_address(
             address.as_ref(),
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
@@ -187,7 +187,7 @@ where
         Some(self.get_value(node_id))
     }
 
-    pub fn get_value_from_address_option(
+    pub fn get_value_at_address_option(
         &self,
         address: &ManagedAddress<SA>,
         node_id: u32,
@@ -195,7 +195,7 @@ where
         if node_id == NULL_ENTRY {
             return None;
         }
-        Some(self.get_value_from_address(address, node_id))
+        Some(self.get_value_at_address(address, node_id))
     }
 
     fn set_value(&mut self, node_id: u32, value: &T) {
@@ -222,7 +222,7 @@ where
     }
 
     pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
-        self.get_info_from_address(address).len == 0
+        self.get_info_at_address(address).len == 0
     }
 
     /// Returns the length of the `Queue`.
@@ -230,6 +230,10 @@ where
     /// This operation should compute in *O*(1) time.
     pub fn len(&self) -> usize {
         self.get_info().len as usize
+    }
+
+    pub fn len_at_address(&self, address: &ManagedAddress<SA>) -> usize {
+        self.get_info_at_address(address).len as usize
     }
 
     /// Appends an element to the back of a queue
@@ -305,8 +309,8 @@ where
         self.get_value_option(self.get_info().front)
     }
 
-    pub fn front_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
-        self.get_value_from_address_option(address, self.get_info_from_address(address).front)
+    pub fn front_at_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.get_value_at_address_option(address, self.get_info_at_address(address).front)
     }
 
     /// Provides a copy to the back element, or `None` if the queue is
@@ -315,8 +319,8 @@ where
         self.get_value_option(self.get_info().back)
     }
 
-    pub fn back_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
-        self.get_value_from_address_option(address, self.get_info_from_address(address).back)
+    pub fn back_at_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.get_value_at_address_option(address, self.get_info_at_address(address).back)
     }
 
     /// Removes the last element from a queue and returns it, or `None` if
@@ -376,8 +380,8 @@ where
         Iter::new(self)
     }
 
-    pub fn iter_from_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
-        Iter::new_from_address(self, address)
+    pub fn iter_at_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
+        Iter::new_at_address(self, address)
     }
 
     pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T> {
@@ -457,8 +461,8 @@ where
 
     /// Same functionality as the normal version of this function, the only difference being that the check
     /// is done on an external queue mapper whose info is taken from a different address
-    pub fn check_internal_consistency_from_address(&self, address: &ManagedAddress<SA>) -> bool {
-        let info = self.get_info_from_address(address);
+    pub fn check_internal_consistency_at_address(&self, address: &ManagedAddress<SA>) -> bool {
+        let info = self.get_info_at_address(address);
         let mut front = info.front;
         let mut back = info.back;
         if info.len == 0 {
@@ -480,10 +484,10 @@ where
             }
 
             // the node before the first and the one after the last should both be null
-            if self.get_node_from_address(address, front).previous != NULL_ENTRY {
+            if self.get_node_at_address(address, front).previous != NULL_ENTRY {
                 return false;
             }
-            if self.get_node_from_address(address, back).next != NULL_ENTRY {
+            if self.get_node_at_address(address, back).next != NULL_ENTRY {
                 return false;
             }
 
@@ -491,7 +495,7 @@ where
             let mut forwards = Vec::new();
             while front != NULL_ENTRY {
                 forwards.push(front);
-                front = self.get_node_from_address(address, front).next;
+                front = self.get_node_at_address(address, front).next;
             }
             if forwards.len() != info.len as usize {
                 return false;
@@ -501,7 +505,7 @@ where
             let mut backwards = Vec::new();
             while back != NULL_ENTRY {
                 backwards.push(back);
-                back = self.get_node_from_address(address, back).previous;
+                back = self.get_node_at_address(address, back).previous;
             }
             if backwards.len() != info.len as usize {
                 return false;
@@ -563,12 +567,12 @@ where
         }
     }
 
-    fn new_from_address(
+    fn new_at_address(
         queue: &'a QueueMapper<SA, T>,
         address: &ManagedAddress<SA>,
     ) -> Iter<'a, SA, T> {
         Iter {
-            node_id: queue.get_info_from_address(address).front,
+            node_id: queue.get_info_at_address(address).front,
             queue,
         }
     }

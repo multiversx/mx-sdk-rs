@@ -72,7 +72,7 @@ where
         )
     }
 
-    fn get_node_id_from_address(&self, address: &ManagedAddress<SA>, value: &T) -> u32 {
+    fn get_node_id_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> u32 {
         storage_get_from_address(
             address.as_ref(),
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
@@ -101,13 +101,17 @@ where
         self.queue_mapper.is_empty()
     }
 
-    pub fn is_empty_at_address(&self) -> bool {
-        self.queue_mapper.is_empty()
+    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
+        self.queue_mapper.is_empty_at_address(address)
     }
 
     /// Returns the number of elements in the set.
     pub fn len(&self) -> usize {
         self.queue_mapper.len()
+    }
+
+    pub fn len_at_address(&self, address: &ManagedAddress<SA>) -> usize {
+        self.queue_mapper.len_at_address(address)
     }
 
     /// Returns `true` if the set contains a value.
@@ -116,7 +120,7 @@ where
     }
 
     pub fn contains_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> bool {
-        self.get_node_id_from_address(address, value) != NULL_ENTRY
+        self.get_node_id_at_address(address, value) != NULL_ENTRY
     }
 
     pub fn next(&self, value: &T) -> Option<T> {
@@ -130,19 +134,16 @@ where
         self.queue_mapper.get_value_option(next_node_id)
     }
 
-    pub fn next_from_address(&self, address: &ManagedAddress<SA>, value: &T) -> Option<T> {
-        let node_id = self.get_node_id_from_address(address, value);
+    pub fn next_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> Option<T> {
+        let node_id = self.get_node_id_at_address(address, value);
         if node_id == NULL_ENTRY {
             return None;
         }
 
-        let next_node_id = self
-            .queue_mapper
-            .get_node_from_address(address, node_id)
-            .next;
+        let next_node_id = self.queue_mapper.get_node_at_address(address, node_id).next;
 
         self.queue_mapper
-            .get_value_from_address_option(address, next_node_id)
+            .get_value_at_address_option(address, next_node_id)
     }
 
     pub fn previous(&self, value: &T) -> Option<T> {
@@ -156,35 +157,35 @@ where
         self.queue_mapper.get_value_option(previous_node_id)
     }
 
-    pub fn previous_from_address(&self, address: &ManagedAddress<SA>, value: &T) -> Option<T> {
-        let node_id = self.get_node_id_from_address(address, value);
+    pub fn previous_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> Option<T> {
+        let node_id = self.get_node_id_at_address(address, value);
         if node_id == NULL_ENTRY {
             return None;
         }
 
         let next_node_id = self
             .queue_mapper
-            .get_node_from_address(address, node_id)
+            .get_node_at_address(address, node_id)
             .previous;
 
         self.queue_mapper
-            .get_value_from_address_option(address, next_node_id)
+            .get_value_at_address_option(address, next_node_id)
     }
 
     pub fn front(&self) -> Option<T> {
         self.queue_mapper.front()
     }
 
-    pub fn front_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
-        self.queue_mapper.front_from_address(address)
+    pub fn front_at_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.queue_mapper.front_at_address(address)
     }
 
     pub fn back(&self) -> Option<T> {
         self.queue_mapper.back()
     }
 
-    pub fn back_from_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
-        self.queue_mapper.back_from_address(address)
+    pub fn back_at_address(&self, address: &ManagedAddress<SA>) -> Option<T> {
+        self.queue_mapper.back_at_address(address)
     }
 
     /// Adds a value to the set.
@@ -228,8 +229,8 @@ where
         self.queue_mapper.iter()
     }
 
-    pub fn iter_from_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
-        self.queue_mapper.iter_from_address(address)
+    pub fn iter_at_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
+        self.queue_mapper.iter_at_address(address)
     }
 
     pub fn iter_from_value(&self, value: &T) -> Iter<SA, T> {
@@ -242,7 +243,7 @@ where
         address: &ManagedAddress<SA>,
         value: &T,
     ) -> Iter<SA, T> {
-        let node_id = self.get_node_id_from_address(address, value);
+        let node_id = self.get_node_id_at_address(address, value);
         self.queue_mapper.iter_from_node_id(node_id)
     }
 
@@ -251,9 +252,9 @@ where
         self.queue_mapper.check_internal_consistency()
     }
 
-    pub fn check_internal_consistency_from_address(&self, address: &ManagedAddress<SA>) -> bool {
+    pub fn check_internal_consistency_at_address(&self, address: &ManagedAddress<SA>) -> bool {
         self.queue_mapper
-            .check_internal_consistency_from_address(address)
+            .check_internal_consistency_at_address(address)
     }
 }
 
