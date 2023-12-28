@@ -26,7 +26,7 @@ rand_pcg = "0.2.1"
 rand_seeder = "0.2.2"
 rustc_version = "0.4"
 toml = "0.5.8"
-cargo_toml = "0.10.1"
+cargo_toml = "0.11.1"
 pathdiff = "0.2.1"
 
 [features]
@@ -34,7 +34,6 @@ mandos-go-tests = []
 
 [dependencies.elrond-wasm]
 version = "=0.28.0"
-path = "../elrond-wasm"
 
 [dependencies.mandos]
 version = "0.12.0"
