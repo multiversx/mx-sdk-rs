@@ -1,0 +1,10 @@
+[package]
+name = "value_storage-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+[dependencies.value_storage]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.44.0"

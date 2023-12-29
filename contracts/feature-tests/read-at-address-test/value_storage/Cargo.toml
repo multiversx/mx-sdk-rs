@@ -1,0 +1,20 @@
+[package]
+name = "value_storage"
+version = "0.0.0"
+authors = ["you"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/value_storage.rs"
+[dependencies.multiversx-sc]
+version = "0.44.0"
+
+[dev-dependencies]
+num-bigint = "0.4.2"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.44.0"
+
+[workspace]
+members = [".", "meta"]

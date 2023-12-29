@@ -4,7 +4,7 @@ pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::StorageMapperApi,
+    api::{StorageMapperApi, StorageReadApi},
     codec::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
@@ -229,21 +229,8 @@ where
         self.queue_mapper.iter()
     }
 
-    pub fn iter_at_address(&self, address: &ManagedAddress<SA>) -> Iter<SA, T> {
-        self.queue_mapper.iter_at_address(address)
-    }
-
     pub fn iter_from_value(&self, value: &T) -> Iter<SA, T> {
         let node_id = self.get_node_id(value);
-        self.queue_mapper.iter_from_node_id(node_id)
-    }
-
-    pub fn iter_from_value_at_address(
-        &self,
-        address: &ManagedAddress<SA>,
-        value: &T,
-    ) -> Iter<SA, T> {
-        let node_id = self.get_node_id_at_address(address, value);
         self.queue_mapper.iter_from_node_id(node_id)
     }
 
