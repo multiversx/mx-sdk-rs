@@ -65,3 +65,31 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
         }
     }).collect()
 }
+
+pub fn format_receiver_vers(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let tokens: Vec<proc_macro::TokenTree> = format_tokenize::tokenize(input);
+
+    let collected_tokens: Vec<proc_macro::TokenStream> = tokens
+        .iter()
+        .map(|token| match token {
+            proc_macro::TokenTree::Group(_lit) => {
+                let format_string = _lit.to_string();
+                let dot_count = format_string.chars().filter(|&c| c == '.').count();
+
+                if dot_count != 2 {
+                    panic!("The argument does not have the required format.");
+                }
+                let str_as_bytes = byte_str_literal(format_string.as_bytes());
+
+                // quote!(FrameworkVersion::new($str_as_bytes);)
+
+                quote!(multiversx_sc_meta::version::FrameworkVersion::new($str_as_bytes);)
+            },
+            _ => panic!("Tokentree does not match with the requirements"),
+        })
+        .collect();
+
+    let result: proc_macro::TokenStream = collected_tokens.into_iter().collect();
+
+    result
+}

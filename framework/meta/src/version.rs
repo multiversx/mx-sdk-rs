@@ -5,11 +5,14 @@ pub struct FrameworkVersion {
 }
 
 impl FrameworkVersion {
-    pub fn new(major: i8, minor: i16, patch: i16) -> Self {
+    pub fn new(version_bytes: &[u8]) -> Self {
+        let version_str = String::from_utf8_lossy(version_bytes).to_string();
+        let version_arr: Vec<&str> = version_str.split('.').collect();
+
         let version = Version {
-            major: major.try_into().unwrap(),
-            minor: minor.try_into().unwrap(),
-            patch: patch.try_into().unwrap(),
+            major: version_arr[0].parse().unwrap(),
+            minor: version_arr[1].parse().unwrap(),
+            patch: version_arr[2].parse().unwrap(),
             pre: Prerelease::EMPTY,
             build: BuildMetadata::EMPTY,
         };
@@ -19,13 +22,8 @@ impl FrameworkVersion {
 }
 
 #[macro_export]
-macro_rules! known_versions {
-    ($($v:literal),*)  => {
-        [$(
-            {
-                let version: Vec<&str> = $v.split('.').collect();
-                FrameworkVersion::new(version[0].parse().unwrap(),version[1].parse().unwrap(),version[2].parse().unwrap())
-            }
-        ),*]
+macro_rules! sc_version {
+    ($($arg:expr),+ $(,)?) => {
+        multiversx_sc::derive::format_version!($($arg),+);
     };
 }
