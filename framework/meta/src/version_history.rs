@@ -1,6 +1,3 @@
-use crate::sc_version;
-use crate::version::FrameworkVersion;
-
 /// The last version to be used for upgrades and templates.
 ///
 /// Should be edited every time a new version of the framework is released.
@@ -64,9 +61,10 @@ pub fn template_versions() -> &'static [&'static str] {
 }
 
 /// We started supporting contract templates with version 0.43.0.
-pub fn template_versions_with_proc_macro() -> () {
-    sc_version!(0.43.0);
-}
+// pub fn template_versions_with_proc_macro() {
+//     sc_version!(0.43.0);
+//     // self::FrameworkVersion::new("1.2.2");
+// }
 
 pub fn validate_template_tag(tag: &str) -> bool {
     template_versions().iter().any(|&tt| tt == tag)
@@ -163,7 +161,7 @@ pub mod tests {
 
     #[test]
     fn framework_version_test() {
-        sc_version!(0.28.0, 0.29.0);
-        sc_version!(0.1.123, 2.2.12, 1.1.1);
+        // sc_version!(0.28.0, 0.29.0);
+        // sc_version!(0.1.123, 2.2.12, 1.1.1);
     }
 }

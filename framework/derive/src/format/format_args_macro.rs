@@ -80,10 +80,10 @@ pub fn format_receiver_vers(input: proc_macro::TokenStream) -> proc_macro::Token
                     panic!("The argument does not have the required format.");
                 }
                 let str_as_bytes = byte_str_literal(format_string.as_bytes());
-
-                // quote!(FrameworkVersion::new($str_as_bytes);)
-
-                quote!(multiversx_sc_meta::version::FrameworkVersion::new($str_as_bytes);)
+                
+                quote!(
+                    FrameworkVersion::new($str_as_bytes);
+                )
             },
             _ => panic!("Tokentree does not match with the requirements"),
         })

@@ -21,9 +21,14 @@ impl FrameworkVersion {
     }
 }
 
-#[macro_export]
+// #[macro_use]
 macro_rules! sc_version {
     ($($arg:expr),+ $(,)?) => {
         multiversx_sc::derive::format_version!($($arg),+);
     };
+}
+
+pub fn template_versions_with_proc_macro() {
+    // self::FrameworkVersion::new("0.1.1");
+    sc_version!(0.43.0);
 }
