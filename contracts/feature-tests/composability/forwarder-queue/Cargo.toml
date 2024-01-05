@@ -8,9 +8,6 @@ publish = false
 [lib]
 path = "src/forwarder_queue.rs"
 
-[features]
-promises = ["multiversx-sc/promises"]
-
 [dependencies.vault]
 path = "../vault"
 

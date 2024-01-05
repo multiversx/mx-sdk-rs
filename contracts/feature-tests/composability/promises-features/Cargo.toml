@@ -14,5 +14,4 @@ path = "../vault"
 [dependencies.multiversx-sc]
 version = "0.45.2"
 path = "../../../../framework/base"
-features = ["promises", "back-transfers"]
 

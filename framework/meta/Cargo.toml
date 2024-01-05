@@ -53,7 +53,7 @@ common-path = { version = "1.0.0", optional = true }
 [dependencies.multiversx-sc]
 version = "=0.45.2"
 path = "../base"
-features = ["alloc", "num-bigint", "promises"]
+features = ["alloc", "num-bigint"]
 
 [dev-dependencies]
 multiversx-sc-meta = { path = ".", features = ["standalone"] }
