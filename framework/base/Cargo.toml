@@ -25,7 +25,6 @@ back-transfers = []
 esdt-token-payment-legacy-decode = []
 
 [dependencies]
-hashbrown = "0.14.2"
 hex-literal = "0.4.1"
 bitflags = "2.4.1"
 num-traits = { version = "0.2", default-features = false }
