@@ -1,10 +1,8 @@
-mod oc_allocator;
-mod oc_parse;
-mod oc_parse_stack_size;
+mod contract_allocator;
+mod stack_size;
 
-pub use oc_allocator::ContractAllocator;
-pub use oc_parse::*;
-pub use oc_parse_stack_size::*;
+pub use contract_allocator::{parse_allocator, ContractAllocator};
+pub use stack_size::*;
 
 use crate::ei::EIVersion;
 

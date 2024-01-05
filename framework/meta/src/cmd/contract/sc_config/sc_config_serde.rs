@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
-pub struct MultiContractConfigSerde {
+pub struct ScConfigSerde {
     #[serde(default)]
     pub settings: MultiContractGeneralSettingsSerde,
     #[serde(default)]
