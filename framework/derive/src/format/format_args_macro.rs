@@ -1,4 +1,4 @@
-use proc_macro::quote;
+use proc_macro::{quote, Literal};
 
 use crate::{format::format_tokenize, generate::util::byte_str_literal};
 
@@ -66,30 +66,36 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
     }).collect()
 }
 
-pub fn format_receiver_vers(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn version_triple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tokens: Vec<proc_macro::TokenTree> = format_tokenize::tokenize(input);
 
-    let collected_tokens: Vec<proc_macro::TokenStream> = tokens
+    tokens
         .iter()
         .map(|token| match token {
-            proc_macro::TokenTree::Group(_lit) => {
-                let format_string = _lit.to_string();
-                let dot_count = format_string.chars().filter(|&c| c == '.').count();
+            proc_macro::TokenTree::Group(lit) => {
+                let format_string = lit.stream().to_string();
 
-                if dot_count != 2 {
-                    panic!("The argument does not have the required format.");
-                }
-                let str_as_bytes = byte_str_literal(format_string.as_bytes());
-                
+                let version_tokens: Vec<&str> = format_string.split('.').collect();
+                assert!(
+                    version_tokens.len() == 3,
+                    "The argument does not have the required format."
+                );
+
+                let major = u64_literal_from_str(version_tokens[0]);
+                let minor = u64_literal_from_str(version_tokens[1]);
+                let patch = u64_literal_from_str(version_tokens[2]);
+
                 quote!(
-                    FrameworkVersion::new($str_as_bytes);
+                    ($major, $minor, $patch)
                 )
             },
             _ => panic!("Tokentree does not match with the requirements"),
         })
-        .collect();
+        .collect()
+}
 
-    let result: proc_macro::TokenStream = collected_tokens.into_iter().collect();
-
-    result
+fn u64_literal_from_str(s: &str) -> proc_macro::TokenTree {
+    proc_macro::TokenTree::Literal(Literal::u64_suffixed(
+        s.parse().expect("failed to parse token as u64"),
+    ))
 }

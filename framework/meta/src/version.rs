@@ -5,8 +5,7 @@ pub struct FrameworkVersion {
 }
 
 impl FrameworkVersion {
-    pub fn new(version_bytes: &[u8]) -> Self {
-        let version_str = String::from_utf8_lossy(version_bytes).to_string();
+    pub fn parse(version_str: &str) -> Self {
         let version_arr: Vec<&str> = version_str.split('.').collect();
 
         let version = Version {
@@ -19,16 +18,42 @@ impl FrameworkVersion {
 
         FrameworkVersion { version }
     }
+
+    pub const fn new(major: u64, minor: u64, patch: u64) -> Self {
+        let version = Version {
+            major,
+            minor,
+            patch,
+            pre: Prerelease::EMPTY,
+            build: BuildMetadata::EMPTY,
+        };
+
+        FrameworkVersion { version }
+    }
+
+    pub const fn from_triple(triple: (u64, u64, u64)) -> Self {
+        let (major, minor, patch) = triple;
+        FrameworkVersion::new(major, minor, patch)
+    }
 }
 
+
+
 // #[macro_use]
-macro_rules! sc_version {
-    ($($arg:expr),+ $(,)?) => {
-        multiversx_sc::derive::format_version!($($arg),+);
+macro_rules! framework_version {
+    ($arg:expr) => {
+        FrameworkVersion::from_triple(multiversx_sc::derive::version_triple!($arg))
     };
 }
 
-pub fn template_versions_with_proc_macro() {
-    // self::FrameworkVersion::new("0.1.1");
-    sc_version!(0.43.0);
+// #[macro_use]
+macro_rules! framework_versions {
+    ($($arg:expr),+ $(,)?) => {
+        &[$(framework_version!($arg)),+]
+    };
 }
+
+const V123: FrameworkVersion = framework_version!(1.2.3);
+const ALL: &[FrameworkVersion] = framework_versions!(1.2.3, 3.4.5);
+
+
