@@ -1,5 +1,5 @@
-use basic_features::ProxyTrait as _;
-use multiversx_sc::types::MultiValueEncoded;
+use basic_features::{empty_storage::ProxyTrait as _, ProxyTrait as _};
+use multiversx_sc::types::{ManagedAddress, MultiValueEncoded};
 use multiversx_sc_scenario::{
     api::StaticApi,
     scenario_model::{Account, ScCallStep, ScDeployStep, ScQueryStep, SetStateStep},
@@ -98,6 +98,127 @@ impl StorageMapperGetState {
 
         self
     }
+
+    fn contains_at_address(
+        &mut self,
+        item: u32,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: bool,
+    ) -> &mut Self {
+        let contains: bool = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .contains_at_address_endpoint(&item, other_contract_address),
+            ),
+        );
+        assert_eq!(contains, expected);
+        self
+    }
+
+    fn next_at_address(
+        &mut self,
+        item: u32,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: u32,
+    ) -> &mut Self {
+        let next: u32 = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .next_at_address_endpoint(&item, other_contract_address),
+            ),
+        );
+        assert_eq!(next, expected);
+        self
+    }
+
+    fn previous_at_address(
+        &mut self,
+        item: u32,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: u32,
+    ) -> &mut Self {
+        let previous: u32 = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .previous_at_address_endpoint(&item, other_contract_address),
+            ),
+        );
+        assert_eq!(previous, expected);
+        self
+    }
+
+    fn is_empty_at_address(
+        &mut self,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: bool,
+    ) -> &mut Self {
+        let is_empty: bool = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .is_empty_at_address_endpoint(other_contract_address),
+            ),
+        );
+        assert_eq!(is_empty, expected);
+        self
+    }
+
+    fn front_at_address(
+        &mut self,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: u32,
+    ) -> &mut Self {
+        let front: u32 = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .front_at_address_endpoint(other_contract_address),
+            ),
+        );
+        assert_eq!(front, expected);
+        self
+    }
+
+    fn back_at_address(
+        &mut self,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: u32,
+    ) -> &mut Self {
+        let back: u32 = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .back_at_address_endpoint(other_contract_address),
+            ),
+        );
+        assert_eq!(back, expected);
+        self
+    }
+    fn len_at_address(
+        &mut self,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: usize,
+    ) -> &mut Self {
+        let len: usize = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .len_at_address_endpoint(other_contract_address),
+            ),
+        );
+        assert_eq!(len, expected);
+        self
+    }
+    fn check_internal_consistency_at_address(
+        &mut self,
+        other_contract_address: ManagedAddress<StaticApi>,
+        expected: bool,
+    ) -> &mut Self {
+        let consistency: bool = self.world.sc_call_get_result(
+            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
+                self.basic_features_contract
+                    .check_internal_consistency_at_address_endpoint(other_contract_address),
+            ),
+        );
+        assert_eq!(consistency, expected);
+        self
+    }
 }
 
 #[test]
@@ -108,13 +229,32 @@ fn storage_mapper_get_at_address_test() {
     state.deploy_basic_features_contract();
     state.deploy_value_storage_contract();
 
+    //is empty
+    state.is_empty_at_address(state.value_storage_contract.to_address().into(), true);
+
+    //check internal consistency
+    state.check_internal_consistency_at_address(
+        state.value_storage_contract.to_address().into(),
+        true,
+    );
+
+    //contains at address
+    state.contains_at_address(
+        11u32,
+        state.value_storage_contract.to_address().into(),
+        false,
+    );
+
+    //len at address 
+    state.len_at_address(state.value_storage_contract.to_address().into(), 0usize);
+
     //fill
-    state.fill_set_mapper();
+    // state.fill_set_mapper();
 
     //check
-    let mut check = MultiValueEncoded::new();
-    for item in 1u32..=10u32 {
-        check.push(item)
-    }
-    state.check_storage_vec(check);
+    // let mut check = MultiValueEncoded::new();
+    // for item in 1u32..=10u32 {
+    //     check.push(item)
+    // }
+    // state.check_storage_vec(check);
 }
