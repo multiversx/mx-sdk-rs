@@ -1,24 +1,13 @@
+use std::cmp::Ordering;
+
 use semver::{BuildMetadata, Prerelease, Version};
 
+#[derive(Debug, Clone, Eq)]
 pub struct FrameworkVersion {
     pub version: Version,
 }
 
 impl FrameworkVersion {
-    pub fn parse(version_str: &str) -> Self {
-        let version_arr: Vec<&str> = version_str.split('.').collect();
-
-        let version = Version {
-            major: version_arr[0].parse().unwrap(),
-            minor: version_arr[1].parse().unwrap(),
-            patch: version_arr[2].parse().unwrap(),
-            pre: Prerelease::EMPTY,
-            build: BuildMetadata::EMPTY,
-        };
-
-        FrameworkVersion { version }
-    }
-
     pub const fn new(major: u64, minor: u64, patch: u64) -> Self {
         let version = Version {
             major,
@@ -37,23 +26,40 @@ impl FrameworkVersion {
     }
 }
 
+impl Ord for FrameworkVersion {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.version.cmp(&other.version)
+    }
+}
 
+impl PartialOrd for FrameworkVersion {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
 
-// #[macro_use]
+impl PartialEq for FrameworkVersion {
+    fn eq(&self, other: &Self) -> bool {
+        self.version == other.version
+    }
+}
+
+pub fn is_sorted(versions: &[FrameworkVersion]) -> bool {
+    versions
+        .windows(2)
+        .all(|window| (window[0].cmp(&window[1])).eq(&Ordering::Less))
+}
+
+#[macro_export]
 macro_rules! framework_version {
     ($arg:expr) => {
         FrameworkVersion::from_triple(multiversx_sc::derive::version_triple!($arg))
     };
 }
 
-// #[macro_use]
+#[macro_export]
 macro_rules! framework_versions {
     ($($arg:expr),+ $(,)?) => {
         &[$(framework_version!($arg)),+]
     };
 }
-
-const V123: FrameworkVersion = framework_version!(1.2.3);
-const ALL: &[FrameworkVersion] = framework_versions!(1.2.3, 3.4.5);
-
-

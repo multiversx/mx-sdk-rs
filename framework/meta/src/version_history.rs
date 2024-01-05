@@ -1,3 +1,5 @@
+use crate::{framework_version, framework_versions, version::FrameworkVersion};
+
 /// The last version to be used for upgrades and templates.
 ///
 /// Should be edited every time a new version of the framework is released.
@@ -55,16 +57,17 @@ pub const VERSIONS: &[&str] = &[
     "0.45.2",
 ];
 
+const ALL_VERSIONS: &[FrameworkVersion] = framework_versions![
+    0.28.0, 0.29.0, 0.29.2, 0.29.3, 0.30.0, 0.31.0, 0.31.1, 0.32.0, 0.33.0, 0.33.1, 0.34.0, 0.34.1,
+    0.35.0, 0.36.0, 0.36.1, 0.37.0, 0.38.0, 0.39.0, 0.39.1, 0.39.2, 0.39.3, 0.39.4, 0.39.5, 0.39.6,
+    0.39.7, 0.39.8, 0.40.0, 0.40.1, 0.41.0, 0.41.1, 0.41.2, 0.41.3, 0.42.0, 0.43.0, 0.43.1, 0.43.2,
+    0.43.3, 0.43.4, 0.43.5, 0.44.0, 0.45.0, 0.45.2,
+];
+
 /// We started supporting contract templates with version 0.43.0.
 pub fn template_versions() -> &'static [&'static str] {
     &VERSIONS[33..]
 }
-
-/// We started supporting contract templates with version 0.43.0.
-// pub fn template_versions_with_proc_macro() {
-//     sc_version!(0.43.0);
-//     // self::FrameworkVersion::new("1.2.2");
-// }
 
 pub fn validate_template_tag(tag: &str) -> bool {
     template_versions().iter().any(|&tt| tt == tag)
@@ -131,7 +134,8 @@ pub fn versions_iter(last_version: String) -> VersionIterator {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::sc_version;
+
+    use crate::version::is_sorted;
 
     use super::*;
 
@@ -161,7 +165,6 @@ pub mod tests {
 
     #[test]
     fn framework_version_test() {
-        // sc_version!(0.28.0, 0.29.0);
-        // sc_version!(0.1.123, 2.2.12, 1.1.1);
+        assert_eq!(is_sorted(ALL_VERSIONS), true);
     }
 }
