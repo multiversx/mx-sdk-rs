@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          373
+// Endpoints:                          383
 // Async Callback:                       1
-// Total number of exported functions: 375
+// Total number of exported functions: 385
 
 #![no_std]
 
@@ -395,6 +395,16 @@ multiversx_sc_wasm_adapter::endpoints! {
         token_identifier_is_valid_2 => token_identifier_is_valid_2
         non_zero_usize_iter => non_zero_usize_iter
         non_zero_usize_macro => non_zero_usize_macro
+        empty_set_mapper => empty_set_mapper
+        other_contract_address => other_contract_address
+        contains_at_address_endpoint => contains_at_address_endpoint
+        next_at_address_endpoint => next_at_address_endpoint
+        previous_at_address_endpoint => previous_at_address_endpoint
+        is_empty_at_address_endpoint => is_empty_at_address_endpoint
+        front_at_address_endpoint => front_at_address_endpoint
+        back_at_address_endpoint => back_at_address_endpoint
+        len_at_address_endpoint => len_at_address_endpoint
+        check_internal_consistency_at_address_endpoint => check_internal_consistency_at_address_endpoint
     )
 }
 
