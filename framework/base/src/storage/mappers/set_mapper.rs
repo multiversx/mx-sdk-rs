@@ -4,7 +4,7 @@ pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{StorageMapperApi, StorageReadApi},
+    api::StorageMapperApi,
     codec::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,

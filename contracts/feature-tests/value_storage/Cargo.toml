@@ -7,14 +7,16 @@ publish = false
 
 [lib]
 path = "src/value_storage.rs"
+
 [dependencies.multiversx-sc]
 version = "0.44.0"
+path = "../../../framework/base"
 
 [dev-dependencies]
 num-bigint = "0.4.2"
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.44.0"
+path = "../../../framework/scenario"
 
-[workspace]
-members = [".", "meta"]
+

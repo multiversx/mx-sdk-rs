@@ -38,6 +38,7 @@ pub mod storage_raw_api_features;
 pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod types;
+pub mod empty_storage;
 
 #[multiversx_sc::contract]
 pub trait BasicFeatures:
@@ -76,6 +77,7 @@ pub trait BasicFeatures:
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + empty_storage::EmptyStorage
 {
     #[init]
     fn init(&self) {}

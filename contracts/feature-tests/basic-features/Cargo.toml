@@ -22,3 +22,6 @@ path = "../../../contracts/modules"
 
 [dev-dependencies.esdt-system-sc-mock]
 path = "../esdt-system-sc-mock"
+
+[dev-dependencies.value_storage]
+path = "../value_storage"

@@ -1,6 +1,7 @@
 #![no_std]
 
 multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 /// A contract with storage. Will be read from the other contract
 #[multiversx_sc::contract]
