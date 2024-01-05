@@ -21,12 +21,12 @@ pub enum EIVersion {
     /// - more managed crypto hooks
     /// - big floats
     /// - some managed ESDT properties.
-    #[default]
     V1_2,
 
-    /// VM Hooks version planned to be released with VM 1.5 in Q2 2023.
+    /// Latest VM Hooks version, released with VM 1.5 in January 2024.
     ///
     /// It adds the new async call functionality (promises).
+    #[default]
     V1_3,
 }
 

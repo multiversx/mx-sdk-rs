@@ -191,7 +191,6 @@ pub trait ForwarderQueue {
                         .transfer_execute();
                 },
                 QueuedCallType::Promise => {
-                    #[cfg(feature = "promises")]
                     contract_call
                         .with_gas_limit(call.gas_limit)
                         .with_raw_arguments(call.args)

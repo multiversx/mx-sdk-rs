@@ -12,7 +12,6 @@ path = "src/vault.rs"
 [dependencies.multiversx-sc]
 version = "0.45.2"
 path = "../../../../framework/base"
-features = ["promises"]
 
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.45.2"

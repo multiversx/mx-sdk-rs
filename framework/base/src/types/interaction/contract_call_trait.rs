@@ -80,7 +80,6 @@ where
 
     /// Converts to an async promise.
     #[inline]
-    #[cfg(feature = "promises")]
     fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
         self.into_normalized().async_call_promise()
     }
@@ -98,7 +97,6 @@ where
     /// Executes immediately, synchronously, and returns contract call result.
     /// Only works if the target contract is in the same shard.
     #[inline]
-    #[cfg(feature = "back-transfers")]
     fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
     ) -> (RequestedResult, super::BackTransfers<SA>)
