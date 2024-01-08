@@ -188,7 +188,7 @@ impl TxResponse {
             let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
 
             if !is_issue_fungible && !is_issue_semi_fungible && !is_issue_non_fungible && !is_register_meta_esdt {
-                continue
+                continue;
             }
 
             if scr.data.starts_with("ESDTTransfer@") {
@@ -198,14 +198,17 @@ impl TxResponse {
                 }
 
                 self.new_issued_token_identifier = Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+
+                break;
             } else if scr.data.starts_with("@00@") {
                 let encoded_tid = scr.data.split('@').nth(2);
                 if encoded_tid.is_none() {
                     return self;
                 }
 
-                self.new_issued_token_identifier =
-                    Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+                self.new_issued_token_identifier = Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+
+                break;
             }
         }
 
