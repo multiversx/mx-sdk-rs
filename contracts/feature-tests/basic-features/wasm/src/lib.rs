@@ -5,14 +5,12 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          383
+// Endpoints:                          384
 // Async Callback:                       1
-// Total number of exported functions: 385
+// Total number of exported functions: 386
 
 #![no_std]
-
-// Configuration that works with rustc < 1.73.0.
-// TODO: Recommended rustc version: 1.73.0 or newer.
+#![allow(internal_features)]
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -397,6 +395,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         non_zero_usize_macro => non_zero_usize_macro
         empty_set_mapper => empty_set_mapper
         other_contract_address => other_contract_address
+        set_other_contract_address => set_other_contract_address
         contains_at_address_endpoint => contains_at_address_endpoint
         next_at_address_endpoint => next_at_address_endpoint
         previous_at_address_endpoint => previous_at_address_endpoint

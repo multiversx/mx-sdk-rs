@@ -1,0 +1,91 @@
+{
+    "name": "set mapper get at address",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "1",
+                    "balance": "0"
+                },
+                "sc:value-storage": {
+                    "nonce": "1",
+                    "balance": "0",
+                    "code": "file:../../value_storage/output/value_storage.wasm"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fill destination set mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:value-storage",
+                "value": "0",
+                "function": "fill_set_mapper",
+                "arguments": [
+                    "0x0a"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set other contract address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "set_other_contract_address",
+                "arguments": [
+                    "sc:value-storage"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "contains at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "value": "0",
+                "function": "contains_at_address_endpoint",
+                "arguments": [
+                    "0x05"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": ["0x01"],
+                "status": "0",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

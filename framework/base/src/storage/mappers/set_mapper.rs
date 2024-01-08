@@ -9,6 +9,7 @@ use crate::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
+    contract_base::StorageRawWrapper,
     storage::{storage_get, storage_get_from_address, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
@@ -73,10 +74,15 @@ where
     }
 
     fn get_node_id_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> u32 {
-        storage_get_from_address(
-            address.as_ref(),
-            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
-                .as_ref(),
+        // storage_get_from_address(
+        //     address.as_ref(),
+        // self.build_named_value_key(NODE_ID_IDENTIFIER, value)
+        //     .as_ref(),
+        // )
+        let wrapper = StorageRawWrapper::new();
+        wrapper.read_from_address(
+            address,
+            self.build_named_value_key(NODE_ID_IDENTIFIER, value),
         )
     }
 
