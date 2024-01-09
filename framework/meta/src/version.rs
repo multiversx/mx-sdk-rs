@@ -24,6 +24,15 @@ impl FrameworkVersion {
         let (major, minor, patch) = triple;
         FrameworkVersion::new(major, minor, patch)
     }
+
+    pub fn from_string_template(version_str: &str) -> Self {
+        let version_arr: Vec<&str> = version_str.split('.').collect();
+        let major: u64= version_arr[0].parse().unwrap();
+        let minor: u64= version_arr[0].parse().unwrap();
+        let patch: u64= version_arr[0].parse().unwrap();
+        
+        FrameworkVersion::new(major, minor, patch)
+    }
 }
 
 impl Ord for FrameworkVersion {
