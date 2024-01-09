@@ -10,7 +10,7 @@ use crate::{
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::{storage_get, storage_set, StorageKey},
-    types::{ManagedType, MultiValueEncoded},
+    types::{ManagedType, MultiValueEncoded, ManagedAddress},
 };
 
 const NULL_ENTRY: u32 = 0;
@@ -91,6 +91,10 @@ where
     /// Returns `true` if the set contains no elements.
     pub fn is_empty(&self) -> bool {
         self.queue_mapper.is_empty()
+    }
+
+    pub fn is_empty_at_address(&self, address: ManagedAddress<SA>) -> bool {
+        self.queue_mapper.is_empty_at_address(&address)
     }
 
     /// Returns the number of elements in the set.

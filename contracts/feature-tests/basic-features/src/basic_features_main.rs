@@ -38,6 +38,7 @@ pub mod storage_raw_api_features;
 pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod types;
+pub mod storage_mapper_get_at_address;
 
 #[multiversx_sc::contract]
 pub trait BasicFeatures:
@@ -76,6 +77,7 @@ pub trait BasicFeatures:
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
+    + storage_mapper_get_at_address::StorageMapperGetAtAddress
 {
     #[init]
     fn init(&self) {}

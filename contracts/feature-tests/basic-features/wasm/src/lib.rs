@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          368
+// Endpoints:                          370
 // Async Callback:                       1
-// Total number of exported functions: 370
+// Total number of exported functions: 372
 
 #![no_std]
 #![allow(internal_features)]
@@ -388,6 +388,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         token_identifier_is_valid_2 => token_identifier_is_valid_2
         non_zero_usize_iter => non_zero_usize_iter
         non_zero_usize_macro => non_zero_usize_macro
+        set_contract_address => set_contract_address
+        is_empty_at_address => is_empty_at_address
     )
 }
 

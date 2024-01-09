@@ -1,0 +1,111 @@
+{
+    "name": "storage mapper get at address",
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:get-at-address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../../get-at-address/output/get-at-address.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "set contract address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_contract_address",
+                "arguments": [
+                    "sc:get-at-address"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "fill set mapper",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:get-at-address",
+                "function": "fill_set_mapper",
+                "arguments": [
+                    "10"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:contract_address": "sc:get-at-address"
+                    },
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "sc:get-at-address": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": "*",
+                    "code": "file:../../get-at-address/output/get-at-address.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "*",
+                    "storage": {},
+                    "code": ""
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "is empty at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "is_empty_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [""],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

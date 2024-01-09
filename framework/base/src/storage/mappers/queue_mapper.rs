@@ -3,15 +3,16 @@ use core::marker::PhantomData;
 use super::{StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::StorageMapperApi,
+    api::{StorageMapperApi, StorageReadApi, StorageReadApiImpl},
     codec::{
         self,
         derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
         multi_encode_iter_or_handle_err, CodecFrom, DecodeDefault, EncodeDefault,
         EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get, storage_set, StorageKey},
-    types::{ManagedType, MultiValueEncoded},
+    contract_base::StorageRawWrapper,
+    storage::{storage_get, storage_get_from_address, storage_set, StorageKey},
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
 
@@ -126,6 +127,15 @@ where
         storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
+    fn get_info_at_address(&self, address: &ManagedAddress<SA>) -> QueueMapperInfo {
+        // storage_get_from_address::storage_get_from_address(
+        // address.as_ref(),
+        // self.build_name_key(INFO_IDENTIFIER).as_ref(),
+        // )
+        let wrapper = StorageRawWrapper::new();
+        wrapper.read_from_address(address, self.build_name_key(INFO_IDENTIFIER))
+    }
+
     fn set_info(&mut self, value: QueueMapperInfo) {
         storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
     }
@@ -188,6 +198,10 @@ where
     /// This operation should compute in *O*(1) time.
     pub fn is_empty(&self) -> bool {
         self.get_info().len == 0
+    }
+
+    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
+        self.get_info_at_address(address).len == 0
     }
 
     /// Returns the length of the `Queue`.
