@@ -26,6 +26,9 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.46.1] - 2024-01-10
+- Interactor: fixed parsing of newly issued token identifier.
+
 ## [sc 0.46.0] - 2024-01-05
 - Promises callback memory allocator bugfix.
 - Removed features: `promises`, `managed-map`, `back-transfers`.
