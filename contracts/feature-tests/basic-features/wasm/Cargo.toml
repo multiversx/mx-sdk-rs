@@ -25,7 +25,7 @@ overflow-checks = true
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.46.0"
+version = "0.46.1"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]
