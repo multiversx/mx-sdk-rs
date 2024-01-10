@@ -1,9 +1,12 @@
 use core::marker::PhantomData;
 
-use super::{StorageClearable, StorageMapper};
+use super::{
+    set_mapper::{StorageAddress, StorageSCAddress},
+    StorageClearable, StorageMapper,
+};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{StorageMapperApi, StorageReadApi, StorageReadApiImpl},
+    api::{ManagedTypeApi, StorageMapperApi, StorageReadApi, StorageReadApiImpl},
     codec::{
         self,
         derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
@@ -15,6 +18,7 @@ use crate::{
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
+use codec::{NestedDecode, NestedEncode};
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
@@ -34,6 +38,13 @@ pub struct QueueMapperInfo {
     pub back: u32,
     pub new: u32,
 }
+impl NestedEncode for Node {}
+
+impl NestedDecode for Node {}
+
+impl NestedEncode for QueueMapperInfo {}
+
+impl NestedDecode for QueueMapperInfo {}
 
 impl EncodeDefault for QueueMapperInfo {
     fn is_default(&self) -> bool {
@@ -63,34 +74,37 @@ impl QueueMapperInfo {
 ///
 /// The `QueueMapper` allows pushing and popping elements at either end
 /// in constant time.
-pub struct QueueMapper<SA, T>
+pub struct QueueMapper<SA, A, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + 'static,
+    A: StorageAddress<SA>,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for QueueMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         QueueMapper {
             _phantom_api: PhantomData,
+            address: StorageSCAddress,
             base_key,
             _phantom_item: PhantomData,
         }
     }
 }
 
-impl<SA, T> StorageClearable for QueueMapper<SA, T>
+impl<SA, T> StorageClearable for QueueMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
         let info = self.get_info();
@@ -105,10 +119,10 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, T>
+impl<SA, T> QueueMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -124,16 +138,8 @@ where
     }
 
     fn get_info(&self) -> QueueMapperInfo {
-        storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
-    }
-
-    fn get_info_at_address(&self, address: &ManagedAddress<SA>) -> QueueMapperInfo {
-        // storage_get_from_address::storage_get_from_address(
-        // address.as_ref(),
-        // self.build_name_key(INFO_IDENTIFIER).as_ref(),
-        // )
-        let wrapper = StorageRawWrapper::new();
-        wrapper.read_from_address(address, self.build_name_key(INFO_IDENTIFIER))
+        self.address
+            .address_storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
     fn set_info(&mut self, value: QueueMapperInfo) {
@@ -141,7 +147,7 @@ where
     }
 
     fn get_node(&self, node_id: u32) -> Node {
-        storage_get(
+        self.address.address_storage_get(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
         )
@@ -164,7 +170,7 @@ where
     }
 
     fn get_value(&self, node_id: u32) -> T {
-        storage_get(
+        self.address.address_storage_get(
             self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
                 .as_ref(),
         )
@@ -198,10 +204,6 @@ where
     /// This operation should compute in *O*(1) time.
     pub fn is_empty(&self) -> bool {
         self.get_info().len == 0
-    }
-
-    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
-        self.get_info_at_address(address).len == 0
     }
 
     /// Returns the length of the `Queue`.
@@ -419,10 +421,166 @@ where
     }
 }
 
-impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, T>
+impl<SA, T> QueueMapper<SA, ManagedAddress<SA>, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + ManagedTypeApi,
+{
+    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(&node_id);
+        named_key
+    }
+
+    fn build_name_key(&self, name: &[u8]) -> StorageKey<SA> {
+        let mut name_key = self.base_key.clone();
+        name_key.append_bytes(name);
+        name_key
+    }
+
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        QueueMapper {
+            _phantom_api: PhantomData::<SA>,
+            address,
+            base_key: base_key.clone(),
+            _phantom_item: PhantomData::<T>,
+        }
+    }
+
+    fn get_info(&self) -> QueueMapperInfo {
+        self.address
+            .address_storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
+    }
+
+    fn get_node(&self, node_id: u32) -> Node {
+        self.address.address_storage_get(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
+    }
+
+    fn get_value(&self, node_id: u32) -> T {
+        self.address.address_storage_get(
+            self.build_node_id_named_key(VALUE_IDENTIFIER, node_id)
+                .as_ref(),
+        )
+    }
+
+    fn get_value_option(&self, node_id: u32) -> Option<T> {
+        if node_id == NULL_ENTRY {
+            return None;
+        }
+        Some(self.get_value(node_id))
+    }
+
+    /// Returns `true` if the `Queue` is empty.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn is_empty(&self) -> bool {
+        self.get_info().len == 0
+    }
+
+    /// Returns the length of the `Queue`.
+    ///
+    /// This operation should compute in *O*(1) time.
+    pub fn len(&self) -> usize {
+        self.get_info().len as usize
+    }
+
+    /// Provides a copy to the front element, or `None` if the queue is
+    /// empty.
+    pub fn front(&self) -> Option<T> {
+        self.get_value_option(self.get_info().front)
+    }
+
+    /// Provides a copy to the back element, or `None` if the queue is
+    /// empty.
+    pub fn back(&self) -> Option<T> {
+        self.get_value_option(self.get_info().back)
+    }
+
+    // Provides a forward iterator.
+    // pub fn iter(&self) -> Iter<SA, T> {
+    //     Iter::new(self)
+    // }
+
+    /// Runs several checks in order to verify that both forwards and backwards iteration
+    /// yields the same node entries and that the number of items in the queue is correct.
+    /// Used for unit testing.
+    ///
+    /// This operation should compute in *O*(n) time.
+    pub fn check_internal_consistency(&self) -> bool {
+        let info = self.get_info();
+        let mut front = info.front;
+        let mut back = info.back;
+        if info.len == 0 {
+            // if the queue is empty, both ends should point to null entries
+            if front != NULL_ENTRY {
+                return false;
+            }
+            if back != NULL_ENTRY {
+                return false;
+            }
+            true
+        } else {
+            // if the queue is non-empty, both ends should point to non-null entries
+            if front == NULL_ENTRY {
+                return false;
+            }
+            if back == NULL_ENTRY {
+                return false;
+            }
+
+            // the node before the first and the one after the last should both be null
+            if self.get_node(front).previous != NULL_ENTRY {
+                return false;
+            }
+            if self.get_node(back).next != NULL_ENTRY {
+                return false;
+            }
+
+            // iterate forwards
+            let mut forwards = Vec::new();
+            while front != NULL_ENTRY {
+                forwards.push(front);
+                front = self.get_node(front).next;
+            }
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+
+            // iterate backwards
+            let mut backwards = Vec::new();
+            while back != NULL_ENTRY {
+                backwards.push(back);
+                back = self.get_node(back).previous;
+            }
+            if backwards.len() != info.len as usize {
+                return false;
+            }
+
+            // check that both iterations match element-wise
+            let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
+            if forwards != backwards_reversed {
+                return false;
+            }
+
+            // check that the node IDs are unique
+            forwards.sort_unstable();
+            forwards.dedup();
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+            true
+        }
+    }
+}
+
+impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, StorageSCAddress, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     type Item = T;
 
@@ -440,18 +598,18 @@ where
 pub struct Iter<'a, SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     node_id: u32,
-    queue: &'a QueueMapper<SA, T>,
+    queue: &'a QueueMapper<SA, StorageSCAddress, T>,
 }
 
 impl<'a, SA, T> Iter<'a, SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    fn new(queue: &'a QueueMapper<SA, T>) -> Iter<'a, SA, T> {
+    fn new(queue: &'a QueueMapper<SA, StorageSCAddress, T>) -> Iter<'a, SA, T> {
         Iter {
             node_id: queue.get_info().front,
             queue,
@@ -462,7 +620,7 @@ where
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + 'static,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     type Item = T;
 
@@ -478,10 +636,10 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for QueueMapper<SA, T>
+impl<SA, T> TopEncodeMulti for QueueMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -492,18 +650,18 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<QueueMapper<SA, T>> for MultiValueEncoded<SA, T>
+impl<SA, T> CodecFrom<QueueMapper<SA, StorageSCAddress, T>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for QueueMapper<SA, T>
+impl<SA, T> TypeAbi for QueueMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + TypeAbi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()

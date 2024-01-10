@@ -4,29 +4,59 @@ pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::StorageMapperApi,
+    api::{ManagedTypeApi, StorageMapperApi},
     codec::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get, storage_set, StorageKey},
-    types::{ManagedType, MultiValueEncoded, ManagedAddress},
+    storage::{storage_get_from_address, storage_set, StorageKey},
+    storage_get,
+    types::{ManagedAddress, ManagedRef, ManagedType, MultiValueEncoded, ManagedOption},
 };
 
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
-pub struct SetMapper<SA, T>
+pub trait StorageAddress<SA>
+where
+    SA: StorageMapperApi ,
+{
+    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T;
+}
+
+pub struct StorageSCAddress;
+
+impl<SA> StorageAddress<SA> for StorageSCAddress
 where
     SA: StorageMapperApi,
+{
+    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
+        storage_get(key)
+    }
+}
+
+impl<SA> StorageAddress<SA> for ManagedAddress<SA>
+where
+    SA: StorageMapperApi,
+{
+    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
+        storage_get_from_address(self.as_ref(), key)
+    }
+}
+
+pub struct SetMapper<SA, A, T>
+where
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
-    queue_mapper: QueueMapper<SA, T>,
+    queue_mapper: QueueMapper<SA, A, T>,
 }
 
-impl<SA, T> StorageMapper<SA> for SetMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for SetMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -34,13 +64,14 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         SetMapper {
             _phantom_api: PhantomData,
+            address: StorageSCAddress,
             base_key: base_key.clone(),
-            queue_mapper: QueueMapper::<SA, T>::new(base_key),
+            queue_mapper: QueueMapper::new(base_key),
         }
     }
 }
 
-impl<SA, T> StorageClearable for SetMapper<SA, T>
+impl<SA, T> StorageClearable for SetMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -53,23 +84,65 @@ where
     }
 }
 
-impl<SA, T> SetMapper<SA, T>
+impl<SA, T> SetMapper<SA, ManagedAddress<SA>, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + ManagedTypeApi,
 {
-    fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
+    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);
         named_key.append_item(value);
         named_key
     }
 
+    fn new_from_address(&self, address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        SetMapper {
+            _phantom_api: PhantomData,
+            address,
+            base_key: base_key.clone(),
+            queue_mapper: QueueMapper::new_from_address(self.address.clone(), base_key),
+        }
+    }
+
     fn get_node_id(&self, value: &T) -> u32 {
-        storage_get(
+        self.address.address_storage_get(
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
                 .as_ref(),
         )
+    }
+
+    // Returns `true` if the set contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.queue_mapper.is_empty()
+    }
+
+    // Returns the number of elements in the set.
+    pub fn len(&self) -> usize {
+        self.queue_mapper.len()
+    }
+
+    // Returns `true` if the set contains a value.
+    pub fn contains(&self, value: &T) -> bool {
+        self.get_node_id(value) != NULL_ENTRY
+    }
+
+    // Checks the internal consistency of the collection. Used for unit tests.
+    pub fn check_internal_consistency(&self) -> bool {
+        self.queue_mapper.check_internal_consistency()
+    }
+}
+
+impl<SA, T> SetMapper<SA, StorageSCAddress, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(value);
+        named_key
     }
 
     fn set_node_id(&self, value: &T, node_id: u32) {
@@ -86,25 +159,6 @@ where
                 .as_ref(),
             &codec::Empty,
         );
-    }
-
-    /// Returns `true` if the set contains no elements.
-    pub fn is_empty(&self) -> bool {
-        self.queue_mapper.is_empty()
-    }
-
-    pub fn is_empty_at_address(&self, address: ManagedAddress<SA>) -> bool {
-        self.queue_mapper.is_empty_at_address(&address)
-    }
-
-    /// Returns the number of elements in the set.
-    pub fn len(&self) -> usize {
-        self.queue_mapper.len()
-    }
-
-    /// Returns `true` if the set contains a value.
-    pub fn contains(&self, value: &T) -> bool {
-        self.get_node_id(value) != NULL_ENTRY
     }
 
     /// Adds a value to the set.
@@ -148,13 +202,35 @@ where
         self.queue_mapper.iter()
     }
 
-    /// Checks the internal consistency of the collection. Used for unit tests.
+    fn get_node_id(&self, value: &T) -> u32 {
+        self.address.address_storage_get(
+            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
+                .as_ref(),
+        )
+    }
+
+    // Returns `true` if the set contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.queue_mapper.is_empty()
+    }
+
+    // Returns the number of elements in the set.
+    pub fn len(&self) -> usize {
+        self.queue_mapper.len()
+    }
+
+    // Returns `true` if the set contains a value.
+    pub fn contains(&self, value: &T) -> bool {
+        self.get_node_id(value) != NULL_ENTRY
+    }
+
+    // Checks the internal consistency of the collection. Used for unit tests.
     pub fn check_internal_consistency(&self) -> bool {
         self.queue_mapper.check_internal_consistency()
     }
 }
 
-impl<'a, SA, T> IntoIterator for &'a SetMapper<SA, T>
+impl<'a, SA, T> IntoIterator for &'a SetMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -168,7 +244,7 @@ where
     }
 }
 
-impl<SA, T> Extend<T> for SetMapper<SA, T>
+impl<SA, T> Extend<T> for SetMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -184,7 +260,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for SetMapper<SA, T>
+impl<SA, T> TopEncodeMulti for SetMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -198,7 +274,7 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<SetMapper<SA, T>> for MultiValueEncoded<SA, T>
+impl<SA, T> CodecFrom<SetMapper<SA, StorageSCAddress, T>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -206,7 +282,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for SetMapper<SA, T>
+impl<SA, T> TypeAbi for SetMapper<SA, StorageSCAddress, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
