@@ -15,11 +15,4 @@ pub trait StorageMapperGetAtAddress {
    fn set_contract_address(&self, address: ManagedAddress) {
     self.contract_address().set(address)
    }
-
-   #[endpoint]
-   fn is_empty_at_address(&self) -> bool {
-    let mapper = self.empty_set_mapper();
-    let contract_address = self.contract_address().get();
-    mapper.is_empty_at_address(contract_address)
-   }
 }

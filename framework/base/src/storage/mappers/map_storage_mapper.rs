@@ -5,7 +5,7 @@ use super::{
     SetMapper, StorageClearable, StorageMapper,
 };
 use crate::{
-    api::{StorageMapperApi, ManagedTypeApi},
+    api::StorageMapperApi,
     codec::{NestedDecode, NestedEncode, TopDecode, TopEncode},
     storage::{self, StorageKey}, types::ManagedAddress,
 };
@@ -13,7 +13,7 @@ use crate::{
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
 
-pub struct MapStorageMapper<SA, A, K, V>
+pub struct MapStorageMapper<SA, K, V, A = StorageSCAddress>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -22,11 +22,11 @@ where
 {
     _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
-    keys_set: SetMapper<SA, A, K>,
+    keys_set: SetMapper<SA, K, A>,
     _phantom_value: PhantomData<V>,
 }
 
-impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, StorageSCAddress, K, V>
+impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V, StorageSCAddress>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -42,7 +42,7 @@ where
     }
 }
 
-impl<SA, K, V> StorageClearable for MapStorageMapper<SA, StorageSCAddress, K, V>
+impl<SA, K, V> StorageClearable for MapStorageMapper<SA, K, V, StorageSCAddress>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<SA, K, V> MapStorageMapper<SA, StorageSCAddress, K, V>
+impl<SA, K, V> MapStorageMapper<SA, K, V, StorageSCAddress>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -155,10 +155,10 @@ where
     }
 }
 
-impl<SA, K, V> MapStorageMapper<SA, ManagedAddress<SA>, K, V>
+impl<SA, K, V> MapStorageMapper<SA, K, V, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + ManagedTypeApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: StorageMapper<SA> + StorageClearable,
 {
     fn build_named_key(&self, name: &[u8], key: &K) -> StorageKey<SA> {
@@ -216,7 +216,7 @@ where
     
 }
 
-impl<'a, SA, K, V> IntoIterator for &'a MapStorageMapper<SA, StorageSCAddress, K, V>
+impl<'a, SA, K, V> IntoIterator for &'a MapStorageMapper<SA, K, V, StorageSCAddress>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -239,7 +239,7 @@ where
     V: StorageMapper<SA> + StorageClearable,
 {
     key_iter: Keys<'a, SA, K>,
-    hash_map: &'a MapStorageMapper<SA, A, K, V>,
+    hash_map: &'a MapStorageMapper<SA, K, V, A>,
 }
 
 impl<'a, SA, K, V> Iter<'a, SA, StorageSCAddress, K, V>
@@ -249,7 +249,7 @@ where
     V: StorageMapper<SA> + StorageClearable,
 {
     fn new(
-        hash_map: &'a MapStorageMapper<SA, StorageSCAddress, K, V>,
+        hash_map: &'a MapStorageMapper<SA, K, V, StorageSCAddress>,
     ) -> Iter<'a, SA, StorageSCAddress, K, V> {
         Iter {
             key_iter: hash_map.keys(),
@@ -284,7 +284,7 @@ where
     V: StorageMapper<SA> + StorageClearable,
 {
     key_iter: Keys<'a, SA, K>,
-    hash_map: &'a MapStorageMapper<SA, A, K, V>,
+    hash_map: &'a MapStorageMapper<SA, K, V, A>,
 }
 
 impl<'a, SA, K, V> Values<'a, SA, StorageSCAddress, K, V>
@@ -293,7 +293,7 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
-    fn new(hash_map: &'a MapStorageMapper<SA, StorageSCAddress, K, V>) -> Values<'a, SA, StorageSCAddress, K, V> {
+    fn new(hash_map: &'a MapStorageMapper<SA, K, V, StorageSCAddress>) -> Values<'a, SA, StorageSCAddress, K, V> {
         Values {
             key_iter: hash_map.keys(),
             hash_map,
@@ -343,7 +343,7 @@ where
     V: StorageMapper<SA> + StorageClearable,
 {
     pub(super) key: K,
-    pub(super) map: &'a mut MapStorageMapper<SA, A, K, V>,
+    pub(super) map: &'a mut MapStorageMapper<SA, K, V, A>,
 
     // Be invariant in `K` and `V`
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
@@ -359,7 +359,7 @@ where
     V: StorageMapper<SA> + StorageClearable,
 {
     pub(super) key: K,
-    pub(super) map: &'a mut MapStorageMapper<SA, A, K, V>,
+    pub(super) map: &'a mut MapStorageMapper<SA, K, V, A>,
 
     // Be invariant in `K` and `V`
     pub(super) _marker: PhantomData<&'a mut (K, V)>,

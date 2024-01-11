@@ -6,15 +6,14 @@ use super::{
 };
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{ManagedTypeApi, StorageMapperApi, StorageReadApi, StorageReadApiImpl},
+    api::StorageMapperApi,
     codec::{
         self,
         derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
         multi_encode_iter_or_handle_err, CodecFrom, DecodeDefault, EncodeDefault,
         EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    contract_base::StorageRawWrapper,
-    storage::{storage_get, storage_get_from_address, storage_set, StorageKey},
+    storage::{storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
@@ -74,7 +73,7 @@ impl QueueMapperInfo {
 ///
 /// The `QueueMapper` allows pushing and popping elements at either end
 /// in constant time.
-pub struct QueueMapper<SA, A, T>
+pub struct QueueMapper<SA, T, A = StorageSCAddress>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -86,7 +85,7 @@ where
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for QueueMapper<SA, StorageSCAddress, T>
+impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -101,7 +100,7 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for QueueMapper<SA, StorageSCAddress, T>
+impl<SA, T> StorageClearable for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -119,7 +118,7 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, StorageSCAddress, T>
+impl<SA, T> QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -421,10 +420,10 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, ManagedAddress<SA>, T>
+impl<SA, T> QueueMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + ManagedTypeApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -577,7 +576,7 @@ where
     }
 }
 
-impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, StorageSCAddress, T>
+impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -601,7 +600,7 @@ where
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     node_id: u32,
-    queue: &'a QueueMapper<SA, StorageSCAddress, T>,
+    queue: &'a QueueMapper<SA, T, StorageSCAddress>,
 }
 
 impl<'a, SA, T> Iter<'a, SA, T>
@@ -609,7 +608,7 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
-    fn new(queue: &'a QueueMapper<SA, StorageSCAddress, T>) -> Iter<'a, SA, T> {
+    fn new(queue: &'a QueueMapper<SA, T, StorageSCAddress>) -> Iter<'a, SA, T> {
         Iter {
             node_id: queue.get_info().front,
             queue,
@@ -636,7 +635,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for QueueMapper<SA, StorageSCAddress, T>
+impl<SA, T> TopEncodeMulti for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -650,7 +649,7 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<QueueMapper<SA, StorageSCAddress, T>> for MultiValueEncoded<SA, T>
+impl<SA, T> CodecFrom<QueueMapper<SA, T, StorageSCAddress>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -658,7 +657,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for QueueMapper<SA, StorageSCAddress, T>
+impl<SA, T> TypeAbi for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
