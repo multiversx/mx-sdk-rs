@@ -112,22 +112,22 @@ where
         )
     }
 
-    // Returns `true` if the set contains no elements.
+    /// Returns `true` if the set contains no elements.
     pub fn is_empty(&self) -> bool {
         self.queue_mapper.is_empty()
     }
 
-    // Returns the number of elements in the set.
+    /// Returns the number of elements in the set.
     pub fn len(&self) -> usize {
         self.queue_mapper.len()
     }
 
-    // Returns `true` if the set contains a value.
+    /// Returns `true` if the set contains a value.
     pub fn contains(&self, value: &T) -> bool {
         self.get_node_id(value) != NULL_ENTRY
     }
 
-    // Checks the internal consistency of the collection. Used for unit tests.
+    /// Checks the internal consistency of the collection. Used for unit tests.
     pub fn check_internal_consistency(&self) -> bool {
         self.queue_mapper.check_internal_consistency()
     }
