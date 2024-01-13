@@ -59,6 +59,7 @@ pub async fn retrieve_account_as_scenario_set_state(
             code: retrieve_code(account.code),
             owner: None,
             developer_rewards: None,
+            update: None,
         },
     );
 

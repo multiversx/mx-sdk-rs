@@ -35,6 +35,7 @@
             "step": "checkState",
             "accounts": {
                 "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "*",
                     "balance": "0",
                     "esdt": {},
                     "storage": {
@@ -62,13 +63,15 @@
             "expect": {
                 "out": [],
                 "status": "0",
-                "message": "str:"
+                "message": "str:",
+                "refund": "*"
             }
         },
         {
             "step": "checkState",
             "accounts": {
                 "0x0000000000000000fb1397e8225ea85e0f0e6e8c7b126d0016ccbde0e667151e": {
+                    "nonce": "*",
                     "balance": "0",
                     "esdt": {},
                     "storage": {
@@ -95,7 +98,8 @@
                     "0x33"
                 ],
                 "status": "0",
-                "message": "str:"
+                "message": "str:",
+                "refund": "*"
             }
         }
     ]

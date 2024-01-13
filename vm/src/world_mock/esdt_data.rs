@@ -25,6 +25,13 @@ impl EsdtData {
             && !self.frozen
     }
 
+    pub fn is_empty_with_roles(&self) -> bool {
+        self.instances.is_empty_esdt()
+            && self.last_nonce == 0
+            && !self.roles.is_empty()
+            && !self.frozen
+    }
+
     pub fn get_roles(&self) -> Vec<Vec<u8>> {
         self.roles.get()
     }

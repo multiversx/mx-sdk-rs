@@ -96,7 +96,7 @@ impl ScenarioWorld {
         }
     }
 
-    pub(crate) fn get_state(&self) -> &BlockchainState {
+    pub fn get_state(&self) -> &BlockchainState {
         &self.get_debugger_backend().vm_runner.blockchain_mock.state
     }
 
@@ -110,6 +110,11 @@ impl ScenarioWorld {
 
     pub fn start_trace(&mut self) -> &mut Self {
         self.get_mut_debugger_backend().trace = Some(ScenarioTrace::default());
+        self
+    }
+
+    pub fn start_trace_with(&mut self, trace: ScenarioTrace) -> &mut Self {
+        self.get_mut_debugger_backend().trace = Some(trace);
         self
     }
 

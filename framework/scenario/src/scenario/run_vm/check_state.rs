@@ -124,8 +124,10 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                 match expected_value {
                     CheckEsdt::Short(expected_balance) => {
                         if expected_balance.value.is_zero() {
+                            let actual_value_is_empty =
+                                actual_value.is_empty() || actual_value.is_empty_with_roles();
                             assert!(
-                                actual_value.is_empty(),
+                                actual_value_is_empty,
                                 "No balance expected for ESDT token address: {}. token name: {}. nonce: {}.",
                                 address,
                                 bytes_to_string(key.value.as_slice()),

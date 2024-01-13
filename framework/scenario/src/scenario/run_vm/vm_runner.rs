@@ -25,7 +25,9 @@ impl ScenarioVMRunner {
 
 impl ScenarioRunner for ScenarioVMRunner {
     fn run_external_steps(&mut self, _step: &ExternalStepsStep) {
-        panic!("cannot call directly as such")
+        // Ignored so we can write to trace
+        // TODO find a beter way
+        // panic!("cannot call directly as such")
     }
 
     fn run_set_state_step(&mut self, step: &SetStateStep) {

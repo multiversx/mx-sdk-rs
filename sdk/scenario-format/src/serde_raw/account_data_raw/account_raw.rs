@@ -41,4 +41,8 @@ pub struct AccountRaw {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub developer_rewards: Option<ValueSubTree>,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub update: Option<bool>,
 }

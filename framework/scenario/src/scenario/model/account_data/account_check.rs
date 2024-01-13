@@ -11,7 +11,7 @@ use crate::{
     },
     scenario_model::CheckEsdtData,
 };
-use std::collections::BTreeMap;
+use std::collections::{btree_map, BTreeMap};
 
 #[derive(Debug, Default, Clone)]
 pub struct CheckAccount {
@@ -86,7 +86,10 @@ impl CheckAccount {
                 self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
             },
             CheckEsdtMap::Equal(check_esdt_map) => {
-                if check_esdt_map.contents.contains_key(&token_id) {
+                if let btree_map::Entry::Vacant(e) = check_esdt_map.contents.entry(token_id.clone())
+                {
+                    e.insert(CheckEsdt::Short(balance));
+                } else {
                     let prev_entry = check_esdt_map.contents.get_mut(&token_id).unwrap();
                     match prev_entry {
                         CheckEsdt::Short(prev_balance_check) => *prev_balance_check = balance,
@@ -115,35 +118,105 @@ impl CheckAccount {
         BigUintValue: From<V>,
         T: TopEncode,
     {
-        let token_id = BytesKey::from(token_id_expr);
-
-        if let CheckEsdtMap::Unspecified = &self.esdt {
-            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
-
-            if let Some(attributes_expr) = attributes_expr {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    top_encode_to_vec_u8_or_panic(&attributes_expr),
-                );
+        let insert_check_esdt = |map: &mut CheckEsdtMapContents| {
+            let token_id = BytesKey::from(token_id_expr);
+            let attributes_expr = if let Some(attributes_expr) = attributes_expr {
+                top_encode_to_vec_u8_or_panic(&attributes_expr)
             } else {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    Vec::<u8>::new(),
-                );
-            }
-
-            let mut new_esdt_map = BTreeMap::new();
-            let _ = new_esdt_map.insert(token_id, check_esdt);
-
-            let new_check_esdt_map = CheckEsdtMapContents {
-                contents: new_esdt_map,
-                other_esdts_allowed: true,
+                Vec::<u8>::new()
             };
 
-            self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
-        }
+            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
+            check_esdt.add_balance_and_attributes_check(nonce_expr, balance_expr, attributes_expr);
+
+            map.contents.insert(token_id, check_esdt)
+        };
+
+        match &mut self.esdt {
+            CheckEsdtMap::Equal(map) => {
+                insert_check_esdt(map);
+            },
+            _ => {
+                let mut new_map = CheckEsdtMapContents {
+                    contents: BTreeMap::new(),
+                    other_esdts_allowed: true,
+                };
+
+                insert_check_esdt(&mut new_map);
+
+                self.esdt = CheckEsdtMap::Equal(new_map);
+            },
+        };
+
+        self
+    }
+
+    pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
+    where
+        BytesKey: From<K>,
+    {
+        let insert_check_esdt = |map: &mut CheckEsdtMapContents| {
+            let token_id = BytesKey::from(token_id_expr);
+
+            map.contents
+                .entry(token_id)
+                .and_modify(|check_esdt| check_esdt.add_roles_check(roles.clone()))
+                .or_insert(CheckEsdt::Full(CheckEsdtData {
+                    roles,
+                    ..Default::default()
+                }));
+        };
+
+        match &mut self.esdt {
+            CheckEsdtMap::Equal(map) => {
+                insert_check_esdt(map);
+            },
+            _ => {
+                let mut new_map = CheckEsdtMapContents {
+                    contents: BTreeMap::new(),
+                    other_esdts_allowed: true,
+                };
+
+                insert_check_esdt(&mut new_map);
+
+                self.esdt = CheckEsdtMap::Equal(new_map);
+            },
+        };
+
+        self
+    }
+
+    pub fn esdt_nft_last_nonce<K>(mut self, token_id_expr: K, last_nonce: u64) -> Self
+    where
+        BytesKey: From<K>,
+    {
+        let insert_check_esdt = |map: &mut CheckEsdtMapContents| {
+            let token_id = BytesKey::from(token_id_expr);
+
+            map.contents
+                .entry(token_id)
+                .and_modify(|check_esdt| check_esdt.add_last_nonce_check(last_nonce))
+                .or_insert(CheckEsdt::Full(CheckEsdtData {
+                    last_nonce: CheckValue::Equal(last_nonce.into()),
+                    ..Default::default()
+                }));
+        };
+
+        match &mut self.esdt {
+            CheckEsdtMap::Equal(map) => {
+                insert_check_esdt(map);
+            },
+            _ => {
+                let mut new_map = CheckEsdtMapContents {
+                    contents: BTreeMap::new(),
+                    other_esdts_allowed: true,
+                };
+
+                insert_check_esdt(&mut new_map);
+
+                self.esdt = CheckEsdtMap::Equal(new_map);
+            },
+        };
 
         self
     }
@@ -192,7 +265,7 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
     fn into_raw(self) -> CheckAccountRaw {
         CheckAccountRaw {
             comment: self.comment,
-            nonce: self.nonce.into_raw(),
+            nonce: self.nonce.into_raw_explicit(),
             balance: self.balance.into_raw(),
             esdt: self.esdt.into_raw(),
             username: self.username.into_raw(),

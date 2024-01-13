@@ -27,7 +27,7 @@ pub fn async_call_tx_input(async_call: &AsyncCallTxData, call_type: CallType) ->
         func_name: async_call.endpoint_name.clone(),
         args: async_call.arguments.clone(),
         call_type,
-        gas_limit: 1000,
+        gas_limit: u64::MAX,
         gas_price: 0,
         tx_hash: async_call.tx_hash.clone(),
         ..Default::default()
@@ -72,7 +72,8 @@ pub fn async_callback_tx_input(
         func_name: TxFunctionName::CALLBACK,
         args,
         call_type: CallType::AsyncCallback,
-        gas_limit: 1000,
+        gas_limit: u64::MAX,
+
         gas_price: 0,
         tx_hash: async_data.tx_hash.clone(),
         callback_payments,

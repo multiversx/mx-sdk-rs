@@ -151,7 +151,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
             esdt_values: Vec::new(),
             func_name: TxFunctionName::EMPTY,
             args,
-            gas_limit: 1000,
+            gas_limit: u64::MAX,
             gas_price: 0,
             tx_hash,
             ..Default::default()

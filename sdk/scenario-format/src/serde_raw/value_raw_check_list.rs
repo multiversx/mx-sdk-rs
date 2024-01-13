@@ -21,6 +21,10 @@ impl CheckValueListRaw {
     pub fn is_unspecified(&self) -> bool {
         matches!(self, CheckValueListRaw::Unspecified)
     }
+
+    pub fn as_star() -> Self {
+        Self::Star
+    }
 }
 
 impl Serialize for CheckValueListRaw {
