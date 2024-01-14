@@ -1,6 +1,5 @@
 mod blockchain_wrapper;
 mod call_value_wrapper;
-mod callback_args_wrapper;
 mod crypto_wrapper;
 mod error_helper;
 mod send_raw_wrapper;
@@ -10,7 +9,6 @@ mod storage_raw_wrapper;
 
 pub use blockchain_wrapper::BlockchainWrapper;
 pub use call_value_wrapper::CallValueWrapper;
-pub use callback_args_wrapper::CallbackArgApiWrapper;
 pub use crypto_wrapper::CryptoWrapper;
 pub use error_helper::ErrorHelper;
 pub use send_raw_wrapper::SendRawWrapper;

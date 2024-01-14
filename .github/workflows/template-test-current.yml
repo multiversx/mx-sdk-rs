@@ -22,7 +22,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           default: true
-          toolchain: nightly-2023-05-26
+          toolchain: nightly-2023-12-11
           target: wasm32-unknown-unknown
 
       - name: Setup the PATH variable

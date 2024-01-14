@@ -356,10 +356,8 @@ impl BlockchainApiImpl for VmApiImpl {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> multiversx_sc::types::EsdtLocalRoleFlags {
-        unsafe {
-            multiversx_sc::types::EsdtLocalRoleFlags::from_bits_unchecked(getESDTLocalRoles(
-                token_id_handle,
-            ) as u64)
-        }
+        multiversx_sc::types::EsdtLocalRoleFlags::from_bits_retain(unsafe {
+            getESDTLocalRoles(token_id_handle)
+        } as u64)
     }
 }

@@ -19,12 +19,13 @@ opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
+overflow-checks = false
 
 [dependencies.queue-repeat]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.45.1"
+version = "0.46.1"
 path = "../../../../../framework/wasm-adapter"
 
 [workspace]

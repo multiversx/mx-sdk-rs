@@ -1,11 +1,10 @@
 use crate::model::EsdtAttribute;
-use proc_macro2::TokenTree;
 
 pub(super) fn is_attribute_with_no_args(attr: &syn::Attribute, name: &str) -> bool {
-    if let Some(first_seg) = attr.path.segments.first() {
+    if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == name {
             assert!(
-                attr.path.segments.len() == 1,
+                attr.path().segments.len() == 1,
                 "no arguments allowed for attribute `{name}`"
             );
             return true;
@@ -19,51 +18,56 @@ pub(super) fn get_attribute_with_one_type_arg(
     attr: &syn::Attribute,
     name: &str,
 ) -> Option<EsdtAttribute> {
-    let attr_path = &attr.path;
+    let attr_path = &attr.path();
     if let Some(first_seg) = attr_path.segments.first() {
         if first_seg.ident == name {
-            let mut tokens = attr.tokens.clone().into_iter();
-            let group = match tokens.next() {
-                Some(TokenTree::Group(group_val)) => group_val,
-                _ => panic!("Expected a group as attribute argument"),
+            let (ticker, ty) = match attr.meta.clone() {
+                syn::Meta::Path(_) => {
+                    panic!("attribute needs 2 arguments: ticker (string) and type")
+                },
+                syn::Meta::List(list) => {
+                    assert!(!list.tokens.is_empty(), "argument can not be empty. attribute needs 2 arguments: ticker (string) and type");
+
+                    let mut iter = list.tokens.into_iter();
+
+                    let first_literal = match iter.next() {
+                        Some(proc_macro2::TokenTree::Literal(literal)) => literal.to_string(),
+                        _ => {
+                            panic!("expected a string as the first token in the attribute argument")
+                        },
+                    };
+
+                    let ticker = first_literal.trim_matches('\"').to_string();
+
+                    let _ = match iter.next() {
+                        Some(proc_macro2::TokenTree::Punct(punct)) => punct,
+                        _ => panic!("expected a punctuation token after the first literal"),
+                    };
+
+                    let mut ty = proc_macro2::TokenStream::new();
+
+                    for token in &mut iter {
+                        match token {
+                            proc_macro2::TokenTree::Punct(punct) => {
+                                ty.extend(quote! { #punct });
+                            },
+                            proc_macro2::TokenTree::Ident(ident) => {
+                                ty.extend(quote! { #ident });
+                            },
+                            _ => break,
+                        }
+                    }
+
+                    if ticker.trim().is_empty() {
+                        panic!("ticker field can't be empty");
+                    }
+
+                    (ticker, ty)
+                },
+                syn::Meta::NameValue(_) => panic!("arguments can not be name value"),
             };
 
-            let mut iter = group.stream().into_iter();
-
-            let first_literal = match iter.next() {
-                Some(TokenTree::Literal(literal)) => literal.to_string(),
-                _ => panic!("Expected a literal as the first token in the attribute argument"),
-            };
-
-            let symbol = first_literal.trim_matches('\"').to_string();
-
-            let _ = match iter.next() {
-                Some(TokenTree::Punct(punct)) => punct,
-                _ => panic!("Expected a punctuation token after the literal"),
-            };
-
-            let mut chosen_type = proc_macro2::TokenStream::new();
-
-            for token in &mut iter {
-                match token {
-                    TokenTree::Punct(punct) => {
-                        chosen_type.extend(quote! { #punct });
-                    },
-                    TokenTree::Ident(ident) => {
-                        chosen_type.extend(quote! { #ident });
-                    },
-                    _ => break,
-                }
-            }
-
-            if symbol.is_empty() {
-                panic!("Ticker field can't be empty");
-            }
-
-            let esdt_attribute = EsdtAttribute {
-                ticker: symbol,
-                ty: chosen_type,
-            };
+            let esdt_attribute = EsdtAttribute { ticker, ty };
 
             return Some(esdt_attribute);
         }
@@ -73,41 +77,55 @@ pub(super) fn get_attribute_with_one_type_arg(
 }
 
 pub(super) fn attr_one_string_arg(attr: &syn::Attribute) -> String {
-    let result_str: String;
-    let mut iter = attr.clone().tokens.into_iter();
-    match iter.next() {
-        Some(proc_macro2::TokenTree::Group(group)) => {
-            assert!(
-                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
-                "annotation paranthesis expected (check events and storage)"
-            );
-            let mut iter2 = group.stream().into_iter();
-            match iter2.next() {
-                Some(proc_macro2::TokenTree::Literal(lit)) => {
-                    let str_val = lit.to_string();
-                    assert!(
-                        str_val.starts_with('\"') && str_val.ends_with('\"'),
-                        "string literal expected as attribute argument (check events and storage)"
-                    );
-                    let substr = &str_val[1..str_val.len() - 1];
-                    result_str = substr.to_string();
-                },
-                _ => panic!("literal expected as annotation identifier (check events and storage)"),
+    match attr.meta.clone() {
+        syn::Meta::Path(path) => {
+            let mut iter = path.segments.into_iter();
+            match iter.next() {
+                Some(syn::PathSegment {
+                    ident: _,
+                    arguments: syn::PathArguments::None,
+                }) => String::new(),
+                Some(_) => panic!("unexpected attribute argument tokens"),
+                None => panic!("unexpected attribute argument tokens"),
             }
         },
-        _ => panic!("missing annotation identifier (check events and storage)"),
+        syn::Meta::List(list) => {
+            assert!(
+                list.delimiter == syn::MacroDelimiter::Paren(syn::token::Paren::default()),
+                "attribute paranthesis expected"
+            );
+
+            assert!(
+                !list.tokens.is_empty(),
+                "attribute needs to have at least one argument"
+            );
+
+            let mut iter = list.tokens.into_iter();
+            let arg_token_tree = match iter.next() {
+                Some(proc_macro2::TokenTree::Literal(literal)) => {
+                    assert!(
+                        !literal.to_string().trim_matches('"').trim().is_empty(),
+                        "the argument can not be an empty string or whitespace"
+                    );
+                    literal.to_string().trim_matches('\"').to_string()
+                },
+                Some(_) => {
+                    panic!("unexpected attribute argument tokens: attribute has to be a string")
+                },
+                None => panic!("attribute needs to have at least one argument"),
+            };
+
+            assert!(iter.next().is_none(), "too many tokens in attribute");
+            arg_token_tree
+        },
+        syn::Meta::NameValue(_) => {
+            panic!("unexpected attribute argument tokens: argument can not be name value")
+        },
     }
-
-    assert!(
-        iter.next().is_none(),
-        "too many tokens in attribute (check events and storage)"
-    );
-
-    result_str
 }
 
 pub(super) fn is_attr_one_string_arg(attr: &syn::Attribute, attr_name: &str) -> Option<String> {
-    if let Some(first_seg) = attr.path.segments.first() {
+    if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == attr_name {
             Some(attr_one_string_arg(attr))
         } else {
@@ -119,26 +137,45 @@ pub(super) fn is_attr_one_string_arg(attr: &syn::Attribute, attr_name: &str) -> 
 }
 
 fn attr_one_opt_token_tree_arg(attr: &syn::Attribute) -> Option<proc_macro2::TokenTree> {
-    let mut iter = attr.clone().tokens.into_iter();
-    let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
-        Some(proc_macro2::TokenTree::Group(group)) => {
+    match attr.clone().meta {
+        syn::Meta::Path(val) => {
+            let mut iter = val.segments.into_iter();
+            let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
+                Some(syn::PathSegment {
+                    ident: _,
+                    arguments: syn::PathArguments::None,
+                }) => None,
+                Some(_) => panic!("unexpected attribute argument tokens"),
+                None => None,
+            };
+
+            arg_token_tree
+        },
+        syn::Meta::List(val) => {
             assert!(
-                group.delimiter() == proc_macro2::Delimiter::Parenthesis,
+                val.delimiter == syn::MacroDelimiter::Paren(syn::token::Paren::default()),
                 "attribute paranthesis expected"
             );
-            let mut iter2 = group.stream().into_iter();
-            match iter2.next() {
-                Some(token_tree) => Some(token_tree),
-                _ => panic!("attribute argument expected"),
-            }
+
+            assert!(
+                !val.tokens.is_empty(),
+                "attribute needs to have at least one argument"
+            );
+
+            let mut iter = val.tokens.into_iter();
+            let arg_token_tree: Option<proc_macro2::TokenTree> = match iter.next() {
+                Some(proc_macro2::TokenTree::Ident(ident)) => {
+                    Some(proc_macro2::TokenTree::Ident(ident))
+                },
+                Some(_) => panic!("unexpected attribute argument tokens"),
+                None => None,
+            };
+
+            assert!(iter.next().is_none(), "too many tokens in attribute");
+            arg_token_tree
         },
-        Some(_) => panic!("unexpected attribute argument tokens"),
-        None => None,
-    };
-
-    assert!(iter.next().is_none(), "too many tokens in attribute");
-
-    arg_token_tree
+        syn::Meta::NameValue(_) => panic!("unexpected attribute argument tokens"),
+    }
 }
 
 /// Finds a method attribute with given name and 1 single optional argument.
@@ -147,7 +184,7 @@ pub(super) fn is_attr_with_one_opt_token_tree_arg(
     attr: &syn::Attribute,
     attr_name: &str,
 ) -> Option<Option<proc_macro2::TokenTree>> {
-    if let Some(first_seg) = attr.path.segments.first() {
+    if let Some(first_seg) = attr.path().segments.first() {
         if first_seg.ident == attr_name {
             Some(attr_one_opt_token_tree_arg(attr))
         } else {

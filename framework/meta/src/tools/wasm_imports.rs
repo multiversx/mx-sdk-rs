@@ -21,5 +21,7 @@ fn parse_wasm_imports(wasm_data: Vec<u8>) -> Result<Vec<String>, BinaryReaderErr
         }
     }
 
+    import_names.sort();
+
     Ok(import_names)
 }

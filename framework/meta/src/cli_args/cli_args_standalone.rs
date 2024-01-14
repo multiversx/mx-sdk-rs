@@ -185,6 +185,10 @@ pub struct UpgradeArgs {
     /// By default it will be the last version out.
     #[arg(long = "to", verbatim_doc_comment)]
     pub override_target_version: Option<String>,
+
+    /// Skips 'cargo check' after upgrade
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub no_check: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
