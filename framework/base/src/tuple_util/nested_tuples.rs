@@ -83,7 +83,7 @@ macro_rules! unnest {
 macro_rules! flatten_impl {
     ($(($t:ident $($ts:ident)+))+) => {
         $(
-            impl<$t,$($ts),+> Flatten for tuple_list_type!($t,$($ts),+) {
+            impl<$t,$($ts),+> NestedTupleFlatten for tuple_list_type!($t,$($ts),+) {
                 type Flattened = ($t,$($ts),+);
                 type Unpacked = ($t,$($ts),+);
 
