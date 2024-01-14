@@ -12,7 +12,7 @@ use crate::{
     types::{EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, MultiValueEncoded},
 };
 
-use super::{ContractCallNoPayment, ManagedArgBuffer};
+use super::{ContractCallNoPayment, ManagedArgBuffer, TypedFunctionCall};
 
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
@@ -57,6 +57,18 @@ where
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
         self.arg_buffer.push_multi_arg(arg);
         self
+    }
+
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Api>) -> Self {
+        self.arg_buffer = raw;
+        self
+    }
+
+    pub fn typed_result<R>(self) -> TypedFunctionCall<Api, R>
+    where
+        R: TopEncodeMulti + TopDecodeMulti,
+    {
+        self.into()
     }
 }
 

@@ -215,7 +215,7 @@ where
     }
 }
 
-fn decode_result<SA, RequestedResult>(
+pub(super) fn decode_result<SA, RequestedResult>(
     raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
 ) -> RequestedResult
 where

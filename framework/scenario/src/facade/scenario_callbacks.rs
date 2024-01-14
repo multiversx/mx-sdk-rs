@@ -8,7 +8,13 @@ pub struct WithTxResult<F>(pub F)
 where
     F: FnOnce(&TxResponse);
 
-impl<F> TxResultHandler<ScenarioTxEnvironment> for WithTxResult<F> where F: FnOnce(&TxResponse) {}
+impl<F> TxResultHandler<ScenarioTxEnvironment> for WithTxResult<F>
+where
+    F: FnOnce(&TxResponse),
+{
+    type OriginalResult = ();
+}
+
 impl<F> TxRunnableCallback<ScenarioTxEnvironment> for WithTxResult<F>
 where
     F: FnOnce(&TxResponse),

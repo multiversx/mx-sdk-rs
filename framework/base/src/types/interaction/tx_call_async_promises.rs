@@ -5,8 +5,8 @@ use crate::{
 };
 
 use super::{
-    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, Tx, TxResultHandler, TxGas,
-    TxPayment, TxScEnv, TxToSpecified,
+    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, Tx, TxGas, TxPayment,
+    TxResultHandler, TxScEnv, TxToSpecified,
 };
 
 pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -37,7 +37,13 @@ where
     }
 }
 
-impl<Api> TxResultHandler<TxScEnv<Api>> for CallbackClosureWithGas<Api> where Api: CallTypeApi {}
+impl<Api> TxResultHandler<TxScEnv<Api>> for CallbackClosureWithGas<Api>
+where
+    Api: CallTypeApi,
+{
+    type OriginalResult = ();
+}
+
 impl<Api> TxPromisesCallback<Api> for CallbackClosureWithGas<Api>
 where
     Api: CallTypeApi,

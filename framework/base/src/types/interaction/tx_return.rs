@@ -4,47 +4,34 @@ use crate::{
     types::{ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
 };
 
-use super::{FunctionCall, TxEnv, TxResultHandler};
+use super::{FunctionCall, ReturnTypeMarker, TxEnv, TxResultHandler};
 
 pub trait TxReturn<Env>: TxResultHandler<Env>
 where
     Env: TxEnv,
 {
-    type Returned;
-
-    fn sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returned;
+    type Returns;
 }
 
 impl<Env> TxReturn<Env> for ()
 where
     Env: TxEnv,
 {
-    type Returned = ();
-
-    fn sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returned {
-    }
+    type Returns = ();
 }
 
-pub struct ReturnRaw;
-
-impl<Env> TxResultHandler<Env> for ReturnRaw where Env: TxEnv {}
-
-impl<Env> TxReturn<Env> for ReturnRaw
+impl<Env, OriginalResult> TxReturn<Env> for ReturnTypeMarker<OriginalResult>
 where
     Env: TxEnv,
 {
-    type Returned = ManagedVec<Env::Api, ManagedBuffer<Env::Api>>;
-
-    fn sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returned {
-        raw_results.clone()
-    }
+    type Returns = ();
 }
+
+// impl<Env, Head, Tail> TxReturn<Env> for (Head, Tail)
+// where
+//     Env: TxEnv,
+//     Head: TxReturn<Env>,
+//     Tail: TxReturn<Env, Returns = ()>,
+// {
+//     type Returns = Head::Returns;
+// }

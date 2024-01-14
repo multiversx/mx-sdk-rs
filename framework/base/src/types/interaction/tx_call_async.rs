@@ -22,7 +22,12 @@ where
     fn save_callback_closure_to_storage(&self) {}
 }
 
-impl<Api> TxResultHandler<TxScEnv<Api>> for CallbackClosure<Api> where Api: CallTypeApi {}
+impl<Api> TxResultHandler<TxScEnv<Api>> for CallbackClosure<Api>
+where
+    Api: CallTypeApi,
+{
+    type OriginalResult = ();
+}
 
 impl<Api> TxAsyncCallCallback<Api> for CallbackClosure<Api>
 where
@@ -33,7 +38,13 @@ where
     }
 }
 
-impl<Api> TxResultHandler<TxScEnv<Api>> for Option<CallbackClosure<Api>> where Api: CallTypeApi {}
+impl<Api> TxResultHandler<TxScEnv<Api>> for Option<CallbackClosure<Api>>
+where
+    Api: CallTypeApi,
+{
+    type OriginalResult = ();
+}
+
 impl<Api> TxAsyncCallCallback<Api> for Option<CallbackClosure<Api>>
 where
     Api: CallTypeApi + StorageWriteApi,

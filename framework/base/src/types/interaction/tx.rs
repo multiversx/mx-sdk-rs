@@ -12,8 +12,10 @@ use crate::{
 };
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, TxResultHandler, TxData, TxDataFunctionCall, TxEnv, TxFrom,
-    TxFromSpecified, TxGas, TxPayment, TxScEnv, TxTo, TxToSpecified,
+    AsyncCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, ReturnTypeMarker, TxData, TxDataFunctionCall,
+    TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxResultHandler, TxReturn, TxScEnv, TxTo,
+    TxToSpecified,
 };
 
 #[must_use]
@@ -134,9 +136,7 @@ where
         }
     }
 
-    pub fn to_caller(
-        self,
-    ) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data, RH> {
+    pub fn to_caller(self) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data, RH> {
         let caller = BlockchainWrapper::<Env::Api>::new().get_caller();
         self.to(caller)
     }
@@ -211,8 +211,7 @@ where
     }
 }
 
-impl<Env, From, To, Gas, Data, RH>
-    Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data, RH>
+impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -243,8 +242,7 @@ where
     }
 }
 
-impl<Env, From, To, Gas, Data, RH>
-    Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
+impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -292,20 +290,19 @@ where
     }
 }
 
-impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
+impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, (), ()>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
-    RH: TxResultHandler<Env>,
 {
     #[inline]
     pub fn call<FC: Into<FunctionCall<Env::Api>>>(
         self,
         call: FC,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, ()> {
         Tx {
             env: self.env,
             from: self.from,
@@ -313,7 +310,7 @@ where
             payment: self.payment,
             gas: self.gas,
             data: call.into(),
-            result_handler: self.result_handler,
+            result_handler: (),
         }
     }
 
@@ -321,7 +318,7 @@ where
     pub fn function_name<N: Into<ManagedBuffer<Env::Api>>>(
         self,
         function_name: N,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, ()> {
         Tx {
             env: self.env,
             from: self.from,
@@ -329,13 +326,12 @@ where
             payment: self.payment,
             gas: self.gas,
             data: FunctionCall::new(function_name),
-            result_handler: self.result_handler,
+            result_handler: (),
         }
     }
 }
 
-impl<Env, From, To, Payment, Gas, RH>
-    Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -347,6 +343,12 @@ where
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
         self.data = self.data.argument(arg);
+        self
+    }
+
+    #[inline]
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
+        self.data.arg_buffer = raw;
         self
     }
 }
@@ -361,10 +363,84 @@ where
     Data: TxData<Env>,
 {
     #[inline]
-    pub fn callback<RH>(
+    pub fn original_result<OriginalResult>(
         self,
-        callback: RH,
-    ) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    ) -> Tx<Env, From, To, Payment, Gas, Data, OriginalResultMarker<OriginalResult>> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: OriginalResultMarker::new(),
+        }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, ResultList>
+    Tx<Env, From, To, Payment, Gas, Data, ResultList>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+    ResultList: RHList<Env>,
+{
+    #[inline]
+    pub fn result_handler<RH>(
+        self,
+        item: RH,
+    ) -> Tx<Env, From, To, Payment, Gas, Data, ResultList::NoRetOutput>
+    where
+        RH: RHListItem<Env, ResultList::OriginalResult, Returns = ()>,
+        ResultList: RHListAppendNoRet<Env, RH>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler.append_no_ret(item),
+        }
+    }
+
+    #[inline]
+    pub fn returns<RH>(
+        self,
+        item: RH,
+    ) -> Tx<Env, From, To, Payment, Gas, Data, ResultList::RetOutput>
+    where
+        RH: RHListItem<Env, ResultList::OriginalResult>,
+        ResultList: RHListAppendRet<Env, RH>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler.append_ret(item),
+        }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data> Tx<Env, From, To, Payment, Gas, Data, ()>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+{
+    #[inline]
+    pub fn callback<RH>(self, callback: RH) -> Tx<Env, From, To, Payment, Gas, Data, RH>
     where
         RH: TxResultHandler<Env>,
     {
