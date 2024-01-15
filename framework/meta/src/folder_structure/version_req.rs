@@ -25,7 +25,7 @@ impl VersionReq {
 
     pub fn into_string(self) -> String {
         if self.is_strict {
-            format!("={}", self.semver.version.to_string())
+            format!("={}", self.semver.version)
         } else {
             self.semver.version.to_string()
         }

@@ -14,8 +14,8 @@ pub fn print_upgrading(dir: &RelevantDirectory) {
             "\n{}",
             format!(
                 "Upgrading from {} to {} in {}\n",
-                from_version.version.to_string(),
-                to_version.version.to_string(),
+                from_version.version,
+                to_version.version,
                 dir.path.display(),
             )
             .purple()
@@ -29,8 +29,8 @@ pub fn print_post_processing(dir: &RelevantDirectory) {
             "\n{}",
             format!(
                 "Post-processing after upgrade from {} to {} in {}\n",
-                from_version.version.to_string(),
-                to_version.version.to_string(),
+                from_version.version,
+                to_version.version,
                 dir.path.display(),
             )
             .purple()
@@ -113,7 +113,7 @@ pub fn print_cargo_check(dir: &RelevantDirectory) {
         "\n{}",
         format!(
             "Running cargo check after upgrading to version {} in {}\n",
-            dir.version.semver.version.to_string(),
+            dir.version.semver.version,
             dir.path.display(),
         )
         .purple()

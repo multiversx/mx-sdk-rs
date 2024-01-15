@@ -133,7 +133,7 @@ pub mod tests {
         let f1: FrameworkVersion = framework_version!(0.44.0);
         let f2: FrameworkVersion = framework_version!(0.41.2);
 
-        assert_eq!(true, f1 > f2);
+        assert!(f1 > f2);
     }
 
     #[test]
@@ -168,12 +168,12 @@ pub mod tests {
         let version = find_version_by_str("0.28.0");
         match version {
             Some(v) => assert_eq!(VERSIONS[0], *v),
-            None => assert!(false),
+            None => unreachable!(),
         }
-    }    
-    
+    }
+
     #[test]
     fn framework_version_test() {
-        assert_eq!(is_sorted(VERSIONS), true);
+        assert!(is_sorted(VERSIONS));
     }
 }

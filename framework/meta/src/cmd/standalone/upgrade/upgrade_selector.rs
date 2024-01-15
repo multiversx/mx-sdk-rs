@@ -38,7 +38,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
     assert!(
         VERSIONS.contains(&last_version),
         "Invalid requested version: {}",
-        last_version.version.to_string(),
+        last_version.version,
     );
 
     let mut dirs = RelevantDirectories::find_all(path, args.ignore.as_slice());
