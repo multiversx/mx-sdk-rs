@@ -1,16 +1,6 @@
-use core::marker::PhantomData;
+use crate::api::CallTypeApi;
 
-use crate::{
-    api::{BlockchainApiImpl, CallTypeApi},
-    contract_base::BlockchainWrapper,
-    types::{ManagedAddress, ManagedBuffer},
-};
-
-use super::{
-    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, AnnotatedValue, AsyncCall, ExplicitGas,
-    FunctionCall, Tx, TxBaseWithEnv, TxData, TxEnv, TxFrom, TxGas, TxPayment, TxScEnv,
-    TxToSpecified,
-};
+use super::{FunctionCall, Tx, TxData, TxFrom, TxGas, TxPayment, TxScEnv, TxToSpecified};
 
 impl<Api, From, To, Payment, Gas, FC> Tx<TxScEnv<Api>, From, To, Payment, Gas, FC, ()>
 where

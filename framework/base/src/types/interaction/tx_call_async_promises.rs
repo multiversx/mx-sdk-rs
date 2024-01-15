@@ -1,7 +1,7 @@
 use crate::{
     api::{const_handles, CallTypeApi},
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedBuffer, ManagedType},
+    types::{CallbackClosure, ManagedBuffer, ManagedType},
 };
 
 use super::{

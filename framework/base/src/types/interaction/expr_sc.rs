@@ -1,9 +1,6 @@
 use core::ptr;
 
-use crate::{
-    api::CallTypeApi,
-    types::{ManagedAddress, ManagedBuffer},
-};
+use crate::types::{ManagedAddress, ManagedBuffer};
 
 use super::{AnnotatedValue, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified};
 

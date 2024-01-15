@@ -1,12 +1,8 @@
 use core::marker::PhantomData;
 
-use crate::{
-    abi::{TypeAbi, TypeName},
-    api::{CallTypeApi, ManagedTypeApi},
-    types::{EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, MultiValueEncoded},
-};
+use crate::api::ManagedTypeApi;
 
-use super::{ContractCallNoPayment, FunctionCall, ManagedArgBuffer};
+use super::FunctionCall;
 
 /// Encodes a function call on the blockchain, together with the original result type.
 ///

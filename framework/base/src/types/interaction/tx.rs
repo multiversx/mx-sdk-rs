@@ -1,9 +1,6 @@
-use core::marker::PhantomData;
-
 use multiversx_sc_codec::TopEncodeMulti;
 
 use crate::{
-    api::CallTypeApi,
     contract_base::BlockchainWrapper,
     types::{
         BigUint, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
@@ -12,10 +9,9 @@ use crate::{
 };
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, ReturnTypeMarker, TxData, TxDataFunctionCall,
-    TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxResultHandler, TxReturn, TxScEnv, TxTo,
-    TxToSpecified,
+    ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
+    RHListAppendRet, RHListItem, TxData, TxDataFunctionCall, TxEnv, TxFrom, TxFromSpecified, TxGas,
+    TxPayment, TxResultHandler, TxTo, TxToSpecified,
 };
 
 #[must_use]

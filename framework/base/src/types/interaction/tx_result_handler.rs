@@ -1,10 +1,4 @@
-use crate::{
-    api::ManagedTypeApi,
-    formatter::SCLowerHex,
-    types::{ManagedBuffer, ManagedBufferCachedBuilder},
-};
-
-use super::{FunctionCall, TxEnv};
+use super::TxEnv;
 
 pub trait TxResultHandler<Env>
 where

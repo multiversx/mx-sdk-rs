@@ -1,12 +1,10 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress},
+    types::CallbackClosure,
 };
 
-use super::{
-    FunctionCall, Tx, TxDataFunctionCall, TxEnv, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
-};
+use super::{Tx, TxDataFunctionCall, TxPayment, TxResultHandler, TxScEnv, TxToSpecified};
 
 pub trait TxAsyncCallCallback<Api>: TxResultHandler<TxScEnv<Api>>
 where

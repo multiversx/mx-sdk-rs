@@ -1,14 +1,13 @@
 use crate::{
-    api::{CallTypeApi, StorageWriteApi},
+    api::CallTypeApi,
     contract_base::SendRawWrapper,
     tuple_util::NestedTupleFlatten,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedBuffer, ManagedVec},
+    types::{ManagedBuffer, ManagedVec},
 };
 
 use super::{
-    ConsNoRet, ConsRet, FunctionCall, OriginalResultMarker, RHList, RHListItem, Tx,
-    TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxResultHandler, TxReturn, TxReturnSync, TxScEnv,
-    TxToSpecified,
+    ConsNoRet, ConsRet, OriginalResultMarker, RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv,
+    TxGas, TxPayment, TxScEnv, TxToSpecified,
 };
 
 pub trait RHListItemSync<Env, Original>: RHListItem<Env, Original>
@@ -37,7 +36,7 @@ where
 {
     fn list_sync_call_result(
         self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> Self::ListReturns {
     }
 }
@@ -48,7 +47,7 @@ where
 {
     fn list_sync_call_result(
         self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> Self::ListReturns {
     }
 }

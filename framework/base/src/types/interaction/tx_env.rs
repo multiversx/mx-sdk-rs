@@ -1,9 +1,4 @@
-use core::marker::PhantomData;
-
-use crate::{
-    api::CallTypeApi,
-    types::{ManagedAddress, ManagedBuffer},
-};
+use crate::{api::CallTypeApi, types::ManagedAddress};
 
 use super::AnnotatedValue;
 
