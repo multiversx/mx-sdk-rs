@@ -24,7 +24,7 @@ pub trait CallPromisesDirectModule {
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_callback(self.callbacks().the_one_callback(1001, 1002))
+            .with_callback(self.callbacks().the_one_callback(1001, 1002u32.into()))
             .register_promise();
     }
 
@@ -49,7 +49,7 @@ pub trait CallPromisesDirectModule {
             .with_gas_limit(gas_limit)
             .async_call_promise()
             .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_callback(self.callbacks().the_one_callback(2001, 2002))
+            .with_callback(self.callbacks().the_one_callback(2001, 2002u32.into()))
             .register_promise();
     }
 
@@ -58,7 +58,7 @@ pub trait CallPromisesDirectModule {
         &self,
         #[call_result] result: MultiValueEncoded<ManagedBuffer>,
         arg1: usize,
-        arg2: usize,
+        arg2: BigUint,
     ) {
         self.async_call_event_callback(arg1, arg2, &result.into_vec_of_buffers());
     }
@@ -67,7 +67,7 @@ pub trait CallPromisesDirectModule {
     fn async_call_event_callback(
         &self,
         #[indexed] arg1: usize,
-        #[indexed] arg2: usize,
+        #[indexed] arg2: BigUint,
         arguments: &ManagedVec<Self::Api, ManagedBuffer>,
     );
 }

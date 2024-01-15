@@ -1,4 +1,4 @@
-use super::{oc_validate::validate_contract_variant, ContractVariant};
+use super::{contract_variant_validate::validate_contract_variant, ContractVariant};
 
 /// Allowed file names for the SC config.
 ///

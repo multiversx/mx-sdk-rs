@@ -25,11 +25,12 @@ impl FrameworkVersion {
         FrameworkVersion::new(major, minor, patch)
     }
 
-    pub fn from_string_template(version_str: &str) -> Self {
+    pub fn from_string_template(version_str: &str) -> Self {        
         let version_arr: Vec<&str> = version_str.split('.').collect();
+
         let major: u64 = version_arr[0].parse().unwrap();
-        let minor: u64 = version_arr[0].parse().unwrap();
-        let patch: u64 = version_arr[0].parse().unwrap();
+        let minor: u64 = version_arr[1].parse().unwrap();
+        let patch: u64 = version_arr[2].parse().unwrap();
 
         FrameworkVersion::new(major, minor, patch)
     }
@@ -62,7 +63,7 @@ pub fn is_sorted(versions: &[FrameworkVersion]) -> bool {
 #[macro_export]
 macro_rules! framework_version {
     ($arg:expr) => {
-        FrameworkVersion::from_triple(multiversx_sc::derive::version_triple!($arg))
+        FrameworkVersion::from_triple(multiversx_sc::derive::format_version!($arg))
     };
 }
 

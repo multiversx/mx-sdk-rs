@@ -5,6 +5,7 @@ on:
     branches:
       - master
   pull_request:
+  workflow_dispatch:
 
 permissions:
   checks: write
@@ -13,7 +14,7 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v2.3.3
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v2.3.5
     with:
       rust-toolchain: nightly-2023-12-11
       vmtools-version: v1.5.19

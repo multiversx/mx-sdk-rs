@@ -31,7 +31,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
                 .iter()
                 .find(|v| v.version.to_string() == override_target_v)
                 .cloned()
-                .unwrap_or_else(|| LAST_UPGRADE_VERSION)
+                .unwrap_or(LAST_UPGRADE_VERSION)
         })
         .unwrap_or_else(|| LAST_UPGRADE_VERSION);
 
@@ -51,14 +51,14 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         print_tree_dir_metadata(dir, &last_version)
     });
 
-    for (from_version, to_version) in versions_iter(last_version.clone()) {
+    for (from_version, to_version) in versions_iter(last_version) {
         if dirs.count_for_version(from_version) == 0 {
             continue;
         }
 
         print_upgrading_all(
             from_version.version.to_string().as_str(),
-            &to_version.version.to_string().as_str(),
+            to_version.version.to_string().as_str(),
         );
         dirs.start_upgrade(from_version, to_version);
         for dir in dirs.iter_version(from_version) {
@@ -69,8 +69,6 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
             upgrade_post_processing(dir, &settings);
         }
 
-        // // change the version in memory for the next iteration (dirs is not reloaded from disk)
-        // dirs.update_versions_in_memory(from_version, to_version);
         dirs.finish_upgrade();
     }
 }
@@ -80,35 +78,32 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
         print_upgrading(dir);
     }
 
-    match dir.upgrade_in_progress {
-        Some((from_version, to_version)) => match to_version.version.to_string().as_str() {
+    if let Some((from_version, to_version)) = dir.upgrade_in_progress {
+        match to_version.version.to_string().as_str() {
             "0.31.0" => upgrade_to_31_0(dir),
             "0.32.0" => upgrade_to_32_0(dir),
             "0.39.0" => upgrade_to_39_0(dir),
             "0.45.0" => upgrade_to_45_0(dir),
             _ => version_bump_in_cargo_toml(&dir.path, from_version, to_version),
-        },
-        None => {},
+        }
     }
 }
 
 fn upgrade_post_processing(dir: &RelevantDirectory, settings: &UpgradeSettings) {
-    match dir.upgrade_in_progress {
-        Some((_, to_version)) => {
-            if [
-                "0.28.0", "0.29.0", "0.30.0", "0.31.0", "0.32.0", "0.33.0", "0.34.0", "0.35.0",
-                "0.36.0", "0.37.0", "0.40.0", "0.41.0", "0.42.0", "0.43.0", "0.44.0", "0.45.2",
-            ]
-            .contains(&to_version.version.to_string().as_str())
-            {
-                print_post_processing(dir);
-                cargo_check(dir, settings);
-            } else if to_version.version.to_string().as_str() == "0.39.0" {
-                print_post_processing(dir);
-                postprocessing_after_39_0(dir);
-                cargo_check(dir, settings);
-            }
-        },
-        _ => {},
+    if let Some((_, to_version)) = dir.upgrade_in_progress {
+        if [
+            "0.28.0", "0.29.0", "0.30.0", "0.31.0", "0.32.0", "0.33.0", "0.34.0", "0.35.0",
+            "0.36.0", "0.37.0", "0.40.0", "0.41.0", "0.42.0", "0.43.0", "0.44.0", "0.45.2",
+            "0.46.0",
+        ]
+        .contains(&to_version.version.to_string().as_str())
+        {
+            print_post_processing(dir);
+            cargo_check(dir, settings);
+        } else if to_version.version.to_string().as_str() == "0.39.0" {
+            print_post_processing(dir);
+            postprocessing_after_39_0(dir);
+            cargo_check(dir, settings);
+        }
     }
 }
