@@ -17,7 +17,6 @@ use crate::{
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
-use codec::{NestedDecode, NestedEncode};
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
@@ -37,13 +36,6 @@ pub struct QueueMapperInfo {
     pub back: u32,
     pub new: u32,
 }
-impl NestedEncode for Node {}
-
-impl NestedDecode for Node {}
-
-impl NestedEncode for QueueMapperInfo {}
-
-impl NestedDecode for QueueMapperInfo {}
 
 impl EncodeDefault for QueueMapperInfo {
     fn is_default(&self) -> bool {
@@ -77,7 +69,7 @@ pub struct QueueMapper<SA, T, A = StorageSCAddress>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
@@ -88,7 +80,7 @@ where
 impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode,
 {
     fn new(base_key: StorageKey<SA>) -> Self {
         QueueMapper {
@@ -103,7 +95,7 @@ where
 impl<SA, T> StorageClearable for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode,
 {
     fn clear(&mut self) {
         let info = self.get_info();
@@ -121,7 +113,7 @@ where
 impl<SA, T> QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -423,7 +415,7 @@ where
 impl<SA, T> QueueMapper<SA, T, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
         let mut named_key = self.base_key.clone();
@@ -579,7 +571,7 @@ where
 impl<'a, SA, T> IntoIterator for &'a QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
 
@@ -597,7 +589,7 @@ where
 pub struct Iter<'a, SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + 'static,
 {
     node_id: u32,
     queue: &'a QueueMapper<SA, T, StorageSCAddress>,
@@ -606,7 +598,7 @@ where
 impl<'a, SA, T> Iter<'a, SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + 'static,
 {
     fn new(queue: &'a QueueMapper<SA, T, StorageSCAddress>) -> Iter<'a, SA, T> {
         Iter {
@@ -619,7 +611,7 @@ where
 impl<'a, SA, T> Iterator for Iter<'a, SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
 
@@ -638,7 +630,7 @@ where
 impl<SA, T> TopEncodeMulti for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -652,7 +644,7 @@ where
 impl<SA, T> CodecFrom<QueueMapper<SA, T, StorageSCAddress>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    T: TopEncode + TopDecode,
 {
 }
 
@@ -660,7 +652,7 @@ where
 impl<SA, T> TypeAbi for QueueMapper<SA, T, StorageSCAddress>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+    T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()

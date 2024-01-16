@@ -7,7 +7,8 @@ use super::{
 use crate::{
     api::StorageMapperApi,
     codec::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    storage::{self, StorageKey}, types::ManagedAddress,
+    storage::{self, StorageKey},
+    types::ManagedAddress,
 };
 
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
@@ -212,8 +213,6 @@ where
             })
         }
     }
-
-    
 }
 
 impl<'a, SA, K, V> IntoIterator for &'a MapStorageMapper<SA, K, V, StorageSCAddress>
@@ -293,7 +292,9 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: StorageMapper<SA> + StorageClearable,
 {
-    fn new(hash_map: &'a MapStorageMapper<SA, K, V, StorageSCAddress>) -> Values<'a, SA, StorageSCAddress, K, V> {
+    fn new(
+        hash_map: &'a MapStorageMapper<SA, K, V, StorageSCAddress>,
+    ) -> Values<'a, SA, StorageSCAddress, K, V> {
         Values {
             key_iter: hash_map.keys(),
             hash_map,

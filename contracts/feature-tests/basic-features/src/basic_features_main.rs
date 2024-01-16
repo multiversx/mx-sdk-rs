@@ -23,6 +23,7 @@ pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_address_to_id;
 pub mod storage_mapper_fungible_token;
+pub mod storage_mapper_get_at_address;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
@@ -38,7 +39,6 @@ pub mod storage_raw_api_features;
 pub mod struct_eq;
 pub mod token_identifier_features;
 pub mod types;
-pub mod storage_mapper_get_at_address;
 
 #[multiversx_sc::contract]
 pub trait BasicFeatures:
