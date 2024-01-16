@@ -94,7 +94,7 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
 
 fn upgrade_post_processing(dir: &RelevantDirectory, settings: &UpgradeSettings) {
     if let Some((_, to_version)) = &dir.upgrade_in_progress {
-        if CHECK_AFTER_UPGRADE_TO.contains(&to_version) {
+        if CHECK_AFTER_UPGRADE_TO.contains(to_version) {
             print_post_processing(dir);
             cargo_check(dir, settings);
         } else if framework_version!(0.39.0) == *to_version {
