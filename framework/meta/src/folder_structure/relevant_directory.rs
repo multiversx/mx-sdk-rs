@@ -1,4 +1,4 @@
-use crate::{CargoTomlContents, version::FrameworkVersion};
+use crate::{version::FrameworkVersion, CargoTomlContents};
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
@@ -100,7 +100,11 @@ impl RelevantDirectories {
     }
 
     /// Marks all appropriate directories as ready for upgrade.
-    pub fn start_upgrade(&mut self, from_version: &'static FrameworkVersion, to_version: &'static FrameworkVersion) {
+    pub fn start_upgrade(
+        &mut self,
+        from_version: &'static FrameworkVersion,
+        to_version: &'static FrameworkVersion,
+    ) {
         for dir in self.0.iter_mut() {
             if dir.version.semver == *from_version {
                 dir.upgrade_in_progress = Some((from_version, to_version));

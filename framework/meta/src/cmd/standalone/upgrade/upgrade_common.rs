@@ -12,7 +12,8 @@ use crate::{
     folder_structure::{
         DirectoryType, RelevantDirectory, VersionReq, CARGO_TOML_FILE_NAME, FRAMEWORK_CRATE_NAMES,
     },
-    CargoTomlContents, version::FrameworkVersion,
+    version::FrameworkVersion,
+    CargoTomlContents,
 };
 
 use super::{upgrade_print::*, upgrade_settings::UpgradeSettings};
@@ -75,7 +76,11 @@ fn try_replace_file_name(file_name_str: &str, patterns: &[(&str, &str)]) -> Opti
 }
 
 /// Uses `CargoTomlContents`. Will only replace versions of framework crates.
-pub fn version_bump_in_cargo_toml(path: &Path, from_version: &FrameworkVersion, to_version: &FrameworkVersion) {
+pub fn version_bump_in_cargo_toml(
+    path: &Path,
+    from_version: &FrameworkVersion,
+    to_version: &FrameworkVersion,
+) {
     if is_cargo_toml_file(path) {
         let mut cargo_toml_contents = CargoTomlContents::load_from_file(path);
         upgrade_all_dependency_versions(

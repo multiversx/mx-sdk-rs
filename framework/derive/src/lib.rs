@@ -64,6 +64,6 @@ pub fn format_receiver_args(input: proc_macro::TokenStream) -> proc_macro::Token
 }
 
 #[proc_macro]
-pub fn format_version(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    format::format_version(input)
+pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    format::semver_tuple(input)
 }

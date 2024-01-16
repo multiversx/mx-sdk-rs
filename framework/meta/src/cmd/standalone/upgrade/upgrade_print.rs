@@ -14,8 +14,8 @@ pub fn print_upgrading(dir: &RelevantDirectory) {
             "\n{}",
             format!(
                 "Upgrading from {} to {} in {}\n",
-                from_version.version,
-                to_version.version,
+                from_version,
+                to_version,
                 dir.path.display(),
             )
             .purple()
@@ -29,8 +29,8 @@ pub fn print_post_processing(dir: &RelevantDirectory) {
             "\n{}",
             format!(
                 "Post-processing after upgrade from {} to {} in {}\n",
-                from_version.version,
-                to_version.version,
+                from_version,
+                to_version,
                 dir.path.display(),
             )
             .purple()
@@ -38,10 +38,14 @@ pub fn print_post_processing(dir: &RelevantDirectory) {
     }
 }
 
-pub fn print_upgrading_all(from_version: &str, to_version: &str) {
+pub fn print_upgrading_all(from_version: &FrameworkVersion, to_version: &FrameworkVersion) {
     println!(
         "\n{}",
-        format!("Upgrading from {from_version} to {to_version} across crates ...").purple()
+        format!(
+            "Upgrading from {} to {} across crates ...",
+            from_version, to_version
+        )
+        .purple()
     );
 }
 
@@ -84,7 +88,7 @@ pub fn print_tree_dir_metadata(dir: &RelevantDirectory, last_version: &Framework
         Lib => print!(" {}", "[lib]".magenta()),
     }
 
-    let version_string = format!("[{}]", dir.version.semver.version.to_string().as_str());
+    let version_string = format!("[{}]", dir.version.semver);
     if dir.version.semver == *last_version {
         print!(" {}", version_string.green());
     } else {
@@ -113,7 +117,7 @@ pub fn print_cargo_check(dir: &RelevantDirectory) {
         "\n{}",
         format!(
             "Running cargo check after upgrading to version {} in {}\n",
-            dir.version.semver.version,
+            dir.version.semver,
             dir.path.display(),
         )
         .purple()

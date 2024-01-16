@@ -2,7 +2,7 @@ use proc_macro::{quote, Literal};
 
 use crate::format::format_tokenize;
 
-pub fn format_version(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tokens: Vec<proc_macro::TokenTree> = format_tokenize::tokenize(input);
 
     tokens

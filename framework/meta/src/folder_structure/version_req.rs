@@ -1,4 +1,7 @@
-use crate::{version::FrameworkVersion, version_history::{find_version_by_str, LAST_VERSION}};
+use crate::{
+    version::FrameworkVersion,
+    version_history::{find_version_by_str, LAST_VERSION},
+};
 
 /// Crate version requirements, as expressed in Cargo.toml. A very crude version.
 ///
@@ -12,7 +15,9 @@ impl VersionReq {
     pub fn from_string(raw: String) -> Self {
         if let Some(stripped_version) = raw.strip_prefix('=') {
             VersionReq {
-                semver: find_version_by_str(stripped_version).unwrap_or(&LAST_VERSION).clone(),
+                semver: find_version_by_str(stripped_version)
+                    .unwrap_or(&LAST_VERSION)
+                    .clone(),
                 is_strict: true,
             }
         } else {
@@ -25,9 +30,9 @@ impl VersionReq {
 
     pub fn into_string(self) -> String {
         if self.is_strict {
-            format!("={}", self.semver.version)
+            format!("={}", self.semver)
         } else {
-            self.semver.version.to_string()
+            self.semver.to_string()
         }
     }
 }

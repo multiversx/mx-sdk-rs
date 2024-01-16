@@ -1,3 +1,4 @@
+use core::fmt;
 use std::cmp::Ordering;
 
 use semver::{BuildMetadata, Prerelease, Version};
@@ -25,7 +26,7 @@ impl FrameworkVersion {
         FrameworkVersion::new(major, minor, patch)
     }
 
-    pub fn from_string_template(version_str: &str) -> Self {        
+    pub fn from_string_template(version_str: &str) -> Self {
         let version_arr: Vec<&str> = version_str.split('.').collect();
 
         let major: u64 = version_arr[0].parse().unwrap();
@@ -54,16 +55,20 @@ impl PartialEq for FrameworkVersion {
     }
 }
 
+impl fmt::Display for FrameworkVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.version)
+    }
+}
+
 pub fn is_sorted(versions: &[FrameworkVersion]) -> bool {
-    versions
-        .windows(2)
-        .all(|window| (window[0].cmp(&window[1])).eq(&Ordering::Less))
+    versions.windows(2).all(|window| (window[0] < window[1]))
 }
 
 #[macro_export]
 macro_rules! framework_version {
     ($arg:expr) => {
-        FrameworkVersion::from_triple(multiversx_sc::derive::format_version!($arg))
+        FrameworkVersion::from_triple(multiversx_sc::derive::semver_tuple!($arg))
     };
 }
 

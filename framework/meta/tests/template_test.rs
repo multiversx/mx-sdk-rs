@@ -115,7 +115,7 @@ fn template_test_released(template_name: &str, new_name: &str) {
         .join("temp-download")
         .join(new_name);
     let repo_source = RepoSource::download_from_github(
-        RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.version.to_string()),
+        RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.to_string()),
         temp_dir_path,
     );
 
