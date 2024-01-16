@@ -9,7 +9,7 @@ use colored::Colorize;
 use std::path::Path;
 
 pub fn print_upgrading(dir: &RelevantDirectory) {
-    if let Some((from_version, to_version)) = dir.upgrade_in_progress {
+    if let Some((from_version, to_version)) = &dir.upgrade_in_progress {
         println!(
             "\n{}",
             format!(
@@ -24,7 +24,7 @@ pub fn print_upgrading(dir: &RelevantDirectory) {
 }
 
 pub fn print_post_processing(dir: &RelevantDirectory) {
-    if let Some((from_version, to_version)) = dir.upgrade_in_progress {
+    if let Some((from_version, to_version)) = &dir.upgrade_in_progress {
         println!(
             "\n{}",
             format!(

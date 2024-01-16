@@ -33,7 +33,7 @@ pub enum DirectoryType {
 pub struct RelevantDirectory {
     pub path: PathBuf,
     pub version: VersionReq,
-    pub upgrade_in_progress: Option<(&'static FrameworkVersion, &'static FrameworkVersion)>,
+    pub upgrade_in_progress: Option<(FrameworkVersion, FrameworkVersion)>,
     pub dir_type: DirectoryType,
 }
 
@@ -100,14 +100,10 @@ impl RelevantDirectories {
     }
 
     /// Marks all appropriate directories as ready for upgrade.
-    pub fn start_upgrade(
-        &mut self,
-        from_version: &'static FrameworkVersion,
-        to_version: &'static FrameworkVersion,
-    ) {
+    pub fn start_upgrade(&mut self, from_version: FrameworkVersion, to_version: FrameworkVersion) {
         for dir in self.0.iter_mut() {
-            if dir.version.semver == *from_version {
-                dir.upgrade_in_progress = Some((from_version, to_version));
+            if dir.version.semver == from_version {
+                dir.upgrade_in_progress = Some((from_version.clone(), to_version.clone()));
             }
         }
     }
@@ -116,7 +112,7 @@ impl RelevantDirectories {
     /// and resets upgrade status.
     pub fn finish_upgrade(&mut self) {
         for dir in self.0.iter_mut() {
-            if let Some((_, to_version)) = dir.upgrade_in_progress {
+            if let Some((_, to_version)) = &dir.upgrade_in_progress {
                 dir.version.semver = to_version.clone();
                 dir.upgrade_in_progress = None;
             }

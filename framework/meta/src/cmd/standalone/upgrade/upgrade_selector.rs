@@ -2,7 +2,9 @@ use crate::{
     cli_args::UpgradeArgs,
     cmd::standalone::upgrade::upgrade_settings::UpgradeSettings,
     folder_structure::{dir_pretty_print, RelevantDirectories, RelevantDirectory},
-    version_history::{versions_iter, LAST_UPGRADE_VERSION, VERSIONS},
+    framework_version,
+    version::FrameworkVersion,
+    version_history::{versions_iter, CHECK_AFTER_UPGRADE_TO, LAST_UPGRADE_VERSION, VERSIONS},
 };
 
 use super::{
@@ -57,7 +59,7 @@ pub fn upgrade_sc(args: &UpgradeArgs) {
         }
 
         print_upgrading_all(from_version, to_version);
-        dirs.start_upgrade(from_version, to_version);
+        dirs.start_upgrade(from_version.clone(), to_version.clone());
         for dir in dirs.iter_version(from_version) {
             upgrade_function_selector(dir);
         }
@@ -75,29 +77,27 @@ fn upgrade_function_selector(dir: &RelevantDirectory) {
         print_upgrading(dir);
     }
 
-    if let Some((from_version, to_version)) = dir.upgrade_in_progress {
-        match to_version.to_string().as_str() {
-            "0.31.0" => upgrade_to_31_0(dir),
-            "0.32.0" => upgrade_to_32_0(dir),
-            "0.39.0" => upgrade_to_39_0(dir),
-            "0.45.0" => upgrade_to_45_0(dir),
-            _ => version_bump_in_cargo_toml(&dir.path, from_version, to_version),
+    if let Some((from_version, to_version)) = &dir.upgrade_in_progress {
+        if framework_version!(0.31.0) == *to_version {
+            upgrade_to_31_0(dir)
+        } else if framework_version!(0.32.0) == *to_version {
+            upgrade_to_32_0(dir)
+        } else if framework_version!(0.39.0) == *to_version {
+            upgrade_to_39_0(dir)
+        } else if framework_version!(0.45.0) == *to_version {
+            upgrade_to_45_0(dir)
+        } else {
+            version_bump_in_cargo_toml(&dir.path, from_version, to_version)
         }
     }
 }
 
 fn upgrade_post_processing(dir: &RelevantDirectory, settings: &UpgradeSettings) {
-    if let Some((_, to_version)) = dir.upgrade_in_progress {
-        if [
-            "0.28.0", "0.29.0", "0.30.0", "0.31.0", "0.32.0", "0.33.0", "0.34.0", "0.35.0",
-            "0.36.0", "0.37.0", "0.40.0", "0.41.0", "0.42.0", "0.43.0", "0.44.0", "0.45.2",
-            "0.46.0",
-        ]
-        .contains(&to_version.to_string().as_str())
-        {
+    if let Some((_, to_version)) = &dir.upgrade_in_progress {
+        if CHECK_AFTER_UPGRADE_TO.contains(&to_version) {
             print_post_processing(dir);
             cargo_check(dir, settings);
-        } else if to_version.to_string().as_str() == "0.39.0" {
+        } else if framework_version!(0.39.0) == *to_version {
             print_post_processing(dir);
             postprocessing_after_39_0(dir);
             cargo_check(dir, settings);
