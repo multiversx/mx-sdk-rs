@@ -1,0 +1,66 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/basic-features.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scDeploy",
+            "id": "deploy",
+            "tx": {
+                "from": "address:an_account",
+                "contractCode": "file:../output/basic-features.wasm",
+                "arguments": [],
+                "gasLimit": "200,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "",
+                "logs": [],
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "dumpState",
+            "comment": "all accounts beginning"
+        },
+        {
+            "step": "scCall",
+            "id": "call to basic features",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "token_identifier_egld",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "str:EGLD"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "dumpState",
+            "comment": "all accounts end"
+        }
+    ]
+}

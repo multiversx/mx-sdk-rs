@@ -21,15 +21,19 @@ impl VMAddress {
     }
 
     pub fn generate_mock_address(creator_address: &[u8], creator_nonce: u64) -> Self {
-        let mut result = [0x11; 32];
+        let mut result = [0x00; 32];
+
+        result[10] = 0x11;
+        result[11] = 0x11;
+        result[12] = 0x11;
+        result[13] = 0x11;
 
         result[14..29].copy_from_slice(&creator_address[..15]);
         result[29] = creator_nonce as u8;
         result[30..].copy_from_slice(&creator_address[30..]);
 
-        let vm_type = DEFAULT_VM_TYPE;
         let start_index = NUM_INT_CHARACTERS_FOR_ADDRESS - VM_TYPE_LEN;
-        result[start_index..(start_index + 2)].copy_from_slice(vm_type);
+        result[start_index..(start_index + DEFAULT_VM_TYPE.len())].copy_from_slice(DEFAULT_VM_TYPE);
 
         VMAddress::from(result)
     }
@@ -130,7 +134,6 @@ impl VMAddress {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::{display_util::address_hex, types::VMAddress};
@@ -144,7 +147,7 @@ mod tests {
         let mock_address = VMAddress::generate_mock_address(&creator_address.to_vec(), 1u64);
         assert_eq!(
             address_hex(&mock_address),
-            "0x11111111111111110f0f111111116f776e65725f5f5f5f5f5f5f5f5f5f015f5f"
+            "0x00000000000000000f0f111111116f776e65725f5f5f5f5f5f5f5f5f5f015f5f"
         );
     }
 }
