@@ -4,6 +4,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use colored::Colorize;
+
 use crate::{
     display_util::address_hex,
     types::VMAddress,
@@ -11,6 +13,10 @@ use crate::{
 };
 
 use super::{BlockchainUpdate, TxCacheSource};
+
+pub const NUM_INT_CHARACTERS_FOR_ADDRESS: usize = 10;
+pub const VM_TYPE_LEN: usize = 2;
+pub const DEFAULT_VM_TYPE: &[u8] = &[0xF, 0xF];
 
 pub struct TxCache {
     source_ref: Arc<dyn TxCacheSource>,
@@ -102,8 +108,33 @@ impl TxCache {
         self.blockchain_ref()
             .get_new_address(creator_address.clone(), current_nonce - 1)
             .unwrap_or_else(|| {
-                panic!("Missing new address. Only explicit new deploy addresses supported")
+                let new_mock_address =
+                    self.generate_mock_address(&creator_address.to_vec(), current_nonce - 1);
+                println!(
+                    "{}",
+                    format!(
+                        "Missing new address for {:?}.\nCreating a new mock address...: {:?}",
+                        address_hex(creator_address),
+                        address_hex(&new_mock_address)
+                    )
+                    .yellow()
+                );
+                new_mock_address
             })
+    }
+
+    fn generate_mock_address(&self, creator_address: &[u8], creator_nonce: u64) -> VMAddress {
+        let mut result = [0x11; 32];
+
+        result[14..29].copy_from_slice(&creator_address[..15]);
+        result[29] = creator_nonce as u8;
+        result[30..].copy_from_slice(&creator_address[30..]);
+
+        let vm_type = DEFAULT_VM_TYPE;
+        let start_index = NUM_INT_CHARACTERS_FOR_ADDRESS - VM_TYPE_LEN;
+        result[start_index..(start_index + 2)].copy_from_slice(vm_type);
+
+        VMAddress::from(result)
     }
 
     pub fn get_new_token_identifiers(&self) -> Vec<String> {
