@@ -6,7 +6,7 @@ use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
-use num_traits::ToPrimitive;
+use num_traits::{float::FloatCore, ToPrimitive};
 
 use core::{
     cmp::Ordering,
