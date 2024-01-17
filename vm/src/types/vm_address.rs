@@ -4,6 +4,10 @@ use core::fmt::Debug;
 
 const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
+pub const NUM_INT_CHARACTERS_FOR_ADDRESS: usize = 10;
+pub const VM_TYPE_LEN: usize = 2;
+pub const DEFAULT_VM_TYPE: &[u8] = &[0xF, 0xF];
+
 /// Address type being used in the VM only.
 ///
 /// Its implementation is similar to that of the heap Address in the framework,
@@ -14,6 +18,20 @@ pub struct VMAddress(H256);
 impl VMAddress {
     pub const fn new(bytes: [u8; 32]) -> Self {
         VMAddress(H256::new(bytes))
+    }
+
+    pub fn generate_mock_address(creator_address: &[u8], creator_nonce: u64) -> Self {
+        let mut result = [0x11; 32];
+
+        result[14..29].copy_from_slice(&creator_address[..15]);
+        result[29] = creator_nonce as u8;
+        result[30..].copy_from_slice(&creator_address[30..]);
+
+        let vm_type = DEFAULT_VM_TYPE;
+        let start_index = NUM_INT_CHARACTERS_FOR_ADDRESS - VM_TYPE_LEN;
+        result[start_index..(start_index + 2)].copy_from_slice(vm_type);
+
+        VMAddress::from(result)
     }
 }
 
@@ -109,5 +127,24 @@ impl VMAddress {
             .iter()
             .take(SC_ADDRESS_NUM_LEADING_ZEROS.into())
             .all(|item| item == &0u8)
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use crate::{display_util::address_hex, types::VMAddress};
+
+    #[test]
+    fn generate_mock_address_test() {
+        let creator_address = VMAddress::new([
+            111, 119, 110, 101, 114, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95,
+            95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95, 95,
+        ]);
+        let mock_address = VMAddress::generate_mock_address(&creator_address.to_vec(), 1u64);
+        assert_eq!(
+            address_hex(&mock_address),
+            "0x11111111111111110f0f111111116f776e65725f5f5f5f5f5f5f5f5f5f015f5f"
+        );
     }
 }
