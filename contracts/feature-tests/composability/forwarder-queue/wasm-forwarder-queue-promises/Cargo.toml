@@ -23,10 +23,9 @@ overflow-checks = false
 
 [dependencies.forwarder-queue]
 path = ".."
-features = ["promises"]
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.45.2"
+version = "0.46.1"
 path = "../../../../../framework/wasm-adapter"
 
 [workspace]

@@ -1,5 +1,5 @@
 use super::*;
-use hashbrown::HashMap;
+use multiversx_sc_codec::Vec;
 
 pub trait TypeDescriptionContainer {
     fn new() -> Self;
@@ -18,24 +18,32 @@ pub trait TypeDescriptionContainer {
 }
 
 #[derive(Clone, Default, Debug)]
-pub struct TypeDescriptionContainerImpl(pub HashMap<TypeName, TypeDescription>);
+pub struct TypeDescriptionContainerImpl(pub Vec<(TypeName, TypeDescription)>);
 
 impl TypeDescriptionContainer for TypeDescriptionContainerImpl {
     fn new() -> Self {
-        TypeDescriptionContainerImpl(HashMap::new())
+        TypeDescriptionContainerImpl(Vec::new())
     }
 
     fn contains_type(&self, type_name: &str) -> bool {
-        self.0.contains_key(type_name)
+        self.0
+            .iter()
+            .any(|(existing_type_name, _)| existing_type_name == type_name)
     }
 
     fn insert(&mut self, type_name: TypeName, type_description: TypeDescription) {
-        self.0.insert(type_name, type_description);
+        if let Some((_existing_type_name, exisiting_type_description)) =
+            self.0.iter_mut().find(|(name, _)| name == &type_name)
+        {
+            *exisiting_type_description = type_description;
+        } else {
+            self.0.push((type_name, type_description));
+        }
     }
 
     fn insert_all(&mut self, other: &Self) {
         for (key, value) in other.0.iter() {
-            self.0.insert(key.clone(), value.clone());
+            self.insert(key.clone(), value.clone());
         }
     }
 }

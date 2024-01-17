@@ -21,12 +21,12 @@ pub enum EIVersion {
     /// - more managed crypto hooks
     /// - big floats
     /// - some managed ESDT properties.
-    #[default]
     V1_2,
 
-    /// VM Hooks version planned to be released with VM 1.5 in Q2 2023.
+    /// Latest VM Hooks version, released with VM 1.5 in January 2024.
     ///
     /// It adds the new async call functionality (promises).
+    #[default]
     V1_3,
 }
 
@@ -61,5 +61,20 @@ impl EIVersion {
 
     pub fn contains_vm_hook(&self, vm_hook_names: &str) -> bool {
         self.vm_hook_names().contains(&vm_hook_names)
+    }
+}
+
+/// Parses an EIVersion, or returns None, if "ignore" was specifically stated.
+pub fn parse_check_ei(ei: &Option<String>) -> Option<EIVersion> {
+    if let Some(ei_name) = ei {
+        if ei_name == "ignore" {
+            None
+        } else {
+            let ei_version = EIVersion::from_name(ei_name)
+                .unwrap_or_else(|| panic!("invalid EI version: {ei_name}"));
+            Some(ei_version)
+        }
+    } else {
+        Some(EIVersion::default())
     }
 }

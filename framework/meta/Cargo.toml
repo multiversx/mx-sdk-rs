@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-meta"
-version = "0.45.2"
+version = "0.46.1"
 edition = "2021"
 
 authors = [
@@ -51,9 +51,9 @@ pathdiff = { version = "0.2.1", optional = true }
 common-path = { version = "1.0.0", optional = true }
 
 [dependencies.multiversx-sc]
-version = "=0.45.2"
+version = "=0.46.1"
 path = "../base"
-features = ["alloc", "num-bigint", "promises"]
+features = ["alloc", "num-bigint"]
 
 [dev-dependencies]
 multiversx-sc-meta = { path = ".", features = ["standalone"] }

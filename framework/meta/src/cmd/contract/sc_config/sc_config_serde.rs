@@ -2,7 +2,8 @@ use serde::Deserialize;
 use std::collections::HashMap;
 
 #[derive(Deserialize, Debug)]
-pub struct MultiContractConfigSerde {
+#[serde(deny_unknown_fields)]
+pub struct ScConfigSerde {
     #[serde(default)]
     pub settings: MultiContractGeneralSettingsSerde,
     #[serde(default)]
@@ -13,6 +14,7 @@ pub struct MultiContractConfigSerde {
 }
 
 #[derive(Deserialize, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct ContractVariantSerde {
     pub name: Option<String>,
 
@@ -57,11 +59,13 @@ pub struct ContractVariantSerde {
 }
 
 #[derive(Deserialize, Default, Debug)]
+#[serde(deny_unknown_fields)]
 pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
 }
 
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
 pub struct ContractVariantProfileSerde {
     #[serde(default)]
     #[serde(rename = "codegen-units")]

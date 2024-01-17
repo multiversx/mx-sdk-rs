@@ -44,5 +44,8 @@ mod tests {
         assert_eq!(parse_stack_size_expr("1 pages"), 65536);
         assert_eq!(parse_stack_size_expr("2 pages"), 65536 * 2);
         assert_eq!(parse_stack_size_expr("10 pages"), 65536 * 10);
+
+        assert_eq!(parse_stack_size_expr("128k"), DEFAULT_STACK_SIZE);
+        assert_eq!(parse_stack_size_expr("2 pages"), DEFAULT_STACK_SIZE);
     }
 }

@@ -44,3 +44,10 @@ impl ContractAllocator {
         }
     }
 }
+
+pub fn parse_allocator(allocator: &Option<String>) -> ContractAllocator {
+    allocator
+        .as_ref()
+        .map(|s| ContractAllocator::parse_or_panic(s))
+        .unwrap_or_default()
+}
