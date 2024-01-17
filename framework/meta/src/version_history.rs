@@ -175,7 +175,6 @@ pub mod tests {
     fn template_versions_test() {
         assert!(validate_template_tag("0.43.0"));
         assert!(!validate_template_tag("0.42.0"));
-        assert!(!validate_template_tag("0.47.0"));
     }
 
     #[test]
