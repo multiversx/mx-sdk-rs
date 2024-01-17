@@ -40,7 +40,8 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "file:../vault/output/vault.wasm"
+                    "file:../vault/output/vault.wasm",
+                    "0x0100"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -64,6 +65,7 @@
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm",
+                    "codeMetadata": "0x0100",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -78,6 +80,7 @@
                 "function": "deploy_contract",
                 "arguments": [
                     "file:../vault/output/vault.wasm",
+                    "0x0100",
                     "str:some_argument"
                 ],
                 "gasLimit": "50,000,000",
@@ -103,6 +106,7 @@
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm",
+                    "codeMetadata": "0x0100",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -117,6 +121,7 @@
                 "function": "deploy_from_source",
                 "arguments": [
                     "sc:child",
+                    "0x0100",
                     "str:some_argument"
                 ],
                 "gasLimit": "50,000,000",
@@ -141,6 +146,7 @@
                     "balance": "0",
                     "storage": {},
                     "code": "file:../vault/output/vault.wasm",
+                    "codeMetadata": "0x0100",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
