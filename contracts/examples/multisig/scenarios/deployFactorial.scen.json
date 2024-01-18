@@ -26,7 +26,7 @@
                 "arguments": [
                     "0",
                     "sc:factorial-code",
-                    "0x0000"
+                    "0x0100"
                 ],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"
@@ -72,7 +72,7 @@
                             "1-discriminant": "0x07",
                             "2-amount": "u32:0",
                             "3-code_source": "sc:factorial-code",
-                            "4-code_metadata": "0x0000",
+                            "4-code_metadata": "0x0100",
                             "5-arguments": "u32:0"
                         }
                     },
