@@ -47,10 +47,11 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     AccountRaw {
         balance: balance_raw,
-        code: code_raw,
         comment: None,
         esdt: all_esdt_raw,
         nonce: Some(u64_as_raw(acc.nonce)),
+        code: code_raw,
+        code_metadata: Some(bytes_as_raw(acc.code_metadata.to_vec())),
         owner: acc.contract_owner.as_ref().map(vm_address_as_raw),
         storage: storage_raw,
         username: None, // TODO: Add if needed
@@ -244,6 +245,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
         developer_rewards: CheckBytesValueRaw::Equal(rust_biguint_as_raw(&acc.developer_rewards)),
         storage: CheckStorageRaw::Equal(check_storage_raw),
         code: CheckBytesValueRaw::Star,
+        code_metadata: CheckBytesValueRaw::Star,
         async_call_data: CheckBytesValueRaw::Unspecified,
         comment: None,
         username: CheckBytesValueRaw::Unspecified,
@@ -304,10 +306,16 @@ pub(crate) fn u64_as_raw_opt(value: u64) -> Option<ValueSubTree> {
     U64Value::from(value).into_raw_opt()
 }
 
-pub(crate) fn bytes_as_raw(bytes: &[u8]) -> ValueSubTree {
+pub(crate) fn bytes_as_raw<B>(bytes: B) -> ValueSubTree
+where
+    B: AsRef<[u8]>,
+{
     ValueSubTree::Str(bytes_to_hex(bytes))
 }
 
-pub(crate) fn bytes_to_hex(bytes: &[u8]) -> String {
+pub(crate) fn bytes_to_hex<B>(bytes: B) -> String
+where
+    B: AsRef<[u8]>,
+{
     format!("0x{}", hex::encode(bytes))
 }

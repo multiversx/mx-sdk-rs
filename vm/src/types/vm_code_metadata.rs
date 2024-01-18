@@ -40,9 +40,21 @@ impl VMCodeMetadata {
 }
 
 impl From<[u8; 2]> for VMCodeMetadata {
-    #[inline]
     fn from(arr: [u8; 2]) -> Self {
         VMCodeMetadata::from(u16::from_be_bytes(arr))
+    }
+}
+
+impl From<&[u8]> for VMCodeMetadata {
+    fn from(slice: &[u8]) -> Self {
+        let arr: [u8; 2] = slice.try_into().unwrap_or_default();
+        VMCodeMetadata::from(arr)
+    }
+}
+
+impl From<&Vec<u8>> for VMCodeMetadata {
+    fn from(v: &Vec<u8>) -> Self {
+        VMCodeMetadata::from(v.as_slice())
     }
 }
 
