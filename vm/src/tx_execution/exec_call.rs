@@ -3,9 +3,7 @@ use crate::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
         TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
-    },
-    with_shared::Shareable,
-    world_mock::{AccountData, AccountEsdt, BlockchainState},
+    }, types::VMCodeMetadata, with_shared::Shareable, world_mock::{AccountData, AccountEsdt, BlockchainState}
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
@@ -242,6 +240,7 @@ impl BlockchainVMRef {
                 username: Vec::new(),
                 storage: HashMap::new(),
                 contract_path: None,
+                code_metadata: VMCodeMetadata::empty(),
                 contract_owner: None,
                 developer_rewards: BigUint::zero(),
             });

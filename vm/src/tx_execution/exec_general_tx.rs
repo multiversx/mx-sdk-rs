@@ -6,7 +6,7 @@ use crate::{
         BlockchainUpdate, CallType, TxCache, TxContext, TxContextStack, TxFunctionName, TxInput,
         TxLog, TxResult,
     },
-    types::{top_encode_big_uint, VMAddress},
+    types::{top_encode_big_uint, VMAddress, VMCodeMetadata},
     with_shared::Shareable,
 };
 
@@ -128,6 +128,7 @@ impl BlockchainVMRef {
         &self,
         mut tx_input: TxInput,
         contract_path: Vec<u8>,
+        code_metadata: VMCodeMetadata,
         tx_cache: TxCache,
         f: F,
     ) -> (TxResult, VMAddress, BlockchainUpdate)
@@ -151,7 +152,12 @@ impl BlockchainVMRef {
                 BlockchainUpdate::empty(),
             );
         }
-        tx_context_sh.create_new_contract(&new_address, contract_path, tx_input_ref.from.clone());
+        tx_context_sh.create_new_contract(
+            &new_address,
+            contract_path,
+            code_metadata,
+            tx_input_ref.from.clone(),
+        );
         tx_context_sh
             .tx_cache
             .increase_egld_balance(&new_address, &tx_input_ref.egld_value);
