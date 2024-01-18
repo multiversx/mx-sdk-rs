@@ -95,6 +95,11 @@ pub struct TestArgs {
     /// If scen and go are both specified, scen overrides the go argument.
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub scen: bool,
+
+    /// This arg prints all the output from the vm
+    /// Default value will be "false" if not specified
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub nc: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
