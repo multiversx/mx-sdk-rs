@@ -4,11 +4,6 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
-                    "nonce": "0",
-                    "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
-                },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "0"
@@ -38,24 +33,20 @@
             "comment": "all accounts beginning"
         },
         {
-            "step": "scCall",
-            "id": "call to basic features",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "token_identifier_egld",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "str:EGLD"
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
+            "step": "checkState",
+            "accounts": {
+                "address:an_account": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "storage": {},
+                    "code": ""
+                },
+                "0x00000000000000000f0f11111111616e5f6163636f756e745f5f5f5f5f005f5f": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {},
+                    "code": "file:../output/basic-features.wasm"
+                }
             }
         },
         {
