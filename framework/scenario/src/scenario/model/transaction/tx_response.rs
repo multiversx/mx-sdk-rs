@@ -175,11 +175,11 @@ impl TxResponse {
     fn process_new_issued_token_identifier(mut self) -> Self {
         for scr in self.api_scrs.iter() {
             if scr.sender.to_string() != SYSTEM_SC_BECH32 {
-                continue
+                continue;
             }
 
             let Some(prev_tx) = self.api_scrs.iter().find(|e| e.hash == scr.prev_tx_hash) else {
-                continue
+                continue;
             };
 
             let is_issue_fungible = prev_tx.data.starts_with("issue@");
@@ -187,7 +187,11 @@ impl TxResponse {
             let is_issue_non_fungible = prev_tx.data.starts_with("issueNonFungible@");
             let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
 
-            if !is_issue_fungible && !is_issue_semi_fungible && !is_issue_non_fungible && !is_register_meta_esdt {
+            if !is_issue_fungible
+                && !is_issue_semi_fungible
+                && !is_issue_non_fungible
+                && !is_register_meta_esdt
+            {
                 continue;
             }
 
@@ -197,7 +201,8 @@ impl TxResponse {
                     return self;
                 }
 
-                self.new_issued_token_identifier = Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+                self.new_issued_token_identifier =
+                    Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
 
                 break;
             } else if scr.data.starts_with("@00@") {
@@ -206,7 +211,8 @@ impl TxResponse {
                     return self;
                 }
 
-                self.new_issued_token_identifier = Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+                self.new_issued_token_identifier =
+                    Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
 
                 break;
             }
@@ -1261,7 +1267,6 @@ mod tests {
         let expected: Option<String> = Some("EGLDMEX-95c6d5".to_string());
 
         assert_eq!(tx_response.new_issued_token_identifier, expected)
-
     }
 
     #[test]
@@ -1978,7 +1983,6 @@ mod tests {
         let expected: Option<String> = Some("AVASH-7d8b5d".to_string());
 
         assert_eq!(tx_response.new_issued_token_identifier, expected)
-
     }
 
     #[test]
