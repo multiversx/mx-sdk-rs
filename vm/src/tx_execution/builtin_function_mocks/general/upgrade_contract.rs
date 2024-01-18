@@ -2,7 +2,10 @@ use crate::tx_execution::{
     builtin_function_names::UPGRADE_CONTRACT_FUNC_NAME, create_transfer_value_log, BlockchainVMRef,
 };
 
-use crate::tx_mock::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult};
+use crate::{
+    tx_mock::{BlockchainUpdate, CallType, TxCache, TxFunctionName, TxInput, TxResult},
+    types::VMCodeMetadata,
+};
 
 use super::super::builtin_func_trait::BuiltinFunction;
 
@@ -31,9 +34,7 @@ impl BuiltinFunction for UpgradeContract {
         }
 
         let new_code = tx_input.args[0].clone();
-
-        // tx_input.args[1] is the code metadata, we ignore for now
-        // TODO: model code metadata in Mandos
+        let code_metadata = VMCodeMetadata::from(&tx_input.args[1]);
 
         let args = if tx_input.args.len() > 2 {
             tx_input.args[2..].to_vec()
@@ -43,6 +44,7 @@ impl BuiltinFunction for UpgradeContract {
 
         tx_cache.with_account_mut(&tx_input.to, |account| {
             account.contract_path = Some(new_code);
+            account.code_metadata = code_metadata;
         });
 
         let transfer_value_log = create_transfer_value_log(&tx_input, CallType::UpgradeFromSource);
