@@ -96,10 +96,10 @@ pub struct TestArgs {
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub scen: bool,
 
-    /// This arg prints all the output from the vm
+    /// This arg prints the entire output of the vm.
     /// Default value will be "false" if not specified
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
-    pub nc: bool,
+    pub nocapture: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
