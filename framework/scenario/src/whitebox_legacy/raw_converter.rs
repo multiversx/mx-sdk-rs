@@ -78,10 +78,10 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
             attributes: Some(bytes_as_raw(&inst.metadata.attributes)),
             balance: Some(rust_biguint_as_raw(&inst.balance)),
             creator: inst.metadata.creator.as_ref().map(vm_address_as_raw),
-            hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
+            hash: inst.metadata.hash.as_ref().map(bytes_as_raw),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
-            uri: inst.metadata.uri.iter().map(|u| bytes_as_raw(u)).collect(),
+            uri: inst.metadata.uri.iter().map(bytes_as_raw).collect(),
         };
 
         instances_raw.push(inst_raw);
