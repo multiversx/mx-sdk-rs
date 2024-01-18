@@ -11,7 +11,7 @@ pub fn test(test_args: &TestArgs) {
 
     let go = test_args.go;
     let scen = test_args.scen;
-    let no_capture = if test_args.nc { "-- --nocapture" } else { "" };
+    let no_capture = test_args.nc;
 
     if scen {
         program = "run-scenarios";
@@ -21,14 +21,17 @@ pub fn test(test_args: &TestArgs) {
             println!("{}", "If scen parameter is true, it will override the go parameter. Executing scenarios...".yellow());
         }
     } else if go {
-        args.extend([
-            "test",
-            no_capture,
-            "--features",
-            "multiversx-sc-scenario/run-go-tests",
-        ]);
+        args.extend(["test", "--features", "multiversx-sc-scenario/run-go-tests"]);
+
+        if no_capture {
+            args.extend(["--", "--nocapture"])
+        }
     } else {
-        args.extend(["test", no_capture]);
+        args.extend(["test"]);
+
+        if no_capture {
+            args.extend(["--", "--nocapture"])
+        }
     }
 
     let args_str = args.join(" ");
@@ -50,9 +53,6 @@ pub fn test(test_args: &TestArgs) {
             )
         });
 
-    println!("args are {}", args_str);
-    println!("program is {}", program);
-
     println!("Process finished with: {status}");
-    // assert!(status.success());
+    assert!(status.success());
 }
