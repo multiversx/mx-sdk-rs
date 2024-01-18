@@ -40,7 +40,8 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../vault/output/vault-upgrade.wasm"
+                    "code": "file:../vault/output/vault-upgrade.wasm",
+                    "codeMetadata": "0x0100"
                 },
                 "+": ""
             }
@@ -63,6 +64,7 @@
             },
             "expect": {
                 "out": "*",
+                "status": "",
                 "logs": [
                     {
                         "address": "sc:forwarder",

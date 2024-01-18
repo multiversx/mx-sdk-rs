@@ -57,6 +57,7 @@ pub async fn retrieve_account_as_scenario_set_state(
             storage: convert_storage(account_storage),
             comment: None,
             code: retrieve_code(account.code),
+            code_metadata: None, // TODO: retrieve code metadata
             owner: None,
             developer_rewards: None,
         },
