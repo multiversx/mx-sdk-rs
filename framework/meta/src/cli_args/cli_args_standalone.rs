@@ -260,12 +260,24 @@ pub struct TestGenArgs {
     pub create: bool,
 }
 
-#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+#[derive(Default, PartialEq, Eq, Debug, Clone, Parser)]
+#[command(propagate_version = true)]
 pub struct InstallArgs {
-    /// Install the `multiversx-scenario-go-cli`.
-    #[arg(short = 'g', long, verbatim_doc_comment)]
-    pub scenario_go: bool,
+    #[command(subcommand)]
+    pub command: Option<InstallCommand>,
+}
 
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum InstallCommand {
+    #[command(about = "Installs all the known tools")]
+    All,
+
+    #[command(about = "Installs the `mx-scenario-go` tool")]
+    MxScenarioGo(InstallMxScenarioGoArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallMxScenarioGoArgs {
     /// The framework version on which the contracts should be created.
     #[arg(long, verbatim_doc_comment)]
     pub tag: Option<String>,
