@@ -1,4 +1,5 @@
 use crate::{
+    abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
     types::{BigFloat, BigInt, BigUint},
 };
@@ -7,6 +8,7 @@ use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
+
 use num_traits::ToPrimitive;
 
 use core::{
@@ -371,5 +373,15 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, 
                 &other.data * &scaling_factor(diff_decimals) == self.data
             },
         }
+    }
+}
+
+impl<M: ManagedTypeApi, D: Decimals> TypeAbi for ManagedDecimal<M, D> {
+    fn type_name() -> TypeName {
+        TypeName::from("ManagedDecimal")
+    }
+
+    fn is_variadic() -> bool {
+        false
     }
 }

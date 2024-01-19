@@ -11,6 +11,7 @@ pub mod codec_err_test;
 pub mod crypto_features;
 pub mod echo;
 pub mod echo_managed;
+pub mod egld_decimal;
 pub mod elliptic_curve_features;
 pub mod event_features;
 pub mod macro_features;
@@ -75,6 +76,7 @@ pub trait BasicFeatures:
     + small_num_overflow_test_ops::SmallIntOverflow
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
+    + egld_decimal::EgldDecimal
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
 {
     #[init]
