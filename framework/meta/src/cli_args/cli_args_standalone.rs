@@ -56,13 +56,18 @@ pub enum StandaloneCliAction {
 
     #[command(name = "templates", about = "Lists all pre-existing templates")]
     TemplateList(TemplateListArgs),
+
     #[command(
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
     )]
     TestGen(TestGenArgs),
+
     #[command(name = "test", about = "Runs cargo test")]
     Test(TestArgs),
+
+    #[command(name = "install", about = "Installs framework dependencies")]
+    Install(InstallArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -253,4 +258,15 @@ pub struct TestGenArgs {
     /// Creates test files if they don't exist.
     #[arg(long, verbatim_doc_comment)]
     pub create: bool,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallArgs {
+    /// Install the `multiversx-scenario-go-cli`.
+    #[arg(short = 'g', long, verbatim_doc_comment)]
+    pub scenario_go: bool,
+
+    /// The framework version on which the contracts should be created.
+    #[arg(long, verbatim_doc_comment)]
+    pub tag: Option<String>,
 }
