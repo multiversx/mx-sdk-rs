@@ -66,10 +66,8 @@ pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {
             }
         },
         syn::Data::Enum(data_enum) => {
-            assert!(
-                data_enum.variants.len() < 256,
-                "enums with more than 256 variants not supported"
-            );
+            validate_enum_variants(&data_enum.variants);
+
             let variant_dep_decode_snippets =
                 variant_dep_decode_snippets(name, data_enum, &quote! {input});
 
