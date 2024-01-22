@@ -5,15 +5,15 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:caller": {
                     "nonce": "0",
                     "balance": "0",
                     "code": "file:../output/basic-features.wasm"
                 },
-                "sc:get-at-address": {
+                "sc:to-be-called": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../../get-at-address/output/get-at-address.wasm"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -26,10 +26,10 @@
             "id": "set contract address",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features",
+                "to": "sc:caller",
                 "function": "set_contract_address",
                 "arguments": [
-                    "sc:get-at-address"
+                    "sc:to-be-called"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -47,7 +47,7 @@
             "id": "fill set mapper",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:get-at-address",
+                "to": "sc:to-be-called",
                 "function": "fill_set_mapper",
                 "arguments": [
                     "10"
@@ -66,19 +66,19 @@
         {
             "step": "checkState",
             "accounts": {
-                "sc:basic-features": {
+                "sc:caller": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:contract_address": "sc:get-at-address"
+                        "str:contract_address": "sc:to-be-called"
                     },
                     "code": "file:../output/basic-features.wasm"
                 },
-                "sc:get-at-address": {
+                "sc:to-be-called": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": "*",
-                    "code": "file:../../get-at-address/output/get-at-address.wasm"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -93,7 +93,7 @@
             "id": "is empty at address",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features",
+                "to": "sc:caller",
                 "function": "is_empty_at_address",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -114,7 +114,7 @@
             "id": "contains at address",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features",
+                "to": "sc:caller",
                 "function": "contains_at_address",
                 "arguments": [
                     "5"
@@ -137,7 +137,7 @@
             "id": "len at address",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:basic-features",
+                "to": "sc:caller",
                 "function": "len_at_address",
                 "arguments": [],
                 "gasLimit": "50,000,000",

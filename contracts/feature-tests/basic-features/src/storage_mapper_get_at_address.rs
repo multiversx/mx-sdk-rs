@@ -37,4 +37,16 @@ pub trait StorageMapperGetAtAddress {
             SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
         mapper.len()
     }
+
+    /// Storage to be called. For testing, this contract is deployed twice, 
+    /// and this module acts both as caller and receiver
+    #[storage_mapper("set_mapper")]
+    fn set_mapper(&self) -> SetMapper<u32>;
+
+    #[endpoint]
+    fn fill_set_mapper(&self, value: u32) {
+        for item in 1u32..=value {
+            self.set_mapper().insert(item);
+        }
+    }
 }

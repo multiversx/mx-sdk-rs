@@ -392,7 +392,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         is_empty_at_address => is_empty_at_address
         contains_at_address => contains_at_address
         len_at_address => len_at_address
-        check_internal_consistency_at_address => check_internal_consistency_at_address
+        fill_set_mapper => fill_set_mapper
     )
 }
 
