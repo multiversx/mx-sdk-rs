@@ -35,7 +35,6 @@ jobs:
           sc-meta install mx-scenario-go --tag v0.0.101-alpha.1
 
           which wasm-opt
-          which wasm2wat
           which mx-scenario-go
 
       - name: Build the wasm contracts
@@ -148,5 +147,5 @@ jobs:
         env:
           RUSTFLAGS: ""
         with:
-          github_token: ${{ secrets.token }}
+          github_token: ${{ github.token }}
           clippy_flags: --all-targets --all-features
