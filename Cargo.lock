@@ -1884,6 +1884,7 @@ dependencies = [
  "reqwest",
  "ruplacer",
  "rustc_version",
+ "semver",
  "serde",
  "serde_json",
  "toml",

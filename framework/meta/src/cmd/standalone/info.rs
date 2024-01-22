@@ -14,6 +14,6 @@ pub fn call_info(args: &InfoArgs) {
 
     let dirs = RelevantDirectories::find_all(path, args.ignore.as_slice());
     dir_pretty_print(dirs.iter(), "", &|dir| {
-        print_tree_dir_metadata(dir, LAST_UPGRADE_VERSION)
+        print_tree_dir_metadata(dir, &LAST_UPGRADE_VERSION)
     });
 }
