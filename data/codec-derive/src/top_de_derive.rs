@@ -67,10 +67,8 @@ fn top_decode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
             }
         },
         syn::Data::Enum(data_enum) => {
-            assert!(
-                data_enum.variants.len() < 256,
-                "enums with more than 256 variants not supported"
-            );
+            validate_enum_variants(&data_enum.variants);
+
             if is_fieldless_enum(data_enum) {
                 // fieldless enums are special, they can be top-decoded as u8 directly
                 let top_decode_arms = fieldless_enum_match_arm_result_ok(name, data_enum);
