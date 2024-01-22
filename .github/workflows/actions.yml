@@ -34,7 +34,6 @@ jobs:
 
           which wasm-opt
           which wasm2wat
-          which run-scenarios
           which mx-scenario-go
 
       - name: Build the wasm contracts
@@ -126,7 +125,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ inputs.rust-toolchain }}
+          toolchain: nightly-2023-12-11
 
       - name: Run the rust tests
         env:
@@ -141,11 +140,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ inputs.rust-toolchain }}
+          toolchain: nightly-2023-12-11
           components: clippy
       - uses: giraffate/clippy-action@v1
         env:
           RUSTFLAGS: ""
         with:
           github_token: ${{ secrets.token }}
-          clippy_flags: ${{ inputs.clippy-args }}
+          clippy_flags: --all-targets --all-features
