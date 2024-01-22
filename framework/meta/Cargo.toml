@@ -42,6 +42,7 @@ convert_case = "0.6.0"
 hex = "0.4"
 wasmparser = "0.118.1"
 wasmprinter = "0.2.71"
+semver = "1.0.20"
 
 ruplacer = { version = "0.8.1", default-features = false, optional = true }
 reqwest = { version = "0.11.4", features = ["blocking", "json"], optional = true }

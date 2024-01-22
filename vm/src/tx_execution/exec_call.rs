@@ -3,7 +3,10 @@ use crate::{
         async_call_tx_input, async_callback_tx_input, async_promise_callback_tx_input,
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
         TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
-    }, types::VMCodeMetadata, with_shared::Shareable, world_mock::{AccountData, AccountEsdt, BlockchainState}
+    },
+    types::VMCodeMetadata,
+    with_shared::Shareable,
+    world_mock::{AccountData, AccountEsdt, BlockchainState},
 };
 use num_bigint::BigUint;
 use num_traits::Zero;

@@ -12,8 +12,8 @@ pub fn upgrade_to_45_0(dir: &RelevantDirectory) {
     if dir.dir_type == DirectoryType::Contract {
         v_0_45_prepare_meta(&dir.path);
     }
-    let (from_version, to_version) = dir.upgrade_in_progress.unwrap();
-    version_bump_in_cargo_toml(&dir.path, from_version, to_version);
+    let (from_version, to_version) = dir.upgrade_in_progress.clone().unwrap();
+    version_bump_in_cargo_toml(&dir.path, &from_version, &to_version);
 }
 
 fn v_0_45_prepare_meta(sc_crate_path: &Path) {
