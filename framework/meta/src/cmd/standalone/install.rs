@@ -1,4 +1,5 @@
 mod install_scenario_go;
+mod system_info;
 
 use crate::cli_args::{InstallArgs, InstallCommand, InstallMxScenarioGoArgs};
 

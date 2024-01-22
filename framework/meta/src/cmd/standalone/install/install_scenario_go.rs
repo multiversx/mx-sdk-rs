@@ -7,10 +7,11 @@ use std::{
 
 use crate::print_util::println_green;
 
+use super::system_info::{get_system_info, SystemInfo};
+
 const USER_AGENT: &str = "multiversx-sc-meta";
 const SCENARIO_CLI_RELEASES_BASE_URL: &str =
     "https://api.github.com/repos/multiversx/mx-chain-scenario-cli-go/releases";
-const SCENARIO_CLI_ZIP_NAME: &str = "mx-scenario-go.zip";
 const CARGO_HOME: &str = env!("CARGO_HOME");
 
 #[derive(Clone, Debug)]
@@ -28,13 +29,20 @@ pub struct ScenarioGoInstaller {
     cargo_bin_folder: PathBuf,
 }
 
+fn select_zip_name() -> String {
+    match get_system_info() {
+        SystemInfo::Linux => "mx_scenario_go_linux_amd64.zip".to_string(),
+        SystemInfo::MacOs => "mx_scenario_go_darwin_amd64.zip".to_string(),
+    }
+}
+
 impl ScenarioGoInstaller {
     pub fn new(tag: Option<String>) -> Self {
         let cargo_home = PathBuf::from(CARGO_HOME);
         let cargo_bin_folder = cargo_home.join("bin");
         ScenarioGoInstaller {
             tag,
-            zip_name: SCENARIO_CLI_ZIP_NAME.to_string(),
+            zip_name: select_zip_name(),
             user_agent: USER_AGENT.to_string(),
             temp_dir_path: std::env::temp_dir(),
             cargo_bin_folder,
