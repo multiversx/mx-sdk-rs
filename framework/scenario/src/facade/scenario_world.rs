@@ -12,7 +12,7 @@ use crate::{
     scenario::{run_trace::ScenarioTrace, run_vm::ScenarioVMRunner},
     scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
     scenario_model::BytesValue,
-    vm_go_tool::run_vm_go_tool,
+    vm_go_tool::run_mx_scenario_go,
 };
 use multiversx_sc_meta::find_workspace::find_current_workspace;
 use std::path::{Path, PathBuf};
@@ -75,7 +75,7 @@ impl ScenarioWorld {
                 debugger.run_scenario_file(&absolute_path);
             },
             Backend::VmGoBackend => {
-                run_vm_go_tool(&absolute_path);
+                run_mx_scenario_go(&absolute_path);
             },
         }
     }
