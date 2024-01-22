@@ -5,6 +5,7 @@ use crate::{
 use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{TxFunctionName, TxInput, TxResult},
+    types::VMCodeMetadata,
 };
 
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
@@ -34,6 +35,7 @@ impl ScenarioVMRunner {
         let (new_address, tx_result) = self.blockchain_mock.vm.sc_create(
             tx_input,
             contract_code,
+            VMCodeMetadata::from(sc_deploy_step.tx.code_metadata.bits()),
             &mut self.blockchain_mock.state,
             f,
         );
