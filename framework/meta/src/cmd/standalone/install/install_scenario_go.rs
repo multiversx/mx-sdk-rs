@@ -106,7 +106,7 @@ impl ScenarioGoInstaller {
 
         let zip_asset = assets
             .iter()
-            .find(|asset| self.asset_is_zip(*asset))
+            .find(|asset| self.asset_is_zip(asset))
             .expect("executable zip asset not found in release");
 
         let download_url = zip_asset
