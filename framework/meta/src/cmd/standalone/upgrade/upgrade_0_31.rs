@@ -7,8 +7,8 @@ use std::path::Path;
 pub fn upgrade_to_31_0(dir: &RelevantDirectory) {
     v_0_31_replace_in_files(dir.path.as_ref());
 
-    let (from_version, to_version) = dir.upgrade_in_progress.unwrap();
-    version_bump_in_cargo_toml(&dir.path, from_version, to_version);
+    let (from_version, to_version) = dir.upgrade_in_progress.clone().unwrap();
+    version_bump_in_cargo_toml(&dir.path, &from_version, &to_version);
 }
 
 fn v_0_31_replace_in_files(sc_crate_path: &Path) {

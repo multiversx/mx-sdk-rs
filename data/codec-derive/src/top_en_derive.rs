@@ -59,10 +59,8 @@ fn top_encode_method_body(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
             }
         },
         syn::Data::Enum(data_enum) => {
-            assert!(
-                data_enum.variants.len() < 256,
-                "enums with more than 256 variants not supported"
-            );
+            validate_enum_variants(&data_enum.variants);
+
             let variant_top_encode_snippets = variant_top_encode_snippets(name, data_enum);
 
             quote! {

@@ -28,8 +28,8 @@ pub fn upgrade_to_39_0(dir: &RelevantDirectory) {
     v_0_39_replace_in_files(&dir.path);
     rename_files(dir.path.as_ref(), SCENARIO_FILE_PATTERNS);
 
-    let (from_version, to_version) = dir.upgrade_in_progress.unwrap();
-    version_bump_in_cargo_toml(&dir.path, from_version, to_version);
+    let (from_version, to_version) = dir.upgrade_in_progress.clone().unwrap();
+    version_bump_in_cargo_toml(&dir.path, &from_version, &to_version);
 }
 
 /// Post-processing: re-generate the wasm crates.

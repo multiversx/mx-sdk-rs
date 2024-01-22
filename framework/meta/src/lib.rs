@@ -9,6 +9,7 @@ mod mxsc_file_json;
 mod print_util;
 mod tools;
 pub use tools::find_workspace;
+pub mod version;
 pub mod version_history;
 
 #[macro_use]
