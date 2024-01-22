@@ -37,12 +37,4 @@ pub trait StorageMapperGetAtAddress {
             SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
         mapper.len()
     }
-
-    #[endpoint]
-    fn check_internal_consistency_at_address(&self) -> bool {
-        let address = self.contract_address().get();
-        let mapper: SetMapper<u32, _> =
-            SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
-        mapper.check_internal_consistency()
-    }
 }

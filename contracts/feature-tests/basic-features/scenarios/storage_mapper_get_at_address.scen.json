@@ -152,27 +152,6 @@
                 "gas": "*",
                 "refund": "*"
             }
-        },
-        {
-            "step": "scCall",
-            "id": "check internal consistency at address",
-            "tx": {
-                "from": "address:an_account",
-                "to": "sc:basic-features",
-                "function": "check_internal_consistency_at_address",
-                "arguments": [],
-                "gasLimit": "50,000,000",
-                "gasPrice": "0"
-            },
-            "expect": {
-                "out": [
-                    "0x01"
-                ],
-                "status": "",
-                "logs": "*",
-                "gas": "*",
-                "refund": "*"
-            }
         }
     ]
 }
