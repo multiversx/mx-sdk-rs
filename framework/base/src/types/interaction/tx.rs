@@ -386,13 +386,13 @@ where
     ResultList: RHList<Env>,
 {
     #[inline]
-    pub fn result_handler<RH>(
+    pub fn with_result<ResultHandler>(
         self,
-        item: RH,
+        result_handler: ResultHandler,
     ) -> Tx<Env, From, To, Payment, Gas, Data, ResultList::NoRetOutput>
     where
-        RH: RHListItem<Env, ResultList::OriginalResult, Returns = ()>,
-        ResultList: RHListAppendNoRet<Env, RH>,
+        ResultHandler: RHListItem<Env, ResultList::OriginalResult, Returns = ()>,
+        ResultList: RHListAppendNoRet<Env, ResultHandler>,
     {
         Tx {
             env: self.env,
@@ -401,7 +401,7 @@ where
             payment: self.payment,
             gas: self.gas,
             data: self.data,
-            result_handler: self.result_handler.append_no_ret(item),
+            result_handler: self.result_handler.append_no_ret(result_handler),
         }
     }
 

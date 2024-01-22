@@ -9,7 +9,10 @@ use multiversx_sc::{
         test_util::top_encode_to_vec_u8_or_panic,
     },
     storage::mappers::SingleValue,
-    types::{Address, CodeMetadata, ContractCallNoPayment, FunctionCall},
+    types::{
+        Address, AddressExpr, CodeMetadata, ContractCallNoPayment, FunctionCall, ReturnsExact,
+        ScExpr,
+    },
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -124,12 +127,16 @@ impl MultisigTestState {
     }
 
     fn propose_add_board_member(&mut self, board_member_address: Address) -> usize {
-        self.world.sc_call_get_result(
-            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                self.multisig_contract
-                    .propose_add_board_member(board_member_address),
-            ),
-        )
+        self.world.run_tx(|tx| {
+            tx.from(AddressExpr("proposer"))
+                .to(ScExpr("multisig"))
+                .call(
+                    self.multisig_contract
+                        .propose_add_board_member(board_member_address),
+                )
+                .original_result::<usize>()
+                .returns(ReturnsExact)
+        })
     }
 
     fn propose_add_proposer(&mut self, proposer_address: Address) -> usize {
