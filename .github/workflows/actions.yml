@@ -26,6 +26,8 @@ jobs:
 
       - name: Install prerequisites
         run: |
+          pipx install multiversx-sdk-cli==v9.3.1
+
           cargo install wasm-opt
           cargo install twiggy
           
