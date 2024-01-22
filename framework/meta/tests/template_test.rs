@@ -72,7 +72,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
         target.clone(),
         true,
     )
-    .create_contract(LAST_TEMPLATE_VERSION.to_string());
+    .create_contract(LAST_TEMPLATE_VERSION);
 
     if BUILD_CONTRACTS {
         build_contract(&target);
@@ -127,7 +127,7 @@ fn template_test_released(template_name: &str, new_name: &str) {
         target.clone(),
         false,
     )
-    .create_contract(LAST_TEMPLATE_VERSION.to_string());
+    .create_contract(LAST_TEMPLATE_VERSION);
 
     if BUILD_CONTRACTS {
         build_contract(&target);
