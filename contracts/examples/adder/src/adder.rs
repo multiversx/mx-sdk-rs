@@ -1,4 +1,5 @@
 #![no_std]
+use crate::heap::Box;
 
 multiversx_sc::imports!();
 /// One of the simplest smart contracts possible,
@@ -11,6 +12,7 @@ pub trait Adder {
 
     #[init]
     fn init(&self, initial_value: BigUint) {
+        let _buffer = Box::new([0u8; 1024]);
         self.sum().set(initial_value);
     }
 
