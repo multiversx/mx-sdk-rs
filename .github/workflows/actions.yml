@@ -34,6 +34,7 @@ jobs:
           cargo install --path framework/meta
           sc-meta install mx-scenario-go --tag v0.0.101-alpha.1
 
+          which mxpy
           which wasm-opt
           which mx-scenario-go
 
@@ -53,7 +54,7 @@ jobs:
           RUSTFLAGS: ""
         run: |
           sc-meta all build-dbg --twiggy-paths --target-dir $(pwd)/target --path .
-          python3 -m multiversx_sdk_cli.cli contract report --skip-build --skip-twiggy --output-format json --output-file report.json
+          mxpy contract report --skip-build --skip-twiggy --output-format json --output-file report.json
 
       - name: Upload the report json
         uses: actions/upload-artifact@v3
@@ -78,9 +79,9 @@ jobs:
           if [ ! -f base-report/report.json ]
           then
               echo ":warning: Warning: Could not download the report for the base branch. Displaying only the report for the current branch. :warning:" >> report.md
-              python3 -m multiversx_sdk_cli.cli contract report --compare report.json --output-format github-markdown --output-file report-table.md
+              mxpy contract report --compare report.json --output-format github-markdown --output-file report-table.md
           else
-              python3 -m multiversx_sdk_cli.cli contract report --compare base-report/report.json report.json --output-format github-markdown --output-file report-table.md
+              mxpy contract report --compare base-report/report.json report.json --output-format github-markdown --output-file report-table.md
           fi
           cat report-table.md >> report.md
 
