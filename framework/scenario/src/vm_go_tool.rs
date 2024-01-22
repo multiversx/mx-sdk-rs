@@ -31,7 +31,7 @@ pub fn run_mx_scenario_go(absolute_path: &Path) {
         "{}",
         format!("Warning: `{RUNNER_TOOL_NAME}` not found. Using `{RUNNER_TOOL_NAME_LEGACY}` as fallback.").yellow(),
     );
-    let output = Command::new(RUNNER_TOOL_NAME).arg(absolute_path).output();
+    let output = Command::new(RUNNER_TOOL_NAME_LEGACY).arg(absolute_path).output();
     if run_scenario_tool(RUNNER_TOOL_NAME_LEGACY, output).is_ok() {
         return;
     }
