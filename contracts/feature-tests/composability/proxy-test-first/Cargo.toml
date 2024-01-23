@@ -9,18 +9,13 @@ publish = false
 path = "src/proxy-test-first.rs"
 
 [dependencies]
-hex-literal = "0.3.1"
+hex-literal = "0.4.1"
 
 [dependencies.multiversx-sc]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../../framework/base"
 features = ["alloc"]
 
-[dependencies.multiversx-sc-wasm-adapter]
-version = "0.43.2"
-path = "../../../../framework/wasm-adapter"
-optional = true
-
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../../framework/scenario"

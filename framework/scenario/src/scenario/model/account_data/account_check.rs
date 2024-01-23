@@ -1,3 +1,5 @@
+use multiversx_sc::codec::{top_encode_to_vec_u8_or_panic, TopEncode};
+
 use crate::{
     scenario::model::{
         BigUintValue, BytesKey, BytesValue, CheckEsdt, CheckEsdtInstances, CheckEsdtMap,
@@ -7,6 +9,7 @@ use crate::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         serde_raw::CheckAccountRaw,
     },
+    scenario_model::CheckEsdtData,
 };
 use std::collections::BTreeMap;
 
@@ -19,6 +22,7 @@ pub struct CheckAccount {
     pub username: CheckValue<BytesValue>,
     pub storage: CheckStorage,
     pub code: CheckValue<BytesValue>,
+    pub code_metadata: CheckValue<BytesValue>,
     pub owner: CheckValue<BytesValue>, // WARNING! Not currently checked. TODO: implement check
     pub developer_rewards: CheckValue<BigUintValue>,
     pub async_call_data: CheckValue<BytesValue>,
@@ -99,6 +103,52 @@ impl CheckAccount {
         self
     }
 
+    pub fn esdt_nft_balance_and_attributes<K, N, V, T>(
+        mut self,
+        token_id_expr: K,
+        nonce_expr: N,
+        balance_expr: V,
+        attributes_expr: Option<T>,
+    ) -> Self
+    where
+        BytesKey: From<K>,
+        U64Value: From<N>,
+        BigUintValue: From<V>,
+        T: TopEncode,
+    {
+        let token_id = BytesKey::from(token_id_expr);
+
+        if let CheckEsdtMap::Unspecified = &self.esdt {
+            let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
+
+            if let Some(attributes_expr) = attributes_expr {
+                check_esdt.add_balance_and_attributes_check(
+                    nonce_expr,
+                    balance_expr,
+                    top_encode_to_vec_u8_or_panic(&attributes_expr),
+                );
+            } else {
+                check_esdt.add_balance_and_attributes_check(
+                    nonce_expr,
+                    balance_expr,
+                    Vec::<u8>::new(),
+                );
+            }
+
+            let mut new_esdt_map = BTreeMap::new();
+            let _ = new_esdt_map.insert(token_id, check_esdt);
+
+            let new_check_esdt_map = CheckEsdtMapContents {
+                contents: new_esdt_map,
+                other_esdts_allowed: true,
+            };
+
+            self.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
+        }
+
+        self
+    }
+
     pub fn check_storage(mut self, key: &str, value: &str) -> Self {
         let mut details = match self.storage {
             CheckStorage::Star => CheckStorageDetails::default(),
@@ -126,6 +176,7 @@ impl InterpretableFrom<Box<CheckAccountRaw>> for CheckAccount {
             username: CheckValue::<BytesValue>::interpret_from(from.username, context),
             storage: CheckStorage::interpret_from(from.storage, context),
             code: CheckValue::<BytesValue>::interpret_from(from.code, context),
+            code_metadata: CheckValue::<BytesValue>::interpret_from(from.code_metadata, context),
             owner: CheckValue::<BytesValue>::interpret_from(from.owner, context),
             developer_rewards: CheckValue::<BigUintValue>::interpret_from(
                 from.developer_rewards,
@@ -149,6 +200,7 @@ impl IntoRaw<CheckAccountRaw> for CheckAccount {
             username: self.username.into_raw(),
             storage: self.storage.into_raw(),
             code: self.code.into_raw_explicit(), // TODO: convert back to into_raw after VM CI upgrade
+            code_metadata: self.code_metadata.into_raw(),
             owner: self.owner.into_raw_explicit(), // TODO: convert back to into_raw after VM CI upgrade
             developer_rewards: self.developer_rewards.into_raw(),
             async_call_data: self.async_call_data.into_raw(),

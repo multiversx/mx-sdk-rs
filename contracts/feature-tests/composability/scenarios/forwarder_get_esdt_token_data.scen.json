@@ -168,6 +168,33 @@
         },
         {
             "step": "scQuery",
+            "id": "missing-account",
+            "tx": {
+                "to": "sc:forwarder",
+                "function": "get_esdt_token_data",
+                "arguments": [
+                    "address:missing-account",
+                    "str:FUNG-00001",
+                    "0"
+                ]
+            },
+            "expect": {
+                "out": [
+                    "0",
+                    "0",
+                    "false",
+                    "",
+                    "",
+                    "",
+                    "0x0000000000000000000000000000000000000000000000000000000000000000",
+                    "",
+                    ""
+                ],
+                "status": "0"
+            }
+        },
+        {
+            "step": "scQuery",
             "id": "missing-token",
             "tx": {
                 "to": "sc:forwarder",

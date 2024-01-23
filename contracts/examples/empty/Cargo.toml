@@ -9,12 +9,12 @@ publish = false
 path = "src/empty.rs"
 
 [dependencies.multiversx-sc]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../framework/base"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../framework/scenario"
 
 [dev-dependencies]
-num-bigint = "0.4.2"
+num-bigint = "0.4"

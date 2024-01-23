@@ -44,14 +44,14 @@
             "accounts": {
                 "sc:child": {
                     "balance": "500",
+                    "code": "file:../../composability/vault/output/vault.wasm",
                     "owner": "sc:use_module",
-                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "developerRewards": "100"
                 },
                 "sc:not_child": {
                     "balance": "500",
-                    "owner": "sc:not_owner",
-                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json"
+                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "owner": "sc:not_owner"
                 }
             }
         },
@@ -115,14 +115,14 @@
                 },
                 "sc:child": {
                     "balance": "500",
+                    "code": "file:../../composability/vault/output/vault.wasm",
                     "owner": "sc:use_module",
-                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "developerRewards": "0"
                 },
                 "sc:not_child": {
                     "balance": "500",
-                    "owner": "sc:not_owner",
-                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json"
+                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "owner": "sc:not_owner"
                 }
             }
         }

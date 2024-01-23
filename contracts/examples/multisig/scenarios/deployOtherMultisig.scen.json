@@ -26,7 +26,7 @@
                 "arguments": [
                     "0",
                     "sc:multisig",
-                    "0x0000",
+                    "0x0100",
                     "1",
                     "address:paul"
                 ],

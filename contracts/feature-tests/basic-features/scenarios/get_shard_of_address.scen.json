@@ -23,7 +23,9 @@
                 "from": "address:an_account",
                 "to": "sc:basic-features",
                 "function": "get_shard_of_address",
-                "arguments": ["sc:basic-features"],
+                "arguments": [
+                    "sc:basic-features"
+                ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
@@ -43,7 +45,9 @@
             "tx": {
                 "to": "sc:basic-features",
                 "function": "get_shard_of_address",
-                "arguments": ["sc:basic-features"]
+                "arguments": [
+                    "sc:basic-features"
+                ]
             },
             "expect": {
                 "out": [

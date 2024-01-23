@@ -5,6 +5,9 @@ authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
 edition = "2021"
 publish = false
 
+[dev-dependencies.builtin-func-features]
+path = "builtin-func-features"
+
 [dev-dependencies.forwarder]
 path = "forwarder"
 
@@ -29,6 +32,10 @@ path = "recursive-caller"
 [dev-dependencies.vault]
 path = "vault"
 
+[dependencies.multiversx-sc]
+version = "0.47.0"
+path = "../../../framework/base"
+
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../framework/scenario"

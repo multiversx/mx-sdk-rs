@@ -30,8 +30,11 @@ build_and_copy_with_scenarios() {
    cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
    rm $vm_contract_path/output/*.wasm
-   cp -R $contract_path/scenarios \
-      $vm_contract_path
+
+   # copying scenarios ...
+   rsync -av \
+      $contract_path/scenarios/ \
+      $vm_contract_path/scenarios/
 }
 
 # building all contracts takes a lot of time, only the ones for the wasm-vm tests are built below
@@ -64,6 +67,7 @@ build_and_copy_composability() {
 }
 
 build_and_copy ./contracts/feature-tests/composability/forwarder         $VM_REPO_PATH/test/features/composability/forwarder
+build_and_copy ./contracts/feature-tests/composability/forwarder-queue   $VM_REPO_PATH/test/features/composability/forwarder-queue
 build_and_copy ./contracts/feature-tests/composability/forwarder-raw     $VM_REPO_PATH/test/features/composability/forwarder-raw
 build_and_copy ./contracts/feature-tests/composability/proxy-test-first  $VM_REPO_PATH/test/features/composability/proxy-test-first
 build_and_copy ./contracts/feature-tests/composability/proxy-test-second $VM_REPO_PATH/test/features/composability/proxy-test-second
@@ -73,6 +77,4 @@ build_and_copy ./contracts/feature-tests/composability/vault             $VM_REP
 
 rm -f $VM_REPO_PATH/test/features/composability/scenarios/*
 cp -R contracts/feature-tests/composability/scenarios \
-   $VM_REPO_PATH/test/features/composability
-cp -R contracts/feature-tests/composability/scenarios-promises \
    $VM_REPO_PATH/test/features/composability

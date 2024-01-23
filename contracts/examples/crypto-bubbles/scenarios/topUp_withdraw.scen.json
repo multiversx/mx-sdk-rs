@@ -43,7 +43,9 @@
                             "str:top_up",
                             "address:acc1"
                         ],
-                        "data": "0x4000000"
+                        "data": [
+                            "0x4000000"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -68,14 +70,13 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "*",
+                        "address": "sc:crypto_bubbles",
                         "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "sc:crypto_bubbles",
-                            "address:acc1",
-                            "0x4000000"
+                            "0x4000000",
+                            "address:acc1"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:crypto_bubbles",
@@ -84,7 +85,9 @@
                             "str:withdraw",
                             "address:acc1"
                         ],
-                        "data": "0x4000000"
+                        "data": [
+                            "0x4000000"
+                        ]
                     }
                 ],
                 "gas": "*",

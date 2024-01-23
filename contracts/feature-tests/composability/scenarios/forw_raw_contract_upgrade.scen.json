@@ -8,6 +8,9 @@
                 "sc:forwarder": {
                     "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 },
+                "sc:reference": {
+                    "code": "file:../vault/output/vault-upgrade.wasm"
+                },
                 "sc:child": {
                     "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
@@ -16,27 +19,30 @@
         },
         {
             "step": "scCall",
-            "id": "upgrade-vault-to-forwarder",
+            "id": "upgrade-vault-from-source",
             "tx": {
                 "from": "address:a_user",
                 "to": "sc:forwarder",
                 "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:child",
-                    "sc:forwarder"
+                    "sc:reference",
+                    "0x0102"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": []
+                "out": "*",
+                "status": ""
             }
         },
         {
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../vault/output/vault-upgrade.wasm",
+                    "codeMetadata": "0x0102"
                 },
                 "+": ""
             }
@@ -50,7 +56,8 @@
                 "function": "call_upgrade",
                 "arguments": [
                     "sc:child",
-                    "mxsc:../vault/output/vault.mxsc.json",
+                    "file:../vault/output/vault.wasm",
+                    "0x0102",
                     "str:upgrade-init-arg"
                 ],
                 "gasLimit": "500,000,000",
@@ -58,6 +65,7 @@
             },
             "expect": {
                 "out": [
+                    "str:upgraded",
                     "str:upgrade-init-arg"
                 ]
             }
@@ -66,7 +74,8 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm",
+                    "codeMetadata": "0x0102"
                 },
                 "+": ""
             }

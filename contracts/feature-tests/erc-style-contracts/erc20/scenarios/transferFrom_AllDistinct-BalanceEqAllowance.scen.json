@@ -48,7 +48,9 @@
                             "address:coin_holder_1",
                             "address:coin_holder_2"
                         ],
-                        "data": "0x17"
+                        "data": [
+                            "0x17"
+                        ]
                     }
                 ],
                 "gas": "*",

@@ -16,7 +16,7 @@
                     "sc:multisig-child",
                     "0",
                     "sc:adder-code",
-                    "0x0000",
+                    "0x0100",
                     "1234"
                 ],
                 "gasLimit": "15,000,000",

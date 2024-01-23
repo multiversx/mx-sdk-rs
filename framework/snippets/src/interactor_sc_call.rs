@@ -6,7 +6,7 @@ use multiversx_sc_scenario::{
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall, TxResponse},
 };
-use multiversx_sdk::data::transaction::Transaction;
+use multiversx_sdk::{data::transaction::Transaction, utils::base64_encode};
 
 impl Interactor {
     pub async fn sc_call<S>(&mut self, mut sc_call_step: S)
@@ -51,7 +51,7 @@ impl Interactor {
         let data = if contract_call_tx_data.is_empty() {
             None
         } else {
-            Some(base64::encode(contract_call_tx_data))
+            Some(String::from_utf8(base64_encode(contract_call_tx_data).into()).unwrap())
         };
 
         Transaction {
@@ -74,12 +74,13 @@ fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<StaticApi, ()>)
     let mut result = String::from_utf8(
         contract_call
             .basic
-            .endpoint_name
+            .function_call
+            .function_name
             .to_boxed_bytes()
             .into_vec(),
     )
     .unwrap();
-    for argument in contract_call.basic.arg_buffer.raw_arg_iter() {
+    for argument in contract_call.basic.function_call.arg_buffer.raw_arg_iter() {
         result.push('@');
         result.push_str(hex::encode(argument.to_boxed_bytes().as_slice()).as_str());
     }

@@ -1,4 +1,5 @@
 use quote::quote;
+use syn::{punctuated::Punctuated, token::Comma, Variant};
 
 pub fn is_fieldless_enum(data_enum: &syn::DataEnum) -> bool {
     data_enum
@@ -84,4 +85,11 @@ where
         },
         syn::Fields::Unit => quote! {},
     }
+}
+
+pub fn validate_enum_variants(variants: &Punctuated<Variant, Comma>) {
+    assert!(
+        variants.len() <= 256,
+        "enums with more than 256 variants not supported"
+    );
 }

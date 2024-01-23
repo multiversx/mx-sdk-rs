@@ -12,6 +12,6 @@ files_include = [
     "scenarios",
     "src",
     "tests",
-    "wasm/Cargo.toml",
     "Cargo.toml",
+    "multiversx.json",
 ]

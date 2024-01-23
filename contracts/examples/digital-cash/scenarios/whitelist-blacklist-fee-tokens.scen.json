@@ -1,0 +1,176 @@
+{
+    "name": "whitelist-blacklist-fee-token",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "set-accounts.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "whitelist-fail",
+            "tx": {
+                "from": "address:digital_cash_owner_address",
+                "to": "sc:the_digital_cash_contract",
+                "function": "whitelistFeeToken",
+                "arguments": [
+                    "biguint:10",
+                    "str:EGLD"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Token already whitelisted",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "whitelist-success-1",
+            "tx": {
+                "from": "address:digital_cash_owner_address",
+                "to": "sc:the_digital_cash_contract",
+                "function": "whitelistFeeToken",
+                "arguments": [
+                    "3",
+                    "str:CASHTOKEN-778899"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "whitelist-success-2",
+            "tx": {
+                "from": "address:digital_cash_owner_address",
+                "to": "sc:the_digital_cash_contract",
+                "function": "whitelistFeeToken",
+                "arguments": [
+                    "5",
+                    "str:ESDT-778899"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "blacklist-fail",
+            "tx": {
+                "from": "address:digital_cash_owner_address",
+                "to": "sc:the_digital_cash_contract",
+                "function": "blacklistFeeToken",
+                "arguments": [
+                    "str:ESDT-000000"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:Token is not whitelisted",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "blacklist-success",
+            "tx": {
+                "from": "address:digital_cash_owner_address",
+                "to": "sc:the_digital_cash_contract",
+                "function": "blacklistFeeToken",
+                "arguments": [
+                    "str:ESDT-778899"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "0",
+                "message": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "sc:the_digital_cash_contract": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "storage": {
+                        "str:fee|nested:str:EGLD": "10",
+                        "str:fee|nested:str:CASHTOKEN-778899": "3",
+                        "str:whitelistedFeeTokens|str:.len": "2",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:whitelistedFeeTokens|str:.item|u32:2": "str:CASHTOKEN-778899",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:CASHTOKEN-778899": "2",
+                        "str:allTimeFeeTokens|str:.len": "3",
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:allTimeFeeTokens|str:.item|u32:2": "str:CASHTOKEN-778899",
+                        "str:allTimeFeeTokens|str:.item|u32:3": "str:ESDT-778899",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:allTimeFeeTokens|str:.index|nested:str:CASHTOKEN-778899": "2",
+                        "str:allTimeFeeTokens|str:.index|nested:str:ESDT-778899": "3"
+                    },
+                    "code": "file:../output/digital-cash.wasm"
+                },
+                "address:acc1": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "storage": {}
+                },
+                "address:acc2": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-123456": "100"
+                    },
+                    "storage": {}
+                },
+                "address:acc3": {
+                    "nonce": "0",
+                    "balance": "1,000,000",
+                    "esdt": {
+                        "str:CASHTOKEN-112233": "100",
+                        "str:CASHTOKEN-445566": "100",
+                        "str:CASHTOKEN-778899": "100"
+                    },
+                    "storage": {}
+                },
+                "address:digital_cash_owner_address": {
+                    "nonce": "6",
+                    "balance": "0",
+                    "storage": {}
+                }
+            }
+        }
+    ]
+}

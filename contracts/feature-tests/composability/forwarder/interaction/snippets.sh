@@ -9,7 +9,7 @@ VAULT_ADDRESS_HEX="0x$(mxpy wallet bech32 --decode ${VAULT_ADDRESS_BECH32})"
 
 ECHO_ARGS_FUNC_NAME=echo_args_async
 
-PROXY=https://testnet-api.elrond.com
+PROXY=https://testnet-api.multiversx.com
 CHAIN_ID=T
 
 deployForwarder() {

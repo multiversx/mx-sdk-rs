@@ -48,7 +48,9 @@
                             "address:coin_holder_1",
                             "address:coin_holder_2"
                         ],
-                        "data": "0x0a"
+                        "data": [
+                            "0x0a"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -82,7 +84,9 @@
                             "address:coin_holder_1",
                             "address:account_6"
                         ],
-                        "data": "0x0a"
+                        "data": [
+                            "0x0a"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -116,7 +120,9 @@
                             "address:coin_holder_1",
                             "address:coin_holder_1"
                         ],
-                        "data": "0x0a"
+                        "data": [
+                            "0x0a"
+                        ]
                     }
                 ],
                 "gas": "*",

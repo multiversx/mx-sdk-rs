@@ -8,21 +8,18 @@ publish = false
 [lib]
 path = "src/forwarder_queue.rs"
 
-[features]
-promises = ["multiversx-sc/promises"]
-
 [dependencies.vault]
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.43.2"
+version = "0.47.0"
 path = "../../../../framework/scenario"

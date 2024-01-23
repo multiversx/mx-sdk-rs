@@ -51,11 +51,16 @@
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKENA",
-                            "",
+                            "0",
                             "1000",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:DirectCall",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     }
                 ],
                 "gas": "*",

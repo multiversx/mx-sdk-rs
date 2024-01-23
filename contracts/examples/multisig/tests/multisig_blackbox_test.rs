@@ -9,7 +9,7 @@ use multiversx_sc::{
         test_util::top_encode_to_vec_u8_or_panic,
     },
     storage::mappers::SingleValue,
-    types::{Address, CodeMetadata, ContractCallNoPayment},
+    types::{Address, CodeMetadata, ContractCallNoPayment, FunctionCall},
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -31,7 +31,6 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
 const QUORUM_SIZE: usize = 1;
-const STATUS_ERR_CODE_EXPR: u64 = 4;
 
 type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
 type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
@@ -161,8 +160,7 @@ impl MultisigTestState {
                 self.multisig_contract.propose_transfer_execute(
                     to,
                     egld_amount,
-                    contract_call.endpoint_name,
-                    contract_call.arg_buffer.into_multi_value_encoded(),
+                    contract_call.into_function_call(),
                 ),
             ))
     }
@@ -178,8 +176,7 @@ impl MultisigTestState {
                 self.multisig_contract.propose_async_call(
                     to,
                     egld_amount,
-                    contract_call.endpoint_name,
-                    contract_call.arg_buffer.into_multi_value_encoded(),
+                    contract_call.into_function_call(),
                 ),
             ))
     }
@@ -243,10 +240,7 @@ impl MultisigTestState {
             ScCallStep::new()
                 .from(BOARD_MEMBER_ADDRESS_EXPR)
                 .call(self.multisig_contract.perform_action_endpoint(action_id))
-                .expect(TxExpect::err(
-                    STATUS_ERR_CODE_EXPR,
-                    "str:".to_string() + err_message,
-                )),
+                .expect(TxExpect::user_error("str:".to_string() + err_message)),
         );
     }
 
@@ -370,8 +364,7 @@ fn test_change_quorum() {
         ScCallStep::new()
             .from(BOARD_MEMBER_ADDRESS_EXPR)
             .call(state.multisig_contract.discard_action(action_id))
-            .expect(TxExpect::err(
-                STATUS_ERR_CODE_EXPR,
+            .expect(TxExpect::user_error(
                 "str:cannot discard action with valid signatures",
             )),
     );
@@ -394,10 +387,7 @@ fn test_change_quorum() {
         ScCallStep::new()
             .from(BOARD_MEMBER_ADDRESS_EXPR)
             .call(state.multisig_contract.sign(action_id))
-            .expect(TxExpect::err(
-                STATUS_ERR_CODE_EXPR,
-                "str:action does not exist",
-            )),
+            .expect(TxExpect::user_error("str:action does not exist")),
     );
 
     // add another board member
@@ -408,7 +398,7 @@ fn test_change_quorum() {
         SetStateStep::new().put_account(NEW_BOARD_MEMBER_ADDRESS_EXPR, Account::new().nonce(1)),
     );
 
-    let action_id = state.propose_add_board_member(new_board_member_address.clone());
+    let action_id = state.propose_add_board_member(new_board_member_address);
     state.sign(action_id);
     state.perform(action_id);
 
@@ -451,13 +441,9 @@ fn test_transfer_execute_to_user() {
             .call(state.multisig_contract.propose_transfer_execute(
                 new_user_address.clone(),
                 0u64,
-                OptionalValue::<String>::None,
-                MultiValueVec::<Vec<u8>>::new(),
+                FunctionCall::empty(),
             ))
-            .expect(TxExpect::err(
-                STATUS_ERR_CODE_EXPR,
-                "str:proposed action has no effect",
-            )),
+            .expect(TxExpect::user_error("str:proposed action has no effect")),
     );
 
     // propose
@@ -466,10 +452,9 @@ fn test_transfer_execute_to_user() {
             .world
             .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
                 state.multisig_contract.propose_transfer_execute(
-                    new_user_address.clone(),
+                    new_user_address,
                     AMOUNT.parse::<u64>().unwrap(),
-                    OptionalValue::<String>::None,
-                    MultiValueVec::<Vec<u8>>::new(),
+                    FunctionCall::empty(),
                 ),
             ));
     state.sign(action_id);
@@ -547,7 +532,7 @@ fn test_deploy_and_upgrade_from_source() {
 
     let adder_call = state.adder_contract.add(5u64);
 
-    let action_id = state.propose_transfer_execute(new_adder_address.clone(), 0u64, adder_call);
+    let action_id = state.propose_transfer_execute(new_adder_address, 0u64, adder_call);
     state.sign(action_id);
     state.perform(action_id);
 
@@ -576,7 +561,7 @@ fn test_deploy_and_upgrade_from_source() {
     let action_id = state.propose_sc_upgrade_from_source(
         state.adder_address.clone(),
         0u64,
-        factorial_address.clone(),
+        factorial_address,
         CodeMetadata::all(),
         MultiValueVec::new(),
     );

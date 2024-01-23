@@ -125,6 +125,12 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         uris_handle: RawHandle,
     );
 
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    );
+
     fn check_esdt_frozen(
         &self,
         address_handle: Self::ManagedBufferHandle,

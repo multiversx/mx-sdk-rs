@@ -52,7 +52,7 @@
                             "0",
                             "1200"
                         ],
-                        "data": ""
+                        "data": []
                     },
                     {
                         "address": "sc:forwarder",
@@ -60,7 +60,9 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": ""
+                        "data": [
+                            ""
+                        ]
                     }
                 ],
                 "gas": "*",

@@ -56,7 +56,7 @@
                             "",
                             "str:new-uri-1"
                         ],
-                        "data": ""
+                        "data": []
                     }
                 ],
                 "gas": "*",
@@ -125,7 +125,7 @@
                             "str:new-uri-2",
                             "str:new-uri-3"
                         ],
-                        "data": ""
+                        "data": []
                     }
                 ],
                 "gas": "*",

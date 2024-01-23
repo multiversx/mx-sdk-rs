@@ -52,7 +52,20 @@
                             "0",
                             "1200"
                         ],
-                        "data": ""
+                        "data": []
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:forwarder"
+                        ],
+                        "data": [
+                            "str:AsyncCallback",
+                            "str:callBack",
+                            "0x00"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -60,7 +73,9 @@
                         "topics": [
                             "str:callback_raw"
                         ],
-                        "data": "nested:0x00"
+                        "data": [
+                            "nested:0x00"
+                        ]
                     }
                 ],
                 "gas": "*",

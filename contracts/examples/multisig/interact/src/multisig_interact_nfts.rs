@@ -1,7 +1,9 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::multiversx_sc::codec::multi_types::IgnoreValue;
-use multiversx_sc_snippets::multiversx_sc::codec::test_util::top_encode_to_vec_u8_or_panic;
+use multiversx_sc_scenario::multiversx_sc::{
+    codec::{multi_types::IgnoreValue, Empty},
+    types::FunctionCall,
+};
 
 use super::*;
 
@@ -39,17 +41,17 @@ impl MultisigInteract {
             .interactor
             .sc_call_get_result(
                 ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        system_sc_address,
-                        ISSUE_COST,
-                        "registerAndSetAllRoles".to_string(),
-                        MultiValueVec::from([
-                            COLLECTION_NAME.as_bytes(),
-                            COLLECTION_TICKER.as_bytes(),
-                            TOKEN_TYPE.as_bytes(),
-                            top_encode_to_vec_u8_or_panic(&0u32).as_slice(),
-                        ]),
-                    ))
+                    .call(
+                        self.state.multisig().propose_async_call(
+                            system_sc_address,
+                            ISSUE_COST,
+                            FunctionCall::new("registerAndSetAllRoles")
+                                .argument(&COLLECTION_NAME)
+                                .argument(&COLLECTION_TICKER)
+                                .argument(&TOKEN_TYPE)
+                                .argument(&0u32),
+                        ),
+                    )
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000")
                     .expect(TxExpect::ok().additional_error_message("failed to issue collection")),
@@ -100,15 +102,15 @@ impl MultisigInteract {
             .interactor
             .sc_call_get_result(
                 ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        system_sc_address,
-                        ISSUE_COST,
-                        "issueNonFungible".to_string(),
-                        MultiValueVec::from([
-                            COLLECTION_NAME.to_string(),
-                            COLLECTION_TICKER.to_string(),
-                        ]),
-                    ))
+                    .call(
+                        self.state.multisig().propose_async_call(
+                            system_sc_address,
+                            ISSUE_COST,
+                            FunctionCall::new("issueNonFungible")
+                                .argument(&COLLECTION_NAME)
+                                .argument(&COLLECTION_TICKER),
+                        ),
+                    )
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000"),
             )
@@ -158,16 +160,16 @@ impl MultisigInteract {
             .interactor
             .sc_call_get_result(
                 ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        &self.system_sc_address,
-                        0u64,
-                        "setSpecialRole".to_string(),
-                        MultiValueVec::from([
-                            self.collection_token_identifier.as_bytes(),
-                            multisig_address.as_bytes(),
-                            "ESDTRoleNFTCreate".as_bytes(),
-                        ]),
-                    ))
+                    .call(
+                        self.state.multisig().propose_async_call(
+                            &self.system_sc_address,
+                            0u64,
+                            FunctionCall::new("setSpecialRole")
+                                .argument(&self.collection_token_identifier)
+                                .argument(&multisig_address)
+                                .argument(&"ESDTRoleNFTCreate"),
+                        ),
+                    )
                     .from(&self.wallet_address)
                     .gas_limit("10,000,000"),
             )
@@ -200,20 +202,20 @@ impl MultisigInteract {
             );
 
             let typed_sc_call = ScCallStep::new()
-                .call(self.state.multisig().propose_async_call(
-                    &multisig_address,
-                    0u64,
-                    "ESDTNFTCreate".to_string(),
-                    MultiValueVec::from([
-                        self.collection_token_identifier.as_bytes(),
-                        top_encode_to_vec_u8_or_panic(&1u32).as_slice(),
-                        item_name.as_bytes(),
-                        top_encode_to_vec_u8_or_panic(&ROYALTIES).as_slice(),
-                        &[][..],
-                        METADATA.as_bytes(),
-                        image_cid.as_bytes(),
-                    ]),
-                ))
+                .call(
+                    self.state.multisig().propose_async_call(
+                        &multisig_address,
+                        0u64,
+                        FunctionCall::new("ESDTNFTCreate")
+                            .argument(&self.collection_token_identifier)
+                            .argument(&1u32)
+                            .argument(&item_name)
+                            .argument(&ROYALTIES)
+                            .argument(&Empty)
+                            .argument(&METADATA)
+                            .argument(&image_cid),
+                    ),
+                )
                 .from(&self.wallet_address)
                 .gas_limit("10,000,000");
 

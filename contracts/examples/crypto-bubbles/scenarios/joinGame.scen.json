@@ -53,7 +53,9 @@
                             "str:top_up",
                             "address:acc1"
                         ],
-                        "data": "0x0200"
+                        "data": [
+                            "0x0200"
+                        ]
                     },
                     {
                         "address": "sc:crypto_bubbles",
@@ -63,7 +65,9 @@
                             "0x12",
                             "address:acc1"
                         ],
-                        "data": "0x200"
+                        "data": [
+                            "0x200"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -95,7 +99,9 @@
                             "str:top_up",
                             "address:acc2"
                         ],
-                        "data": "0x150"
+                        "data": [
+                            "0x150"
+                        ]
                     },
                     {
                         "address": "sc:crypto_bubbles",
@@ -105,7 +111,9 @@
                             "0x12",
                             "address:acc2"
                         ],
-                        "data": "0x150"
+                        "data": [
+                            "0x150"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -137,7 +145,9 @@
                             "str:top_up",
                             "address:acc2"
                         ],
-                        "data": "0x2000"
+                        "data": [
+                            "0x2000"
+                        ]
                     },
                     {
                         "address": "sc:crypto_bubbles",
@@ -147,7 +157,9 @@
                             "0x12",
                             "address:acc2"
                         ],
-                        "data": "0x2000"
+                        "data": [
+                            "0x2000"
+                        ]
                     }
                 ],
                 "gas": "*",

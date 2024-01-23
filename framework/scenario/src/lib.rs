@@ -32,6 +32,8 @@ pub use num_bigint;
 
 pub use multiversx_sc;
 
+pub use multiversx_sc_meta as meta;
+
 /// Exposing the scenario model. Might be moved in the future,
 /// but the export will hopefully remain the same.
 pub use crate::scenario::model as scenario_model;
