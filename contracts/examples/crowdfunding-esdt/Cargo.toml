@@ -17,6 +17,6 @@ version = "0.46.1"
 path = "../../../framework/scenario"
 
 [dev-dependencies]
-num-bigint = "0.4.2"
+num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
