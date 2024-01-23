@@ -10,6 +10,7 @@ use multiversx_sc::types::String;
 pub trait EchoAllocTypes {
     #[endpoint]
     fn echo_h256(&self, h: H256) -> H256 {
+        let _buffer = Box::new([0u8; 1024]);
         h
     }
 
@@ -85,6 +86,11 @@ pub trait EchoAllocTypes {
 
     #[endpoint]
     fn echo_ser_example_1(&self, se: StructExampleAlloc) -> StructExampleAlloc {
+        se
+    }
+
+    #[endpoint]
+    fn trigger_fail_allocator(&self, se: StructExampleAlloc) -> StructExampleAlloc {
         se
     }
 }

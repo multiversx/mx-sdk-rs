@@ -5,15 +5,17 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           64
+// Endpoints:                           65
 // Async Callback (empty):               1
-// Total number of exported functions:  66
+// Total number of exported functions:  67
 
 #![no_std]
-#![allow(internal_features)]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
-multiversx_sc_wasm_adapter::allocator!(static64k);
+multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
@@ -33,6 +35,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_boxed_ser_example_1 => echo_boxed_ser_example_1
         echo_multi_value_tuples => echo_multi_value_tuples
         echo_ser_example_1 => echo_ser_example_1
+        trigger_fail_allocator => trigger_fail_allocator
         echo_vec_of_managed_buffer => echo_vec_of_managed_buffer
         echo_big_int_vec => echo_big_int_vec
         echo_varags_u32 => echo_varags_u32
