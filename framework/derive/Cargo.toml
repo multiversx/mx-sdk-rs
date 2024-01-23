@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-derive"
-version = "0.46.1"
+version = "0.47.0"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]
@@ -14,7 +14,7 @@ keywords = ["multiversx", "blockchain", "contract"]
 categories = ["cryptography::cryptocurrencies", "development-tools::procedural-macro-helpers"]
 
 [dependencies]
-proc-macro2 = "=1.0.75"
+proc-macro2 = "=1.0.76"
 quote = "=1.0.35"
 syn = "=2.0.48"
 hex = "=0.4.3"
