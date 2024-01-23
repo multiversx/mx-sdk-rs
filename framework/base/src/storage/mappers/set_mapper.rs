@@ -24,9 +24,9 @@ where
     fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T;
 }
 
-pub struct StorageSCAddress;
+pub struct CurrentStorage;
 
-impl<SA> StorageAddress<SA> for StorageSCAddress
+impl<SA> StorageAddress<SA> for CurrentStorage
 where
     SA: StorageMapperApi,
 {
@@ -44,7 +44,7 @@ where
     }
 }
 
-pub struct SetMapper<SA, T, A = StorageSCAddress>
+pub struct SetMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -56,7 +56,7 @@ where
     queue_mapper: QueueMapper<SA, T, A>,
 }
 
-impl<SA, T> StorageMapper<SA> for SetMapper<SA, T, StorageSCAddress>
+impl<SA, T> StorageMapper<SA> for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -64,14 +64,14 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         SetMapper {
             _phantom_api: PhantomData,
-            address: StorageSCAddress,
+            address: CurrentStorage,
             base_key: base_key.clone(),
             queue_mapper: QueueMapper::new(base_key),
         }
     }
 }
 
-impl<SA, T> StorageClearable for SetMapper<SA, T, StorageSCAddress>
+impl<SA, T> StorageClearable for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -99,7 +99,7 @@ where
     }
 }
 
-impl<SA, T> SetMapper<SA, T, StorageSCAddress>
+impl<SA, T> SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -218,7 +218,7 @@ where
     }
 }
 
-impl<SA, T> Extend<T> for SetMapper<SA, T, StorageSCAddress>
+impl<SA, T> Extend<T> for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -234,7 +234,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for SetMapper<SA, T, StorageSCAddress>
+impl<SA, T> TopEncodeMulti for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -248,7 +248,7 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<SetMapper<SA, T, StorageSCAddress>> for MultiValueEncoded<SA, T>
+impl<SA, T> CodecFrom<SetMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -256,7 +256,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for SetMapper<SA, T, StorageSCAddress>
+impl<SA, T> TypeAbi for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,

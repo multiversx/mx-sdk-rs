@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{self, StorageAddress, StorageSCAddress},
+    set_mapper::{self, CurrentStorage, StorageAddress},
     SetMapper, StorageClearable, StorageMapper,
 };
 use crate::{
@@ -14,7 +14,7 @@ use crate::{
 const MAPPED_STORAGE_VALUE_IDENTIFIER: &[u8] = b".storage";
 type Keys<'a, SA, A, T> = set_mapper::Iter<'a, SA, A, T>;
 
-pub struct MapStorageMapper<SA, K, V, A = StorageSCAddress>
+pub struct MapStorageMapper<SA, K, V, A = CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -27,7 +27,7 @@ where
     _phantom_value: PhantomData<V>,
 }
 
-impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V, StorageSCAddress>
+impl<SA, K, V> StorageMapper<SA> for MapStorageMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -43,7 +43,7 @@ where
     }
 }
 
-impl<SA, K, V> StorageClearable for MapStorageMapper<SA, K, V, StorageSCAddress>
+impl<SA, K, V> StorageClearable for MapStorageMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -57,7 +57,7 @@ where
     }
 }
 
-impl<SA, K, V> MapStorageMapper<SA, K, V, StorageSCAddress>
+impl<SA, K, V> MapStorageMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -330,7 +330,7 @@ where
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
 }
 
-impl<'a, SA, K, V> Entry<'a, SA, StorageSCAddress, K, V>
+impl<'a, SA, K, V> Entry<'a, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
@@ -338,7 +338,7 @@ where
 {
     /// Ensures a value is in the entry by inserting the default if empty, and returns
     /// an `OccupiedEntry`.
-    pub fn or_insert_default(self) -> OccupiedEntry<'a, SA, StorageSCAddress, K, V> {
+    pub fn or_insert_default(self) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
             Entry::Vacant(entry) => entry.insert_default(),
@@ -369,7 +369,7 @@ where
     }
 }
 
-impl<'a, SA, K, V> Entry<'a, SA, StorageSCAddress, K, V>
+impl<'a, SA, K, V> Entry<'a, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
@@ -377,7 +377,7 @@ where
 {
     /// Ensures a value is in the entry by inserting the default value if empty,
     /// and returns an `OccupiedEntry`.
-    pub fn or_default(self) -> OccupiedEntry<'a, SA, StorageSCAddress, K, V> {
+    pub fn or_default(self) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
             Entry::Vacant(entry) => entry.insert_default(),
@@ -399,7 +399,7 @@ where
     }
 }
 
-impl<'a, SA, K, V> VacantEntry<'a, SA, StorageSCAddress, K, V>
+impl<'a, SA, K, V> VacantEntry<'a, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
@@ -407,7 +407,7 @@ where
 {
     /// Sets the value of the entry with the `VacantEntry`'s key,
     /// and returns an `OccupiedEntry`.
-    pub fn insert_default(self) -> OccupiedEntry<'a, SA, StorageSCAddress, K, V> {
+    pub fn insert_default(self) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         self.map.insert_default(self.key.clone());
         OccupiedEntry {
             key: self.key,
@@ -435,7 +435,7 @@ where
     }
 }
 
-impl<'a, SA, K, V> OccupiedEntry<'a, SA, StorageSCAddress, K, V>
+impl<'a, SA, K, V> OccupiedEntry<'a, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,

@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 
 use super::{
-    set_mapper::{StorageAddress, StorageSCAddress},
+    set_mapper::{CurrentStorage, StorageAddress},
     StorageClearable, StorageMapper,
 };
 use crate::{
@@ -65,7 +65,7 @@ impl QueueMapperInfo {
 ///
 /// The `QueueMapper` allows pushing and popping elements at either end
 /// in constant time.
-pub struct QueueMapper<SA, T, A = StorageSCAddress>
+pub struct QueueMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
@@ -77,7 +77,7 @@ where
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, StorageSCAddress>
+impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -85,14 +85,14 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         QueueMapper {
             _phantom_api: PhantomData,
-            address: StorageSCAddress,
+            address: CurrentStorage,
             base_key,
             _phantom_item: PhantomData,
         }
     }
 }
 
-impl<SA, T> StorageClearable for QueueMapper<SA, T, StorageSCAddress>
+impl<SA, T> StorageClearable for QueueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -110,7 +110,7 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, T, StorageSCAddress>
+impl<SA, T> QueueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -496,7 +496,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for QueueMapper<SA, T, StorageSCAddress>
+impl<SA, T> TopEncodeMulti for QueueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -510,7 +510,7 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<QueueMapper<SA, T, StorageSCAddress>> for MultiValueEncoded<SA, T>
+impl<SA, T> CodecFrom<QueueMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -518,7 +518,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for QueueMapper<SA, T, StorageSCAddress>
+impl<SA, T> TypeAbi for QueueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
