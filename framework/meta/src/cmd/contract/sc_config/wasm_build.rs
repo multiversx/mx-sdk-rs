@@ -24,10 +24,6 @@ impl ContractVariant {
 
         assert!(exit_status.success(), "contract build process failed");
 
-        // let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
-        // println!(">>>>>>>>output_wasm_path {}", output_wasm_path);
-        // let wasm_data = WasmInfo::build_wasm_info(&output_wasm_path);
-
         self.finalize_build(build_args, output_path);
     }
 

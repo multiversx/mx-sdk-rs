@@ -1,5 +1,4 @@
 #![no_std]
-// use crate::heap::Box;
 
 multiversx_sc::imports!();
 /// One of the simplest smart contracts possible,

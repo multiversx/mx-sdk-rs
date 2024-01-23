@@ -66,7 +66,7 @@ pub trait ProxyTestFirst {
             .message_me_proxy()
             .init(123)
             .with_egld_transfer(payment.clone_value())
-            .deploy_contract::<i32>(&code, CodeMetadata::DEFAULT);
+            .deploy_contract::<i32>(&code, CodeMetadata::UPGRADEABLE);
         self.set_other_contract(&address);
         init_result + 1
     }
@@ -81,7 +81,7 @@ pub trait ProxyTestFirst {
             .contract(other_contract)
             .init(456) // TODO: upgrade proxy
             .with_egld_transfer(payment.clone_value())
-            .upgrade_contract(&code, CodeMetadata::DEFAULT);
+            .upgrade_contract(&code, CodeMetadata::UPGRADEABLE);
     }
 
     #[payable("EGLD")]

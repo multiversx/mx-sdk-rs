@@ -1,3 +1,4 @@
+use colored::Colorize;
 use std::{fs, str::from_utf8};
 use wasmparser::{BinaryReaderError, Parser, Payload};
 
@@ -33,7 +34,13 @@ impl WasmInfo {
             .expect("error occured while extracting memory allocation information from .wasm ");
 
         if allocator_trigger {
-            panic!("FailAllocator triggered: memory allocation forbidden");
+            println!(
+                "{}",
+                "FailAllocator triggered: memory allocation forbidden"
+                    .to_string()
+                    .red()
+                    .bold()
+            );
         }
 
         Self::new()

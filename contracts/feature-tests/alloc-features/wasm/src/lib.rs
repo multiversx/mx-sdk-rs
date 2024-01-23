@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           65
+// Endpoints:                           64
 // Async Callback (empty):               1
-// Total number of exported functions:  67
+// Total number of exported functions:  66
 
 #![no_std]
 
@@ -35,7 +35,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         echo_boxed_ser_example_1 => echo_boxed_ser_example_1
         echo_multi_value_tuples => echo_multi_value_tuples
         echo_ser_example_1 => echo_ser_example_1
-        trigger_fail_allocator => trigger_fail_allocator
         echo_vec_of_managed_buffer => echo_vec_of_managed_buffer
         echo_big_int_vec => echo_big_int_vec
         echo_varags_u32 => echo_varags_u32
