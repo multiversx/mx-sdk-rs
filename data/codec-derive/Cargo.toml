@@ -21,7 +21,7 @@ proc-macro = true
 default = ["syn/full", "syn/parsing", "syn/extra-traits"]
 
 [dependencies]
-proc-macro2 = "1.0.66"
-quote = "1.0.33"
-syn = "2.0.39"
-hex = "0.4"
+proc-macro2 = "=1.0.75"
+quote = "=1.0.35"
+syn = "=2.0.48"
+hex = "=0.4.3"
