@@ -38,7 +38,7 @@ pub trait StorageMapperGetAtAddress {
         mapper.len()
     }
 
-    /// Storage to be called. For testing, this contract is deployed twice, 
+    /// Storage to be called. For testing, this contract is deployed twice,
     /// and this module acts both as caller and receiver
     #[storage_mapper("set_mapper")]
     fn set_mapper(&self) -> SetMapper<u32>;

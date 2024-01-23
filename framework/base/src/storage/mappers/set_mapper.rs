@@ -89,13 +89,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
-        let mut named_key = self.base_key.clone();
-        named_key.append_bytes(name);
-        named_key.append_item(value);
-        named_key
-    }
-
     pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         SetMapper {
             _phantom_api: PhantomData,
@@ -104,33 +97,6 @@ where
             queue_mapper: QueueMapper::new_from_address(address, base_key),
         }
     }
-
-    fn get_node_id(&self, value: &T) -> u32 {
-        self.address.address_storage_get(
-            self.build_named_value_key(NODE_ID_IDENTIFIER, value)
-                .as_ref(),
-        )
-    }
-
-    /// Returns `true` if the set contains no elements.
-    pub fn is_empty(&self) -> bool {
-        self.queue_mapper.is_empty()
-    }
-
-    /// Returns the number of elements in the set.
-    pub fn len(&self) -> usize {
-        self.queue_mapper.len()
-    }
-
-    /// Returns `true` if the set contains a value.
-    pub fn contains(&self, value: &T) -> bool {
-        self.get_node_id(value) != NULL_ENTRY
-    }
-
-    /// Checks the internal consistency of the collection. Used for unit tests.
-    pub fn check_internal_consistency(&self) -> bool {
-        self.queue_mapper.check_internal_consistency()
-    }
 }
 
 impl<SA, T> SetMapper<SA, T, StorageSCAddress>
@@ -138,13 +104,6 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
-        let mut named_key = self.base_key.clone();
-        named_key.append_bytes(name);
-        named_key.append_item(value);
-        named_key
-    }
-
     fn set_node_id(&self, value: &T, node_id: u32) {
         storage_set(
             self.build_named_value_key(NODE_ID_IDENTIFIER, value)
@@ -195,10 +154,24 @@ where
             self.remove(&item);
         }
     }
+}
+
+impl<SA, A, T> SetMapper<SA, T, A>
+where
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(value);
+        named_key
+    }
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, T> {
+    pub fn iter(&self) -> Iter<SA, A, T> {
         self.queue_mapper.iter()
     }
 
@@ -209,35 +182,36 @@ where
         )
     }
 
-    // Returns `true` if the set contains no elements.
-    pub fn is_empty(&self) -> bool {
-        self.queue_mapper.is_empty()
-    }
-
-    // Returns the number of elements in the set.
-    pub fn len(&self) -> usize {
-        self.queue_mapper.len()
-    }
-
-    // Returns `true` if the set contains a value.
+    /// Returns `true` if the set contains a value.
     pub fn contains(&self, value: &T) -> bool {
         self.get_node_id(value) != NULL_ENTRY
     }
 
-    // Checks the internal consistency of the collection. Used for unit tests.
+    /// Returns `true` if the set contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.queue_mapper.is_empty()
+    }
+
+    /// Returns the number of elements in the set.
+    pub fn len(&self) -> usize {
+        self.queue_mapper.len()
+    }
+
+    /// Checks the internal consistency of the collection. Used for unit tests.
     pub fn check_internal_consistency(&self) -> bool {
         self.queue_mapper.check_internal_consistency()
     }
 }
 
-impl<'a, SA, T> IntoIterator for &'a SetMapper<SA, T, StorageSCAddress>
+impl<'a, SA, A, T> IntoIterator for &'a SetMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     type Item = T;
 
-    type IntoIter = Iter<'a, SA, T>;
+    type IntoIter = Iter<'a, SA, A, T>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
