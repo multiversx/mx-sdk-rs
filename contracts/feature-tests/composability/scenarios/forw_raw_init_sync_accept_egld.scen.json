@@ -27,7 +27,7 @@
             "tx": {
                 "from": "address:owner",
                 "egldValue": "1000",
-                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
+                "contractCode": "mxsc:../forwarder-raw/output/forwarder-raw-init-sync-call.mxsc.json",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"

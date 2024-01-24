@@ -21,12 +21,12 @@
                             ]
                         }
                     },
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../promises-features/output/promises-features.wasm"
+                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
                 }
             }
         },
@@ -128,7 +128,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -144,7 +144,7 @@
                         }
                     },
                     "storage": "*",
-                    "code": "file:../promises-features/output/promises-features.wasm"
+                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
                 }
             }
         }

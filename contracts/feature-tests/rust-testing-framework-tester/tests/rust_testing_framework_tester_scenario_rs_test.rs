@@ -9,10 +9,6 @@ fn world() -> ScenarioWorld {
         "mxsc:output/rust-testing-framework-tester.mxsc.json",
         rust_testing_framework_tester::ContractBuilder,
     );
-    blockchain.register_contract(
-        "file:output/rust-testing-framework-tester.wasm",
-        rust_testing_framework_tester::ContractBuilder,
-    );
     blockchain
 }
 

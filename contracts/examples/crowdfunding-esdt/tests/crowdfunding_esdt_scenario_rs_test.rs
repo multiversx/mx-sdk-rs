@@ -8,10 +8,6 @@ fn world() -> ScenarioWorld {
         "mxsc:output/crowdfunding-esdt.mxsc.json",
         crowdfunding_esdt::ContractBuilder,
     );
-    blockchain.register_contract(
-        "file:output/crowdfunding-esdt.wasm",
-        crowdfunding_esdt::ContractBuilder,
-    );
 
     blockchain
 }

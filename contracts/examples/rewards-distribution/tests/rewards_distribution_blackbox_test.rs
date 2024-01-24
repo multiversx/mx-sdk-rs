@@ -31,9 +31,9 @@ const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
 const ALICE_ADDRESS_EXPR: &str = "address:alice";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const REWARDS_DISTRIBUTION_ADDRESS_EXPR: &str = "sc:rewards-distribution";
-const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "file:output/rewards-distribution.wasm";
+const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "mxsc:output/rewards-distribution.mxsc.json";
 const SEED_NFT_MINTER_ADDRESS_EXPR: &str = "sc:seed-nft-minter";
-const SEED_NFT_MINTER_PATH_EXPR: &str = "file:../seed-nft-minter/output/seed-nft-minter.wasm";
+const SEED_NFT_MINTER_PATH_EXPR: &str = "mxsc:../seed-nft-minter/output/seed-nft-minter.mxsc.json";
 
 type RewardsDistributionContract = ContractInfo<rewards_distribution::Proxy<StaticApi>>;
 type SeedNFTMinterContract = ContractInfo<mock_seed_nft_minter::Proxy<StaticApi>>;

@@ -10,7 +10,7 @@
                     "owner": "sc:forwarder"
                 },
                 "sc:reference": {
-                    "code": "file:../vault/output/vault-upgrade.wasm"
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
                 }
             }
         },
@@ -42,12 +42,12 @@
                     "nonce": "*"
                 },
                 "sc:forwarder": {
-                    "code": "file:../vault/output/vault-upgrade.wasm",
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json",
                     "codeMetadata": "0x0102",
                     "owner": "sc:forwarder"
                 },
                 "sc:reference": {
-                    "code": "file:../vault/output/vault-upgrade.wasm"
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
                 }
             }
         }

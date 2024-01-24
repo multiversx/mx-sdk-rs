@@ -5,11 +5,11 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
-        "file:builtin-func-features/output/builtin-func-features.wasm",
+        "mxsc:builtin-func-features/output/builtin-func-features.mxsc.json",
         builtin_func_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:forwarder-queue/output/forwarder-queue.wasm",
+        "mxsc:forwarder-queue/output/forwarder-queue.mxsc.json",
         forwarder_queue::ContractBuilder,
     );
     blockchain.register_contract(
@@ -40,12 +40,12 @@ fn world() -> ScenarioWorld {
     let vault_sc_config =
         meta::multi_contract_config::<vault::AbiProvider>(&blockchain.current_dir().join("vault"));
     blockchain.register_contract_variant(
-        "file:vault/output/vault.wasm",
+        "mxsc:vault/output/vault.mxsc.json",
         vault::ContractBuilder,
         vault_sc_config.find_contract("vault"),
     );
     blockchain.register_contract_variant(
-        "file:vault/output/vault-upgrade.wasm",
+        "mxsc:vault/output/vault-upgrade.mxsc.json",
         vault::ContractBuilder,
         vault_sc_config.find_contract("vault-upgrade"),
     );
