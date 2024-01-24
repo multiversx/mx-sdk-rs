@@ -33,6 +33,7 @@ jobs:
 
           which wasm-opt
           which mx-scenario-go
+          mx-scenario-go --version
 
       - name: Run template tool test
         run: |
