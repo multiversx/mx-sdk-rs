@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            2
+// Endpoints:                            3
 // Async Callback (empty):               1
-// Total number of exported functions:   4
+// Total number of exported functions:   5
 
 #![no_std]
 
@@ -24,6 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => default_init
         sample_value => sample_value
         example_feature_message => example_feature_message
+        alloc_with_fail_memory => alloc_with_fail_memory
     )
 }
 

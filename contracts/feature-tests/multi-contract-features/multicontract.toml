@@ -37,3 +37,15 @@ features = ["example_feature"]
 [contracts.multi-contract-alt-impl]
 add-unlabelled = false
 add-labels = ["alt-impl"]
+
+[contracts.multi-contract-fail-memory]
+allocator = "fail"
+add-labels = ["fail-memory"]
+
+[contracts.multi-contract-leaking-memory]
+allocator = "leaking"
+add-labels = ["leaking-memory"]
+
+[contracts.multi-contract-static64k-memory]
+allocator = "static64k"
+add-labels = ["static64k-memory"]

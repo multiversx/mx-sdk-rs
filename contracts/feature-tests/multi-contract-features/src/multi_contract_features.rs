@@ -1,5 +1,5 @@
 #![no_std]
-
+use crate::heap::Box;
 multiversx_sc::imports!();
 
 #[multiversx_sc::contract]
@@ -43,6 +43,27 @@ pub trait MultiContractFeatures {
     #[label("mcs-external-view")]
     fn sample_value_external_set(&self, sample_value: BigUint) {
         self.sample_value().set(sample_value);
+    }
+
+    #[endpoint]
+    #[label("fail-memory")]
+    fn alloc_with_fail_memory(&self) -> i32 {
+        let _ = Box::new([0u8; 1024]);
+        1
+    }
+
+    #[endpoint]
+    #[label("leaking-memory")]
+    fn alloc_with_leaking_memory(&self) -> i32 {
+        let _ = Box::new(42);
+        1
+    }
+
+    #[endpoint]
+    #[label("static64k-memory")]
+    fn alloc_with_static64k_memory(&self) -> i32 {
+        let _ = Box::new([0u8; 1024]);
+        1
     }
 
     #[view]

@@ -23,3 +23,18 @@ fn mcf_external_get_go() {
 fn mcf_external_pure_go() {
     world().run("scenarios/mcf-external-pure.scen.json");
 }
+
+#[test]
+fn mcf_fail_memory_go() {
+    world().run("scenarios/mcf-fail-memory.scen.json");
+}
+
+#[test]
+fn mcf_leaking_memory_go() {
+    world().run("scenarios/mcf-leaking-memory.scen.json");
+}
+
+#[test]
+fn mcf_static64k_memory_go() {
+    world().run("scenarios/mcf-static64k-memory.scen.json");
+}
