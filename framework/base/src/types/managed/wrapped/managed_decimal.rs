@@ -9,8 +9,6 @@ use multiversx_sc_codec::{
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
-use num_traits::ToPrimitive;
-
 use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Sub},
@@ -19,35 +17,6 @@ use core::{
 fn scaling_factor<M: ManagedTypeApi>(num_decimals: NumDecimals) -> BigUint<M> {
     // TODO: cache
     BigUint::from(10u32).pow(num_decimals as u32)
-}
-
-// Constants for the Random algorithm
-const MULTIPLIER: u64 = 6364136223846793005;
-const INCREMENT: u64 = 1442695040888963407;
-const MODULUS: u64 = (1 << 63) - 1;
-
-// Custom random number generator
-struct Random {
-    state: u64,
-}
-
-impl Random {
-    fn new(seed: u64) -> Self {
-        Random { state: seed }
-    }
-
-    fn next(&mut self) -> f64 {
-        self.state = self.state.wrapping_mul(MULTIPLIER).wrapping_add(INCREMENT) % MODULUS;
-        self.state as f64 / MODULUS as f64
-    }
-}
-
-// Function to generate random f64 numbers within a range
-fn random_float_in_range(min: f64, max: f64, seed: u64) -> f64 {
-    let mut rng = Random::new(seed);
-
-    let scaled = rng.next() * (max - min);
-    scaled + min
 }
 
 pub trait Decimals {
@@ -100,41 +69,6 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
 
     pub fn scale(&self) -> usize {
         self.decimals.num_decimals()
-    }
-
-    pub fn log<T: Decimals>(self, target_base: f64, precision: T) -> ManagedDecimal<M, T> {
-        let num_decimals = f64::from(precision.num_decimals() as u32);
-        let number = f64::from(self.data.to_u64().unwrap() as u32);
-
-        assert!(number >= 1f64 && target_base >= 1f64, "wrong input");
-
-        let precise = (number.log10() * num_decimals / target_base.log10())
-            .trunc()
-            .round() as u64;
-
-        ManagedDecimal::from_raw_units(BigUint::<M>::from(precise), precision)
-    }
-
-    pub fn root<T: Decimals>(self, degree: f64, precision: T) -> ManagedDecimal<M, T> {
-        let value = self.data.to_u64().unwrap().to_f64().unwrap();
-        let mut x_pre = random_float_in_range(0.0, 10.0, 123456u64); //Random seed
-        let eps = 1e-3; // Smaller epsilon for accuracy
-        let mut del_x = f64::MAX; // Initializing difference between roots
-
-        let mut x_k = 0f64;
-
-        while del_x > eps {
-            x_k = ((degree - 1.0) * x_pre + value / x_pre.powf(degree - 1.0)) / degree;
-            del_x = (x_k - x_pre).abs();
-
-            x_pre = x_k;
-        }
-
-        let rounded = (x_k * precision.num_decimals() as f64)
-            .round()
-            .to_u64()
-            .unwrap();
-        ManagedDecimal::from_raw_units(BigUint::from(rounded), precision)
     }
 
     pub fn rescale<T: Decimals>(self, scale_to: T) -> ManagedDecimal<M, T>
