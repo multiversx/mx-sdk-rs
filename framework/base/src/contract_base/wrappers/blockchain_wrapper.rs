@@ -10,9 +10,7 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
-        BackTransfers, BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec,
-        TokenIdentifier,
+        BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec, TokenIdentifier
     },
 };
 
@@ -133,6 +131,11 @@ where
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
         BigUint::from_handle(handle)
+    }
+
+    #[inline]
+    pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
+        A::blockchain_api_impl().get_code_metadata(address.get_handle())
     }
 
     #[inline]

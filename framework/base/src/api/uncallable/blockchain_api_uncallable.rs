@@ -157,4 +157,8 @@ impl BlockchainApiImpl for UncallableApi {
     ) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
+
+    fn get_code_metadata(&self, _address_handle: Self::ManagedBufferHandle) -> crate::types::CodeMetadata {
+        unreachable!()
+    }
 }

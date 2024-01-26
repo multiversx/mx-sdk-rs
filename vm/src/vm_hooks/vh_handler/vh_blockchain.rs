@@ -1,5 +1,5 @@
 use crate::{
-    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
+    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress, VMCodeMetadata},
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
 };
@@ -136,6 +136,15 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .esdt
             .get_esdt_balance(token_id_bytes, nonce);
         self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
+    }
+
+    fn get_code_metadata(
+        &self, 
+        address_handle: RawHandle,
+    ) -> VMCodeMetadata {
+        let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
+        let data = self.account_data(&address).unwrap();
+        data.code_metadata
     }
 
     #[allow(clippy::too_many_arguments)]

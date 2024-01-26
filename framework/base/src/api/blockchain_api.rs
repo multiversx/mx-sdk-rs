@@ -1,7 +1,7 @@
 use super::{HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl, RawHandle};
 use crate::types::{
     heap::{Address, Box, H256},
-    EsdtLocalRoleFlags,
+    CodeMetadata, EsdtLocalRoleFlags,
 };
 
 pub trait BlockchainApi: ManagedTypeApi {
@@ -60,6 +60,8 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         let _ = self.mb_load_slice(address_handle, 0, address.as_mut());
         self.load_balance_legacy(dest, &address);
     }
+
+    fn get_code_metadata(&self, address_handle: Self::ManagedBufferHandle) -> CodeMetadata;
 
     fn load_state_root_hash_managed(&self, dest: Self::ManagedBufferHandle);
 
