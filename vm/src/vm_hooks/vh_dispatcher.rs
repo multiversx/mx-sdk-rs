@@ -938,8 +938,9 @@ impl VMHooks for VMHooksDispatcher {
         self.handler.mb_to_hex(source_handle, dest_handle);
     }
 
-    fn managed_get_code_metadata(&self, address_handle: i32) -> crate::types::VMCodeMetadata {
-       self.handler.get_code_metadata(address_handle)
+    fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32) {
+        self.handler
+            .managed_get_code_metadata(address_handle, response_handle);
     }
 
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {

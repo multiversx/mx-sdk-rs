@@ -1,5 +1,5 @@
 use crate::{
-    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress, VMCodeMetadata},
+    types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
 };
@@ -138,13 +138,17 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
         self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
     }
 
-    fn get_code_metadata(
-        &self, 
-        address_handle: RawHandle,
-    ) -> VMCodeMetadata {
+    fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32) {
         let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
-        let data = self.account_data(&address).unwrap();
-        data.code_metadata
+        let Some(data) = self.account_data(&address) else {
+            self.vm_error(&format!(
+                "account not found: {}",
+                hex::encode(address.as_bytes())
+            ))
+        };
+        let code_metadata_bytes = data.code_metadata.to_byte_array();
+        self.m_types_lock()
+            .mb_set(response_handle, code_metadata_bytes.to_vec())
     }
 
     #[allow(clippy::too_many_arguments)]

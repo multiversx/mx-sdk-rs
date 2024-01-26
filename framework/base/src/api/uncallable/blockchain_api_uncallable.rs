@@ -158,7 +158,11 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn get_code_metadata(&self, _address_handle: Self::ManagedBufferHandle) -> crate::types::CodeMetadata {
+    fn managed_get_code_metadata(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _response_handle: Self::ManagedBufferHandle,
+    ) {
         unreachable!()
     }
 }

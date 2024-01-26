@@ -268,11 +268,16 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         multiversx_sc::types::EsdtLocalRoleFlags::from_bits_retain(result as u64)
     }
 
-    fn get_code_metadata(
+    fn managed_get_code_metadata(
         &self,
         address_handle: Self::ManagedBufferHandle,
-    ) -> multiversx_sc::types::CodeMetadata {
-        let result =
-            self.with_vm_hooks(|vh| vh.managed_get_code_metadata(address_handle.get_raw_handle()));
+        response_handle: Self::ManagedBufferHandle,
+    ) {
+        self.with_vm_hooks(|vh| {
+            vh.managed_get_code_metadata(
+                address_handle.get_raw_handle_unchecked(),
+                response_handle.get_raw_handle_unchecked(),
+            )
+        });
     }
 }
