@@ -21,7 +21,7 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const USER_ADDRESS_EXPR: &str = "address:user";
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
+const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
 
 const MERGED_TOKEN_ID_EXPR: &str = "str:MERGED-123456";
 const MERGED_TOKEN_ID: &[u8] = b"MERGED-123456";

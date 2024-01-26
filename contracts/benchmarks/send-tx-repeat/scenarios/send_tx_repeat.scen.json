@@ -26,7 +26,7 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/send-tx-repeat.wasm",
+                "contractCode": "mxsc:../output/send-tx-repeat.mxsc.json",
                 "arguments": [],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
@@ -82,7 +82,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/send-tx-repeat.wasm"
+                    "code": "mxsc:../output/send-tx-repeat.mxsc.json"
                 }
             }
         }

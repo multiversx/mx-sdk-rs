@@ -106,7 +106,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/bonding-curve-contract.wasm",
+                "contractCode": "mxsc:../output/bonding-curve-contract.mxsc.json",
                 "arguments": [],
                 "gasLimit": "15,000,000",
                 "gasPrice": "0"
@@ -212,7 +212,7 @@
                 "sc:bonding-curve-contract": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/bonding-curve-contract.wasm"
+                    "code": "mxsc:../output/bonding-curve-contract.mxsc.json"
                 }
             }
         }

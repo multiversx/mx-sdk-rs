@@ -163,24 +163,33 @@ impl TemplateAdjuster {
         let old_wasm = wasm_file_name(&self.metadata.name);
         let new_wasm = wasm_file_name(&self.target.new_name);
 
-        replace_in_files(
-            &self.target.contract_dir(),
-            "*.scen.json",
-            &[Query::substring(&old_wasm, &new_wasm)][..],
-        );
+        let old_mxsc = mxsc_file_name(&self.metadata.name);
+        let new_mxsc = mxsc_file_name(&self.target.new_name);
 
-        replace_in_files(
-            &self.target.contract_dir(),
-            "*.steps.json",
-            &[Query::substring(&old_wasm, &new_wasm)][..],
-        );
+        self.rename_in_scenarios(&old_wasm, &new_wasm);
+        self.rename_in_scenarios(&old_mxsc, &new_mxsc);
 
         queries.push(Query::substring(&old_wasm, &new_wasm));
+        queries.push(Query::substring(&old_mxsc, &new_mxsc));
 
         replace_in_files(
             &self.target.contract_dir().join(TEST_DIRECTORY),
             "*.rs",
             &queries,
+        );
+    }
+
+    fn rename_in_scenarios(&self, old: &str, new: &str) {
+        replace_in_files(
+            &self.target.contract_dir(),
+            "*.scen.json",
+            &[Query::substring(old, new)][..],
+        );
+
+        replace_in_files(
+            &self.target.contract_dir(),
+            "*.steps.json",
+            &[Query::substring(old, new)][..],
         );
     }
 
@@ -198,6 +207,10 @@ impl TemplateAdjuster {
 
 fn wasm_file_name(name: &str) -> String {
     format!("{name}.wasm",)
+}
+
+fn mxsc_file_name(name: &str) -> String {
+    format!("{name}.mxsc.json",)
 }
 
 fn rs_file_name(name: &str) -> String {

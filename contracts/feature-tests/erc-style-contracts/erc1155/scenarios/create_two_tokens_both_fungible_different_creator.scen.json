@@ -80,7 +80,7 @@
                         "str:balanceOf|address:second_creator|str:.node_id|biguint:2": "1",
                         "str:balanceOf|address:second_creator|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../output/erc1155.wasm"
+                    "code": "mxsc:../output/erc1155.mxsc.json"
                 }
             }
         }

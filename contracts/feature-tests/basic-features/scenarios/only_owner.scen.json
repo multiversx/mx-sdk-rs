@@ -16,7 +16,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm",
+                    "code": "mxsc:../output/basic-features.mxsc.json",
                     "owner": "address:owner"
                 }
             }
@@ -74,7 +74,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm",
+                    "code": "mxsc:../output/basic-features.mxsc.json",
                     "owner": "address:owner"
                 },
                 "address:an_account": {
