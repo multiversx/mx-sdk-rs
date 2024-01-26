@@ -12,7 +12,7 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -107,7 +107,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "2",

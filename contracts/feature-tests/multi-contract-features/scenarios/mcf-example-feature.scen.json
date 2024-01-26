@@ -4,10 +4,10 @@
             "step": "setState",
             "accounts": {
                 "sc:mcf": {
-                    "code": "file:../output/multi-contract-features.wasm"
+                    "code": "mxsc:../output/multi-contract-features.mxsc.json"
                 },
                 "sc:mcf-example-feature": {
-                    "code": "file:../output/multi-contract-example-feature.wasm"
+                    "code": "mxsc:../output/multi-contract-example-feature.mxsc.json"
                 },
                 "address:owner": {}
             }

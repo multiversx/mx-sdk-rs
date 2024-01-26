@@ -22,7 +22,7 @@ impl MetaConfig {
         let main_contract = self.sc_config.main_contract();
         let crate_name = &main_contract.contract_name;
         let snake_case_name = &main_contract.public_name_snake_case();
-        let wasm_output_file_path_expr = format!("\"file:../output/{crate_name}.wasm\"");
+        let wasm_output_file_path_expr = format!("\"mxsc:../output/{crate_name}.mxsc.json\"");
         let file =
             create_snippets_crate_and_get_lib_file(&self.snippets_dir, crate_name, args.overwrite);
         write_snippets_to_file(

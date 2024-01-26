@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/order-book/pair");
 
     blockchain.register_contract(
-        "file:output/order-book-pair.wasm",
+        "mxsc:output/order-book-pair.mxsc.json",
         order_book_pair::ContractBuilder,
     );
     blockchain

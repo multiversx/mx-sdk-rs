@@ -7,10 +7,10 @@
                 "address:a_user": {},
                 "address:new_owner": {},
                 "sc:forwarder": {
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "sc:child": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 }
             }
@@ -42,7 +42,7 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "address:new_owner"
                 },
                 "+": ""

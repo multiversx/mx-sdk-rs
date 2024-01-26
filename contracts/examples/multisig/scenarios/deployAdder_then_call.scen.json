@@ -80,7 +80,7 @@
                             ]
                         }
                     },
-                    "code": "file:../output/multisig.wasm"
+                    "code": "mxsc:../output/multisig.mxsc.json"
                 },
                 "+": ""
             }
@@ -169,7 +169,7 @@
                     "storage": {
                         "str:sum": "1234"
                     },
-                    "code": "file:../test-contracts/adder.wasm"
+                    "code": "mxsc:../test-contracts/adder.mxsc.json"
                 },
                 "+": ""
             }
@@ -307,7 +307,7 @@
                     "storage": {
                         "str:sum": "2468"
                     },
-                    "code": "file:../test-contracts/adder.wasm"
+                    "code": "mxsc:../test-contracts/adder.mxsc.json"
                 },
                 "+": ""
             }

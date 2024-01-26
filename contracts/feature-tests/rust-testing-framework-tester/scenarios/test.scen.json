@@ -27,6 +27,7 @@
                         "str:totalValue": "0x01"
                     },
                     "code": "file:../output/rust-testing-framework-tester.wasm",
+                    "codeMetadata": "0x0506",
                     "developerRewards": "0"
                 }
             }

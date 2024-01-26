@@ -15,7 +15,7 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const USER_ADDRESS_EXPR: &str = "address:user";
 
 const TRANSFER_ROLE_FEATURES_ADDRESS_EXPR: &str = "sc:transfer-role-features";
-const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "file:output/transfer-role-features.wasm";
+const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "mxsc:output/transfer-role-features.mxsc.json";
 
 const TRANSFER_TOKEN_ID_EXPR: &str = "str:TRANSFER-123456";
 const TRANSFER_TOKEN_ID: &[u8] = b"TRANSFER-123456";
@@ -56,7 +56,7 @@ fn test_transfer_role() {
     let vault_code = world.code_expression(VAULT_PATH_EXPR);
 
     const VAULT_ADDRESS_EXPR: &str = "sc:vault";
-    const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
+    const VAULT_PATH_EXPR: &str = "mxsc:../vault/output/vault.mxsc.json";
 
     world.register_contract(VAULT_PATH_EXPR, vault::ContractBuilder);
     world.set_state_step(
