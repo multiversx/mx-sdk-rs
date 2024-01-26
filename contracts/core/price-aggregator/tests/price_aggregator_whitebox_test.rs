@@ -22,7 +22,7 @@ pub const USD_TICKER: &[u8] = b"USDC";
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
-const PRICE_AGGREGATOR_PATH_EXPR: &str = "file:output/multiversx-price-aggregator-sc.wasm";
+const PRICE_AGGREGATOR_PATH_EXPR: &str = "mxsc:output/multiversx-price-aggregator-sc.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

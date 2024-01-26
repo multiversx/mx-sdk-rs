@@ -5,7 +5,7 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "file:../output/use-module.wasm"
+                    "code": "mxsc:../output/use-module.mxsc.json"
                 }
             }
         },

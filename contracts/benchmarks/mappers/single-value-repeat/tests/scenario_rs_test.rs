@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/single-value-repeat");
 
     blockchain.register_contract(
-        "file:output/single-value-repeat.wasm",
+        "mxsc:output/single-value-repeat.mxsc.json",
         single_value_repeat::ContractBuilder,
     );
     blockchain

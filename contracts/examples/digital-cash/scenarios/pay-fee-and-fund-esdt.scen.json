@@ -112,7 +112,7 @@
                         "str:allTimeFeeTokens|str:.index|nested:str:CASHTOKEN-778899": "2",
                         "str:allTimeFeeTokens|str:.index|nested:str:ESDT-778899": "3"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",

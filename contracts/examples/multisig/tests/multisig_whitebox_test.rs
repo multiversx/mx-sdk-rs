@@ -33,7 +33,7 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const BOARD_MEMBER_ADDRESS_EXPR: &str = "address:board-member";
 const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
-const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
+const MULTISIG_PATH_EXPR: &str = "mxsc:output/multisig.mxsc.json";
 const QUORUM_SIZE: usize = 1;
 
 type RustBigUint = num_bigint::BigUint;
@@ -594,7 +594,7 @@ fn test_transfer_execute_sc_all() {
 
     const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
     const ADDER_ADDRESS_EXPR: &str = "sc:adder";
-    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+    const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.set_state_step(
@@ -655,7 +655,7 @@ fn test_async_call_to_sc() {
 
     const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
     const ADDER_ADDRESS_EXPR: &str = "sc:adder";
-    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+    const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.set_state_step(
@@ -719,7 +719,7 @@ fn test_deploy_and_upgrade_from_source() {
     const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
     const ADDER_ADDRESS_EXPR: &str = "sc:adder";
     const NEW_ADDER_ADDRESS_EXPR: &str = "sc:new-adder";
-    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+    const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.set_state_step(
@@ -802,7 +802,7 @@ fn test_deploy_and_upgrade_from_source() {
     let factorial_code = world.code_expression(FACTORIAL_PATH_EXPR);
 
     const FACTORIAL_ADDRESS_EXPR: &str = "sc:factorial";
-    const FACTORIAL_PATH_EXPR: &str = "file:test-contracts/factorial.wasm";
+    const FACTORIAL_PATH_EXPR: &str = "mxsc:test-contracts/factorial.mxsc.json";
 
     world.register_contract(FACTORIAL_PATH_EXPR, factorial::ContractBuilder);
     world.set_state_step(SetStateStep::new().put_account(

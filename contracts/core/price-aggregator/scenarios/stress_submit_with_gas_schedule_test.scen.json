@@ -226,7 +226,7 @@
             "id": "",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multiversx-price-aggregator-sc.wasm",
+                "contractCode": "mxsc:../output/multiversx-price-aggregator-sc.mxsc.json",
                 "arguments": [
                     "0x45474c44",
                     "0x14",

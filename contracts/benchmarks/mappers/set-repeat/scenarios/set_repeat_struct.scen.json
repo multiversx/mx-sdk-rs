@@ -24,7 +24,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/set-repeat.wasm",
+                "contractCode": "mxsc:../output/set-repeat.mxsc.json",
                 "arguments": [],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"

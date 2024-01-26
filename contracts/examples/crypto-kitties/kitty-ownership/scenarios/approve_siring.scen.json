@@ -48,7 +48,7 @@
                         "str:nrOwnedKitties|address:acc2": "1",
                         "str:sireAllowedAddress|u32:1": "address:acc2"
                     },
-                    "code": "file:../output/kitty-ownership.wasm"
+                    "code": "mxsc:../output/kitty-ownership.mxsc.json"
                 },
                 "+": ""
             }

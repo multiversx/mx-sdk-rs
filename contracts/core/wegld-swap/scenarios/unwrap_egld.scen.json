@@ -62,7 +62,7 @@
                     "storage": {
                         "str:wrappedEgldTokenId": "str:EGLD-abcdef"
                     },
-                    "code": "file:../output/multiversx-wegld-swap-sc.wasm"
+                    "code": "mxsc:../output/multiversx-wegld-swap-sc.mxsc.json"
                 }
             }
         }

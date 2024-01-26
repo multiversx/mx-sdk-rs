@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/big-float-features");
 
     blockchain.register_contract(
-        "file:output/big-float-features.wasm",
+        "mxsc:output/big-float-features.mxsc.json",
         big_float_features::ContractBuilder,
     );
 

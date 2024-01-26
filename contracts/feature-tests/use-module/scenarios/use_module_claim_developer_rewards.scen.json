@@ -26,7 +26,7 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/use-module.wasm",
+                "contractCode": "mxsc:../output/use-module.mxsc.json",
                 "arguments": [],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"
@@ -44,13 +44,13 @@
             "accounts": {
                 "sc:child": {
                     "balance": "500",
-                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "owner": "sc:use_module",
                     "developerRewards": "100"
                 },
                 "sc:not_child": {
                     "balance": "500",
-                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "owner": "sc:not_owner"
                 }
             }
@@ -102,7 +102,7 @@
             "accounts": {
                 "sc:use_module": {
                     "balance": "100",
-                    "code": "file:../output/use-module.wasm",
+                    "code": "mxsc:../output/use-module.mxsc.json",
                     "owner": "address:owner"
                 },
                 "address:not_owner": {
@@ -115,13 +115,13 @@
                 },
                 "sc:child": {
                     "balance": "500",
-                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "owner": "sc:use_module",
                     "developerRewards": "0"
                 },
                 "sc:not_child": {
                     "balance": "500",
-                    "code": "file:../../composability/vault/output/vault.wasm",
+                    "code": "mxsc:../../composability/vault/output/vault.mxsc.json",
                     "owner": "sc:not_owner"
                 }
             }
