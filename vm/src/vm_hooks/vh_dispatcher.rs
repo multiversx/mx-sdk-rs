@@ -944,7 +944,8 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {
-        self.handler.managed_is_builtin_function(function_name_handle)
+        self.handler
+            .managed_is_builtin_function(function_name_handle)
     }
 
     fn big_float_new_from_parts(

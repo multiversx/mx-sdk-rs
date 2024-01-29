@@ -368,7 +368,7 @@ impl BlockchainApiImpl for VmApiImpl {
     fn managed_is_builtin_function(&self, function_name_handle: Self::ManagedBufferHandle) -> bool {
         unsafe { managedIsBuiltinFunction(function_name_handle) }
     }
-    
+
     fn managed_get_code_metadata(
         &self,
         address_handle: Self::ManagedBufferHandle,
