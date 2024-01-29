@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -51,7 +51,7 @@
                         "str:unique_id_mapper.item|u32:4": "",
                         "str:unique_id_mapper.item|u32:5": ""
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -145,7 +145,7 @@
                         "str:unique_id_mapper.item|u32:4": "",
                         "str:unique_id_mapper.item|u32:5": ""
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -261,7 +261,7 @@
                         "str:unique_id_mapper.item|u32:4": "",
                         "str:unique_id_mapper.item|u32:5": ""
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",

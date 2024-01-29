@@ -4,6 +4,7 @@ use crate::{
         merge_results, AsyncCallTxData, BlockchainUpdate, CallType, Promise, TxCache, TxContext,
         TxContextStack, TxInput, TxPanic, TxResult, TxResultCalls,
     },
+    types::VMCodeMetadata,
     with_shared::Shareable,
     world_mock::{AccountData, AccountEsdt, BlockchainState},
 };
@@ -242,6 +243,7 @@ impl BlockchainVMRef {
                 username: Vec::new(),
                 storage: HashMap::new(),
                 contract_path: None,
+                code_metadata: VMCodeMetadata::empty(),
                 contract_owner: None,
                 developer_rewards: BigUint::zero(),
             });

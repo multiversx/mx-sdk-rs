@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::{scenario_model::*, *};
 
-const ADDER_PATH_EXPR: &str = "file:output/adder.wasm";
+const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

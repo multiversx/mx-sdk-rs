@@ -4,7 +4,10 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/vec-repeat");
 
-    blockchain.register_contract("file:output/vec-repeat.wasm", vec_repeat::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:output/vec-repeat.mxsc.json",
+        vec_repeat::ContractBuilder,
+    );
     blockchain
 }
 

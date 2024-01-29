@@ -68,7 +68,7 @@
                             "6-prize_pool": "biguint:0"
                         }
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
         }

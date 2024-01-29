@@ -63,7 +63,7 @@
                         "str:userStatus|0x0000002": "1",
                         "str:user_count": "2"
                     },
-                    "code": "file:../output/ping-pong-egld.wasm"
+                    "code": "mxsc:../output/ping-pong-egld.mxsc.json"
                 }
             }
         }

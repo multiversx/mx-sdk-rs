@@ -98,7 +98,7 @@
                         },
                         "+": ""
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
         }

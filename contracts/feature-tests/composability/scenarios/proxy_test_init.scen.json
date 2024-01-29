@@ -11,7 +11,7 @@
                 "sc:proxy-first": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                    "code": "mxsc:../proxy-test-first/output/proxy-test-first.mxsc.json"
                 }
             },
             "newAddresses": [
@@ -31,7 +31,7 @@
                 "egldValue": "100",
                 "function": "deploySecondContract",
                 "arguments": [
-                    "file:../proxy-test-second/output/proxy-test-second.wasm"
+                    "mxsc:../proxy-test-second/output/proxy-test-second.mxsc.json"
                 ],
                 "gasLimit": "1,000,000,000,000",
                 "gasPrice": "0"
@@ -61,7 +61,7 @@
                     "storage": {
                         "str:other_contract": "sc:proxy-second"
                     },
-                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
+                    "code": "mxsc:../proxy-test-first/output/proxy-test-first.mxsc.json"
                 },
                 "sc:proxy-second": {
                     "nonce": "0",
@@ -70,7 +70,7 @@
                         "str:init_arg": "123",
                         "str:last_payment": "100"
                     },
-                    "code": "file:../proxy-test-second/output/proxy-test-second.wasm"
+                    "code": "mxsc:../proxy-test-second/output/proxy-test-second.mxsc.json"
                 }
             }
         }

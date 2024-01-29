@@ -7,20 +7,23 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
     blockchain.register_partial_contract::<multisig::AbiProvider, _>(
-        "file:output/multisig.wasm",
+        "mxsc:output/multisig.mxsc.json",
         multisig::ContractBuilder,
         "multisig",
     );
     blockchain.register_partial_contract::<multisig::AbiProvider, _>(
-        "file:output/multisig-view.wasm",
+        "mxsc:output/multisig-view.mxsc.json",
         multisig::ContractBuilder,
         "multisig-view",
     );
 
-    blockchain.register_contract("file:test-contracts/adder.wasm", adder::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:test-contracts/adder.mxsc.json",
+        adder::ContractBuilder,
+    );
 
     blockchain.register_contract(
-        "file:test-contracts/factorial.wasm",
+        "mxsc:test-contracts/factorial.mxsc.json",
         factorial::ContractBuilder,
     );
 

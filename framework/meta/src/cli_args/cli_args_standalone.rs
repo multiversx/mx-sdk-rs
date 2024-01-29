@@ -56,13 +56,18 @@ pub enum StandaloneCliAction {
 
     #[command(name = "templates", about = "Lists all pre-existing templates")]
     TemplateList(TemplateListArgs),
+
     #[command(
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
     )]
     TestGen(TestGenArgs),
+
     #[command(name = "test", about = "Runs cargo test")]
     Test(TestArgs),
+
+    #[command(name = "install", about = "Installs framework dependencies")]
+    Install(InstallArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -95,6 +100,11 @@ pub struct TestArgs {
     /// If scen and go are both specified, scen overrides the go argument.
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub scen: bool,
+
+    /// This arg prints the entire output of the vm.
+    /// Default value will be "false" if not specified
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub nocapture: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -253,4 +263,27 @@ pub struct TestGenArgs {
     /// Creates test files if they don't exist.
     #[arg(long, verbatim_doc_comment)]
     pub create: bool,
+}
+
+#[derive(Default, PartialEq, Eq, Debug, Clone, Parser)]
+#[command(propagate_version = true)]
+pub struct InstallArgs {
+    #[command(subcommand)]
+    pub command: Option<InstallCommand>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum InstallCommand {
+    #[command(about = "Installs all the known tools")]
+    All,
+
+    #[command(about = "Installs the `mx-scenario-go` tool")]
+    MxScenarioGo(InstallMxScenarioGoArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallMxScenarioGoArgs {
+    /// The framework version on which the contracts should be created.
+    #[arg(long, verbatim_doc_comment)]
+    pub tag: Option<String>,
 }
