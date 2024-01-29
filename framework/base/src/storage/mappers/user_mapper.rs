@@ -5,11 +5,14 @@ use crate::codec::{
     TopEncodeMultiOutput,
 };
 
-use super::StorageMapper;
+use super::{
+    set_mapper::{CurrentStorage, StorageAddress},
+    StorageMapper,
+};
 use crate::{
     abi::{TypeAbi, TypeName},
     api::StorageMapperApi,
-    storage::{storage_get, storage_get_len, storage_set, StorageKey},
+    storage::{storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, ManagedVec, MultiValueEncoded},
 };
 
@@ -26,11 +29,13 @@ const COUNT_SUFFIX: &[u8] = b"_count";
 /// user data other than address/id.
 ///
 /// It also doesn't allow removing users. Once in, their ids are reserved forever.
-pub struct UserMapper<SA>
+pub struct UserMapper<SA, A = CurrentStorage>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
 }
 
@@ -41,14 +46,29 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         UserMapper {
             _phantom_api: PhantomData,
+            address: CurrentStorage,
             base_key,
         }
     }
 }
 
-impl<SA> UserMapper<SA>
+impl<SA> UserMapper<SA, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
+{
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        UserMapper {
+            _phantom_api: PhantomData,
+            address,
+            base_key,
+        }
+    }
+}
+
+impl<SA, A> UserMapper<SA, A>
+where
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
 {
     fn get_user_id_key(&self, address: &ManagedAddress<SA>) -> StorageKey<SA> {
         let mut user_id_key = self.base_key.clone();
@@ -73,11 +93,8 @@ where
     /// Yields the user id for a given address.
     /// Will return 0 if the address is not known to the contract.
     pub fn get_user_id(&self, address: &ManagedAddress<SA>) -> usize {
-        storage_get(self.get_user_id_key(address).as_ref())
-    }
-
-    fn set_user_id(&self, address: &ManagedAddress<SA>, id: usize) {
-        storage_set(self.get_user_id_key(address).as_ref(), &id);
+        self.address
+            .address_storage_get(self.get_user_id_key(address).as_ref())
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -85,8 +102,8 @@ where
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
 
-        if storage_get_len(key.as_ref()) > 0 {
-            Some(storage_get(key.as_ref()))
+        if self.address.address_storage_get_len(key.as_ref()) > 0 {
+            Some(self.address.address_storage_get(key.as_ref()))
         } else {
             None
         }
@@ -95,7 +112,8 @@ where
     /// Yields the user address for a given id.
     /// Will cause a deserialization error if the id is invalid.
     pub fn get_user_address_unchecked(&self, id: usize) -> ManagedAddress<SA> {
-        storage_get(self.get_user_address_key(id).as_ref())
+        self.address
+            .address_storage_get(self.get_user_address_key(id).as_ref())
     }
 
     /// Yields the user address for a given id, if the id is valid.
@@ -103,38 +121,45 @@ where
     pub fn get_user_address_or_zero(&self, id: usize) -> ManagedAddress<SA> {
         let key = self.get_user_address_key(id);
         // TODO: optimize, storage_load_managed_buffer_len is currently called twice
-        if storage_get_len(key.as_ref()) > 0 {
-            storage_get(key.as_ref())
+        if self.address.address_storage_get_len(key.as_ref()) > 0 {
+            self.address.address_storage_get(key.as_ref())
         } else {
             ManagedAddress::zero()
         }
+    }
+
+    /// Number of users.
+    pub fn get_user_count(&self) -> usize {
+        self.address
+            .address_storage_get(self.get_user_count_key().as_ref())
+    }
+
+    /// Loads all addresses from storage and places them in a ManagedVec.
+    /// Can easily consume a lot of gas.
+    pub fn get_all_addresses(&self) -> ManagedVec<SA, ManagedAddress<SA>> {
+        let user_count = self.get_user_count();
+        let mut result = ManagedVec::new();
+        for i in 1..=user_count {
+            result.push(self.get_user_address_or_zero(i));
+        }
+        result
+    }
+}
+
+impl<SA> UserMapper<SA, CurrentStorage>
+where
+    SA: StorageMapperApi,
+{
+    fn set_user_id(&self, address: &ManagedAddress<SA>, id: usize) {
+        storage_set(self.get_user_id_key(address).as_ref(), &id);
     }
 
     fn set_user_address(&self, id: usize, address: &ManagedAddress<SA>) {
         storage_set(self.get_user_address_key(id).as_ref(), address);
     }
 
-    /// Number of users.
-    pub fn get_user_count(&self) -> usize {
-        storage_get(self.get_user_count_key().as_ref())
-    }
-
     fn set_user_count(&self, user_count: usize) {
         storage_set(self.get_user_count_key().as_ref(), &user_count);
-    }
-
-    /// Yields the user id for a given address, or creates a new user id if there isn't one.
-    /// Will safely keep the user count in sync.
-    pub fn get_or_create_user(&self, address: &ManagedAddress<SA>) -> usize {
-        let mut user_id = self.get_user_id(address);
-        if user_id == 0 {
-            let next_user_count = self.get_user_count() + 1;
-            self.set_user_count(next_user_count);
-            user_id = next_user_count;
-            self.set_user_id(address, user_id);
-            self.set_user_address(user_id, address);
-        }
-        user_id
     }
 
     /// Tries to insert a number of addresses.
@@ -163,21 +188,24 @@ where
         self.set_user_count(user_count);
     }
 
-    /// Loads all addresses from storage and places them in a ManagedVec.
-    /// Can easily consume a lot of gas.
-    pub fn get_all_addresses(&self) -> ManagedVec<SA, ManagedAddress<SA>> {
-        let user_count = self.get_user_count();
-        let mut result = ManagedVec::new();
-        for i in 1..=user_count {
-            result.push(self.get_user_address_or_zero(i));
+    /// Yields the user id for a given address, or creates a new user id if there isn't one.
+    /// Will safely keep the user count in sync.
+    pub fn get_or_create_user(&self, address: &ManagedAddress<SA>) -> usize {
+        let mut user_id = self.get_user_id(address);
+        if user_id == 0 {
+            let next_user_count = self.get_user_count() + 1;
+            self.set_user_count(next_user_count);
+            user_id = next_user_count;
+            self.set_user_id(address, user_id);
+            self.set_user_address(user_id, address);
         }
-        result
+        user_id
     }
 }
 
 /// Behaves like a MultiResultVec<Address> when an endpoint result,
 /// and lists all users addresses.
-impl<SA> TopEncodeMulti for UserMapper<SA>
+impl<SA> TopEncodeMulti for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
@@ -191,13 +219,13 @@ where
     }
 }
 
-impl<SA> CodecFrom<UserMapper<SA>> for MultiValueEncoded<SA, ManagedAddress<SA>> where
+impl<SA> CodecFrom<UserMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, ManagedAddress<SA>> where
     SA: StorageMapperApi
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA> TypeAbi for UserMapper<SA>
+impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
