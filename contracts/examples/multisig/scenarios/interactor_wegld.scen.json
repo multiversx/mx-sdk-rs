@@ -11,8 +11,7 @@
                         "str:CAN-2abf4b": "1000",
                         "str:CAN-6d39e6": "1000",
                         "str:CAN-ac1592": "1000"
-                    },
-                    "username": ""
+                    }
                 }
             }
         },
@@ -31,8 +30,7 @@
                                 }
                             ]
                         }
-                    },
-                    "username": ""
+                    }
                 }
             }
         },
@@ -41,8 +39,7 @@
             "accounts": {
                 "0xb13a017423c366caff8cecfb77a12610a130f4888134122c7937feae0d6d7d17": {
                     "nonce": "179",
-                    "balance": "7777023510140000000",
-                    "username": ""
+                    "balance": "7777023510140000000"
                 }
             }
         },
@@ -56,8 +53,7 @@
                         "str:USDC-091bd3": "9997000000000",
                         "str:XRF-079f0d": "999999805000000000000000000",
                         "str:XUSDC-929b9b": "1000000000000000000000000"
-                    },
-                    "username": ""
+                    }
                 }
             }
         },
@@ -69,14 +65,12 @@
                     "balance": "54039792195269569513",
                     "esdt": {
                         "str:WEGLD-6cf38e": {
-                            "instances": [],
                             "roles": [
                                 "ESDTRoleLocalBurn",
                                 "ESDTRoleLocalMint"
                             ]
                         }
                     },
-                    "username": "",
                     "storage": {
                         "0x7772617070656445676c64546f6b656e4964": "0x5745474c442d366366333865"
                     },
@@ -96,7 +90,6 @@
         },
         {
             "step": "scDeploy",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "contractCode": "mxsc:../output/multisig.mxsc.json",
@@ -107,16 +100,15 @@
                     "0xb13a017423c366caff8cecfb77a12610a130f4888134122c7937feae0d6d7d17",
                     "0x3af8d9c9423b2577c6252722c1d90212a4111f7203f9744f76fcfa1d0a310033"
                 ],
-                "gasLimit": "70,000,000",
-                "gasPrice": ""
+                "gasLimit": "70,000,000"
             },
             "expect": {
+                "out": [],
                 "status": "0"
             }
         },
         {
             "step": "transfer",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -126,7 +118,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -136,13 +127,11 @@
                     "0xb1a2bc2ec50000",
                     "0x7772617045676c64"
                 ],
-                "gasLimit": "10,000,000",
-                "gasPrice": ""
+                "gasLimit": "10,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xb2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -150,13 +139,11 @@
                 "arguments": [
                     "0x01"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xb13a017423c366caff8cecfb77a12610a130f4888134122c7937feae0d6d7d17",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -164,13 +151,11 @@
                 "arguments": [
                     "0x01"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0x3af8d9c9423b2577c6252722c1d90212a4111f7203f9744f76fcfa1d0a310033",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -178,13 +163,11 @@
                 "arguments": [
                     "0x01"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -192,13 +175,11 @@
                 "arguments": [
                     "0x01"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -211,13 +192,11 @@
                     "0x58d15e17628000",
                     "0x756e7772617045676c64"
                 ],
-                "gasLimit": "10,000,000",
-                "gasPrice": ""
+                "gasLimit": "10,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xb2a11555ce521e4944e09ab17549d85b487dcd26c84b5017a39e31a3670889ba",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -225,13 +204,11 @@
                 "arguments": [
                     "0x02"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xb13a017423c366caff8cecfb77a12610a130f4888134122c7937feae0d6d7d17",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -239,13 +216,11 @@
                 "arguments": [
                     "0x02"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0x3af8d9c9423b2577c6252722c1d90212a4111f7203f9744f76fcfa1d0a310033",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -253,13 +228,11 @@
                 "arguments": [
                     "0x02"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050013ee5923031e866a442d3cb543820bf74178bc7fed60",
@@ -267,8 +240,7 @@
                 "arguments": [
                     "0x02"
                 ],
-                "gasLimit": "15,000,000",
-                "gasPrice": ""
+                "gasLimit": "15,000,000"
             }
         }
     ]

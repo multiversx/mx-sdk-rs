@@ -42,4 +42,9 @@ pub trait BlockchainApiFeatures {
     fn get_cumulated_validator_rewards(&self) -> BigUint {
         self.blockchain().get_cumulated_validator_rewards()
     }
+
+    #[endpoint]
+    fn get_code_metadata(&self, address: ManagedAddress) -> CodeMetadata {
+        self.blockchain().get_code_metadata(&address)
+    }
 }
