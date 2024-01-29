@@ -9,7 +9,7 @@ use num_traits::Zero;
 
 // The Go VM doesn't do it, but if we change that, we can enable it easily here too via this constant.
 const ESDT_TOKEN_DATA_FUNC_RESETS_VALUES: bool = false;
-const VM_BUILTIN_FUNCTIONS: [&str; 16] = [
+const VM_BUILTIN_FUNCTION_NAMES: [&str; 16] = [
     ESDT_LOCAL_MINT_FUNC_NAME,
     ESDT_LOCAL_BURN_FUNC_NAME,
     ESDT_MULTI_TRANSFER_FUNC_NAME,
@@ -171,7 +171,7 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
     }
 
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> bool {
-        VM_BUILTIN_FUNCTIONS.contains(
+        VM_BUILTIN_FUNCTION_NAMES.contains(
             &self
                 .m_types_lock()
                 .mb_to_function_name(function_name_handle)
