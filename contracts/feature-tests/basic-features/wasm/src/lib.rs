@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          373
+// Endpoints:                          375
 // Async Callback:                       1
-// Total number of exported functions: 375
+// Total number of exported functions: 377
 
 #![no_std]
 #![allow(internal_features)]
@@ -129,6 +129,8 @@ multiversx_sc_wasm_adapter::endpoints! {
         get_tx_hash => get_tx_hash
         get_gas_left => get_gas_left
         get_cumulated_validator_rewards => get_cumulated_validator_rewards
+        get_code_metadata => get_code_metadata
+        is_builtin_function => is_builtin_function
         codec_err_finish => codec_err_finish
         codec_err_storage_key => codec_err_storage_key
         codec_err_storage_get => codec_err_storage_get
