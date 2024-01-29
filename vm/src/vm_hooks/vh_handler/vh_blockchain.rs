@@ -1,7 +1,7 @@
 use crate::{
     tx_execution::vm_builtin_function_names::*,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
-    vm_hooks::{vh_dispatcher::bool_to_i32, VMHooksHandlerSource},
+    vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
 };
 use num_bigint::BigInt;
@@ -170,14 +170,12 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .mb_set(response_handle, code_metadata_bytes.to_vec())
     }
 
-    fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {
-        bool_to_i32(
-            VM_BUILTIN_FUNCTIONS.contains(
-                &self
-                    .m_types_lock()
-                    .mb_to_function_name(function_name_handle)
-                    .as_str(),
-            ),
+    fn managed_is_builtin_function(&self, function_name_handle: i32) -> bool {
+        VM_BUILTIN_FUNCTIONS.contains(
+            &self
+                .m_types_lock()
+                .mb_to_function_name(function_name_handle)
+                .as_str(),
         )
     }
 
