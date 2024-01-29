@@ -152,4 +152,6 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         address_handle: Self::ManagedBufferHandle,
         response_handle: Self::ManagedBufferHandle,
     );
+
+    fn managed_is_builtin_function(&self, function_name_handle: Self::ManagedBufferHandle) -> bool;
 }
