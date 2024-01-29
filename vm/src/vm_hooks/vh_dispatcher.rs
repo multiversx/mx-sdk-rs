@@ -18,7 +18,7 @@ impl VMHooksDispatcher {
     }
 }
 
-fn bool_to_i32(b: bool) -> i32 {
+pub fn bool_to_i32(b: bool) -> i32 {
     if b {
         1
     } else {
@@ -944,7 +944,7 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {
-        panic!("Unavailable: managed_is_builtin_function")
+        self.handler.managed_is_builtin_function(function_name_handle)
     }
 
     fn big_float_new_from_parts(
