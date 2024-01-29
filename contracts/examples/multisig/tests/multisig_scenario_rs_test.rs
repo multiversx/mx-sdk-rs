@@ -17,7 +17,10 @@ fn world() -> ScenarioWorld {
         "multisig-view",
     );
 
-    blockchain.register_contract("mxsc:test-contracts/adder.mxsc.json", adder::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:test-contracts/adder.mxsc.json",
+        adder::ContractBuilder,
+    );
 
     blockchain.register_contract(
         "mxsc:test-contracts/factorial.mxsc.json",
