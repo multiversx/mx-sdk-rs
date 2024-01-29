@@ -10,7 +10,6 @@ use crate::{
         TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::{storage_clear, storage_set, StorageKey},
-    storage_get_len,
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use core::{marker::PhantomData, usize};
@@ -151,7 +150,9 @@ where
     /// There are no restrictions on the index,
     /// calling for an invalid index will simply return `true`.
     pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
-        storage_get_len(self.item_key(index).as_ref()) == 0
+        self.address
+            .address_storage_get_len(self.item_key(index).as_ref())
+            == 0
     }
 
     /// Loads all items from storage and places them in a Vec.

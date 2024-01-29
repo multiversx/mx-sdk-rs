@@ -12,7 +12,7 @@ use crate::{
         EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeMulti,
         TopEncodeMultiOutput, TopEncodeOutput,
     },
-    storage::{storage_clear, storage_get_len, storage_set, StorageKey},
+    storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType},
 };
 
@@ -78,7 +78,7 @@ where
     }
 
     pub fn raw_byte_length(&self) -> usize {
-        storage_get_len(self.key.as_ref())
+        self.address.address_storage_get_len(self.key.as_ref())
     }
 }
 
