@@ -9,6 +9,12 @@
                     "code": "mxsc:../output/basic-features.mxsc.json",
                     "codeMetadata": "0x0104"
                 },
+                "sc:basic-features-2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "codeMetadata": "0x0100"
+                },
                 "address:an_account": {
                     "nonce": "0",
                     "balance": "0"
@@ -31,6 +37,29 @@
             "expect": {
                 "out": [
                     "0x0104"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_code_metadata-2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_code_metadata",
+                "arguments": [
+                    "sc:basic-features-2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0100"
                 ],
                 "status": "",
                 "logs": "*",
