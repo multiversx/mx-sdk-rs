@@ -216,6 +216,11 @@ fn get_shard_of_address_go() {
 }
 
 #[test]
+fn is_builtin_function_go() {
+    world().run("scenarios/is_builtin_function.scen.json");
+}
+
+#[test]
 fn managed_address_array_go() {
     world().run("scenarios/managed_address_array.scen.json");
 }

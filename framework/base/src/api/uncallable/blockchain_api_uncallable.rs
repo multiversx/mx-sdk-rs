@@ -165,4 +165,11 @@ impl BlockchainApiImpl for UncallableApi {
     ) {
         unreachable!()
     }
+
+    fn managed_is_builtin_function(
+        &self,
+        _function_name_handle: Self::ManagedBufferHandle,
+    ) -> bool {
+        unreachable!()
+    }
 }

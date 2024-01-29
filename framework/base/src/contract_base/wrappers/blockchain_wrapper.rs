@@ -146,6 +146,11 @@ where
     }
 
     #[inline]
+    pub fn is_builtin_function(&self, function_name: &ManagedBuffer<A>) -> bool {
+        A::blockchain_api_impl().managed_is_builtin_function(function_name.get_handle())
+    }
+
+    #[inline]
     pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
         token.map_ref_or_else(
             || self.get_balance(&self.get_sc_address()),
