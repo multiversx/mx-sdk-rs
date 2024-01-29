@@ -159,14 +159,9 @@ where
 /// Intermediary type for deserializing the result of an endpoint that returns a `SingleValueMapper`.
 ///
 /// Necessary because we cannot implement `CodecFrom` directly on `T`.
-pub struct SingleValue<T: TopDecode, SA: StorageMapperApi, A: StorageAddress<SA>>(
-    T,
-    PhantomData<(SA, A)>,
-);
+pub struct SingleValue<T: TopDecode>(T);
 
-impl<T: TopEncode + TopDecode, SA: StorageMapperApi> TopEncode
-    for SingleValue<T, SA, CurrentStorage>
-{
+impl<T: TopEncode + TopDecode> TopEncode for SingleValue<T> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -176,28 +171,23 @@ impl<T: TopEncode + TopDecode, SA: StorageMapperApi> TopEncode
     }
 }
 
-impl<T: TopDecode, SA: StorageMapperApi, A: StorageAddress<SA>> TopDecode
-    for SingleValue<T, SA, A>
-{
+impl<T: TopDecode> TopDecode for SingleValue<T> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        Ok(SingleValue::<T, SA, A>(
-            T::top_decode_or_handle_err(input, h)?,
-            PhantomData,
-        ))
+        Ok(SingleValue::<T>(T::top_decode_or_handle_err(input, h)?))
     }
 }
 
-impl<T: TopDecode, SA: StorageMapperApi, A: StorageAddress<SA>> From<T> for SingleValue<T, SA, A> {
+impl<T: TopDecode> From<T> for SingleValue<T> {
     fn from(value: T) -> Self {
-        SingleValue::<T, SA, A>(value, PhantomData)
+        SingleValue::<T>(value)
     }
 }
 
-impl<T: TopDecode, SA: StorageMapperApi, A: StorageAddress<SA>> SingleValue<T, SA, A> {
+impl<T: TopDecode> SingleValue<T> {
     #[inline]
     pub fn into(self) -> T {
         self.0
@@ -212,8 +202,7 @@ where
 {
 }
 
-impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T, CurrentStorage>>
-    for SingleValue<R, SA, CurrentStorage>
+impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T, CurrentStorage>> for SingleValue<R>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
