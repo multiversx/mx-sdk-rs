@@ -83,6 +83,8 @@ extern "C" {
     fn managedIsESDTLimitedTransfer(tokenIDHandle: i32) -> i32;
 
     fn getESDTLocalRoles(tokenhandle: i32) -> i64;
+
+    fn managedGetCodeMetadata(addressHandle: i32, resultHandle: i32);
 }
 
 impl BlockchainApi for VmApiImpl {
@@ -359,5 +361,15 @@ impl BlockchainApiImpl for VmApiImpl {
         multiversx_sc::types::EsdtLocalRoleFlags::from_bits_retain(unsafe {
             getESDTLocalRoles(token_id_handle)
         } as u64)
+    }
+
+    fn managed_get_code_metadata(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        response_handle: Self::ManagedBufferHandle,
+    ) {
+        unsafe {
+            managedGetCodeMetadata(address_handle, response_handle);
+        }
     }
 }

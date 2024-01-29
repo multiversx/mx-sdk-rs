@@ -146,4 +146,10 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> EsdtLocalRoleFlags;
+
+    fn managed_get_code_metadata(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        response_handle: Self::ManagedBufferHandle,
+    );
 }
