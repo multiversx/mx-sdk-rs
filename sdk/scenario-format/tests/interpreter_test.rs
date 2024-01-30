@@ -32,6 +32,25 @@ fn test_string() {
 }
 
 #[test]
+fn test_mxsc_pack() {
+    let context = &InterpreterContext::default();
+    assert_eq!(
+        b"test".to_vec(),
+        interpret_string("mxsc:tests/test.json", context)
+    );
+}
+
+#[test]
+fn test_mxsc_no_pack() {
+    let context = &mut InterpreterContext::default().with_allowed_missing_files();
+
+    assert_eq!(
+        b"MISSING:\"no_file.json\"".to_vec(),
+        interpret_string("mxsc:no_file.json", context)
+    );
+}
+
+#[test]
 fn test_address() {
     let context = InterpreterContext::default();
     assert_eq!(

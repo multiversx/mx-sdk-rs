@@ -173,7 +173,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/bonding-curve-contract.wasm"
+                    "code": "mxsc:../output/bonding-curve-contract.mxsc.json"
                 }
             }
         }

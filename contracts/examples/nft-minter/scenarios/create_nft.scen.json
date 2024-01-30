@@ -116,7 +116,7 @@
                             "3-amount": "biguint:500"
                         }
                     },
-                    "code": "file:../output/nft-minter.wasm",
+                    "code": "mxsc:../output/nft-minter.mxsc.json",
                     "owner": "address:owner"
                 },
                 "+": ""

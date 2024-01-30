@@ -10,7 +10,7 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 }
             },
             "newAddresses": [
@@ -26,7 +26,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-async-call.wasm",
+                "contractCode": "mxsc:../forwarder-raw/output/forwarder-raw-init-async-call.mxsc.json",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",

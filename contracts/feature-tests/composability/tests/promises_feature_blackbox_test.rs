@@ -9,9 +9,10 @@ use promises_features::call_sync_bt::ProxyTrait;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const PROMISES_FEATURE_ADDRESS_EXPR: &str = "sc:promises-feature";
-const PROMISES_FEATURES_PATH_EXPR: &str = "file:promises-features/output/promises-feature.wasm";
+const PROMISES_FEATURES_PATH_EXPR: &str =
+    "mxsc:promises-features/output/promises-feature.mxsc.json";
 const VAULT_ADDRESS_EXPR: &str = "sc:vault";
-const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
+const VAULT_PATH_EXPR: &str = "mxsc:../vault/output/vault.mxsc.json";
 
 const TOKEN_ID_EXPR: &str = "str:TOKEN-123456";
 const TOKEN_ID: &[u8] = b"TOKEN-123456";

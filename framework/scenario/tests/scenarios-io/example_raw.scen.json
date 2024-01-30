@@ -153,7 +153,7 @@
                             ]
                         }
                     },
-                    "code": "file:smart-contract.wasm",
+                    "code": "mxsc:smart-contract.mxsc.json",
                     "owner": "address:alice",
                     "developerRewards": "100"
                 }
@@ -467,7 +467,7 @@
                         "str:anything-goes": "*",
                         "+": ""
                     },
-                    "code": "file:smart-contract.wasm",
+                    "code": "mxsc:smart-contract.mxsc.json",
                     "owner": "address:bob"
                 },
                 "address:smart_contract_address_2": {

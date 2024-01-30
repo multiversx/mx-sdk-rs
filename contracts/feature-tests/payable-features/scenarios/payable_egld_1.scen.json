@@ -8,7 +8,7 @@
                 "sc:payable-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/payable-features.wasm"
+                    "code": "mxsc:../output/payable-features.mxsc.json"
                 },
                 "address:an-account": {
                     "nonce": "0",

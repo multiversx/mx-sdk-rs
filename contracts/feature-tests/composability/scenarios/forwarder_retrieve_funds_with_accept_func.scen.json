@@ -18,12 +18,12 @@
                     "esdt": {
                         "str:THIRDTOKEN-abcdef": "5,000,000"
                     },
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },
@@ -77,7 +77,7 @@
                         "str:SECTOKEN-abcdef": "2,000,000"
                     },
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -88,7 +88,7 @@
                     "storage": {
                         "+": ""
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         }

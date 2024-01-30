@@ -939,11 +939,15 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32) {
-        panic!("Unavailable: managed_get_code_metadata")
+        self.handler
+            .managed_get_code_metadata(address_handle, response_handle);
     }
 
     fn managed_is_builtin_function(&self, function_name_handle: i32) -> i32 {
-        panic!("Unavailable: managed_is_builtin_function")
+        bool_to_i32(
+            self.handler
+                .managed_is_builtin_function(function_name_handle),
+        )
     }
 
     fn big_float_new_from_parts(

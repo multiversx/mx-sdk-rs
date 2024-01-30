@@ -83,7 +83,7 @@
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "address:acc1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "2"
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
         }

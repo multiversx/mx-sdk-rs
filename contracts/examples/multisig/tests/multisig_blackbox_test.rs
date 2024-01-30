@@ -23,10 +23,10 @@ use num_bigint::BigUint;
 
 const ADDER_ADDRESS_EXPR: &str = "sc:adder";
 const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
-const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 const BOARD_MEMBER_ADDRESS_EXPR: &str = "address:board-member";
 const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
-const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
+const MULTISIG_PATH_EXPR: &str = "mxsc:output/multisig.mxsc.json";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
@@ -545,7 +545,7 @@ fn test_deploy_and_upgrade_from_source() {
     );
 
     const FACTORIAL_ADDRESS_EXPR: &str = "sc:factorial";
-    const FACTORIAL_PATH_EXPR: &str = "file:test-contracts/factorial.wasm";
+    const FACTORIAL_PATH_EXPR: &str = "mxsc:test-contracts/factorial.mxsc.json";
 
     let factorial_code = state.world.code_expression(FACTORIAL_PATH_EXPR);
     let factorial_address = AddressValue::from(FACTORIAL_ADDRESS_EXPR).to_address();
