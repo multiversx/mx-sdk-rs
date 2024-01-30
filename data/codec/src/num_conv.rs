@@ -22,15 +22,23 @@ pub fn top_encode_number(x: u64, signed: bool, buffer: &mut [u8; 8]) -> &[u8] {
     let irrelevant_byte = if negative { 0xffu8 } else { 0x00u8 };
 
     let mut offset = 0usize;
-    while buffer[offset] == irrelevant_byte {
-        debug_assert!(offset < 7);
-        offset += 1;
-    }
-
-    if signed && buffer[offset] >> 7 != negative as u8 {
-        debug_assert!(offset > 0);
-        offset -= 1;
-    }
+    let mut cursor = 1usize;
+    cursor &= (buffer[0] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[1] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[2] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[3] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[4] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[5] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[6] == irrelevant_byte) as usize;
+    offset += cursor;
+    cursor &= (buffer[7] == irrelevant_byte) as usize;
+    offset += cursor;
 
     &buffer[offset..]
 }
