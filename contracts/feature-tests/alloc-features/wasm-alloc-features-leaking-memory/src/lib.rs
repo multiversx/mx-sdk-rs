@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           64
+// Endpoints:                           65
 // Async Callback (empty):               1
-// Total number of exported functions:  66
+// Total number of exported functions:  67
 
 #![no_std]
 
@@ -15,7 +15,7 @@
 // TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
-multiversx_sc_wasm_adapter::allocator!(static64k);
+multiversx_sc_wasm_adapter::allocator!(leaking);
 multiversx_sc_wasm_adapter::panic_handler!();
 
 multiversx_sc_wasm_adapter::endpoints! {
@@ -86,6 +86,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         boxed_bytes_concat_2 => boxed_bytes_concat_2
         boxed_bytes_split => boxed_bytes_split
         vec_concat_const => vec_concat_const
+        alloc_with_leaking_memory => alloc_with_leaking_memory
     )
 }
 

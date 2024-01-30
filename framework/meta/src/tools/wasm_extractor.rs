@@ -1,6 +1,8 @@
 use colored::Colorize;
-use std::{fs, str::from_utf8};
+use std::fs;
 use wasmparser::{BinaryReaderError, Parser, Payload};
+
+const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
@@ -70,17 +72,12 @@ pub fn is_memory_allocation(wasm_data: Vec<u8>) -> Result<bool, BinaryReaderErro
     for payload in parser.parse_all(&wasm_data).flatten() {
         if let Payload::DataSection(data_section) = payload {
             for data_fragment in data_section {
-                let cleaned_data_fragment: Vec<u8> = data_fragment?
+                if data_fragment?
                     .data
-                    .iter()
-                    .filter(|&&b| b < 128)
-                    .cloned()
-                    .collect();
-
-                if let Ok(data_fragment_str) = from_utf8(&cleaned_data_fragment) {
-                    if data_fragment_str.contains("memory allocation forbidden") {
-                        return Ok(true);
-                    }
+                    .windows(ERROR_FAIL_ALLOCATOR.len())
+                    .any(|data| data == ERROR_FAIL_ALLOCATOR)
+                {
+                    return Ok(true);
                 }
             }
         }

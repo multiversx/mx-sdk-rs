@@ -6,3 +6,11 @@ main = "alloc-features"
 add-unlabelled = true
 allocator = "static64k"
 stack-size = "32k"
+
+[contracts.alloc-features-fail-memory]
+allocator = "fail"
+add-labels = ["fail-memory"]
+
+[contracts.alloc-features-leaking-memory]
+allocator = "leaking"
+add-labels = ["leaking-memory"]
