@@ -460,6 +460,22 @@ where
         })
     }
 }
+impl<M, T> ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + PartialEq + Debug + Ord,
+{
+    pub fn sorted_dedup(&mut self)
+    where
+        [(); T::PAYLOAD_SIZE]:,
+    {
+        self.with_self_as_slice_mut(|slice| {
+            let (dedup, _) = slice.partition_dedup();
+            dedup.sort();
+            dedup
+        })
+    }
+}
 
 impl<M, T> Clone for ManagedVec<M, T>
 where
