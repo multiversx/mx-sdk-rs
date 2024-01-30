@@ -141,7 +141,6 @@ impl TxResponse {
                 if event.identifier == "writeLog" {
                     if let Some(data) = &event.data {
                         let decoded_data = String::from_utf8(base64_decode(data)).unwrap();
-
                         if decoded_data.starts_with('@') {
                             let out = decode_scr_data_or_panic(decoded_data.as_str());
                             return Some(out);
@@ -164,7 +163,6 @@ impl TxResponse {
             }
 
             let address_raw = base64_decode(topics.unwrap().first().unwrap());
-
             let address: Address = Address::from_slice(address_raw.as_slice());
             self.new_deployed_address = Some(address);
         }
