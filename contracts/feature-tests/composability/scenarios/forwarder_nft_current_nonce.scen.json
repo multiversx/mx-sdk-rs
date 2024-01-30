@@ -33,7 +33,7 @@
                             "lastNonce": "1"
                         }
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             }
         },

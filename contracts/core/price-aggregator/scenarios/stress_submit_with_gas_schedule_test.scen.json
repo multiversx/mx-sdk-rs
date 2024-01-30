@@ -223,10 +223,9 @@
         },
         {
             "step": "scDeploy",
-            "id": "",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multiversx-price-aggregator-sc.wasm",
+                "contractCode": "mxsc:../output/multiversx-price-aggregator-sc.mxsc.json",
                 "arguments": [
                     "0x45474c44",
                     "0x14",
@@ -284,8 +283,7 @@
                     "0x6f7261636c6534395f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f",
                     "0x6f7261636c6535305f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f"
                 ],
-                "gasLimit": "120,000,000",
-                "gasPrice": ""
+                "gasLimit": "120,000,000"
             },
             "expect": {
                 "out": [],
@@ -295,15 +293,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle1",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -313,15 +309,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle2",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -331,15 +325,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle3",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -349,15 +341,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle4",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -367,15 +357,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle5",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -385,15 +373,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle6",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -403,15 +389,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle7",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -421,15 +405,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle8",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -439,15 +421,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle9",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -457,15 +437,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle10",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -475,15 +453,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle11",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -493,15 +469,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle12",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -511,15 +485,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle13",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -529,15 +501,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle14",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -547,15 +517,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle15",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -565,15 +533,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle16",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -583,15 +549,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle17",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -601,15 +565,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle18",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -619,15 +581,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle19",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -637,15 +597,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle20",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -655,15 +613,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle21",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -673,15 +629,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle22",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -691,15 +645,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle23",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -709,15 +661,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle24",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -727,15 +677,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle25",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -745,15 +693,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle26",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -763,15 +709,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle27",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -781,15 +725,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle28",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -799,15 +741,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle29",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -817,15 +757,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle30",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -835,15 +773,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle31",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -853,15 +789,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle32",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -871,15 +805,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle33",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -889,15 +821,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle34",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -907,15 +837,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle35",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -925,15 +853,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle36",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -943,15 +869,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle37",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -961,15 +885,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle38",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -979,15 +901,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle39",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -997,15 +917,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle40",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1015,15 +933,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle41",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1033,15 +949,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle42",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1051,15 +965,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle43",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1069,15 +981,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle44",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1087,15 +997,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle45",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1105,15 +1013,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle46",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1123,15 +1029,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle47",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1141,15 +1045,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle48",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1159,15 +1061,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle49",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1177,15 +1077,13 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle50",
                 "to": "sc:price-aggregator",
                 "egldValue": "20",
                 "function": "stake",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1195,7 +1093,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:price-aggregator",
@@ -1205,8 +1102,7 @@
                     "0x55534443",
                     "0x"
                 ],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1216,14 +1112,12 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:price-aggregator",
                 "function": "unpause",
                 "arguments": [],
-                "gasLimit": "5,000,000",
-                "gasPrice": ""
+                "gasLimit": "5,000,000"
             },
             "expect": {
                 "out": [],
@@ -1233,7 +1127,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle1",
                 "to": "sc:price-aggregator",
@@ -1245,8 +1138,7 @@
                     "0x619911dbb570258c",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1256,7 +1148,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle2",
                 "to": "sc:price-aggregator",
@@ -1268,8 +1159,7 @@
                     "0x3cf8d3d3a05bf655",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1279,7 +1169,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle3",
                 "to": "sc:price-aggregator",
@@ -1291,8 +1180,7 @@
                     "0x4d92440172e0bf71",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1302,7 +1190,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle4",
                 "to": "sc:price-aggregator",
@@ -1314,8 +1201,7 @@
                     "0xd971ed41066daa08",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1325,7 +1211,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle5",
                 "to": "sc:price-aggregator",
@@ -1337,8 +1222,7 @@
                     "0x34a9348cb04afbd1",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1348,7 +1232,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle6",
                 "to": "sc:price-aggregator",
@@ -1360,8 +1243,7 @@
                     "0x6c01a77d55c0861f",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1371,7 +1253,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle7",
                 "to": "sc:price-aggregator",
@@ -1383,8 +1264,7 @@
                     "0xea1e93f2b82ec0f6",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1394,7 +1274,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle8",
                 "to": "sc:price-aggregator",
@@ -1406,8 +1285,7 @@
                     "0x2f067fee00bbd5bc",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1417,7 +1295,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle9",
                 "to": "sc:price-aggregator",
@@ -1429,8 +1306,7 @@
                     "0x1706fe5397a21f74",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1440,7 +1316,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle10",
                 "to": "sc:price-aggregator",
@@ -1452,8 +1327,7 @@
                     "0xbffd5631e9e448a8",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1463,7 +1337,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle11",
                 "to": "sc:price-aggregator",
@@ -1475,8 +1348,7 @@
                     "0x1940496d3bc8934c",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1486,7 +1358,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle12",
                 "to": "sc:price-aggregator",
@@ -1498,8 +1369,7 @@
                     "0xbd0af0d3aba30235",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1509,7 +1379,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle13",
                 "to": "sc:price-aggregator",
@@ -1521,8 +1390,7 @@
                     "0xebcf9494ec0fac0c",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1532,7 +1400,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle14",
                 "to": "sc:price-aggregator",
@@ -1544,8 +1411,7 @@
                     "0x7aeb67c3eabe498c",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1555,7 +1421,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle15",
                 "to": "sc:price-aggregator",
@@ -1567,8 +1432,7 @@
                     "0x5c758d17b8445f7f",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1578,7 +1442,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle16",
                 "to": "sc:price-aggregator",
@@ -1590,8 +1453,7 @@
                     "0x6978fe48b9a58974",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1601,7 +1463,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle17",
                 "to": "sc:price-aggregator",
@@ -1613,8 +1474,7 @@
                     "0x8692c26f665bc7ad",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1624,7 +1484,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle18",
                 "to": "sc:price-aggregator",
@@ -1636,8 +1495,7 @@
                     "0x2d3a93b7522e72b6",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1647,7 +1505,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle19",
                 "to": "sc:price-aggregator",
@@ -1659,8 +1516,7 @@
                     "0x4faa49415e935688",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1670,7 +1526,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle20",
                 "to": "sc:price-aggregator",
@@ -1682,8 +1537,7 @@
                     "0x5cbca2cc253dbf54",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1693,7 +1547,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle21",
                 "to": "sc:price-aggregator",
@@ -1705,8 +1558,7 @@
                     "0xdd20d194dd695735",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1716,7 +1568,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle22",
                 "to": "sc:price-aggregator",
@@ -1728,8 +1579,7 @@
                     "0x32f039c1765a2ec3",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1739,7 +1589,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle23",
                 "to": "sc:price-aggregator",
@@ -1751,8 +1600,7 @@
                     "0x84372c9de3d535d9",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1762,7 +1610,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle24",
                 "to": "sc:price-aggregator",
@@ -1774,8 +1621,7 @@
                     "0x91b23ed59de93417",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1785,7 +1631,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle25",
                 "to": "sc:price-aggregator",
@@ -1797,8 +1642,7 @@
                     "0x4b81d1a55887f5f9",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1808,7 +1652,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle26",
                 "to": "sc:price-aggregator",
@@ -1820,8 +1663,7 @@
                     "0xd88e348ef6679e1d",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1831,7 +1673,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle27",
                 "to": "sc:price-aggregator",
@@ -1843,8 +1684,7 @@
                     "0x2557834dc8059cc7",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1854,7 +1694,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle28",
                 "to": "sc:price-aggregator",
@@ -1866,8 +1705,7 @@
                     "0x22d86f8317546033",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1877,7 +1715,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle29",
                 "to": "sc:price-aggregator",
@@ -1889,8 +1726,7 @@
                     "0x5a775ddd32ca5367",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1900,7 +1736,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle30",
                 "to": "sc:price-aggregator",
@@ -1912,8 +1747,7 @@
                     "0x59f049471cd2662c",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1923,7 +1757,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle31",
                 "to": "sc:price-aggregator",
@@ -1935,8 +1768,7 @@
                     "0xb59fdc2aedbf845f",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1946,7 +1778,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle32",
                 "to": "sc:price-aggregator",
@@ -1958,8 +1789,7 @@
                     "0xab13e96eb802f883",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1969,7 +1799,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle33",
                 "to": "sc:price-aggregator",
@@ -1981,8 +1810,7 @@
                     "0xf6f152ab53ad7170",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -1992,7 +1820,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle34",
                 "to": "sc:price-aggregator",
@@ -2004,8 +1831,7 @@
                     "0x5bae78b87d516979",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2015,7 +1841,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle35",
                 "to": "sc:price-aggregator",
@@ -2027,8 +1852,7 @@
                     "0xe47859cc0fdb0abe",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2038,7 +1862,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle36",
                 "to": "sc:price-aggregator",
@@ -2050,8 +1873,7 @@
                     "0x7c36ab1fa1a348b4",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2061,7 +1883,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle37",
                 "to": "sc:price-aggregator",
@@ -2073,8 +1894,7 @@
                     "0x7fda3ef39b74e04b",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2084,7 +1904,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle38",
                 "to": "sc:price-aggregator",
@@ -2096,8 +1915,7 @@
                     "0x461d81a84db50115",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2107,7 +1925,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle39",
                 "to": "sc:price-aggregator",
@@ -2119,8 +1936,7 @@
                     "0xcc0ab8ccc363dd0c",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2130,7 +1946,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle40",
                 "to": "sc:price-aggregator",
@@ -2142,8 +1957,7 @@
                     "0x11c15058c7c6c1fa",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2153,7 +1967,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle41",
                 "to": "sc:price-aggregator",
@@ -2165,8 +1978,7 @@
                     "0x293b700535555d4f",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2176,7 +1988,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle42",
                 "to": "sc:price-aggregator",
@@ -2188,8 +1999,7 @@
                     "0x4e8d04d2f0e53efd",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2199,7 +2009,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle43",
                 "to": "sc:price-aggregator",
@@ -2211,8 +2020,7 @@
                     "0x42be3651d7b9499e",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2222,7 +2030,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle44",
                 "to": "sc:price-aggregator",
@@ -2234,8 +2041,7 @@
                     "0xb82a437fc87cd8a0",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2245,7 +2051,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle45",
                 "to": "sc:price-aggregator",
@@ -2257,8 +2062,7 @@
                     "0xb12ebd0d9ff3f396",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2268,7 +2072,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle46",
                 "to": "sc:price-aggregator",
@@ -2280,8 +2083,7 @@
                     "0x85b4d01e5a20d445",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2291,7 +2093,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle47",
                 "to": "sc:price-aggregator",
@@ -2303,8 +2104,7 @@
                     "0x92edaca582002375",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2314,7 +2114,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle48",
                 "to": "sc:price-aggregator",
@@ -2326,8 +2125,7 @@
                     "0x351151b47fee6331",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2337,7 +2135,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle49",
                 "to": "sc:price-aggregator",
@@ -2349,8 +2146,7 @@
                     "0x9155d2992ceb6beb",
                     "0x"
                 ],
-                "gasLimit": "7,000,000",
-                "gasPrice": ""
+                "gasLimit": "7,000,000"
             },
             "expect": {
                 "out": [],
@@ -2360,7 +2156,6 @@
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "address:oracle50",
                 "to": "sc:price-aggregator",
@@ -2372,8 +2167,7 @@
                     "0xdbc0895ce5855dec",
                     "0x"
                 ],
-                "gasLimit": "50,000,000",
-                "gasPrice": ""
+                "gasLimit": "50,000,000"
             },
             "expect": {
                 "out": [],

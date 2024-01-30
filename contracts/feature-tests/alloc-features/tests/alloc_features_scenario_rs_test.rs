@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/alloc-features");
 
     blockchain.register_contract(
-        "file:output/alloc-features.wasm",
+        "mxsc:output/alloc-features.mxsc.json",
         alloc_features::ContractBuilder,
     );
 

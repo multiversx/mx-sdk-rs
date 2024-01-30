@@ -13,12 +13,12 @@ const ACCEPT_FUNDS_FUNC_NAME: &[u8] = b"accept_funds";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const REJECT_FUNDS_FUNC_NAME: &[u8] = b"reject_funds";
 const TRANSFER_ROLE_FEATURES_ADDRESS_EXPR: &str = "sc:transfer-role-features";
-const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "file:output/transfer-role-features.wasm";
+const TRANSFER_ROLE_FEATURES_PATH_EXPR: &str = "mxsc:output/transfer-role-features.mxsc.json";
 const TRANSFER_TOKEN_ID: &[u8] = b"TRANSFER-123456";
 const TRANSFER_TOKEN_ID_EXPR: &str = "str:TRANSFER-123456";
 const USER_ADDRESS_EXPR: &str = "address:user";
 const VAULT_ADDRESS_EXPR: &str = "sc:vault";
-const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
+const VAULT_PATH_EXPR: &str = "mxsc:../vault/output/vault.mxsc.json";
 
 type TransferRoleFeaturesContract = ContractInfo<transfer_role_features::Proxy<StaticApi>>;
 

@@ -55,7 +55,7 @@
                         "str:tokenIdentifier": "str:EGLD",
                         "str:deposit|address:donor1": "250,000,000,000"
                     },
-                    "code": "file:../output/crowdfunding-esdt.wasm"
+                    "code": "mxsc:../output/crowdfunding-esdt.mxsc.json"
                 }
             }
         }

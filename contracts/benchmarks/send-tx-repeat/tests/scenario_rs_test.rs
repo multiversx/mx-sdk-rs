@@ -3,7 +3,7 @@ use multiversx_sc_scenario::*;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.register_contract(
-        "file:output/send-tx-repeat.wasm",
+        "mxsc:output/send-tx-repeat.mxsc.json",
         send_tx_repeat::ContractBuilder,
     );
     blockchain

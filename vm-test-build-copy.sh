@@ -14,8 +14,9 @@ build_and_copy() {
    sc-meta all build --target-dir $TARGET_DIR --path $contract_path || return 1
 
    mkdir -p $vm_contract_path/output
-   cp $contract_path/output/*.wasm \
+   cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
+   rm $vm_contract_path/output/*.wasm
 }
 
 build_and_copy_with_scenarios() {
@@ -26,8 +27,9 @@ build_and_copy_with_scenarios() {
    sc-meta all build --target-dir $TARGET_DIR --path $contract_path || return 1
    mkdir -p $vm_contract_path/output
    rm -rf $vm_contract_path/scenarios
-   cp $contract_path/output/*.wasm \
+   cp $contract_path/output/*.mxsc.json \
       $vm_contract_path/output
+   rm $vm_contract_path/output/*.wasm
 
    # copying scenarios ...
    rsync -av \
@@ -59,18 +61,20 @@ build_and_copy_composability() {
    contract_with_underscores="${contract//-/_}"
 
    sc-meta all build --target-dir $TARGET_DIR --path ./contracts/feature-tests/composability/$contract || return 1
-   cp -R contracts/feature-tests/composability/$contract/output/${contract}.wasm \
-      $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.wasm
+   cp -R contracts/feature-tests/composability/$contract/output/${contract}.mxsc.json \
+      $VM_REPO_PATH/test/features/composability/$contract/output/${contract}.mxsc.json
+   rm contracts/feature-tests/composability/$contract/output/*.wasm
 }
 
-build_and_copy ./contracts/feature-tests/composability/forwarder         $VM_REPO_PATH/test/features/composability/forwarder
-build_and_copy ./contracts/feature-tests/composability/forwarder-queue   $VM_REPO_PATH/test/features/composability/forwarder-queue
-build_and_copy ./contracts/feature-tests/composability/forwarder-raw     $VM_REPO_PATH/test/features/composability/forwarder-raw
-build_and_copy ./contracts/feature-tests/composability/proxy-test-first  $VM_REPO_PATH/test/features/composability/proxy-test-first
-build_and_copy ./contracts/feature-tests/composability/proxy-test-second $VM_REPO_PATH/test/features/composability/proxy-test-second
-build_and_copy ./contracts/feature-tests/composability/recursive-caller  $VM_REPO_PATH/test/features/composability/recursive-caller
-build_and_copy ./contracts/feature-tests/composability/promises-features $VM_REPO_PATH/test/features/composability/promises-features
-build_and_copy ./contracts/feature-tests/composability/vault             $VM_REPO_PATH/test/features/composability/vault
+build_and_copy ./contracts/feature-tests/composability/builtin-func-features $VM_REPO_PATH/test/features/composability/builtin-func-features
+build_and_copy ./contracts/feature-tests/composability/forwarder             $VM_REPO_PATH/test/features/composability/forwarder
+build_and_copy ./contracts/feature-tests/composability/forwarder-queue       $VM_REPO_PATH/test/features/composability/forwarder-queue
+build_and_copy ./contracts/feature-tests/composability/forwarder-raw         $VM_REPO_PATH/test/features/composability/forwarder-raw
+build_and_copy ./contracts/feature-tests/composability/proxy-test-first      $VM_REPO_PATH/test/features/composability/proxy-test-first
+build_and_copy ./contracts/feature-tests/composability/proxy-test-second     $VM_REPO_PATH/test/features/composability/proxy-test-second
+build_and_copy ./contracts/feature-tests/composability/recursive-caller      $VM_REPO_PATH/test/features/composability/recursive-caller
+build_and_copy ./contracts/feature-tests/composability/promises-features     $VM_REPO_PATH/test/features/composability/promises-features
+build_and_copy ./contracts/feature-tests/composability/vault                 $VM_REPO_PATH/test/features/composability/vault
 
 rm -f $VM_REPO_PATH/test/features/composability/scenarios/*
 cp -R contracts/feature-tests/composability/scenarios \

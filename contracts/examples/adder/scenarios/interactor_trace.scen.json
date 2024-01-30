@@ -11,8 +11,7 @@
                         "str:CAN-2abf4b": "1000",
                         "str:CAN-6d39e6": "1000",
                         "str:CAN-ac1592": "1000"
-                    },
-                    "username": ""
+                    }
                 }
             }
         },
@@ -28,23 +27,21 @@
         },
         {
             "step": "scDeploy",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
-                "contractCode": "file:../output/adder.wasm",
+                "contractCode": "mxsc:../output/adder.mxsc.json",
                 "arguments": [
                     "0x00"
                 ],
-                "gasLimit": "70,000,000",
-                "gasPrice": ""
+                "gasLimit": "70,000,000"
             },
             "expect": {
+                "out": [],
                 "status": "0"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050028600ceb73ac22ec0b6f257aff7bed74dffa3ebfed60",
@@ -52,16 +49,15 @@
                 "arguments": [
                     "0x07"
                 ],
-                "gasLimit": "70,000,000",
-                "gasPrice": ""
+                "gasLimit": "70,000,000"
             },
             "expect": {
+                "out": [],
                 "status": "0"
             }
         },
         {
             "step": "scCall",
-            "id": "",
             "tx": {
                 "from": "0xe32afedc904fe1939746ad973beb383563cf63642ba669b3040f9b9428a5ed60",
                 "to": "0x0000000000000000050028600ceb73ac22ec0b6f257aff7bed74dffa3ebfed60",
@@ -69,10 +65,10 @@
                 "arguments": [
                     "0x05"
                 ],
-                "gasLimit": "70,000,000",
-                "gasPrice": ""
+                "gasLimit": "70,000,000"
             },
             "expect": {
+                "out": [],
                 "status": "0"
             }
         }

@@ -55,7 +55,7 @@
                         "str:balanceOf|address:creator|str:.node_id|biguint:1": "1",
                         "str:balanceOf|address:creator|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../output/erc1155.wasm"
+                    "code": "mxsc:../output/erc1155.mxsc.json"
                 }
             }
         }

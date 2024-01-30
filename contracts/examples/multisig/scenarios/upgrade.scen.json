@@ -110,7 +110,7 @@
                         "str:quorum": "1",
                         "str:sum": "1234"
                     },
-                    "code": "file:../test-contracts/adder.wasm"
+                    "code": "mxsc:../test-contracts/adder.mxsc.json"
                 },
                 "+": ""
             }

@@ -10,9 +10,9 @@ use crate::{
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
     storage::{self},
     types::{
-        BackTransfers, BigUint, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags, EsdtTokenData,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType, ManagedVec,
-        TokenIdentifier,
+        BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags,
+        EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType,
+        ManagedVec, TokenIdentifier,
     },
 };
 
@@ -133,6 +133,21 @@ where
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
         BigUint::from_handle(handle)
+    }
+
+    #[inline]
+    pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
+        let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
+        A::blockchain_api_impl()
+            .managed_get_code_metadata(address.get_handle(), mbuf_temp_1.clone());
+        let mut buffer = [0u8; 2];
+        ManagedBuffer::<A>::from_handle(mbuf_temp_1).load_to_byte_array(&mut buffer);
+        CodeMetadata::from(buffer)
+    }
+
+    #[inline]
+    pub fn is_builtin_function(&self, function_name: &ManagedBuffer<A>) -> bool {
+        A::blockchain_api_impl().managed_is_builtin_function(function_name.get_handle())
     }
 
     #[inline]

@@ -7,7 +7,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/big-float-features.wasm"
+                    "code": "mxsc:../output/big-float-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",

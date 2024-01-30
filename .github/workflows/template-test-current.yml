@@ -25,25 +25,15 @@ jobs:
           toolchain: nightly-2023-12-11
           target: wasm32-unknown-unknown
 
-      - name: Setup the PATH variable
-        run: |
-          echo "PATH=$HOME/.local/bin:$HOME/multiversx-sdk/vmtools:$PATH" >> $GITHUB_ENV
-
       - name: Install prerequisites
         run: |
-          pip3 install multiversx-sdk-cli==v6.0.0
-          mkdir $HOME/multiversx-sdk
-          python3 -m multiversx_sdk_cli.cli deps install vmtools --tag v1.4.60
-          
-          wget -O binaryen.tar.gz https://github.com/WebAssembly/binaryen/releases/download/version_112/binaryen-version_112-x86_64-linux.tar.gz
-          tar -xf binaryen.tar.gz
-          cp binaryen-version_112/bin/wasm-opt $HOME/.local/bin
-
-          sudo apt install -y wabt=1.0.27-1
+          cargo install wasm-opt
+          cargo install --path framework/meta
+          sc-meta install mx-scenario-go --tag v2.0.0
 
           which wasm-opt
-          which wasm2wat
-          which run-scenarios
+          which mx-scenario-go
+          mx-scenario-go --version
 
       - name: Run template tool test
         run: |

@@ -74,7 +74,7 @@ impl State {
             "bech32:".to_string() + SC_ADDRESS
         };
         let contract_code = BytesValue::interpret_from(
-            "file:../output/rust-snippets-generator-test.wasm",
+            "mxsc:../output/rust-snippets-generator-test.mxsc.json",
             &InterpreterContext::default(),
         );
         let contract = ContractType::new(sc_addr_expr);

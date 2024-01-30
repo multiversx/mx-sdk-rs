@@ -16,7 +16,7 @@
                         "str:balance|address:account_1": "0x2710",
                         "str:totalSupply": "0x2710"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         },
@@ -72,7 +72,7 @@
                         "str:allowance|address:account_1|address:account_1": "0x25",
                         "str:totalSupply": "0x2710"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         }
