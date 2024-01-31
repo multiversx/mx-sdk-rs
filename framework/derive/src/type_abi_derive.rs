@@ -71,13 +71,14 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     let variant_docs = extract_doc(variant.attrs.as_slice());
                     let variant_name_str = variant.ident.to_string();
                     let variant_field_snippets = fields_snippets(&variant.fields);
+                    let variant_discriminant = get_discriminant(variant_index, variant);
                     quote! {
                         let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#variant_field_snippets)*
                         variant_descriptions.push(multiversx_sc::abi::EnumVariantDescription::new(
                             &[ #(#variant_docs),* ],
                             #variant_name_str,
-                            #variant_index,
+                            #variant_discriminant,
                             field_descriptions,
                         ));
                     }
@@ -118,4 +119,15 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
     type_abi_impl.into()
+}
+
+pub fn get_discriminant(variant_index: usize, variant: &syn::Variant) -> proc_macro2::TokenStream {
+    if let Some((_, syn::Expr::Lit(expr))) = &variant.discriminant {
+        let lit = match &expr.lit {
+            syn::Lit::Int(val) => val.base10_parse().unwrap(),
+            _ => 0usize,
+        };
+        return quote! { #lit};
+    }
+    quote! { #variant_index }
 }

@@ -93,3 +93,15 @@ pub fn validate_enum_variants(variants: &Punctuated<Variant, Comma>) {
         "enums with more than 256 variants not supported"
     );
 }
+
+pub fn get_discriminant(variant_index: usize, variant: &syn::Variant) -> proc_macro2::TokenStream {
+    let variant_index_u8 = variant_index as u8;
+    if let Some((_, syn::Expr::Lit(expr))) = &variant.discriminant {
+        let lit = match &expr.lit {
+            syn::Lit::Int(val) => val.base10_parse().unwrap(),
+            _ => 0u8,
+        };
+        return quote! { #lit};
+    }
+    quote! { #variant_index_u8 }
+}

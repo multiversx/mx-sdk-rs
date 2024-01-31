@@ -30,13 +30,13 @@ pub fn variant_dep_decode_snippets(
 		.iter()
 		.enumerate()
 		.map(|(variant_index, variant)| {
-			let variant_index_u8 = variant_index as u8;
+            let variant_discriminant = get_discriminant(variant_index, variant);
 			let variant_ident = &variant.ident;
 			let variant_field_snippets = fields_decl_syntax(&variant.fields, |index, field| {
 				dep_decode_snippet(index, field, input_value)
 			});
 			quote! {
-				#variant_index_u8 => core::result::Result::Ok( #name::#variant_ident #variant_field_snippets ),
+                #variant_discriminant => core::result::Result::Ok( #name::#variant_ident #variant_field_snippets ),
 			}
 		})
 		.collect()

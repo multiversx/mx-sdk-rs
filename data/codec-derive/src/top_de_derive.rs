@@ -12,10 +12,10 @@ fn fieldless_enum_match_arm_result_ok(
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_index_u8 = variant_index as u8;
+            let variant_discriminant = get_discriminant(variant_index, variant);
             let variant_ident = &variant.ident;
             quote! {
-                #variant_index_u8 => core::result::Result::Ok( #name::#variant_ident ),
+                #variant_discriminant => core::result::Result::Ok( #name::#variant_ident ),
             }
         })
         .collect()
