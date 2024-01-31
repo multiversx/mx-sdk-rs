@@ -282,6 +282,11 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
+fn new_address_rs() {
+    world().run("scenarios/new_address.scen.json");
+}
+
+#[test]
 fn only_owner_rs() {
     world().run("scenarios/only_owner.scen.json");
 }

@@ -1,5 +1,4 @@
 {
-    "gasSchedule": "v3",
     "steps": [
         {
             "step": "setState",
@@ -15,7 +14,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:an_account",
-                "contractCode": "file:../output/basic-features.wasm",
+                "contractCode": "mxsc:../output/basic-features.mxsc.json",
                 "arguments": [],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"
@@ -29,10 +28,6 @@
             }
         },
         {
-            "step": "dumpState",
-            "comment": "all accounts beginning"
-        },
-        {
             "step": "checkState",
             "accounts": {
                 "address:an_account": {
@@ -41,17 +36,13 @@
                     "storage": {},
                     "code": ""
                 },
-                "0x00000000000000000f0f11111111616e5f6163636f756e745f5f5f5f5f005f5f": {
+                "0x0000000000000000000011111111616e5f6163636f756e745f5f5f5f5f005f5f": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 }
             }
-        },
-        {
-            "step": "dumpState",
-            "comment": "all accounts end"
         }
     ]
 }
