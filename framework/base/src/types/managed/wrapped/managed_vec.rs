@@ -426,24 +426,29 @@ where
     }
 
     pub fn is_sorted(&self) -> bool {
-        self.with_self_as_slice(|slice| slice.is_sorted())
-    }
-
-    pub fn is_sorted_by<F>(&self, mut compare: F) -> bool
-    where
-        F: FnMut(&T, &T) -> Option<Ordering>,
-    {
         self.with_self_as_slice(|slice| {
-            slice.is_sorted_by(|a, b| compare(&a.decode(), &b.decode()))
-        })
-    }
+            let mut slice_iter = slice.iter();
+            #[inline]
+            fn check<'a, T>(
+                last: &'a mut T,
+                mut compare: impl FnMut(&T, &T) -> Option<Ordering> + 'a,
+            ) -> impl FnMut(T) -> bool + 'a {
+                move |curr| {
+                    if let Some(Ordering::Greater) | None = compare(&last, &curr) {
+                        return false;
+                    }
+                    *last = curr;
+                    true
+                }
+            }
 
-    pub fn is_sorted_by_key<K, F>(&self, mut f: F) -> bool
-    where
-        F: FnMut(&T) -> K,
-        K: Ord,
-    {
-        self.with_self_as_slice(|slice| slice.is_sorted_by_key(|a| f(&a.decode())))
+            let mut last = match slice_iter.next() {
+                Some(e) => e,
+                None => return true,
+            };
+
+            slice_iter.all(check(&mut last, PartialOrd::partial_cmp))
+        })
     }
 }
 
