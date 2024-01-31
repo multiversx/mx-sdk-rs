@@ -280,7 +280,7 @@ where
         QueueMapper {
             _phantom_api: PhantomData::<SA>,
             address,
-            base_key: base_key.clone(),
+            base_key,
             _phantom_item: PhantomData::<T>,
         }
     }
