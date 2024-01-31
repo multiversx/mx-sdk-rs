@@ -12,9 +12,7 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use core::{
-    borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData, mem,
-};
+use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
 
 use super::EncodedManagedVecItem;
 
