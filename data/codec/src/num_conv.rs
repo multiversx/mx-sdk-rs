@@ -1,15 +1,15 @@
-pub const TOP_ENCODE_NUMBER_BUFFER_SIZE: usize = 9;
+pub type TopEncodeNumberBuffer = [u8; 9];
+
+pub const fn top_encode_number_buffer() -> TopEncodeNumberBuffer {
+    [0u8; 9]
+}
 
 /// Encodes number to minimimum number of bytes (top-encoding).
 ///
 /// Smaller types need to be converted to u64 before using this function.
 ///
 /// No generics here, we avoid monomorphization to make the SC binary as small as possible.
-pub fn top_encode_number(
-    x: u64,
-    signed: bool,
-    buffer: &mut [u8; TOP_ENCODE_NUMBER_BUFFER_SIZE],
-) -> &[u8] {
+pub fn top_encode_number(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuffer) -> &[u8] {
     let offset = fill_buffer_find_offset(x, signed, buffer);
 
     debug_assert!(offset < 9);
@@ -24,11 +24,7 @@ pub fn top_encode_number(
 ///
 /// This function is hyper-optimized to not contain any jumps. There are no ifs or loops in this,
 /// the entire algorithm is performed via arithmetic, boolean and bitwise operations.
-fn fill_buffer_find_offset(
-    x: u64,
-    signed: bool,
-    buffer: &mut [u8; TOP_ENCODE_NUMBER_BUFFER_SIZE],
-) -> usize {
+fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuffer) -> usize {
     let b0 = (x >> 56 & 0xff) as u8;
 
     let negative = signed && msbit_is_one(b0);
@@ -167,7 +163,7 @@ mod test {
     /// Only checks the filling out of the buffer.
     #[test]
     fn test_populate_buffer() {
-        let mut buffer = [0u8; TOP_ENCODE_NUMBER_BUFFER_SIZE];
+        let mut buffer = top_encode_number_buffer();
         let _ = fill_buffer_find_offset(0x12345678abcdef12, false, &mut buffer);
         assert_eq!(
             buffer,
@@ -176,7 +172,7 @@ mod test {
     }
 
     fn test_encode_decode(x: u64, signed: bool, bytes: &[u8]) {
-        let mut buffer = [0u8; TOP_ENCODE_NUMBER_BUFFER_SIZE];
+        let mut buffer = top_encode_number_buffer();
         assert_eq!(
             top_encode_number(x, signed, &mut buffer),
             bytes,
