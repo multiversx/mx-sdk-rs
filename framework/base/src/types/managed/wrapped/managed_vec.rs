@@ -12,7 +12,9 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
+use core::{
+    borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData, mem,
+};
 
 use super::EncodedManagedVecItem;
 
@@ -455,23 +457,32 @@ where
         [(); T::PAYLOAD_SIZE]:,
     {
         self.with_self_as_slice_mut(|slice| {
-            let (dedup, _) = slice.partition_dedup();
-            dedup
-        })
-    }
-}
-impl<M, T> ManagedVec<M, T>
-where
-    M: ManagedTypeApi,
-    T: ManagedVecItem + PartialEq + Debug + Ord,
-{
-    pub fn sorted_dedup(&mut self)
-    where
-        [(); T::PAYLOAD_SIZE]:,
-    {
-        self.with_self_as_slice_mut(|slice| {
-            let (dedup, _) = slice.partition_dedup();
-            dedup.sort();
+            let same_bucket = |a, b| a == b;
+            let len = slice.len();
+            if len <= 1 {
+                return slice;
+            }
+
+            let ptr = slice.as_mut_ptr();
+            let mut next_read: usize = 1;
+            let mut next_write: usize = 1;
+            unsafe {
+                // Avoid bounds checks by using raw pointers.
+                while next_read < len {
+                    let ptr_read = ptr.add(next_read);
+                    let prev_ptr_write = ptr.add(next_write - 1);
+                    if !same_bucket(&mut *ptr_read, &mut *prev_ptr_write) {
+                        if next_read != next_write {
+                            let ptr_write = prev_ptr_write.add(1);
+                            mem::swap(&mut *ptr_read, &mut *ptr_write);
+                        }
+                        next_write += 1;
+                    }
+                    next_read += 1;
+                }
+            }
+
+            let (dedup, _) = slice.split_at_mut(next_write);
             dedup
         })
     }
