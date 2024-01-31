@@ -1,7 +1,10 @@
-pub type TopEncodeNumberBuffer = [u8; 9];
+pub type TopEncodeNumberBuffer = [u8; 8];
 
+/// This buffer is needed to provide some underlying structure on stack off which to build a variable-length slice.
+///
+/// Its length is 9 (one more than necessary, to elegantly deal with the edge case "-1").
 pub const fn top_encode_number_buffer() -> TopEncodeNumberBuffer {
-    [0u8; 9]
+    [0u8; 8]
 }
 
 /// Encodes number to minimimum number of bytes (top-encoding).
@@ -14,7 +17,7 @@ pub fn top_encode_number(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuffe
 
     debug_assert!(offset < 9);
 
-    unsafe { buffer.get_unchecked(offset..8) }
+    unsafe { buffer.get_unchecked(offset..) }
 }
 
 /// At the same time fills the buffer,
@@ -60,8 +63,11 @@ fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuf
     change_one_to_zero_unless(&mut cursor, b6 == skippable_byte);
     offset += cursor;
 
+    // The last byte: it can only get skipped for the number 0.
+    // Writing `b7 == skippable_byte` instead would also have caught -1,
+    // but that is an edge case where we do not want the last byte skipped.
     let b7 = (x & 0xff) as u8;
-    change_one_to_zero_unless(&mut cursor, b7 == skippable_byte);
+    change_one_to_zero_unless(&mut cursor, x == 0);
     offset += cursor;
 
     buffer[0] = b0;
@@ -72,7 +78,6 @@ fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuf
     buffer[5] = b5;
     buffer[6] = b6;
     buffer[7] = b7;
-    buffer[8] = 0;
 
     // For signed numbers, it can sometimes happen that we are skipping too many bytes,
     // and the most significant bit ends up different than what we started with.
@@ -82,8 +87,13 @@ fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuf
     cursor = 1;
     change_one_to_zero_unless(&mut cursor, signed);
     change_one_to_zero_unless(&mut cursor, offset > 0);
-    let msbit_corrupted =
-        msbit_is_one(unsafe { *buffer.get_unchecked(offset) }) != msbit_is_one(b0);
+
+    // The only time when the offset can be 8 (and thus out of bounds)
+    // is for the number 0. Conveniently, for 0 all bytes are 0, so applying modulo 8 does not change the outcome.
+    let byte_at_offset = buffer[offset % 8];
+
+    // The main condition for stepping back one step: the most significant bit changed in the process.
+    let msbit_corrupted = msbit_is_one(byte_at_offset) != msbit_is_one(b0);
     change_one_to_zero_unless(&mut cursor, msbit_corrupted);
 
     // According to this algorithm, it should be impossible to underflow
@@ -133,7 +143,7 @@ fn change_one_to_zero_unless(x: &mut usize, condition: bool) {
 
 /// For negative = true, yields 0xff.
 ///
-/// For negative = true, yields 0x00.
+/// For negative = false, yields 0x00.
 ///
 /// Has no if, doesn't branch.
 #[inline]
@@ -165,10 +175,7 @@ mod test {
     fn test_populate_buffer() {
         let mut buffer = top_encode_number_buffer();
         let _ = fill_buffer_find_offset(0x12345678abcdef12, false, &mut buffer);
-        assert_eq!(
-            buffer,
-            [0x12, 0x34, 0x56, 0x78, 0xab, 0xcd, 0xef, 0x12, 0x00]
-        );
+        assert_eq!(buffer, [0x12, 0x34, 0x56, 0x78, 0xab, 0xcd, 0xef, 0x12]);
     }
 
     fn test_encode_decode(x: u64, signed: bool, bytes: &[u8]) {
