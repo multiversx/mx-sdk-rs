@@ -434,7 +434,7 @@ where
                 mut compare: impl FnMut(&T, &T) -> Option<Ordering> + 'a,
             ) -> impl FnMut(T) -> bool + 'a {
                 move |curr| {
-                    if let Some(Ordering::Greater) | None = compare(&last, &curr) {
+                    if let Some(Ordering::Greater) | None = compare(last, &curr) {
                         return false;
                     }
                     *last = curr;
@@ -479,7 +479,7 @@ where
                     if !same_bucket(&mut *ptr_read, &mut *prev_ptr_write) {
                         if next_read != next_write {
                             let ptr_write = prev_ptr_write.add(1);
-                            mem::swap(&mut *ptr_read, &mut *ptr_write);
+                            core::ptr::swap(ptr_read, ptr_write);
                         }
                         next_write += 1;
                     }
