@@ -4,10 +4,10 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:fail-memory": {
+                "sc:fail_memory": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/alloc-features.wasm"
+                    "code": "file:../output/fail-memory.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -27,9 +27,9 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": "",
+                "out": [],
                 "status": "4",
-                "message": "str:yess",
+                "message": "str:memory allocation forbidden",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
