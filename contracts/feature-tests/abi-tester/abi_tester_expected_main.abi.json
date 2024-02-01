@@ -701,7 +701,7 @@
         "ExplicitDiscriminant": {
             "type": "enum",
             "docs": [
-                "An enum with more similar explicit discriminants"
+                "An enum with similar explicit discriminants"
             ],
             "variants": [
                 {
