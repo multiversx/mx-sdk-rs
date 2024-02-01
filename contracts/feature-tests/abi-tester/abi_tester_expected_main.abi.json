@@ -19,7 +19,7 @@
     },
     "docs": [
         "Contract whose sole purpose is to verify that",
-        "the ABI generation framework works sa expected.",
+        "the ABI generation framework works as expected.",
         "",
         "Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,",
         "including Rust docs."
@@ -446,6 +446,14 @@
         {
             "ticker": "OnlyInEsdt",
             "type": "OnlyShowsUpInEsdtAttr"
+        },
+        {
+            "ticker": "ExplicitDiscriminant",
+            "type": "ExplicitDiscriminant"
+        },
+        {
+            "ticker": "ExplicitDiscriminantMixed",
+            "type": "ExplicitDiscriminantMixed"
         }
     ],
     "hasCallback": false,
@@ -687,6 +695,78 @@
                 {
                     "name": "Invalid",
                     "discriminant": 4
+                }
+            ]
+        },
+        "ExplicitDiscriminant": {
+            "type": "enum",
+            "docs": [
+                "An enum with more similar explicit discriminants"
+            ],
+            "variants": [
+                {
+                    "name": "Zero",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Thirty",
+                    "discriminant": 30
+                },
+                {
+                    "name": "Twelve",
+                    "discriminant": 12
+                },
+                {
+                    "name": "Fifty",
+                    "discriminant": 50
+                },
+                {
+                    "name": "FiftyOne",
+                    "discriminant": 51
+                }
+            ]
+        },
+        "ExplicitDiscriminantMixed": {
+            "type": "enum",
+            "docs": [
+                "An enum with different explicit discriminants"
+            ],
+            "variants": [
+                {
+                    "name": "Zero",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Unit",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Tuple",
+                    "discriminant": 4,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u16"
+                        }
+                    ]
+                },
+                {
+                    "name": "Five",
+                    "discriminant": 5
+                },
+                {
+                    "name": "Struct",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u8"
+                        },
+                        {
+                            "name": "b",
+                            "type": "u16"
+                        }
+                    ]
                 }
             ]
         },

@@ -123,8 +123,8 @@ pub fn get_discriminant(
         },
         Some((_, prev_value)) => prev_value + 1,
 
-        //vec is empty, first element is added
-        None => 0,
+        //vec is empty, return index
+        None => variant_index as u8,
     };
 
     quote! { #next_value}
