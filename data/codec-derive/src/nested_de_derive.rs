@@ -25,12 +25,14 @@ pub fn variant_dep_decode_snippets(
     data_enum: &syn::DataEnum,
     input_value: &proc_macro2::TokenStream,
 ) -> Vec<proc_macro2::TokenStream> {
+    //(index of last explicit, value)
+    let mut previous_disc: Vec<(usize, u8)> = Vec::new();
     data_enum
 		.variants
 		.iter()
 		.enumerate()
 		.map(|(variant_index, variant)| {
-            let variant_discriminant = get_discriminant(variant_index, variant);
+            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
 			let variant_ident = &variant.ident;
 			let variant_field_snippets = fields_decl_syntax(&variant.fields, |index, field| {
 				dep_decode_snippet(index, field, input_value)

@@ -94,14 +94,38 @@ pub fn validate_enum_variants(variants: &Punctuated<Variant, Comma>) {
     );
 }
 
-pub fn get_discriminant(variant_index: usize, variant: &syn::Variant) -> proc_macro2::TokenStream {
-    let variant_index_u8 = variant_index as u8;
+pub fn get_discriminant(
+    variant_index: usize,
+    variant: &syn::Variant,
+    previous_disc: &mut Vec<(usize, u8)>,
+) -> proc_macro2::TokenStream {
+    //if it has explicit discriminant
     if let Some((_, syn::Expr::Lit(expr))) = &variant.discriminant {
         let lit = match &expr.lit {
-            syn::Lit::Int(val) => val.base10_parse().unwrap(),
-            _ => 0u8,
+            syn::Lit::Int(val) => {
+                let value = val.base10_parse().unwrap_or_else(|_| {
+                    panic!("Can not unwrap int value from explicit discriminant")
+                });
+                previous_disc.push((variant_index, value));
+                value
+            },
+            _ => panic!("Only integer values as discriminants"), //unreachable
         };
         return quote! { #lit};
     }
-    quote! { #variant_index_u8 }
+
+    //if no explicit discriminant, check previous discriminants
+    //get previous explicit + 1 if there has been any explicit before
+    let next_value = match previous_disc.last() {
+        //there are previous explicit discriminants
+        Some((prev_index, prev_value)) if *prev_index < variant_index - 1 => {
+            prev_value + (variant_index - prev_index) as u8
+        },
+        Some((_, prev_value)) => prev_value + 1,
+
+        //vec is empty, first element is added
+        None => 0,
+    };
+
+    quote! { #next_value}
 }

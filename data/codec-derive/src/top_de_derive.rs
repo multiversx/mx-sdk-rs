@@ -7,12 +7,14 @@ fn fieldless_enum_match_arm_result_ok(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
+    //(index of last explicit, value)
+    let mut previous_disc: Vec<(usize, u8)> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_discriminant = get_discriminant(variant_index, variant);
+            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
             let variant_ident = &variant.ident;
             quote! {
                 #variant_discriminant => core::result::Result::Ok( #name::#variant_ident ),

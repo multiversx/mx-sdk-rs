@@ -12,12 +12,14 @@ fn variant_dep_encode_snippets(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
+    //(index of last explicit, value)
+    let mut previous_disc: Vec<(usize, u8)> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_discriminant = get_discriminant(variant_index, variant);
+            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
             let variant_ident = &variant.ident;
             let local_var_declarations =
                 fields_decl_syntax(&variant.fields, local_variable_for_field);
