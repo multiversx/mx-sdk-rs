@@ -7,8 +7,7 @@ fn fieldless_enum_match_arm_result_ok(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
-    //(index of last explicit, value)
-    let mut previous_disc: Vec<(usize, u8)> = Vec::new();
+    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
         .variants
         .iter()

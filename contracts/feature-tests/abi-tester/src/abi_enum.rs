@@ -18,7 +18,6 @@ pub enum ExplicitDiscriminant {
     Twelve = 12,
     Fifty = 50,
     FiftyOne,
-    
 }
 
 /// An enum with different explicit discriminants
@@ -29,8 +28,5 @@ pub enum ExplicitDiscriminantMixed {
     Unit = 3,
     Tuple(u16),
     Five,
-    Struct {
-        a: u8,
-        b: u16,
-    } = 1,
+    Struct { a: u8, b: u16 } = 1,
 }
