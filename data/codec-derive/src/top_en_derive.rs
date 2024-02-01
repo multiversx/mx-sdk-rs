@@ -7,13 +7,12 @@ pub fn variant_top_encode_snippets(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
-    let mut previous_disc: Vec<(usize, u8)> = Vec::new();
+    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            //(index of last explicit, value)
             let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
             let variant_ident = &variant.ident;
             if variant.fields.is_empty() {

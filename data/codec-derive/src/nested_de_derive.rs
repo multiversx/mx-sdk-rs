@@ -25,8 +25,7 @@ pub fn variant_dep_decode_snippets(
     data_enum: &syn::DataEnum,
     input_value: &proc_macro2::TokenStream,
 ) -> Vec<proc_macro2::TokenStream> {
-    //(index of last explicit, value)
-    let mut previous_disc: Vec<(usize, u8)> = Vec::new();
+    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
 		.variants
 		.iter()
