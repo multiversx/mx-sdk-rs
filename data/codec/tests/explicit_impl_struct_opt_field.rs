@@ -7,6 +7,9 @@ use codec::{
 };
 use core::fmt::Debug;
 
+/// Example of how to have an optional, or variable-length field at the end of a structure.
+///
+/// Careful! This is non-standard and is not really friendly to nested encoding.
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct StructOptField {
     pub field: u32,
