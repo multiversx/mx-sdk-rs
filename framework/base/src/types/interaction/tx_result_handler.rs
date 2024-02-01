@@ -13,26 +13,3 @@ where
 {
     type OriginalResult = ();
 }
-
-// impl<Env, Head, Tail> TxResultHandler<Env> for (Head, Tail)
-// where
-//     Env: TxEnv,
-//     Head: TxResultHandler<Env>,
-//     Tail: TxResultHandler<Env>,
-// {
-//     type OriginalResult = Tail::OriginalResult;
-// }
-
-pub trait TxRunnableCallback<Env>: TxResultHandler<Env>
-where
-    Env: TxEnv,
-{
-    fn run_callback(self, env: &Env);
-}
-
-impl<Env> TxRunnableCallback<Env> for ()
-where
-    Env: TxEnv,
-{
-    fn run_callback(self, _env: &Env) {}
-}

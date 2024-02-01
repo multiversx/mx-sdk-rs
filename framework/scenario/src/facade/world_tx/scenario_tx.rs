@@ -15,7 +15,7 @@ impl ScenarioWorld {
         }
     }
 
-    pub fn run_tx<STx, F>(&mut self, f: F) -> STx::Returns
+    pub fn tx_return<STx, F>(&mut self, f: F) -> STx::Returns
     where
         STx: ScenarioTx,
         F: FnOnce(TxScenarioBase) -> STx,
@@ -28,10 +28,10 @@ impl ScenarioWorld {
 
     pub fn tx<STx, F>(&mut self, f: F) -> &mut Self
     where
-        STx: ScenarioTx,
+        STx: ScenarioTx<Returns = ()>,
         F: FnOnce(TxScenarioBase) -> STx,
     {
-        let _ = self.run_tx(f);
+        let () = self.tx_return(f);
         self
     }
 }

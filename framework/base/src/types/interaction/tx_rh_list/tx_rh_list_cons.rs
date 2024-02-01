@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::types::{TxEnv, TxResultHandler};
+use crate::types::{OriginalResultMarker, TxEnv, TxResultHandler};
 
 use super::RHListItem;
 
@@ -60,31 +60,6 @@ where
     fn append_no_ret(self, t: T) -> Self::NoRetOutput {
         ConsNoRet::new(t, self)
     }
-}
-
-pub struct OriginalResultMarker<O> {
-    _phantom: PhantomData<O>,
-}
-
-impl<O> Default for OriginalResultMarker<O> {
-    fn default() -> Self {
-        Self {
-            _phantom: Default::default(),
-        }
-    }
-}
-
-impl<O> OriginalResultMarker<O> {
-    pub fn new() -> Self {
-        Self::default()
-    }
-}
-
-impl<Env, O> TxResultHandler<Env> for OriginalResultMarker<O>
-where
-    Env: TxEnv,
-{
-    type OriginalResult = O;
 }
 
 impl<Env, O> RHList<Env> for OriginalResultMarker<O>

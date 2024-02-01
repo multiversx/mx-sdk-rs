@@ -4,7 +4,10 @@ use crate::{
     types::CallbackClosure,
 };
 
-use super::{Tx, TxDataFunctionCall, TxPayment, TxResultHandler, TxScEnv, TxToSpecified};
+use super::{
+    Tx, TxData, TxDataFunctionCall, TxEnv, TxFrom, TxGas, TxPayment, TxResultHandler, TxScEnv,
+    TxTo, TxToSpecified,
+};
 
 pub trait TxAsyncCallCallback<Api>: TxResultHandler<TxScEnv<Api>>
 where
@@ -50,6 +53,32 @@ where
     fn save_callback_closure_to_storage(&self) {
         if let Some(closure) = self {
             closure.save_callback_closure_to_storage();
+        }
+    }
+}
+
+impl<Api, From, To, Payment, Gas, Data> Tx<TxScEnv<Api>, From, To, Payment, Gas, Data, ()>
+where
+    Api: CallTypeApi,
+    From: TxFrom<TxScEnv<Api>>,
+    To: TxTo<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    Data: TxData<TxScEnv<Api>>,
+{
+    #[inline]
+    pub fn callback<RH>(self, callback: RH) -> Tx<TxScEnv<Api>, From, To, Payment, Gas, Data, RH>
+    where
+        RH: TxAsyncCallCallback<Api>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: callback,
         }
     }
 }

@@ -426,32 +426,6 @@ where
     }
 }
 
-impl<Env, From, To, Payment, Gas, Data> Tx<Env, From, To, Payment, Gas, Data, ()>
-where
-    Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Payment: TxPayment<Env>,
-    Gas: TxGas<Env>,
-    Data: TxData<Env>,
-{
-    #[inline]
-    pub fn callback<RH>(self, callback: RH) -> Tx<Env, From, To, Payment, Gas, Data, RH>
-    where
-        RH: TxResultHandler<Env>,
-    {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: self.data,
-            result_handler: callback,
-        }
-    }
-}
-
 impl<Env, From, To, Payment, Gas, FC, RH> Tx<Env, From, To, Payment, Gas, FC, RH>
 where
     Env: TxEnv,

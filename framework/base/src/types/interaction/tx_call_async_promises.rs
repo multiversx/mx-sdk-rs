@@ -99,7 +99,6 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
-    // #[cfg(feature = "promises")]
     pub fn async_call_promise(self) {
         let callback_name = self.result_handler.callback_name();
         let mut cb_closure_args_serialized =

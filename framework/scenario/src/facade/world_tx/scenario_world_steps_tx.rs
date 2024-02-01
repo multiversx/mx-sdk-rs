@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use multiversx_sc::types::{
     AnnotatedValue, FunctionCall, ManagedAddress, Tx, TxBaseWithEnv, TxEnv, TxFromSpecified, TxGas,
-    TxPayment, TxRunnableCallback, TxToSpecified,
+    TxPayment, TxToSpecified,
 };
 
 use crate::{
@@ -10,7 +10,3 @@ use crate::{
     facade::ScenarioWorld,
     scenario_model::{ScCallStep, TxResponse},
 };
-
-
-
-

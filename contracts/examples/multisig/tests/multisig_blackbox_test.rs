@@ -127,7 +127,7 @@ impl MultisigTestState {
     }
 
     fn propose_add_board_member(&mut self, board_member_address: Address) -> usize {
-        self.world.run_tx(|tx| {
+        self.world.tx_return(|tx| {
             tx.from(AddressExpr("proposer"))
                 .to(ScExpr("multisig"))
                 .call(
