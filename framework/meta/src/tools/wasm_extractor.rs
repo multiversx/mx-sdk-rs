@@ -38,7 +38,7 @@ impl WasmInfo {
         if allocator_trigger {
             println!(
                 "{}",
-                "FailAllocator triggered: memory allocation forbidden"
+                "FailAllocator used while memory allocation is accessible in code. Contract may fail unexpectedly when memory allocation is attempted"
                     .to_string()
                     .red()
                     .bold()

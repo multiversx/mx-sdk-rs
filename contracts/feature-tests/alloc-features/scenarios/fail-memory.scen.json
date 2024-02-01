@@ -4,10 +4,10 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:alloc-features-fail-memory": {
+                "sc:fail-memory": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/alloc-features-fail-memory.wasm"
+                    "code": "file:../output/alloc-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -20,7 +20,7 @@
             "id": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:alloc-features-fail-memory",
+                "to": "sc:fail_memory",
                 "function": "alloc_with_fail_memory",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -29,7 +29,7 @@
             "expect": {
                 "out": "",
                 "status": "4",
-                "message": "str:memory allocation forbidden",
+                "message": "str:yess",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"
