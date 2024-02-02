@@ -2,6 +2,11 @@ use super::parse::attributes::extract_doc;
 use proc_macro::TokenStream;
 use quote::quote;
 
+pub struct ExplicitDiscriminant {
+    pub variant_index: usize,
+    pub value: usize,
+}
+
 fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
     let field_docs = extract_doc(field.attrs.as_slice());
     let field_name_str = if let Some(ident) = &field.ident {
@@ -63,6 +68,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
             }
         },
         syn::Data::Enum(data_enum) => {
+            let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
             let enum_variant_snippets: Vec<proc_macro2::TokenStream> = data_enum
                 .variants
                 .iter()
@@ -71,13 +77,15 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                     let variant_docs = extract_doc(variant.attrs.as_slice());
                     let variant_name_str = variant.ident.to_string();
                     let variant_field_snippets = fields_snippets(&variant.fields);
+                    let variant_discriminant =
+                        get_discriminant(variant_index, variant, &mut previous_disc);
                     quote! {
                         let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#variant_field_snippets)*
                         variant_descriptions.push(multiversx_sc::abi::EnumVariantDescription::new(
                             &[ #(#variant_docs),* ],
                             #variant_name_str,
-                            #variant_index,
+                            #variant_discriminant,
                             field_descriptions,
                         ));
                     }
@@ -118,4 +126,47 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
         }
     };
     type_abi_impl.into()
+}
+
+pub fn get_discriminant(
+    variant_index: usize,
+    variant: &syn::Variant,
+    previous_disc: &mut Vec<ExplicitDiscriminant>,
+) -> proc_macro2::TokenStream {
+    // if it has explicit discriminant
+    if let Some((_, syn::Expr::Lit(expr))) = &variant.discriminant {
+        let lit = match &expr.lit {
+            syn::Lit::Int(val) => {
+                let value = val.base10_parse().unwrap_or_else(|_| {
+                    panic!("Can not unwrap int value from explicit discriminant")
+                });
+                previous_disc.push(ExplicitDiscriminant {
+                    variant_index,
+                    value,
+                });
+                value
+            },
+            _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
+        };
+        return quote! { #lit};
+    }
+
+    // if no explicit discriminant, check previous discriminants
+    // get previous explicit + 1 if there has been any explicit before
+    let next_value = match previous_disc.last() {
+        // there are previous explicit discriminants
+        Some(ExplicitDiscriminant {
+            variant_index: prev_index,
+            value: prev_value,
+        }) if *prev_index < variant_index - 1 => prev_value + variant_index - prev_index,
+        Some(ExplicitDiscriminant {
+            variant_index: _,
+            value: prev_value,
+        }) => prev_value + 1,
+
+        // vec is empty, return index
+        None => variant_index,
+    };
+
+    quote! { #next_value}
 }
