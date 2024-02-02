@@ -4,6 +4,8 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+use colored::Colorize;
+
 use crate::{
     display_util::address_hex,
     types::VMAddress,
@@ -102,7 +104,18 @@ impl TxCache {
         self.blockchain_ref()
             .get_new_address(creator_address.clone(), current_nonce - 1)
             .unwrap_or_else(|| {
-                panic!("Missing new address. Only explicit new deploy addresses supported")
+                let new_mock_address =
+                    VMAddress::generate_mock_address(&creator_address.to_vec(), current_nonce - 1);
+                println!(
+                    "{}",
+                    format!(
+                        "Missing new address for {:?}.\nCreating a new mock address...: {:?}",
+                        address_hex(creator_address),
+                        address_hex(&new_mock_address)
+                    )
+                    .yellow()
+                );
+                new_mock_address
             })
     }
 
