@@ -8,14 +8,11 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "storage": {},
                     "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
-                    "balance": "0",
-                    "storage": {},
-                    "code": ""
+                    "balance": "0"
                 }
             }
         },
@@ -25,13 +22,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_u8",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -45,7 +42,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_u8",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -67,13 +63,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_i8",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -87,7 +83,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_i8",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -109,13 +104,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_u16",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -129,7 +124,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_u16",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -151,13 +145,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_i16",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -171,7 +165,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_i16",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -193,13 +186,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_u32",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -213,7 +206,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_u32",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -235,13 +227,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_i32",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -255,7 +247,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_i32",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -277,13 +268,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_u64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -297,7 +288,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_u64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -319,13 +309,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_i64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -339,7 +329,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_i64",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -361,13 +350,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_usize",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -381,7 +370,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_usize",
                 "arguments": [],
                 "gasLimit": "50,000,000",
@@ -403,13 +391,13 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "no_overflow_isize",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
+                "out": [],
                 "status": "4",
                 "message": "str:panic occurred",
                 "logs": "*",
@@ -423,7 +411,6 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:basic-features",
-                "value": "0",
                 "function": "overflow_isize",
                 "arguments": [],
                 "gasLimit": "50,000,000",

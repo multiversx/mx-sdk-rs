@@ -200,6 +200,11 @@ fn get_caller_go() {
 }
 
 #[test]
+fn get_code_metadata_go() {
+    world().run("scenarios/get_code_metadata.scen.json");
+}
+
+#[test]
 fn get_cumulated_validator_rewards_go() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
 }
@@ -208,6 +213,11 @@ fn get_cumulated_validator_rewards_go() {
 #[ignore = "TODO: missing support from scenario-go"]
 fn get_shard_of_address_go() {
     world().run("scenarios/get_shard_of_address.scen.json");
+}
+
+#[test]
+fn is_builtin_function_go() {
+    world().run("scenarios/is_builtin_function.scen.json");
 }
 
 #[test]
@@ -354,6 +364,11 @@ fn storage_mapper_address_to_id_go() {
 #[ignore = "currently not supported. TODO: investigate"]
 fn storage_mapper_fungible_token_go() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
+}
+
+#[test]
+fn storage_mapper_get_at_address_go() {
+    world().run("scenarios/storage_mapper_get_at_address.scen.json");
 }
 
 #[test]

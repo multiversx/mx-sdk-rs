@@ -1,6 +1,8 @@
 use colored::Colorize;
-use std::{fs, str::from_utf8};
-use wasmparser::{BinaryReaderError, Parser, Payload};
+use std::fs;
+use wasmparser::{BinaryReaderError, DataSectionReader, ImportSectionReader, Parser, Payload};
+
+const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
@@ -8,83 +10,82 @@ pub struct WasmInfo {
 }
 
 impl WasmInfo {
-    const fn new() -> Self {
+    const fn new(imports: Vec<String>, allocator_trigger: bool) -> Self {
         WasmInfo {
-            imports: Vec::new(),
-            allocator_trigger: false,
+            imports,
+            allocator_trigger,
         }
     }
 
-    pub fn set_imports(&mut self, output_wasm_path: &str) {
+    pub fn extract_wasm_info(
+        output_wasm_path: &str,
+        extract_imports_enabled: bool,
+    ) -> Result<WasmInfo, BinaryReaderError> {
         let wasm_data = fs::read(output_wasm_path)
-            .expect("error occured while extracting imports from .wasm: file not found");
+            .expect("error occured while extracting information from .wasm: file not found");
 
-        let imports = parse_wasm_imports(wasm_data)
-            .expect("error occured while extracting imports from .wasm ");
+        populate_wasm_info(wasm_data, extract_imports_enabled)
+    }
+}
 
-        self.imports = imports;
+fn populate_wasm_info(
+    wasm_data: Vec<u8>,
+    extract_imports_enabled: bool,
+) -> Result<WasmInfo, BinaryReaderError> {
+    let mut imports = Vec::new();
+    let mut allocator_triggered = false;
+
+    let parser = Parser::new(0);
+    for payload in parser.parse_all(&wasm_data) {
+        match payload? {
+            Payload::ImportSection(import_section) => {
+                imports = extract_imports(import_section, extract_imports_enabled);
+            },
+            Payload::DataSection(data_section) => {
+                allocator_triggered = is_fail_allocator_triggered(data_section);
+            },
+            _ => (),
+        }
     }
 
-    pub fn build_wasm_info(output_wasm_path: &str) -> Self {
-        let wasm_data = fs::read(output_wasm_path).expect(
-            "error occured while extracting memory allocation information from .wasm: file not found",
-        );
+    Ok(WasmInfo::new(imports, allocator_triggered))
+}
 
-        let allocator_trigger = is_memory_allocation(wasm_data)
-            .expect("error occured while extracting memory allocation information from .wasm ");
-
-        if allocator_trigger {
+fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {
+    for data_fragment in data_section.into_iter().flatten() {
+        if data_fragment
+            .data
+            .windows(ERROR_FAIL_ALLOCATOR.len())
+            .any(|data| data == ERROR_FAIL_ALLOCATOR)
+        {
             println!(
                 "{}",
-                "FailAllocator triggered: memory allocation forbidden"
+                "FailAllocator used while memory allocation is accessible in code. Contract may fail unexpectedly when memory allocation is attempted"
                     .to_string()
                     .red()
                     .bold()
             );
+            return true;
         }
-
-        Self::new()
     }
+
+    false
 }
 
-fn parse_wasm_imports(wasm_data: Vec<u8>) -> Result<Vec<String>, BinaryReaderError> {
-    let mut import_names = Vec::new();
+pub fn extract_imports(
+    import_section: ImportSectionReader,
+    import_extraction_enabled: bool,
+) -> Vec<String> {
+    if !import_extraction_enabled {
+        return Vec::new();
+    }
 
-    let parser = Parser::new(0);
-    for payload in parser.parse_all(&wasm_data) {
-        if let Payload::ImportSection(import_section) = payload? {
-            for import in import_section {
-                import_names.push(import?.name.to_string());
-            }
-        }
+    let mut import_names = Vec::new();
+    for import in import_section.into_iter().flatten() {
+        import_names.push(import.name.to_string());
     }
 
     import_names.sort();
 
-    Ok(import_names)
-}
-
-pub fn is_memory_allocation(wasm_data: Vec<u8>) -> Result<bool, BinaryReaderError> {
-    let parser = Parser::new(0);
-
-    for payload in parser.parse_all(&wasm_data).flatten() {
-        if let Payload::DataSection(data_section) = payload {
-            for data_fragment in data_section {
-                let cleaned_data_fragment: Vec<u8> = data_fragment?
-                    .data
-                    .iter()
-                    .filter(|&&b| b < 128)
-                    .cloned()
-                    .collect();
-
-                if let Ok(data_fragment_str) = from_utf8(&cleaned_data_fragment) {
-                    if data_fragment_str.contains("memory allocation forbidden") {
-                        return Ok(true);
-                    }
-                }
-            }
-        }
-    }
-
-    Ok(false)
+    import_names
 }

@@ -4,13 +4,27 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/alloc-features");
 
-    blockchain.register_contract(
+    blockchain.register_partial_contract::<alloc_features::AbiProvider, _>(
         "mxsc:output/alloc-features.mxsc.json",
         alloc_features::ContractBuilder,
+        "alloc-features"
+    );
+
+    blockchain.register_partial_contract::<alloc_features::AbiProvider, _>(
+        "mxsc:output/fail-memory.mxsc.json",
+        alloc_features::ContractBuilder,
+        "fail-memory",
+    );    
+    
+    blockchain.register_partial_contract::<alloc_features::AbiProvider, _>(
+        "mxsc:output/leaking-memory.mxsc.json",
+        alloc_features::ContractBuilder,
+        "leaking-memory",
     );
 
     blockchain
 }
+
 #[test]
 fn boxed_bytes_zeros_rs() {
     world().run("scenarios/boxed_bytes_zeros.scen.json");
@@ -70,6 +84,16 @@ fn echo_varargs_u_32_alloc_rs() {
 fn echo_vec_u_8_rs() {
     world().run("scenarios/echo_vec_u8.scen.json");
 }
+
+// #[test]
+// fn fail_memory_rs() {
+//     world().run("scenarios/fail-memory.scen.json");
+// }
+
+// #[test]
+// fn leaking_memory_rs() {
+//     world().run("scenarios/leaking-memory.scen.json");
+// }
 
 #[test]
 fn managed_buffer_concat_2_rs() {
