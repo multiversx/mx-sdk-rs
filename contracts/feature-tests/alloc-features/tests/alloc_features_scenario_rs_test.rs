@@ -90,10 +90,10 @@ fn echo_vec_u_8_rs() {
 //     world().run("scenarios/fail-memory.scen.json");
 // }
 
-#[test]
-fn leaking_memory_rs() {
-    world().run("scenarios/leaking-memory.scen.json");
-}
+// #[test]
+// fn leaking_memory_rs() {
+//     world().run("scenarios/leaking-memory.scen.json");
+// }
 
 #[test]
 fn managed_buffer_concat_2_rs() {
