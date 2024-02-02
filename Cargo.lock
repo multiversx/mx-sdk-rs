@@ -1784,6 +1784,7 @@ name = "multiversx-chain-vm"
 version = "0.8.1"
 dependencies = [
  "bitflags 2.4.2",
+ "colored",
  "ed25519-dalek",
  "hex",
  "hex-literal",
