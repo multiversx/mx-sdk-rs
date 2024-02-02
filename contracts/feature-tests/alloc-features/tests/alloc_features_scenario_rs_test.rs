@@ -14,14 +14,15 @@ fn world() -> ScenarioWorld {
         "mxsc:output/fail-memory.mxsc.json",
         alloc_features::ContractBuilder,
         "fail-memory",
+    );    
+    
+    blockchain.register_partial_contract::<alloc_features::AbiProvider, _>(
+        "mxsc:output/leaking-memory.mxsc.json",
+        alloc_features::ContractBuilder,
+        "leaking-memory",
     );
 
     blockchain
-}
-
-#[test]
-fn fail_memory_rs() {
-    world().run("scenarios/fail-memory.scen.json");
 }
 
 #[test]
@@ -84,7 +85,15 @@ fn echo_vec_u_8_rs() {
     world().run("scenarios/echo_vec_u8.scen.json");
 }
 
+// #[test]
+// fn fail_memory_rs() {
+//     world().run("scenarios/fail-memory.scen.json");
+// }
 
+#[test]
+fn leaking_memory_rs() {
+    world().run("scenarios/leaking-memory.scen.json");
+}
 
 #[test]
 fn managed_buffer_concat_2_rs() {

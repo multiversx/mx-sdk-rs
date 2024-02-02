@@ -11,3 +11,8 @@ stack-size = "32k"
 name = "fail-memory"
 allocator = "fail"
 add-labels = ["fail-memory"]
+
+[contracts.alloc-features-leaking-memory]
+name = "leaking-memory"
+allocator = "leaking"
+add-labels = ["leaking-memory"]

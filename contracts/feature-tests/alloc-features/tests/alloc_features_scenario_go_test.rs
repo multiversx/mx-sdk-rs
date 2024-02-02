@@ -69,10 +69,10 @@ fn fail_memory_go() {
     world().run("scenarios/fail-memory.scen.json");
 }
 
-// #[test]
-// fn leaking_memory_go() {
-//     world().run("scenarios/leaking-memory.scen.json");
-// }
+#[test]
+fn leaking_memory_go() {
+    world().run("scenarios/leaking-memory.scen.json");
+}
 
 #[test]
 fn managed_buffer_concat_2_go() {

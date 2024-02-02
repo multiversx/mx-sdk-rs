@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "fail-memory-wasm"
+name = "leaking-memory-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false

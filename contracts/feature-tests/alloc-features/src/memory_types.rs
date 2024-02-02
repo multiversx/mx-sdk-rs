@@ -9,4 +9,11 @@ pub trait MemoryTypes {
         let _x = String::from("H");
         1
     }
+
+    #[endpoint]
+    #[label("leaking-memory")]
+    fn alloc_with_leaking_memory(&self) -> i32 {
+        let _ = Box::new(42);
+        1
+    }
 }

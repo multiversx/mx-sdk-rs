@@ -69,18 +69,11 @@ impl ContractVariant {
 
     fn finalize_build(&self, build_args: &BuildArgs, output_path: &str) {
         self.copy_contracts_to_output(build_args, output_path);
-        let wasm_data = self.build_wasm_info(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
-        self.extract_imports(build_args, output_path, wasm_data);
+        self.extract_wasm_info(build_args, output_path);
         self.run_twiggy(build_args, output_path);
         self.pack_mxsc_file(build_args, output_path);
-    }
-
-    fn build_wasm_info(&self, build_args: &BuildArgs, output_path: &str) -> WasmInfo {
-        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
-
-        WasmInfo::build_wasm_info(&output_wasm_path)
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -130,19 +123,25 @@ impl ContractVariant {
         tools::wasm_to_wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
 
-    fn extract_imports(&self, build_args: &BuildArgs, output_path: &str, mut wasm_data: WasmInfo) {
+    fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &str) {
+        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
+
         if !build_args.extract_imports {
+            WasmInfo::extract_wasm_info(&output_wasm_path, build_args.extract_imports)
+                .expect("error occured while extracting imports from .wasm ");
             return;
         }
 
-        let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let output_imports_json_path = format!(
             "{}/{}",
             output_path,
             self.imports_json_output_name(build_args)
         );
         print_extract_imports(&output_imports_json_path);
-        wasm_data.set_imports(&output_wasm_path);
+
+        let wasm_data = WasmInfo::extract_wasm_info(&output_wasm_path, true)
+            .expect("error occured while extracting imports from .wasm ");
+
         write_imports_output(
             output_imports_json_path.as_str(),
             wasm_data.imports.as_slice(),
