@@ -147,7 +147,7 @@ mod tests {
         let mock_address = VMAddress::generate_mock_address(&creator_address.to_vec(), 1u64);
         assert_eq!(
             address_hex(&mock_address),
-            "0x00000000000000000000111111116f776e65725f5f5f5f5f5f5f5f5f5f015f5f"
+            "0x00000000000000000500111111116f776e65725f5f5f5f5f5f5f5f5f5f015f5f"
         );
     }
 }
