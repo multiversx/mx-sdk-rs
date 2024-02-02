@@ -6,7 +6,7 @@ const SC_ADDRESS_NUM_LEADING_ZEROS: u8 = 8;
 
 pub const NUM_INT_CHARACTERS_FOR_ADDRESS: usize = 10;
 pub const VM_TYPE_LEN: usize = 2;
-pub const DEFAULT_VM_TYPE: &[u8] = &[0, 0];
+pub const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
 /// Address type being used in the VM only.
 ///
