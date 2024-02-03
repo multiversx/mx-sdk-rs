@@ -135,12 +135,6 @@ where
     Tail: RHList<Env>,
 {
     type ListReturns = (Head::Returns, Tail::ListReturns);
-
-    // fn list_return(&self) -> Self::ListReturn {
-    //     let head_ret = self.head.single_return();
-    //     let tail_ret = self.tail.list_return();
-    //     (head_ret, tail_ret)
-    // }
 }
 
 impl<Env, Head, Tail, T> RHListAppendRet<Env, T> for ConsRet<Env, Head, Tail>
@@ -214,11 +208,6 @@ where
     Tail: RHList<Env>,
 {
     type ListReturns = Tail::ListReturns;
-
-    // fn list_return(&self) -> Self::ListReturn {
-    //     self.head.single_return();
-    //     self.tail.list_return()
-    // }
 }
 
 impl<Env, Head, Tail, T> RHListAppendRet<Env, T> for ConsNoRet<Env, Head, Tail>
