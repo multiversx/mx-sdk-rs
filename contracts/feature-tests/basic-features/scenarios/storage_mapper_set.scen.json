@@ -298,6 +298,209 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "first-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_insert",
+                "arguments": [
+                    "111"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "second-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_insert",
+                "arguments": [
+                    "222"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "third-insert",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_insert",
+                "arguments": [
+                    "333"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "true"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "check-front",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_front",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "111"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "check-back",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_back",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "333"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "check-next",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_next",
+                "arguments": [
+                    "222"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "333"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "check-next-out-of-bounds",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_next",
+                "arguments": [
+                    "333"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "check-previous",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_previous",
+                "arguments": [
+                    "222"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "111"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "check-iter-from",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "set_mapper_iter_from_and_count",
+                "arguments": [
+                    "222"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "2"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }
