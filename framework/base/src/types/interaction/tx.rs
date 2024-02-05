@@ -11,8 +11,8 @@ use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
     AsyncCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxData, TxDataDeploy,
-    TxDataFunctionCall, TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxResultHandler, TxScEnv,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, TxData, TxDataDeploy, TxDataFunctionCall,
+    TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv,
     TxTo, TxToSpecified,
 };
 
@@ -470,7 +470,7 @@ where
 impl<Env, Payment, Gas, Data> Tx<Env, (), (), Payment, Gas, Data, ()>
 where
     Env: TxEnv,
-    Payment: TxPayment<Env> + TxEgldOnlyPayment<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
     Data: TxData<Env>,
 {
@@ -482,7 +482,7 @@ where
             payment: self.payment,
             gas: self.gas,
             data: TxDataDeploy::default(),
-            result_handler: (),
+            result_handler: self.result_handler,
         }
     }
 }
@@ -490,7 +490,7 @@ where
 impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()>
 where
     Env: TxEnv,
-    Payment: TxPayment<Env> + TxEgldOnlyPayment<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
 {
     pub fn code(
@@ -506,7 +506,7 @@ where
             payment: self.payment,
             gas: self.gas,
             data: data_deploy,
-            result_handler: (),
+            result_handler: self.result_handler,
         }
     }
 
@@ -523,7 +523,7 @@ where
             payment: self.payment,
             gas: self.gas,
             data: data_deploy,
-            result_handler: (),
+            result_handler: self.result_handler,
         }
     }
 
@@ -540,26 +540,15 @@ where
             payment: self.payment,
             gas: self.gas,
             data: data_deploy,
-            result_handler: (),
+            result_handler: self.result_handler,
         }
     }
 }
 
-pub trait TxEgldOnlyPayment<Env>
-where
-    Env: TxEnv,
-    Self: Clone,
-{
-}
-
-impl<Env> TxEgldOnlyPayment<Env> for EgldPayment<Env::Api> where Env: TxEnv {}
-
-impl<Env> TxEgldOnlyPayment<Env> for () where Env: TxEnv {}
-
 impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()>
 where
     Env: TxEnv,
-    Payment: TxPayment<Env> + TxEgldOnlyPayment<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
 {
     pub fn execute_deploy(

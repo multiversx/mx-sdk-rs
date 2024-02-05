@@ -8,9 +8,7 @@ use crate::{
     },
 };
 
-use super::{
-    FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo,
-};
+use super::{FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo};
 
 pub struct TxDataDeploy<Env>
 where
