@@ -19,12 +19,12 @@ fn big_float_overflow_test_rs() {
 
     let first = BigFloat::<StaticApi>::from_sci(1_005, -3)
         .pow(exp)
-        .to_fixed_point(&(1_000_000_000_000_000_00i64.into()))
+        .to_fixed_point(&(100_000_000_000_000_000i64.into()))
         .into_big_uint();
 
     let second = BigFloat::<StaticApi>::from_sci(1_005, -3)
         .pow(exp)
-        .to_fixed_point(&(1_000_000_000_000_000_0i64.into()))
+        .to_fixed_point(&(10_000_000_000_000_000i64.into()))
         .into_big_uint();
 
     let third = BigFloat::<StaticApi>::from_sci(1_005, -3)
