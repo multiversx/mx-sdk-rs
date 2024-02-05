@@ -4,10 +4,10 @@
         {
             "step": "setState",
             "accounts": {
-                "sc:fail_memory": {
+                "sc:alloc-mem-leaking": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/fail-memory.wasm"
+                    "code": "file:../output/alloc-mem-leaking.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -20,16 +20,17 @@
             "id": "1",
             "tx": {
                 "from": "address:an_account",
-                "to": "sc:fail_memory",
-                "function": "alloc_with_fail_memory",
+                "to": "sc:alloc-mem-leaking",
+                "function": "alloc_with_leaking_memory",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:memory allocation forbidden",
+                "out": [
+                    "1"
+                ],
+                "status": "",
                 "logs": "*",
                 "gas": "*",
                 "refund": "*"

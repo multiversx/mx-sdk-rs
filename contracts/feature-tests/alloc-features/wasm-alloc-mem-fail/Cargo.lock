@@ -10,6 +10,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "alloc-mem-fail-wasm"
+version = "0.0.0"
+dependencies = [
+ "alloc-features",
+ "multiversx-sc-wasm-adapter",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -44,14 +52,6 @@ name = "hex-literal"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
-
-[[package]]
-name = "leaking-memory-wasm"
-version = "0.0.0"
-dependencies = [
- "alloc-features",
- "multiversx-sc-wasm-adapter",
-]
 
 [[package]]
 name = "multiversx-sc"

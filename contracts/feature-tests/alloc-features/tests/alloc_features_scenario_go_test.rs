@@ -66,12 +66,12 @@ fn echo_vec_u_8_go() {
 
 #[test]
 fn fail_memory_go() {
-    world().run("scenarios/fail-memory.scen.json");
+    world().run("scenarios/alloc_mem_fail.scen.json");
 }
 
 #[test]
 fn leaking_memory_go() {
-    world().run("scenarios/leaking-memory.scen.json");
+    world().run("scenarios/alloc_mem_leaking.scen.json");
 }
 
 #[test]
