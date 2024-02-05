@@ -1,6 +1,11 @@
 use quote::quote;
 use syn::{punctuated::Punctuated, token::Comma, Variant};
 
+pub struct ExplicitDiscriminant {
+    pub variant_index: usize,
+    pub value: u8,
+}
+
 pub fn is_fieldless_enum(data_enum: &syn::DataEnum) -> bool {
     data_enum
         .variants
@@ -92,4 +97,47 @@ pub fn validate_enum_variants(variants: &Punctuated<Variant, Comma>) {
         variants.len() <= 256,
         "enums with more than 256 variants not supported"
     );
+}
+
+pub fn get_discriminant(
+    variant_index: usize,
+    variant: &syn::Variant,
+    previous_disc: &mut Vec<ExplicitDiscriminant>,
+) -> proc_macro2::TokenStream {
+    // if it has explicit discriminant
+    if let Some((_, syn::Expr::Lit(expr))) = &variant.discriminant {
+        let lit = match &expr.lit {
+            syn::Lit::Int(val) => {
+                let value = val.base10_parse().unwrap_or_else(|_| {
+                    panic!("Can not unwrap int value from explicit discriminant")
+                });
+                previous_disc.push(ExplicitDiscriminant {
+                    variant_index,
+                    value,
+                });
+                value
+            },
+            _ => panic!("Only integer values as discriminants"), // theoretically covered by the compiler
+        };
+        return quote! { #lit};
+    }
+
+    // if no explicit discriminant, check previous discriminants
+    // get previous explicit + 1 if there has been any explicit before
+    let next_value = match previous_disc.last() {
+        //there are previous explicit discriminants
+        Some(ExplicitDiscriminant {
+            variant_index: prev_index,
+            value: prev_value,
+        }) if *prev_index < variant_index - 1 => prev_value + (variant_index - prev_index) as u8,
+        Some(ExplicitDiscriminant {
+            variant_index: _,
+            value: prev_value,
+        }) => prev_value + 1,
+
+        // vec is empty, return index
+        None => variant_index as u8,
+    };
+
+    quote! { #next_value}
 }
