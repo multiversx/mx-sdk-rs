@@ -12,6 +12,6 @@ path = "src/promises_main.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.47.1"
+version = "0.47.2"
 path = "../../../../framework/base"
 

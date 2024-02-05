@@ -11,7 +11,7 @@ use abi_test_type::*;
 use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
-/// the ABI generation framework works sa expected.
+/// the ABI generation framework works as expected.
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
@@ -22,6 +22,8 @@ use only_nested::*;
 #[esdt_attribute("STRUCT1", AbiEnum)]
 #[esdt_attribute("STRUCT2", AbiManagedType<Self::Api>)]
 #[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
+#[esdt_attribute["ExplicitDiscriminant", ExplicitDiscriminant]]
+#[esdt_attribute["ExplicitDiscriminantMixed", ExplicitDiscriminantMixed]]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]

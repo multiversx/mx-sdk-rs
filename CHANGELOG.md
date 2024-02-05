@@ -26,6 +26,15 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.47.2, codec 0.18.6, vm 0.8.2, scenario-format 0.22.2] - 2024-02-02
+- Scenario testing infrastructure:
+	- The Rust VM can generate mock addresses, if not specified in advance.
+	- The `sc:` syntax now generates addresses with VM type 0x0500, same as the latest version of mx-scenario-go.
+	- Rust test support for checking `code_metadata`.
+- Explicit discriminants supported for enums.
+- Optimized `top_encode_number` function. It no longer contains branches or loops.
+- Removed reliance on Rust nightly features `is_sorted` and `slice_partition_dedup`.
+
 ## [sc 0.47.1, codec 0.18.5, vm 0.8.1, scenario-format 0.22.1] - 2024-01-29
 - Blockchain hooks: `get_code_metadata`, `is_builtin_function`.
 - Support for `mxsc:` syntax in scenarios.
