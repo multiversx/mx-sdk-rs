@@ -31,7 +31,7 @@ impl ScenarioWorld {
         STx: ScenarioTx<Returns = ()>,
         F: FnOnce(TxScenarioBase) -> STx,
     {
-        let () = self.tx_return(f);
+        self.tx_return(f);
         self
     }
 }
