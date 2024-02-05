@@ -1,6 +1,7 @@
 use multiversx_sdk::{
     blockchain::{CommunicationProxy, DEVNET_GATEWAY},
     data::{address::Address, transaction::Transaction},
+    utils::base64_encode,
 };
 
 #[tokio::main]
@@ -16,7 +17,7 @@ async fn main() {
             "erd1rh5ws22jxm9pe7dtvhfy6j3uttuupkepferdwtmslms5fydtrh5sx3xr8r",
         )
         .unwrap(),
-        data: Some(base64::encode("hello")),
+        data: Some(base64_encode("hello")),
         chain_id: "1".to_string(),
         version: 1,
         options: 0,

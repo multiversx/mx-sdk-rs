@@ -1,6 +1,9 @@
 use core::marker::PhantomData;
 
-use super::{set_mapper, SetMapper, StorageClearable, StorageMapper};
+use super::{
+    set_mapper::{self, CurrentStorage, StorageAddress},
+    SetMapper, StorageClearable, StorageMapper,
+};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
@@ -9,25 +12,26 @@ use crate::{
         NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::{storage_clear, storage_get, storage_set, StorageKey},
-    types::{ManagedType, MultiValueEncoded},
+    types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
 const MAPPED_VALUE_IDENTIFIER: &[u8] = b".mapped";
-type Keys<'a, SA, T> = set_mapper::Iter<'a, SA, T>;
+type Keys<'a, SA, A, T> = set_mapper::Iter<'a, SA, A, T>;
 
-pub struct MapMapper<SA, K, V>
+pub struct MapMapper<SA, K, V, A = CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    A: StorageAddress<SA>,
     V: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
     base_key: StorageKey<SA>,
-    keys_set: SetMapper<SA, K>,
+    keys_set: SetMapper<SA, K, A>,
     _phantom_value: PhantomData<V>,
 }
 
-impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V>
+impl<SA, K, V> StorageMapper<SA> for MapMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -37,13 +41,13 @@ where
         MapMapper {
             _phantom_api: PhantomData,
             base_key: base_key.clone(),
-            keys_set: SetMapper::<SA, K>::new(base_key),
+            keys_set: SetMapper::new(base_key),
             _phantom_value: PhantomData,
         }
     }
 }
 
-impl<SA, K, V> StorageClearable for MapMapper<SA, K, V>
+impl<SA, K, V> StorageClearable for MapMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -57,23 +61,12 @@ where
     }
 }
 
-impl<SA, K, V> MapMapper<SA, K, V>
+impl<SA, K, V> MapMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
-    fn build_named_key(&self, name: &[u8], key: &K) -> StorageKey<SA> {
-        let mut named_key = self.base_key.clone();
-        named_key.append_bytes(name);
-        named_key.append_item(key);
-        named_key
-    }
-
-    fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
-    }
-
     fn set_mapped_value(&self, key: &K, value: &V) {
         storage_set(
             self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref(),
@@ -83,46 +76,6 @@ where
 
     fn clear_mapped_value(&self, key: &K) {
         storage_clear(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref());
-    }
-
-    /// Returns `true` if the map contains no elements.
-    pub fn is_empty(&self) -> bool {
-        self.keys_set.is_empty()
-    }
-
-    /// Returns the number of elements in the map.
-    pub fn len(&self) -> usize {
-        self.keys_set.len()
-    }
-
-    /// Returns `true` if the map contains a value for the specified key.
-    pub fn contains_key(&self, k: &K) -> bool {
-        self.keys_set.contains(k)
-    }
-
-    /// Gets the given key's corresponding entry in the map for in-place manipulation.
-    pub fn entry(&mut self, key: K) -> Entry<'_, SA, K, V> {
-        if self.contains_key(&key) {
-            Entry::Occupied(OccupiedEntry {
-                key,
-                map: self,
-                _marker: PhantomData,
-            })
-        } else {
-            Entry::Vacant(VacantEntry {
-                key,
-                map: self,
-                _marker: PhantomData,
-            })
-        }
-    }
-
-    /// Gets a reference to the value in the entry.
-    pub fn get(&self, k: &K) -> Option<V> {
-        if self.keys_set.contains(k) {
-            return Some(self.get_mapped_value(k));
-        }
-        None
     }
 
     /// Sets the value of the entry, and returns the entry's old value.
@@ -142,58 +95,134 @@ where
         }
         None
     }
-
-    /// An iterator visiting all keys in arbitrary order.
-    /// The iterator element type is `&'a K`.
-    pub fn keys(&self) -> Keys<SA, K> {
-        self.keys_set.iter()
-    }
-
-    /// An iterator visiting all values in arbitrary order.
-    /// The iterator element type is `&'a V`.
-    pub fn values(&self) -> Values<SA, K, V> {
-        Values::new(self)
-    }
-
-    /// An iterator visiting all key-value pairs in arbitrary order.
-    /// The iterator element type is `(&'a K, &'a V)`.
-    pub fn iter(&self) -> Iter<SA, K, V> {
-        Iter::new(self)
-    }
 }
 
-impl<'a, SA, K, V> IntoIterator for &'a MapMapper<SA, K, V>
+impl<SA, K, V> MapMapper<SA, K, V, ManagedAddress<SA>>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode,
     V: TopEncode + TopDecode,
 {
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        MapMapper {
+            _phantom_api: PhantomData,
+            base_key: base_key.clone(),
+            keys_set: SetMapper::new_from_address(address, base_key),
+            _phantom_value: PhantomData,
+        }
+    }
+}
+
+impl<'a, SA, A, K, V> IntoIterator for &'a MapMapper<SA, K, V, A>
+where
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    V: TopEncode + TopDecode,
+{
     type Item = (K, V);
 
-    type IntoIter = Iter<'a, SA, K, V>;
+    type IntoIter = Iter<'a, SA, A, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
     }
 }
 
-pub struct Iter<'a, SA, K, V>
+impl<SA, A, K, V> MapMapper<SA, K, V, A>
 where
     SA: StorageMapperApi,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode,
+    A: StorageAddress<SA>,
+    V: TopEncode + TopDecode,
 {
-    key_iter: Keys<'a, SA, K>,
-    hash_map: &'a MapMapper<SA, K, V>,
+    /// Returns `true` if the map contains a value for the specified key.
+    pub fn contains_key(&self, k: &K) -> bool {
+        self.keys_set.contains(k)
+    }
+
+    fn build_named_key(&self, name: &[u8], key: &K) -> StorageKey<SA> {
+        let mut named_key = self.base_key.clone();
+        named_key.append_bytes(name);
+        named_key.append_item(key);
+        named_key
+    }
+
+    fn get_mapped_value(&self, key: &K) -> V {
+        storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
+    }
+
+    /// Gets a reference to the value in the entry.
+    pub fn get(&self, k: &K) -> Option<V> {
+        if self.keys_set.contains(k) {
+            return Some(self.get_mapped_value(k));
+        }
+        None
+    }
+
+    pub fn keys(&self) -> Keys<SA, A, K> {
+        self.keys_set.iter()
+    }
+
+    /// Returns `true` if the map contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.keys_set.is_empty()
+    }
+
+    /// Returns the number of elements in the map.
+    pub fn len(&self) -> usize {
+        self.keys_set.len()
+    }
+
+    /// Gets the given key's corresponding entry in the map for in-place manipulation.
+    pub fn entry(&mut self, key: K) -> Entry<'_, SA, A, K, V> {
+        if self.contains_key(&key) {
+            Entry::Occupied(OccupiedEntry {
+                key,
+                map: self,
+                _marker: PhantomData,
+            })
+        } else {
+            Entry::Vacant(VacantEntry {
+                key,
+                map: self,
+                _marker: PhantomData,
+            })
+        }
+    }
+
+    /// An iterator visiting all values in arbitrary order.
+    /// The iterator element type is `&'a V`.
+    pub fn values(&self) -> Values<SA, A, K, V> {
+        Values::new(self)
+    }
+
+    /// An iterator visiting all key-value pairs in arbitrary order.
+    /// The iterator element type is `(&'a K, &'a V)`.
+    pub fn iter(&self) -> Iter<SA, A, K, V> {
+        Iter::new(self)
+    }
 }
 
-impl<'a, SA, K, V> Iter<'a, SA, K, V>
+pub struct Iter<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    A: StorageAddress<SA>,
     V: TopEncode + TopDecode + 'static,
 {
-    fn new(hash_map: &'a MapMapper<SA, K, V>) -> Iter<'a, SA, K, V> {
+    key_iter: Keys<'a, SA, A, K>,
+    hash_map: &'a MapMapper<SA, K, V, A>,
+}
+
+impl<'a, SA, A, K, V> Iter<'a, SA, A, K, V>
+where
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
+    fn new(hash_map: &'a MapMapper<SA, K, V, A>) -> Iter<'a, SA, A, K, V> {
         Iter {
             key_iter: hash_map.keys(),
             hash_map,
@@ -201,9 +230,10 @@ where
     }
 }
 
-impl<'a, SA, K, V> Iterator for Iter<'a, SA, K, V>
+impl<'a, SA, A, K, V> Iterator for Iter<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -219,23 +249,25 @@ where
     }
 }
 
-pub struct Values<'a, SA, K, V>
+pub struct Values<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    A: StorageAddress<SA>,
     V: TopEncode + TopDecode + 'static,
 {
-    key_iter: Keys<'a, SA, K>,
-    hash_map: &'a MapMapper<SA, K, V>,
+    key_iter: Keys<'a, SA, A, K>,
+    hash_map: &'a MapMapper<SA, K, V, A>,
 }
 
-impl<'a, SA, K, V> Values<'a, SA, K, V>
+impl<'a, SA, A, K, V> Values<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
-    fn new(hash_map: &'a MapMapper<SA, K, V>) -> Values<'a, SA, K, V> {
+    fn new(hash_map: &'a MapMapper<SA, K, V, A>) -> Values<'a, SA, A, K, V> {
         Values {
             key_iter: hash_map.keys(),
             hash_map,
@@ -243,9 +275,10 @@ where
     }
 }
 
-impl<'a, SA, K, V> Iterator for Values<'a, SA, K, V>
+impl<'a, SA, A, K, V> Iterator for Values<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
     V: TopEncode + TopDecode + 'static,
 {
@@ -261,29 +294,31 @@ where
     }
 }
 
-pub enum Entry<'a, SA, K: 'a, V: 'a>
+pub enum Entry<'a, SA, A, K: 'a, V: 'a>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    A: StorageAddress<SA>,
     V: TopEncode + TopDecode + 'static,
 {
     /// A vacant entry.
-    Vacant(VacantEntry<'a, SA, K, V>),
+    Vacant(VacantEntry<'a, SA, A, K, V>),
 
     /// An occupied entry.
-    Occupied(OccupiedEntry<'a, SA, K, V>),
+    Occupied(OccupiedEntry<'a, SA, A, K, V>),
 }
 
 /// A view into a vacant entry in a `MapMapper`.
 /// It is part of the [`Entry`] enum.
-pub struct VacantEntry<'a, SA, K: 'a, V: 'a>
+pub struct VacantEntry<'a, SA, A, K: 'a, V: 'a>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    A: StorageAddress<SA>,
     V: TopEncode + TopDecode + 'static,
 {
     pub(super) key: K,
-    pub(super) map: &'a mut MapMapper<SA, K, V>,
+    pub(super) map: &'a mut MapMapper<SA, K, V, A>,
 
     // Be invariant in `K` and `V`
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
@@ -291,20 +326,37 @@ where
 
 /// A view into an occupied entry in a `MapMapper`.
 /// It is part of the [`Entry`] enum.
-pub struct OccupiedEntry<'a, SA, K: 'a, V: 'a>
+pub struct OccupiedEntry<'a, SA, A, K: 'a, V: 'a>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    A: StorageAddress<SA>,
     V: TopEncode + TopDecode + 'static,
 {
     pub(super) key: K,
-    pub(super) map: &'a mut MapMapper<SA, K, V>,
+    pub(super) map: &'a mut MapMapper<SA, K, V, A>,
 
     // Be invariant in `K` and `V`
     pub(super) _marker: PhantomData<&'a mut (K, V)>,
 }
 
-impl<'a, SA, K, V> Entry<'a, SA, K, V>
+impl<'a, SA, A, K, V> Entry<'a, SA, A, K, V>
+where
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+    V: TopEncode + TopDecode + 'static,
+{
+    /// Returns a reference to this entry's key.
+    pub fn key(&self) -> &K {
+        match *self {
+            Entry::Occupied(ref entry) => entry.key(),
+            Entry::Vacant(ref entry) => entry.key(),
+        }
+    }
+}
+
+impl<'a, SA, K, V> Entry<'a, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
@@ -312,7 +364,7 @@ where
 {
     /// Ensures a value is in the entry by inserting the default if empty, and returns
     /// an `OccupiedEntry`.
-    pub fn or_insert(self, default: V) -> OccupiedEntry<'a, SA, K, V> {
+    pub fn or_insert(self, default: V) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
             Entry::Vacant(entry) => entry.insert(default),
@@ -321,7 +373,10 @@ where
 
     /// Ensures a value is in the entry by inserting the result of the default function if empty,
     /// and returns an `OccupiedEntry`.
-    pub fn or_insert_with<F: FnOnce() -> V>(self, default: F) -> OccupiedEntry<'a, SA, K, V> {
+    pub fn or_insert_with<F: FnOnce() -> V>(
+        self,
+        default: F,
+    ) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
             Entry::Vacant(entry) => entry.insert(default()),
@@ -334,21 +389,16 @@ where
     ///
     /// The reference to the moved key is provided so that cloning or copying the key is
     /// unnecessary, unlike with `.or_insert_with(|| ... )`.
-    pub fn or_insert_with_key<F: FnOnce(&K) -> V>(self, default: F) -> OccupiedEntry<'a, SA, K, V> {
+    pub fn or_insert_with_key<F: FnOnce(&K) -> V>(
+        self,
+        default: F,
+    ) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
             Entry::Vacant(entry) => {
                 let value = default(entry.key());
                 entry.insert(value)
             },
-        }
-    }
-
-    /// Returns a reference to this entry's key.
-    pub fn key(&self) -> &K {
-        match *self {
-            Entry::Occupied(ref entry) => entry.key(),
-            Entry::Vacant(ref entry) => entry.key(),
         }
     }
 
@@ -368,7 +418,7 @@ where
     }
 }
 
-impl<'a, SA, K, V: Default> Entry<'a, SA, K, V>
+impl<'a, SA, K, V: Default> Entry<'a, SA, CurrentStorage, K, V>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
@@ -376,7 +426,7 @@ where
 {
     /// Ensures a value is in the entry by inserting the default value if empty,
     /// and returns an `OccupiedEntry`.
-    pub fn or_default(self) -> OccupiedEntry<'a, SA, K, V> {
+    pub fn or_default(self) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         match self {
             Entry::Occupied(entry) => entry,
             Entry::Vacant(entry) => entry.insert(Default::default()),
@@ -384,9 +434,10 @@ where
     }
 }
 
-impl<'a, SA, K, V> VacantEntry<'a, SA, K, V>
+impl<'a, SA, A, K, V> VacantEntry<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
@@ -395,10 +446,17 @@ where
     pub fn key(&self) -> &K {
         &self.key
     }
+}
 
+impl<'a, SA, K, V> VacantEntry<'a, SA, CurrentStorage, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+    V: TopEncode + TopDecode + 'static,
+{
     /// Sets the value of the entry with the `VacantEntry`'s key,
     /// and returns an `OccupiedEntry`.
-    pub fn insert(self, value: V) -> OccupiedEntry<'a, SA, K, V> {
+    pub fn insert(self, value: V) -> OccupiedEntry<'a, SA, CurrentStorage, K, V> {
         self.map.insert(self.key.clone(), value);
         OccupiedEntry {
             key: self.key,
@@ -408,9 +466,10 @@ where
     }
 }
 
-impl<'a, SA, K, V> OccupiedEntry<'a, SA, K, V>
+impl<'a, SA, A, K, V> OccupiedEntry<'a, SA, A, K, V>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     V: TopEncode + TopDecode + 'static,
 {
@@ -419,15 +478,22 @@ where
         &self.key
     }
 
+    /// Gets the value in the entry.
+    pub fn get(&self) -> V {
+        self.map.get(&self.key).unwrap()
+    }
+}
+
+impl<'a, SA, K, V> OccupiedEntry<'a, SA, CurrentStorage, K, V>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+    V: TopEncode + TopDecode + 'static,
+{
     /// Take ownership of the key and value from the map.
     pub fn remove_entry(self) -> (K, V) {
         let value = self.map.remove(&self.key).unwrap();
         (self.key, value)
-    }
-
-    /// Gets the value in the entry.
-    pub fn get(&self) -> V {
-        self.map.get(&self.key).unwrap()
     }
 
     /// Syntactic sugar, to more compactly express a get, update and set in one line.
@@ -453,7 +519,7 @@ where
 }
 
 /// Behaves like a MultiResultVec<MultiValue2<K, V>> when an endpoint result.
-impl<SA, K, V> TopEncodeMulti for MapMapper<SA, K, V>
+impl<SA, K, V> TopEncodeMulti for MapMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -469,7 +535,8 @@ where
     }
 }
 
-impl<SA, K, V> CodecFrom<MapMapper<SA, K, V>> for MultiValueEncoded<SA, MultiValue2<K, V>>
+impl<SA, K, V> CodecFrom<MapMapper<SA, K, V, CurrentStorage>>
+    for MultiValueEncoded<SA, MultiValue2<K, V>>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -478,7 +545,7 @@ where
 }
 
 /// Behaves like a MultiResultVec<MultiValue<K, V>> when an endpoint result.
-impl<SA, K, V> TypeAbi for MapMapper<SA, K, V>
+impl<SA, K, V> TypeAbi for MapMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi + 'static,

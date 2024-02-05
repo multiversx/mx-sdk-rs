@@ -11,7 +11,7 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 }
             },
             "newAddresses": [
@@ -50,7 +50,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "file:../vault/output/vault.wasm"
+                    "mxsc:../vault/output/vault.mxsc.json"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -72,7 +72,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -86,7 +86,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "file:../vault/output/vault.wasm",
+                    "mxsc:../vault/output/vault.mxsc.json",
                     "str:some_argument"
                 ],
                 "gasLimit": "50,000,000",
@@ -110,7 +110,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -124,7 +124,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_two_contracts",
                 "arguments": [
-                    "file:../vault/output/vault.wasm"
+                    "mxsc:../vault/output/vault.mxsc.json"
                 ],
                 "gasLimit": "80,000,000",
                 "gasPrice": "0"
@@ -147,14 +147,14 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "sc:child3": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -192,7 +192,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 },
                 "+": ""

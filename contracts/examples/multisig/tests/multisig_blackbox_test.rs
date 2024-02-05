@@ -9,7 +9,10 @@ use multiversx_sc::{
         test_util::top_encode_to_vec_u8_or_panic,
     },
     storage::mappers::SingleValue,
-    types::{Address, CodeMetadata, ContractCallNoPayment, FunctionCall},
+    types::{
+        Address, AddressExpr, CodeMetadata, ContractCallNoPayment, FunctionCall, ReturnsExact,
+        ScExpr,
+    },
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -23,10 +26,10 @@ use num_bigint::BigUint;
 
 const ADDER_ADDRESS_EXPR: &str = "sc:adder";
 const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
-const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 const BOARD_MEMBER_ADDRESS_EXPR: &str = "address:board-member";
 const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
-const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
+const MULTISIG_PATH_EXPR: &str = "mxsc:output/multisig.mxsc.json";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
@@ -124,12 +127,16 @@ impl MultisigTestState {
     }
 
     fn propose_add_board_member(&mut self, board_member_address: Address) -> usize {
-        self.world.sc_call_get_result(
-            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                self.multisig_contract
-                    .propose_add_board_member(board_member_address),
-            ),
-        )
+        self.world.tx_return(|tx| {
+            tx.from(AddressExpr("proposer"))
+                .to(ScExpr("multisig"))
+                .call(
+                    self.multisig_contract
+                        .propose_add_board_member(board_member_address),
+                )
+                .original_result::<usize>()
+                .returns(ReturnsExact)
+        })
     }
 
     fn propose_add_proposer(&mut self, proposer_address: Address) -> usize {
@@ -545,7 +552,7 @@ fn test_deploy_and_upgrade_from_source() {
     );
 
     const FACTORIAL_ADDRESS_EXPR: &str = "sc:factorial";
-    const FACTORIAL_PATH_EXPR: &str = "file:test-contracts/factorial.wasm";
+    const FACTORIAL_PATH_EXPR: &str = "mxsc:test-contracts/factorial.mxsc.json";
 
     let factorial_code = state.world.code_expression(FACTORIAL_PATH_EXPR);
     let factorial_address = AddressValue::from(FACTORIAL_ADDRESS_EXPR).to_address();

@@ -93,7 +93,7 @@
                         "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
                         "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "3",
@@ -229,7 +229,7 @@
                         "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
                         "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "3",

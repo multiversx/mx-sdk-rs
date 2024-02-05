@@ -9,7 +9,7 @@ use crate::{
 };
 
 use super::{
-    FunctionCall, ManagedArgBuffer, Tx, TxCallback, TxEnv, TxFrom, TxGas, TxPayment, TxTo,
+    FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo,
 };
 
 pub struct TxDataDeploy<Env>

@@ -32,6 +32,8 @@ pub use num_bigint;
 
 pub use multiversx_sc;
 
+pub use multiversx_sc_meta as meta;
+
 /// Exposing the scenario model. Might be moved in the future,
 /// but the export will hopefully remain the same.
 pub use crate::scenario::model as scenario_model;
@@ -42,7 +44,7 @@ pub use crate::scenario as mandos_system;
 // Re-exporting the whole mandos crate for easier use in tests.
 pub use multiversx_chain_scenario_format as scenario_format;
 
-pub use facade::{ContractInfo, ScenarioWorld, WhiteboxContract, WithTxResult};
+pub use facade::{world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract};
 
 use std::path::Path;
 

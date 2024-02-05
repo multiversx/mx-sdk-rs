@@ -57,7 +57,7 @@ impl InterpretableFrom<TxCallRaw> for TxCall {
                 .map(|t| BytesValue::interpret_from(t, context))
                 .collect(),
             gas_limit: U64Value::interpret_from(from.gas_limit, context),
-            gas_price: U64Value::interpret_from(from.gas_price, context),
+            gas_price: U64Value::interpret_from(from.gas_price.unwrap_or_default(), context),
         }
     }
 }
@@ -81,7 +81,7 @@ impl IntoRaw<TxCallRaw> for TxCall {
                 .map(|arg| arg.into_raw())
                 .collect(),
             gas_limit: self.gas_limit.into_raw(),
-            gas_price: self.gas_price.into_raw(),
+            gas_price: self.gas_price.into_raw_opt(),
         }
     }
 }

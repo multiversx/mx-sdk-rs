@@ -1,6 +1,4 @@
-use crate::api::{BlockchainApiImpl, CallTypeApi};
-
-use super::{contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, TxEnv};
+use super::TxEnv;
 
 pub trait TxGas<Env>
 where

@@ -1,5 +1,5 @@
 use crate::{
-    api::{use_raw_handle, StaticVarApiImpl},
+    api::{use_raw_handle, StaticVarApiImpl, StorageWriteApi},
     codec::TopDecodeMulti,
 };
 
@@ -64,17 +64,26 @@ where
         }
         result.into_managed_buffer()
     }
+}
 
-    pub(super) fn async_call(self) -> AsyncCall<SA> {
+impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
+where
+    SA: CallTypeApi + StorageWriteApi + 'static,
+{
+    pub(super) fn build_async_call(self) -> AsyncCall<SA> {
         Tx::new_tx_from_sc()
             .to(self.basic.to)
             .egld(self.egld_payment)
             .call(self.basic.function_call)
             .callback(None)
     }
+}
 
-    #[cfg(feature = "promises")]
-    pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
+impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
+where
+    SA: CallTypeApi + 'static,
+{
+    pub(super) fn build_async_call_promise(self) -> super::AsyncCallPromises<SA> {
         super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
@@ -216,7 +225,7 @@ where
     }
 }
 
-fn decode_result<SA, RequestedResult>(
+pub(super) fn decode_result<SA, RequestedResult>(
     raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
 ) -> RequestedResult
 where

@@ -21,5 +21,8 @@ pub struct TxDeployRaw {
     pub arguments: Vec<ValueSubTree>,
 
     pub gas_limit: ValueSubTree,
-    pub gas_price: ValueSubTree,
+
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gas_price: Option<ValueSubTree>,
 }

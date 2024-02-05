@@ -1,10 +1,8 @@
-use num_traits::Zero;
-
 use crate::{
-    api::{CallTypeApi, ManagedTypeApi},
+    api::ManagedTypeApi,
     contract_base::SendRawWrapper,
     types::{
-        BigUint, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment, EsdtTokenPayment,
+        EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment, EsdtTokenPayment,
         ManagedAddress, MultiEsdtPayment,
     },
 };
@@ -80,7 +78,6 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         EgldPayment::no_payment().perform_transfer_execute(env, to, gas_limit, fc);
-        // perform_transfer_execute_egld(BigUint::zero(), to, gas_limit, fc);
     }
 }
 
