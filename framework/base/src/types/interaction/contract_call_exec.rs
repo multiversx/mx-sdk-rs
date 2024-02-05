@@ -70,7 +70,7 @@ impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
     SA: CallTypeApi + StorageWriteApi + 'static,
 {
-    pub(super) fn async_call(self) -> AsyncCall<SA> {
+    pub(super) fn build_async_call(self) -> AsyncCall<SA> {
         Tx::new_tx_from_sc()
             .to(self.basic.to)
             .egld(self.egld_payment)
@@ -83,7 +83,7 @@ impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
+    pub(super) fn build_async_call_promise(self) -> super::AsyncCallPromises<SA> {
         super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
