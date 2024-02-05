@@ -26,6 +26,20 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.47.1, codec 0.18.5, vm 0.8.1, scenario-format 0.22.1] - 2024-01-29
+- Blockchain hooks: `get_code_metadata`, `is_builtin_function`.
+- Support for `mxsc:` syntax in scenarios.
+- Updated dependencies.
+
+## [sc 0.47.0, codec 0.18.4, vm 0.8.0, scenario-format 0.22.0] - 2024-01-23
+- Added support for the code metadata in the Rust VM and Rust scenarios backend.
+- `sc-meta`:
+	- New `mx-scenario-go` installer;
+	- `--nocapture` flag added in `sc-meta test` CLI;
+	- Framework version system refactor,
+- `SetMapper` and `QueueMapper` can read from another contract.
+- Fixed an edge case when generating enum encoding.
+
 ## [sc 0.46.1] - 2024-01-10
 - Interactor: fixed parsing of newly issued token identifier.
 

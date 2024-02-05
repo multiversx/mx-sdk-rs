@@ -110,7 +110,7 @@ impl MultisigInteract {
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
         let multisig_code = BytesValue::interpret_from(
-            "file:../output/multisig.wasm",
+            "mxsc:../output/multisig.mxsc.json",
             &InterpreterContext::default(),
         );
 

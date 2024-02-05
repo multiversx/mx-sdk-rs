@@ -13,7 +13,7 @@ multiversx_sc::derive_imports!();
 
 // Additionally, we also have to update the interact-rs snippets manually to add relative paths:
 // [dependencies.multiversx-sc-snippets]
-// version = "0.46.1"
+// version = "0.47.1"
 // path = "../../../../framework/snippets"
 
 #[derive(

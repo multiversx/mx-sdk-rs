@@ -17,7 +17,7 @@
                         "str:balance|address:account_2": "0x0a",
                         "str:totalSupply": "0x010000000000000000000000000000000000000000000000000000000000000009"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         },
@@ -73,7 +73,7 @@
                         "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:totalSupply": "0x010000000000000000000000000000000000000000000000000000000000000009"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         }

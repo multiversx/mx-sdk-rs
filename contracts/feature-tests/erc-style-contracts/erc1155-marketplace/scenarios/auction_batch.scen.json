@@ -84,7 +84,7 @@
                         "str:balanceOf|sc:marketplace_contract|str:.node_id|biguint:1": "1",
                         "str:balanceOf|sc:marketplace_contract|str:.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../../erc1155/output/erc1155.wasm"
+                    "code": "mxsc:../../erc1155/output/erc1155.mxsc.json"
                 },
                 "sc:marketplace_contract": {
                     "nonce": "0",
@@ -95,7 +95,7 @@
                         "str:auctionForToken|biguint:1|biguint:2": "u32:4|str:EGLD|biguint:100|u32:2|u16:500|u64:1000|address:creator|u32:0|u64:0|u64:0|u64:0|u64:0",
                         "str:auctionForToken|biguint:1|biguint:3": "u32:4|str:EGLD|biguint:100|u32:2|u16:500|u64:1000|address:creator|u32:0|u64:0|u64:0|u64:0|u64:0"
                     },
-                    "code": "file:../output/erc1155-marketplace.wasm"
+                    "code": "mxsc:../output/erc1155-marketplace.mxsc.json"
                 }
             }
         }

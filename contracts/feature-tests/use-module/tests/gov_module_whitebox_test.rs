@@ -23,7 +23,7 @@ const INITIAL_GOV_TOKEN_BALANCE: u64 = 1_000;
 const GAS_LIMIT: u64 = 1_000_000;
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
+const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";

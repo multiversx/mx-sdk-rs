@@ -17,7 +17,7 @@
                         "str:allowance|address:acc2|sc:lottery": "100",
                         "str:totalSupply": "1,000,000,000"
                     },
-                    "code": "file:../../erc20/output/erc20.wasm"
+                    "code": "mxsc:../../erc20/output/erc20.mxsc.json"
                 }
             }
         }

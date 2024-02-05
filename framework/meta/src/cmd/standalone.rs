@@ -1,5 +1,6 @@
 mod all;
 mod info;
+pub mod install;
 mod local_deps;
 mod print_util;
 pub mod scen_test_gen;
@@ -11,6 +12,7 @@ use crate::cli_args::{StandaloneCliAction, StandaloneCliArgs};
 use all::call_all_meta;
 use clap::Parser;
 use info::call_info;
+use install::install;
 use local_deps::local_deps;
 use scen_test_gen::test_gen_tool;
 use template::{create_contract, print_template_names};
@@ -39,6 +41,7 @@ pub fn cli_main_standalone() {
             test_gen_tool(args);
         },
         Some(StandaloneCliAction::Test(args)) => test(args),
+        Some(StandaloneCliAction::Install(args)) => install(args),
         None => {},
     }
 }

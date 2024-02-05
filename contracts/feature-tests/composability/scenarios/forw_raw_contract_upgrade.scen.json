@@ -6,13 +6,13 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 },
                 "sc:reference": {
-                    "code": "file:../vault/output/vault-upgrade.wasm"
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
                 },
                 "sc:child": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
                     "owner": "sc:forwarder"
                 }
             }
@@ -26,7 +26,8 @@
                 "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:child",
-                    "sc:reference"
+                    "sc:reference",
+                    "0x0102"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -40,7 +41,8 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../vault/output/vault-upgrade.wasm"
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json",
+                    "codeMetadata": "0x0102"
                 },
                 "+": ""
             }
@@ -54,7 +56,8 @@
                 "function": "call_upgrade",
                 "arguments": [
                     "sc:child",
-                    "file:../vault/output/vault.wasm",
+                    "mxsc:../vault/output/vault.mxsc.json",
+                    "0x0102",
                     "str:upgrade-init-arg"
                 ],
                 "gasLimit": "500,000,000",
@@ -71,7 +74,8 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json",
+                    "codeMetadata": "0x0102"
                 },
                 "+": ""
             }

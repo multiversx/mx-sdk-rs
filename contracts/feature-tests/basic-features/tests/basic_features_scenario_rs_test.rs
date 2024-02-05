@@ -5,11 +5,11 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
-        "file:output/basic-features.wasm",
+        "mxsc:output/basic-features.mxsc.json",
         basic_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
+        "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
         esdt_system_sc_mock::ContractBuilder,
     );
 
@@ -216,6 +216,11 @@ fn get_caller_rs() {
 }
 
 #[test]
+fn get_code_metadata_rs() {
+    world().run("scenarios/get_code_metadata.scen.json");
+}
+
+#[test]
 fn get_cumulated_validator_rewards_rs() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
 }
@@ -223,6 +228,11 @@ fn get_cumulated_validator_rewards_rs() {
 #[test]
 fn get_shard_of_address_rs() {
     world().run("scenarios/get_shard_of_address.scen.json");
+}
+
+#[test]
+fn is_builtin_function_rs() {
+    world().run("scenarios/is_builtin_function.scen.json");
 }
 
 #[test]
@@ -372,6 +382,11 @@ fn storage_mapper_address_to_id_rs() {
 #[ignore]
 fn storage_mapper_fungible_token_rs() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
+}
+
+#[test]
+fn storage_mapper_get_at_address_rs() {
+    world().run("scenarios/storage_mapper_get_at_address.scen.json");
 }
 
 #[test]

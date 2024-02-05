@@ -16,7 +16,7 @@
                         "str:playerBalance|address:acc1": "0x311",
                         "str:playerBalance|address:acc2": "0x422"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -182,7 +182,7 @@
                         "str:playerBalance|address:acc1": "0x311",
                         "str:playerBalance|address:acc2": "0x422"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "1",

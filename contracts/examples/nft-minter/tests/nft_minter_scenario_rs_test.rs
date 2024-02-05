@@ -4,7 +4,10 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/nft-minter");
 
-    blockchain.register_contract("file:output/nft-minter.wasm", nft_minter::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:output/nft-minter.mxsc.json",
+        nft_minter::ContractBuilder,
+    );
     blockchain
 }
 

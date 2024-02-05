@@ -1,4 +1,4 @@
-use crate::CargoTomlContents;
+use crate::{version::FrameworkVersion, CargoTomlContents};
 use std::{
     fs::{self, DirEntry},
     path::{Path, PathBuf},
@@ -33,7 +33,7 @@ pub enum DirectoryType {
 pub struct RelevantDirectory {
     pub path: PathBuf,
     pub version: VersionReq,
-    pub upgrade_in_progress: Option<(&'static str, &'static str)>,
+    pub upgrade_in_progress: Option<(FrameworkVersion, FrameworkVersion)>,
     pub dir_type: DirectoryType,
 }
 
@@ -83,27 +83,27 @@ impl RelevantDirectories {
             .filter(|dir| dir.dir_type == DirectoryType::Contract)
     }
 
-    pub fn count_for_version(&self, version: &str) -> usize {
+    pub fn count_for_version(&self, version: &FrameworkVersion) -> usize {
         self.0
             .iter()
-            .filter(|dir| dir.version.semver == version)
+            .filter(|dir| dir.version.semver == *version)
             .count()
     }
 
     pub fn iter_version(
         &mut self,
-        version: &'static str,
+        version: &'static FrameworkVersion,
     ) -> impl Iterator<Item = &RelevantDirectory> {
         self.0
             .iter()
-            .filter(move |dir| dir.version.semver == version)
+            .filter(move |dir| dir.version.semver == *version)
     }
 
     /// Marks all appropriate directories as ready for upgrade.
-    pub fn start_upgrade(&mut self, from_version: &'static str, to_version: &'static str) {
+    pub fn start_upgrade(&mut self, from_version: FrameworkVersion, to_version: FrameworkVersion) {
         for dir in self.0.iter_mut() {
             if dir.version.semver == from_version {
-                dir.upgrade_in_progress = Some((from_version, to_version));
+                dir.upgrade_in_progress = Some((from_version.clone(), to_version.clone()));
             }
         }
     }
@@ -113,7 +113,7 @@ impl RelevantDirectories {
     pub fn finish_upgrade(&mut self) {
         for dir in self.0.iter_mut() {
             if let Some((_, to_version)) = &dir.upgrade_in_progress {
-                dir.version.semver = to_version.to_string();
+                dir.version.semver = to_version.clone();
                 dir.upgrade_in_progress = None;
             }
         }

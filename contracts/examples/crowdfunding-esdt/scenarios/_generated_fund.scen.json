@@ -29,7 +29,7 @@
             "accounts": {
                 "0x0000000000000000d720a08b839a004c2e6386f5aecc19ec74807d1920cb6aeb": {
                     "balance": "0",
-                    "code": "file:../output/crowdfunding-esdt.wasm",
+                    "code": "mxsc:../output/crowdfunding-esdt.mxsc.json",
                     "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925"
                 }
             }
@@ -89,7 +89,7 @@
                         "str:target": "0x07d0",
                         "str:tokenIdentifier": "0x43524f57442d313233343536"
                     },
-                    "code": "file:../output/crowdfunding-esdt.wasm",
+                    "code": "mxsc:../output/crowdfunding-esdt.mxsc.json",
                     "owner": "0x66687aadf862bd776c8fc18b8e9f8e20089714856ee233b3902a591d0d5f2925",
                     "developerRewards": "0"
                 }

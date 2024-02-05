@@ -1,4 +1,5 @@
 use crate::{
+    tx_execution::vm_builtin_function_names::*,
     types::{EsdtLocalRole, EsdtLocalRoleFlags, RawHandle, VMAddress},
     vm_hooks::VMHooksHandlerSource,
     world_mock::{EsdtData, EsdtInstance},
@@ -8,6 +9,24 @@ use num_traits::Zero;
 
 // The Go VM doesn't do it, but if we change that, we can enable it easily here too via this constant.
 const ESDT_TOKEN_DATA_FUNC_RESETS_VALUES: bool = false;
+const VM_BUILTIN_FUNCTION_NAMES: [&str; 16] = [
+    ESDT_LOCAL_MINT_FUNC_NAME,
+    ESDT_LOCAL_BURN_FUNC_NAME,
+    ESDT_MULTI_TRANSFER_FUNC_NAME,
+    ESDT_NFT_TRANSFER_FUNC_NAME,
+    ESDT_NFT_CREATE_FUNC_NAME,
+    ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
+    ESDT_NFT_ADD_URI_FUNC_NAME,
+    ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+    ESDT_NFT_BURN_FUNC_NAME,
+    ESDT_TRANSFER_FUNC_NAME,
+    CHANGE_OWNER_BUILTIN_FUNC_NAME,
+    CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
+    SET_USERNAME_FUNC_NAME,
+    MIGRATE_USERNAME_FUNC_NAME,
+    DELETE_USERNAME_FUNC_NAME,
+    UPGRADE_CONTRACT_FUNC_NAME,
+];
 
 pub trait VMHooksBlockchain: VMHooksHandlerSource {
     fn is_contract_address(&self, address_bytes: &[u8]) -> bool {
@@ -136,6 +155,28 @@ pub trait VMHooksBlockchain: VMHooksHandlerSource {
             .esdt
             .get_esdt_balance(token_id_bytes, nonce);
         self.m_types_lock().bi_overwrite(dest, esdt_balance.into());
+    }
+
+    fn managed_get_code_metadata(&self, address_handle: i32, response_handle: i32) {
+        let address = VMAddress::from_slice(self.m_types_lock().mb_get(address_handle));
+        let Some(data) = self.account_data(&address) else {
+            self.vm_error(&format!(
+                "account not found: {}",
+                hex::encode(address.as_bytes())
+            ))
+        };
+        let code_metadata_bytes = data.code_metadata.to_byte_array();
+        self.m_types_lock()
+            .mb_set(response_handle, code_metadata_bytes.to_vec())
+    }
+
+    fn managed_is_builtin_function(&self, function_name_handle: i32) -> bool {
+        VM_BUILTIN_FUNCTION_NAMES.contains(
+            &self
+                .m_types_lock()
+                .mb_to_function_name(function_name_handle)
+                .as_str(),
+        )
     }
 
     #[allow(clippy::too_many_arguments)]
