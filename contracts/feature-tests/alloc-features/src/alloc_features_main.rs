@@ -8,11 +8,11 @@ pub mod echo_managed_alloc;
 pub mod elliptic_curve_features_legacy;
 pub mod macro_features_legacy;
 pub mod managed_buffer_features_alloc;
+pub mod memory_types;
 pub mod storage_direct_load_alloc;
 pub mod storage_direct_store_alloc;
 pub mod type_features_alloc;
 pub mod types;
-pub mod memory_types;
 
 /// Features of the framework/VM that use the heap allocator.
 ///
@@ -31,7 +31,7 @@ pub trait AllocFeatures:
     + storage_direct_load_alloc::StorageLoadFeatures
     + storage_direct_store_alloc::StorageStoreFeatures
     + type_features_alloc::AllocTypeFeatures
-    + memory_types:: MemoryTypes
+    + memory_types::MemoryTypes
 {
     #[init]
     fn init(&self) {}
