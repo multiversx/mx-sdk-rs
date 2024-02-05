@@ -164,10 +164,12 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
 
         if let Some(esdt_token_id) = token.into_esdt_option() {
-            self.send()
-                .direct_esdt(&caller, &esdt_token_id, nonce, &amount);
+            self.tx()
+                .to(caller)
+                .esdt((esdt_token_id, nonce, amount))
+                .transfer();
         } else {
-            self.send().direct_egld(&caller, &amount);
+            self.tx().to(caller).egld(amount).transfer();
         }
     }
 
@@ -185,7 +187,7 @@ pub trait Vault {
             all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
-        self.send().direct_multi(&caller, &all_payments);
+        self.tx().to(caller).multi_esdt(all_payments).transfer();
     }
 
     #[payable("*")]
@@ -223,8 +225,7 @@ pub trait Vault {
             ));
         }
 
-        self.send()
-            .direct_multi(&self.blockchain().get_caller(), &new_tokens);
+        self.tx().to_caller().multi_esdt(new_tokens).transfer();
     }
 
     #[event("accept_funds")]

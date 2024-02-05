@@ -1,5 +1,8 @@
 use adder::*;
-use multiversx_sc::storage::mappers::SingleValue;
+use multiversx_sc::{
+    storage::mappers::SingleValue,
+    types::{AddressExpr, ScExpr},
+};
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
@@ -41,12 +44,14 @@ fn adder_blackbox_with_values() {
                 .call(adder_contract.sum())
                 .expect_value(SingleValue::from(BigUint::from(5u32))),
         )
-        .sc_call(
-            ScCallStep::new()
-                .from(owner_address)
-                .to(&adder_contract)
-                .call(adder_contract.add(3u32)),
-        )
+        .tx(|tx| {
+            tx.from(AddressExpr("owner"))
+                .to(ScExpr("adder"))
+                .call(adder_contract.add(3u32))
+                .callback(WithTxResult(|response| {
+                    assert!(response.tx_error.is_success());
+                }))
+        })
         .check_state_step(
             CheckStateStep::new()
                 .put_account(owner_address, CheckAccount::new())

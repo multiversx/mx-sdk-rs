@@ -14,7 +14,7 @@ use crate::{
     },
 };
 
-use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};
+use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, Tx};
 use crate::api::managed_types::handles::HandleConstraints;
 
 /// Using max u64 to represent maximum possible gas,
@@ -66,12 +66,11 @@ where
     }
 
     pub(super) fn async_call(self) -> AsyncCall<SA> {
-        AsyncCall {
-            to: self.basic.to,
-            egld_payment: self.egld_payment,
-            function_call: self.basic.function_call,
-            callback_call: None,
-        }
+        Tx::new_tx_from_sc()
+            .to(self.basic.to)
+            .egld(self.egld_payment)
+            .call(self.basic.function_call)
+            .callback(None)
     }
 
     pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {

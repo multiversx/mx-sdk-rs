@@ -26,7 +26,7 @@ use crate as multiversx_sc; // required by the ManagedVecItem derive
 #[repr(transparent)]
 #[derive(ManagedVecItem, Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
-    data: ManagedOption<M, TokenIdentifier<M>>,
+    pub(crate) data: ManagedOption<M, TokenIdentifier<M>>,
 }
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {

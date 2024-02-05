@@ -159,6 +159,26 @@ where
     }
 }
 
+impl<M> From<crate::types::heap::String> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(s: crate::types::heap::String) -> Self {
+        Self::new_from_bytes(s.as_bytes())
+    }
+}
+
+impl<M> From<&crate::types::heap::String> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(s: &crate::types::heap::String) -> Self {
+        Self::new_from_bytes(s.as_bytes())
+    }
+}
+
 impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
     #[inline]
     fn default() -> Self {

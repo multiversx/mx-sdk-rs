@@ -6,17 +6,13 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{
-        ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
-    formatter::SCLowerHex,
-    types::{
-        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec,
-        MultiValueEncoded,
-    },
+    types::{EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, MultiValueEncoded},
 };
 
-use super::ManagedArgBuffer;
+use super::{ContractCallNoPayment, ManagedArgBuffer};
 
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
@@ -62,15 +58,23 @@ where
         self.arg_buffer.push_multi_arg(arg);
         self
     }
+}
 
-    pub fn to_call_data_string(&self) -> ManagedBuffer<Api> {
-        let mut result = ManagedBufferCachedBuilder::default();
-        result.append_managed_buffer(&self.function_name);
-        for arg in self.arg_buffer.raw_arg_iter() {
-            result.append_bytes(b"@");
-            SCLowerHex::fmt(&*arg, &mut result);
-        }
-        result.into_managed_buffer()
+impl<Api> From<()> for FunctionCall<Api>
+where
+    Api: ManagedTypeApi,
+{
+    fn from(_: ()) -> Self {
+        FunctionCall::empty()
+    }
+}
+
+impl<Api, R> From<ContractCallNoPayment<Api, R>> for FunctionCall<Api>
+where
+    Api: CallTypeApi,
+{
+    fn from(ccnp: ContractCallNoPayment<Api, R>) -> Self {
+        ccnp.function_call
     }
 }
 

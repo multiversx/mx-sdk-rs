@@ -53,6 +53,29 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
         )
     }
 
+    /// Equivalent to a `match { Egld | Esdt }`.
+    ///
+    /// Context passed on from function to closures, to avoid ownership issues.
+    /// More precisely, since only one of the two closures `for_egld` and `for_esdt` is called,
+    /// it is ok for them to have fully owned access to anything from the environment.
+    /// The compiler doesn't know that only one of them can ever be called,
+    /// so if we pass context to both closures, it will complain that they are moved twice..
+    pub fn map_egld_or_esdt<Context, D, F, U>(self, context: Context, for_egld: D, for_esdt: F) -> U
+    where
+        D: FnOnce(Context, BigUint<M>) -> U,
+        F: FnOnce(Context, EsdtTokenPayment<M>) -> U,
+    {
+        if self.token_identifier.data.is_some() {
+            let token_identifier = unsafe { self.token_identifier.data.unwrap_no_check() };
+            for_esdt(
+                context,
+                EsdtTokenPayment::new(token_identifier, self.token_nonce, self.amount),
+            )
+        } else {
+            for_egld(context, self.amount)
+        }
+    }
+
     pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }

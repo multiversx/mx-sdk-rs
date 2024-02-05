@@ -172,6 +172,10 @@ where
     pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
         self.data
     }
+
+    pub fn iter_buffers(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
+        ManagedVecRefIterator::new(&self.data)
+    }
 }
 
 impl<M> ManagedArgBuffer<M>
