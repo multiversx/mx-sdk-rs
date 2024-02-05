@@ -10,45 +10,6 @@ use crate::{
 
 use super::{FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo};
 
-pub struct TxDataDeploy<Env>
-where
-    Env: TxEnv,
-{
-    pub code: ManagedBuffer<Env::Api>,
-    pub metadata: CodeMetadata,
-    pub arg_buffer: ManagedArgBuffer<Env::Api>,
-}
-
-impl<Env> Default for TxDataDeploy<Env>
-where
-    Env: TxEnv,
-{
-    fn default() -> TxDataDeploy<Env> {
-        TxDataDeploy {
-            code: ManagedBuffer::new(),
-            metadata: CodeMetadata::DEFAULT,
-            arg_buffer: ManagedArgBuffer::new(),
-        }
-    }
-}
-
-impl<Env> TxData<Env> for TxDataDeploy<Env>
-where
-    Env: TxEnv,
-{
-    fn is_no_call(&self) -> bool {
-        false
-    }
-
-    fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
-        // Implement as needed for deployment-specific data
-        let mut result = ManagedBufferCachedBuilder::default();
-        result.append_managed_buffer(&self.code);
-        // Add other fields as needed
-        result.into_managed_buffer()
-    }
-}
-
 pub trait TxData<Env>
 where
     Env: TxEnv,

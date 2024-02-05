@@ -47,10 +47,11 @@ where
 }
 
 /// Marks a payment object that only contains EGLD or nothing at all.
-pub trait TxPaymentEgldOnly<Env>: TxPayment<Env> + Clone
+pub trait TxPaymentEgldOnly<Env>: TxPayment<Env>
 where
     Env: TxEnv,
 {
+    fn to_egld_payment(self) -> EgldPayment<Env::Api>;
 }
 
 impl<Env> TxPayment<Env> for ()
@@ -89,7 +90,14 @@ where
     }
 }
 
-impl<Env> TxPaymentEgldOnly<Env> for () where Env: TxEnv {}
+impl<Env> TxPaymentEgldOnly<Env> for ()
+where
+    Env: TxEnv,
+{
+    fn to_egld_payment(self) -> EgldPayment<Env::Api> {
+        EgldPayment::no_payment()
+    }
+}
 
 impl<Env> TxPayment<Env> for EgldPayment<Env::Api>
 where
@@ -133,7 +141,14 @@ where
     }
 }
 
-impl<Env> TxPaymentEgldOnly<Env> for EgldPayment<Env::Api> where Env: TxEnv {}
+impl<Env> TxPaymentEgldOnly<Env> for EgldPayment<Env::Api>
+where
+    Env: TxEnv,
+{
+    fn to_egld_payment(self) -> EgldPayment<Env::Api> {
+        self
+    }
+}
 
 impl<Env> TxPayment<Env> for EsdtTokenPayment<Env::Api>
 where

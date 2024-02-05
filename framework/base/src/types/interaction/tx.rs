@@ -10,10 +10,10 @@ use alloc::boxed::Box;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    AsyncCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxData, TxDataDeploy, TxDataFunctionCall,
-    TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv,
-    TxTo, TxToSpecified,
+    AsyncCall, DeployCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
+    RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxData, TxDataFunctionCall, TxEnv,
+    TxFrom, TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified,
 };
 
 #[must_use]
@@ -474,110 +474,66 @@ where
     Gas: TxGas<Env>,
     Data: TxData<Env>,
 {
-    pub fn deploy(self) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
+    pub fn deploy(self) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: TxDataDeploy::default(),
+            data: DeployCall::default(),
             result_handler: self.result_handler,
         }
     }
 }
 
-impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()>
+impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()>
 where
     Env: TxEnv,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
 {
     pub fn code(
-        self,
+        mut self,
         code: ManagedBuffer<Env::Api>,
-    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
-        let mut data_deploy = self.data;
-        data_deploy.code = code;
+    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
+        self.data.code = code;
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: data_deploy,
+            data: self.data,
             result_handler: self.result_handler,
         }
     }
 
     pub fn code_metadata(
-        self,
+        mut self,
         code_metadata: CodeMetadata,
-    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
-        let mut data_deploy = self.data;
-        data_deploy.metadata = code_metadata;
+    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
+        self.data.code_metadata = code_metadata;
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: data_deploy,
+            data: self.data,
             result_handler: self.result_handler,
         }
     }
 
-    pub fn arguments(
-        self,
-        arg_buffer: ManagedArgBuffer<Env::Api>,
-    ) -> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()> {
-        let mut data_deploy = self.data;
-        data_deploy.arg_buffer = arg_buffer;
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: data_deploy,
-            result_handler: self.result_handler,
-        }
+    #[inline]
+    pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
+        self.data = self.data.argument(arg);
+        self
     }
-}
 
-impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, TxDataDeploy<Env>, ()>
-where
-    Env: TxEnv,
-    Payment: TxPaymentEgldOnly<Env>,
-    Gas: TxGas<Env>,
-{
-    pub fn execute_deploy(
-        &self,
-    ) -> (
-        ManagedAddress<Env::Api>,
-        ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) {
-        let result = self
-            .payment
-            .clone()
-            .convert_tx_data(
-                &self.env,
-                &self.from,
-                ManagedAddress::<Env::Api>::default(),
-                FunctionCall {
-                    function_name: "".into(),
-                    arg_buffer: self.data.arg_buffer.clone(),
-                },
-            )
-            .egld_payment
-            .value;
-        let wrap = SendRawWrapper::<Env::Api>::new();
-        wrap.deploy_contract(
-            self.gas.resolve_gas(&self.env),
-            &result,
-            &self.data.code,
-            self.data.metadata,
-            &self.data.arg_buffer,
-        )
+    #[inline]
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
+        self.data.arg_buffer = raw;
+        self
     }
 }
