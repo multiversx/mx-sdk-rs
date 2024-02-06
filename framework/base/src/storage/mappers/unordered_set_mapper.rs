@@ -1,7 +1,10 @@
 use core::marker::PhantomData;
 
 pub use super::vec_mapper::Iter;
-use super::{StorageClearable, StorageMapper, VecMapper};
+use super::{
+    set_mapper::{CurrentStorage, StorageAddress},
+    StorageClearable, StorageMapper, VecMapper,
+};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
@@ -9,25 +12,27 @@ use crate::{
         multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
         TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get_from_address, StorageKey},
-    storage_clear, storage_get, storage_set,
+    storage::StorageKey,
+    storage_clear, storage_set,
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
 const ITEM_INDEX: &[u8] = b".index";
 const NULL_ENTRY: usize = 0;
 
-pub struct UnorderedSetMapper<SA, T>
+pub struct UnorderedSetMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
-    vec_mapper: VecMapper<SA, T>,
+    vec_mapper: VecMapper<SA, T, A>,
 }
 
-impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -35,13 +40,29 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         UnorderedSetMapper {
             _phantom_api: PhantomData,
+            address: CurrentStorage,
             base_key: base_key.clone(),
             vec_mapper: VecMapper::<SA, T>::new(base_key),
         }
     }
 }
 
-impl<SA, T> StorageClearable for UnorderedSetMapper<SA, T>
+impl<SA, T> UnorderedSetMapper<SA, T, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        UnorderedSetMapper {
+            _phantom_api: PhantomData,
+            address: address.clone(),
+            base_key: base_key.clone(),
+            vec_mapper: VecMapper::new_from_address(address, base_key),
+        }
+    }
+}
+
+impl<SA, T> StorageClearable for UnorderedSetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
@@ -54,9 +75,10 @@ where
     }
 }
 
-impl<SA, T> UnorderedSetMapper<SA, T>
+impl<SA, T, A> UnorderedSetMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn item_index_key(&self, value: &T) -> StorageKey<SA> {
@@ -66,34 +88,17 @@ where
         item_key
     }
 
-    pub fn get_index(&self, value: &T) -> usize {
-        storage_get(self.item_index_key(value).as_ref())
-    }
-
     /// Gets the item's index at the given address' mapper.
     /// Returns `0` if the item is not in the list.
-    pub fn get_index_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> usize {
-        storage_get_from_address(address.as_ref(), self.item_index_key(value).as_ref())
+    pub fn get_index(&self, value: &T) -> usize {
+        self.address
+            .address_storage_get(self.item_index_key(value).as_ref())
     }
 
-    /// Get item at index from storage.
+    /// Get item at index from the given address.
     /// Index must be valid (1 <= index <= count).
     pub fn get_by_index(&self, index: usize) -> T {
         self.vec_mapper.get(index)
-    }
-
-    /// Gets the item by index from the given address.
-    /// Index must be valid (1 <= index <= count).
-    pub fn get_by_index_at_address(&self, address: &ManagedAddress<SA>, index: usize) -> T {
-        self.vec_mapper.get_at_address(address, index)
-    }
-
-    fn set_index(&self, value: &T, index: usize) {
-        storage_set(self.item_index_key(value).as_ref(), &index);
-    }
-
-    fn clear_index(&self, value: &T) {
-        storage_clear(self.item_index_key(value).as_ref());
     }
 
     /// Returns `true` if the set contains no elements.
@@ -101,19 +106,9 @@ where
         self.vec_mapper.is_empty()
     }
 
-    /// Returns `true` if the address' mapper contains no elements.
-    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
-        self.vec_mapper.is_empty_at_address(address)
-    }
-
     /// Returns the number of elements in the set.
     pub fn len(&self) -> usize {
         self.vec_mapper.len()
-    }
-
-    /// Returns the number of elements contained in the given address' mapper.
-    pub fn len_at_address(&self, address: &ManagedAddress<SA>) -> usize {
-        self.vec_mapper.len_at_address(address)
     }
 
     /// Returns `true` if the set contains a value.
@@ -121,9 +116,24 @@ where
         self.get_index(value) != NULL_ENTRY
     }
 
-    /// Returns `true` if the mapper at the given address contains the value.
-    pub fn contains_at_address(&self, address: &ManagedAddress<SA>, value: &T) -> bool {
-        self.get_index_at_address(address, value) != NULL_ENTRY
+    /// An iterator visiting all elements in arbitrary order.
+    /// The iterator element type is `&'a T`.
+    pub fn iter(&self) -> Iter<SA, T, A> {
+        self.vec_mapper.iter()
+    }
+}
+
+impl<SA, T> UnorderedSetMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode,
+{
+    fn set_index(&self, value: &T, index: usize) {
+        storage_set(self.item_index_key(value).as_ref(), &index);
+    }
+
+    fn clear_index(&self, value: &T) {
+        storage_clear(self.item_index_key(value).as_ref());
     }
 
     /// Adds a value to the set.
@@ -168,22 +178,17 @@ where
         self.set_index(&value2, index1);
         true
     }
-
-    /// An iterator visiting all elements in arbitrary order.
-    /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, T> {
-        self.vec_mapper.iter()
-    }
 }
 
-impl<'a, SA, T> IntoIterator for &'a UnorderedSetMapper<SA, T>
+impl<'a, SA, T, A> IntoIterator for &'a UnorderedSetMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     type Item = T;
 
-    type IntoIter = Iter<'a, SA, T>;
+    type IntoIter = Iter<'a, SA, T, A>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
