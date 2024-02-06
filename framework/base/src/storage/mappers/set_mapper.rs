@@ -5,10 +5,15 @@ use storage_get_from_address::storage_get_len_from_address;
 pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName}, api::StorageMapperApi, codec::{
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    api::StorageMapperApi,
+    codec::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
-    }, storage::{storage_get_from_address, storage_set, StorageKey}, storage_get, storage_get_len, types::{ManagedAddress, ManagedRef, ManagedType, MultiValueEncoded}
+    },
+    storage::{storage_get_from_address, storage_set, StorageKey},
+    storage_get, storage_get_len,
+    types::{ManagedAddress, ManagedRef, ManagedType, MultiValueEncoded},
 };
 
 const NULL_ENTRY: u32 = 0;

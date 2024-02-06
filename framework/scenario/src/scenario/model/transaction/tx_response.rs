@@ -1,5 +1,4 @@
-use multiversx_chain_vm::crypto_functions::keccak256;
-use multiversx_chain_vm::tx_mock::TxResult;
+use multiversx_chain_vm::{crypto_functions::keccak256, tx_mock::TxResult};
 use multiversx_sc::types::Address;
 use multiversx_sdk::{
     data::transaction::{ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork},
@@ -67,7 +66,7 @@ impl TxResponse {
         response.process(
             tx.sender.to_bytes(),
             tx.nonce,
-            tx.processing_type_on_destination
+            tx.processing_type_on_destination,
         )
     }
 
@@ -126,7 +125,7 @@ impl TxResponse {
         self,
         sender_address: [u8; 32],
         nonce: u64,
-        processing_type_on_destination: String
+        processing_type_on_destination: String,
     ) -> Self {
         self.process_out()
             .process_new_deployed_address(sender_address, nonce, processing_type_on_destination)
@@ -170,10 +169,10 @@ impl TxResponse {
         mut self,
         sender_address_bytes: [u8; 32],
         nonce: u64,
-        processing_type_on_destination: String
+        processing_type_on_destination: String,
     ) -> Self {
         if processing_type_on_destination != SC_DEPLOY_PROCESSING_TYPE {
-            return self
+            return self;
         }
 
         let sender_nonce_bytes = nonce.to_le_bytes();
@@ -257,8 +256,8 @@ impl TxResponse {
 
 #[cfg(test)]
 mod tests {
-    use multiversx_sc::types::Address;
     use crate::scenario_model::TxResponse;
+    use multiversx_sc::types::Address;
     use multiversx_sdk::data::transaction::{TransactionInfo, TransactionOnNetwork};
 
     #[test]
@@ -313,9 +312,14 @@ mod tests {
             .unwrap()
             .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
-        let opt_address = tx_response.new_deployed_address.map(|e| multiversx_sdk::data::address::Address::from_bytes(*e.as_array()).to_bech32_string().unwrap());
+        let opt_address = tx_response.new_deployed_address.map(|e| {
+            multiversx_sdk::data::address::Address::from_bytes(*e.as_array())
+                .to_bech32_string()
+                .unwrap()
+        });
 
-        let expected = Some("erd1qqqqqqqqqqqqqpgqwpdf84ggxzqzmr2zmw959q4nlf9nz562q33sak25ze".to_string());
+        let expected =
+            Some("erd1qqqqqqqqqqqqqpgqwpdf84ggxzqzmr2zmw959q4nlf9nz562q33sak25ze".to_string());
 
         assert_eq!(opt_address, expected)
     }
