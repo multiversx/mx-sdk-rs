@@ -313,7 +313,7 @@ mod tests {
             .unwrap()
             .transaction;
         let tx_response = TxResponse::from_network_tx(tx_on_network);
-        let opt_address = tx_response.new_deployed_address.map(|e| multiversx_sdk::data::address::Address::from_bytes(e.as_array().clone()).to_bech32_string().unwrap());
+        let opt_address = tx_response.new_deployed_address.map(|e| multiversx_sdk::data::address::Address::from_bytes(*e.as_array()).to_bech32_string().unwrap());
 
         let expected = Some("erd1qqqqqqqqqqqqqpgqwpdf84ggxzqzmr2zmw959q4nlf9nz562q33sak25ze".to_string());
 
