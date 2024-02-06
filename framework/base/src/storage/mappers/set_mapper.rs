@@ -1,17 +1,14 @@
 use core::marker::PhantomData;
 
+use storage_get_from_address::storage_get_len_from_address;
+
 pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::StorageMapperApi,
-    codec::{
+    abi::{TypeAbi, TypeDescriptionContainer, TypeName}, api::StorageMapperApi, codec::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
         NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
-    },
-    storage::{storage_get_from_address, storage_set, StorageKey},
-    storage_get,
-    types::{ManagedAddress, ManagedRef, ManagedType, MultiValueEncoded},
+    }, storage::{storage_get_from_address, storage_set, StorageKey}, storage_get, storage_get_len, types::{ManagedAddress, ManagedRef, ManagedType, MultiValueEncoded}
 };
 
 const NULL_ENTRY: u32 = 0;
@@ -22,6 +19,7 @@ where
     SA: StorageMapperApi,
 {
     fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T;
+    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize;
 }
 
 pub struct CurrentStorage;
@@ -33,6 +31,10 @@ where
     fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
         storage_get(key)
     }
+
+    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
+        storage_get_len(key)
+    }
 }
 
 impl<SA> StorageAddress<SA> for ManagedAddress<SA>
@@ -41,6 +43,10 @@ where
 {
     fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
         storage_get_from_address(self.as_ref(), key)
+    }
+
+    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
+        storage_get_len_from_address(self.as_ref(), key)
     }
 }
 
