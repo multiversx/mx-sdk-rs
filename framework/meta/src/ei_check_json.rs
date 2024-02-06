@@ -21,6 +21,6 @@ impl EiCheckJson {
             });
         }
 
-        return None;
+        None
     }
 }

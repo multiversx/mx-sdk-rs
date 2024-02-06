@@ -170,7 +170,7 @@ fn print_ei_check(wasm_data: &WasmInfo, check_ei: &Option<EIVersion>) {
     if let Some(ei) = check_ei {
         print_check_ei(ei.name());
 
-        if wasm_data.ei_check == true {
+        if wasm_data.ei_check {
             print_check_ei_ok();
             return;
         }

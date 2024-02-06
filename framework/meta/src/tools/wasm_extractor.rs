@@ -1,15 +1,19 @@
 use colored::Colorize;
 use std::fs;
-use wasmparser::{BinaryReaderError, DataSectionReader, ImportSectionReader, Parser, Payload};
+use wasmparser::{
+    BinaryReaderError, DataSectionReader, FunctionBody, ImportSectionReader, Parser, Payload,
+};
 
 use crate::ei::EIVersion;
 
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
+const MEMORY_GROW_OPCODE: u8 = 0x40;
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
     pub allocator_trigger: bool,
     pub ei_check: bool,
+    pub memory_grow_flag: bool,
 }
 
 impl WasmInfo {
@@ -33,6 +37,7 @@ fn populate_wasm_info(
     let mut imports = Vec::new();
     let mut allocator_trigger = false;
     let mut ei_check = false;
+    let mut memory_grow_flag = false;
 
     let parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
@@ -44,6 +49,9 @@ fn populate_wasm_info(
             Payload::DataSection(data_section) => {
                 allocator_trigger = is_fail_allocator_triggered(data_section);
             },
+            Payload::CodeSectionEntry(code_section) => {
+                memory_grow_flag = is_mem_grow(code_section);
+            },
             _ => (),
         }
     }
@@ -52,6 +60,7 @@ fn populate_wasm_info(
         imports,
         allocator_trigger,
         ei_check,
+        memory_grow_flag,
     })
 }
 
@@ -108,5 +117,15 @@ fn is_ei_valid(imports: Vec<String>, check_ei: &Option<EIVersion>) -> bool {
         }
     }
 
-    return false;
+    false
+}
+
+fn is_mem_grow(code_section: FunctionBody) -> bool {
+    let mut code = code_section.get_binary_reader();
+    while code.bytes_remaining() > 0 {
+        if code.read_u8().unwrap() == MEMORY_GROW_OPCODE {
+            return true;
+        }
+    }
+    false
 }

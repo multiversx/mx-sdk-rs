@@ -13,6 +13,9 @@ pub struct ReportInfoJson {
     pub memory_allocation_error: bool,
 
     #[serde(default)]
+    pub is_mem_grow: bool,
+
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ei_check: Option<EiCheckJson>,
 }
@@ -28,6 +31,7 @@ impl ReportInfoJson {
         ReportInfoJson {
             imports: wasm_info.imports.iter().map(|i| i.to_string()).collect(),
             memory_allocation_error: wasm_info.allocator_trigger,
+            is_mem_grow: wasm_info.memory_grow_flag,
             ei_check,
         }
     }
