@@ -38,6 +38,38 @@ pub trait StorageMapperGetAtAddress {
         mapper.len()
     }
 
+    #[endpoint]
+    fn next_at_address(&self, item: u32) -> u32 {
+        let address = self.contract_address().get();
+        let mapper: SetMapper<u32, _> =
+            SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
+        mapper.next(&item).unwrap()
+    }
+
+    #[endpoint]
+    fn previous_at_address(&self, item: u32) -> u32 {
+        let address = self.contract_address().get();
+        let mapper: SetMapper<u32, _> =
+            SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
+        mapper.previous(&item).unwrap()
+    }
+
+    #[endpoint]
+    fn front_at_address(&self) -> u32 {
+        let address = self.contract_address().get();
+        let mapper: SetMapper<u32, _> =
+            SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
+        mapper.front().unwrap()
+    }
+
+    #[endpoint]
+    fn back_at_address(&self) -> u32 {
+        let address = self.contract_address().get();
+        let mapper: SetMapper<u32, _> =
+            SetMapper::new_from_address(address, StorageKey::from("set_mapper"));
+        mapper.back().unwrap()
+    }
+
     /// Storage to be called. For testing, this contract is deployed twice,
     /// and this module acts both as caller and receiver
     #[storage_mapper("set_mapper")]
