@@ -309,12 +309,16 @@ where
         Iter::new(self)
     }
 
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, A, T> {
+        Iter::new_from_node_id(self, node_id)
+    }
+
     fn get_info(&self) -> QueueMapperInfo {
         self.address
             .address_storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
-    fn get_node(&self, node_id: u32) -> Node {
+    pub fn get_node(&self, node_id: u32) -> Node {
         self.address.address_storage_get(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
@@ -328,7 +332,7 @@ where
         )
     }
 
-    fn get_value_option(&self, node_id: u32) -> Option<T> {
+    pub fn get_value_option(&self, node_id: u32) -> Option<T> {
         if node_id == NULL_ENTRY {
             return None;
         }
@@ -473,6 +477,10 @@ where
             node_id: queue.get_info().front,
             queue,
         }
+    }
+
+    pub fn new_from_node_id(queue: &'a QueueMapper<SA, T, A>, node_id: u32) -> Iter<'a, SA, A, T> {
+        Iter { node_id, queue }
     }
 }
 

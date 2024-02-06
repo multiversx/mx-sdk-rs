@@ -12,14 +12,14 @@ path = "src/forwarder_queue.rs"
 path = "../vault"
 
 [dependencies.multiversx-sc]
-version = "0.47.1"
+version = "0.47.3"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.47.1"
+version = "0.47.3"
 path = "../../../../framework/wasm-adapter"
 optional = true
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.47.1"
+version = "0.47.3"
 path = "../../../../framework/scenario"

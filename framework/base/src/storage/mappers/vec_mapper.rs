@@ -1,4 +1,7 @@
-use super::{StorageClearable, StorageMapper};
+use super::{
+    set_mapper::{CurrentStorage, StorageAddress},
+    StorageClearable, StorageMapper,
+};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, StorageMapperApi},
@@ -6,14 +9,10 @@ use crate::{
         multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopDecode, TopEncode,
         TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{
-        storage_clear, storage_get, storage_get_from_address, storage_get_len, storage_set,
-        StorageKey,
-    },
+    storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use core::{marker::PhantomData, usize};
-use storage_get_from_address::storage_get_len_from_address;
 
 const ITEM_SUFFIX: &[u8] = b".item";
 const LEN_SUFFIX: &[u8] = b".len";
@@ -26,18 +25,19 @@ static INDEX_OUT_OF_RANGE_ERR_MSG: &[u8] = b"index out of range";
 /// Indexes start from 1, instead of 0. (We avoid 0-value indexes to prevent confusion between an uninitialized variable and zero.)
 /// It also stores the count separately, at what would be index 0.
 /// The count is always kept in sync automatically.
-pub struct VecMapper<SA, T>
+pub struct VecMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
     len_key: StorageKey<SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for VecMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for VecMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -48,6 +48,7 @@ where
 
         VecMapper {
             _phantom_api: PhantomData,
+            address: CurrentStorage,
             base_key,
             len_key,
             _phantom_item: PhantomData,
@@ -55,7 +56,26 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for VecMapper<SA, T>
+impl<SA, T> VecMapper<SA, T, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        let mut len_key = base_key.clone();
+        len_key.append_bytes(LEN_SUFFIX);
+
+        VecMapper {
+            _phantom_api: PhantomData,
+            address,
+            base_key,
+            len_key,
+            _phantom_item: PhantomData,
+        }
+    }
+}
+
+impl<SA, T> StorageClearable for VecMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -65,9 +85,10 @@ where
     }
 }
 
-impl<SA, T> VecMapper<SA, T>
+impl<SA, T, A> VecMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode,
 {
     fn item_key(&self, index: usize) -> StorageKey<SA> {
@@ -77,18 +98,9 @@ where
         item_key
     }
 
-    fn save_count(&self, new_len: usize) {
-        storage_set(self.len_key.as_ref(), &new_len);
-    }
-
     /// Number of items managed by the mapper.
     pub fn len(&self) -> usize {
-        storage_get(self.len_key.as_ref())
-    }
-
-    /// Number of items in the mapper at the given address.
-    pub fn len_at_address(&self, address: &ManagedAddress<SA>) -> usize {
-        storage_get_from_address(address.as_ref(), self.len_key.as_ref())
+        self.address.address_storage_get(self.len_key.as_ref())
     }
 
     /// True if no items present in the mapper.
@@ -96,8 +108,73 @@ where
         self.len() == 0
     }
 
-    pub fn is_empty_at_address(&self, address: &ManagedAddress<SA>) -> bool {
-        self.len_at_address(address) == 0
+    /// Get item at index from storage.
+    /// Index must be valid (1 <= index <= count).
+    pub fn get(&self, index: usize) -> T {
+        if index == 0 || index > self.len() {
+            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
+        }
+        self.get_unchecked(index)
+    }
+
+    /// Get item at index from storage.
+    /// There are no restrictions on the index,
+    /// calling for an invalid index will simply return the zero-value.
+    pub fn get_unchecked(&self, index: usize) -> T {
+        self.address
+            .address_storage_get(self.item_key(index).as_ref())
+    }
+
+    /// Get item at index from storage.
+    /// If index is valid (1 <= index <= count), returns value at index,
+    /// else calls lambda given as argument.
+    /// The lambda only gets called lazily if the index is not valid.
+    pub fn get_or_else<F: FnOnce() -> T>(self, index: usize, or_else: F) -> T {
+        if index == 0 || index > self.len() {
+            or_else()
+        } else {
+            self.get_unchecked(index)
+        }
+    }
+
+    /// Checks whether or not there is anything ins storage at index.
+    /// Index must be valid (1 <= index <= count).
+    pub fn item_is_empty(&self, index: usize) -> bool {
+        if index == 0 || index > self.len() {
+            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
+        }
+        self.item_is_empty_unchecked(index)
+    }
+
+    /// Checks whether or not there is anything in storage at index.
+    /// There are no restrictions on the index,
+    /// calling for an invalid index will simply return `true`.
+    pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
+        self.address
+            .address_storage_get_len(self.item_key(index).as_ref())
+            == 0
+    }
+
+    /// Loads all items from storage and places them in a Vec.
+    /// Can easily consume a lot of gas.
+    #[cfg(feature = "alloc")]
+    pub fn load_as_vec(&self) -> alloc::vec::Vec<T> {
+        self.iter().collect()
+    }
+
+    /// Provides a forward iterator.
+    pub fn iter(&self) -> Iter<SA, T, A> {
+        Iter::new(self)
+    }
+}
+
+impl<SA, T> VecMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+    fn save_count(&self, new_len: usize) {
+        storage_set(self.len_key.as_ref(), &new_len);
     }
 
     /// Add one item at the end of the list.
@@ -121,86 +198,6 @@ where
         }
         self.save_count(len);
         len
-    }
-
-    /// Get item at index from storage.
-    /// Index must be valid (1 <= index <= count).
-    pub fn get(&self, index: usize) -> T {
-        if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
-        }
-        self.get_unchecked(index)
-    }
-
-    /// Get the item at index from the target's storage.
-    /// Index must be valid (1 <= index <= count).
-    pub fn get_at_address(&self, address: &ManagedAddress<SA>, index: usize) -> T {
-        if index == 0 || index > self.len_at_address(address) {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
-        }
-        self.get_unchecked_at_address(address, index)
-    }
-
-    /// Get item at index from storage.
-    /// There are no restrictions on the index,
-    /// calling for an invalid index will simply return the zero-value.
-    pub fn get_unchecked(&self, index: usize) -> T {
-        storage_get(self.item_key(index).as_ref())
-    }
-
-    /// Gets the item without checking index bounds.
-    /// Prefer using `get_at_address` instead.
-    pub fn get_unchecked_at_address(&self, address: &ManagedAddress<SA>, index: usize) -> T {
-        storage_get_from_address(address.as_ref(), self.item_key(index).as_ref())
-    }
-
-    /// Get item at index from storage.
-    /// If index is valid (1 <= index <= count), returns value at index,
-    /// else calls lambda given as argument.
-    /// The lambda only gets called lazily if the index is not valid.
-    pub fn get_or_else<F: FnOnce() -> T>(self, index: usize, or_else: F) -> T {
-        if index == 0 || index > self.len() {
-            or_else()
-        } else {
-            self.get_unchecked(index)
-        }
-    }
-
-    /// Checks whether or not there is anything in storage at index.
-    /// There are no restrictions on the index,
-    /// calling for an invalid index will simply return `true`.
-    pub fn item_is_empty_unchecked(&self, index: usize) -> bool {
-        storage_get_len(self.item_key(index).as_ref()) == 0
-    }
-
-    /// Checks if the mapper at the given address stores anything at this index.
-    /// Does not check index bounds.
-    /// Prefer using `item_is_empty` instead.
-    pub fn item_is_empty_unchecked_at_address(
-        &self,
-        address: &ManagedAddress<SA>,
-        index: usize,
-    ) -> bool {
-        let len = storage_get_len_from_address(address.as_ref(), self.item_key(index).as_ref());
-        len == 0
-    }
-
-    /// Checks whether or not there is anything ins storage at index.
-    /// Index must be valid (1 <= index <= count).
-    pub fn item_is_empty(&self, index: usize) -> bool {
-        if index == 0 || index > self.len() {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
-        }
-        self.item_is_empty_unchecked(index)
-    }
-
-    /// Checks if the mapper at the given address stores anything at this index.
-    /// Index must be valid (1 <= index <= count).
-    pub fn item_is_empty_at_address(&self, address: &ManagedAddress<SA>, index: usize) -> bool {
-        if index == 0 || index > self.len_at_address(address) {
-            SA::error_api_impl().signal_error(INDEX_OUT_OF_RANGE_ERR_MSG);
-        }
-        self.item_is_empty_unchecked_at_address(address, index)
     }
 
     /// Set item at index in storage.
@@ -257,13 +254,6 @@ where
         last_item_as_option
     }
 
-    /// Loads all items from storage and places them in a Vec.
-    /// Can easily consume a lot of gas.
-    #[cfg(feature = "alloc")]
-    pub fn load_as_vec(&self) -> alloc::vec::Vec<T> {
-        self.iter().collect()
-    }
-
     /// Deletes all contents form storage and sets count to 0.
     /// Can easily consume a lot of gas.
     pub fn clear(&mut self) {
@@ -273,21 +263,17 @@ where
         }
         self.save_count(0);
     }
-
-    /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, T> {
-        Iter::new(self)
-    }
 }
 
-impl<'a, SA, T> IntoIterator for &'a VecMapper<SA, T>
+impl<'a, SA, T, A> IntoIterator for &'a VecMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
 
-    type IntoIter = Iter<'a, SA, T>;
+    type IntoIter = Iter<'a, SA, T, A>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
@@ -298,22 +284,24 @@ where
 ///
 /// This `struct` is created by [`VecMapper::iter()`]. See its
 /// documentation for more.
-pub struct Iter<'a, SA, T>
+pub struct Iter<'a, SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
     index: usize,
     len: usize,
-    vec: &'a VecMapper<SA, T>,
+    vec: &'a VecMapper<SA, T, A>,
 }
 
-impl<'a, SA, T> Iter<'a, SA, T>
+impl<'a, SA, T, A> Iter<'a, SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
-    fn new(vec: &'a VecMapper<SA, T>) -> Iter<'a, SA, T> {
+    fn new(vec: &'a VecMapper<SA, T, A>) -> Iter<'a, SA, T, A> {
         Iter {
             index: 1,
             len: vec.len(),
@@ -322,9 +310,10 @@ where
     }
 }
 
-impl<'a, SA, T> Iterator for Iter<'a, SA, T>
+impl<'a, SA, T, A> Iterator for Iter<'a, SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -341,7 +330,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for VecMapper<SA, T>
+impl<SA, T> TopEncodeMulti for VecMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -355,7 +344,7 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<VecMapper<SA, T>> for MultiValueEncoded<SA, T>
+impl<SA, T> CodecFrom<VecMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
@@ -363,7 +352,7 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for VecMapper<SA, T>
+impl<SA, T> TypeAbi for VecMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,

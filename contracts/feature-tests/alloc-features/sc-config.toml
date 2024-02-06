@@ -7,12 +7,12 @@ add-unlabelled = true
 allocator = "static64k"
 stack-size = "32k"
 
-[contracts.alloc-features-fail-memory]
-name = "fail-memory"
+[contracts.alloc-mem-fail]
+name = "alloc-mem-fail"
 allocator = "fail"
-add-labels = ["fail-memory"]
+add-labels = ["alloc-mem-fail"]
 
-[contracts.alloc-features-leaking-memory]
-name = "leaking-memory"
+[contracts.alloc-mem-leaking]
+name = "alloc-mem-leaking"
 allocator = "leaking"
-add-labels = ["leaking-memory"]
+add-labels = ["alloc-mem-leaking"]

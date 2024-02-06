@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "leaking-memory-wasm"
+name = "alloc-mem-fail-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -25,7 +25,7 @@ overflow-checks = false
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.47.1"
+version = "0.47.3"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]
