@@ -2,53 +2,57 @@ use colored::Colorize;
 use std::fs;
 use wasmparser::{BinaryReaderError, DataSectionReader, ImportSectionReader, Parser, Payload};
 
+use crate::ei::EIVersion;
+
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 
 pub struct WasmInfo {
     pub imports: Vec<String>,
     pub allocator_trigger: bool,
+    pub ei_check: bool,
 }
 
 impl WasmInfo {
-    const fn new(imports: Vec<String>, allocator_trigger: bool) -> Self {
-        WasmInfo {
-            imports,
-            allocator_trigger,
-        }
-    }
-
     pub fn extract_wasm_info(
         output_wasm_path: &str,
         extract_imports_enabled: bool,
+        check_ei: &Option<EIVersion>,
     ) -> Result<WasmInfo, BinaryReaderError> {
         let wasm_data = fs::read(output_wasm_path)
             .expect("error occured while extracting information from .wasm: file not found");
 
-        populate_wasm_info(wasm_data, extract_imports_enabled)
+        populate_wasm_info(wasm_data, extract_imports_enabled, check_ei)
     }
 }
 
 fn populate_wasm_info(
     wasm_data: Vec<u8>,
     extract_imports_enabled: bool,
+    check_ei: &Option<EIVersion>,
 ) -> Result<WasmInfo, BinaryReaderError> {
     let mut imports = Vec::new();
-    let mut allocator_triggered = false;
+    let mut allocator_trigger = false;
+    let mut ei_check = false;
 
     let parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
         match payload? {
             Payload::ImportSection(import_section) => {
                 imports = extract_imports(import_section, extract_imports_enabled);
+                ei_check = is_ei_valid(imports.clone(), check_ei);
             },
             Payload::DataSection(data_section) => {
-                allocator_triggered = is_fail_allocator_triggered(data_section);
+                allocator_trigger = is_fail_allocator_triggered(data_section);
             },
             _ => (),
         }
     }
 
-    Ok(WasmInfo::new(imports, allocator_triggered))
+    Ok(WasmInfo {
+        imports,
+        allocator_trigger,
+        ei_check,
+    })
 }
 
 fn is_fail_allocator_triggered(data_section: DataSectionReader) -> bool {
@@ -88,4 +92,21 @@ pub fn extract_imports(
     import_names.sort();
 
     import_names
+}
+
+fn is_ei_valid(imports: Vec<String>, check_ei: &Option<EIVersion>) -> bool {
+    if let Some(ei) = check_ei {
+        let mut num_errors = 0;
+        for import in imports {
+            if !ei.contains_vm_hook(import.as_str()) {
+                num_errors += 1;
+            }
+        }
+
+        if num_errors == 0 {
+            return true;
+        }
+    }
+
+    return false;
 }

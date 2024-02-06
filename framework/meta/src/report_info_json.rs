@@ -19,10 +19,16 @@ pub struct ReportInfoJson {
 
 impl ReportInfoJson {
     pub fn new(wasm_info: &WasmInfo, ei_check_info: Option<EiCheckJson>) -> Self {
+        let ei_check = if wasm_info.imports.is_empty() {
+            None
+        } else {
+            ei_check_info
+        };
+
         ReportInfoJson {
             imports: wasm_info.imports.iter().map(|i| i.to_string()).collect(),
             memory_allocation_error: wasm_info.allocator_trigger,
-            ei_check: ei_check_info,
+            ei_check,
         }
     }
 }

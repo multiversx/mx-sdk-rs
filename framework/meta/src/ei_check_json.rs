@@ -13,17 +13,14 @@ pub struct EiCheckJson {
 }
 
 impl EiCheckJson {
-    pub fn new(check_ei: &Option<EIVersion>, status: bool) -> Self {
-        EiCheckJson {
-            ei_version: get_ei_version(check_ei),
-            ok: status,
+    pub fn new(check_ei: &Option<EIVersion>, status: bool) -> Option<Self> {
+        if let Some(ei) = check_ei {
+            return Some(EiCheckJson {
+                ei_version: ei.name().to_string(),
+                ok: status,
+            });
         }
-    }
-}
 
-fn get_ei_version(check_ei: &Option<EIVersion>) -> String {
-    match check_ei {
-        Some(ei) => ei.name().to_string(),
-        None => "ignore".to_string(),
+        return None;
     }
 }
