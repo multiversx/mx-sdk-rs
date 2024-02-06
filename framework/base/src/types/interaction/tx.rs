@@ -1,17 +1,19 @@
-use multiversx_sc_codec::TopEncodeMulti;
-
 use crate::{
-    contract_base::BlockchainWrapper,
+    api::{self, CallTypeApi, ManagedTypeApi},
+    contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
-        BigUint, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec,
-        MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer,
+        ManagedVec, MultiEsdtPayment,
     },
 };
+use alloc::boxed::Box;
+use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
-    RHListAppendRet, RHListItem, TxData, TxDataFunctionCall, TxEnv, TxFrom, TxFromSpecified, TxGas,
-    TxPayment, TxResultHandler, TxTo, TxToSpecified,
+    AsyncCall, DeployCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
+    RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxData, TxDataFunctionCall, TxEnv,
+    TxFrom, TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified,
 };
 
 #[must_use]
@@ -462,5 +464,76 @@ where
             data: result.fc,
             result_handler: self.result_handler,
         }
+    }
+}
+
+impl<Env, Payment, Gas, Data> Tx<Env, (), (), Payment, Gas, Data, ()>
+where
+    Env: TxEnv,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    Data: TxData<Env>,
+{
+    pub fn deploy(self) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: DeployCall::default(),
+            result_handler: self.result_handler,
+        }
+    }
+}
+
+impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()>
+where
+    Env: TxEnv,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+{
+    pub fn code(
+        mut self,
+        code: ManagedBuffer<Env::Api>,
+    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
+        self.data.code = code;
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    pub fn code_metadata(
+        mut self,
+        code_metadata: CodeMetadata,
+    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
+        self.data.code_metadata = code_metadata;
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    #[inline]
+    pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
+        self.data = self.data.argument(arg);
+        self
+    }
+
+    #[inline]
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
+        self.data.arg_buffer = raw;
+        self
     }
 }

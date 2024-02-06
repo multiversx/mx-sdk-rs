@@ -1,9 +1,14 @@
 use crate::{
+    api::ManagedTypeApi,
+    contract_base::SendRawWrapper,
     formatter::SCLowerHex,
-    types::{ManagedBuffer, ManagedBufferCachedBuilder},
+    types::{
+        CodeMetadata, EgldPayment, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder,
+        ManagedVec,
+    },
 };
 
-use super::{FunctionCall, TxEnv};
+use super::{FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo};
 
 pub trait TxData<Env>
 where
@@ -32,6 +37,7 @@ where
         ManagedBuffer::new()
     }
 }
+
 impl<Env> TxDataFunctionCall<Env> for () where Env: TxEnv {}
 
 impl<Env> TxData<Env> for FunctionCall<Env::Api>

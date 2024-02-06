@@ -9,14 +9,15 @@ pub trait ForwarderRawDeployUpgrade {
         code_metadata: CodeMetadata,
         args: MultiValueEncoded<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
-        self.send_raw()
-            .deploy_contract(
-                self.blockchain().get_gas_left(),
-                &BigUint::zero(),
-                &code,
-                code_metadata,
-                &args.to_arg_buffer(),
-            )
+        self.tx()
+            .deploy()
+            .code(code)
+            .code_metadata(code_metadata)
+            .arguments_raw(args.to_arg_buffer())
+            .with_gas_limit(self.blockchain().get_gas_left())
+            .returns(ReturnsNewAddress)
+            .returns(ReturnsRaw)
+            .execute_deploy()
             .into()
     }
 
