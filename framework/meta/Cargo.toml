@@ -40,7 +40,7 @@ colored = "2.0"
 lazy_static = "1.4.0"
 convert_case = "0.6.0"
 hex = "0.4"
-wasmparser = "0.120.0"
+wasmparser = "0.121.0"
 wasmprinter = "0.2.71"
 semver = "1.0.20"
 
