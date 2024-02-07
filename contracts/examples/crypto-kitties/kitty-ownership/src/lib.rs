@@ -10,6 +10,7 @@ use random::*;
 
 #[multiversx_sc::contract]
 pub trait KittyOwnership {
+    #[allow_multiple_var_args]
     #[init]
     fn init(
         &self,

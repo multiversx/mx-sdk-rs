@@ -16,6 +16,12 @@ pub struct ContractTrait {
     pub trait_attributes: TraitProperties,
 }
 
+#[derive(Clone, Debug)]
+pub struct EsdtAttribute {
+    pub ticker: String,
+    pub ty: proc_macro2::TokenStream,
+}
+
 impl ContractTrait {
     pub fn callback_count(&self) -> usize {
         self.methods

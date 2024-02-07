@@ -11,7 +11,7 @@
                     "esdt": {
                         "str:ESDT-123456": "200"
                     },
-                    "code": "file:../forwarder/output/forwarder.wasm"
+                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
                 },
                 "address:viewer": {
                     "nonce": "0",

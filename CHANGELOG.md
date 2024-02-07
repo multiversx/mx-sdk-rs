@@ -26,6 +26,89 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.47.3, sdk 0.3.2] - 2024-02-06
+- SDK: changed the way to retrieve the new deployed address afte deploy/
+- Support for reading from another contract for the following storage mappers: `AddressToIdMapper`, `BiDiMapper`, `LinkedListMapper`, `SetMapper`, `SingleValueMapper`, `UniqueIdMapper`, `UnorderedSetMapper`, `UserMapper`, `VecMapper`, `WhitelistMapper`.
+- Additional methods to access data nodes directly in the `SetMapper` and `QueueMapper`.
+
+## [sc 0.47.2, codec 0.18.6, vm 0.8.2, scenario-format 0.22.2] - 2024-02-02
+- Scenario testing infrastructure:
+	- The Rust VM can generate mock addresses, if not specified in advance.
+	- The `sc:` syntax now generates addresses with VM type 0x0500, same as the latest version of mx-scenario-go.
+	- Rust test support for checking `code_metadata`.
+- Explicit discriminants supported for enums.
+- Optimized `top_encode_number` function. It no longer contains branches or loops.
+- Removed reliance on Rust nightly features `is_sorted` and `slice_partition_dedup`.
+
+## [sc 0.47.1, codec 0.18.5, vm 0.8.1, scenario-format 0.22.1] - 2024-01-29
+- Blockchain hooks: `get_code_metadata`, `is_builtin_function`.
+- Support for `mxsc:` syntax in scenarios.
+- Updated dependencies.
+
+## [sc 0.47.0, codec 0.18.4, vm 0.8.0, scenario-format 0.22.0] - 2024-01-23
+- Added support for the code metadata in the Rust VM and Rust scenarios backend.
+- `sc-meta`:
+	- New `mx-scenario-go` installer;
+	- `--nocapture` flag added in `sc-meta test` CLI;
+	- Framework version system refactor,
+- `SetMapper` and `QueueMapper` can read from another contract.
+- Fixed an edge case when generating enum encoding.
+
+## [sc 0.46.1] - 2024-01-10
+- Interactor: fixed parsing of newly issued token identifier.
+
+## [sc 0.46.0] - 2024-01-05
+- Promises callback memory allocator bugfix.
+- Removed features: `promises`, `managed-map`, `back-transfers`.
+- Removed `hashbrown` dependency from framework.
+- Imports in output now sorted.
+
+## [sc 0.45.2, codec 0.18.3, vm 0.7.1, scenario-format 0.21.1, sdk 0.3.1] - 2023-12-18
+- Updated framework dependencies to the latest versions: syn, bitflags, wasmparser, base64, sha2, sha3, itertools, hmac, pem, pbkdf2, etc.
+- `sc-meta` improvements:
+	- `overflow-checks` field in `sc-config.toml`;
+	- Upgrade: new `--no-check` flag, which disables the compile check after major version upgrades;
+	- Template: `wasm` crates no longer copied for new versions; retroactively patched missing `multiversx.json` file for older versions.
+
+## [sc 0.45.1, codec 0.18.2] - 2023-11-24
+- Fixed sc-meta standalone install backwards compatibility.
+- Better hygiene in codec derive.
+
+## [sc 0.45.0, vm 0.7.0, scenario-format 0.21.0, sdk 0.3.0] - 2023-11-24
+- Replicated VM 1.5 in the Rust VM. This includes support for:
+	- promises,
+	- back-transfers,
+	- modified event logs.
+- New endpoint annotation, `#[upgrade]`. Contract variants with upgrade endpoint, but without init now allowed.
+- Build system:
+	- `wasm` crates now fully generated based on data from `sc-config.toml` and root `Cargo.toml`.
+	- Setting wasm target dir automatically, if not specified, based on workspace.
+
+## [sc 0.44.0, vm 0.6.0] - 2023-11-03
+- Back-transfer:
+	- API support in framework (not yet implemented in the Rust VM);
+	- Feature flag: `"back-transfers"`;
+	- EI updated.
+- ESDT attribute ABI annotation and generator.
+- Multiple var-args disallowed, unless annotating endpoint with `#[allow_multiple_var_args]`.
+- Build system updates:
+	- `multicontract.toml` renamed to `sc-config.toml`;
+	- `add-unlabelled` default true.
+- New `FunctionCall` object & refactoring. Can be used as multi-value to pass contract call info to contracts.
+- `AddressToId` storage mapper.
+
+
+## [sc 0.43.5] - 2023-10-16
+- Meta crate: removed external dependencies to `wasm2wat` and `wasm-objdump`, replaces with internal implementation.
+- NFT subscription module.
+- EsdtTokenData implements `ManagedVecItem`.
+- Contract call `argument` method.
+- `SendRawWrapper` made public.
+
+## [sc 0.43.4] - 2023-09-18
+- Bugfix in `sc-meta`: fixed `--locked argument` in `all` command.
+- Template fix: added `multiversx.json` files.
+- Testing framework: check NFT balances and attributes.
 
 ## [sc 0.43.3, vm 0.5.2] - 2023-09-08
 - Added several new methods in the `SendWrapper`, which perform EGLD & ESDT transfers but don't do anything if the value is zero.

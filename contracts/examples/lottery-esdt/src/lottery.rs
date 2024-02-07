@@ -17,6 +17,7 @@ pub trait Lottery {
     #[init]
     fn init(&self) {}
 
+    #[allow_multiple_var_args]
     #[endpoint]
     fn start(
         &self,
@@ -43,6 +44,7 @@ pub trait Lottery {
         );
     }
 
+    #[allow_multiple_var_args]
     #[endpoint(createLotteryPool)]
     fn create_lottery_pool(
         &self,
@@ -69,6 +71,7 @@ pub trait Lottery {
         );
     }
 
+    #[allow_multiple_var_args]
     #[allow(clippy::too_many_arguments)]
     fn start_lottery(
         &self,

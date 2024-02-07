@@ -1,0 +1,92 @@
+{
+    "name": "mint and update nft",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "init.scen.json"
+        },
+        {
+            "step": "scCall",
+            "id": "create-NFT-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-subscription",
+                "function": "mint",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "2",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-subscription",
+                                    "attributes": {
+                                        "0-expiration": "u64:0",
+                                        "1-attributes": "nested:str:common"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "update-NFT-1",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-subscription",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "1",
+                        "value": "1"
+                    }
+                ],
+                "function": "update_attributes",
+                "arguments": [
+                    "str:rare"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "3",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-subscription",
+                                    "attributes": {
+                                        "0-expiration": "u64:0",
+                                        "1-attributes": "nested:str:rare"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        }
+    ]
+}

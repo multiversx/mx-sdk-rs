@@ -29,11 +29,11 @@ impl ComposabilityInteract {
             .await;
         let wallet_address = interactor.register_wallet(judy());
         let forw_queue_code = BytesValue::interpret_from(
-            "file:../forwarder-queue/output/forwarder-queue.wasm",
+            "mxsc:../forwarder-queue/output/forwarder-queue.mxsc.json",
             &InterpreterContext::default(),
         );
         let vault_code = BytesValue::interpret_from(
-            "file:../vault/output/vault.wasm",
+            "mxsc:../vault/output/vault.mxsc.json",
             &InterpreterContext::default(),
         );
 

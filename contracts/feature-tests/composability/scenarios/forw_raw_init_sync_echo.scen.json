@@ -10,7 +10,7 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 }
             },
             "newAddresses": [
@@ -26,7 +26,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
+                "contractCode": "mxsc:../forwarder-raw/output/forwarder-raw-init-sync-call.mxsc.json",
                 "arguments": [
                     "sc:vault",
                     "str:echo_arguments",
@@ -45,16 +45,32 @@
                 "logs": [
                     {
                         "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
                         "endpoint": "",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            {
+                                "0-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",

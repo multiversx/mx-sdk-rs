@@ -107,6 +107,7 @@ pub trait EchoTypes {
         nz
     }
 
+    #[allow_multiple_var_args]
     #[view]
     fn echo_some_args_ignore_others(
         &self,

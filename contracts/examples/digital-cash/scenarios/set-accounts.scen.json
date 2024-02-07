@@ -42,9 +42,10 @@
             "id": "deploy",
             "tx": {
                 "from": "address:digital_cash_owner_address",
-                "contractCode": "file:../output/digital-cash.wasm",
+                "contractCode": "mxsc:../output/digital-cash.mxsc.json",
                 "arguments": [
-                    "10"
+                    "10",
+                    "str:EGLD"
                 ],
                 "gasLimit": "5,000,000",
                 "gasPrice": "0"
@@ -63,9 +64,15 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {
-                        "str:fee": "10"
+                        "str:fee|nested:str:EGLD": "10",
+                        "str:whitelistedFeeTokens|str:.len": "1",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:allTimeFeeTokens|str:.len": "1",
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",

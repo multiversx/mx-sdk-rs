@@ -51,10 +51,20 @@ fn execute(state: &BlockchainState, accounts: &CheckAccounts) {
             let actual_code = account.contract_path.as_ref().unwrap_or(default_value);
             assert!(
                 expected_account.code.check(actual_code),
-                "bad account code. Address: {}. Want: {}. Have: {}",
+                "bad account code. Address: {}. Want: {}. Have: {} ({} bytes)",
                 expected_address,
                 expected_account.code,
-                std::str::from_utf8(actual_code.as_slice()).unwrap()
+                hex::encode(actual_code),
+                actual_code.len(),
+            );
+
+            let actual_code_metadata = account.code_metadata.to_vec();
+            assert!(
+                expected_account.code_metadata.check(&actual_code_metadata),
+                "bad account code metadata. Address: {}. Want: {}. Have: {}",
+                expected_address,
+                expected_account.code_metadata,
+                hex::encode(actual_code_metadata),
             );
 
             assert!(
@@ -140,7 +150,7 @@ pub fn check_account_esdt(address: &AddressKey, expected: &CheckEsdtMap, actual:
                             let single_instance = actual_value
                                 .instances
                                 .get_by_nonce(0)
-                                .unwrap_or_else(|| panic!("Expected fungible ESDT with none 0"));
+                                .unwrap_or_else(|| panic!("Expected fungible ESDT with nonce 0"));
                             assert_eq!(
                                 single_instance.balance,
                                 expected_balance.value,

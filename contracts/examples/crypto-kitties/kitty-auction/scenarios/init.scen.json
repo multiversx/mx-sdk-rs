@@ -29,7 +29,7 @@
             "comment": "we don't care about autoBirthFee in this test, so we set it to 0",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../../kitty-ownership/output/kitty-ownership.wasm",
+                "contractCode": "mxsc:../../kitty-ownership/output/kitty-ownership.mxsc.json",
                 "arguments": [
                     "0"
                 ],
@@ -49,7 +49,7 @@
             "id": "deploy - kitty auction contract",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "file:../output/kitty-auction.wasm",
+                "contractCode": "mxsc:../output/kitty-auction.mxsc.json",
                 "arguments": [
                     "100",
                     "500",
@@ -104,7 +104,7 @@
                         "str:totalKitties": "1",
                         "str:kitty|u32:0": "u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u8:0|u64:0|u64:0|u32:0|u32:0|u32:0|u16:0|u16:0"
                     },
-                    "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
+                    "code": "mxsc:../../kitty-ownership/output/kitty-ownership.mxsc.json"
                 },
                 "sc:kitty_auction_contract": {
                     "nonce": "0",
@@ -115,7 +115,7 @@
                         "str:genZeroKittyEndingPrice": "500",
                         "str:genZeroKittyAuctionDuration": "100,000"
                     },
-                    "code": "file:../output/kitty-auction.wasm"
+                    "code": "mxsc:../output/kitty-auction.mxsc.json"
                 }
             }
         }

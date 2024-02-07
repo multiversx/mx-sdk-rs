@@ -36,7 +36,7 @@
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
                 "egldValue": "1,000",
-                "function": "deposit_fees",
+                "function": "depositFees",
                 "arguments": [
                     "0xa40e72cdac3580e7203a4c2565c932f7691c35e624bcfd82718d7f559c88f440"
                 ],
@@ -54,7 +54,7 @@
         },
         {
             "step": "scCall",
-            "id": "forward-ok",
+            "id": "forward-without-fees-ok",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
@@ -81,8 +81,8 @@
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
-                "egldValue": "1,000",
-                "function": "deposit_fees",
+                "egldValue": "500",
+                "function": "depositFees",
                 "arguments": [
                     "0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee"
                 ],
@@ -100,10 +100,36 @@
         },
         {
             "step": "scCall",
-            "id": "forward-ok",
+            "id": "forward-with-fees-fail",
             "tx": {
                 "from": "address:acc2",
                 "to": "sc:the_digital_cash_contract",
+                "egldValue": "500",
+                "function": "forward",
+                "arguments": [
+                    "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
+                    "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
+                    "0x1ac4f6d4d45836d97ffeda83a66aaea7631a3bb3d4063421ccb2b9de9485bdb4c9bd6e44e003f6a9c9eb74379467238204ff579471d203b1878c3f1530592a02"
+                ],
+                "gasLimit": "500,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:invalid depositor address",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "forward-with-fees-ok",
+            "tx": {
+                "from": "address:acc2",
+                "to": "sc:the_digital_cash_contract",
+                "egldValue": "500",
                 "function": "forward",
                 "arguments": [
                     "0x885532043a061e0c779e4064b85193f72cffd22c5bcc208c209128e60f21bf0d",
@@ -142,7 +168,11 @@
                             "4-expiration_round": "u64:10",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:1",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
                         "str:deposit|0x487bd4010b50c24a02018345fe5171edf4182e6294325382c75ef4c4409f01bd": {
@@ -153,7 +183,11 @@
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:1",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
                         "str:deposit|0x8dc17613990e9b7476401a36d112d1a4d31190dec21e7e9a3c933872a27613ee": {
@@ -164,13 +198,23 @@
                             "4-expiration_round": "u64:16",
                             "5-fees": {
                                 "0-num_token_to_transfer": "u32:3",
-                                "1-value": "biguint:1,000"
+                                "1-value": {
+                                    "0-tokenIdentifier": "nested:str:EGLD",
+                                    "1-nonce": "u64:0",
+                                    "2-amount": "biguint:1,000"
+                                }
                             }
                         },
-                        "str:fee": "10",
-                        "str:collected_fees": "40"
+                        "str:fee|nested:str:EGLD": "10",
+                        "str:whitelistedFeeTokens|str:.len": "1",
+                        "str:whitelistedFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:whitelistedFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:allTimeFeeTokens|str:.len": "1",
+                        "str:allTimeFeeTokens|str:.item|u32:1": "str:EGLD",
+                        "str:allTimeFeeTokens|str:.index|nested:str:EGLD": "1",
+                        "str:collectedFees|nested:str:EGLD": "40"
                     },
-                    "code": "file:../output/digital-cash.wasm"
+                    "code": "mxsc:../output/digital-cash.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "3",
@@ -178,7 +222,7 @@
                     "storage": {}
                 },
                 "address:acc2": {
-                    "nonce": "7",
+                    "nonce": "9",
                     "balance": "997,000",
                     "esdt": {
                         "str:CASHTOKEN-123456": "50"

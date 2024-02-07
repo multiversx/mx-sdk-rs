@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/digital-cash");
 
     blockchain.register_contract(
-        "file:output/digital-cash.wasm",
+        "mxsc:output/digital-cash.mxsc.json",
         digital_cash::ContractBuilder,
     );
     blockchain
@@ -44,6 +44,21 @@ fn fund_egld_and_esdt_rs() {
 #[test]
 fn set_accounts_rs() {
     world().run("scenarios/set-accounts.scen.json");
+}
+
+#[test]
+fn whitelist_blacklist_fee_token_rs() {
+    world().run("scenarios/whitelist-blacklist-fee-tokens.scen.json");
+}
+
+#[test]
+fn pay_fee_and_fund_esdt_rs() {
+    world().run("scenarios/pay-fee-and-fund-esdt.scen.json");
+}
+
+#[test]
+fn pay_fee_and_fund_egld_rs() {
+    world().run("scenarios/pay-fee-and-fund-egld.scen.json");
 }
 
 #[test]

@@ -1,7 +1,7 @@
 use super::attributes::*;
 use crate::model::{ArgMetadata, ArgPaymentMetadata, MethodArgument};
 
-pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
+pub fn extract_method_args(m: &syn::TraitItemFn) -> Vec<MethodArgument> {
     if m.sig.inputs.is_empty() {
         missing_self_panic(m);
     }
@@ -29,7 +29,7 @@ pub fn extract_method_args(m: &syn::TraitItemMethod) -> Vec<MethodArgument> {
         .collect()
 }
 
-fn missing_self_panic(m: &syn::TraitItemMethod) -> ! {
+fn missing_self_panic(m: &syn::TraitItemFn) -> ! {
     panic!(
         "Trait method `{}` must have `&self` as its first argument.",
         m.sig.ident

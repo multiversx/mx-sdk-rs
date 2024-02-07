@@ -26,6 +26,6 @@ pub trait UpgradeContractModule {
     ) {
         self.vault_proxy(child_sc_address)
             .init(opt_arg)
-            .upgrade_from_source(&source_address, CodeMetadata::DEFAULT)
+            .upgrade_from_source(&source_address, CodeMetadata::UPGRADEABLE)
     }
 }

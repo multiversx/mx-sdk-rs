@@ -4,7 +4,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/erc-style-contracts/erc20");
 
-    blockchain.register_contract("file:output/erc20.wasm", erc20::ContractBuilder);
+    blockchain.register_contract("mxsc:output/erc20.mxsc.json", erc20::ContractBuilder);
     blockchain
 }
 

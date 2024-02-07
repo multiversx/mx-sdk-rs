@@ -1,0 +1,90 @@
+{
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:basic-features": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "codeMetadata": "0x0104"
+                },
+                "sc:basic-features-2": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "codeMetadata": "0x0100"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_code_metadata",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_code_metadata",
+                "arguments": [
+                    "sc:basic-features"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0104"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_code_metadata-2",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_code_metadata",
+                "arguments": [
+                    "sc:basic-features-2"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "0x0100"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "get_code_metadata-missing-address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:basic-features",
+                "function": "get_code_metadata",
+                "arguments": [
+                    "sc:missing"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [],
+                "status": "10",
+                "message": "str:account not found: 000000000000000005006d697373696e675f5f5f5f5f5f5f5f5f5f5f5f5f5f5f"
+            }
+        }
+    ]
+}

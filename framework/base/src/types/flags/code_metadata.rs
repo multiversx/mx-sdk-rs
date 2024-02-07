@@ -14,7 +14,7 @@ const PAYABLE_BY_SC_STRING: &[u8] = b"PayableBySC";
 const DEFAULT_STRING: &[u8] = b"Default";
 
 bitflags! {
-    #[derive(Default)]
+    #[derive(Default, PartialEq, Debug, Clone, Copy)]
     pub struct CodeMetadata: u16 {
         const DEFAULT = 0;
         const UPGRADEABLE = 0b0000_0001_0000_0000; // LSB of first byte

@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/mappers/queue-repeat");
 
     blockchain.register_contract(
-        "file:output/queue-repeat.wasm",
+        "mxsc:output/queue-repeat.mxsc.json",
         queue_repeat::ContractBuilder,
     );
     blockchain

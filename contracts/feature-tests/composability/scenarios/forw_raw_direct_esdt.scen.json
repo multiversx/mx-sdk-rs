@@ -14,12 +14,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         },
@@ -51,11 +51,16 @@
                         "endpoint": "str:ESDTTransfer",
                         "topics": [
                             "str:TEST-TOKENA",
-                            "",
+                            "0",
                             "1000",
                             "sc:vault"
                         ],
-                        "data": ""
+                        "data": [
+                            "str:DirectCall",
+                            "str:ESDTTransfer",
+                            "str:TEST-TOKENA",
+                            "1000"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -81,13 +86,13 @@
                         "str:TEST-TOKENA": "1000"
                     },
                     "storage": {},
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         }

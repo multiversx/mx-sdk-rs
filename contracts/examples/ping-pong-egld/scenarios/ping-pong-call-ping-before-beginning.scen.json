@@ -59,7 +59,7 @@
                         "str:activationTimestamp": "780",
                         "str:deadline": "123,780"
                     },
-                    "code": "file:../output/ping-pong-egld.wasm"
+                    "code": "mxsc:../output/ping-pong-egld.mxsc.json"
                 }
             }
         }

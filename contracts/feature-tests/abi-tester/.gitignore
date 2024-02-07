@@ -7,5 +7,6 @@
 output
 
 # Used for debugging the ABI generator test
+abi_tester_generated_esdt_attr.esdt-abi.json
 abi_tester_generated_main.abi.json
 abi_tester_generated_view.abi.json

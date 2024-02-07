@@ -62,7 +62,7 @@
                         "str:allowance|address:erc20_owner|address:acc1": "400,000",
                         "str:totalSupply": "1,000,000,000"
                     },
-                    "code": "file:../../erc20/output/erc20.wasm"
+                    "code": "mxsc:../../erc20/output/erc20.mxsc.json"
                 },
                 "sc:crowdfunding": {
                     "nonce": "0",
@@ -72,7 +72,7 @@
                         "str:deadline": "123,456",
                         "str:erc20ContractAddress": "sc:erc20"
                     },
-                    "code": "file:../output/crowdfunding-erc20.wasm"
+                    "code": "mxsc:../output/crowdfunding-erc20.mxsc.json"
                 }
             }
         }

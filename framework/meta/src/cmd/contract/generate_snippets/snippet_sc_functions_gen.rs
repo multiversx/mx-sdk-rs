@@ -80,8 +80,8 @@ s
 }
 
 fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
-    write_method_declaration(file, endpoint_abi.rust_method_name);
-    write_payments_declaration(file, endpoint_abi.payable_in_tokens);
+    write_method_declaration(file, &endpoint_abi.rust_method_name);
+    write_payments_declaration(file, &endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration(file, &endpoint_abi.inputs);
     if matches!(endpoint_abi.mutability, EndpointMutabilityAbi::Readonly) {
         write_contract_query(file, endpoint_abi);
@@ -98,14 +98,14 @@ fn write_method_declaration(file: &mut File, endpoint_name: &str) {
     writeln!(file, "    async fn {endpoint_name}(&mut self) {{").unwrap();
 }
 
-fn write_payments_declaration(file: &mut File, accepted_tokens: &[&str]) {
+fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {
     if accepted_tokens.is_empty() {
         return;
     }
 
     // only handle EGLD and "any" case, as they're the most common
     let biguint_default = map_abi_type_to_rust_type("BigUint".to_string());
-    let first_accepted = accepted_tokens[0];
+    let first_accepted = &accepted_tokens[0];
     if first_accepted == "EGLD" {
         writeln!(
             file,
@@ -152,7 +152,7 @@ fn endpoint_args_when_called(inputs: &[InputAbi]) -> String {
         if !result.is_empty() {
             result.push_str(", ");
         }
-        result.push_str(input.arg_name);
+        result.push_str(&input.arg_name);
     }
     result
 }

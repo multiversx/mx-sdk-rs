@@ -3,11 +3,11 @@ use multiversx_sc_scenario::*;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.register_contract(
-        "file:output/erc1155-marketplace.wasm",
+        "mxsc:output/erc1155-marketplace.mxsc.json",
         erc1155_marketplace::ContractBuilder,
     );
     blockchain.register_contract(
-        "file:../erc1155/output/erc1155.wasm",
+        "mxsc:../erc1155/output/erc1155.mxsc.json",
         erc1155::ContractBuilder,
     );
 

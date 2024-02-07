@@ -1,14 +1,21 @@
-use crate::codec::TopDecodeMulti;
+use crate::{
+    api::{use_raw_handle, StaticVarApiImpl},
+    codec::TopDecodeMulti,
+};
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
+    types::{
+        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType,
+        ManagedVec,
+    },
 };
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld};
+use crate::api::managed_types::handles::HandleConstraints;
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
@@ -30,10 +37,28 @@ where
         }
     }
 
+    #[inline]
+    pub fn get_back_transfers(&self) -> (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>) {
+        let esdt_transfer_value_handle: SA::BigIntHandle =
+            use_raw_handle(SA::static_var_api_impl().next_handle());
+        let call_value_handle: SA::BigIntHandle =
+            use_raw_handle(SA::static_var_api_impl().next_handle());
+
+        SA::blockchain_api_impl().managed_get_back_transfers(
+            esdt_transfer_value_handle.get_raw_handle(),
+            call_value_handle.get_raw_handle(),
+        );
+
+        (
+            BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+            ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        )
+    }
+
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
         let mut result = ManagedBufferCachedBuilder::default();
-        result.append_managed_buffer(&self.basic.endpoint_name);
-        for arg in self.basic.arg_buffer.raw_arg_iter() {
+        result.append_managed_buffer(&self.basic.function_call.function_name);
+        for arg in self.basic.function_call.arg_buffer.raw_arg_iter() {
             result.append_bytes(b"@");
             SCLowerHex::fmt(&*arg, &mut result);
         }
@@ -44,19 +69,16 @@ where
         AsyncCall {
             to: self.basic.to,
             egld_payment: self.egld_payment,
-            endpoint_name: self.basic.endpoint_name,
-            arg_buffer: self.basic.arg_buffer,
+            function_call: self.basic.function_call,
             callback_call: None,
         }
     }
 
-    #[cfg(feature = "promises")]
     pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
         super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
-            endpoint_name: self.basic.endpoint_name,
-            arg_buffer: self.basic.arg_buffer,
+            function_call: self.basic.function_call,
             explicit_gas_limit: self.basic.explicit_gas_limit,
             extra_gas_for_callback: 0,
             callback_call: None,
@@ -73,8 +95,8 @@ where
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.egld_payment,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.basic.function_call.function_name,
+            &self.basic.function_call.arg_buffer,
         );
 
         SendRawWrapper::<SA>::new().clean_return_data();
@@ -89,8 +111,8 @@ where
         let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
             &self.basic.to,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.basic.function_call.function_name,
+            &self.basic.function_call.arg_buffer,
         );
 
         SendRawWrapper::<SA>::new().clean_return_data();
@@ -106,8 +128,8 @@ where
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.egld_payment,
-            &self.basic.endpoint_name,
-            &self.basic.arg_buffer,
+            &self.basic.function_call.function_name,
+            &self.basic.function_call.arg_buffer,
         );
 
         SendRawWrapper::<SA>::new().clean_return_data();
@@ -139,8 +161,8 @@ where
             &self.to,
             &egld_payment,
             gas_limit,
-            &self.endpoint_name,
-            &self.arg_buffer,
+            &self.function_call.function_name,
+            &self.function_call.arg_buffer,
         );
     }
 
@@ -154,8 +176,8 @@ where
                 &payment.token_identifier,
                 &payment.amount,
                 gas_limit,
-                &self.endpoint_name,
-                &self.arg_buffer,
+                &self.function_call.function_name,
+                &self.function_call.arg_buffer,
             );
         } else {
             // non-fungible/semi-fungible ESDT
@@ -165,8 +187,8 @@ where
                 payment.token_nonce,
                 &payment.amount,
                 gas_limit,
-                &self.endpoint_name,
-                &self.arg_buffer,
+                &self.function_call.function_name,
+                &self.function_call.arg_buffer,
             );
         }
     }
@@ -180,8 +202,8 @@ where
             &self.to,
             &payments,
             gas_limit,
-            &self.endpoint_name,
-            &self.arg_buffer,
+            &self.function_call.function_name,
+            &self.function_call.arg_buffer,
         );
     }
 
@@ -203,7 +225,7 @@ where
 {
     let mut loader = ManagedResultArgLoader::new(raw_result);
     let arg_id = ArgId::from(&b"sync result"[..]);
-    let h = ArgErrorHandler::<SA>::from(arg_id);
+    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
     let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
     result
 }

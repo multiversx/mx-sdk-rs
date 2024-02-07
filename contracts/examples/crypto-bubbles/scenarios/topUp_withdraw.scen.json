@@ -12,7 +12,7 @@
                 "sc:crypto_bubbles": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -43,7 +43,9 @@
                             "str:top_up",
                             "address:acc1"
                         ],
-                        "data": "0x4000000"
+                        "data": [
+                            "0x4000000"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -68,14 +70,13 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "*",
+                        "address": "sc:crypto_bubbles",
                         "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "sc:crypto_bubbles",
-                            "address:acc1",
-                            "0x4000000"
+                            "0x4000000",
+                            "address:acc1"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:crypto_bubbles",
@@ -84,7 +85,9 @@
                             "str:withdraw",
                             "address:acc1"
                         ],
-                        "data": "0x4000000"
+                        "data": [
+                            "0x4000000"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -104,7 +107,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "2",

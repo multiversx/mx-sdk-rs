@@ -1,0 +1,215 @@
+{
+    "name": "subscription",
+    "steps": [
+        {
+            "step": "externalSteps",
+            "path": "mint_nft.scen.json"
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "1"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "add-subscription",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-subscription",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "1",
+                        "value": "1"
+                    }
+                ],
+                "function": "renew",
+                "arguments": [
+                    "2"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-subscription",
+                                    "attributes": {
+                                        "0-expiration": "u64:3",
+                                        "1-attributes": "nested:str:rare"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "2"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "renew-subscription-not-ended",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-subscription",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "1",
+                        "value": "1"
+                    }
+                ],
+                "function": "renew",
+                "arguments": [
+                    "3"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-subscription",
+                                    "attributes": {
+                                        "0-expiration": "u64:6",
+                                        "1-attributes": "nested:str:rare"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "10"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "renew-subscription-already-ended",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-subscription",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "1",
+                        "value": "1"
+                    }
+                ],
+                "function": "renew",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-subscription",
+                                    "attributes": {
+                                        "0-expiration": "u64:15",
+                                        "1-attributes": "nested:str:rare"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        },
+        {
+            "step": "setState",
+            "currentBlockInfo": {
+                "blockTimestamp": "11"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "cancel-subscription",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:nft-subscription",
+                "esdtValue": [
+                    {
+                        "tokenIdentifier": "str:NFT-123456",
+                        "nonce": "1",
+                        "value": "1"
+                    }
+                ],
+                "function": "cancel",
+                "arguments": [],
+                "gasLimit": "20,000,000",
+                "gasPrice": "0"
+            }
+        },
+        {
+            "step": "checkState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "*",
+                    "balance": "0",
+                    "esdt": {
+                        "str:NFT-123456": {
+                            "instances": [
+                                {
+                                    "nonce": "1",
+                                    "balance": "1",
+                                    "creator": "sc:nft-subscription",
+                                    "attributes": {
+                                        "0-expiration": "u64:0",
+                                        "1-attributes": "nested:str:rare"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                },
+                "+": ""
+            }
+        }
+    ]
+}

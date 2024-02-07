@@ -1,8 +1,10 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{BigUint, CallbackClosure, ManagedAddress},
 };
+
+use super::FunctionCall;
 
 #[must_use]
 pub struct AsyncCall<SA>
@@ -11,8 +13,7 @@ where
 {
     pub(crate) to: ManagedAddress<SA>,
     pub(crate) egld_payment: BigUint<SA>,
-    pub(crate) endpoint_name: ManagedBuffer<SA>,
-    pub(crate) arg_buffer: ManagedArgBuffer<SA>,
+    pub(crate) function_call: FunctionCall<SA>,
     pub(crate) callback_call: Option<CallbackClosure<SA>>,
 }
 
@@ -37,8 +38,8 @@ where
         SendRawWrapper::<SA>::new().async_call_raw(
             &self.to,
             &self.egld_payment,
-            &self.endpoint_name,
-            &self.arg_buffer,
+            &self.function_call.function_name,
+            &self.function_call.arg_buffer,
         )
     }
 }

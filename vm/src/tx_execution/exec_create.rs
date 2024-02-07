@@ -1,6 +1,6 @@
 use crate::{
     tx_mock::{TxCache, TxInput, TxResult},
-    types::VMAddress,
+    types::{VMAddress, VMCodeMetadata},
     with_shared::Shareable,
     world_mock::BlockchainState,
 };
@@ -12,6 +12,7 @@ impl BlockchainVMRef {
         &self,
         tx_input: TxInput,
         contract_path: &[u8],
+        code_metadata: VMCodeMetadata,
         state: &mut Shareable<BlockchainState>,
         f: F,
     ) -> (VMAddress, TxResult)
@@ -26,7 +27,7 @@ impl BlockchainVMRef {
         let (tx_result, new_address, blockchain_updates) = state.with_shared(|state_arc| {
             let tx_cache = TxCache::new(state_arc);
 
-            self.deploy_contract(tx_input, contract_path.to_vec(), tx_cache, f)
+            self.deploy_contract(tx_input, contract_path.to_vec(), code_metadata, tx_cache, f)
         });
 
         blockchain_updates.apply(state);

@@ -16,7 +16,7 @@ use crate::derive::TypeAbi;
 /// - EGLD (can be zero in case of no payment whatsoever);
 /// - Multi-ESDT (one or more ESDT transfers).
 #[derive(
-    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug,
+    TopDecode, TopEncode, TypeAbi, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug,
 )]
 pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {
     Egld(BigUint<M>),

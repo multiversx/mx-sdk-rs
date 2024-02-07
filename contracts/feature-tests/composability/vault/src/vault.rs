@@ -14,6 +14,19 @@ pub trait Vault {
         opt_arg_to_echo
     }
 
+    #[upgrade]
+    #[label("upgrade")]
+    fn upgrade(
+        &self,
+        opt_arg_to_echo: OptionalValue<ManagedBuffer>,
+    ) -> MultiValue2<&'static str, OptionalValue<ManagedBuffer>> {
+        self.upgraded_event();
+        ("upgraded", opt_arg_to_echo).into()
+    }
+
+    #[event("upgraded")]
+    fn upgraded_event(&self);
+
     #[endpoint]
     fn echo_arguments(
         &self,
@@ -106,6 +119,7 @@ pub trait Vault {
             .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
     }
 
+    #[allow_multiple_var_args]
     #[label("promises-endpoint")]
     #[payable("*")]
     #[endpoint]
@@ -213,7 +227,6 @@ pub trait Vault {
             .direct_multi(&self.blockchain().get_caller(), &new_tokens);
     }
 
-    /// TODO: invert token_payment and token_nonce, for consistency.
     #[event("accept_funds")]
     fn accept_funds_event(
         &self,

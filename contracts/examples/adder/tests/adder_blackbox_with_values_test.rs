@@ -2,13 +2,13 @@ use adder::*;
 use multiversx_sc::storage::mappers::SingleValue;
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
-const ADDER_PATH_EXPR: &str = "file:output/adder.wasm";
+const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
 
-    blockchain.register_contract("file:output/adder.wasm", adder::ContractBuilder);
+    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     blockchain
 }
 

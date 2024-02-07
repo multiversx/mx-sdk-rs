@@ -54,16 +54,20 @@ pub enum StandaloneCliAction {
     #[command(name = "new", about = "Creates a contract by a pre-existing template")]
     Template(TemplateArgs),
 
-    #[command(
-        name = "templates",
-        about = "Creates a contract by a pre-existing template"
-    )]
+    #[command(name = "templates", about = "Lists all pre-existing templates")]
     TemplateList(TemplateListArgs),
+
     #[command(
         name = "test-gen",
         about = "Generates Rust integration tests based on scenarios provided in the scenarios folder of each contract."
     )]
     TestGen(TestGenArgs),
+
+    #[command(name = "test", about = "Runs cargo test")]
+    Test(TestArgs),
+
+    #[command(name = "install", about = "Installs framework dependencies")]
+    Install(InstallArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -77,6 +81,30 @@ pub struct InfoArgs {
     #[arg(long, verbatim_doc_comment)]
     #[clap(global = true, default_value = "target")]
     pub ignore: Vec<String>,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TestArgs {
+    /// Target directory where to generate contract integration tests.
+    /// Will be current directory if not specified.
+    #[arg(short, long, verbatim_doc_comment)]
+    pub path: Option<String>,
+
+    /// This arg runs rust and go tests.
+    /// Default value will be "false" if not specified.
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub go: bool,
+
+    /// This arg runs scenarios.
+    /// Default value will be "false" if not specified.
+    /// If scen and go are both specified, scen overrides the go argument.
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub scen: bool,
+
+    /// This arg prints the entire output of the vm.
+    /// Default value will be "false" if not specified
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub nocapture: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -167,6 +195,10 @@ pub struct UpgradeArgs {
     /// By default it will be the last version out.
     #[arg(long = "to", verbatim_doc_comment)]
     pub override_target_version: Option<String>,
+
+    /// Skips 'cargo check' after upgrade
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub no_check: bool,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -231,4 +263,27 @@ pub struct TestGenArgs {
     /// Creates test files if they don't exist.
     #[arg(long, verbatim_doc_comment)]
     pub create: bool,
+}
+
+#[derive(Default, PartialEq, Eq, Debug, Clone, Parser)]
+#[command(propagate_version = true)]
+pub struct InstallArgs {
+    #[command(subcommand)]
+    pub command: Option<InstallCommand>,
+}
+
+#[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
+pub enum InstallCommand {
+    #[command(about = "Installs all the known tools")]
+    All,
+
+    #[command(about = "Installs the `mx-scenario-go` tool")]
+    MxScenarioGo(InstallMxScenarioGoArgs),
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallMxScenarioGoArgs {
+    /// The framework version on which the contracts should be created.
+    #[arg(long, verbatim_doc_comment)]
+    pub tag: Option<String>,
 }
