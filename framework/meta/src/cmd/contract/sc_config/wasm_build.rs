@@ -5,8 +5,10 @@ use crate::{
     abi_json::ContractAbiJson,
     cli_args::BuildArgs,
     ei::EIVersion,
+    ei_check_json::EiCheckJson,
     mxsc_file_json::{save_mxsc_file_json, MxscFileJson},
     print_util::*,
+    report_info_json::ReportInfoJson,
     tools::{self, WasmInfo},
 };
 
@@ -71,9 +73,9 @@ impl ContractVariant {
         self.copy_contracts_to_output(build_args, output_path);
         self.run_wasm_opt(build_args, output_path);
         self.run_wasm2wat(build_args, output_path);
-        self.extract_wasm_info(build_args, output_path);
+        let wasm_info = self.extract_wasm_info(build_args, output_path);
         self.run_twiggy(build_args, output_path);
-        self.pack_mxsc_file(build_args, output_path);
+        self.pack_mxsc_file(build_args, output_path, wasm_info);
     }
 
     fn copy_contracts_to_output(&self, build_args: &BuildArgs, output_path: &str) {
@@ -84,7 +86,7 @@ impl ContractVariant {
             .expect("failed to copy compiled contract to output directory");
     }
 
-    fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &str) {
+    fn pack_mxsc_file(&self, build_args: &BuildArgs, output_path: &str, wasm_info: WasmInfo) {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
         let compiled_bytes = fs::read(output_wasm_path).expect("failed to open compiled contract");
         let output_mxsc_path = format!("{output_path}/{}", self.mxsc_file_output_name(build_args));
@@ -92,11 +94,14 @@ impl ContractVariant {
         print_contract_size(compiled_bytes.len());
         let mut abi = ContractAbiJson::from(&self.abi);
         let build_info = core::mem::take(&mut abi.build_info).unwrap();
+        let ei_check_json = EiCheckJson::new(&self.settings.check_ei, wasm_info.ei_check);
+        let report = ReportInfoJson::new(&wasm_info, ei_check_json);
         let mxsc_file_json = MxscFileJson {
             build_info,
             abi,
             size: compiled_bytes.len(),
             code: hex::encode(compiled_bytes),
+            report,
         };
 
         save_mxsc_file_json(&mxsc_file_json, output_mxsc_path);
@@ -123,13 +128,16 @@ impl ContractVariant {
         tools::wasm_to_wat(output_wasm_path.as_str(), output_wat_path.as_str());
     }
 
-    fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &str) {
+    fn extract_wasm_info(&self, build_args: &BuildArgs, output_path: &str) -> WasmInfo {
         let output_wasm_path = format!("{output_path}/{}", self.wasm_output_name(build_args));
 
         if !build_args.extract_imports {
-            WasmInfo::extract_wasm_info(&output_wasm_path, build_args.extract_imports)
-                .expect("error occured while extracting imports from .wasm ");
-            return;
+            return WasmInfo::extract_wasm_info(
+                &output_wasm_path,
+                build_args.extract_imports,
+                &self.settings.check_ei,
+            )
+            .expect("error occured while extracting imports from .wasm ");
         }
 
         let output_imports_json_path = format!(
@@ -139,14 +147,17 @@ impl ContractVariant {
         );
         print_extract_imports(&output_imports_json_path);
 
-        let wasm_data = WasmInfo::extract_wasm_info(&output_wasm_path, true)
-            .expect("error occured while extracting imports from .wasm ");
+        let wasm_data =
+            WasmInfo::extract_wasm_info(&output_wasm_path, true, &self.settings.check_ei)
+                .expect("error occured while extracting imports from .wasm ");
 
         write_imports_output(
             output_imports_json_path.as_str(),
             wasm_data.imports.as_slice(),
         );
-        validate_ei(&wasm_data.imports, &self.settings.check_ei);
+        print_ei_check(&wasm_data, &self.settings.check_ei);
+
+        wasm_data
     }
 }
 
@@ -155,18 +166,19 @@ fn write_imports_output(dest_path: &str, import_names: &[String]) {
     fs::write(dest_path, json).expect("failed to write imports json file");
 }
 
-fn validate_ei(import_names: &[String], check_ei: &Option<EIVersion>) {
+fn print_ei_check(wasm_data: &WasmInfo, check_ei: &Option<EIVersion>) {
     if let Some(ei) = check_ei {
         print_check_ei(ei.name());
-        let mut num_errors = 0;
-        for import_name in import_names {
-            if !ei.contains_vm_hook(import_name) {
-                print_invalid_vm_hook(import_name, ei.name());
-                num_errors += 1;
-            }
-        }
-        if num_errors == 0 {
+
+        if wasm_data.ei_check {
             print_check_ei_ok();
+            return;
+        }
+
+        for import_name in &wasm_data.imports {
+            if !ei.contains_vm_hook(import_name.as_str()) {
+                print_invalid_vm_hook(import_name.as_str(), ei.name());
+            }
         }
     } else {
         print_ignore_ei_check();
