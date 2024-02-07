@@ -11,6 +11,8 @@ static mut NEXT_HANDLE: i32 = const_handles::NEW_HANDLE_START_FROM;
 static mut NUM_ARGUMENTS: i32 = 0;
 static mut CALL_VALUE_EGLD_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
 static mut CALL_VALUE_MULTI_ESDT_HANDLE: i32 = const_handles::UNINITIALIZED_HANDLE;
+static mut SCALING_FACTOR_INIT: [bool; const_handles::SCALING_FACTOR_LENGTH as usize] =
+    [false; const_handles::SCALING_FACTOR_LENGTH as usize];
 
 // The compiler seems to enjoy inlining this method no matter how many times it shows up.
 // Hence the rather drastic directive.
@@ -77,5 +79,26 @@ impl StaticVarApiImpl for VmApiImpl {
 
     fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
         unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
+    }
+
+    fn set_scaling_factor_init(
+        &self,
+        scaling_factor: [bool; const_handles::SCALING_FACTOR_LENGTH as usize],
+    ) {
+        unsafe {
+            SCALING_FACTOR_INIT = scaling_factor;
+        }
+    }
+
+    fn get_scaling_factor_init(&self) -> [bool; const_handles::SCALING_FACTOR_LENGTH as usize] {
+        unsafe { SCALING_FACTOR_INIT }
+    }
+
+    fn get_i64_from_handle(&self, _handle: RawHandle) -> i64 {
+        todo!()
+    }
+
+    fn set_i64_to_handle(&self, _handle: RawHandle, _value: i64) {
+        todo!()
     }
 }

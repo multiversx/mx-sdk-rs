@@ -24,8 +24,9 @@ pub const MBUF_TEMPORARY_2: RawHandle = -26;
 
 pub const NEW_HANDLE_START_FROM: RawHandle = -100; // > -100 reserved for APIs
 
+// Vec of 64 entries of 1 bit
 pub const SCALING_FACTOR_START: RawHandle = -101;
-pub const SCALING_FACTOR_LENGTH: RawHandle = 64; // vec of 64 entries of 1 byte (u64)
+pub const SCALING_FACTOR_LENGTH: RawHandle = 64; 
 
 /// Used as a flag. Do not use as a regular handle.
 pub const MANAGED_OPTION_NONE: RawHandle = i32::MAX - 1;
