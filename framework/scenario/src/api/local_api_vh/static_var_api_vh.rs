@@ -1,8 +1,11 @@
+use std::borrow::Borrow;
+
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 use multiversx_sc::{
-    api::{use_raw_handle, RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{const_handles, use_raw_handle, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
+use num_traits::ToBytes;
 
 impl<VHB: VMHooksApiBackend> StaticVarApi for VMHooksApi<VHB> {
     type StaticVarApiImpl = Self;
@@ -78,6 +81,30 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
     fn get_call_value_multi_esdt_handle(&self) -> RawHandle {
         self.with_static_data(|data| {
             use_raw_handle(data.static_vars_cell.borrow().call_value_multi_esdt_handle)
+        })
+    }
+
+    fn set_scaling_factor_init(
+        &self,
+        scaling_factor: [bool; const_handles::SCALING_FACTOR_LENGTH],
+    ) {
+        self.with_static_data(|data| {
+            data.static_vars_cell.borrow_mut().scaling_factor_init = scaling_factor
+        })
+    }
+
+    fn get_scaling_factor_init(&self) -> [bool; const_handles::SCALING_FACTOR_LENGTH as usize] {
+        self.with_static_data(|data| data.static_vars_cell.borrow().scaling_factor_init)
+    }
+
+    // maybe replace with vm hooks call from managed decimal
+    fn get_i64_from_handle(&self, handle: RawHandle) -> i64 {
+        self.with_vm_hooks(|vm| vm.big_int_get_int64(handle))
+    }
+
+    fn set_i64_to_handle(&self, handle: RawHandle, value: i64) {
+        self.with_vm_hooks(|vm| {
+            vm.big_int_set_int64(destination_handle, value);
         })
     }
 }

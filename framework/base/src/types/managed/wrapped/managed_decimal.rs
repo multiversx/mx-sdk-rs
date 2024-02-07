@@ -1,22 +1,84 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::ManagedTypeApi,
+    api::{const_handles, ManagedTypeApi, StaticVarApiImpl},
     types::{BigFloat, BigInt, BigUint},
 };
 
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, Vec,
 };
+use num_traits::One;
 
 use core::{
     cmp::Ordering,
     ops::{Add, Div, Mul, Sub},
 };
 
-fn scaling_factor<M: ManagedTypeApi>(num_decimals: NumDecimals) -> BigUint<M> {
-    // TODO: cache
+fn bytes_to_bits(bytes: &[u8]) -> Vec<bool> {
+    let mut bits = Vec::new();
+    for &byte in bytes {
+        for i in (0..8).rev() {
+            // iterate over each bit in the byte
+            bits.push((byte >> i) & 1 == 1);
+        }
+    }
+    bits
+}
+
+fn reconstruct<M: ManagedTypeApi>(
+    sf_init: [bool; const_handles::SCALING_FACTOR_LENGTH as usize],
+) -> BigUint<M> {
+    let mut bits = Vec::with_capacity(sf_init.len());
+    for (index, init) in sf_init.iter().enumerate() {
+        if !init {
+            break;
+        }
+        // get value from handle = start + index;
+        let actual_handle = const_handles::SCALING_FACTOR_START + index as i32;
+        let bit = M::static_var_api_impl().get_i64_from_handle(actual_handle);
+        bits.push(bit.is_one());
+    }
+
+    // reconstruct u64 from bits
+    let mut result_u64 = 0;
+    for bit in &bits {
+        result_u64 = (result_u64 << 1) | (*bit as u64);
+    }
+
+    BigUint::from(result_u64)
+}
+
+fn calc_scaling_factor<M: ManagedTypeApi>(num_decimals: NumDecimals) -> BigUint<M> {
     BigUint::from(10u32).pow(num_decimals as u32)
+}
+
+fn scaling_factor<M: ManagedTypeApi>(num_decimals: NumDecimals) -> BigUint<M> {
+    let mut sf_init = M::static_var_api_impl().get_scaling_factor_init();
+    // not cached
+    if !sf_init[0] {
+        let scaling_factor = calc_scaling_factor(num_decimals);
+        // turn big uint into bits
+        let bits = bytes_to_bits(scaling_factor.to_bytes_be().as_slice());
+        // cache everything (set handles with bit value, set initialized for each bit)
+        for (index, bit) in bits.iter().enumerate() {
+            let actual_handle = const_handles::SCALING_FACTOR_START + index as i32;
+
+            // set handle
+            M::static_var_api_impl().set_i64_to_handle(actual_handle, i64::from(*bit));
+
+            // set initialized
+            sf_init[index] = true;
+        }
+        // set new sf_init
+        M::static_var_api_impl().set_scaling_factor_init(sf_init);
+
+        // return calculated scaling factor
+        return scaling_factor;
+    }
+
+    // reconstruct number from cache
+    reconstruct(sf_init)
 }
 
 pub trait Decimals {

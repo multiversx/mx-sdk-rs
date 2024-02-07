@@ -1,6 +1,6 @@
 use crate::types::LockableStaticBuffer;
 
-use super::RawHandle;
+use super::{const_handles, RawHandle};
 
 pub trait StaticVarApi {
     type StaticVarApiImpl: StaticVarApiImpl;
@@ -31,4 +31,12 @@ pub trait StaticVarApiImpl {
     fn set_call_value_multi_esdt_handle(&self, handle: RawHandle);
 
     fn get_call_value_multi_esdt_handle(&self) -> RawHandle;
+
+    fn set_scaling_factor_init(&self, scaling_factor: [bool; const_handles::SCALING_FACTOR_LENGTH as usize]);
+
+    fn get_scaling_factor_init(&self) -> [bool; const_handles::SCALING_FACTOR_LENGTH as usize];
+
+    fn get_i64_from_handle(&self, handle: RawHandle) -> i64;
+
+    fn set_i64_to_handle(&self, handle: RawHandle, value: i64);
 }
