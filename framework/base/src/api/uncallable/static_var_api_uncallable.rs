@@ -57,24 +57,15 @@ impl StaticVarApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn set_scaling_factor_init(
-        &self,
-        _scaling_factor: [bool; crate::api::const_handles::SCALING_FACTOR_LENGTH as usize],
-    ) {
+    fn is_scaling_factor_cached(&self, _decimals: usize) -> bool {
         unreachable!()
     }
 
-    fn get_scaling_factor_init(
-        &self,
-    ) -> [bool; crate::api::const_handles::SCALING_FACTOR_LENGTH as usize] {
+    fn set_scaling_factor_cached(&self, _decimals: usize) -> i32 {
         unreachable!()
     }
 
-    fn get_i64_from_handle(&self, _handle: RawHandle) -> i64 {
-        unreachable!()
-    }
-
-    fn set_i64_to_handle(&self, _handle: RawHandle, _value: i64) {
+    fn set_initialized(&self, _decimals: usize) {
         unreachable!()
     }
 }

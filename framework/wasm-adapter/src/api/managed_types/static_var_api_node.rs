@@ -1,5 +1,5 @@
 use multiversx_sc::{
-    api::{const_handles, RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{const_handles, BigIntApiImpl, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -81,24 +81,21 @@ impl StaticVarApiImpl for VmApiImpl {
         unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
     }
 
-    fn set_scaling_factor_init(
-        &self,
-        scaling_factor: [bool; const_handles::SCALING_FACTOR_LENGTH as usize],
-    ) {
-        unsafe {
-            SCALING_FACTOR_INIT = scaling_factor;
+    fn set_scaling_factor_cached(&self, decimals: usize) -> i32 {
+        let handle = const_handles::get_scaling_factor_handle(decimals);
+        let value: i64 = 10i64.pow(decimals as u32);
+        self.bi_set_int64(handle, value);
+        self.set_initialized(decimals);
+        handle
+    }
+
+    fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
+        unsafe { SCALING_FACTOR_INIT[decimals] }
+    }
+
+    fn set_initialized(&self, decimals: usize) {
+        {
+            unsafe { SCALING_FACTOR_INIT[decimals] = true }
         }
-    }
-
-    fn get_scaling_factor_init(&self) -> [bool; const_handles::SCALING_FACTOR_LENGTH as usize] {
-        unsafe { SCALING_FACTOR_INIT }
-    }
-
-    fn get_i64_from_handle(&self, _handle: RawHandle) -> i64 {
-        todo!()
-    }
-
-    fn set_i64_to_handle(&self, _handle: RawHandle, _value: i64) {
-        todo!()
     }
 }
