@@ -75,13 +75,13 @@ where
     /// Converts to a legacy async call.
     #[inline]
     fn async_call(self) -> AsyncCall<SA> {
-        self.into_normalized().async_call()
+        self.into_normalized().build_async_call()
     }
 
     /// Converts to an async promise.
     #[inline]
     fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
-        self.into_normalized().async_call_promise()
+        self.into_normalized().build_async_call_promise()
     }
 
     /// Executes immediately, synchronously, and returns contract call result.

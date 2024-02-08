@@ -36,6 +36,7 @@ pub mod log_util;
 mod macros;
 pub mod non_zero_util;
 pub mod storage;
+pub mod tuple_util;
 pub mod types;
 
 pub use hex_call_data::*;

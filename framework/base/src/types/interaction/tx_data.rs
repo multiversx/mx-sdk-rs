@@ -1,5 +1,4 @@
 use crate::{
-    api::ManagedTypeApi,
     formatter::SCLowerHex,
     types::{ManagedBuffer, ManagedBufferCachedBuilder},
 };

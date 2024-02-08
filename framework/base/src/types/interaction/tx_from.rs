@@ -1,4 +1,4 @@
-use crate::{api::CallTypeApi, contract_base::BlockchainWrapper, types::ManagedAddress};
+use crate::types::ManagedAddress;
 
 use super::{AnnotatedValue, TxEnv};
 

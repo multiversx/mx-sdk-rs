@@ -1,10 +1,9 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
-    contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, EgldPayment, ManagedAddress},
+    types::{CallbackClosure, EgldPayment, ManagedAddress},
 };
 
-use super::{FunctionCall, Tx, TxAsyncCallCallback, TxScEnv};
+use super::{FunctionCall, Tx, TxScEnv};
 
 pub type AsyncCall<Api> = Tx<
     TxScEnv<Api>,
@@ -22,7 +21,7 @@ where
     Api: CallTypeApi,
 {
     pub fn with_callback(mut self, callback_call: CallbackClosure<Api>) -> Self {
-        self.callback = Some(callback_call);
+        self.result_handler = Some(callback_call);
         self
     }
 }

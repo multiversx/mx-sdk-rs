@@ -1,7 +1,4 @@
-use crate::{
-    api::ManagedTypeApi,
-    types::{ManagedAddress, ManagedBuffer},
-};
+use crate::types::{ManagedAddress, ManagedBuffer};
 
 use super::TxEnv;
 

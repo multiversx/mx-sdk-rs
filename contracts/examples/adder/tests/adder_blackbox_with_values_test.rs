@@ -48,7 +48,7 @@ fn adder_blackbox_with_values() {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
                 .call(adder_contract.add(3u32))
-                .callback(WithTxResult(|response| {
+                .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());
                 }))
         })

@@ -1,15 +1,15 @@
 use crate::{
     api::{const_handles, CallTypeApi},
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedBuffer, ManagedType},
+    types::{CallbackClosure, ManagedBuffer, ManagedType},
 };
 
 use super::{
-    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, Tx, TxCallback, TxGas,
-    TxPayment, TxScEnv, TxToSpecified,
+    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, Tx, TxGas, TxPayment,
+    TxResultHandler, TxScEnv, TxToSpecified,
 };
 
-pub trait TxPromisesCallback<Api>: TxCallback<TxScEnv<Api>>
+pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>
 where
     Api: CallTypeApi,
 {
@@ -37,7 +37,13 @@ where
     }
 }
 
-impl<Api> TxCallback<TxScEnv<Api>> for CallbackClosureWithGas<Api> where Api: CallTypeApi {}
+impl<Api> TxResultHandler<TxScEnv<Api>> for CallbackClosureWithGas<Api>
+where
+    Api: CallTypeApi,
+{
+    type OriginalResult = ();
+}
+
 impl<Api> TxPromisesCallback<Api> for CallbackClosureWithGas<Api>
 where
     Api: CallTypeApi,
@@ -77,8 +83,8 @@ where
             payment: self.payment,
             gas: self.gas,
             data: self.data,
-            callback: CallbackClosureWithGas {
-                closure: self.callback,
+            result_handler: CallbackClosureWithGas {
+                closure: self.result_handler,
                 gas_for_callback: gas,
             },
         }
@@ -93,14 +99,13 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
-    // #[cfg(feature = "promises")]
     pub fn async_call_promise(self) {
-        let callback_name = self.callback.callback_name();
+        let callback_name = self.result_handler.callback_name();
         let mut cb_closure_args_serialized =
             ManagedBuffer::<Api>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        self.callback
+        self.result_handler
             .overwrite_with_serialized_args(&mut cb_closure_args_serialized);
-        let extra_gas_for_callback = self.callback.gas_for_callback();
+        let extra_gas_for_callback = self.result_handler.gas_for_callback();
 
         let normalized = self.normalize_tx();
 
