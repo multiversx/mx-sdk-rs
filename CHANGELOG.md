@@ -26,6 +26,11 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.47.4, vm 0.8.3] - 2024-02-08
+- Post-build wasm report added to `.mxsc.json` file.
+- Fixed a dependency issue involving ed25519-dalek (downgraded dependency).
+
 ## [sc 0.47.3, sdk 0.3.2] - 2024-02-06
 - SDK: changed the way to retrieve the new deployed address afte deploy/
 - Support for reading from another contract for the following storage mappers: `AddressToIdMapper`, `BiDiMapper`, `LinkedListMapper`, `SetMapper`, `SingleValueMapper`, `UniqueIdMapper`, `UnorderedSetMapper`, `UserMapper`, `VecMapper`, `WhitelistMapper`.
