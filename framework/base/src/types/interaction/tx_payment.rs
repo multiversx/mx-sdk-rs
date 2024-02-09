@@ -19,9 +19,11 @@ where
     pub fc: FunctionCall<Api>,
 }
 
+/// Describes a payment that is part of a transaction.
 pub trait TxPayment<Env>
 where
     Env: TxEnv,
+    Self: Clone,
 {
     fn is_no_payment(&self) -> bool;
 
@@ -42,6 +44,14 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     );
+}
+
+/// Marks a payment object that only contains EGLD or nothing at all.
+pub trait TxPaymentEgldOnly<Env>: TxPayment<Env>
+where
+    Env: TxEnv,
+{
+    fn to_egld_payment(self) -> EgldPayment<Env::Api>;
 }
 
 impl<Env> TxPayment<Env> for ()
@@ -77,6 +87,15 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         EgldPayment::no_payment().perform_transfer_execute(env, to, gas_limit, fc);
+    }
+}
+
+impl<Env> TxPaymentEgldOnly<Env> for ()
+where
+    Env: TxEnv,
+{
+    fn to_egld_payment(self) -> EgldPayment<Env::Api> {
+        EgldPayment::no_payment()
     }
 }
 
@@ -119,6 +138,15 @@ where
             &fc.function_name,
             &fc.arg_buffer,
         );
+    }
+}
+
+impl<Env> TxPaymentEgldOnly<Env> for EgldPayment<Env::Api>
+where
+    Env: TxEnv,
+{
+    fn to_egld_payment(self) -> EgldPayment<Env::Api> {
+        self
     }
 }
 

@@ -1,4 +1,7 @@
-use crate::types::{ManagedBuffer, ManagedVec, RHListItemSync, TxEnv};
+use crate::types::{
+    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec,
+    RHListItemSync, TxEnv,
+};
 
 use super::RHListItem;
 
@@ -17,6 +20,19 @@ where
 {
     fn item_sync_call_result(
         self,
+        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+    ) -> Self::Returns {
+        raw_results.clone()
+    }
+}
+
+impl<Env, Original> RHListItemDeploy<Env, Original> for ReturnsRaw
+where
+    Env: TxEnv,
+{
+    fn item_deploy_result(
+        self,
+        _new_address: &ManagedAddress<Env::Api>,
         raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> Self::Returns {
         raw_results.clone()
