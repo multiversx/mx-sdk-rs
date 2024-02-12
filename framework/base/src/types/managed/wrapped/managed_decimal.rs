@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{const_handles, use_raw_handle, ManagedTypeApi, StaticVarApiImpl},
+    api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::{BigFloat, BigInt, BigUint},
 };
 
@@ -19,13 +19,21 @@ use super::ManagedRef;
 fn scaling_factor<M: ManagedTypeApi>(
     num_decimals: NumDecimals,
 ) -> ManagedRef<'static, M, BigUint<M>> {
-    let handle = const_handles::get_scaling_factor_handle(num_decimals);
+    let handle: M::BigIntHandle =
+        use_raw_handle(const_handles::get_scaling_factor_handle(num_decimals));
 
     if !M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
-        M::static_var_api_impl().set_scaling_factor_cached(num_decimals);
+        M::static_var_api_impl().set_initialized(num_decimals);
+
+        let temp1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+        let temp2: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_2);
+        let api = M::managed_type_impl();
+        api.bi_set_int64(temp1.clone(), 10);
+        api.bi_set_int64(temp2.clone(), num_decimals as i64);
+        api.bi_pow(handle.clone(), temp1, temp2);
     }
 
-    unsafe { ManagedRef::<M, BigUint<M>>::wrap_handle(use_raw_handle(handle)) }
+    unsafe { ManagedRef::<M, BigUint<M>>::wrap_handle(handle) }
 }
 
 pub trait Decimals {
