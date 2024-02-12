@@ -23,8 +23,6 @@ fn scaling_factor<M: ManagedTypeApi>(
         use_raw_handle(const_handles::get_scaling_factor_handle(num_decimals));
 
     if !M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
-        M::static_var_api_impl().set_initialized(num_decimals);
-
         let temp1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
         let temp2: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_2);
         let api = M::managed_type_impl();

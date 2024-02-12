@@ -1,6 +1,6 @@
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 use multiversx_sc::{
-    api::{const_handles, use_raw_handle, RawHandle, StaticVarApi, StaticVarApiImpl},
+    api::{use_raw_handle, RawHandle, StaticVarApi, StaticVarApiImpl},
     types::LockableStaticBuffer,
 };
 
@@ -82,7 +82,13 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
     }
 
     fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
-        self.with_static_data(|data| data.static_vars_cell.borrow().scaling_factor_init[decimals])
+        if !self
+            .with_static_data(|data| data.static_vars_cell.borrow().scaling_factor_init[decimals])
+        {
+            self.set_initialized(decimals);
+            return false;
+        }
+        true
     }
 
     fn set_initialized(&self, decimals: usize) {
@@ -92,12 +98,6 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
     }
 
     fn set_scaling_factor_cached(&self, decimals: usize) {
-        let handle = const_handles::get_scaling_factor_handle(decimals);
-        self.with_vm_hooks(|vm| {
-            let ten = vm.big_int_new(10i64);
-            let num_decimals = vm.big_int_new(decimals as i64);
-            vm.big_int_pow(handle, ten, num_decimals);
-        });
         self.set_initialized(decimals);
     }
 }
