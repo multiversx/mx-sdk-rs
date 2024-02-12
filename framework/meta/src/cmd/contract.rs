@@ -4,6 +4,7 @@ mod meta_config;
 pub mod sc_config;
 pub mod wasm_cargo_toml_data;
 pub mod wasm_cargo_toml_generate;
+mod generate_proxy_struct;
 
 use std::path::Path;
 
