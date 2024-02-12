@@ -1,10 +1,10 @@
+mod generate_proxy;
 mod generate_snippets;
 mod meta_abi;
 mod meta_config;
 pub mod sc_config;
 pub mod wasm_cargo_toml_data;
 pub mod wasm_cargo_toml_generate;
-mod generate_proxy_struct;
 
 use std::path::Path;
 
@@ -32,6 +32,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
         ContractCliAction::GenerateSnippets(gs_args) => {
             meta_config_opt.generate_rust_snippets(&gs_args)
         },
+        ContractCliAction::GenerateProxies => meta_config_opt.generate_rust_proxies_struct(),
     }
 }
 

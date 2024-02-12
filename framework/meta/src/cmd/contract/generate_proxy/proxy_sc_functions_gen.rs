@@ -8,49 +8,48 @@ use crate::cmd::contract::generate_snippets::{
     snippet_type_map::{handle_abi_type, RustTypeString},
 };
 
-pub(crate) fn write_content(file: &mut File, abi: &ContractAbi) {
-    for constructor_abi in &abi.constructors {
-        write_endpoint(file, constructor_abi, "ContractDeploy");
+const CONTRACT_DEPLOY: &str = "ContractDeploy";
+const CONTRACT_CALL_NO_PAYMENT: &str = "ContractCallNoPayment";
+
+pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
+    for constructor_abi in abi.constructors {
+        write_endpoint(file, constructor_abi.clone(), CONTRACT_DEPLOY);
         write_constructor_content_macro(file);
-        write_constructor_contract_deploy(file, &constructor_abi.inputs);
-        writeln!(file, "\t\t___contract_deploy___").unwrap();
-        writeln!(file, "\t}}").unwrap();
-        write_newline(file);
+        write_constructor_contract_deploy(file, constructor_abi.inputs);
+        write_end_of_constructor(file);
     }
 
-    for endpoint_abi in &abi.endpoints {
-        write_endpoint(file, endpoint_abi, "ContractCallNoPayment");
+    for endpoint_abi in abi.endpoints {
+        write_endpoint(file, endpoint_abi.clone(), CONTRACT_CALL_NO_PAYMENT);
         write_endpoint_content_macro(file, endpoint_abi.name);
-        write_contract_call(file, &endpoint_abi.inputs);
-        writeln!(file, "\t\t___contract_call___").unwrap();
-        writeln!(file, "\t}}").unwrap();
-        write_newline(file);
+        write_contract_call(file, endpoint_abi.inputs);
+        write_end_of_endpoint(file);
     }
 
     writeln!(file, "}}").unwrap();
 }
 
-fn write_constructor_contract_deploy(file: &mut File, inputs: &[InputAbi]) {
+fn write_constructor_contract_deploy(file: &mut File, inputs: Vec<InputAbi>) {
     if inputs.is_empty() {
         return;
     }
 
     for input in inputs.iter() {
-        write_constructor_contract_call(file, &input.arg_name);
+        write_constructor_contract_call(file, input.arg_name.clone());
     }
 }
 
-fn write_contract_call(file: &mut File, inputs: &[InputAbi]) {
+fn write_contract_call(file: &mut File, inputs: Vec<InputAbi>) {
     if inputs.is_empty() {
         return;
     }
 
     for input in inputs.iter() {
-        write_contract_call_input(file, &input.arg_name);
+        write_contract_call_input(file, input.arg_name.clone());
     }
 }
 
-fn write_contract_call_input(file: &mut File, arg_name: &&str) {
+fn write_contract_call_input(file: &mut File, arg_name: String) {
     writeln!(
         file,
         "\t\tContractCall::proxy_arg(&mut ___contract_call___, &{arg_name});"
@@ -58,7 +57,7 @@ fn write_contract_call_input(file: &mut File, arg_name: &&str) {
     .unwrap();
 }
 
-fn write_constructor_contract_call(file: &mut File, arg_name: &&str) {
+fn write_constructor_contract_call(file: &mut File, arg_name: String) {
     writeln!(
         file,
         "\t\t___contract_deploy___.push_endpoint_arg(&{arg_name});"
@@ -66,7 +65,7 @@ fn write_constructor_contract_call(file: &mut File, arg_name: &&str) {
     .unwrap();
 }
 
-fn write_endpoint_content_macro(file: &mut File, name: &str) {
+fn write_endpoint_content_macro(file: &mut File, name: String) {
     writeln!(
         file,
         "\t\tlet ___address___ = multiversx_sc::extract_address!(self);"
@@ -88,23 +87,23 @@ fn write_constructor_content_macro(file: &mut File) {
     writeln!(file, "\t\tlet mut ___contract_deploy___ = multiversx_sc::constructors_proxy!(___opt_address___);").unwrap();
 }
 
-fn write_endpoint(file: &mut File, endpoint_abi: &EndpointAbi, interaction_deploy: &str) {
+fn write_endpoint(file: &mut File, endpoint_abi: EndpointAbi, interaction_deploy: &str) {
     write_info_endpoint(file, endpoint_abi.docs);
     write_endpoint_fn(file, endpoint_abi.rust_method_name);
-    write_generic_args(file, &endpoint_abi.inputs);
-    write_parameters(file, &endpoint_abi.inputs, interaction_deploy);
-    write_output(file, &endpoint_abi.outputs);
+    write_generic_args(file, endpoint_abi.inputs.clone());
+    write_parameters(file, endpoint_abi.inputs, interaction_deploy);
+    write_output(file, endpoint_abi.outputs);
 }
 
-fn write_output(file: &mut File, outputs: &OutputAbis) {
-    let output_type = map_output_types_to_rust_types(outputs);
+fn write_output(file: &mut File, outputs: OutputAbis) {
+    let output_type = map_output_types_to_rust_types(&outputs);
 
     let output_type_print = output_type.replace("<StaticApi>", "<A>");
     write!(file, "{output_type_print}",).unwrap();
     writeln!(file, "> {{").unwrap();
 }
 
-fn write_parameters(file: &mut File, inputs: &[InputAbi], interaction_deploy: &str) {
+fn write_parameters(file: &mut File, inputs: Vec<InputAbi>, interaction_deploy: &str) {
     writeln!(file, "(").unwrap();
     writeln!(file, "\t\t&mut self,").unwrap();
 
@@ -119,21 +118,21 @@ fn write_parameter_arg(file: &mut File, index: usize, arg_name: &str) {
     writeln!(file, "\t\t{arg_name}: Arg{index},").unwrap()
 }
 
-fn write_endpoint_fn(file: &mut File, rust_method_name: &str) {
+fn write_endpoint_fn(file: &mut File, rust_method_name: String) {
     write!(file, "\tfn {rust_method_name}").unwrap();
 }
 
-fn write_info_endpoint(file: &mut File, abi_docs: &[&str]) {
-    if !abi_docs.is_empty() {
+fn write_info_endpoint(file: &mut File, docs: Vec<String>) {
+    if !docs.is_empty() {
         write!(file, "\t//").unwrap();
     }
 
-    for &abi_doc in abi_docs {
+    for abi_doc in docs {
         writeln!(file, "{abi_doc} ").unwrap();
     }
 }
 
-fn write_generic_args(file: &mut File, inputs: &[InputAbi]) {
+fn write_generic_args(file: &mut File, inputs: Vec<InputAbi>) {
     if inputs.is_empty() {
         return;
     }
@@ -160,4 +159,16 @@ fn write_argument(file: &mut File, index: usize, type_name: String) {
         type_print
     )
     .unwrap();
+}
+
+fn write_end_of_constructor(file: &mut File) {
+    writeln!(file, "\t\t___contract_deploy___").unwrap();
+    writeln!(file, "\t}}").unwrap();
+    write_newline(file);
+}
+
+fn write_end_of_endpoint(file: &mut File) {
+    writeln!(file, "\t\t___contract_call___").unwrap();
+    writeln!(file, "\t}}").unwrap();
+    write_newline(file);
 }
