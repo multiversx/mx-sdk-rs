@@ -81,12 +81,12 @@ impl StaticVarApiImpl for VmApiImpl {
         unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
     }
 
-    fn set_scaling_factor_cached(&self, decimals: usize) -> i32 {
+    fn set_scaling_factor_cached(&self, decimals: usize) {
         let handle = const_handles::get_scaling_factor_handle(decimals);
-        let value: i64 = 10i64.pow(decimals as u32);
-        self.bi_set_int64(handle, value);
+        let ten = self.bi_new(10i64);
+        let num_decimals = self.bi_new(decimals as i64);
+        self.bi_pow(handle, ten, num_decimals);
         self.set_initialized(decimals);
-        handle
     }
 
     fn is_scaling_factor_cached(&self, decimals: usize) -> bool {

@@ -91,11 +91,13 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
         })
     }
 
-    fn set_scaling_factor_cached(&self, decimals: usize) -> i32 {
+    fn set_scaling_factor_cached(&self, decimals: usize) {
         let handle = const_handles::get_scaling_factor_handle(decimals);
-        let value: i64 = 10i64.pow(decimals as u32);
-        self.with_vm_hooks(|vm| vm.big_int_set_int64(handle, value));
+        self.with_vm_hooks(|vm| {
+            let ten = vm.big_int_new(10i64);
+            let num_decimals = vm.big_int_new(decimals as i64);
+            vm.big_int_pow(handle, ten, num_decimals);
+        });
         self.set_initialized(decimals);
-        handle
     }
 }

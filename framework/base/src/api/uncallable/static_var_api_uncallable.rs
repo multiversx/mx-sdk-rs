@@ -61,7 +61,7 @@ impl StaticVarApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn set_scaling_factor_cached(&self, _decimals: usize) -> i32 {
+    fn set_scaling_factor_cached(&self, _decimals: usize) {
         unreachable!()
     }
 

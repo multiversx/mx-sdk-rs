@@ -1,6 +1,6 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{const_handles, ManagedTypeApi, StaticVarApiImpl},
+    api::{const_handles, use_raw_handle, ManagedTypeApi, StaticVarApiImpl},
     types::{BigFloat, BigInt, BigUint},
 };
 
@@ -11,7 +11,7 @@ use multiversx_sc_codec::{
 
 use core::{
     cmp::Ordering,
-    ops::{Add, Deref, Div, Mul, Sub},
+    ops::{Add, Div, Mul, Sub},
 };
 
 use super::ManagedRef;
@@ -19,25 +19,20 @@ use super::ManagedRef;
 fn scaling_factor<M: ManagedTypeApi>(
     num_decimals: NumDecimals,
 ) -> ManagedRef<'static, M, BigUint<M>> {
-    if M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
-        let cached_handle = const_handles::get_scaling_factor_handle(num_decimals);
-        unsafe {
-            return ManagedRef::<M, BigUint<M>>::wrap_handle(cached_handle.into());
-        }
+    let handle = const_handles::get_scaling_factor_handle(num_decimals);
+
+    if !M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
+        M::static_var_api_impl().set_scaling_factor_cached(num_decimals);
     }
 
-    let new_handle = M::static_var_api_impl().set_scaling_factor_cached(num_decimals);
-
-    unsafe {
-        return ManagedRef::<M, BigUint<M>>::wrap_handle(new_handle.into());
-    }
+    unsafe { ManagedRef::<M, BigUint<M>>::wrap_handle(use_raw_handle(handle)) }
 }
 
 pub trait Decimals {
     fn num_decimals(&self) -> NumDecimals;
 
     fn scaling_factor<M: ManagedTypeApi>(&self) -> BigUint<M> {
-        scaling_factor(self.num_decimals()).deref().clone()
+        scaling_factor(self.num_decimals()).clone_value()
     }
 }
 
@@ -58,7 +53,7 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
     }
 
     fn scaling_factor<M: ManagedTypeApi>(&self) -> BigUint<M> {
-        scaling_factor(self.num_decimals()).deref().clone()
+        scaling_factor(self.num_decimals()).clone_value()
     }
 }
 
