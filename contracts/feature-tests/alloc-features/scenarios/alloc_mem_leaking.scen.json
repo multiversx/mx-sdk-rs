@@ -1,0 +1,40 @@
+{
+    "gasSchedule": "v3",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "sc:alloc-mem-leaking": {
+                    "nonce": "0",
+                    "balance": "0",
+                    "code": "file:../output/alloc-mem-leaking.wasm"
+                },
+                "address:an_account": {
+                    "nonce": "0",
+                    "balance": "0"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "1",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:alloc-mem-leaking",
+                "function": "alloc_with_leaking_memory",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        }
+    ]
+}

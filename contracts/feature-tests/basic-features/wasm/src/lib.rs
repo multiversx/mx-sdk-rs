@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          375
+// Endpoints:                          384
 // Async Callback:                       1
-// Total number of exported functions: 377
+// Total number of exported functions: 386
 
 #![no_std]
 #![allow(internal_features)]
@@ -310,6 +310,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         set_mapper_insert => set_mapper_insert
         set_mapper_contains => set_mapper_contains
         set_mapper_remove => set_mapper_remove
+        set_mapper_front => set_mapper_front
+        set_mapper_back => set_mapper_back
+        set_mapper_next => set_mapper_next
+        set_mapper_previous => set_mapper_previous
+        set_mapper_iter_from_and_count => set_mapper_iter_from_and_count
         map_my_single_value_mapper => map_my_single_value_mapper
         my_single_value_mapper_increment_1 => my_single_value_mapper_increment_1
         my_single_value_mapper_increment_2 => my_single_value_mapper_increment_2
@@ -394,6 +399,10 @@ multiversx_sc_wasm_adapter::endpoints! {
         is_empty_at_address => is_empty_at_address
         contains_at_address => contains_at_address
         len_at_address => len_at_address
+        next_at_address => next_at_address
+        previous_at_address => previous_at_address
+        front_at_address => front_at_address
+        back_at_address => back_at_address
         fill_set_mapper => fill_set_mapper
     )
 }

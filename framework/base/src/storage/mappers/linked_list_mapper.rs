@@ -1,6 +1,9 @@
 use core::marker::PhantomData;
 
-use super::{StorageClearable, StorageMapper};
+use super::{
+    set_mapper::{CurrentStorage, StorageAddress},
+    StorageClearable, StorageMapper,
+};
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
@@ -13,11 +16,10 @@ use crate::{
         CodecFrom, DecodeDefault, EncodeDefault, EncodeErrorHandler, NestedDecode, NestedEncode,
         TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_get, storage_set, StorageKey},
-    types::{heap::BoxedBytes, ManagedType, MultiValueEncoded},
+    storage::{storage_set, StorageKey},
+    types::{heap::BoxedBytes, ManagedAddress, ManagedType, MultiValueEncoded},
 };
 use alloc::vec::Vec;
-use storage_get::storage_get_len;
 
 const NULL_ENTRY: u32 = 0;
 const INFO_IDENTIFIER: &[u8] = b".info";
@@ -89,17 +91,19 @@ impl LinkedListInfo {
     }
 }
 
-pub struct LinkedListMapper<SA, T>
+pub struct LinkedListMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T>
+impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
@@ -107,6 +111,22 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         LinkedListMapper {
             _phantom_api: PhantomData,
+            address: CurrentStorage,
+            base_key,
+            _phantom_item: PhantomData,
+        }
+    }
+}
+
+impl<SA, T> LinkedListMapper<SA, T, ManagedAddress<SA>>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+{
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+        LinkedListMapper {
+            _phantom_api: PhantomData,
+            address,
             base_key,
             _phantom_item: PhantomData,
         }
@@ -132,9 +152,10 @@ where
     }
 }
 
-impl<SA, T> LinkedListMapper<SA, T>
+impl<SA, T, A> LinkedListMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
@@ -151,41 +172,22 @@ where
     }
 
     fn get_info(&self) -> LinkedListInfo {
-        storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
-    }
-
-    fn set_info(&mut self, value: LinkedListInfo) {
-        storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
+        self.address
+            .address_storage_get(self.build_name_key(INFO_IDENTIFIER).as_ref())
     }
 
     fn get_node(&self, node_id: u32) -> LinkedListNode<T> {
-        storage_get(
+        self.address.address_storage_get(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
         )
     }
 
     fn is_empty_node(&self, node_id: u32) -> bool {
-        storage_get_len(
+        self.address.address_storage_get_len(
             self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
                 .as_ref(),
         ) == 0
-    }
-
-    fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {
-        storage_set(
-            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-                .as_ref(),
-            item,
-        );
-    }
-
-    fn clear_node(&mut self, node_id: u32) {
-        storage_set(
-            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
-                .as_ref(),
-            &BoxedBytes::empty(),
-        );
     }
 
     pub fn is_empty(&self) -> bool {
@@ -206,6 +208,108 @@ where
         let info = self.get_info();
 
         self.get_node_by_id(info.back)
+    }
+
+    pub fn get_node_by_id(&self, node_id: u32) -> Option<LinkedListNode<T>> {
+        if self.is_empty_node(node_id) {
+            return None;
+        }
+
+        Some(self.get_node(node_id))
+    }
+
+    pub fn iter(&self) -> Iter<SA, T, A> {
+        Iter::new(self)
+    }
+
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T, A> {
+        Iter::new_from_node_id(self, node_id)
+    }
+
+    pub fn check_internal_consistency(&self) -> bool {
+        let info = self.get_info();
+        let mut front = info.front;
+        let mut back = info.back;
+
+        if info.len == 0 {
+            if front != NULL_ENTRY {
+                return false;
+            }
+            if back != NULL_ENTRY {
+                return false;
+            }
+            true
+        } else {
+            if front == NULL_ENTRY {
+                return false;
+            }
+            if back == NULL_ENTRY {
+                return false;
+            }
+
+            if self.get_node(front).prev_id != NULL_ENTRY {
+                return false;
+            }
+            if self.get_node(back).next_id != NULL_ENTRY {
+                return false;
+            }
+
+            let mut forwards = Vec::new();
+            while front != NULL_ENTRY {
+                forwards.push(front);
+                front = self.get_node(front).next_id;
+            }
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+
+            let mut backwards = Vec::new();
+            while back != NULL_ENTRY {
+                backwards.push(back);
+                back = self.get_node(back).prev_id;
+            }
+            if backwards.len() != info.len as usize {
+                return false;
+            }
+
+            let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
+            if forwards != backwards_reversed {
+                return false;
+            }
+
+            forwards.sort_unstable();
+            forwards.dedup();
+            if forwards.len() != info.len as usize {
+                return false;
+            }
+            true
+        }
+    }
+}
+
+impl<SA, T> LinkedListMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+{
+    fn set_info(&mut self, value: LinkedListInfo) {
+        storage_set(self.build_name_key(INFO_IDENTIFIER).as_ref(), &value);
+    }
+
+    fn set_node(&mut self, node_id: u32, item: &LinkedListNode<T>) {
+        storage_set(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+            item,
+        );
+    }
+
+    fn clear_node(&mut self, node_id: u32) {
+        storage_set(
+            self.build_node_id_named_key(NODE_IDENTIFIER, node_id)
+                .as_ref(),
+            &BoxedBytes::empty(),
+        );
     }
 
     pub fn pop_back(&mut self) -> Option<LinkedListNode<T>> {
@@ -423,120 +527,50 @@ where
         self.remove_node(&node);
         Some(node)
     }
-
-    pub fn get_node_by_id(&self, node_id: u32) -> Option<LinkedListNode<T>> {
-        if self.is_empty_node(node_id) {
-            return None;
-        }
-
-        Some(self.get_node(node_id))
-    }
-
-    pub fn iter(&self) -> Iter<SA, T> {
-        Iter::new(self)
-    }
-
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T> {
-        Iter::new_from_node_id(self, node_id)
-    }
-
-    pub fn check_internal_consistency(&self) -> bool {
-        let info = self.get_info();
-        let mut front = info.front;
-        let mut back = info.back;
-
-        if info.len == 0 {
-            if front != NULL_ENTRY {
-                return false;
-            }
-            if back != NULL_ENTRY {
-                return false;
-            }
-            true
-        } else {
-            if front == NULL_ENTRY {
-                return false;
-            }
-            if back == NULL_ENTRY {
-                return false;
-            }
-
-            if self.get_node(front).prev_id != NULL_ENTRY {
-                return false;
-            }
-            if self.get_node(back).next_id != NULL_ENTRY {
-                return false;
-            }
-
-            let mut forwards = Vec::new();
-            while front != NULL_ENTRY {
-                forwards.push(front);
-                front = self.get_node(front).next_id;
-            }
-            if forwards.len() != info.len as usize {
-                return false;
-            }
-
-            let mut backwards = Vec::new();
-            while back != NULL_ENTRY {
-                backwards.push(back);
-                back = self.get_node(back).prev_id;
-            }
-            if backwards.len() != info.len as usize {
-                return false;
-            }
-
-            let backwards_reversed: Vec<u32> = backwards.iter().rev().cloned().collect();
-            if forwards != backwards_reversed {
-                return false;
-            }
-
-            forwards.sort_unstable();
-            forwards.dedup();
-            if forwards.len() != info.len as usize {
-                return false;
-            }
-            true
-        }
-    }
 }
 
-impl<'a, SA, T> IntoIterator for &'a LinkedListMapper<SA, T>
+impl<'a, SA, T, A> IntoIterator for &'a LinkedListMapper<SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     type Item = LinkedListNode<T>;
 
-    type IntoIter = Iter<'a, SA, T>;
+    type IntoIter = Iter<'a, SA, T, A>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
     }
 }
 
-pub struct Iter<'a, SA, T>
+pub struct Iter<'a, SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     node_opt: Option<LinkedListNode<T>>,
-    linked_list: &'a LinkedListMapper<SA, T>,
+    linked_list: &'a LinkedListMapper<SA, T, A>,
 }
 
-impl<'a, SA, T> Iter<'a, SA, T>
+impl<'a, SA, T, A> Iter<'a, SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    fn new(linked_list: &'a LinkedListMapper<SA, T>) -> Iter<'a, SA, T> {
+    fn new(linked_list: &'a LinkedListMapper<SA, T, A>) -> Iter<'a, SA, T, A> {
         Iter {
             node_opt: linked_list.front(),
             linked_list,
         }
     }
 
-    fn new_from_node_id(linked_list: &'a LinkedListMapper<SA, T>, node_id: u32) -> Iter<'a, SA, T> {
+    fn new_from_node_id(
+        linked_list: &'a LinkedListMapper<SA, T, A>,
+        node_id: u32,
+    ) -> Iter<'a, SA, T, A> {
         Iter {
             node_opt: linked_list.get_node_by_id(node_id),
             linked_list,
@@ -544,9 +578,10 @@ where
     }
 }
 
-impl<'a, SA, T> Iterator for Iter<'a, SA, T>
+impl<'a, SA, T, A> Iterator for Iter<'a, SA, T, A>
 where
     SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     type Item = LinkedListNode<T>;
