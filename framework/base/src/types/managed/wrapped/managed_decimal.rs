@@ -176,6 +176,36 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TopDecode
     }
 }
 
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedEncode
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    #[inline]
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        NestedEncode::dep_encode_or_handle_err(&self.data, dest, h)?;
+
+        Result::Ok(())
+    }
+}
+
+impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> NestedDecode
+    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+{
+    #[inline]
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Result::Ok(ManagedDecimal::const_decimals_from_raw(
+            <BigUint<M> as NestedDecode>::dep_decode_or_handle_err(input, h)?,
+        ))
+    }
+}
+
 impl<M: ManagedTypeApi> NestedEncode for ManagedDecimal<M, NumDecimals> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
