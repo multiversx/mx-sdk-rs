@@ -11,7 +11,7 @@ use multiversx_sc_codec::{
 
 use core::{
     cmp::Ordering,
-    ops::{Add, Div, Mul, Sub},
+    ops::{Add, Deref, Div, Mul, Sub},
 };
 
 use super::ManagedRef;
@@ -31,14 +31,14 @@ fn scaling_factor<M: ManagedTypeApi>(
         api.bi_pow(handle.clone(), temp1, temp2);
     }
 
-    unsafe { ManagedRef::<M, BigUint<M>>::wrap_handle(handle) }
+    unsafe { ManagedRef::<'static, M, BigUint<M>>::wrap_handle(handle) }
 }
 
 pub trait Decimals {
     fn num_decimals(&self) -> NumDecimals;
 
-    fn scaling_factor<M: ManagedTypeApi>(&self) -> BigUint<M> {
-        scaling_factor(self.num_decimals()).clone_value()
+    fn scaling_factor<M: ManagedTypeApi>(&self) -> ManagedRef<'static, M, BigUint<M>> {
+        scaling_factor(self.num_decimals())
     }
 }
 
@@ -58,8 +58,8 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
         DECIMALS
     }
 
-    fn scaling_factor<M: ManagedTypeApi>(&self) -> BigUint<M> {
-        scaling_factor(self.num_decimals()).clone_value()
+    fn scaling_factor<M: ManagedTypeApi>(&self) -> ManagedRef<'static, M, BigUint<M>> {
+        scaling_factor(self.num_decimals())
     }
 }
 
@@ -71,7 +71,7 @@ pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
 
 impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     pub fn trunc(&self) -> BigUint<M> {
-        &self.data / &self.decimals.scaling_factor()
+        &self.data / self.decimals.scaling_factor().deref()
     }
 
     pub fn into_raw_units(&self) -> &BigUint<M> {
@@ -96,14 +96,14 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         match from_num_decimals.cmp(&scale_to_num_decimals) {
             Ordering::Less => {
                 let delta_decimals = scale_to_num_decimals - from_num_decimals;
-                let scaling_factor = delta_decimals.scaling_factor();
-                ManagedDecimal::from_raw_units(&self.data * &scaling_factor, scale_to)
+                let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
+                ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
             },
             Ordering::Equal => ManagedDecimal::from_raw_units(self.data, scale_to),
             Ordering::Greater => {
                 let delta_decimals = from_num_decimals - scale_to_num_decimals;
-                let scaling_factor = delta_decimals.scaling_factor();
-                ManagedDecimal::from_raw_units(&self.data * &scaling_factor, scale_to)
+                let scaling_factor: &BigUint<M> = &delta_decimals.scaling_factor();
+                ManagedDecimal::from_raw_units(&self.data * scaling_factor, scale_to)
             },
         }
     }
@@ -129,7 +129,7 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         big_float: BigFloat<M>,
         num_decimals: T,
     ) -> ManagedDecimal<M, T> {
-        let scaling_factor = num_decimals.scaling_factor();
+        let scaling_factor: &BigUint<M> = &num_decimals.scaling_factor();
         let magnitude = big_float.magnitude();
 
         let scaled = &BigFloat::from(scaling_factor) * &magnitude;
@@ -245,7 +245,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
     fn from(value: BigUint<M>) -> Self {
         let decimals = ConstDecimals;
         ManagedDecimal {
-            data: &value * &decimals.scaling_factor(),
+            data: &value * decimals.scaling_factor().deref(),
             decimals,
         }
     }
@@ -310,14 +310,14 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, 
         {
             Ordering::Less => {
                 let diff_decimals = other.decimals.num_decimals() - self.decimals.num_decimals();
-                let scaling_factor = diff_decimals.scaling_factor();
-                &self.data * &scaling_factor == other.data
+                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                &self.data * scaling_factor == other.data
             },
             Ordering::Equal => self.data == other.data,
             Ordering::Greater => {
                 let diff_decimals = self.decimals.num_decimals() - other.decimals.num_decimals();
-                let scaling_factor = diff_decimals.scaling_factor();
-                &other.data * &scaling_factor == self.data
+                let scaling_factor: &BigUint<M> = &diff_decimals.scaling_factor();
+                &other.data * scaling_factor == self.data
             },
         }
     }

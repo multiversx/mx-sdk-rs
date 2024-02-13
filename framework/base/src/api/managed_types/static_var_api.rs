@@ -35,6 +35,4 @@ pub trait StaticVarApiImpl {
     fn is_scaling_factor_cached(&self, decimals: usize) -> bool;
 
     fn set_scaling_factor_cached(&self, decimals: usize);
-
-    fn set_initialized(&self, decimals: usize);
 }
