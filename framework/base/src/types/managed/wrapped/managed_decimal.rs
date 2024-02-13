@@ -1,10 +1,9 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeName},
     api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::{BigFloat, BigInt, BigUint},
 };
 
-use alloc::string::ToString;
 use multiversx_sc_codec::{
     DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
     NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
@@ -356,21 +355,11 @@ impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> PartialEq<ManagedDecimal<M, 
 
 impl<M: ManagedTypeApi> TypeAbi for ManagedDecimal<M, NumDecimals> {
     fn type_name() -> TypeName {
-        TypeName::from("ManagedDecimal")
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        NumDecimals::provide_type_descriptions(accumulator);
+        TypeName::from("ManagedDecimal<usize>")
     }
 
     fn is_variadic() -> bool {
-        true
-    }
-}
-
-impl<const DECIMALS: NumDecimals> TypeAbi for ConstDecimals<DECIMALS> {
-    fn type_name() -> TypeName {
-        DECIMALS.to_string()
+        false
     }
 }
 
@@ -378,11 +367,7 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> TypeAbi
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
     fn type_name() -> TypeName {
-        TypeName::from("ManagedDecimal")
-    }
-
-    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        ConstDecimals::<DECIMALS>::provide_type_descriptions(accumulator);
+        TypeName::from(alloc::format!("ManagedDecimal<{}>", DECIMALS))
     }
 
     fn is_variadic() -> bool {
