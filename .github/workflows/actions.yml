@@ -32,7 +32,7 @@ jobs:
           cargo install twiggy
           
           cargo install --path framework/meta
-          sc-meta install mx-scenario-go --tag v2.0.0
+          sc-meta install mx-scenario-go --tag v2.1.0-alpha
 
           which mxpy
           which wasm-opt

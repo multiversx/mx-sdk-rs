@@ -72,6 +72,7 @@ pub struct TransactionOnNetwork {
     pub notarized_at_source_in_meta_hash: String,
     pub notarized_at_destination_in_meta_nonce: u64,
     pub notarized_at_destination_in_meta_hash: String,
+    pub processing_type_on_destination: String,
     pub miniblock_type: String,
     pub miniblock_hash: String,
     pub timestamp: u64,

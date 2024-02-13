@@ -424,24 +424,29 @@ where
     }
 
     pub fn is_sorted(&self) -> bool {
-        self.with_self_as_slice(|slice| slice.is_sorted())
-    }
-
-    pub fn is_sorted_by<F>(&self, mut compare: F) -> bool
-    where
-        F: FnMut(&T, &T) -> Option<Ordering>,
-    {
         self.with_self_as_slice(|slice| {
-            slice.is_sorted_by(|a, b| compare(&a.decode(), &b.decode()))
-        })
-    }
+            let mut slice_iter = slice.iter();
+            #[inline]
+            fn check<'a, T>(
+                last: &'a mut T,
+                mut compare: impl FnMut(&T, &T) -> Option<Ordering> + 'a,
+            ) -> impl FnMut(T) -> bool + 'a {
+                move |curr| {
+                    if let Some(Ordering::Greater) | None = compare(last, &curr) {
+                        return false;
+                    }
+                    *last = curr;
+                    true
+                }
+            }
 
-    pub fn is_sorted_by_key<K, F>(&self, mut f: F) -> bool
-    where
-        F: FnMut(&T) -> K,
-        K: Ord,
-    {
-        self.with_self_as_slice(|slice| slice.is_sorted_by_key(|a| f(&a.decode())))
+            let mut last = match slice_iter.next() {
+                Some(e) => e,
+                None => return true,
+            };
+
+            slice_iter.all(check(&mut last, PartialOrd::partial_cmp))
+        })
     }
 }
 
@@ -455,7 +460,32 @@ where
         [(); T::PAYLOAD_SIZE]:,
     {
         self.with_self_as_slice_mut(|slice| {
-            let (dedup, _) = slice.partition_dedup();
+            let same_bucket = |a, b| a == b;
+            let len = slice.len();
+            if len <= 1 {
+                return slice;
+            }
+
+            let ptr = slice.as_mut_ptr();
+            let mut next_read: usize = 1;
+            let mut next_write: usize = 1;
+            unsafe {
+                // Avoid bounds checks by using raw pointers.
+                while next_read < len {
+                    let ptr_read = ptr.add(next_read);
+                    let prev_ptr_write = ptr.add(next_write - 1);
+                    if !same_bucket(&mut *ptr_read, &mut *prev_ptr_write) {
+                        if next_read != next_write {
+                            let ptr_write = prev_ptr_write.add(1);
+                            core::ptr::swap(ptr_read, ptr_write);
+                        }
+                        next_write += 1;
+                    }
+                    next_read += 1;
+                }
+            }
+
+            let (dedup, _) = slice.split_at_mut(next_write);
             dedup
         })
     }

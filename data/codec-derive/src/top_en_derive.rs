@@ -7,18 +7,19 @@ pub fn variant_top_encode_snippets(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
+    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let discriminant_u8 = variant_index as u8;
+            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
             let variant_ident = &variant.ident;
             if variant.fields.is_empty() {
                 // top-encode discriminant directly
                 quote! {
                     #name::#variant_ident =>
-                        codec::TopEncode::top_encode_or_handle_err(&#discriminant_u8, output, __h__),
+                        codec::TopEncode::top_encode_or_handle_err(&#variant_discriminant, output, __h__),
                 }
             } else {
                 // dep-encode to buffer first
@@ -31,7 +32,7 @@ pub fn variant_top_encode_snippets(
                     #name::#variant_ident #local_var_declarations => {
                         let mut __buffer__ = output.start_nested_encode();
                         let __dest__ = &mut __buffer__;
-                        codec::NestedEncode::dep_encode_or_handle_err(&#discriminant_u8, __dest__, __h__)?;
+                        codec::NestedEncode::dep_encode_or_handle_err(&#variant_discriminant, __dest__, __h__)?;
                         #(#variant_field_snippets)*
                         output.finalize_nested_encode(__buffer__);
                         core::result::Result::Ok(())
