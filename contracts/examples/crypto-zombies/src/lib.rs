@@ -27,6 +27,9 @@ pub trait CryptoZombies:
         self.cooldown_time().set(86400u64);
     }
 
+    #[upgrade]
+    fn upgrade(&self) {}
+
     #[only_owner]
     #[endpoint]
     fn set_crypto_kitties_sc_address(&self, address: ManagedAddress) {
