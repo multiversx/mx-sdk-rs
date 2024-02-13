@@ -2,14 +2,14 @@
 #![allow(clippy::type_complexity)]
 multiversx_sc::imports!();
 
-pub struct Proxy<A>
+pub struct TxProxy<A>
 where
     A: multiversx_sc::api::VMApi + 'static,
 {
     pub address: ManagedOption<A, ManagedAddress<A>>,
 }
 
-impl<A> Proxy<A>
+impl<A> TxProxy<A>
 where
     A: multiversx_sc::api::VMApi + 'static,
 {	fn init<

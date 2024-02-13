@@ -14,35 +14,17 @@ multiversx_sc::imports!();"#
     write_newline(file);
 }
 
-// pub(crate) fn write_struct_template(file: &mut File) {
-//     write!(
-//         file,
-//         "pub struct Proxy<A>
-// where
-//     A: multiversx_sc::api::VMApi + 'static,
-// {{
-//     phantom = Phantom
-// }}
-
-// impl<A> Proxy<A>
-// where
-//     A: multiversx_sc::api::VMApi + 'static,
-// {{"
-//     )
-//     .unwrap();
-// }
-
 pub(crate) fn write_struct_template(file: &mut File) {
     write!(
         file,
-        "pub struct Proxy<A>
+        "pub struct TxProxy<A>
 where
     A: multiversx_sc::api::VMApi + 'static,
 {{
     pub address: ManagedOption<A, ManagedAddress<A>>,
 }}
 
-impl<A> Proxy<A>
+impl<A> TxProxy<A>
 where
     A: multiversx_sc::api::VMApi + 'static,
 {{"

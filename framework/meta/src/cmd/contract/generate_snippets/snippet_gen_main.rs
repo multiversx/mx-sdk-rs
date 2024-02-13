@@ -2,7 +2,7 @@ use std::fs::File;
 
 use multiversx_sc::abi::ContractAbi;
 
-use crate::cli_args::GenerateSnippetsArgs;
+use crate::cli_args::GenerateOverwriteArg;
 
 use super::{
     super::meta_config::MetaConfig,
@@ -18,7 +18,7 @@ use super::{
 };
 
 impl MetaConfig {
-    pub fn generate_rust_snippets(&self, args: &GenerateSnippetsArgs) {
+    pub fn generate_rust_snippets(&self, args: &GenerateOverwriteArg) {
         let main_contract = self.sc_config.main_contract();
         let crate_name = &main_contract.contract_name;
         let snake_case_name = &main_contract.public_name_snake_case();

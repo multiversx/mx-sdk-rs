@@ -65,13 +65,13 @@ pub enum ContractCliAction {
         name = "snippets",
         about = "Generates a snippets project, based on the contract ABI."
     )]
-    GenerateSnippets(GenerateSnippetsArgs),
+    GenerateSnippets(GenerateOverwriteArg),
 
     #[command(
         name = "proxy",
         about = "Generates a proxy, based on the contract ABI."
     )]
-    GenerateProxies,
+    GenerateProxies(GenerateOverwriteArg),
 }
 
 impl CliArgsToRaw for ContractCliAction {
@@ -99,12 +99,13 @@ impl CliArgsToRaw for ContractCliAction {
             ContractCliAction::Update => {
                 raw.push("update".to_string());
             },
-            ContractCliAction::GenerateSnippets(args) => {
+            ContractCliAction::GenerateSnippets(arg) => {
                 raw.push("snippets".to_string());
-                raw.append(&mut args.to_raw());
+                raw.append(&mut arg.to_raw());
             },
-            ContractCliAction::GenerateProxies => {
+            ContractCliAction::GenerateProxies(arg) => {
                 raw.push("proxy".to_string());
+                raw.append(&mut arg.to_raw());
             },
         }
         raw
@@ -112,13 +113,13 @@ impl CliArgsToRaw for ContractCliAction {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct GenerateSnippetsArgs {
-    /// Override snippets project if it already exists.
+pub struct GenerateOverwriteArg {
+    /// Override file if it already exists.
     #[arg(long, verbatim_doc_comment)]
     pub overwrite: bool,
 }
 
-impl CliArgsToRaw for GenerateSnippetsArgs {
+impl CliArgsToRaw for GenerateOverwriteArg {
     fn to_raw(&self) -> Vec<String> {
         let mut raw = Vec::new();
         if self.overwrite {

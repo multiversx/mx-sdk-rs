@@ -29,10 +29,12 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
         },
         ContractCliAction::Clean => meta_config_opt.clean(),
         ContractCliAction::Update => meta_config_opt.update(),
-        ContractCliAction::GenerateSnippets(gs_args) => {
-            meta_config_opt.generate_rust_snippets(&gs_args)
+        ContractCliAction::GenerateSnippets(gs_arg) => {
+            meta_config_opt.generate_rust_snippets(&gs_arg)
         },
-        ContractCliAction::GenerateProxies => meta_config_opt.generate_rust_proxies_struct(),
+        ContractCliAction::GenerateProxies(arg) => {
+            meta_config_opt.generate_rust_proxies_struct(&arg)
+        },
     }
 }
 
