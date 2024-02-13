@@ -7,4 +7,7 @@ multiversx_sc::imports!();
 pub trait EmptyContract {
     #[init]
     fn init(&self) {}
+
+    #[upgrade]
+    fn upgrade(&self) {}
 }

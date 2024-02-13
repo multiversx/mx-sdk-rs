@@ -47,6 +47,9 @@ pub trait PingPong {
         self.max_funds().set(max_funds.into_option());
     }
 
+    #[upgrade]
+    fn upgrade(&self) {}
+
     /// User sends some EGLD to be locked in the contract for a period of time.
     /// Optional `_data` argument is ignored.
     #[payable("EGLD")]
