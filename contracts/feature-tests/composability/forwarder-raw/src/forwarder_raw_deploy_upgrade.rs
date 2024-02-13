@@ -10,7 +10,7 @@ pub trait ForwarderRawDeployUpgrade {
         args: MultiValueEncoded<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, ManagedVec<Self::Api, ManagedBuffer>> {
         self.tx()
-            .deploy()
+            .raw_deploy()
             .code(code)
             .code_metadata(code_metadata)
             .arguments_raw(args.to_arg_buffer())

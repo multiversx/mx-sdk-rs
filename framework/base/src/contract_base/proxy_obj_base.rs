@@ -1,10 +1,11 @@
 use crate::{
     api::VMApi,
-    types::{ManagedAddress, ManagedOption},
+    types::{ManagedAddress, ManagedOption, TxScEnv, TxTo},
 };
 
 pub trait ProxyObjBase {
     type Api: VMApi;
+    type To: TxTo<TxScEnv<Self::Api>>;
 
     /// Extracts the address contained in the proxy object and replaces it with None.
     ///
@@ -17,6 +18,9 @@ pub trait ProxyObjBase {
     /// Will crash if no address was specified.
     #[doc(hidden)]
     fn extract_address(&mut self) -> ManagedAddress<Self::Api>;
+
+    #[doc(hidden)]
+    fn extract_proxy_to(&mut self) -> Self::To;
 }
 
 pub trait ProxyObjNew: ProxyObjBase {

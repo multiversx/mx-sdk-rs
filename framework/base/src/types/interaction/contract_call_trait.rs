@@ -6,10 +6,7 @@ use crate::{
 
 use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
 
-/// Defines a contract call object, which is the basis for all calls to other contracts.
-///
-/// Its implementations differ on the type of payment that gets sent with the call.
-pub trait ContractCall<SA>: Sized
+pub trait ContractCallBase<SA>
 where
     SA: CallTypeApi + 'static,
 {
@@ -19,7 +16,15 @@ where
     /// thus reducing it to a simple transaction with optional EGLD value.
     #[doc(hidden)]
     fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult>;
+}
 
+/// Defines a contract call object, which is the basis for all calls to other contracts.
+///
+/// Its implementations differ on the type of payment that gets sent with the call.
+pub trait ContractCall<SA>: ContractCallBase<SA> + Sized
+where
+    SA: CallTypeApi + 'static,
+{
     /// Mutable access to the common base.
     #[doc(hidden)]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, Self::OriginalResult>;

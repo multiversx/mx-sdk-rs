@@ -7,7 +7,10 @@ use crate::{
     },
 };
 
-use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
+use super::{
+    contract_call_no_payment::ContractCallNoPayment, contract_call_trait::ContractCallBase,
+    ContractCall, ContractCallWithEgld,
+};
 
 /// Holds data for calling another contract, with a single payment, either EGLD or a single ESDT token.
 ///
@@ -40,7 +43,8 @@ where
     }
 }
 
-impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallBase<SA>
+    for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
@@ -56,7 +60,13 @@ where
             self.into_normalized_esdt()
         }
     }
+}
 
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
+where
+    SA: CallTypeApi + 'static,
+    OriginalResult: TopEncodeMulti,
+{
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic

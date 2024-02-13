@@ -16,11 +16,12 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
             .tx()
             .to(to)
             .egld(payment)
+            .raw_call()
             .function_name(endpoint_name)
             .argument(&args)
             .with_gas_limit(half_gas)
             .returns(ReturnsRaw)
-            .execute_on_dest_context();
+            .sync_call();
 
         self.execute_on_dest_context_result(result);
     }

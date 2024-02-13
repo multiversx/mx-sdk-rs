@@ -340,6 +340,7 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi + 'static,
     {
         type Api = A;
+        type To = ();
 
         fn extract_opt_address(
             &mut self,
@@ -356,6 +357,8 @@ mod sample_adder {
                 multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET.as_bytes(),
             )
         }
+
+        fn extract_proxy_to(&mut self) -> Self::To {}
     }
 
     impl<A> multiversx_sc::contract_base::ProxyObjNew for Proxy<A>
@@ -370,9 +373,12 @@ mod sample_adder {
             }
         }
 
-        fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self::ProxyTo {
+        fn contract(
+            mut self,
+            address: multiversx_sc::types::ManagedAddress<Self::Api>,
+        ) -> Self::ProxyTo {
             ProxyTo {
-                address: multiversx_sc::types::ManagedOption::some(address)
+                address: multiversx_sc::types::ManagedOption::some(address),
             }
         }
     }
@@ -390,6 +396,7 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi + 'static,
     {
         type Api = A;
+        type To = multiversx_sc::types::ManagedAddress<A>;
 
         fn extract_opt_address(
             &mut self,
@@ -409,6 +416,10 @@ mod sample_adder {
                 multiversx_sc::types::ManagedOption::none(),
             );
             address.unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
+        }
+
+        fn extract_proxy_to(&mut self) -> Self::To {
+            self.extract_address()
         }
     }
 

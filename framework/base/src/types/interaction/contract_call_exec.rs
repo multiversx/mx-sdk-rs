@@ -74,7 +74,7 @@ where
         Tx::new_tx_from_sc()
             .to(self.basic.to)
             .egld(self.egld_payment)
-            .call(self.basic.function_call)
+            .function_call(self.basic.function_call)
             .callback(None)
     }
 }

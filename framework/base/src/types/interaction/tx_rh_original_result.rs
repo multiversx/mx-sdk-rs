@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{TxEnv, TxResultHandler};
+use super::{TxEmptyResultHandler, TxEnv, TxResultHandler};
 
 /// Contains no data.
 ///
@@ -32,3 +32,5 @@ where
 {
     type OriginalResult = O;
 }
+
+impl<Env, O> TxEmptyResultHandler<Env> for OriginalResultMarker<O> where Env: TxEnv {}

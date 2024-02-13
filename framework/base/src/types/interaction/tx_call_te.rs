@@ -1,8 +1,11 @@
 use crate::api::CallTypeApi;
 
-use super::{FunctionCall, Tx, TxData, TxFrom, TxGas, TxPayment, TxScEnv, TxToSpecified};
+use super::{
+    FunctionCall, Tx, TxData, TxEmptyResultHandler, TxFrom, TxGas, TxPayment, TxScEnv,
+    TxToSpecified,
+};
 
-impl<Api, From, To, Payment, Gas, FC> Tx<TxScEnv<Api>, From, To, Payment, Gas, FC, ()>
+impl<Api, From, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, From, To, Payment, Gas, FC, RH>
 where
     Api: CallTypeApi,
     From: TxFrom<TxScEnv<Api>>,
@@ -10,6 +13,7 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxData<TxScEnv<Api>> + Into<FunctionCall<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
     fn transfer_execute_with_gas(self, gas_limit: u64) {
         self.to.with_value_ref(|to| {
