@@ -12,12 +12,13 @@ fn variant_dep_encode_snippets(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
+    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_index_u8 = variant_index as u8;
+            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
             let variant_ident = &variant.ident;
             let local_var_declarations =
                 fields_decl_syntax(&variant.fields, local_variable_for_field);
@@ -26,7 +27,7 @@ fn variant_dep_encode_snippets(
             });
             quote! {
                 #name::#variant_ident #local_var_declarations => {
-                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, __dest__, __h__)?;
+                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_discriminant, __dest__, __h__)?;
                     #(#variant_field_snippets)*
                 },
             }
