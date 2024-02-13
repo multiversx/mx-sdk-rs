@@ -39,6 +39,18 @@ where
     pub fn to_address(&self) -> Address {
         self.scenario_address_expr.to_address()
     }
+
+    /// For historical reasons the proxy consumes its address whenever it is called.
+    ///
+    /// When using it in tests, as part of `ContractInfo`,
+    /// it is convenient to refresh it before each call.
+    ///
+    /// It is sort of a hack, designed to optimize proxy use in contracts,
+    /// while making it easier to use in tests.
+    fn refresh_proxy_address(&mut self) {
+        self.proxy_inst =
+            P::new_proxy_obj().contract(self.scenario_address_expr.value.clone().into());
+    }
 }
 
 impl<P: ProxyObjNew> From<&ContractInfo<P>> for AddressKey {
@@ -74,6 +86,7 @@ impl<P: ProxyObjNew> Deref for ContractInfo<P> {
 
 impl<P: ProxyObjNew> DerefMut for ContractInfo<P> {
     fn deref_mut(&mut self) -> &mut Self::Target {
+        self.refresh_proxy_address();
         &mut self.proxy_inst
     }
 }
