@@ -65,13 +65,13 @@ pub enum ContractCliAction {
         name = "snippets",
         about = "Generates a snippets project, based on the contract ABI."
     )]
-    GenerateSnippets(GenerateOverwriteArg),
+    GenerateSnippets(GenerateSnippetsArgs),
 
     #[command(
         name = "proxy",
         about = "Generates a proxy, based on the contract ABI."
     )]
-    GenerateProxies(GenerateOverwriteArg),
+    GenerateProxies(GenerateProxyArgs),
 }
 
 impl CliArgsToRaw for ContractCliAction {
@@ -99,13 +99,13 @@ impl CliArgsToRaw for ContractCliAction {
             ContractCliAction::Update => {
                 raw.push("update".to_string());
             },
-            ContractCliAction::GenerateSnippets(arg) => {
+            ContractCliAction::GenerateSnippets(args) => {
                 raw.push("snippets".to_string());
-                raw.append(&mut arg.to_raw());
+                raw.append(&mut args.to_raw());
             },
-            ContractCliAction::GenerateProxies(arg) => {
+            ContractCliAction::GenerateProxies(args) => {
                 raw.push("proxy".to_string());
-                raw.append(&mut arg.to_raw());
+                raw.append(&mut args.to_raw());
             },
         }
         raw
@@ -113,13 +113,29 @@ impl CliArgsToRaw for ContractCliAction {
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
-pub struct GenerateOverwriteArg {
-    /// Override file if it already exists.
+pub struct GenerateSnippetsArgs {
+    /// Override snippets project if it already exists.
     #[arg(long, verbatim_doc_comment)]
     pub overwrite: bool,
 }
 
-impl CliArgsToRaw for GenerateOverwriteArg {
+impl CliArgsToRaw for GenerateSnippetsArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.overwrite {
+            raw.push("--overwrite".to_string());
+        }
+        raw
+    }
+}
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct GenerateProxyArgs {
+    /// Override TxProxy project if it already exists.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
+}
+
+impl CliArgsToRaw for GenerateProxyArgs {
     fn to_raw(&self) -> Vec<String> {
         let mut raw = Vec::new();
         if self.overwrite {
