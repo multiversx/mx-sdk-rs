@@ -81,12 +81,8 @@ impl StaticVarApiImpl for VmApiImpl {
         unsafe { CALL_VALUE_MULTI_ESDT_HANDLE }
     }
 
-    fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
-        if !unsafe { SCALING_FACTOR_INIT[decimals] } {
-            self.set_scaling_factor_cached(decimals);
-            return false;
-        }
-        true
+    fn get_scaling_factor_cached(&self, decimals: usize) -> bool {
+        unsafe { SCALING_FACTOR_INIT[decimals] }
     }
 
     fn set_scaling_factor_cached(&self, decimals: usize) {

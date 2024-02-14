@@ -22,16 +22,21 @@ fn scaling_factor<M: ManagedTypeApi>(
     let handle: M::BigIntHandle =
         use_raw_handle(const_handles::get_scaling_factor_handle(num_decimals));
 
-    if !M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
-        let temp1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        let temp2: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_2);
-        let api = M::managed_type_impl();
-        api.bi_set_int64(temp1.clone(), 10);
-        api.bi_set_int64(temp2.clone(), num_decimals as i64);
-        api.bi_pow(handle.clone(), temp1, temp2);
+    if !M::static_var_api_impl().get_scaling_factor_cached(num_decimals) {
+        cache_scaling_factor::<M>(handle.clone(), num_decimals);
+        M::static_var_api_impl().set_scaling_factor_cached(num_decimals);
     }
 
     unsafe { ManagedRef::<'static, M, BigUint<M>>::wrap_handle(handle) }
+}
+
+fn cache_scaling_factor<M: ManagedTypeApi>(handle: M::BigIntHandle, num_decimals: NumDecimals) {
+    let temp1: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
+    let temp2: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_2);
+    let api = M::managed_type_impl();
+    api.bi_set_int64(temp1.clone(), 10);
+    api.bi_set_int64(temp2.clone(), num_decimals as i64);
+    api.bi_pow(handle, temp1, temp2);
 }
 
 pub trait Decimals {
@@ -272,10 +277,11 @@ impl<M: ManagedTypeApi> TopDecode for ManagedDecimal<M, NumDecimals> {
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> From<BigUint<M>>
     for ManagedDecimal<M, ConstDecimals<DECIMALS>>
 {
-    fn from(value: BigUint<M>) -> Self {
+    fn from(mut value: BigUint<M>) -> Self {
         let decimals = ConstDecimals;
+        value *= decimals.scaling_factor().deref();
         ManagedDecimal {
-            data: &value * decimals.scaling_factor().deref(),
+            data: value,
             decimals,
         }
     }

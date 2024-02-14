@@ -57,9 +57,9 @@ impl StaticVarApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn is_scaling_factor_cached(&self, _decimals: usize) -> bool {
+    fn get_scaling_factor_cached(&self, _decimals: usize) -> bool {
         unreachable!()
-    }  
+    }
 
     fn set_scaling_factor_cached(&self, _decimals: usize) {
         unreachable!()
