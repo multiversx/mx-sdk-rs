@@ -39,3 +39,41 @@ pub mod types;
 pub use hex_call_data::*;
 pub use hex_literal;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
+
+/// Conveniently groups all framework imports required by a smart contract form the framework.
+pub mod imports {
+    pub use crate::{
+        abi::TypeAbi,
+        api::{ErrorApiImpl, ManagedTypeApi},
+        arrayvec::ArrayVec,
+        codec::{
+            multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
+            TopEncode,
+        },
+        contract_base::{ContractBase, ProxyObjBase},
+        err_msg,
+        esdt::*,
+        io::*,
+        non_zero_usize,
+        non_zero_util::*,
+        require, sc_format, sc_panic, sc_print,
+        storage::mappers::*,
+        types::*,
+    };
+    pub use core::ops::{
+        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+        DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+    };
+}
+
+/// Conveniently groups all imports required for deriving framework-related traits for types.
+pub mod derive_imports {
+    pub use crate::{
+        codec,
+        codec::derive::{
+            NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
+            TopEncodeOrDefault,
+        },
+        derive::{ManagedVecItem, TypeAbi},
+    };
+}

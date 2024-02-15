@@ -5,29 +5,7 @@
 #[macro_export]
 macro_rules! imports {
     () => {
-        use core::ops::{
-            Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-            DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
-            SubAssign,
-        };
-        use multiversx_sc::{
-            abi::TypeAbi,
-            api::{ErrorApiImpl, ManagedTypeApi},
-            arrayvec::ArrayVec,
-            codec::{
-                multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-                TopEncode,
-            },
-            contract_base::{ContractBase, ProxyObjBase},
-            err_msg,
-            esdt::*,
-            io::*,
-            non_zero_usize,
-            non_zero_util::*,
-            require, sc_format, sc_panic, sc_print,
-            storage::mappers::*,
-            types::*,
-        };
+        use multiversx_sc::imports::*;
     };
 }
 
@@ -35,14 +13,7 @@ macro_rules! imports {
 #[macro_export]
 macro_rules! derive_imports {
     () => {
-        use multiversx_sc::{
-            codec,
-            codec::derive::{
-                NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
-                TopEncodeOrDefault,
-            },
-            derive::{ManagedVecItem, TypeAbi},
-        };
+        use multiversx_sc::derive_imports::*;
     };
 }
 
