@@ -24,7 +24,7 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            require, require_old, sc_format, sc_panic, sc_print,
+            require, sc_format, sc_panic, sc_print,
             storage::mappers::*,
             types::*,
         };
@@ -75,6 +75,10 @@ macro_rules! sc_error {
 /// }
 /// # }
 /// ```
+#[deprecated(
+    since = "0.48.0",
+    note = "Use `require!` instead, which terminates immediately."
+)]
 #[macro_export]
 macro_rules! require_old {
     ($expression:expr, $error_msg:expr) => {
