@@ -11,7 +11,7 @@ use multiversx_sc_codec::{
 
 use core::{
     cmp::Ordering,
-    ops::{Add, Deref, Sub},
+    ops::{Add, Deref, Div, Mul, Sub},
 };
 
 use super::ManagedRef;
@@ -70,7 +70,7 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
 
 #[derive(Debug, Clone)]
 pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
-    pub data: BigUint<M>,
+    data: BigUint<M>,
     decimals: D,
 }
 
@@ -304,6 +304,30 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, Const
 
     fn sub(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
         ManagedDecimal::const_decimals_from_raw(self.data - other.data)
+    }
+}
+
+impl<M: ManagedTypeApi, const D1: NumDecimals, const D2: NumDecimals>
+    Mul<ManagedDecimal<M, ConstDecimals<D2>>> for ManagedDecimal<M, ConstDecimals<D1>>
+where
+    ConstDecimals<D1>: Add<ConstDecimals<D2>>,
+{
+    type Output = ManagedDecimal<M, <ConstDecimals<D2> as Add<ConstDecimals<D1>>>::Output>;
+
+    fn mul(self, other: ManagedDecimal<M, ConstDecimals<D2>>) -> Self::Output {
+        ManagedDecimal::const_decimals_from_raw(self.data * other.data)
+    }
+}
+
+impl<M: ManagedTypeApi, const D1: NumDecimals, const D2: NumDecimals>
+    Div<ManagedDecimal<M, ConstDecimals<D2>>> for ManagedDecimal<M, ConstDecimals<D1>>
+where
+    ConstDecimals<D1>: Sub<ConstDecimals<D2>>,
+{
+    type Output = ManagedDecimal<M, <ConstDecimals<D1> as Sub<ConstDecimals<D2>>>::Output>;
+
+    fn div(self, other: ManagedDecimal<M, ConstDecimals<D2>>) -> Self::Output {
+        ManagedDecimal::const_decimals_from_raw(self.data / other.data)
     }
 }
 
