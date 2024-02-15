@@ -11,7 +11,7 @@ use multiversx_sc_codec::{
 
 use core::{
     cmp::Ordering,
-    ops::{Add, Deref, Div, Mul, Sub},
+    ops::{Add, Deref, Sub},
 };
 
 use super::ManagedRef;
@@ -70,7 +70,7 @@ impl<const DECIMALS: NumDecimals> Decimals for ConstDecimals<DECIMALS> {
 
 #[derive(Debug, Clone)]
 pub struct ManagedDecimal<M: ManagedTypeApi, D: Decimals> {
-    data: BigUint<M>,
+    pub data: BigUint<M>,
     decimals: D,
 }
 
@@ -304,34 +304,6 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, Const
 
     fn sub(self, other: ManagedDecimal<M, ConstDecimals<DECIMALS>>) -> Self::Output {
         ManagedDecimal::const_decimals_from_raw(self.data - other.data)
-    }
-}
-
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-    Mul<ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-where
-    [(); DECIMALS + OTHER_DECIMALS]:,
-{
-    type Output = ManagedDecimal<M, ConstDecimals<{ DECIMALS + OTHER_DECIMALS }>>;
-
-    fn mul(self, other: ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data * other.data)
-    }
-}
-
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-    Div<ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
-where
-    [(); DECIMALS - OTHER_DECIMALS]:,
-{
-    type Output = ManagedDecimal<M, ConstDecimals<{ DECIMALS - OTHER_DECIMALS }>>;
-
-    fn div(self, other: ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data / other.data)
     }
 }
 

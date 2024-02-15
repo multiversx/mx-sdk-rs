@@ -8,6 +8,7 @@ mod managed_address;
 mod managed_buffer_cached_builder;
 mod managed_byte_array;
 mod managed_decimal;
+mod managed_decimal_macros;
 mod managed_option;
 mod managed_ref;
 mod managed_vec;
