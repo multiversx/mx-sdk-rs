@@ -1,7 +1,7 @@
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
-    types::{BigFloat, BigInt, BigUint},
+    types::{BigFloat, BigUint},
 };
 
 use multiversx_sc_codec::{
@@ -117,19 +117,6 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         BigFloat::from_big_uint(&self.data)
     }
 
-    pub fn to_big_int(self) -> BigInt<M> {
-        BigInt::from_biguint(crate::types::Sign::Plus, self.data)
-    }
-
-    pub fn from_big_int<T: Decimals>(big_int: BigInt<M>, num_decimals: T) -> ManagedDecimal<M, T> {
-        ManagedDecimal::from_raw_units(
-            big_int
-                .into_big_uint()
-                .unwrap_or_sc_panic("failed to cast BigInt to BigUint"),
-            num_decimals,
-        )
-    }
-
     pub fn from_big_float<T: Decimals>(
         big_float: BigFloat<M>,
         num_decimals: T,
@@ -140,7 +127,12 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
         let scaled = &BigFloat::from(scaling_factor) * &magnitude;
         let fixed_big_int = scaled.trunc();
 
-        ManagedDecimal::<M, T>::from_big_int(fixed_big_int, num_decimals)
+        ManagedDecimal::from_raw_units(
+            fixed_big_int
+                .into_big_uint()
+                .unwrap_or_sc_panic("failed to cast BigInt to BigUint"),
+            num_decimals,
+        )
     }
 }
 
