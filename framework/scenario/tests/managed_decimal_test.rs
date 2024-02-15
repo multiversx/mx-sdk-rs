@@ -9,14 +9,14 @@ use multiversx_sc_scenario::api::StaticApi;
 
 #[test]
 pub fn test_managed_decimal() {
-    let fixed = ManagedDecimal::<StaticApi, ConstDecimals<2usize>>::from(BigUint::from(1u64));
-    let fixed_2 = ManagedDecimal::<StaticApi, ConstDecimals<2usize>>::from(BigUint::from(5u64));
-    let fixed_3 = ManagedDecimal::<StaticApi, ConstDecimals<4usize>>::from(BigUint::from(8u64));
+    let fixed = ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(1u64));
+    let fixed_2 = ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64));
+    let fixed_3 = ManagedDecimal::<StaticApi, ConstDecimals<4>>::from(BigUint::from(8u64));
 
     let addition = fixed.clone() + fixed_2.clone();
     assert_eq!(
         addition,
-        ManagedDecimal::<StaticApi, ConstDecimals<2usize>>::from(BigUint::from(6u64))
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(6u64))
     );
     assert_eq!(addition.into_raw_units(), &BigUint::from(600u64));
     assert_eq!(addition.trunc(), BigUint::from(6u64));
@@ -24,19 +24,19 @@ pub fn test_managed_decimal() {
     let subtraction = addition - fixed;
     assert_eq!(
         subtraction,
-        ManagedDecimal::<StaticApi, ConstDecimals<2usize>>::from(BigUint::from(5u64))
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64))
     );
 
     let multiplication = fixed_3.clone() * fixed_2;
     assert_eq!(
         multiplication,
-        ManagedDecimal::<StaticApi, ConstDecimals<6usize>>::from(BigUint::from(40u64))
+        ManagedDecimal::<StaticApi, ConstDecimals<6>>::from(BigUint::from(40u64))
     );
 
     let division = multiplication / fixed_3;
     assert_eq!(
         division,
-        ManagedDecimal::<StaticApi, ConstDecimals<2usize>>::from(BigUint::from(5u64))
+        ManagedDecimal::<StaticApi, ConstDecimals<2>>::from(BigUint::from(5u64))
     );
 
     let fixed_4: ManagedDecimal<StaticApi, NumDecimals> =
@@ -47,7 +47,7 @@ pub fn test_managed_decimal() {
         ManagedDecimal::from_raw_units(BigUint::from(100000000u64), 8usize)
     );
 
-    let fixed_6: ManagedDecimal<StaticApi, ConstDecimals<2usize>> =
+    let fixed_6: ManagedDecimal<StaticApi, ConstDecimals<2>> =
         ManagedDecimal::from(BigUint::from(1500u64));
     let fixed_7 = fixed_6.rescale(ConstDecimals::<8>);
     assert_eq!(

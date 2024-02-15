@@ -24,10 +24,10 @@ pub const CALLBACK_CLOSURE_ARGS_BUFFER: RawHandle = -23;
 pub const MBUF_TEMPORARY_1: RawHandle = -25;
 pub const MBUF_TEMPORARY_2: RawHandle = -26;
 
-pub const NEW_HANDLE_START_FROM: RawHandle = -100; // > -100 reserved for APIs
+pub const NEW_HANDLE_START_FROM: RawHandle = -200; // > -100 reserved for APIs
 
 // Vec of 64 entries of 1 bit
-pub const SCALING_FACTOR_START: RawHandle = -101;
+pub const SCALING_FACTOR_START: RawHandle = -100;
 pub const SCALING_FACTOR_LENGTH: usize = 64;
 
 /// Used as a flag. Do not use as a regular handle.

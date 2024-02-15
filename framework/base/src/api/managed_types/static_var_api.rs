@@ -32,9 +32,7 @@ pub trait StaticVarApiImpl {
 
     fn get_call_value_multi_esdt_handle(&self) -> RawHandle;
 
-    fn is_scaling_factor_cached(&self, decimals: usize) -> bool;
+    fn get_scaling_factor_cached(&self, decimals: usize) -> bool;
 
-    fn set_scaling_factor_cached(&self, decimals: usize) -> i32;
-
-    fn set_initialized(&self, decimals: usize);
+    fn set_scaling_factor_cached(&self, decimals: usize);
 }
