@@ -7,7 +7,7 @@ use multiversx_sc::types::{
 use crate::multiversx_sc::{
     api::ManagedTypeApi,
     codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
-    contract_base::ProxyObjBase,
+    contract_base::ProxyObjNew,
     types::{Address, ManagedAddress},
 };
 
@@ -15,12 +15,15 @@ use crate::scenario::model::{AddressKey, AddressValue};
 
 /// Bundles a representation of a contract with the contract proxy,
 /// so that it can be easily called in the context of a blockchain mock.
-pub struct ContractInfo<P: ProxyObjBase> {
+pub struct ContractInfo<P: ProxyObjNew> {
     pub scenario_address_expr: AddressKey,
-    proxy_inst: P,
+    proxy_inst: P::ProxyTo,
 }
 
-impl<P: ProxyObjBase> ContractInfo<P> {
+impl<P> ContractInfo<P>
+where
+    P: ProxyObjNew,
+{
     pub fn new<A>(address_expr: A) -> Self
     where
         AddressKey: From<A>,
@@ -36,49 +39,59 @@ impl<P: ProxyObjBase> ContractInfo<P> {
     pub fn to_address(&self) -> Address {
         self.scenario_address_expr.to_address()
     }
+
+    /// For historical reasons the proxy consumes its address whenever it is called.
+    ///
+    /// When using it in tests, as part of `ContractInfo`,
+    /// it is convenient to refresh it before each call.
+    ///
+    /// It is sort of a hack, designed to optimize proxy use in contracts,
+    /// while making it easier to use in tests.
+    fn refresh_proxy_address(&mut self) {
+        self.proxy_inst =
+            P::new_proxy_obj().contract(self.scenario_address_expr.value.clone().into());
+    }
 }
 
-impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressKey {
+impl<P: ProxyObjNew> From<&ContractInfo<P>> for AddressKey {
     fn from(from: &ContractInfo<P>) -> Self {
         from.scenario_address_expr.clone()
     }
 }
 
-impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressKey {
+impl<P: ProxyObjNew> From<ContractInfo<P>> for AddressKey {
     fn from(from: ContractInfo<P>) -> Self {
         from.scenario_address_expr
     }
 }
 
-impl<P: ProxyObjBase> From<&ContractInfo<P>> for AddressValue {
+impl<P: ProxyObjNew> From<&ContractInfo<P>> for AddressValue {
     fn from(from: &ContractInfo<P>) -> Self {
         AddressValue::from(&from.scenario_address_expr)
     }
 }
 
-impl<P: ProxyObjBase> From<ContractInfo<P>> for AddressValue {
+impl<P: ProxyObjNew> From<ContractInfo<P>> for AddressValue {
     fn from(from: ContractInfo<P>) -> Self {
         AddressValue::from(&from.scenario_address_expr)
     }
 }
 
-impl<P: ProxyObjBase> Deref for ContractInfo<P> {
-    type Target = P;
+impl<P: ProxyObjNew> Deref for ContractInfo<P> {
+    type Target = P::ProxyTo;
     fn deref(&self) -> &Self::Target {
         &self.proxy_inst
     }
 }
 
-impl<P: ProxyObjBase> DerefMut for ContractInfo<P> {
+impl<P: ProxyObjNew> DerefMut for ContractInfo<P> {
     fn deref_mut(&mut self) -> &mut Self::Target {
-        let proxy_inst = core::mem::replace(&mut self.proxy_inst, P::new_proxy_obj());
-        let proxy_inst = proxy_inst.contract(self.scenario_address_expr.value.clone().into());
-        let _ = core::mem::replace(&mut self.proxy_inst, proxy_inst);
+        self.refresh_proxy_address();
         &mut self.proxy_inst
     }
 }
 
-impl<P: ProxyObjBase> TopEncode for ContractInfo<P> {
+impl<P: ProxyObjNew> TopEncode for ContractInfo<P> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -90,15 +103,15 @@ impl<P: ProxyObjBase> TopEncode for ContractInfo<P> {
     }
 }
 
-impl<P: ProxyObjBase> CodecFrom<ContractInfo<P>> for Address {}
-impl<P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for Address {}
-impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
-impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
+impl<P: ProxyObjNew> CodecFrom<ContractInfo<P>> for Address {}
+impl<P: ProxyObjNew> CodecFrom<&ContractInfo<P>> for Address {}
+impl<M: ManagedTypeApi, P: ProxyObjNew> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
+impl<M: ManagedTypeApi, P: ProxyObjNew> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
 
 impl<Env, P> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &ContractInfo<P>
 where
     Env: TxEnv,
-    P: ProxyObjBase,
+    P: ProxyObjNew,
 {
     fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self.scenario_address_expr.original.as_str().into()
@@ -116,7 +129,7 @@ where
 impl<P, Env> TxFrom<Env> for &ContractInfo<P>
 where
     Env: TxEnv,
-    P: ProxyObjBase,
+    P: ProxyObjNew,
 {
     fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         (&self.scenario_address_expr.value).into()
@@ -125,18 +138,18 @@ where
 impl<P, Env> TxFromSpecified<Env> for &ContractInfo<P>
 where
     Env: TxEnv,
-    P: ProxyObjBase,
+    P: ProxyObjNew,
 {
 }
 impl<P, Env> TxTo<Env> for &ContractInfo<P>
 where
     Env: TxEnv,
-    P: ProxyObjBase,
+    P: ProxyObjNew,
 {
 }
 impl<P, Env> TxToSpecified<Env> for &ContractInfo<P>
 where
     Env: TxEnv,
-    P: ProxyObjBase,
+    P: ProxyObjNew,
 {
 }

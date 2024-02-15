@@ -9,7 +9,7 @@
 #![allow(unused)]
 
 use multiversx_sc::{
-    contract_base::ProxyObjBase,
+    contract_base::ProxyObjNew,
     types::{BigInt, ManagedAddress},
 };
 use multiversx_sc_scenario::api::{SingleTxApi, StaticApi};
@@ -332,8 +332,7 @@ mod sample_adder {
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
-        pub address:
-            multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+        _phantom: core::marker::PhantomData<A>,
     }
 
     impl<A> multiversx_sc::contract_base::ProxyObjBase for Proxy<A>
@@ -342,16 +341,55 @@ mod sample_adder {
     {
         type Api = A;
 
+        fn extract_opt_address(
+            &mut self,
+        ) -> multiversx_sc::types::ManagedOption<
+            Self::Api,
+            multiversx_sc::types::ManagedAddress<Self::Api>,
+        > {
+            multiversx_sc::types::ManagedOption::none()
+        }
+
+        fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<Self::Api> {
+            multiversx_sc::api::ErrorApiImpl::signal_error(
+                &<A as multiversx_sc::api::ErrorApi>::error_api_impl(),
+                multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET.as_bytes(),
+            )
+        }
+    }
+
+    impl<A> multiversx_sc::contract_base::ProxyObjNew for Proxy<A>
+    where
+        A: multiversx_sc::api::VMApi + 'static,
+    {
+        type ProxyTo = ProxyTo<A>;
+
         fn new_proxy_obj() -> Self {
             Proxy {
-                address: multiversx_sc::types::ManagedOption::none(),
+                _phantom: core::marker::PhantomData,
             }
         }
 
-        fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self {
-            self.address = multiversx_sc::types::ManagedOption::some(address);
-            self
+        fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self::ProxyTo {
+            ProxyTo {
+                address: multiversx_sc::types::ManagedOption::some(address)
+            }
         }
+    }
+
+    pub struct ProxyTo<A>
+    where
+        A: multiversx_sc::api::VMApi + 'static,
+    {
+        pub address:
+            multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+    }
+
+    impl<A> multiversx_sc::contract_base::ProxyObjBase for ProxyTo<A>
+    where
+        A: multiversx_sc::api::VMApi + 'static,
+    {
+        type Api = A;
 
         fn extract_opt_address(
             &mut self,
@@ -375,8 +413,10 @@ mod sample_adder {
     }
 
     impl<A> super::module_1::ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<A> super::module_1::ProxyTrait for ProxyTo<A> where A: multiversx_sc::api::VMApi {}
 
     impl<A> ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<A> ProxyTrait for ProxyTo<A> where A: multiversx_sc::api::VMApi {}
 
     pub struct CallbackProxyObj<A>
     where
