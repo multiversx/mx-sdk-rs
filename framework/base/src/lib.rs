@@ -1,15 +1,17 @@
 #![no_std]
+
 #![feature(never_type)]
 #![feature(exhaustive_patterns)]
 #![feature(try_trait_v2)]
 #![feature(control_flow_enum)]
-#![allow(clippy::type_complexity)]
-#![allow(deprecated)]
 #![feature(maybe_uninit_uninit_array)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(negative_impls)]
 #![feature(generic_const_exprs)]
+
 #![allow(incomplete_features)]
+#![allow(deprecated)]
+
 pub use multiversx_sc_derive::{self as derive, contract, module, proxy};
 
 // re-export basic heap types
