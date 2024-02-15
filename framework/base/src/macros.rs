@@ -24,12 +24,9 @@ macro_rules! imports {
             io::*,
             non_zero_usize,
             non_zero_util::*,
-            require, require_old, sc_error, sc_format, sc_panic, sc_print,
+            require, require_old, sc_format, sc_panic, sc_print,
             storage::mappers::*,
-            types::{
-                SCResult::{Err, Ok},
-                *,
-            },
+            types::*,
         };
     };
 }
@@ -50,6 +47,10 @@ macro_rules! derive_imports {
 }
 
 /// Compact way of returning a static error message.
+#[deprecated(
+    since = "0.48.0",
+    note = "Use `sc_panic!` instead, which terminates immediately."
+)]
 #[macro_export]
 macro_rules! sc_error {
     ($s:expr) => {
@@ -197,7 +198,7 @@ macro_rules! sc_try {
 macro_rules! only_owner {
     ($trait_self: expr, $error_msg:expr) => {
         if ($trait_self.blockchain().get_caller() != $trait_self.blockchain().get_owner_address()) {
-            return sc_error!($error_msg);
+            return multiversx_sc::sc_error!($error_msg);
         }
     };
 }
