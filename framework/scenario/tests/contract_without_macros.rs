@@ -123,15 +123,14 @@ mod sample_adder {
         fn init(&self, initial_value: &BigInt<Self::Api>) {
             self.set_sum(initial_value);
         }
-        fn add(&self, value: BigInt<Self::Api>) -> SCResult<()> {
+        fn add(&self, value: BigInt<Self::Api>) {
             let mut sum = self.get_sum();
             sum.add_assign(value);
             self.set_sum(&sum);
-            Ok(())
         }
         fn get_sum(&self) -> BigInt<Self::Api>;
         fn set_sum(&self, sum: &BigInt<Self::Api>);
-        fn add_version(&self) -> SCResult<()> {
+        fn add_version(&self) {
             self.add(self.version())
         }
         fn callback(&self);
