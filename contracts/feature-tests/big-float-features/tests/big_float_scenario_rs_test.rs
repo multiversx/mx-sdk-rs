@@ -1,4 +1,4 @@
-use multiversx_sc::types::{BigFloat, BigInt, BigUint};
+use multiversx_sc::types::{BigFloat, BigUint};
 use multiversx_sc_scenario::{api::StaticApi, *};
 
 fn world() -> ScenarioWorld {
@@ -27,15 +27,15 @@ fn big_float_overflow_test_rs() {
         .to_fixed_point(&(10_000_000_000_000_000i64.into()))
         .into_big_uint();
 
-    let third = BigFloat::<StaticApi>::from_sci(1_005, -3)
+    let third_float = BigFloat::<StaticApi>::from_sci(1_005, -3)
         .pow(exp)
-        .to_managed_decimal(17usize)
-        .to_big_int();
+        .to_managed_decimal(17usize);
+    let third = third_float.into_raw_units();
 
-    let forth = BigFloat::<StaticApi>::from_sci(1_005, -3)
+    let forth_float = BigFloat::<StaticApi>::from_sci(1_005, -3)
         .pow(exp)
-        .to_managed_decimal(16usize)
-        .to_big_int();
+        .to_managed_decimal(16usize);
+    let forth = forth_float.into_raw_units();
 
     assert_eq!(
         first.unwrap_or_sc_panic("unwrap failed"),
@@ -51,10 +51,10 @@ fn big_float_overflow_test_rs() {
     assert_eq!(
         third,
         /* overflow */
-        BigInt::from(9223372036854775807i64)
+        &BigUint::from(9223372036854775807u64)
     );
 
-    assert_eq!(forth, BigInt::from(2184473079534488064i64));
+    assert_eq!(forth, &BigUint::from(2184473079534488064u64));
 }
 
 #[test]

@@ -85,6 +85,25 @@ pub fn test_managed_decimal() {
 }
 
 #[test]
+fn test_managed_decimal_conversion() {
+    let fixed: ManagedDecimal<StaticApi, NumDecimals> =
+        ManagedDecimal::from_raw_units(BigUint::from(123456789123456789u64), 15usize); //123,45....
+
+    let float_coresp = fixed.to_big_float();
+
+    // hook not available yet, uncomment when available
+    // assert_eq!(
+    //     float_coresp.to_buffer(),
+    //     ManagedBuffer::from("123.456789123456789")
+    // );
+
+    assert_eq!(
+        float_coresp,
+        BigFloat::from_frac(123456789123456789i64, 1_000_000_000_000_000i64)
+    );
+}
+
+#[test]
 fn test_encode_decode() {
     let fixed_struct: ManagedDecimal<StaticApi, NumDecimals> =
         ManagedDecimal::from_raw_units(BigUint::from(1u64), 1usize);

@@ -114,7 +114,14 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     }
 
     pub fn to_big_float(&self) -> BigFloat<M> {
-        BigFloat::from_big_uint(&self.data)
+        let numerator = self.data.to_u64().unwrap() as i64;
+        let denominator = self
+            .decimals
+            .scaling_factor::<M>()
+            .deref()
+            .to_u64()
+            .unwrap() as i64;
+        BigFloat::from_frac(numerator, denominator)
     }
 
     pub fn from_big_float<T: Decimals>(
