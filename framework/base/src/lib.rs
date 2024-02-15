@@ -1,5 +1,4 @@
 #![no_std]
-
 #![feature(never_type)]
 #![feature(exhaustive_patterns)]
 #![feature(try_trait_v2)]
@@ -8,7 +7,6 @@
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(negative_impls)]
 #![feature(generic_const_exprs)]
-
 #![allow(incomplete_features)]
 #![allow(deprecated)]
 
