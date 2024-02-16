@@ -152,6 +152,94 @@
                 "gas": "*",
                 "refund": "*"
             }
+        },
+        {
+            "step": "scCall",
+            "id": "next at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "next_at_address",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "6"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "previous at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "previous_at_address",
+                "arguments": [
+                    "5"
+                ],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "4"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "front at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "front_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "1"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "back at address",
+            "tx": {
+                "from": "address:an_account",
+                "to": "sc:caller",
+                "function": "back_at_address",
+                "arguments": [],
+                "gasLimit": "50,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": [
+                    "10"
+                ],
+                "status": "",
+                "logs": "*",
+                "gas": "*",
+                "refund": "*"
+            }
         }
     ]
 }

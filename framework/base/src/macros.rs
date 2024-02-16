@@ -18,7 +18,7 @@ macro_rules! imports {
                 multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
                 TopEncode,
             },
-            contract_base::{ContractBase, ProxyObjBase},
+            contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
             err_msg,
             esdt::*,
             io::*,

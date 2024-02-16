@@ -2,17 +2,19 @@ use crate::{
     api::{self, CallTypeApi, ManagedTypeApi},
     contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
-        BigUint, CodeMetadata, EgldPayment, EsdtTokenPayment, ManagedAddress, ManagedBuffer,
-        ManagedVec, MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldPayment, EsdtTokenPayment,
+        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
     },
 };
 use alloc::boxed::Box;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    AsyncCall, DeployCall, ExplicitGas, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
-    RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxData, TxDataFunctionCall, TxEnv,
-    TxFrom, TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase, AsyncCall,
+    Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, ExplicitGas,
+    FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
+    RHListAppendRet, RHListItem, TxCodeSource, TxData, TxDataFunctionCall, TxEnv, TxFrom,
+    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
     TxToSpecified,
 };
 
@@ -92,12 +94,10 @@ where
 {
     pub fn from<From>(self, from: From) -> Tx<Env, From, To, Payment, Gas, Data, RH>
     where
-        From: TxFromSpecified<Env>,
+        From: TxFrom<Env>,
     {
-        let mut env = self.env;
-        env.annotate_from(&from);
         Tx {
-            env,
+            env: self.env,
             from,
             to: self.to,
             payment: self.payment,
@@ -117,14 +117,15 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Specifies the recipient of the transaction.
+    ///
+    /// Allows argument to also be `()`.
     pub fn to<To>(self, to: To) -> Tx<Env, From, To, Payment, Gas, Data, RH>
     where
-        To: TxToSpecified<Env>,
+        To: TxTo<Env>,
     {
-        let mut env = self.env;
-        env.annotate_to(&to);
         Tx {
-            env,
+            env: self.env,
             from: self.from,
             to,
             payment: self.payment,
@@ -162,6 +163,13 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
+    }
+
+    pub fn with_egld_transfer(
+        self,
+        egld_amount: BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EgldPayment<Env::Api>, Gas, Data, RH> {
+        self.egld(egld_amount)
     }
 }
 
@@ -206,6 +214,37 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
+    }
+
+    /// Backwards compatibility.
+    pub fn with_multi_token_transfer(
+        self,
+        payments: MultiEsdtPayment<Env::Api>, // TODO: references
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        self.multi_esdt(payments)
+    }
+
+    pub fn egld_or_single_esdt<P: Into<EgldOrEsdtTokenPayment<Env::Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: payment.into(),
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Backwards compatibility.
+    pub fn with_egld_or_single_esdt_transfer<P: Into<EgldOrEsdtTokenPayment<Env::Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
+        self.egld_or_single_esdt(payment)
     }
 }
 
@@ -288,43 +327,41 @@ where
     }
 }
 
-impl<Env, From, To, Payment, Gas> Tx<Env, From, To, Payment, Gas, (), ()>
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
 {
     #[inline]
-    pub fn call<FC: Into<FunctionCall<Env::Api>>>(
-        self,
-        call: FC,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, ()> {
+    pub fn raw_call(self) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: call.into(),
-            result_handler: (),
+            data: FunctionCall::empty(),
+            result_handler: self.result_handler,
         }
     }
 
     #[inline]
-    pub fn function_name<N: Into<ManagedBuffer<Env::Api>>>(
+    pub fn function_call(
         self,
-        function_name: N,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, ()> {
+        call: FunctionCall<Env::Api>,
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: FunctionCall::new(function_name),
-            result_handler: (),
+            data: call,
+            result_handler: self.result_handler,
         }
     }
 }
@@ -338,6 +375,59 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
+    pub fn into_function_call(self) -> FunctionCall<Env::Api> {
+        self.data
+    }
+}
+
+impl<Env, From, Payment, Gas> Tx<Env, From, (), Payment, Gas, (), ()>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+{
+    /// Merges the argument data into the current tx.
+    /// Used for function calls originating in proxies.
+    ///
+    /// Different environment in the argument allowed because of compatibility with old proxies.
+    ///
+    /// Method still subject to considerable change.
+    pub fn call<Env2, To, O>(
+        self,
+        call: Tx<Env2, (), To, (), (), FunctionCall<Env::Api>, OriginalResultMarker<O>>,
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, OriginalResultMarker<O>>
+    where
+        Env2: TxEnv<Api = Env::Api>,
+        To: TxTo<Env> + TxTo<Env2>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: call.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: call.data,
+            result_handler: call.result_handler,
+        }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    #[inline]
+    pub fn function_name<N: Into<ManagedBuffer<Env::Api>>>(mut self, function_name: N) -> Self {
+        self.data.function_name = function_name.into();
+        self
+    }
+
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
         self.data = self.data.argument(arg);
@@ -467,14 +557,48 @@ where
     }
 }
 
-impl<Env, Payment, Gas, Data> Tx<Env, (), (), Payment, Gas, Data, ()>
+impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
+    for Tx<
+        TxScEnv<Api>,
+        (),
+        To,
+        Payment,
+        (),
+        FunctionCall<Api>,
+        OriginalResultMarker<OriginalResult>,
+    >
+where
+    Api: CallTypeApi + 'static,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    OriginalResult: TopEncodeMulti,
+{
+    type OriginalResult = OriginalResult;
+
+    fn into_normalized(self) -> ContractCallWithEgld<Api, OriginalResult> {
+        let normalized = self.normalize_tx();
+        ContractCallWithEgld {
+            basic: ContractCallNoPayment {
+                _phantom: core::marker::PhantomData,
+                to: normalized.to,
+                function_call: normalized.data,
+                explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
+                _return_type: core::marker::PhantomData,
+            },
+            egld_payment: normalized.payment.value,
+        }
+    }
+}
+
+impl<Env, To, Payment, Gas, RH> Tx<Env, (), To, Payment, Gas, (), RH>
 where
     Env: TxEnv,
+    To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
-    Data: TxData<Env>,
+    RH: TxResultHandler<Env>,
 {
-    pub fn deploy(self) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
+    pub fn raw_deploy(self) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, ()>, RH> {
         Tx {
             env: self.env,
             from: self.from,
@@ -487,42 +611,58 @@ where
     }
 }
 
-impl<Env, Payment, Gas> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()>
+impl<Env, To, Payment, Gas, RH> Tx<Env, (), To, Payment, Gas, DeployCall<Env, ()>, RH>
 where
     Env: TxEnv,
+    To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
 {
     pub fn code(
         mut self,
         code: ManagedBuffer<Env::Api>,
-    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
-        self.data.code = code;
+    ) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, Code<Env>>, RH> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: self.data,
+            data: self.data.code_source(Code::new(code)),
             result_handler: self.result_handler,
         }
     }
 
-    pub fn code_metadata(
+    pub fn from_source(
         mut self,
-        code_metadata: CodeMetadata,
-    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env>, ()> {
-        self.data.code_metadata = code_metadata;
+        source_address: ManagedAddress<Env::Api>,
+    ) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, FromSource<Env>>, RH> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: self.data,
+            data: self.data.code_source(FromSource::new(source_address)),
             result_handler: self.result_handler,
         }
+    }
+}
+
+impl<Env, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, (), To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+where
+    Env: TxEnv,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    CodeSource: TxCodeSource<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn code_metadata(mut self, code_metadata: CodeMetadata) -> Self {
+        self.data = self.data.code_metadata(code_metadata);
+        self
     }
 
     #[inline]
@@ -535,5 +675,45 @@ where
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
         self
+    }
+}
+
+impl<Api, To, Payment, OriginalResult>
+    From<
+        Tx<
+            TxScEnv<Api>,
+            (),
+            To,
+            Payment,
+            (),
+            DeployCall<TxScEnv<Api>, ()>,
+            OriginalResultMarker<OriginalResult>,
+        >,
+    > for ContractDeploy<Api, OriginalResult>
+where
+    Api: CallTypeApi + 'static,
+    To: TxTo<TxScEnv<Api>>,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    OriginalResult: TopEncodeMulti,
+{
+    fn from(
+        value: Tx<
+            TxScEnv<Api>,
+            (),
+            To,
+            Payment,
+            (),
+            DeployCall<TxScEnv<Api>, ()>,
+            OriginalResultMarker<OriginalResult>,
+        >,
+    ) -> Self {
+        ContractDeploy {
+            _phantom: core::marker::PhantomData,
+            to: ManagedOption::none(),
+            egld_payment: value.payment.to_egld_payment().value,
+            explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
+            arg_buffer: value.data.arg_buffer,
+            _return_type: core::marker::PhantomData,
+        }
     }
 }
