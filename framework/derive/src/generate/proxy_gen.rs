@@ -46,6 +46,24 @@ pub fn proxy_arg_gen(
 
 pub fn generate_proxy_method_sig(
     method: &Method,
+    return_type: proc_macro2::TokenStream,
+) -> proc_macro2::TokenStream {
+    let method_name = &method.name;
+    let mut generics = method.generics.clone();
+    let generics_where = &method.generics.where_clause;
+    let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
+    let result = quote! {
+        fn #method_name #generics (
+            &mut self,
+            #(#arg_decl),*
+        ) -> #return_type
+        #generics_where
+    };
+    result
+}
+
+pub fn generate_proxy_method_sig_old(
+    method: &Method,
     proxy_return_struct_path: proc_macro2::TokenStream,
 ) -> proc_macro2::TokenStream {
     let method_name = &method.name;
@@ -67,6 +85,11 @@ pub fn generate_proxy_method_sig(
 }
 
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
+    let original_type = match &m.return_type {
+        syn::ReturnType::Default => quote! { () },
+        syn::ReturnType::Type(_, ty) => quote! { #ty },
+    };
+
     let mut token_count = 0;
     let mut token_expr =
         quote! { multiversx_sc::types::EgldOrEsdtTokenIdentifier::<Self::Api>::egld() };
@@ -84,7 +107,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
                 arg_push_snippets.push(quote! {
-                    multiversx_sc::types::ContractCall::proxy_arg(&mut ___contract_call___, &#pat);
+                    .argument(&#pat)
                 });
             },
             ArgPaymentMetadata::PaymentToken => {
@@ -127,62 +150,58 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         "No more than one payment multi argument allowed in call proxy"
     );
 
-    let contract_call_type;
-    let contract_call_init;
+    let payment_type;
+    let payment_init;
     if token_count > 0 || nonce_count > 0 || payment_count > 0 {
         assert!(multi_count == 0, "#[payment_multi] cannot coexist with any other payment annotation in the same endpoint");
 
         if token_count == 0 && nonce_count == 0 {
-            contract_call_type = quote! { multiversx_sc::types::ContractCallWithEgld };
-            contract_call_init = quote! {
-                let mut ___contract_call___ = multiversx_sc::types::ContractCallWithEgld::new(
-                    ___address___,
-                    #endpoint_name,
-                    #payment_expr,
-                );
-            };
+            payment_type = quote! { multiversx_sc::types::EgldPayment<Self::Api> };
+            payment_init = quote! { .egld(#payment_expr) };
         } else {
-            contract_call_type = quote! { multiversx_sc::types::ContractCallWithEgldOrSingleEsdt };
-            contract_call_init = quote! {
-                let mut ___contract_call___ = multiversx_sc::types::ContractCallWithEgldOrSingleEsdt::new(
-                    ___address___,
-                    #endpoint_name,
+            payment_type = quote! { multiversx_sc::types::EgldOrEsdtTokenPayment<Self::Api> };
+            payment_init = quote! { .egld_or_single_esdt(
+                multiversx_sc::types::EgldOrEsdtTokenPayment::new(
                     #token_expr,
                     #nonce_expr,
                     #payment_expr,
-                );
-            };
+                )
+            )};
         }
     } else if multi_count > 0 {
         let multi_expr = multi_expr_opt.unwrap();
-        contract_call_type = quote! { multiversx_sc::types::ContractCallWithMultiEsdt };
-        contract_call_init = quote! {
-            let mut ___contract_call___ = multiversx_sc::types::ContractCallWithMultiEsdt::new(
-                ___address___,
-                #endpoint_name,
-                #multi_expr.clone_value(),
-            );
-        };
+        payment_type = quote! { MultiEsdtPayment<Self::Api> };
+        payment_init = quote! { .multi_esdt(#multi_expr.clone_value()) };
     } else {
-        contract_call_type = quote! { multiversx_sc::types::ContractCallNoPayment };
-        contract_call_init = quote! {
-            let mut ___contract_call___ = multiversx_sc::types::ContractCallNoPayment::new(
-                ___address___,
-                #endpoint_name,
-            );
-        };
+        payment_type = quote! { () };
+        payment_init = quote! {};
     }
 
-    let msig = generate_proxy_method_sig(m, contract_call_type);
+    let return_type = quote! {
+        multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To,
+            #payment_type,
+            (),
+            multiversx_sc::types::FunctionCall<Self::Api>,
+            multiversx_sc::types::OriginalResultMarker<#original_type>,
+        >
+    };
+
+    let msig = generate_proxy_method_sig(m, return_type);
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let ___address___ = self.extract_address();
-            #contract_call_init
-            #(#arg_push_snippets)*
-            ___contract_call___
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .to(self.extract_proxy_to())
+                .original_result()
+                .raw_call()
+                .function_name(#endpoint_name)
+                #payment_init
+                #(#arg_push_snippets)*
         }
     };
 
@@ -191,7 +210,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 
 pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
     let msig =
-        generate_proxy_method_sig(init_method, quote! { multiversx_sc::types::ContractDeploy });
+        generate_proxy_method_sig_old(init_method, quote! { multiversx_sc::types::ContractDeploy });
 
     let mut payment_count = 0;
     let mut multi_count = 0;

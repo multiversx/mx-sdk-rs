@@ -5,7 +5,10 @@ use crate::{
     types::{EgldOrMultiEsdtPayment, ManagedAddress, ManagedBuffer},
 };
 
-use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
+use super::{
+    contract_call_no_payment::ContractCallNoPayment, contract_call_trait::ContractCallBase,
+    ContractCall, ContractCallWithEgld,
+};
 
 /// Holds data for calling another contract, with any type of payment: none, EGLD, Multi-ESDT.
 ///
@@ -19,7 +22,7 @@ where
     pub payment: EgldOrMultiEsdtPayment<SA>,
 }
 
-impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithAnyPayment<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallBase<SA> for ContractCallWithAnyPayment<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
@@ -35,7 +38,13 @@ where
                 .convert_to_esdt_transfer_call(multi_esdt_payment),
         }
     }
+}
 
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithAnyPayment<SA, OriginalResult>
+where
+    SA: CallTypeApi + 'static,
+    OriginalResult: TopEncodeMulti,
+{
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic

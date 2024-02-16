@@ -1,6 +1,8 @@
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
-    types::{FunctionCall, RHListSync, Tx, TxFromSpecified, TxGas, TxPayment, TxToSpecified},
+    types::{
+        FunctionCall, RHListSync, Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+    },
 };
 
 use crate::{api::StaticApi, scenario_model::ScCallStep, ScenarioWorld};
@@ -56,6 +58,8 @@ where
 
     fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns {
         let mut env = self.env;
+        env.annotate_from(&self.from);
+        env.annotate_to(&self.to);
         let mut step = ScCallStep::new()
             .from(env.from_annotation.as_ref().unwrap().as_str())
             .to(env.to_annotation.as_ref().unwrap().as_str())

@@ -5,8 +5,8 @@ use crate::{
 };
 
 use super::{
-    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, Tx, TxGas, TxPayment,
-    TxResultHandler, TxScEnv, TxToSpecified,
+    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, OriginalResultMarker, Tx,
+    TxGas, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
 };
 
 pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -21,6 +21,23 @@ where
 }
 
 impl<Api> TxPromisesCallback<Api> for ()
+where
+    Api: CallTypeApi,
+{
+    fn callback_name(&self) -> &'static str {
+        ""
+    }
+
+    fn overwrite_with_serialized_args(&self, cb_closure_args_serialized: &mut ManagedBuffer<Api>) {
+        cb_closure_args_serialized.overwrite(&[]);
+    }
+
+    fn gas_for_callback(&self) -> u64 {
+        0
+    }
+}
+
+impl<Api, O> TxPromisesCallback<Api> for OriginalResultMarker<O>
 where
     Api: CallTypeApi,
 {
@@ -89,6 +106,15 @@ where
             },
         }
     }
+
+    /// Backwards compatibility.
+    pub fn with_extra_gas_for_callback(
+        self,
+        gas: u64,
+    ) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, CallbackClosureWithGas<Api>>
+    {
+        self.gas_for_callback(gas)
+    }
 }
 
 impl<Api, To, Payment, Callback>
@@ -99,7 +125,7 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
-    pub fn async_call_promise(self) {
+    pub fn register_promise(self) {
         let callback_name = self.result_handler.callback_name();
         let mut cb_closure_args_serialized =
             ManagedBuffer::<Api>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
@@ -120,5 +146,22 @@ where
             extra_gas_for_callback,
             &cb_closure_args_serialized,
         )
+    }
+}
+
+impl<Api, To, Payment, Gas, Callback>
+    Tx<TxScEnv<Api>, (), To, Payment, Gas, FunctionCall<Api>, Callback>
+where
+    Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    Callback: TxPromisesCallback<Api>,
+{
+    /// Backwards compatibility only.
+    #[inline]
+    pub fn async_call_promise(self) -> Self {
+        self
     }
 }

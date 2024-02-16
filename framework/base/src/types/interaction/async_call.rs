@@ -34,12 +34,3 @@ where
         self.async_call_and_exit()
     }
 }
-
-impl<Api> AsyncCall<Api>
-where
-    Api: CallTypeApi + StorageWriteApi,
-{
-    pub fn call_and_exit(self) -> ! {
-        self.async_call_and_exit()
-    }
-}

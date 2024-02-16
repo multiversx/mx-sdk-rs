@@ -11,7 +11,8 @@ use crate::{
 };
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_with_egld::ContractCallWithEgld,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
+    contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
     ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, FunctionCall, ManagedArgBuffer,
     Tx, TxScEnv,
@@ -35,7 +36,7 @@ where
     pub(super) _return_type: PhantomData<OriginalResult>,
 }
 
-impl<SA, OriginalResult> ContractCall<SA> for ContractCallNoPayment<SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallBase<SA> for ContractCallNoPayment<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
@@ -49,7 +50,13 @@ where
             egld_payment: BigUint::zero(),
         }
     }
+}
 
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallNoPayment<SA, OriginalResult>
+where
+    SA: CallTypeApi + 'static,
+    OriginalResult: TopEncodeMulti,
+{
     #[inline]
     fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         self
@@ -169,6 +176,6 @@ where
     }
 
     pub fn tx(self) -> Tx<TxScEnv<SA>, (), (), (), (), FunctionCall<SA>, ()> {
-        Tx::new_tx_from_sc().call(self.function_call)
+        Tx::new_tx_from_sc().function_call(self.function_call)
     }
 }
