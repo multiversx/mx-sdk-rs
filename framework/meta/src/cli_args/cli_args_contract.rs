@@ -66,6 +66,12 @@ pub enum ContractCliAction {
         about = "Generates a snippets project, based on the contract ABI."
     )]
     GenerateSnippets(GenerateSnippetsArgs),
+
+    #[command(
+        name = "proxy",
+        about = "Generates a proxy, based on the contract ABI."
+    )]
+    GenerateProxies(GenerateProxyArgs),
 }
 
 impl CliArgsToRaw for ContractCliAction {
@@ -97,6 +103,10 @@ impl CliArgsToRaw for ContractCliAction {
                 raw.push("snippets".to_string());
                 raw.append(&mut args.to_raw());
             },
+            ContractCliAction::GenerateProxies(args) => {
+                raw.push("proxy".to_string());
+                raw.append(&mut args.to_raw());
+            },
         }
         raw
     }
@@ -110,6 +120,22 @@ pub struct GenerateSnippetsArgs {
 }
 
 impl CliArgsToRaw for GenerateSnippetsArgs {
+    fn to_raw(&self) -> Vec<String> {
+        let mut raw = Vec::new();
+        if self.overwrite {
+            raw.push("--overwrite".to_string());
+        }
+        raw
+    }
+}
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct GenerateProxyArgs {
+    /// Override TxProxy project if it already exists.
+    #[arg(long, verbatim_doc_comment)]
+    pub overwrite: bool,
+}
+
+impl CliArgsToRaw for GenerateProxyArgs {
     fn to_raw(&self) -> Vec<String> {
         let mut raw = Vec::new();
         if self.overwrite {
