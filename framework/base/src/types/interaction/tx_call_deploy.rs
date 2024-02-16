@@ -182,6 +182,64 @@ where
     }
 }
 
+impl<Api, Payment, Gas, RH>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        ManagedAddress<Api>,
+        Payment,
+        Gas,
+        DeployCall<TxScEnv<Api>, Code<TxScEnv<Api>>>,
+        RH,
+    >
+where
+    Api: CallTypeApi,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
+{
+    pub fn upgrade_async_call(self) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        SendRawWrapper::<Api>::new().upgrade_contract(
+            &self.to,
+            gas,
+            &self.payment.to_egld_payment().value,
+            &self.data.code_source.code,
+            self.data.code_metadata,
+            &self.data.arg_buffer,
+        );
+    }
+}
+
+impl<Api, Payment, Gas, RH>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        ManagedAddress<Api>,
+        Payment,
+        Gas,
+        DeployCall<TxScEnv<Api>, FromSource<TxScEnv<Api>>>,
+        RH,
+    >
+where
+    Api: CallTypeApi,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
+{
+    pub fn upgrade_async_call(self) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+            &self.to,
+            gas,
+            &self.payment.to_egld_payment().value,
+            &self.data.code_source.address,
+            self.data.code_metadata,
+            &self.data.arg_buffer,
+        );
+    }
+}
+
 impl<Api, Payment, Gas, OriginalResult>
     Tx<
         TxScEnv<Api>,

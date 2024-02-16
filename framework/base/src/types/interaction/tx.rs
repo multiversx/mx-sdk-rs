@@ -611,9 +611,10 @@ where
     }
 }
 
-impl<Env, Payment, Gas, RH> Tx<Env, (), (), Payment, Gas, DeployCall<Env, ()>, RH>
+impl<Env, To, Payment, Gas, RH> Tx<Env, (), To, Payment, Gas, DeployCall<Env, ()>, RH>
 where
     Env: TxEnv,
+    To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
@@ -621,7 +622,7 @@ where
     pub fn code(
         mut self,
         code: ManagedBuffer<Env::Api>,
-    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env, Code<Env>>, RH> {
+    ) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, Code<Env>>, RH> {
         Tx {
             env: self.env,
             from: self.from,
@@ -636,7 +637,7 @@ where
     pub fn from_source(
         mut self,
         source_address: ManagedAddress<Env::Api>,
-    ) -> Tx<Env, (), (), Payment, Gas, DeployCall<Env, FromSource<Env>>, RH> {
+    ) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, FromSource<Env>>, RH> {
         Tx {
             env: self.env,
             from: self.from,
@@ -649,10 +650,11 @@ where
     }
 }
 
-impl<Env, Payment, Gas, CodeSource, RH>
-    Tx<Env, (), (), Payment, Gas, DeployCall<Env, CodeSource>, RH>
+impl<Env, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, (), To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
 where
     Env: TxEnv,
+    To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
     CodeSource: TxCodeSource<Env>,

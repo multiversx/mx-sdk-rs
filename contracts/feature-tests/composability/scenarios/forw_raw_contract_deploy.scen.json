@@ -128,7 +128,6 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-src-with-arg"
                 ],
                 "status": "0",
