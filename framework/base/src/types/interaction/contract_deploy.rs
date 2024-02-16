@@ -22,12 +22,12 @@ pub struct ContractDeploy<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    _phantom: PhantomData<SA>,
+    pub(crate) _phantom: PhantomData<SA>,
     pub to: ManagedOption<SA, ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
     pub egld_payment: BigUint<SA>,
     pub explicit_gas_limit: u64,
     pub arg_buffer: ManagedArgBuffer<SA>,
-    _return_type: PhantomData<OriginalResult>,
+    pub(crate) _return_type: PhantomData<OriginalResult>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.

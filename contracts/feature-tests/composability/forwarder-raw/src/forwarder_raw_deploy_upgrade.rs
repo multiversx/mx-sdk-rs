@@ -17,7 +17,7 @@ pub trait ForwarderRawDeployUpgrade {
             .with_gas_limit(self.blockchain().get_gas_left())
             .returns(ReturnsNewAddress)
             .returns(ReturnsRaw)
-            .execute_deploy()
+            .sync_call()
             .into()
     }
 
