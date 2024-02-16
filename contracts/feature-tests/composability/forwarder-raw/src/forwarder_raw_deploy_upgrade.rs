@@ -36,7 +36,6 @@ pub trait ForwarderRawDeployUpgrade {
             .with_gas_limit(self.blockchain().get_gas_left())
             .returns(ReturnsNewAddress)
             .sync_call()
-            .into()
     }
 
     #[endpoint]
@@ -53,8 +52,7 @@ pub trait ForwarderRawDeployUpgrade {
             .code(new_code)
             .code_metadata(code_metadata)
             .arguments_raw(args.to_arg_buffer())
-            .upgrade_async_call()
-            .into()
+            .upgrade_async_call();
     }
 
     #[endpoint]
@@ -72,7 +70,6 @@ pub trait ForwarderRawDeployUpgrade {
             .code_metadata(code_metadata)
             .arguments_raw(args.to_arg_buffer())
             .with_gas_limit(self.blockchain().get_gas_left())
-            .upgrade_async_call()
-            .into()
+            .upgrade_async_call();
     }
 }
