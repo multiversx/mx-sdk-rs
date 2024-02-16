@@ -196,8 +196,7 @@ mod sample_adder {
                 Self::Api,
                 (multiversx_sc::types::BigInt<Self::Api>, ()),
             >(("value", ()));
-            let result = self.add(value);
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
+            self.add(value);
         }
 
         fn call(&self, fn_name: &str) -> bool {
@@ -417,15 +416,15 @@ fn contract_without_macros_basic() {
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
 
-    let _ = adder.add(BigInt::from(7));
+    adder.add(BigInt::from(7));
     assert_eq!(BigInt::from(12), adder.get_sum());
 
-    let _ = adder.add(BigInt::from(-1));
+    adder.add(BigInt::from(-1));
     assert_eq!(BigInt::from(11), adder.get_sum());
 
     assert_eq!(BigInt::from(100), adder.version());
 
-    let _ = adder.add_version();
+    adder.add_version();
     assert_eq!(BigInt::from(111), adder.get_sum());
 
     assert!(!adder.call("invalid_endpoint"));
