@@ -62,34 +62,14 @@ pub fn generate_proxy_method_sig(
     result
 }
 
-pub fn generate_proxy_method_sig_old(
-    method: &Method,
-    proxy_return_struct_path: proc_macro2::TokenStream,
-) -> proc_macro2::TokenStream {
-    let method_name = &method.name;
-    let mut generics = method.generics.clone();
-    let generics_where = &method.generics.where_clause;
-    let arg_decl = proxy_arg_gen(&method.method_args, &mut generics);
-    let ret_tok = match &method.return_type {
+fn original_type_tokens(m: &Method) -> proc_macro2::TokenStream {
+    match &m.return_type {
         syn::ReturnType::Default => quote! { () },
         syn::ReturnType::Type(_, ty) => quote! { #ty },
-    };
-    let result = quote! {
-        fn #method_name #generics (
-            &mut self,
-            #(#arg_decl),*
-        ) -> #proxy_return_struct_path<Self::Api, #ret_tok>
-        #generics_where
-    };
-    result
+    }
 }
 
 pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2::TokenStream {
-    let original_type = match &m.return_type {
-        syn::ReturnType::Default => quote! { () },
-        syn::ReturnType::Type(_, ty) => quote! { #ty },
-    };
-
     let mut token_count = 0;
     let mut token_expr =
         quote! { multiversx_sc::types::EgldOrEsdtTokenIdentifier::<Self::Api>::egld() };
@@ -177,6 +157,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         payment_init = quote! {};
     }
 
+    let original_type = original_type_tokens(m);
     let return_type = quote! {
         multiversx_sc::types::Tx<
             multiversx_sc::types::TxScEnv<Self::Api>,
@@ -209,50 +190,41 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
 }
 
 pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
-    let msig =
-        generate_proxy_method_sig_old(init_method, quote! { multiversx_sc::types::ContractDeploy });
-
     let mut payment_count = 0;
     let mut multi_count = 0;
     let mut token_count = 0;
     let mut nonce_count = 0;
 
-    let arg_push_snippets: Vec<proc_macro2::TokenStream> = init_method
-        .method_args
-        .iter()
-        .map(|arg| match &arg.metadata.payment {
+    let mut payment_type = quote! { () };
+    let mut payment_init = quote! {};
+
+    let mut arg_push_snippets = Vec::<proc_macro2::TokenStream>::new();
+
+    for arg in &init_method.method_args {
+        match &arg.metadata.payment {
             ArgPaymentMetadata::NotPayment => {
                 let pat = &arg.pat;
-                quote! {
-                    ___contract_deploy___.push_endpoint_arg(&#pat);
-                }
+                arg_push_snippets.push(quote! {
+                    .argument(&#pat)
+                });
             },
             ArgPaymentMetadata::PaymentToken => {
                 token_count += 1;
-
-                quote! {}
             },
             ArgPaymentMetadata::PaymentNonce => {
                 nonce_count += 1;
-
-                quote! {}
             },
             ArgPaymentMetadata::PaymentAmount => {
                 payment_count += 1;
-                let pat = &arg.pat;
-                quote! {
-                    ___contract_deploy___ = ___contract_deploy___.with_egld_transfer(#pat);
-                }
+                let payment_expr = &arg.pat;
+                payment_type = quote! { multiversx_sc::types::EgldPayment<Self::Api> };
+                payment_init = quote! { .egld(#payment_expr) };
             },
             ArgPaymentMetadata::PaymentMulti => {
                 multi_count += 1;
-                let pat = &arg.pat;
-                quote! {
-                    ___contract_deploy___ = ___contract_deploy___.with_multi_token_transfer(#pat);
-                }
             },
-        })
-        .collect();
+        }
+    }
 
     assert!(
         payment_count <= 1,
@@ -260,17 +232,36 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
     );
     assert!(token_count == 0, "No ESDT payment allowed in #[init]");
     assert!(nonce_count == 0, "No SFT/NFT payment allowed in #[init]");
+    assert!(
+        multi_count == 0,
+        "No multi ESDT payments allowed in #[init]"
+    );
+
+    let original_type = original_type_tokens(init_method);
+    let return_type = quote! {
+        multiversx_sc::types::Tx<
+            multiversx_sc::types::TxScEnv<Self::Api>,
+            (),
+            Self::To, // still accepted, until we separate the upgrade constructor completely
+            #payment_type,
+            (),
+            multiversx_sc::types::DeployCall<multiversx_sc::types::TxScEnv<Self::Api>, ()>,
+            multiversx_sc::types::OriginalResultMarker<#original_type>,
+        >
+    };
+
+    let msig = generate_proxy_method_sig(init_method, return_type);
 
     let sig = quote! {
         #[allow(clippy::too_many_arguments)]
         #[allow(clippy::type_complexity)]
         #msig {
-            let ___opt_address___ = self.extract_opt_address();
-            let mut ___contract_deploy___ = multiversx_sc::types::new_contract_deploy(
-                ___opt_address___,
-            );
-            #(#arg_push_snippets)*
-            ___contract_deploy___
+            multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
+                .raw_deploy()
+                #payment_init
+                #(#arg_push_snippets)*
+                .original_result()
+                .to(self.extract_proxy_to()) // still accepted, until we separate the upgrade constructor completely
         }
     };
 
