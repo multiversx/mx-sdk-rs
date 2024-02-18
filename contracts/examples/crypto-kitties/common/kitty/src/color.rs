@@ -1,4 +1,4 @@
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
 use random::*;
 
