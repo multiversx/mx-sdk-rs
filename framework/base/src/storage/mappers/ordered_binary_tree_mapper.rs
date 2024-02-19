@@ -25,6 +25,8 @@ static LAST_ID_KEY_SUFFIX: &[u8] = b"_lastId";
 
 static CORRUPT_TREE_ERR_MGS: &[u8] = b"Corrupt tree";
 
+// https://en.wikipedia.org/wiki/Binary_search_tree
+
 #[derive(TopEncode, TopDecode, Clone)]
 pub struct OrderedBinaryTreeNode<T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone> {
     pub(crate) current_node_id: NodeId,
@@ -220,7 +222,46 @@ where
         opt_predecessor
     }
 
-    pub fn insert_element(&mut self, new_data: T) {}
+    pub fn insert_element(&mut self, new_data: T) {
+        let new_node_id = self.get_and_increment_last_id();
+        let mut new_node = OrderedBinaryTreeNode::new(new_node_id, new_data);
+
+        let mut opt_new_node_parent = None;
+        let mut opt_current_node = self.get_root();
+        while opt_current_node.is_some() {
+            opt_new_node_parent = opt_current_node.clone();
+
+            let current_node = unsafe { opt_current_node.unwrap_unchecked() };
+            if new_node.data < current_node.data {
+                opt_current_node = self.get_node_by_id(current_node.left_id);
+            } else {
+                opt_current_node = self.get_node_by_id(current_node.right_id);
+            }
+        }
+
+        let new_node_parent_id = match &opt_new_node_parent {
+            Some(node) => node.current_node_id,
+            None => NULL_NODE_ID,
+        };
+        new_node.parent_id = new_node_parent_id;
+
+        if opt_new_node_parent.is_none() {
+            let root_key = self.build_root_key();
+            storage_set(root_key.as_ref(), &new_node);
+
+            return;
+        }
+
+        let mut new_node_parent = unsafe { opt_new_node_parent.unwrap_unchecked() };
+        if new_node.data < new_node_parent.data {
+            new_node_parent.left_id = new_node.current_node_id;
+        } else {
+            new_node_parent.right_id = new_node.current_node_id;
+        }
+
+        self.set_item(new_node_id, &new_node);
+        self.set_item(new_node_parent.current_node_id, &new_node_parent);
+    }
 }
 
 impl<SA, T, A> OrderedBinaryTreeMapper<SA, T, A>
@@ -274,11 +315,11 @@ where
         key
     }
 
-    fn get_last_id(&self) -> NodeId {
-        let key = self.build_last_id_key();
+    // fn get_last_id(&self) -> NodeId {
+    //     let key = self.build_last_id_key();
 
-        self.address.address_storage_get(key.as_ref())
-    }
+    //     self.address.address_storage_get(key.as_ref())
+    // }
 
     fn get_and_increment_last_id(&self) -> NodeId {
         let key = self.build_last_id_key();
