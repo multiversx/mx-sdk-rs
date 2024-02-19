@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use codec::Empty;
+
 use crate::{
     api::StorageMapperApi,
     imports::{ErrorApiImpl, ManagedType},
@@ -109,9 +111,7 @@ where
         opt_node: Option<OrderedBinaryTreeNode<T>>,
         data: &T,
     ) -> Option<OrderedBinaryTreeNode<T>> {
-        if opt_node.is_none() {
-            return None;
-        }
+        opt_node.as_ref()?;
 
         let node = unsafe { opt_node.unwrap_unchecked() };
         if &node.data == data {
@@ -232,6 +232,10 @@ where
             opt_new_node_parent = opt_current_node.clone();
 
             let current_node = unsafe { opt_current_node.unwrap_unchecked() };
+            if new_node.data == current_node.data {
+                return;
+            }
+
             if new_node.data < current_node.data {
                 opt_current_node = self.get_node_by_id(current_node.left_id);
             } else {
@@ -261,6 +265,97 @@ where
 
         self.set_item(new_node_id, &new_node);
         self.set_item(new_node_parent.current_node_id, &new_node_parent);
+    }
+
+    pub fn delete_node(&mut self, data: T) {
+        let opt_root = self.get_root();
+        let opt_node = self.iterative_search(opt_root, &data);
+        if opt_node.is_none() {
+            SA::error_api_impl().signal_error(b"Node not found");
+        }
+
+        let node = unsafe { opt_node.unwrap_unchecked() };
+        if node.left_id == NULL_NODE_ID {
+            let opt_to_add = self.get_node_by_id(node.right_id);
+            self.shift_nodes(&node, opt_to_add);
+
+            return;
+        }
+
+        if node.right_id == NULL_NODE_ID {
+            let opt_to_add = self.get_node_by_id(node.left_id);
+            self.shift_nodes(&node, opt_to_add);
+
+            return;
+        }
+
+        let opt_successor = self.find_successor(node.clone());
+        if opt_successor.is_none() {
+            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+        }
+
+        let mut successor = unsafe { opt_successor.unwrap_unchecked() };
+        if successor.parent_id != node.current_node_id {
+            let opt_right = self.get_node_by_id(successor.right_id);
+            self.shift_nodes(&successor, opt_right);
+
+            successor.right_id = node.right_id;
+
+            let opt_successor_right_node = self.get_node_by_id(successor.right_id);
+            if opt_successor_right_node.is_none() {
+                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+            }
+
+            let mut successor_right_node = unsafe { opt_successor_right_node.unwrap_unchecked() };
+            successor_right_node.parent_id = successor.current_node_id;
+
+            self.set_item(successor_right_node.current_node_id, &successor_right_node);
+        }
+
+        self.shift_nodes(&node, Some(successor.clone()));
+        successor.left_id = node.left_id;
+
+        let opt_successor_left_node = self.get_node_by_id(successor.left_id);
+        if opt_successor_left_node.is_none() {
+            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+        }
+
+        let mut successor_left_node = unsafe { opt_successor_left_node.unwrap_unchecked() };
+        successor_left_node.parent_id = successor.current_node_id;
+
+        self.set_item(successor_left_node.current_node_id, &successor_left_node);
+        self.set_item(successor.current_node_id, &successor);
+    }
+
+    fn shift_nodes(
+        &mut self,
+        to_delete: &OrderedBinaryTreeNode<T>,
+        opt_to_add: Option<OrderedBinaryTreeNode<T>>,
+    ) {
+        if to_delete.parent_id == NULL_NODE_ID {
+            let root_key = self.build_root_key();
+            match opt_to_add {
+                Some(to_add) => storage_set(root_key.as_ref(), &to_add),
+                None => storage_set(root_key.as_ref(), &Empty),
+            };
+
+            return;
+        }
+
+        let to_add_id = match opt_to_add {
+            Some(to_add) => to_add.current_node_id,
+            None => NULL_NODE_ID,
+        };
+
+        let mut parent = self.try_get_node_by_id(to_delete.parent_id);
+        if to_delete.current_node_id == parent.left_id {
+            parent.left_id = to_add_id;
+        } else {
+            parent.right_id = to_add_id;
+        }
+
+        self.set_item(parent.current_node_id, &parent);
+        self.clear_item(to_delete.current_node_id);
     }
 }
 
@@ -315,12 +410,6 @@ where
         key
     }
 
-    // fn get_last_id(&self) -> NodeId {
-    //     let key = self.build_last_id_key();
-
-    //     self.address.address_storage_get(key.as_ref())
-    // }
-
     fn get_and_increment_last_id(&self) -> NodeId {
         let key = self.build_last_id_key();
         let last_id: NodeId = self.address.address_storage_get(key.as_ref());
@@ -333,5 +422,10 @@ where
     fn set_item(&mut self, id: NodeId, node: &OrderedBinaryTreeNode<T>) {
         let key = self.build_key_for_item(id);
         storage_set(key.as_ref(), node);
+    }
+
+    fn clear_item(&mut self, id: NodeId) {
+        let key = self.build_key_for_item(id);
+        storage_set(key.as_ref(), &Empty);
     }
 }
