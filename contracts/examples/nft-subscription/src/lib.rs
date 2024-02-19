@@ -1,7 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 use multiversx_sc_modules::{default_issue_callbacks, subscription};
 
