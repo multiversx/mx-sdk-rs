@@ -19,6 +19,7 @@ pub type NodeId = u64;
 
 pub const NULL_NODE_ID: NodeId = 0;
 
+static ROOT_SUFFIX: &[u8] = b"_root";
 static ID_SUFFIX: &[u8] = b"_id";
 static LAST_ID_KEY_SUFFIX: &[u8] = b"_lastId";
 
@@ -59,7 +60,6 @@ where
     A: StorageAddress<SA>,
     T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
-    opt_root: Option<OrderedBinaryTreeNode<T>>,
     address: A,
     key: StorageKey<SA>,
     _phantom_api: PhantomData<SA>,
@@ -73,11 +73,17 @@ where
     T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
     pub fn get_root(&self) -> Option<OrderedBinaryTreeNode<T>> {
-        self.opt_root.clone()
+        let root_key = self.build_root_key();
+        let storage_len = self.address.address_storage_get_len(root_key.as_ref());
+        if storage_len == 0 {
+            return None;
+        }
+
+        Some(self.address.address_storage_get(root_key.as_ref()))
     }
 
     pub fn get_depth(&self, node: &OrderedBinaryTreeNode<T>) -> usize {
-        if self.opt_root.is_none() {
+        if self.get_root().is_none() {
             return 0;
         }
 
@@ -244,6 +250,13 @@ where
         }
 
         unsafe { opt_node.unwrap_unchecked() }
+    }
+
+    fn build_root_key(&self) -> StorageKey<SA> {
+        let mut key = self.key.clone();
+        key.append_bytes(ROOT_SUFFIX);
+
+        key
     }
 
     fn build_key_for_item(&self, id: NodeId) -> StorageKey<SA> {
