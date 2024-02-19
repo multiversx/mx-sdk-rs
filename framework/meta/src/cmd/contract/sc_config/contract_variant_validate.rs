@@ -1,4 +1,4 @@
-use multiversx_sc::abi::{ContractAbi, EndpointAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointTypeAbi};
 
 use super::ContractVariant;
 
@@ -16,16 +16,30 @@ fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), St
             Err("Missing constructor. Add a method annotated with `#[init]`.".to_string())
         },
         1 => Ok(()),
-        _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
+        2 => if has_init(contract_variant) && has_upgrade(contract_variant) {
+            Ok(())
+        }
+        else {
+            Err("You can only have two constructors and only one of each: `#[init]` and `#[upgrade]`".to_string())
+        }
+        _ => Err("More than two constructors present. Exactly one method annotated with `#[init]` and another optional `#[upgrade]` is required.".to_string()),
     }
 }
 
 fn has_upgrade(contract_variant: &ContractVariant) -> bool {
     contract_variant
         .abi
-        .endpoints
+        .constructors
         .iter()
-        .any(|endpoint| endpoint.name == "upgrade")
+        .any(|endpoint| matches!(endpoint.endpoint_type, EndpointTypeAbi::Upgrade))
+}
+
+fn has_init(contract_variant: &ContractVariant) -> bool {
+    contract_variant
+        .abi
+        .constructors
+        .iter()
+        .any(|endpoint| matches!(endpoint.endpoint_type, EndpointTypeAbi::Init))
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.

@@ -73,7 +73,7 @@ fn validate_payment_args(m: &Method) {
 
         assert!(num_payment_token == 0, "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name);
     }
-    if let PublicRole::Init(init_metadata) = &m.public_role {
+    if let PublicRole::Init(init_metadata) | PublicRole::Upgrade(init_metadata) = &m.public_role {
         assert!(
             init_metadata.payable.no_esdt(),
             "only EGLD payments currently allowed in constructors"
