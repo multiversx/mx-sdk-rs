@@ -12,12 +12,12 @@ use super::set_mapper::{CurrentStorage, StorageAddress};
 use crate::codec::{
     self,
     derive::{TopDecode, TopEncode},
-    NestedDecode, NestedEncode, TopDecode, TopEncode,
+    NestedDecode, NestedEncode,
 };
 
 pub type NodeId = u64;
 
-const NULL_ID: NodeId = 0;
+pub const NULL_NODE_ID: NodeId = 0;
 
 static ID_SUFFIX: &[u8] = b"_id";
 static LAST_ID_KEY_SUFFIX: &[u8] = b"_lastId";
@@ -25,23 +25,25 @@ static LAST_ID_KEY_SUFFIX: &[u8] = b"_lastId";
 static CORRUPT_TREE_ERR_MGS: &[u8] = b"Corrupt tree";
 
 #[derive(TopEncode, TopDecode, Clone)]
-pub struct OrderedBinaryTreeNode<
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
-> {
+pub struct OrderedBinaryTreeNode<T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone> {
+    pub(crate) current_node_id: NodeId,
     pub(crate) left_id: NodeId,
     pub(crate) right_id: NodeId,
+    pub(crate) parent_id: NodeId,
     pub(crate) data: T,
 }
 
 impl<T> OrderedBinaryTreeNode<T>
 where
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
+    T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
-    pub fn new(data: T) -> Self {
+    pub fn new(current_node_id: NodeId, data: T) -> Self {
         Self {
             data,
-            left_id: NULL_ID,
-            right_id: NULL_ID,
+            current_node_id,
+            left_id: NULL_NODE_ID,
+            right_id: NULL_NODE_ID,
+            parent_id: NULL_NODE_ID,
         }
     }
 
@@ -55,7 +57,7 @@ pub struct OrderedBinaryTreeMapper<SA, T, A = CurrentStorage>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
+    T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
     opt_root: Option<OrderedBinaryTreeNode<T>>,
     address: A,
@@ -68,33 +70,10 @@ impl<SA, T, A> OrderedBinaryTreeMapper<SA, T, A>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
+    T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
     pub fn get_root(&self) -> Option<OrderedBinaryTreeNode<T>> {
         self.opt_root.clone()
-    }
-
-    pub fn get_node_by_id(&self, id: NodeId) -> Option<OrderedBinaryTreeNode<T>> {
-        if id == NULL_ID {
-            return None;
-        }
-
-        let key = self.build_key_for_item(id);
-        let storage_len = self.address.address_storage_get_len(key.as_ref());
-        if storage_len == 0 {
-            return None;
-        }
-
-        Some(self.address.address_storage_get(key.as_ref()))
-    }
-
-    pub fn try_get_node_by_id(&self, id: NodeId) -> OrderedBinaryTreeNode<T> {
-        let opt_node = self.get_node_by_id(id);
-        if opt_node.is_none() {
-            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
-        }
-
-        unsafe { opt_node.unwrap_unchecked() }
     }
 
     pub fn get_depth(&self, node: &OrderedBinaryTreeNode<T>) -> usize {
@@ -162,7 +141,7 @@ where
     }
 
     pub fn find_max(&self, mut node: OrderedBinaryTreeNode<T>) -> OrderedBinaryTreeNode<T> {
-        while node.right_id != NULL_ID {
+        while node.right_id != NULL_NODE_ID {
             node = self.try_get_node_by_id(node.right_id);
         }
 
@@ -170,35 +149,103 @@ where
     }
 
     pub fn find_min(&self, mut node: OrderedBinaryTreeNode<T>) -> OrderedBinaryTreeNode<T> {
-        while node.left_id != NULL_ID {
+        while node.left_id != NULL_NODE_ID {
             node = self.try_get_node_by_id(node.left_id);
         }
 
         node
     }
 
-    pub fn find_successor(&self, node: OrderedBinaryTreeNode<T>) -> OrderedBinaryTreeNode<T> {
-        if node.right_id != NULL_ID {
+    pub fn find_successor(
+        &self,
+        mut node: OrderedBinaryTreeNode<T>,
+    ) -> Option<OrderedBinaryTreeNode<T>> {
+        if node.right_id != NULL_NODE_ID {
             let right_node = self.try_get_node_by_id(node.right_id);
-            return self.find_min(right_node);
+            return Some(self.find_min(right_node));
         }
+
+        let mut successor_id = node.parent_id;
+        let mut opt_successor = self.get_node_by_id(successor_id);
+        while successor_id != NULL_NODE_ID {
+            if opt_successor.is_none() {
+                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+            }
+
+            let successor = unsafe { opt_successor.unwrap_unchecked() };
+            if node.current_node_id != successor.right_id {
+                return Some(successor);
+            }
+
+            successor_id = successor.parent_id;
+            opt_successor = self.get_node_by_id(successor_id);
+            node = successor;
+        }
+
+        opt_successor
     }
 
-    // pub fn insert_element(&mut self, data: T) {
-    //     let new_node = OrderedBinaryTreeNode::new(data);
-    //     if self.opt_root.is_none() {
-    //         let root_id = self.get_and_increment_last_id();
-    //         self.set_item(root_id, &new_node);
-    //     }
-    // }
+    pub fn find_predecessor(
+        &self,
+        mut node: OrderedBinaryTreeNode<T>,
+    ) -> Option<OrderedBinaryTreeNode<T>> {
+        if node.left_id != NULL_NODE_ID {
+            let left_node = self.try_get_node_by_id(node.left_id);
+            return Some(self.find_max(left_node));
+        }
+
+        let mut predecessor_id = node.parent_id;
+        let mut opt_predecessor = self.get_node_by_id(predecessor_id);
+        while predecessor_id != NULL_NODE_ID {
+            if opt_predecessor.is_none() {
+                SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+            }
+
+            let predecessor = unsafe { opt_predecessor.unwrap_unchecked() };
+            if node.current_node_id != predecessor.left_id {
+                return Some(predecessor);
+            }
+
+            predecessor_id = predecessor.parent_id;
+            opt_predecessor = self.get_node_by_id(predecessor_id);
+            node = predecessor;
+        }
+
+        opt_predecessor
+    }
+
+    pub fn insert_element(&mut self, new_data: T) {}
 }
 
 impl<SA, T, A> OrderedBinaryTreeMapper<SA, T, A>
 where
     SA: StorageMapperApi,
     A: StorageAddress<SA>,
-    T: TopEncode + TopDecode + NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
+    T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
+    fn get_node_by_id(&self, id: NodeId) -> Option<OrderedBinaryTreeNode<T>> {
+        if id == NULL_NODE_ID {
+            return None;
+        }
+
+        let key = self.build_key_for_item(id);
+        let storage_len = self.address.address_storage_get_len(key.as_ref());
+        if storage_len == 0 {
+            return None;
+        }
+
+        Some(self.address.address_storage_get(key.as_ref()))
+    }
+
+    fn try_get_node_by_id(&self, id: NodeId) -> OrderedBinaryTreeNode<T> {
+        let opt_node = self.get_node_by_id(id);
+        if opt_node.is_none() {
+            SA::error_api_impl().signal_error(CORRUPT_TREE_ERR_MGS);
+        }
+
+        unsafe { opt_node.unwrap_unchecked() }
+    }
+
     fn build_key_for_item(&self, id: NodeId) -> StorageKey<SA> {
         let mut item_key = self.key.clone();
         item_key.append_bytes(ID_SUFFIX);
