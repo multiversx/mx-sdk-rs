@@ -95,6 +95,21 @@ fn ordered_binary_tree_test() {
             let opt_root = my_tree_mapper.get_root();
             let depth = my_tree_mapper.get_depth(&opt_root.unwrap());
             assert_eq!(depth, 2);
+
+            my_tree_mapper.insert_element(4u32.into());
+            my_tree_mapper.delete_node(5u32.into());
+
+            let opt_root = my_tree_mapper.get_root();
+            assert_eq!(
+                opt_root,
+                Some(OrderedBinaryTreeNode {
+                    current_node_id: 4,
+                    left_id: 2,
+                    right_id: NULL_NODE_ID,
+                    parent_id: NULL_NODE_ID,
+                    data: 8u32.into()
+                })
+            );
         })
         .assert_ok();
 }

@@ -312,6 +312,7 @@ where
             let opt_right = self.get_node_by_id(successor.right_id);
             self.shift_nodes(&successor, opt_right);
 
+            successor = self.try_get_node_by_id(successor.current_node_id);
             successor.right_id = node.right_id;
 
             let opt_successor_right_node = self.get_node_by_id(successor.right_id);
@@ -326,6 +327,7 @@ where
         }
 
         self.shift_nodes(&node, Some(successor.clone()));
+        successor = self.try_get_node_by_id(successor.current_node_id);
         successor.left_id = node.left_id;
 
         let opt_successor_left_node = self.get_node_by_id(successor.left_id);
@@ -343,17 +345,21 @@ where
     fn shift_nodes(
         &mut self,
         to_delete: &OrderedBinaryTreeNode<T>,
-        opt_to_add: Option<OrderedBinaryTreeNode<T>>,
+        mut opt_to_add: Option<OrderedBinaryTreeNode<T>>,
     ) {
         if to_delete.parent_id == NULL_NODE_ID {
             let root_id_key = self.build_root_id_key();
-            let root_key = self.build_root_key();
-            match opt_to_add {
+            match &mut opt_to_add {
                 Some(to_add) => {
+                    to_add.parent_id = NULL_NODE_ID;
                     storage_set(root_id_key.as_ref(), &to_add.current_node_id);
-                    storage_set(root_key.as_ref(), &to_add);
+
+                    let root_key = self.build_root_key();
+                    storage_set(root_key.as_ref(), to_add);
                 },
                 None => {
+                    let root_key = self.build_root_key();
+
                     storage_set(root_id_key.as_ref(), &Empty);
                     storage_set(root_key.as_ref(), &Empty);
                 },
@@ -362,7 +368,7 @@ where
             return;
         }
 
-        let to_add_id = match opt_to_add {
+        let to_add_id = match &opt_to_add {
             Some(to_add) => to_add.current_node_id,
             None => NULL_NODE_ID,
         };
@@ -372,6 +378,12 @@ where
             parent.left_id = to_add_id;
         } else {
             parent.right_id = to_add_id;
+        }
+
+        if let Some(to_add) = &mut opt_to_add {
+            to_add.parent_id = to_delete.parent_id;
+
+            self.set_item(to_add.current_node_id, &to_add);
         }
 
         self.set_item(parent.current_node_id, &parent);
