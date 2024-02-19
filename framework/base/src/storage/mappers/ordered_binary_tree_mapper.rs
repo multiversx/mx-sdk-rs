@@ -9,7 +9,10 @@ use crate::{
     storage_set,
 };
 
-use super::set_mapper::{CurrentStorage, StorageAddress};
+use super::{
+    set_mapper::{CurrentStorage, StorageAddress},
+    StorageMapper,
+};
 
 use crate::codec::{
     self,
@@ -21,7 +24,7 @@ pub type NodeId = u64;
 
 pub const NULL_NODE_ID: NodeId = 0;
 
-static ROOT_SUFFIX: &[u8] = b"_root";
+static ROOT_ID_SUFFIX: &[u8] = b"_rootId";
 static ID_SUFFIX: &[u8] = b"_id";
 static LAST_ID_KEY_SUFFIX: &[u8] = b"_lastId";
 
@@ -29,13 +32,13 @@ static CORRUPT_TREE_ERR_MGS: &[u8] = b"Corrupt tree";
 
 // https://en.wikipedia.org/wiki/Binary_search_tree
 
-#[derive(TopEncode, TopDecode, Clone)]
+#[derive(TopEncode, TopDecode, Clone, PartialEq, Debug)]
 pub struct OrderedBinaryTreeNode<T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone> {
-    pub(crate) current_node_id: NodeId,
-    pub(crate) left_id: NodeId,
-    pub(crate) right_id: NodeId,
-    pub(crate) parent_id: NodeId,
-    pub(crate) data: T,
+    pub current_node_id: NodeId,
+    pub left_id: NodeId,
+    pub right_id: NodeId,
+    pub parent_id: NodeId,
+    pub data: T,
 }
 
 impl<T> OrderedBinaryTreeNode<T>
@@ -51,11 +54,6 @@ where
             parent_id: NULL_NODE_ID,
         }
     }
-
-    #[inline]
-    pub fn get_data(&self) -> &T {
-        &self.data
-    }
 }
 
 pub struct OrderedBinaryTreeMapper<SA, T, A = CurrentStorage>
@@ -68,6 +66,22 @@ where
     key: StorageKey<SA>,
     _phantom_api: PhantomData<SA>,
     _phantom_item: PhantomData<T>,
+}
+
+impl<SA, T> StorageMapper<SA> for OrderedBinaryTreeMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone + 'static,
+{
+    #[inline]
+    fn new(base_key: StorageKey<SA>) -> Self {
+        OrderedBinaryTreeMapper {
+            address: CurrentStorage,
+            key: base_key,
+            _phantom_api: PhantomData,
+            _phantom_item: PhantomData,
+        }
+    }
 }
 
 impl<SA, T, A> OrderedBinaryTreeMapper<SA, T, A>
@@ -87,10 +101,6 @@ where
     }
 
     pub fn get_depth(&self, node: &OrderedBinaryTreeNode<T>) -> usize {
-        if self.get_root().is_none() {
-            return 0;
-        }
-
         let opt_left_node = self.get_node_by_id(node.left_id);
         let opt_right_node = self.get_node_by_id(node.right_id);
 
@@ -250,6 +260,9 @@ where
         new_node.parent_id = new_node_parent_id;
 
         if opt_new_node_parent.is_none() {
+            let root_id_key = self.build_root_id_key();
+            storage_set(root_id_key.as_ref(), &new_node.current_node_id);
+
             let root_key = self.build_root_key();
             storage_set(root_key.as_ref(), &new_node);
 
@@ -333,10 +346,17 @@ where
         opt_to_add: Option<OrderedBinaryTreeNode<T>>,
     ) {
         if to_delete.parent_id == NULL_NODE_ID {
+            let root_id_key = self.build_root_id_key();
             let root_key = self.build_root_key();
             match opt_to_add {
-                Some(to_add) => storage_set(root_key.as_ref(), &to_add),
-                None => storage_set(root_key.as_ref(), &Empty),
+                Some(to_add) => {
+                    storage_set(root_id_key.as_ref(), &to_add.current_node_id);
+                    storage_set(root_key.as_ref(), &to_add);
+                },
+                None => {
+                    storage_set(root_id_key.as_ref(), &Empty);
+                    storage_set(root_key.as_ref(), &Empty);
+                },
             };
 
             return;
@@ -388,11 +408,20 @@ where
         unsafe { opt_node.unwrap_unchecked() }
     }
 
-    fn build_root_key(&self) -> StorageKey<SA> {
+    fn build_root_id_key(&self) -> StorageKey<SA> {
         let mut key = self.key.clone();
-        key.append_bytes(ROOT_SUFFIX);
+        key.append_bytes(ROOT_ID_SUFFIX);
 
         key
+    }
+
+    fn build_root_key(&self) -> StorageKey<SA> {
+        let mut key = self.key.clone();
+        key.append_bytes(ROOT_ID_SUFFIX);
+
+        let root_id = self.address.address_storage_get(key.as_ref());
+
+        self.build_key_for_item(root_id)
     }
 
     fn build_key_for_item(&self, id: NodeId) -> StorageKey<SA> {
