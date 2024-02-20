@@ -383,7 +383,7 @@ where
         if let Some(to_add) = &mut opt_to_add {
             to_add.parent_id = to_delete.parent_id;
 
-            self.set_item(to_add.current_node_id, &to_add);
+            self.set_item(to_add.current_node_id, to_add);
         }
 
         self.set_item(parent.current_node_id, &parent);
