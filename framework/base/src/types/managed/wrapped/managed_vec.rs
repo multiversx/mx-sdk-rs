@@ -152,14 +152,6 @@ where
         if self.len() != N {
             return None;
         }
-        /*
-        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
-        for (index, value) in self.iter().enumerate() {
-            result_uninit[index].write(value);
-        }
-
-        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
-        */
 
         let mut result_uninit =
             unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
