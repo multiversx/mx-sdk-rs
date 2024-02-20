@@ -174,7 +174,10 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
     for endpoint_abi in builder.collected_endpoints {
         match endpoint_abi.endpoint_type {
             multiversx_sc::abi::EndpointTypeAbi::Init => constructors.push(endpoint_abi),
-            multiversx_sc::abi::EndpointTypeAbi::Upgrade => constructors.push(endpoint_abi),
+            multiversx_sc::abi::EndpointTypeAbi::Upgrade => {
+                constructors.push(endpoint_abi.clone());
+                endpoints.push(endpoint_abi)
+            },
             multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::PromisesCallback => {
                 promise_callbacks.push(endpoint_abi)

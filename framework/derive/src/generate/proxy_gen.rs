@@ -264,6 +264,7 @@ pub fn generate_method_impl(contract_trait: &ContractTrait) -> Vec<proc_macro2::
         .iter()
         .filter_map(|m| match &m.public_role {
             PublicRole::Init(_) => Some(generate_proxy_deploy(m)),
+            PublicRole::Upgrade(_) => Some(generate_proxy_endpoint(m, "upgrade".to_string())),
             PublicRole::Endpoint(endpoint_metadata) => Some(generate_proxy_endpoint(
                 m,
                 endpoint_metadata.public_name.to_string(),
