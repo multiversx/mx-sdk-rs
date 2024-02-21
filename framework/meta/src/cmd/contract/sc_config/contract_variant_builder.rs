@@ -1,4 +1,4 @@
-use multiversx_sc::abi::{ContractAbi, EndpointAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointTypeAbi};
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     fs,
@@ -175,11 +175,17 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
         match endpoint_abi.endpoint_type {
             multiversx_sc::abi::EndpointTypeAbi::Init => constructors.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::Upgrade => {
-                if !constructors.is_empty() {
-                    endpoints.push(endpoint_abi)
-                } else {
-                    endpoints.push(endpoint_abi.clone());
+                if constructors.is_empty() {
                     constructors.push(endpoint_abi);
+                } else {
+                    if constructors
+                        .iter()
+                        .any(|c| matches!(c.endpoint_type, EndpointTypeAbi::Upgrade))
+                    {
+                        endpoints.push(endpoint_abi);
+                    } else {
+                        constructors.push(endpoint_abi);
+                    }
                 }
             },
             multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),

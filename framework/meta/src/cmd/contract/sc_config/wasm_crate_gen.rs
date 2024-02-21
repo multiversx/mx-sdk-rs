@@ -1,4 +1,7 @@
-use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
+use multiversx_sc::{
+    abi::{EndpointAbi, EndpointTypeAbi},
+    external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG,
+};
 use rustc_version::Version;
 use std::{
     fs::{self, File},
@@ -111,6 +114,14 @@ impl ContractVariant {
     /// Writing some nicely formatted comments breaking down all exported functions.
     fn write_stat_comments(&self, wasm_lib_file: &mut File) {
         write_stat_comment(wasm_lib_file, "Init:", NUM_INIT);
+        if self
+            .abi
+            .constructors
+            .iter()
+            .any(|c| matches!(c.endpoint_type, EndpointTypeAbi::Upgrade))
+        {
+            write_stat_comment(wasm_lib_file, "Upgrade:", NUM_INIT)
+        }
         write_stat_comment(wasm_lib_file, "Endpoints:", self.abi.endpoints.len());
         if self.abi.has_callback {
             write_stat_comment(wasm_lib_file, "Async Callback:", NUM_ASYNC_CB);
