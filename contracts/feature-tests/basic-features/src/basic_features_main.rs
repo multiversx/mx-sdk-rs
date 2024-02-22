@@ -100,4 +100,7 @@ pub trait BasicFeatures:
 
         arg1
     }
+
+    #[storage_mapper("coolTree")]
+    fn cool_tree(&self) -> OrderedBinaryTreeMapper<Self::Api, BigUint>;
 }
