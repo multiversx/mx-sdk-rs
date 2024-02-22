@@ -25,36 +25,3 @@ pub trait Adder {
         self.sum().update(|sum| *sum += value);
     }
 }
-
-pub struct TxProxy;
-
-impl<Env> TxProxyTrait<Env> for TxProxy
-where
-    Env: TxEnv,
-{
-    type TxProxyMethods = TxProxyMethods<Env>;
-
-    fn env(self, env: Env) -> Self::TxProxyMethods {
-        TxProxyMethods { env }
-    }
-}
-
-impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethods<Env> {
-    pub fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>>(
-        self,
-        arg0: Arg0,
-    ) -> multiversx_sc::types::Tx<
-        Env,
-        (),
-        (),
-        (),
-        (),
-        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
-        (),
-    > {
-        Tx::new_with_env(self.env)
-            .raw_call()
-            .function_name("add")
-            .argument(&arg0)
-    }
-}
