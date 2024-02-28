@@ -298,24 +298,6 @@ pub fn proxy_trait(contract: &ContractTrait) -> proc_macro2::TokenStream {
     }
 }
 
-pub fn tx_proxy_trait() -> proc_macro2::TokenStream {
-    quote! {
-        pub trait TxProxyTrait<Env>{
-            type TxProxyMethods;
-
-            fn env(self, env: Env) -> Self::TxProxyMethods;
-        }
-    }
-}
-
-pub fn tx_proxy_methods() -> proc_macro2::TokenStream {
-    quote! {
-        pub struct TxProxyMethods<Env: TxEnv> {
-            env: Env,
-        }        
-    }
-}
-
 pub fn proxy_obj_code(contract: &ContractTrait) -> proc_macro2::TokenStream {
     let proxy_object_def = snippets::proxy_object_def();
     let impl_all_proxy_traits =

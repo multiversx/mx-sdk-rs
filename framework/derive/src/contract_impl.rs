@@ -130,8 +130,6 @@ pub fn contract_implementation(
     };
 
     let proxy_trait = proxy_gen::proxy_trait(contract);
-    let tx_proxy_trait = proxy_gen::tx_proxy_trait();
-    let tx_proxy_methods = proxy_gen::tx_proxy_methods();
     let proxy_obj_code = if is_contract_main {
         proxy_gen::proxy_obj_code(contract)
     } else {
@@ -146,10 +144,6 @@ pub fn contract_implementation(
         #endpoints_mod
 
         #proxy_trait
-
-        #tx_proxy_trait
-
-        #tx_proxy_methods
 
         #proxy_obj_code
 
