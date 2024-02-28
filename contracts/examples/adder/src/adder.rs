@@ -85,7 +85,7 @@ trait TxProxyMethodsTrait<Env: TxEnv + multiversx_sc::api::CallTypeApi> {
     fn init<Arg0, O>(
         self,
         initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<Env, (), (), (), (), DeployCall<TxScEnv, FromSource<TxScEnv<Api>>>, OriginalResultMarker<O>>
+    ) -> multiversx_sc::types::Tx<Env, (), (), (), (), FunctionCall<Env::Api>, OriginalResultMarker<O>>
     where
         Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>;
 }
