@@ -47,13 +47,26 @@ pub trait Decimals {
     }
 }
 
+pub type NumDecimals = usize;
+
 impl Decimals for NumDecimals {
     fn num_decimals(&self) -> NumDecimals {
         *self
     }
 }
 
-pub type NumDecimals = usize;
+// impl Add<NumDecimals> for NumDecimals {
+//     type Output = NumDecimals;
+//     fn add(self, rhs: NumDecimals) -> Self::Output {
+//         self + rhs
+//     }
+// }
+// impl Sub<NumDecimals> for NumDecimals {
+//     type Output = NumDecimals;
+//     fn sub(self, rhs: NumDecimals) -> Self::Output {
+//         self - rhs
+//     }
+// }
 
 #[derive(Clone, Debug)]
 pub struct ConstDecimals<const DECIMALS: NumDecimals>;
@@ -307,27 +320,35 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, Const
     }
 }
 
-impl<M: ManagedTypeApi, const D1: NumDecimals, const D2: NumDecimals>
-    Mul<ManagedDecimal<M, ConstDecimals<D2>>> for ManagedDecimal<M, ConstDecimals<D1>>
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals>
+    Mul<ManagedDecimal<M, D2>> for ManagedDecimal<M, D1>
 where
-    ConstDecimals<D1>: Add<ConstDecimals<D2>>,
+    D1: Add<D2>,
+    <D1 as Add<D2>>::Output: Decimals,
 {
-    type Output = ManagedDecimal<M, <ConstDecimals<D2> as Add<ConstDecimals<D1>>>::Output>;
+    type Output = ManagedDecimal<M, <D1 as Add<D2>>::Output>;
 
-    fn mul(self, other: ManagedDecimal<M, ConstDecimals<D2>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data * other.data)
+    fn mul(self, other: ManagedDecimal<M, D2>) -> Self::Output {
+        ManagedDecimal {
+            data: self.data * other.data,
+            decimals: self.decimals + other.decimals,
+        }
     }
 }
 
-impl<M: ManagedTypeApi, const D1: NumDecimals, const D2: NumDecimals>
-    Div<ManagedDecimal<M, ConstDecimals<D2>>> for ManagedDecimal<M, ConstDecimals<D1>>
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals>
+    Div<ManagedDecimal<M, D2>> for ManagedDecimal<M, D1>
 where
-    ConstDecimals<D1>: Sub<ConstDecimals<D2>>,
+    D1: Sub<D2>,
+    <D1 as Sub<D2>>::Output: Decimals,
 {
-    type Output = ManagedDecimal<M, <ConstDecimals<D1> as Sub<ConstDecimals<D2>>>::Output>;
+    type Output = ManagedDecimal<M, <D1 as Sub<D2>>::Output>;
 
-    fn div(self, other: ManagedDecimal<M, ConstDecimals<D2>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data / other.data)
+    fn div(self, other: ManagedDecimal<M, D2>) -> Self::Output {
+        ManagedDecimal {
+            data: self.data / other.data,
+            decimals: self.decimals - other.decimals,
+        }
     }
 }
 
