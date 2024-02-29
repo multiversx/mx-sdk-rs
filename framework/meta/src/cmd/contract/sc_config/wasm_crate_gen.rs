@@ -1,7 +1,4 @@
-use multiversx_sc::{
-    abi::{EndpointAbi, EndpointTypeAbi},
-    external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG,
-};
+use multiversx_sc::{abi::EndpointAbi, external_view_contract::EXTERNAL_VIEW_CONSTRUCTOR_FLAG};
 use rustc_version::Version;
 use std::{
     fs::{self, File},
@@ -119,12 +116,7 @@ impl ContractVariant {
             write_stat_comment(wasm_lib_file, "Init:", NUM_INIT);
             total += NUM_INIT;
         }
-        if self
-            .abi
-            .endpoints
-            .iter()
-            .any(|c| matches!(c.endpoint_type, EndpointTypeAbi::Upgrade))
-        {
+        if !self.abi.upgrade_constructors.is_empty() {
             write_stat_comment(wasm_lib_file, "Upgrade:", NUM_INIT);
         }
 

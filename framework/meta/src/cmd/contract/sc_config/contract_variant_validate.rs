@@ -1,4 +1,4 @@
-use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointTypeAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi};
 
 use super::ContractVariant;
 
@@ -27,24 +27,21 @@ fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), St
 }
 
 fn has_upgrade(contract_variant: &ContractVariant) -> bool {
-    contract_variant
-        .abi
-        .endpoints
-        .iter()
-        .any(|endpoint| matches!(endpoint.endpoint_type, EndpointTypeAbi::Upgrade))
+    !contract_variant.abi.upgrade_constructors.is_empty()
 }
 
 fn has_init(contract_variant: &ContractVariant) -> bool {
-    contract_variant
-        .abi
-        .constructors
-        .iter()
-        .any(|endpoint| matches!(endpoint.endpoint_type, EndpointTypeAbi::Init))
+    !contract_variant.abi.constructors.is_empty()
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.
 fn validate_contract_var_args(abi: &ContractAbi) -> Result<(), String> {
-    for endpoint_abi in abi.constructors.iter().chain(abi.endpoints.iter()) {
+    for endpoint_abi in abi
+        .constructors
+        .iter()
+        .chain(abi.upgrade_constructors.iter())
+        .chain(abi.endpoints.iter())
+    {
         validate_endpoint_var_args_number(endpoint_abi)?;
         validate_endpoint_var_args_order(endpoint_abi)?;
     }

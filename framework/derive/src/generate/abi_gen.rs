@@ -103,7 +103,7 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                 );
                 Some(quote! {
                     #endpoint_def
-                    contract_abi.endpoints.push(endpoint_abi);
+                    contract_abi.upgrade_constructors.push(endpoint_abi);
                 })
             },
             PublicRole::Endpoint(endpoint_metadata) => {
