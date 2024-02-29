@@ -14,8 +14,8 @@ pub fn test(test_args: &TestArgs) {
     let no_capture = test_args.nocapture;
 
     if scen {
-        program = "mx-scenario-go";
-        args.extend(["run", "./"]);
+        program = "run-scenarios";
+        args.push("./");
 
         if go {
             println!("{}", "If scen parameter is true, it will override the go parameter. Executing scenarios...".yellow());
