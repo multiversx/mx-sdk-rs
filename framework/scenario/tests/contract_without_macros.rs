@@ -123,15 +123,14 @@ mod sample_adder {
         fn init(&self, initial_value: &BigInt<Self::Api>) {
             self.set_sum(initial_value);
         }
-        fn add(&self, value: BigInt<Self::Api>) -> SCResult<()> {
+        fn add(&self, value: BigInt<Self::Api>) {
             let mut sum = self.get_sum();
             sum.add_assign(value);
             self.set_sum(&sum);
-            Ok(())
         }
         fn get_sum(&self) -> BigInt<Self::Api>;
         fn set_sum(&self, sum: &BigInt<Self::Api>);
-        fn add_version(&self) -> SCResult<()> {
+        fn add_version(&self) {
             self.add(self.version())
         }
         fn callback(&self);
@@ -197,8 +196,7 @@ mod sample_adder {
                 Self::Api,
                 (multiversx_sc::types::BigInt<Self::Api>, ()),
             >(("value", ()));
-            let result = self.add(value);
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
+            self.add(value);
         }
 
         fn call(&self, fn_name: &str) -> bool {
@@ -418,15 +416,15 @@ fn contract_without_macros_basic() {
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
 
-    let _ = adder.add(BigInt::from(7));
+    adder.add(BigInt::from(7));
     assert_eq!(BigInt::from(12), adder.get_sum());
 
-    let _ = adder.add(BigInt::from(-1));
+    adder.add(BigInt::from(-1));
     assert_eq!(BigInt::from(11), adder.get_sum());
 
     assert_eq!(BigInt::from(100), adder.version());
 
-    let _ = adder.add_version();
+    adder.add_version();
     assert_eq!(BigInt::from(111), adder.get_sum());
 
     assert!(!adder.call("invalid_endpoint"));
