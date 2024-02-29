@@ -11,7 +11,6 @@ pub fn test(test_args: &TestArgs) {
 
     let go = test_args.go;
     let scen = test_args.scen;
-    let no_capture = test_args.nocapture;
 
     if scen {
         program = "run-scenarios";
@@ -20,16 +19,10 @@ pub fn test(test_args: &TestArgs) {
         if go {
             println!("{}", "If scen parameter is true, it will override the go parameter. Executing scenarios...".yellow());
         }
+    } else if go {
+        args.extend(["test", "--features", "multiversx-sc-scenario/run-go-tests"]);
     } else {
-        args.push("test");
-
-        if go {
-            args.extend(["--features", "multiversx-sc-scenario/run-go-tests"]);
-        }
-
-        if no_capture {
-            args.extend(["--", "--nocapture"]);
-        }
+        args.extend(["test"]);
     }
 
     let args_str = args.join(" ");

@@ -20,7 +20,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         },
@@ -92,7 +92,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         }

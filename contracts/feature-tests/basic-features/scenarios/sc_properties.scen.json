@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "code": "file:../output/basic-features.wasm",
                     "owner": "address:someone_else"
                 },
                 "address:an_account": {
@@ -75,7 +75,7 @@
             "id": "1",
             "tx": {
                 "from": "address:an_account",
-                "contractCode": "mxsc:../output/basic-features.mxsc.json",
+                "contractCode": "file:../output/basic-features.wasm",
                 "arguments": [],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -121,7 +121,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "code": "file:../output/basic-features.wasm",
                     "owner": "address:someone_else"
                 },
                 "address:an_account": {
@@ -134,7 +134,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/basic-features.mxsc.json",
+                    "code": "file:../output/basic-features.wasm",
                     "owner": "address:an_account"
                 }
             }

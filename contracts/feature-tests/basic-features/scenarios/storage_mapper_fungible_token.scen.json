@@ -7,7 +7,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -30,7 +30,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json"
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
                 }
             }
         },
@@ -68,7 +68,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-000000"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -94,7 +94,7 @@
                     "storage": {
                         "str:nrIssuedTokens": "1"
                     },
-                    "code": "mxsc:../../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json"
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
                 }
             }
         },
@@ -111,7 +111,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": ""
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 }
             }
         },
@@ -151,7 +151,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-111111"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -177,7 +177,7 @@
                     "storage": {
                         "str:nrIssuedTokens": "2"
                     },
-                    "code": "mxsc:../../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json"
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
                 }
             }
         },
@@ -194,7 +194,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": ""
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 }
             }
         },
@@ -233,7 +233,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-222222"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -259,7 +259,7 @@
                     "storage": {
                         "str:nrIssuedTokens": "3"
                     },
-                    "code": "mxsc:../../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json"
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
                 }
             }
         },
@@ -277,7 +277,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": ""
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 }
             }
         },
@@ -318,7 +318,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-333333"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -344,7 +344,7 @@
                     "storage": {
                         "str:nrIssuedTokens": "4"
                     },
-                    "code": "mxsc:../../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json"
+                    "code": "file:../../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm"
                 }
             }
         },
@@ -361,7 +361,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": "str:TICKER-333333"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 }
             }
         },
@@ -397,7 +397,7 @@
                         "str:fungibleTokenMapper": "str:TICKER-333333",
                         "str:rolesSet": "true"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }
@@ -427,7 +427,7 @@
                         "str:fungibleTokenMapper": "str:TICKER-333333",
                         "str:rolesSet": "true"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 }
             }
         },
@@ -478,7 +478,7 @@
                         "str:fungibleTokenMapper": "str:TICKER-333333",
                         "str:rolesSet": "true"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }
@@ -538,7 +538,7 @@
                         "str:fungibleTokenMapper": "str:TICKER-333333",
                         "str:rolesSet": "true"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }
@@ -588,7 +588,7 @@
                         "str:fungibleTokenMapper": "str:TICKER-333333",
                         "str:rolesSet": "true"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }
@@ -766,7 +766,7 @@
                     "storage": {
                         "str:fungibleTokenMapper": ""
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 }
             }
         },

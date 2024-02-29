@@ -1,7 +1,7 @@
 use multiversx_sc::abi::{ContractAbi, EndpointAbi};
-use multiversx_sc_meta::cmd::contract::sc_config::{ScConfig, ScConfigSerde};
+use multiversx_sc_meta::cmd::contract::sc_config::{MultiContractConfigSerde, ScConfig};
 
-fn get_serialized_toml() -> ScConfigSerde {
+fn get_serialized_toml() -> MultiContractConfigSerde {
     toml::from_str(
         r#"
         [settings]

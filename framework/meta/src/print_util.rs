@@ -2,13 +2,6 @@ use std::process::Command;
 
 use colored::Colorize;
 
-/// Just for convenience, since we seem to be printing many things in green.
-///
-/// The argument is of type `String` because the argument is always a `format!` expression.
-pub fn println_green(s: String) {
-    println!("{}", s.green());
-}
-
 pub fn format_command(command: &Command) -> String {
     let mut result = String::new();
     for (key, opt_value) in command.get_envs() {
@@ -48,15 +41,18 @@ pub fn print_copy_contract(source_wasm_path: &str, output_wasm_path: &str) {
 }
 
 pub fn print_call_wasm_opt(wasm_path: &str) {
-    println_green(format!("Calling wasm-opt on {wasm_path} ..."));
+    println!("{}", format!("Calling wasm-opt on {wasm_path} ...").green(),);
 }
 
 pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
-    println_green(format!("Extracting wat from {wasm_path} to {wat_path} ..."));
+    println!(
+        "{}",
+        format!("Extracting wat from {wasm_path} to {wat_path} ...").green(),
+    );
 }
 
 pub fn print_pack_mxsc_file(output_mxsc_path: &str) {
-    println_green(format!("Packing {output_mxsc_path} ..."));
+    println!("{}", format!("Packing {output_mxsc_path} ...").green(),);
 }
 
 pub fn print_contract_size(size: usize) {
@@ -64,7 +60,10 @@ pub fn print_contract_size(size: usize) {
 }
 
 pub fn print_extract_imports(imports_path: &str) {
-    println_green(format!("Extracting imports to {imports_path} ..."));
+    println!(
+        "{}",
+        format!("Extracting imports to {imports_path} ...").green(),
+    );
 }
 
 pub fn print_check_ei(ei_version: &str) {
@@ -92,7 +91,8 @@ pub fn print_ignore_ei_check() {
 }
 
 pub fn print_workspace_target_dir(target_path_str: &str) {
-    println_green(format!(
-        "Using workspace target directory: {target_path_str} ..."
-    ));
+    println!(
+        "{}",
+        format!("Using workspace target directory: {target_path_str} ...").green()
+    );
 }

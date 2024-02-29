@@ -1,5 +1,3 @@
-use multiversx_sc::storage::StorageKey;
-
 multiversx_sc::imports!();
 
 /// Storage mapper test.
@@ -55,12 +53,8 @@ pub trait SingleValueMapperFeatures {
 
     #[endpoint]
     fn is_empty_at_address_single_value_mapper(&self, address: ManagedAddress) -> bool {
-        let mapper: SingleValueMapper<Self::Api, BigInt, _> = SingleValueMapper::new_from_address(
-            address,
-            StorageKey::from("my_single_value_mapper"),
-        );
-
-        mapper.is_empty()
+        self.map_my_single_value_mapper()
+            .is_empty_at_address(&address)
     }
 
     #[endpoint]

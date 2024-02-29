@@ -15,7 +15,7 @@
                     "storage": {
                         "str:other_contract": "sc:proxy-second"
                     },
-                    "code": "mxsc:../proxy-test-first/output/proxy-test-first.mxsc.json"
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 }
             }
         },
@@ -53,7 +53,7 @@
                     "storage": {
                         "str:other_contract": "sc:proxy-second"
                     },
-                    "code": "mxsc:../proxy-test-first/output/proxy-test-first.mxsc.json"
+                    "code": "file:../proxy-test-first/output/proxy-test-first.wasm"
                 },
                 "sc:proxy-second": {
                     "nonce": "0",

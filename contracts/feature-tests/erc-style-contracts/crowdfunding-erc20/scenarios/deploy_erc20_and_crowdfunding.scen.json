@@ -31,7 +31,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:erc20_owner",
-                "contractCode": "mxsc:../../erc20/output/erc20.mxsc.json",
+                "contractCode": "file:../../erc20/output/erc20.wasm",
                 "arguments": [
                     "1,000,000,000"
                 ],
@@ -65,7 +65,7 @@
                         "str:balance|address:erc20_owner": "1,000,000,000",
                         "str:totalSupply": "1,000,000,000"
                     },
-                    "code": "mxsc:../../erc20/output/erc20.mxsc.json"
+                    "code": "file:../../erc20/output/erc20.wasm"
                 }
             }
         },
@@ -74,7 +74,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:crowdfunding_owner",
-                "contractCode": "mxsc:../output/crowdfunding-erc20.mxsc.json",
+                "contractCode": "file:../output/crowdfunding-erc20.wasm",
                 "arguments": [
                     "1,000,000",
                     "123,456",
@@ -110,7 +110,7 @@
                         "str:balance|address:erc20_owner": "1,000,000,000",
                         "str:totalSupply": "1,000,000,000"
                     },
-                    "code": "mxsc:../../erc20/output/erc20.mxsc.json"
+                    "code": "file:../../erc20/output/erc20.wasm"
                 },
                 "sc:crowdfunding": {
                     "nonce": "0",
@@ -120,7 +120,7 @@
                         "str:deadline": "123,456",
                         "str:erc20ContractAddress": "sc:erc20"
                     },
-                    "code": "mxsc:../output/crowdfunding-erc20.mxsc.json"
+                    "code": "file:../output/crowdfunding-erc20.wasm"
                 }
             }
         }

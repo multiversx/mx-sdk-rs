@@ -5,13 +5,15 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           10
+// Endpoints:                            9
 // Async Callback (empty):               1
 // Promise callbacks:                    3
-// Total number of exported functions:  15
+// Total number of exported functions:  14
 
 #![no_std]
-#![allow(internal_features)]
+
+// Configuration that works with rustc < 1.73.0.
+// TODO: Recommended rustc version: 1.73.0 or newer.
 #![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
@@ -29,7 +31,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         promise_raw_single_token => promise_raw_single_token
         promise_raw_multi_transfer => promise_raw_multi_transfer
         forward_sync_retrieve_funds_bt => forward_sync_retrieve_funds_bt
-        forward_sync_retrieve_funds_bt_twice => forward_sync_retrieve_funds_bt_twice
         forward_promise_retrieve_funds_back_transfers => forward_promise_retrieve_funds_back_transfers
         retrieve_funds_callback => retrieve_funds_callback
         the_one_callback => the_one_callback

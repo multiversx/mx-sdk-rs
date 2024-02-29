@@ -25,7 +25,6 @@ pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_address_to_id;
 pub mod storage_mapper_fungible_token;
-pub mod storage_mapper_get_at_address;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;

@@ -6,7 +6,7 @@ use multiversx_sc_scenario::{
     multiversx_sc::{codec::CodecFrom, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
-use multiversx_sdk::{data::vm::VmValueRequest, utils::base64_decode};
+use multiversx_sdk::data::vm::VmValueRequest;
 
 impl Interactor {
     pub async fn sc_query<S>(&mut self, mut step: S) -> &mut Self

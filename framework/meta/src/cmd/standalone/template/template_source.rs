@@ -3,7 +3,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::{folder_structure::RelevantDirectories, version::FrameworkVersion};
+use crate::folder_structure::RelevantDirectories;
 
 use super::{copy_util::whitelisted_deep_copy, template_metadata::TemplateMetadata, RepoSource};
 
@@ -17,19 +17,18 @@ pub struct TemplateSource<'a> {
 }
 
 impl<'a> TemplateSource<'a> {
-    pub fn copy_template(&self, target_path: impl AsRef<Path>, args_tag: FrameworkVersion) {
+    pub fn copy_template(&self, target_path: impl AsRef<Path>) {
         whitelisted_deep_copy(
             &self.source_path,
             target_path.as_ref(),
             &self.metadata.files_include,
-            args_tag,
         );
     }
 }
 
 pub fn template_sources(repo_temp_dir: &RepoSource) -> Vec<TemplateSource<'_>> {
     let templates_path = repo_temp_dir.repo_path().join(TEMPLATES_PATH_IN_REPO);
-    let dirs = RelevantDirectories::find_all(templates_path, &[]);
+    let dirs = RelevantDirectories::find_all(&templates_path, &[]);
     let mut sources = Vec::new();
     for dir in dirs.iter_contract_crates() {
         let template_metadata_path = dir.path.join(TEMPLATE_TOML_FILE_NAME);

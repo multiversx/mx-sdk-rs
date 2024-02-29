@@ -5,13 +5,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use crate::ei::parse_check_ei;
-
 use super::{
-    contract_variant_settings::{parse_allocator, parse_stack_size},
-    sc_config_model::SC_CONFIG_FILE_NAMES,
-    ContractVariant, ContractVariantProfile, ContractVariantSerde, ContractVariantSettings,
-    ScConfig, ScConfigSerde,
+    oc_global_config::SC_CONFIG_FILE_NAMES,
+    oc_settings::{parse_allocator, parse_check_ei, parse_stack_size},
+    ContractVariant, ContractVariantSerde, ContractVariantSettings, MultiContractConfigSerde,
+    ScConfig,
 };
 
 /// Temporary structure, to help create instances of `ContractVariant`. Not publicly exposed.
@@ -77,7 +75,10 @@ impl ContractVariantBuilder {
                     stack_size: parse_stack_size(&cms.stack_size),
                     features: cms.features.clone(),
                     kill_legacy_callback: cms.kill_legacy_callback,
-                    profile: ContractVariantProfile::from_serde(&cms.profile),
+                    contract_variant_profile: cms
+                        .contract_variant_profile
+                        .clone()
+                        .unwrap_or(default.settings.contract_variant_profile),
                 },
                 ..default
             },
@@ -254,7 +255,7 @@ impl ScConfig {
     /// Assembles an `ContractVariantConfig` from a raw config object that was loaded via Serde.
     ///
     /// In most cases the config will be loaded from a .toml file, use `load_from_file` for that.
-    pub fn load_from_config(config: &ScConfigSerde, original_abi: &ContractAbi) -> Self {
+    pub fn load_from_config(config: &MultiContractConfigSerde, original_abi: &ContractAbi) -> Self {
         let mut contract_builders: HashMap<String, ContractVariantBuilder> = config
             .contracts
             .iter()
@@ -299,7 +300,7 @@ impl ScConfig {
     pub fn load_from_file<P: AsRef<Path>>(path: P, original_abi: &ContractAbi) -> Option<Self> {
         match fs::read_to_string(path.as_ref()) {
             Ok(s) => {
-                let config_serde: ScConfigSerde = toml::from_str(s.as_str())
+                let config_serde: MultiContractConfigSerde = toml::from_str(s.as_str())
                     .unwrap_or_else(|error| panic!("error parsing multicontract.toml: {error}"));
                 Some(Self::load_from_config(&config_serde, original_abi))
             },

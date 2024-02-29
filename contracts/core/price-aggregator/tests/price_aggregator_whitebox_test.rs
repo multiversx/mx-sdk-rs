@@ -1,12 +1,10 @@
 use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
+    staking::EndpointWrappers as StakingEndpointWrappers,
     PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
 use multiversx_sc::types::{EgldOrEsdtTokenIdentifier, MultiValueEncoded};
-use multiversx_sc_modules::{
-    pause::EndpointWrappers as PauseEndpointWrappers,
-    staking::EndpointWrappers as StakingEndpointWrappers,
-};
+use multiversx_sc_modules::pause::EndpointWrappers as PauseEndpointWrappers;
 use multiversx_sc_scenario::{
     managed_address, managed_biguint, managed_buffer, scenario_model::*, WhiteboxContract, *,
 };
@@ -15,14 +13,14 @@ pub const DECIMALS: u8 = 0;
 pub const EGLD_TICKER: &[u8] = b"EGLD";
 pub const NR_ORACLES: usize = 4;
 pub const SLASH_AMOUNT: u64 = 10;
-pub const SLASH_QUORUM: usize = 3;
+pub const SLASH_QUORUM: usize = 2;
 pub const STAKE_AMOUNT: u64 = 20;
 pub const SUBMISSION_COUNT: usize = 3;
 pub const USD_TICKER: &[u8] = b"USDC";
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
-const PRICE_AGGREGATOR_PATH_EXPR: &str = "mxsc:output/multiversx-price-aggregator-sc.mxsc.json";
+const PRICE_AGGREGATOR_PATH_EXPR: &str = "file:output/multiversx-price-aggregator-sc.wasm";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -389,14 +387,6 @@ fn test_price_aggregator_slashing() {
         &price_aggregator_whitebox,
         ScCallStep::new()
             .from(&oracles[2])
-            .argument(BytesValue::from(oracles[1].to_address().as_bytes())),
-        |sc| sc.call_vote_slash_member(),
-    );
-
-    world.whitebox_call(
-        &price_aggregator_whitebox,
-        ScCallStep::new()
-            .from(&oracles[3])
             .argument(BytesValue::from(oracles[1].to_address().as_bytes())),
         |sc| sc.call_vote_slash_member(),
     );

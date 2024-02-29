@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/examples/lottery-esdt");
 
     blockchain.register_contract(
-        "mxsc:output/lottery-esdt.mxsc.json",
+        "file:output/lottery-esdt.wasm",
         lottery_esdt::ContractBuilder,
     );
     blockchain

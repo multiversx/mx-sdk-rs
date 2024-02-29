@@ -31,7 +31,7 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         },
@@ -91,7 +91,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "mxsc:../forwarder/output/forwarder.mxsc.json"
+                    "code": "file:../forwarder/output/forwarder.wasm"
                 }
             }
         }

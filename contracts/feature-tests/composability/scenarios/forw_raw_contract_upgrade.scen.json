@@ -6,13 +6,13 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 },
                 "sc:reference": {
-                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
+                    "code": "file:../vault/output/vault-upgrade.wasm"
                 },
                 "sc:child": {
-                    "code": "mxsc:../vault/output/vault.mxsc.json",
+                    "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder"
                 }
             }
@@ -26,8 +26,7 @@
                 "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:child",
-                    "sc:reference",
-                    "0x0102"
+                    "sc:reference"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
@@ -41,8 +40,7 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json",
-                    "codeMetadata": "0x0102"
+                    "code": "file:../vault/output/vault-upgrade.wasm"
                 },
                 "+": ""
             }
@@ -56,8 +54,7 @@
                 "function": "call_upgrade",
                 "arguments": [
                     "sc:child",
-                    "mxsc:../vault/output/vault.mxsc.json",
-                    "0x0102",
+                    "file:../vault/output/vault.wasm",
                     "str:upgrade-init-arg"
                 ],
                 "gasLimit": "500,000,000",
@@ -74,8 +71,7 @@
             "step": "checkState",
             "accounts": {
                 "sc:child": {
-                    "code": "mxsc:../vault/output/vault.mxsc.json",
-                    "codeMetadata": "0x0102"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "+": ""
             }

@@ -1,5 +1,3 @@
-use crate::{version::FrameworkVersion, version_history::LAST_TEMPLATE_VERSION};
-
 pub enum RepoVersion {
     Master,
     Tag(String),
@@ -23,13 +21,6 @@ impl RepoVersion {
             RepoVersion::Tag(tag) => {
                 format!("mx-sdk-rs-{tag}")
             },
-        }
-    }
-
-    pub fn get_tag(&self) -> FrameworkVersion {
-        match self {
-            RepoVersion::Master => LAST_TEMPLATE_VERSION,
-            RepoVersion::Tag(tag) => FrameworkVersion::from_string_template(tag),
         }
     }
 }

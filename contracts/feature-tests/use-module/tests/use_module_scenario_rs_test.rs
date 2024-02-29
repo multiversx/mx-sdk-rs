@@ -33,13 +33,10 @@ use multiversx_sc_scenario::*;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.register_contract(
-        "mxsc:output/use-module.mxsc.json",
-        use_module::ContractBuilder,
-    );
+    blockchain.register_contract("file:output/use-module.wasm", use_module::ContractBuilder);
 
     blockchain.register_contract(
-        "mxsc:test-wasm/elrond-wasm-sc-dns.mxsc.json",
+        "file:test-wasm/elrond-wasm-sc-dns.wasm",
         dns_mock::ContractBuilder,
     );
 

@@ -24,7 +24,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../output/queue-repeat.mxsc.json",
+                "contractCode": "file:../output/queue-repeat.wasm",
                 "arguments": [],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"

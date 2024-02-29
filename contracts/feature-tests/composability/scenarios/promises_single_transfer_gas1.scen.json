@@ -10,12 +10,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }
         },
@@ -56,12 +56,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:promises": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../promises-features/output/promises-features.mxsc.json"
+                    "code": "file:../promises-features/output/promises-features.wasm"
                 }
             }
         }

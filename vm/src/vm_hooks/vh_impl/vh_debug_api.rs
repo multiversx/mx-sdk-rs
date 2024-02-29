@@ -139,7 +139,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         &self,
         egld_value: num_bigint::BigUint,
         contract_code: Vec<u8>,
-        code_metadata: VMCodeMetadata,
+        _code_metadata: VMCodeMetadata,
         args: Vec<Vec<u8>>,
     ) -> (VMAddress, Vec<Vec<u8>>) {
         let contract_address = self.current_address();
@@ -162,7 +162,6 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         let (tx_result, new_address, blockchain_updates) = self.0.vm_ref.deploy_contract(
             tx_input,
             contract_code,
-            code_metadata,
             tx_cache,
             execute_current_tx_context_input,
         );
@@ -240,8 +239,10 @@ impl DebugApiVMHooksHandler {
 
         let contract_address = &self.0.input_ref().to;
         let builtin_functions = &self.0.vm_ref.builtin_functions;
-        self.back_transfers_lock()
-            .new_from_result(contract_address, &tx_result, builtin_functions);
+        let current_back_transfers =
+            BackTransfers::new_from_result(contract_address, &tx_result, builtin_functions);
+
+        self.back_transfers_lock().merge(&current_back_transfers);
 
         tx_result.result_values
     }

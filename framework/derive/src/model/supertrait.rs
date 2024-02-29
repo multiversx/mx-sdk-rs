@@ -1,7 +1,7 @@
-use syn::{punctuated::Punctuated, token::PathSep};
+use syn::{punctuated::Punctuated, token::Colon2};
 
 /// Path to a Rust module containing a contract module.
-pub type ModulePath = Punctuated<syn::PathSegment, PathSep>;
+pub type ModulePath = Punctuated<syn::PathSegment, Colon2>;
 
 #[derive(Clone, Debug)]
 pub struct Supertrait {

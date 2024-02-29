@@ -14,12 +14,12 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.47.4"
+            "version": "0.45.1"
         }
     },
     "docs": [
         "Contract whose sole purpose is to verify that",
-        "the ABI generation framework works as expected.",
+        "the ABI generation framework works sa expected.",
         "",
         "Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,",
         "including Rust docs."

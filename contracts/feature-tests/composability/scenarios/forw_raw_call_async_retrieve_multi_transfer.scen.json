@@ -22,12 +22,12 @@
                             ]
                         }
                     },
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         },
@@ -79,7 +79,7 @@
                         }
                     },
                     "storage": {},
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
@@ -104,7 +104,7 @@
                         },
                         "str:callback_payments.len": "1"
                     },
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         }

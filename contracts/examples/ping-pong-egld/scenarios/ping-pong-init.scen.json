@@ -31,7 +31,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "mxsc:../output/ping-pong-egld.mxsc.json",
+                "contractCode": "file:../output/ping-pong-egld.wasm",
                 "arguments": [
                     "500,000,000,000",
                     "123,000",
@@ -73,7 +73,7 @@
                         "str:activationTimestamp": "780",
                         "str:deadline": "123,780"
                     },
-                    "code": "mxsc:../output/ping-pong-egld.mxsc.json"
+                    "code": "file:../output/ping-pong-egld.wasm"
                 }
             }
         }

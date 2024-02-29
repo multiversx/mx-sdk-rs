@@ -61,7 +61,7 @@ impl BasicFeaturesInteract {
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
         let code_expr = BytesValue::interpret_from(
-            "mxsc:../output/basic-features-storage-bytes.mxsc.json",
+            "file:../output/basic-features-storage-bytes.wasm",
             &InterpreterContext::default(),
         );
 

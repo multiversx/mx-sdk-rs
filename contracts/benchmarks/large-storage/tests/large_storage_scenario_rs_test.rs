@@ -4,7 +4,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/benchmarks/large-storage");
     blockchain.register_contract(
-        "mxsc:output/large-storage.mxsc.json",
+        "file:output/large-storage.wasm",
         large_storage::ContractBuilder,
     );
     blockchain

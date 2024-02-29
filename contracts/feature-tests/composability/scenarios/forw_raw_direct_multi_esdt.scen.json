@@ -19,7 +19,7 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         },
@@ -75,7 +75,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             }
         }
