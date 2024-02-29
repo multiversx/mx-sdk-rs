@@ -15,6 +15,7 @@ pub const CALL_VALUE_SINGLE_ESDT: RawHandle = -13;
 
 pub const BIG_INT_TEMPORARY_1: RawHandle = -14;
 pub const BIG_INT_TEMPORARY_2: RawHandle = -15;
+pub const BIG_FLOAT_TEMPORARY: RawHandle = -16;
 
 /// WARNING! With the current VM this still needs to be initialized before use.
 pub const MBUF_CONST_EMPTY: RawHandle = -20;

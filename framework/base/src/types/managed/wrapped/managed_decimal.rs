@@ -1,6 +1,9 @@
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{const_handles, use_raw_handle, BigIntApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    api::{
+        const_handles, use_raw_handle, BigFloatApiImpl, BigIntApiImpl, ManagedTypeApi,
+        StaticVarApiImpl,
+    },
     types::{BigFloat, BigUint},
 };
 
@@ -114,14 +117,12 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     }
 
     pub fn to_big_float(&self) -> BigFloat<M> {
-        let numerator = self.data.to_u64().unwrap() as i64;
-        let denominator = self
-            .decimals
-            .scaling_factor::<M>()
-            .deref()
-            .to_u64()
-            .unwrap() as i64;
-        BigFloat::from_frac(numerator, denominator)
+        let result = BigFloat::from_big_uint(&self.data);
+        let temp_handle: M::BigFloatHandle = use_raw_handle(const_handles::BIG_FLOAT_TEMPORARY);
+        let denominator = self.decimals.scaling_factor::<M>();
+        M::managed_type_impl().bf_set_bi(temp_handle.clone(), denominator.handle);
+        M::managed_type_impl().bf_div(result.handle.clone(), result.handle.clone(), temp_handle);
+        result
     }
 
     pub fn from_big_float<T: Decimals>(
