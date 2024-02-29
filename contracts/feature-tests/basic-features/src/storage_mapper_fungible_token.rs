@@ -83,6 +83,12 @@ pub trait FungibleTokenMapperFeatures:
         );
     }
 
+    #[view(getTokenMapperState)]
+    fn get_token_mapper_state(&self) -> bool {
+        let state = self.fungible_token_mapper().get_token_state();
+        state.is_pending()
+    }
+
     #[endpoint]
     fn set_local_roles_fungible(&self) {
         let roles = [EsdtLocalRole::Mint, EsdtLocalRole::Burn];

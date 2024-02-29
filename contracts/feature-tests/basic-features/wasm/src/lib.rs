@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          384
+// Endpoints:                          385
 // Async Callback:                       1
-// Total number of exported functions: 386
+// Total number of exported functions: 387
 
 #![no_std]
 #![allow(internal_features)]
@@ -346,6 +346,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         issue_fungible_default_callback => issue_fungible_default_callback
         issue_fungible_custom_callback => issue_fungible_custom_callback
         issue_and_set_all_roles_fungible => issue_and_set_all_roles_fungible
+        getTokenMapperState => get_token_mapper_state
         set_local_roles_fungible => set_local_roles_fungible
         mint_fungible => mint_fungible
         mint_and_send_fungible => mint_and_send_fungible
