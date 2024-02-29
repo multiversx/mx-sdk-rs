@@ -39,8 +39,8 @@ where
     }
 }
 
-trait TxProxyMethodsTrait<Env: TxEnv + multiversx_sc::api::CallTypeApi> {
-    fn add<Arg0, O>(
+pub trait TxProxyMethodsTrait<Env: TxEnv + multiversx_sc::api::CallTypeApi> {
+    fn add<Arg0, OriginalResult>(
         self,
         value: Arg0,
     ) -> multiversx_sc::types::Tx<
@@ -50,12 +50,12 @@ trait TxProxyMethodsTrait<Env: TxEnv + multiversx_sc::api::CallTypeApi> {
         (),
         (),
         FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
+        OriginalResultMarker<OriginalResult>,
     >
     where
         Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>;
 
-    fn upgrade<Arg0, O>(
+    fn upgrade<Arg0, OriginalResult>(
         self,
         initial_value: Arg0,
     ) -> multiversx_sc::types::Tx<
@@ -65,12 +65,12 @@ trait TxProxyMethodsTrait<Env: TxEnv + multiversx_sc::api::CallTypeApi> {
         (),
         (),
         FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
+        OriginalResultMarker<OriginalResult>,
     >
     where
         Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>;
 
-    fn sum<O>(
+    fn sum<OriginalResult>(
         self,
     ) -> multiversx_sc::types::Tx<
         Env,
@@ -79,40 +79,32 @@ trait TxProxyMethodsTrait<Env: TxEnv + multiversx_sc::api::CallTypeApi> {
         (),
         (),
         FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
+        OriginalResultMarker<OriginalResult>,
     >;
 
-    fn init<Arg0, O>(
+    #[allow(clippy::type_complexity)]
+    fn init<Arg0, OriginalResult>(
         self,
         initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<Env, (), (), (), (), FunctionCall<Env::Api>, OriginalResultMarker<O>>
+    ) -> multiversx_sc::types::Tx<
+        Env,
+        (),
+        (),
+        (),
+        (),
+        DeployCall<Env::Api, ()>,
+        OriginalResultMarker<OriginalResult>,
+    >
     where
-        Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>;
+        Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>,
+        DeployCall<<Env as TxEnv>::Api, ()>: TxData<Env>,
+        <Env as TxEnv>::Api: TxEnv;
 }
 
-impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
+impl<Env: TxEnv<Api = Env> + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
     for TxProxyMethods<Env>
 {
-    fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>, O>(
-        self,
-        initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<
-        Env,
-        (),
-        (),
-        (),
-        (),
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
-    > {
-        Tx::new_with_env(self.env)
-            .raw_call()
-            .function_name("init")
-            .argument(&initial_value)
-            .original_result()
-    }
-
-    fn sum<O>(
+    fn sum<OriginalResult>(
         self,
     ) -> multiversx_sc::types::Tx<
         Env,
@@ -121,7 +113,7 @@ impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
         (),
         (),
         FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
+        OriginalResultMarker<OriginalResult>,
     > {
         Tx::new_with_env(self.env)
             .raw_call()
@@ -129,7 +121,7 @@ impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
             .original_result()
     }
 
-    fn upgrade<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>, O>(
+    fn upgrade<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>, OriginalResult>(
         self,
         initial_value: Arg0,
     ) -> multiversx_sc::types::Tx<
@@ -139,9 +131,9 @@ impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
         (),
         (),
         FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
+        OriginalResultMarker<OriginalResult>,
     > {
-        Tx::new_with_env(self.env.clone())
+        Tx::new_with_env(self.env)
             .raw_call()
             .function_name("upgrade")
             .argument(&initial_value)
@@ -149,7 +141,7 @@ impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
     }
 
     //Add desired amount to the storage variable.
-    fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>, O>(
+    fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>, OriginalResult>(
         self,
         value: Arg0,
     ) -> multiversx_sc::types::Tx<
@@ -159,12 +151,35 @@ impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethodsTrait<Env>
         (),
         (),
         FunctionCall<Env::Api>,
-        OriginalResultMarker<O>,
+        OriginalResultMarker<OriginalResult>,
     > {
-        Tx::new_with_env(self.env.clone())
+        Tx::new_with_env(self.env)
             .raw_call()
             .function_name("add")
             .argument(&value)
+            .original_result()
+    }
+
+    fn init<Arg0, OriginalResult>(
+        self,
+        initial_value: Arg0,
+    ) -> multiversx_sc::types::Tx<
+        Env,
+        (),
+        (),
+        (),
+        (),
+        DeployCall<<Env as TxEnv>::Api, ()>,
+        OriginalResultMarker<OriginalResult>,
+    >
+    where
+        Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>,
+        DeployCall<<Env as TxEnv>::Api, ()>: TxData<Env>,
+        <Env as TxEnv>::Api: TxEnv,
+    {
+        Tx::new_with_env(self.env)
+            .raw_deploy()
+            .argument(&initial_value)
             .original_result()
     }
 }
