@@ -1,6 +1,7 @@
 #![no_std]
 
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 use function_selector::FunctionSelector;
 use multiversx_sc_modules::{

@@ -1,12 +1,13 @@
 use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
+    staking::ProxyTrait as _,
     ContractObj, PriceAggregator, ProxyTrait as _, MAX_ROUND_DURATION_SECONDS,
 };
 use multiversx_sc::{
     codec::multi_types::MultiValueVec,
     types::{Address, EgldOrEsdtTokenIdentifier},
 };
-use multiversx_sc_modules::{pause::ProxyTrait, staking::ProxyTrait as _};
+use multiversx_sc_modules::pause::ProxyTrait;
 use multiversx_sc_scenario::{
     api::StaticApi,
     managed_address, managed_biguint, managed_buffer,
@@ -19,9 +20,9 @@ const EGLD_TICKER: &[u8] = b"EGLD";
 const NR_ORACLES: usize = 4;
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
-const PRICE_AGGREGATOR_PATH_EXPR: &str = "mxsc:output/multiversx-price-aggregator-sc.mxsc.json";
+const PRICE_AGGREGATOR_PATH_EXPR: &str = "file:output/multiversx-price-aggregator-sc.wasm";
 const SLASH_AMOUNT: u64 = 10;
-const SLASH_QUORUM: usize = 3;
+const SLASH_QUORUM: usize = 2;
 const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
@@ -288,8 +289,9 @@ fn test_price_aggregator_submit_round_ok() {
     state
         .world
         .whitebox_query(&state.price_aggregator_whitebox, |sc| {
-            let result =
-                sc.latest_price_feed(managed_buffer!(EGLD_TICKER), managed_buffer!(USD_TICKER));
+            let result = sc
+                .latest_price_feed(managed_buffer!(EGLD_TICKER), managed_buffer!(USD_TICKER))
+                .unwrap();
 
             let (round_id, from, to, timestamp, price, decimals) = result.into_tuple();
             assert_eq!(round_id, 1);
@@ -367,7 +369,6 @@ fn test_price_aggregator_slashing() {
 
     state.vote_slash_member(&state.oracles[0].clone(), state.oracles[1].to_address());
     state.vote_slash_member(&state.oracles[2].clone(), state.oracles[1].to_address());
-    state.vote_slash_member(&state.oracles[3].clone(), state.oracles[1].to_address());
 
     state.world.sc_call(
         ScCallStep::new().from(&state.oracles[0]).call(

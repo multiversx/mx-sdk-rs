@@ -6,12 +6,12 @@
                 "sc:mcf": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/multi-contract-features.mxsc.json"
+                    "code": "file:../output/multi-contract-features.wasm"
                 },
                 "sc:mcf-view": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/multi-contract-features-view.mxsc.json"
+                    "code": "file:../output/multi-contract-features-view.wasm"
                 },
                 "address:an-account": {
                     "nonce": "0",

@@ -23,7 +23,7 @@
             "id": "1",
             "tx": {
                 "from": "address:crypto_bubbles_owner",
-                "contractCode": "mxsc:../output/crypto-bubbles.mxsc.json",
+                "contractCode": "file:../output/crypto-bubbles.wasm",
                 "arguments": [],
                 "gasLimit": "0x100000",
                 "gasPrice": "0x01"
@@ -49,7 +49,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
+                    "code": "file:../output/crypto-bubbles.wasm"
                 }
             }
         }

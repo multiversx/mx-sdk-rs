@@ -26,7 +26,7 @@
                 "arguments": [
                     "0",
                     "sc:adder-code",
-                    "0x0100",
+                    "0x0000",
                     "1234"
                 ],
                 "gasLimit": "200,000,000",
@@ -73,14 +73,14 @@
                             "1-discriminant": "0x07",
                             "2-amount": "u32:0",
                             "3-code_source": "sc:adder-code",
-                            "4-code_metadata": "0x0100",
+                            "4-code_metadata": "0x0000",
                             "5-arguments": [
                                 "u32:1",
                                 "u32:2|1234"
                             ]
                         }
                     },
-                    "code": "mxsc:../output/multisig.mxsc.json"
+                    "code": "file:../output/multisig.wasm"
                 },
                 "+": ""
             }
@@ -169,7 +169,7 @@
                     "storage": {
                         "str:sum": "1234"
                     },
-                    "code": "mxsc:../test-contracts/adder.mxsc.json"
+                    "code": "file:../test-contracts/adder.wasm"
                 },
                 "+": ""
             }
@@ -307,7 +307,7 @@
                     "storage": {
                         "str:sum": "2468"
                     },
-                    "code": "mxsc:../test-contracts/adder.mxsc.json"
+                    "code": "file:../test-contracts/adder.wasm"
                 },
                 "+": ""
             }

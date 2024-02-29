@@ -12,7 +12,7 @@
                 "sc:erc20": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/erc20.mxsc.json"
+                    "code": "file:../output/erc20.wasm"
                 }
             }
         },
@@ -50,7 +50,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/erc20.mxsc.json"
+                    "code": "file:../output/erc20.wasm"
                 }
             }
         }

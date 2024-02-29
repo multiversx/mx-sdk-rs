@@ -8,7 +8,7 @@
                 "sc:panic_features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/panic-message-features.mxsc.json"
+                    "code": "file:../output/panic-message-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -45,7 +45,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/panic-message-features.mxsc.json"
+                    "code": "file:../output/panic-message-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "1",

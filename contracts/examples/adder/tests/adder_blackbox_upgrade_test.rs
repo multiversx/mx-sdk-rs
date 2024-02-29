@@ -1,12 +1,12 @@
 use multiversx_sc_scenario::{scenario_model::*, *};
 
-const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+const ADDER_PATH_EXPR: &str = "file:output/adder.wasm";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
 
-    blockchain.register_contract("mxsc:output/adder.mxsc.json", adder::ContractBuilder);
+    blockchain.register_contract("file:output/adder.wasm", adder::ContractBuilder);
     blockchain
 }
 

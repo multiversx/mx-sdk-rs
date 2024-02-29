@@ -4,10 +4,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/factorial");
 
-    blockchain.register_contract(
-        "mxsc:output/factorial.mxsc.json",
-        factorial::ContractBuilder,
-    );
+    blockchain.register_contract("file:output/factorial.wasm", factorial::ContractBuilder);
     blockchain
 }
 

@@ -69,10 +69,8 @@ impl AdderInteract {
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
         let wallet_address = interactor.register_wallet(test_wallets::mike());
-        let adder_code = BytesValue::interpret_from(
-            "mxsc:../output/adder.mxsc.json",
-            &InterpreterContext::default(),
-        );
+        let adder_code =
+            BytesValue::interpret_from("file:../output/adder.wasm", &InterpreterContext::default());
 
         Self {
             interactor,

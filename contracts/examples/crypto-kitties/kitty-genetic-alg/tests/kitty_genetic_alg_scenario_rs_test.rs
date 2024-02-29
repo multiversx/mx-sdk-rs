@@ -3,7 +3,7 @@ use multiversx_sc_scenario::*;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.register_contract(
-        "mxsc:output/kitty-genetic-alg.mxsc.json",
+        "file:output/kitty-genetic-alg.wasm",
         kitty_genetic_alg::ContractBuilder,
     );
     blockchain

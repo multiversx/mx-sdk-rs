@@ -26,7 +26,7 @@
                 "arguments": [
                     "0",
                     "sc:factorial-code",
-                    "0x0100"
+                    "0x0000"
                 ],
                 "gasLimit": "200,000,000",
                 "gasPrice": "0"
@@ -72,11 +72,11 @@
                             "1-discriminant": "0x07",
                             "2-amount": "u32:0",
                             "3-code_source": "sc:factorial-code",
-                            "4-code_metadata": "0x0100",
+                            "4-code_metadata": "0x0000",
                             "5-arguments": "u32:0"
                         }
                     },
-                    "code": "mxsc:../output/multisig.mxsc.json"
+                    "code": "file:../output/multisig.wasm"
                 },
                 "+": ""
             }
@@ -184,13 +184,13 @@
                         "str:quorum": "2",
                         "str:action_data.len": "3"
                     },
-                    "code": "mxsc:../output/multisig.mxsc.json"
+                    "code": "file:../output/multisig.wasm"
                 },
                 "sc:factorial": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../test-contracts/factorial.mxsc.json"
+                    "code": "file:../test-contracts/factorial.wasm"
                 },
                 "+": ""
             }

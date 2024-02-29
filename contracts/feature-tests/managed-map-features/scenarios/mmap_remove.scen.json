@@ -17,7 +17,7 @@
                         "str:key|u32:3": "str:key3",
                         "str:value|u32:3": "str:value3"
                     },
-                    "code": "mxsc:../output/managed-map-features.mxsc.json"
+                    "code": "file:../output/managed-map-features.wasm"
                 },
                 "address:an-account": {
                     "nonce": "0"

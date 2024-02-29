@@ -5,7 +5,7 @@ use multiversx_sc_meta::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
     find_workspace::find_current_workspace,
-    version_history::{self, LAST_TEMPLATE_VERSION},
+    version_history,
 };
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
@@ -72,7 +72,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
         target.clone(),
         true,
     )
-    .create_contract(LAST_TEMPLATE_VERSION);
+    .create_contract();
 
     if BUILD_CONTRACTS {
         build_contract(&target);
@@ -127,7 +127,7 @@ fn template_test_released(template_name: &str, new_name: &str) {
         target.clone(),
         false,
     )
-    .create_contract(LAST_TEMPLATE_VERSION);
+    .create_contract();
 
     if BUILD_CONTRACTS {
         build_contract(&target);

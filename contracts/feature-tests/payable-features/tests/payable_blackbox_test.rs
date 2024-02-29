@@ -1,6 +1,6 @@
 use multiversx_sc_scenario::{scenario_model::*, *};
 
-const PF_PATH_EXPR: &str = "mxsc:output/payable-features.mxsc.json";
+const PF_PATH_EXPR: &str = "file:output/payable-features.wasm";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

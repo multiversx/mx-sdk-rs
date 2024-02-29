@@ -9,7 +9,7 @@
                     "balance": "0"
                 },
                 "sc:factorial": {
-                    "code": "mxsc:../output/factorial.mxsc.json"
+                    "code": "file:../output/factorial.wasm"
                 }
             }
         },

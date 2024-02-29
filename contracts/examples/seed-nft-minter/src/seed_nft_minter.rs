@@ -1,6 +1,7 @@
 #![no_std]
 
-use multiversx_sc::{derive_imports::*, imports::*};
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 mod distribution_module;
 mod nft_module;
@@ -122,7 +123,7 @@ pub trait SeedNftMinter:
 }
 
 mod nft_marketplace_proxy {
-    use multiversx_sc::imports::*;
+    multiversx_sc::imports!();
 
     #[multiversx_sc::proxy]
     pub trait NftMarketplace {

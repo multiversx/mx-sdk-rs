@@ -9,10 +9,9 @@ use promises_features::call_sync_bt::ProxyTrait;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const PROMISES_FEATURE_ADDRESS_EXPR: &str = "sc:promises-feature";
-const PROMISES_FEATURES_PATH_EXPR: &str =
-    "mxsc:promises-features/output/promises-feature.mxsc.json";
+const PROMISES_FEATURES_PATH_EXPR: &str = "file:promises-features/output/promises-feature.wasm";
 const VAULT_ADDRESS_EXPR: &str = "sc:vault";
-const VAULT_PATH_EXPR: &str = "mxsc:../vault/output/vault.mxsc.json";
+const VAULT_PATH_EXPR: &str = "file:../vault/output/vault.wasm";
 
 const TOKEN_ID_EXPR: &str = "str:TOKEN-123456";
 const TOKEN_ID: &[u8] = b"TOKEN-123456";
@@ -88,34 +87,6 @@ fn test_back_transfers() {
                     TOKEN_ID,
                     0u64,
                     &token_amount,
-                ),
-        ),
-    );
-
-    state
-        .world
-        .check_state_step(CheckStateStep::new().put_account(
-            state.promises_features_contract,
-            CheckAccount::new().esdt_balance(TOKEN_ID_EXPR, token_amount),
-        ));
-}
-
-#[test]
-fn test_multi_call_back_transfers() {
-    let mut state = PromisesFeaturesTestState::new();
-    let token_amount = BigUint::from(1000u64);
-    let half_token_amount = token_amount.clone() / 2u64;
-    let vault_address = state.vault_contract.to_address();
-
-    state.world.sc_call(
-        ScCallStep::new().from(USER_ADDRESS_EXPR).call(
-            state
-                .promises_features_contract
-                .forward_sync_retrieve_funds_bt_twice(
-                    vault_address.clone(),
-                    TOKEN_ID,
-                    0u64,
-                    &half_token_amount,
                 ),
         ),
     );

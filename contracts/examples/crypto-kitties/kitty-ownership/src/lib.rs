@@ -1,7 +1,7 @@
 #![no_std]
 #![allow(clippy::suspicious_operation_groupings)]
 
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
 
 use core::cmp::max;
 

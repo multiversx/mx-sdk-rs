@@ -11,7 +11,7 @@
                 "sc:use_module": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/use-module.mxsc.json",
+                    "code": "file:../output/use-module.wasm",
                     "owner": "address:a_user"
                 },
                 "sc:dns#87": {
@@ -20,7 +20,7 @@
                     "storage": {
                         "str:registration_cost": "1000"
                     },
-                    "code": "mxsc:../test-wasm/elrond-wasm-sc-dns.mxsc.json"
+                    "code": "file:../test-wasm/elrond-wasm-sc-dns.wasm"
                 }
             }
         },
@@ -55,7 +55,7 @@
                     "balance": "*",
                     "username": "str:coolname0001.elrond",
                     "storage": {},
-                    "code": "mxsc:../output/use-module.mxsc.json"
+                    "code": "file:../output/use-module.wasm"
                 },
                 "+": ""
             }

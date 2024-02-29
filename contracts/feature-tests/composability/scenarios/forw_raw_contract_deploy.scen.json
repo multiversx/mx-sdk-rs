@@ -11,7 +11,7 @@
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
+                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
                 }
             },
             "newAddresses": [
@@ -40,8 +40,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "mxsc:../vault/output/vault.mxsc.json",
-                    "0x0100"
+                    "file:../vault/output/vault.wasm"
                 ],
                 "gasLimit": "50,000,000",
                 "gasPrice": "0"
@@ -64,8 +63,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../vault/output/vault.mxsc.json",
-                    "codeMetadata": "0x0100",
+                    "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -79,8 +77,7 @@
                 "to": "sc:forwarder",
                 "function": "deploy_contract",
                 "arguments": [
-                    "mxsc:../vault/output/vault.mxsc.json",
-                    "0x0100",
+                    "file:../vault/output/vault.wasm",
                     "str:some_argument"
                 ],
                 "gasLimit": "50,000,000",
@@ -105,8 +102,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../vault/output/vault.mxsc.json",
-                    "codeMetadata": "0x0100",
+                    "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder"
                 },
                 "+": ""
@@ -121,7 +117,6 @@
                 "function": "deploy_from_source",
                 "arguments": [
                     "sc:child",
-                    "0x0100",
                     "str:some_argument"
                 ],
                 "gasLimit": "50,000,000",
@@ -145,8 +140,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../vault/output/vault.mxsc.json",
-                    "codeMetadata": "0x0100",
+                    "code": "file:../vault/output/vault.wasm",
                     "owner": "sc:forwarder"
                 },
                 "+": ""

@@ -1,4 +1,4 @@
-use syn::{punctuated::Punctuated, token::PathSep};
+use syn::{punctuated::Punctuated, token::Colon2};
 
 /// Splits off the last part of a path from the rest.
 /// e.g. `some::module::Item` will be split into `some::module::` and `Item`.
@@ -7,7 +7,7 @@ use syn::{punctuated::Punctuated, token::PathSep};
 /// The method is designed for contexts where explicit module specification is required.
 pub fn split_path_last(
     path: &syn::Path,
-) -> Option<(Punctuated<syn::PathSegment, PathSep>, syn::PathSegment)> {
+) -> Option<(Punctuated<syn::PathSegment, Colon2>, syn::PathSegment)> {
     if path.segments.len() >= 2 {
         let mut leading_segments = path.segments.clone();
         let last_segment = leading_segments.pop().unwrap().into_value();

@@ -19,13 +19,12 @@ opt-level = "z"
 lto = true
 debug = false
 panic = "abort"
-overflow-checks = false
 
 [dependencies.seed-nft-minter]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.47.4"
+version = "0.45.1"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

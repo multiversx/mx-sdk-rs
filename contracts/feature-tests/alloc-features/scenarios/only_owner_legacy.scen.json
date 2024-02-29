@@ -16,7 +16,7 @@
                 "sc:alloc-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/alloc-features.mxsc.json",
+                    "code": "file:../output/alloc-features.wasm",
                     "owner": "address:owner"
                 }
             }
@@ -74,7 +74,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/alloc-features.mxsc.json",
+                    "code": "file:../output/alloc-features.wasm",
                     "owner": "address:owner"
                 },
                 "address:an_account": {

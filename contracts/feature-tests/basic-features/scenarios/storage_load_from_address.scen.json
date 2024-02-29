@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "sc:external-contract": {
                     "nonce": "0",
@@ -16,7 +16,7 @@
                     "storage": {
                         "str:external-key": "str:external-value"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",

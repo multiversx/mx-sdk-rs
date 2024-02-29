@@ -58,7 +58,7 @@
                         "str:owner|u32:1": "address:bidder2",
                         "str:sireAllowedAddress|u32:1": "address:bidder1"
                     },
-                    "code": "mxsc:../../kitty-ownership/output/kitty-ownership.mxsc.json"
+                    "code": "file:../../kitty-ownership/output/kitty-ownership.wasm"
                 },
                 "sc:kitty_auction_contract": {
                     "nonce": "0",
@@ -69,7 +69,7 @@
                         "str:genZeroKittyEndingPrice": "500",
                         "str:genZeroKittyAuctionDuration": "100,000"
                     },
-                    "code": "mxsc:../output/kitty-auction.mxsc.json"
+                    "code": "file:../output/kitty-auction.wasm"
                 }
             }
         }

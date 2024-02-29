@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "sc:other": {
                     "nonce": "0",
@@ -16,7 +16,7 @@
                     "storage": {
                         "str:otherStorage": "str:myValue"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -55,7 +55,7 @@
                     "storage": {
                         "str:coolKey": "str:12345"
                     },
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "+": ""
             }

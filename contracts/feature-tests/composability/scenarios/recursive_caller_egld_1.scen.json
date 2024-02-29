@@ -12,12 +12,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "1000",
-                    "code": "mxsc:../recursive-caller/output/recursive-caller.mxsc.json"
+                    "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }
             }
         },
@@ -123,13 +123,13 @@
                     "storage": {
                         "str:call_counts|nested:str:accept_funds": "1"
                     },
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 },
                 "sc:recursive-caller": {
                     "nonce": "0",
                     "balance": "999",
                     "storage": {},
-                    "code": "mxsc:../recursive-caller/output/recursive-caller.mxsc.json"
+                    "code": "file:../recursive-caller/output/recursive-caller.wasm"
                 }
             }
         }

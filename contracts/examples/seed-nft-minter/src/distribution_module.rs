@@ -1,4 +1,5 @@
-use multiversx_sc::{derive_imports::*, imports::*};
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 pub const MAX_DISTRIBUTION_PERCENTAGE: u64 = 100_000; // 100%
 

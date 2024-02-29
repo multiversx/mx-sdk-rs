@@ -23,7 +23,7 @@
             "id": "deploy",
             "tx": {
                 "from": "address:my_address",
-                "contractCode": "mxsc:../output/kitty-genetic-alg.mxsc.json",
+                "contractCode": "file:../output/kitty-genetic-alg.wasm",
                 "arguments": [],
                 "gasLimit": "1,000,000",
                 "gasPrice": "0"
@@ -47,7 +47,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "mxsc:../output/kitty-genetic-alg.mxsc.json"
+                    "code": "file:../output/kitty-genetic-alg.wasm"
                 }
             }
         }

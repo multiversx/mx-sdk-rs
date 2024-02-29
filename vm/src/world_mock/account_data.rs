@@ -2,10 +2,7 @@ use num_bigint::BigUint;
 use num_traits::Zero;
 
 use super::AccountEsdt;
-use crate::{
-    display_util::key_hex,
-    types::{VMAddress, VMCodeMetadata},
-};
+use crate::{display_util::key_hex, types::VMAddress};
 use std::{collections::HashMap, fmt, fmt::Write};
 
 pub type AccountStorage = HashMap<Vec<u8>, Vec<u8>>;
@@ -19,7 +16,6 @@ pub struct AccountData {
     pub storage: AccountStorage,
     pub username: Vec<u8>,
     pub contract_path: Option<Vec<u8>>,
-    pub code_metadata: VMCodeMetadata,
     pub contract_owner: Option<VMAddress>,
     pub developer_rewards: BigUint,
 }
@@ -34,7 +30,6 @@ impl AccountData {
             storage: AccountStorage::default(),
             username: vec![],
             contract_path: None,
-            code_metadata: VMCodeMetadata::empty(),
             contract_owner: None,
             developer_rewards: BigUint::zero(),
         }

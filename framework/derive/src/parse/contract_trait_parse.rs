@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub fn parse_contract_trait(
-    args: proc_macro::TokenStream,
+    args: syn::AttributeArgs,
     contract_trait: &syn::ItemTrait,
 ) -> ContractTrait {
     validate_attribute_args(args);
@@ -34,7 +34,7 @@ pub fn parse_contract_trait(
         .items
         .iter()
         .map(|itm| match itm {
-            syn::TraitItem::Fn(m) => process_method(m, &trait_attributes),
+            syn::TraitItem::Method(m) => process_method(m, &trait_attributes),
             _ => panic!("Only methods allowed in contract traits"),
         })
         .collect();
