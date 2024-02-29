@@ -5,7 +5,3 @@ pub trait TxProxyTrait<Env> {
 
     fn env(self, env: Env) -> Self::TxProxyMethods;
 }
-
-pub struct TxProxyMethods<Env: TxEnv> {
-    pub env: Env,
-}
