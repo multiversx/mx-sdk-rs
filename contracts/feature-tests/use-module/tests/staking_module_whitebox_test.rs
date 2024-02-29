@@ -24,7 +24,7 @@ const PAUL_ADDRESS_EXPR: &str = "address:paul";
 const SALLY_ADDRESS_EXPR: &str = "address:sally";
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
+const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

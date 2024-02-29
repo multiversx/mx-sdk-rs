@@ -12,13 +12,12 @@ fn variant_dep_encode_snippets(
     name: &syn::Ident,
     data_enum: &syn::DataEnum,
 ) -> Vec<proc_macro2::TokenStream> {
-    let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
         .variants
         .iter()
         .enumerate()
         .map(|(variant_index, variant)| {
-            let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
+            let variant_index_u8 = variant_index as u8;
             let variant_ident = &variant.ident;
             let local_var_declarations =
                 fields_decl_syntax(&variant.fields, local_variable_for_field);
@@ -27,7 +26,7 @@ fn variant_dep_encode_snippets(
             });
             quote! {
                 #name::#variant_ident #local_var_declarations => {
-                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_discriminant, __dest__, __h__)?;
+                    codec::NestedEncode::dep_encode_or_handle_err(&#variant_index_u8, __dest__, __h__)?;
                     #(#variant_field_snippets)*
                 },
             }
@@ -57,8 +56,10 @@ pub fn nested_encode_impl(ast: &syn::DeriveInput) -> TokenStream {
             }
         },
         syn::Data::Enum(data_enum) => {
-            validate_enum_variants(&data_enum.variants);
-
+            assert!(
+                data_enum.variants.len() < 256,
+                "enums with more than 256 variants not supported"
+            );
             let variant_dep_encode_snippets = variant_dep_encode_snippets(name, data_enum);
 
             quote! {

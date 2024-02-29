@@ -5,11 +5,11 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/basic-features");
 
     blockchain.register_contract(
-        "mxsc:output/basic-features.mxsc.json",
+        "file:output/basic-features.wasm",
         basic_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:../esdt-system-sc-mock/output/esdt-system-sc-mock.mxsc.json",
+        "file:../esdt-system-sc-mock/output/esdt-system-sc-mock.wasm",
         esdt_system_sc_mock::ContractBuilder,
     );
 
@@ -37,18 +37,23 @@ fn big_uint_eq_u_64_rs() {
 }
 
 #[test]
+fn small_num_overflow_rs() {
+    world().run("scenarios/small_num_overflow.scen.json");
+}
+
+#[test]
 fn big_uint_from_u_64_rs() {
     world().run("scenarios/big_uint_from_u64.scen.json");
 }
 
 #[test]
-fn big_uint_pow_rs() {
-    world().run("scenarios/big_uint_pow.scen.json");
+fn big_uint_sqrt_rs() {
+    world().run("scenarios/big_uint_sqrt.scen.json");
 }
 
 #[test]
-fn big_uint_sqrt_rs() {
-    world().run("scenarios/big_uint_sqrt.scen.json");
+fn big_uint_pow_rs() {
+    world().run("scenarios/big_uint_pow.scen.json");
 }
 
 #[test]
@@ -216,11 +221,6 @@ fn get_caller_rs() {
 }
 
 #[test]
-fn get_code_metadata_rs() {
-    world().run("scenarios/get_code_metadata.scen.json");
-}
-
-#[test]
 fn get_cumulated_validator_rewards_rs() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
 }
@@ -228,11 +228,6 @@ fn get_cumulated_validator_rewards_rs() {
 #[test]
 fn get_shard_of_address_rs() {
     world().run("scenarios/get_shard_of_address.scen.json");
-}
-
-#[test]
-fn is_builtin_function_rs() {
-    world().run("scenarios/is_builtin_function.scen.json");
 }
 
 #[test]
@@ -282,11 +277,6 @@ fn managed_vec_biguint_push_rs() {
 }
 
 #[test]
-fn new_address_rs() {
-    world().run("scenarios/new_address.scen.json");
-}
-
-#[test]
 fn only_owner_rs() {
     world().run("scenarios/only_owner.scen.json");
 }
@@ -316,11 +306,6 @@ fn return_codes_rs() {
 #[test]
 fn sc_properties_rs() {
     world().run("scenarios/sc_properties.scen.json");
-}
-
-#[test]
-fn small_num_overflow_rs() {
-    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -379,19 +364,14 @@ fn storage_map_3_rs() {
 }
 
 #[test]
-fn storage_mapper_address_to_id_rs() {
-    world().run("scenarios/storage_mapper_address_to_id.scen.json");
-}
-
-#[test]
 #[ignore]
 fn storage_mapper_fungible_token_rs() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
 }
 
 #[test]
-fn storage_mapper_get_at_address_rs() {
-    world().run("scenarios/storage_mapper_get_at_address.scen.json");
+fn storage_mapper_address_to_id_rs() {
+    world().run("scenarios/storage_mapper_address_to_id.scen.json");
 }
 
 #[test]

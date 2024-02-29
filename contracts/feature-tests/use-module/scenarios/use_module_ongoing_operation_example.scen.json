@@ -5,7 +5,7 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:use_module": {
-                    "code": "mxsc:../output/use-module.mxsc.json"
+                    "code": "file:../output/use-module.wasm"
                 }
             }
         },
@@ -39,7 +39,7 @@
                     "storage": {
                         "str:ongoing_operation:currentOngoingOperation": ""
                     },
-                    "code": "mxsc:../output/use-module.mxsc.json"
+                    "code": "file:../output/use-module.wasm"
                 },
                 "+": ""
             }
@@ -74,7 +74,7 @@
                     "storage": {
                         "str:ongoing_operation:currentOngoingOperation": "1"
                     },
-                    "code": "mxsc:../output/use-module.mxsc.json"
+                    "code": "file:../output/use-module.wasm"
                 },
                 "+": ""
             }
@@ -109,7 +109,7 @@
                     "storage": {
                         "str:ongoing_operation:currentOngoingOperation": ""
                     },
-                    "code": "mxsc:../output/use-module.mxsc.json"
+                    "code": "file:../output/use-module.wasm"
                 },
                 "+": ""
             }

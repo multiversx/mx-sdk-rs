@@ -10,7 +10,7 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "mxsc:../vault/output/vault.mxsc.json"
+                    "code": "file:../vault/output/vault.wasm"
                 }
             },
             "newAddresses": [
@@ -27,7 +27,7 @@
             "tx": {
                 "from": "address:owner",
                 "egldValue": "1000",
-                "contractCode": "mxsc:../forwarder-raw/output/forwarder-raw-init-sync-call.mxsc.json",
+                "contractCode": "file:../forwarder-raw/output/forwarder-raw-init-sync-call.wasm",
                 "arguments": [
                     "sc:vault",
                     "str:accept_funds"

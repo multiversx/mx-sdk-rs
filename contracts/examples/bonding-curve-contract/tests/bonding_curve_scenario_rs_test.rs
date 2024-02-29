@@ -3,7 +3,7 @@ use multiversx_sc_scenario::*;
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.register_contract(
-        "mxsc:output/bonding-curve-contract.mxsc.json",
+        "file:output/bonding-curve-contract.wasm",
         bonding_curve_contract::ContractBuilder,
     );
     blockchain

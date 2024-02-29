@@ -9,17 +9,17 @@ publish = false
 path = "src/check_pause.rs"
 
 [dev-dependencies]
-num-bigint = "0.4"
+num-bigint = "0.4.2"
 
 [dependencies.multiversx-sc]
-version = "0.47.4"
+version = "0.45.1"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.47.4"
+version = "0.45.1"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.47.4"
+version = "0.45.1"
 path = "../../../framework/scenario"
 

@@ -23,7 +23,6 @@ pub mod storage_direct_load;
 pub mod storage_direct_store;
 pub mod storage_mapper_address_to_id;
 pub mod storage_mapper_fungible_token;
-pub mod storage_mapper_get_at_address;
 pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
@@ -77,7 +76,6 @@ pub trait BasicFeatures:
     + token_identifier_features::TokenIdentifierFeatures
     + non_zero_features::TypeFeatures
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
-    + storage_mapper_get_at_address::StorageMapperGetAtAddress
 {
     #[init]
     fn init(&self) {}

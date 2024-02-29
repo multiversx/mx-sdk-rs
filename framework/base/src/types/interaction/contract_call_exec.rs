@@ -74,6 +74,7 @@ where
         }
     }
 
+    #[cfg(feature = "promises")]
     pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
         super::AsyncCallPromises {
             to: self.basic.to,

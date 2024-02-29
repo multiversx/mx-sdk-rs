@@ -28,7 +28,7 @@
             "id": "deploy-first-contract",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../first-contract/output/first-contract.mxsc.json",
+                "contractCode": "file:../first-contract/output/first-contract.wasm",
                 "arguments": [
                     "str:cool_token",
                     "sc:second_contract"
@@ -48,7 +48,7 @@
             "id": "deploy-second-contract",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../second-contract/output/second-contract.mxsc.json",
+                "contractCode": "file:../second-contract/output/second-contract.wasm",
                 "arguments": [
                     "str:cool_token"
                 ],

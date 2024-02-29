@@ -6,7 +6,7 @@
             "step": "setState",
             "accounts": {
                 "sc:basic-features": {
-                    "code": "mxsc:../output/basic-features.mxsc.json"
+                    "code": "file:../output/basic-features.wasm"
                 },
                 "address:an_account": {}
             }

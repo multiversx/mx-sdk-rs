@@ -12,7 +12,7 @@
                 "sc:check-pause": {
                     "nonce": "1",
                     "balance": "0",
-                    "code": "mxsc:../../check-pause/output/check-pause.mxsc.json",
+                    "code": "file:../../check-pause/output/check-pause.wasm",
                     "owner": "sc:proxy-pause"
                 }
             },
@@ -29,7 +29,7 @@
             "id": "1-deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../output/proxy-pause.mxsc.json",
+                "contractCode": "file:../output/proxy-pause.wasm",
                 "arguments": [],
                 "gasLimit": "20,000,000",
                 "gasPrice": "0"

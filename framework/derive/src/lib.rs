@@ -49,21 +49,18 @@ pub fn proxy(
 #[proc_macro_derive(TypeAbi)]
 pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse(input).unwrap();
+
     type_abi_derive::type_abi_derive(&ast)
 }
 
 #[proc_macro_derive(ManagedVecItem)]
 pub fn managed_vec_item_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse(input).unwrap();
+
     managed_vec_item_derive::managed_vec_item_derive(&ast)
 }
 
 #[proc_macro]
 pub fn format_receiver_args(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     format::format_receiver_args_macro(input)
-}
-
-#[proc_macro]
-pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    format::semver_tuple(input)
 }

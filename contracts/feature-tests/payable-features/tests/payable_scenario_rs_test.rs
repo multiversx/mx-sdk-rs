@@ -4,7 +4,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/payable-features");
     blockchain.register_contract(
-        "mxsc:output/payable-features.mxsc.json",
+        "file:output/payable-features.wasm",
         payable_features::ContractBuilder,
     );
     blockchain

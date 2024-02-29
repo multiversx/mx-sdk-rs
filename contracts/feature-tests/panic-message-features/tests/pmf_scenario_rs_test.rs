@@ -5,7 +5,7 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/panic-message-features");
 
     blockchain.register_partial_contract::<panic_message_features::AbiProvider, _>(
-        "mxsc:output/panic-message-features.mxsc.json",
+        "file:output/panic-message-features.wasm",
         panic_message_features::ContractBuilder,
         "panic-message-features",
     );

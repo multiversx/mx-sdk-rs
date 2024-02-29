@@ -83,7 +83,7 @@
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "1",
                         "+": ""
                     },
-                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
+                    "code": "file:../output/lottery-esdt.wasm"
                 }
             }
         }

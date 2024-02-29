@@ -1,6 +1,6 @@
 use crate::{
     tx_execution::BlockchainVMRef,
-    types::{VMAddress, VMCodeMetadata},
+    types::VMAddress,
     world_mock::{AccountData, AccountEsdt, BlockchainState, FailingExecutor},
 };
 use num_bigint::BigUint;
@@ -49,7 +49,6 @@ impl TxContext {
             esdt: AccountEsdt::default(),
             username: Vec::new(),
             contract_path: None,
-            code_metadata: VMCodeMetadata::empty(),
             contract_owner: None,
             developer_rewards: BigUint::zero(),
         });
@@ -149,7 +148,6 @@ impl TxContext {
         &self,
         new_address: &VMAddress,
         contract_path: Vec<u8>,
-        code_metadata: VMCodeMetadata,
         contract_owner: VMAddress,
     ) {
         assert!(
@@ -165,7 +163,6 @@ impl TxContext {
             esdt: AccountEsdt::default(),
             username: Vec::new(),
             contract_path: Some(contract_path),
-            code_metadata,
             contract_owner: Some(contract_owner),
             developer_rewards: BigUint::zero(),
         });

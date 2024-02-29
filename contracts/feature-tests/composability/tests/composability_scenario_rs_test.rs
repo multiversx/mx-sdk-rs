@@ -5,47 +5,47 @@ fn world() -> ScenarioWorld {
     blockchain.set_current_dir_from_workspace("contracts/feature-tests/composability");
 
     blockchain.register_contract(
-        "mxsc:builtin-func-features/output/builtin-func-features.mxsc.json",
+        "file:builtin-func-features/output/builtin-func-features.wasm",
         builtin_func_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder-queue/output/forwarder-queue.mxsc.json",
+        "file:forwarder-queue/output/forwarder-queue.wasm",
         forwarder_queue::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder/output/forwarder.mxsc.json",
+        "file:forwarder/output/forwarder.wasm",
         forwarder::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:forwarder-raw/output/forwarder-raw.mxsc.json",
+        "file:forwarder-raw/output/forwarder-raw.wasm",
         forwarder_raw::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:promises-features/output/promises-features.mxsc.json",
+        "file:promises-features/output/promises-features.wasm",
         promises_features::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:proxy-test-first/output/proxy-test-first.mxsc.json",
+        "file:proxy-test-first/output/proxy-test-first.wasm",
         proxy_test_first::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:proxy-test-second/output/proxy-test-second.mxsc.json",
+        "file:proxy-test-second/output/proxy-test-second.wasm",
         proxy_test_second::ContractBuilder,
     );
     blockchain.register_contract(
-        "mxsc:recursive-caller/output/recursive-caller.mxsc.json",
+        "file:recursive-caller/output/recursive-caller.wasm",
         recursive_caller::ContractBuilder,
     );
 
     let vault_sc_config =
         meta::multi_contract_config::<vault::AbiProvider>(&blockchain.current_dir().join("vault"));
     blockchain.register_contract_variant(
-        "mxsc:vault/output/vault.mxsc.json",
+        "file:vault/output/vault.wasm",
         vault::ContractBuilder,
         vault_sc_config.find_contract("vault"),
     );
     blockchain.register_contract_variant(
-        "mxsc:vault/output/vault-upgrade.mxsc.json",
+        "file:vault/output/vault-upgrade.wasm",
         vault::ContractBuilder,
         vault_sc_config.find_contract("vault-upgrade"),
     );
