@@ -9,29 +9,14 @@ pub fn validate_contract_variant(contract_variant: &ContractVariant) -> Result<(
 }
 
 fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), String> {
-    match contract_variant.abi.constructors.len() {
-        0 => if has_upgrade(contract_variant) {
-            Ok(())
-        } else {
-            Err("Missing constructor. Add a method annotated with `#[init]`.".to_string())
-        },
-        1 => Ok(()),
-        2 => if has_init(contract_variant) && has_upgrade(contract_variant) {
-            Ok(())
-        }
-        else {
-            Err("You can only have two constructors and only one of each: `#[init]` and `#[upgrade]`".to_string())
-        }
-        _ => Err("More than two constructors present. Exactly one method annotated with `#[init]` and another optional `#[upgrade]` is required.".to_string()),
+    match (
+        contract_variant.abi.constructors.len(),
+        contract_variant.abi.upgrade_constructors.len(),
+    ) {
+        (0, 0) => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
+        (1, 0) | (0, 1) | (1, 1) => Ok(()),
+        (_, _) => Err("More than two constructors present. Exactly one method annotated with `#[init]` and/or another optional `#[upgrade]` is required. ".to_string()),
     }
-}
-
-fn has_upgrade(contract_variant: &ContractVariant) -> bool {
-    !contract_variant.abi.upgrade_constructors.is_empty()
-}
-
-fn has_init(contract_variant: &ContractVariant) -> bool {
-    !contract_variant.abi.constructors.is_empty()
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.

@@ -44,6 +44,22 @@
         ],
         "outputs": []
     },
+    "upgradeConstructor": {
+        "docs": [
+            "Upgrade constructor."
+        ],
+        "inputs": [
+            {
+                "name": "_constructor_arg_1",
+                "type": "i32"
+            },
+            {
+                "name": "_constructor_arg_2",
+                "type": "OnlyShowsUpInConstructor"
+            }
+        ],
+        "outputs": []
+    },
     "endpoints": [
         {
             "docs": [
