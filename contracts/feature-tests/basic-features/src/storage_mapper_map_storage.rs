@@ -46,19 +46,24 @@ pub trait MapStorageMapperFeatures {
     }
 
     #[endpoint]
-    fn map_storage_mapper_insert_value(&self, item: u32, key: u32, value: u32) -> Option<u32> {
+    fn map_storage_mapper_insert_value(
+        &self,
+        item: u32,
+        key: u32,
+        value: u32,
+    ) -> SCResult<Option<u32>> {
         let map_storage_mapper = self.map_storage_mapper();
         if let Some(mut map) = map_storage_mapper.get(&item) {
-            return map.insert(key, value);
+            return Ok(map.insert(key, value));
         }
         sc_panic!("No storage!")
     }
 
     #[endpoint]
-    fn map_storage_mapper_get_value(&self, item: u32, key: u32) -> Option<u32> {
+    fn map_storage_mapper_get_value(&self, item: u32, key: u32) -> SCResult<Option<u32>> {
         let map_storage_mapper = self.map_storage_mapper();
         if let Some(map) = map_storage_mapper.get(&item) {
-            return map.get(&key);
+            return Ok(map.get(&key));
         }
         sc_panic!("No storage!")
     }

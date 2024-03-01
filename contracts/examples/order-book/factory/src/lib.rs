@@ -1,6 +1,7 @@
 #![no_std]
 
-use multiversx_sc::{derive_imports::*, imports::*};
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct TokenIdPair<M: ManagedTypeApi> {

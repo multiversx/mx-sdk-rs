@@ -1,6 +1,6 @@
 #![no_std]
 
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
 
 mod lottery_info;
 mod status;

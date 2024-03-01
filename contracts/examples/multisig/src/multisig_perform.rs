@@ -3,7 +3,7 @@ use crate::{
     user_role::UserRole,
 };
 
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
 
 /// Gas required to finish transaction after transfer-execute.
 const PERFORM_ACTION_FINISH_GAS: u64 = 300_000;

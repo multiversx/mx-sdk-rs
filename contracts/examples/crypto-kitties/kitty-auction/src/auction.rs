@@ -1,4 +1,4 @@
-use multiversx_sc::derive_imports::*;
+multiversx_sc::derive_imports!();
 
 use multiversx_sc::{
     api::ManagedTypeApi,

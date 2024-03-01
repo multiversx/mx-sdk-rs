@@ -5,7 +5,32 @@
 #[macro_export]
 macro_rules! imports {
     () => {
-        use multiversx_sc::imports::*;
+        use core::ops::{
+            Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
+            DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
+            SubAssign,
+        };
+        use multiversx_sc::{
+            abi::TypeAbi,
+            api::{ErrorApiImpl, ManagedTypeApi},
+            arrayvec::ArrayVec,
+            codec::{
+                multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
+                TopEncode,
+            },
+            contract_base::{ContractBase, ProxyObjBase},
+            err_msg,
+            esdt::*,
+            io::*,
+            non_zero_usize,
+            non_zero_util::*,
+            require, require_old, sc_error, sc_format, sc_panic, sc_print,
+            storage::mappers::*,
+            types::{
+                SCResult::{Err, Ok},
+                *,
+            },
+        };
     };
 }
 
@@ -13,15 +38,18 @@ macro_rules! imports {
 #[macro_export]
 macro_rules! derive_imports {
     () => {
-        use multiversx_sc::derive_imports::*;
+        use multiversx_sc::{
+            codec,
+            codec::derive::{
+                NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
+                TopEncodeOrDefault,
+            },
+            derive::{ManagedVecItem, TypeAbi},
+        };
     };
 }
 
 /// Compact way of returning a static error message.
-#[deprecated(
-    since = "0.48.0",
-    note = "Use `sc_panic!` instead, which terminates immediately."
-)]
 #[macro_export]
 macro_rules! sc_error {
     ($s:expr) => {
@@ -46,10 +74,6 @@ macro_rules! sc_error {
 /// }
 /// # }
 /// ```
-#[deprecated(
-    since = "0.48.0",
-    note = "Use `require!` instead, which terminates immediately."
-)]
 #[macro_export]
 macro_rules! require_old {
     ($expression:expr, $error_msg:expr) => {
@@ -173,7 +197,7 @@ macro_rules! sc_try {
 macro_rules! only_owner {
     ($trait_self: expr, $error_msg:expr) => {
         if ($trait_self.blockchain().get_caller() != $trait_self.blockchain().get_owner_address()) {
-            return multiversx_sc::sc_error!($error_msg);
+            return sc_error!($error_msg);
         }
     };
 }

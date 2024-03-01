@@ -1,5 +1,3 @@
-#![allow(deprecated)]
-
 use multiversx_sc::types::{SCResult, StaticSCError};
 use multiversx_sc_scenario::api::StaticApi;
 

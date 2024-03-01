@@ -3,7 +3,7 @@ use multiversx_sc::{
     types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
-use multiversx_sc::derive_imports::*;
+multiversx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
 pub struct CallActionData<M: ManagedTypeApi> {

@@ -1,8 +1,10 @@
 #![no_std]
 
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
 
 mod pause_proxy {
+    multiversx_sc::imports!();
+
     #[multiversx_sc::proxy]
     pub trait Pausable {
         #[endpoint]

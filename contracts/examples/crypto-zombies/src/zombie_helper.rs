@@ -1,4 +1,4 @@
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
 
 use crate::storage;
 

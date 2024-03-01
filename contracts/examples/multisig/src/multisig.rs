@@ -10,7 +10,7 @@ pub mod user_role;
 use action::ActionFullInfo;
 use user_role::UserRole;
 
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
 
 /// Multi-signature smart contract implementation.
 /// Acts like a wallet that needs multiple signers for any action performed.

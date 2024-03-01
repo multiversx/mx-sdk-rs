@@ -1,5 +1,3 @@
-#![allow(deprecated)]
-
 multiversx_sc::imports!();
 
 use multiversx_sc::types::String;
@@ -13,12 +11,12 @@ pub trait MacroFeaturesLegacy {
     #[view]
     fn only_owner_legacy(&self) -> SCResult<()> {
         multiversx_sc::only_owner!(self, "Custom only owner message");
-        SCResult::Ok(())
+        Ok(())
     }
 
     #[view]
     fn return_sc_error(&self) -> SCResult<()> {
-        multiversx_sc::sc_error!("return_sc_error")
+        sc_error!("return_sc_error")
     }
 
     #[view]
@@ -57,13 +55,13 @@ pub trait MacroFeaturesLegacy {
         require!(test, "test argument is false");
         let unwrapped =
             SCResult::<String, StaticSCError>::from_result(arg.ok_or("option argument is none"))?;
-        SCResult::Ok(unwrapped)
+        Ok(unwrapped)
     }
 
     #[endpoint]
     fn result_echo_2(&self, arg: Option<String>) -> SCResult<String> {
         let unwrapped = arg.ok_or("option argument is none")?;
-        SCResult::Ok(unwrapped)
+        Ok(unwrapped)
     }
 
     #[endpoint]

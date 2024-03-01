@@ -1,6 +1,7 @@
 #![no_std]
 
-use multiversx_sc::{derive_imports::*, imports::*};
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 use multiversx_sc_modules::ongoing_operation::{
     CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
 };
@@ -439,6 +440,8 @@ fn ticket_from_storage(position: u64, ticket_id: u64) -> u64 {
 }
 
 mod seed_nft_minter {
+    multiversx_sc::imports!();
+
     #[multiversx_sc::proxy]
     pub trait SeedNftMinter {
         #[endpoint(getNftCount)]

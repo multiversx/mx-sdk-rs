@@ -1,4 +1,5 @@
-use multiversx_sc::imports::*;
+multiversx_sc::imports!();
+multiversx_sc::derive_imports!();
 
 use super::common::{Order, OrderType};
 
