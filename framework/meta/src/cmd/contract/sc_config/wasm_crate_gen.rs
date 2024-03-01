@@ -110,7 +110,16 @@ fn write_stat_comment(wasm_lib_file: &mut File, label: &str, number: usize) {
 impl ContractVariant {
     /// Writing some nicely formatted comments breaking down all exported functions.
     fn write_stat_comments(&self, wasm_lib_file: &mut File) {
-        write_stat_comment(wasm_lib_file, "Init:", NUM_INIT);
+        let mut total = self.abi.endpoints.len() + NUM_ASYNC_CB + self.abi.promise_callbacks.len();
+
+        if !self.abi.constructors.is_empty() {
+            write_stat_comment(wasm_lib_file, "Init:", NUM_INIT);
+            total += NUM_INIT;
+        }
+        if !self.abi.upgrade_constructors.is_empty() {
+            write_stat_comment(wasm_lib_file, "Upgrade:", NUM_INIT);
+        }
+
         write_stat_comment(wasm_lib_file, "Endpoints:", self.abi.endpoints.len());
         if self.abi.has_callback {
             write_stat_comment(wasm_lib_file, "Async Callback:", NUM_ASYNC_CB);
@@ -124,8 +133,6 @@ impl ContractVariant {
                 self.abi.promise_callbacks.len(),
             );
         }
-        let total =
-            self.abi.endpoints.len() + NUM_INIT + NUM_ASYNC_CB + self.abi.promise_callbacks.len();
 
         write_stat_comment(wasm_lib_file, "Total number of exported functions:", total);
     }

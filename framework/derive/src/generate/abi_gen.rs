@@ -91,6 +91,21 @@ fn generate_endpoint_snippets(contract: &ContractTrait) -> Vec<proc_macro2::Toke
                     contract_abi.constructors.push(endpoint_abi);
                 })
             },
+            PublicRole::Upgrade(_) => {
+                let endpoint_def = generate_endpoint_snippet(
+                    m,
+                    "upgrade",
+                    false,
+                    false,
+                    EndpointMutabilityMetadata::Mutable,
+                    EndpointTypeMetadata::Upgrade,
+                    m.is_allow_multiple_var_args(),
+                );
+                Some(quote! {
+                    #endpoint_def
+                    contract_abi.upgrade_constructors.push(endpoint_abi);
+                })
+            },
             PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_def = generate_endpoint_snippet(
                     m,

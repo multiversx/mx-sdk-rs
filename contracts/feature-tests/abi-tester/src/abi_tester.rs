@@ -30,6 +30,12 @@ pub trait AbiTester {
     #[payable("EGLD")]
     fn init(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {}
 
+    /// Upgrade constructor.
+    #[upgrade]
+    fn upgrade(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {
+        self.init(_constructor_arg_1, _constructor_arg_2)
+    }
+
     /// Example endpoint docs.
     #[endpoint]
     #[output_name("single output")]

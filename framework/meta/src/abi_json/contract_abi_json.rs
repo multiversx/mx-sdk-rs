@@ -21,6 +21,10 @@ pub struct ContractAbiJson {
     pub constructor: Option<ConstructorAbiJson>,
 
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub upgrade_constructor: Option<ConstructorAbiJson>,
+
+    #[serde(default)]
     pub endpoints: Vec<EndpointAbiJson>,
 
     #[serde(default)]
@@ -48,6 +52,7 @@ impl From<&ContractAbi> for ContractAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             constructor: abi.constructors.first().map(ConstructorAbiJson::from),
+            upgrade_constructor: abi.upgrade_constructors.first().map(ConstructorAbiJson::from),
             endpoints: abi.endpoints.iter().map(EndpointAbiJson::from).collect(),
             promises_callback_names: abi
                 .promise_callbacks

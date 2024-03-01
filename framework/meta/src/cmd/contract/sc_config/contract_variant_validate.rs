@@ -9,28 +9,24 @@ pub fn validate_contract_variant(contract_variant: &ContractVariant) -> Result<(
 }
 
 fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), String> {
-    match contract_variant.abi.constructors.len() {
-        0 => if has_upgrade(contract_variant) {
-            Ok(())
-        } else {
-            Err("Missing constructor. Add a method annotated with `#[init]`.".to_string())
-        },
-        1 => Ok(()),
-        _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
+    match (
+        contract_variant.abi.constructors.len(),
+        contract_variant.abi.upgrade_constructors.len(),
+    ) {
+        (0, 0) => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
+        (1, 0) | (0, 1) | (1, 1) => Ok(()),
+        (_, _) => Err("More than two constructors present. Exactly one method annotated with `#[init]` and/or another optional `#[upgrade]` is required. ".to_string()),
     }
-}
-
-fn has_upgrade(contract_variant: &ContractVariant) -> bool {
-    contract_variant
-        .abi
-        .endpoints
-        .iter()
-        .any(|endpoint| endpoint.name == "upgrade")
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.
 fn validate_contract_var_args(abi: &ContractAbi) -> Result<(), String> {
-    for endpoint_abi in abi.constructors.iter().chain(abi.endpoints.iter()) {
+    for endpoint_abi in abi
+        .constructors
+        .iter()
+        .chain(abi.upgrade_constructors.iter())
+        .chain(abi.endpoints.iter())
+    {
         validate_endpoint_var_args_number(endpoint_abi)?;
         validate_endpoint_var_args_order(endpoint_abi)?;
     }
