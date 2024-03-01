@@ -1,5 +1,3 @@
-multiversx_sc::imports!();
-
 use crate::types::*;
 
 /// Example of comparing structures in a contract.

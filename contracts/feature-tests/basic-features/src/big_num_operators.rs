@@ -1,5 +1,3 @@
-multiversx_sc::imports!();
-
 /// Checks that BigUint/BigInt operators work as expected.
 #[multiversx_sc::module]
 #[allow(clippy::redundant_clone)]

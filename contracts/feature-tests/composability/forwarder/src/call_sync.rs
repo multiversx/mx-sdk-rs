@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 

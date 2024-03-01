@@ -1,6 +1,6 @@
 use multiversx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
 
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
 // to test, run the following command in the crate folder:
 // cargo expand --test derive_managed_vec_item_struct_1_test > expanded.rs

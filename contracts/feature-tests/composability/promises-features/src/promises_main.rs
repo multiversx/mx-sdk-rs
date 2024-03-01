@@ -7,7 +7,7 @@ mod call_promises_bt;
 pub mod call_sync_bt;
 mod common;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test contract for investigating the new async call framework.
 #[multiversx_sc::contract]

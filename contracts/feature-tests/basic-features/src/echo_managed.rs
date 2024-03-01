@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test endpoint argument and result serialization.
 #[multiversx_sc::module]

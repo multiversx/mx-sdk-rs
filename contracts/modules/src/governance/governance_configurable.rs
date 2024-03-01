@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// # MultiversX smart contract module - Governance
 ///

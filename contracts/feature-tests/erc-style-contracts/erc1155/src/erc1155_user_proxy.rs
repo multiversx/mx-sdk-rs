@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::proxy]
 pub trait Erc1155UserProxy {

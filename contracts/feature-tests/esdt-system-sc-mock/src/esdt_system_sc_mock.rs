@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 const ZERO_ASCII: u8 = b'0';
 const DASH: u8 = b'-';

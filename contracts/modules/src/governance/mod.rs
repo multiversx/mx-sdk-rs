@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 pub mod governance_configurable;
 pub mod governance_events;

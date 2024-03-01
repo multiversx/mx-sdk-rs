@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 pub mod big_float_methods;
 pub mod big_float_methods_wrapped;

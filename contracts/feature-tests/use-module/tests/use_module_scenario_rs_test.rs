@@ -1,5 +1,5 @@
 mod user_builtin {
-    multiversx_sc::imports!();
+    use multiversx_sc::imports::*;
 
     #[multiversx_sc::proxy]
     pub trait UserBuiltin {
@@ -9,7 +9,7 @@ mod user_builtin {
 }
 
 mod dns_mock {
-    multiversx_sc::imports!();
+    use multiversx_sc::imports::*;
 
     #[multiversx_sc::contract]
     pub trait DnsMock {

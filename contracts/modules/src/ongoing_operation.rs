@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 pub const DEFAULT_MIN_GAS_TO_SAVE_PROGRESS: u64 = 1_000_000;
 

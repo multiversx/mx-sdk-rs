@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(never_type)]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 pub mod echo_alloc;
 pub mod echo_managed_alloc;

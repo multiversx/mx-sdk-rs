@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Used for testing the egld_decimal function return type
 #[multiversx_sc::module]

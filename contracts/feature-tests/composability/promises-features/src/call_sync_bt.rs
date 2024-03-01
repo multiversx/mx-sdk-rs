@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Not directly related to promises, but this contract already has the setup for VM 1.5.
 #[multiversx_sc::module]

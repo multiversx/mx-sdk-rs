@@ -1,7 +1,5 @@
 use crate::ExampleStruct;
 
-multiversx_sc::imports!();
-
 #[multiversx_sc::module]
 pub trait BenchmarkCommon {
     fn append_index(&self, base: &ManagedBuffer, index: usize) -> ManagedBuffer {

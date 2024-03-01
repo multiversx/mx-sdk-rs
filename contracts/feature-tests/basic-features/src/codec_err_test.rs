@@ -1,8 +1,7 @@
-multiversx_sc::imports!();
 use crate::types::CodecErrorTestType;
+use multiversx_sc::imports::*;
 
 mod encode_err_proxy {
-    multiversx_sc::imports!();
     use crate::types::CodecErrorTestType;
 
     #[multiversx_sc::proxy]

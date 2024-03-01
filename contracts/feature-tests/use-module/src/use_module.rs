@@ -14,7 +14,7 @@ mod only_owner_derived_mod;
 mod only_owner_mod;
 pub mod token_merge_mod_impl;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Contract that tests that using modules works correctly.
 /// Also provides testing for the most common modules:
@@ -63,7 +63,7 @@ pub trait UseModule:
     }
 
     #[endpoint(checkPause)]
-    fn check_pause(&self) -> SCResult<bool> {
-        Ok(self.is_paused())
+    fn check_pause(&self) -> bool {
+        self.is_paused()
     }
 }

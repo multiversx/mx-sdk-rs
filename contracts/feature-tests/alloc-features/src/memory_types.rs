@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Storage tests: direct load from storage to the heap.
 #[multiversx_sc::module]

@@ -3,7 +3,7 @@
 
 use multiversx_sc::codec::Empty;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// General test contract.
 /// Used especially for investigating async calls and contract interaction in general.

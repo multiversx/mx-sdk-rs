@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Various macros provided by multiversx-sc.
 #[multiversx_sc::module]

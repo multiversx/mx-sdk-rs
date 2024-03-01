@@ -1,5 +1,7 @@
-use multiversx_sc::types::{BoxedBytes, Vec};
-multiversx_sc::derive_imports!();
+use multiversx_sc::{
+    derive_imports::*,
+    types::{BoxedBytes, Vec},
+};
 
 /// Example serialization for a structure that uses the heap allocator.
 /// Also checking nested serialization of basic types.

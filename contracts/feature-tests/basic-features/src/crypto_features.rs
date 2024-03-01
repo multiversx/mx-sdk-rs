@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// All crypto functions provided by Arwen exposed here.
 #[multiversx_sc::module]

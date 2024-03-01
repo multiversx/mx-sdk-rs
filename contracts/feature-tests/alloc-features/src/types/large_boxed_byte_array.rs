@@ -1,5 +1,4 @@
-use multiversx_sc::types::Box;
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, types::Box};
 
 const ARRAY_SIZE: usize = 512;
 

@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Serialization of managed types, mixed with the heap allocator.
 #[multiversx_sc::module]

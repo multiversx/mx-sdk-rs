@@ -1,22 +1,23 @@
-multiversx_sc::imports!();
+#![allow(deprecated)]
+
+use multiversx_sc::imports::*;
 
 use multiversx_sc::types::String;
 
-/// Legacy, deprecated macros. Will b removed once they get removed.
+/// Legacy, deprecated macros. Will be removed once they get removed.
 ///
 /// Error conversions should be moved to corresponding new formatter-based error tests.
 #[multiversx_sc::module]
 pub trait MacroFeaturesLegacy {
-    #[allow(deprecated)]
     #[view]
     fn only_owner_legacy(&self) -> SCResult<()> {
         multiversx_sc::only_owner!(self, "Custom only owner message");
-        Ok(())
+        SCResult::Ok(())
     }
 
     #[view]
     fn return_sc_error(&self) -> SCResult<()> {
-        sc_error!("return_sc_error")
+        multiversx_sc::sc_error!("return_sc_error")
     }
 
     #[view]
@@ -55,13 +56,13 @@ pub trait MacroFeaturesLegacy {
         require!(test, "test argument is false");
         let unwrapped =
             SCResult::<String, StaticSCError>::from_result(arg.ok_or("option argument is none"))?;
-        Ok(unwrapped)
+        SCResult::Ok(unwrapped)
     }
 
     #[endpoint]
     fn result_echo_2(&self, arg: Option<String>) -> SCResult<String> {
         let unwrapped = arg.ok_or("option argument is none")?;
-        Ok(unwrapped)
+        SCResult::Ok(unwrapped)
     }
 
     #[endpoint]

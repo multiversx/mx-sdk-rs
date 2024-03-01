@@ -1,5 +1,3 @@
-multiversx_sc::imports!();
-
 /// Example of a module that contains the constructor.
 #[multiversx_sc::module]
 pub trait InternalModuleInit {

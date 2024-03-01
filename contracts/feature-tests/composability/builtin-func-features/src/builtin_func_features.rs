@@ -2,7 +2,7 @@
 
 pub mod builtin_func_proxy;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test contract for investigating async calls.
 #[multiversx_sc::contract]

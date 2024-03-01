@@ -1,6 +1,6 @@
 use multiversx_sc::storage::StorageKey;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Storage mapper test.
 #[multiversx_sc::module]

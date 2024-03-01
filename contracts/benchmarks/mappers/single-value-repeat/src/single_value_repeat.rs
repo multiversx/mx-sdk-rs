@@ -2,7 +2,7 @@
 
 use benchmark_common::ExampleStruct;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::contract]
 pub trait SingleValueRepeat: benchmark_common::BenchmarkCommon {

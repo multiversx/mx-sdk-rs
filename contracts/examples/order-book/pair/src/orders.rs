@@ -1,6 +1,4 @@
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
-
+use multiversx_sc::imports::*;
 use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 
 use super::{common, events, validation};

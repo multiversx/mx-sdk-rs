@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 // Base cost for standalone + estimate cost of actual sc call
 const ISSUE_EXPECTED_GAS_COST: u64 = 90_000_000 + 25_000_000;

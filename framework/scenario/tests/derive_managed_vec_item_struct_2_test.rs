@@ -1,4 +1,4 @@
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
 // to test, run the following command in the crate folder:
 // cargo expand --test derive_managed_vec_item_struct_2_test > expanded.rs

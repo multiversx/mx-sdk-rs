@@ -14,7 +14,7 @@ pub mod roles;
 pub mod sft;
 pub mod storage;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test contract for investigating contract calls.
 #[multiversx_sc::contract]

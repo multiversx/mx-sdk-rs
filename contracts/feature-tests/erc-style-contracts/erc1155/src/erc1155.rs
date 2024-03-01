@@ -1,8 +1,7 @@
 #![no_std]
 #![allow(clippy::type_complexity)]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 pub mod erc1155_user_proxy;
 

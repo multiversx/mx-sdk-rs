@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Standard smart contract module that, when added to a smart contract, offers pausability.
 ///

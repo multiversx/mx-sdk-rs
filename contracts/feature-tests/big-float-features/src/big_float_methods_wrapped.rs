@@ -1,6 +1,6 @@
 use crate::big_float_methods;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::module]
 pub trait BigFloatWrappedMethods: big_float_methods::BigFloatMethods {

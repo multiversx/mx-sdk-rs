@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Contains all events that can be emitted by the contract.
 #[multiversx_sc::module]

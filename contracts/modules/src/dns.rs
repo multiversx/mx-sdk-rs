@@ -1,6 +1,4 @@
 mod dns_proxy {
-    multiversx_sc::imports!();
-
     #[multiversx_sc::proxy]
     pub trait Dns {
         #[payable("EGLD")]
@@ -9,7 +7,7 @@ mod dns_proxy {
     }
 }
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Standard smart contract module that deals with registering usernames in a DNS contract.
 ///

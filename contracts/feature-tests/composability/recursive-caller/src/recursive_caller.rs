@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test contract for investigating async calls.
 #[multiversx_sc::contract]

@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 use super::governance_proposal::GovernanceProposal;
 use crate::governance::ProposalId;

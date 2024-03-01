@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 use multiversx_sc_modules::default_issue_callbacks;
 mod fractional_uri_info;
@@ -144,7 +144,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
 }
 
 mod nft_marketplace_proxy {
-    multiversx_sc::imports!();
+    use multiversx_sc::imports::*;
 
     #[multiversx_sc::proxy]
     pub trait NftMarketplace {

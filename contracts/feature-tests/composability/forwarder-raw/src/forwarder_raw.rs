@@ -7,7 +7,7 @@ mod forwarder_raw_common;
 mod forwarder_raw_deploy_upgrade;
 mod forwarder_raw_sync;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test contract for investigating async calls.
 /// TODO: split into modules

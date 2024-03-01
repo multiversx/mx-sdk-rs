@@ -1,4 +1,4 @@
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
 /// Copied from multiversx-sc serialization tests.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

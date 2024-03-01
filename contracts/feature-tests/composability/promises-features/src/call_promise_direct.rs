@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Test contract for investigating the new async call framework.
 #[multiversx_sc::module]

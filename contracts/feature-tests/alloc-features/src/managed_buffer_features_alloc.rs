@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// ManagedBuffers interacting with the heap.
 #[multiversx_sc::module]

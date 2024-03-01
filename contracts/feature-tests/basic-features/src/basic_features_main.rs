@@ -1,7 +1,7 @@
 #![no_std]
 #![feature(never_type)]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 pub mod big_num_methods;
 pub mod big_num_operators;
@@ -104,4 +104,7 @@ pub trait BasicFeatures:
 
         arg1
     }
+
+    #[storage_mapper("coolTree")]
+    fn cool_tree(&self) -> OrderedBinaryTreeMapper<Self::Api, BigUint>;
 }

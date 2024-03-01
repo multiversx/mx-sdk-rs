@@ -1,7 +1,6 @@
 use multiversx_sc::storage::StorageKey;
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 /// Module that calls another contract to read the content of a SetMapper remotely
 #[multiversx_sc::module]

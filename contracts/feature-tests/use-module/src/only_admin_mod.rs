@@ -1,6 +1,6 @@
 use multiversx_sc_modules::only_admin;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::module]
 #[only_admin]

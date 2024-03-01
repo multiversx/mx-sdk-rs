@@ -1,5 +1,4 @@
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, imports::*};
 
 /// Standard smart contract module for managing a Subscription NFT.
 /// Adaptation of the EIP-5643 for MultiversX, more here https://eips.ethereum.org/EIPS/eip-5643  

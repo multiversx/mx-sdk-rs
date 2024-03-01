@@ -1,5 +1,5 @@
 use crate::only_nested::*;
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
 /// Its only purpose is to test that the ABI generator works fine.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]

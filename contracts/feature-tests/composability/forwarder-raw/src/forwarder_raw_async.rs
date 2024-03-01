@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::module]
 pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {

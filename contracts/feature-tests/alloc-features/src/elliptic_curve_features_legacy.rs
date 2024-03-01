@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// All elliptic curve functions provided by Arwen exposed here.
 /// TODO: remove heap allocation and move to basic features.

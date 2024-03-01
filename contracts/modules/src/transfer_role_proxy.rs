@@ -1,6 +1,6 @@
 use multiversx_sc::codec::TopEncodeMulti;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 const CALLBACK_RESERVED_GAS_PER_TOKEN: u64 = 1_000_000;
 static ERR_CALLBACK_MSG: &[u8] = b"Error received in callback:";
