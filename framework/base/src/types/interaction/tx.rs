@@ -14,8 +14,8 @@ use super::{
     Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, ExplicitGas,
     FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
     RHListAppendRet, RHListItem, TxCodeSource, TxData, TxDataFunctionCall, TxEnv, TxFrom,
-    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv,
-    TxTo, TxToSpecified,
+    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxProxyTraitV2,
+    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -473,7 +473,7 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn typed<Proxy, Payment, Data, RH, F>(
+    pub fn typed_v1<Proxy, Payment, Data, RH, F>(
         self,
         proxy: Proxy,
         f: F,
@@ -496,6 +496,13 @@ where
             data: proxy_tx.data,
             result_handler: proxy_tx.result_handler,
         }
+    }
+
+    pub fn typed_v2<Proxy>(self, proxy: Proxy) -> Proxy::TxProxyMethods
+    where
+        Proxy: TxProxyTraitV2<Env, From, To, Gas>,
+    {
+        proxy.prepare_methods(self)
     }
 }
 
