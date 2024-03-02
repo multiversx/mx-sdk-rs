@@ -1,5 +1,5 @@
 use adder::*;
-use multiversx_sc::{storage::mappers::SingleValue, types::AddressExpr};
+use multiversx_sc::{storage::mappers::SingleValue, types::{AddressExpr, ScExpr}};
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
@@ -43,7 +43,8 @@ fn adder_blackbox_with_values() {
         )
         .tx(|tx| {
             tx.from(AddressExpr("owner"))
-                .call(adder_contract.add(3u32))
+                .to(ScExpr("adder"))
+                .typed(temp_proxy::TxProxy, |p| p.add(3u32))
                 .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());
                 }))

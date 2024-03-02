@@ -14,8 +14,8 @@ use super::{
     Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, ExplicitGas,
     FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
     RHListAppendRet, RHListItem, TxCodeSource, TxData, TxDataFunctionCall, TxEnv, TxFrom,
-    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
-    TxToSpecified,
+    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv,
+    TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -462,6 +462,39 @@ where
             gas: self.gas,
             data: self.data,
             result_handler: OriginalResultMarker::new(),
+        }
+    }
+}
+
+impl<Env, From, To, Gas> Tx<Env, From, To, (), Gas, (), ()>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
+    pub fn typed<Proxy, Payment, Data, RH, F>(
+        self,
+        proxy: Proxy,
+        f: F,
+    ) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    where
+        Proxy: TxProxyTrait<Env>,
+        Payment: TxPayment<Env>,
+        Data: TxData<Env>,
+        RH: TxResultHandler<Env>,
+        F: FnOnce(Proxy::TxProxyMethods) -> Tx<Env, (), (), Payment, (), Data, RH>,
+    {
+        let proxy_methods = proxy.env(self.env);
+        let proxy_tx = f(proxy_methods);
+        Tx {
+            env: proxy_tx.env,
+            from: self.from,
+            to: self.to,
+            payment: proxy_tx.payment,
+            gas: self.gas,
+            data: proxy_tx.data,
+            result_handler: proxy_tx.result_handler,
         }
     }
 }
