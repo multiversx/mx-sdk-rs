@@ -367,6 +367,15 @@
                 }
             ]
         },
+        "ManagedDecimalWrapper": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field",
+                    "type": "ManagedDecimal<2>"
+                }
+            ]
+        },
         "OnlyShowsUpAsNested01": {
             "type": "struct",
             "docs": [
