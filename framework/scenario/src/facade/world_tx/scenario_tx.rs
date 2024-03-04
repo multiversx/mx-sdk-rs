@@ -1,11 +1,17 @@
+use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        FunctionCall, RHListSync, Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        AnnotatedValue, FunctionCall, ManagedAddress, RHListSync, Tx, TxEnv, TxFromSpecified,
+        TxGas, TxPayment, TxToSpecified,
     },
 };
 
-use crate::{api::StaticApi, scenario_model::ScCallStep, ScenarioWorld};
+use crate::{
+    api::StaticApi,
+    scenario_model::{AddressValue, ScCallStep},
+    ScenarioWorld,
+};
 
 use super::{RHListScenario, ScenarioTxEnvironment, TxScenarioBase};
 
@@ -44,6 +50,18 @@ pub trait ScenarioTx {
     fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns;
 }
 
+fn address_annotated<Env, Addr>(env: &Env, from: Addr) -> AddressValue
+where
+    Env: TxEnv,
+    Addr: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+{
+    let annotation = from.annotation(env).to_string();
+    AddressValue {
+        value: from.into_value().to_address(),
+        original: ValueSubTree::Str(annotation),
+    }
+}
+
 impl<From, To, Payment, Gas, RH> ScenarioTx
     for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
 where
@@ -58,11 +76,9 @@ where
 
     fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns {
         let mut env = self.env;
-        env.annotate_from(&self.from);
-        env.annotate_to(&self.to);
         let mut step = ScCallStep::new()
-            .from(env.from_annotation.as_ref().unwrap().as_str())
-            .to(env.to_annotation.as_ref().unwrap().as_str())
+            .from(address_annotated(&env, self.from))
+            .to(address_annotated(&env, self.to))
             .function(self.data.function_name.to_string().as_str());
         for arg in self.data.arg_buffer.iter_buffers() {
             step = step.argument(arg.to_vec());

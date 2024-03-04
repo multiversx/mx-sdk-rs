@@ -5,6 +5,8 @@ use crate::types::{ManagedAddress, ManagedBuffer};
 use super::{AnnotatedValue, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified};
 
 const SC_PREFIX: &str = "sc:";
+const VM_TYPE_LEN: usize = 2;
+const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ScExpr<'a>(pub &'a str);
@@ -52,6 +54,11 @@ impl<'a> ScExpr<'a> {
             len = 22;
         }
         unsafe {
+            ptr::copy_nonoverlapping(
+                DEFAULT_VM_TYPE.as_ptr(),
+                result.as_ptr().offset(8) as *mut u8,
+                VM_TYPE_LEN,
+            );
             ptr::copy_nonoverlapping(
                 expr_bytes.as_ptr(),
                 result.as_ptr().offset(10) as *mut u8,
