@@ -33,12 +33,12 @@ mod tx_env_sc;
 mod tx_from;
 mod tx_gas;
 mod tx_payment;
+mod tx_proxy;
 mod tx_result_handler;
 mod tx_rh_list;
 mod tx_rh_original_result;
 mod tx_to;
 mod typed_function_call;
-mod tx_proxy;
 
 pub use annotated::*;
 pub use async_call::AsyncCall;
@@ -71,11 +71,11 @@ pub use tx_env_sc::*;
 pub use tx_from::*;
 pub use tx_gas::*;
 pub use tx_payment::*;
+pub use tx_proxy::*;
 pub use tx_result_handler::*;
 pub use tx_rh_list::*;
 pub use tx_rh_original_result::*;
 pub use tx_to::*;
 pub use typed_function_call::*;
-pub use tx_proxy::*;
 
 pub type TxScBase<Api> = TxBaseWithEnv<TxScEnv<Api>>;

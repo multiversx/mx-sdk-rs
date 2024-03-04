@@ -9,8 +9,7 @@ use super::{
     proxy_crate_gen::create_file,
     proxy_sc_functions_gen::write_content,
     proxy_template_gen::{
-        write_impl_for_tx_proxy, write_imports, write_struct_template,
-        write_tx_proxy_method_header,
+        write_impl_for_tx_proxy, write_imports, write_struct_template, write_tx_proxy_method_header,
     },
 };
 
