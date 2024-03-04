@@ -1,5 +1,3 @@
-use num_traits::ToPrimitive;
-
 use super::RawHandle;
 
 /// Used as a flag. Reading from this handle will always result in a crash.
@@ -34,7 +32,7 @@ pub const SCALING_FACTOR_LENGTH: usize = 64;
 /// Used as a flag. Do not use as a regular handle.
 pub const MANAGED_OPTION_NONE: RawHandle = i32::MAX - 1;
 
-pub fn get_scaling_factor_handle(decimals: usize) -> i32 {
-    let decimals_i32 = decimals.to_i32().unwrap();
+pub const fn get_scaling_factor_handle(decimals: usize) -> i32 {
+    let decimals_i32 = decimals as i32;
     SCALING_FACTOR_START - decimals_i32
 }

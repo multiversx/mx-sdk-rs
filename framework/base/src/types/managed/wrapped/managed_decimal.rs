@@ -25,7 +25,7 @@ fn scaling_factor<M: ManagedTypeApi>(
     let handle: M::BigIntHandle =
         use_raw_handle(const_handles::get_scaling_factor_handle(num_decimals));
 
-    if !M::static_var_api_impl().get_scaling_factor_cached(num_decimals) {
+    if !M::static_var_api_impl().is_scaling_factor_cached(num_decimals) {
         cache_scaling_factor::<M>(handle.clone(), num_decimals);
         M::static_var_api_impl().set_scaling_factor_cached(num_decimals);
     }

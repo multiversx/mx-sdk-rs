@@ -81,7 +81,7 @@ impl<VHB: VMHooksApiBackend> StaticVarApiImpl for VMHooksApi<VHB> {
         })
     }
 
-    fn get_scaling_factor_cached(&self, decimals: usize) -> bool {
+    fn is_scaling_factor_cached(&self, decimals: usize) -> bool {
         self.with_static_data(|data| data.static_vars_cell.borrow().scaling_factor_init[decimals])
     }
 
