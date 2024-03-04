@@ -28,11 +28,10 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
-impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
+impl<Env, To, Gas> TxProxyMethods<Env, (), To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
-    From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
@@ -41,20 +40,28 @@ where
         initial_value: Arg0,
     ) -> multiversx_sc::types::Tx<
         Env,
-        From,
+        (),
         To,
         (),
         Gas,
-        FunctionCall<Env::Api>,
+        DeployCall<Env, ()>,
         OriginalResultMarker<()>,
     > {
         self.wrapped_tx
-            .raw_call()
-            .function_name("init")
+            .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
+}
 
+impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    Env::Api: VMApi,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
     pub fn sum(
         self,
     ) -> multiversx_sc::types::Tx<

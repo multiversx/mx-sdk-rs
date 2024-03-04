@@ -33,12 +33,11 @@ where
         (),
         (),
         (),
-        FunctionCall<Env::Api>,
+        DeployCall<Env, ()>,
         OriginalResultMarker<()>,
     > {
         Tx::new_with_env(self.env)
-            .raw_call()
-            .function_name("init")
+            .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
