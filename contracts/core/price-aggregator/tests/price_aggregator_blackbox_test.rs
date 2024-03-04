@@ -288,9 +288,8 @@ fn test_price_aggregator_submit_round_ok() {
     state
         .world
         .whitebox_query(&state.price_aggregator_whitebox, |sc| {
-            let result = sc
-                .latest_price_feed(managed_buffer!(EGLD_TICKER), managed_buffer!(USD_TICKER))
-                .unwrap();
+            let result =
+                sc.latest_price_feed(managed_buffer!(EGLD_TICKER), managed_buffer!(USD_TICKER));
 
             let (round_id, from, to, timestamp, price, decimals) = result.into_tuple();
             assert_eq!(round_id, 1);

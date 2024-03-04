@@ -1,7 +1,6 @@
 use crate::distribution_module;
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, imports::*};
 
 use multiversx_sc_modules::default_issue_callbacks;
 

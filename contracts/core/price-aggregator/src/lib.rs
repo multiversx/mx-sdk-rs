@@ -303,16 +303,16 @@ pub trait PriceAggregator:
         &self,
         from: ManagedBuffer,
         to: ManagedBuffer,
-    ) -> SCResult<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
-        require_old!(self.not_paused(), PAUSED_ERROR_MSG);
+    ) -> MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8> {
+        require!(self.not_paused(), PAUSED_ERROR_MSG);
 
         let token_pair = TokenPair { from, to };
         let round_values = self
             .rounds()
             .get(&token_pair)
-            .ok_or("token pair not found")?;
+            .unwrap_or_else(|| sc_panic!("token pair not found"));
         let feed = self.make_price_feed(token_pair, round_values);
-        Ok((
+        (
             feed.round_id,
             feed.from,
             feed.to,
@@ -320,7 +320,7 @@ pub trait PriceAggregator:
             feed.price,
             feed.decimals,
         )
-            .into())
+            .into()
     }
 
     #[view(latestPriceFeedOptional)]
@@ -329,7 +329,7 @@ pub trait PriceAggregator:
         from: ManagedBuffer,
         to: ManagedBuffer,
     ) -> OptionalValue<MultiValue6<u32, ManagedBuffer, ManagedBuffer, u64, BigUint, u8>> {
-        self.latest_price_feed(from, to).ok().into()
+        Some(self.latest_price_feed(from, to)).into()
     }
 
     #[only_owner]
