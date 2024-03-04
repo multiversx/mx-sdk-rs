@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+
 use multiversx_sc::api::VMApi;
 
 multiversx_sc::imports!();
@@ -27,15 +29,8 @@ where
     pub fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
         self,
         initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<
-        Env,
-        (),
-        (),
-        (),
-        (),
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> multiversx_sc::types::Tx<Env, (), (), (), (), DeployCall<Env, ()>, OriginalResultMarker<()>>
+    {
         Tx::new_with_env(self.env)
             .raw_deploy()
             .argument(&initial_value)
