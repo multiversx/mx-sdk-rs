@@ -1,6 +1,5 @@
 use crate::api::VmApiImpl;
 pub use alloc::alloc::Layout;
-use alloc::string::ToString;
 use multiversx_sc::{
     api::{ErrorApi, ErrorApiImpl},
     types::{ManagedBuffer, ManagedType},
@@ -19,13 +18,10 @@ pub fn panic_fmt(_: &PanicInfo) -> ! {
 /// Mostly used for debugging, the additional code is normally not deemed to be worth it.
 pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     let mut panic_msg = ManagedPanicMessage::default();
-    let message = panic_info.to_string();
-    if !message.is_empty() {
-        panic_msg.append_str("panic occurred: ");
-        panic_msg.append_str(&message);
-    } else {
-        panic_msg.append_str("unknown panic occurred");
-    };
+    panic_msg.append_str("panic occurred: ");
+
+    let _ = core::fmt::write(&mut panic_msg, format_args!("{:?}", panic_info.payload()))
+        .expect("Failed to write panic payload");
 
     VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.get_handle())
 }
