@@ -27,17 +27,16 @@ fn test_template_list() {
         ]
     );
 }
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_crypto_zombies() {
+    template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
+}
 
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_adder() {
     template_test_current("adder", "examples", "new-adder");
-}
-
-#[test]
-#[cfg_attr(not(feature = "template-test-current"), ignore)]
-fn template_current_crypto_zombies() {
-    template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
 }
 
 #[test]
