@@ -9,7 +9,7 @@ use super::{
     proxy_crate_gen::create_file,
     proxy_sc_functions_gen::write_content,
     proxy_template_gen::{
-        write_impl_for_tx_proxy, write_imports, write_struct_template, write_tx_proxy_method_header,
+        write_header, write_impl_for_tx_proxy, write_struct_template, write_struct_tx_proxy_methods,
     },
 };
 
@@ -23,9 +23,9 @@ impl MetaConfig {
 }
 
 fn write_proxies_to_file(mut file: File, abi: ContractAbi) {
-    write_imports(&mut file);
+    write_header(&mut file);
     write_struct_template(&mut file);
     write_impl_for_tx_proxy(&mut file);
-    write_tx_proxy_method_header(&mut file);
+    write_struct_tx_proxy_methods(&mut file);
     write_content(&mut file, abi);
 }
