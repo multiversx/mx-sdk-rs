@@ -10,7 +10,7 @@ use multiversx_sc_modules::staking;
 use price_aggregator_data::{OracleStatus, PriceFeed, TimestampedPrice, TokenPair};
 
 const SUBMISSION_LIST_MAX_LEN: usize = 50;
-const SUBMISSION_LIST_MIN_LEN: usize = 3;
+const SUBMISSION_LIST_MIN_LEN: usize = 1;
 const FIRST_SUBMISSION_TIMESTAMP_MAX_DIFF_SECONDS: u64 = 30;
 pub const MAX_ROUND_DURATION_SECONDS: u64 = 1_800; // 30 minutes
 const PAUSED_ERROR_MSG: &[u8] = b"Contract is paused";
