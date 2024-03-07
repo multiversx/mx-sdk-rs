@@ -57,7 +57,7 @@ where
 {
     let annotation = from.annotation(env).to_string();
     AddressValue {
-        value: from.into_value().to_address(),
+        value: from.into_value(env).to_address(),
         original: ValueSubTree::Str(annotation),
     }
 }

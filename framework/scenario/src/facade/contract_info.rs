@@ -148,4 +148,8 @@ where
     Env: TxEnv,
     P: ProxyObjNew,
 {
+    fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
+        let ma: ManagedAddress<Env::Api> = (&self.scenario_address_expr.value).into();
+        f(&ma);
+    }
 }
