@@ -1,8 +1,6 @@
 use core::ptr;
 
-use crate::types::{ManagedAddress, ManagedBuffer};
-
-use super::{AnnotatedValue, TxEnv, TxFrom, TxFromSpecified};
+use crate::types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified};
 
 const ADDRESS_PREFIX: &str = "address:";
 

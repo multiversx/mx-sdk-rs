@@ -1,8 +1,9 @@
 use core::ptr;
 
-use crate::types::{ManagedAddress, ManagedBuffer};
-
-use super::{AnnotatedValue, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified};
+use crate::types::{
+    AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+    TxToSpecified,
+};
 
 const SC_PREFIX: &str = "sc:";
 const VM_TYPE_LEN: usize = 2;
