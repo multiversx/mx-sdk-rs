@@ -44,23 +44,27 @@ where
 {
 }
 
+pub trait TxFromSourceValue<Env>: AnnotatedValue<Env, ManagedAddress<Env::Api>>
+where
+    Env: TxEnv,
+{
+}
+
+impl<Env> TxFromSourceValue<Env> for ManagedAddress<Env::Api> where Env: TxEnv {}
+
 /// Indicates the source of a "deploy from source" or "upgrade from source".
-pub struct FromSource<Env>
+pub struct FromSource<FromSourceValue>(pub FromSourceValue);
+
+impl<Env, FromSourceValue> TxCodeSource<Env> for FromSource<FromSourceValue>
 where
     Env: TxEnv,
+    FromSourceValue: TxFromSourceValue<Env>,
 {
-    pub address: ManagedAddress<Env::Api>,
 }
 
-impl<Env> FromSource<Env>
+impl<Env, FromSourceValue> TxCodeSourceSpecified<Env> for FromSource<FromSourceValue>
 where
     Env: TxEnv,
+    FromSourceValue: TxFromSourceValue<Env>,
 {
-    pub fn new(address: ManagedAddress<Env::Api>) -> Self {
-        FromSource { address }
-    }
 }
-
-impl<Env> TxCodeSource<Env> for FromSource<Env> where Env: TxEnv {}
-
-impl<Env> TxCodeSourceSpecified<Env> for FromSource<Env> where Env: TxEnv {}

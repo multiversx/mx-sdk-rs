@@ -10,8 +10,8 @@ use crate::{
 use super::{
     contract_call_exec::decode_result, Code, ConsNoRet, ConsRet, DeployCall, FromSource,
     OriginalResultMarker, RHList, RHListItem, Tx, TxCodeValue, TxDataFunctionCall,
-    TxEmptyResultHandler, TxEnv, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv,
-    TxToSpecified,
+    TxEmptyResultHandler, TxEnv, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly,
+    TxResultHandler, TxScEnv, TxToSpecified,
 };
 
 pub trait RHListItemDeploy<Env, Original>: RHListItem<Env, Original>
@@ -120,12 +120,21 @@ where
     }
 }
 
-impl<Api, Payment, Gas, RH>
-    Tx<TxScEnv<Api>, (), (), Payment, Gas, DeployCall<TxScEnv<Api>, FromSource<TxScEnv<Api>>>, RH>
+impl<Api, Payment, Gas, FromSourceValue, RH>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        (),
+        Payment,
+        Gas,
+        DeployCall<TxScEnv<Api>, FromSource<FromSourceValue>>,
+        RH,
+    >
 where
     Api: CallTypeApi,
     Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
+    FromSourceValue: TxFromSourceValue<TxScEnv<Api>>,
     RH: TxResultHandler<TxScEnv<Api>>,
 {
     fn execute_deploy_from_source_raw(
@@ -137,7 +146,7 @@ where
         let (new_address, raw_results) = SendRawWrapper::<Api>::new().deploy_from_source_contract(
             gas_limit,
             &egld_payment.value,
-            &self.data.code_source.address,
+            &self.data.code_source.0.into_value(&self.env),
             self.data.code_metadata,
             &self.data.arg_buffer,
         );
@@ -167,12 +176,21 @@ where
     }
 }
 
-impl<Api, Payment, Gas, RH>
-    Tx<TxScEnv<Api>, (), (), Payment, Gas, DeployCall<TxScEnv<Api>, FromSource<TxScEnv<Api>>>, RH>
+impl<Api, Payment, Gas, FromSourceValue, RH>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        (),
+        Payment,
+        Gas,
+        DeployCall<TxScEnv<Api>, FromSource<FromSourceValue>>,
+        RH,
+    >
 where
     Api: CallTypeApi,
     Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
+    FromSourceValue: TxFromSourceValue<TxScEnv<Api>>,
     RH: RHListDeploy<TxScEnv<Api>>,
     RH::ListReturns: NestedTupleFlatten,
 {
@@ -215,20 +233,21 @@ where
     }
 }
 
-impl<Api, Payment, Gas, RH>
+impl<Api, Payment, Gas, FromSourceValue, RH>
     Tx<
         TxScEnv<Api>,
         (),
         ManagedAddress<Api>,
         Payment,
         Gas,
-        DeployCall<TxScEnv<Api>, FromSource<TxScEnv<Api>>>,
+        DeployCall<TxScEnv<Api>, FromSource<FromSourceValue>>,
         RH,
     >
 where
     Api: CallTypeApi,
     Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
+    FromSourceValue: TxFromSourceValue<TxScEnv<Api>>,
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
     pub fn upgrade_async_call(self) {
@@ -237,7 +256,7 @@ where
             &self.to,
             gas,
             &self.payment.to_egld_payment().value,
-            &self.data.code_source.address,
+            &self.data.code_source.0.into_value(&self.env),
             self.data.code_metadata,
             &self.data.arg_buffer,
         );

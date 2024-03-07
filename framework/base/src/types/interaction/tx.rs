@@ -14,8 +14,8 @@ use super::{
     AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
     DeployCall, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
     RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEnv, TxFrom, TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxProxyTraitV2, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxDataFunctionCall, TxEnv, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas, TxPayment,
+    TxPaymentEgldOnly, TxProxyTrait, TxProxyTraitV2, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -679,17 +679,20 @@ where
         }
     }
 
-    pub fn from_source(
+    pub fn from_source<FromSourceValue>(
         mut self,
-        source_address: ManagedAddress<Env::Api>,
-    ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, FromSource<Env>>, RH> {
+        source_address: FromSourceValue,
+    ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, FromSource<FromSourceValue>>, RH>
+    where
+        FromSourceValue: TxFromSourceValue<Env>,
+    {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: self.data.code_source(FromSource::new(source_address)),
+            data: self.data.code_source(FromSource(source_address)),
             result_handler: self.result_handler,
         }
     }
