@@ -117,15 +117,11 @@ where
         self.scenario_address_expr.original.as_str().into()
     }
 
-    fn into_value(self) -> ManagedAddress<Env::Api> {
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         (&self.scenario_address_expr.value).into()
     }
-
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
-        let ma: ManagedAddress<Env::Api> = (&self.scenario_address_expr.value).into();
-        f(&ma);
-    }
 }
+
 impl<P, Env> TxFrom<Env> for &ContractInfo<P>
 where
     Env: TxEnv,
@@ -152,4 +148,8 @@ where
     Env: TxEnv,
     P: ProxyObjNew,
 {
+    fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
+        let ma: ManagedAddress<Env::Api> = (&self.scenario_address_expr.value).into();
+        f(&ma);
+    }
 }

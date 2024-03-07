@@ -1,7 +1,7 @@
 use adder::*;
 use multiversx_sc::{
     storage::mappers::SingleValue,
-    types::{AddressExpr, ScExpr},
+    types::{AddressExpr, ScExpr, WithResultNewAddress},
 };
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
@@ -20,7 +20,6 @@ fn adder_blackbox_with_values() {
     let mut world = world();
     let owner_address = "address:owner";
     let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
-    let adder_code = world.code_expression(ADDER_PATH_EXPR);
 
     world
         .start_trace()
@@ -29,15 +28,15 @@ fn adder_blackbox_with_values() {
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .sc_deploy_use_result(
-            ScDeployStep::new()
-                .from(owner_address)
-                .code(adder_code)
-                .call(adder_contract.init(5u32)),
-            |new_address, _: TypedResponse<()>| {
-                assert_eq!(new_address, adder_contract.to_address());
-            },
-        )
+        .tx(|tx| {
+            tx.from(AddressExpr("owner"))
+                .typed_v2(temp_proxy_v2::TxProxy)
+                .init(5u32)
+                .code(MxscExpr("output/adder.mxsc.json"))
+                .with_result(WithResultNewAddress::new(|new_address| {
+                    assert_eq!(new_address.to_address(), adder_contract.to_address());
+                }))
+        })
         .sc_query(
             ScQueryStep::new()
                 .to(&adder_contract)

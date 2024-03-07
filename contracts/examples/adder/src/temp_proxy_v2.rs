@@ -30,18 +30,25 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
-impl<Env, To, Gas> TxProxyMethods<Env, (), To, Gas>
+impl<Env, From, Gas> TxProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
-    To: TxTo<Env>,
+    From: TxFrom<Env>,
     Gas: TxGas<Env>,
 {
     pub fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
         self,
         initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<Env, (), To, (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>>
-    {
+    ) -> multiversx_sc::types::Tx<
+        Env,
+        From,
+        (),
+        (),
+        Gas,
+        DeployCall<Env, ()>,
+        OriginalResultMarker<()>,
+    > {
         self.wrapped_tx
             .raw_deploy()
             .argument(&initial_value)
