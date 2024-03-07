@@ -1,4 +1,7 @@
-use crate::{api::CallTypeApi, types::ManagedAddress};
+use crate::{
+    api::CallTypeApi,
+    types::{ManagedAddress, ManagedBuffer},
+};
 
 use super::AnnotatedValue;
 

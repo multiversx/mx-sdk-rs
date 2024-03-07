@@ -3,7 +3,7 @@ use crate::{
     types::{ManagedAddress, ManagedBuffer},
 };
 
-use super::TxEnv;
+use super::{AnnotatedValue, TxEnv};
 
 pub trait TxCodeSource<Env>
 where
@@ -19,26 +19,30 @@ where
 {
 }
 
+pub trait TxCodeValue<Env>: AnnotatedValue<Env, ManagedBuffer<Env::Api>>
+where
+    Env: TxEnv,
+{
+}
+
+impl<Env> TxCodeValue<Env> for ManagedBuffer<Env::Api> where Env: TxEnv {}
+
 /// Contains code for a deploy or upgrade.
-pub struct Code<Env>
+pub struct Code<CodeValue>(pub CodeValue);
+
+impl<Env, CodeValue> TxCodeSource<Env> for Code<CodeValue>
 where
     Env: TxEnv,
+    CodeValue: TxCodeValue<Env>,
 {
-    pub code: ManagedBuffer<Env::Api>,
 }
 
-impl<Env> Code<Env>
+impl<Env, CodeValue> TxCodeSourceSpecified<Env> for Code<CodeValue>
 where
     Env: TxEnv,
+    CodeValue: TxCodeValue<Env>,
 {
-    pub fn new(code: ManagedBuffer<Env::Api>) -> Self {
-        Code { code }
-    }
 }
-
-impl<Env> TxCodeSource<Env> for Code<Env> where Env: TxEnv {}
-
-impl<Env> TxCodeSourceSpecified<Env> for Code<Env> where Env: TxEnv {}
 
 /// Indicates the source of a "deploy from source" or "upgrade from source".
 pub struct FromSource<Env>

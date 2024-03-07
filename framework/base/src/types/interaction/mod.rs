@@ -61,6 +61,7 @@ pub use managed_arg_buffer::ManagedArgBuffer;
 pub use tx::*;
 pub use tx_call_async::*;
 pub use tx_call_async_promises::*;
+pub use tx_call_deploy::*;
 pub use tx_call_sync::*;
 pub use tx_code_source::*;
 pub use tx_data::*;

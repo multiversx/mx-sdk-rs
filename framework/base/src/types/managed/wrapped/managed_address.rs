@@ -8,11 +8,9 @@ use crate::{
         NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode,
         TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCLowerHex},
+    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
 };
-
-use super::ManagedBufferCachedBuilder;
 
 #[repr(transparent)]
 #[derive(Clone)]
@@ -254,9 +252,7 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
 
 impl<M: ManagedTypeApi> ManagedAddress<M> {
     pub fn hex_expr(&self) -> ManagedBuffer<M> {
-        let mut result = ManagedBufferCachedBuilder::new_from_slice(b"0x");
-        result.append_lower_hex(self);
-        result.into_managed_buffer()
+        self.bytes.buffer.hex_expr()
     }
 }
 

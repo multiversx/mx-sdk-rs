@@ -1,9 +1,12 @@
 use multiversx_sc::{
     codec::TopDecodeMulti,
-    types::{RHList, RHListItem, ReturnsExact, TxEnv},
+    types::{ManagedAddress, RHList, RHListItem, ReturnsExact, TxEnv, WithResultNewAddress},
 };
 
-use crate::scenario_model::{TxResponse, TypedResponse};
+use crate::{
+    api::StaticApi,
+    scenario_model::{TxResponse, TypedResponse},
+};
 
 use super::ScenarioTxEnvironment;
 
@@ -20,5 +23,19 @@ where
         response
             .result
             .expect("ReturnsExact expects that transaction is successful")
+    }
+}
+
+impl<F, Original> RHListItemScenario<Original> for WithResultNewAddress<ScenarioTxEnvironment, F>
+where
+    F: FnOnce(&ManagedAddress<StaticApi>),
+{
+    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+        let new_address = tx_response
+            .new_deployed_address
+            .clone()
+            .expect("missing returned address");
+
+        (self.f)(&ManagedAddress::from_address(&new_address));
     }
 }

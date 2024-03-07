@@ -36,3 +36,16 @@ where
         self.clone()
     }
 }
+
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for ManagedBuffer<Env::Api>
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> crate::types::ManagedBuffer<Env::Api> {
+        self.hex_expr()
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        self
+    }
+}
