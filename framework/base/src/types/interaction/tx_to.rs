@@ -26,7 +26,7 @@ where
     Env: TxEnv,
 {
     fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
-        f(&self)
+        f(self)
     }
 }
 
