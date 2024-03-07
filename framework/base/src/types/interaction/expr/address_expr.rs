@@ -1,6 +1,9 @@
 use core::ptr;
 
-use crate::types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified};
+use crate::types::{
+    AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+    TxToSpecified,
+};
 
 const ADDRESS_PREFIX: &str = "address:";
 
@@ -17,15 +20,9 @@ where
         result
     }
 
-    fn into_value(self) -> ManagedAddress<Env::Api> {
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
-    }
-
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
-        let expr: [u8; 32] = self.eval_to_array();
-        let ma = expr.into();
-        f(&ma);
     }
 }
 impl<Env> TxFrom<Env> for AddressExpr
@@ -38,6 +35,17 @@ where
     }
 }
 impl<Env> TxFromSpecified<Env> for AddressExpr where Env: TxEnv {}
+impl<Env> TxTo<Env> for AddressExpr where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for AddressExpr
+where
+    Env: TxEnv,
+{
+    fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
+        let expr: [u8; 32] = self.eval_to_array();
+        let ma = expr.into();
+        f(&ma);
+    }
+}
 
 impl AddressExpr {
     pub const fn eval_to_array(&self) -> [u8; 32] {

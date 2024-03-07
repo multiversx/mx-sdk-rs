@@ -582,7 +582,7 @@ where
         let result = self.payment.convert_tx_data(
             &self.env,
             &self.from,
-            self.to.into_value(),
+            self.to.into_value(&self.env),
             self.data.into(),
         );
         Tx {

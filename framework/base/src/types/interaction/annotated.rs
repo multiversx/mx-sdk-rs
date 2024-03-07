@@ -6,11 +6,9 @@ pub trait AnnotatedValue<Env, T>
 where
     Env: TxEnv,
 {
-    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api>;
+    fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api>;
 
-    fn into_value(self) -> T;
-
-    fn with_value_ref<F: FnOnce(&T)>(&self, f: F);
+    fn into_value(self, env: &Env) -> T;
 }
 
 impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for ManagedAddress<Env::Api>
@@ -21,12 +19,8 @@ where
         self.hex_expr()
     }
 
-    fn into_value(self) -> ManagedAddress<Env::Api> {
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         self
-    }
-
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
-        f(self)
     }
 }
 
@@ -38,11 +32,7 @@ where
         self.hex_expr()
     }
 
-    fn into_value(self) -> ManagedAddress<Env::Api> {
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         self.clone()
-    }
-
-    fn with_value_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, f: F) {
-        f(self)
     }
 }
