@@ -4,7 +4,7 @@ use crate::{
     api::{
         use_raw_handle, BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl,
     },
-    types::{BigInt, BigUint, ManagedType},
+    types::{BigInt, BigUint, Decimals, ManagedDecimal, ManagedType},
 };
 use alloc::string::String;
 
@@ -168,6 +168,10 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 
     pub fn to_fixed_point(&self, denominator: &BigFloat<M>) -> BigInt<M> {
         (self * denominator).trunc()
+    }
+
+    pub fn to_managed_decimal<T: Decimals>(self, decimals: T) -> ManagedDecimal<M, T> {
+        ManagedDecimal::<M, T>::from_big_float(self, decimals)
     }
 }
 
