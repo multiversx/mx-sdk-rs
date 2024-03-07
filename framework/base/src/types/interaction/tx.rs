@@ -10,12 +10,12 @@ use alloc::boxed::Box;
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase, AsyncCall,
-    Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, ExplicitGas,
-    FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
-    RHListAppendRet, RHListItem, TxCodeSource, TxData, TxDataFunctionCall, TxEnv, TxFrom,
-    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
-    TxToSpecified,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
+    AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
+    DeployCall, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
+    RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
+    TxDataFunctionCall, TxEnv, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas, TxPayment,
+    TxPaymentEgldOnly, TxProxyTrait, TxProxyTraitV2, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -466,6 +466,46 @@ where
     }
 }
 
+impl<Env, From, To, Gas> Tx<Env, From, To, (), Gas, (), ()>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
+    pub fn typed_v1<Proxy, Payment, Data, RH, F>(
+        self,
+        proxy: Proxy,
+        f: F,
+    ) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    where
+        Proxy: TxProxyTrait<Env>,
+        Payment: TxPayment<Env>,
+        Data: TxData<Env>,
+        RH: TxResultHandler<Env>,
+        F: FnOnce(Proxy::TxProxyMethods) -> Tx<Env, (), (), Payment, (), Data, RH>,
+    {
+        let proxy_methods = proxy.env(self.env);
+        let proxy_tx = f(proxy_methods);
+        Tx {
+            env: proxy_tx.env,
+            from: self.from,
+            to: self.to,
+            payment: proxy_tx.payment,
+            gas: self.gas,
+            data: proxy_tx.data,
+            result_handler: proxy_tx.result_handler,
+        }
+    }
+
+    pub fn typed_v2<Proxy>(self, proxy: Proxy) -> Proxy::TxProxyMethods
+    where
+        Proxy: TxProxyTraitV2<Env, From, To, Gas>,
+    {
+        proxy.prepare_methods(self)
+    }
+}
+
 impl<Env, From, To, Payment, Gas, Data, ResultList>
     Tx<Env, From, To, Payment, Gas, Data, ResultList>
 where
@@ -542,7 +582,7 @@ where
         let result = self.payment.convert_tx_data(
             &self.env,
             &self.from,
-            self.to.into_value(),
+            self.to.into_value(&self.env),
             self.data.into(),
         );
         Tx {
@@ -590,15 +630,16 @@ where
     }
 }
 
-impl<Env, To, Payment, Gas, RH> Tx<Env, (), To, Payment, Gas, (), RH>
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
 where
     Env: TxEnv,
+    From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
-    pub fn raw_deploy(self) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, ()>, RH> {
+    pub fn raw_deploy(self) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, ()>, RH> {
         Tx {
             env: self.env,
             from: self.from,
@@ -611,49 +652,57 @@ where
     }
 }
 
-impl<Env, To, Payment, Gas, RH> Tx<Env, (), To, Payment, Gas, DeployCall<Env, ()>, RH>
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, DeployCall<Env, ()>, RH>
 where
     Env: TxEnv,
+    From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
-    pub fn code(
+    pub fn code<CodeValue>(
         mut self,
-        code: ManagedBuffer<Env::Api>,
-    ) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, Code<Env>>, RH> {
+        code: CodeValue,
+    ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, Code<CodeValue>>, RH>
+    where
+        CodeValue: TxCodeValue<Env>,
+    {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: self.data.code_source(Code::new(code)),
+            data: self.data.code_source(Code(code)),
             result_handler: self.result_handler,
         }
     }
 
-    pub fn from_source(
+    pub fn from_source<FromSourceValue>(
         mut self,
-        source_address: ManagedAddress<Env::Api>,
-    ) -> Tx<Env, (), To, Payment, Gas, DeployCall<Env, FromSource<Env>>, RH> {
+        source_address: FromSourceValue,
+    ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, FromSource<FromSourceValue>>, RH>
+    where
+        FromSourceValue: TxFromSourceValue<Env>,
+    {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: self.data.code_source(FromSource::new(source_address)),
+            data: self.data.code_source(FromSource(source_address)),
             result_handler: self.result_handler,
         }
     }
 }
 
-impl<Env, To, Payment, Gas, CodeSource, RH>
-    Tx<Env, (), To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+impl<Env, From, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
 where
     Env: TxEnv,
+    From: TxFrom<Env>,
     To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,

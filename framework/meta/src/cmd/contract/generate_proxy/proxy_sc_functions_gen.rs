@@ -1,125 +1,80 @@
 use std::{fs::File, io::Write};
 
-use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbis};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi};
 
 use crate::cmd::contract::generate_snippets::{
     snippet_gen_common::write_newline,
-    snippet_sc_functions_gen::map_output_types_to_rust_types,
     snippet_type_map::{handle_abi_type, RustTypeString},
 };
 
-const CONTRACT_DEPLOY: &str = "ContractDeploy";
-const CONTRACT_CALL_NO_PAYMENT: &str = "ContractCallNoPayment";
-
 pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     for constructor_abi in abi.constructors {
-        write_endpoint(file, constructor_abi.clone(), CONTRACT_DEPLOY);
-        write_constructor_content_macro(file);
-        write_constructor_contract_deploy(file, constructor_abi.inputs);
-        write_end_of_constructor(file);
+        write_endpoint(file, constructor_abi.clone());
+        write_function_content(file, constructor_abi);
+        write_end_of_function(file);
     }
 
     for endpoint_abi in abi.endpoints {
-        write_endpoint(file, endpoint_abi.clone(), CONTRACT_CALL_NO_PAYMENT);
-        write_endpoint_content_macro(file, endpoint_abi.name);
-        write_contract_call(file, endpoint_abi.inputs);
-        write_end_of_endpoint(file);
+        write_endpoint(file, endpoint_abi.clone());
+        write_function_content(file, endpoint_abi);
+        write_end_of_function(file);
     }
 
     writeln!(file, "}}").unwrap();
 }
 
-fn write_constructor_contract_deploy(file: &mut File, inputs: Vec<InputAbi>) {
-    if inputs.is_empty() {
-        return;
+fn write_function_content(file: &mut File, end: EndpointAbi) {
+    writeln!(
+        file,
+        "\t\tTx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name(\"{}\")",
+        end.name
+    )
+    .unwrap();
+
+    for input in end.inputs.iter() {
+        writeln!(
+            file,
+            "\t\t\t.argument(&{})",
+            input.arg_name // .argument(&arg0)"
+        )
+        .unwrap();
     }
-
-    for input in inputs.iter() {
-        write_constructor_contract_call(file, input.arg_name.clone());
-    }
 }
 
-fn write_contract_call(file: &mut File, inputs: Vec<InputAbi>) {
-    if inputs.is_empty() {
-        return;
-    }
-
-    for input in inputs.iter() {
-        write_contract_call_input(file, input.arg_name.clone());
-    }
-}
-
-fn write_contract_call_input(file: &mut File, arg_name: String) {
-    writeln!(
-        file,
-        "\t\tContractCall::proxy_arg(&mut ___contract_call___, &{arg_name});"
-    )
-    .unwrap();
-}
-
-fn write_constructor_contract_call(file: &mut File, arg_name: String) {
-    writeln!(
-        file,
-        "\t\t___contract_deploy___.push_endpoint_arg(&{arg_name});"
-    )
-    .unwrap();
-}
-
-fn write_endpoint_content_macro(file: &mut File, name: String) {
-    writeln!(
-        file,
-        "\t\tlet ___address___ = multiversx_sc::extract_address!(self);"
-    )
-    .unwrap();
-    writeln!(
-        file,
-        "\t\tlet mut ___contract_call___ = multiversx_sc::endpoints_proxy!({name}, ___address___);"
-    )
-    .unwrap();
-}
-
-fn write_constructor_content_macro(file: &mut File) {
-    writeln!(
-        file,
-        "\t\tlet ___opt_address___ = multiversx_sc::extract_opt_address!(self);"
-    )
-    .unwrap();
-    writeln!(file, "\t\tlet mut ___contract_deploy___ = multiversx_sc::constructors_proxy!(___opt_address___);").unwrap();
-}
-
-fn write_endpoint(file: &mut File, endpoint_abi: EndpointAbi, interaction_deploy: &str) {
+fn write_endpoint(file: &mut File, endpoint_abi: EndpointAbi) {
     write_info_endpoint(file, endpoint_abi.docs);
-    write_endpoint_fn(file, endpoint_abi.rust_method_name);
-    write_generic_args(file, endpoint_abi.inputs.clone());
-    write_parameters(file, endpoint_abi.inputs, interaction_deploy);
-    write_output(file, endpoint_abi.outputs);
+    write_function_header_endpoint(file, endpoint_abi.rust_method_name);
+    write_args(file, endpoint_abi.inputs.clone());
+    write_parameters_and_output(file, endpoint_abi.inputs);
 }
 
-fn write_output(file: &mut File, outputs: OutputAbis) {
-    let output_type = map_output_types_to_rust_types(&outputs);
-
-    let output_type_print = output_type.replace("<StaticApi>", "<A>");
-    write!(file, "{output_type_print}",).unwrap();
-    writeln!(file, "> {{").unwrap();
-}
-
-fn write_parameters(file: &mut File, inputs: Vec<InputAbi>, interaction_deploy: &str) {
+#[rustfmt::skip]
+fn write_parameters_and_output(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(file, "(").unwrap();
     writeln!(file, "\t\t&mut self,").unwrap();
 
     for (index, input) in inputs.iter().enumerate() {
-        write_parameter_arg(file, index, &input.arg_name);
+        writeln!(file, "\t\t{}: Arg{index},", &input.arg_name).unwrap();
     }
 
-    write!(file, "\t) -> {interaction_deploy}<A, ").unwrap();
+    write!(
+        file,
+        "\t) -> multiversx_sc::types::Tx<Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {{\n"
+    )
+    .unwrap();
 }
 
-fn write_parameter_arg(file: &mut File, index: usize, arg_name: &str) {
-    writeln!(file, "\t\t{arg_name}: Arg{index},").unwrap()
-}
-
-fn write_endpoint_fn(file: &mut File, rust_method_name: String) {
-    write!(file, "\tfn {rust_method_name}").unwrap();
+fn write_function_header_endpoint(file: &mut File, rust_method_name: String) {
+    write!(file, "\tpub fn {rust_method_name}").unwrap();
 }
 
 fn write_info_endpoint(file: &mut File, docs: Vec<String>) {
@@ -132,7 +87,7 @@ fn write_info_endpoint(file: &mut File, docs: Vec<String>) {
     }
 }
 
-fn write_generic_args(file: &mut File, inputs: Vec<InputAbi>) {
+fn write_args(file: &mut File, inputs: Vec<InputAbi>) {
     if inputs.is_empty() {
         return;
     }
@@ -151,7 +106,7 @@ fn write_argument(file: &mut File, index: usize, type_name: String) {
     handle_abi_type(&mut type_string, type_name);
     let type_string_str = type_string.get_type_name().to_string();
 
-    let type_print = type_string_str.replace("<StaticApi>", "<A>");
+    let type_print = type_string_str.replace("<StaticApi>", "<Env>");
 
     writeln!(
         file,
@@ -161,14 +116,7 @@ fn write_argument(file: &mut File, index: usize, type_name: String) {
     .unwrap();
 }
 
-fn write_end_of_constructor(file: &mut File) {
-    writeln!(file, "\t\t___contract_deploy___").unwrap();
-    writeln!(file, "\t}}").unwrap();
-    write_newline(file);
-}
-
-fn write_end_of_endpoint(file: &mut File) {
-    writeln!(file, "\t\t___contract_call___").unwrap();
+fn write_end_of_function(file: &mut File) {
     writeln!(file, "\t}}").unwrap();
     write_newline(file);
 }

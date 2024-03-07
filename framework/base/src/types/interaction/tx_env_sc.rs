@@ -43,18 +43,6 @@ where
 {
     type Api = Api;
 
-    fn annotate_from<From>(&mut self, _from: &From)
-    where
-        From: AnnotatedValue<Self, ManagedAddress<Api>>,
-    {
-    }
-
-    fn annotate_to<To>(&mut self, _to: &To)
-    where
-        To: AnnotatedValue<Self, ManagedAddress<Api>>,
-    {
-    }
-
     fn resolve_sender_address(&self) -> ManagedAddress<Api> {
         BlockchainWrapper::<Api>::new().get_sc_address()
     }

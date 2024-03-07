@@ -1,60 +1,90 @@
-#![allow(clippy::too_many_arguments)]
-#![allow(clippy::type_complexity)]
 multiversx_sc::imports!();
 
-pub struct TxProxy<A>
+pub struct TxProxy;
+
+impl<Env> TxProxyTrait<Env> for TxProxy
 where
-    A: multiversx_sc::api::VMApi + 'static,
+    Env: TxEnv,
 {
-    pub address: ManagedOption<A, ManagedAddress<A>>,
+    type TxProxyMethods = TxProxyMethods<Env>;
+
+    fn env(self, env: Env) -> Self::TxProxyMethods {
+        TxProxyMethods { env }
+    }
 }
 
-impl<A> TxProxy<A>
-where
-    A: multiversx_sc::api::VMApi + 'static,
-{	fn init<
-		Arg0: multiversx_sc::codec::CodecInto<BigUint<A>>,
+impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethods<Env> {
+	pub fn init<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>,
 	>(
 		&mut self,
 		initial_value: Arg0,
-	) -> ContractDeploy<A, ()> {
-		let ___opt_address___ = multiversx_sc::extract_opt_address!(self);
-		let mut ___contract_deploy___ = multiversx_sc::constructors_proxy!(___opt_address___);
-		___contract_deploy___.push_endpoint_arg(&initial_value);
-		___contract_deploy___
+	) -> multiversx_sc::types::Tx<Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+		Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("init")
+			.argument(&initial_value)
 	}
 
-	fn sum(
+	pub fn sum(
 		&mut self,
-	) -> ContractCallNoPayment<A, BigUint<A>> {
-		let ___address___ = multiversx_sc::extract_address!(self);
-		let mut ___contract_call___ = multiversx_sc::endpoints_proxy!(getSum, ___address___);
-		___contract_call___
+	) -> multiversx_sc::types::Tx<Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+		Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("getSum")
 	}
 
-	fn upgrade<
-		Arg0: multiversx_sc::codec::CodecInto<BigUint<A>>,
+	pub fn upgrade<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>,
 	>(
 		&mut self,
 		initial_value: Arg0,
-	) -> ContractCallNoPayment<A, ()> {
-		let ___address___ = multiversx_sc::extract_address!(self);
-		let mut ___contract_call___ = multiversx_sc::endpoints_proxy!(upgrade, ___address___);
-		ContractCall::proxy_arg(&mut ___contract_call___, &initial_value);
-		___contract_call___
+	) -> multiversx_sc::types::Tx<Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+		Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("upgrade")
+			.argument(&initial_value)
 	}
 
 	//Add desired amount to the storage variable. 
-	fn add<
-		Arg0: multiversx_sc::codec::CodecInto<BigUint<A>>,
+	pub fn add<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>,
 	>(
 		&mut self,
 		value: Arg0,
-	) -> ContractCallNoPayment<A, ()> {
-		let ___address___ = multiversx_sc::extract_address!(self);
-		let mut ___contract_call___ = multiversx_sc::endpoints_proxy!(add, ___address___);
-		ContractCall::proxy_arg(&mut ___contract_call___, &value);
-		___contract_call___
+	) -> multiversx_sc::types::Tx<Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+		Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("add")
+			.argument(&value)
 	}
 
 }
