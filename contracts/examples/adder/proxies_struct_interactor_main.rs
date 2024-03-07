@@ -1,79 +1,87 @@
-////////////////////////////////////////////////////
-////////////////// AUTO-GENERATED //////////////////
-////////////////////////////////////////////////////
-
-#![allow(clippy::all)]
-
-use multiversx_sc::api::VMApi;
-
 multiversx_sc::imports!();
 
 pub struct TxProxy;
 
-impl<Env, From, To, Gas> TxProxyTraitV2<Env, From, To, Gas> for TxProxy
+impl<Env> TxProxyTrait<Env> for TxProxy
 where
     Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
 {
-    type TxProxyMethods = TxProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = TxProxyMethods<Env>;
 
-    fn prepare_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
-        TxProxyMethods { wrapped_tx: tx }
+    fn env(self, env: Env) -> Self::TxProxyMethods {
+        TxProxyMethods { env }
     }
 }
 
-pub struct TxProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
-    wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
-}
-
-impl<Env, To, Gas> TxProxyMethods<Env, (), To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
-	pub fn init<
-		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>,
+impl<Env: TxEnv + multiversx_sc::api::CallTypeApi> TxProxyMethods<Env> {
+    pub fn init<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>
 	>(
-		self,
-		initial_value: Arg0,
-	) -> multiversx_sc::types::Tx<Env, (), To, (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>>
-	{
-		self.wrapped_tx
+        &mut self,
+        initial_value: Arg0,
+    ) -> multiversx_sc::types::Tx<Env, (), To, (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>>
+    {
+        self.wrapped_tx
             .raw_deploy()
-			.argument(&initial_value)
-			.original_result()
-	}
+            .argument(&initial_value)
+            .original_result()
+    }
+
+    pub fn sum(
+        &mut self,
+    ) -> multiversx_sc::types::Tx<
+        Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+        Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("getSum")
+    }
+
+    pub fn upgrade<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>
+	>(
+        &mut self,
+        initial_value: Arg0,
+    ) -> multiversx_sc::types::Tx<
+        Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+        Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("upgrade")
+            .argument(&initial_value)
+    }
+
+    //Add desired amount to the storage variable.
+    pub fn add<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env>>
+	>(
+        &mut self,
+        value: Arg0,
+    ) -> multiversx_sc::types::Tx<
+        Env,
+        (),
+        (),
+        (),
+        (),
+        FunctionCall<<Env as multiversx_sc::types::TxEnv>::Api>,
+        (),
+    > {
+        Tx::new_with_env(self.env.clone())
+            .raw_call()
+            .function_name("add")
+            .argument(&value)
+    }
 
 }
-impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
-	pub fn sum(
-		self,
-	) 	pub fn upgrade<
-		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>,
-	>(
-		self,
-		initial_value: Arg0,
-	) 	//Add desired amount to the storage variable. 
-	pub fn add<
-		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>,
-	>(
-		self,
-		value: Arg0,
-	) }
