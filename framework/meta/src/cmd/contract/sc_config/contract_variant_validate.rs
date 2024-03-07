@@ -69,7 +69,7 @@ fn validate_endpoint_var_args_order(endpoint_abi: &EndpointAbi) -> Result<(), St
 
 #[cfg(test)]
 mod tests {
-    use multiversx_sc::abi::{InputAbi, TypeName};
+    use multiversx_sc::abi::{InputAbi, TypeNames};
 
     use super::*;
 
@@ -78,12 +78,12 @@ mod tests {
         let mut endpoint_def = EndpointAbi::default();
         let var_arg_1 = InputAbi {
             arg_name: "arg_1".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: true,
         };
         let var_arg_2 = InputAbi {
             arg_name: "arg_2".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: true,
         };
         endpoint_def.inputs.push(var_arg_1);
@@ -103,12 +103,12 @@ mod tests {
         let mut endpoint_def = EndpointAbi::default();
         let arg = InputAbi {
             arg_name: "arg_1".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: false,
         };
         let var_arg_1 = InputAbi {
             arg_name: "arg_2".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: true,
         };
 

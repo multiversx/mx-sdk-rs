@@ -6,7 +6,7 @@ use crate::{
 #[cfg(feature = "alloc")]
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     fn type_name() -> TypeName {
-        super::type_name_variadic::<T>()
+        super::type_name_variadic::<T>().abi
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -30,7 +30,7 @@ impl TypeAbi for IgnoreValue {
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     fn type_name() -> TypeName {
-        super::type_name_optional::<T>()
+        super::type_name_optional::<T>().abi
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

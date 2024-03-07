@@ -66,7 +66,11 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<SingleValueMapper<Env::Api, multiversx_sc::types::BigUint<Env::Api>>>,
+        OriginalResultMarker<
+            multiversx_sc::types::managed::basic::big_uint::BigUint<
+                multiversx_sc::api::uncallable::UncallableApi,
+            >,
+        >,
     > {
         self.wrapped_tx
             .raw_call()

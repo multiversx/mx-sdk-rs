@@ -41,16 +41,19 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
-        self,
-        initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<Env, (), To, (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>>
-    {
-        self.wrapped_tx
+	pub fn init<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>,
+	>(
+		self,
+		initial_value: Arg0,
+	) -> multiversx_sc::types::Tx<Env, (), To, (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>>
+	{
+		self.wrapped_tx
             .raw_deploy()
-            .argument(&initial_value)
-            .original_result()
-    }
+			.argument(&initial_value)
+			.original_result()
+	}
+
 }
 impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
 where
@@ -60,14 +63,17 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn sum(self) {}
-
-    pub fn upgrade<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
-        self,
-        initial_value: Arg0,
-    ) {
-    }
-
-    //Add desired amount to the storage variable.
-    pub fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(self, value: Arg0) {}
-}
+	pub fn sum(
+		self,
+	) 	pub fn upgrade<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>,
+	>(
+		self,
+		initial_value: Arg0,
+	) 	//Add desired amount to the storage variable. 
+	pub fn add<
+		Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>,
+	>(
+		self,
+		value: Arg0,
+	) }

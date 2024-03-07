@@ -2,7 +2,18 @@ use super::*;
 use alloc::{string::ToString, vec::Vec};
 
 pub trait TypeAbi {
+    fn type_names() -> TypeNames {
+        TypeNames {
+            abi: Self::type_name(),
+            rust: Self::type_name_rust(),
+        }
+    }
+
     fn type_name() -> TypeName {
+        core::any::type_name::<Self>().into()
+    }
+
+    fn type_name_rust() -> TypeName {
         core::any::type_name::<Self>().into()
     }
 
@@ -11,12 +22,12 @@ pub trait TypeAbi {
     /// TypeAbi doesn't care for the exact accumulator type,
     /// which is abstracted by the TypeDescriptionContainer trait.
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        let type_name = Self::type_name();
+        let type_names = Self::type_names();
         accumulator.insert(
-            type_name,
+            type_names,
             TypeDescription {
                 docs: Vec::new(),
-                name: Self::type_name(),
+                names: Self::type_names(),
                 contents: TypeContents::NotSpecified,
             },
         );
@@ -44,23 +55,33 @@ pub trait TypeAbi {
         };
         result.push(OutputAbi {
             output_name: output_name.to_string(),
-            type_name: Self::type_name(),
+            type_names: Self::type_names(),
             multi_result: Self::is_variadic(),
         });
         result
     }
 }
 
-pub fn type_name_variadic<T: TypeAbi>() -> TypeName {
-    let mut repr = TypeName::from("variadic<");
-    repr.push_str(T::type_name().as_str());
-    repr.push('>');
-    repr
+pub fn type_name_variadic<T: TypeAbi>() -> TypeNames {
+    let mut abi = TypeName::from("variadic<");
+    abi.push_str(T::type_name().as_str());
+    abi.push('>');
+
+    let mut rust = TypeName::from("variadic<");
+    rust.push_str(T::type_name_rust().as_str());
+    rust.push('>');
+
+    TypeNames { abi, rust }
 }
 
-pub fn type_name_optional<T: TypeAbi>() -> TypeName {
-    let mut repr = TypeName::from("optional<");
-    repr.push_str(T::type_name().as_str());
-    repr.push('>');
-    repr
+pub fn type_name_optional<T: TypeAbi>() -> TypeNames {
+    let mut abi = TypeName::from("optional<");
+    abi.push_str(T::type_name().as_str());
+    abi.push('>');
+
+    let mut rust = TypeName::from("optional<");
+    rust.push_str(T::type_name().as_str());
+    rust.push('>');
+
+    TypeNames { abi, rust }
 }

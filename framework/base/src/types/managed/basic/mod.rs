@@ -6,7 +6,7 @@ mod big_int_cmp;
 mod big_int_operators;
 mod big_int_sign;
 mod big_num_cmp;
-mod big_uint;
+pub mod big_uint;
 mod big_uint_cmp;
 mod big_uint_operators;
 mod cast_to_i64;

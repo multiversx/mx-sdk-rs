@@ -532,7 +532,7 @@ where
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<T>()
+        crate::abi::type_name_variadic::<T>().abi
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

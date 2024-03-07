@@ -139,7 +139,7 @@ where
     Api: ManagedTypeApi,
 {
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedBuffer<Api>>()
+        crate::abi::type_name_variadic::<ManagedBuffer<Api>>().abi
     }
 
     fn is_variadic() -> bool {

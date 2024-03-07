@@ -3,10 +3,12 @@ use alloc::{
     vec::Vec,
 };
 
+use super::TypeNames;
+
 #[derive(Clone, Debug)]
 pub struct TypeDescription {
     pub docs: Vec<String>,
-    pub name: String,
+    pub names: TypeNames,
     pub contents: TypeContents,
 }
 
@@ -17,17 +19,20 @@ impl TypeDescription {
     /// We use this as value while the fields are being computed.
     pub const PLACEHOLDER: TypeDescription = TypeDescription {
         docs: Vec::new(),
-        name: String::new(),
+        names: TypeNames {
+            abi: String::new(),
+            rust: String::new(),
+        },
         contents: TypeContents::NotSpecified,
     };
 }
 
 impl TypeDescription {
     /// Used in code generation.
-    pub fn new(docs: &[&str], name: String, contents: TypeContents) -> Self {
+    pub fn new(docs: &[&str], names: TypeNames, contents: TypeContents) -> Self {
         TypeDescription {
             docs: docs.iter().map(|s| s.to_string()).collect(),
-            name,
+            names,
             contents,
         }
     }

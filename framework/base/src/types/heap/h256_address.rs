@@ -206,6 +206,10 @@ impl TypeAbi for Address {
     fn type_name() -> TypeName {
         "Address".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "multiversx_sc::types::heap::h256_address".into()
+    }
 }
 
 #[cfg(test)]
