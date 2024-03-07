@@ -142,6 +142,20 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
             num_decimals,
         )
     }
+
+    pub fn log<T: Decimals>(self, target_base: BigUint<M>, precision: T) -> ManagedDecimal<M, T> {
+        let num_decimals = precision.num_decimals() as u32;
+        let number = self.data;
+
+        assert!(
+            number >= BigUint::from(1u64) && target_base >= BigUint::from(1u64),
+            "wrong input"
+        );
+
+        let no_with_prec = number.pow(num_decimals);
+        let precise = no_with_prec.log2() / target_base.log2();
+        ManagedDecimal::from_raw_units(BigUint::<M>::from(precise), precision)
+    }
 }
 
 impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> ManagedDecimal<M, ConstDecimals<DECIMALS>> {
