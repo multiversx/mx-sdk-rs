@@ -11,17 +11,26 @@ use multiversx_sc::{
 use crate::{
     api::StaticApi,
     scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep},
-    ScenarioWorld,
+    ScenarioWorld, WorldRefEnv,
 };
 
 use super::{RHListScenario, ScenarioTxEnv, TxScenarioBase};
 
 impl ScenarioWorld {
-    fn tx_env(&self) -> ScenarioTxEnv {
+    fn new_env_data(&self) -> ScenarioTxEnv {
         ScenarioTxEnv {
             context_path: self.current_dir.clone(),
             ..Default::default()
         }
+    }
+
+    fn wrap_world_ref<'w>(&'w mut self) -> WorldRefEnv<'w> {
+        let data = self.new_env_data();
+        WorldRefEnv { world: self, data }
+    }
+
+    pub fn tx<'w>(&'w mut self) -> Tx<WorldRefEnv<'w>, (), (), (), (), (), ()> {
+        Tx::new_with_env(self.wrap_world_ref())
     }
 
     pub fn tx_return<STx, F>(&mut self, f: F) -> STx::Returns
@@ -29,13 +38,13 @@ impl ScenarioWorld {
         STx: ScenarioTx,
         F: FnOnce(TxScenarioBase) -> STx,
     {
-        let env = self.tx_env();
+        let env = self.new_env_data();
         let tx_base = TxScenarioBase::new_with_env(env);
         let tx = f(tx_base);
         tx.run_as_scenario_step(self)
     }
 
-    pub fn tx<STx, F>(&mut self, f: F) -> &mut Self
+    pub fn chain_tx<STx, F>(&mut self, f: F) -> &mut Self
     where
         STx: ScenarioTx<Returns = ()>,
         F: FnOnce(TxScenarioBase) -> STx,
@@ -49,6 +58,12 @@ pub trait ScenarioTx {
     type Returns;
 
     fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns;
+}
+
+pub trait ScenarioTx2 {
+    type Returns;
+
+    fn run(self) -> Self::Returns;
 }
 
 fn address_annotated<Env, Addr>(env: &Env, from: Addr) -> AddressValue
@@ -98,6 +113,36 @@ where
         }
 
         world.sc_call(&mut step);
+        let response = step.response.expect("step did not return result");
+
+        let tuple_result = self.result_handler.item_scenario_result(&response);
+        tuple_result.flatten_unpack()
+    }
+}
+
+impl<'w, From, To, Payment, Gas, RH> ScenarioTx2
+    for Tx<WorldRefEnv<'w>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+where
+    From: TxFromSpecified<WorldRefEnv<'w>>,
+    To: TxToSpecified<WorldRefEnv<'w>>,
+    Payment: TxPayment<WorldRefEnv<'w>>,
+    Gas: TxGas<WorldRefEnv<'w>>,
+    RH: RHListScenario<WorldRefEnv<'w>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn run(self) -> Self::Returns {
+        let mut env = self.env;
+        let mut step = ScCallStep::new()
+            .from(address_annotated(&env, self.from))
+            .to(address_annotated(&env, self.to))
+            .function(self.data.function_name.to_string().as_str());
+        for arg in self.data.arg_buffer.iter_buffers() {
+            step.tx.arguments.push(arg.to_vec().into());
+        }
+
+        env.world.sc_call(&mut step);
         let response = step.response.expect("step did not return result");
 
         let tuple_result = self.result_handler.item_scenario_result(&response);

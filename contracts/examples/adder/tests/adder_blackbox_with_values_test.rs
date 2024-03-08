@@ -28,7 +28,7 @@ fn adder_blackbox_with_values() {
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .tx(|tx| {
+        .chain_tx(|tx| {
             tx.from(AddressExpr("owner"))
                 .typed_v2(temp_proxy_v2::TxProxy)
                 .init(5u32)
@@ -43,23 +43,24 @@ fn adder_blackbox_with_values() {
                 .call(adder_contract.sum())
                 .expect_value(SingleValue::from(BigUint::from(5u32))),
         )
-        .tx(|tx| {
+        .chain_tx(|tx| {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
                 .typed_v1(temp_proxy::TxProxy, |p| p.add(2u32))
                 .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());
                 }))
-        })
-        .tx(|tx| {
-            tx.from(AddressExpr("owner"))
-                .to(ScExpr("adder"))
-                .typed_v2(temp_proxy_v2::TxProxy)
-                .add(1u32)
-                .with_result(WithRawTxResponse(|response| {
-                    assert!(response.tx_error.is_success());
-                }))
-        })
+        });
+
+    world
+        .tx()
+        .from(AddressExpr("owner"))
+        .to(ScExpr("adder"))
+        .typed_v2(temp_proxy_v2::TxProxy)
+        .add(1u32)
+        .run();
+
+    world
         .check_state_step(
             CheckStateStep::new()
                 .put_account(owner_address, CheckAccount::new())
