@@ -82,7 +82,7 @@ where
     To: TxToSpecified<ScenarioTxEnvironment>,
     Payment: TxPayment<ScenarioTxEnvironment>,
     Gas: TxGas<ScenarioTxEnvironment>,
-    RH: RHListScenario,
+    RH: RHListScenario<ScenarioTxEnvironment>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
@@ -120,7 +120,7 @@ where
     Payment: TxPayment<ScenarioTxEnvironment>,
     Gas: TxGas<ScenarioTxEnvironment>,
     CodeValue: TxCodeValue<ScenarioTxEnvironment>,
-    RH: RHListScenario,
+    RH: RHListScenario<ScenarioTxEnvironment>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
