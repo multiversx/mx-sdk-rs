@@ -111,8 +111,8 @@ fn test_to_array_of_refs() {
     assert!(refs.is_some());
 
     let refs = refs.unwrap();
-    for i in 0..10 {
-        assert_eq!(refs[i], i as i32);
+    for (i, &item) in refs.iter().enumerate() {
+        assert_eq!(item, i as i32);
     }
 }
 
