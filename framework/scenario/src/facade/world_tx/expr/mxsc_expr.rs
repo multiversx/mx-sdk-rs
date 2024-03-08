@@ -9,21 +9,21 @@ use multiversx_sc::types::{
     TxTo, TxToSpecified,
 };
 
-use crate::{api::StaticApi, ScenarioTxEnvironment};
+use crate::{api::StaticApi, ScenarioTxEnv};
 
 const MXSC_PREFIX: &str = "mxsc:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct MxscExpr<'a>(pub &'a str);
 
-impl<'a> AnnotatedValue<ScenarioTxEnvironment, ManagedBuffer<StaticApi>> for MxscExpr<'a> {
-    fn annotation(&self, _env: &ScenarioTxEnvironment) -> ManagedBuffer<StaticApi> {
+impl<'a> AnnotatedValue<ScenarioTxEnv, ManagedBuffer<StaticApi>> for MxscExpr<'a> {
+    fn annotation(&self, _env: &ScenarioTxEnv) -> ManagedBuffer<StaticApi> {
         let mut result = ManagedBuffer::new_from_bytes(MXSC_PREFIX.as_bytes());
         result.append_bytes(self.0.as_bytes());
         result
     }
 
-    fn into_value(self, env: &ScenarioTxEnvironment) -> ManagedBuffer<StaticApi> {
+    fn into_value(self, env: &ScenarioTxEnv) -> ManagedBuffer<StaticApi> {
         let context = InterpreterContext::new()
             .with_dir(env.context_path.clone())
             .with_allowed_missing_files();
@@ -32,4 +32,4 @@ impl<'a> AnnotatedValue<ScenarioTxEnvironment, ManagedBuffer<StaticApi>> for Mxs
     }
 }
 
-impl<'a> TxCodeValue<ScenarioTxEnvironment> for MxscExpr<'a> {}
+impl<'a> TxCodeValue<ScenarioTxEnv> for MxscExpr<'a> {}
