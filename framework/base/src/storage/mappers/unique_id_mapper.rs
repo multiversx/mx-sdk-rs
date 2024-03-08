@@ -224,7 +224,7 @@ where
     SA: StorageMapperApi,
 {
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<usize>().abi
+        crate::abi::type_name_variadic::<usize>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

@@ -230,7 +230,7 @@ where
     SA: StorageMapperApi,
 {
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedAddress<SA>>().abi
+        crate::abi::type_name_variadic::<ManagedAddress<SA>>()
     }
 
     fn is_variadic() -> bool {

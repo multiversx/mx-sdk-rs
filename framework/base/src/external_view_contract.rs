@@ -1,7 +1,7 @@
 use alloc::string::ToString;
 
 use crate::{
-    abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, TypeAbi, TypeNames},
+    abi::{EndpointAbi, EndpointMutabilityAbi, EndpointTypeAbi, InputAbi, TypeAbi},
     api::{
         const_handles, use_raw_handle, CallValueApiImpl, ManagedBufferApiImpl, StorageWriteApiImpl,
         VMApi, EXTERNAL_VIEW_TARGET_ADRESS_KEY,
@@ -49,10 +49,7 @@ pub fn external_view_contract_constructor_abi() -> EndpointAbi {
     );
     endpoint_abi.inputs.push(InputAbi {
         arg_name: "target_contract_address".to_string(),
-        type_names: TypeNames {
-            abi: crate::types::heap::Address::type_name(),
-            rust: crate::types::heap::Address::type_name_rust(),
-        },
+        type_names: crate::types::heap::Address::type_names(),
         multi_arg: false,
     });
     endpoint_abi

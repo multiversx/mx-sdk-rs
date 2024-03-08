@@ -62,26 +62,16 @@ pub trait TypeAbi {
     }
 }
 
-pub fn type_name_variadic<T: TypeAbi>() -> TypeNames {
-    let mut abi = TypeName::from("variadic<");
-    abi.push_str(T::type_name().as_str());
-    abi.push('>');
-
-    let mut rust = TypeName::from("variadic<");
-    rust.push_str(T::type_name_rust().as_str());
-    rust.push('>');
-
-    TypeNames { abi, rust }
+pub fn type_name_variadic<T: TypeAbi>() -> TypeName {
+    let mut repr = TypeName::from("variadic<");
+    repr.push_str(T::type_name().as_str());
+    repr.push('>');
+    repr
 }
 
-pub fn type_name_optional<T: TypeAbi>() -> TypeNames {
-    let mut abi = TypeName::from("optional<");
-    abi.push_str(T::type_name().as_str());
-    abi.push('>');
-
-    let mut rust = TypeName::from("optional<");
-    rust.push_str(T::type_name().as_str());
-    rust.push('>');
-
-    TypeNames { abi, rust }
+pub fn type_name_optional<T: TypeAbi>() -> TypeName {
+    let mut repr = TypeName::from("optional<");
+    repr.push_str(T::type_name().as_str());
+    repr.push('>');
+    repr
 }
