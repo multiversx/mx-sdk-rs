@@ -4,6 +4,8 @@ pub mod twiggy;
 mod wasm_extractor;
 mod wasm_opt;
 mod wasm_to_wat;
+pub(crate) mod report_creator;
+pub(crate) mod report_feature;
 
 pub use git_describe::git_describe;
 pub use wasm_extractor::WasmInfo;

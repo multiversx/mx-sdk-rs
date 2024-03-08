@@ -6,6 +6,8 @@ use wasmparser::{
 
 use crate::ei::EIVersion;
 
+use super::report_creator::ReportCreator;
+
 const ERROR_FAIL_ALLOCATOR: &[u8; 27] = b"memory allocation forbidden";
 const MEMORY_GROW_OPCODE: u8 = 0x40;
 
@@ -14,6 +16,7 @@ pub struct WasmInfo {
     pub allocator_trigger: bool,
     pub ei_check: bool,
     pub memory_grow_flag: bool,
+    pub report: ReportCreator
 }
 
 impl WasmInfo {
@@ -38,6 +41,14 @@ fn populate_wasm_info(
     let mut allocator_trigger = false;
     let mut ei_check = false;
     let mut memory_grow_flag = false;
+    let report = ReportCreator {
+        report_features: todo!(),
+        skip_build: todo!(),
+        skip_twiggy: todo!(),
+        require_twiggy_paths: todo!(),
+        build_options: todo!(),
+        build_args: todo!(),
+    }
 
     let parser = Parser::new(0);
     for payload in parser.parse_all(&wasm_data) {
