@@ -3,22 +3,22 @@ use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
         AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListSync,
-        Tx, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv, TxFromSpecified, TxGas,
-        TxPayment, TxToSpecified,
+        Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
+        TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
 };
 
 use crate::{
     api::StaticApi,
-    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep},
+    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
     ScenarioWorld, WorldRefEnv,
 };
 
-use super::{RHListScenario, ScenarioTxEnv, TxScenarioBase};
+use super::{RHListScenario, ScenarioTxEnvData};
 
 impl ScenarioWorld {
-    fn new_env_data(&self) -> ScenarioTxEnv {
-        ScenarioTxEnv {
+    fn new_env_data(&self) -> ScenarioTxEnvData {
+        ScenarioTxEnvData {
             context_path: self.current_dir.clone(),
             ..Default::default()
         }
@@ -29,38 +29,30 @@ impl ScenarioWorld {
         WorldRefEnv { world: self, data }
     }
 
-    pub fn tx<'w>(&'w mut self) -> Tx<WorldRefEnv<'w>, (), (), (), (), (), ()> {
+    pub fn tx<'w>(&'w mut self) -> TxBaseWithEnv<WorldRefEnv<'w>> {
         Tx::new_with_env(self.wrap_world_ref())
-    }
-
-    pub fn tx_return<STx, F>(&mut self, f: F) -> STx::Returns
-    where
-        STx: ScenarioTx,
-        F: FnOnce(TxScenarioBase) -> STx,
-    {
-        let env = self.new_env_data();
-        let tx_base = TxScenarioBase::new_with_env(env);
-        let tx = f(tx_base);
-        tx.run_as_scenario_step(self)
     }
 
     pub fn chain_tx<STx, F>(&mut self, f: F) -> &mut Self
     where
-        STx: ScenarioTx<Returns = ()>,
-        F: FnOnce(TxScenarioBase) -> STx,
+        STx: ScenarioTxRunOnWorld<Returns = ()>,
+        F: FnOnce(TxBaseWithEnv<ScenarioTxEnvData>) -> STx,
     {
-        self.tx_return(f);
+        let env = self.new_env_data();
+        let tx_base = TxBaseWithEnv::new_with_env(env);
+        let tx = f(tx_base);
+        tx.run_on_world(self);
         self
     }
 }
 
-pub trait ScenarioTx {
+pub trait ScenarioTxRunOnWorld {
     type Returns;
 
-    fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns;
+    fn run_on_world(self, world: &mut ScenarioWorld) -> Self::Returns;
 }
 
-pub trait ScenarioTx2 {
+pub trait ScenarioTxRun {
     type Returns;
 
     fn run(self) -> Self::Returns;
@@ -90,37 +82,97 @@ where
     }
 }
 
-impl<From, To, Payment, Gas, RH> ScenarioTx
-    for Tx<ScenarioTxEnv, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+fn tx_to_sc_call_step<Env, From, To, Payment, Gas>(
+    env: &Env,
+    from: From,
+    to: To,
+    _payment: Payment,
+    _gas: Gas,
+    data: FunctionCall<Env::Api>,
+) -> ScCallStep
 where
-    From: TxFromSpecified<ScenarioTxEnv>,
-    To: TxToSpecified<ScenarioTxEnv>,
-    Payment: TxPayment<ScenarioTxEnv>,
-    Gas: TxGas<ScenarioTxEnv>,
-    RH: RHListScenario<ScenarioTxEnv>,
+    Env: TxEnv,
+    From: TxFromSpecified<Env>,
+    To: TxToSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+{
+    let mut step = ScCallStep::new()
+        .from(address_annotated(env, from))
+        .to(address_annotated(env, to))
+        .function(data.function_name.to_string().as_str());
+    for arg in data.arg_buffer.iter_buffers() {
+        step.tx.arguments.push(arg.to_vec().into());
+    }
+
+    step
+}
+
+fn tx_to_sc_deploy_step<Env, From, Payment, Gas, CodeValue>(
+    env: &Env,
+    from: From,
+    _payment: Payment,
+    _gas: Gas,
+    data: DeployCall<Env, Code<CodeValue>>,
+) -> ScDeployStep
+where
+    Env: TxEnv,
+    From: TxFromSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    CodeValue: TxCodeValue<Env>,
+{
+    let mut step = ScDeployStep::new()
+        .from(address_annotated(env, from))
+        .code(code_annotated(env, data.code_source));
+    for arg in data.arg_buffer.iter_buffers() {
+        step.tx.arguments.push(arg.to_vec().into());
+    }
+
+    step
+}
+
+fn process_result<Env, RH>(
+    response: Option<TxResponse>,
+    result_handler: RH,
+) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
+where
+    Env: TxEnv,
+    RH: RHListScenario<Env>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    let response = response.expect("step did not return result");
+    let tuple_result = result_handler.item_scenario_result(&response);
+    tuple_result.flatten_unpack()
+}
+
+impl<From, To, Payment, Gas, RH> ScenarioTxRunOnWorld
+    for Tx<ScenarioTxEnvData, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+where
+    From: TxFromSpecified<ScenarioTxEnvData>,
+    To: TxToSpecified<ScenarioTxEnvData>,
+    Payment: TxPayment<ScenarioTxEnvData>,
+    Gas: TxGas<ScenarioTxEnvData>,
+    RH: RHListScenario<ScenarioTxEnvData>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns {
-        let mut env = self.env;
-        let mut step = ScCallStep::new()
-            .from(address_annotated(&env, self.from))
-            .to(address_annotated(&env, self.to))
-            .function(self.data.function_name.to_string().as_str());
-        for arg in self.data.arg_buffer.iter_buffers() {
-            step.tx.arguments.push(arg.to_vec().into());
-        }
-
+    fn run_on_world(self, world: &mut ScenarioWorld) -> Self::Returns {
+        let mut step = tx_to_sc_call_step(
+            &self.env,
+            self.from,
+            self.to,
+            self.payment,
+            self.gas,
+            self.data,
+        );
         world.sc_call(&mut step);
-        let response = step.response.expect("step did not return result");
-
-        let tuple_result = self.result_handler.item_scenario_result(&response);
-        tuple_result.flatten_unpack()
+        process_result(step.response, self.result_handler)
     }
 }
 
-impl<'w, From, To, Payment, Gas, RH> ScenarioTx2
+impl<'w, From, To, Payment, Gas, RH> ScenarioTxRun
     for Tx<WorldRefEnv<'w>, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
 where
     From: TxFromSpecified<WorldRefEnv<'w>>,
@@ -133,48 +185,71 @@ where
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
     fn run(self) -> Self::Returns {
-        let mut env = self.env;
-        let mut step = ScCallStep::new()
-            .from(address_annotated(&env, self.from))
-            .to(address_annotated(&env, self.to))
-            .function(self.data.function_name.to_string().as_str());
-        for arg in self.data.arg_buffer.iter_buffers() {
-            step.tx.arguments.push(arg.to_vec().into());
-        }
-
-        env.world.sc_call(&mut step);
-        let response = step.response.expect("step did not return result");
-
-        let tuple_result = self.result_handler.item_scenario_result(&response);
-        tuple_result.flatten_unpack()
+        let mut step = tx_to_sc_call_step(
+            &self.env,
+            self.from,
+            self.to,
+            self.payment,
+            self.gas,
+            self.data,
+        );
+        self.env.world.sc_call(&mut step);
+        process_result(step.response, self.result_handler)
     }
 }
 
-impl<From, Payment, Gas, CodeValue, RH> ScenarioTx
-    for Tx<ScenarioTxEnv, From, (), Payment, Gas, DeployCall<ScenarioTxEnv, Code<CodeValue>>, RH>
+impl<From, Payment, Gas, CodeValue, RH> ScenarioTxRunOnWorld
+    for Tx<
+        ScenarioTxEnvData,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<ScenarioTxEnvData, Code<CodeValue>>,
+        RH,
+    >
 where
-    From: TxFromSpecified<ScenarioTxEnv>,
-    Payment: TxPayment<ScenarioTxEnv>,
-    Gas: TxGas<ScenarioTxEnv>,
-    CodeValue: TxCodeValue<ScenarioTxEnv>,
-    RH: RHListScenario<ScenarioTxEnv>,
+    From: TxFromSpecified<ScenarioTxEnvData>,
+    Payment: TxPayment<ScenarioTxEnvData>,
+    Gas: TxGas<ScenarioTxEnvData>,
+    CodeValue: TxCodeValue<ScenarioTxEnvData>,
+    RH: RHListScenario<ScenarioTxEnvData>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
-    fn run_as_scenario_step(self, world: &mut ScenarioWorld) -> Self::Returns {
-        let mut env = self.env;
-        let mut step = ScDeployStep::new()
-            .from(address_annotated(&env, self.from))
-            .code(code_annotated(&env, self.data.code_source));
-        for arg in self.data.arg_buffer.iter_buffers() {
-            step.tx.arguments.push(arg.to_vec().into());
-        }
-
+    fn run_on_world(self, world: &mut ScenarioWorld) -> Self::Returns {
+        let mut step =
+            tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
         world.sc_deploy(&mut step);
-        let response = step.response.expect("step did not return result");
+        process_result(step.response, self.result_handler)
+    }
+}
 
-        let tuple_result = self.result_handler.item_scenario_result(&response);
-        tuple_result.flatten_unpack()
+impl<'w, From, Payment, Gas, CodeValue, RH> ScenarioTxRun
+    for Tx<
+        WorldRefEnv<'w>,
+        From,
+        (),
+        Payment,
+        Gas,
+        DeployCall<WorldRefEnv<'w>, Code<CodeValue>>,
+        RH,
+    >
+where
+    From: TxFromSpecified<WorldRefEnv<'w>>,
+    Payment: TxPayment<WorldRefEnv<'w>>,
+    Gas: TxGas<WorldRefEnv<'w>>,
+    CodeValue: TxCodeValue<WorldRefEnv<'w>>,
+    RH: RHListScenario<WorldRefEnv<'w>>,
+    RH::ListReturns: NestedTupleFlatten,
+{
+    type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
+
+    fn run(self) -> Self::Returns {
+        let mut step =
+            tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
+        self.env.world.sc_deploy(&mut step);
+        process_result(step.response, self.result_handler)
     }
 }

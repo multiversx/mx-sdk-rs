@@ -7,7 +7,7 @@ use multiversx_sc::{
 
 use crate::scenario_model::TxResponse;
 
-use super::{RHListItemScenario, ScenarioTxEnv};
+use super::{RHListItemScenario, ScenarioTxEnvData};
 
 /// Wraps a closure that handles a `TxResponse` object.
 pub struct WithRawTxResponse<F>(pub F)

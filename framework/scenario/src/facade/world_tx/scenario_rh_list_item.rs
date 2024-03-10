@@ -8,7 +8,7 @@ use crate::{
     scenario_model::{TxResponse, TypedResponse},
 };
 
-use super::ScenarioTxEnv;
+use super::ScenarioTxEnvData;
 
 pub trait RHListItemScenario<Env, Original>: RHListItem<Env, Original>
 where

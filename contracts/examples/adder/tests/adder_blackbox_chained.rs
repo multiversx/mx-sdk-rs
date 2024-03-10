@@ -16,7 +16,7 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_blackbox_with_values() {
+fn adder_blackbox_chained() {
     let mut world = world();
     let owner_address = "address:owner";
     let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
@@ -46,21 +46,12 @@ fn adder_blackbox_with_values() {
         .chain_tx(|tx| {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
-                .typed_v1(temp_proxy::TxProxy, |p| p.add(2u32))
+                .typed_v2(temp_proxy_v2::TxProxy)
+                .add(3u32)
                 .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());
                 }))
-        });
-
-    world
-        .tx()
-        .from(AddressExpr("owner"))
-        .to(ScExpr("adder"))
-        .typed_v2(temp_proxy_v2::TxProxy)
-        .add(1u32)
-        .run();
-
-    world
+        })
         .check_state_step(
             CheckStateStep::new()
                 .put_account(owner_address, CheckAccount::new())
@@ -69,5 +60,5 @@ fn adder_blackbox_with_values() {
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         )
-        .write_scenario_trace("trace1.scen.json");
+        .write_scenario_trace("trace2.scen.json");
 }
