@@ -38,7 +38,6 @@ impl ScenarioWorld {
     pub(crate) fn new_env_data(&self) -> ScenarioTxEnvData {
         ScenarioTxEnvData {
             context_path: self.current_dir.clone(),
-            ..Default::default()
         }
     }
 }

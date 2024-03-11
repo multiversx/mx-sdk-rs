@@ -55,7 +55,7 @@ where
 }
 
 impl ScenarioWorld {
-    pub fn query<'w>(&'w mut self) -> TxBaseWithEnv<ScenarioEnvQuery<'w>> {
+    pub fn query(&mut self) -> TxBaseWithEnv<ScenarioEnvQuery<'_>> {
         let data = self.new_env_data();
         let env = ScenarioEnvQuery { world: self, data };
         Tx::new_with_env(env)

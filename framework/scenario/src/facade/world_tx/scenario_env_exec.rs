@@ -69,7 +69,7 @@ where
 }
 
 impl ScenarioWorld {
-    pub fn tx<'w>(&'w mut self) -> TxBaseWithEnv<ScenarioEnvExec<'w>> {
+    pub fn tx(&mut self) -> TxBaseWithEnv<ScenarioEnvExec<'_>> {
         let data = self.new_env_data();
         let env = ScenarioEnvExec { world: self, data };
         Tx::new_with_env(env)
