@@ -41,8 +41,8 @@ fn adder_blackbox_chained() {
             tx.to(ScExpr("adder"))
                 .typed_v2(temp_proxy_v2::TxProxy)
                 .sum()
-                .with_result(WithResultSimilar::new(|value: SingleValue<BigUint>| {
-                    assert_eq!(value.into(), BigUint::from(5u32));
+                .with_result(WithResultSimilar::new(|value: BigUint| {
+                    assert_eq!(value, BigUint::from(5u32));
                 }))
         })
         .chain_call(|tx| {

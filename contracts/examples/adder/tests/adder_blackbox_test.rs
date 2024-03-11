@@ -49,9 +49,9 @@ fn adder_blackbox() {
         .to(SC_ADDER)
         .typed_v2(temp_proxy_v2::TxProxy)
         .sum()
-        .returns(ReturnsSimilar::<SingleValue<BigUint>>::new())
+        .returns(ReturnsSimilar::<BigUint>::new())
         .run();
-    assert_eq!(value.into(), BigUint::from(5u32));
+    assert_eq!(value, BigUint::from(5u32));
 
     // TODO: remove
     world
