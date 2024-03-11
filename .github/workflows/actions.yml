@@ -133,7 +133,7 @@ jobs:
 
       - name: Install prerequisites
         run: |
-          apt-get install llvm-17
+          sudo apt-get install llvm-17
 
           which llvm-cov
           which llvm-profdata
