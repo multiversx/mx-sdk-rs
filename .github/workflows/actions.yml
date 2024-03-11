@@ -133,10 +133,12 @@ jobs:
       - name: Install prerequisites
         run: |
           rustup component add llvm-tools-preview
-          echo "$(dirname $(find ~/.rustup -name llvm-cov))" >> $GITHUB_PATH
+          dirname $(find ~/.rustup -name llvm-cov) >> $GITHUB_PATH
 
-          which llvm-cov
-          which llvm-profdata
+          echo $(dirname $(find ~/.rustup -name llvm-cov))
+
+          # which llvm-cov
+          # which llvm-profdata
 
       - name: Run tests and generate report
         env:
