@@ -75,10 +75,10 @@ pub fn convert_type_descriptions_to_json(
     type_descriptions: &TypeDescriptionContainerImpl,
 ) -> BTreeMap<String, TypeDescriptionJson> {
     let mut types = BTreeMap::new();
-    for (type_name, type_description) in type_descriptions.0.iter() {
+    for (type_names, type_description) in type_descriptions.0.iter() {
         if type_description.contents.is_specified() {
             types.insert(
-                type_name.clone(),
+                type_names.abi.clone(),
                 TypeDescriptionJson::from(type_description),
             );
         }

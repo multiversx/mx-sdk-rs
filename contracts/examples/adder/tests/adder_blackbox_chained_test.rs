@@ -1,8 +1,5 @@
 use adder::*;
-use multiversx_sc::{
-    storage::mappers::SingleValue,
-    types::{AddressExpr, ScExpr, WithResultNewAddress, WithResultSimilar},
-};
+use multiversx_sc::types::{AddressExpr, ScExpr, WithResultNewAddress, WithResultSimilar};
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
@@ -41,8 +38,8 @@ fn adder_blackbox_chained() {
             tx.to(ScExpr("adder"))
                 .typed_v2(temp_proxy_v2::TxProxy)
                 .sum()
-                .with_result(WithResultSimilar::new(|value: SingleValue<BigUint>| {
-                    assert_eq!(value.into(), BigUint::from(5u32));
+                .with_result(WithResultSimilar::new(|value: BigUint| {
+                    assert_eq!(value, BigUint::from(5u32));
                 }))
         })
         .chain_call(|tx| {

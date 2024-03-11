@@ -95,7 +95,7 @@ fn write_args(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(file, "<").unwrap();
 
     for (index, input) in inputs.iter().enumerate() {
-        write_argument(file, index, input.type_name.to_string());
+        write_argument(file, index, input.type_names.abi.to_string());
     }
 
     write!(file, "\t>").unwrap();

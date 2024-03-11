@@ -291,6 +291,10 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     fn type_name() -> TypeName {
         TypeName::from("BigUint")
     }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("multiversx_sc::types::BigUint<$API>")
+    }
 }
 
 impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {

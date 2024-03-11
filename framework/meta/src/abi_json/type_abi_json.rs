@@ -68,10 +68,10 @@ impl From<&TypeDescription> for TypeDescriptionJson {
 }
 
 impl TypeDescriptionJson {
-    pub fn to_type_description(&self, name: &str) -> TypeDescription {
+    pub fn to_type_description(&self, names: TypeNames) -> TypeDescription {
         TypeDescription {
             docs: self.docs.clone(),
-            name: name.to_string(),
+            names,
             contents: match self.content_type.as_str() {
                 TYPE_DESCRIPTION_JSON_TYPE_STRUCT => TypeContents::Struct(
                     self.fields

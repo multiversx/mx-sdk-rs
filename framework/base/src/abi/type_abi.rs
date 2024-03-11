@@ -2,7 +2,18 @@ use super::*;
 use alloc::{string::ToString, vec::Vec};
 
 pub trait TypeAbi {
+    fn type_names() -> TypeNames {
+        TypeNames {
+            abi: Self::type_name(),
+            rust: Self::type_name_rust(),
+        }
+    }
+
     fn type_name() -> TypeName {
+        core::any::type_name::<Self>().into()
+    }
+
+    fn type_name_rust() -> TypeName {
         core::any::type_name::<Self>().into()
     }
 
@@ -11,12 +22,12 @@ pub trait TypeAbi {
     /// TypeAbi doesn't care for the exact accumulator type,
     /// which is abstracted by the TypeDescriptionContainer trait.
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-        let type_name = Self::type_name();
+        let type_names = Self::type_names();
         accumulator.insert(
-            type_name,
+            type_names,
             TypeDescription {
                 docs: Vec::new(),
-                name: Self::type_name(),
+                names: Self::type_names(),
                 contents: TypeContents::NotSpecified,
             },
         );
@@ -44,7 +55,7 @@ pub trait TypeAbi {
         };
         result.push(OutputAbi {
             output_name: output_name.to_string(),
-            type_name: Self::type_name(),
+            type_names: Self::type_names(),
             multi_result: Self::is_variadic(),
         });
         result

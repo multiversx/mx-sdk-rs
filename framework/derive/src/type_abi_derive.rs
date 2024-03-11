@@ -50,16 +50,16 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
             let struct_field_snippets = fields_snippets(&data_struct.fields);
             quote! {
                 fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    let type_name = Self::type_name();
-                    if !accumulator.contains_type(&type_name) {
-                        accumulator.reserve_type_name(type_name.clone());
+                    let type_names = Self::type_names();
+                    if !accumulator.contains_type(&type_names.abi) {
+                        accumulator.reserve_type_name(type_names.clone());
                         let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#struct_field_snippets)*
                         accumulator.insert(
-                            type_name.clone(),
+                            type_names.clone(),
                             multiversx_sc::abi::TypeDescription::new(
                                 &[ #(#type_docs),* ],
-                                type_name,
+                                type_names,
                                 multiversx_sc::abi::TypeContents::Struct(field_descriptions),
                             ),
                         );
@@ -93,16 +93,16 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                 .collect();
             quote! {
                 fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    let type_name = Self::type_name();
-                    if !accumulator.contains_type(&type_name) {
-                        accumulator.reserve_type_name(type_name.clone());
+                    let type_names = Self::type_names();
+                    if !accumulator.contains_type(&type_names.abi) {
+                        accumulator.reserve_type_name(type_names.clone());
                         let mut variant_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#enum_variant_snippets)*
                         accumulator.insert(
-                            type_name.clone(),
+                            type_names.clone(),
                             multiversx_sc::abi::TypeDescription::new(
                                 &[ #(#type_docs),* ],
-                                type_name,
+                                type_names,
                                 multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
                             ),
                         );

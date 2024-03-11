@@ -1,8 +1,5 @@
 use adder::*;
-use multiversx_sc::{
-    storage::mappers::SingleValue,
-    types::{AddressExpr, ReturnsSimilar, ScExpr, WithResultNewAddress},
-};
+use multiversx_sc::types::{AddressExpr, ReturnsSimilar, ScExpr, WithResultNewAddress};
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
@@ -49,9 +46,9 @@ fn adder_blackbox() {
         .to(SC_ADDER)
         .typed_v2(temp_proxy_v2::TxProxy)
         .sum()
-        .returns(ReturnsSimilar::<SingleValue<BigUint>>::new())
+        .returns(ReturnsSimilar::<BigUint>::new())
         .run();
-    assert_eq!(value.into(), BigUint::from(5u32));
+    assert_eq!(value, BigUint::from(5u32));
 
     // TODO: remove
     world
