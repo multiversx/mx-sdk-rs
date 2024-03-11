@@ -167,7 +167,7 @@ jobs:
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
-          body-path: ./coverage.md
+          body-file: ./coverage.md
           edit-mode: replace
 
   rust_test:
