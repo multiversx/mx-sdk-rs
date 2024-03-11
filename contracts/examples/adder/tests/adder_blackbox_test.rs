@@ -20,10 +20,10 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_blackbox_with_values() {
+fn adder_blackbox() {
     let mut world = world();
     let owner_address = "address:owner";
-    let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace();
 
@@ -43,13 +43,6 @@ fn adder_blackbox_with_values() {
             assert_eq!(new_address.to_address(), adder_contract.to_address());
         }))
         .run();
-
-    world.sc_query(
-        ScQueryStep::new()
-            .to(&adder_contract)
-            .call(adder_contract.sum())
-            .expect_value(SingleValue::from(BigUint::from(5u32))),
-    );
 
     let value = world
         .query()
