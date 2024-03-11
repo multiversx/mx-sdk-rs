@@ -33,7 +33,6 @@ fn target_from_args(args: &TemplateArgs) -> ContractCreatorTarget {
     ContractCreatorTarget {
         target_path,
         new_name,
-        no_new_dir: args.no_new_dir,
     }
 }
 

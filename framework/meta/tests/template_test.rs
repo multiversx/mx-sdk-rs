@@ -75,42 +75,6 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
         new_name: new_name.to_string().to_case(Case::Kebab),
-        no_new_dir: false,
-    };
-
-    let repo_source = RepoSource::from_local_path(workspace_path);
-
-    prepare_target_dir(&target);
-
-    ContractCreator::new(
-        &repo_source,
-        template_name.to_string(),
-        target.clone(),
-        true,
-    )
-    .create_contract(LAST_TEMPLATE_VERSION);
-
-    if BUILD_CONTRACTS {
-        build_contract(&target);
-    }
-    cargo_test(&target);
-}
-
-/// Recreates the folder structure in `contracts`, on the same level.
-/// This way, the relative paths are still valid in this case,
-/// and we can test the templates with the framework version of the current branch.
-#[test]
-#[cfg_attr(not(feature = "template-test-current"), ignore)]
-fn template_test_no_new_dir() {
-    let template_name = "empty";
-    let sub_path = "examples";
-    let new_name = "new-empty";
-
-    let workspace_path = find_current_workspace().unwrap();
-    let target = ContractCreatorTarget {
-        target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
-        new_name: new_name.to_string().to_case(Case::Kebab),
-        no_new_dir: true,
     };
 
     let repo_source = RepoSource::from_local_path(workspace_path);
@@ -159,7 +123,6 @@ fn template_test_released(template_name: &str, new_name: &str) {
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
         new_name: new_name.to_string(),
-        no_new_dir: false,
     };
 
     let temp_dir_path = workspace_path
