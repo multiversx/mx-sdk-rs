@@ -1,7 +1,7 @@
 use adder::*;
 use multiversx_sc::{
     storage::mappers::SingleValue,
-    types::{AddressExpr, ScExpr, WithResultNewAddress},
+    types::{AddressExpr, ReturnsSimilar, ScExpr, WithResultNewAddress},
 };
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
@@ -50,6 +50,15 @@ fn adder_blackbox_with_values() {
             .call(adder_contract.sum())
             .expect_value(SingleValue::from(BigUint::from(5u32))),
     );
+
+    let value = world
+        .query()
+        .to(SC_ADDER)
+        .typed_v2(temp_proxy_v2::TxProxy)
+        .sum()
+        .returns(ReturnsSimilar::<SingleValue<BigUint>>::new())
+        .run();
+    assert_eq!(value.into(), BigUint::from(5u32));
 
     // TODO: remove
     world

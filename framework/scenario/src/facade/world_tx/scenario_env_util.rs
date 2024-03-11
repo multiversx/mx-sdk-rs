@@ -10,7 +10,7 @@ use multiversx_sc::{
 
 use crate::{
     api::StaticApi,
-    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
+    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep, TxResponse},
     RHListScenario, ScenarioEnvExec, ScenarioWorld,
 };
 
@@ -81,6 +81,25 @@ where
     let mut step = ScDeployStep::new()
         .from(address_annotated(env, from))
         .code(code_annotated(env, data.code_source));
+    for arg in data.arg_buffer.iter_buffers() {
+        step.tx.arguments.push(arg.to_vec().into());
+    }
+
+    step
+}
+
+pub(super) fn tx_to_sc_query_step<Env, To>(
+    env: &Env,
+    to: To,
+    data: FunctionCall<Env::Api>,
+) -> ScQueryStep
+where
+    Env: TxEnv,
+    To: TxToSpecified<Env>,
+{
+    let mut step = ScQueryStep::new()
+        .to(address_annotated(env, to))
+        .function(data.function_name.to_string().as_str());
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }

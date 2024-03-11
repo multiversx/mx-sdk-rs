@@ -34,6 +34,15 @@ impl ScenarioTxEnv for ScenarioTxEnvData {
     }
 }
 
+impl ScenarioWorld {
+    pub(crate) fn new_env_data(&self) -> ScenarioTxEnvData {
+        ScenarioTxEnvData {
+            context_path: self.current_dir.clone(),
+            ..Default::default()
+        }
+    }
+}
+
 /// Provides a `run` method for transactions and steps.
 pub trait ScenarioTxRun {
     type Returns;

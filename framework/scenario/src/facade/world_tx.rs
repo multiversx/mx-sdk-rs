@@ -2,6 +2,7 @@
 
 mod expr;
 mod scenario_env;
+mod scenario_env_deploy;
 mod scenario_env_exec;
 mod scenario_env_query;
 mod scenario_env_util;

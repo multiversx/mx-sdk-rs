@@ -1,7 +1,7 @@
 use adder::*;
 use multiversx_sc::{
     storage::mappers::SingleValue,
-    types::{AddressExpr, ScExpr, WithResultNewAddress},
+    types::{AddressExpr, ScExpr, WithResultNewAddress, WithResultSimilar},
 };
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
@@ -19,7 +19,7 @@ fn world() -> ScenarioWorld {
 fn adder_blackbox_chained() {
     let mut world = world();
     let owner_address = "address:owner";
-    let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world
         .start_trace()
@@ -28,7 +28,7 @@ fn adder_blackbox_chained() {
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .chain_tx(|tx| {
+        .chain_deploy(|tx| {
             tx.from(AddressExpr("owner"))
                 .typed_v2(temp_proxy_v2::TxProxy)
                 .init(5u32)
@@ -37,13 +37,15 @@ fn adder_blackbox_chained() {
                     assert_eq!(new_address.to_address(), adder_contract.to_address());
                 }))
         })
-        .sc_query(
-            ScQueryStep::new()
-                .to(&adder_contract)
-                .call(adder_contract.sum())
-                .expect_value(SingleValue::from(BigUint::from(5u32))),
-        )
-        .chain_tx(|tx| {
+        .chain_query(|tx| {
+            tx.to(ScExpr("adder"))
+                .typed_v2(temp_proxy_v2::TxProxy)
+                .sum()
+                .with_result(WithResultSimilar::new(|value: SingleValue<BigUint>| {
+                    assert_eq!(value.into(), BigUint::from(5u32));
+                }))
+        })
+        .chain_call(|tx| {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
                 .typed_v2(temp_proxy_v2::TxProxy)
