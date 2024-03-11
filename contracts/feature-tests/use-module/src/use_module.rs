@@ -63,7 +63,7 @@ pub trait UseModule:
     }
 
     #[endpoint(checkPause)]
-    fn check_pause(&self) -> SCResult<bool> {
-        Ok(self.is_paused())
+    fn check_pause(&self) -> bool {
+        self.is_paused()
     }
 }

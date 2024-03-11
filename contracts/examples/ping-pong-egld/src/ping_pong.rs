@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 mod user_status;
 
@@ -46,6 +46,9 @@ pub trait PingPong {
         self.activation_timestamp().set(activation_timestamp);
         self.max_funds().set(max_funds.into_option());
     }
+
+    #[upgrade]
+    fn upgrade(&self) {}
 
     /// User sends some EGLD to be locked in the contract for a period of time.
     /// Optional `_data` argument is ignored.

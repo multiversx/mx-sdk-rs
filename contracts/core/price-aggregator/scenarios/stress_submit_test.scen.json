@@ -220,6 +220,7 @@
         },
         {
             "step": "scDeploy",
+            "id": "",
             "tx": {
                 "from": "address:owner",
                 "contractCode": "mxsc:../output/multiversx-price-aggregator-sc.mxsc.json",
@@ -289,6 +290,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle1",
                 "to": "sc:price-aggregator",
@@ -304,6 +306,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle2",
                 "to": "sc:price-aggregator",
@@ -319,6 +322,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle3",
                 "to": "sc:price-aggregator",
@@ -334,6 +338,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle4",
                 "to": "sc:price-aggregator",
@@ -349,6 +354,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle5",
                 "to": "sc:price-aggregator",
@@ -364,6 +370,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle6",
                 "to": "sc:price-aggregator",
@@ -379,6 +386,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle7",
                 "to": "sc:price-aggregator",
@@ -394,6 +402,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle8",
                 "to": "sc:price-aggregator",
@@ -409,6 +418,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle9",
                 "to": "sc:price-aggregator",
@@ -424,6 +434,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle10",
                 "to": "sc:price-aggregator",
@@ -439,6 +450,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle11",
                 "to": "sc:price-aggregator",
@@ -454,6 +466,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle12",
                 "to": "sc:price-aggregator",
@@ -469,6 +482,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle13",
                 "to": "sc:price-aggregator",
@@ -484,6 +498,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle14",
                 "to": "sc:price-aggregator",
@@ -499,6 +514,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle15",
                 "to": "sc:price-aggregator",
@@ -514,6 +530,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle16",
                 "to": "sc:price-aggregator",
@@ -529,6 +546,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle17",
                 "to": "sc:price-aggregator",
@@ -544,6 +562,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle18",
                 "to": "sc:price-aggregator",
@@ -559,6 +578,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle19",
                 "to": "sc:price-aggregator",
@@ -574,6 +594,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle20",
                 "to": "sc:price-aggregator",
@@ -589,6 +610,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle21",
                 "to": "sc:price-aggregator",
@@ -604,6 +626,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle22",
                 "to": "sc:price-aggregator",
@@ -619,6 +642,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle23",
                 "to": "sc:price-aggregator",
@@ -634,6 +658,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle24",
                 "to": "sc:price-aggregator",
@@ -649,6 +674,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle25",
                 "to": "sc:price-aggregator",
@@ -664,6 +690,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle26",
                 "to": "sc:price-aggregator",
@@ -679,6 +706,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle27",
                 "to": "sc:price-aggregator",
@@ -694,6 +722,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle28",
                 "to": "sc:price-aggregator",
@@ -709,6 +738,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle29",
                 "to": "sc:price-aggregator",
@@ -724,6 +754,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle30",
                 "to": "sc:price-aggregator",
@@ -739,6 +770,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle31",
                 "to": "sc:price-aggregator",
@@ -754,6 +786,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle32",
                 "to": "sc:price-aggregator",
@@ -769,6 +802,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle33",
                 "to": "sc:price-aggregator",
@@ -784,6 +818,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle34",
                 "to": "sc:price-aggregator",
@@ -799,6 +834,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle35",
                 "to": "sc:price-aggregator",
@@ -814,6 +850,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle36",
                 "to": "sc:price-aggregator",
@@ -829,6 +866,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle37",
                 "to": "sc:price-aggregator",
@@ -844,6 +882,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle38",
                 "to": "sc:price-aggregator",
@@ -859,6 +898,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle39",
                 "to": "sc:price-aggregator",
@@ -874,6 +914,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle40",
                 "to": "sc:price-aggregator",
@@ -889,6 +930,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle41",
                 "to": "sc:price-aggregator",
@@ -904,6 +946,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle42",
                 "to": "sc:price-aggregator",
@@ -919,6 +962,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle43",
                 "to": "sc:price-aggregator",
@@ -934,6 +978,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle44",
                 "to": "sc:price-aggregator",
@@ -949,6 +994,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle45",
                 "to": "sc:price-aggregator",
@@ -964,6 +1010,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle46",
                 "to": "sc:price-aggregator",
@@ -979,6 +1026,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle47",
                 "to": "sc:price-aggregator",
@@ -994,6 +1042,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle48",
                 "to": "sc:price-aggregator",
@@ -1009,6 +1058,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle49",
                 "to": "sc:price-aggregator",
@@ -1024,6 +1074,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle50",
                 "to": "sc:price-aggregator",
@@ -1039,6 +1090,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:price-aggregator",
@@ -1057,6 +1109,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:owner",
                 "to": "sc:price-aggregator",
@@ -1071,6 +1124,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle1",
                 "to": "sc:price-aggregator",
@@ -1079,7 +1133,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x5f",
-                    "0x20f828b458ed8ed1",
+                    "0x3beec6f9cf5130ed",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1091,6 +1145,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle2",
                 "to": "sc:price-aggregator",
@@ -1099,7 +1154,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x2676d2b701c3b471",
+                    "0x50d924566a98aec8",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1111,6 +1166,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle3",
                 "to": "sc:price-aggregator",
@@ -1119,7 +1175,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x18052e90c58519cd",
+                    "0x097b928bb2d85516",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1131,6 +1187,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle4",
                 "to": "sc:price-aggregator",
@@ -1139,7 +1196,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x4b139df90523ff1e",
+                    "0x765c960a5c3c6b95",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1151,6 +1208,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle5",
                 "to": "sc:price-aggregator",
@@ -1159,7 +1217,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x8d8ff5c57157d8b2",
+                    "0xf7426f44c20f404c",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1171,6 +1229,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle6",
                 "to": "sc:price-aggregator",
@@ -1179,7 +1238,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x429916db24f4a29a",
+                    "0xa5c69769ba606c2b",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1191,6 +1250,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle7",
                 "to": "sc:price-aggregator",
@@ -1199,7 +1259,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x20c94b8b0e79ad2c",
+                    "0xe8f77e933d1f2517",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1211,6 +1271,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle8",
                 "to": "sc:price-aggregator",
@@ -1219,7 +1280,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x9394613d6e0c60a0",
+                    "0x94fba404681c1183",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1231,6 +1292,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle9",
                 "to": "sc:price-aggregator",
@@ -1239,7 +1301,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x09b91e4b6287762c",
+                    "0xdc506f08b25d3b71",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1251,6 +1313,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle10",
                 "to": "sc:price-aggregator",
@@ -1259,7 +1322,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x8f523ef0c30d5660",
+                    "0xf5b0acb8ddff3752",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1271,6 +1334,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle11",
                 "to": "sc:price-aggregator",
@@ -1279,7 +1343,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x9a3b75436bbc9750",
+                    "0x39a7d356f768ea5e",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1291,6 +1355,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle12",
                 "to": "sc:price-aggregator",
@@ -1299,7 +1364,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xaf90f593a2eca8b0",
+                    "0xaf145a7f797a48a1",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1311,6 +1376,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle13",
                 "to": "sc:price-aggregator",
@@ -1319,7 +1385,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xe49d6e0a84537efc",
+                    "0xb18143fe76eef718",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1331,6 +1397,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle14",
                 "to": "sc:price-aggregator",
@@ -1339,7 +1406,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x9358a38ff254be4b",
+                    "0x6f64a1ddec18e577",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1351,6 +1418,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle15",
                 "to": "sc:price-aggregator",
@@ -1359,7 +1427,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x4224d33d8a7342fb",
+                    "0x87ffce2a932db3d4",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1371,6 +1439,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle16",
                 "to": "sc:price-aggregator",
@@ -1379,7 +1448,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x9787f59a3d6b5a71",
+                    "0xe6642c7265c738c1",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1391,6 +1460,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle17",
                 "to": "sc:price-aggregator",
@@ -1399,7 +1469,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xae871a49e18c8a4e",
+                    "0xd6079c55087a67d5",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1411,6 +1481,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle18",
                 "to": "sc:price-aggregator",
@@ -1419,7 +1490,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x426db614e3f1db01",
+                    "0x90f7bb0d816fb87d",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1431,6 +1502,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle19",
                 "to": "sc:price-aggregator",
@@ -1439,7 +1511,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xa7964ea7d746a2de",
+                    "0xa0ccc6f5f8c73ff2",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1451,6 +1523,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle20",
                 "to": "sc:price-aggregator",
@@ -1459,7 +1532,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x23c8408e16872669",
+                    "0x258d38a35ccfd93d",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1471,6 +1544,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle21",
                 "to": "sc:price-aggregator",
@@ -1479,7 +1553,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xdcb762dbcd5970bc",
+                    "0x903f62b19408019d",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1491,6 +1565,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle22",
                 "to": "sc:price-aggregator",
@@ -1499,7 +1574,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xf99680ec6f6c3cc0",
+                    "0xc319aab79b2f512e",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1511,6 +1586,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle23",
                 "to": "sc:price-aggregator",
@@ -1519,7 +1595,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xd0e83298636e0010",
+                    "0x4b41176cd679e194",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1531,6 +1607,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle24",
                 "to": "sc:price-aggregator",
@@ -1539,7 +1616,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x2859a982dbd969a6",
+                    "0xaf3c4ad7cdcac230",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1551,6 +1628,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle25",
                 "to": "sc:price-aggregator",
@@ -1559,7 +1637,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x2114dddd7df53e50",
+                    "0x2a8c4a82dfb68f13",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1571,6 +1649,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle26",
                 "to": "sc:price-aggregator",
@@ -1579,7 +1658,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x4b800fe697e62e53",
+                    "0x358e92c93a69a2f9",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1591,6 +1670,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle27",
                 "to": "sc:price-aggregator",
@@ -1599,7 +1679,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x03f2afbf9d784e9f",
+                    "0xb4bd55d9eebad664",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1611,6 +1691,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle28",
                 "to": "sc:price-aggregator",
@@ -1619,7 +1700,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x56934b4f2bf5659e",
+                    "0x9061fc2440f4db51",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1631,6 +1712,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle29",
                 "to": "sc:price-aggregator",
@@ -1639,7 +1721,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x7e9d18115922d624",
+                    "0xc8fde2d627d1b95a",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1651,6 +1733,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle30",
                 "to": "sc:price-aggregator",
@@ -1659,7 +1742,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x21bceff1135a433b",
+                    "0xacede2c42f9bc928",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1671,6 +1754,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle31",
                 "to": "sc:price-aggregator",
@@ -1679,7 +1763,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x014ad037b6df3b54",
+                    "0xb0a4ecb8d46cfe86",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1691,6 +1775,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle32",
                 "to": "sc:price-aggregator",
@@ -1699,7 +1784,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x897754a9bc7fe8fb",
+                    "0xa8d8ee43a5c4ade8",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1711,6 +1796,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle33",
                 "to": "sc:price-aggregator",
@@ -1719,7 +1805,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x9cbab2c3f4582758",
+                    "0xe20bb0819b83cbb6",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1731,6 +1817,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle34",
                 "to": "sc:price-aggregator",
@@ -1739,7 +1826,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x3b21d0b3809f72a2",
+                    "0xb5566ca4a8a6da5b",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1751,6 +1838,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle35",
                 "to": "sc:price-aggregator",
@@ -1759,7 +1847,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x2a750e9ce9c38392",
+                    "0x30b4e318dbf9c0a1",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1771,6 +1859,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle36",
                 "to": "sc:price-aggregator",
@@ -1779,7 +1868,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x441ec6f7ccef3419",
+                    "0x34cd5592ee7ab5f0",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1791,6 +1880,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle37",
                 "to": "sc:price-aggregator",
@@ -1799,7 +1889,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x04355cff356a9270",
+                    "0x4908da8f754f9e29",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1811,6 +1901,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle38",
                 "to": "sc:price-aggregator",
@@ -1819,7 +1910,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x9f8f08c2a0fd1712",
+                    "0x460da40079bef875",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1831,6 +1922,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle39",
                 "to": "sc:price-aggregator",
@@ -1839,7 +1931,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x0237bdd960ee91a4",
+                    "0x6eb6dd52e24341b6",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1851,6 +1943,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle40",
                 "to": "sc:price-aggregator",
@@ -1859,7 +1952,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xd78d767d7431f639",
+                    "0xa06bb000b0901e98",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1871,6 +1964,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle41",
                 "to": "sc:price-aggregator",
@@ -1879,7 +1973,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x0a97da94934b5384",
+                    "0x4f83b3dd7f1dd80e",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1891,6 +1985,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle42",
                 "to": "sc:price-aggregator",
@@ -1899,7 +1994,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x83fd9fa634cd092c",
+                    "0x169e4556e8cd5271",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1911,6 +2006,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle43",
                 "to": "sc:price-aggregator",
@@ -1919,7 +2015,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0xa603bdf728ab39ca",
+                    "0xa45b9cfe7527301b",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1931,6 +2027,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle44",
                 "to": "sc:price-aggregator",
@@ -1939,7 +2036,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x1e855680884a968e",
+                    "0xe3a28965ea6a3ae4",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1951,6 +2048,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle45",
                 "to": "sc:price-aggregator",
@@ -1959,7 +2057,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x59185a21db734c4a",
+                    "0x4efa7be66acf5ded",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1971,6 +2069,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle46",
                 "to": "sc:price-aggregator",
@@ -1979,7 +2078,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x0fb5b1c819ef5113",
+                    "0x5f75311f8cd29ea9",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -1991,6 +2090,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle47",
                 "to": "sc:price-aggregator",
@@ -1999,7 +2099,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x1f0d54522394ace8",
+                    "0xfc7c1268abc1d8e3",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -2011,6 +2111,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle48",
                 "to": "sc:price-aggregator",
@@ -2019,7 +2120,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x8efc62f2eff2c135",
+                    "0xd24cc52d844c6a40",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -2031,6 +2132,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle49",
                 "to": "sc:price-aggregator",
@@ -2039,7 +2141,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x1bb36c03cf1e6971",
+                    "0x804fc08cd1c73c42",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"
@@ -2051,6 +2153,7 @@
         },
         {
             "step": "scCall",
+            "id": "",
             "tx": {
                 "from": "address:oracle50",
                 "to": "sc:price-aggregator",
@@ -2059,7 +2162,7 @@
                     "0x45474c44",
                     "0x55534443",
                     "0x64",
-                    "0x2571ea17cf81f6f2",
+                    "0x093077783f01d496",
                     "0x"
                 ],
                 "gasLimit": "7,000,000"

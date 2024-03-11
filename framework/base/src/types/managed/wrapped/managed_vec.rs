@@ -1,3 +1,4 @@
+use super::EncodedManagedVecItem;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
@@ -12,9 +13,14 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
-use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
-
-use super::EncodedManagedVecItem;
+use core::{
+    borrow::Borrow,
+    cmp::Ordering,
+    fmt::Debug,
+    iter::FromIterator,
+    marker::PhantomData,
+    mem::{transmute_copy, ManuallyDrop, MaybeUninit},
+};
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -147,12 +153,14 @@ where
             return None;
         }
 
-        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        let mut result_uninit =
+            unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
+
         for (index, value) in self.iter().enumerate() {
             result_uninit[index].write(value);
         }
 
-        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
         Some(result)
     }
 

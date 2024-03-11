@@ -1,7 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 mod crypto_kitties_proxy;
 mod storage;
@@ -26,6 +25,9 @@ pub trait CryptoZombies:
         self.level_up_fee().set(BigUint::from(1000000000000000u64));
         self.cooldown_time().set(86400u64);
     }
+
+    #[upgrade]
+    fn upgrade(&self) {}
 
     #[only_owner]
     #[endpoint]
