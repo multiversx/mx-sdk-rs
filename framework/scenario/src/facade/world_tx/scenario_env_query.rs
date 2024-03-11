@@ -6,12 +6,12 @@ use crate::{
     api::StaticApi, scenario_model::TxResponse, ScenarioTxEnv, ScenarioTxEnvData, ScenarioWorld,
 };
 
-pub struct WorldRefEnv<'w> {
+pub struct ScenarioEnvQuery<'w> {
     pub world: &'w mut ScenarioWorld,
     pub data: ScenarioTxEnvData,
 }
 
-impl<'w> TxEnv for WorldRefEnv<'w> {
+impl<'w> TxEnv for ScenarioEnvQuery<'w> {
     type Api = StaticApi;
 
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
@@ -23,7 +23,7 @@ impl<'w> TxEnv for WorldRefEnv<'w> {
     }
 }
 
-impl<'w> ScenarioTxEnv for WorldRefEnv<'w> {
+impl<'w> ScenarioTxEnv for ScenarioEnvQuery<'w> {
     fn env_data(&self) -> &ScenarioTxEnvData {
         &self.data
     }

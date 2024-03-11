@@ -9,7 +9,7 @@ use multiversx_sc::types::{
     TxTo, TxToSpecified,
 };
 
-use crate::{api::StaticApi, ScenarioTxEnv, ScenarioTxEnvData, WorldRefEnv};
+use crate::{api::StaticApi, ScenarioEnvExec, ScenarioTxEnv, ScenarioTxEnvData};
 
 const MXSC_PREFIX: &str = "mxsc:";
 
