@@ -146,9 +146,10 @@ impl<M: ManagedTypeApi, D: Decimals> ManagedDecimal<M, D> {
     pub fn log<T: Decimals>(self, target_base: BigUint<M>, precision: T) -> ManagedDecimal<M, T> {
         let num_decimals = precision.num_decimals() as u32;
         let number = self.data;
+        let one = BigUint::from(1u64);
 
         assert!(
-            number >= BigUint::from(1u64) && target_base >= BigUint::from(1u64),
+            number >= one && target_base >= one,
             "wrong input"
         );
 
