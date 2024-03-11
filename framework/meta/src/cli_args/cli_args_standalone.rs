@@ -225,6 +225,10 @@ pub struct TemplateArgs {
     #[arg(long, verbatim_doc_comment)]
     pub template: String,
 
+    /// Skips creating a new dir for the contract
+    #[arg(short, long, default_value = "false", verbatim_doc_comment)]
+    pub no_new_dir: bool,
+
     /// The framework version on which the contracts should be created.
     #[arg(long, verbatim_doc_comment)]
     pub tag: Option<String>,
