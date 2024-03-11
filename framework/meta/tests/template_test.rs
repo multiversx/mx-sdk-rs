@@ -56,15 +56,12 @@ fn template_current_ping_pong_egld() {
 #[test]
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn test_correct_naming() {
-    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
-}
-#[test]
-#[cfg_attr(not(feature = "template-test-current"), ignore)]
-fn test_correct_pharsing() {
     assert_eq!(
         "myNew42-correct_Empty".to_string().to_case(Case::Kebab),
         "my-new-42-correct-empty"
     );
+
+    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
 }
 
 /// Recreates the folder structure in `contracts`, on the same level.
