@@ -134,6 +134,7 @@ jobs:
       - name: Install prerequisites
         run: |
           rustup component add llvm-tools-preview
+          echo "::add-path::$(dirname $(find ~/.rustup -name llvm-cov))"
 
           which llvm-cov
           which llvm-profdata
