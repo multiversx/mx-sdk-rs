@@ -7,6 +7,7 @@ use crate::codec::{
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
+    imports::Never,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 
@@ -98,7 +99,7 @@ impl<M> EncodeErrorHandler for ExitCodecErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = !;
+    type HandledErr = Never;
 
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);
@@ -111,7 +112,7 @@ impl<M> DecodeErrorHandler for ExitCodecErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = !;
+    type HandledErr = Never;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);

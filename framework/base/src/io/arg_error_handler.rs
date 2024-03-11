@@ -29,11 +29,14 @@ where
     }
 }
 
+#[derive(Debug)]
+pub enum Never {}
+
 impl<M> DecodeErrorHandler for ArgErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = !;
+    type HandledErr = Never;
 
     #[inline(always)]
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {

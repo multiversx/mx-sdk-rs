@@ -34,12 +34,15 @@ impl DecodeErrorHandler for DefaultErrorHandler {
     }
 }
 
+#[derive(Debug)]
+pub enum Never {}
+
 /// An error handler that panics immediately, instead of returning a `Result`.
 #[derive(Clone, Copy)]
 pub struct PanicErrorHandler;
 
 impl EncodeErrorHandler for PanicErrorHandler {
-    type HandledErr = !;
+    type HandledErr = Never;
 
     #[inline]
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
@@ -48,7 +51,7 @@ impl EncodeErrorHandler for PanicErrorHandler {
 }
 
 impl DecodeErrorHandler for PanicErrorHandler {
-    type HandledErr = !;
+    type HandledErr = Never;
 
     #[inline]
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {

@@ -4,12 +4,9 @@ use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
         ManagedTypeApi, StaticVarApiImpl, StorageReadApi, StorageReadApiImpl,
-    },
-    codec::*,
-    err_msg,
-    types::{
+    }, codec::*, err_msg, imports::Never, types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
-    },
+    }
 };
 use alloc::boxed::Box;
 
@@ -158,7 +155,7 @@ impl<M> DecodeErrorHandler for StorageGetErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = !;
+    type HandledErr = Never;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
