@@ -8,14 +8,18 @@ use crate::{
     scenario_model::{TxResponse, TypedResponse},
 };
 
-use super::ScenarioTxEnvironment;
+use super::ScenarioTxEnv;
 
-pub trait RHListItemScenario<Original>: RHListItem<ScenarioTxEnvironment, Original> {
+pub trait RHListItemScenario<Env, Original>: RHListItem<Env, Original>
+where
+    Env: TxEnv,
+{
     fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns;
 }
 
-impl<Original> RHListItemScenario<Original> for ReturnsExact
+impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsExact
 where
+    Env: TxEnv,
     Original: TopDecodeMulti,
 {
     fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
@@ -26,9 +30,10 @@ where
     }
 }
 
-impl<F, Original> RHListItemScenario<Original> for WithResultNewAddress<ScenarioTxEnvironment, F>
+impl<Env, Original, F> RHListItemScenario<Env, Original> for WithResultNewAddress<Env, F>
 where
-    F: FnOnce(&ManagedAddress<StaticApi>),
+    Env: TxEnv,
+    F: FnOnce(&ManagedAddress<Env::Api>),
 {
     fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
         let new_address = tx_response

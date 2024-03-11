@@ -4,15 +4,15 @@ use multiversx_sc::types::{AnnotatedValue, ManagedAddress, TxBaseWithEnv, TxEnv}
 
 use crate::{api::StaticApi, scenario_model::TxResponse};
 
-pub type TxScenarioBase = TxBaseWithEnv<ScenarioTxEnvironment>;
+pub type TxScenarioBase = TxBaseWithEnv<ScenarioTxEnv>;
 
 #[derive(Default, Debug, Clone)]
-pub struct ScenarioTxEnvironment {
+pub struct ScenarioTxEnv {
     pub context_path: PathBuf,
     pub response: Option<TxResponse>,
 }
 
-impl TxEnv for ScenarioTxEnvironment {
+impl TxEnv for ScenarioTxEnv {
     type Api = StaticApi;
 
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {

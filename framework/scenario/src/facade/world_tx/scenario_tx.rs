@@ -14,11 +14,11 @@ use crate::{
     ScenarioWorld,
 };
 
-use super::{RHListScenario, ScenarioTxEnvironment, TxScenarioBase};
+use super::{RHListScenario, ScenarioTxEnv, TxScenarioBase};
 
 impl ScenarioWorld {
-    fn tx_env(&self) -> ScenarioTxEnvironment {
-        ScenarioTxEnvironment {
+    fn tx_env(&self) -> ScenarioTxEnv {
+        ScenarioTxEnv {
             context_path: self.current_dir.clone(),
             ..Default::default()
         }
@@ -76,13 +76,13 @@ where
 }
 
 impl<From, To, Payment, Gas, RH> ScenarioTx
-    for Tx<ScenarioTxEnvironment, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
+    for Tx<ScenarioTxEnv, From, To, Payment, Gas, FunctionCall<StaticApi>, RH>
 where
-    From: TxFromSpecified<ScenarioTxEnvironment>,
-    To: TxToSpecified<ScenarioTxEnvironment>,
-    Payment: TxPayment<ScenarioTxEnvironment>,
-    Gas: TxGas<ScenarioTxEnvironment>,
-    RH: RHListScenario,
+    From: TxFromSpecified<ScenarioTxEnv>,
+    To: TxToSpecified<ScenarioTxEnv>,
+    Payment: TxPayment<ScenarioTxEnv>,
+    Gas: TxGas<ScenarioTxEnv>,
+    RH: RHListScenario<ScenarioTxEnv>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
@@ -106,21 +106,13 @@ where
 }
 
 impl<From, Payment, Gas, CodeValue, RH> ScenarioTx
-    for Tx<
-        ScenarioTxEnvironment,
-        From,
-        (),
-        Payment,
-        Gas,
-        DeployCall<ScenarioTxEnvironment, Code<CodeValue>>,
-        RH,
-    >
+    for Tx<ScenarioTxEnv, From, (), Payment, Gas, DeployCall<ScenarioTxEnv, Code<CodeValue>>, RH>
 where
-    From: TxFromSpecified<ScenarioTxEnvironment>,
-    Payment: TxPayment<ScenarioTxEnvironment>,
-    Gas: TxGas<ScenarioTxEnvironment>,
-    CodeValue: TxCodeValue<ScenarioTxEnvironment>,
-    RH: RHListScenario,
+    From: TxFromSpecified<ScenarioTxEnv>,
+    Payment: TxPayment<ScenarioTxEnv>,
+    Gas: TxGas<ScenarioTxEnv>,
+    CodeValue: TxCodeValue<ScenarioTxEnv>,
+    RH: RHListScenario<ScenarioTxEnv>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
