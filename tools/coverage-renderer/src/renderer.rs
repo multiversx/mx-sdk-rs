@@ -26,13 +26,14 @@ fn render_totals(summary: &Summary) {
 
 fn render_files(files: &[FileSummary], root: &str) {
     println!("## Files");
+    println!("<details><summary>Expand</summary>\n");
     println!("| File | Lines | Regions | Functions | Instantiations |");
     println!("|---|---|---|---|---|");
     for file in files {
         render_file(file, root);
     }
 
-    println!();
+    println!("</details>");
 }
 
 fn render_file(file: &FileSummary, root: &str) {
