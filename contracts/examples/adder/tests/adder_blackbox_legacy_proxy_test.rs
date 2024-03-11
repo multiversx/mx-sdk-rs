@@ -1,14 +1,13 @@
 use adder::*;
 use multiversx_sc::{
     storage::mappers::SingleValue,
-    types::{AddressExpr, ReturnsSimilar, ScExpr, WithResultNewAddress},
+    types::{AddressExpr, ReturnsSimilar, WithResultNewAddress},
 };
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
 const OWNER: AddressExpr = AddressExpr("owner");
-const SC_ADDER: ScExpr = ScExpr("adder");
 const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
@@ -20,10 +19,10 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_blackbox() {
+fn adder_blackbox_legacy_proxy() {
     let mut world = world();
     let owner_address = "address:owner";
-    let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace();
 
@@ -44,32 +43,24 @@ fn adder_blackbox() {
         }))
         .run();
 
+    world.sc_query(
+        ScQueryStep::new()
+            .to(&adder_contract)
+            .call(adder_contract.sum())
+            .expect_value(SingleValue::from(BigUint::from(5u32))),
+    );
+
     let value = world
         .query()
-        .to(SC_ADDER)
-        .typed_v2(temp_proxy_v2::TxProxy)
-        .sum()
+        .call(adder_contract.sum())
         .returns(ReturnsSimilar::<SingleValue<BigUint>>::new())
         .run();
     assert_eq!(value.into(), BigUint::from(5u32));
 
-    // TODO: remove
     world
         .tx()
         .from(OWNER)
-        .to(SC_ADDER)
-        .typed_v1(temp_proxy::TxProxy, |p| p.add(2u32))
-        .with_result(WithRawTxResponse(|response| {
-            assert!(response.tx_error.is_success());
-        }))
-        .run();
-
-    world
-        .tx()
-        .from(OWNER)
-        .to(SC_ADDER)
-        .typed_v2(temp_proxy_v2::TxProxy)
-        .add(1u32)
+        .call(adder_contract.add(3u32))
         .with_result(WithRawTxResponse(|response| {
             assert!(response.tx_error.is_success());
         }))
