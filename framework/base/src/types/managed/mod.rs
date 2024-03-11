@@ -1,4 +1,4 @@
-pub mod basic;
+mod basic;
 mod codec_util;
 mod managed_type_trait;
 mod multi_value;

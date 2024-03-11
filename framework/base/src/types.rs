@@ -3,7 +3,7 @@ mod flags;
 pub mod heap;
 mod interaction;
 mod io;
-pub mod managed;
+mod managed;
 mod static_buffer;
 
 pub use crypto::*;
