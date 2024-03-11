@@ -1,8 +1,5 @@
 use adder::*;
-use multiversx_sc::{
-    storage::mappers::SingleValue,
-    types::{AddressExpr, ScExpr, WithResultNewAddress, WithResultSimilar},
-};
+use multiversx_sc::types::{AddressExpr, ScExpr, WithResultNewAddress, WithResultSimilar};
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
