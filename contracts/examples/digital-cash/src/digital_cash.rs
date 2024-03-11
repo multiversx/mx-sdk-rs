@@ -1,8 +1,7 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 mod constants;
 mod deposit_info;

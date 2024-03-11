@@ -12,6 +12,10 @@ use core::{
 use super::{SCError, StaticSCError};
 
 /// Default way to optionally return an error from a smart contract endpoint.
+#[deprecated(
+    since = "0.48.0",
+    note = "Use in-place error handling instead, such as `require!` or `sc_panic!`"
+)]
 #[must_use]
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SCResult<T, E = StaticSCError> {
