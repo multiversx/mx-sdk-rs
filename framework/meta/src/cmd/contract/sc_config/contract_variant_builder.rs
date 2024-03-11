@@ -169,11 +169,13 @@ fn collect_add_endpoints(
 
 fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAbi) -> ContractAbi {
     let mut constructors = Vec::new();
+    let mut upgrade_constructors = Vec::new();
     let mut endpoints = Vec::new();
     let mut promise_callbacks = Vec::new();
     for endpoint_abi in builder.collected_endpoints {
         match endpoint_abi.endpoint_type {
             multiversx_sc::abi::EndpointTypeAbi::Init => constructors.push(endpoint_abi),
+            multiversx_sc::abi::EndpointTypeAbi::Upgrade => upgrade_constructors.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::Endpoint => endpoints.push(endpoint_abi),
             multiversx_sc::abi::EndpointTypeAbi::PromisesCallback => {
                 promise_callbacks.push(endpoint_abi)
@@ -188,6 +190,7 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
         docs: original_abi.docs.clone(),
         name: original_abi.name.clone(),
         constructors,
+        upgrade_constructors,
         endpoints,
         promise_callbacks,
         events: original_abi.events.clone(),

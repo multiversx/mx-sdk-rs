@@ -2,24 +2,34 @@ use multiversx_sc::types::{ConsNoRet, ConsRet, OriginalResultMarker, RHList, RHL
 
 use crate::scenario_model::TxResponse;
 
-use super::{RHListItemScenario, ScenarioTxEnvironment};
+use super::RHListItemScenario;
 
-pub trait RHListScenario: RHList<ScenarioTxEnvironment> {
+pub trait RHListScenario<Env>: RHList<Env>
+where
+    Env: TxEnv,
+{
     fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns;
 }
 
-impl RHListScenario for () {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns {}
-}
-
-impl<O> RHListScenario for OriginalResultMarker<O> {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns {}
-}
-
-impl<Head, Tail> RHListScenario for ConsRet<ScenarioTxEnvironment, Head, Tail>
+impl<Env> RHListScenario<Env> for ()
 where
-    Head: RHListItemScenario<Tail::OriginalResult>,
-    Tail: RHListScenario,
+    Env: TxEnv,
+{
+    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns {}
+}
+
+impl<Env, O> RHListScenario<Env> for OriginalResultMarker<O>
+where
+    Env: TxEnv,
+{
+    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns {}
+}
+
+impl<Env, Head, Tail> RHListScenario<Env> for ConsRet<Env, Head, Tail>
+where
+    Env: TxEnv,
+    Head: RHListItemScenario<Env, Tail::OriginalResult>,
+    Tail: RHListScenario<Env>,
 {
     fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns {
         let head_result = self.head.item_scenario_result(tx_response);
@@ -28,10 +38,11 @@ where
     }
 }
 
-impl<Head, Tail> RHListScenario for ConsNoRet<ScenarioTxEnvironment, Head, Tail>
+impl<Env, Head, Tail> RHListScenario<Env> for ConsNoRet<Env, Head, Tail>
 where
-    Head: RHListItemScenario<Tail::OriginalResult, Returns = ()>,
-    Tail: RHListScenario,
+    Env: TxEnv,
+    Head: RHListItemScenario<Env, Tail::OriginalResult, Returns = ()>,
+    Tail: RHListScenario<Env>,
 {
     fn item_scenario_result(self, tx_response: &TxResponse) -> Self::ListReturns {
         self.head.item_scenario_result(tx_response);

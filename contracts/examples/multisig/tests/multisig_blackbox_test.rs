@@ -17,7 +17,7 @@ use multiversx_sc_scenario::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
         SetStateStep, TxExpect,
     },
-    ContractInfo, ScenarioWorld,
+    ContractInfo, ScenarioTxRun, ScenarioWorld,
 };
 use num_bigint::BigUint;
 
@@ -124,14 +124,15 @@ impl MultisigTestState {
     }
 
     fn propose_add_board_member(&mut self, board_member_address: Address) -> usize {
-        self.world.tx_return(|tx| {
-            tx.from(AddressExpr("proposer"))
-                .call(
-                    self.multisig_contract
-                        .propose_add_board_member(board_member_address),
-                )
-                .returns(ReturnsExact)
-        })
+        self.world
+            .tx()
+            .from(AddressExpr("proposer"))
+            .call(
+                self.multisig_contract
+                    .propose_add_board_member(board_member_address),
+            )
+            .returns(ReturnsExact)
+            .run()
     }
 
     fn propose_add_proposer(&mut self, proposer_address: Address) -> usize {

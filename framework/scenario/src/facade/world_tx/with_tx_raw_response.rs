@@ -1,25 +1,30 @@
 use core::marker::PhantomData;
 
-use multiversx_sc::{codec::TopDecodeMulti, types::RHListItem};
+use multiversx_sc::{
+    codec::TopDecodeMulti,
+    types::{RHListItem, TxEnv},
+};
 
 use crate::scenario_model::TxResponse;
 
-use super::{RHListItemScenario, ScenarioTxEnvironment};
+use super::{RHListItemScenario, ScenarioTxEnvData};
 
 /// Wraps a closure that handles a `TxResponse` object.
 pub struct WithRawTxResponse<F>(pub F)
 where
     F: FnOnce(&TxResponse);
 
-impl<F, Original> RHListItem<ScenarioTxEnvironment, Original> for WithRawTxResponse<F>
+impl<Env, Original, F> RHListItem<Env, Original> for WithRawTxResponse<F>
 where
+    Env: TxEnv,
     F: FnOnce(&TxResponse),
 {
     type Returns = ();
 }
 
-impl<Original, F> RHListItemScenario<Original> for WithRawTxResponse<F>
+impl<Env, Original, F> RHListItemScenario<Env, Original> for WithRawTxResponse<F>
 where
+    Env: TxEnv,
     Original: TopDecodeMulti,
     F: FnOnce(&TxResponse),
 {

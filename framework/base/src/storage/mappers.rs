@@ -4,6 +4,7 @@ mod linked_list_mapper;
 mod map_mapper;
 mod map_storage_mapper;
 mod mapper;
+mod ordered_binary_tree_mapper;
 mod queue_mapper;
 mod set_mapper;
 mod single_value_mapper;
@@ -20,6 +21,9 @@ pub use linked_list_mapper::{LinkedListMapper, LinkedListNode};
 pub use map_mapper::MapMapper;
 pub use map_storage_mapper::MapStorageMapper;
 pub use mapper::{StorageClearable, StorageMapper};
+pub use ordered_binary_tree_mapper::{
+    NodeId, OrderedBinaryTreeMapper, OrderedBinaryTreeNode, NULL_NODE_ID,
+};
 pub use queue_mapper::QueueMapper;
 pub use set_mapper::SetMapper;
 pub use single_value_mapper::{SingleValue, SingleValueMapper};

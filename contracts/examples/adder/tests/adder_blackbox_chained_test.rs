@@ -1,7 +1,7 @@
 use adder::*;
 use multiversx_sc::{
     storage::mappers::SingleValue,
-    types::{AddressExpr, ScExpr, WithResultNewAddress},
+    types::{AddressExpr, ScExpr, WithResultNewAddress, WithResultSimilar},
 };
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
@@ -16,10 +16,10 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_blackbox_with_values() {
+fn adder_blackbox_chained() {
     let mut world = world();
     let owner_address = "address:owner";
-    let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world
         .start_trace()
@@ -28,7 +28,7 @@ fn adder_blackbox_with_values() {
                 .put_account(owner_address, Account::new().nonce(1))
                 .new_address(owner_address, 1, "sc:adder"),
         )
-        .tx(|tx| {
+        .chain_deploy(|tx| {
             tx.from(AddressExpr("owner"))
                 .typed_v2(temp_proxy_v2::TxProxy)
                 .init(5u32)
@@ -37,25 +37,19 @@ fn adder_blackbox_with_values() {
                     assert_eq!(new_address.to_address(), adder_contract.to_address());
                 }))
         })
-        .sc_query(
-            ScQueryStep::new()
-                .to(&adder_contract)
-                .call(adder_contract.sum())
-                .expect_value(SingleValue::from(BigUint::from(5u32))),
-        )
-        .tx(|tx| {
-            tx.from(AddressExpr("owner"))
-                .to(ScExpr("adder"))
-                .typed_v1(temp_proxy::TxProxy, |p| p.add(2u32))
-                .with_result(WithRawTxResponse(|response| {
-                    assert!(response.tx_error.is_success());
+        .chain_query(|tx| {
+            tx.to(ScExpr("adder"))
+                .typed_v2(temp_proxy_v2::TxProxy)
+                .sum()
+                .with_result(WithResultSimilar::new(|value: SingleValue<BigUint>| {
+                    assert_eq!(value.into(), BigUint::from(5u32));
                 }))
         })
-        .tx(|tx| {
+        .chain_call(|tx| {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
                 .typed_v2(temp_proxy_v2::TxProxy)
-                .add(1u32)
+                .add(3u32)
                 .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());
                 }))
@@ -68,5 +62,5 @@ fn adder_blackbox_with_values() {
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         )
-        .write_scenario_trace("trace1.scen.json");
+        .write_scenario_trace("trace2.scen.json");
 }

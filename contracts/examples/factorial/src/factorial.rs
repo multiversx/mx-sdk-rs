@@ -1,6 +1,7 @@
 #![no_std]
+#![allow(unused_imports)]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 #[multiversx_sc::contract]
 pub trait Factorial {

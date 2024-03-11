@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.47.4"
+            "version": "0.47.5"
         }
     },
     "docs": [
@@ -31,6 +31,22 @@
         ],
         "payableInTokens": [
             "EGLD"
+        ],
+        "inputs": [
+            {
+                "name": "_constructor_arg_1",
+                "type": "i32"
+            },
+            {
+                "name": "_constructor_arg_2",
+                "type": "OnlyShowsUpInConstructor"
+            }
+        ],
+        "outputs": []
+    },
+    "upgradeConstructor": {
+        "docs": [
+            "Upgrade constructor."
         ],
         "inputs": [
             {

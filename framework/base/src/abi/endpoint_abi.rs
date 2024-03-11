@@ -32,6 +32,7 @@ pub enum EndpointMutabilityAbi {
 pub enum EndpointTypeAbi {
     #[default]
     Init,
+    Upgrade,
     Endpoint,
     PromisesCallback,
 }

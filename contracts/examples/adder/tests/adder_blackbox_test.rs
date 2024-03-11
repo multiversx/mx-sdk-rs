@@ -1,6 +1,15 @@
-use multiversx_sc_scenario::{scenario_model::*, *};
+use adder::*;
+use multiversx_sc::{
+    storage::mappers::SingleValue,
+    types::{AddressExpr, ReturnsSimilar, ScExpr, WithResultNewAddress},
+};
+use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+
+const OWNER: AddressExpr = AddressExpr("owner");
+const SC_ADDER: ScExpr = ScExpr("adder");
+const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -11,43 +20,69 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_blackbox_raw() {
+fn adder_blackbox() {
     let mut world = world();
-    let adder_code = world.code_expression(ADDER_PATH_EXPR);
+    let owner_address = "address:owner";
+    let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+
+    world.start_trace();
+
+    world.set_state_step(
+        SetStateStep::new()
+            .put_account(owner_address, Account::new().nonce(1))
+            .new_address(owner_address, 1, "sc:adder"),
+    );
 
     world
-        .set_state_step(
-            SetStateStep::new()
-                .put_account("address:owner", Account::new().nonce(1))
-                .new_address("address:owner", 1, "sc:adder"),
-        )
-        .sc_deploy(
-            ScDeployStep::new()
-                .from("address:owner")
-                .code(adder_code)
-                .argument("5")
-                .expect(TxExpect::ok().no_result()),
-        )
-        .sc_query(
-            ScQueryStep::new()
-                .to("sc:adder")
-                .function("getSum")
-                .expect(TxExpect::ok().result("5")),
-        )
-        .sc_call(
-            ScCallStep::new()
-                .from("address:owner")
-                .to("sc:adder")
-                .function("add")
-                .argument("3")
-                .expect(TxExpect::ok().no_result()),
-        )
-        .check_state_step(
-            CheckStateStep::new()
-                .put_account("address:owner", CheckAccount::new())
-                .put_account(
-                    "sc:adder",
-                    CheckAccount::new().check_storage("str:sum", "8"),
-                ),
-        );
+        .tx()
+        .from(OWNER)
+        .typed_v2(temp_proxy_v2::TxProxy)
+        .init(5u32)
+        .code(CODE_EXPR)
+        .with_result(WithResultNewAddress::new(|new_address| {
+            assert_eq!(new_address.to_address(), adder_contract.to_address());
+        }))
+        .run();
+
+    let value = world
+        .query()
+        .to(SC_ADDER)
+        .typed_v2(temp_proxy_v2::TxProxy)
+        .sum()
+        .returns(ReturnsSimilar::<SingleValue<BigUint>>::new())
+        .run();
+    assert_eq!(value.into(), BigUint::from(5u32));
+
+    // TODO: remove
+    world
+        .tx()
+        .from(OWNER)
+        .to(SC_ADDER)
+        .typed_v1(temp_proxy::TxProxy, |p| p.add(2u32))
+        .with_result(WithRawTxResponse(|response| {
+            assert!(response.tx_error.is_success());
+        }))
+        .run();
+
+    world
+        .tx()
+        .from(OWNER)
+        .to(SC_ADDER)
+        .typed_v2(temp_proxy_v2::TxProxy)
+        .add(1u32)
+        .with_result(WithRawTxResponse(|response| {
+            assert!(response.tx_error.is_success());
+        }))
+        .run();
+
+    world.check_state_step(
+        CheckStateStep::new()
+            .put_account(owner_address, CheckAccount::new())
+            .put_account(
+                &adder_contract,
+                CheckAccount::new().check_storage("str:sum", "8"),
+            ),
+    );
+
+    world.write_scenario_trace("trace1.scen.json");
 }

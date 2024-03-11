@@ -154,6 +154,9 @@ impl ContractVariant {
     /// Should correspond to all wasm exported functions.
     pub fn all_exported_function_names(&self) -> Vec<String> {
         let mut result = vec!["init".to_string()];
+        if !self.abi.upgrade_constructors.is_empty() {
+            result.push("upgrade".to_string())
+        }
         result.append(&mut self.endpoint_names());
         if self.abi.has_callback {
             result.push("callBack".to_string());
@@ -169,6 +172,7 @@ impl std::fmt::Debug for ContractVariant {
             .field("config_name", &self.contract_id)
             .field("public_name", &self.contract_name)
             .field("num-constructors", &self.abi.constructors.len())
+            .field("num-upgrade-constructors", &self.abi.upgrade_constructors.len())
             .field("num-endpoints", &self.abi.endpoints.len())
             .field("settings", &self.settings)
             .finish()

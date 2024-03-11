@@ -2,6 +2,7 @@ use super::reserved;
 use crate::model::{ArgPaymentMetadata, ContractTrait, Method, PublicRole};
 
 const INIT_ENDPOINT_NAME: &str = "init";
+const UPGRADE_ENDPOINT_NAME: &str = "upgrade";
 
 /// TODO: make it work with Result instead of panic
 pub fn validate_contract(contract_trait: &ContractTrait) {
@@ -22,6 +23,10 @@ fn validate_method_name(m: &Method) {
         assert!(
             endpoint_name_str != INIT_ENDPOINT_NAME,
             "Cannot declare endpoint with name 'init'. Use #[init] instead."
+        );
+        assert!(
+            endpoint_name_str != UPGRADE_ENDPOINT_NAME,
+            "Cannot declare endpoint with name 'upgrade'. Use #[upgrade] instead."
         );
         assert!(!reserved::is_reserved(endpoint_name_str.as_str()), "Cannot declare endpoint with name '{endpoint_name_str}', because that name is reserved by the Arwen API.");
     }
@@ -73,7 +78,7 @@ fn validate_payment_args(m: &Method) {
 
         assert!(num_payment_token == 0, "`#[payment_token]` only allowed in payable endpoints, payable init or callbacks (method: `{}`)", m.name);
     }
-    if let PublicRole::Init(init_metadata) = &m.public_role {
+    if let PublicRole::Init(init_metadata) | PublicRole::Upgrade(init_metadata) = &m.public_role {
         assert!(
             init_metadata.payable.no_esdt(),
             "only EGLD payments currently allowed in constructors"
