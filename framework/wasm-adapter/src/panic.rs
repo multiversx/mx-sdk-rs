@@ -2,7 +2,7 @@ use crate::api::VmApiImpl;
 pub use alloc::alloc::Layout;
 use multiversx_sc::{
     api::{ErrorApi, ErrorApiImpl},
-    types::{ManagedBuffer, ManagedRef, ManagedType},
+    types::{ManagedBuffer, ManagedType},
 };
 
 /// Also used in wasm crate macros.
@@ -20,31 +20,9 @@ pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     let mut panic_msg = ManagedPanicMessage::default();
     panic_msg.append_str("panic occurred: ");
 
-    // downcasting the payload (default panic behavior in std) doesn't work in this scenario
-    // the payload is always a dummy value
-    // panic runtime is irrelevant for no_std applications
-    // let payload = if let Some(payload) = panic_info.payload().downcast_ref::<&'static str>() {
-    //     *payload
-    // } else {
-    //     "unknown panic occurred"
-    // };
-    // panic_msg.append_str(payload);
-
-    // write full panic
     core::fmt::write(&mut panic_msg, format_args!("{:?}", panic_info))
-        .expect("Failed to write panic payload");
+        .unwrap_or_else(|_| panic_msg.append_str("unable to write panic"));
 
-    // take str
-    // let str = format_args!("{:?}", panic_info).as_str();
-
-    // extract message
-    // let message = extract_panic_message(full_panic_str);
-
-    // overwrite buf
-    // match message {
-    //     Some(val) => panic_msg.overwrite(val.as_bytes()),
-    //     None => panic_msg.overwrite(b"unknown panic"),
-    // }
     VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.get_handle())
 }
 
@@ -57,19 +35,15 @@ impl ManagedPanicMessage {
     fn append_str(&mut self, s: &str) {
         self.buffer.append_bytes(s.as_bytes());
     }
-
-    fn _overwrite(&mut self, s: &str) {
-        self.buffer.overwrite(s.as_bytes());
-    }
-
-    fn _buffer(&self) -> ManagedRef<VmApiImpl, ManagedBuffer<VmApiImpl>> {
-        self.buffer.as_ref()
-    }
 }
 
 impl core::fmt::Write for ManagedPanicMessage {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
-        self.append_str(s);
+        let file_name = match s.rfind('/') {
+            Some(index) => &s[index + 1..],
+            None => s,
+        };
+        self.append_str(file_name);
         Ok(())
     }
 }
