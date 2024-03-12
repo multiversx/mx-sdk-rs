@@ -82,7 +82,10 @@ where
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
+        match endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 
     fn resolve_gas_limit(&self) -> u64 {
@@ -108,8 +111,10 @@ where
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"init result"[..]);
         let h = ArgErrorHandler::<SA>::from(arg_id);
-        let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
-        result
+        match RequestedResult::multi_decode_or_handle_err(&mut loader, h) {
+            Ok(result) => result,
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 
     /// Executes immediately, synchronously, and returns Some(Address) of the deployed contract.  

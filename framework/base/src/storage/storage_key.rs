@@ -60,10 +60,13 @@ where
     where
         T: NestedEncode,
     {
-        let Ok(()) = item.dep_encode_or_handle_err(
+        match item.dep_encode_or_handle_err(
             &mut self.buffer,
             ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_KEY_ENCODE_ERROR),
-        );
+        ) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 
     #[inline]

@@ -1,7 +1,9 @@
 use crate::codec::{self, DecodeError, EncodeError, TopEncodeMulti, TryStaticCast};
 
-use crate::api::{EndpointFinishApi, ErrorApiImpl};
-use crate::imports::Never;
+use crate::{
+    api::{EndpointFinishApi, ErrorApiImpl},
+    imports::Never,
+};
 
 use super::SCError;
 

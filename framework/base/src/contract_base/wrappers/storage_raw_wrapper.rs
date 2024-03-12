@@ -63,9 +63,10 @@ where
             result_buffer.get_handle(),
         );
 
-        let Ok(value) =
-            V::top_decode_or_handle_err(result_buffer, StorageGetErrorHandler::<A>::default());
-        value
+        match V::top_decode_or_handle_err(result_buffer, StorageGetErrorHandler::<A>::default()) {
+            Ok(value) => value,
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 
     /// Write a serializable value to storage under the given key

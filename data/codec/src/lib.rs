@@ -1,6 +1,5 @@
 #![no_std]
 #![feature(try_trait_v2)]
-#![feature(exhaustive_patterns)]
 #![feature(auto_traits)]
 #![feature(negative_impls)]
 

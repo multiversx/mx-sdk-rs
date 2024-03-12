@@ -1,5 +1,5 @@
 #![allow(clippy::type_complexity)]
-#![feature(exhaustive_patterns)]
+// #![feature(exhaustive_patterns)]
 
 pub mod api;
 pub mod bech32;

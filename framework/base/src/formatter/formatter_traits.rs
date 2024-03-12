@@ -90,10 +90,14 @@ pub trait SCCodec {
 impl<T: TopEncode> SCCodec for T {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let mut encoded = ManagedBuffer::<F::Api>::new();
-        let Ok(()) = self.top_encode_or_handle_err(
+
+        match self.top_encode_or_handle_err(
             &mut encoded,
             ExitCodecErrorHandler::<F::Api>::from(err_msg::FORMATTER_ENCODE_ERROR),
-        );
+        ) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        };
         SCLowerHex::fmt(&encoded, f);
     }
 }

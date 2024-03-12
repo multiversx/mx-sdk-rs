@@ -126,10 +126,13 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let Ok(value) = T::top_decode_or_handle_err(
+    let value = match T::top_decode_or_handle_err(
         StorageGetFromAddressInput::new(addr, key),
         StorageGetErrorHandler::<A>::default(),
-    );
+    ) {
+        Ok(val) => val,
+        Err(err) => panic!("panic occured: {:#?}", err),
+    };
     value
 }
 

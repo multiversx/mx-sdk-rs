@@ -20,7 +20,10 @@ where
 {
     let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
     let mut output = ApiOutputAdapter::<FA>::default();
-    let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
+    match item.multi_encode_or_handle_err(&mut output, h) {
+        Ok(_) => {},
+        Err(err) => panic!("panic occured: {:#?}", err),
+    }
 }
 
 #[derive(Clone)]

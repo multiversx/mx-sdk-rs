@@ -68,10 +68,13 @@ where
     T: TopEncodeMulti,
 {
     pub fn push(&mut self, item: T) {
-        let Ok(()) = item.multi_encode_or_handle_err(
+        match item.multi_encode_or_handle_err(
             &mut self.raw_buffers,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        );
+        ) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 }
 

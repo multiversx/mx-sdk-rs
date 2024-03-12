@@ -31,19 +31,25 @@ where
 
     pub fn top_encode_to_managed_buffer<T: TopEncode>(&self, value: &T) -> ManagedBuffer<M> {
         let mut result = ManagedBuffer::new();
-        let Ok(()) = value.top_encode_or_handle_err(
+        match value.top_encode_or_handle_err(
             &mut result,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        );
+        ) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        };
         result
     }
 
     pub fn top_encode_to_boxed_bytes<T: TopEncode>(&self, value: &T) -> BoxedBytes {
         let mut result = BoxedBytes::empty();
-        let Ok(()) = value.top_encode_or_handle_err(
+        match value.top_encode_or_handle_err(
             &mut result,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        );
+        ) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        };
         result
     }
 
@@ -56,19 +62,23 @@ where
         buffer: &ManagedBuffer<M>,
         error_message: &'static [u8],
     ) -> T {
-        let Ok(value) = T::top_decode_or_handle_err(
+        match T::top_decode_or_handle_err(
             buffer.clone(), // TODO: remove clone
             ExitCodecErrorHandler::<M>::from(error_message),
-        );
-        value
+        ) {
+            Ok(value) => value,
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
-        let Ok(value) = T::top_decode_or_handle_err(
+        match T::top_decode_or_handle_err(
             slice,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR),
-        );
-        value
+        ) {
+            Ok(value) => value,
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 }
 

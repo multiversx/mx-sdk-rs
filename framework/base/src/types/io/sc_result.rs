@@ -105,7 +105,10 @@ where
     FromErr: Into<StaticSCError>,
 {
     fn from_residual(residual: Result<convert::Infallible, FromErr>) -> Self {
-        let Err(e) = residual;
+        let e = match residual {
+            Ok(_) => panic!("residual is not error"),
+            Err(err) => err,
+        };
         SCResult::Err(e.into())
     }
 }

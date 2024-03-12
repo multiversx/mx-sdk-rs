@@ -54,7 +54,10 @@ where
         if self.data_loader.has_next() {
             let arg_id = ArgId::from(&b"var args"[..]);
             let h = ArgErrorHandler::<M>::from(arg_id);
-            let Ok(result) = T::multi_decode_or_handle_err(&mut self.data_loader, h);
+            let result = match T::multi_decode_or_handle_err(&mut self.data_loader, h) {
+                Ok(val) => val,
+                Err(err) => panic!("panic occured: {:#?}", err),
+            };
             Some(result)
         } else {
             None

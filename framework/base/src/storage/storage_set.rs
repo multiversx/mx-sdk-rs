@@ -85,10 +85,13 @@ where
     T: TopEncode,
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    let Ok(()) = value.top_encode_or_handle_err(
+    match value.top_encode_or_handle_err(
         StorageSetOutput::new(key),
         ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
-    );
+    ) {
+        Ok(_) => {},
+        Err(err) => panic!("panic occured: {:#?}", err),
+    }
 }
 
 /// Useful for storage mappers.

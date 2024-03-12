@@ -52,7 +52,10 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.closure_args, h);
+        match endpoint_arg.multi_encode_or_handle_err(&mut self.closure_args, h) {
+            Ok(_) => {},
+            Err(err) => panic!("panic occured: {:#?}", err),
+        }
     }
 
     pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {

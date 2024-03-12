@@ -71,8 +71,10 @@ where
 {
     let mut arg_loader = EndpointSingleArgLoader::<AA>::new(index);
     let h = ArgErrorHandler::<AA>::from(arg_id);
-    let Ok(value) = T::multi_decode_or_handle_err(&mut arg_loader, h);
-    value
+    match T::multi_decode_or_handle_err(&mut arg_loader, h) {
+        Ok(value) => value,
+        Err(err) => panic!("panic occured: {:#?}", err),
+    }
 }
 
 #[inline(never)]
@@ -83,9 +85,10 @@ where
     T: TopDecodeMulti,
 {
     let h = ArgErrorHandler::<AA>::from(arg_id);
-    let result = T::multi_decode_or_handle_err(loader, h);
-    let Ok(value) = result;
-    value
+    match T::multi_decode_or_handle_err(loader, h) {
+        Ok(value) => value,
+        Err(err) => panic!("panic occured: {:#?}", err),
+    }
 }
 
 /// Models an argument tree of the form `(arg1, (arg2, ... (argn, ())))`, used for retrieving endpoint arguments.

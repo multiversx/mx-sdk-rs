@@ -48,6 +48,9 @@ pub fn top_encode_to_vec_u8<T: TopEncode>(obj: &T) -> Result<Vec<u8>, EncodeErro
 
 pub fn top_encode_to_vec_u8_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
     let mut bytes = Vec::<u8>::new();
-    let Ok(()) = obj.top_encode_or_handle_err(&mut bytes, PanicErrorHandler);
+    match obj.top_encode_or_handle_err(&mut bytes, PanicErrorHandler) {
+        Ok(_) => {},
+        Err(err) => panic!("panic occured: {:#?}", err),
+    }
     bytes
 }

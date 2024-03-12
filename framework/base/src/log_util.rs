@@ -21,10 +21,13 @@ where
     A: ErrorApi + ManagedTypeApi,
     T: TopEncodeMulti,
 {
-    let Ok(()) = topic.multi_encode_or_handle_err(
+    match topic.multi_encode_or_handle_err(
         accumulator,
         ExitCodecErrorHandler::<A>::from(err_msg::LOG_TOPIC_ENCODE_ERROR),
-    );
+    ) {
+        Ok(_) => {},
+        Err(err) => panic!("panic occured: {:#?}", err),
+    }
 }
 
 pub fn serialize_log_data<T, A>(data: T) -> ManagedBuffer<A>
@@ -33,10 +36,13 @@ where
     A: ErrorApi + ManagedTypeApi,
 {
     let mut data_buffer = ManagedBuffer::new();
-    let Ok(()) = data.top_encode_or_handle_err(
+    match data.top_encode_or_handle_err(
         &mut data_buffer,
         ExitCodecErrorHandler::<A>::from(err_msg::LOG_DATA_ENCODE_ERROR),
-    );
+    ) {
+        Ok(_) => {},
+        Err(err) => panic!("panic occured: {:#?}", err),
+    };
     data_buffer
 }
 
