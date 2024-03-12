@@ -35,6 +35,10 @@ impl ManagedPanicMessage {
     fn append_str(&mut self, s: &str) {
         self.buffer.append_bytes(s.as_bytes());
     }
+
+    fn _overwrite(&mut self, s: &str) {
+        self.buffer.overwrite(s.as_bytes());
+    }
 }
 
 impl core::fmt::Write for ManagedPanicMessage {
