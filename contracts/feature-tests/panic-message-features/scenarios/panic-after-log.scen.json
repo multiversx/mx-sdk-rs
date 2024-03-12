@@ -30,7 +30,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:panic occured: PanicInfo { payload: Any { .. }, message: Some(panic after log), location: Location { file: panic_features.rs, line: 22, col: 9 }, can_unwind: true, force_no_backtrace: false }",
+                "message": "file:error-message-after-log.txt",
                 "logs": [
                     {
                         "address": "address:an_account",
