@@ -134,8 +134,8 @@ macro_rules! sc_format {
 
 /// Equivalent to the `?` operator for SCResult.
 #[deprecated(
-    since = "0.16.0",
-    note = "The `?` operator can now be used on `SCResult`, please use it instead."
+since = "0.16.0",
+note = "The `?` operator can now be used on `SCResult`, please use it instead."
 )]
 #[macro_export]
 macro_rules! sc_try {
@@ -166,8 +166,8 @@ macro_rules! sc_try {
 /// # }
 /// ```
 #[deprecated(
-    since = "0.26.0",
-    note = "Replace with the `#[only_owner]` attribute that can be placed on an endpoint. That one is more compact and shows up in the ABI."
+since = "0.26.0",
+note = "Replace with the `#[only_owner]` attribute that can be placed on an endpoint. That one is more compact and shows up in the ABI."
 )]
 #[macro_export]
 macro_rules! only_owner {
@@ -183,5 +183,49 @@ macro_rules! only_owner {
 macro_rules! non_zero_usize {
     ($input: expr, $error_msg:expr) => {
         NonZeroUsize::new($input).unwrap_or_else(|| sc_panic!($error_msg))
+    };
+}
+
+#[macro_export]
+macro_rules! endpoints_proxy {
+    ($endpoint_name:ident, $address:ident)
+     => {
+        multiversx_sc::types::ContractCallNoPayment::new(
+            $address,
+            stringify!($endpoint_name),
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! constructors_proxy {
+    ($opt_address:ident)
+     => {
+        multiversx_sc::types::new_contract_deploy(
+            $opt_address,
+        );
+    };
+}
+
+#[macro_export]
+macro_rules! extract_opt_address {
+    ($address:expr) => {
+        {
+            core::mem::replace(
+                &mut $address.address,
+                multiversx_sc::types::ManagedOption::none(),
+            )
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! extract_address {
+    ($address:expr)
+     => {
+        {
+            multiversx_sc::extract_opt_address!($address)
+                .unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
+        }
     };
 }

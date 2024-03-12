@@ -205,7 +205,7 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
     .unwrap();
 }
 
-fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
+pub fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
     let results_len = outputs.len();
     if results_len == 0 {
         return "()".to_string();

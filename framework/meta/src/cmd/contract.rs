@@ -1,3 +1,5 @@
+mod generate_proxy_trait;
+mod generate_proxy_struct;
 mod generate_snippets;
 mod meta_abi;
 mod meta_config;
@@ -31,6 +33,8 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
         ContractCliAction::GenerateSnippets(gs_args) => {
             meta_config_opt.generate_rust_snippets(&gs_args)
         },
+        ContractCliAction::GenerateProxies => meta_config_opt.generate_rust_proxies(),
+        ContractCliAction::GenerateProxiesStruct => meta_config_opt.generate_rust_proxies_struct()
     }
 }
 
