@@ -1,11 +1,11 @@
-use serde::Deserialize;
 use anyhow::{bail, Result};
+use serde::Deserialize;
 use serde_json::Value;
 
 #[derive(Deserialize)]
 pub struct Coverage {
     pub files: Vec<FileSummary>,
-    pub totals: Summary, 
+    pub totals: Summary,
 }
 
 #[derive(Deserialize)]
@@ -28,7 +28,6 @@ pub struct FileSummary {
     pub filename: String,
     pub summary: Summary,
 }
-
 
 pub fn parse_llvm_cov_output(output: &str) -> Result<Coverage> {
     let llvm_cov_output: Value = serde_json::from_str(output)?;
