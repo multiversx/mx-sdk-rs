@@ -1,0 +1,13 @@
+name: On pull request, do reproducible builds
+
+on:
+  pull_request:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    uses: multiversx/mx-sc-actions/.github/workflows/reproducible-build.yml@v2.3.2
+    with:
+      image_tag: v5.3.0
