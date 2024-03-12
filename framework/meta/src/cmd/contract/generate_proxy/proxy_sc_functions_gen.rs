@@ -106,7 +106,7 @@ fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>) {
     )
     .unwrap();
 
-    if outputs.len() == 0 {
+    if outputs.is_empty() {
         write!(file, "()").unwrap();
     } else {
         parse_and_write_outputs(file, outputs);
@@ -215,6 +215,7 @@ fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
             .type_names
             .rust
             .replace("multiversx_sc::api::uncallable::UncallableApi", "Env::Api")
+            .replace("$API", "Env::Api")
             .to_string();
 
         let mut current_string = String::new();
@@ -223,8 +224,8 @@ fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
         for character in env_api.chars() {
             if character == COLON {
                 // adjust_on_colon_suffix(character, current_string, found_words);
-                if current_string.ends_with(COLON) && !current_string.ends_with(ENV){
-                    if current_string.len() > 0
+                if current_string.ends_with(COLON) && !current_string.ends_with(ENV) {
+                    if !current_string.is_empty()
                         && current_string.chars().next().unwrap().is_uppercase()
                     {
                         found_words.push(current_string[..current_string.len() - 1].to_string());
@@ -234,7 +235,7 @@ fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
                     current_string.push(character);
                 }
             } else if character == ' ' && current_string.ends_with(',') {
-                if current_string.len() > 0 && current_string.chars().next().unwrap().is_uppercase()
+                if !current_string.is_empty() && current_string.chars().next().unwrap().is_uppercase()
                 {
                     current_string.push(character);
                     found_words.push(current_string.clone());
