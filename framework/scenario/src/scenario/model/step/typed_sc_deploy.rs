@@ -120,6 +120,12 @@ impl<OriginalResult> AsMut<ScDeployStep> for TypedScDeploy<OriginalResult> {
     }
 }
 
+impl<OriginalResult> AsMut<TypedScDeploy<OriginalResult>> for TypedScDeploy<OriginalResult> {
+    fn as_mut(&mut self) -> &mut TypedScDeploy<OriginalResult> {
+        self
+    }
+}
+
 impl<OriginalResult> From<TypedScDeploy<OriginalResult>> for ScDeployStep {
     fn from(typed: TypedScDeploy<OriginalResult>) -> Self {
         typed.sc_deploy_step

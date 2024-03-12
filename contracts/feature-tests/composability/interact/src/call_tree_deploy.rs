@@ -20,7 +20,7 @@ impl ComposabilityInteract {
         let mut typed_vault_deploys = self.typed_sc_deploy_vault(call_state).await;
         let mut typed_forwarder_deploys = self.typed_sc_deploy_forwarder_queue(call_state).await;
 
-        let mut steps = Vec::new();
+        let mut steps: Vec<&mut ScDeployStep> = Vec::new();
         for typed_sc_deploy in &mut typed_vault_deploys {
             steps.push(typed_sc_deploy.as_mut());
         }

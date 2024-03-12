@@ -162,7 +162,7 @@ impl MultisigInteract {
         let board = self.board();
         let (new_address, _) = self
             .interactor
-            .sc_deploy_get_result::<_, IgnoreValue>(
+            .sc_deploy_get_result::<_, IgnoreValue, _>(
                 ScDeployStep::new()
                     .call(
                         self.state

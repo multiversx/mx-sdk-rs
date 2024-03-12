@@ -103,7 +103,7 @@ impl BasicFeaturesInteract {
 
         let (new_address, _) = self
             .interactor
-            .sc_deploy_get_result::<_, IgnoreValue>(
+            .sc_deploy_get_result::<_, IgnoreValue, _>(
                 ScDeployStep::new()
                     .call(self.state.default_contract().init())
                     .from(&self.wallet_address)
