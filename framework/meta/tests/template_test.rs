@@ -1,5 +1,6 @@
 use std::{fs, process::Command};
 
+use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
     cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
@@ -52,6 +53,17 @@ fn template_current_ping_pong_egld() {
     template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
 }
 
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn test_correct_naming() {
+    assert_eq!(
+        "myNew42-correct_Empty".to_string().to_case(Case::Kebab),
+        "my-new-42-correct-empty"
+    );
+
+    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
+}
+
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
@@ -59,7 +71,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
-        new_name: new_name.to_string(),
+        new_name: new_name.to_string().to_case(Case::Kebab),
     };
 
     let repo_source = RepoSource::from_local_path(workspace_path);
