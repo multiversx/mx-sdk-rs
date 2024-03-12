@@ -4,7 +4,7 @@ use anyhow::{bail, Result};
 
 pub fn get_workspace_root() -> Result<String> {
     let output = Command::new("cargo")
-        .args(&["metadata", "--no-deps", "--format-version=1"])
+        .args(["metadata", "--no-deps", "--format-version=1"])
         .output()?;
 
     let metadata: serde_json::Value = serde_json::from_slice(&output.stdout)?;
