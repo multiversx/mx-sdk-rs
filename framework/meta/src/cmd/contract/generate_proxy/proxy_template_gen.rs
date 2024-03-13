@@ -9,9 +9,7 @@ const PREFIX_AUTO_GENERATED: &str = "///////////////////////////////////////////
 
 const IMPORTS: &str = "#![allow(clippy::all)]
 
-use multiversx_sc::api::VMApi;
-
-multiversx_sc::imports!();";
+use multiversx_sc::imports::*;";
 
 pub(crate) fn write_header(file: &mut File) {
     writeln!(file, "{PREFIX_AUTO_GENERATED}").unwrap();

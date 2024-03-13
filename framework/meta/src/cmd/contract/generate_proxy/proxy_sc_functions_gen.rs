@@ -7,9 +7,6 @@ use crate::cmd::contract::generate_snippets::{
     snippet_type_map::{handle_abi_type, RustTypeString},
 };
 
-const ENV: &str = "Env:";
-const COLON: char = ':';
-
 pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     write_header_impl_constructor(file);
     for constructor_abi in abi.constructors {
@@ -32,7 +29,7 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
 fn write_header_impl_constructor(file: &mut File) {
     writeln!(
         file,
-        r#"impl<Env, To, Gas> TxProxyMethods<Env, (), To, Gas>
+        r#"impl<Env, From, Gas> TxProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -59,8 +56,8 @@ where
 }
 
 fn write_constructor_header(file: &mut File, contructor_abi: EndpointAbi) {
-    write_fn_signature(file, contructor_abi);
-    write_constructor_output(file);
+    write_fn_signature(file, contructor_abi.clone());
+    write_constructor_output(file, contructor_abi.outputs);
 }
 
 fn write_endpoint_header(file: &mut File, contructor_abi: EndpointAbi) {
@@ -84,10 +81,26 @@ fn write_parameters(file: &mut File, inputs: Vec<InputAbi>) {
     write!(file, "\t) ").unwrap();
 }
 
-fn write_constructor_output(file: &mut File) {
+fn write_constructor_output(file: &mut File, outputs: Vec<OutputAbi>) {
+    write!(
+        file,
+        "-> Tx<
+        Env,
+        From,
+        (),
+        (),
+        Gas,
+        DeployCall<Env, ()>,
+        OriginalResultMarker<"
+    )
+    .unwrap();
+
+    parse_and_write_outputs(file, outputs);
+
     writeln!(
         file,
-        "-> multiversx_sc::types::Tx<Env, (), To, (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>>\n\t{{"
+        ">,
+    > {{"
     )
     .unwrap();
 }
@@ -95,7 +108,7 @@ fn write_constructor_output(file: &mut File) {
 fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>) {
     write!(
         file,
-        "-> multiversx_sc::types::Tx<
+        "-> Tx<
         Env,
         From,
         To,
@@ -106,11 +119,7 @@ fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>) {
     )
     .unwrap();
 
-    if outputs.is_empty() {
-        write!(file, "()").unwrap();
-    } else {
-        parse_and_write_outputs(file, outputs);
-    }
+    parse_and_write_outputs(file, outputs);
 
     writeln!(
         file,
@@ -128,12 +137,7 @@ fn write_constructor_content(file: &mut File, inputs: Vec<InputAbi>) {
     )
     .unwrap();
     for input in inputs.iter() {
-        writeln!(
-            file,
-            "\t\t\t.argument(&{})",
-            input.arg_name // .argument(&arg0)"
-        )
-        .unwrap();
+        writeln!(file, "\t\t\t.argument(&{})", input.arg_name).unwrap();
     }
     writeln!(file, "\t\t\t.original_result()").unwrap();
 }
@@ -149,12 +153,7 @@ fn write_endpoint_content(file: &mut File, function_name: String, inputs: Vec<In
     .unwrap();
 
     for input in inputs.iter() {
-        writeln!(
-            file,
-            "\t\t\t.argument(&{})",
-            input.arg_name // .argument(&arg0)"
-        )
-        .unwrap();
+        writeln!(file, "\t\t\t.argument(&{})", input.arg_name).unwrap();
     }
 
     writeln!(file, "\t\t\t.original_result()").unwrap();
@@ -198,7 +197,7 @@ fn write_argument(file: &mut File, index: usize, type_name: String) {
 
     writeln!(
         file,
-        "\t\tArg{index}: multiversx_sc::codec::CodecInto<{}>,",
+        "\t\tArg{index}: CodecInto<{}>,",
         type_print
     )
     .unwrap();
@@ -209,46 +208,22 @@ fn write_end_of_function(file: &mut File) {
     write_newline(file);
 }
 
+fn adjust_type_name(original_rust_name: &str) -> String {
+    original_rust_name
+        .replace("multiversx_sc::api::uncallable::UncallableApi", "Env::Api")
+        .replace("$API", "Env::Api")
+        .to_string()
+}
+
 fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
-    for output in outputs {
-        let env_api = output
-            .type_names
-            .rust
-            .replace("multiversx_sc::api::uncallable::UncallableApi", "Env::Api")
-            .replace("$API", "Env::Api")
-            .to_string();
-
-        let mut current_string = String::new();
-        let mut found_words = Vec::new();
-
-        for character in env_api.chars() {
-            if character == COLON {
-                // adjust_on_colon_suffix(character, current_string, found_words);
-                if current_string.ends_with(COLON) && !current_string.ends_with(ENV) {
-                    if !current_string.is_empty()
-                        && current_string.chars().next().unwrap().is_uppercase()
-                    {
-                        found_words.push(current_string[..current_string.len() - 1].to_string());
-                    }
-                    current_string.clear();
-                } else {
-                    current_string.push(character);
-                }
-            } else if character == ' ' && current_string.ends_with(',') {
-                if !current_string.is_empty() && current_string.chars().next().unwrap().is_uppercase()
-                {
-                    current_string.push(character);
-                    found_words.push(current_string.clone());
-                    current_string.clear();
-                } else {
-                    current_string.push(character);
-                }
-            } else {
-                current_string.push(character);
-            }
-        }
-
-        found_words.push(current_string);
-        write!(file, "{}", found_words.join("")).unwrap();
+    match outputs.len() {
+        0 => {
+            write!(file, "()").unwrap();
+        },
+        1 => {
+            let adjusted = adjust_type_name(&outputs[0].type_names.rust);
+            write!(file, "{adjusted}").unwrap();
+        },
+        _ => panic!("multiple outputs not yet supported"),
     }
 }

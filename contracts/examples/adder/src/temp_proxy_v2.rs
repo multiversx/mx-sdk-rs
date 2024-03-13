@@ -1,8 +1,10 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![allow(clippy::all)]
 
-use multiversx_sc::api::VMApi;
-
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 pub struct TxProxy;
 
@@ -40,22 +42,13 @@ where
     pub fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
         self,
         initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> Tx<Env, From, (), (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
 }
-
 impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -66,14 +59,14 @@ where
 {
     pub fn sum(
         self,
-    ) -> multiversx_sc::types::Tx<
+    ) -> Tx<
         Env,
         From,
         To,
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<BigUint<Env::Api>>,
+        OriginalResultMarker<multiversx_sc::types::BigUint<Env::Api>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -85,15 +78,7 @@ where
     pub fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
         self,
         value: Arg0,
-    ) -> multiversx_sc::types::Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<()>> {
         self.wrapped_tx
             .raw_call()
             .function_name("add")

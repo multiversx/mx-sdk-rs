@@ -43,7 +43,7 @@ pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 pub mod imports {
     pub use crate::{
         abi::TypeAbi,
-        api::{ErrorApiImpl, ManagedTypeApi},
+        api::{ErrorApiImpl, ManagedTypeApi, VMApi},
         arrayvec::ArrayVec,
         codec::{
             multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
