@@ -39,15 +39,26 @@ where
     From: TxFrom<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
+    pub fn init<
+        Arg0: CodecInto<BigUint<Env::Api>>,
+    >(
         self,
         initial_value: Arg0,
-    ) -> Tx<Env, From, (), (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>> {
+    ) -> Tx<
+        Env,
+        From,
+        (),
+        (),
+        Gas,
+        DeployCall<Env, ()>,
+        OriginalResultMarker<()>,
+    > {
         self.wrapped_tx
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
+
 }
 impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
 where
@@ -74,15 +85,26 @@ where
             .original_result()
     }
 
-    //Add desired amount to the storage variable.
-    pub fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
+    /// Add desired amount to the storage variable. 
+    pub fn add<
+        Arg0: CodecInto<BigUint<Env::Api>>,
+    >(
         self,
         value: Arg0,
-    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<()>> {
+    ) -> Tx<
+        Env,
+        From,
+        To,
+        (),
+        Gas,
+        FunctionCall<Env::Api>,
+        OriginalResultMarker<()>,
+    > {
         self.wrapped_tx
             .raw_call()
             .function_name("add")
             .argument(&value)
             .original_result()
     }
+
 }

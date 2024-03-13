@@ -66,7 +66,7 @@ fn write_endpoint_header(file: &mut File, contructor_abi: EndpointAbi) {
 }
 
 fn write_fn_signature(file: &mut File, endpoint_abi: EndpointAbi) {
-    write_info_endpoint(file, endpoint_abi.docs);
+    write_endpoint_docs(file, endpoint_abi.docs);
     write_function_header_endpoint(file, endpoint_abi.rust_method_name);
     write_args(file, endpoint_abi.inputs.clone());
     write_parameters(file, endpoint_abi.inputs);
@@ -163,9 +163,9 @@ fn write_function_header_endpoint(file: &mut File, rust_method_name: String) {
     write!(file, "    pub fn {rust_method_name}").unwrap();
 }
 
-fn write_info_endpoint(file: &mut File, docs: Vec<String>) {
+fn write_endpoint_docs(file: &mut File, docs: Vec<String>) {
     if !docs.is_empty() {
-        write!(file, "    //").unwrap();
+        write!(file, "    /// ").unwrap();
     }
 
     for abi_doc in docs {
