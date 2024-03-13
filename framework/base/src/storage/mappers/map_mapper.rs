@@ -11,7 +11,7 @@ use crate::{
         multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
         NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_clear, storage_get, storage_set, StorageKey},
+    storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
@@ -26,6 +26,7 @@ where
     V: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
     keys_set: SetMapper<SA, K, A>,
     _phantom_value: PhantomData<V>,
@@ -40,6 +41,7 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         MapMapper {
             _phantom_api: PhantomData,
+            address: CurrentStorage,
             base_key: base_key.clone(),
             keys_set: SetMapper::new(base_key),
             _phantom_value: PhantomData,
@@ -106,6 +108,7 @@ where
     pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         MapMapper {
             _phantom_api: PhantomData,
+            address: address.clone(),
             base_key: base_key.clone(),
             keys_set: SetMapper::new_from_address(address, base_key),
             _phantom_value: PhantomData,
@@ -149,7 +152,8 @@ where
     }
 
     fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
+        self.address
+            .address_storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
     }
 
     /// Gets a reference to the value in the entry.
