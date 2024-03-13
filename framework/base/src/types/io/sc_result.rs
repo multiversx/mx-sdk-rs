@@ -132,6 +132,10 @@ impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
         T::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+
     /// Gives `SCResult<()>` the possibility to produce 0 output ABIs,
     /// just like `()`.
     /// It is also possible to have `SCResult<MultiResultX<...>>`,

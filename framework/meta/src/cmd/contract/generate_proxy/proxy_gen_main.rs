@@ -13,7 +13,7 @@ use super::{
     },
 };
 
-const PROXIES_SOURCE_FILE_NAME: &str = "/output/proxies_struct_interactor_main.rs";
+const PROXIES_SOURCE_FILE_NAME: &str = "/output/proxy.rs";
 
 impl MetaConfig {
     pub fn generate_rust_proxies_struct(&self, args: &GenerateProxyArgs) {

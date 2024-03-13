@@ -408,6 +408,10 @@ where
         TokenIdentifier::<SA>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        TokenIdentifier::<SA>::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
         TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
     }

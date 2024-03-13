@@ -311,6 +311,10 @@ where
         <&[usize] as TypeAbi>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        <&[usize] as TypeAbi>::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         usize::provide_type_descriptions(accumulator);
     }

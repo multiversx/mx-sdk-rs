@@ -242,6 +242,10 @@ where
     fn type_name() -> TypeName {
         Address::type_name()
     }
+
+    fn type_name_rust() -> TypeName {
+        Address::type_name_rust()
+    }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {

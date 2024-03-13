@@ -233,6 +233,10 @@ where
         crate::abi::type_name_variadic::<ManagedAddress<SA>>()
     }
 
+    fn type_name_rust() -> TypeName {
+        ManagedAddress::<SA>::type_name_rust()
+    }
+
     fn is_variadic() -> bool {
         true
     }

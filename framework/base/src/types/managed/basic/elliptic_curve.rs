@@ -422,4 +422,8 @@ impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
     fn type_name() -> TypeName {
         TypeName::from("EllipticCurve")
     }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("multiversx_sc::types::EllipticCurve<$API>")
+    }
 }

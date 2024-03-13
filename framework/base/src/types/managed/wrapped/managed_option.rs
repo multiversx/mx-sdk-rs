@@ -279,6 +279,10 @@ where
         Option::<T>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        Option::<T>::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }

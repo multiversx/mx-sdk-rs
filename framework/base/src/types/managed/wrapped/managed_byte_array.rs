@@ -211,6 +211,10 @@ where
     fn type_name() -> TypeName {
         <&[u8; N] as TypeAbi>::type_name()
     }
+
+    fn type_name_rust() -> TypeName {
+        <&[u8; N] as TypeAbi>::type_name_rust()
+    }
 }
 
 impl<M, const N: usize> SCLowerHex for ManagedByteArray<M, N>

@@ -142,6 +142,10 @@ where
         crate::abi::type_name_variadic::<ManagedBuffer<Api>>()
     }
 
+    fn type_name_rust() -> TypeName {
+        ManagedAddress::<Api>::type_name_rust()
+    }
+
     fn is_variadic() -> bool {
         true
     }

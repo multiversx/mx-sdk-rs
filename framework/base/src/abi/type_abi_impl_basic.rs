@@ -19,6 +19,10 @@ impl<T: TypeAbi> TypeAbi for &T {
         T::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -27,6 +31,10 @@ impl<T: TypeAbi> TypeAbi for &T {
 impl<T: TypeAbi> TypeAbi for Box<T> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -46,6 +54,10 @@ impl<T: TypeAbi> TypeAbi for &[T] {
         repr
     }
 
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -54,6 +66,10 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 impl<T: TypeAbi> TypeAbi for Vec<T> {
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        <&[T]>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -66,6 +82,10 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
         <&[T]>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        <&[T]>::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -74,6 +94,10 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        <&[T]>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -91,11 +115,19 @@ impl TypeAbi for &str {
     fn type_name() -> TypeName {
         TypeName::type_name()
     }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::type_name_rust()
+    }
 }
 
 impl TypeAbi for Box<str> {
     fn type_name() -> TypeName {
         TypeName::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::type_name_rust()
     }
 }
 
@@ -142,6 +174,10 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
     }
 
     /// Similar to the SCResult implementation.

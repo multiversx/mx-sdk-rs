@@ -331,6 +331,10 @@ where
         MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         K::provide_type_descriptions(accumulator);
         V::provide_type_descriptions(accumulator);

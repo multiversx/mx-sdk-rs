@@ -361,6 +361,10 @@ where
         crate::abi::type_name_variadic::<T>()
     }
 
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }

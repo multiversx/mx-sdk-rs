@@ -83,4 +83,8 @@ impl crate::abi::TypeAbi for Sign {
     fn type_name() -> TypeName {
         TypeName::from("Sign")
     }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("multiversx_sc::types::Sign<$API>")
+    }
 }
