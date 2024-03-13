@@ -74,11 +74,11 @@ fn write_fn_signature(file: &mut File, endpoint_abi: EndpointAbi) {
 
 fn write_parameters(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(file, "(").unwrap();
-    writeln!(file, "\t\tself,").unwrap();
+    writeln!(file, "        self,").unwrap();
     for (index, input) in inputs.iter().enumerate() {
-        writeln!(file, "\t\t{}: Arg{index},", &input.arg_name).unwrap();
+        writeln!(file, "        {}: Arg{index},", &input.arg_name).unwrap();
     }
-    write!(file, "\t) ").unwrap();
+    write!(file, "    ) ").unwrap();
 }
 
 fn write_constructor_output(file: &mut File, outputs: Vec<OutputAbi>) {
@@ -132,20 +132,20 @@ fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>) {
 fn write_constructor_content(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(
         file,
-        "\t\tself.wrapped_tx
+        "        self.wrapped_tx
             .raw_deploy()"
     )
     .unwrap();
     for input in inputs.iter() {
-        writeln!(file, "\t\t\t.argument(&{})", input.arg_name).unwrap();
+        writeln!(file, "            .argument(&{})", input.arg_name).unwrap();
     }
-    writeln!(file, "\t\t\t.original_result()").unwrap();
+    writeln!(file, "            .original_result()").unwrap();
 }
 
 fn write_endpoint_content(file: &mut File, function_name: String, inputs: Vec<InputAbi>) {
     writeln!(
         file,
-        "\t\tself.wrapped_tx
+        "        self.wrapped_tx
             .raw_call()
             .function_name(\"{}\")",
         function_name
@@ -153,19 +153,19 @@ fn write_endpoint_content(file: &mut File, function_name: String, inputs: Vec<In
     .unwrap();
 
     for input in inputs.iter() {
-        writeln!(file, "\t\t\t.argument(&{})", input.arg_name).unwrap();
+        writeln!(file, "            .argument(&{})", input.arg_name).unwrap();
     }
 
-    writeln!(file, "\t\t\t.original_result()").unwrap();
+    writeln!(file, "            .original_result()").unwrap();
 }
 
 fn write_function_header_endpoint(file: &mut File, rust_method_name: String) {
-    write!(file, "\tpub fn {rust_method_name}").unwrap();
+    write!(file, "    pub fn {rust_method_name}").unwrap();
 }
 
 fn write_info_endpoint(file: &mut File, docs: Vec<String>) {
     if !docs.is_empty() {
-        write!(file, "\t//").unwrap();
+        write!(file, "    //").unwrap();
     }
 
     for abi_doc in docs {
@@ -184,7 +184,7 @@ fn write_args(file: &mut File, inputs: Vec<InputAbi>) {
         write_argument(file, index, input.type_names.abi.to_string());
     }
 
-    write!(file, "\t>").unwrap();
+    write!(file, "    >").unwrap();
 }
 
 fn write_argument(file: &mut File, index: usize, type_name: String) {
@@ -197,14 +197,14 @@ fn write_argument(file: &mut File, index: usize, type_name: String) {
 
     writeln!(
         file,
-        "\t\tArg{index}: CodecInto<{}>,",
+        "        Arg{index}: CodecInto<{}>,",
         type_print
     )
     .unwrap();
 }
 
 fn write_end_of_function(file: &mut File) {
-    writeln!(file, "\t}}").unwrap();
+    writeln!(file, "    }}").unwrap();
     write_newline(file);
 }
 
