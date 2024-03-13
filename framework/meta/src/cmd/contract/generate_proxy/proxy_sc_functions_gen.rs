@@ -195,12 +195,7 @@ fn write_argument(file: &mut File, index: usize, type_name: String) {
         .replace("StaticApi", "Env::Api")
         .to_string();
 
-    writeln!(
-        file,
-        "        Arg{index}: CodecInto<{}>,",
-        type_print
-    )
-    .unwrap();
+    writeln!(file, "        Arg{index}: CodecInto<{}>,", type_print).unwrap();
 }
 
 fn write_end_of_function(file: &mut File) {
