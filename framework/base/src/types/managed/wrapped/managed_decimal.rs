@@ -307,31 +307,35 @@ impl<M: ManagedTypeApi, const DECIMALS: NumDecimals> Sub<ManagedDecimal<M, Const
     }
 }
 
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-    Mul<ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Mul<ManagedDecimal<M, D2>>
+    for ManagedDecimal<M, D1>
 where
-    [(); DECIMALS + OTHER_DECIMALS]:,
+    D1: Add<D2>,
+    <D1 as Add<D2>>::Output: Decimals,
 {
-    type Output = ManagedDecimal<M, ConstDecimals<{ DECIMALS + OTHER_DECIMALS }>>;
+    type Output = ManagedDecimal<M, <D1 as Add<D2>>::Output>;
 
-    fn mul(self, other: ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data * other.data)
+    fn mul(self, other: ManagedDecimal<M, D2>) -> Self::Output {
+        ManagedDecimal {
+            data: self.data * other.data,
+            decimals: self.decimals + other.decimals,
+        }
     }
 }
 
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl<M: ManagedTypeApi, const DECIMALS: NumDecimals, const OTHER_DECIMALS: NumDecimals>
-    Div<ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>>
-    for ManagedDecimal<M, ConstDecimals<DECIMALS>>
+impl<M: ManagedTypeApi, D1: Decimals, D2: Decimals> Div<ManagedDecimal<M, D2>>
+    for ManagedDecimal<M, D1>
 where
-    [(); DECIMALS - OTHER_DECIMALS]:,
+    D1: Sub<D2>,
+    <D1 as Sub<D2>>::Output: Decimals,
 {
-    type Output = ManagedDecimal<M, ConstDecimals<{ DECIMALS - OTHER_DECIMALS }>>;
+    type Output = ManagedDecimal<M, <D1 as Sub<D2>>::Output>;
 
-    fn div(self, other: ManagedDecimal<M, ConstDecimals<OTHER_DECIMALS>>) -> Self::Output {
-        ManagedDecimal::const_decimals_from_raw(self.data / other.data)
+    fn div(self, other: ManagedDecimal<M, D2>) -> Self::Output {
+        ManagedDecimal {
+            data: self.data / other.data,
+            decimals: self.decimals - other.decimals,
+        }
     }
 }
 
