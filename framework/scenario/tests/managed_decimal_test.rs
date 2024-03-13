@@ -85,6 +85,33 @@ pub fn test_managed_decimal() {
 }
 
 #[test]
+fn logarithm_test() {
+    let fixed =
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(BigUint::from(10u64), 1usize);
+
+    let fixed_const = ManagedDecimal::<StaticApi, ConstDecimals<1>>::const_decimals_from_raw(
+        BigUint::from(10u64),
+    );
+
+    let log2_fixed = fixed.log(BigUint::from(2u64), 10_000usize);
+    assert_eq!(
+        log2_fixed,
+        ManagedDecimal::<StaticApi, NumDecimals>::from_raw_units(
+            BigUint::from(33219u64),
+            10_000usize
+        )
+    );
+
+    let log2_const = fixed_const.log(BigUint::from(2u64), ConstDecimals::<10_000>);
+    assert_eq!(
+        log2_const,
+        ManagedDecimal::<StaticApi, ConstDecimals::<10_000>>::const_decimals_from_raw(
+            BigUint::from(33219u64)
+        )
+    );
+}
+
+#[test]
 fn test_managed_decimal_conversion() {
     let fixed: ManagedDecimal<StaticApi, NumDecimals> =
         ManagedDecimal::from_raw_units(BigUint::from(123456789123456789u64), 15usize); //123,45....
