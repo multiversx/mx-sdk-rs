@@ -518,6 +518,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06ea2b9bc92be3c2baa9334a323ebca2d6f074ff852cd1d7b11064035cd3868f"
 
 [[package]]
+name = "coverage-renderer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1785,7 +1794,7 @@ checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "arrayvec",
  "getrandom 0.2.12",
@@ -1806,7 +1815,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "bitflags 2.4.2",
  "hex-literal",
@@ -1836,7 +1845,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1847,7 +1856,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "clap",
  "colored",
@@ -1873,14 +1882,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "base64",
  "bech32",
@@ -1906,7 +1915,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "base64",
  "env_logger",
@@ -1920,7 +1929,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "multiversx-sc",
 ]
@@ -1951,7 +1960,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.47.4"
+version = "0.47.5"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",

@@ -98,6 +98,25 @@ fn test_into_vec() {
 }
 
 #[test]
+fn test_to_array_of_refs() {
+    let mut vec = ManagedVec::<StaticApi, i32>::new();
+    for i in 0..10 {
+        vec.push(i);
+    }
+
+    let refs: Option<[i32; 20]> = vec.to_array_of_refs();
+    assert!(refs.is_none());
+
+    let refs: Option<[i32; 10]> = vec.to_array_of_refs();
+    assert!(refs.is_some());
+
+    let refs = refs.unwrap();
+    for (i, &item) in refs.iter().enumerate() {
+        assert_eq!(item, i as i32);
+    }
+}
+
+#[test]
 fn test_take_u64() {
     let mut vec = Vec::<u64>::new();
     let mut managed_vec = ManagedVec::<StaticApi, u64>::new();
