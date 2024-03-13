@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
     codec::*,
@@ -60,13 +62,11 @@ where
     where
         T: NestedEncode,
     {
-        match item.dep_encode_or_handle_err(
+        item.dep_encode_or_handle_err(
             &mut self.buffer,
             ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_KEY_ENCODE_ERROR),
-        ) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        }
+        )
+        .unwrap_infallible()
     }
 
     #[inline]

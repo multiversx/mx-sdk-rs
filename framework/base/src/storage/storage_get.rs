@@ -1,4 +1,4 @@
-use core::marker::PhantomData;
+use core::{convert::Infallible, marker::PhantomData};
 
 use crate::{
     api::{
@@ -7,12 +7,12 @@ use crate::{
     },
     codec::*,
     err_msg,
-    imports::Never,
     types::{
         BigInt, BigUint, ManagedBuffer, ManagedBufferNestedDecodeInput, ManagedRef, ManagedType,
     },
 };
 use alloc::boxed::Box;
+use unwrap_infallible::UnwrapInfallible;
 
 use super::StorageKey;
 
@@ -114,14 +114,11 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let value = match T::top_decode_or_handle_err(
+    T::top_decode_or_handle_err(
         StorageGetInput::new(key),
         StorageGetErrorHandler::<A>::default(),
-    ) {
-        Ok(val) => val,
-        Err(err) => panic!("panic occured: {:#?}", err),
-    };
-    value
+    )
+    .unwrap_infallible()
 }
 
 /// Useful for storage mappers.
@@ -162,7 +159,7 @@ impl<M> DecodeErrorHandler for StorageGetErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = Never;
+    type HandledErr = Infallible;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);

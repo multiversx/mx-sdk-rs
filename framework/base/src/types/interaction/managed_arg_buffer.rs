@@ -15,6 +15,7 @@ use crate::{
 };
 use alloc::vec::Vec;
 use multiversx_sc_codec::TopEncodeMulti;
+use unwrap_infallible::UnwrapInfallible;
 
 #[derive(Debug, Default, Clone)]
 #[repr(transparent)]
@@ -180,22 +181,17 @@ where
 {
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
         let mut encoded_buffer = ManagedBuffer::new();
-        match arg.top_encode_or_handle_err(
+        arg.top_encode_or_handle_err(
             &mut encoded_buffer,
             ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
-        ) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        };
+        )
+        .unwrap_infallible();
         self.push_arg_raw(encoded_buffer);
     }
 
     pub fn push_multi_arg<T: TopEncodeMulti>(&mut self, arg: &T) {
         let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        match arg.multi_encode_or_handle_err(self, h) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        }
+        arg.multi_encode_or_handle_err(self, h).unwrap_infallible();
     }
 }
 
@@ -285,10 +281,7 @@ where
     pub fn serialize_overwrite(&self, dest: &mut ManagedBuffer<M>) {
         dest.overwrite(&[]);
         let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR);
-        match self.top_encode_or_handle_err(dest, h) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        }
+        self.top_encode_or_handle_err(dest, h).unwrap_infallible()
     }
 
     /// Deserializes self from a managed buffer in-place, without creating a new handle.
@@ -298,10 +291,8 @@ where
         self.clear();
         let mut nested_de_input = ManagedBufferNestedDecodeInput::new(source);
         while nested_de_input.remaining_len() > 0 {
-            let item = match ManagedBuffer::dep_decode_or_handle_err(&mut nested_de_input, h) {
-                Ok(val) => val,
-                Err(err) => panic!("panic occured: {:#?}", err),
-            };
+            let item = ManagedBuffer::dep_decode_or_handle_err(&mut nested_de_input, h)
+                .unwrap_infallible();
             self.push_arg_raw(item);
         }
     }

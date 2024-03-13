@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
@@ -68,13 +70,11 @@ where
     T: TopEncodeMulti,
 {
     pub fn push(&mut self, item: T) {
-        match item.multi_encode_or_handle_err(
+        item.multi_encode_or_handle_err(
             &mut self.raw_buffers,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        ) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        }
+        )
+        .unwrap_infallible()
     }
 }
 

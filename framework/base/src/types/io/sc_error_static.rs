@@ -1,9 +1,6 @@
 use crate::codec::{self, DecodeError, EncodeError, TopEncodeMulti, TryStaticCast};
 
-use crate::{
-    api::{EndpointFinishApi, ErrorApiImpl},
-    imports::Never,
-};
+use crate::api::{EndpointFinishApi, ErrorApiImpl};
 
 use super::SCError;
 
@@ -54,12 +51,6 @@ impl From<DecodeError> for StaticSCError {
     #[inline]
     fn from(err: DecodeError) -> Self {
         StaticSCError(err.message_bytes())
-    }
-}
-
-impl From<Never> for StaticSCError {
-    fn from(_: Never) -> Self {
-        unreachable!()
     }
 }
 

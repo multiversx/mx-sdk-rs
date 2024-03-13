@@ -1,4 +1,6 @@
-use core::marker::PhantomData;
+use core::{convert::Infallible, marker::PhantomData};
+
+use unwrap_infallible::UnwrapInfallible;
 
 use crate::codec::{
     DecodeError, DecodeErrorHandler, EncodeError, EncodeErrorHandler, TopDecode, TopEncode,
@@ -7,7 +9,6 @@ use crate::codec::{
 use crate::{
     api::{ErrorApi, ErrorApiImpl, ManagedTypeApi},
     err_msg,
-    imports::Never,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
 };
 
@@ -31,25 +32,23 @@ where
 
     pub fn top_encode_to_managed_buffer<T: TopEncode>(&self, value: &T) -> ManagedBuffer<M> {
         let mut result = ManagedBuffer::new();
-        match value.top_encode_or_handle_err(
-            &mut result,
-            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        ) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        };
+        value
+            .top_encode_or_handle_err(
+                &mut result,
+                ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+            )
+            .unwrap_infallible();
         result
     }
 
     pub fn top_encode_to_boxed_bytes<T: TopEncode>(&self, value: &T) -> BoxedBytes {
         let mut result = BoxedBytes::empty();
-        match value.top_encode_or_handle_err(
-            &mut result,
-            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        ) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        };
+        value
+            .top_encode_or_handle_err(
+                &mut result,
+                ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+            )
+            .unwrap_infallible();
         result
     }
 
@@ -62,23 +61,19 @@ where
         buffer: &ManagedBuffer<M>,
         error_message: &'static [u8],
     ) -> T {
-        match T::top_decode_or_handle_err(
+        T::top_decode_or_handle_err(
             buffer.clone(), // TODO: remove clone
             ExitCodecErrorHandler::<M>::from(error_message),
-        ) {
-            Ok(value) => value,
-            Err(err) => panic!("panic occured: {:#?}", err),
-        }
+        )
+        .unwrap_infallible()
     }
 
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
-        match T::top_decode_or_handle_err(
+        T::top_decode_or_handle_err(
             slice,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR),
-        ) {
-            Ok(value) => value,
-            Err(err) => panic!("panic occured: {:#?}", err),
-        }
+        )
+        .unwrap_infallible()
     }
 }
 
@@ -109,7 +104,7 @@ impl<M> EncodeErrorHandler for ExitCodecErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = Never;
+    type HandledErr = Infallible;
 
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);
@@ -122,7 +117,7 @@ impl<M> DecodeErrorHandler for ExitCodecErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = Never;
+    type HandledErr = Infallible;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);

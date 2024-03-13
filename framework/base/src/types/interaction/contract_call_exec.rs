@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     api::{use_raw_handle, StaticVarApiImpl},
     codec::TopDecodeMulti,
@@ -226,8 +228,5 @@ where
     let mut loader = ManagedResultArgLoader::new(raw_result);
     let arg_id = ArgId::from(&b"sync result"[..]);
     let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
-    match RequestedResult::multi_decode_or_handle_err(&mut loader, h) {
-        Ok(result) => result,
-        Err(err) => panic!("panic occured: {:#?}", err),
-    }
+    RequestedResult::multi_decode_or_handle_err(&mut loader, h).unwrap_infallible()
 }

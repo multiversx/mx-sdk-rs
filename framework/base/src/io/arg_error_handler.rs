@@ -1,4 +1,4 @@
-use core::marker::PhantomData;
+use core::{convert::Infallible, marker::PhantomData};
 
 use crate::{
     api::{ErrorApi, ManagedTypeApi},
@@ -29,14 +29,11 @@ where
     }
 }
 
-#[derive(Debug)]
-pub enum Never {}
-
 impl<M> DecodeErrorHandler for ArgErrorHandler<M>
 where
     M: ManagedTypeApi + ErrorApi,
 {
-    type HandledErr = Never;
+    type HandledErr = Infallible;
 
     #[inline(always)]
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {

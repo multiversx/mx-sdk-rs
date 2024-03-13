@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::codec::TopEncode;
 
 use crate::{
@@ -90,14 +92,11 @@ pub trait SCCodec {
 impl<T: TopEncode> SCCodec for T {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let mut encoded = ManagedBuffer::<F::Api>::new();
-
-        match self.top_encode_or_handle_err(
+        self.top_encode_or_handle_err(
             &mut encoded,
             ExitCodecErrorHandler::<F::Api>::from(err_msg::FORMATTER_ENCODE_ERROR),
-        ) {
-            Ok(_) => {},
-            Err(err) => panic!("panic occured: {:#?}", err),
-        };
+        )
+        .unwrap_infallible();
         SCLowerHex::fmt(&encoded, f);
     }
 }

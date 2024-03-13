@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use super::{EndpointDynArgLoader, EndpointSingleArgLoader, ManagedResultArgLoader};
 use crate::{
     api::{
@@ -71,10 +73,7 @@ where
 {
     let mut arg_loader = EndpointSingleArgLoader::<AA>::new(index);
     let h = ArgErrorHandler::<AA>::from(arg_id);
-    match T::multi_decode_or_handle_err(&mut arg_loader, h) {
-        Ok(value) => value,
-        Err(err) => panic!("panic occured: {:#?}", err),
-    }
+    T::multi_decode_or_handle_err(&mut arg_loader, h).unwrap_infallible()
 }
 
 #[inline(never)]
@@ -85,10 +84,7 @@ where
     T: TopDecodeMulti,
 {
     let h = ArgErrorHandler::<AA>::from(arg_id);
-    match T::multi_decode_or_handle_err(loader, h) {
-        Ok(value) => value,
-        Err(err) => panic!("panic occured: {:#?}", err),
-    }
+    T::multi_decode_or_handle_err(loader, h).unwrap_infallible()
 }
 
 /// Models an argument tree of the form `(arg1, (arg2, ... (argn, ())))`, used for retrieving endpoint arguments.
