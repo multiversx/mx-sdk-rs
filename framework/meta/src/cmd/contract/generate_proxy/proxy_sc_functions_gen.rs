@@ -8,7 +8,7 @@ use crate::cmd::contract::generate_snippets::{
 };
 
 pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
-    write_header_impl_constructor(file);
+    write_header_impl_constructor(file, &abi.name);
     for constructor_abi in abi.constructors {
         write_constructor_header(file, constructor_abi.clone());
         write_constructor_content(file, constructor_abi.inputs);
@@ -16,7 +16,7 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     }
     writeln!(file, "}}").unwrap();
 
-    write_header_impl_endpoints(file);
+    write_header_impl_endpoints(file, &abi.name);
     for endpoint_abi in abi.endpoints {
         write_endpoint_header(file, endpoint_abi.clone());
         write_endpoint_content(file, endpoint_abi.name, endpoint_abi.inputs);
@@ -26,10 +26,10 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     writeln!(file, "}}").unwrap();
 }
 
-fn write_header_impl_constructor(file: &mut File) {
+fn write_header_impl_constructor(file: &mut File, name: &String) {
     writeln!(
         file,
-        r#"impl<Env, From, Gas> TxProxyMethods<Env, From, (), Gas>
+        r#"impl<Env, From, Gas> Tx{name}Methods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -40,10 +40,10 @@ where
     .unwrap();
 }
 
-fn write_header_impl_endpoints(file: &mut File) {
+fn write_header_impl_endpoints(file: &mut File, name: &String) {
     writeln!(
         file,
-        r#"impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
+        r#"impl<Env, From, To, Gas> Tx{name}Methods<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,

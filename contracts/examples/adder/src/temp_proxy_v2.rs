@@ -15,14 +15,14 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    type TxProxyMethods = TxProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = TxAdderMethods<Env, From, To, Gas>;
 
     fn prepare_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
-        TxProxyMethods { wrapped_tx: tx }
+        TxAdderMethods { wrapped_tx: tx }
     }
 }
 
-pub struct TxProxyMethods<Env, From, To, Gas>
+pub struct TxAdderMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -32,7 +32,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
-impl<Env, From, Gas> TxProxyMethods<Env, From, (), Gas>
+impl<Env, From, Gas> TxAdderMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -60,7 +60,7 @@ where
     }
 
 }
-impl<Env, From, To, Gas> TxProxyMethods<Env, From, To, Gas>
+impl<Env, From, To, Gas> TxAdderMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,

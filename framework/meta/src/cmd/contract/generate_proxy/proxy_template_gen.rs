@@ -18,25 +18,25 @@ pub(crate) fn write_header(file: &mut File) {
     write_newline(file);
 }
 
-pub(crate) fn write_struct_template(file: &mut File) {
-    writeln!(file, "pub struct TxProxy;").unwrap();
+pub(crate) fn write_struct_template(file: &mut File, name: &String) {
+    writeln!(file, "pub struct Tx{name};").unwrap();
     write_newline(file)
 }
 
-pub(crate) fn write_impl_for_tx_proxy(file: &mut File) {
+pub(crate) fn write_impl_for_tx_proxy(file: &mut File, name: &String) {
     writeln!(
         file,
-        r#"impl<Env, From, To, Gas> TxProxyTraitV2<Env, From, To, Gas> for TxProxy
+        r#"impl<Env, From, To, Gas> TxProxyTraitV2<Env, From, To, Gas> for Tx{name}
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {{
-    type TxProxyMethods = TxProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = Tx{name}Methods<Env, From, To, Gas>;
 
     fn prepare_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {{
-        TxProxyMethods {{ wrapped_tx: tx }}
+        Tx{name}Methods {{ wrapped_tx: tx }}
     }}
 }}"#
     )
@@ -45,10 +45,10 @@ where
     write_newline(file);
 }
 
-pub(crate) fn write_struct_tx_proxy_methods(file: &mut File) {
+pub(crate) fn write_struct_tx_proxy_methods(file: &mut File, name: &String) {
     writeln!(
         file,
-        r#"pub struct TxProxyMethods<Env, From, To, Gas>
+        r#"pub struct Tx{name}Methods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
