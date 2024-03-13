@@ -46,8 +46,8 @@ pub mod imports {
         api::{ErrorApiImpl, ManagedTypeApi, VMApi},
         arrayvec::ArrayVec,
         codec::{
-            multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-            TopEncode,
+            multi_types::*, CodecFrom, CodecFromSelf, CodecInto, DecodeError, IntoMultiValue,
+            NestedDecode, NestedEncode, TopDecode, TopEncode,
         },
         contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
         err_msg,
