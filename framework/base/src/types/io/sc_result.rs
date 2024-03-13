@@ -106,7 +106,7 @@ where
 {
     fn from_residual(residual: Result<convert::Infallible, FromErr>) -> Self {
         let e = match residual {
-            Ok(_) => panic!("residual is not error"),
+            Ok(_) => unreachable!(),
             Err(err) => err,
         };
         SCResult::Err(e.into())
