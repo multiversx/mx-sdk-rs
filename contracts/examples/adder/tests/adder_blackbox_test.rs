@@ -66,7 +66,7 @@ fn adder_blackbox() {
             .put_account(owner_address, CheckAccount::new())
             .put_account(
                 &adder_contract,
-                CheckAccount::new().check_storage("str:sum", "8"),
+                CheckAccount::new().check_storage("str:sum", "6"),
             ),
     );
 
