@@ -203,8 +203,7 @@ impl TemplateAdjuster {
         let old_mxsc = mxsc_file_name(&self.metadata.name);
         let new_mxsc = mxsc_file_name(&self.target.new_name);
 
-        let mut queries = Vec::<Query>::new();
-        queries.push(Query::substring(&old_mxsc, &new_mxsc));
+        let queries = vec![Query::substring(&old_mxsc, &new_mxsc)];
 
         replace_in_files(
             &self.target.contract_dir().join(INTERACT_DIRECTORY),
