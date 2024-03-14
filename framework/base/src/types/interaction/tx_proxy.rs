@@ -1,12 +1,6 @@
 use super::{Tx, TxEnv, TxFrom, TxGas, TxTo};
 
-pub trait TxProxyTrait<Env> {
-    type TxProxyMethods;
-
-    fn env(self, env: Env) -> Self::TxProxyMethods;
-}
-
-pub trait TxProxyTraitV2<Env, From, To, Gas>
+pub trait TxProxyTrait<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,

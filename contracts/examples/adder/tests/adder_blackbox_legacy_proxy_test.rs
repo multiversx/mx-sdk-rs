@@ -35,7 +35,7 @@ fn adder_blackbox_legacy_proxy() {
     world
         .tx()
         .from(OWNER)
-        .typed_v2(temp_proxy_v2::TxProxy)
+        .typed(temp_proxy::TxProxy)
         .init(5u32)
         .code(CODE_EXPR)
         .with_result(WithResultNewAddress::new(|new_address| {
