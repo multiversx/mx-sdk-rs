@@ -12,7 +12,7 @@ use crate::{
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
-use alloc::vec::Vec;
+use alloc::{format, vec::Vec};
 use core::{
     borrow::Borrow,
     cmp::Ordering,
@@ -689,7 +689,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        <&[T] as TypeAbi>::type_name_rust()
+        format!("ManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

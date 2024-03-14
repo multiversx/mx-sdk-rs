@@ -309,6 +309,6 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        <&[ManagedBuffer<M>] as TypeAbi>::type_name_rust()
+        "ManagedArgBufer<$API>".into()
     }
 }

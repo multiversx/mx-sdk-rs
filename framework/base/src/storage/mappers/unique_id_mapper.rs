@@ -228,7 +228,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        usize::type_name_rust()
+        crate::abi::type_name_multi_value_encoded::<usize>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

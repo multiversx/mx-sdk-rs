@@ -304,7 +304,7 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
     }
 
     fn type_name_rust() -> TypeName {
-        TypeName::from("multiversx_sc::types::BigInt<$API>")
+        TypeName::from("BigInt<$API>")
     }
 }
 

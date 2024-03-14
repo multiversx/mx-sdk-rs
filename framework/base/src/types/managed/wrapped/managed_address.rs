@@ -244,7 +244,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        Address::type_name_rust()
+        "ManagedAddress<$API>".into()
     }
 }
 

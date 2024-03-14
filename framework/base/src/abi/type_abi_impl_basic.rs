@@ -2,6 +2,7 @@ use super::*;
 use crate::arrayvec::ArrayVec;
 use alloc::{
     boxed::Box,
+    format,
     string::{String, ToString},
     vec::Vec,
 };
@@ -55,7 +56,7 @@ impl<T: TypeAbi> TypeAbi for &[T] {
     }
 
     fn type_name_rust() -> TypeName {
-        T::type_name_rust()
+        format!("&[{}]", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -69,7 +70,7 @@ impl<T: TypeAbi> TypeAbi for Vec<T> {
     }
 
     fn type_name_rust() -> TypeName {
-        <&[T]>::type_name_rust()
+        format!("Vec<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -83,7 +84,7 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
     }
 
     fn type_name_rust() -> TypeName {
-        <&[T]>::type_name_rust()
+        format!("ArrayVec<{}, {}usize>", T::type_name_rust(), CAP)
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -117,7 +118,7 @@ impl TypeAbi for &str {
     }
 
     fn type_name_rust() -> TypeName {
-        TypeName::type_name_rust()
+        "&str".into()
     }
 }
 
@@ -160,10 +161,12 @@ type_abi_name_only!(bool, "bool");
 
 impl<T: TypeAbi> TypeAbi for Option<T> {
     fn type_name() -> TypeName {
-        let mut repr = TypeName::from("Option<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        format!("Option<{}>", T::type_name())
+    }
+
+    
+    fn type_name_rust() -> TypeName {
+        format!("Option<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -177,7 +180,11 @@ impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
     }
 
     fn type_name_rust() -> TypeName {
-        T::type_name_rust()
+        format!(
+            "Result<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Similar to the SCResult implementation.

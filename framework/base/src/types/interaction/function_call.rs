@@ -143,7 +143,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        ManagedAddress::<Api>::type_name_rust()
+        "FunctionCall<$API>".into()
     }
 
     fn is_variadic() -> bool {

@@ -234,7 +234,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        ManagedAddress::<SA>::type_name_rust()
+        crate::abi::type_name_multi_value_encoded::<ManagedAddress<SA>>()
     }
 
     fn is_variadic() -> bool {

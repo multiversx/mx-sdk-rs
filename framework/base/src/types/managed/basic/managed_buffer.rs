@@ -465,6 +465,10 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> TypeName {
         "bytes".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedBuffer<$API>".into()
+    }
 }
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {

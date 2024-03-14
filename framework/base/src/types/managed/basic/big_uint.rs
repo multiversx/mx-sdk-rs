@@ -293,7 +293,7 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     }
 
     fn type_name_rust() -> TypeName {
-        TypeName::from("multiversx_sc::types::BigUint<$API>")
+        TypeName::from("BigUint<$API>")
     }
 }
 

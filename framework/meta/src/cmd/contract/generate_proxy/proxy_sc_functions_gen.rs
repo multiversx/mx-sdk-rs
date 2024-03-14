@@ -2,10 +2,7 @@ use std::{fs::File, io::Write};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
 
-use crate::cmd::contract::generate_snippets::{
-    snippet_gen_common::write_newline,
-    snippet_type_map::{handle_abi_type, RustTypeString},
-};
+use crate::cmd::contract::generate_snippets::snippet_gen_common::write_newline;
 
 use super::proxy_naming::proxy_methods_type_name;
 
@@ -168,12 +165,8 @@ fn write_function_header_endpoint(file: &mut File, rust_method_name: String) {
 }
 
 fn write_endpoint_docs(file: &mut File, docs: Vec<String>) {
-    if !docs.is_empty() {
-        write!(file, "    /// ").unwrap();
-    }
-
     for abi_doc in docs {
-        writeln!(file, "{abi_doc} ").unwrap();
+        writeln!(file, "    /// {abi_doc} ").unwrap();
     }
 }
 
@@ -185,21 +178,15 @@ fn write_args(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(file, "<").unwrap();
 
     for (index, input) in inputs.iter().enumerate() {
-        write_argument(file, index, input.type_names.abi.to_string());
+        write_argument(file, index, &input.type_names.rust);
     }
 
     write!(file, "    >").unwrap();
 }
 
-fn write_argument(file: &mut File, index: usize, type_name: String) {
-    let mut type_string = RustTypeString::default();
-    handle_abi_type(&mut type_string, type_name);
-    let type_print = type_string
-        .get_type_name()
-        .replace("StaticApi", "Env::Api")
-        .to_string();
-
-    writeln!(file, "        Arg{index}: CodecInto<{}>,", type_print).unwrap();
+fn write_argument(file: &mut File, index: usize, rust_name: &str) {
+    let adjusted = adjust_type_name(rust_name);
+    writeln!(file, "        Arg{index}: CodecInto<{adjusted}>,").unwrap();
 }
 
 fn write_end_of_function(file: &mut File) {

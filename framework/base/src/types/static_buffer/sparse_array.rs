@@ -1,3 +1,5 @@
+use alloc::format;
+
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ErrorApiImpl},
@@ -312,7 +314,7 @@ where
     }
 
     fn type_name_rust() -> TypeName {
-        <&[usize] as TypeAbi>::type_name_rust()
+        format!("SparseArray<$API, {CAPACITY}usize>")
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
