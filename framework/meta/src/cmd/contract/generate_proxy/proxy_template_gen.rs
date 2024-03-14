@@ -20,13 +20,13 @@ pub(crate) fn write_header(file: &mut File) {
     write_newline(file);
 }
 
-pub(crate) fn write_struct_template(file: &mut File, name: &String) {
+pub(crate) fn write_struct_template(file: &mut File, name: &str) {
     let proxy_type_name = proxy_type_name(name);
     writeln!(file, "pub struct {proxy_type_name};").unwrap();
     write_newline(file)
 }
 
-pub(crate) fn write_impl_for_tx_proxy(file: &mut File, name: &String) {
+pub(crate) fn write_impl_for_tx_proxy(file: &mut File, name: &str) {
     let proxy_type_name = proxy_type_name(name);
     let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
@@ -50,7 +50,7 @@ where
     write_newline(file);
 }
 
-pub(crate) fn write_struct_tx_proxy_methods(file: &mut File, name: &String) {
+pub(crate) fn write_struct_tx_proxy_methods(file: &mut File, name: &str) {
     let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,

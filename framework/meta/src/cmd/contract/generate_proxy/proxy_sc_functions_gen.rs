@@ -28,7 +28,7 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     writeln!(file, "}}").unwrap();
 }
 
-fn write_header_impl_constructor(file: &mut File, name: &String) {
+fn write_header_impl_constructor(file: &mut File, name: &str) {
     let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,
@@ -43,7 +43,7 @@ where
     .unwrap();
 }
 
-fn write_header_impl_endpoints(file: &mut File, name: &String) {
+fn write_header_impl_endpoints(file: &mut File, name: &str) {
     let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,
