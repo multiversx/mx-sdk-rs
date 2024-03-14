@@ -25,9 +25,8 @@ llvm-cov export \
   --ignore-filename-regex='wasm-adapter' \
   --ignore-filename-regex='benchmarks/' \
   --ignore-filename-regex='tests/' \
-  --ignore-filename-regex='tools/coverage-renderer/' \
   --instr-profile=tests.profdata --summary-only --format=text > tests.coverage
 rm ./tests.profdata
 
-cargo run --quiet --bin coverage-renderer ./tests.coverage > coverage.md
+cargo run --bin sc-meta test-coverage-render --input ./tests.coverage --output ./coverage.md
 rm ./tests.coverage
