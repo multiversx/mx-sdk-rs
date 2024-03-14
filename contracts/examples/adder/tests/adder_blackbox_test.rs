@@ -33,7 +33,7 @@ fn adder_blackbox() {
     world
         .tx()
         .from(OWNER)
-        .typed(temp_proxy::TxProxy)
+        .typed(temp_proxy::AdderProxy)
         .init(5u32)
         .code(CODE_EXPR)
         .with_result(WithResultNewAddress::new(|new_address| {
@@ -44,7 +44,7 @@ fn adder_blackbox() {
     let value = world
         .query()
         .to(SC_ADDER)
-        .typed(temp_proxy::TxProxy)
+        .typed(temp_proxy::AdderProxy)
         .sum()
         .returns(ReturnsSimilar::<BigUint>::new())
         .run();
@@ -54,7 +54,7 @@ fn adder_blackbox() {
         .tx()
         .from(OWNER)
         .to(SC_ADDER)
-        .typed(temp_proxy::TxProxy)
+        .typed(temp_proxy::AdderProxy)
         .add(1u32)
         .with_result(WithRawTxResponse(|response| {
             assert!(response.tx_error.is_success());

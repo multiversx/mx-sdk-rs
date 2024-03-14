@@ -7,6 +7,8 @@ use crate::cmd::contract::generate_snippets::{
     snippet_type_map::{handle_abi_type, RustTypeString},
 };
 
+use super::proxy_naming::proxy_methods_type_name;
+
 pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     write_header_impl_constructor(file, &abi.name);
     for constructor_abi in abi.constructors {
@@ -27,9 +29,10 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
 }
 
 fn write_header_impl_constructor(file: &mut File, name: &String) {
+    let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,
-        r#"impl<Env, From, Gas> Tx{name}Methods<Env, From, (), Gas>
+        r#"impl<Env, From, Gas> {proxy_methods_type_name}<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -41,9 +44,10 @@ where
 }
 
 fn write_header_impl_endpoints(file: &mut File, name: &String) {
+    let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,
-        r#"impl<Env, From, To, Gas> Tx{name}Methods<Env, From, To, Gas>
+        r#"impl<Env, From, To, Gas> {proxy_methods_type_name}<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
