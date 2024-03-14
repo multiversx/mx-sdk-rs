@@ -543,6 +543,7 @@ where
     FC: TxDataFunctionCall<Env>,
     RH: TxResultHandler<Env>,
 {
+    #[allow(clippy::type_complexity)]
     pub fn normalize_tx(
         self,
     ) -> Tx<
