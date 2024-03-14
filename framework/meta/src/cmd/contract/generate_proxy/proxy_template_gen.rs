@@ -40,7 +40,7 @@ where
 {{
     type TxProxyMethods = {proxy_methods_type_name}<Env, From, To, Gas>;
 
-    fn prepare_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {{
+    fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {{
         {proxy_methods_type_name} {{ wrapped_tx: tx }}
     }}
 }}"#

@@ -477,7 +477,7 @@ where
     where
         Proxy: TxProxyTrait<Env, From, To, Gas>,
     {
-        proxy.prepare_methods(self)
+        proxy.proxy_methods(self)
     }
 }
 

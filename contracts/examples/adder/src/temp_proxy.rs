@@ -17,7 +17,7 @@ where
 {
     type TxProxyMethods = AdderProxyMethods<Env, From, To, Gas>;
 
-    fn prepare_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
+    fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
         AdderProxyMethods { wrapped_tx: tx }
     }
 }
