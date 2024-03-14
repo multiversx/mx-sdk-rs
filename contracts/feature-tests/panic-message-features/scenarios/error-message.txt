@@ -1,0 +1,1 @@
+panic occured: PanicInfo { payload: Any { .. }, message: Some(example panic message 123), location: Location { file: "panic_features.rs", line: 22, col: 9 }, can_unwind: true, force_no_backtrace: false }
