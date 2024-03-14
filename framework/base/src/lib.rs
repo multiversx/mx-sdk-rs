@@ -1,6 +1,4 @@
 #![no_std]
-#![feature(never_type)]
-#![feature(exhaustive_patterns)]
 #![feature(try_trait_v2)]
 #![feature(control_flow_enum)]
 #![feature(negative_impls)]

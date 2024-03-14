@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     CodecFrom, PanicErrorHandler, TopDecodeMultiInput, TopEncodeMulti, TopEncodeMultiOutput,
 };
@@ -9,9 +11,9 @@ where
     Medium: Default + TopDecodeMultiInput + TopEncodeMultiOutput,
 {
     let mut medium: Medium = Default::default();
-    let Ok(()) = from.multi_encode_or_handle_err(&mut medium, PanicErrorHandler);
-    let Ok(result) = To::multi_decode_or_handle_err(&mut medium, PanicErrorHandler);
-    result
+    from.multi_encode_or_handle_err(&mut medium, PanicErrorHandler)
+        .unwrap_infallible();
+    To::multi_decode_or_handle_err(&mut medium, PanicErrorHandler).unwrap_infallible()
 }
 
 #[allow(unused)]
