@@ -38,17 +38,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "adder-interact"
-version = "0.0.0"
-dependencies = [
- "adder",
- "clap",
- "multiversx-sc-snippets",
- "serde",
- "toml",
-]
-
-[[package]]
 name = "adder-meta"
 version = "0.0.0"
 dependencies = [
@@ -211,6 +200,17 @@ version = "0.0.0"
 dependencies = [
  "basic-features",
  "multiversx-sc-meta",
+]
+
+[[package]]
+name = "basic-interact"
+version = "0.0.0"
+dependencies = [
+ "adder",
+ "clap",
+ "multiversx-sc-snippets",
+ "serde",
+ "toml",
 ]
 
 [[package]]

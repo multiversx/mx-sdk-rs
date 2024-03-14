@@ -10,6 +10,7 @@ use ruplacer::Query;
 use toml::value::Table;
 
 const TEST_DIRECTORY: &str = "./tests";
+const INTERACT_DIRECTORY: &str = "./interact";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
@@ -34,7 +35,11 @@ impl TemplateAdjuster {
             remove_paths_from_deps(&mut toml, &[]);
         }
 
-        toml.add_workspace(&[".", "meta"]);
+        if self.metadata.has_interactor {
+            toml.add_workspace(&[".", "meta", "interact"]);
+        } else {
+            toml.add_workspace(&[".", "meta"]);
+        }
 
         toml.save_to_file(&cargo_toml_path);
     }
@@ -71,6 +76,7 @@ impl TemplateAdjuster {
         self.rename_in_cargo_toml_meta();
         self.rename_in_cargo_toml_wasm();
         self.rename_in_tests();
+        self.rename_in_interactor();
         self.rename_solution_files();
     }
 
@@ -190,6 +196,20 @@ impl TemplateAdjuster {
             &self.target.contract_dir(),
             "*.steps.json",
             &[Query::substring(old, new)][..],
+        );
+    }
+
+    fn rename_in_interactor(&self) {
+        let old_mxsc = mxsc_file_name(&self.metadata.name);
+        let new_mxsc = mxsc_file_name(&self.target.new_name);
+
+        let mut queries = Vec::<Query>::new();
+        queries.push(Query::substring(&old_mxsc, &new_mxsc));
+
+        replace_in_files(
+            &self.target.contract_dir().join(INTERACT_DIRECTORY),
+            "*.rs",
+            &queries,
         );
     }
 
