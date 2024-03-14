@@ -1,3 +1,5 @@
+use alloc::format;
+
 use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use crate::{
@@ -130,6 +132,14 @@ where
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "SCResult<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Gives `SCResult<()>` the possibility to produce 0 output ABIs,

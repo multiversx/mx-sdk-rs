@@ -172,7 +172,10 @@ impl std::fmt::Debug for ContractVariant {
             .field("config_name", &self.contract_id)
             .field("public_name", &self.contract_name)
             .field("num-constructors", &self.abi.constructors.len())
-            .field("num-upgrade-constructors", &self.abi.upgrade_constructors.len())
+            .field(
+                "num-upgrade-constructors",
+                &self.abi.upgrade_constructors.len(),
+            )
             .field("num-endpoints", &self.abi.endpoints.len())
             .field("settings", &self.settings)
             .finish()

@@ -227,6 +227,10 @@ where
         crate::abi::type_name_variadic::<usize>()
     }
 
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<usize>()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         usize::provide_type_descriptions(accumulator);
     }

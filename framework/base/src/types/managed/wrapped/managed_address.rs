@@ -242,6 +242,10 @@ where
     fn type_name() -> TypeName {
         Address::type_name()
     }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedAddress<$API>".into()
+    }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {

@@ -2,6 +2,7 @@ use super::*;
 use crate::arrayvec::ArrayVec;
 use alloc::{
     boxed::Box,
+    format,
     string::{String, ToString},
     vec::Vec,
 };
@@ -19,6 +20,10 @@ impl<T: TypeAbi> TypeAbi for &T {
         T::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -27,6 +32,10 @@ impl<T: TypeAbi> TypeAbi for &T {
 impl<T: TypeAbi> TypeAbi for Box<T> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -46,6 +55,10 @@ impl<T: TypeAbi> TypeAbi for &[T] {
         repr
     }
 
+    fn type_name_rust() -> TypeName {
+        format!("&[{}]", T::type_name_rust())
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -54,6 +67,10 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 impl<T: TypeAbi> TypeAbi for Vec<T> {
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Vec<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -66,6 +83,10 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
         <&[T]>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        format!("ArrayVec<{}, {}usize>", T::type_name_rust(), CAP)
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -74,6 +95,10 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        <&[T]>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -91,11 +116,19 @@ impl TypeAbi for &str {
     fn type_name() -> TypeName {
         TypeName::type_name()
     }
+
+    fn type_name_rust() -> TypeName {
+        "&str".into()
+    }
 }
 
 impl TypeAbi for Box<str> {
     fn type_name() -> TypeName {
         TypeName::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::type_name_rust()
     }
 }
 
@@ -128,10 +161,12 @@ type_abi_name_only!(bool, "bool");
 
 impl<T: TypeAbi> TypeAbi for Option<T> {
     fn type_name() -> TypeName {
-        let mut repr = TypeName::from("Option<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        format!("Option<{}>", T::type_name())
+    }
+
+    
+    fn type_name_rust() -> TypeName {
+        format!("Option<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -142,6 +177,14 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "Result<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Similar to the SCResult implementation.

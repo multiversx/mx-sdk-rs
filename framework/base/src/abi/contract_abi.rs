@@ -41,7 +41,8 @@ impl ContractAbi {
         self.constructors
             .extend_from_slice(other.constructors.as_slice());
         self.endpoints.extend_from_slice(other.endpoints.as_slice());
-        self.upgrade_constructors.extend_from_slice(other.upgrade_constructors.as_slice());
+        self.upgrade_constructors
+            .extend_from_slice(other.upgrade_constructors.as_slice());
         self.events.extend_from_slice(other.events.as_slice());
         self.promise_callbacks
             .extend_from_slice(other.promise_callbacks.as_slice());

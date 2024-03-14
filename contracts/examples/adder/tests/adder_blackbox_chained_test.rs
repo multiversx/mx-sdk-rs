@@ -27,7 +27,7 @@ fn adder_blackbox_chained() {
         )
         .chain_deploy(|tx| {
             tx.from(AddressExpr("owner"))
-                .typed_v2(temp_proxy_v2::TxProxy)
+                .typed(temp_proxy::AdderProxy)
                 .init(5u32)
                 .code(MxscExpr("output/adder.mxsc.json"))
                 .with_result(WithResultNewAddress::new(|new_address| {
@@ -36,7 +36,7 @@ fn adder_blackbox_chained() {
         })
         .chain_query(|tx| {
             tx.to(ScExpr("adder"))
-                .typed_v2(temp_proxy_v2::TxProxy)
+                .typed(temp_proxy::AdderProxy)
                 .sum()
                 .with_result(WithResultSimilar::new(|value: BigUint| {
                     assert_eq!(value, BigUint::from(5u32));
@@ -45,7 +45,7 @@ fn adder_blackbox_chained() {
         .chain_call(|tx| {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
-                .typed_v2(temp_proxy_v2::TxProxy)
+                .typed(temp_proxy::AdderProxy)
                 .add(3u32)
                 .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());

@@ -1,5 +1,5 @@
 use super::*;
-use alloc::{string::ToString, vec::Vec};
+use alloc::{format, string::ToString, vec::Vec};
 
 pub trait TypeAbi {
     fn type_names() -> TypeNames {
@@ -63,10 +63,11 @@ pub trait TypeAbi {
 }
 
 pub fn type_name_variadic<T: TypeAbi>() -> TypeName {
-    let mut repr = TypeName::from("variadic<");
-    repr.push_str(T::type_name().as_str());
-    repr.push('>');
-    repr
+    format!("variadic<{}>", T::type_name())
+}
+
+pub fn type_name_multi_value_encoded<T: TypeAbi>() -> TypeName {
+    format!("MultiValueEncoded<$API, {}>", T::type_name_rust())
 }
 
 pub fn type_name_optional<T: TypeAbi>() -> TypeName {

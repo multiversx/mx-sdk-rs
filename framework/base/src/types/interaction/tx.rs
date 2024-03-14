@@ -15,7 +15,7 @@ use super::{
     DeployCall, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
     RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
     TxDataFunctionCall, TxEnv, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas, TxPayment,
-    TxPaymentEgldOnly, TxProxyTrait, TxProxyTraitV2, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -473,36 +473,11 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn typed_v1<Proxy, Payment, Data, RH, F>(
-        self,
-        proxy: Proxy,
-        f: F,
-    ) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    pub fn typed<Proxy>(self, proxy: Proxy) -> Proxy::TxProxyMethods
     where
-        Proxy: TxProxyTrait<Env>,
-        Payment: TxPayment<Env>,
-        Data: TxData<Env>,
-        RH: TxResultHandler<Env>,
-        F: FnOnce(Proxy::TxProxyMethods) -> Tx<Env, (), (), Payment, (), Data, RH>,
+        Proxy: TxProxyTrait<Env, From, To, Gas>,
     {
-        let proxy_methods = proxy.env(self.env);
-        let proxy_tx = f(proxy_methods);
-        Tx {
-            env: proxy_tx.env,
-            from: self.from,
-            to: self.to,
-            payment: proxy_tx.payment,
-            gas: self.gas,
-            data: proxy_tx.data,
-            result_handler: proxy_tx.result_handler,
-        }
-    }
-
-    pub fn typed_v2<Proxy>(self, proxy: Proxy) -> Proxy::TxProxyMethods
-    where
-        Proxy: TxProxyTraitV2<Env, From, To, Gas>,
-    {
-        proxy.prepare_methods(self)
+        proxy.proxy_methods(self)
     }
 }
 
@@ -568,6 +543,7 @@ where
     FC: TxDataFunctionCall<Env>,
     RH: TxResultHandler<Env>,
 {
+    #[allow(clippy::type_complexity)]
     pub fn normalize_tx(
         self,
     ) -> Tx<

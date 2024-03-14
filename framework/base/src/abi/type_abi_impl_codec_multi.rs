@@ -1,3 +1,5 @@
+use alloc::format;
+
 use crate::{
     abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
     codec::multi_types::{IgnoreValue, OptionalValue},
@@ -7,6 +9,10 @@ use crate::{
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     fn type_name() -> TypeName {
         super::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("MultiValueVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -23,6 +29,10 @@ impl TypeAbi for IgnoreValue {
         TypeName::from("ignore")
     }
 
+    fn type_name_rust() -> TypeName {
+        "IgnoreValue".into()
+    }
+
     fn is_variadic() -> bool {
         true
     }
@@ -31,6 +41,10 @@ impl TypeAbi for IgnoreValue {
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     fn type_name() -> TypeName {
         super::type_name_optional::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("OptionalValue<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

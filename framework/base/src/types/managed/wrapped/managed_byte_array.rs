@@ -1,5 +1,7 @@
 use core::convert::TryFrom;
 
+use alloc::format;
+
 use crate::{
     abi::{TypeAbi, TypeName},
     api::ManagedTypeApi,
@@ -210,6 +212,10 @@ where
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> TypeName {
         <&[u8; N] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ManagedByteArray<$API, {N}usize>")
     }
 }
 

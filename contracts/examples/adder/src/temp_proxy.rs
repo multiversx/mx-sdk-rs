@@ -1,73 +1,85 @@
+////////////////////////////////////////////////////
+////////////////// AUTO-GENERATED //////////////////
+////////////////////////////////////////////////////
+
 #![allow(clippy::all)]
 
-use multiversx_sc::api::VMApi;
+use multiversx_sc::imports::*;
 
-multiversx_sc::imports!();
+pub struct AdderProxy;
 
-pub struct TxProxy;
-
-impl<Env> TxProxyTrait<Env> for TxProxy
+impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for AdderProxy
 where
     Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
 {
-    type TxProxyMethods = TxProxyMethods<Env>;
+    type TxProxyMethods = AdderProxyMethods<Env, From, To, Gas>;
 
-    fn env(self, env: Env) -> Self::TxProxyMethods {
-        TxProxyMethods { env }
+    fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
+        AdderProxyMethods { wrapped_tx: tx }
     }
 }
 
-pub struct TxProxyMethods<Env: TxEnv> {
-    pub env: Env,
+pub struct AdderProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
+    wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
-impl<Env> TxProxyMethods<Env>
+impl<Env, From, Gas> AdderProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
+    From: TxFrom<Env>,
+    Gas: TxGas<Env>,
 {
-    pub fn init<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
+    pub fn init<Arg0: CodecInto<BigUint<Env::Api>>>(
         self,
         initial_value: Arg0,
-    ) -> multiversx_sc::types::Tx<Env, (), (), (), (), DeployCall<Env, ()>, OriginalResultMarker<()>>
-    {
-        Tx::new_with_env(self.env)
+    ) -> Tx<Env, From, (), (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>> {
+        self.wrapped_tx
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
-
+}
+impl<Env, From, To, Gas> AdderProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    Env::Api: VMApi,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
     pub fn sum(
         self,
-    ) -> multiversx_sc::types::Tx<
+    ) -> Tx<
         Env,
+        From,
+        To,
         (),
-        (),
-        (),
-        (),
+        Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<SingleValueMapper<Env::Api, multiversx_sc::types::BigUint<Env::Api>>>,
+        OriginalResultMarker<multiversx_sc::types::BigUint<Env::Api>>,
     > {
-        Tx::new_with_env(self.env)
+        self.wrapped_tx
             .raw_call()
             .function_name("getSum")
             .original_result()
     }
 
-    //Add desired amount to the storage variable.
-    pub fn add<Arg0: multiversx_sc::codec::CodecInto<BigUint<Env::Api>>>(
+    /// Add desired amount to the storage variable.
+    pub fn add<Arg0: CodecInto<BigUint<Env::Api>>>(
         self,
         value: Arg0,
-    ) -> multiversx_sc::types::Tx<
-        Env,
-        (),
-        (),
-        (),
-        (),
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
-        Tx::new_with_env(self.env)
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<()>> {
+        self.wrapped_tx
             .raw_call()
             .function_name("add")
             .argument(&value)

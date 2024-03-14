@@ -43,11 +43,11 @@ pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 pub mod imports {
     pub use crate::{
         abi::TypeAbi,
-        api::{ErrorApiImpl, ManagedTypeApi},
+        api::{ErrorApiImpl, ManagedTypeApi, VMApi},
         arrayvec::ArrayVec,
         codec::{
-            multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-            TopEncode,
+            multi_types::*, CodecFrom, CodecFromSelf, CodecInto, DecodeError, IntoMultiValue,
+            NestedDecode, NestedEncode, TopDecode, TopEncode,
         },
         contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
         err_msg,

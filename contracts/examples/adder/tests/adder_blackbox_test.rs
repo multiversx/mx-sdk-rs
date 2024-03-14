@@ -33,7 +33,7 @@ fn adder_blackbox() {
     world
         .tx()
         .from(OWNER)
-        .typed_v2(temp_proxy_v2::TxProxy)
+        .typed(temp_proxy::AdderProxy)
         .init(5u32)
         .code(CODE_EXPR)
         .with_result(WithResultNewAddress::new(|new_address| {
@@ -44,28 +44,17 @@ fn adder_blackbox() {
     let value = world
         .query()
         .to(SC_ADDER)
-        .typed_v2(temp_proxy_v2::TxProxy)
+        .typed(temp_proxy::AdderProxy)
         .sum()
         .returns(ReturnsSimilar::<BigUint>::new())
         .run();
     assert_eq!(value, BigUint::from(5u32));
 
-    // TODO: remove
     world
         .tx()
         .from(OWNER)
         .to(SC_ADDER)
-        .typed_v1(temp_proxy::TxProxy, |p| p.add(2u32))
-        .with_result(WithRawTxResponse(|response| {
-            assert!(response.tx_error.is_success());
-        }))
-        .run();
-
-    world
-        .tx()
-        .from(OWNER)
-        .to(SC_ADDER)
-        .typed_v2(temp_proxy_v2::TxProxy)
+        .typed(temp_proxy::AdderProxy)
         .add(1u32)
         .with_result(WithRawTxResponse(|response| {
             assert!(response.tx_error.is_success());
@@ -77,7 +66,7 @@ fn adder_blackbox() {
             .put_account(owner_address, CheckAccount::new())
             .put_account(
                 &adder_contract,
-                CheckAccount::new().check_storage("str:sum", "8"),
+                CheckAccount::new().check_storage("str:sum", "6"),
             ),
     );
 

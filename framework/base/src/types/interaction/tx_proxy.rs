@@ -1,12 +1,7 @@
 use super::{Tx, TxEnv, TxFrom, TxGas, TxTo};
 
-pub trait TxProxyTrait<Env> {
-    type TxProxyMethods;
-
-    fn env(self, env: Env) -> Self::TxProxyMethods;
-}
-
-pub trait TxProxyTraitV2<Env, From, To, Gas>
+/// Defines a proxy object for a smart contract.
+pub trait TxProxyTrait<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -15,5 +10,6 @@ where
 {
     type TxProxyMethods;
 
-    fn prepare_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods;
+    /// Creates the associated type that contains the proxy methods implementations.
+    fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods;
 }

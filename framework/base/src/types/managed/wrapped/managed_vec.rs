@@ -12,7 +12,7 @@ use crate::{
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
-use alloc::vec::Vec;
+use alloc::{format, vec::Vec};
 use core::{
     borrow::Borrow,
     cmp::Ordering,
@@ -686,6 +686,10 @@ where
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

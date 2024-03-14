@@ -142,6 +142,10 @@ where
         crate::abi::type_name_variadic::<ManagedBuffer<Api>>()
     }
 
+    fn type_name_rust() -> TypeName {
+        "FunctionCall<$API>".into()
+    }
+
     fn is_variadic() -> bool {
         true
     }
