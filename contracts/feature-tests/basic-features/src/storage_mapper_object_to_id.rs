@@ -10,6 +10,14 @@ pub trait ObjectToIdMapperFeatures {
     }
 
     #[endpoint]
+    fn object_to_id_mapper_get_id_non_zero(
+        &self,
+        object: ExampleStructManaged<Self::Api>,
+    ) -> AddressId {
+        self.object_ids().get_id_non_zero(&object)
+    }
+
+    #[endpoint]
     fn object_to_id_mapper_get_object(
         &self,
         object_id: ObjectId,

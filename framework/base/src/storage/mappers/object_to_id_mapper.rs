@@ -16,6 +16,7 @@ use super::{
 
 static ID_SUFFIX: &[u8] = b"id";
 static OBJECT_SUFFIX: &[u8] = b"object";
+static UNKNOW_OBJECT_ERR_MSG: &[u8] = b"Unknown object";
 static LAST_ID_SUFFIX: &[u8] = b"lastId";
 
 pub type ObjectId = u64;
@@ -66,6 +67,17 @@ where
     {
         let key = self.object_to_id_key(object);
         self.address.address_storage_get(key.as_ref())
+    }
+
+    pub fn get_id_non_zero<BT>(&self, object: BT) -> ObjectId
+    where
+        BT: Borrow<T>,
+    {
+        let id = self.get_id(object);
+        if id == NULL_ID {
+            SA::error_api_impl().signal_error(UNKNOW_OBJECT_ERR_MSG);
+        }
+        id
     }
 
     pub fn get_object(&self, id: ObjectId) -> Option<T> {
@@ -131,7 +143,7 @@ where
     {
         let existing_id = self.get_id(object.borrow());
         if existing_id != NULL_ID {
-            SA::error_api_impl().signal_error(b"Object already registered");
+            SA::error_api_impl().signal_error(b"Object already exists");
         }
 
         self.insert_object(object)
