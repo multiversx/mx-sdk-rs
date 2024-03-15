@@ -27,7 +27,10 @@ They are:
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
 
-## [sc 0.47.6] - 2024-03-15
+## [sc 0.47.7] - 2024-03-15
+- Template bugfix (concerning the interactor).
+
+## [sc 0.47.6] - 2024-03-14
 - Template naming bugfix, regarding numbers in the project name.
 - Added the interactor to the adder template.
 

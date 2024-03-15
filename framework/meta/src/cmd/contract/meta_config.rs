@@ -205,7 +205,7 @@ overflow-checks = false
 path = \"..\"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = \"0.47.6\"
+version = \"0.47.7\"
 path = \"../../../../framework/wasm-adapter\"
 
 [workspace]
@@ -218,7 +218,7 @@ members = [\".\"]
             name: "test".to_string(),
             edition: "2021".to_string(),
             profile: ContractVariantProfile::default(),
-            framework_version: "0.47.6".to_string(),
+            framework_version: "0.47.7".to_string(),
             framework_path: Option::Some("../../../framework/base".to_string()),
             contract_features: Vec::<String>::new(),
         };
