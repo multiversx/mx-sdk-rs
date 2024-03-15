@@ -14,6 +14,7 @@ const INTERACT_DIRECTORY: &str = "./interact";
 const ROOT_CARGO_TOML: &str = "./Cargo.toml";
 const META_CARGO_TOML: &str = "./meta/Cargo.toml";
 const WASM_CARGO_TOML: &str = "./wasm/Cargo.toml";
+const INTERACT_CARGO_TOML: &str = "./interact/Cargo.toml";
 
 pub struct TemplateAdjuster {
     pub metadata: TemplateMetadata,
@@ -25,6 +26,7 @@ impl TemplateAdjuster {
         self.update_dependencies_root();
         self.update_dependencies_meta();
         self.update_dependencies_wasm(args_tag);
+        self.update_dependencies_interact();
     }
 
     fn update_dependencies_root(&self) {
@@ -61,6 +63,21 @@ impl TemplateAdjuster {
         }
 
         let cargo_toml_path = self.target.contract_dir().join(WASM_CARGO_TOML);
+        let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
+
+        if !self.keep_paths {
+            remove_paths_from_deps(&mut toml, &[&self.metadata.name]);
+        }
+
+        toml.save_to_file(&cargo_toml_path);
+    }
+
+    fn update_dependencies_interact(&self) {
+        if !self.metadata.has_interactor {
+            return;
+        }
+
+        let cargo_toml_path = self.target.contract_dir().join(INTERACT_CARGO_TOML);
         let mut toml = CargoTomlContents::load_from_file(&cargo_toml_path);
 
         if !self.keep_paths {

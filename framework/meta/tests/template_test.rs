@@ -98,6 +98,8 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
 fn template_released_adder() {
     template_test_released("adder", "released-adder");
+
+    cargo_check_interactor("", "released-adder");
 }
 
 #[test]
