@@ -1,6 +1,7 @@
 #![no_std]
 
 use multiversx_sc::{derive_imports::*, imports::*};
+pub mod temp_proxy;
 
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
