@@ -1,4 +1,4 @@
-use core::{borrow::Borrow, mem::MaybeUninit};
+use core::borrow::Borrow;
 
 use crate::{
     api::ManagedTypeApi,
@@ -8,6 +8,8 @@ use crate::{
     },
 };
 
+use super::Payload;
+
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
 /// in the underlying managed buffer.
@@ -15,7 +17,10 @@ use crate::{
 /// the payload is just the handle, whereas the mai ndata is kept by the VM.
 pub trait ManagedVecItem: 'static {
     /// Size of the data stored in the underlying `ManagedBuffer`.
-    const PAYLOAD_SIZE: usize;
+    // const PAYLOAD_SIZE: usize;
+    type PayloadContent: Payload;
+
+    fn payload_content(self) -> Self::PayloadContent;
 
     /// If true, then the encoding of the item is identical to the payload,
     /// and no further conversion is necessary
@@ -124,6 +129,7 @@ impl ManagedVecItem for bool {
     }
 }
 
+// initial impl
 impl<T> ManagedVecItem for Option<T>
 where
     [(); 1 + T::PAYLOAD_SIZE]:,
@@ -221,50 +227,6 @@ where
             &self.get_handle(),
             writer,
         )
-    }
-}
-
-impl<T, const N: usize> ManagedVecItem for [T; N]
-where
-    [(); T::PAYLOAD_SIZE * N]:,
-    T: ManagedVecItem,
-{
-    const PAYLOAD_SIZE: usize = T::PAYLOAD_SIZE * N;
-    const SKIPS_RESERIALIZATION: bool = T::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
-        reader(&mut byte_arr[..]);
-        let mut result: [T; N] = unsafe { MaybeUninit::zeroed().assume_init() };
-        let mut from_index = 0;
-        for item in result.iter_mut() {
-            let to_index = from_index + T::PAYLOAD_SIZE;
-            *item = T::from_byte_reader(|bytes| {
-                bytes.copy_from_slice(&byte_arr[from_index..to_index]);
-            });
-            from_index = to_index;
-        }
-        result
-    }
-
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
-    }
-
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-        let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
-        let mut from_index = 0;
-        for item in self {
-            let to_index = from_index + T::PAYLOAD_SIZE;
-            item.to_byte_writer(|bytes| {
-                byte_arr[from_index..to_index].copy_from_slice(bytes);
-            });
-            from_index = to_index;
-        }
-        writer(&byte_arr[..])
     }
 }
 

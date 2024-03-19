@@ -17,6 +17,7 @@ mod managed_vec_ref_iter;
 pub(crate) mod preloaded_managed_buffer;
 mod randomness_source;
 mod token_identifier;
+mod payload_data;
 
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
@@ -37,3 +38,4 @@ pub use managed_vec_ref::ManagedVecRef;
 pub use managed_vec_ref_iter::ManagedVecRefIterator;
 pub use randomness_source::RandomnessSource;
 pub use token_identifier::TokenIdentifier;
+pub use payload_data::*;
