@@ -122,6 +122,10 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                 #name_str.into()
             }
 
+            fn type_name_rust() -> multiversx_sc::abi::TypeName {
+                #name_str.into()
+            }
+
             #type_description_impl
         }
     };
