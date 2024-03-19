@@ -48,7 +48,18 @@ pub fn proxy(
 
 #[proc_macro_derive(TypeAbi)]
 pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ast = syn::parse(input).unwrap();
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
+    for a in ast.clone().attrs {
+        match &a.meta {
+            syn::Meta::Path(_path) => {},
+            syn::Meta::List(list) => {
+                for token in <proc_macro2::TokenStream as Clone>::clone(&list.tokens).into_iter() {
+                    println!(">>>{}", token.to_string());
+                }
+            },
+            syn::Meta::NameValue(_name_value) => {},
+        }
+    }
     type_abi_derive::type_abi_derive(&ast)
 }
 
