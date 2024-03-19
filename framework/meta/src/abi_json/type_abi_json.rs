@@ -87,6 +87,7 @@ impl TypeDescriptionJson {
                 ),
                 _ => TypeContents::NotSpecified,
             },
+            macro_attributes: Vec::new()
         }
     }
 }

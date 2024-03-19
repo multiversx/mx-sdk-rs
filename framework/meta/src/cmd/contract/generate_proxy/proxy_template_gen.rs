@@ -80,6 +80,7 @@ where
 }
 
 fn write_enum(file: &mut File, type_description: &TypeDescription) {
+    write_macro_attributes(file, &type_description.macro_attributes);
     writeln!(file, r#"pub enum {} {{"#, type_description.names.abi).unwrap();
 
     for content in type_description.contents.extract_names() {
@@ -88,4 +89,18 @@ fn write_enum(file: &mut File, type_description: &TypeDescription) {
 
     writeln!(file, "}}").unwrap();
     write_newline(file);
+}
+
+fn write_macro_attributes(file: &mut File, macro_attributes: &[String]) {
+    writeln!(file, "#[derive(TypeAbi)]").unwrap();
+    if !macro_attributes.is_empty() {
+        write!(file, "#[derive(").unwrap();
+    }
+
+    let attributes = macro_attributes.join("").replace(',', ", ");
+    write!(file, "{attributes}").unwrap();
+
+    if !macro_attributes.is_empty() {
+        writeln!(file, ")]").unwrap();
+    }
 }

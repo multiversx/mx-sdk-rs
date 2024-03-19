@@ -45,6 +45,20 @@ pub fn extract_doc(attrs: &[syn::Attribute]) -> Vec<String> {
         .collect()
 }
 
+pub fn extract_macro_attributes(attrs: &[syn::Attribute]) -> Vec<String> {
+    let mut macro_attributes = Vec::new();
+
+    for a in attrs {
+        if let syn::Meta::List(list) = &a.meta {
+            for token in list.tokens.clone().into_iter() {
+                macro_attributes.push(token.to_string());
+            }
+        }
+    }
+
+    macro_attributes
+}
+
 fn remove_backslashes(input: &str) -> String {
     input
         .trim_matches('\"')

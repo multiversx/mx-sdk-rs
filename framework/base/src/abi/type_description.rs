@@ -10,6 +10,7 @@ pub struct TypeDescription {
     pub docs: Vec<String>,
     pub names: TypeNames,
     pub contents: TypeContents,
+    pub macro_attributes: Vec<String>,
 }
 
 impl TypeDescription {
@@ -24,16 +25,23 @@ impl TypeDescription {
             rust: String::new(),
         },
         contents: TypeContents::NotSpecified,
+        macro_attributes: Vec::new(),
     };
 }
 
 impl TypeDescription {
     /// Used in code generation.
-    pub fn new(docs: &[&str], names: TypeNames, contents: TypeContents) -> Self {
+    pub fn new(
+        docs: &[&str],
+        names: TypeNames,
+        contents: TypeContents,
+        macro_attributes: &[&str],
+    ) -> Self {
         TypeDescription {
             docs: docs.iter().map(|s| s.to_string()).collect(),
             names,
             contents,
+            macro_attributes: macro_attributes.iter().map(|s| s.to_string()).collect(),
         }
     }
 }
@@ -55,7 +63,7 @@ impl TypeContents {
         let mut names = Vec::new();
         match &self {
             TypeContents::Enum(enum_variants) => {
-                for enum_variant in enum_variants.into_iter() {
+                for enum_variant in enum_variants {
                     names.push(enum_variant.name.clone());
                 }
             },

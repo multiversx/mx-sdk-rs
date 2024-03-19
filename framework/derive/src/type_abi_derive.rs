@@ -1,3 +1,5 @@
+use crate::parse::attributes::extract_macro_attributes;
+
 use super::parse::attributes::extract_doc;
 use proc_macro::TokenStream;
 use quote::quote;
@@ -45,6 +47,8 @@ fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
 
 pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let type_docs = extract_doc(ast.attrs.as_slice());
+    let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
+
     let type_description_impl = match &ast.data {
         syn::Data::Struct(data_struct) => {
             let struct_field_snippets = fields_snippets(&data_struct.fields);
@@ -61,6 +65,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                                 &[ #(#type_docs),* ],
                                 type_names,
                                 multiversx_sc::abi::TypeContents::Struct(field_descriptions),
+                                &[ #(#macro_attributes),* ],
                             ),
                         );
                     }
@@ -104,6 +109,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                                 &[ #(#type_docs),* ],
                                 type_names,
                                 multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
+                                &[ #(#macro_attributes),* ],
                             ),
                         );
                     }
