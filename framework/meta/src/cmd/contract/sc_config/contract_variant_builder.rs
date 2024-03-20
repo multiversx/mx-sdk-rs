@@ -263,7 +263,7 @@ impl ScConfig {
             .iter()
             .map(ContractVariantBuilder::map_from_config)
             .collect();
-        Self::collect_and_process_endpoints(
+        collect_and_process_endpoints(
             &mut contract_builders,
             original_abi,
             &config.labels_for_contracts,
@@ -276,8 +276,8 @@ impl ScConfig {
         if contracts.is_empty() {
             contracts.push(ContractVariant::default_from_abi(original_abi));
         }
-        Self::validate_contracts(&mut contracts, &config.settings.main);
-
+        set_main_contract_flag(&mut contracts, &config.settings.main);
+        validate_contract_variants(&contracts);
         let default_contract_config_name = config.settings.main.clone().unwrap_or_default();
         ScConfig {
             default_contract_config_name,
@@ -285,26 +285,20 @@ impl ScConfig {
             proxy_paths: config.settings.proxy_paths.clone(),
         }
     }
+}
 
-    fn validate_contracts(
-        contracts: &mut [ContractVariant],
-        default_config_name_opt: &Option<String>,
-    ) {
-        set_main_contract_flag(contracts, default_config_name_opt);
-        validate_contract_variants(contracts);
-    }
+fn collect_and_process_endpoints(
+    contract_builders: &mut HashMap<String, ContractVariantBuilder>,
+    original_abi: &ContractAbi,
+    labels_for_contracts: &HashMap<String, Vec<String>>,
+) {
+    collect_unlabelled_endpoints(contract_builders, original_abi);
+    collect_labelled_endpoints(contract_builders, original_abi);
+    collect_add_endpoints(contract_builders, original_abi);
+    process_labels_for_contracts(contract_builders, labels_for_contracts);
+}
 
-    fn collect_and_process_endpoints(
-        contract_builders: &mut HashMap<String, ContractVariantBuilder>,
-        original_abi: &ContractAbi,
-        labels_for_contracts: &HashMap<String, Vec<String>>,
-    ) {
-        collect_unlabelled_endpoints(contract_builders, original_abi);
-        collect_labelled_endpoints(contract_builders, original_abi);
-        collect_add_endpoints(contract_builders, original_abi);
-        process_labels_for_contracts(contract_builders, labels_for_contracts);
-    }
-
+impl ScConfig {
     /// Provides the config for the cases where no `multicontract.toml` file is available.
     ///
     /// The default configuration contains a single main contract, with all endpoints.
