@@ -15,6 +15,8 @@ const IMPORTS: &str = "#![allow(clippy::all)]
 
 use multiversx_sc::imports::*;";
 
+const DERIVE_IMPORTS: &str = "use multiversx_sc::derive_imports::*;";
+
 pub(crate) fn write_header(file: &mut File) {
     writeln!(file, "{PREFIX_AUTO_GENERATED}").unwrap();
     writeln!(file, r#"{IMPORTS}"#).unwrap();
@@ -80,6 +82,7 @@ where
 }
 
 fn write_enum(file: &mut File, type_description: &TypeDescription) {
+    write_derive_imports(file);
     write_macro_attributes(file, &type_description.macro_attributes);
     writeln!(file, r#"pub enum {} {{"#, type_description.names.abi).unwrap();
 
@@ -103,4 +106,9 @@ fn write_macro_attributes(file: &mut File, macro_attributes: &[String]) {
     if !macro_attributes.is_empty() {
         writeln!(file, ")]").unwrap();
     }
+}
+
+fn write_derive_imports(file: &mut File) {
+    writeln!(file, "{DERIVE_IMPORTS}").unwrap();
+    write_newline(file);
 }
