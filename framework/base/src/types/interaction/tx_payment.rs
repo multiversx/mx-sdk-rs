@@ -1,6 +1,8 @@
 use crate::{
     api::ManagedTypeApi,
     contract_base::SendRawWrapper,
+    formatter::FormatBuffer,
+    imports::{BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
     types::{
         EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment, EsdtTokenPayment,
         ManagedAddress, MultiEsdtPayment,
@@ -17,6 +19,50 @@ where
     pub to: ManagedAddress<Api>,
     pub egld_payment: EgldPayment<Api>,
     pub fc: FunctionCall<Api>,
+}
+
+#[derive(Clone)]
+pub struct AnnotatedEgldPayment<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub value: BigUint<Api>,
+    pub annotation: ManagedBuffer<Api>,
+}
+
+impl<Api> AnnotatedEgldPayment<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub fn new_egld(value: BigUint<Api>) -> Self {
+        let mut annotation = ManagedBufferCachedBuilder::default();
+        annotation.append_display(&value);
+        AnnotatedEgldPayment {
+            value,
+            annotation: annotation.into_managed_buffer(),
+        }
+    }
+}
+
+#[derive(Clone)]
+pub struct FullPaymentData<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub egld: Option<AnnotatedEgldPayment<Api>>,
+    pub multi_esdt: MultiEsdtPayment<Api>,
+}
+
+impl<Api> Default for FullPaymentData<Api>
+where
+    Api: ManagedTypeApi,
+{
+    fn default() -> Self {
+        Self {
+            egld: None,
+            multi_esdt: Default::default(),
+        }
+    }
 }
 
 /// Describes a payment that is part of a transaction.
@@ -44,6 +90,8 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     );
+
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api>;
 }
 
 /// Marks a payment object that only contains EGLD or nothing at all.
@@ -87,6 +135,10 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         EgldPayment::no_payment().perform_transfer_execute(env, to, gas_limit, fc);
+    }
+
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+        FullPaymentData::default()
     }
 }
 
@@ -139,6 +191,13 @@ where
             &fc.arg_buffer,
         );
     }
+
+    fn into_full_payment_data(self) -> FullPaymentData<<Env as TxEnv>::Api> {
+        FullPaymentData {
+            egld: Some(AnnotatedEgldPayment::new_egld(self.value)),
+            multi_esdt: ManagedVec::new(),
+        }
+    }
 }
 
 impl<Env> TxPaymentEgldOnly<Env> for EgldPayment<Env::Api>
@@ -184,6 +243,13 @@ where
     ) {
         MultiEsdtPayment::from_single_item(self).perform_transfer_execute(env, to, gas_limit, fc);
     }
+
+    fn into_full_payment_data(self) -> FullPaymentData<<Env as TxEnv>::Api> {
+        FullPaymentData {
+            egld: None,
+            multi_esdt: MultiEsdtPayment::from_single_item(self),
+        }
+    }
 }
 
 impl<Env> TxPayment<Env> for MultiEsdtPayment<Env::Api>
@@ -226,6 +292,13 @@ where
             &fc.arg_buffer,
         );
     }
+
+    fn into_full_payment_data(self) -> FullPaymentData<<Env as TxEnv>::Api> {
+        FullPaymentData {
+            egld: None,
+            multi_esdt: self,
+        }
+    }
 }
 
 impl<Env> TxPayment<Env> for EgldOrEsdtTokenPayment<Env::Api>
@@ -266,6 +339,14 @@ where
                 EgldPayment::from(amount).perform_transfer_execute(env, to, gas_limit, fc)
             },
             |(to, fc), esdt_payment| esdt_payment.perform_transfer_execute(env, to, gas_limit, fc),
+        )
+    }
+
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+        self.map_egld_or_esdt(
+            (),
+            |(), amount| TxPayment::<Env>::into_full_payment_data(EgldPayment::from(amount)),
+            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment),
         )
     }
 }
@@ -311,6 +392,17 @@ where
             },
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.perform_transfer_execute(env, to, gas_limit, fc)
+            },
+        }
+    }
+
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+        match self {
+            EgldOrMultiEsdtPayment::Egld(egld_amount) => {
+                TxPayment::<Env>::into_full_payment_data(EgldPayment::from(egld_amount))
+            },
+            EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
+                TxPayment::<Env>::into_full_payment_data(multi_esdt_payment)
             },
         }
     }

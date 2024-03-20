@@ -13,7 +13,7 @@ use multiversx_sc::{
 use crate::{
     api::StaticApi,
     scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
-    ScenarioEnvExec, ScenarioTxEnv, ScenarioTxRun, ScenarioTxRunOnWorld, ScenarioWorld,
+    ScenarioEnvExec, ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
 use super::{scenario_env_util::*, RHListScenario, ScenarioTxEnvData};

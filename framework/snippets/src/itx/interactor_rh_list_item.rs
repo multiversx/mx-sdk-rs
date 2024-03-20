@@ -1,17 +1,14 @@
-use multiversx_sc::{
-    codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
-    types::{
-        ManagedAddress, RHList, RHListItem, ReturnsExact, ReturnsNewAddress, ReturnsSimilar, TxEnv,
-        WithResultNewAddress, WithResultSimilar,
-    },
-};
-
-use crate::{
+use multiversx_sc_scenario::{
     api::StaticApi,
+    multiversx_sc::{
+        codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
+        types::{
+            ManagedAddress, RHList, RHListItem, ReturnsExact, ReturnsSimilar, TxEnv,
+            WithResultNewAddress, WithResultSimilar,
+        },
+    },
     scenario_model::{TxResponse, TypedResponse},
 };
-
-use super::ScenarioTxEnvData;
 
 pub trait RHListItemScenario<Env, Original>: RHListItem<Env, Original>
 where
@@ -60,20 +57,6 @@ where
             .result
             .expect("ReturnsExact expects that transaction is successful");
         (self.f)(value);
-    }
-}
-
-impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsNewAddress
-where
-    Env: TxEnv,
-{
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
-        let new_address = tx_response
-            .new_deployed_address
-            .clone()
-            .expect("missing returned address");
-
-        new_address.into()
     }
 }
 

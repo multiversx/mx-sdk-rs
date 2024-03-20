@@ -1,3 +1,5 @@
+use multiversx_sc::types::{AnnotatedValue, ManagedBuffer, TxCodeValue, TxEnv};
+
 use crate::scenario_format::{
     interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
     serde_raw::ValueSubTree,
@@ -134,3 +136,33 @@ impl fmt::Display for BytesValue {
         self.original.fmt(f)
     }
 }
+
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for BytesValue
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<<Env as TxEnv>::Api> {
+        self.original.to_concatenated_string().into()
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        self.value.into()
+    }
+}
+
+impl<Env> TxCodeValue<Env> for BytesValue where Env: TxEnv {}
+
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for &BytesValue
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<<Env as TxEnv>::Api> {
+        self.original.to_concatenated_string().into()
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        self.value.clone().into()
+    }
+}
+
+impl<Env> TxCodeValue<Env> for &BytesValue where Env: TxEnv {}
