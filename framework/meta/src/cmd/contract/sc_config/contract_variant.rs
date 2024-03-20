@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use super::ContractVariantSettings;
+use super::{contract_variant_builder::default_wasm_crate_name, ContractVariantSettings};
 use crate::cli_args::BuildArgs;
 use multiversx_sc::abi::ContractAbi;
 
@@ -35,6 +35,19 @@ pub struct ContractVariant {
 }
 
 impl ContractVariant {
+    pub fn default_from_abi(abi: &ContractAbi) -> Self {
+        let default_contract_config_name = abi.build_info.contract_crate.name.to_string();
+        let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
+        ContractVariant {
+            main: true,
+            settings: ContractVariantSettings::default(),
+            contract_id: default_contract_config_name.clone(),
+            contract_name: default_contract_config_name,
+            wasm_crate_name,
+            abi: abi.clone(),
+        }
+    }
+
     pub fn public_name_snake_case(&self) -> String {
         self.contract_name.replace('-', "_")
     }

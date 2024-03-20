@@ -2,7 +2,7 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
-use adder::{temp_proxy, ProxyTrait};
+use adder::{adder_proxy, ProxyTrait};
 use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
@@ -102,7 +102,7 @@ impl AdderInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .typed(temp_proxy::AdderProxy)
+            .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(&self.adder_code)
             .with_result(WithRawTxResponse(|response| {
@@ -181,7 +181,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.adder().to_address())
-            .typed(temp_proxy::AdderProxy)
+            .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
             .run()
@@ -195,7 +195,7 @@ impl AdderInteract {
             .interactor
             .query()
             .to(self.state.adder().to_address())
-            .typed(temp_proxy::AdderProxy)
+            .typed(adder_proxy::AdderProxy)
             .sum()
             .returns(ReturnsSimilar::<BigUint>::new())
             .prepare_async()
