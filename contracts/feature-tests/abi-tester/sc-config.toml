@@ -1,6 +1,7 @@
 # Abi-tester multi-contract config, used for testing.
 
 [settings]
+proxy-paths = ["src/abi_proxy.rs"]
 main = "main"
 
 [contracts.main]
