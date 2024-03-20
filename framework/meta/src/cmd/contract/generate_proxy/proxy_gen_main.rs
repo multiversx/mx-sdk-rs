@@ -11,16 +11,13 @@ use super::{
     },
 };
 
-const PROXIES_SOURCE_FILE_NAME: &str = "/output/proxy.rs";
+const OUTPUT_PROXY_PATH: &str = "/output/proxy.rs";
 
 impl MetaConfig {
     pub fn generate_proxy(&self) {
-        if self.sc_config.proxy_paths.is_empty() {
-            write_proxy_with_explicit_path(PROXIES_SOURCE_FILE_NAME, &self.original_contract_abi);
-        } else {
-            for path in &self.sc_config.proxy_paths {
-                write_proxy_with_explicit_path(path, &self.original_contract_abi);
-            }
+        write_proxy_with_explicit_path(OUTPUT_PROXY_PATH, &self.original_contract_abi);
+        for path in &self.sc_config.proxy_paths {
+            write_proxy_with_explicit_path(path, &self.original_contract_abi);
         }
     }
 }
