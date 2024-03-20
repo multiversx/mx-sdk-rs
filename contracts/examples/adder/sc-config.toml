@@ -1,0 +1,4 @@
+[settings]
+proxy-paths = ["src/adder_proxy.rs"]
+
+[contracts.adder]
