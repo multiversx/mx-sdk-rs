@@ -6,22 +6,6 @@
 
 use multiversx_sc::imports::*;
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct Zombie<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub name: ManagedBuffer<Api>,
-    pub dna: u64,
-    pub level: u16,
-    pub ready_time: u64,
-    pub win_count: usize,
-    pub loss_count: usize,
-}
-
 pub struct CryptoZombiesProxy;
 
 impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for CryptoZombiesProxy
@@ -426,3 +410,19 @@ where
     }
 
 }
+use multiversx_sc::derive_imports::*;
+
+#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
+pub struct Zombie<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub name: ManagedBuffer<Api>,
+    pub dna: u64,
+    pub level: u16,
+    pub ready_time: u64,
+    pub win_count: usize,
+    pub loss_count: usize,
+}
+

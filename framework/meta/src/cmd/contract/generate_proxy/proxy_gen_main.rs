@@ -25,9 +25,9 @@ impl MetaConfig {
 
 fn write_proxies_to_file(mut file: File, abi: ContractAbi) {
     write_header(&mut file);
-    write_types(&mut file, &abi.type_descriptions);
     write_struct_template(&mut file, &abi.name);
     write_impl_for_tx_proxy(&mut file, &abi.name);
     write_struct_tx_proxy_methods(&mut file, &abi.name);
-    write_content(&mut file, abi);
+    write_content(&mut file, abi.clone());
+    write_types(&mut file, &abi.type_descriptions);
 }

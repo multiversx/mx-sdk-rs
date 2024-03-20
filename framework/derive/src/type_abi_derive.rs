@@ -191,5 +191,5 @@ fn extract_rust_type(ty_generics: &syn::TypeGenerics<'_>, mut output_name: Strin
     }
 
     output_name.push_str("<$API>");
-    return output_name;
+    output_name
 }
