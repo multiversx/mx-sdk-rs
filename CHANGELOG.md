@@ -26,6 +26,14 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
+## [sc 0.47.7] - 2024-03-15
+- Template bugfix (concerning the interactor).
+
+## [sc 0.47.6] - 2024-03-14
+- Template naming bugfix, regarding numbers in the project name.
+- Added the interactor to the adder template.
+
 ## [sc 0.47.5] - 2024-03-08
 - Fixed an issue with `MapMapper` when reading from another contract.
 - Got rid of nightly feature `maybe_uninit_uninit_array`/`maybe_uninit_array_assume_init`.

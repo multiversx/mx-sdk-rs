@@ -1,10 +1,10 @@
-mod adder_interact_cli;
-mod adder_interact_config;
-mod adder_interact_state;
+mod basic_interact_cli;
+mod basic_interact_config;
+mod basic_interact_state;
 
 use adder::ProxyTrait;
-use adder_interact_config::Config;
-use adder_interact_state::State;
+use basic_interact_config::Config;
+use basic_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
@@ -30,24 +30,24 @@ const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 async fn main() {
     env_logger::init();
 
-    let mut adder_interact = AdderInteract::init().await;
+    let mut basic_interact = AdderInteract::init().await;
 
-    let cli = adder_interact_cli::InteractCli::parse();
+    let cli = basic_interact_cli::InteractCli::parse();
     match &cli.command {
-        Some(adder_interact_cli::InteractCliCommand::Add(args)) => {
-            adder_interact.add(args.value).await;
+        Some(basic_interact_cli::InteractCliCommand::Add(args)) => {
+            basic_interact.add(args.value).await;
         },
-        Some(adder_interact_cli::InteractCliCommand::Deploy) => {
-            adder_interact.deploy().await;
+        Some(basic_interact_cli::InteractCliCommand::Deploy) => {
+            basic_interact.deploy().await;
         },
-        Some(adder_interact_cli::InteractCliCommand::Feed) => {
-            adder_interact.feed_contract_egld().await;
+        Some(basic_interact_cli::InteractCliCommand::Feed) => {
+            basic_interact.feed_contract_egld().await;
         },
-        Some(adder_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
-            adder_interact.multi_deploy(&args.count).await;
+        Some(basic_interact_cli::InteractCliCommand::MultiDeploy(args)) => {
+            basic_interact.multi_deploy(&args.count).await;
         },
-        Some(adder_interact_cli::InteractCliCommand::Sum) => {
-            adder_interact.print_sum().await;
+        Some(basic_interact_cli::InteractCliCommand::Sum) => {
+            basic_interact.print_sum().await;
         },
         None => {},
     }
