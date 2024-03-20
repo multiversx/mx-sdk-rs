@@ -1,13 +1,13 @@
 [package]
-name = "adder-interact"
+name = "basic-interact"
 version = "0.0.0"
 authors = ["Ovidiu Stinga <ovidiu.stinga@multiversx.com>"]
 edition = "2021"
 publish = false
 
 [[bin]]
-name = "adder-interact"
-path = "src/adder_interact.rs"
+name = "basic-interact"
+path = "src/basic_interact.rs"
 
 [dependencies]
 clap = { version = "4.4.7", features = ["derive"] }
@@ -18,5 +18,5 @@ toml = "0.8.6"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.47.5"
+version = "0.47.7"
 path = "../../../../framework/snippets"
