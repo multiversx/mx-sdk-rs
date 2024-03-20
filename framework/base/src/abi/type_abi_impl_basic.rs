@@ -164,7 +164,6 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
         format!("Option<{}>", T::type_name())
     }
 
-    
     fn type_name_rust() -> TypeName {
         format!("Option<{}>", T::type_name_rust())
     }
