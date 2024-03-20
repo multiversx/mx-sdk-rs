@@ -15,9 +15,19 @@ const PROXIES_SOURCE_FILE_NAME: &str = "/output/proxy.rs";
 
 impl MetaConfig {
     pub fn generate_proxy(&self) {
-        let file = create_file(PROXIES_SOURCE_FILE_NAME);
-        write_proxy_to_file(file, &self.original_contract_abi);
+        if self.sc_config.proxy_paths.is_empty() {
+            write_proxy_with_explicit_path(PROXIES_SOURCE_FILE_NAME, &self.original_contract_abi);
+        } else {
+            for path in &self.sc_config.proxy_paths {
+                write_proxy_with_explicit_path(path, &self.original_contract_abi);
+            }
+        }
     }
+}
+
+fn write_proxy_with_explicit_path(path: &str, abi: &ContractAbi) {
+    let file = create_file(path);
+    write_proxy_to_file(file, abi);
 }
 
 fn write_proxy_to_file(mut file: File, abi: &ContractAbi) {

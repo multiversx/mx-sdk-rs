@@ -62,6 +62,9 @@ pub struct ContractVariantSerde {
 #[serde(deny_unknown_fields)]
 pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
+
+    #[serde(rename = "proxy-paths")]
+    pub proxy_paths: Option<Vec<String>>
 }
 
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq)]

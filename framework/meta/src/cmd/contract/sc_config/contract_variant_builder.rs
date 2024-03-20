@@ -276,6 +276,7 @@ impl ScConfig {
         ScConfig {
             default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
             contracts,
+            proxy_paths: config.settings.proxy_paths.clone().unwrap_or_default(),
         }
     }
 
@@ -295,6 +296,7 @@ impl ScConfig {
                 wasm_crate_name,
                 abi: original_abi.clone(),
             }],
+            proxy_paths: Vec::new(),
         }
     }
 

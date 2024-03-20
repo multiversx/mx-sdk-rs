@@ -15,6 +15,7 @@ pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.tom
 pub struct ScConfig {
     pub default_contract_config_name: String,
     pub contracts: Vec<ContractVariant>,
+    pub proxy_paths: Vec<String>
 }
 
 impl ScConfig {
