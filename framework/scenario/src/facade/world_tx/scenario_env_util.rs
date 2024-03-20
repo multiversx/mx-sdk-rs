@@ -10,11 +10,14 @@ use multiversx_sc::{
 
 use crate::{
     api::StaticApi,
-    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep, TxResponse},
+    scenario_model::{
+        AddressValue, BigUintValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep,
+        TransferStep, TxResponse,
+    },
     RHListScenario, ScenarioEnvExec, ScenarioWorld,
 };
 
-pub(super) fn address_annotated<Env, Addr>(env: &Env, from: Addr) -> AddressValue
+pub fn address_annotated<Env, Addr>(env: &Env, from: Addr) -> AddressValue
 where
     Env: TxEnv,
     Addr: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
@@ -26,7 +29,7 @@ where
     }
 }
 
-pub(super) fn code_annotated<Env, CodeValue>(env: &Env, code: Code<CodeValue>) -> BytesValue
+pub fn code_annotated<Env, CodeValue>(env: &Env, code: Code<CodeValue>) -> BytesValue
 where
     Env: TxEnv,
     CodeValue: TxCodeValue<Env>,
@@ -38,11 +41,11 @@ where
     }
 }
 
-pub(super) fn tx_to_sc_call_step<Env, From, To, Payment, Gas>(
+pub fn tx_to_sc_call_step<Env, From, To, Payment, Gas>(
     env: &Env,
     from: From,
     to: To,
-    _payment: Payment,
+    payment: Payment,
     _gas: Gas,
     data: FunctionCall<Env::Api>,
 ) -> ScCallStep
@@ -61,13 +64,18 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
+    let full_payment_data = payment.into_full_payment_data();
+    if let Some(annotated_egld_payment) = full_payment_data.egld {
+        step.tx.egld_value = annotated_egld_payment.into();
+    }
+
     step
 }
 
-pub(super) fn tx_to_sc_deploy_step<Env, From, Payment, Gas, CodeValue>(
+pub fn tx_to_sc_deploy_step<Env, From, Payment, Gas, CodeValue>(
     env: &Env,
     from: From,
-    _payment: Payment,
+    payment: Payment,
     _gas: Gas,
     data: DeployCall<Env, Code<CodeValue>>,
 ) -> ScDeployStep
@@ -85,14 +93,15 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
+    let full_payment_data = payment.into_full_payment_data();
+    if let Some(annotated_egld_payment) = full_payment_data.egld {
+        step.tx.egld_value = annotated_egld_payment.into();
+    }
+
     step
 }
 
-pub(super) fn tx_to_sc_query_step<Env, To>(
-    env: &Env,
-    to: To,
-    data: FunctionCall<Env::Api>,
-) -> ScQueryStep
+pub fn tx_to_sc_query_step<Env, To>(env: &Env, to: To, data: FunctionCall<Env::Api>) -> ScQueryStep
 where
     Env: TxEnv,
     To: TxToSpecified<Env>,
@@ -107,7 +116,33 @@ where
     step
 }
 
-pub(super) fn process_result<Env, RH>(
+pub fn tx_to_transfer_step<Env, From, To, Payment, Gas>(
+    env: &Env,
+    from: From,
+    to: To,
+    payment: Payment,
+    _gas: Gas,
+) -> TransferStep
+where
+    Env: TxEnv,
+    From: TxFromSpecified<Env>,
+    To: TxToSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+{
+    let mut step = TransferStep::new()
+        .from(address_annotated(env, from))
+        .to(address_annotated(env, to));
+
+    let full_payment_data = payment.into_full_payment_data();
+    if let Some(annotated_egld_payment) = full_payment_data.egld {
+        step.tx.egld_value = annotated_egld_payment.into();
+    }
+
+    step
+}
+
+pub fn process_result<Env, RH>(
     response: Option<TxResponse>,
     result_handler: RH,
 ) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
