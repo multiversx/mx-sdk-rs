@@ -200,7 +200,7 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
     }
 }
 
-fn default_wasm_crate_name(contract_name: &str) -> String {
+pub(crate) fn default_wasm_crate_name(contract_name: &str) -> String {
     format!("{contract_name}-wasm")
 }
 
@@ -236,7 +236,7 @@ fn set_main_contract_flag(
         )
     } else {
         let first_contract = contracts.get_mut(0).unwrap_or_else(|| {
-            panic!("Cannot set default contract because no optput contract was specified.")
+            panic!("Cannot set default contract because no output contract was specified.")
         });
         first_contract.main = true;
     }
@@ -263,22 +263,42 @@ impl ScConfig {
             .iter()
             .map(ContractVariantBuilder::map_from_config)
             .collect();
-        collect_unlabelled_endpoints(&mut contract_builders, original_abi);
-        collect_labelled_endpoints(&mut contract_builders, original_abi);
-        collect_add_endpoints(&mut contract_builders, original_abi);
-        process_labels_for_contracts(&mut contract_builders, &config.labels_for_contracts);
+        collect_and_process_endpoints(
+            &mut contract_builders,
+            original_abi,
+            &config.labels_for_contracts,
+        );
+
         let mut contracts: Vec<ContractVariant> = contract_builders
             .into_values()
             .map(|builder| build_contract(builder, original_abi))
             .collect();
+        if contracts.is_empty() {
+            contracts.push(ContractVariant::default_from_abi(original_abi));
+        }
         set_main_contract_flag(&mut contracts, &config.settings.main);
         validate_contract_variants(&contracts);
+        let default_contract_config_name = config.settings.main.clone().unwrap_or_default();
         ScConfig {
-            default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
+            default_contract_config_name,
             contracts,
+            proxy_paths: config.settings.proxy_paths.clone(),
         }
     }
+}
 
+fn collect_and_process_endpoints(
+    contract_builders: &mut HashMap<String, ContractVariantBuilder>,
+    original_abi: &ContractAbi,
+    labels_for_contracts: &HashMap<String, Vec<String>>,
+) {
+    collect_unlabelled_endpoints(contract_builders, original_abi);
+    collect_labelled_endpoints(contract_builders, original_abi);
+    collect_add_endpoints(contract_builders, original_abi);
+    process_labels_for_contracts(contract_builders, labels_for_contracts);
+}
+
+impl ScConfig {
     /// Provides the config for the cases where no `multicontract.toml` file is available.
     ///
     /// The default configuration contains a single main contract, with all endpoints.
@@ -295,6 +315,7 @@ impl ScConfig {
                 wasm_crate_name,
                 abi: original_abi.clone(),
             }],
+            proxy_paths: Vec::new(),
         }
     }
 

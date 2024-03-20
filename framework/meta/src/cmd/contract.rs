@@ -32,9 +32,7 @@ pub fn cli_main<AbiObj: ContractAbiProvider>() {
         ContractCliAction::GenerateSnippets(gs_arg) => {
             meta_config_opt.generate_rust_snippets(&gs_arg)
         },
-        ContractCliAction::GenerateProxies(arg) => {
-            meta_config_opt.generate_rust_proxies_struct(&arg)
-        },
+        ContractCliAction::GenerateProxies => meta_config_opt.generate_proxy(),
     }
 }
 
