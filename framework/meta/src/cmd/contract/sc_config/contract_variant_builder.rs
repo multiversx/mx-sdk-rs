@@ -236,7 +236,7 @@ fn set_main_contract_flag(
         )
     } else {
         let first_contract = contracts.get_mut(0).unwrap_or_else(|| {
-            panic!("Cannot set default contract because no optput contract was specified.")
+            panic!("Cannot set default contract because no output contract was specified.")
         });
         first_contract.main = true;
     }
