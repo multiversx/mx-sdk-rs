@@ -202,7 +202,7 @@ where
 
     /// Set item at index in storage.
     /// Index must be valid (1 <= index <= count).
-    pub fn set(&self, index: usize, item: &T) {
+    pub fn set(&mut self, index: usize, item: &T) {
         if index == 0 || index > self.len() {
             SA::error_api_impl().signal_error(&b"index out of range"[..]);
         }

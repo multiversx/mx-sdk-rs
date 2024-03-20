@@ -15,4 +15,9 @@ files_include = [
     "Cargo.toml",
     "README.md",
     "multiversx.json",
+    "interact/Cargo.toml",
+    "interact/config.toml",
+    "interact/.gitignore",
+    "interact/src",
 ]
+has_interactor = true
