@@ -1,6 +1,4 @@
-use crate::cmd::standalone::test_coverage::{
-    error::TestCoverageError, util::deep_find_files_with_ext,
-};
+use crate::cmd::standalone::test_coverage::error::TestCoverageError;
 use serde::Deserialize;
 use std::process::Command;
 
