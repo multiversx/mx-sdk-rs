@@ -10,7 +10,7 @@ use multiversx_sc::{
 
 use crate::{
     api::StaticApi, scenario_model::TxResponse, RHListScenario, ScenarioTxEnv, ScenarioTxEnvData,
-    ScenarioTxRun, ScenarioTxRunOnWorld, ScenarioWorld,
+    ScenarioTxRun, ScenarioWorld,
 };
 
 use super::scenario_env_util::*;

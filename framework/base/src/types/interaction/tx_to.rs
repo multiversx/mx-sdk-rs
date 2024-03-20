@@ -1,4 +1,4 @@
-use crate::types::ManagedAddress;
+use crate::types::{Address, ManagedAddress};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -37,5 +37,27 @@ where
 {
     fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
         f(self)
+    }
+}
+
+impl<Env> TxTo<Env> for Address where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for Address
+where
+    Env: TxEnv,
+{
+    fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
+        let managed_address = ManagedAddress::from(self);
+        f(&managed_address)
+    }
+}
+
+impl<Env> TxTo<Env> for &Address where Env: TxEnv {}
+impl<Env> TxToSpecified<Env> for &Address
+where
+    Env: TxEnv,
+{
+    fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
+        let managed_address = ManagedAddress::from(*self);
+        f(&managed_address)
     }
 }

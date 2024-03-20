@@ -48,13 +48,3 @@ pub trait ScenarioTxRun {
 
     fn run(self) -> Self::Returns;
 }
-
-/// Provides a method to run scenario steps and txs, which also takes a `ScenarioWorld` argument.
-///
-/// It is used for chaining methods that can't include the reference to the ScenarioWorld in the environment
-/// for reasons imposed by lifetimes/the borrow checker.
-pub trait ScenarioTxRunOnWorld {
-    type Returns;
-
-    fn run_on_world(self, world: &mut ScenarioWorld) -> Self::Returns;
-}

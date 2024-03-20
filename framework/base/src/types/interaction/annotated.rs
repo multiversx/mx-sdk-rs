@@ -1,4 +1,4 @@
-use crate::types::{ManagedAddress, ManagedBuffer};
+use crate::types::{Address, ManagedAddress, ManagedBuffer};
 
 use super::TxEnv;
 
@@ -34,6 +34,32 @@ where
 
     fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         self.clone()
+    }
+}
+
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for Address
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedAddress::from(self).hex_expr()
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
+        self.into()
+    }
+}
+
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &Address
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedAddress::from(*self).hex_expr()
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
+        self.into()
     }
 }
 
