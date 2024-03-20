@@ -1,4 +1,4 @@
-use crate::types::{Address, ManagedAddress, ManagedBuffer};
+use crate::types::{heap::Address, ManagedAddress, ManagedBuffer};
 
 use super::TxEnv;
 

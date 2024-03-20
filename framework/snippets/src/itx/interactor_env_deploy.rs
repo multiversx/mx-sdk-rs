@@ -47,7 +47,6 @@ where
     CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
     RH: RHListScenario<InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
-    <RH::ListReturns as NestedTupleFlatten>::Unpacked: Send,
 {
     type Exec = InteractorDeployStep<'w, RH>;
 
@@ -56,7 +55,7 @@ where
             tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
         InteractorDeployStep {
             world: self.env.world,
-            sc_deploy_step: sc_deploy_step,
+            sc_deploy_step,
             result_handler: self.result_handler,
         }
     }
