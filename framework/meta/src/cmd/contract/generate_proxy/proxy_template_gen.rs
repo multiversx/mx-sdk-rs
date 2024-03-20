@@ -25,9 +25,12 @@ pub(crate) fn write_header(file: &mut File) {
 }
 
 pub(crate) fn write_types(file: &mut File, types: &TypeDescriptionContainerImpl) {
-    for t in types.0.iter() {
-        if matches!(t.1.contents, TypeContents::Enum(_)) {
-            write_enum(file, &t.1);
+    for (_, type_description) in &types.0 {
+        match &type_description.contents {
+            TypeContents::Enum(_) => write_enum(file, type_description),
+            TypeContents::Struct(_) => write_struct(file, type_description),
+            TypeContents::NotSpecified => {},
+            TypeContents::ExplicitEnum(_) => {},
         }
     }
 }
@@ -88,6 +91,35 @@ fn write_enum(file: &mut File, type_description: &TypeDescription) {
 
     for content in type_description.contents.extract_names() {
         writeln!(file, "    {content},").unwrap();
+    }
+
+    writeln!(file, "}}").unwrap();
+    write_newline(file);
+}
+
+fn write_struct(file: &mut File, type_description: &TypeDescription) {
+    let struct_name = type_description.names.rust.replace("$API", "Api");
+
+    write_derive_imports(file);
+    write_macro_attributes(file, &type_description.macro_attributes);
+    writeln!(file, r#"pub struct {}"#, struct_name).unwrap();
+
+    if struct_name.contains("<Api>") {
+        writeln!(
+            file,
+            r#"where
+    Api: ManagedTypeApi,"#
+        )
+        .unwrap();
+    }
+
+    writeln!(file, r#"{{"#).unwrap();
+
+    for content in type_description.contents.extract_names().chunks_exact(2) {
+        let variable_name = &content[0];
+        let variable_type = &content[1].replace("$API", "Api");
+
+        writeln!(file, "    pub {variable_name}: {variable_type},").unwrap();
     }
 
     writeln!(file, "}}").unwrap();

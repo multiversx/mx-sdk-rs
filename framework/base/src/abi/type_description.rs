@@ -67,16 +67,13 @@ impl TypeContents {
                     names.push(enum_variant.name.clone());
                 }
             },
-            TypeContents::Struct(_struct_fields) => {
-                // for struct_field in struct_fields {
-                //     todo!()
-                // }
+            TypeContents::Struct(struct_fields) => {
+                for struct_field in struct_fields {
+                    names.push(struct_field.name.clone());
+                    names.push(struct_field.field_type.clone());
+                }
             },
-            TypeContents::ExplicitEnum(_explicit_enum_variants) => {
-                // for explicit_enum_variant in explicit_enum_variants {
-                //     todo!()
-                // }
-            },
+            TypeContents::ExplicitEnum(_explicit_enum_variants) => {},
             TypeContents::NotSpecified => {},
         }
 

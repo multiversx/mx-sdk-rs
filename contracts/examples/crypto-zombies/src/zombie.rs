@@ -1,6 +1,7 @@
 use multiversx_sc::{derive_imports::*, imports::*};
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<M: ManagedTypeApi> {
     pub name: ManagedBuffer<M>,
     pub dna: u64,

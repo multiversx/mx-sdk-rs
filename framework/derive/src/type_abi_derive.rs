@@ -2,7 +2,7 @@ use crate::parse::attributes::extract_macro_attributes;
 
 use super::parse::attributes::extract_doc;
 use proc_macro::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
@@ -21,7 +21,7 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
         field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
             &[ #(#field_docs),* ],
             #field_name_str,
-            <#field_ty>::type_name(),
+            <#field_ty>::type_name_rust(),
         ));
         <#field_ty>::provide_type_descriptions(accumulator);
     }
@@ -122,6 +122,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let name_rust = extract_rust_type(ty_generics, name_str.clone());
     let type_abi_impl = quote! {
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
             fn type_name() -> multiversx_sc::abi::TypeName {
@@ -129,7 +130,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
             }
 
             fn type_name_rust() -> multiversx_sc::abi::TypeName {
-                #name_str.into()
+                #name_rust.into()
             }
 
             #type_description_impl
@@ -179,4 +180,16 @@ pub fn get_discriminant(
     };
 
     quote! { #next_value}
+}
+
+fn extract_rust_type(ty_generics: &syn::TypeGenerics<'_>, mut output_name: String) -> String {
+    let mut ty_generics_tokens = proc_macro2::TokenStream::new();
+    ty_generics.to_tokens(&mut ty_generics_tokens);
+
+    if ty_generics_tokens.to_string().is_empty() {
+        return output_name;
+    }
+
+    output_name.push_str("<$API>");
+    return output_name;
 }

@@ -9,6 +9,7 @@ mod zombie_attack;
 mod zombie_factory;
 mod zombie_feeding;
 mod zombie_helper;
+pub mod temp_proxy;
 
 #[multiversx_sc::contract]
 pub trait CryptoZombies:
