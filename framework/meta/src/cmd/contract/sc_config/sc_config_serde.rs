@@ -63,8 +63,9 @@ pub struct ContractVariantSerde {
 pub struct MultiContractGeneralSettingsSerde {
     pub main: Option<String>,
 
+    #[serde(default)]
     #[serde(rename = "proxy-paths")]
-    pub proxy_paths: Option<Vec<String>>
+    pub proxy_paths: Vec<String>,
 }
 
 #[derive(Deserialize, Default, Debug, Clone, PartialEq, Eq)]

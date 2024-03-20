@@ -200,7 +200,7 @@ fn build_contract_abi(builder: ContractVariantBuilder, original_abi: &ContractAb
     }
 }
 
-fn default_wasm_crate_name(contract_name: &str) -> String {
+pub(crate) fn default_wasm_crate_name(contract_name: &str) -> String {
     format!("{contract_name}-wasm")
 }
 
@@ -263,21 +263,46 @@ impl ScConfig {
             .iter()
             .map(ContractVariantBuilder::map_from_config)
             .collect();
-        collect_unlabelled_endpoints(&mut contract_builders, original_abi);
-        collect_labelled_endpoints(&mut contract_builders, original_abi);
-        collect_add_endpoints(&mut contract_builders, original_abi);
-        process_labels_for_contracts(&mut contract_builders, &config.labels_for_contracts);
+        Self::collect_and_process_endpoints(
+            &mut contract_builders,
+            original_abi,
+            &config.labels_for_contracts,
+        );
+
         let mut contracts: Vec<ContractVariant> = contract_builders
             .into_values()
             .map(|builder| build_contract(builder, original_abi))
             .collect();
-        set_main_contract_flag(&mut contracts, &config.settings.main);
-        validate_contract_variants(&contracts);
-        ScConfig {
-            default_contract_config_name: config.settings.main.clone().unwrap_or_default(),
-            contracts,
-            proxy_paths: config.settings.proxy_paths.clone().unwrap_or_default(),
+        if contracts.is_empty() {
+            contracts.push(ContractVariant::default_from_abi(original_abi));
         }
+        Self::validate_contracts(&mut contracts, &config.settings.main);
+
+        let default_contract_config_name = config.settings.main.clone().unwrap_or_default();
+        ScConfig {
+            default_contract_config_name,
+            contracts,
+            proxy_paths: config.settings.proxy_paths.clone(),
+        }
+    }
+
+    fn validate_contracts(
+        contracts: &mut [ContractVariant],
+        default_config_name_opt: &Option<String>,
+    ) {
+        set_main_contract_flag(contracts, default_config_name_opt);
+        validate_contract_variants(contracts);
+    }
+
+    fn collect_and_process_endpoints(
+        contract_builders: &mut HashMap<String, ContractVariantBuilder>,
+        original_abi: &ContractAbi,
+        labels_for_contracts: &HashMap<String, Vec<String>>,
+    ) {
+        collect_unlabelled_endpoints(contract_builders, original_abi);
+        collect_labelled_endpoints(contract_builders, original_abi);
+        collect_add_endpoints(contract_builders, original_abi);
+        process_labels_for_contracts(contract_builders, labels_for_contracts);
     }
 
     /// Provides the config for the cases where no `multicontract.toml` file is available.
