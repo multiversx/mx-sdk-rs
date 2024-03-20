@@ -244,6 +244,10 @@ impl TypeAbi for BoxedBytes {
     fn type_name() -> TypeName {
         "bytes".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "BoxedBytes".into()
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
