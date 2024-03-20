@@ -81,8 +81,8 @@ pub fn combine_instrumentation_results(
 pub fn export_coverage_summary(
     root_dir: &str,
     profdata_file: &str,
-    binary_files: &Vec<String>,
-    ignore_filename_regex: &Vec<String>,
+    binary_files: &[String],
+    ignore_filename_regex: &[String],
 ) -> Result<Coverage, TestCoverageError> {
     let objects = binary_files
         .iter()
@@ -103,7 +103,7 @@ pub fn export_coverage_summary(
         .arg("export")
         .args(&objects)
         .args(&ignore_filename_regex)
-        .args(&[
+        .args([
             &format!("--instr-profile={}", profdata_file),
             "--summary-only",
             "--format=text",

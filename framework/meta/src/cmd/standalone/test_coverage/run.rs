@@ -17,7 +17,7 @@ pub fn run_test_coverage(
     root_path: &str,
     output_path: &str,
     output_format: &TestCoverageOutputFormat,
-    ignore_filename_regex: &Vec<String>,
+    ignore_filename_regex: &[String],
 ) -> Result<(), TestCoverageError> {
     ensure_dependencies_in_path()?;
 
@@ -44,7 +44,7 @@ pub fn run_test_coverage(
 
     match output_format {
         TestCoverageOutputFormat::Markdown => {
-            render_coverage(&mut output, &coverage, &root_path);
+            render_coverage(&mut output, &coverage, root_path);
         },
         TestCoverageOutputFormat::Json => {
             output = serde_json::to_string_pretty(&coverage).unwrap();
