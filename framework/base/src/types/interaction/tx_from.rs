@@ -1,4 +1,4 @@
-use crate::types::ManagedAddress;
+use crate::types::{heap::Address, ManagedAddress};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -44,3 +44,25 @@ where
     }
 }
 impl<Env> TxFromSpecified<Env> for &ManagedAddress<Env::Api> where Env: TxEnv {}
+
+impl<Env> TxFrom<Env> for Address
+where
+    Env: TxEnv,
+{
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        self.into()
+    }
+}
+
+impl<Env> TxFromSpecified<Env> for Address where Env: TxEnv {}
+
+impl<Env> TxFrom<Env> for &Address
+where
+    Env: TxEnv,
+{
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from_address(self)
+    }
+}
+
+impl<Env> TxFromSpecified<Env> for &Address where Env: TxEnv {}

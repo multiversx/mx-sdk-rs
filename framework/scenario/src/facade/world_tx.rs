@@ -5,7 +5,7 @@ mod scenario_env;
 mod scenario_env_deploy;
 mod scenario_env_exec;
 mod scenario_env_query;
-mod scenario_env_util;
+pub mod scenario_env_util;
 mod scenario_rh_list;
 mod scenario_rh_list_item;
 mod with_tx_raw_response;

@@ -2,26 +2,24 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
-use adder::ProxyTrait;
+use adder::{temp_proxy, ProxyTrait};
 use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::{storage::mappers::SingleValue, types::Address},
+    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsSimilar},
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
         mandos_system::ScenarioRunner,
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{
-            BytesValue, ScCallStep, ScDeployStep, ScQueryStep, Scenario, TransferStep, TxExpect,
-        },
+        scenario_model::{BytesValue, ScDeployStep, Scenario},
         standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo,
+        test_wallets, ContractInfo, WithRawTxResponse,
     },
-    tokio, Interactor, StepBuffer,
+    tokio, Interactor, InteractorPrepareAsync, StepBuffer,
 };
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
@@ -100,28 +98,32 @@ impl AdderInteract {
     async fn deploy(&mut self) {
         self.set_state().await;
 
-        self.interactor
-            .sc_deploy_use_result(
-                ScDeployStep::new()
-                    .call(self.state.default_adder().init(BigUint::from(0u64)))
-                    .from(&self.wallet_address)
-                    .code(&self.adder_code),
-                |new_address, tr| {
-                    tr.result.unwrap_or_else(|err| {
-                        panic!(
-                            "deploy failed: status: {}, message: {}",
-                            err.status, err.message
-                        )
-                    });
-
-                    let new_address_bech32 = bech32::encode(&new_address);
-                    println!("new address: {new_address_bech32}");
-
-                    let new_address_expr = format!("bech32:{new_address_bech32}");
-                    self.state.set_adder_address(&new_address_expr);
-                },
-            )
+        let new_address = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .typed(temp_proxy::AdderProxy)
+            .init(0u32)
+            .code(&self.adder_code)
+            .with_result(WithRawTxResponse(|response| {
+                let err = &response.tx_error;
+                assert!(
+                    err.is_success(),
+                    "deploy failed: status: {}, message: {}",
+                    err.status,
+                    err.message
+                );
+            }))
+            .returns(ReturnsNewAddress)
+            .prepare_async()
+            .run()
             .await;
+
+        let new_address_bech32 = bech32::encode(&new_address.to_address());
+        println!("new address: {new_address_bech32}");
+
+        let new_address_expr = format!("bech32:{new_address_bech32}");
+        self.state.set_adder_address(&new_address_expr);
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -164,38 +166,42 @@ impl AdderInteract {
     }
 
     async fn feed_contract_egld(&mut self) {
-        let _ = self
-            .interactor
-            .transfer(
-                TransferStep::new()
-                    .from(&self.wallet_address)
-                    .to(self.state.adder())
-                    .egld_value("0,050000000000000000"),
-            )
+        self.interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.adder().to_address())
+            .egld(50000000000000000u64.into()) // TODO: annotate "0,050000000000000000"
+            .prepare_async()
+            .run()
             .await;
     }
 
     async fn add(&mut self, value: u64) {
         self.interactor
-            .sc_call(
-                ScCallStep::new()
-                    .call(self.state.adder().add(value))
-                    .from(&self.wallet_address)
-                    .expect(
-                        TxExpect::ok().additional_error_message("performing add failed with: "),
-                    ),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.adder().to_address())
+            .typed(temp_proxy::AdderProxy)
+            .add(value)
+            .prepare_async()
+            .run()
             .await;
 
         println!("successfully performed add");
     }
 
     async fn print_sum(&mut self) {
-        self.interactor
-            .sc_query_use_result(ScQueryStep::new().call(self.state.adder().sum()), |tr| {
-                let sum: SingleValue<BigUint> = tr.result.unwrap();
-                println!("sum: {}", sum.into());
-            })
+        let sum = self
+            .interactor
+            .query()
+            .to(self.state.adder().to_address())
+            .typed(temp_proxy::AdderProxy)
+            .sum()
+            .returns(ReturnsSimilar::<BigUint>::new())
+            .prepare_async()
+            .run()
             .await;
+
+        println!("sum: {sum}");
     }
 }
