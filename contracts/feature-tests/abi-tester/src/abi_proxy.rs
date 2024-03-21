@@ -4,7 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
+use multiversx_sc::proxy_imports::*;
 
 pub struct AbiTesterProxy;
 
@@ -449,7 +449,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<OnlyShowsUpAsNestedInBox>,
+        OriginalResultMarker<Box<OnlyShowsUpAsNestedInBox>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -466,7 +466,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<&[OnlyShowsUpAsNestedInBoxedSlice]>,
+        OriginalResultMarker<Box<[OnlyShowsUpAsNestedInBoxedSlice]>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -496,7 +496,7 @@ where
     }
 
     pub fn item_for_slice<
-        Arg0: CodecInto<&[OnlyShowsUpAsNestedInSlice]>,
+        Arg0: CodecInto<Box<[OnlyShowsUpAsNestedInSlice]>>,
     >(
         self,
         _ref: Arg0,
@@ -636,42 +636,32 @@ where
     }
 
 }
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpInConstructor
 {
     pub something: (),
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiTestType
 {
     pub nested: OnlyShowsUpAsNested01,
-    pub next: Option<AbiTestType>,
-    pub tuple_madness: (OnlyShowsUpAsNested02, Option<AbiTestType>),
+    pub next: Option<Box<AbiTestType>>,
+    pub tuple_madness: (OnlyShowsUpAsNested02, Option<Box<AbiTestType>>),
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested01
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested02
 {
     pub something: [u8; 0],
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub enum AbiEnum {
     Nothing,
     Something,
@@ -679,23 +669,17 @@ pub enum AbiEnum {
     SomeStruct,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested08
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested09
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiManagedType<Api>
 where
     Api: ManagedTypeApi,
@@ -705,44 +689,32 @@ where
     pub managed_buffer: ManagedBuffer<Api>,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested03
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested04
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested05
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested06
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested07
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub enum EsdtLocalRole {
     None,
     Mint,
@@ -755,26 +727,22 @@ pub enum EsdtLocalRole {
     Transfer,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub struct EsdtTokenPayment<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub token_identifier: multiversx_sc::types::managed::wrapped::token_identifier::TokenIdentifier<multiversx_sc::api::uncallable::UncallableApi>,
+    pub token_identifier: TokenIdentifier<Api>,
     pub token_nonce: u64,
     pub amount: BigUint<Api>,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub struct EsdtTokenData<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub token_type: EsdtTokenType,
+    pub token_type: self::EsdtTokenType,
     pub amount: BigUint<Api>,
     pub frozen: bool,
     pub hash: ManagedBuffer<Api>,
@@ -785,9 +753,7 @@ where
     pub uris: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,
@@ -796,96 +762,70 @@ pub enum EsdtTokenType {
     Invalid,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInSingleValueMapper
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInVec
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInArrayVec
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, ManagedVecItem)]
 pub struct AbiManagedVecItem
 {
     pub value1: u32,
     pub value2: u32,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInArray
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInBox
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInBoxedSlice
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInRef
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInSlice
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInOption
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub struct OnlyShowsUpInEsdtAttr
 {
     pub field: OnlyShowsUpAsNested10,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested10
 {
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
+#[derive(TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
     Zero,
     Thirty,
@@ -894,10 +834,7 @@ pub enum ExplicitDiscriminant {
     FiftyOne,
 }
 
-use multiversx_sc::derive_imports::*;
-
-#[derive(TypeAbi)]
-#[derive(u8)]
+#[derive(TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
     Unit,

@@ -35,7 +35,7 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
     }
 
     fn type_name_rust() -> TypeName {
-        T::type_name_rust()
+        format!("Box<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -56,7 +56,8 @@ impl<T: TypeAbi> TypeAbi for &[T] {
     }
 
     fn type_name_rust() -> TypeName {
-        format!("&[{}]", T::type_name_rust())
+        // we need to convert to an owned type
+        format!("Box<[{}]>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -98,7 +99,7 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
     }
 
     fn type_name_rust() -> TypeName {
-        <&[T]>::type_name_rust()
+        format!("Box<[{}]>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -118,7 +119,8 @@ impl TypeAbi for &str {
     }
 
     fn type_name_rust() -> TypeName {
-        "&str".into()
+        // we need to convert to an owned type
+        "Box<str>".into()
     }
 }
 

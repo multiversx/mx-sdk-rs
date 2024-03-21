@@ -96,7 +96,6 @@ fn write_enum(file: &mut File, type_description: &TypeDescription) {
 
 fn write_struct(file: &mut File, type_description: &TypeDescription) {
     let struct_name = type_description.names.rust.replace("$API", "Api");
-
     write_macro_attributes(file, &type_description.macro_attributes);
     writeln!(file, r#"pub struct {}"#, struct_name).unwrap();
 
@@ -123,16 +122,9 @@ fn write_struct(file: &mut File, type_description: &TypeDescription) {
 }
 
 fn write_macro_attributes(file: &mut File, macro_attributes: &[String]) {
-    writeln!(file, "#[derive(TypeAbi)]").unwrap();
-    if !macro_attributes.is_empty() {
-        write!(file, "#[derive(").unwrap();
-    }
-
-    let attributes = macro_attributes.join("").replace(',', ", ");
-    write!(file, "{attributes}").unwrap();
-
-    if !macro_attributes.is_empty() {
-        writeln!(file, ")]").unwrap();
+    if macro_attributes.is_empty() {
+        writeln!(file, "#[derive(TopEncode, TopDecode)]").unwrap();
+    } else {
+        writeln!(file, "#[derive({})]", macro_attributes.join(", ")).unwrap();
     }
 }
-

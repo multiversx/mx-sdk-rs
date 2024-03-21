@@ -50,8 +50,12 @@ pub fn extract_macro_attributes(attrs: &[syn::Attribute]) -> Vec<String> {
 
     for a in attrs {
         if let syn::Meta::List(list) = &a.meta {
-            for token in list.tokens.clone().into_iter() {
-                macro_attributes.push(token.to_string());
+            if list.path.is_ident("derive") {
+                for token in list.tokens.clone().into_iter() {
+                    if let proc_macro2::TokenTree::Ident(ident) = token {
+                        macro_attributes.push(ident.to_string());
+                    }
+                }
             }
         }
     }
