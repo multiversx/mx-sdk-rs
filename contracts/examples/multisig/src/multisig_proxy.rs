@@ -4,8 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
-use crate as multisig;
+use multiversx_sc::proxy_imports::*;
 
 pub struct MultisigProxy;
 
@@ -104,7 +103,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<MultiValueEncoded<Env::Api, multisig::action::ActionFullInfo<Env::Api>>>,
+        OriginalResultMarker<MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -154,7 +153,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<multisig::user_role::UserRole>,
+        OriginalResultMarker<UserRole>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -356,7 +355,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<multisig::action::Action<Env::Api>>,
+        OriginalResultMarker<Action<Env::Api>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -722,3 +721,44 @@ where
     }
 
 }
+#[derive(TopEncode, TopDecode)]
+pub struct ActionFullInfo<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub action_id: usize,
+    pub action_data: Action<Api>,
+    pub signers: ManagedVec<Api, ManagedAddress<Api>>,
+}
+
+#[derive(TopEncode, TopDecode)]
+pub enum Action {
+    Nothing,
+    AddBoardMember,
+    AddProposer,
+    RemoveUser,
+    ChangeQuorum,
+    SendTransferExecute,
+    SendAsyncCall,
+    SCDeployFromSource,
+    SCUpgradeFromSource,
+}
+
+#[derive(TopEncode, TopDecode)]
+pub struct CallActionData<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub to: ManagedAddress<Api>,
+    pub egld_amount: BigUint<Api>,
+    pub endpoint_name: ManagedBuffer<Api>,
+    pub arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+}
+
+#[derive(TopEncode, TopDecode)]
+pub enum UserRole {
+    None,
+    Proposer,
+    BoardMember,
+}
+
