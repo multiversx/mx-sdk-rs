@@ -17,6 +17,7 @@ use super::{ContractCallNoPayment, ManagedArgBuffer, TypedFunctionCall};
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
 /// Can be used as a multi-argument, to embed a call within a call.
+#[derive(Clone)]
 pub struct FunctionCall<Api>
 where
     Api: ManagedTypeApi,

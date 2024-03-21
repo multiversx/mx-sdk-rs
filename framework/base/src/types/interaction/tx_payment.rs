@@ -9,17 +9,7 @@ use crate::{
     },
 };
 
-use super::{FunctionCall, TxEnv, TxFrom};
-
-/// Temporary structure for returning a normalized transfer.
-pub struct PaymentConversionResult<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub to: ManagedAddress<Api>,
-    pub egld_payment: EgldPayment<Api>,
-    pub fc: FunctionCall<Api>,
-}
+use super::{FunctionCall, TxEnv, TxFrom, TxToSpecified};
 
 #[derive(Clone)]
 pub struct AnnotatedEgldPayment<Api>
@@ -73,16 +63,6 @@ where
 {
     fn is_no_payment(&self) -> bool;
 
-    fn convert_tx_data<From>(
-        self,
-        env: &Env,
-        from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>;
-
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -108,23 +88,6 @@ where
 {
     fn is_no_payment(&self) -> bool {
         true
-    }
-
-    fn convert_tx_data<From>(
-        self,
-        _env: &Env,
-        _from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>,
-    {
-        PaymentConversionResult {
-            to,
-            egld_payment: EgldPayment::no_payment(),
-            fc,
-        }
     }
 
     fn perform_transfer_execute(
@@ -159,23 +122,6 @@ where
         self.value == 0u32
     }
 
-    fn convert_tx_data<From>(
-        self,
-        _env: &Env,
-        _from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>,
-    {
-        PaymentConversionResult {
-            to,
-            egld_payment: self,
-            fc,
-        }
-    }
-
     fn perform_transfer_execute(
         self,
         _env: &Env,
@@ -192,7 +138,7 @@ where
         );
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<<Env as TxEnv>::Api> {
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: Some(AnnotatedEgldPayment::new_egld(self.value)),
             multi_esdt: ManagedVec::new(),
@@ -217,23 +163,6 @@ where
         self.amount == 0u32
     }
 
-    fn convert_tx_data<From>(
-        self,
-        env: &Env,
-        from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>,
-    {
-        if self.token_nonce == 0 {
-            convert_tx_data_fungible(self, to, fc)
-        } else {
-            convert_tx_data_nft(self, from.resolve_address(env), to, fc)
-        }
-    }
-
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -244,7 +173,7 @@ where
         MultiEsdtPayment::from_single_item(self).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<<Env as TxEnv>::Api> {
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: MultiEsdtPayment::from_single_item(self),
@@ -258,23 +187,6 @@ where
 {
     fn is_no_payment(&self) -> bool {
         self.is_empty()
-    }
-
-    fn convert_tx_data<From>(
-        self,
-        env: &Env,
-        from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>,
-    {
-        match self.len() {
-            0 => ().convert_tx_data(env, from, to, fc),
-            1 => self.get(0).convert_tx_data(env, from, to, fc),
-            _ => convert_tx_data_multi(self, from.resolve_address(env), to, fc),
-        }
     }
 
     fn perform_transfer_execute(
@@ -293,7 +205,7 @@ where
         );
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<<Env as TxEnv>::Api> {
+    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: self,
@@ -307,23 +219,6 @@ where
 {
     fn is_no_payment(&self) -> bool {
         self.amount == 0u32
-    }
-
-    fn convert_tx_data<From>(
-        self,
-        env: &Env,
-        from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>,
-    {
-        self.map_egld_or_esdt(
-            (to, fc),
-            |(to, fc), amount| EgldPayment::from(amount).convert_tx_data(env, from, to, fc),
-            |(to, fc), esdt_payment| esdt_payment.convert_tx_data(env, from, to, fc),
-        )
     }
 
     fn perform_transfer_execute(
@@ -359,26 +254,6 @@ where
         self.is_empty()
     }
 
-    fn convert_tx_data<From>(
-        self,
-        env: &Env,
-        from: &From,
-        to: ManagedAddress<Env::Api>,
-        fc: FunctionCall<Env::Api>,
-    ) -> PaymentConversionResult<Env::Api>
-    where
-        From: TxFrom<Env>,
-    {
-        match self {
-            EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                EgldPayment::from(egld_amount).convert_tx_data(env, from, to, fc)
-            },
-            EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
-                multi_esdt_payment.convert_tx_data(env, from, to, fc)
-            },
-        }
-    }
-
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -405,52 +280,5 @@ where
                 TxPayment::<Env>::into_full_payment_data(multi_esdt_payment)
             },
         }
-    }
-}
-
-fn convert_tx_data_fungible<Api>(
-    payment: EsdtTokenPayment<Api>,
-    to: ManagedAddress<Api>,
-    fc: FunctionCall<Api>,
-) -> PaymentConversionResult<Api>
-where
-    Api: ManagedTypeApi,
-{
-    PaymentConversionResult {
-        to,
-        egld_payment: EgldPayment::no_payment(),
-        fc: fc.convert_to_single_transfer_fungible_call(payment),
-    }
-}
-
-fn convert_tx_data_nft<Api>(
-    payment: EsdtTokenPayment<Api>,
-    from: ManagedAddress<Api>,
-    to: ManagedAddress<Api>,
-    fc: FunctionCall<Api>,
-) -> PaymentConversionResult<Api>
-where
-    Api: ManagedTypeApi,
-{
-    PaymentConversionResult {
-        to: from,
-        egld_payment: EgldPayment::no_payment(),
-        fc: fc.convert_to_single_transfer_nft_call(&to, payment),
-    }
-}
-
-fn convert_tx_data_multi<Api>(
-    payment: MultiEsdtPayment<Api>,
-    from: ManagedAddress<Api>,
-    to: ManagedAddress<Api>,
-    fc: FunctionCall<Api>,
-) -> PaymentConversionResult<Api>
-where
-    Api: ManagedTypeApi,
-{
-    PaymentConversionResult {
-        to: from,
-        egld_payment: EgldPayment::no_payment(),
-        fc: fc.convert_to_multi_transfer_esdt_call(&to, payment),
     }
 }
