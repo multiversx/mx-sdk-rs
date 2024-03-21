@@ -721,7 +721,7 @@ where
     }
 
 }
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode)]
 pub struct ActionFullInfo<Api>
 where
     Api: ManagedTypeApi,
@@ -731,20 +731,34 @@ where
     pub signers: ManagedVec<Api, ManagedAddress<Api>>,
 }
 
-#[derive(TopEncode, TopDecode)]
-pub enum Action {
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
+pub enum Action<Api>
+where
+    Api: ManagedTypeApi,
+{
     Nothing,
-    AddBoardMember,
-    AddProposer,
-    RemoveUser,
-    ChangeQuorum,
-    SendTransferExecute,
-    SendAsyncCall,
-    SCDeployFromSource,
-    SCUpgradeFromSource,
+    AddBoardMember(ManagedAddress<Api>),
+    AddProposer(ManagedAddress<Api>),
+    RemoveUser(ManagedAddress<Api>),
+    ChangeQuorum(usize),
+    SendTransferExecute(CallActionData<Api>),
+    SendAsyncCall(CallActionData<Api>),
+    SCDeployFromSource {
+        amount: BigUint<Api>,
+        source: ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+    },
+    SCUpgradeFromSource {
+        sc_address: ManagedAddress<Api>,
+        amount: BigUint<Api>,
+        source: ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+    },
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, Clone)]
 pub struct CallActionData<Api>
 where
     Api: ManagedTypeApi,

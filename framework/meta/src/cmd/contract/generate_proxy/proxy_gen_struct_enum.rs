@@ -22,25 +22,32 @@ pub(crate) fn write_types(file: &mut File, types: &TypeDescriptionContainerImpl)
     }
 }
 
+fn start_write_type(file: &mut File, type_type: &str,  type_description: &TypeDescription,) {
+    let struct_name = type_description.names.rust.replace("$API", "Api");
+    write_macro_attributes(file, &type_description.macro_attributes);
+    write!(file, r#"pub {type_type} {struct_name}"#).unwrap();
+
+    if struct_name.contains("<Api>") {
+        writeln!(
+            file,
+            r#"
+where
+    Api: ManagedTypeApi,"#
+        )
+        .unwrap();
+    } else {
+        write!(file, " ").unwrap();
+    }
+
+    writeln!(file, r#"{{"#).unwrap();
+}
+
 fn write_struct(
     file: &mut File,
     struct_fields: &Vec<StructFieldDescription>,
     type_description: &TypeDescription,
 ) {
-    let struct_name = type_description.names.rust.replace("$API", "Api");
-    write_macro_attributes(file, &type_description.macro_attributes);
-    writeln!(file, r#"pub struct {struct_name}"#).unwrap();
-
-    if struct_name.contains("<Api>") {
-        writeln!(
-            file,
-            r#"where
-    Api: ManagedTypeApi,"#
-        )
-        .unwrap();
-    }
-
-    writeln!(file, r#"{{"#).unwrap();
+    start_write_type(file, "struct", type_description);
 
     for field in struct_fields {
         writeln!(
@@ -61,13 +68,7 @@ fn write_enum(
     enum_variants: &Vec<EnumVariantDescription>,
     type_description: &TypeDescription,
 ) {
-    write_macro_attributes(file, &type_description.macro_attributes);
-    writeln!(
-        file,
-        r#"pub enum {} {{"#,
-        type_description.names.rust.replace("$API", "Api")
-    )
-    .unwrap();
+    start_write_type(file, "enum", type_description);
 
     for variant in enum_variants {
         write!(file, "    {}", variant.name).unwrap();
