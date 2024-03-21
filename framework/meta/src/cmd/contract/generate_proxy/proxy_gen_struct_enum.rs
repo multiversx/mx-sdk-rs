@@ -94,7 +94,7 @@ fn write_macro_attributes(file: &mut File, macro_attributes: &[String]) {
     }
 }
 
-fn write_struct_in_variant(file: &mut File, fields: &Vec<StructFieldDescription>) {
+fn write_struct_in_variant(file: &mut File, fields: &[StructFieldDescription]) {
     writeln!(file, " {{").unwrap();
 
     for field in fields {
@@ -110,7 +110,7 @@ fn write_struct_in_variant(file: &mut File, fields: &Vec<StructFieldDescription>
     writeln!(file, "    }},").unwrap();
 }
 
-fn write_tuple_in_variant(file: &mut File, fields: &Vec<StructFieldDescription>) {
+fn write_tuple_in_variant(file: &mut File, fields: &[StructFieldDescription]) {
     write!(file, "(").unwrap();
     write!(file, "{}", fields[0].field_type.rust.replace("$API", "Api")).unwrap();
 
