@@ -360,16 +360,6 @@ where
     pub fees: Fee<Api>,
 }
 
-#[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
-pub struct EsdtTokenPayment<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub token_identifier: TokenIdentifier<Api>,
-    pub token_nonce: u64,
-    pub amount: BigUint<Api>,
-}
-
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Fee<Api>
 where
@@ -377,15 +367,5 @@ where
 {
     pub num_token_to_transfer: usize,
     pub value: EgldOrEsdtTokenPayment<Api>,
-}
-
-#[derive(TopEncode, TopDecode)]
-pub struct EgldOrEsdtTokenPayment<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub token_identifier: EgldOrEsdtTokenIdentifier<Api>,
-    pub token_nonce: u64,
-    pub amount: BigUint<Api>,
 }
 

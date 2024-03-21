@@ -9,8 +9,23 @@ use crate::cmd::contract::generate_snippets::snippet_gen_common::write_newline;
 
 const ZERO: &str = "0";
 
+/// Types defined in the framework don't need to be generated again in the proxy.
+const TYPES_FROM_FRAMEWORK: &[&str] = &[
+    "EsdtTokenPayment<$API>",
+    "EgldOrEsdtTokenPayment<$API>",
+    "EsdtTokenData<$API>",
+    "EgldOrEsdtTokenIdentifier<$API>",
+    "EgldOrEsdtTokenPayment<$API>",
+    "EgldOrMultiEsdtPayment<$API>",
+    "EsdtTokenData<$API>",
+];
+
 pub(crate) fn write_types(file: &mut File, types: &TypeDescriptionContainerImpl) {
     for (_, type_description) in &types.0 {
+        if TYPES_FROM_FRAMEWORK.contains(&type_description.names.rust.as_str()) {
+            continue;
+        }
+
         match &type_description.contents {
             TypeContents::Enum(enum_variants) => write_enum(file, enum_variants, type_description),
             TypeContents::Struct(struct_fields) => {
@@ -22,7 +37,7 @@ pub(crate) fn write_types(file: &mut File, types: &TypeDescriptionContainerImpl)
     }
 }
 
-fn start_write_type(file: &mut File, type_type: &str,  type_description: &TypeDescription,) {
+fn start_write_type(file: &mut File, type_type: &str, type_description: &TypeDescription) {
     let struct_name = type_description.names.rust.replace("$API", "Api");
     write_macro_attributes(file, &type_description.macro_attributes);
     write!(file, r#"pub {type_type} {struct_name}"#).unwrap();
