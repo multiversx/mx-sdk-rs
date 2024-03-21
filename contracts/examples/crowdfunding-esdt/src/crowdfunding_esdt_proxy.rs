@@ -4,17 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
-
-use multiversx_sc::derive_imports::*;
-
-#[type_abi]
-#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
-pub enum Status {
-    FundingPeriod,
-    Successful,
-    Failed,
-}
+use multiversx_sc::proxy_imports::*;
 
 pub struct CrowdfundingProxy;
 
@@ -225,3 +215,10 @@ where
     }
 
 }
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
+pub enum Status {
+    FundingPeriod,
+    Successful,
+    Failed,
+}
+

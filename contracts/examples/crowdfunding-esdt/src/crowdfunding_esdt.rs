@@ -1,7 +1,7 @@
 #![no_std]
 
 use multiversx_sc::{derive_imports::*, imports::*};
-pub mod temp_proxy;
+pub mod crowdfunding_esdt_proxy;
 
 #[type_abi]
 #[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]

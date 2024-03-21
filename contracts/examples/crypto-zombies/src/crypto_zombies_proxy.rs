@@ -4,7 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
+use multiversx_sc::proxy_imports::*;
 
 pub struct CryptoZombiesProxy;
 
@@ -410,9 +410,6 @@ where
     }
 
 }
-use multiversx_sc::derive_imports::*;
-
-#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<Api>
 where

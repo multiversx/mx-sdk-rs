@@ -5,6 +5,7 @@ use multiversx_sc::imports::*;
 
 mod constants;
 mod deposit_info;
+pub mod digital_cash_proxy;
 mod helpers;
 mod pay_fee_and_fund;
 mod signature_operations;
