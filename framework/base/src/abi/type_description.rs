@@ -70,7 +70,7 @@ impl TypeContents {
             TypeContents::Struct(struct_fields) => {
                 for struct_field in struct_fields {
                     names.push(struct_field.name.clone());
-                    names.push(struct_field.field_type.clone());
+                    // names.push(struct_field.field_type.clone());
                 }
             },
             TypeContents::ExplicitEnum(_explicit_enum_variants) => {},
@@ -112,12 +112,12 @@ impl EnumVariantDescription {
 pub struct StructFieldDescription {
     pub docs: Vec<String>,
     pub name: String,
-    pub field_type: String,
+    pub field_type: TypeNames,
 }
 
 impl StructFieldDescription {
     /// Used in code generation.
-    pub fn new(docs: &[&str], name: &str, field_type: String) -> Self {
+    pub fn new(docs: &[&str], name: &str, field_type: TypeNames) -> Self {
         Self {
             docs: docs.iter().map(|s| s.to_string()).collect(),
             name: name.to_string(),

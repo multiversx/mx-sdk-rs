@@ -20,7 +20,7 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
         field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
             &[ #(#field_docs),* ],
             #field_name_str,
-            <#field_ty>::type_name_rust(),
+            <#field_ty>::type_names(),
         ));
         <#field_ty>::provide_type_descriptions(accumulator);
     }
