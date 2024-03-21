@@ -29,7 +29,7 @@ pub trait TypeAbi {
                 docs: Vec::new(),
                 names: Self::type_names(),
                 contents: TypeContents::NotSpecified,
-                macro_attributes: Vec::new()
+                macro_attributes: Vec::new(),
             },
         );
     }

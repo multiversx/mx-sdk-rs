@@ -8,7 +8,7 @@ use multiversx_sc::imports::*;
 
 use multiversx_sc::derive_imports::*;
 
-#[derive(TypeAbi)]
+#[type_abi]
 #[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,

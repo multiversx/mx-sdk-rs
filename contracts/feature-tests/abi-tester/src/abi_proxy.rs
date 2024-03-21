@@ -714,7 +714,7 @@ pub struct OnlyShowsUpAsNested07
 {
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum EsdtLocalRole {
     None,
     Mint,
@@ -727,7 +727,7 @@ pub enum EsdtLocalRole {
     Transfer,
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct EsdtTokenPayment<Api>
 where
     Api: ManagedTypeApi,
@@ -737,12 +737,12 @@ where
     pub amount: BigUint<Api>,
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(Clone, TopDecode, TopEncode, NestedDecode, NestedEncode, Debug, ManagedVecItem)]
 pub struct EsdtTokenData<Api>
 where
     Api: ManagedTypeApi,
 {
-    pub token_type: self::EsdtTokenType,
+    pub token_type: EsdtTokenType,
     pub amount: BigUint<Api>,
     pub frozen: bool,
     pub hash: ManagedBuffer<Api>,
@@ -753,7 +753,7 @@ where
     pub uris: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, ManagedVecItem)]
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,

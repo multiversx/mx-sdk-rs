@@ -4,12 +4,12 @@ use multiversx_sc::imports::*;
 
 mod crypto_kitties_proxy;
 mod storage;
+pub mod temp_proxy;
 mod zombie;
 mod zombie_attack;
 mod zombie_factory;
 mod zombie_feeding;
 mod zombie_helper;
-pub mod temp_proxy;
 
 #[multiversx_sc::contract]
 pub trait CryptoZombies:

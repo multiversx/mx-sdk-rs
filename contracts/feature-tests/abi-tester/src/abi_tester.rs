@@ -3,7 +3,7 @@
 multiversx_sc::imports!();
 
 mod abi_enum;
-// pub mod abi_proxy;
+pub mod abi_proxy;
 mod abi_test_type;
 mod only_nested;
 

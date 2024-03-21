@@ -1,7 +1,6 @@
 use crate::parse::attributes::extract_macro_attributes;
 
 use super::parse::attributes::extract_doc;
-use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 
 pub struct ExplicitDiscriminant {
@@ -45,7 +44,8 @@ fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     }
 }
 
-pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
+pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
     let type_docs = extract_doc(ast.attrs.as_slice());
     let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
 
@@ -123,7 +123,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let name_rust = extract_rust_type(ty_generics, name_str.clone());
-    let type_abi_impl = quote! {
+    quote! {
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
             fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
@@ -135,8 +135,16 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
 
             #type_description_impl
         }
-    };
-    type_abi_impl.into()
+    }
+}
+
+pub fn type_abi_full(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
+    let input_conv = proc_macro2::TokenStream::from(input.clone());
+    let derive_code = type_abi_derive(input);
+    quote! {
+        #input_conv
+        #derive_code
+    }
 }
 
 pub fn get_discriminant(

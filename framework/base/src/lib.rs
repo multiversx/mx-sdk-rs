@@ -73,7 +73,7 @@ pub mod derive_imports {
             NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
             TopEncodeOrDefault,
         },
-        derive::{ManagedVecItem, TypeAbi},
+        derive::{type_abi, ManagedVecItem, TypeAbi},
     };
 }
 

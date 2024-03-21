@@ -412,7 +412,7 @@ where
 }
 use multiversx_sc::derive_imports::*;
 
-#[derive(TypeAbi)]
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<Api>
 where

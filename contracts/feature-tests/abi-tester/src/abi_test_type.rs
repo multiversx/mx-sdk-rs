@@ -6,7 +6,7 @@ use multiversx_sc::{
 multiversx_sc::derive_imports!();
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(TypeAbi)]
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiTestType {
     /// This type should only appear here.
@@ -21,7 +21,7 @@ pub struct AbiTestType {
 }
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(TypeAbi)]
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiManagedType<M: ManagedTypeApi> {
     pub big_uint: BigUint<M>,
@@ -30,14 +30,14 @@ pub struct AbiManagedType<M: ManagedTypeApi> {
 }
 
 /// Its only purpose is to test that the ABI generator works fine.
-#[derive(TypeAbi)]
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, ManagedVecItem)]
 pub struct AbiManagedVecItem {
     pub value1: u32,
     pub value2: u32,
 }
 
-#[derive(TypeAbi)]
+#[type_abi]
 pub struct OnlyShowsUpInEsdtAttr {
     pub field: OnlyShowsUpAsNested10,
 }

@@ -3,7 +3,7 @@
 use multiversx_sc::{derive_imports::*, imports::*};
 pub mod temp_proxy;
 
-#[derive(TypeAbi)]
+#[type_abi]
 #[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,
