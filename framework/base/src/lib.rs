@@ -76,3 +76,8 @@ pub mod derive_imports {
         derive::{ManagedVecItem, TypeAbi},
     };
 }
+
+/// Conveniently groups all imports required for generated proxies.
+pub mod proxy_imports {
+    pub use crate::{derive_imports::*, imports::*};
+}

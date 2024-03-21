@@ -173,7 +173,7 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
     }
 
     fn type_name_rust() -> TypeName {
-        "TokenIdentifier".into()
+        "TokenIdentifier<$API>".into()
     }
 }
 

@@ -11,15 +11,13 @@ const PREFIX_AUTO_GENERATED: &str = "///////////////////////////////////////////
 ////////////////////////////////////////////////////
 ";
 
-const IMPORTS: &str = "#![allow(clippy::all)]
+const PRELUDE: &str = "#![allow(clippy::all)]
 
-use multiversx_sc::imports::*;";
-
-const DERIVE_IMPORTS: &str = "use multiversx_sc::derive_imports::*;";
+use multiversx_sc::proxy_imports::*;";
 
 pub(crate) fn write_header(file: &mut File) {
     writeln!(file, "{PREFIX_AUTO_GENERATED}").unwrap();
-    writeln!(file, r#"{IMPORTS}"#).unwrap();
+    writeln!(file, r#"{PRELUDE}"#).unwrap();
 
     write_newline(file);
 }
@@ -85,7 +83,6 @@ where
 }
 
 fn write_enum(file: &mut File, type_description: &TypeDescription) {
-    write_derive_imports(file);
     write_macro_attributes(file, &type_description.macro_attributes);
     writeln!(file, r#"pub enum {} {{"#, type_description.names.abi).unwrap();
 
@@ -100,7 +97,6 @@ fn write_enum(file: &mut File, type_description: &TypeDescription) {
 fn write_struct(file: &mut File, type_description: &TypeDescription) {
     let struct_name = type_description.names.rust.replace("$API", "Api");
 
-    write_derive_imports(file);
     write_macro_attributes(file, &type_description.macro_attributes);
     writeln!(file, r#"pub struct {}"#, struct_name).unwrap();
 
@@ -140,7 +136,3 @@ fn write_macro_attributes(file: &mut File, macro_attributes: &[String]) {
     }
 }
 
-fn write_derive_imports(file: &mut File) {
-    writeln!(file, "{DERIVE_IMPORTS}").unwrap();
-    write_newline(file);
-}
