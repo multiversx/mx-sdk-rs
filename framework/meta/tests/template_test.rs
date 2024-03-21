@@ -38,7 +38,7 @@ fn template_current_adder() {
 }
 
 #[test]
-#[cfg_attr(not(feature = "template-test-current"), ignore)]
+// #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_crypto_zombies() {
     template_test_current("crypto-zombies", "examples", "new-crypto-zombies");
 }

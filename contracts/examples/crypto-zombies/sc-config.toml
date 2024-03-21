@@ -1,2 +1,2 @@
 [settings]
-proxy-paths = ["src/crypto_zombies_proxy.rs"]
+proxy-paths = ["src/proxy_crypto_zombies.rs"]
