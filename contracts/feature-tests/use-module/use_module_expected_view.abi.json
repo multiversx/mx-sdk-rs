@@ -267,7 +267,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier"
+                    "type": "TokenIdentifier<$API>"
                 },
                 {
                     "name": "token_nonce",
@@ -275,7 +275,7 @@
                 },
                 {
                     "name": "amount",
-                    "type": "BigUint"
+                    "type": "BigUint<$API>"
                 }
             ]
         },
@@ -309,11 +309,11 @@
             "fields": [
                 {
                     "name": "depositor_addr",
-                    "type": "Address"
+                    "type": "ManagedAddress<$API>"
                 },
                 {
                     "name": "tokens",
-                    "type": "EsdtTokenPayment"
+                    "type": "EsdtTokenPayment<$API>"
                 }
             ]
         },
@@ -326,15 +326,15 @@
                 },
                 {
                     "name": "dest_address",
-                    "type": "Address"
+                    "type": "ManagedAddress<$API>"
                 },
                 {
                     "name": "function_name",
-                    "type": "bytes"
+                    "type": "ManagedBuffer<$API>"
                 },
                 {
                     "name": "arguments",
-                    "type": "List<bytes>"
+                    "type": "ManagedVec<$API, ManagedBuffer<$API>>"
                 }
             ]
         },
@@ -343,19 +343,19 @@
             "fields": [
                 {
                     "name": "proposer",
-                    "type": "Address"
+                    "type": "ManagedAddress<$API>"
                 },
                 {
                     "name": "actions",
-                    "type": "List<GovernanceAction>"
+                    "type": "ArrayVec<GovernanceAction<$API>, 4usize>"
                 },
                 {
                     "name": "description",
-                    "type": "bytes"
+                    "type": "ManagedBuffer<$API>"
                 },
                 {
                     "name": "fees",
-                    "type": "ProposalFees"
+                    "type": "ProposalFees<$API>"
                 }
             ]
         },
@@ -414,11 +414,11 @@
             "fields": [
                 {
                     "name": "total_amount",
-                    "type": "BigUint"
+                    "type": "BigUint<$API>"
                 },
                 {
                     "name": "entries",
-                    "type": "List<FeeEntry>"
+                    "type": "ManagedVec<$API, FeeEntry<$API>>"
                 }
             ]
         },
@@ -427,19 +427,19 @@
             "fields": [
                 {
                     "name": "up_votes",
-                    "type": "BigUint"
+                    "type": "BigUint<$API>"
                 },
                 {
                     "name": "down_votes",
-                    "type": "BigUint"
+                    "type": "BigUint<$API>"
                 },
                 {
                     "name": "down_veto_votes",
-                    "type": "BigUint"
+                    "type": "BigUint<$API>"
                 },
                 {
                     "name": "abstain_votes",
-                    "type": "BigUint"
+                    "type": "BigUint<$API>"
                 }
             ]
         },
