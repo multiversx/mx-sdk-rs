@@ -637,27 +637,23 @@ where
 
 }
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpInConstructor
-{
+pub struct OnlyShowsUpInConstructor {
     pub something: (),
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct AbiTestType
-{
+pub struct AbiTestType {
     pub nested: OnlyShowsUpAsNested01,
     pub next: Option<Box<AbiTestType>>,
     pub tuple_madness: (OnlyShowsUpAsNested02, Option<Box<AbiTestType>>),
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested01
-{
+pub struct OnlyShowsUpAsNested01 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested02
-{
+pub struct OnlyShowsUpAsNested02 {
     pub something: [u8; 0],
 }
 
@@ -673,13 +669,11 @@ pub enum AbiEnum {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested08
-{
+pub struct OnlyShowsUpAsNested08 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested09
-{
+pub struct OnlyShowsUpAsNested09 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
@@ -693,28 +687,23 @@ where
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested03
-{
+pub struct OnlyShowsUpAsNested03 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested04
-{
+pub struct OnlyShowsUpAsNested04 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested05
-{
+pub struct OnlyShowsUpAsNested05 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested06
-{
+pub struct OnlyShowsUpAsNested06 {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested07
-{
+pub struct OnlyShowsUpAsNested07 {
 }
 
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
@@ -730,32 +719,6 @@ pub enum EsdtLocalRole {
     Transfer,
 }
 
-#[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
-pub struct EsdtTokenPayment<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub token_identifier: TokenIdentifier<Api>,
-    pub token_nonce: u64,
-    pub amount: BigUint<Api>,
-}
-
-#[derive(Clone, TopDecode, TopEncode, NestedDecode, NestedEncode, Debug, ManagedVecItem)]
-pub struct EsdtTokenData<Api>
-where
-    Api: ManagedTypeApi,
-{
-    pub token_type: EsdtTokenType,
-    pub amount: BigUint<Api>,
-    pub frozen: bool,
-    pub hash: ManagedBuffer<Api>,
-    pub name: ManagedBuffer<Api>,
-    pub attributes: ManagedBuffer<Api>,
-    pub creator: ManagedAddress<Api>,
-    pub royalties: BigUint<Api>,
-    pub uris: ManagedVec<Api, ManagedBuffer<Api>>,
-}
-
 #[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, ManagedVecItem)]
 pub enum EsdtTokenType {
     Fungible,
@@ -766,66 +729,54 @@ pub enum EsdtTokenType {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInSingleValueMapper
-{
+pub struct OnlyShowsUpAsNestedInSingleValueMapper {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInVec
-{
+pub struct OnlyShowsUpAsNestedInVec {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInArrayVec
-{
+pub struct OnlyShowsUpAsNestedInArrayVec {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, ManagedVecItem)]
-pub struct AbiManagedVecItem
-{
+pub struct AbiManagedVecItem {
     pub value1: u32,
     pub value2: u32,
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInArray
-{
+pub struct OnlyShowsUpAsNestedInArray {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInBox
-{
+pub struct OnlyShowsUpAsNestedInBox {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInBoxedSlice
-{
+pub struct OnlyShowsUpAsNestedInBoxedSlice {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInRef
-{
+pub struct OnlyShowsUpAsNestedInRef {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInSlice
-{
+pub struct OnlyShowsUpAsNestedInSlice {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInOption
-{
+pub struct OnlyShowsUpAsNestedInOption {
 }
 
 #[derive(TopEncode, TopDecode)]
-pub struct OnlyShowsUpInEsdtAttr
-{
+pub struct OnlyShowsUpInEsdtAttr {
     pub field: OnlyShowsUpAsNested10,
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested10
-{
+pub struct OnlyShowsUpAsNested10 {
 }
 
 #[derive(TopEncode, TopDecode)]
