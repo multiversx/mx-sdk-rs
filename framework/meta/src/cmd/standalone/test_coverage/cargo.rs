@@ -77,12 +77,9 @@ pub fn get_instrumented_test_binaries_paths(path: &str) -> Result<Vec<String>, T
             continue;
         };
 
-        if !matches!(
-            message.get("reason").map(|val| val.as_str()),
-            Some(Some("compiler-artifact"))
-        ) {
+        let Some("compiler-artifact") = message.get("reason").and_then(|val| val.as_str()) else {
             continue;
-        }
+        };
 
         let Ok(mut message) = serde_json::from_value::<PartialCompilerArtifactMessage>(message)
         else {
