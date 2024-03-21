@@ -58,27 +58,6 @@ impl TypeContents {
     pub fn is_specified(&self) -> bool {
         !matches!(*self, TypeContents::NotSpecified)
     }
-
-    pub fn extract_names(&self) -> Vec<String> {
-        let mut names = Vec::new();
-        match &self {
-            TypeContents::Enum(enum_variants) => {
-                for enum_variant in enum_variants {
-                    names.push(enum_variant.name.clone());
-                }
-            },
-            TypeContents::Struct(struct_fields) => {
-                for struct_field in struct_fields {
-                    names.push(struct_field.name.clone());
-                    // names.push(struct_field.field_type.clone());
-                }
-            },
-            TypeContents::ExplicitEnum(_explicit_enum_variants) => {},
-            TypeContents::NotSpecified => {},
-        }
-
-        names
-    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
