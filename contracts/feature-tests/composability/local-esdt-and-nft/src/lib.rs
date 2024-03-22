@@ -287,7 +287,7 @@ pub trait LocalEsdtAndEsdtNft {
             ManagedAsyncCallResult::Err(message) => {
                 // return issue cost to the caller
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens);
+                    self.tx().to(caller).egld(&returned_tokens).transfer();
                 }
 
                 self.last_error_message().set(&message.err_msg);
@@ -311,7 +311,7 @@ pub trait LocalEsdtAndEsdtNft {
                 let (token_identifier, returned_tokens) =
                     self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens);
+                    self.tx().to(caller).egld(&returned_tokens).transfer();
                 }
 
                 self.last_error_message().set(&message.err_msg);
