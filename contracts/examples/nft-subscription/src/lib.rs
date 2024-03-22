@@ -35,12 +35,15 @@ pub trait NftSubscription:
             ManagedBuffer::from(b"common"),
             &ManagedVec::new(),
         );
-        self.send().direct_esdt(
-            &self.blockchain().get_caller(),
-            self.token_id().get_token_id_ref(),
-            nonce,
-            &BigUint::from(1u8),
-        );
+
+        self.tx()
+            .to(ToCaller)
+            .esdt_refs(
+                self.token_id().get_token_id_ref(),
+                nonce,
+                &BigUint::from(1u8),
+            )
+            .transfer();
     }
 
     #[payable("*")]
@@ -48,12 +51,10 @@ pub trait NftSubscription:
     fn update_attributes(&self, attributes: ManagedBuffer) {
         let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
         self.update_subscription_attributes::<ManagedBuffer>(&id, nonce, attributes);
-        self.send().direct_esdt(
-            &self.blockchain().get_caller(),
-            &id,
-            nonce,
-            &BigUint::from(1u8),
-        );
+        self.tx()
+            .to(ToCaller)
+            .esdt_refs(&id, nonce, &BigUint::from(1u8))
+            .transfer();
     }
 
     #[payable("*")]
@@ -61,12 +62,10 @@ pub trait NftSubscription:
     fn renew(&self, duration: u64) {
         let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
         self.renew_subscription::<ManagedBuffer>(&id, nonce, duration);
-        self.send().direct_esdt(
-            &self.blockchain().get_caller(),
-            &id,
-            nonce,
-            &BigUint::from(1u8),
-        );
+        self.tx()
+            .to(ToCaller)
+            .esdt_refs(&id, nonce, &BigUint::from(1u8))
+            .transfer();
     }
 
     #[payable("*")]
@@ -74,12 +73,11 @@ pub trait NftSubscription:
     fn cancel(&self) {
         let (id, nonce, _) = self.call_value().single_esdt().into_tuple();
         self.cancel_subscription::<ManagedBuffer>(&id, nonce);
-        self.send().direct_esdt(
-            &self.blockchain().get_caller(),
-            &id,
-            nonce,
-            &BigUint::from(1u8),
-        );
+
+        self.tx()
+            .to(ToCaller)
+            .esdt_refs(&id, nonce, &BigUint::from(1u8))
+            .transfer();
     }
 
     #[storage_mapper("tokenId")]

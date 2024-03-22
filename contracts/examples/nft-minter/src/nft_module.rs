@@ -88,13 +88,11 @@ pub trait NftModule {
         self.price_tag(nft_nonce).clear();
 
         let nft_token_id = self.nft_token_id().get();
-        let caller = self.blockchain().get_caller();
-        self.send().direct_esdt(
-            &caller,
-            &nft_token_id,
-            nft_nonce,
-            &BigUint::from(NFT_AMOUNT),
-        );
+
+        self.tx()
+            .to(ToCaller)
+            .esdt_refs(&nft_token_id, nft_nonce, &BigUint::from(NFT_AMOUNT))
+            .transfer();
 
         let owner = self.blockchain().get_owner_address();
         self.send().direct(

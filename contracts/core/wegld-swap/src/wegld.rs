@@ -23,9 +23,10 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
         self.send()
             .esdt_local_mint(&wrapped_egld_token_id, 0, &payment_amount);
 
-        let caller = self.blockchain().get_caller();
-        self.send()
-            .direct_esdt(&caller, &wrapped_egld_token_id, 0, &payment_amount);
+        self.tx()
+            .to(ToCaller)
+            .esdt_refs(&wrapped_egld_token_id, 0, &payment_amount)
+            .transfer();
 
         EsdtTokenPayment::new(wrapped_egld_token_id, 0, payment_amount.clone_value())
     }

@@ -3,6 +3,7 @@ use crate::{
         CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage_clear, storage_get, storage_set,
+    types::Tx,
 };
 
 use super::{
@@ -368,13 +369,14 @@ where
     }
 
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
-        let send_wrapper = SendWrapper::<SA>::new();
-        send_wrapper.direct_esdt(
-            to,
-            &payment.token_identifier,
-            payment.token_nonce,
-            &payment.amount,
-        );
+        Tx::new_tx_from_sc()
+            .to(to)
+            .esdt_refs(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            )
+            .transfer();
     }
 }
 

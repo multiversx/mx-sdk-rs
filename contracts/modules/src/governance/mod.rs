@@ -84,12 +84,14 @@ pub trait GovernanceModule:
         for fee_entry in fees_to_send.iter() {
             let payment = fee_entry.tokens.clone();
 
-            self.send().direct_esdt(
-                &fee_entry.depositor_addr,
-                &payment.token_identifier,
-                payment.token_nonce,
-                &payment.amount,
-            );
+            self.tx()
+                .to(&fee_entry.depositor_addr)
+                .esdt_refs(
+                    &payment.token_identifier,
+                    payment.token_nonce,
+                    &payment.amount,
+                )
+                .transfer();
             self.user_claim_event(&caller, proposal_id, &fee_entry.tokens);
         }
     }
@@ -420,12 +422,14 @@ pub trait GovernanceModule:
 
         for fee_entry in payments.entries.iter() {
             let payment = fee_entry.tokens;
-            self.send().direct_esdt(
-                &fee_entry.depositor_addr,
-                &payment.token_identifier,
-                payment.token_nonce,
-                &payment.amount,
-            );
+            self.tx()
+                .to(&fee_entry.depositor_addr)
+                .esdt_refs(
+                    &payment.token_identifier,
+                    payment.token_nonce,
+                    &payment.amount,
+                )
+                .transfer();
         }
     }
 
