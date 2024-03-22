@@ -73,11 +73,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             all_token_payments.push(payment);
         }
 
-        self.tx()
-            .with_gas_limit(self.blockchain().get_gas_left())
-            .to(&to)
-            .multi_esdt(all_token_payments)
-            .transfer_execute();
+        self.tx().to(&to).multi_esdt(all_token_payments).transfer();
     }
 
     #[payable("EGLD")]
