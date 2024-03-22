@@ -28,6 +28,7 @@ pub mod storage_mapper_linked_list;
 pub mod storage_mapper_map;
 pub mod storage_mapper_map_storage;
 pub mod storage_mapper_non_fungible_token;
+pub mod storage_mapper_object_to_id;
 pub mod storage_mapper_queue;
 pub mod storage_mapper_set;
 pub mod storage_mapper_single;
@@ -78,6 +79,7 @@ pub trait BasicFeatures:
     + non_zero_features::TypeFeatures
     + multiversx_sc_modules::default_issue_callbacks::DefaultIssueCallbacksModule
     + storage_mapper_get_at_address::StorageMapperGetAtAddress
+    + storage_mapper_object_to_id::ObjectToIdMapperFeatures
 {
     #[init]
     fn init(&self) {}
