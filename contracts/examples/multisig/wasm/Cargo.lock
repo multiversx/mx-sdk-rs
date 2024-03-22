@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.47.4"
+version = "0.47.8"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -85,7 +85,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.47.4"
+version = "0.47.8"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -96,14 +96,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.47.4"
+version = "0.47.8"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.47.4"
+version = "0.47.8"
 dependencies = [
  "multiversx-sc",
 ]
@@ -156,9 +156,9 @@ dependencies = [
 
 [[package]]
 name = "smallvec"
-version = "1.13.1"
+version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6ecd384b10a64542d77071bd64bd7b231f4ed5940fba55e98c3de13824cf3d7"
+checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
 
 [[package]]
 name = "syn"
