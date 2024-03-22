@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     OriginalResultMarker, Tx, TxData, TxDataFunctionCall, TxEnv, TxFrom, TxGas, TxPayment,
-    TxPaymentNormalize, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 pub trait TxAsyncCallCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -119,7 +119,7 @@ impl<Api, To, Payment, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, (), FC, RH>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
+    Payment: TxPayment<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
     RH: TxAsyncCallCallback<Api>,
 {

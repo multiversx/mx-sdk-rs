@@ -1,6 +1,6 @@
 use crate::{
     contract_base::SendRawWrapper,
-    types::{BigUint, ManagedAddress, ManagedVec},
+    types::{BigUint, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
 };
 
 use super::{
@@ -37,6 +37,25 @@ where
                 &fc.function_name,
                 &fc.arg_buffer,
             );
+        })
+    }
+
+    fn with_normalized<From, To, F, R>(
+        self,
+        env: &Env,
+        _from: &From,
+        to: To,
+        fc: FunctionCall<Env::Api>,
+        f: F,
+    ) -> R
+    where
+        From: TxFrom<Env>,
+        To: TxToSpecified<Env>,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+    {
+        to.with_address_ref(env, |to_addr| {
+            self.0
+                .with_egld_value(|egld_value| f(to_addr, egld_value, &fc))
         })
     }
 

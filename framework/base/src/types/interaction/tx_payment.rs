@@ -2,13 +2,11 @@ mod tx_payment_egld;
 mod tx_payment_egld_value;
 mod tx_payment_multi_esdt;
 mod tx_payment_none;
-mod tx_payment_normalize;
 mod tx_payment_other;
 mod tx_payment_single_esdt;
 
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
-pub use tx_payment_normalize::TxPaymentNormalize;
 
 use crate::{
     api::ManagedTypeApi,
@@ -19,15 +17,18 @@ use crate::{
     },
 };
 
-use super::{FunctionCall, TxEnv};
+use super::{FunctionCall, TxEnv, TxFrom, TxToSpecified};
 
 /// Describes a payment that is part of a transaction.
 pub trait TxPayment<Env>
 where
     Env: TxEnv,
 {
+    /// Returns true if payment indicates transfer of either non-zero EGLD or ESDT amounts.
     fn is_no_payment(&self) -> bool;
 
+    /// Transfer-execute calls have different APIs for different payments types.
+    /// This method selects between them.
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -36,6 +37,21 @@ where
         fc: FunctionCall<Env::Api>,
     );
 
+    /// Converts an ESDT call to a built-in function call, if necessary.
+    fn with_normalized<From, To, F, R>(
+        self,
+        env: &Env,
+        from: &From,
+        to: To,
+        fc: FunctionCall<Env::Api>,
+        f: F,
+    ) -> R
+    where
+        From: TxFrom<Env>,
+        To: TxToSpecified<Env>,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R;
+
+    /// Payment data to be used by the testing framework. Will be refactored.
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api>;
 }
 
