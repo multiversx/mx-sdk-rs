@@ -63,10 +63,11 @@ pub trait EsdtModule {
             ManagedAsyncCallResult::Err(_) => {
                 // return payment to initial caller
                 let initial_caller = self.blockchain().get_owner_address();
-                let egld_returned = self.call_value().egld_value().to_u64().unwrap();
-                if egld_returned > 0u64 {
-                    self.tx().to(&initial_caller).egld(egld_returned).transfer();
-                }
+                let egld_returned = self.call_value().egld_value();
+                self.tx()
+                    .to(&initial_caller)
+                    .egld(&*egld_returned)
+                    .transfer_if_not_empty();
             },
         }
     }
