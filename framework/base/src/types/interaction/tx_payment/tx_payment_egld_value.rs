@@ -1,6 +1,6 @@
-use crate::types::BigUint;
+use crate::types::{AnnotatedValue, BigUint};
 
-use super::{AnnotatedValue, TxEnv};
+use super::TxEnv;
 
 pub trait TxEgldValue<Env>: AnnotatedValue<Env, BigUint<Env::Api>>
 where

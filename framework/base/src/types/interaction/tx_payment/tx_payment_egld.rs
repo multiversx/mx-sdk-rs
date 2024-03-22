@@ -4,8 +4,8 @@ use crate::{
 };
 
 use super::{
-    AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv,
-    TxPayment,
+    AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment,
+    TxPaymentEgldOnly,
 };
 
 /// Indicates the EGLD payment in a transaction.
@@ -45,34 +45,6 @@ where
             egld: Some(AnnotatedEgldPayment::new_egld(self.0.into_value(env))),
             multi_esdt: ManagedVec::new(),
         }
-    }
-}
-
-/// Marks a payment object that only contains EGLD or nothing at all.
-pub trait TxPaymentEgldOnly<Env>: TxPayment<Env>
-where
-    Env: TxEnv,
-{
-    fn with_egld_value<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&BigUint<Env::Api>) -> R;
-
-    fn into_egld_payment(self, env: &Env) -> BigUint<Env::Api>;
-}
-
-impl<Env> TxPaymentEgldOnly<Env> for ()
-where
-    Env: TxEnv,
-{
-    fn with_egld_value<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&BigUint<Env::Api>) -> R,
-    {
-        f(&BigUint::zero())
-    }
-
-    fn into_egld_payment(self, _env: &Env) -> BigUint<Env::Api> {
-        BigUint::zero()
     }
 }
 

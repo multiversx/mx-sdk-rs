@@ -1,11 +1,9 @@
 use crate::types::{
     BigUint, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedAddress,
-    MultiEsdtPayment,
+    MultiEsdtPayment, TxFrom, TxToSpecified,
 };
 
-use super::{
-    Egld, FunctionCall, TxEgldValue, TxEnv, TxFrom, TxPayment,  TxToSpecified,
-};
+use super::{Egld, FunctionCall, TxEgldValue, TxEnv, TxPayment};
 
 /// Defines how a payment transforms a transaction,
 /// e.g. from ESDT transfer to ESDTTransfer builtin function.
