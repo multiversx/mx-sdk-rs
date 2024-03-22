@@ -86,7 +86,7 @@ pub trait GovernanceModule:
 
             self.tx()
                 .to(&fee_entry.depositor_addr)
-                .esdt_refs(
+                .single_esdt(
                     &payment.token_identifier,
                     payment.token_nonce,
                     &payment.amount,
@@ -424,7 +424,7 @@ pub trait GovernanceModule:
             let payment = fee_entry.tokens;
             self.tx()
                 .to(&fee_entry.depositor_addr)
-                .esdt_refs(
+                .single_esdt(
                     &payment.token_identifier,
                     payment.token_nonce,
                     &payment.amount,

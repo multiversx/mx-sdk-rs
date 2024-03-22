@@ -197,7 +197,7 @@ where
     ) {
         Tx::new_tx_from_sc()
             .to(to)
-            .esdt_refs(token_identifier, token_nonce, amount)
+            .single_esdt(token_identifier, token_nonce, amount)
             .transfer();
     }
 

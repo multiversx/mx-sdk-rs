@@ -371,7 +371,7 @@ where
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
         Tx::new_tx_from_sc()
             .to(to)
-            .esdt_refs(
+            .single_esdt(
                 &payment.token_identifier,
                 payment.token_nonce,
                 &payment.amount,

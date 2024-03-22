@@ -207,7 +207,7 @@ where
     /// Sets a single token payment, with the token identifier and amount kept as references.
     ///
     /// This is handy whem we only want one ESDT transfer and we want to avoid unnecessary object clones.
-    pub fn esdt_refs<'a>(
+    pub fn single_esdt<'a>(
         self,
         token_identifier: &'a TokenIdentifier<Env::Api>,
         token_nonce: u64,

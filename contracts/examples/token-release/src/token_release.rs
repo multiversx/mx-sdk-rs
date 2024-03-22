@@ -314,7 +314,7 @@ pub trait TokenRelease {
     ) {
         self.tx()
             .to(address)
-            .esdt_refs(token_identifier, 0, amount)
+            .single_esdt(token_identifier, 0, amount)
             .transfer();
     }
 

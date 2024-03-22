@@ -273,7 +273,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
 
         self.tx()
             .to(&to)
-            .esdt_refs(&token_identifier, token_nonce, &amount)
+            .single_esdt(&token_identifier, token_nonce, &amount)
             .transfer();
 
         self.send_event(&to, &token_identifier, token_nonce, &amount);

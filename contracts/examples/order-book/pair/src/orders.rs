@@ -355,7 +355,7 @@ pub trait OrdersModule:
             if transfer.payment.amount > 0 {
                 self.tx()
                     .to(&transfer.to)
-                    .esdt_refs(&transfer.payment.token_id, 0, &transfer.payment.amount)
+                    .single_esdt(&transfer.payment.token_id, 0, &transfer.payment.amount)
                     .transfer();
             }
         }

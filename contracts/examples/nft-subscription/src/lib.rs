@@ -38,7 +38,7 @@ pub trait NftSubscription:
 
         self.tx()
             .to(ToCaller)
-            .esdt_refs(
+            .single_esdt(
                 self.token_id().get_token_id_ref(),
                 nonce,
                 &BigUint::from(1u8),
@@ -53,7 +53,7 @@ pub trait NftSubscription:
         self.update_subscription_attributes::<ManagedBuffer>(&id, nonce, attributes);
         self.tx()
             .to(ToCaller)
-            .esdt_refs(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(&id, nonce, &BigUint::from(1u8))
             .transfer();
     }
 
@@ -64,7 +64,7 @@ pub trait NftSubscription:
         self.renew_subscription::<ManagedBuffer>(&id, nonce, duration);
         self.tx()
             .to(ToCaller)
-            .esdt_refs(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(&id, nonce, &BigUint::from(1u8))
             .transfer();
     }
 
@@ -76,7 +76,7 @@ pub trait NftSubscription:
 
         self.tx()
             .to(ToCaller)
-            .esdt_refs(&id, nonce, &BigUint::from(1u8))
+            .single_esdt(&id, nonce, &BigUint::from(1u8))
             .transfer();
     }
 

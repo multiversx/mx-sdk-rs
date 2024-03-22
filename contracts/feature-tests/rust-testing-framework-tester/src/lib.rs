@@ -93,7 +93,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
         self.tx()
             .to(ToCaller)
-            .esdt_refs(&payment.token_identifier, 0, &amount)
+            .single_esdt(&payment.token_identifier, 0, &amount)
             .transfer();
     }
 
@@ -114,7 +114,7 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     ) {
         self.tx()
             .to(&to)
-            .esdt_refs(&token_id, nft_nonce, &amount)
+            .single_esdt(&token_id, nft_nonce, &amount)
             .transfer();
     }
 

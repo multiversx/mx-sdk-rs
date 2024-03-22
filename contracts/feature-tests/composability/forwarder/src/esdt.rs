@@ -32,7 +32,10 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
     #[endpoint]
     fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
-        self.tx().to(to).esdt_refs(&token_id, 0, amount).transfer();
+        self.tx()
+            .to(to)
+            .single_esdt(&token_id, 0, amount)
+            .transfer();
     }
 
     #[payable("*")]
@@ -44,7 +47,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
         self.tx()
             .to(&to)
-            .esdt_refs(&token_id, 0, &amount_to_send)
+            .single_esdt(&token_id, 0, &amount_to_send)
             .transfer();
     }
 
@@ -58,11 +61,11 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
     ) {
         self.tx()
             .to(to)
-            .esdt_refs(&token_id, 0, amount_first_time)
+            .single_esdt(&token_id, 0, amount_first_time)
             .transfer();
         self.tx()
             .to(to)
-            .esdt_refs(&token_id, 0, amount_second_time)
+            .single_esdt(&token_id, 0, amount_second_time)
             .transfer();
     }
 

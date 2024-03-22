@@ -68,7 +68,7 @@ pub trait NftModule:
 
         self.tx()
             .to(ToCaller)
-            .esdt_refs(&nft_token_id, nft_nonce, &BigUint::from(NFT_AMOUNT))
+            .single_esdt(&nft_token_id, nft_nonce, &BigUint::from(NFT_AMOUNT))
             .transfer();
 
         self.distribute_funds(

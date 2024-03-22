@@ -14,7 +14,7 @@ pub trait HelpersModule: storage::StorageModule {
             let esdt_fee = fee.clone().unwrap_esdt();
             self.tx()
                 .to(address)
-                .esdt_refs(&esdt_fee.token_identifier, 0, &esdt_fee.amount)
+                .single_esdt(&esdt_fee.token_identifier, 0, &esdt_fee.amount)
                 .transfer();
         }
     }

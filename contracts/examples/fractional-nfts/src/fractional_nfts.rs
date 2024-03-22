@@ -87,7 +87,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
 
         self.tx()
             .to(ToCaller)
-            .esdt_refs(
+            .single_esdt(
                 fractional_token,
                 fractional_nonce,
                 &initial_fractional_amount,
@@ -127,7 +127,7 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
 
         self.tx()
             .to(ToCaller)
-            .esdt_refs(
+            .single_esdt(
                 &original.token_identifier,
                 original.token_nonce,
                 &original.amount,
