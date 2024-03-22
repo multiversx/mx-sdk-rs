@@ -127,10 +127,14 @@ where
     where
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| {
-            let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
-            f(&from.resolve_address(env), &BigUint::zero(), &fc_conv)
-        })
+        match self.len() {
+            0 => ().with_normalized(env, from, to, fc, f),
+            1 => self.get(0).with_normalized(env, from, to, fc, f),
+            _ => to.with_address_ref(env, |to_addr| {
+                let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
+                f(&from.resolve_address(env), &BigUint::zero(), &fc_conv)
+            }),
+        }
     }
 }
 
