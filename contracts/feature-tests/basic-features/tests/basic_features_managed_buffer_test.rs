@@ -1,4 +1,4 @@
-use multiversx_sc::types::{ManagedAddress, ManagedBuffer};
+use multiversx_sc::types::{BigFloat, BigUint, ManagedAddress, ManagedBuffer};
 use multiversx_sc_scenario::{api::StaticApi, *};
 
 use basic_features::managed_buffer_features::ManagedBufferFeatures;
@@ -8,6 +8,14 @@ fn test_managed_buffer_new_empty() {
     let bf = basic_features::contract_obj::<StaticApi>();
     let result = bf.mbuffer_new();
     assert_eq!(ManagedBuffer::new(), result);
+}
+
+#[test]
+fn test_managed_buffer_from_big_float() {
+    let bf = basic_features::contract_obj::<StaticApi>();
+    let big_float = BigFloat::from_big_uint(&BigUint::from(5u64));
+    let result = bf.mbuffer_from_big_float(big_float);
+    println!("result is {:#?}", result);
 }
 
 #[test]

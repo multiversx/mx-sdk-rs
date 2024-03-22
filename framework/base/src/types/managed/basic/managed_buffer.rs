@@ -2,7 +2,7 @@ use crate::{
     abi::TypeName,
     api::{
         use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, StaticVarApiImpl,
+        ManagedTypeApi, ManagedTypeApiImpl, StaticVarApiImpl,
     },
     codec::{
         CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
@@ -14,6 +14,8 @@ use crate::{
     },
     types::{heap::BoxedBytes, ManagedType, StaticBufferRef},
 };
+
+use super::BigFloat;
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
@@ -95,6 +97,24 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             let result = f(buffer);
             self.overwrite(result);
         });
+    }
+
+    pub fn mb_from_big_float(big_float: BigFloat<M>) -> Self {
+        let big_float_handle = big_float.get_handle();
+        let new_handle: M::ManagedBufferHandle =
+            use_raw_handle(M::static_var_api_impl().next_handle());
+        M::managed_type_impl().mb_from_big_float(big_float_handle, new_handle.clone());
+        ManagedBuffer::from_handle(new_handle)
+    }
+}
+
+impl<M> From<BigFloat<M>> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(big_float: BigFloat<M>) -> Self {
+        Self::mb_from_big_float(big_float)
     }
 }
 
