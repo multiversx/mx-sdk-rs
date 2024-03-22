@@ -104,15 +104,16 @@ where
 {
     fn execute_deploy_raw(self) -> (ManagedAddress<Api>, ManagedVec<Api, ManagedBuffer<Api>>, RH) {
         let gas_limit = self.gas.resolve_gas(&self.env);
-        let egld_payment = self.payment.to_egld_payment();
 
-        let (new_address, raw_results) = SendRawWrapper::<Api>::new().deploy_contract(
-            gas_limit,
-            &egld_payment.value,
-            &self.data.code_source.0.into_value(&self.env),
-            self.data.code_metadata,
-            &self.data.arg_buffer,
-        );
+        let (new_address, raw_results) = self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().deploy_contract(
+                gas_limit,
+                egld_value,
+                &self.data.code_source.0.into_value(&self.env),
+                self.data.code_metadata,
+                &self.data.arg_buffer,
+            )
+        });
 
         SendRawWrapper::<Api>::new().clean_return_data();
 
@@ -141,15 +142,16 @@ where
         self,
     ) -> (ManagedAddress<Api>, ManagedVec<Api, ManagedBuffer<Api>>, RH) {
         let gas_limit = self.gas.resolve_gas(&self.env);
-        let egld_payment = self.payment.to_egld_payment();
 
-        let (new_address, raw_results) = SendRawWrapper::<Api>::new().deploy_from_source_contract(
-            gas_limit,
-            &egld_payment.value,
-            &self.data.code_source.0.into_value(&self.env),
-            self.data.code_metadata,
-            &self.data.arg_buffer,
-        );
+        let (new_address, raw_results) = self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().deploy_from_source_contract(
+                gas_limit,
+                egld_value,
+                &self.data.code_source.0.into_value(&self.env),
+                self.data.code_metadata,
+                &self.data.arg_buffer,
+            )
+        });
 
         SendRawWrapper::<Api>::new().clean_return_data();
 
@@ -222,14 +224,16 @@ where
 {
     pub fn upgrade_async_call(self) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        SendRawWrapper::<Api>::new().upgrade_contract(
-            &self.to,
-            gas,
-            &self.payment.to_egld_payment().value,
-            &self.data.code_source.0.into_value(&self.env),
-            self.data.code_metadata,
-            &self.data.arg_buffer,
-        );
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_contract(
+                &self.to,
+                gas,
+                egld_value,
+                &self.data.code_source.0.into_value(&self.env),
+                self.data.code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
     }
 }
 
@@ -252,14 +256,16 @@ where
 {
     pub fn upgrade_async_call(self) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        SendRawWrapper::<Api>::new().upgrade_from_source_contract(
-            &self.to,
-            gas,
-            &self.payment.to_egld_payment().value,
-            &self.data.code_source.0.into_value(&self.env),
-            self.data.code_metadata,
-            &self.data.arg_buffer,
-        );
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+                &self.to,
+                gas,
+                egld_value,
+                &self.data.code_source.0.into_value(&self.env),
+                self.data.code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
     }
 }
 
@@ -337,14 +343,16 @@ where
     /// For clarity, we don't want it set twice.
     pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        SendRawWrapper::<Api>::new().upgrade_contract(
-            &self.to,
-            gas,
-            &self.payment.to_egld_payment().value,
-            code,
-            code_metadata,
-            &self.data.arg_buffer,
-        );
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_contract(
+                &self.to,
+                gas,
+                egld_value,
+                code,
+                code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
     }
 
     /// Backwards compatibility, immitates the old API.
@@ -358,13 +366,15 @@ where
         code_metadata: CodeMetadata,
     ) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        SendRawWrapper::<Api>::new().upgrade_from_source_contract(
-            &self.to,
-            gas,
-            &self.payment.to_egld_payment().value,
-            source_address,
-            code_metadata,
-            &self.data.arg_buffer,
-        );
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+                &self.to,
+                gas,
+                egld_value,
+                source_address,
+                code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
     }
 }

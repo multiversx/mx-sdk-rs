@@ -170,7 +170,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.adder().to_address())
-            .egld(50000000000000000u64.into()) // TODO: annotate "0,050000000000000000"
+            .egld(50000000000000000u64) // TODO: annotate "0,050000000000000000"
             .prepare_async()
             .run()
             .await;
