@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::codec::{TopEncode, TopEncodeMulti};
 
 use crate::{
@@ -21,10 +23,12 @@ where
     A: ErrorApi + ManagedTypeApi,
     T: TopEncodeMulti,
 {
-    let Ok(()) = topic.multi_encode_or_handle_err(
-        accumulator,
-        ExitCodecErrorHandler::<A>::from(err_msg::LOG_TOPIC_ENCODE_ERROR),
-    );
+    topic
+        .multi_encode_or_handle_err(
+            accumulator,
+            ExitCodecErrorHandler::<A>::from(err_msg::LOG_TOPIC_ENCODE_ERROR),
+        )
+        .unwrap_infallible();
 }
 
 pub fn serialize_log_data<T, A>(data: T) -> ManagedBuffer<A>
@@ -33,10 +37,11 @@ where
     A: ErrorApi + ManagedTypeApi,
 {
     let mut data_buffer = ManagedBuffer::new();
-    let Ok(()) = data.top_encode_or_handle_err(
+    data.top_encode_or_handle_err(
         &mut data_buffer,
         ExitCodecErrorHandler::<A>::from(err_msg::LOG_DATA_ENCODE_ERROR),
-    );
+    )
+    .unwrap_infallible();
     data_buffer
 }
 

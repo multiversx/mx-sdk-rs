@@ -1,3 +1,5 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
     api::{
         const_handles, use_raw_handle, ErrorApi, ManagedBufferApiImpl, ManagedTypeApi,
@@ -85,10 +87,12 @@ where
     T: TopEncode,
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
-    let Ok(()) = value.top_encode_or_handle_err(
-        StorageSetOutput::new(key),
-        ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
-    );
+    value
+        .top_encode_or_handle_err(
+            StorageSetOutput::new(key),
+            ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_ENCODE_ERROR),
+        )
+        .unwrap_infallible()
 }
 
 /// Useful for storage mappers.

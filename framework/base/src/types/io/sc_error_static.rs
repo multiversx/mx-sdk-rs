@@ -54,12 +54,6 @@ impl From<DecodeError> for StaticSCError {
     }
 }
 
-impl From<!> for StaticSCError {
-    fn from(_: !) -> Self {
-        unreachable!()
-    }
-}
-
 impl TopEncodeMulti for StaticSCError {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where

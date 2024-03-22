@@ -1,5 +1,6 @@
 use super::{Log, TxResponse, TxResponseStatus};
 use multiversx_sc::codec::{PanicErrorHandler, TopDecodeMulti};
+use unwrap_infallible::UnwrapInfallible;
 
 pub struct TypedResponse<T>
 where
@@ -19,7 +20,8 @@ where
     pub fn from_raw(raw_response: &TxResponse) -> Self {
         let result: Result<T, TxResponseStatus> = if raw_response.tx_error.is_success() {
             let mut result_raw = raw_response.out.clone();
-            let Ok(decoded) = T::multi_decode_or_handle_err(&mut result_raw, PanicErrorHandler);
+            let decoded = T::multi_decode_or_handle_err(&mut result_raw, PanicErrorHandler)
+                .unwrap_infallible();
             Ok(decoded)
         } else {
             Err(raw_response.tx_error.clone())

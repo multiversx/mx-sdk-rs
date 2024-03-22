@@ -1,12 +1,14 @@
 use crate::*;
 use alloc::vec::Vec;
 use core::fmt::Debug;
+use unwrap_infallible::UnwrapInfallible;
 
 /// Calls top encode and panics if an encoding error occurs.
 /// Do not use in smart contracts!
 pub fn top_encode_to_vec_u8_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
     let mut bytes = Vec::<u8>::new();
-    let Ok(()) = obj.top_encode_or_handle_err(&mut bytes, PanicErrorHandler);
+    obj.top_encode_or_handle_err(&mut bytes, PanicErrorHandler)
+        .unwrap_infallible();
     bytes
 }
 
@@ -14,7 +16,8 @@ pub fn top_encode_to_vec_u8_or_panic<T: TopEncode>(obj: &T) -> Vec<u8> {
 /// Do not use in smart contracts!
 pub fn dep_encode_to_vec_or_panic<T: NestedEncode>(obj: &T) -> Vec<u8> {
     let mut bytes = Vec::<u8>::new();
-    let Ok(()) = obj.dep_encode_or_handle_err(&mut bytes, PanicErrorHandler);
+    obj.dep_encode_or_handle_err(&mut bytes, PanicErrorHandler)
+        .unwrap_infallible();
     bytes
 }
 
@@ -41,15 +44,14 @@ pub fn check_dep_encode<T: NestedEncode>(obj: &T) -> Vec<u8> {
 /// Calls nested decode and panics if an encoding error occurs.
 /// Do not use in smart contracts!
 pub fn dep_decode_from_byte_slice_or_panic<T: NestedDecode>(input: &[u8]) -> T {
-    let Ok(result) = dep_decode_from_byte_slice(input, PanicErrorHandler);
-    result
+    dep_decode_from_byte_slice(input, PanicErrorHandler).unwrap_infallible()
 }
 
 /// Calls both the fast exit and the regular top-decode,
 /// compares that the outputs are equal, then returns the result.
 /// To be used in serialization tests.
 pub fn check_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
-    let Ok(fast_exit_obj) = T::top_decode_or_handle_err(bytes, PanicErrorHandler);
+    let fast_exit_obj = T::top_decode_or_handle_err(bytes, PanicErrorHandler).unwrap_infallible();
     let result_obj = T::top_decode_or_handle_err(bytes, DefaultErrorHandler).unwrap();
     assert_eq!(fast_exit_obj, result_obj);
     fast_exit_obj
@@ -59,7 +61,7 @@ pub fn check_top_decode<T: TopDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
 /// compares that the outputs are equal, then returns the result.
 /// To be used in serialization tests.
 pub fn check_dep_decode<T: NestedDecode + PartialEq + Debug>(bytes: &[u8]) -> T {
-    let Ok(fast_exit_obj) = dep_decode_from_byte_slice(bytes, PanicErrorHandler);
+    let fast_exit_obj = dep_decode_from_byte_slice(bytes, PanicErrorHandler).unwrap_infallible();
     let result_obj = dep_decode_from_byte_slice(bytes, DefaultErrorHandler).unwrap();
     assert_eq!(fast_exit_obj, result_obj);
     fast_exit_obj

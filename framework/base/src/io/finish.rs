@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput, TryStaticCast};
 
 use crate::{
@@ -20,7 +22,8 @@ where
 {
     let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
     let mut output = ApiOutputAdapter::<FA>::default();
-    let Ok(()) = item.multi_encode_or_handle_err(&mut output, h);
+    item.multi_encode_or_handle_err(&mut output, h)
+        .unwrap_infallible()
 }
 
 #[derive(Clone)]

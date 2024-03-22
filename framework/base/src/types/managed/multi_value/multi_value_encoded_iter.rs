@@ -1,5 +1,7 @@
 use core::marker::PhantomData;
 
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::codec::{TopDecodeMulti, TopDecodeMultiInput};
 
 use crate::{
@@ -54,7 +56,8 @@ where
         if self.data_loader.has_next() {
             let arg_id = ArgId::from(&b"var args"[..]);
             let h = ArgErrorHandler::<M>::from(arg_id);
-            let Ok(result) = T::multi_decode_or_handle_err(&mut self.data_loader, h);
+            let result =
+                T::multi_decode_or_handle_err(&mut self.data_loader, h).unwrap_infallible();
             Some(result)
         } else {
             None
