@@ -1,6 +1,7 @@
+use crate::parse::attributes::extract_macro_attributes;
+
 use super::parse::attributes::extract_doc;
-use proc_macro::TokenStream;
-use quote::quote;
+use quote::{quote, ToTokens};
 
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
@@ -19,7 +20,7 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
         field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
             &[ #(#field_docs),* ],
             #field_name_str,
-            <#field_ty>::type_name(),
+            <#field_ty>::type_names(),
         ));
         <#field_ty>::provide_type_descriptions(accumulator);
     }
@@ -43,8 +44,11 @@ fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     }
 }
 
-pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
+pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
     let type_docs = extract_doc(ast.attrs.as_slice());
+    let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
+
     let type_description_impl = match &ast.data {
         syn::Data::Struct(data_struct) => {
             let struct_field_snippets = fields_snippets(&data_struct.fields);
@@ -61,6 +65,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                                 &[ #(#type_docs),* ],
                                 type_names,
                                 multiversx_sc::abi::TypeContents::Struct(field_descriptions),
+                                &[ #(#macro_attributes),* ],
                             ),
                         );
                     }
@@ -104,6 +109,7 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                                 &[ #(#type_docs),* ],
                                 type_names,
                                 multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
+                                &[ #(#macro_attributes),* ],
                             ),
                         );
                     }
@@ -116,16 +122,29 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    let type_abi_impl = quote! {
+    let name_rust = extract_rust_type(ty_generics, name_str.clone());
+    quote! {
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
             fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
             }
 
+            fn type_name_rust() -> multiversx_sc::abi::TypeName {
+                #name_rust.into()
+            }
+
             #type_description_impl
         }
-    };
-    type_abi_impl.into()
+    }
+}
+
+pub fn type_abi_full(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
+    let input_conv = proc_macro2::TokenStream::from(input.clone());
+    let derive_code = type_abi_derive(input);
+    quote! {
+        #input_conv
+        #derive_code
+    }
 }
 
 pub fn get_discriminant(
@@ -169,4 +188,16 @@ pub fn get_discriminant(
     };
 
     quote! { #next_value}
+}
+
+fn extract_rust_type(ty_generics: &syn::TypeGenerics<'_>, mut output_name: String) -> String {
+    let mut ty_generics_tokens = proc_macro2::TokenStream::new();
+    ty_generics.to_tokens(&mut ty_generics_tokens);
+
+    if ty_generics_tokens.to_string().is_empty() {
+        return output_name;
+    }
+
+    output_name.push_str("<$API>");
+    output_name
 }

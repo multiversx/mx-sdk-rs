@@ -35,7 +35,7 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
     }
 
     fn type_name_rust() -> TypeName {
-        T::type_name_rust()
+        format!("Box<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -56,7 +56,8 @@ impl<T: TypeAbi> TypeAbi for &[T] {
     }
 
     fn type_name_rust() -> TypeName {
-        format!("&[{}]", T::type_name_rust())
+        // we need to convert to an owned type
+        format!("Box<[{}]>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -98,7 +99,7 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
     }
 
     fn type_name_rust() -> TypeName {
-        <&[T]>::type_name_rust()
+        format!("Box<[{}]>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -118,7 +119,8 @@ impl TypeAbi for &str {
     }
 
     fn type_name_rust() -> TypeName {
-        "&str".into()
+        // we need to convert to an owned type
+        "Box<str>".into()
     }
 }
 
@@ -204,8 +206,7 @@ macro_rules! tuple_impls {
                 $($name: TypeAbi,)+
             {
 				fn type_name() -> TypeName {
-					let mut repr = TypeName::from("tuple");
-					repr.push_str("<");
+					let mut repr = TypeName::from("tuple<");
 					$(
 						if $n > 0 {
 							repr.push(',');
@@ -213,6 +214,18 @@ macro_rules! tuple_impls {
 						repr.push_str($name::type_name().as_str());
                     )+
 					repr.push('>');
+					repr
+				}
+
+                fn type_name_rust() -> TypeName {
+					let mut repr = TypeName::from("(");
+					$(
+						if $n > 0 {
+							repr.push_str(", ");
+						}
+						repr.push_str($name::type_name_rust().as_str());
+                    )+
+					repr.push(')');
 					repr
 				}
 
@@ -252,6 +265,15 @@ impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
         repr.push('<');
         repr.push_str(T::type_name().as_str());
         repr.push('>');
+        repr
+    }
+
+    fn type_name_rust() -> TypeName {
+        let mut repr = TypeName::from("[");
+        repr.push_str(T::type_name_rust().as_str());
+        repr.push_str("; ");
+        repr.push_str(N.to_string().as_str());
+        repr.push(']');
         repr
     }
 

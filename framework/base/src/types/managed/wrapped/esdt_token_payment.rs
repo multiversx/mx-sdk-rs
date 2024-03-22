@@ -10,12 +10,13 @@ use crate::{
         derive::{NestedEncode, TopEncode},
         IntoMultiValue, NestedDecode, TopDecode,
     },
-    derive::TypeAbi,
+    derive::type_abi,
 };
 
 use super::ManagedVec;
 
-#[derive(TopEncode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug)]
+#[type_abi]
+#[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,

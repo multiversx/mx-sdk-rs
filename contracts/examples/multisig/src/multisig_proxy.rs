@@ -4,8 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
-use crate as multisig;
+use multiversx_sc::proxy_imports::*;
 
 pub struct MultisigProxy;
 
@@ -104,7 +103,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<MultiValueEncoded<Env::Api, multisig::action::ActionFullInfo<Env::Api>>>,
+        OriginalResultMarker<MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -154,7 +153,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<multisig::user_role::UserRole>,
+        OriginalResultMarker<UserRole>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -356,7 +355,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<multisig::action::Action<Env::Api>>,
+        OriginalResultMarker<Action<Env::Api>>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -722,3 +721,58 @@ where
     }
 
 }
+#[derive(TopEncode)]
+pub struct ActionFullInfo<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub action_id: usize,
+    pub action_data: Action<Api>,
+    pub signers: ManagedVec<Api, ManagedAddress<Api>>,
+}
+
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
+pub enum Action<Api>
+where
+    Api: ManagedTypeApi,
+{
+    Nothing,
+    AddBoardMember(ManagedAddress<Api>),
+    AddProposer(ManagedAddress<Api>),
+    RemoveUser(ManagedAddress<Api>),
+    ChangeQuorum(usize),
+    SendTransferExecute(CallActionData<Api>),
+    SendAsyncCall(CallActionData<Api>),
+    SCDeployFromSource {
+        amount: BigUint<Api>,
+        source: ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+    },
+    SCUpgradeFromSource {
+        sc_address: ManagedAddress<Api>,
+        amount: BigUint<Api>,
+        source: ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+    },
+}
+
+#[derive(NestedEncode, NestedDecode, Clone)]
+pub struct CallActionData<Api>
+where
+    Api: ManagedTypeApi,
+{
+    pub to: ManagedAddress<Api>,
+    pub egld_amount: BigUint<Api>,
+    pub endpoint_name: ManagedBuffer<Api>,
+    pub arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+}
+
+#[derive(TopEncode, TopDecode)]
+pub enum UserRole {
+    None,
+    Proposer,
+    BoardMember,
+}
+

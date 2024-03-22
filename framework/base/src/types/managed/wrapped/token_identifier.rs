@@ -171,6 +171,10 @@ impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
     fn type_name() -> TypeName {
         "TokenIdentifier".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "TokenIdentifier<$API>".into()
+    }
 }
 
 impl<M: ManagedTypeApi> SCDisplay for TokenIdentifier<M> {

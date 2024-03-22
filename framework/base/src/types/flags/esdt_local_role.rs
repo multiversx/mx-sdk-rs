@@ -5,7 +5,7 @@ use crate::{
 
 use super::EsdtLocalRoleFlags;
 use crate as multiversx_sc;
-use crate::{derive::TypeAbi, types::ManagedVecItem};
+use crate::{derive::type_abi, types::ManagedVecItem};
 
 static ESDT_ROLE_NONE: &[u8] = &[];
 static ESDT_ROLE_LOCAL_MINT: &[u8] = b"ESDTRoleLocalMint";
@@ -17,9 +17,8 @@ static ESDT_ROLE_NFT_ADD_URI: &[u8] = b"ESDTRoleNFTAddURI";
 static ESDT_ROLE_NFT_UPDATE_ATTRIBUTES: &[u8] = b"ESDTRoleNFTUpdateAttributes";
 static ESDT_ROLE_TRANSFER: &[u8] = b"ESDTTransferRole";
 
-#[derive(
-    TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug, Copy,
-)]
+#[type_abi]
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
 pub enum EsdtLocalRole {
     None,
     Mint,

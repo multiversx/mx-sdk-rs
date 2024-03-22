@@ -12,7 +12,7 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     }
 
     fn type_name_rust() -> TypeName {
-        format!("MultiValueVec<$API, {}>", T::type_name_rust())
+        format!("MultiValueVec<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -71,6 +71,19 @@ macro_rules! multi_arg_impls {
                             repr.push(',');
                         }
                         repr.push_str($name::type_name().as_str());
+                    )+
+                    repr.push('>');
+                    repr
+                }
+
+                fn type_name_rust() -> TypeName {
+                    let mut repr = TypeName::from(stringify!($mval_struct));
+                    repr.push('<');
+                    $(
+                        if $n > 0 {
+                            repr.push_str(", ");
+                        }
+                        repr.push_str($name::type_name_rust().as_str());
                     )+
                     repr.push('>');
                     repr

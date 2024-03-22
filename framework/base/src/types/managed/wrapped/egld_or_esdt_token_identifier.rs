@@ -214,6 +214,10 @@ impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
     fn type_name() -> TypeName {
         "EgldOrEsdtTokenIdentifier".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "EgldOrEsdtTokenIdentifier<$API>".into()
+    }
 }
 
 impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {

@@ -210,6 +210,16 @@ fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
             let adjusted = adjust_type_name(&outputs[0].type_names.rust);
             write!(file, "{adjusted}").unwrap();
         },
-        _ => panic!("multiple outputs not yet supported"),
+        _ => {
+            write!(file, "MultiValue{}<", outputs.len()).unwrap();
+            for (i, output) in outputs.iter().enumerate() {
+                if i > 0 {
+                    write!(file, ", ").unwrap();
+                }
+                let adjusted = adjust_type_name(&output.type_names.rust);
+                write!(file, "{adjusted}").unwrap();
+            }
+            write!(file, ">").unwrap();
+        },
     }
 }

@@ -1,8 +1,10 @@
 #![no_std]
 
 use multiversx_sc::{derive_imports::*, imports::*};
+pub mod crowdfunding_esdt_proxy;
 
-#[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone, Copy, Debug)]
+#[type_abi]
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,
     Successful,

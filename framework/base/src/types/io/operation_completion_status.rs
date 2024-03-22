@@ -98,6 +98,7 @@ impl TypeAbi for OperationCompletionStatus {
                         INTERRUPTED_STR,
                     )
                 ].to_vec()),
+                macro_attributes: Vec::new()
             },
         );
     }

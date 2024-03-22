@@ -73,6 +73,11 @@ pub mod derive_imports {
             NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
             TopEncodeOrDefault,
         },
-        derive::{ManagedVecItem, TypeAbi},
+        derive::{type_abi, ManagedVecItem, TypeAbi},
     };
+}
+
+/// Conveniently groups all imports required for generated proxies.
+pub mod proxy_imports {
+    pub use crate::{derive_imports::*, imports::*};
 }

@@ -9,13 +9,13 @@ const PREFIX_AUTO_GENERATED: &str = "///////////////////////////////////////////
 ////////////////////////////////////////////////////
 ";
 
-const IMPORTS: &str = "#![allow(clippy::all)]
+const PRELUDE: &str = "#![allow(clippy::all)]
 
-use multiversx_sc::imports::*;";
+use multiversx_sc::proxy_imports::*;";
 
 pub(crate) fn write_header(file: &mut File) {
     writeln!(file, "{PREFIX_AUTO_GENERATED}").unwrap();
-    writeln!(file, r#"{IMPORTS}"#).unwrap();
+    writeln!(file, r#"{PRELUDE}"#).unwrap();
 
     write_newline(file);
 }
