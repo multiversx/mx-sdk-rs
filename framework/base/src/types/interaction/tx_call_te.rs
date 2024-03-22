@@ -50,11 +50,14 @@ where
         self.transfer_execute_with_gas(0)
     }
 
+    /// Transfers funds, amount is greater than zero. Does nothing otherwise.
+    ///
+    /// Can only used for simple transfers.
     pub fn transfer_non_zero(self) {
         if self.payment.is_no_payment() {
             return;
         }
 
-        self.transfer_execute_with_gas(0)
+        self.transfer();
     }
 }
