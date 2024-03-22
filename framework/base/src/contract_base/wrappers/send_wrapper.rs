@@ -75,10 +75,7 @@ where
     /// Used especially for sending EGLD to regular accounts.
     #[inline]
     pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
-        Tx::new_tx_from_sc()
-            .to(to)
-            .egld(amount)
-            .transfer();
+        Tx::new_tx_from_sc().to(to).egld(amount).transfer();
     }
 
     /// Sends EGLD to a given address, directly.
@@ -86,10 +83,7 @@ where
     ///
     /// If the amount is 0, it returns without error.
     pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
-        Tx::new_tx_from_sc()
-            .to(to)
-            .egld(amount)
-            .transfer_non_zero();
+        Tx::new_tx_from_sc().to(to).egld(amount).transfer_non_zero();
     }
 
     /// Sends either EGLD, ESDT or NFT to the target address,
@@ -293,13 +287,10 @@ where
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
     ) {
-        let _ = self.send_raw_wrapper().multi_esdt_transfer_execute(
-            to,
-            payments,
-            0,
-            &ManagedBuffer::new(),
-            &ManagedArgBuffer::new(),
-        );
+        Tx::new_tx_from_sc()
+            .to(to)
+            .multi_esdt_ref(payments)
+            .transfer();
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
