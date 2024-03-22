@@ -13,14 +13,14 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     #[payable("*")]
     fn forward_direct_esdt_via_transf_exec(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().single_fungible_esdt();
-        self.send().direct_esdt(&to, &token, 0, &payment);
+        self.tx().to(&to).esdt_refs(&token, 0, &payment).transfer();
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
-        self.send().direct_multi(&to, &payments);
+        self.tx().to(&to).multi_esdt_ref(&payments).transfer();
     }
 
     fn forward_contract_call(
