@@ -1,9 +1,5 @@
-use crate::{
-    contract_base::BlockchainWrapper,
-    types::{
-        interaction::tx_call_deploy::RHListItemDeploy, BackTransfers, ManagedAddress,
-        ManagedBuffer, ManagedVec, RHListItemSync, TxEnv,
-    },
+use crate::types::{
+    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv,
 };
 
 use super::RHListItem;

@@ -1,11 +1,9 @@
 use crate::{
-    api::ManagedTypeApi,
-    contract_base::SendRawWrapper,
     formatter::SCLowerHex,
-    types::{CodeMetadata, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
+    types::{ManagedBuffer, ManagedBufferCachedBuilder},
 };
 
-use super::{FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo};
+use super::{FunctionCall, TxEnv};
 
 pub trait TxData<Env>
 where

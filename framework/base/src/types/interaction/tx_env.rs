@@ -1,9 +1,4 @@
-use crate::{
-    api::CallTypeApi,
-    types::{ManagedAddress, ManagedBuffer},
-};
-
-use super::AnnotatedValue;
+use crate::{api::CallTypeApi, types::ManagedAddress};
 
 pub trait TxEnv: Sized {
     type Api: CallTypeApi;

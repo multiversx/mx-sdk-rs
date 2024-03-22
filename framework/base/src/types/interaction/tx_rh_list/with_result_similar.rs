@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use multiversx_sc_codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti};
+use multiversx_sc_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::types::{
     interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItemSync,

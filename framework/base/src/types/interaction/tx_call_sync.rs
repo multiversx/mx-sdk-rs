@@ -9,8 +9,8 @@ use crate::{
 
 use super::{
     contract_call_exec::decode_result, BackTransfers, ConsNoRet, ConsRet, OriginalResultMarker,
-    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxPaymentNormalize,
-    TxScEnv, TxToSpecified,
+    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPaymentNormalize, TxScEnv,
+    TxToSpecified,
 };
 
 pub trait RHListItemSync<Env, Original>: RHListItem<Env, Original>
