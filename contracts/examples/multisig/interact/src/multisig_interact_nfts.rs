@@ -1,8 +1,8 @@
 use std::time::Duration;
 
 use multiversx_sc_scenario::multiversx_sc::{
-    codec::{multi_types::IgnoreValue, Empty},
-    types::FunctionCall,
+    codec::Empty,
+    types::{FunctionCall, ReturnsNewTokenIdentidier},
 };
 
 use super::*;
@@ -73,33 +73,20 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        // let _ = self
-        //     .interactor
-        //     .tx()
-        //     .from(&self.wallet_address)
-        //     .to(&self.state.multisig().to_address())
-        //     .with_gas_limit(80_000_000u64)
-        //     .typed(multisig_proxy::MultisigProxy)
-        //     .perform_action_endpoint(action_id)
-        //     .with_result(WithResultTokenIdentifier::new(|token_id| {
-        //         self.collection_token_identifier = token_id.to_string()
-        //     }));
-
-        let response: TypedResponse<IgnoreValue> = self
+        let new_token_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(self.state.multisig().perform_action_endpoint(action_id))
-                    .from(&self.wallet_address)
-                    .gas_limit("80,000,000")
-                    .expect(TxExpect::ok().additional_error_message(
-                        "perform issue collection with all roles failed: ",
-                    )),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(80_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .perform_action_endpoint(action_id)
+            .returns(ReturnsNewTokenIdentidier)
+            .prepare_async()
+            .run()
             .await;
-        self.collection_token_identifier = response
-            .new_issued_token_identifier
-            .expect("new token identifier could not be retrieved");
+        self.collection_token_identifier = new_token_id.to_string();
+
         println!(
             "collection token identifier: {}",
             self.collection_token_identifier
@@ -141,22 +128,20 @@ impl MultisigInteract {
             return;
         }
         println!("quorum reached for action `{action_id}`");
+        let new_token_id = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(80_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .perform_action_endpoint(action_id)
+            .returns(ReturnsNewTokenIdentidier)
+            .prepare_async()
+            .run()
+            .await;
+        self.collection_token_identifier = new_token_id.to_string();
 
-        let response: TypedResponse<IgnoreValue> =
-            self.interactor
-                .sc_call_get_result(
-                    ScCallStep::new()
-                        .call(self.state.multisig().perform_action_endpoint(action_id))
-                        .from(&self.wallet_address)
-                        .gas_limit("80,000,000")
-                        .expect(TxExpect::ok().additional_error_message(
-                            "perform issue collection with all failed: ",
-                        )),
-                )
-                .await;
-        self.collection_token_identifier = response
-            .new_issued_token_identifier
-            .expect("new token identifier could not be retrieved");
         println!(
             "collection token identifier: {}",
             self.collection_token_identifier

@@ -1,8 +1,9 @@
 use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
-        ManagedAddress, RHList, RHListItem, ReturnsExact, ReturnsNewAddress, ReturnsSimilar, TxEnv,
-        WithResultNewAddress, WithResultSimilar,
+        ManagedAddress, RHList, RHListItem, ReturnsExact, ReturnsNewAddress,
+        ReturnsNewTokenIdentidier, ReturnsSimilar, TokenIdentifier, TxEnv, WithResultNewAddress,
+        WithResultSimilar,
     },
 };
 
@@ -74,6 +75,20 @@ where
             .expect("missing returned address");
 
         new_address.into()
+    }
+}
+
+impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsNewTokenIdentidier
+where
+    Env: TxEnv,
+{
+    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+        let new_token_id = tx_response
+            .new_issued_token_identifier
+            .clone()
+            .expect("missing returned token identifier");
+
+        TokenIdentifier::from(new_token_id.as_str())
     }
 }
 
