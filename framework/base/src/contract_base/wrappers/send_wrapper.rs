@@ -75,7 +75,10 @@ where
     /// Used especially for sending EGLD to regular accounts.
     #[inline]
     pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
-        self.send_raw_wrapper().direct_egld(to, amount, Empty)
+        Tx::new_tx_from_sc()
+            .to(to)
+            .egld(amount)
+            .transfer();
     }
 
     /// Sends EGLD to a given address, directly.
@@ -83,11 +86,10 @@ where
     ///
     /// If the amount is 0, it returns without error.
     pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
-        if amount == &0 {
-            return;
-        }
-
-        self.direct_egld(to, amount)
+        Tx::new_tx_from_sc()
+            .to(to)
+            .egld(amount)
+            .transfer_non_zero();
     }
 
     /// Sends either EGLD, ESDT or NFT to the target address,
