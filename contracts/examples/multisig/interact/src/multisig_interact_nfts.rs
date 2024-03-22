@@ -73,6 +73,18 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
+        // let _ = self
+        //     .interactor
+        //     .tx()
+        //     .from(&self.wallet_address)
+        //     .to(&self.state.multisig().to_address())
+        //     .with_gas_limit(80_000_000u64)
+        //     .typed(multisig_proxy::MultisigProxy)
+        //     .perform_action_endpoint(action_id)
+        //     .with_result(WithResultTokenIdentifier::new(|token_id| {
+        //         self.collection_token_identifier = token_id.to_string()
+        //     }));
+
         let response: TypedResponse<IgnoreValue> = self
             .interactor
             .sc_call_get_result(
@@ -98,23 +110,22 @@ impl MultisigInteract {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(
-                        self.state.multisig().propose_async_call(
-                            system_sc_address,
-                            ISSUE_COST,
-                            FunctionCall::new("issueNonFungible")
-                                .argument(&COLLECTION_NAME)
-                                .argument(&COLLECTION_TICKER),
-                        ),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                system_sc_address,
+                ISSUE_COST,
+                FunctionCall::new("issueNonFungible")
+                    .argument(&COLLECTION_NAME)
+                    .argument(&COLLECTION_TICKER),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsSimilar::<usize>::new())
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed issue colllection action `{action_id}`");
         action_id
@@ -156,24 +167,23 @@ impl MultisigInteract {
         let multisig_address = self.state.multisig().to_address();
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(
-                        self.state.multisig().propose_async_call(
-                            &self.system_sc_address,
-                            0u64,
-                            FunctionCall::new("setSpecialRole")
-                                .argument(&self.collection_token_identifier)
-                                .argument(&multisig_address)
-                                .argument(&"ESDTRoleNFTCreate"),
-                        ),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                &self.system_sc_address,
+                0u64,
+                FunctionCall::new("setSpecialRole")
+                    .argument(&self.collection_token_identifier)
+                    .argument(&multisig_address)
+                    .argument(&"ESDTRoleNFTCreate"),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsSimilar::<usize>::new())
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed set special role with action `{action_id}`");
         action_id

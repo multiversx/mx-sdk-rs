@@ -13,7 +13,7 @@ use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
-    multiversx_sc::types::{BigUint, ReturnsNewAddress, ReturnsSimilar},
+    multiversx_sc::types::{BigUint, ReturnsSimilar},
     scenario_format::interpret_trait::InterpretableFrom,
     standalone::retrieve_account_as_scenario_set_state,
     test_wallets,
@@ -158,18 +158,19 @@ impl MultisigInteract {
     async fn deploy(&mut self) {
         self.set_state().await;
 
-        let board = self.board();
+        let _board = self.board();
 
-        let new_address = self
-            .interactor
-            .tx()
-            .from(&self.wallet_address)
-            .typed(multisig_proxy::MultisigProxy)
-            .init(&Config::load_config().quorum(), board)
-            .code(&self.multisig_code)
-            .with_gas_limit(100_000_000u64)
-            .returns(ReturnsNewAddress)
-            .sync_call();
+        let new_address = Address::zero();
+        // let new_address = self
+        //     .interactor
+        //     .tx()
+        //     .from(&self.wallet_address)
+        //     .typed(multisig_proxy::MultisigProxy)
+        //     .init(&Config::load_config().quorum(), board)
+        //     .code(&self.multisig_code)
+        //     .with_gas_limit(100_000_000u64)
+        //     .returns(ReturnsNewAddress)
+        //     .sync_call();
 
         let new_address_bech32 = bech32::encode(&new_address);
         println!("new address: {new_address_bech32}");
@@ -242,7 +243,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.multisig().to_address())
-            .egld(BigUint::from(5_000_000_000_000_000_0u64)) // 0,05 or 5 * 10^16
+            .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
             .prepare_async()
             .run()
             .await;
@@ -303,13 +304,25 @@ impl MultisigInteract {
 
     async fn quorum_reached(&mut self, action_id: usize) -> bool {
         self.interactor
-            .quick_query(self.state.multisig().quorum_reached(action_id))
+            .query()
+            .to(self.state.multisig().to_address())
+            .typed(multisig_proxy::MultisigProxy)
+            .quorum_reached(action_id)
+            .returns(ReturnsSimilar::<bool>::new())
+            .prepare_async()
+            .run()
             .await
     }
 
     async fn signed(&mut self, signer: &Address, action_id: usize) -> bool {
         self.interactor
-            .quick_query(self.state.multisig().signed(signer, action_id))
+            .query()
+            .to(self.state.multisig().to_address())
+            .typed(multisig_proxy::MultisigProxy)
+            .signed(signer, action_id)
+            .returns(ReturnsSimilar::<bool>::new())
+            .prepare_async()
+            .run()
             .await
     }
 
