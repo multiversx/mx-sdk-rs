@@ -33,8 +33,10 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         }
 
         if egld_funds > 0 {
-            self.send()
-                .direct_egld(&deposit.depositor_address, &egld_funds);
+            self.tx()
+                .to(&deposit.depositor_address)
+                .egld(&egld_funds)
+                .transfer();
         }
 
         if !esdt_funds.is_empty() {
@@ -71,8 +73,10 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
             .update(|collected_fees| *collected_fees += fee_cost);
 
         if deposit.egld_funds > 0 {
-            self.send()
-                .direct_egld(&caller_address, &deposit.egld_funds);
+            self.tx()
+                .to(&caller_address)
+                .egld(&deposit.egld_funds)
+                .transfer();
         }
         if !deposit.esdt_funds.is_empty() {
             self.send()

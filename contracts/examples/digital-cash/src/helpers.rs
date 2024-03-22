@@ -9,7 +9,7 @@ use crate::{
 pub trait HelpersModule: storage::StorageModule {
     fn send_fee_to_address(&self, fee: &EgldOrEsdtTokenPayment, address: &ManagedAddress) {
         if fee.token_identifier == EgldOrEsdtTokenIdentifier::egld() {
-            self.send().direct_egld(address, &fee.amount);
+            self.tx().to(address).egld(&fee.amount).transfer();
         } else {
             let esdt_fee = fee.clone().unwrap_esdt();
             self.send()
