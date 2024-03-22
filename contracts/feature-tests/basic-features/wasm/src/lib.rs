@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          387
+// Endpoints:                          384
 // Async Callback:                       1
-// Total number of exported functions: 389
+// Total number of exported functions: 386
 
 #![no_std]
 #![allow(internal_features)]
@@ -395,6 +395,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         token_identifier_is_valid_2 => token_identifier_is_valid_2
         non_zero_usize_iter => non_zero_usize_iter
         non_zero_usize_macro => non_zero_usize_macro
+        returns_egld_decimal => returns_egld_decimal
         set_contract_address => set_contract_address
         is_empty_at_address => is_empty_at_address
         contains_at_address => contains_at_address
@@ -406,6 +407,11 @@ multiversx_sc_wasm_adapter::endpoints! {
         keys_at_address => keys_at_address
         values_at_address => values_at_address
         fill_set_mapper => fill_set_mapper
+        managed_decimal_addition => managed_decimal_addition
+        managed_decimal_subtraction => managed_decimal_subtraction
+        managed_decimal_eq => managed_decimal_eq
+        managed_decimal_trunc => managed_decimal_trunc
+        managed_decimal_into_raw_units => managed_decimal_into_raw_units
         fill_map_mapper => fill_map_mapper
     )
 }

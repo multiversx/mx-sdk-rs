@@ -1,7 +1,7 @@
 use crate::only_nested::*;
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{BigUint, Box, ManagedBuffer},
+    types::{BigUint, Box, ConstDecimals, ManagedBuffer, ManagedDecimal},
 };
 multiversx_sc::derive_imports!();
 
@@ -37,4 +37,9 @@ pub struct AbiManagedVecItem {
 #[derive(TypeAbi)]
 pub struct OnlyShowsUpInEsdtAttr {
     pub field: OnlyShowsUpAsNested10,
+}
+
+#[derive(TypeAbi)]
+pub struct ManagedDecimalWrapper<M: ManagedTypeApi> {
+    pub field: ManagedDecimal<M, ConstDecimals<2>>,
 }

@@ -22,8 +22,10 @@ use only_nested::*;
 #[esdt_attribute("STRUCT1", AbiEnum)]
 #[esdt_attribute("STRUCT2", AbiManagedType<Self::Api>)]
 #[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
-#[esdt_attribute["ExplicitDiscriminant", ExplicitDiscriminant]]
-#[esdt_attribute["ExplicitDiscriminantMixed", ExplicitDiscriminantMixed]]
+#[esdt_attribute("ExplicitDiscriminant", ExplicitDiscriminant)]
+#[esdt_attribute("ExplicitDiscriminantMixed", ExplicitDiscriminantMixed)]
+#[esdt_attribute("ManagedDecimalVar", ManagedDecimal<Self::Api, NumDecimals>)]
+#[esdt_attribute("ManagedDecimalConst", ManagedDecimalWrapper<Self::Api>)]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]
