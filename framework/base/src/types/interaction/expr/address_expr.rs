@@ -40,10 +40,13 @@ impl<Env> TxToSpecified<Env> for AddressExpr
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F: FnOnce(&ManagedAddress<Env::Api>)>(&self, _env: &Env, f: F) {
+    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
+    {
         let expr: [u8; 32] = self.eval_to_array();
         let ma = expr.into();
-        f(&ma);
+        f(&ma)
     }
 }
 

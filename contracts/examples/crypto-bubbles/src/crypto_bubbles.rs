@@ -38,7 +38,7 @@ pub trait CryptoBubbles {
             *balance -= amount;
         });
 
-        self.send().direct_egld(player, amount);
+        self.tx().to(player).egld(amount).transfer();
 
         self.withdraw_event(player, amount);
     }

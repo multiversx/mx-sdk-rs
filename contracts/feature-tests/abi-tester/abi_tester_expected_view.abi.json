@@ -193,7 +193,7 @@
             "fields": [
                 {
                     "name": "big_uint",
-                    "type": "BigUint<$API>"
+                    "type": "BigUint"
                 },
                 {
                     "name": "integer",
@@ -201,7 +201,7 @@
                 },
                 {
                     "name": "managed_buffer",
-                    "type": "ManagedBuffer<$API>"
+                    "type": "bytes"
                 }
             ]
         },
@@ -239,7 +239,7 @@
                         "Tests that recursive types will not send the ABI generator into an infinite loop."
                     ],
                     "name": "next",
-                    "type": "Option<Box<AbiTestType>>"
+                    "type": "Option<AbiTestType>"
                 },
                 {
                     "docs": [
@@ -247,7 +247,7 @@
                         "Also, just like above, recursive types need to work even when nested into a tuple."
                     ],
                     "name": "tuple_madness",
-                    "type": "(OnlyShowsUpAsNested02, Option<Box<AbiTestType>>)"
+                    "type": "tuple<OnlyShowsUpAsNested02,Option<AbiTestType>>"
                 }
             ]
         },
@@ -301,7 +301,7 @@
                 },
                 {
                     "name": "amount",
-                    "type": "BigUint<$API>"
+                    "type": "BigUint"
                 },
                 {
                     "name": "frozen",
@@ -309,27 +309,27 @@
                 },
                 {
                     "name": "hash",
-                    "type": "ManagedBuffer<$API>"
+                    "type": "bytes"
                 },
                 {
                     "name": "name",
-                    "type": "ManagedBuffer<$API>"
+                    "type": "bytes"
                 },
                 {
                     "name": "attributes",
-                    "type": "ManagedBuffer<$API>"
+                    "type": "bytes"
                 },
                 {
                     "name": "creator",
-                    "type": "ManagedAddress<$API>"
+                    "type": "Address"
                 },
                 {
                     "name": "royalties",
-                    "type": "BigUint<$API>"
+                    "type": "BigUint"
                 },
                 {
                     "name": "uris",
-                    "type": "ManagedVec<$API, ManagedBuffer<$API>>"
+                    "type": "List<bytes>"
                 }
             ]
         },
@@ -338,7 +338,7 @@
             "fields": [
                 {
                     "name": "token_identifier",
-                    "type": "TokenIdentifier<$API>"
+                    "type": "TokenIdentifier"
                 },
                 {
                     "name": "token_nonce",
@@ -346,7 +346,7 @@
                 },
                 {
                     "name": "amount",
-                    "type": "BigUint<$API>"
+                    "type": "BigUint"
                 }
             ]
         },
@@ -461,7 +461,7 @@
             "fields": [
                 {
                     "name": "something",
-                    "type": "[u8; 0]"
+                    "type": "array0<u8>"
                 }
             ]
         },

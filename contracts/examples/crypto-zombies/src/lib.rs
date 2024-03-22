@@ -3,8 +3,8 @@
 use multiversx_sc::imports::*;
 
 mod crypto_kitties_proxy;
+pub mod proxy_crypto_zombies;
 mod storage;
-pub mod temp_proxy;
 mod zombie;
 mod zombie_attack;
 mod zombie_factory;

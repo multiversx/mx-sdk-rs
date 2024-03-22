@@ -32,6 +32,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[rustfmt::skip]
 impl<Env, From, Gas> MultisigProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
@@ -46,23 +47,16 @@ where
         self,
         quorum: Arg0,
         board: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyDeploy<Env, From, Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&quorum)
             .argument(&board)
             .original_result()
     }
-
 }
+
+#[rustfmt::skip]
 impl<Env, From, To, Gas> MultisigProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -74,15 +68,7 @@ where
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol. 
     pub fn deposit(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("deposit")
@@ -96,15 +82,7 @@ where
     /// - (number of signers followed by) list of signer addresses. 
     pub fn get_pending_action_full_info(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getPendingActionFullInfo")
@@ -120,15 +98,7 @@ where
         self,
         user: Arg0,
         action_id: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<bool>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
             .raw_call()
             .function_name("signed")
@@ -146,15 +116,7 @@ where
     >(
         self,
         user: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<UserRole>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, UserRole> {
         self.wrapped_tx
             .raw_call()
             .function_name("userRole")
@@ -165,15 +127,7 @@ where
     /// Lists all users that can sign actions. 
     pub fn get_all_board_members(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getAllBoardMembers")
@@ -183,15 +137,7 @@ where
     /// Lists all proposers that are not board members. 
     pub fn get_all_proposers(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getAllProposers")
@@ -204,15 +150,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("sign")
@@ -227,15 +165,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("unsign")
@@ -251,15 +181,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("discardAction")
@@ -270,15 +192,7 @@ where
     /// Minimum number of signatures needed to perform any action. 
     pub fn quorum(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("getQuorum")
@@ -289,15 +203,7 @@ where
     /// It is kept in sync with the user list by the contract. 
     pub fn num_board_members(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("getNumBoardMembers")
@@ -308,15 +214,7 @@ where
     /// It is kept in sync with the user list by the contract. 
     pub fn num_proposers(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("getNumProposers")
@@ -327,15 +225,7 @@ where
     /// 0 means that no action was ever proposed yet. 
     pub fn get_action_last_index(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("getActionLastIndex")
@@ -348,15 +238,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<Action>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, Action<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getActionData")
@@ -372,15 +254,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<ManagedVec<Env::Api, ManagedAddress<Env::Api>>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getActionSigners")
@@ -395,15 +269,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("getActionSignerCount")
@@ -421,15 +287,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("getActionValidSignerCount")
@@ -444,15 +302,7 @@ where
     >(
         self,
         board_member_address: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeAddBoardMember")
@@ -467,15 +317,7 @@ where
     >(
         self,
         proposer_address: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeAddProposer")
@@ -489,15 +331,7 @@ where
     >(
         self,
         user_address: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeRemoveUser")
@@ -510,15 +344,7 @@ where
     >(
         self,
         new_quorum: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeChangeQuorum")
@@ -539,15 +365,7 @@ where
         to: Arg0,
         egld_amount: Arg1,
         function_call: Arg2,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeTransferExecute")
@@ -571,15 +389,7 @@ where
         to: Arg0,
         egld_amount: Arg1,
         function_call: Arg2,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeAsyncCall")
@@ -600,15 +410,7 @@ where
         source: Arg1,
         code_metadata: Arg2,
         arguments: Arg3,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeSCDeployFromSource")
@@ -632,15 +434,7 @@ where
         source: Arg2,
         code_metadata: Arg3,
         arguments: Arg4,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("proposeSCUpgradeFromSource")
@@ -658,15 +452,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<bool>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
             .raw_call()
             .function_name("quorumReached")
@@ -680,15 +466,7 @@ where
     >(
         self,
         action_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<OptionalValue<ManagedAddress<Env::Api>>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<ManagedAddress<Env::Api>>> {
         self.wrapped_tx
             .raw_call()
             .function_name("performAction")
@@ -703,15 +481,7 @@ where
         self,
         dns_address: Arg0,
         name: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("dnsRegister")
@@ -719,9 +489,9 @@ where
             .argument(&name)
             .original_result()
     }
-
 }
-#[derive(TopEncode, TopDecode)]
+
+#[derive(TopEncode)]
 pub struct ActionFullInfo<Api>
 where
     Api: ManagedTypeApi,
@@ -731,20 +501,34 @@ where
     pub signers: ManagedVec<Api, ManagedAddress<Api>>,
 }
 
-#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode)]
-pub enum Action {
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
+pub enum Action<Api>
+where
+    Api: ManagedTypeApi,
+{
     Nothing,
-    AddBoardMember,
-    AddProposer,
-    RemoveUser,
-    ChangeQuorum,
-    SendTransferExecute,
-    SendAsyncCall,
-    SCDeployFromSource,
-    SCUpgradeFromSource,
+    AddBoardMember(ManagedAddress<Api>),
+    AddProposer(ManagedAddress<Api>),
+    RemoveUser(ManagedAddress<Api>),
+    ChangeQuorum(usize),
+    SendTransferExecute(CallActionData<Api>),
+    SendAsyncCall(CallActionData<Api>),
+    SCDeployFromSource {
+        amount: BigUint<Api>,
+        source: ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+    },
+    SCUpgradeFromSource {
+        sc_address: ManagedAddress<Api>,
+        amount: BigUint<Api>,
+        source: ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+        arguments: ManagedVec<Api, ManagedBuffer<Api>>,
+    },
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, Clone)]
 pub struct CallActionData<Api>
 where
     Api: ManagedTypeApi,
@@ -761,4 +545,3 @@ pub enum UserRole {
     Proposer,
     BoardMember,
 }
-

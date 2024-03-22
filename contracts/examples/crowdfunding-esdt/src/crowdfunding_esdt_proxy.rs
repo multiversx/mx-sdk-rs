@@ -4,17 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
-
-use multiversx_sc::derive_imports::*;
-
-#[type_abi]
-#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
-pub enum Status {
-    FundingPeriod,
-    Successful,
-    Failed,
-}
+use multiversx_sc::proxy_imports::*;
 
 pub struct CrowdfundingProxy;
 
@@ -58,15 +48,7 @@ where
         target: Arg0,
         deadline: Arg1,
         token_identifier: Arg2,
-    ) -> Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> Tx<Env, From, (), (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&target)
@@ -74,7 +56,6 @@ where
             .argument(&token_identifier)
             .original_result()
     }
-
 }
 impl<Env, From, To, Gas> CrowdfundingProxyMethods<Env, From, To, Gas>
 where
@@ -86,15 +67,7 @@ where
 {
     pub fn fund(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<()>> {
         self.wrapped_tx
             .raw_call()
             .function_name("fund")
@@ -103,15 +76,7 @@ where
 
     pub fn status(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<Status>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<Status>> {
         self.wrapped_tx
             .raw_call()
             .function_name("status")
@@ -120,15 +85,8 @@ where
 
     pub fn get_current_funds(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<BigUint<Env::Api>>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<BigUint<Env::Api>>>
+    {
         self.wrapped_tx
             .raw_call()
             .function_name("getCurrentFunds")
@@ -137,15 +95,7 @@ where
 
     pub fn claim(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<()>> {
         self.wrapped_tx
             .raw_call()
             .function_name("claim")
@@ -154,15 +104,8 @@ where
 
     pub fn target(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<BigUint<Env::Api>>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<BigUint<Env::Api>>>
+    {
         self.wrapped_tx
             .raw_call()
             .function_name("getTarget")
@@ -171,35 +114,18 @@ where
 
     pub fn deadline(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<u64>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<u64>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getDeadline")
             .original_result()
     }
 
-    pub fn deposit<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-    >(
+    pub fn deposit<Arg0: CodecInto<ManagedAddress<Env::Api>>>(
         self,
         donor: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<BigUint<Env::Api>>,
-    > {
+    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<BigUint<Env::Api>>>
+    {
         self.wrapped_tx
             .raw_call()
             .function_name("getDeposit")
@@ -223,5 +149,10 @@ where
             .function_name("getCrowdfundingTokenIdentifier")
             .original_result()
     }
-
+}
+#[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
+pub enum Status {
+    FundingPeriod,
+    Successful,
+    Failed,
 }

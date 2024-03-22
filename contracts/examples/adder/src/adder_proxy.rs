@@ -4,7 +4,7 @@
 
 #![allow(clippy::all)]
 
-use multiversx_sc::imports::*;
+use multiversx_sc::proxy_imports::*;
 
 pub struct AdderProxy;
 
@@ -32,6 +32,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[rustfmt::skip]
 impl<Env, From, Gas> AdderProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
@@ -39,16 +40,20 @@ where
     From: TxFrom<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn init<Arg0: CodecInto<BigUint<Env::Api>>>(
+    pub fn init<
+        Arg0: CodecInto<BigUint<Env::Api>>,
+    >(
         self,
         initial_value: Arg0,
-    ) -> Tx<Env, From, (), (), Gas, DeployCall<Env, ()>, OriginalResultMarker<()>> {
+    ) -> TxProxyDeploy<Env, From, Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
 }
+
+#[rustfmt::skip]
 impl<Env, From, To, Gas> AdderProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -59,26 +64,20 @@ where
 {
     pub fn sum(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<multiversx_sc::types::BigUint<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getSum")
             .original_result()
     }
 
-    /// Add desired amount to the storage variable.
-    pub fn add<Arg0: CodecInto<BigUint<Env::Api>>>(
+    /// Add desired amount to the storage variable. 
+    pub fn add<
+        Arg0: CodecInto<BigUint<Env::Api>>,
+    >(
         self,
         value: Arg0,
-    ) -> Tx<Env, From, To, (), Gas, FunctionCall<Env::Api>, OriginalResultMarker<()>> {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("add")

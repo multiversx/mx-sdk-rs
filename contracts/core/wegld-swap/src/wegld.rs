@@ -50,7 +50,7 @@ pub trait EgldEsdtSwap: multiversx_sc_modules::pause::PauseModule {
 
         // 1 wrapped eGLD = 1 eGLD, so we pay back the same amount
         let caller = self.blockchain().get_caller();
-        self.send().direct_egld(&caller, &payment_amount);
+        self.tx().to(&caller).egld(&payment_amount).transfer();
     }
 
     #[view(getLockedEgldBalance)]

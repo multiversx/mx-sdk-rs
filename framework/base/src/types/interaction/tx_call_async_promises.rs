@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, OriginalResultMarker, Tx,
-    TxGas, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+    TxGas, TxPayment, TxPaymentNormalize, TxResultHandler, TxScEnv, TxToSpecified,
 };
 
 pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -122,7 +122,7 @@ impl<Api, To, Payment, Callback>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
+    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
     Callback: TxPromisesCallback<Api>,
 {
     pub fn register_promise(self) {
@@ -133,18 +133,24 @@ where
             .overwrite_with_serialized_args(&mut cb_closure_args_serialized);
         let extra_gas_for_callback = self.result_handler.gas_for_callback();
 
-        let normalized = self.normalize_tx();
-
-        SendRawWrapper::<Api>::new().create_async_call_raw(
-            &normalized.to,
-            &normalized.payment.value,
-            &normalized.data.function_name,
-            &normalized.data.arg_buffer,
-            callback_name,
-            callback_name,
-            normalized.gas.0,
-            extra_gas_for_callback,
-            &cb_closure_args_serialized,
+        self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data,
+            |norm_to, norm_egld, norm_fc| {
+                SendRawWrapper::<Api>::new().create_async_call_raw(
+                    norm_to,
+                    norm_egld,
+                    &norm_fc.function_name,
+                    &norm_fc.arg_buffer,
+                    callback_name,
+                    callback_name,
+                    self.gas.0,
+                    extra_gas_for_callback,
+                    &cb_closure_args_serialized,
+                )
+            },
         )
     }
 }
