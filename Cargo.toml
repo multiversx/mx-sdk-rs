@@ -16,7 +16,6 @@ members = [
   "sdk/scenario-format",
 
   "tools/mxpy-snippet-generator",
-  "tools/coverage-renderer",
 
   "vm",
 

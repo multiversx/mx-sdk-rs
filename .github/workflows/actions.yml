@@ -40,14 +40,16 @@ jobs:
 
           echo $(dirname $(find ~/.rustup -name llvm-cov))
 
-          # which llvm-cov
-          # which llvm-profdata
-
       - name: Run tests and generate report
         env:
           RUSTFLAGS: ""
         run: |
-          ./tests-coverage.sh
+          cargo run --bin sc-meta test-coverage \
+            --ignore-filename-regex='meta/src' \
+            --ignore-filename-regex='wasm-adapter' \
+            --ignore-filename-regex='benchmarks/' \
+            --ignore-filename-regex='tests/' \
+            --output ./coverage.md
 
       - name: Upload the report
         uses: actions/upload-artifact@v3
