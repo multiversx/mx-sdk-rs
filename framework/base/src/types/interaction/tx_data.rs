@@ -2,10 +2,7 @@ use crate::{
     api::ManagedTypeApi,
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
-    types::{
-        CodeMetadata, EgldPayment, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder,
-        ManagedVec,
-    },
+    types::{CodeMetadata, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
 };
 
 use super::{FunctionCall, ManagedArgBuffer, Tx, TxEnv, TxFrom, TxGas, TxPayment, TxTo};

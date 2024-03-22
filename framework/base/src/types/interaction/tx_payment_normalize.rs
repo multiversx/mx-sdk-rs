@@ -2,9 +2,8 @@ use crate::{
     api::{self, CallTypeApi, ManagedTypeApi},
     contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment,
-        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec,
-        MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment,
+        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
     },
 };
 use alloc::boxed::Box;
@@ -13,10 +12,11 @@ use multiversx_sc_codec::TopEncodeMulti;
 use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
     AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
-    DeployCall, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
-    RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEnv, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas, TxPayment,
-    TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    DeployCall, Egld, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer,
+    OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource,
+    TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue,
+    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv,
+    TxTo, TxToSpecified,
 };
 
 /// Defines how a payment transforms a transaction,
@@ -60,11 +60,12 @@ where
     }
 }
 
-impl<Env, From, To> TxPaymentNormalize<Env, From, To> for EgldPayment<Env::Api>
+impl<Env, From, To, EgldValue> TxPaymentNormalize<Env, From, To> for Egld<EgldValue>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxToSpecified<Env>,
+    EgldValue: TxEgldValue<Env>,
 {
     fn with_normalized<F, R>(
         self,
@@ -77,7 +78,10 @@ where
     where
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| f(to_addr, &self.value, &fc))
+        to.with_address_ref(env, |to_addr| {
+            self.0
+                .with_egld_value(|egld_value| f(to_addr, egld_value, &fc))
+        })
     }
 }
 
@@ -157,7 +161,7 @@ where
     {
         self.map_egld_or_esdt(
             (to, fc, f),
-            |(to, fc, f), amount| EgldPayment::from(amount).with_normalized(env, from, to, fc, f),
+            |(to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
             |(to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
         )
     }
@@ -182,7 +186,7 @@ where
     {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                EgldPayment::from(egld_amount).with_normalized(env, from, to, fc, f)
+                Egld(egld_amount).with_normalized(env, from, to, fc, f)
             },
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.with_normalized(env, from, to, fc, f)

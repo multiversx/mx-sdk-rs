@@ -4,12 +4,12 @@ use crate::{
     formatter::FormatBuffer,
     imports::{BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
     types::{
-        EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EgldPayment, EsdtTokenPayment,
-        ManagedAddress, MultiEsdtPayment,
+        EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedAddress,
+        MultiEsdtPayment,
     },
 };
 
-use super::{FunctionCall, TxEnv, TxFrom, TxToSpecified};
+use super::{Egld, FunctionCall, TxEnv, TxFrom, TxToSpecified};
 
 #[derive(Clone)]
 pub struct AnnotatedEgldPayment<Api>
@@ -25,12 +25,8 @@ where
     Api: ManagedTypeApi,
 {
     pub fn new_egld(value: BigUint<Api>) -> Self {
-        let mut annotation = ManagedBufferCachedBuilder::default();
-        annotation.append_display(&value);
-        AnnotatedEgldPayment {
-            value,
-            annotation: annotation.into_managed_buffer(),
-        }
+        let annotation = value.to_display();
+        AnnotatedEgldPayment { value, annotation }
     }
 }
 
@@ -59,7 +55,6 @@ where
 pub trait TxPayment<Env>
 where
     Env: TxEnv,
-    Self: Clone,
 {
     fn is_no_payment(&self) -> bool;
 
@@ -71,15 +66,7 @@ where
         fc: FunctionCall<Env::Api>,
     );
 
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api>;
-}
-
-/// Marks a payment object that only contains EGLD or nothing at all.
-pub trait TxPaymentEgldOnly<Env>: TxPayment<Env>
-where
-    Env: TxEnv,
-{
-    fn to_egld_payment(self) -> EgldPayment<Env::Api>;
+    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api>;
 }
 
 impl<Env> TxPayment<Env> for ()
@@ -97,61 +84,11 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        EgldPayment::no_payment().perform_transfer_execute(env, to, gas_limit, fc);
+        Egld(BigUint::zero()).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData::default()
-    }
-}
-
-impl<Env> TxPaymentEgldOnly<Env> for ()
-where
-    Env: TxEnv,
-{
-    fn to_egld_payment(self) -> EgldPayment<Env::Api> {
-        EgldPayment::no_payment()
-    }
-}
-
-impl<Env> TxPayment<Env> for EgldPayment<Env::Api>
-where
-    Env: TxEnv,
-{
-    fn is_no_payment(&self) -> bool {
-        self.value == 0u32
-    }
-
-    fn perform_transfer_execute(
-        self,
-        _env: &Env,
-        to: &ManagedAddress<Env::Api>,
-        gas_limit: u64,
-        fc: FunctionCall<Env::Api>,
-    ) {
-        let _ = SendRawWrapper::<Env::Api>::new().direct_egld_execute(
-            to,
-            &self.value,
-            gas_limit,
-            &fc.function_name,
-            &fc.arg_buffer,
-        );
-    }
-
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
-        FullPaymentData {
-            egld: Some(AnnotatedEgldPayment::new_egld(self.value)),
-            multi_esdt: ManagedVec::new(),
-        }
-    }
-}
-
-impl<Env> TxPaymentEgldOnly<Env> for EgldPayment<Env::Api>
-where
-    Env: TxEnv,
-{
-    fn to_egld_payment(self) -> EgldPayment<Env::Api> {
-        self
     }
 }
 
@@ -173,7 +110,7 @@ where
         MultiEsdtPayment::from_single_item(self).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: MultiEsdtPayment::from_single_item(self),
@@ -205,7 +142,7 @@ where
         );
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: self,
@@ -230,18 +167,16 @@ where
     ) {
         self.map_egld_or_esdt(
             (to, fc),
-            |(to, fc), amount| {
-                EgldPayment::from(amount).perform_transfer_execute(env, to, gas_limit, fc)
-            },
+            |(to, fc), amount| Egld(amount).perform_transfer_execute(env, to, gas_limit, fc),
             |(to, fc), esdt_payment| esdt_payment.perform_transfer_execute(env, to, gas_limit, fc),
         )
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
         self.map_egld_or_esdt(
             (),
-            |(), amount| TxPayment::<Env>::into_full_payment_data(EgldPayment::from(amount)),
-            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment),
+            |(), amount| TxPayment::<Env>::into_full_payment_data(Egld(amount), env),
+            |(), esdt_payment| TxPayment::<Env>::into_full_payment_data(esdt_payment, env),
         )
     }
 }
@@ -263,7 +198,7 @@ where
     ) {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                EgldPayment::from(egld_amount).perform_transfer_execute(env, to, gas_limit, fc)
+                Egld(egld_amount).perform_transfer_execute(env, to, gas_limit, fc)
             },
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.perform_transfer_execute(env, to, gas_limit, fc)
@@ -271,13 +206,13 @@ where
         }
     }
 
-    fn into_full_payment_data(self) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                TxPayment::<Env>::into_full_payment_data(EgldPayment::from(egld_amount))
+                TxPayment::<Env>::into_full_payment_data(Egld(egld_amount), env)
             },
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
-                TxPayment::<Env>::into_full_payment_data(multi_esdt_payment)
+                TxPayment::<Env>::into_full_payment_data(multi_esdt_payment, env)
             },
         }
     }

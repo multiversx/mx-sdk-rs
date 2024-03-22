@@ -64,7 +64,7 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
-    let full_payment_data = payment.into_full_payment_data();
+    let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
     }
@@ -93,7 +93,7 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
-    let full_payment_data = payment.into_full_payment_data();
+    let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
     }
@@ -134,7 +134,7 @@ where
         .from(address_annotated(env, from))
         .to(address_annotated(env, to));
 
-    let full_payment_data = payment.into_full_payment_data();
+    let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
     }

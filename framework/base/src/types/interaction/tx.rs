@@ -2,8 +2,8 @@ use crate::{
     api::{self, CallTypeApi, ManagedTypeApi},
     contract_base::{BlockchainWrapper, SendRawWrapper},
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldPayment, EsdtTokenPayment,
-        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
+        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
     },
 };
 use alloc::boxed::Box;
@@ -12,11 +12,11 @@ use multiversx_sc_codec::TopEncodeMulti;
 use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
     AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
-    DeployCall, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
-    RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEnv, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas, TxPayment,
-    TxPaymentEgldOnly, TxPaymentNormalize, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
-    TxToSpecified,
+    DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer,
+    OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource,
+    TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue,
+    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxPaymentNormalize, TxProxyTrait,
+    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -151,15 +151,18 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
-    pub fn egld(
+    pub fn egld<EgldValue>(
         self,
-        egld_amount: BigUint<Env::Api>,
-    ) -> Tx<Env, From, To, EgldPayment<Env::Api>, Gas, Data, RH> {
+        egld_value: EgldValue,
+    ) -> Tx<Env, From, To, Egld<EgldValue>, Gas, Data, RH>
+    where
+        EgldValue: TxEgldValue<Env>,
+    {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
-            payment: EgldPayment { value: egld_amount },
+            payment: Egld(egld_value),
             gas: self.gas,
             data: self.data,
             result_handler: self.result_handler,
@@ -701,7 +704,7 @@ where
         ContractDeploy {
             _phantom: core::marker::PhantomData,
             to: ManagedOption::none(),
-            egld_payment: value.payment.to_egld_payment().value,
+            egld_payment: value.payment.into_egld_payment(&value.env),
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer: value.data.arg_buffer,
             _return_type: core::marker::PhantomData,
