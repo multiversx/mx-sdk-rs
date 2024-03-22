@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use multiversx_sc_scenario::multiversx_sc::{
     codec::Empty,
-    types::{FunctionCall, ReturnsNewTokenIdentidier},
+    types::{FunctionCall, ReturnsExact, ReturnsNewTokenIdentifier},
 };
 
 use super::*;
@@ -53,7 +53,7 @@ impl MultisigInteract {
                     .argument(&TOKEN_TYPE)
                     .argument(&0u32),
             )
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsExact)
             .prepare_async()
             .run()
             .await;
@@ -81,7 +81,7 @@ impl MultisigInteract {
             .with_gas_limit(80_000_000u64)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
-            .returns(ReturnsNewTokenIdentidier)
+            .returns(ReturnsNewTokenIdentifier)
             .prepare_async()
             .run()
             .await;
@@ -109,7 +109,7 @@ impl MultisigInteract {
                     .argument(&COLLECTION_NAME)
                     .argument(&COLLECTION_TICKER),
             )
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsExact)
             .prepare_async()
             .run()
             .await;
@@ -136,7 +136,7 @@ impl MultisigInteract {
             .with_gas_limit(80_000_000u64)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
-            .returns(ReturnsNewTokenIdentidier)
+            .returns(ReturnsNewTokenIdentifier)
             .prepare_async()
             .run()
             .await;
@@ -165,7 +165,7 @@ impl MultisigInteract {
                     .argument(&multisig_address)
                     .argument(&"ESDTRoleNFTCreate"),
             )
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsExact)
             .prepare_async()
             .run()
             .await;

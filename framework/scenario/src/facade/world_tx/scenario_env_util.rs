@@ -63,7 +63,7 @@ where
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }
-    
+
     let explicit_gas = gas.resolve_gas(env);
     step.tx.gas_limit = U64Value::from(explicit_gas);
 

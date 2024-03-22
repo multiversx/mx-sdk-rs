@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::multiversx_sc::types::{ContractCallBase, FunctionCall};
+use multiversx_sc_scenario::multiversx_sc::types::{ContractCallBase, FunctionCall, ReturnsExact};
 #[allow(unused_imports)]
 use multiversx_sc_snippets::multiversx_sc::types::{
     EsdtTokenPayment, MultiValueEncoded, TokenIdentifier,
@@ -72,7 +72,7 @@ impl MultisigInteract {
                 WRAP_AMOUNT,
                 FunctionCall::new("wrapEgld"),
             )
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsExact)
             .prepare_async()
             .run()
             .await;
@@ -105,7 +105,7 @@ impl MultisigInteract {
                 0u64,
                 contract_call.basic.function_call,
             )
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsExact)
             .prepare_async()
             .run()
             .await;

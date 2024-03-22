@@ -2,7 +2,7 @@ use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
         ManagedAddress, RHList, RHListItem, ReturnsExact, ReturnsNewAddress,
-        ReturnsNewTokenIdentidier, ReturnsSimilar, TokenIdentifier, TxEnv, WithResultNewAddress,
+        ReturnsNewTokenIdentifier, ReturnsSimilar, TokenIdentifier, TxEnv, WithResultNewAddress,
         WithResultSimilar,
     },
 };
@@ -78,7 +78,7 @@ where
     }
 }
 
-impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsNewTokenIdentidier
+impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsNewTokenIdentifier
 where
     Env: TxEnv,
 {
