@@ -220,6 +220,22 @@ where
         }
     }
 
+    /// Sets a reference to multiple ESDT payments.
+    pub fn multi_esdt_ref(
+        self,
+        payments: &MultiEsdtPayment<Env::Api>,
+    ) -> Tx<Env, From, To, &MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: payments,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
     /// Backwards compatibility.
     pub fn with_multi_token_transfer(
         self,
