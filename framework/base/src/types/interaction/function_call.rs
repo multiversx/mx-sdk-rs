@@ -159,7 +159,7 @@ where
     /// Constructs `ESDTTransfer` builtin function call.
     pub(super) fn convert_to_single_transfer_fungible_call(
         self,
-        payment: EsdtTokenPayment<Api>,
+        payment: &EsdtTokenPayment<Api>,
     ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
@@ -177,7 +177,7 @@ where
     pub(super) fn convert_to_single_transfer_nft_call(
         self,
         to: &ManagedAddress<Api>,
-        payment: EsdtTokenPayment<Api>,
+        payment: &EsdtTokenPayment<Api>,
     ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_NFT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
@@ -191,13 +191,13 @@ where
     pub(super) fn convert_to_multi_transfer_esdt_call(
         self,
         to: &ManagedAddress<Api>,
-        payments: ManagedVec<Api, EsdtTokenPayment<Api>>,
+        payments: &ManagedVec<Api, EsdtTokenPayment<Api>>,
     ) -> FunctionCall<Api> {
         let mut result = FunctionCall::new(ESDT_MULTI_TRANSFER_FUNC_NAME)
             .argument(&to)
             .argument(&payments.len());
 
-        for payment in payments.into_iter() {
+        for payment in payments {
             result = result
                 .argument(&payment.token_identifier)
                 .argument(&payment.token_nonce)

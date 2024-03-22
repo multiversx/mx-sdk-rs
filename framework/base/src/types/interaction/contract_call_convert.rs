@@ -38,7 +38,7 @@ where
                     function_call: self
                         .basic
                         .function_call
-                        .convert_to_single_transfer_fungible_call(payment),
+                        .convert_to_single_transfer_fungible_call(&payment),
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
@@ -55,7 +55,7 @@ where
                     function_call: self
                         .basic
                         .function_call
-                        .convert_to_single_transfer_nft_call(&self.basic.to, payment),
+                        .convert_to_single_transfer_nft_call(&self.basic.to, &payment),
                     explicit_gas_limit: self.basic.explicit_gas_limit,
                     _return_type: PhantomData,
                 },
@@ -78,7 +78,7 @@ where
                 function_call: self
                     .basic
                     .function_call
-                    .convert_to_multi_transfer_esdt_call(&self.basic.to, payments),
+                    .convert_to_multi_transfer_esdt_call(&self.basic.to, &payments),
                 explicit_gas_limit: self.basic.explicit_gas_limit,
                 _return_type: PhantomData,
             },

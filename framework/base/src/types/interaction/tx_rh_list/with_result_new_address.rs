@@ -1,8 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::types::{
-    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec,
-    RHListItemSync, TxEnv,
+    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv,
 };
 
 use super::RHListItem;

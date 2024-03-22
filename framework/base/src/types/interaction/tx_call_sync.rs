@@ -9,8 +9,7 @@ use crate::{
 
 use super::{
     contract_call_exec::decode_result, BackTransfers, ConsNoRet, ConsRet, OriginalResultMarker,
-    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxPaymentNormalize,
-    TxScEnv, TxToSpecified,
+    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxScEnv, TxToSpecified,
 };
 
 pub trait RHListItemSync<Env, Original>: RHListItem<Env, Original>
@@ -90,7 +89,7 @@ impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, R
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
+    Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
     RH: RHListSync<TxScEnv<Api>>,
@@ -133,7 +132,7 @@ impl<Api, To, Payment, Gas, FC, OriginalResult>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
+    Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
 {

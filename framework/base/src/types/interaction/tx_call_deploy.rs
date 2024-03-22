@@ -9,9 +9,8 @@ use crate::{
 
 use super::{
     contract_call_exec::decode_result, Code, ConsNoRet, ConsRet, DeployCall, FromSource,
-    OriginalResultMarker, RHList, RHListItem, Tx, TxCodeValue, TxDataFunctionCall,
-    TxEmptyResultHandler, TxEnv, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly,
-    TxResultHandler, TxScEnv, TxToSpecified,
+    OriginalResultMarker, RHList, RHListItem, Tx, TxCodeValue, TxEmptyResultHandler, TxEnv,
+    TxFromSourceValue, TxGas, TxPaymentEgldOnly, TxResultHandler, TxScEnv,
 };
 
 pub trait RHListItemDeploy<Env, Original>: RHListItem<Env, Original>

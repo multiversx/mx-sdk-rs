@@ -40,7 +40,7 @@ impl<Env> TxToSpecified<Env> for AddressExpr
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
