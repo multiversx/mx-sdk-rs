@@ -1,22 +1,10 @@
-use crate::{
-    api::{self, CallTypeApi, ManagedTypeApi},
-    contract_base::{BlockchainWrapper, SendRawWrapper},
-    types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment,
-        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
-    },
+use crate::types::{
+    BigUint, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedAddress,
+    MultiEsdtPayment,
 };
-use alloc::boxed::Box;
-use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
-    AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
-    DeployCall, Egld, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer,
-    OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource,
-    TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue,
-    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv,
-    TxTo, TxToSpecified,
+    Egld, FunctionCall, TxEgldValue, TxEnv, TxFrom, TxPayment,  TxToSpecified,
 };
 
 /// Defines how a payment transforms a transaction,
@@ -48,7 +36,7 @@ where
     fn with_normalized<F, R>(
         self,
         env: &Env,
-        from: &From,
+        _from: &From,
         to: To,
         fc: FunctionCall<Env::Api>,
         f: F,
@@ -70,7 +58,7 @@ where
     fn with_normalized<F, R>(
         self,
         env: &Env,
-        from: &From,
+        _from: &From,
         to: To,
         fc: FunctionCall<Env::Api>,
         f: F,

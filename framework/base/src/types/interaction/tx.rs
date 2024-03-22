@@ -1,22 +1,21 @@
 use crate::{
-    api::{self, CallTypeApi, ManagedTypeApi},
-    contract_base::{BlockchainWrapper, SendRawWrapper},
+    api::CallTypeApi,
+    contract_base::BlockchainWrapper,
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
         ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
     },
 };
-use alloc::boxed::Box;
+
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
-    AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
-    DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer,
-    OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource,
-    TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue,
-    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxPaymentNormalize, TxProxyTrait,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase, Code,
+    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
+    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
+    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxPaymentNormalize,
+    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -623,7 +622,7 @@ where
     RH: TxResultHandler<Env>,
 {
     pub fn code<CodeValue>(
-        mut self,
+        self,
         code: CodeValue,
     ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, Code<CodeValue>>, RH>
     where
@@ -641,7 +640,7 @@ where
     }
 
     pub fn from_source<FromSourceValue>(
-        mut self,
+        self,
         source_address: FromSourceValue,
     ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, FromSource<FromSourceValue>>, RH>
     where

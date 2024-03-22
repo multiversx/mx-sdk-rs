@@ -2,10 +2,7 @@ use multiversx_sc_codec::TopEncodeMulti;
 
 use crate::types::{CodeMetadata, ManagedBuffer, ManagedBufferCachedBuilder};
 
-use super::{
-    Code, FunctionCall, ManagedArgBuffer, Tx, TxCodeSource, TxData, TxEnv, TxFrom, TxGas,
-    TxPayment, TxTo,
-};
+use super::{ManagedArgBuffer, TxCodeSource, TxData, TxEnv};
 
 /// Holds deploy data: code, code metadata, and arguments.
 pub struct DeployCall<Env, CodeSource>
@@ -42,7 +39,7 @@ where
 
     fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
         // Implement as needed for deployment-specific data
-        let mut result = ManagedBufferCachedBuilder::default();
+        let result = ManagedBufferCachedBuilder::default();
         // result.append_managed_buffer(&self.code);
         // Add other fields as needed
         result.into_managed_buffer()

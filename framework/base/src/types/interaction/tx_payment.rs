@@ -1,15 +1,14 @@
 use crate::{
     api::ManagedTypeApi,
     contract_base::SendRawWrapper,
-    formatter::FormatBuffer,
-    imports::{BigUint, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec},
+    imports::{BigUint, ManagedBuffer},
     types::{
         EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedAddress,
         MultiEsdtPayment,
     },
 };
 
-use super::{Egld, FunctionCall, TxEnv, TxFrom, TxToSpecified};
+use super::{Egld, FunctionCall, TxEnv};
 
 #[derive(Clone)]
 pub struct AnnotatedEgldPayment<Api>
@@ -110,7 +109,7 @@ where
         MultiEsdtPayment::from_single_item(self).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: MultiEsdtPayment::from_single_item(self),
@@ -142,7 +141,7 @@ where
         );
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: self.clone(),
@@ -168,7 +167,7 @@ where
         (&self).perform_transfer_execute(env, to, gas_limit, fc);
     }
 
-    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+    fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData {
             egld: None,
             multi_esdt: self,

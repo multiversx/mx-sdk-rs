@@ -6,9 +6,7 @@ use crate::{
     types::ManagedAddress,
 };
 
-use super::{
-    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, AnnotatedValue, Tx, TxBaseWithEnv, TxEnv,
-};
+use super::{contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, Tx, TxBaseWithEnv, TxEnv};
 
 pub struct TxScEnv<Api>
 where
