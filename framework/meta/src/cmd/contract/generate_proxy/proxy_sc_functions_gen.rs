@@ -2,13 +2,14 @@ use std::{fs::File, io::Write};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
 
-use crate::cmd::contract::generate_snippets::snippet_gen_common::write_newline;
-
 use super::proxy_naming::proxy_methods_type_name;
 
 pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     write_header_impl_constructor(file, &abi.name);
-    for constructor_abi in abi.constructors {
+    for (i, constructor_abi) in abi.constructors.into_iter().enumerate() {
+        if i > 0 {
+            writeln!(file).unwrap();
+        }
         write_constructor_header(file, constructor_abi.clone());
         write_constructor_content(file, constructor_abi.inputs);
         write_end_of_function(file);
@@ -16,7 +17,10 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     writeln!(file, "}}").unwrap();
 
     write_header_impl_endpoints(file, &abi.name);
-    for endpoint_abi in abi.endpoints {
+    for (i, endpoint_abi) in abi.endpoints.into_iter().enumerate() {
+        if i > 0 {
+            writeln!(file).unwrap();
+        }
         write_endpoint_header(file, endpoint_abi.clone());
         write_endpoint_content(file, endpoint_abi.name, endpoint_abi.inputs);
         write_end_of_function(file);
@@ -29,7 +33,9 @@ fn write_header_impl_constructor(file: &mut File, name: &str) {
     let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,
-        r#"impl<Env, From, Gas> {proxy_methods_type_name}<Env, From, (), Gas>
+        r#"
+#[rustfmt::skip]
+impl<Env, From, Gas> {proxy_methods_type_name}<Env, From, (), Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -44,7 +50,9 @@ fn write_header_impl_endpoints(file: &mut File, name: &str) {
     let proxy_methods_type_name = proxy_methods_type_name(name);
     writeln!(
         file,
-        r#"impl<Env, From, To, Gas> {proxy_methods_type_name}<Env, From, To, Gas>
+        r#"
+#[rustfmt::skip]
+impl<Env, From, To, Gas> {proxy_methods_type_name}<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -83,51 +91,19 @@ fn write_parameters(file: &mut File, inputs: Vec<InputAbi>) {
 }
 
 fn write_constructor_output(file: &mut File, outputs: Vec<OutputAbi>) {
-    write!(
-        file,
-        "-> Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<"
-    )
-    .unwrap();
+    write!(file, "-> TxProxyDeploy<Env, From, Gas, ").unwrap();
 
     parse_and_write_outputs(file, outputs);
 
-    writeln!(
-        file,
-        ">,
-    > {{"
-    )
-    .unwrap();
+    writeln!(file, "> {{").unwrap();
 }
 
 fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>) {
-    write!(
-        file,
-        "-> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<"
-    )
-    .unwrap();
+    write!(file, "-> TxProxyCall<Env, From, To, Gas, ").unwrap();
 
     parse_and_write_outputs(file, outputs);
 
-    writeln!(
-        file,
-        ">,
-    > {{"
-    )
-    .unwrap();
+    writeln!(file, "> {{").unwrap();
 }
 
 fn write_constructor_content(file: &mut File, inputs: Vec<InputAbi>) {
@@ -191,7 +167,6 @@ fn write_argument(file: &mut File, index: usize, rust_name: &str) {
 
 fn write_end_of_function(file: &mut File) {
     writeln!(file, "    }}").unwrap();
-    write_newline(file);
 }
 
 fn adjust_type_name(original_rust_name: &str) -> String {

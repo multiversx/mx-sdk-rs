@@ -32,6 +32,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[rustfmt::skip]
 impl<Env, From, Gas> CryptoZombiesProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
@@ -41,21 +42,14 @@ where
 {
     pub fn init(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyDeploy<Env, From, Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .original_result()
     }
-
 }
+
+#[rustfmt::skip]
 impl<Env, From, To, Gas> CryptoZombiesProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -69,15 +63,7 @@ where
     >(
         self,
         address: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("set_crypto_kitties_sc_address")
@@ -87,15 +73,7 @@ where
 
     pub fn generate_random_dna(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<u64>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, u64> {
         self.wrapped_tx
             .raw_call()
             .function_name("generate_random_dna")
@@ -107,15 +85,7 @@ where
     >(
         self,
         name: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("create_random_zombie")
@@ -128,15 +98,7 @@ where
     >(
         self,
         zombie_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<bool>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
             .raw_call()
             .function_name("is_ready")
@@ -151,15 +113,7 @@ where
         self,
         zombie_id: Arg0,
         kitty_id: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("feed_on_kitty")
@@ -170,15 +124,7 @@ where
 
     pub fn dna_digits(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<u8>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, u8> {
         self.wrapped_tx
             .raw_call()
             .function_name("dna_digits")
@@ -187,15 +133,7 @@ where
 
     pub fn zombies_count(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<usize>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
             .raw_call()
             .function_name("zombies_count")
@@ -207,15 +145,7 @@ where
     >(
         self,
         id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<Zombie<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, Zombie<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("zombies")
@@ -228,15 +158,7 @@ where
     >(
         self,
         id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<ManagedAddress<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("zombie_owner")
@@ -246,15 +168,7 @@ where
 
     pub fn crypto_kitties_sc_address(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<ManagedAddress<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("crypto_kitties_sc_address")
@@ -263,15 +177,7 @@ where
 
     pub fn cooldown_time(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<u64>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, u64> {
         self.wrapped_tx
             .raw_call()
             .function_name("cooldown_time")
@@ -283,15 +189,7 @@ where
     >(
         self,
         owner: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<MultiValueEncoded<Env::Api, usize>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, usize>> {
         self.wrapped_tx
             .raw_call()
             .function_name("owned_zombies")
@@ -304,15 +202,7 @@ where
     >(
         self,
         zombie_id: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("level_up")
@@ -322,15 +212,7 @@ where
 
     pub fn withdraw(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("withdraw")
@@ -344,15 +226,7 @@ where
         self,
         zombie_id: Arg0,
         name: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("change_name")
@@ -368,15 +242,7 @@ where
         self,
         zombie_id: Arg0,
         dna: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("change_dna")
@@ -392,15 +258,7 @@ where
         self,
         zombie_id: Arg0,
         target_id: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("attack")
@@ -408,8 +266,8 @@ where
             .argument(&target_id)
             .original_result()
     }
-
 }
+
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<Api>
 where
@@ -422,4 +280,3 @@ where
     pub win_count: usize,
     pub loss_count: usize,
 }
-

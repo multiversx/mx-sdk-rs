@@ -32,6 +32,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[rustfmt::skip]
 impl<Env, From, Gas> AdderProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
@@ -44,22 +45,15 @@ where
     >(
         self,
         initial_value: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyDeploy<Env, From, Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
     }
-
 }
+
+#[rustfmt::skip]
 impl<Env, From, To, Gas> AdderProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -70,15 +64,7 @@ where
 {
     pub fn sum(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<BigUint<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getSum")
@@ -91,20 +77,11 @@ where
     >(
         self,
         value: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("add")
             .argument(&value)
             .original_result()
     }
-
 }
