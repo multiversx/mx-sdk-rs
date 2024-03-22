@@ -49,4 +49,12 @@ where
     pub fn transfer(self) {
         self.transfer_execute_with_gas(0)
     }
+
+    pub fn transfer_non_zero(self) {
+        if self.payment.is_no_payment() {
+            return;
+        }
+
+        self.transfer_execute_with_gas(0)
+    }
 }
