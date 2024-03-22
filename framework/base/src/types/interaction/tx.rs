@@ -14,8 +14,8 @@ use super::{
     ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
     RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
-    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxPaymentNormalize,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
+    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 #[must_use]
@@ -565,7 +565,7 @@ impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
 where
     Api: CallTypeApi + 'static,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
+    Payment: TxPayment<TxScEnv<Api>>,
     OriginalResult: TopEncodeMulti,
 {
     type OriginalResult = OriginalResult;
