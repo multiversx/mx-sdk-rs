@@ -9,7 +9,8 @@ use crate::{
 
 use super::{
     contract_call_exec::decode_result, BackTransfers, ConsNoRet, ConsRet, OriginalResultMarker,
-    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxScEnv, TxToSpecified,
+    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxPaymentNormalize,
+    TxScEnv, TxToSpecified,
 };
 
 pub trait RHListItemSync<Env, Original>: RHListItem<Env, Original>
@@ -89,7 +90,7 @@ impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, R
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
+    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
     RH: RHListSync<TxScEnv<Api>>,
@@ -97,19 +98,26 @@ where
 {
     fn execute_sync_call_raw(self) -> (ManagedVec<Api, ManagedBuffer<Api>>, RH) {
         let gas_limit = self.gas.resolve_gas(&self.env);
-        let normalized = self.normalize_tx();
 
-        let raw_result = SendRawWrapper::<Api>::new().execute_on_dest_context_raw(
-            gas_limit,
-            &normalized.to,
-            &normalized.payment.value,
-            &normalized.data.function_name,
-            &normalized.data.arg_buffer,
+        let raw_result = self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data.into(),
+            |norm_to, norm_egld, norm_fc| {
+                SendRawWrapper::<Api>::new().execute_on_dest_context_raw(
+                    gas_limit,
+                    norm_to,
+                    norm_egld,
+                    &norm_fc.function_name,
+                    &norm_fc.arg_buffer,
+                )
+            },
         );
 
         SendRawWrapper::<Api>::new().clean_return_data();
 
-        (raw_result, normalized.result_handler)
+        (raw_result, self.result_handler)
     }
 
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
@@ -125,7 +133,7 @@ impl<Api, To, Payment, Gas, FC, OriginalResult>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
+    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
 {

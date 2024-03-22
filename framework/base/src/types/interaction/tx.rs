@@ -15,7 +15,8 @@ use super::{
     DeployCall, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker,
     RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
     TxDataFunctionCall, TxEnv, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas, TxPayment,
-    TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxPaymentEgldOnly, TxPaymentNormalize, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified,
 };
 
 #[must_use]
@@ -533,46 +534,6 @@ where
     }
 }
 
-impl<Env, From, To, Payment, Gas, FC, RH> Tx<Env, From, To, Payment, Gas, FC, RH>
-where
-    Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxToSpecified<Env>,
-    Payment: TxPayment<Env>,
-    Gas: TxGas<Env>,
-    FC: TxDataFunctionCall<Env>,
-    RH: TxResultHandler<Env>,
-{
-    #[allow(clippy::type_complexity)]
-    pub fn normalize_tx(
-        self,
-    ) -> Tx<
-        Env,
-        From,
-        ManagedAddress<Env::Api>,
-        EgldPayment<Env::Api>,
-        Gas,
-        FunctionCall<Env::Api>,
-        RH,
-    > {
-        let result = self.payment.convert_tx_data(
-            &self.env,
-            &self.from,
-            self.to.into_value(&self.env),
-            self.data.into(),
-        );
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: result.to,
-            payment: result.egld_payment,
-            gas: self.gas,
-            data: result.fc,
-            result_handler: self.result_handler,
-        }
-    }
-}
-
 impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
     for Tx<
         TxScEnv<Api>,
@@ -586,23 +547,28 @@ impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
 where
     Api: CallTypeApi + 'static,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
+    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
     OriginalResult: TopEncodeMulti,
 {
     type OriginalResult = OriginalResult;
 
     fn into_normalized(self) -> ContractCallWithEgld<Api, OriginalResult> {
-        let normalized = self.normalize_tx();
-        ContractCallWithEgld {
-            basic: ContractCallNoPayment {
-                _phantom: core::marker::PhantomData,
-                to: normalized.to,
-                function_call: normalized.data,
-                explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-                _return_type: core::marker::PhantomData,
+        self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data,
+            |norm_to, norm_egld, norm_fc| ContractCallWithEgld {
+                basic: ContractCallNoPayment {
+                    _phantom: core::marker::PhantomData,
+                    to: norm_to.clone(),
+                    function_call: norm_fc.clone(),
+                    explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
+                    _return_type: core::marker::PhantomData,
+                },
+                egld_payment: norm_egld.clone(),
             },
-            egld_payment: normalized.payment.value,
-        }
+        )
     }
 }
 

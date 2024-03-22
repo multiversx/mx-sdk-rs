@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     OriginalResultMarker, Tx, TxData, TxDataFunctionCall, TxEnv, TxFrom, TxGas, TxPayment,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxPaymentNormalize, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
 pub trait TxAsyncCallCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -119,18 +119,25 @@ impl<Api, To, Payment, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, (), FC, RH>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
+    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
     RH: TxAsyncCallCallback<Api>,
 {
     pub fn async_call_and_exit(self) -> ! {
-        let normalized = self.normalize_tx();
-        normalized.result_handler.save_callback_closure_to_storage();
-        SendRawWrapper::<Api>::new().async_call_raw(
-            &normalized.to,
-            &normalized.payment.value,
-            &normalized.data.function_name,
-            &normalized.data.arg_buffer,
+        self.result_handler.save_callback_closure_to_storage();
+        self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data.into(),
+            |norm_to, norm_egld, norm_fc| {
+                SendRawWrapper::<Api>::new().async_call_raw(
+                    norm_to,
+                    norm_egld,
+                    &norm_fc.function_name,
+                    &norm_fc.arg_buffer,
+                )
+            },
         )
     }
 
