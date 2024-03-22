@@ -12,7 +12,7 @@ use crate::{
     api::StaticApi,
     scenario_model::{
         AddressValue, BigUintValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep,
-        TransferStep, TxResponse,
+        TransferStep, TxResponse, U64Value,
     },
     RHListScenario, ScenarioEnvExec, ScenarioWorld,
 };
@@ -46,7 +46,7 @@ pub fn tx_to_sc_call_step<Env, From, To, Payment, Gas>(
     from: From,
     to: To,
     payment: Payment,
-    _gas: Gas,
+    gas: Gas,
     data: FunctionCall<Env::Api>,
 ) -> ScCallStep
 where
@@ -63,6 +63,9 @@ where
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }
+    
+    let explicit_gas = gas.resolve_gas(env);
+    step.tx.gas_limit = U64Value::from(explicit_gas);
 
     let full_payment_data = payment.into_full_payment_data();
     if let Some(annotated_egld_payment) = full_payment_data.egld {

@@ -34,7 +34,7 @@ impl MultisigInteract {
         let action_id = self.propose_wrap_egld().await;
 
         println!("perfoming wrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        self.perform_action(action_id, 15_000_000u64).await;
     }
 
     pub async fn unwrap_egld(&mut self) {
@@ -42,7 +42,7 @@ impl MultisigInteract {
         let action_id = self.propose_unwrap_egld().await;
 
         println!("perfoming unwrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        self.perform_action(action_id, 15_000_000u64).await;
     }
 
     pub async fn wegld_swap_set_state(&mut self) {

@@ -39,26 +39,24 @@ impl MultisigInteract {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(
-                        self.state.multisig().propose_async_call(
-                            system_sc_address,
-                            ISSUE_COST,
-                            FunctionCall::new("registerAndSetAllRoles")
-                                .argument(&COLLECTION_NAME)
-                                .argument(&COLLECTION_TICKER)
-                                .argument(&TOKEN_TYPE)
-                                .argument(&0u32),
-                        ),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000")
-                    .expect(TxExpect::ok().additional_error_message("failed to issue collection")),
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                system_sc_address,
+                ISSUE_COST,
+                FunctionCall::new("registerAndSetAllRoles")
+                    .argument(&COLLECTION_NAME)
+                    .argument(&COLLECTION_TICKER)
+                    .argument(&TOKEN_TYPE)
+                    .argument(&0u32),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsSimilar::<usize>::new())
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed issue colllection with roles all action `{action_id}`");
         action_id
@@ -186,7 +184,7 @@ impl MultisigInteract {
         let action_id = self.propose_set_special_role().await;
 
         println!("performing set special role action `{action_id}`...");
-        self.perform_action(action_id, "80,000,000").await;
+        self.perform_action(action_id, 80_000_000u64).await;
     }
 
     pub async fn create_items(&mut self) {

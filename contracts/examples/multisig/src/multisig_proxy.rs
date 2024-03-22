@@ -355,7 +355,7 @@ where
         (),
         Gas,
         FunctionCall<Env::Api>,
-        OriginalResultMarker<Action<Env::Api>>,
+        OriginalResultMarker<Action>,
     > {
         self.wrapped_tx
             .raw_call()
@@ -727,11 +727,11 @@ where
     Api: ManagedTypeApi,
 {
     pub action_id: usize,
-    pub action_data: Action<Api>,
+    pub action_data: Action,
     pub signers: ManagedVec<Api, ManagedAddress<Api>>,
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode, TopDecode, NestedEncode, NestedDecode)]
 pub enum Action {
     Nothing,
     AddBoardMember,
