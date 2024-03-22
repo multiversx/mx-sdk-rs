@@ -497,7 +497,7 @@ where
     Api: ManagedTypeApi,
 {
     pub action_id: usize,
-    pub action_data: Action,
+    pub action_data: Action<Api>,
     pub signers: ManagedVec<Api, ManagedAddress<Api>>,
 }
 
