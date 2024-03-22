@@ -32,6 +32,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
+#[rustfmt::skip]
 impl<Env, From, Gas> DigitalCashProxyMethods<Env, From, (), Gas>
 where
     Env: TxEnv,
@@ -46,23 +47,16 @@ where
         self,
         fee: Arg0,
         token: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        (),
-        (),
-        Gas,
-        DeployCall<Env, ()>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyDeploy<Env, From, Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&fee)
             .argument(&token)
             .original_result()
     }
-
 }
+
+#[rustfmt::skip]
 impl<Env, From, To, Gas> DigitalCashProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
@@ -78,15 +72,7 @@ where
         self,
         fee: Arg0,
         token: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("whitelistFeeToken")
@@ -100,15 +86,7 @@ where
     >(
         self,
         token: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("blacklistFeeToken")
@@ -118,15 +96,7 @@ where
 
     pub fn claim_fees(
         self,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("claimFees")
@@ -142,15 +112,7 @@ where
         address: Arg0,
         token: Arg1,
         nonce: Arg2,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<BigUint<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("getAmount")
@@ -167,15 +129,7 @@ where
         self,
         address: Arg0,
         valability: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("payFeeAndFundESDT")
@@ -191,15 +145,7 @@ where
         self,
         address: Arg0,
         valability: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("payFeeAndFundEGLD")
@@ -215,15 +161,7 @@ where
         self,
         address: Arg0,
         valability: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("fund")
@@ -237,15 +175,7 @@ where
     >(
         self,
         address: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("depositFees")
@@ -258,15 +188,7 @@ where
     >(
         self,
         address: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("withdraw")
@@ -281,15 +203,7 @@ where
         self,
         address: Arg0,
         signature: Arg1,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("claim")
@@ -307,15 +221,7 @@ where
         address: Arg0,
         forward_address: Arg1,
         signature: Arg2,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<()>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
             .function_name("forward")
@@ -330,23 +236,15 @@ where
     >(
         self,
         donor: Arg0,
-    ) -> Tx<
-        Env,
-        From,
-        To,
-        (),
-        Gas,
-        FunctionCall<Env::Api>,
-        OriginalResultMarker<DepositInfo<Env::Api>>,
-    > {
+    ) -> TxProxyCall<Env, From, To, Gas, DepositInfo<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("deposit")
             .argument(&donor)
             .original_result()
     }
-
 }
+
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct DepositInfo<Api>
 where
@@ -368,4 +266,3 @@ where
     pub num_token_to_transfer: usize,
     pub value: EgldOrEsdtTokenPayment<Api>,
 }
-

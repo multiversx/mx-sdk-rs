@@ -5,8 +5,6 @@ use multiversx_sc::abi::{
     TypeDescriptionContainerImpl,
 };
 
-use crate::cmd::contract::generate_snippets::snippet_gen_common::write_newline;
-
 const ZERO: &str = "0";
 
 /// Types defined in the framework don't need to be generated again in the proxy.
@@ -38,11 +36,12 @@ pub(crate) fn write_types(file: &mut File, types: &TypeDescriptionContainerImpl)
 }
 
 fn start_write_type(file: &mut File, type_type: &str, type_description: &TypeDescription) {
-    let struct_name = type_description.names.rust.replace("$API", "Api");
+    writeln!(file).unwrap();
+    let type_name = type_description.names.rust.replace("$API", "Api");
     write_macro_attributes(file, &type_description.macro_attributes);
-    write!(file, r#"pub {type_type} {struct_name}"#).unwrap();
+    write!(file, r#"pub {type_type} {type_name}"#).unwrap();
 
-    if struct_name.contains("<Api>") {
+    if type_name.contains("<Api>") {
         writeln!(
             file,
             r#"
@@ -75,7 +74,6 @@ fn write_struct(
     }
 
     writeln!(file, "}}").unwrap();
-    write_newline(file);
 }
 
 fn write_enum(
@@ -99,7 +97,6 @@ fn write_enum(
         }
     }
     writeln!(file, "}}").unwrap();
-    write_newline(file);
 }
 
 fn write_macro_attributes(file: &mut File, macro_attributes: &[String]) {
