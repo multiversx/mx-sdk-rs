@@ -1,6 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
+    proxy_imports::{EsdtTokenPaymentRefs, TokenIdentifier},
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
         ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
@@ -197,6 +198,30 @@ where
             from: self.from,
             to: self.to,
             payment: payment.into(),
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Sets a single token payment, with the token identifier and amount kept as references.
+    ///
+    /// This is handy whem we only want one ESDT transfer and we want to avoid unnecessary object clones.
+    pub fn esdt_refs<'a>(
+        self,
+        token_identifier: &'a TokenIdentifier<Env::Api>,
+        token_nonce: u64,
+        amount: &'a BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: EsdtTokenPaymentRefs {
+                token_identifier,
+                token_nonce,
+                amount,
+            },
             gas: self.gas,
             data: self.data,
             result_handler: self.result_handler,

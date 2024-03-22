@@ -222,3 +222,31 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         writer(&arr[..])
     }
 }
+
+/// The version of `EsdtTokenPayment` that contains referrences instead of owned fields.
+pub struct EsdtTokenPaymentRefs<'a, M: ManagedTypeApi> {
+    pub token_identifier: &'a TokenIdentifier<M>,
+    pub token_nonce: u64,
+    pub amount: &'a BigUint<M>,
+}
+
+impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+    pub fn as_refs(&self) -> EsdtTokenPaymentRefs<'_, M> {
+        EsdtTokenPaymentRefs {
+            token_identifier: &self.token_identifier,
+            token_nonce: self.token_nonce,
+            amount: &self.amount,
+        }
+    }
+}
+
+impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
+    /// Will clone the referenced values.
+    pub fn to_owned_payment(&self) -> EsdtTokenPayment<M> {
+        EsdtTokenPayment {
+            token_identifier: self.token_identifier.clone(),
+            token_nonce: self.token_nonce,
+            amount: self.amount.clone(),
+        }
+    }
+}

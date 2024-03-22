@@ -15,18 +15,27 @@ where
 
     fn perform_transfer_execute(
         self,
-        _env: &Env,
+        env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
-            to,
-            self,
-            gas_limit,
-            &fc.function_name,
-            &fc.arg_buffer,
-        );
+        match self.len() {
+            0 => ().perform_transfer_execute(env, to, gas_limit, fc),
+            1 => self
+                .get(0)
+                .as_refs()
+                .perform_transfer_execute(env, to, gas_limit, fc),
+            _ => {
+                let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
+                    to,
+                    self,
+                    gas_limit,
+                    &fc.function_name,
+                    &fc.arg_buffer,
+                );
+            },
+        }
     }
 
     fn with_normalized<From, To, F, R>(
@@ -44,7 +53,7 @@ where
     {
         match self.len() {
             0 => ().with_normalized(env, from, to, fc, f),
-            1 => self.get(0).with_normalized(env, from, to, fc, f),
+            1 => self.get(0).as_refs().with_normalized(env, from, to, fc, f),
             _ => to.with_address_ref(env, |to_addr| {
                 let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
                 f(&from.resolve_address(env), &BigUint::zero(), &fc_conv)
