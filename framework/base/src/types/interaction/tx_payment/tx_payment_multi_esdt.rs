@@ -20,22 +20,13 @@ where
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        match self.len() {
-            0 => ().perform_transfer_execute(env, to, gas_limit, fc),
-            1 => self
-                .get(0)
-                .as_refs()
-                .perform_transfer_execute(env, to, gas_limit, fc),
-            _ => {
-                let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
-                    to,
-                    self,
-                    gas_limit,
-                    &fc.function_name,
-                    &fc.arg_buffer,
-                );
-            },
-        }
+        let _ = SendRawWrapper::<Env::Api>::new().multi_esdt_transfer_execute(
+            to,
+            self,
+            gas_limit,
+            &fc.function_name,
+            &fc.arg_buffer,
+        );
     }
 
     fn with_normalized<From, To, F, R>(
