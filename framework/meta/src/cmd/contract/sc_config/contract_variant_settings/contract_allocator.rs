@@ -4,7 +4,7 @@ pub enum ContractAllocator {
     #[default]
     AllocationForbidden,
 
-    /// An allocator that never deallocates. It calls memory grow to reserve memory chuncks.
+    /// An allocator that never deallocates. It calls memory grow to reserve memory chunks.
     LeakingAllocator,
 
     /// An allocator that uses a statically pre-allocated chunk of memory, of 64kb.

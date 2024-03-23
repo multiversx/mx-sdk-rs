@@ -179,7 +179,7 @@ def format_buffer_hex(buffer: lldb.value) -> str:
 
 def ascii_to_string(buffer_iterator: Iterable[int]) -> str:
     """
-    Converts ascii codes to the coresponding string.
+    Converts ascii codes to the corresponding string.
 
     >>> ascii_to_string([116, 101, 115, 116])
     'test'

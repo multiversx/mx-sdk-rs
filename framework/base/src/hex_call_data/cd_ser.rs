@@ -9,7 +9,7 @@ use super::SEPARATOR;
 
 /// Serializes to the MultiversX smart contract call format.
 ///
-/// This format consists of the function name, followed by '@', follwed by hex-encoded argument bytes separated by '@' characters.
+/// This format consists of the function name, followed by '@', followed by hex-encoded argument bytes separated by '@' characters.
 /// Example: "funcName@00000@aaaa@1234@@".
 /// Arguments can be empty, in which case no hex digits are emitted.
 /// Argument hex encodings will always have an even number of digits.

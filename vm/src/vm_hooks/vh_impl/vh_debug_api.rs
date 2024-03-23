@@ -158,7 +158,7 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         };
 
         let tx_cache = TxCache::new(self.0.blockchain_cache_arc());
-        tx_cache.increase_acount_nonce(contract_address);
+        tx_cache.increase_account_nonce(contract_address);
         let (tx_result, new_address, blockchain_updates) = self.0.vm_ref.deploy_contract(
             tx_input,
             contract_code,

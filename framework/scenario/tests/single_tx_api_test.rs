@@ -6,7 +6,7 @@ fn single_tx_api_test() {
     let storage_raw = StorageRawWrapper::<SingleTxApi>::new();
     let storage_key = "test-num";
 
-    // unitialized, we get the default
+    // uninitialized, we get the default
     let x: i32 = storage_raw.read(storage_key);
     assert_eq!(x, 0);
 

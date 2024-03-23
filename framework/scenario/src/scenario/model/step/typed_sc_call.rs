@@ -105,7 +105,7 @@ impl<OriginalResult> TypedScCall<OriginalResult> {
 
     /// Shorthand for creating a tx expect with status "Ok" and the given value.
     ///
-    /// The given value is type-checked agains the tx return type.
+    /// The given value is type-checked again the tx return type.
     pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
     where
         OriginalResult: TopEncodeMulti,

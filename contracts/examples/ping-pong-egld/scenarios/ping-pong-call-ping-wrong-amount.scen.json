@@ -1,5 +1,5 @@
 {
-    "name": "try to ping the wrong ammount of funds",
+    "name": "try to ping the wrong amount of funds",
     "gasSchedule": "v3",
     "steps": [
         {

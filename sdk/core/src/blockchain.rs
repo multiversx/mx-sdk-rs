@@ -372,12 +372,12 @@ impl CommunicationProxy {
         match resp.data {
             None => Err(anyhow!("{}", resp.error)),
             Some(b) => {
-                let mut tx_hashs: Vec<String> = vec![];
+                let mut tx_hashes: Vec<String> = vec![];
                 for key in b.txs_hashes.keys().sorted() {
-                    tx_hashs.push(b.txs_hashes[key].clone());
+                    tx_hashes.push(b.txs_hashes[key].clone());
                 }
 
-                Ok(tx_hashs)
+                Ok(tx_hashes)
             },
         }
     }

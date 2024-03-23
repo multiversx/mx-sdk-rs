@@ -45,9 +45,9 @@ A maximum of `MAX_GOVERNANCE_PROPOSAL_ACTIONS` may be proposed at a time. All ac
 Additionally, a minimum of `min_token_balance_for_proposal` governance tokens must be deposited at proposal time.
 
 Examples of actions that can be proposed:
-- transfering ESDT tokens to user accounts
+- transferring ESDT tokens to user accounts
 - calling other smart contracts, with or without sending tokens as well
-- calling the goverance contract itself, for the purpose of changing configurable parameters
+- calling the governance contract itself, for the purpose of changing configurable parameters
 
 ## Voting/Downvoting
 

@@ -39,9 +39,9 @@ pub trait Parent {
         initial_supply: BigUint,
     ) {
         let issue_cost = self.call_value().egld_value();
-        let child_contract_adress = self.child_contract_address().get();
+        let child_contract_address = self.child_contract_address().get();
         let _: IgnoreValue = self
-            .child_proxy(child_contract_adress)
+            .child_proxy(child_contract_address)
             .issue_wrapped_egld(token_display_name, token_ticker, initial_supply)
             .with_egld_transfer(issue_cost.clone_value())
             .with_gas_limit(ISSUE_EXPECTED_GAS_COST)
