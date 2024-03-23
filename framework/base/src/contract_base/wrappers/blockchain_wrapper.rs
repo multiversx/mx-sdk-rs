@@ -49,9 +49,9 @@ where
 
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
-        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_caller_managed(handle.clone());
-        ManagedAddress::from_handle(handle)
+        let caller_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
+        A::blockchain_api_impl().load_caller_managed(caller_handle.clone());
+        ManagedAddress::from_handle(caller_handle)
     }
 
     #[deprecated(since = "0.41.0", note = "Please use method `get_sc_address` instead.")]
@@ -63,9 +63,9 @@ where
 
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
-        let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_sc_address_managed(handle.clone());
-        ManagedAddress::from_handle(handle)
+        let sc_address_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_SELF);
+        A::blockchain_api_impl().load_sc_address_managed(sc_address_handle.clone());
+        ManagedAddress::from_handle(sc_address_handle)
     }
 
     #[inline]
@@ -82,9 +82,9 @@ where
     }
 
     pub fn check_caller_is_user_account(&self) {
-        let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        A::blockchain_api_impl().load_caller_managed(mbuf_temp_1.clone());
-        if A::blockchain_api_impl().is_smart_contract(mbuf_temp_1) {
+        let caller_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
+        A::blockchain_api_impl().load_caller_managed(caller_handle.clone());
+        if A::blockchain_api_impl().is_smart_contract(caller_handle) {
             A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER);
         }
     }
