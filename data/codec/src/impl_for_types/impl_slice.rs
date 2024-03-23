@@ -4,7 +4,7 @@ use crate::{
 };
 use alloc::{boxed::Box, vec::Vec};
 
-/// Adds the concantenated encoded contents of a slice to an output buffer,
+/// Adds the concatenated encoded contents of a slice to an output buffer,
 /// without serializing the slice length.
 /// Byte slice is treated separately, via direct transmute.
 pub fn dep_encode_slice_contents<T, O, H>(

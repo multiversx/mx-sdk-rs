@@ -299,7 +299,7 @@ impl BlockchainStateWrapper {
             .set_state_step(SetStateStep::new().put_account(address, account));
     }
 
-    // Has to be used before perfoming a deploy from a SC
+    // Has to be used before performing a deploy from a SC
     // The returned SC wrapper cannot be used before the deploy is actually executed
     pub fn prepare_deploy_from_sc<CB, ContractObjBuilder>(
         &mut self,

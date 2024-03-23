@@ -102,7 +102,7 @@ fn convert_esdt(
 ) -> BTreeMap<String, EsdtRaw> {
     let mut result = BTreeMap::new();
     for (key, value) in sdk_esdt.into_iter() {
-        let (token_identifier, nonce) = split_token_identifer_nonce(key);
+        let (token_identifier, nonce) = split_token_identifier_nonce(key);
         let esdt_raw = result
             .entry(format!("str:{}", token_identifier.clone()))
             .or_insert(EsdtRaw::Full(EsdtFullRaw::default()));
@@ -117,7 +117,7 @@ fn convert_esdt(
     }
 
     for (key, roles) in sdk_esdt_roles.into_iter() {
-        let (token_identifier, _) = split_token_identifer_nonce(key);
+        let (token_identifier, _) = split_token_identifier_nonce(key);
         let esdt_raw = result
             .entry(format!("str:{}", token_identifier.clone()))
             .or_insert(EsdtRaw::Full(EsdtFullRaw::default()));
@@ -129,7 +129,7 @@ fn convert_esdt(
     result
 }
 
-fn split_token_identifer_nonce(full_identifier: String) -> (String, u64) {
+fn split_token_identifier_nonce(full_identifier: String) -> (String, u64) {
     let tokens = full_identifier.split('-').collect::<Vec<_>>();
     match tokens.len() {
         2 => (full_identifier, 0),

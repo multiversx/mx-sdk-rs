@@ -5,7 +5,7 @@ use crate::api::{
 
 use super::ExternalViewApi;
 
-pub const EXTERNAL_VIEW_TARGET_ADRESS_KEY: &[u8] = b"external-view-target-address";
+pub const EXTERNAL_VIEW_TARGET_ADDRESS_KEY: &[u8] = b"external-view-target-address";
 
 impl<A> StorageReadApi for ExternalViewApi<A>
 where
@@ -29,7 +29,7 @@ where
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_overwrite(
             external_view_target_key_handle.clone(),
-            EXTERNAL_VIEW_TARGET_ADRESS_KEY,
+            EXTERNAL_VIEW_TARGET_ADDRESS_KEY,
         );
         let external_view_target_address_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());

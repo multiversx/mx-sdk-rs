@@ -32,10 +32,10 @@ impl TypeDescriptionContainer for TypeDescriptionContainerImpl {
     }
 
     fn insert(&mut self, type_name: TypeName, type_description: TypeDescription) {
-        if let Some((_existing_type_name, exisiting_type_description)) =
+        if let Some((_existing_type_name, existing_type_description)) =
             self.0.iter_mut().find(|(name, _)| name == &type_name)
         {
-            *exisiting_type_description = type_description;
+            *existing_type_description = type_description;
         } else {
             self.0.push((type_name, type_description));
         }

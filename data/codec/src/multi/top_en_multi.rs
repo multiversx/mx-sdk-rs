@@ -3,7 +3,7 @@ use crate::{
 };
 
 pub trait TopEncodeMulti: Sized {
-    /// Attempt to serialize the value to ouput.
+    /// Attempt to serialize the value to output.
     fn multi_encode<O>(&self, output: &mut O) -> Result<(), EncodeError>
     where
         O: TopEncodeMultiOutput,

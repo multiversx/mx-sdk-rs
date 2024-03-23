@@ -51,7 +51,7 @@ impl<T> Queue<T> {
         self.vec.push(value);
     }
 
-    /// Returns a referenece to the first item in the queue, without removing it.
+    /// Returns a reference to the first item in the queue, without removing it.
     /// Returns None if the queue is empty.
     pub fn peek(&self) -> Option<&T> {
         if self.start == self.vec.len() {
@@ -61,7 +61,7 @@ impl<T> Queue<T> {
         Some(head_ref)
     }
 
-    /// Returns a mutable referenece to the first item in the queue, without removing it.
+    /// Returns a mutable reference to the first item in the queue, without removing it.
     /// Returns None if the queue is empty.
     pub fn peek_mut(&mut self) -> Option<&mut T> {
         if self.start == self.vec.len() {

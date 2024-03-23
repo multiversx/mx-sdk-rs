@@ -82,7 +82,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_dep_struc() {
+    fn test_dep_struct() {
         check_dep_encode_decode(
             TestStructWithPhantom::<u64> {
                 x: 42,
@@ -94,7 +94,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_top_struc() {
+    fn test_top_struct() {
         check_top_encode_decode(
             TestStructWithPhantom::<u64> {
                 x: 42,

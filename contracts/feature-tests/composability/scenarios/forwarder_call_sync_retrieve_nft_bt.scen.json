@@ -100,7 +100,7 @@
                         "address": "sc:forwarder",
                         "endpoint": "str:forward_sync_retrieve_funds_bt",
                         "topics": [
-                            "str:back_tranfers",
+                            "str:back_transfers",
                             "0",
                             "str:NFT-000001",
                             "5",

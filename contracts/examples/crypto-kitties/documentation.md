@@ -201,7 +201,7 @@ This function ends the auction for the kitty if one of the end conditions has be
 
 Anyone may call this function, not only the ones involved in the auction.
 
-If this was a selling auction, the `current_bid` is sent to the `kitty_owner` and the kitty's ownership is transfered to `current_winner`. Auction is then cleared from storage.
+If this was a selling auction, the `current_bid` is sent to the `kitty_owner` and the kitty's ownership is transferred to `current_winner`. Auction is then cleared from storage.
 
 If this was a siring auction, the `current_bid` is sent to the `kitty_owner` and the kitty's `sire_allowed_address` is set to `current_winner`.
 
@@ -233,7 +233,7 @@ fn init(
 )
 ```
 
-Each breeding will cost a fixed amount of eGLD. The birth operation can cost a lot of gas, depending on the implementation of the genetic algortihm, so whoever calls the give_birth method (will be discussed later) will get the deposited `birth_fee`.
+Each breeding will cost a fixed amount of eGLD. The birth operation can cost a lot of gas, depending on the implementation of the genetic algorithm, so whoever calls the give_birth method (will be discussed later) will get the deposited `birth_fee`.
 
 The next two arguments are the addresses of the other two contracts: the kitty-auction contract and the kitty-genetic-alg contract. These can either be set now or later by the owner, using the appropriate setter methods.
 

@@ -182,7 +182,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
 
         ContractCallWithMultiEsdt::<Self::Api, ()>::new(
             to,
-            "burn_and_create_retrive_async",
+            "burn_and_create_retrieve_async",
             all_payments,
         )
         .async_call()

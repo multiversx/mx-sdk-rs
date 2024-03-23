@@ -47,7 +47,7 @@ fn ping_pong_call_ping_twice_rs() {
 }
 
 #[test]
-fn ping_pong_call_ping_wrong_ammount_rs() {
+fn ping_pong_call_ping_wrong_amount_rs() {
     world().run("scenarios/ping-pong-call-ping-wrong-ammount.scen.json");
 }
 

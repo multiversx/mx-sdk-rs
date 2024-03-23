@@ -44,7 +44,7 @@ where
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
-    /// Will return 0 results if nothing was transfered, or just EGLD.
+    /// Will return 0 results if nothing was transferred, or just EGLD.
     /// Fully managed underlying types, very efficient.
     pub fn all_esdt_transfers(&self) -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>> {
         let mut call_value_handle: A::ManagedBufferHandle =

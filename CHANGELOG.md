@@ -237,7 +237,7 @@ They are:
 ## [sc 0.39.5, vm 0.1.5] - 2023-02-06
 - `multiversx-sc-meta` improvements:
 	- Rust snippet generator fixes. The generator creates compilable code with appropriate argument types.
-	- `local-deps` command: generates a report on the local depedencies of contract crates. Will explore indirect depdencies too.
+	- `local-deps` command: generates a report on the local dependencies of contract crates. Will explore indirect dependencies too.
 	- Upgrade tool minor fix.
 
 ## [sc 0.39.4, vm 0.1.4] - 2023-01-26
@@ -263,7 +263,7 @@ They are:
 
 ## [sc 0.39.1, codec 0.17.1, vm 0.1.1, scenario-format 0.19.1, sdk 0.1.1] - 2023-01-18
 - `multiversx-sc-meta` can be installed as a standalone tool (`sc-meta`), and used to automatically upgrade contracts.
-- Many depedencies updates across the repo.
+- Many dependencies updates across the repo.
 - Updated readme files.
 
 ## [sc 0.39.0, codec 0.17.0, vm 0.1.0, scenario-format 0.19.0, sdk 0.1.0] - 2023-01-12
@@ -531,7 +531,7 @@ They are:
 - Made the generated code in `wasm/lib.rs` more compact with the use of macros.
 
 ## [elrond-wasm 0.22.0] - 2021-11-02
-- Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automaticaly included, now they can be filtered based on what modules are used.
+- Mechanism for generating contract endpoints based on ABI. Previously, all endpoints from all modules from a crate were automatically included, now they can be filtered based on what modules are used.
 - Contract `meta` crates are now capable of building the respective contracts and the ABIs without relying on `erdpy`.
 - Renamed feature `arwen-tests` to `mandos-go-tests`
 
@@ -618,7 +618,7 @@ They are:
 - Send API refactored for more consistency and ease of use.
 - High level proxies can be used to deploy contracts.
 - Mandos log syntax updated, to match Arwen.
-- A better `#[only_owner]` annotation, which can be applied directly to endoint methods. This annotation also shows up in the ABI.
+- A better `#[only_owner]` annotation, which can be applied directly to endpoint methods. This annotation also shows up in the ABI.
 - `elrond-wasm-derive` now an optional dependency of `elrond-wasm`. Use `#[elrond_wasm::contract]` instead of `#[elrond_wasm_derive::contract]` now. Same for proxies and modules.
 
 ## [elrond-wasm 0.17.4] - 2021-06-30
@@ -773,7 +773,7 @@ They are:
 - ABI generation of endpoint output names
 
 ## [elrond-wasm 0.10.2, elrond-codec 0.4.2] - 2020-12-28
-- Codec type hygene
+- Codec type hygiene
 
 ## [elrond-wasm 0.10.1, elrond-codec 0.4.1, mandos 0.4.1] - 2020-12-23
 - Minor fixes, support for strings
@@ -928,7 +928,7 @@ They are:
 - Async call contract proxy infrastructure
 
 ## [elrond-wasm 0.1.0] - 2020-02-05 
-- Initial relase of the framework
+- Initial release of the framework
 - Main features at this time:
 	- contract main macro
 	- handling of arguments and results automagically using macros

@@ -58,7 +58,7 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
     }
 
     fn halt_with_error(&self, status: u64, message: &str) -> ! {
-        panic!("VM error occured, status: {status}, message: {message}")
+        panic!("VM error occurred, status: {status}, message: {message}")
     }
 
     fn input_ref(&self) -> &TxInput {
