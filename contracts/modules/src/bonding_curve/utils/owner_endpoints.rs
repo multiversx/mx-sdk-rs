@@ -179,7 +179,7 @@ pub trait OwnerEndpointsModule: storage::StorageModule + events::EventsModule {
             self.bonding_curve(&token).clear();
         }
         self.owned_tokens(&caller).clear();
-        self.send().direct_multi(&caller, &tokens_to_claim);
+        self.tx().to(&caller).multi_esdt(tokens_to_claim).transfer();
         if egld_to_claim > BigUint::zero() {
             self.tx().to(&caller).egld(&egld_to_claim).transfer();
         }
