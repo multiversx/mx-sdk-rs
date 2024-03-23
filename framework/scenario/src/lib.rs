@@ -13,15 +13,10 @@ pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
 
-#[deprecated(
-    since = "0.42.0",
-    note = "Use the blackbox testing framework instead. If needed, it also supports whitebox calls."
-)]
 pub mod whitebox_legacy;
 
 /// Keeping this for backwards compatibility.
 /// Unfortunately, the `deprecated` annotation doesn't function for reexports.
-#[allow(deprecated)]
 pub use whitebox_legacy as testing_framework;
 
 pub use api::DebugApi;
