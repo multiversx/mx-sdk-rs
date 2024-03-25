@@ -13,13 +13,6 @@ where
     fn item_process_result(self, raw_result: &RawResult) -> Self::Returns;
 }
 
-impl<RawResult, Env, Original> RHListItemExec<RawResult, Env, Original> for ()
-where
-    Env: TxEnv,
-{
-    fn item_process_result(self, _raw_result: &RawResult) -> Self::Returns {}
-}
-
 /// Indicates how result processing will undergo for an ensemble of result handlers.
 pub trait RHListExec<RawResult, Env>: RHList<Env>
 where
