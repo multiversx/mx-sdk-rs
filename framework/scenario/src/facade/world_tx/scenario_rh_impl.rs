@@ -1,8 +1,8 @@
 use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
-        ManagedAddress, RHList, RHListItem, ReturnsExact, ReturnsNewAddress, ReturnsSimilar, TxEnv,
-        WithResultNewAddress, WithResultSimilar,
+        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsExact, ReturnsNewAddress,
+        ReturnsSimilar, TxEnv, WithResultNewAddress, WithResultSimilar,
     },
 };
 
@@ -13,19 +13,12 @@ use crate::{
 
 use super::ScenarioTxEnvData;
 
-pub trait RHListItemScenario<Env, Original>: RHListItem<Env, Original>
-where
-    Env: TxEnv,
-{
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns;
-}
-
-impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsExact
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsExact
 where
     Env: TxEnv,
     Original: TopDecodeMulti,
 {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let response = TypedResponse::<Original>::from_raw(tx_response);
         response
             .result
@@ -33,13 +26,13 @@ where
     }
 }
 
-impl<Env, Original, T> RHListItemScenario<Env, Original> for ReturnsSimilar<T>
+impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsSimilar<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
     T: CodecFrom<Original>,
 {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let response = TypedResponse::<T>::from_raw(tx_response);
         response
             .result
@@ -47,14 +40,14 @@ where
     }
 }
 
-impl<Env, Original, T, F> RHListItemScenario<Env, Original> for WithResultSimilar<T, F>
+impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultSimilar<T, F>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
     T: CodecFrom<Original>,
     F: FnOnce(T),
 {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let response = TypedResponse::<T>::from_raw(tx_response);
         let value = response
             .result
@@ -63,11 +56,11 @@ where
     }
 }
 
-impl<Env, Original> RHListItemScenario<Env, Original> for ReturnsNewAddress
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsNewAddress
 where
     Env: TxEnv,
 {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let new_address = tx_response
             .new_deployed_address
             .clone()
@@ -77,12 +70,12 @@ where
     }
 }
 
-impl<Env, Original, F> RHListItemScenario<Env, Original> for WithResultNewAddress<Env, F>
+impl<Env, Original, F> RHListItemExec<TxResponse, Env, Original> for WithResultNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),
 {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let new_address = tx_response
             .new_deployed_address
             .clone()

@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 
-use crate::types::{ManagedBuffer, ManagedVec, RHListItemSync, TxEnv};
+use crate::types::{ManagedBuffer, ManagedVec, SyncCallRawResult, TxEnv};
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct WithResultRaw<Env, F>
 where
@@ -34,15 +34,13 @@ where
     type Returns = ();
 }
 
-impl<Env, F, Original> RHListItemSync<Env, Original> for WithResultRaw<Env, F>
+impl<Env, F, Original> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
+    for WithResultRaw<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedVec<Env::Api, ManagedBuffer<Env::Api>>),
 {
-    fn item_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        (self.f)(raw_results)
+    fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Self::Returns {
+        (self.f)(&raw_result.0)
     }
 }

@@ -2,7 +2,7 @@ use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListSync,
+        AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec,
         Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
         TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
@@ -14,7 +14,7 @@ use crate::{
         AddressValue, BigUintValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep,
         TransferStep, TxResponse,
     },
-    RHListScenario, ScenarioEnvExec, ScenarioWorld,
+    ScenarioEnvExec, ScenarioWorld,
 };
 
 pub fn address_annotated<Env, Addr>(env: &Env, from: Addr) -> AddressValue
@@ -148,10 +148,10 @@ pub fn process_result<Env, RH>(
 ) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked
 where
     Env: TxEnv,
-    RH: RHListScenario<Env>,
+    RH: RHListExec<TxResponse, Env>,
     RH::ListReturns: NestedTupleFlatten,
 {
     let response = response.expect("step did not return result");
-    let tuple_result = result_handler.item_scenario_result(&response);
+    let tuple_result = result_handler.list_process_result(&response);
     tuple_result.flatten_unpack()
 }

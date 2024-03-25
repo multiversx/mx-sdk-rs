@@ -1,11 +1,11 @@
 use multiversx_sc_codec::TopDecodeMulti;
 
-use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItemSync,
-    TxEnv,
+use crate::{
+    proxy_imports::SyncCallRawResult,
+    types::{interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, TxEnv},
 };
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct ReturnsExact;
 
@@ -16,15 +16,12 @@ where
     type Returns = Original;
 }
 
-impl<Env, Original> RHListItemSync<Env, Original> for ReturnsExact
+impl<Env, Original> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original> for ReturnsExact
 where
     Env: TxEnv,
     Original: TopDecodeMulti,
 {
-    fn item_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        decode_result::<Env::Api, Original>(raw_results.clone())
+    fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Original {
+        decode_result::<Env::Api, Original>(raw_result.0.clone())
     }
 }

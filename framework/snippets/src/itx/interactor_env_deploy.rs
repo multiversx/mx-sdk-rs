@@ -6,14 +6,13 @@ use multiversx_sc_scenario::{
         tuple_util::NestedTupleFlatten,
         types::{
             AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer,
-            RHListSync, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
+            RHListExec, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
     scenario_env_util::*,
     scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
-    RHListScenario, ScenarioEnvExec, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun,
-    ScenarioWorld,
+    ScenarioEnvExec, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use crate::{Interactor, InteractorPrepareAsync};
@@ -22,7 +21,7 @@ use super::InteractorEnvExec;
 
 pub struct InteractorDeployStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     world: &'w mut Interactor,
@@ -45,7 +44,7 @@ where
     Payment: TxPayment<InteractorEnvExec<'w>>,
     Gas: TxGas<InteractorEnvExec<'w>>,
     CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorDeployStep<'w, RH>;
@@ -63,7 +62,7 @@ where
 
 impl<'w, RH> InteractorDeployStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
@@ -80,7 +79,7 @@ impl Interactor {
         Payment: TxPayment<ScenarioTxEnvData>,
         Gas: TxGas<ScenarioTxEnvData>,
         CodeValue: TxCodeValue<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData, ListReturns = ()>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
         ) -> Tx<
@@ -111,7 +110,7 @@ impl Interactor {
         Payment: TxPayment<ScenarioTxEnvData>,
         Gas: TxGas<ScenarioTxEnvData>,
         CodeValue: TxCodeValue<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData>,
         RH::ListReturns: NestedTupleFlatten,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
