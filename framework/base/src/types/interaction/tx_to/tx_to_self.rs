@@ -6,10 +6,10 @@ use crate::{
 
 use super::{TxTo, TxToSpecified};
 
-/// Indicates that transaction should be sent to the caller (the sender of the current transaction).
-pub struct ToCaller;
+/// Indicates that transaction should be sent to itself.
+pub struct ToSelf;
 
-impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for ToCaller
+impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for ToSelf
 where
     Api: CallTypeApi + BlockchainApi,
 {
@@ -18,12 +18,12 @@ where
     }
 
     fn into_value(self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {
-        BlockchainWrapper::<Api>::new().get_caller()
+        BlockchainWrapper::<Api>::new().get_sc_address()
     }
 }
 
-impl<Api> TxTo<TxScEnv<Api>> for ToCaller where Api: CallTypeApi + BlockchainApi {}
-impl<Api> TxToSpecified<TxScEnv<Api>> for ToCaller
+impl<Api> TxTo<TxScEnv<Api>> for ToSelf where Api: CallTypeApi + BlockchainApi {}
+impl<Api> TxToSpecified<TxScEnv<Api>> for ToSelf
 where
     Api: CallTypeApi + BlockchainApi,
 {
@@ -31,8 +31,8 @@ where
     where
         F: FnOnce(&ManagedAddress<Api>) -> R,
     {
-        let caller_handle: Api::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
-        Api::blockchain_api_impl().load_caller_managed(caller_handle.clone());
-        f(&ManagedAddress::from_handle(caller_handle))
+        let sc_address_handle: Api::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
+        Api::blockchain_api_impl().load_sc_address_managed(sc_address_handle.clone());
+        f(&ManagedAddress::from_handle(sc_address_handle))
     }
 }

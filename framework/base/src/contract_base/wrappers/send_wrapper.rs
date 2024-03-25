@@ -12,6 +12,7 @@ use crate::{
     },
     codec,
     esdt::ESDTSystemSmartContractProxy,
+    proxy_imports::{ReturnsRaw, ToSelf},
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
@@ -380,11 +381,31 @@ where
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
+        endpoint_name: ManagedBuffer<A>,
+        arg_buffer: ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        self.send_raw_wrapper()
-            .call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .with_gas_limit(gas)
+            .raw_call()
+            .function_name(endpoint_name)
+            .arguments_raw(arg_buffer)
+            .returns(ReturnsRaw)
+            .sync_call()
+    }
+
+    fn call_local_esdt_built_in_function_minimal(
+        &self,
+        function_name: &str,
+        arg_buffer: ManagedArgBuffer<A>,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .with_gas_limit(A::blockchain_api_impl().get_gas_left())
+            .raw_call()
+            .function_name(function_name)
+            .arguments_raw(arg_buffer)
+            .sync_call()
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -410,11 +431,7 @@ where
 
         arg_buffer.push_arg(amount);
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(func_name),
-            &arg_buffer,
-        );
+        self.call_local_esdt_built_in_function_minimal(func_name, arg_buffer);
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -456,11 +473,7 @@ where
 
         arg_buffer.push_arg(amount);
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(func_name),
-            &arg_buffer,
-        );
+        self.call_local_esdt_built_in_function_minimal(func_name, arg_buffer);
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
@@ -549,8 +562,8 @@ where
 
         let output = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
-            &arg_buffer,
+            ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
+            arg_buffer,
         );
 
         if let Some(first_result_bytes) = output.try_get(0) {
@@ -770,11 +783,7 @@ where
             arg_buffer.push_arg(uri);
         }
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(ESDT_NFT_ADD_URI_FUNC_NAME),
-            &arg_buffer,
-        );
+        self.call_local_esdt_built_in_function_minimal(ESDT_NFT_ADD_URI_FUNC_NAME, arg_buffer);
     }
 
     /// Changes attributes of an NFT, via a synchronous builtin function call.
@@ -789,10 +798,9 @@ where
         arg_buffer.push_arg(nft_nonce);
         arg_buffer.push_arg(new_attributes);
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME),
-            &arg_buffer,
+        self.call_local_esdt_built_in_function_minimal(
+            ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+            arg_buffer,
         );
     }
 }
