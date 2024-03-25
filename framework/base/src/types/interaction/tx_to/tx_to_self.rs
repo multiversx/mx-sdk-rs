@@ -31,7 +31,8 @@ where
     where
         F: FnOnce(&ManagedAddress<Api>) -> R,
     {
-        let sc_address_handle: Api::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
+        let sc_address_handle: Api::ManagedBufferHandle =
+            use_raw_handle(const_handles::ADDRESS_CALLER);
         Api::blockchain_api_impl().load_sc_address_managed(sc_address_handle.clone());
         f(&ManagedAddress::from_handle(sc_address_handle))
     }

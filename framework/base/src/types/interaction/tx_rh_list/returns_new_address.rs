@@ -1,8 +1,6 @@
-use crate::types::{
-    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv,
-};
+use crate::types::{DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv};
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct ReturnsNewAddress;
 
@@ -13,15 +11,11 @@ where
     type Returns = ManagedAddress<Env::Api>;
 }
 
-impl<Env, Original> RHListItemDeploy<Env, Original> for ReturnsNewAddress
+impl<Env, Original> RHListItemExec<DeployRawResult<Env::Api>, Env, Original> for ReturnsNewAddress
 where
     Env: TxEnv,
 {
-    fn item_deploy_result(
-        self,
-        new_address: &ManagedAddress<Env::Api>,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        new_address.clone()
+    fn item_process_result(self, raw_result: &DeployRawResult<Env::Api>) -> Self::Returns {
+        raw_result.new_address.clone()
     }
 }

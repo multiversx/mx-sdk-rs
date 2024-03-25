@@ -9,81 +9,13 @@ use crate::{
 
 use super::{
     contract_call_exec::decode_result, BackTransfers, ConsNoRet, ConsRet, OriginalResultMarker,
-    RHList, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxScEnv, TxToSpecified,
+    RHList, RHListExec, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxScEnv,
+    TxToSpecified,
 };
 
-pub trait RHListItemSync<Env, Original>: RHListItem<Env, Original>
+pub struct SyncCallRawResult<Api>(pub ManagedVec<Api, ManagedBuffer<Api>>)
 where
-    Env: TxEnv,
-{
-    fn item_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns;
-}
-
-pub trait RHListSync<Env>: RHList<Env>
-where
-    Env: TxEnv,
-{
-    fn list_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns;
-}
-
-impl<Env> RHListSync<Env> for ()
-where
-    Env: TxEnv,
-{
-    fn list_sync_call_result(
-        self,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-    }
-}
-
-impl<Env, O> RHListSync<Env> for OriginalResultMarker<O>
-where
-    Env: TxEnv,
-{
-    fn list_sync_call_result(
-        self,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-    }
-}
-
-impl<Env, Head, Tail> RHListSync<Env> for ConsRet<Env, Head, Tail>
-where
-    Env: TxEnv,
-    Head: RHListItemSync<Env, Tail::OriginalResult>,
-    Tail: RHListSync<Env>,
-{
-    fn list_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-        let head_result = self.head.item_sync_call_result(raw_results);
-        let tail_result = self.tail.list_sync_call_result(raw_results);
-        (head_result, tail_result)
-    }
-}
-
-impl<Env, Head, Tail> RHListSync<Env> for ConsNoRet<Env, Head, Tail>
-where
-    Env: TxEnv,
-    Head: RHListItemSync<Env, Tail::OriginalResult, Returns = ()>,
-    Tail: RHListSync<Env>,
-{
-    fn list_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-        self.head.item_sync_call_result(raw_results);
-        self.tail.list_sync_call_result(raw_results)
-    }
-}
+    Api: CallTypeApi;
 
 impl<Api, To, Payment, Gas, FC, RH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, RH>
 where
@@ -92,7 +24,7 @@ where
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
-    RH: RHListSync<TxScEnv<Api>>,
+    RH: RHListExec<SyncCallRawResult<Api>, TxScEnv<Api>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     fn execute_sync_call_raw(self) -> (ManagedVec<Api, ManagedBuffer<Api>>, RH) {
@@ -121,8 +53,8 @@ where
 
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         let (raw_result, result_handler) = self.execute_sync_call_raw();
-
-        let tuple_result = result_handler.list_sync_call_result(&raw_result);
+        let sync_raw_result = SyncCallRawResult(raw_result);
+        let tuple_result = result_handler.list_process_result(&sync_raw_result);
         tuple_result.flatten_unpack()
     }
 }

@@ -5,13 +5,13 @@ use multiversx_sc_scenario::{
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
         types::{
-            AnnotatedValue, FunctionCall, ManagedAddress, Tx, TxBaseWithEnv, TxEnv,
+            AnnotatedValue, FunctionCall, ManagedAddress, RHListExec, Tx, TxBaseWithEnv, TxEnv,
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
     scenario_env_util::*,
     scenario_model::{ScQueryStep, TxResponse},
-    RHListScenario, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use crate::{Interactor, InteractorPrepareAsync};
@@ -41,7 +41,7 @@ impl<'w> ScenarioTxEnv for InteractorEnvQuery<'w> {
 
 pub struct InteractorQueryStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     world: &'w mut Interactor,
@@ -53,7 +53,7 @@ impl<'w, To, RH> InteractorPrepareAsync
     for Tx<InteractorEnvQuery<'w>, (), To, (), (), FunctionCall<StaticApi>, RH>
 where
     To: TxToSpecified<InteractorEnvQuery<'w>>,
-    RH: RHListScenario<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorQueryStep<'w, RH>;
@@ -70,7 +70,7 @@ where
 
 impl<'w, RH> InteractorQueryStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
@@ -90,7 +90,7 @@ impl Interactor {
     pub async fn chain_query<To, RH, F>(&mut self, f: F) -> &mut Self
     where
         To: TxToSpecified<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData, ListReturns = ()>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
         ) -> Tx<ScenarioTxEnvData, (), To, (), (), FunctionCall<StaticApi>, RH>,
