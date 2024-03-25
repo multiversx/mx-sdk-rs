@@ -1,8 +1,8 @@
 use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
-        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsExact, ReturnsNewAddress,
-        ReturnsSimilar, TxEnv, WithResultNewAddress, WithResultSimilar,
+        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsNewAddress, ReturnsResult,
+        ReturnsResultConv, TxEnv, WithNewAddress, WithResultConv,
     },
 };
 
@@ -13,7 +13,7 @@ use crate::{
 
 use super::ScenarioTxEnvData;
 
-impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsExact
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResult
 where
     Env: TxEnv,
     Original: TopDecodeMulti,
@@ -26,7 +26,7 @@ where
     }
 }
 
-impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsSimilar<T>
+impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultConv<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -40,7 +40,7 @@ where
     }
 }
 
-impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultSimilar<T, F>
+impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultConv<T, F>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -70,7 +70,7 @@ where
     }
 }
 
-impl<Env, Original, F> RHListItemExec<TxResponse, Env, Original> for WithResultNewAddress<Env, F>
+impl<Env, Original, F> RHListItemExec<TxResponse, Env, Original> for WithNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),
