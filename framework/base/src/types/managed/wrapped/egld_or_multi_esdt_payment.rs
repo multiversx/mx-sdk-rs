@@ -33,3 +33,21 @@ impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
         }
     }
 }
+
+pub enum EgldOrMultiEsdtPaymentRefs<'a, M: ManagedTypeApi> {
+    Egld(&'a BigUint<M>),
+    MultiEsdt(&'a ManagedVec<M, EsdtTokenPayment<M>>),
+}
+
+impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
+    pub fn as_refs(&self) -> EgldOrMultiEsdtPaymentRefs<'_, M> {
+        match self {
+            EgldOrMultiEsdtPayment::Egld(egld_value) => {
+                EgldOrMultiEsdtPaymentRefs::Egld(egld_value)
+            },
+            EgldOrMultiEsdtPayment::MultiEsdt(esdt_payments) => {
+                EgldOrMultiEsdtPaymentRefs::MultiEsdt(esdt_payments)
+            },
+        }
+    }
+}
