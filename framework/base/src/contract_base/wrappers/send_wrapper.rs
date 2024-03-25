@@ -188,16 +188,17 @@ where
     }
 
     /// Sends a single ESDT transfer to target address.
-    #[inline]
-    #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt(
         &self,
         to: &ManagedAddress<A>,
         token_identifier: &TokenIdentifier<A>,
-        nonce: u64,
+        token_nonce: u64,
         amount: &BigUint<A>,
     ) {
-        self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
+        Tx::new_tx_from_sc()
+            .to(to)
+            .single_esdt(token_identifier, token_nonce, amount)
+            .transfer();
     }
 
     /// Sends a single ESDT transfer to target address.

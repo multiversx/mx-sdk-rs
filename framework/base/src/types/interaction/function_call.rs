@@ -9,7 +9,10 @@ use crate::{
         CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
-    types::{EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, MultiValueEncoded},
+    types::{
+        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec,
+        MultiValueEncoded,
+    },
 };
 
 use super::{ContractCallNoPayment, ManagedArgBuffer, TypedFunctionCall};
@@ -159,7 +162,7 @@ where
     /// Constructs `ESDTTransfer` builtin function call.
     pub(super) fn convert_to_single_transfer_fungible_call(
         self,
-        payment: &EsdtTokenPayment<Api>,
+        payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
@@ -177,7 +180,7 @@ where
     pub(super) fn convert_to_single_transfer_nft_call(
         self,
         to: &ManagedAddress<Api>,
-        payment: &EsdtTokenPayment<Api>,
+        payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_NFT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
