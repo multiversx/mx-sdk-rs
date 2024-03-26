@@ -48,7 +48,7 @@ pub trait ForwarderRawDeployUpgrade {
     ) {
         self.tx()
             .to(child_sc_address)
-            .raw_deploy()
+            .raw_upgrade()
             .code(new_code)
             .code_metadata(code_metadata)
             .arguments_raw(args.to_arg_buffer())
@@ -65,7 +65,7 @@ pub trait ForwarderRawDeployUpgrade {
     ) {
         self.tx()
             .to(sc_address)
-            .raw_deploy()
+            .raw_upgrade()
             .from_source(source_contract_address)
             .code_metadata(code_metadata)
             .arguments_raw(args.to_arg_buffer())

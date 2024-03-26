@@ -16,7 +16,7 @@ use super::{
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
     RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
     TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -637,6 +637,74 @@ where
     }
 }
 
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn raw_upgrade(self) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: UpgradeCall::default(),
+            result_handler: self.result_handler,
+        }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn code<CodeValue>(
+        self,
+        code: CodeValue,
+    ) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, Code<CodeValue>>, RH>
+    where
+        CodeValue: TxCodeValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data.code_source(Code(code)),
+            result_handler: self.result_handler,
+        }
+    }
+
+    pub fn from_source<FromSourceValue>(
+        self,
+        source_address: FromSourceValue,
+    ) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, FromSource<FromSourceValue>>, RH>
+    where
+        FromSourceValue: TxFromSourceValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data.code_source(FromSource(source_address)),
+            result_handler: self.result_handler,
+        }
+    }
+}
+
 impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, DeployCall<Env, ()>, RH>
 where
     Env: TxEnv,
@@ -685,6 +753,35 @@ where
 
 impl<Env, From, To, Payment, Gas, CodeSource, RH>
     Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    CodeSource: TxCodeSource<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn code_metadata(mut self, code_metadata: CodeMetadata) -> Self {
+        self.data = self.data.code_metadata(code_metadata);
+        self
+    }
+
+    #[inline]
+    pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
+        self.data = self.data.argument(arg);
+        self
+    }
+
+    #[inline]
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
+        self.data.arg_buffer = raw;
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, CodeSource>, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,

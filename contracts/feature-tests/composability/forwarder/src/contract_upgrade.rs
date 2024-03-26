@@ -1,10 +1,9 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait UpgradeContractModule {
-    #[proxy]
-    fn vault_proxy(&self, sc_address: ManagedAddress) -> vault::Proxy<Self::Api>;
-
     #[endpoint(upgradeVault)]
     fn upgrade_vault(
         &self,
@@ -12,9 +11,14 @@ pub trait UpgradeContractModule {
         new_code: ManagedBuffer,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) {
-        self.vault_proxy(child_sc_address)
-            .init(opt_arg)
-            .upgrade_contract(&new_code, CodeMetadata::UPGRADEABLE);
+        let _ = self
+            .tx()
+            .to(child_sc_address)
+            .typed(vault_proxy::VaultProxy)
+            .upgrade(opt_arg)
+            .code(new_code)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .upgrade_async_call();
     }
 
     #[endpoint]
@@ -24,8 +28,13 @@ pub trait UpgradeContractModule {
         source_address: ManagedAddress,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) {
-        self.vault_proxy(child_sc_address)
-            .init(opt_arg)
-            .upgrade_from_source(&source_address, CodeMetadata::UPGRADEABLE)
+        let _ = self
+            .tx()
+            .to(child_sc_address)
+            .typed(vault_proxy::VaultProxy)
+            .upgrade(opt_arg)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .from_source(source_address)
+            .upgrade_async_call();
     }
 }

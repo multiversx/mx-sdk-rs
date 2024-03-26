@@ -62,6 +62,28 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    pub fn upgrade<
+        Arg0: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+    >(
+        self,
+        opt_arg_to_echo: Arg0,
+    ) -> TxProxyUpgrade<Env, From, To, Gas, MultiValue2<Box<str>, OptionalValue<ManagedBuffer<Env::Api>>>> {
+        self.wrapped_tx
+            .raw_upgrade()
+            .argument(&opt_arg_to_echo)
+            .original_result()
+    }
+}
+
+#[rustfmt::skip]
+impl<Env, From, To, Gas> VaultProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    Env::Api: VMApi,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
     pub fn echo_arguments<
         Arg0: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(

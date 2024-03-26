@@ -1,0 +1,127 @@
+use crate::{
+    api::CallTypeApi,
+    contract_base::SendRawWrapper,
+    proxy_imports::{CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
+    tuple_util::NestedTupleFlatten,
+};
+
+use super::{
+    tx_from, Code, DeployRawResult, FromSource, RHListExec, Tx, TxCodeValue, TxEmptyResultHandler,
+    TxFrom, TxFromSourceValue, TxGas, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
+    UpgradeCall,
+};
+
+impl<Api, Payment, Gas, CodeValue, RH>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        ManagedAddress<Api>,
+        Payment,
+        Gas,
+        UpgradeCall<TxScEnv<Api>, Code<CodeValue>>,
+        RH,
+    >
+where
+    Api: CallTypeApi,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    CodeValue: TxCodeValue<TxScEnv<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
+{
+    pub fn upgrade_async_call(self) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_contract(
+                &self.to,
+                gas,
+                egld_value,
+                &self.data.code_source.0.into_value(&self.env),
+                self.data.code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
+    }
+}
+
+impl<Api, Payment, Gas, FromSourceValue, RH>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        ManagedAddress<Api>,
+        Payment,
+        Gas,
+        UpgradeCall<TxScEnv<Api>, FromSource<FromSourceValue>>,
+        RH,
+    >
+where
+    Api: CallTypeApi,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    FromSourceValue: TxFromSourceValue<TxScEnv<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
+{
+    pub fn upgrade_async_call(self) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+                &self.to,
+                gas,
+                egld_value,
+                &self.data.code_source.0.into_value(&self.env),
+                self.data.code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
+    }
+}
+
+impl<Api, Payment, Gas, RH>
+    Tx<TxScEnv<Api>, (), ManagedAddress<Api>, Payment, Gas, UpgradeCall<TxScEnv<Api>, ()>, RH>
+where
+    Api: CallTypeApi,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    RH: TxEmptyResultHandler<TxScEnv<Api>>,
+{
+    /// Backwards compatibility, immitates the old API.
+    ///
+    /// Note that the data type (the `DeployCall`) doesn't have the code set.
+    /// This is because the old API was passing it as paramter, so we do the Apime here.
+    /// For clarity, we don't want it set twice.
+    pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_contract(
+                &self.to,
+                gas,
+                egld_value,
+                code,
+                code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
+    }
+
+    /// Backwards compatibility, immitates the old API.
+    ///
+    /// Note that the data type (the `DeployCall`) doesn't have the code set.
+    /// This is because the old API was passing it as paramter, so we do the Apime here.
+    /// For clarity, we don't want it set twice.
+    pub fn upgrade_from_source(
+        self,
+        source_address: &ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+    ) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        self.payment.with_egld_value(|egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+                &self.to,
+                gas,
+                egld_value,
+                source_address,
+                code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
+    }
+}
