@@ -9,7 +9,7 @@ use multiversx_sc::{
         test_util::top_encode_to_vec_u8_or_panic,
     },
     storage::mappers::SingleValue,
-    types::{Address, AddressExpr, CodeMetadata, FunctionCall, ReturnsExact},
+    types::{Address, AddressExpr, CodeMetadata, FunctionCall, ReturnsResult},
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -131,7 +131,7 @@ impl MultisigTestState {
                 self.multisig_contract
                     .propose_add_board_member(board_member_address),
             )
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .run()
     }
 

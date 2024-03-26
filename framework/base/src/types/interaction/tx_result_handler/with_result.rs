@@ -3,13 +3,14 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::TopDecodeMulti;
 
 use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, SyncCallRawResult,
-    TxEnv,
+    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItem,
+    RHListItemExec, SyncCallRawResult, TxEnv,
 };
 
-use super::{RHListItem, RHListItemExec};
-
-pub struct WithResultExact<T, F>
+/// Defines a lambda function to be called on the decoded result.
+///
+/// Value will be decoded according to the type defined in the smart contract.
+pub struct WithResult<T, F>
 where
     F: FnOnce(T),
 {
@@ -17,19 +18,19 @@ where
     f: F,
 }
 
-impl<T, F> WithResultExact<T, F>
+impl<T, F> WithResult<T, F>
 where
     F: FnOnce(T),
 {
     pub fn new(f: F) -> Self {
-        WithResultExact {
+        WithResult {
             _phantom: PhantomData,
             f,
         }
     }
 }
 
-impl<Env, Original, F> RHListItem<Env, Original> for WithResultExact<Original, F>
+impl<Env, Original, F> RHListItem<Env, Original> for WithResult<Original, F>
 where
     Env: TxEnv,
     F: FnOnce(Original),
@@ -38,7 +39,7 @@ where
 }
 
 impl<Env, Original, F> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
-    for WithResultExact<Original, F>
+    for WithResult<Original, F>
 where
     Env: TxEnv,
     Original: TopDecodeMulti,

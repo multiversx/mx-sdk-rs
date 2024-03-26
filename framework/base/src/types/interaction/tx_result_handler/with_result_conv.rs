@@ -3,13 +3,14 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, SyncCallRawResult,
-    TxEnv,
+    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItem,
+    RHListItemExec, SyncCallRawResult, TxEnv,
 };
 
-use super::{RHListItem, RHListItemExec};
-
-pub struct WithResultSimilar<T, F>
+/// Defines a lambda function to be called on the decoded result.
+///
+/// Value will be converted to type `T`, which should be compatible with the original type.
+pub struct WithResultConv<T, F>
 where
     F: FnOnce(T),
 {
@@ -17,19 +18,19 @@ where
     pub f: F,
 }
 
-impl<T, F> WithResultSimilar<T, F>
+impl<T, F> WithResultConv<T, F>
 where
     F: FnOnce(T),
 {
     pub fn new(f: F) -> Self {
-        WithResultSimilar {
+        WithResultConv {
             _phantom: PhantomData,
             f,
         }
     }
 }
 
-impl<Env, Original, T, F> RHListItem<Env, Original> for WithResultSimilar<T, F>
+impl<Env, Original, T, F> RHListItem<Env, Original> for WithResultConv<T, F>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -40,7 +41,7 @@ where
 }
 
 impl<Env, Original, T, F> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
-    for WithResultSimilar<T, F>
+    for WithResultConv<T, F>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,

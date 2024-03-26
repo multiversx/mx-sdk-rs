@@ -1,10 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::types::{DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv};
+use crate::types::{
+    DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv,
+};
 
-use super::{RHListItem, RHListItemExec};
-
-pub struct WithResultNewAddress<Env, F>
+/// Defines a lambda function to be called on the newly deployed address, after a deploy.
+pub struct WithNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),
@@ -13,20 +14,20 @@ where
     pub f: F,
 }
 
-impl<Env, F> WithResultNewAddress<Env, F>
+impl<Env, F> WithNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),
 {
     pub fn new(f: F) -> Self {
-        WithResultNewAddress {
+        WithNewAddress {
             _phantom: PhantomData,
             f,
         }
     }
 }
 
-impl<Env, F, Original> RHListItem<Env, Original> for WithResultNewAddress<Env, F>
+impl<Env, F, Original> RHListItem<Env, Original> for WithNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),
@@ -35,7 +36,7 @@ where
 }
 
 impl<Env, F, Original> RHListItemExec<DeployRawResult<Env::Api>, Env, Original>
-    for WithResultNewAddress<Env, F>
+    for WithNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),

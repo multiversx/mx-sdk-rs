@@ -1,7 +1,7 @@
 use adder::*;
 use multiversx_sc::{
     storage::mappers::SingleValue,
-    types::{AddressExpr, ReturnsSimilar, WithResultNewAddress},
+    types::{AddressExpr, ReturnsResultConv, WithNewAddress},
 };
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
@@ -38,7 +38,7 @@ fn adder_blackbox_legacy_proxy() {
         .typed(adder_proxy::AdderProxy)
         .init(5u32)
         .code(CODE_EXPR)
-        .with_result(WithResultNewAddress::new(|new_address| {
+        .with_result(WithNewAddress::new(|new_address| {
             assert_eq!(new_address.to_address(), adder_contract.to_address());
         }))
         .run();
@@ -53,7 +53,7 @@ fn adder_blackbox_legacy_proxy() {
     let value = world
         .query()
         .call(adder_contract.sum())
-        .returns(ReturnsSimilar::<SingleValue<BigUint>>::new())
+        .returns(ReturnsResultConv::<SingleValue<BigUint>>::new())
         .run();
     assert_eq!(value.into(), BigUint::from(5u32));
 

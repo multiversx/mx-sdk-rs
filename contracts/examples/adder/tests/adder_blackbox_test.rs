@@ -1,5 +1,5 @@
 use adder::*;
-use multiversx_sc::types::{AddressExpr, ReturnsSimilar, ScExpr, WithResultNewAddress};
+use multiversx_sc::types::{AddressExpr, ReturnsResultConv, ScExpr, WithNewAddress};
 use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
@@ -36,7 +36,7 @@ fn adder_blackbox() {
         .typed(adder_proxy::AdderProxy)
         .init(5u32)
         .code(CODE_EXPR)
-        .with_result(WithResultNewAddress::new(|new_address| {
+        .with_result(WithNewAddress::new(|new_address| {
             assert_eq!(new_address.to_address(), adder_contract.to_address());
         }))
         .run();
@@ -46,7 +46,7 @@ fn adder_blackbox() {
         .to(SC_ADDER)
         .typed(adder_proxy::AdderProxy)
         .sum()
-        .returns(ReturnsSimilar::<BigUint>::new())
+        .returns(ReturnsResultConv::<BigUint>::new())
         .run();
     assert_eq!(value, BigUint::from(5u32));
 

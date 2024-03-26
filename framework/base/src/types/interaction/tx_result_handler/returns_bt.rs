@@ -1,10 +1,11 @@
 use crate::{
     contract_base::BlockchainWrapper,
-    types::{BackTransfers, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv},
+    types::{
+        BackTransfers, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv,
+    },
 };
 
-use super::{RHListItem, RHListItemExec};
-
+/// Indicates that back-transfers will be returned.
 pub struct ReturnsBackTransfers;
 
 impl<Env, Original> RHListItem<Env, Original> for ReturnsBackTransfers
