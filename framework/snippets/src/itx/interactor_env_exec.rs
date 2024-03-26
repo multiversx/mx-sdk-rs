@@ -6,13 +6,13 @@ use multiversx_sc_scenario::{
         tuple_util::NestedTupleFlatten,
         types::{
             AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer,
-            RHListSync, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
+            RHListExec, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
     scenario_env_util::*,
-    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
-    RHListScenario, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
+    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxExpect, TxResponse},
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use crate::{Interactor, InteractorPrepareAsync};
@@ -25,6 +25,8 @@ pub struct InteractorEnvExec<'w> {
 
 impl<'w> TxEnv for InteractorEnvExec<'w> {
     type Api = StaticApi;
+
+    type RHExpect = TxExpect;
 
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
         panic!("Explicit sender address expected")
@@ -43,7 +45,7 @@ impl<'w> ScenarioTxEnv for InteractorEnvExec<'w> {
 
 pub struct InteractorCallStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     world: &'w mut Interactor,
@@ -58,7 +60,7 @@ where
     To: TxToSpecified<InteractorEnvExec<'w>>,
     Payment: TxPayment<InteractorEnvExec<'w>>,
     Gas: TxGas<InteractorEnvExec<'w>>,
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorCallStep<'w, RH>;
@@ -82,13 +84,14 @@ where
 
 impl<'w, RH> InteractorCallStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
-        let mut sc_call_step = self.sc_call_step;
-        self.world.sc_call(&mut sc_call_step).await;
-        process_result(sc_call_step.response, self.result_handler)
+        let mut step = self.sc_call_step;
+        step.expect = Some(self.result_handler.list_tx_expect());
+        self.world.sc_call(&mut step).await;
+        process_result(step.response, self.result_handler)
     }
 }
 
@@ -105,7 +108,7 @@ impl Interactor {
         To: TxToSpecified<ScenarioTxEnvData>,
         Payment: TxPayment<ScenarioTxEnvData>,
         Gas: TxGas<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData, ListReturns = ()>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
         )
@@ -115,6 +118,7 @@ impl Interactor {
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
         let mut step = tx_to_sc_call_step(&tx.env, tx.from, tx.to, tx.payment, tx.gas, tx.data);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         self.sc_call(&mut step).await;
         process_result(step.response, tx.result_handler);
         self

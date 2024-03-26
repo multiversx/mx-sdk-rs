@@ -1,21 +1,21 @@
 use crate::{
-    api::{self, CallTypeApi, ManagedTypeApi},
-    contract_base::{BlockchainWrapper, SendRawWrapper},
+    api::CallTypeApi,
+    contract_base::BlockchainWrapper,
+    proxy_imports::{EsdtTokenPaymentRefs, TokenIdentifier},
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
         ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
     },
 };
-use alloc::boxed::Box;
+
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
-    AnnotatedValue, AsyncCall, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy,
-    DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer,
-    OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource,
-    TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue,
-    TxFromSpecified, TxGas, TxPayment, TxPaymentEgldOnly, TxPaymentNormalize, TxProxyTrait,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase, Code,
+    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
+    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
+    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
     TxResultHandler, TxScEnv, TxTo, TxToSpecified,
 };
 
@@ -204,11 +204,51 @@ where
         }
     }
 
+    /// Sets a single token payment, with the token identifier and amount kept as references.
+    ///
+    /// This is handy whem we only want one ESDT transfer and we want to avoid unnecessary object clones.
+    pub fn single_esdt<'a>(
+        self,
+        token_identifier: &'a TokenIdentifier<Env::Api>,
+        token_nonce: u64,
+        amount: &'a BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: EsdtTokenPaymentRefs {
+                token_identifier,
+                token_nonce,
+                amount,
+            },
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
     /// Adds a collection of ESDT payments to a transaction.
     pub fn multi_esdt(
         self,
         payments: MultiEsdtPayment<Env::Api>, // TODO: references
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: payments,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Sets a reference to multiple ESDT payments.
+    pub fn multi_esdt_ref(
+        self,
+        payments: &MultiEsdtPayment<Env::Api>,
+    ) -> Tx<Env, From, To, &MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
         Tx {
             env: self.env,
             from: self.from,
@@ -550,7 +590,7 @@ impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
 where
     Api: CallTypeApi + 'static,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
+    Payment: TxPayment<TxScEnv<Api>>,
     OriginalResult: TopEncodeMulti,
 {
     type OriginalResult = OriginalResult;
@@ -607,7 +647,7 @@ where
     RH: TxResultHandler<Env>,
 {
     pub fn code<CodeValue>(
-        mut self,
+        self,
         code: CodeValue,
     ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, Code<CodeValue>>, RH>
     where
@@ -625,7 +665,7 @@ where
     }
 
     pub fn from_source<FromSourceValue>(
-        mut self,
+        self,
         source_address: FromSourceValue,
     ) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, FromSource<FromSourceValue>>, RH>
     where

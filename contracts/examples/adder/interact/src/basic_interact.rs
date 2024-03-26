@@ -8,7 +8,7 @@ use basic_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsSimilar},
+    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsResultConv},
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
@@ -197,7 +197,7 @@ impl AdderInteract {
             .to(self.state.adder().to_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
-            .returns(ReturnsSimilar::<BigUint>::new())
+            .returns(ReturnsResultConv::<BigUint>::new())
             .prepare_async()
             .run()
             .await;

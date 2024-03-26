@@ -13,7 +13,7 @@ use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
-    multiversx_sc::types::{BigUint, ReturnsNewAddress, ReturnsSimilar},
+    multiversx_sc::types::{BigUint, ReturnsNewAddress, ReturnsResultConv},
     scenario_format::interpret_trait::InterpretableFrom,
     standalone::retrieve_account_as_scenario_set_state,
     test_wallets,
@@ -309,7 +309,7 @@ impl MultisigInteract {
             .to(self.state.multisig().to_address())
             .typed(multisig_proxy::MultisigProxy)
             .quorum_reached(action_id)
-            .returns(ReturnsSimilar::<bool>::new())
+            .returns(ReturnsResultConv::<bool>::new())
             .prepare_async()
             .run()
             .await
@@ -321,7 +321,7 @@ impl MultisigInteract {
             .to(self.state.multisig().to_address())
             .typed(multisig_proxy::MultisigProxy)
             .signed(signer, action_id)
-            .returns(ReturnsSimilar::<bool>::new())
+            .returns(ReturnsResultConv::<bool>::new())
             .prepare_async()
             .run()
             .await
@@ -388,7 +388,7 @@ impl MultisigInteract {
             .to(self.state.multisig().to_address())
             .typed(multisig_proxy::MultisigProxy)
             .quorum()
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsResultConv::<usize>::new())
             .prepare_async()
             .run()
             .await;
@@ -403,7 +403,7 @@ impl MultisigInteract {
             .to(self.state.multisig().to_address())
             .typed(multisig_proxy::MultisigProxy)
             .num_board_members()
-            .returns(ReturnsSimilar::<usize>::new())
+            .returns(ReturnsResultConv::<usize>::new())
             .prepare_async()
             .run()
             .await;

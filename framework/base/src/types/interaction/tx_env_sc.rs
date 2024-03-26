@@ -6,9 +6,7 @@ use crate::{
     types::ManagedAddress,
 };
 
-use super::{
-    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, AnnotatedValue, Tx, TxBaseWithEnv, TxEnv,
-};
+use super::{contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, Tx, TxBaseWithEnv, TxEnv};
 
 pub struct TxScEnv<Api>
 where
@@ -42,6 +40,8 @@ where
     Api: CallTypeApi,
 {
     type Api = Api;
+
+    type RHExpect = ();
 
     fn resolve_sender_address(&self) -> ManagedAddress<Api> {
         BlockchainWrapper::<Api>::new().get_sc_address()

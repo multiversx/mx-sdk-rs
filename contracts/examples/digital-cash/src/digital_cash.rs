@@ -55,15 +55,17 @@ pub trait DigitalCash:
                 continue;
             }
             if token == EgldOrEsdtTokenIdentifier::egld() {
-                self.send().direct_egld(&caller_address, &fee);
+                self.tx().to(&caller_address).egld(&fee).transfer();
             } else {
                 let collected_fee = EsdtTokenPayment::new(token.unwrap_esdt(), 0, fee);
                 collected_esdt_fees.push(collected_fee);
             }
         }
         if !collected_esdt_fees.is_empty() {
-            self.send()
-                .direct_multi(&caller_address, &collected_esdt_fees);
+            self.tx()
+                .to(&caller_address)
+                .multi_esdt_ref(&collected_esdt_fees)
+                .transfer();
         }
     }
 

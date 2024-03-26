@@ -40,7 +40,7 @@ impl<Env> TxToSpecified<Env> for AddressExpr
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -62,6 +62,11 @@ impl AddressExpr {
             ptr::copy_nonoverlapping(expr_bytes.as_ptr(), result.as_ptr() as *mut u8, len);
         }
         result
+    }
+
+    #[cfg(feature = "alloc")]
+    pub fn eval_to_expr(&self) -> alloc::string::String {
+        alloc::format!("{ADDRESS_PREFIX}{}", self.0)
     }
 }
 

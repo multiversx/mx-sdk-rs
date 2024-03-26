@@ -109,8 +109,10 @@ pub trait TransferRoleProxyModule {
             ManagedAsyncCallResult::Ok(return_values) => return_values,
             ManagedAsyncCallResult::Err(err) => {
                 if !initial_payments.is_empty() {
-                    self.send()
-                        .direct_multi(&original_caller, &initial_payments);
+                    self.tx()
+                        .to(&original_caller)
+                        .multi_esdt(initial_payments)
+                        .transfer();
                 }
 
                 let mut err_result = MultiValueEncoded::new();

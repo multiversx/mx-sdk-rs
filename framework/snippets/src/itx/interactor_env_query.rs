@@ -5,13 +5,13 @@ use multiversx_sc_scenario::{
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
         types::{
-            AnnotatedValue, FunctionCall, ManagedAddress, Tx, TxBaseWithEnv, TxEnv,
+            AnnotatedValue, FunctionCall, ManagedAddress, RHListExec, Tx, TxBaseWithEnv, TxEnv,
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
     scenario_env_util::*,
-    scenario_model::{ScQueryStep, TxResponse},
-    RHListScenario, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
+    scenario_model::{ScQueryStep, TxExpect, TxResponse},
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use crate::{Interactor, InteractorPrepareAsync};
@@ -23,6 +23,8 @@ pub struct InteractorEnvQuery<'w> {
 
 impl<'w> TxEnv for InteractorEnvQuery<'w> {
     type Api = StaticApi;
+
+    type RHExpect = TxExpect;
 
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
         panic!("Explicit sender address expected")
@@ -41,7 +43,7 @@ impl<'w> ScenarioTxEnv for InteractorEnvQuery<'w> {
 
 pub struct InteractorQueryStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     world: &'w mut Interactor,
@@ -53,7 +55,7 @@ impl<'w, To, RH> InteractorPrepareAsync
     for Tx<InteractorEnvQuery<'w>, (), To, (), (), FunctionCall<StaticApi>, RH>
 where
     To: TxToSpecified<InteractorEnvQuery<'w>>,
-    RH: RHListScenario<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorQueryStep<'w, RH>;
@@ -70,13 +72,14 @@ where
 
 impl<'w, RH> InteractorQueryStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvQuery<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
-        let mut sc_call_step = self.sc_query_step;
-        self.world.sc_query(&mut sc_call_step).await;
-        process_result(sc_call_step.response, self.result_handler)
+        let mut step = self.sc_query_step;
+        step.expect = Some(self.result_handler.list_tx_expect());
+        self.world.sc_query(&mut step).await;
+        process_result(step.response, self.result_handler)
     }
 }
 
@@ -90,7 +93,7 @@ impl Interactor {
     pub async fn chain_query<To, RH, F>(&mut self, f: F) -> &mut Self
     where
         To: TxToSpecified<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData, ListReturns = ()>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
         ) -> Tx<ScenarioTxEnvData, (), To, (), (), FunctionCall<StaticApi>, RH>,
@@ -99,6 +102,7 @@ impl Interactor {
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
         let mut step = tx_to_sc_query_step(&tx.env, tx.to, tx.data);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         self.sc_query(&mut step).await;
         process_result(step.response, tx.result_handler);
         self

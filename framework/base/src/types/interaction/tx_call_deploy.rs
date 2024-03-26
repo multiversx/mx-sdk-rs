@@ -9,88 +9,16 @@ use crate::{
 
 use super::{
     contract_call_exec::decode_result, Code, ConsNoRet, ConsRet, DeployCall, FromSource,
-    OriginalResultMarker, RHList, RHListItem, Tx, TxCodeValue, TxDataFunctionCall,
-    TxEmptyResultHandler, TxEnv, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly,
-    TxResultHandler, TxScEnv, TxToSpecified,
+    OriginalResultMarker, RHList, RHListExec, RHListItem, Tx, TxCodeValue, TxEmptyResultHandler,
+    TxEnv, TxFromSourceValue, TxGas, TxPaymentEgldOnly, TxResultHandler, TxScEnv,
 };
 
-pub trait RHListItemDeploy<Env, Original>: RHListItem<Env, Original>
+pub struct DeployRawResult<Api>
 where
-    Env: TxEnv,
+    Api: CallTypeApi,
 {
-    fn item_deploy_result(
-        self,
-        new_address: &ManagedAddress<Env::Api>,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns;
-}
-
-pub trait RHListDeploy<Env>: RHList<Env>
-where
-    Env: TxEnv,
-{
-    fn list_deploy_result(
-        self,
-        new_address: &ManagedAddress<Env::Api>,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns;
-}
-
-impl<Env> RHListDeploy<Env> for ()
-where
-    Env: TxEnv,
-{
-    fn list_deploy_result(
-        self,
-        _new_address: &ManagedAddress<Env::Api>,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-    }
-}
-
-impl<Env, O> RHListDeploy<Env> for OriginalResultMarker<O>
-where
-    Env: TxEnv,
-{
-    fn list_deploy_result(
-        self,
-        _new_address: &ManagedAddress<Env::Api>,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-    }
-}
-
-impl<Env, Head, Tail> RHListDeploy<Env> for ConsRet<Env, Head, Tail>
-where
-    Env: TxEnv,
-    Head: RHListItemDeploy<Env, Tail::OriginalResult>,
-    Tail: RHListDeploy<Env>,
-{
-    fn list_deploy_result(
-        self,
-        new_address: &ManagedAddress<Env::Api>,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-        let head_result = self.head.item_deploy_result(new_address, raw_results);
-        let tail_result = self.tail.list_deploy_result(new_address, raw_results);
-        (head_result, tail_result)
-    }
-}
-
-impl<Env, Head, Tail> RHListDeploy<Env> for ConsNoRet<Env, Head, Tail>
-where
-    Env: TxEnv,
-    Head: RHListItemDeploy<Env, Tail::OriginalResult, Returns = ()>,
-    Tail: RHListDeploy<Env>,
-{
-    fn list_deploy_result(
-        self,
-        new_address: &ManagedAddress<Env::Api>,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::ListReturns {
-        self.head.item_deploy_result(new_address, raw_results);
-        self.tail.list_deploy_result(new_address, raw_results)
-    }
+    pub new_address: ManagedAddress<Api>,
+    pub raw_results: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
 impl<Api, Payment, Gas, CodeValue, RH>
@@ -166,14 +94,18 @@ where
     Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     CodeValue: TxCodeValue<TxScEnv<Api>>,
-    RH: RHListDeploy<TxScEnv<Api>>,
+    RH: RHListExec<DeployRawResult<Api>, TxScEnv<Api>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     /// Synchronously deploys a contract.
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         let (new_address, raw_results, result_handler) = self.execute_deploy_raw();
 
-        let tuple_result = result_handler.list_deploy_result(&new_address, &raw_results);
+        let deploy_raw_result = DeployRawResult {
+            new_address,
+            raw_results,
+        };
+        let tuple_result = result_handler.list_process_result(&deploy_raw_result);
         tuple_result.flatten_unpack()
     }
 }
@@ -193,14 +125,18 @@ where
     Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FromSourceValue: TxFromSourceValue<TxScEnv<Api>>,
-    RH: RHListDeploy<TxScEnv<Api>>,
+    RH: RHListExec<DeployRawResult<Api>, TxScEnv<Api>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     /// Synchronously deploys a contract from source.
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         let (new_address, raw_results, result_handler) = self.execute_deploy_from_source_raw();
 
-        let tuple_result = result_handler.list_deploy_result(&new_address, &raw_results);
+        let deploy_raw_result = DeployRawResult {
+            new_address,
+            raw_results,
+        };
+        let tuple_result = result_handler.list_process_result(&deploy_raw_result);
         tuple_result.flatten_unpack()
     }
 }

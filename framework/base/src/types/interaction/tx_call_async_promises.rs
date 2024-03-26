@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, OriginalResultMarker, Tx,
-    TxGas, TxPayment, TxPaymentNormalize, TxResultHandler, TxScEnv, TxToSpecified,
+    TxGas, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
 };
 
 pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -122,7 +122,7 @@ impl<Api, To, Payment, Callback>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPaymentNormalize<TxScEnv<Api>, (), To>,
+    Payment: TxPayment<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
     pub fn register_promise(self) {

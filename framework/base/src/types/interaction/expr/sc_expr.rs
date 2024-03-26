@@ -42,7 +42,7 @@ impl<'a, Env> TxToSpecified<Env> for ScExpr<'a>
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -73,6 +73,11 @@ impl<'a> ScExpr<'a> {
             );
         }
         result
+    }
+
+    #[cfg(feature = "alloc")]
+    pub fn eval_to_expr(&self) -> alloc::string::String {
+        alloc::format!("{SC_PREFIX}{}", self.0)
     }
 }
 

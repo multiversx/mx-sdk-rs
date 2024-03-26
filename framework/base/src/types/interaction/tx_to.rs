@@ -1,3 +1,9 @@
+mod tx_to_caller;
+mod tx_to_self;
+
+pub use tx_to_caller::ToCaller;
+pub use tx_to_self::ToSelf;
+
 use crate::types::{heap::Address, ManagedAddress};
 
 use super::{AnnotatedValue, TxEnv};
@@ -27,7 +33,7 @@ impl<Env> TxToSpecified<Env> for ManagedAddress<Env::Api>
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -40,7 +46,7 @@ impl<Env> TxToSpecified<Env> for &ManagedAddress<Env::Api>
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -53,7 +59,7 @@ impl<Env> TxToSpecified<Env> for Address
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -67,7 +73,7 @@ impl<Env> TxToSpecified<Env> for &Address
 where
     Env: TxEnv,
 {
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {

@@ -1,8 +1,11 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::multiversx_sc::{
-    codec::Empty,
-    types::{FunctionCall, ReturnsExact, ReturnsNewTokenIdentifier},
+use multiversx_sc_scenario::{
+    multiversx_sc::{
+        codec::Empty,
+        types::{FunctionCall, ReturnsResult},
+    },
+    ReturnsNewTokenIdentifier,
 };
 
 use super::*;
@@ -53,7 +56,7 @@ impl MultisigInteract {
                     .argument(&TOKEN_TYPE)
                     .argument(&0u32),
             )
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .prepare_async()
             .run()
             .await;
@@ -109,7 +112,7 @@ impl MultisigInteract {
                     .argument(&COLLECTION_NAME)
                     .argument(&COLLECTION_TICKER),
             )
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .prepare_async()
             .run()
             .await;
@@ -140,7 +143,7 @@ impl MultisigInteract {
             .prepare_async()
             .run()
             .await;
-        self.collection_token_identifier = new_token_id.to_string();
+        self.collection_token_identifier = new_token_id;
 
         println!(
             "collection token identifier: {}",
@@ -165,7 +168,7 @@ impl MultisigInteract {
                     .argument(&multisig_address)
                     .argument(&"ESDTRoleNFTCreate"),
             )
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .prepare_async()
             .run()
             .await;

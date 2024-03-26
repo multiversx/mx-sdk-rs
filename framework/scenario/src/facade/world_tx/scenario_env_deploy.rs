@@ -4,7 +4,7 @@ use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListSync,
+        AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec,
         Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
         TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
@@ -16,7 +16,7 @@ use crate::{
     ScenarioEnvExec, ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
-use super::{scenario_env_util::*, RHListScenario, ScenarioTxEnvData};
+use super::{scenario_env_util::*, ScenarioTxEnvData};
 
 impl<'w, From, Payment, Gas, CodeValue, RH> ScenarioTxRun
     for Tx<
@@ -33,7 +33,7 @@ where
     Payment: TxPayment<ScenarioEnvExec<'w>>,
     Gas: TxGas<ScenarioEnvExec<'w>>,
     CodeValue: TxCodeValue<ScenarioEnvExec<'w>>,
-    RH: RHListScenario<ScenarioEnvExec<'w>>,
+    RH: RHListExec<TxResponse, ScenarioEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
@@ -41,6 +41,7 @@ where
     fn run(self) -> Self::Returns {
         let mut step =
             tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
+        step.expect = Some(self.result_handler.list_tx_expect());
         self.env.world.sc_deploy(&mut step);
         process_result(step.response, self.result_handler)
     }
@@ -53,7 +54,7 @@ impl ScenarioWorld {
         Payment: TxPayment<ScenarioTxEnvData>,
         Gas: TxGas<ScenarioTxEnvData>,
         CodeValue: TxCodeValue<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData, ListReturns = ()>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
         ) -> Tx<
@@ -71,6 +72,7 @@ impl ScenarioWorld {
         let tx = f(tx_base);
         let mut step = tx_to_sc_deploy_step(&tx.env, tx.from, tx.payment, tx.gas, tx.data);
         self.sc_deploy(&mut step);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         process_result(step.response, tx.result_handler);
         self
     }

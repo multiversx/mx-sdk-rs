@@ -98,8 +98,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
 
         match requested_nonce {
             OptionalValue::Some(nonce) => {
-                self.send()
-                    .direct_esdt(&caller, &requested_token, nonce, &requested_amount);
+                self.tx()
+                    .to(&caller)
+                    .single_esdt(&requested_token, nonce, &requested_amount)
+                    .transfer();
                 if self.nonce_amount(&requested_token, nonce).get() - requested_amount.clone() > 0 {
                     self.nonce_amount(&requested_token, nonce)
                         .update(|val| *val -= requested_amount.clone());
@@ -156,7 +158,7 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             }
         }
 
-        self.send().direct_multi(caller, &tokens_to_send);
+        self.tx().to(caller).multi_esdt(tokens_to_send).transfer();
 
         self.token_details(&token)
             .update(|token_ownership| token_ownership.token_nonces = nonces);
