@@ -18,7 +18,7 @@ where
         env.default_gas()
     }
 
-    fn explicit_or_gas_left(&self, env: &Env) -> u64 {
+    fn explicit_or_gas_left(&self, _env: &Env) -> u64 {
         Env::Api::blockchain_api_impl().get_gas_left()
     }
 }

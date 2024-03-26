@@ -5,8 +5,8 @@ use multiversx_sc_scenario::{
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
         types::{
-            AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer,
-            RHListSync, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
+            AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, Tx,
+            TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
@@ -14,7 +14,7 @@ use multiversx_sc_scenario::{
     scenario_model::{
         AddressValue, BytesValue, ScCallStep, ScDeployStep, TransferStep, TxResponse,
     },
-    RHListScenario, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use crate::{Interactor, InteractorEnvExec, InteractorPrepareAsync};

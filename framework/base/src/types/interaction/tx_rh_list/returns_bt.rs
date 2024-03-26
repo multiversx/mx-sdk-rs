@@ -1,12 +1,9 @@
 use crate::{
     contract_base::BlockchainWrapper,
-    types::{
-        interaction::tx_call_deploy::RHListItemDeploy, BackTransfers, ManagedAddress,
-        ManagedBuffer, ManagedVec, RHListItemSync, TxEnv,
-    },
+    types::{BackTransfers, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv},
 };
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct ReturnsBackTransfers;
 
@@ -17,27 +14,11 @@ where
     type Returns = BackTransfers<Env::Api>;
 }
 
-impl<Env, Original> RHListItemSync<Env, Original> for ReturnsBackTransfers
+impl<RawResult, Env, Original> RHListItemExec<RawResult, Env, Original> for ReturnsBackTransfers
 where
     Env: TxEnv,
 {
-    fn item_sync_call_result(
-        self,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        BlockchainWrapper::<Env::Api>::new().get_back_transfers()
-    }
-}
-
-impl<Env, Original> RHListItemDeploy<Env, Original> for ReturnsBackTransfers
-where
-    Env: TxEnv,
-{
-    fn item_deploy_result(
-        self,
-        _new_address: &ManagedAddress<Env::Api>,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
+    fn item_process_result(self, _raw_result: &RawResult) -> Self::Returns {
         BlockchainWrapper::<Env::Api>::new().get_back_transfers()
     }
 }

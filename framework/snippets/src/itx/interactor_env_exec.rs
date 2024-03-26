@@ -6,13 +6,13 @@ use multiversx_sc_scenario::{
         tuple_util::NestedTupleFlatten,
         types::{
             AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer,
-            RHListSync, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
+            RHListExec, Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
     scenario_env_util::*,
     scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
-    RHListScenario, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use crate::{Interactor, InteractorPrepareAsync};
@@ -43,7 +43,7 @@ impl<'w> ScenarioTxEnv for InteractorEnvExec<'w> {
 
 pub struct InteractorCallStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     world: &'w mut Interactor,
@@ -58,7 +58,7 @@ where
     To: TxToSpecified<InteractorEnvExec<'w>>,
     Payment: TxPayment<InteractorEnvExec<'w>>,
     Gas: TxGas<InteractorEnvExec<'w>>,
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorCallStep<'w, RH>;
@@ -82,7 +82,7 @@ where
 
 impl<'w, RH> InteractorCallStep<'w, RH>
 where
-    RH: RHListScenario<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
@@ -105,7 +105,7 @@ impl Interactor {
         To: TxToSpecified<ScenarioTxEnvData>,
         Payment: TxPayment<ScenarioTxEnvData>,
         Gas: TxGas<ScenarioTxEnvData>,
-        RH: RHListScenario<ScenarioTxEnvData, ListReturns = ()>,
+        RH: RHListExec<TxResponse, ScenarioTxEnvData, ListReturns = ()>,
         F: FnOnce(
             TxBaseWithEnv<ScenarioTxEnvData>,
         )

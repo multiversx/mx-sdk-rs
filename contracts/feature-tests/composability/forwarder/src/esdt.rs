@@ -32,7 +32,10 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
 
     #[endpoint]
     fn send_esdt(&self, to: &ManagedAddress, token_id: TokenIdentifier, amount: &BigUint) {
-        self.send().direct_esdt(to, &token_id, 0, amount);
+        self.tx()
+            .to(to)
+            .single_esdt(&token_id, 0, amount)
+            .transfer();
     }
 
     #[payable("*")]
@@ -42,7 +45,10 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.send().direct_esdt(&to, &token_id, 0, &amount_to_send);
+        self.tx()
+            .to(&to)
+            .single_esdt(&token_id, 0, &amount_to_send)
+            .transfer();
     }
 
     #[endpoint]
@@ -53,9 +59,14 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
         amount_first_time: &BigUint,
         amount_second_time: &BigUint,
     ) {
-        self.send().direct_esdt(to, &token_id, 0, amount_first_time);
-        self.send()
-            .direct_esdt(to, &token_id, 0, amount_second_time);
+        self.tx()
+            .to(to)
+            .single_esdt(&token_id, 0, amount_first_time)
+            .transfer();
+        self.tx()
+            .to(to)
+            .single_esdt(&token_id, 0, amount_second_time)
+            .transfer();
     }
 
     #[endpoint]
@@ -73,13 +84,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             all_token_payments.push(payment);
         }
 
-        let _ = self.send_raw().multi_esdt_transfer_execute(
-            &to,
-            &all_token_payments,
-            self.blockchain().get_gas_left(),
-            &ManagedBuffer::new(),
-            &ManagedArgBuffer::new(),
-        );
+        self.tx().to(&to).multi_esdt(all_token_payments).transfer();
     }
 
     #[payable("EGLD")]

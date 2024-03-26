@@ -2,12 +2,12 @@ use core::marker::PhantomData;
 
 use multiversx_sc::{
     codec::TopDecodeMulti,
-    types::{RHListItem, TxEnv},
+    types::{RHListItem, RHListItemExec, TxEnv},
 };
 
 use crate::scenario_model::TxResponse;
 
-use super::{RHListItemScenario, ScenarioTxEnvData};
+use super::ScenarioTxEnvData;
 
 /// Wraps a closure that handles a `TxResponse` object.
 pub struct WithRawTxResponse<F>(pub F)
@@ -22,13 +22,13 @@ where
     type Returns = ();
 }
 
-impl<Env, Original, F> RHListItemScenario<Env, Original> for WithRawTxResponse<F>
+impl<Env, Original, F> RHListItemExec<TxResponse, Env, Original> for WithRawTxResponse<F>
 where
     Env: TxEnv,
     Original: TopDecodeMulti,
     F: FnOnce(&TxResponse),
 {
-    fn item_scenario_result(self, tx_response: &TxResponse) -> Self::Returns {
-        (self.0)(tx_response)
+    fn item_process_result(self, raw_result: &TxResponse) -> Self::Returns {
+        (self.0)(raw_result)
     }
 }

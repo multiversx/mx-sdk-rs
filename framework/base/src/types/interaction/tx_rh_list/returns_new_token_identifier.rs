@@ -1,10 +1,7 @@
 use crate::{
     contract_base::BlockchainWrapper,
     proxy_imports::TokenIdentifier,
-    types::{
-        interaction::tx_call_deploy::RHListItemDeploy, BackTransfers, ManagedAddress,
-        ManagedBuffer, ManagedVec, RHListItem, RHListItemSync, TxEnv,
-    },
+    types::{BackTransfers, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, TxEnv},
 };
 
 pub struct ReturnsNewTokenIdentifier;

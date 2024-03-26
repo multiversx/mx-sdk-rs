@@ -1,11 +1,8 @@
 use core::marker::PhantomData;
 
-use crate::types::{
-    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec,
-    RHListItemSync, TxEnv,
-};
+use crate::types::{DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv};
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct WithResultNewAddress<Env, F>
 where
@@ -37,16 +34,13 @@ where
     type Returns = ();
 }
 
-impl<Env, F, Original> RHListItemDeploy<Env, Original> for WithResultNewAddress<Env, F>
+impl<Env, F, Original> RHListItemExec<DeployRawResult<Env::Api>, Env, Original>
+    for WithResultNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),
 {
-    fn item_deploy_result(
-        self,
-        new_address: &ManagedAddress<Env::Api>,
-        _raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        (self.f)(new_address);
+    fn item_process_result(self, raw_result: &DeployRawResult<Env::Api>) -> Self::Returns {
+        (self.f)(&raw_result.new_address);
     }
 }

@@ -1,9 +1,9 @@
-use crate::types::{
-    interaction::tx_call_deploy::RHListItemDeploy, ManagedAddress, ManagedBuffer, ManagedVec,
-    RHListItemSync, TxEnv,
+use crate::{
+    proxy_imports::SyncCallRawResult,
+    types::{DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, TxEnv},
 };
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct ReturnsRaw;
 
@@ -14,27 +14,20 @@ where
     type Returns = ManagedVec<Env::Api, ManagedBuffer<Env::Api>>;
 }
 
-impl<Env, Original> RHListItemSync<Env, Original> for ReturnsRaw
+impl<Env, Original> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original> for ReturnsRaw
 where
     Env: TxEnv,
 {
-    fn item_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        raw_results.clone()
+    fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Self::Returns {
+        raw_result.0.clone()
     }
 }
 
-impl<Env, Original> RHListItemDeploy<Env, Original> for ReturnsRaw
+impl<Env, Original> RHListItemExec<DeployRawResult<Env::Api>, Env, Original> for ReturnsRaw
 where
     Env: TxEnv,
 {
-    fn item_deploy_result(
-        self,
-        _new_address: &ManagedAddress<Env::Api>,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        raw_results.clone()
+    fn item_process_result(self, raw_result: &DeployRawResult<Env::Api>) -> Self::Returns {
+        raw_result.raw_results.clone()
     }
 }

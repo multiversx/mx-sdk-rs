@@ -3,11 +3,11 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::TopDecodeMulti;
 
 use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItemSync,
+    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, SyncCallRawResult,
     TxEnv,
 };
 
-use super::RHListItem;
+use super::{RHListItem, RHListItemExec};
 
 pub struct WithResultExact<T, F>
 where
@@ -37,17 +37,15 @@ where
     type Returns = ();
 }
 
-impl<Env, Original, F> RHListItemSync<Env, Original> for WithResultExact<Original, F>
+impl<Env, Original, F> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
+    for WithResultExact<Original, F>
 where
     Env: TxEnv,
     Original: TopDecodeMulti,
     F: FnOnce(Original),
 {
-    fn item_sync_call_result(
-        self,
-        raw_results: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> Self::Returns {
-        let t = decode_result::<Env::Api, Original>(raw_results.clone());
+    fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Self::Returns {
+        let t = decode_result::<Env::Api, Original>(raw_result.0.clone());
         (self.f)(t)
     }
 }
