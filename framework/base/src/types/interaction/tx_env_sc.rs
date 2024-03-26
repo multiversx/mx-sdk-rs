@@ -41,6 +41,8 @@ where
 {
     type Api = Api;
 
+    type RHExpect = ();
+
     fn resolve_sender_address(&self) -> ManagedAddress<Api> {
         BlockchainWrapper::<Api>::new().get_sc_address()
     }
