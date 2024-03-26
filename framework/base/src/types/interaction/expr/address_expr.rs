@@ -63,6 +63,11 @@ impl AddressExpr {
         }
         result
     }
+
+    #[cfg(feature = "alloc")]
+    pub fn eval_to_expr(&self) -> alloc::string::String {
+        alloc::format!("{ADDRESS_PREFIX}{}", self.0)
+    }
 }
 
 #[cfg(test)]

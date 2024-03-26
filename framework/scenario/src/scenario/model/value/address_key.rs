@@ -1,3 +1,5 @@
+use multiversx_sc::types::{AddressExpr, ScExpr};
+
 use super::{value_from_slice, AddressValue};
 use crate::{
     multiversx_sc::types::Address,
@@ -111,6 +113,24 @@ impl From<&Address> for AddressKey {
         AddressKey {
             value: from.clone(),
             original: format!("0x{}", hex::encode(from)),
+        }
+    }
+}
+
+impl From<AddressExpr> for AddressKey {
+    fn from(from: AddressExpr) -> Self {
+        AddressKey {
+            value: from.eval_to_array().into(),
+            original: from.eval_to_expr(),
+        }
+    }
+}
+
+impl From<ScExpr<'_>> for AddressKey {
+    fn from(from: ScExpr) -> Self {
+        AddressKey {
+            value: from.eval_to_array().into(),
+            original: from.eval_to_expr(),
         }
     }
 }

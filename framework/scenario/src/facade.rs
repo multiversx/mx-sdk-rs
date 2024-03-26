@@ -1,5 +1,6 @@
 mod contract_info;
 mod debugger_backend;
+pub(crate) mod result_handlers;
 mod scenario_world;
 mod scenario_world_runner;
 mod scenario_world_steps;

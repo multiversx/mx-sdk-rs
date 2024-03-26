@@ -2,7 +2,11 @@ use std::path::PathBuf;
 
 use multiversx_sc::types::{AnnotatedValue, ManagedAddress, TxBaseWithEnv, TxEnv};
 
-use crate::{api::StaticApi, scenario_model::TxResponse, ScenarioWorld};
+use crate::{
+    api::StaticApi,
+    scenario_model::{TxExpect, TxResponse},
+    ScenarioWorld,
+};
 
 /// Designates a tx environment suitable for running scenarios locally.
 pub trait ScenarioTxEnv: TxEnv {
@@ -17,6 +21,8 @@ pub struct ScenarioTxEnvData {
 
 impl TxEnv for ScenarioTxEnvData {
     type Api = StaticApi;
+
+    type RHExpect = TxExpect;
 
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
         panic!("Explicit sender address expected")
