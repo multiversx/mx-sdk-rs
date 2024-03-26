@@ -2,8 +2,8 @@ use crate::{
     api::ManagedTypeApi,
     contract_base::SendRawWrapper,
     types::{
-        BigUint, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec,
-        MultiEsdtPayment, TokenIdentifier, TxFrom, TxToSpecified,
+        BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec, MultiEsdtPayment,
+        TokenIdentifier, TxFrom, TxToSpecified,
     },
 };
 

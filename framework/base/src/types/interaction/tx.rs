@@ -1,7 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    proxy_imports::{EsdtTokenPaymentRefs, TokenIdentifier},
+    proxy_imports::{EgldOrMultiEsdtPaymentRefs, EsdtTokenPaymentRefs, TokenIdentifier},
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
         ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
@@ -254,6 +254,36 @@ where
             from: self.from,
             to: self.to,
             payment: payments,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    pub fn egld_ref(
+        self,
+        amount: &BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EgldOrMultiEsdtPaymentRefs<'_, Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: EgldOrMultiEsdtPaymentRefs::Egld(amount),
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    pub fn mult_esdt_payment_ref(
+        self,
+        amount: &ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>,
+    ) -> Tx<Env, From, To, EgldOrMultiEsdtPaymentRefs<'_, Env::Api>, Gas, Data, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: EgldOrMultiEsdtPaymentRefs::MultiEsdt(amount),
             gas: self.gas,
             data: self.data,
             result_handler: self.result_handler,
