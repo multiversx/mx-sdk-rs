@@ -7,16 +7,7 @@ use crate::{
     },
 };
 
-use super::{AnnotatedValue, TxEnv};
-
-pub(crate) fn display_u64<Api>(n: u64) -> ManagedBuffer<Api>
-where
-    Api: ManagedTypeApi,
-{
-    let mut result = ManagedBufferCachedBuilder::new_from_slice(&[]);
-    result.append_display(&n);
-    result.into_managed_buffer()
-}
+use super::{display_u64, AnnotatedValue, TxEnv};
 
 impl<Env> AnnotatedValue<Env, u64> for u64
 where

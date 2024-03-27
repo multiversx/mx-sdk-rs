@@ -4,7 +4,8 @@ mod annotated_impl_managed_buffer;
 mod annotated_impl_u64;
 
 use crate::{
-    proxy_imports::ManagedRef,
+    formatter::FormatBuffer,
+    proxy_imports::{ManagedBufferCachedBuilder, ManagedRef, ManagedTypeApi},
     types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer},
 };
 
@@ -35,4 +36,14 @@ where
     {
         f(&self.to_value(env))
     }
+}
+
+/// Useful for u64 display in several places.
+pub(super) fn display_u64<Api>(n: u64) -> ManagedBuffer<Api>
+where
+    Api: ManagedTypeApi,
+{
+    let mut result = ManagedBufferCachedBuilder::new_from_slice(&[]);
+    result.append_display(&n);
+    result.into_managed_buffer()
 }

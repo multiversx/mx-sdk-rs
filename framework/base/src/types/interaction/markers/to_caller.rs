@@ -1,10 +1,10 @@
 use crate::{
     api::{const_handles, use_raw_handle, BlockchainApi, BlockchainApiImpl, CallTypeApi},
     contract_base::BlockchainWrapper,
-    types::{AnnotatedValue, ManagedAddress, ManagedBuffer, ManagedType, TxScEnv},
+    types::{
+        AnnotatedValue, ManagedAddress, ManagedBuffer, ManagedType, TxScEnv, TxTo, TxToSpecified,
+    },
 };
-
-use super::{TxTo, TxToSpecified};
 
 /// Indicates that transaction should be sent to the caller (the sender of the current transaction).
 pub struct ToCaller;

@@ -17,7 +17,7 @@ use multiversx_sc_snippets::{
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
         scenario_model::{BytesValue, ScDeployStep, Scenario},
         standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo, WithRawTxResponse,
+        test_wallets, ContractInfo, NumExpr, WithRawTxResponse,
     },
     tokio, Interactor, InteractorPrepareAsync, StepBuffer,
 };
@@ -170,7 +170,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.adder().to_address())
-            .egld(50000000000000000u64) // TODO: annotate "0,050000000000000000"
+            .egld(NumExpr("0,050000000000000000"))
             .prepare_async()
             .run()
             .await;

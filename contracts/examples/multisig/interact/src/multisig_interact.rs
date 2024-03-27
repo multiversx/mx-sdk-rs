@@ -16,7 +16,7 @@ use multiversx_sc_scenario::{
     multiversx_sc::types::{BigUint, ReturnsNewAddress, ReturnsResult},
     scenario_format::interpret_trait::InterpretableFrom,
     standalone::retrieve_account_as_scenario_set_state,
-    test_wallets,
+    test_wallets, NumExpr,
 };
 use multiversx_sc_snippets::{
     dns_address_for_name, env_logger,
@@ -167,7 +167,7 @@ impl MultisigInteract {
             .typed(multisig_proxy::MultisigProxy)
             .init(&Config::load_config().quorum(), board)
             .code(&self.multisig_code)
-            .with_gas_limit(100_000_000u64)
+            .gas(NumExpr("100,000,000"))
             .returns(ReturnsNewAddress)
             .prepare_async()
             .run()
@@ -260,7 +260,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.multisig().to_address())
-            .with_gas_limit(gas_expr)
+            .gas(gas_expr)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
             .prepare_async()
@@ -371,7 +371,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.multisig().to_address())
-            .with_gas_limit(30_000_000u64)
+            .gas(NumExpr("30,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .dns_register(dns_address, name)
             .prepare_async()

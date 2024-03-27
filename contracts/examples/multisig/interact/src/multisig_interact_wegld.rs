@@ -1,6 +1,9 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::multiversx_sc::types::{ContractCallBase, FunctionCall, ReturnsResult};
+use multiversx_sc_scenario::{
+    multiversx_sc::types::{ContractCallBase, FunctionCall, ReturnsResult},
+    NumExpr,
+};
 #[allow(unused_imports)]
 use multiversx_sc_snippets::multiversx_sc::types::{
     EsdtTokenPayment, MultiValueEncoded, TokenIdentifier,
@@ -65,7 +68,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.state.multisig().to_address())
-            .with_gas_limit(10_000_000u64)
+            .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
                 bech32::decode(WEGLD_SWAP_SC_BECH32),
@@ -98,7 +101,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.state.multisig().to_address())
-            .with_gas_limit(10_000_000u64)
+            .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
                 contract_call.basic.to,
