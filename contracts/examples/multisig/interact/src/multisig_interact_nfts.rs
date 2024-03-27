@@ -1,8 +1,11 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::multiversx_sc::{
-    codec::{multi_types::IgnoreValue, Empty},
-    types::FunctionCall,
+use multiversx_sc_scenario::{
+    multiversx_sc::{
+        codec::Empty,
+        types::{FunctionCall, ReturnsResult},
+    },
+    ReturnsNewTokenIdentifier,
 };
 
 use super::*;
@@ -39,26 +42,24 @@ impl MultisigInteract {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(
-                        self.state.multisig().propose_async_call(
-                            system_sc_address,
-                            ISSUE_COST,
-                            FunctionCall::new("registerAndSetAllRoles")
-                                .argument(&COLLECTION_NAME)
-                                .argument(&COLLECTION_TICKER)
-                                .argument(&TOKEN_TYPE)
-                                .argument(&0u32),
-                        ),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000")
-                    .expect(TxExpect::ok().additional_error_message("failed to issue collection")),
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                system_sc_address,
+                ISSUE_COST,
+                FunctionCall::new("registerAndSetAllRoles")
+                    .argument(&COLLECTION_NAME)
+                    .argument(&COLLECTION_TICKER)
+                    .argument(&TOKEN_TYPE)
+                    .argument(&0u32),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed issue colllection with roles all action `{action_id}`");
         action_id
@@ -75,21 +76,20 @@ impl MultisigInteract {
         }
         println!("quorum reached for action `{action_id}`");
 
-        let response: TypedResponse<IgnoreValue> = self
+        let new_token_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(self.state.multisig().perform_action_endpoint(action_id))
-                    .from(&self.wallet_address)
-                    .gas_limit("80,000,000")
-                    .expect(TxExpect::ok().additional_error_message(
-                        "perform issue collection with all roles failed: ",
-                    )),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(80_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .perform_action_endpoint(action_id)
+            .returns(ReturnsNewTokenIdentifier)
+            .prepare_async()
+            .run()
             .await;
-        self.collection_token_identifier = response
-            .new_issued_token_identifier
-            .expect("new token identifier could not be retrieved");
+        self.collection_token_identifier = new_token_id.to_string();
+
         println!(
             "collection token identifier: {}",
             self.collection_token_identifier
@@ -100,23 +100,22 @@ impl MultisigInteract {
         let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(
-                        self.state.multisig().propose_async_call(
-                            system_sc_address,
-                            ISSUE_COST,
-                            FunctionCall::new("issueNonFungible")
-                                .argument(&COLLECTION_NAME)
-                                .argument(&COLLECTION_TICKER),
-                        ),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                system_sc_address,
+                ISSUE_COST,
+                FunctionCall::new("issueNonFungible")
+                    .argument(&COLLECTION_NAME)
+                    .argument(&COLLECTION_TICKER),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed issue colllection action `{action_id}`");
         action_id
@@ -132,22 +131,20 @@ impl MultisigInteract {
             return;
         }
         println!("quorum reached for action `{action_id}`");
+        let new_token_id = self
+            .interactor
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(80_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .perform_action_endpoint(action_id)
+            .returns(ReturnsNewTokenIdentifier)
+            .prepare_async()
+            .run()
+            .await;
+        self.collection_token_identifier = new_token_id;
 
-        let response: TypedResponse<IgnoreValue> =
-            self.interactor
-                .sc_call_get_result(
-                    ScCallStep::new()
-                        .call(self.state.multisig().perform_action_endpoint(action_id))
-                        .from(&self.wallet_address)
-                        .gas_limit("80,000,000")
-                        .expect(TxExpect::ok().additional_error_message(
-                            "perform issue collection with all failed: ",
-                        )),
-                )
-                .await;
-        self.collection_token_identifier = response
-            .new_issued_token_identifier
-            .expect("new token identifier could not be retrieved");
         println!(
             "collection token identifier: {}",
             self.collection_token_identifier
@@ -158,24 +155,23 @@ impl MultisigInteract {
         let multisig_address = self.state.multisig().to_address();
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(
-                        self.state.multisig().propose_async_call(
-                            &self.system_sc_address,
-                            0u64,
-                            FunctionCall::new("setSpecialRole")
-                                .argument(&self.collection_token_identifier)
-                                .argument(&multisig_address)
-                                .argument(&"ESDTRoleNFTCreate"),
-                        ),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                &self.system_sc_address,
+                0u64,
+                FunctionCall::new("setSpecialRole")
+                    .argument(&self.collection_token_identifier)
+                    .argument(&multisig_address)
+                    .argument(&"ESDTRoleNFTCreate"),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed set special role with action `{action_id}`");
         action_id
@@ -186,7 +182,7 @@ impl MultisigInteract {
         let action_id = self.propose_set_special_role().await;
 
         println!("performing set special role action `{action_id}`...");
-        self.perform_action(action_id, "80,000,000").await;
+        self.perform_action(action_id, 80_000_000u64).await;
     }
 
     pub async fn create_items(&mut self) {

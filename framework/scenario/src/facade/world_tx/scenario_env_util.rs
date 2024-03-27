@@ -12,7 +12,7 @@ use crate::{
     api::StaticApi,
     scenario_model::{
         AddressValue, BigUintValue, BytesValue, ScCallStep, ScDeployStep, ScQueryStep,
-        TransferStep, TxResponse,
+        TransferStep, TxResponse, U64Value,
     },
     ScenarioEnvExec, ScenarioWorld,
 };
@@ -46,7 +46,7 @@ pub fn tx_to_sc_call_step<Env, From, To, Payment, Gas>(
     from: From,
     to: To,
     payment: Payment,
-    _gas: Gas,
+    gas: Gas,
     data: FunctionCall<Env::Api>,
 ) -> ScCallStep
 where
@@ -64,6 +64,9 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
+    let explicit_gas = gas.resolve_gas(env);
+    step.tx.gas_limit = U64Value::from(explicit_gas);
+
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
@@ -76,7 +79,7 @@ pub fn tx_to_sc_deploy_step<Env, From, Payment, Gas, CodeValue>(
     env: &Env,
     from: From,
     payment: Payment,
-    _gas: Gas,
+    gas: Gas,
     data: DeployCall<Env, Code<CodeValue>>,
 ) -> ScDeployStep
 where
@@ -92,6 +95,9 @@ where
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());
     }
+
+    let explicit_gas = gas.resolve_gas(env);
+    step.tx.gas_limit = U64Value::from(explicit_gas);
 
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
@@ -121,7 +127,7 @@ pub fn tx_to_transfer_step<Env, From, To, Payment, Gas>(
     from: From,
     to: To,
     payment: Payment,
-    _gas: Gas,
+    gas: Gas,
 ) -> TransferStep
 where
     Env: TxEnv,
@@ -133,6 +139,9 @@ where
     let mut step = TransferStep::new()
         .from(address_annotated(env, from))
         .to(address_annotated(env, to));
+
+    let explicit_gas = gas.resolve_gas(env);
+    step.tx.gas_limit = U64Value::from(explicit_gas);
 
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {

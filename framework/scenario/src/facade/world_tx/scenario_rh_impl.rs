@@ -22,7 +22,7 @@ where
         let response = TypedResponse::<Original>::from_raw(tx_response);
         response
             .result
-            .expect("ReturnsExact expects that transaction is successful")
+            .expect("ReturnsResult expects that transaction is successful")
     }
 }
 
@@ -36,7 +36,7 @@ where
         let response = TypedResponse::<T>::from_raw(tx_response);
         response
             .result
-            .expect("ReturnsSimilar expects that transaction is successful")
+            .expect("ReturnsResultConv expects that transaction is successful")
     }
 }
 
@@ -51,7 +51,7 @@ where
         let response = TypedResponse::<T>::from_raw(tx_response);
         let value = response
             .result
-            .expect("ReturnsExact expects that transaction is successful");
+            .expect("ReturnsResult expects that transaction is successful");
         (self.f)(value);
     }
 }

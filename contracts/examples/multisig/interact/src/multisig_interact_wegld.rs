@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::multiversx_sc::types::{ContractCallBase, FunctionCall};
+use multiversx_sc_scenario::multiversx_sc::types::{ContractCallBase, FunctionCall, ReturnsResult};
 #[allow(unused_imports)]
 use multiversx_sc_snippets::multiversx_sc::types::{
     EsdtTokenPayment, MultiValueEncoded, TokenIdentifier,
@@ -34,7 +34,7 @@ impl MultisigInteract {
         let action_id = self.propose_wrap_egld().await;
 
         println!("perfoming wrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        self.perform_action(action_id, 15_000_000u64).await;
     }
 
     pub async fn unwrap_egld(&mut self) {
@@ -42,7 +42,7 @@ impl MultisigInteract {
         let action_id = self.propose_unwrap_egld().await;
 
         println!("perfoming unwrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        self.perform_action(action_id, 15_000_000u64).await;
     }
 
     pub async fn wegld_swap_set_state(&mut self) {
@@ -62,19 +62,20 @@ impl MultisigInteract {
     async fn propose_wrap_egld(&mut self) -> usize {
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        bech32::decode(WEGLD_SWAP_SC_BECH32),
-                        WRAP_AMOUNT,
-                        FunctionCall::new("wrapEgld"),
-                    ))
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                bech32::decode(WEGLD_SWAP_SC_BECH32),
+                WRAP_AMOUNT,
+                FunctionCall::new("wrapEgld"),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed wrap egld action `{action_id}`");
         action_id
@@ -94,19 +95,20 @@ impl MultisigInteract {
 
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        contract_call.basic.to,
-                        0u64,
-                        contract_call.basic.function_call,
-                    ))
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(&self.state.multisig().to_address())
+            .with_gas_limit(10_000_000u64)
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                contract_call.basic.to,
+                0u64,
+                contract_call.basic.function_call,
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed unwrap egld action `{action_id}`");
         action_id
