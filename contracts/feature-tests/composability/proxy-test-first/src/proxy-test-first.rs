@@ -81,7 +81,7 @@ pub trait ProxyTestFirst {
             .to(other_contract)
             .raw_upgrade()
             .argument(&456)
-            .egld(payment.clone_value())
+            .egld(payment)
             .upgrade_contract(&code, CodeMetadata::UPGRADEABLE);
     }
 

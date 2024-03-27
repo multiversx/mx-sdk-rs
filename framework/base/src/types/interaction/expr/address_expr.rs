@@ -20,11 +20,12 @@ where
         result
     }
 
-    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
     }
 }
+
 impl<Env> TxFrom<Env> for AddressExpr
 where
     Env: TxEnv,
@@ -36,19 +37,7 @@ where
 }
 impl<Env> TxFromSpecified<Env> for AddressExpr where Env: TxEnv {}
 impl<Env> TxTo<Env> for AddressExpr where Env: TxEnv {}
-impl<Env> TxToSpecified<Env> for AddressExpr
-where
-    Env: TxEnv,
-{
-    fn with_address_ref<F, R>(&self, _env: &Env, f: F) -> R
-    where
-        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
-    {
-        let expr: [u8; 32] = self.eval_to_array();
-        let ma = expr.into();
-        f(&ma)
-    }
-}
+impl<Env> TxToSpecified<Env> for AddressExpr where Env: TxEnv {}
 
 impl AddressExpr {
     pub const fn eval_to_array(&self) -> [u8; 32] {

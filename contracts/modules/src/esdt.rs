@@ -66,7 +66,7 @@ pub trait EsdtModule {
                 let egld_returned = self.call_value().egld_value();
                 self.tx()
                     .to(&initial_caller)
-                    .egld(&*egld_returned)
+                    .egld(egld_returned)
                     .transfer_if_not_empty();
             },
         }

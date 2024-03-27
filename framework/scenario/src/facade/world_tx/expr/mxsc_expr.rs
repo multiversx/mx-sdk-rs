@@ -26,7 +26,7 @@ where
         result
     }
 
-    fn into_value(self, env: &Env) -> ManagedBuffer<Env::Api> {
+    fn to_value(&self, env: &Env) -> ManagedBuffer<Env::Api> {
         let context = InterpreterContext::new()
             .with_dir(env.env_data().context_path.clone())
             .with_allowed_missing_files();

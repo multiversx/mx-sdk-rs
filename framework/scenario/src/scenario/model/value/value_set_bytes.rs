@@ -145,8 +145,8 @@ where
         self.original.to_concatenated_string().into()
     }
 
-    fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
-        self.value.into()
+    fn to_value(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        self.value.clone().into()
     }
 }
 
@@ -160,7 +160,7 @@ where
         self.original.to_concatenated_string().into()
     }
 
-    fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
+    fn to_value(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self.value.clone().into()
     }
 }

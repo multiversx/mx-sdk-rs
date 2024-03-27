@@ -23,7 +23,7 @@ impl<'a> AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>> for FileExp
         result
     }
 
-    fn into_value(self, env: &ScenarioTxEnvData) -> ManagedBuffer<StaticApi> {
+    fn to_value(&self, env: &ScenarioTxEnvData) -> ManagedBuffer<StaticApi> {
         let context = InterpreterContext::new().with_dir(env.context_path.clone());
         let value = interpret_string(&format!("{FILE_PREFIX}{}", self.0), &context);
         value.into()

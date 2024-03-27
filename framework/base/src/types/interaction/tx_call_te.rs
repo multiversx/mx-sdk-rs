@@ -25,7 +25,7 @@ where
     pub fn transfer_execute(self) {
         let gas_limit: u64;
         if self.data.is_no_call() {
-            if self.payment.is_no_payment() {
+            if self.payment.is_no_payment(&self.env) {
                 return;
             } else {
                 gas_limit = 0;
@@ -54,7 +54,7 @@ where
     ///
     /// Can only used for simple transfers.
     pub fn transfer_if_not_empty(self) {
-        if self.payment.is_no_payment() {
+        if self.payment.is_no_payment(&self.env) {
             return;
         }
 
