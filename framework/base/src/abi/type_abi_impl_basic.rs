@@ -113,24 +113,23 @@ impl TypeAbi for String {
     }
 }
 
-impl TypeAbi for &str {
+impl TypeAbi for &'static str {
     fn type_name() -> TypeName {
-        TypeName::type_name()
+        String::type_name()
     }
 
     fn type_name_rust() -> TypeName {
-        // we need to convert to an owned type
-        "Box<str>".into()
+        "&'static str".into()
     }
 }
 
 impl TypeAbi for Box<str> {
     fn type_name() -> TypeName {
-        TypeName::type_name()
+        String::type_name()
     }
 
     fn type_name_rust() -> TypeName {
-        TypeName::type_name_rust()
+        "Box<str>".into()
     }
 }
 
