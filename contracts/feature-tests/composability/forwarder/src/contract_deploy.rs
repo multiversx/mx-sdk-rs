@@ -41,7 +41,7 @@ pub trait DeployContractModule {
             .init(opt_arg)
             .code(code.clone())
             .returns(ReturnsNewAddress)
-            .returns(ReturnsRaw)
+            .returns(ReturnsRawResult)
             .sync_call();
 
         let response = if response_vec.is_empty() {
@@ -66,7 +66,7 @@ pub trait DeployContractModule {
             .code_metadata(CodeMetadata::DEFAULT)
             .from_source(source_address)
             .returns(ReturnsNewAddress)
-            .returns(ReturnsRaw)
+            .returns(ReturnsRawResult)
             .sync_call();
 
         let response = if response_vec.is_empty() {

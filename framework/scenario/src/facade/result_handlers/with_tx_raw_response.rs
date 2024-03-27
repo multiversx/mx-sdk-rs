@@ -1,13 +1,9 @@
-use core::marker::PhantomData;
-
 use multiversx_sc::{
     codec::TopDecodeMulti,
     types::{RHListItem, RHListItemExec, TxEnv},
 };
 
 use crate::scenario_model::TxResponse;
-
-use super::ScenarioTxEnvData;
 
 /// Wraps a closure that handles a `TxResponse` object.
 pub struct WithRawTxResponse<F>(pub F)

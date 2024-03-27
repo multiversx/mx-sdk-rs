@@ -7,10 +7,8 @@ mod scenario_env_exec;
 mod scenario_env_query;
 pub mod scenario_env_util;
 mod scenario_rh_impl;
-mod with_tx_raw_response;
 
 pub use expr::*;
 pub use scenario_env::*;
 pub use scenario_env_exec::ScenarioEnvExec;
 pub use scenario_env_query::ScenarioEnvQuery;
-pub use with_tx_raw_response::WithRawTxResponse;

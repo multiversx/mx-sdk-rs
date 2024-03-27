@@ -12,7 +12,7 @@ use crate::{
     },
     codec,
     esdt::ESDTSystemSmartContractProxy,
-    proxy_imports::{ReturnsRaw, ToSelf},
+    proxy_imports::{ReturnsRawResult, ToSelf},
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
         ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
@@ -390,7 +390,7 @@ where
             .raw_call()
             .function_name(endpoint_name)
             .arguments_raw(arg_buffer)
-            .returns(ReturnsRaw)
+            .returns(ReturnsRawResult)
             .sync_call()
     }
 

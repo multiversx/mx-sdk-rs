@@ -1,10 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::types::{ManagedBuffer, ManagedVec, SyncCallRawResult, TxEnv};
+use crate::types::{
+    ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, SyncCallRawResult, TxEnv,
+};
 
-use super::{RHListItem, RHListItemExec};
-
-pub struct WithResultRaw<Env, F>
+/// Defines a lambda function to be called on the raw result of the transaction.
+pub struct WithRawResult<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedVec<Env::Api, ManagedBuffer<Env::Api>>),
@@ -13,20 +14,20 @@ where
     f: F,
 }
 
-impl<Env, F> WithResultRaw<Env, F>
+impl<Env, F> WithRawResult<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedVec<Env::Api, ManagedBuffer<Env::Api>>),
 {
     pub fn new(f: F) -> Self {
-        WithResultRaw {
+        WithRawResult {
             _phantom: PhantomData,
             f,
         }
     }
 }
 
-impl<Env, F, Original> RHListItem<Env, Original> for WithResultRaw<Env, F>
+impl<Env, F, Original> RHListItem<Env, Original> for WithRawResult<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedVec<Env::Api, ManagedBuffer<Env::Api>>),
@@ -35,7 +36,7 @@ where
 }
 
 impl<Env, F, Original> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
-    for WithResultRaw<Env, F>
+    for WithRawResult<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedVec<Env::Api, ManagedBuffer<Env::Api>>),

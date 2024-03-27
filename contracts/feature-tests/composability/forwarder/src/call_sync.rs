@@ -17,7 +17,7 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(half_gas)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args)
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
@@ -38,7 +38,7 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(one_third_gas)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args.clone())
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
@@ -49,7 +49,7 @@ pub trait ForwarderSyncCallModule {
             .with_gas_limit(one_third_gas)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args)
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
@@ -71,7 +71,7 @@ pub trait ForwarderSyncCallModule {
             .typed(vault_proxy::VaultProxy)
             .accept_funds_echo_payment()
             .with_egld_or_single_esdt_transfer(payment)
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call();
 
         let (egld_value, esdt_transfers_multi) = result.into_tuple();
@@ -91,7 +91,7 @@ pub trait ForwarderSyncCallModule {
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
             .with_egld_or_single_esdt_transfer((token_id, 0u64, amount_to_send))
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call();
     }
 
@@ -117,7 +117,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .call_counts(b"accept_funds")
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call()
     }
 

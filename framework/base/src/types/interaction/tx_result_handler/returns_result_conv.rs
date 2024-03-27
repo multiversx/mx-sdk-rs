@@ -3,17 +3,18 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, SyncCallRawResult,
-    TxEnv,
+    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItem,
+    RHListItemExec, SyncCallRawResult, TxEnv,
 };
 
-use super::{RHListItem, RHListItemExec};
-
-pub struct ReturnsSimilar<T> {
+/// Indicates that result will be returned.
+///
+/// Value will be converted to type `T`, which should be compatible with the original type.
+pub struct ReturnsResultConv<T> {
     _phantom: PhantomData<T>,
 }
 
-impl<T> Default for ReturnsSimilar<T> {
+impl<T> Default for ReturnsResultConv<T> {
     fn default() -> Self {
         Self {
             _phantom: Default::default(),
@@ -21,13 +22,13 @@ impl<T> Default for ReturnsSimilar<T> {
     }
 }
 
-impl<T> ReturnsSimilar<T> {
+impl<T> ReturnsResultConv<T> {
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl<Env, Original, T> RHListItem<Env, Original> for ReturnsSimilar<T>
+impl<Env, Original, T> RHListItem<Env, Original> for ReturnsResultConv<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -37,7 +38,7 @@ where
 }
 
 impl<Env, Original, T> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
-    for ReturnsSimilar<T>
+    for ReturnsResultConv<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,

@@ -74,6 +74,11 @@ impl<'a> ScExpr<'a> {
         }
         result
     }
+
+    #[cfg(feature = "alloc")]
+    pub fn eval_to_expr(&self) -> alloc::string::String {
+        alloc::format!("{SC_PREFIX}{}", self.0)
+    }
 }
 
 #[cfg(test)]

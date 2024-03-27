@@ -23,7 +23,7 @@ pub trait ChangeOwnerModule {
             .to(&address)
             .typed(vault_proxy::VaultProxy)
             .get_owner_address()
-            .returns(ReturnsExact)
+            .returns(ReturnsResult)
             .sync_call()
     }
 }
