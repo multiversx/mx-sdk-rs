@@ -2,13 +2,31 @@ use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer};
 
 use super::TxEnv;
 
-pub trait AnnotatedValue<Env, T>
+pub trait AnnotatedValue<Env, T>: Sized
 where
     Env: TxEnv,
 {
     fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api>;
 
-    fn into_value(self, env: &Env) -> T;
+    /// Produces the value from a reference of the annotated type. Might involve a `.clone()` in some cases.
+    fn to_value(&self, env: &Env) -> T;
+
+    /// Consumes annotated value to produce actual value.
+    ///
+    /// Override whenever it helps to avoid an unnecessary clone.
+    fn into_value(self, env: &Env) -> T {
+        self.to_value(env)
+    }
+
+    /// Can be used when working with references only.
+    ///
+    /// Override whenever it helps to avoid an unnecessary clone.
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&T) -> R,
+    {
+        f(&self.to_value(env))
+    }
 }
 
 impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for ManagedAddress<Env::Api>
@@ -19,8 +37,19 @@ where
         self.hex_expr()
     }
 
+    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+        self.clone()
+    }
+
     fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         self
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
+    {
+        f(self)
     }
 }
 
@@ -32,8 +61,19 @@ where
         self.hex_expr()
     }
 
+    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+        (*self).clone()
+    }
+
     fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
         self.clone()
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
+    {
+        f(self)
     }
 }
 
@@ -45,8 +85,8 @@ where
         ManagedAddress::from(self).hex_expr()
     }
 
-    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
-        self.into()
+    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from(self)
     }
 }
 
@@ -58,8 +98,8 @@ where
         ManagedAddress::from(*self).hex_expr()
     }
 
-    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
-        self.into()
+    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from(*self)
     }
 }
 
@@ -71,8 +111,19 @@ where
         self.hex_expr()
     }
 
+    fn to_value(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        self.clone()
+    }
+
     fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&ManagedBuffer<Env::Api>) -> R,
+    {
+        f(self)
     }
 }
 
@@ -84,8 +135,19 @@ where
         self.to_display()
     }
 
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        self.clone()
+    }
+
     fn into_value(self, _env: &Env) -> BigUint<Env::Api> {
         self
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&BigUint<Env::Api>) -> R,
+    {
+        f(self)
     }
 }
 
@@ -97,8 +159,19 @@ where
         self.to_display()
     }
 
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        (*self).clone()
+    }
+
     fn into_value(self, _env: &Env) -> BigUint<Env::Api> {
         self.clone()
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&BigUint<Env::Api>) -> R,
+    {
+        f(self)
     }
 }
 
@@ -107,10 +180,23 @@ where
     Env: TxEnv,
 {
     fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
-        self.into_value(env).to_display()
+        self.to_value(env).to_display()
     }
 
-    fn into_value(self, _env: &Env) -> BigUint<Env::Api> {
-        BigUint::<Env::Api>::from(self)
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::from(*self)
+    }
+}
+
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for ()
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedBuffer::from("0")
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::zero()
     }
 }

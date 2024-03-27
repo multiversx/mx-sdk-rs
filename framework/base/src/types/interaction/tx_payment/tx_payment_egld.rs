@@ -1,5 +1,6 @@
 use crate::{
     contract_base::SendRawWrapper,
+    proxy_imports::{AnnotatedValue, ManagedBuffer},
     types::{BigUint, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
 };
 
@@ -18,18 +19,18 @@ where
     Env: TxEnv,
     EgldValue: TxEgldValue<Env>,
 {
-    fn is_no_payment(&self) -> bool {
-        self.0.with_egld_value(|egld_value| egld_value == &0u32)
+    fn is_no_payment(&self, env: &Env) -> bool {
+        self.0.with_value_ref(env, |egld_value| egld_value == &0u32)
     }
 
     fn perform_transfer_execute(
         self,
-        _env: &Env,
+        env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
     ) {
-        self.0.with_egld_value(|egld_value| {
+        self.0.with_value_ref(env, |egld_value| {
             let _ = SendRawWrapper::<Env::Api>::new().direct_egld_execute(
                 to,
                 egld_value,
@@ -55,7 +56,7 @@ where
     {
         to.with_address_ref(env, |to_addr| {
             self.0
-                .with_egld_value(|egld_value| f(to_addr, egld_value, &fc))
+                .with_value_ref(env, |egld_value| f(to_addr, egld_value, &fc))
         })
     }
 
@@ -67,19 +68,34 @@ where
     }
 }
 
+impl<Env, EgldValue> AnnotatedValue<Env, BigUint<Env::Api>> for Egld<EgldValue>
+where
+    Env: TxEnv,
+    EgldValue: TxEgldValue<Env>,
+{
+    fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
+        self.0.annotation(env)
+    }
+
+    fn to_value(&self, env: &Env) -> BigUint<Env::Api> {
+        self.0.to_value(env)
+    }
+
+    fn into_value(self, env: &Env) -> BigUint<Env::Api> {
+        self.0.into_value(env)
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&BigUint<Env::Api>) -> R,
+    {
+        self.0.with_value_ref(env, f)
+    }
+}
+
 impl<Env, EgldValue> TxPaymentEgldOnly<Env> for Egld<EgldValue>
 where
     Env: TxEnv,
     EgldValue: TxEgldValue<Env>,
 {
-    fn with_egld_value<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&BigUint<Env::Api>) -> R,
-    {
-        self.0.with_egld_value(f)
-    }
-
-    fn into_egld_payment(self, env: &Env) -> BigUint<Env::Api> {
-        self.0.into_value(env)
-    }
 }

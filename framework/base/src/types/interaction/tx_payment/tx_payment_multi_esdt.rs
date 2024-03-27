@@ -9,7 +9,7 @@ impl<Env> TxPayment<Env> for &MultiEsdtPayment<Env::Api>
 where
     Env: TxEnv,
 {
-    fn is_no_payment(&self) -> bool {
+    fn is_no_payment(&self, _env: &Env) -> bool {
         self.is_empty()
     }
 
@@ -64,7 +64,7 @@ impl<Env> TxPayment<Env> for MultiEsdtPayment<Env::Api>
 where
     Env: TxEnv,
 {
-    fn is_no_payment(&self) -> bool {
+    fn is_no_payment(&self, _env: &Env) -> bool {
         self.is_empty()
     }
 
