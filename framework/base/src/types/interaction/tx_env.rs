@@ -1,4 +1,7 @@
-use crate::{api::CallTypeApi, proxy_imports::ManagedBuffer, types::ManagedAddress};
+use crate::{
+    api::CallTypeApi,
+    types::{ManagedAddress, ManagedBuffer},
+};
 
 pub trait TxEnv: Sized {
     type Api: CallTypeApi;

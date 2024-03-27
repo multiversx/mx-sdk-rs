@@ -7,7 +7,8 @@ use crate::{
 };
 
 use super::{
-    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, AnnotatedValue, Tx, TxBaseWithEnv, TxEnv,
+    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, display_u64, AnnotatedValue, Tx,
+    TxBaseWithEnv, TxEnv,
 };
 
 pub struct TxScEnv<Api>
@@ -50,7 +51,7 @@ where
     }
 
     fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api> {
-        <u64 as AnnotatedValue<Self, u64>>::annotation(&self.default_gas_value(), self)
+        display_u64(self.default_gas_value())
     }
 
     fn default_gas_value(&self) -> u64 {

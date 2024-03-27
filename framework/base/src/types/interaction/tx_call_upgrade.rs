@@ -1,8 +1,8 @@
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
-    proxy_imports::{CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
     tuple_util::NestedTupleFlatten,
+    types::{CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
 };
 
 use super::{

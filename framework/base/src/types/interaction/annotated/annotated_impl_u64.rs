@@ -1,6 +1,6 @@
 use crate::{
+    api::ManagedTypeApi,
     formatter::{FormatBuffer, SCDisplay},
-    proxy_imports::ManagedTypeApi,
     types::{
         heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder,
         ManagedRef,

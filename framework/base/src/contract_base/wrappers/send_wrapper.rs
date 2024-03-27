@@ -12,11 +12,10 @@ use crate::{
     },
     codec,
     esdt::ESDTSystemSmartContractProxy,
-    proxy_imports::{GasLeft, ReturnsRawResult, ToSelf},
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
-        Tx,
+        GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
+        ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
     },
 };
 

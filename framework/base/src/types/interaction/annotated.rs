@@ -4,9 +4,12 @@ mod annotated_impl_managed_buffer;
 mod annotated_impl_u64;
 
 use crate::{
+    api::ManagedTypeApi,
     formatter::FormatBuffer,
-    proxy_imports::{ManagedBufferCachedBuilder, ManagedRef, ManagedTypeApi},
-    types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer},
+    types::{
+        heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder,
+        ManagedRef,
+    },
 };
 
 use super::TxEnv;
