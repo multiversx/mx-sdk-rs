@@ -1,6 +1,7 @@
 mod annotated_impl_big_uint;
 mod annotated_impl_managed_address;
 mod annotated_impl_managed_buffer;
+mod annotated_impl_u64;
 
 use crate::{
     proxy_imports::ManagedRef,

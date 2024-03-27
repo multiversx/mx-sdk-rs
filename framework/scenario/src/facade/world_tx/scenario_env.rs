@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use multiversx_sc::types::{AnnotatedValue, ManagedAddress, TxBaseWithEnv, TxEnv};
+use multiversx_sc::types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxBaseWithEnv, TxEnv};
 
 use crate::{
     api::StaticApi,
@@ -28,8 +28,11 @@ impl TxEnv for ScenarioTxEnvData {
         panic!("Explicit sender address expected")
     }
 
-    fn default_gas(&self) -> u64 {
-        // TODO: annotate
+    fn default_gas_annotation(&self) -> multiversx_sc::types::ManagedBuffer<Self::Api> {
+        ManagedBuffer::from("5,000,000")
+    }
+
+    fn default_gas_value(&self) -> u64 {
         5_000_000
     }
 }

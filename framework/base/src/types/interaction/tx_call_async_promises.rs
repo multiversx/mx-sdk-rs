@@ -6,7 +6,7 @@ use crate::{
 
 use super::{
     callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, OriginalResultMarker, Tx,
-    TxGas, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+    TxGas, TxGasValue, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
 };
 
 pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>
@@ -117,12 +117,13 @@ where
     }
 }
 
-impl<Api, To, Payment, Callback>
-    Tx<TxScEnv<Api>, (), To, Payment, ExplicitGas, FunctionCall<Api>, Callback>
+impl<Api, To, Payment, GasValue, Callback>
+    Tx<TxScEnv<Api>, (), To, Payment, ExplicitGas<GasValue>, FunctionCall<Api>, Callback>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
     Payment: TxPayment<TxScEnv<Api>>,
+    GasValue: TxGasValue<TxScEnv<Api>>,
     Callback: TxPromisesCallback<Api>,
 {
     pub fn register_promise(self) {
@@ -132,6 +133,7 @@ where
         self.result_handler
             .overwrite_with_serialized_args(&mut cb_closure_args_serialized);
         let extra_gas_for_callback = self.result_handler.gas_for_callback();
+        let gas = self.gas.gas_value(&self.env);
 
         self.payment.with_normalized(
             &self.env,
@@ -146,7 +148,7 @@ where
                     &norm_fc.arg_buffer,
                     callback_name,
                     callback_name,
-                    self.gas.0,
+                    gas,
                     extra_gas_for_callback,
                     &cb_closure_args_serialized,
                 )

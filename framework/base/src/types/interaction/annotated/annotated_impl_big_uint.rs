@@ -82,7 +82,7 @@ where
     Env: TxEnv,
 {
     fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
-        self.to_value(env).to_display()
+        BigUint::from(*self).to_display()
     }
 
     fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {

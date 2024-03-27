@@ -4,7 +4,7 @@ use multiversx_sc::{
     types::{
         AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec,
         Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
-        TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        TxFromSpecified, TxGas, TxGasValue, TxPayment, TxToSpecified,
     },
 };
 
@@ -41,6 +41,18 @@ where
     }
 }
 
+pub fn gas_annotated<Env, Gas>(env: &Env, gas: Gas) -> U64Value
+where
+    Env: TxEnv,
+    Gas: TxGas<Env>,
+{
+    let annotation = gas.gas_annotation(env).to_string();
+    U64Value {
+        value: gas.gas_value(env),
+        original: ValueSubTree::Str(annotation),
+    }
+}
+
 pub fn tx_to_sc_call_step<Env, From, To, Payment, Gas>(
     env: &Env,
     from: From,
@@ -64,8 +76,7 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
-    let explicit_gas = gas.resolve_gas(env);
-    step.tx.gas_limit = U64Value::from(explicit_gas);
+    step.tx.gas_limit = gas_annotated(env, gas);
 
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
@@ -96,8 +107,7 @@ where
         step.tx.arguments.push(arg.to_vec().into());
     }
 
-    let explicit_gas = gas.resolve_gas(env);
-    step.tx.gas_limit = U64Value::from(explicit_gas);
+    step.tx.gas_limit = gas_annotated(env, gas);
 
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
@@ -140,8 +150,7 @@ where
         .from(address_annotated(env, from))
         .to(address_annotated(env, to));
 
-    let explicit_gas = gas.resolve_gas(env);
-    step.tx.gas_limit = U64Value::from(explicit_gas);
+    step.tx.gas_limit = gas_annotated(env, gas);
 
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
