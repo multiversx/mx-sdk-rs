@@ -3,10 +3,13 @@ use core::marker::PhantomData;
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::BlockchainWrapper,
-    types::ManagedAddress,
+    types::{ManagedAddress, ManagedBuffer},
 };
 
-use super::{contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, Tx, TxBaseWithEnv, TxEnv};
+use super::{
+    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, display_u64, AnnotatedValue, Tx,
+    TxBaseWithEnv, TxEnv,
+};
 
 pub struct TxScEnv<Api>
 where
@@ -47,7 +50,11 @@ where
         BlockchainWrapper::<Api>::new().get_sc_address()
     }
 
-    fn default_gas(&self) -> u64 {
+    fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api> {
+        display_u64(self.default_gas_value())
+    }
+
+    fn default_gas_value(&self) -> u64 {
         let mut gas_left = Api::blockchain_api_impl().get_gas_left();
         if gas_left > TRANSFER_EXECUTE_DEFAULT_LEFTOVER {
             gas_left -= TRANSFER_EXECUTE_DEFAULT_LEFTOVER;

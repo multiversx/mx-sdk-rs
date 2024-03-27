@@ -31,7 +31,7 @@ where
     RH: TxResultHandler<TxScEnv<Api>>,
 {
     fn execute_deploy_raw(self) -> (ManagedAddress<Api>, ManagedVec<Api, ManagedBuffer<Api>>, RH) {
-        let gas_limit = self.gas.resolve_gas(&self.env);
+        let gas_limit = self.gas.gas_value(&self.env);
 
         let (new_address, raw_results) = self.payment.with_egld_value(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().deploy_contract(
@@ -69,7 +69,7 @@ where
     fn execute_deploy_from_source_raw(
         self,
     ) -> (ManagedAddress<Api>, ManagedVec<Api, ManagedBuffer<Api>>, RH) {
-        let gas_limit = self.gas.resolve_gas(&self.env);
+        let gas_limit = self.gas.gas_value(&self.env);
 
         let (new_address, raw_results) = self.payment.with_egld_value(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().deploy_from_source_contract(

@@ -12,11 +12,10 @@ use crate::{
     },
     codec,
     esdt::ESDTSystemSmartContractProxy,
-    proxy_imports::{ReturnsRawResult, ToSelf},
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
-        Tx,
+        GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
+        ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
     },
 };
 
@@ -386,7 +385,7 @@ where
     ) -> ManagedVec<A, ManagedBuffer<A>> {
         Tx::new_tx_from_sc()
             .to(ToSelf)
-            .with_gas_limit(gas)
+            .gas(gas)
             .raw_call()
             .function_name(endpoint_name)
             .arguments_raw(arg_buffer)
@@ -401,7 +400,7 @@ where
     ) {
         Tx::new_tx_from_sc()
             .to(ToSelf)
-            .with_gas_limit(A::blockchain_api_impl().get_gas_left())
+            .gas(GasLeft)
             .raw_call()
             .function_name(function_name)
             .arguments_raw(arg_buffer)

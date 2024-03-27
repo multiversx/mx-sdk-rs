@@ -1,7 +1,8 @@
 use crate::{
     contract_base::SendRawWrapper,
-    proxy_imports::{AnnotatedValue, ManagedBuffer},
-    types::{BigUint, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
+    types::{
+        AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, ManagedVec, TxFrom, TxToSpecified,
+    },
 };
 
 use super::{

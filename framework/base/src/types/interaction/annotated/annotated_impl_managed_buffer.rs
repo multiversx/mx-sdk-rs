@@ -1,7 +1,4 @@
-use crate::{
-    proxy_imports::ManagedRef,
-    types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer},
-};
+use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedRef};
 
 use super::{AnnotatedValue, TxEnv};
 

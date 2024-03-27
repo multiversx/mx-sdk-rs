@@ -1,22 +1,23 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    proxy_imports::{EsdtTokenPaymentRefs, TokenIdentifier},
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
-        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
+        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        TokenIdentifier,
     },
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase, Code,
-    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
-    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
-    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
+    AnnotatedValue, Code, ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall,
+    Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer,
+    OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource,
+    TxCodeValue, TxData, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue,
+    TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    UpgradeCall,
 };
 
 #[must_use]
@@ -355,10 +356,30 @@ where
 {
     /// Sets an explicit gas limit to the call.
     #[inline]
+    pub fn gas<GasValue>(
+        self,
+        gas_value: GasValue,
+    ) -> Tx<Env, From, To, Payment, ExplicitGas<GasValue>, Data, RH>
+    where
+        GasValue: TxGasValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: ExplicitGas(gas_value),
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Backwards compatibility.
+    #[inline]
     pub fn with_gas_limit(
         self,
         gas_limit: u64,
-    ) -> Tx<Env, From, To, Payment, ExplicitGas, Data, RH> {
+    ) -> Tx<Env, From, To, Payment, ExplicitGas<u64>, Data, RH> {
         Tx {
             env: self.env,
             from: self.from,

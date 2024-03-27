@@ -1,9 +1,3 @@
-mod tx_to_caller;
-mod tx_to_self;
-
-pub use tx_to_caller::ToCaller;
-pub use tx_to_self::ToSelf;
-
 use crate::types::{heap::Address, ManagedAddress};
 
 use super::{AnnotatedValue, TxEnv};

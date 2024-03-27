@@ -1,7 +1,4 @@
-use crate::{
-    proxy_imports::ManagedRef,
-    types::{AnnotatedValue, BigUint},
-};
+use crate::types::{AnnotatedValue, BigUint, ManagedRef};
 
 use super::TxEnv;
 

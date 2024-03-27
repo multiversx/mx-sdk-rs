@@ -28,7 +28,7 @@ where
     RH::ListReturns: NestedTupleFlatten,
 {
     fn execute_sync_call_raw(self) -> (ManagedVec<Api, ManagedBuffer<Api>>, RH) {
-        let gas_limit = self.gas.resolve_gas(&self.env);
+        let gas_limit = self.gas.gas_value(&self.env);
 
         let raw_result = self.payment.with_normalized(
             &self.env,

@@ -3,8 +3,8 @@ use std::path::PathBuf;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        AnnotatedValue, FunctionCall, ManagedAddress, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        AnnotatedValue, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv,
+        TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
 };
 
@@ -30,8 +30,12 @@ impl<'w> TxEnv for ScenarioEnvQuery<'w> {
         panic!("Explicit sender address expected")
     }
 
-    fn default_gas(&self) -> u64 {
-        self.data.default_gas()
+    fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api> {
+        self.data.default_gas_annotation()
+    }
+
+    fn default_gas_value(&self) -> u64 {
+        self.data.default_gas_value()
     }
 }
 

@@ -1,7 +1,4 @@
-use crate::{
-    proxy_imports::ManagedRef,
-    types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer},
-};
+use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedRef};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -82,7 +79,7 @@ where
     Env: TxEnv,
 {
     fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
-        self.to_value(env).to_display()
+        BigUint::from(*self).to_display()
     }
 
     fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {

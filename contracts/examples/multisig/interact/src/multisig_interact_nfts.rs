@@ -5,7 +5,7 @@ use multiversx_sc_scenario::{
         codec::Empty,
         types::{FunctionCall, ReturnsResult},
     },
-    ReturnsNewTokenIdentifier,
+    NumExpr, ReturnsNewTokenIdentifier,
 };
 
 use super::*;
@@ -45,7 +45,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.multisig().to_address())
-            .with_gas_limit(10_000_000u64)
+            .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
                 system_sc_address,
@@ -81,7 +81,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.state.multisig().to_address())
-            .with_gas_limit(80_000_000u64)
+            .gas(NumExpr("80,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
             .returns(ReturnsNewTokenIdentifier)
@@ -103,7 +103,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.state.multisig().to_address())
-            .with_gas_limit(10_000_000u64)
+            .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
                 system_sc_address,
@@ -136,7 +136,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.state.multisig().to_address())
-            .with_gas_limit(80_000_000u64)
+            .gas(NumExpr("80,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
             .returns(ReturnsNewTokenIdentifier)
@@ -158,7 +158,7 @@ impl MultisigInteract {
             .tx()
             .from(&self.wallet_address)
             .to(&self.state.multisig().to_address())
-            .with_gas_limit(10_000_000u64)
+            .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
                 &self.system_sc_address,

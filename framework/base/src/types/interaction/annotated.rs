@@ -1,10 +1,15 @@
 mod annotated_impl_big_uint;
 mod annotated_impl_managed_address;
 mod annotated_impl_managed_buffer;
+mod annotated_impl_u64;
 
 use crate::{
-    proxy_imports::ManagedRef,
-    types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer},
+    api::ManagedTypeApi,
+    formatter::FormatBuffer,
+    types::{
+        heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder,
+        ManagedRef,
+    },
 };
 
 use super::TxEnv;
@@ -34,4 +39,14 @@ where
     {
         f(&self.to_value(env))
     }
+}
+
+/// Useful for u64 display in several places.
+pub(super) fn display_u64<Api>(n: u64) -> ManagedBuffer<Api>
+where
+    Api: ManagedTypeApi,
+{
+    let mut result = ManagedBufferCachedBuilder::new_from_slice(&[]);
+    result.append_display(&n);
+    result.into_managed_buffer()
 }

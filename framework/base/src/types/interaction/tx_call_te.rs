@@ -31,7 +31,7 @@ where
                 gas_limit = 0;
             }
         } else {
-            gas_limit = self.gas.resolve_gas(&self.env);
+            gas_limit = self.gas.gas_value(&self.env);
         }
 
         self.transfer_execute_with_gas(gas_limit);

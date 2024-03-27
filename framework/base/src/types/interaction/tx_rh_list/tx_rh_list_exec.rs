@@ -1,7 +1,6 @@
 use crate::{
     api::CallTypeApi,
-    proxy_imports::{ManagedBuffer, OriginalResultMarker},
-    types::TxEnv,
+    types::{ManagedBuffer, OriginalResultMarker, TxEnv},
 };
 
 use super::{ConsNoRet, ConsRet, RHList, RHListItem};
