@@ -160,8 +160,10 @@ where
     /// Backwards compatibility, immitates the old API.
     ///
     /// Note that the data type (the `DeployCall`) doesn't have the code set.
-    /// This is because the old API was passing it as paramter, so we do the Apime here.
-    /// For clarity, we don't want it set twice.
+    /// This is because the old API was passing it as paramter, so we use it from the `code` argument.
+    ///
+    /// Also note that the code metadata is taken from the `code_metadata` argument.
+    /// If another one was previously set in the `Tx` object, that one will be ignored.
     pub fn deploy_contract<RequestedResult>(
         self,
         code: &ManagedBuffer<Api>,
@@ -181,8 +183,10 @@ where
     /// Backwards compatibility, immitates the old API.
     ///
     /// Note that the data type (the `DeployCall`) doesn't have the code set.
-    /// This is because the old API was passing it as paramter, so we do the Apime here.
-    /// For clarity, we don't want it set twice.
+    /// This is because the old API was passing it as paramter, so we use it from the `code` argument.
+    ///
+    /// Also note that the code metadata is taken from the `code_metadata` argument.
+    /// If another one was previously set in the `Tx` object, that one will be ignored.
     pub fn deploy_from_source<RequestedResult>(
         self,
         source_address: &ManagedAddress<Api>,
