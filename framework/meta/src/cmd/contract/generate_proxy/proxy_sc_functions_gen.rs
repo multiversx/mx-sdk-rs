@@ -167,7 +167,7 @@ fn write_upgrade_constructor_content(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(
         file,
         "        self.wrapped_tx
-                .raw_upgrade()"
+            .raw_upgrade()"
     )
     .unwrap();
     for input in inputs.iter() {
