@@ -35,22 +35,13 @@ pub trait DeployContractModule {
         code: &ManagedBuffer,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
-        let (new_address, response_vec) = self
-            .tx()
+        self.tx()
             .typed(vault_proxy::VaultProxy)
             .init(opt_arg)
             .code(code.clone())
             .returns(ReturnsNewAddress)
-            .returns(ReturnsRawResult)
-            .sync_call();
-
-        let response = if response_vec.is_empty() {
-            OptionalValue::None
-        } else {
-            OptionalValue::Some(response_vec.get(0).clone_value())
-        };
-
-        (new_address, response)
+            .returns(ReturnsResult)
+            .sync_call()
     }
 
     #[endpoint]
@@ -59,22 +50,14 @@ pub trait DeployContractModule {
         source_address: ManagedAddress,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
-        let (new_address, response_vec) = self
-            .tx()
+        self.tx()
             .typed(vault_proxy::VaultProxy)
             .init(opt_arg)
             .code_metadata(CodeMetadata::DEFAULT)
             .from_source(source_address)
             .returns(ReturnsNewAddress)
-            .returns(ReturnsRawResult)
-            .sync_call();
-
-        let response = if response_vec.is_empty() {
-            OptionalValue::None
-        } else {
-            OptionalValue::Some(response_vec.get(0).clone_value())
-        };
-
-        MultiValue2::from((new_address, response))
+            .returns(ReturnsResult)
+            .sync_call()
+            .into()
     }
 }

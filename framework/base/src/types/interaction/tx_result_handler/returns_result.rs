@@ -1,11 +1,8 @@
 use multiversx_sc_codec::TopDecodeMulti;
 
-use crate::{
-    proxy_imports::SyncCallRawResult,
-    types::{
-        interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItem,
-        RHListItemExec, TxEnv,
-    },
+use crate::types::{
+    interaction::contract_call_exec::decode_result, DeployRawResult, ManagedBuffer, ManagedVec,
+    RHListItem, RHListItemExec, SyncCallRawResult, TxEnv,
 };
 
 /// Indicates that result will be returned.
@@ -27,5 +24,15 @@ where
 {
     fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Original {
         decode_result::<Env::Api, Original>(raw_result.0.clone())
+    }
+}
+
+impl<Env, Original> RHListItemExec<DeployRawResult<Env::Api>, Env, Original> for ReturnsResult
+where
+    Env: TxEnv,
+    Original: TopDecodeMulti,
+{
+    fn item_process_result(self, raw_result: &DeployRawResult<Env::Api>) -> Original {
+        decode_result::<Env::Api, Original>(raw_result.raw_results.clone())
     }
 }
