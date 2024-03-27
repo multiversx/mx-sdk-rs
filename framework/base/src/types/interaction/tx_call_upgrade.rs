@@ -28,7 +28,10 @@ where
     CodeValue: TxCodeValue<TxScEnv<Api>>,
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
-    pub fn upgrade_async_call(self) {
+    /// Launches the upgrade async call.
+    ///
+    /// TODO: change return type to `!`.
+    pub fn upgrade_async_call_and_exit(self) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
         self.payment.with_egld_value(|egld_value| {
             SendRawWrapper::<Api>::new().upgrade_contract(
@@ -60,7 +63,10 @@ where
     FromSourceValue: TxFromSourceValue<TxScEnv<Api>>,
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
-    pub fn upgrade_async_call(self) {
+    /// Launches the upgrade from source async call.
+    ///
+    /// TODO: change return type to `!`.
+    pub fn upgrade_async_call_and_exit(self) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
         self.payment.with_egld_value(|egld_value| {
             SendRawWrapper::<Api>::new().upgrade_from_source_contract(

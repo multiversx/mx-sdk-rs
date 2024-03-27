@@ -11,14 +11,13 @@ pub trait UpgradeContractModule {
         new_code: ManagedBuffer,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) {
-        let _ = self
-            .tx()
+        self.tx()
             .to(child_sc_address)
             .typed(vault_proxy::VaultProxy)
             .upgrade(opt_arg)
             .code(new_code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
-            .upgrade_async_call();
+            .upgrade_async_call_and_exit();
     }
 
     #[endpoint]
@@ -28,13 +27,12 @@ pub trait UpgradeContractModule {
         source_address: ManagedAddress,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) {
-        let _ = self
-            .tx()
+        self.tx()
             .to(child_sc_address)
             .typed(vault_proxy::VaultProxy)
             .upgrade(opt_arg)
             .code_metadata(CodeMetadata::UPGRADEABLE)
             .from_source(source_address)
-            .upgrade_async_call();
+            .upgrade_async_call_and_exit();
     }
 }
