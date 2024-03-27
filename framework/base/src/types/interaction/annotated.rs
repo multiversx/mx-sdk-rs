@@ -1,4 +1,7 @@
-use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer};
+use crate::{
+    proxy_imports::ManagedRef,
+    types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer},
+};
 
 use super::TxEnv;
 
@@ -165,6 +168,30 @@ where
 
     fn into_value(self, _env: &Env) -> BigUint<Env::Api> {
         self.clone()
+    }
+
+    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    where
+        F: FnOnce(&BigUint<Env::Api>) -> R,
+    {
+        f(self)
+    }
+}
+
+impl<'a, Env> AnnotatedValue<Env, BigUint<Env::Api>> for ManagedRef<'a, Env::Api, BigUint<Env::Api>>
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        self.to_display()
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        (*self).clone_value()
+    }
+
+    fn into_value(self, _env: &Env) -> BigUint<Env::Api> {
+        self.clone_value()
     }
 
     fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R

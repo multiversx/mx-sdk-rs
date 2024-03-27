@@ -1,4 +1,7 @@
-use crate::types::{AnnotatedValue, BigUint};
+use crate::{
+    proxy_imports::ManagedRef,
+    types::{AnnotatedValue, BigUint},
+};
 
 use super::TxEnv;
 
@@ -10,4 +13,5 @@ where
 
 impl<Env> TxEgldValue<Env> for BigUint<Env::Api> where Env: TxEnv {}
 impl<Env> TxEgldValue<Env> for &BigUint<Env::Api> where Env: TxEnv {}
+impl<'a, Env> TxEgldValue<Env> for ManagedRef<'a, Env::Api, BigUint<Env::Api>> where Env: TxEnv {}
 impl<Env> TxEgldValue<Env> for u64 where Env: TxEnv {}
