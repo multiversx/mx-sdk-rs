@@ -1,9 +1,18 @@
 #![no_std]
 
-use multiversx_sc::imports::*;
-
+use multiversx_sc::{
+    derive::type_abi,
+    imports::*,
+    proxy_imports::*,
+};
 pub mod adder_proxy;
 
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, Default)]
+pub struct Test<M: ManagedTypeApi> {
+    pub field1: u64,
+    pub field2: BigUint<M>,
+}
 /// One of the simplest smart contracts possible,
 /// it holds a single variable in storage, which anyone can increment.
 #[multiversx_sc::contract]
@@ -27,4 +36,7 @@ pub trait Adder {
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
     }
+
+    #[endpoint]
+    fn takes_struct(&self, _elem: Test<Self::Api>) {}
 }
