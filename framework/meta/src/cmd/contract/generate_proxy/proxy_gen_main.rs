@@ -35,5 +35,9 @@ fn write_proxy_to_file(mut file: File, abi: &ContractAbi) {
     write_impl_for_tx_proxy(&mut file, &abi.name);
     write_struct_tx_proxy_methods(&mut file, &abi.name);
     write_content(&mut file, abi.clone());
-    write_types(&mut file, &abi.type_descriptions);
+    write_types(
+        &mut file,
+        &abi.type_descriptions,
+        abi.build_info.contract_crate.name,
+    );
 }
