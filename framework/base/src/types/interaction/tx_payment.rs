@@ -8,6 +8,7 @@ mod tx_payment_single_esdt_ref;
 
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
+pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 
 use crate::{
     api::ManagedTypeApi,
