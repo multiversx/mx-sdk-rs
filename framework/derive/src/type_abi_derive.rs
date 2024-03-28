@@ -1,7 +1,7 @@
 use crate::parse::attributes::extract_macro_attributes;
 
 use super::parse::attributes::extract_doc;
-use quote::{quote, ToTokens};
+use quote::quote;
 
 pub struct ExplicitDiscriminant {
     pub variant_index: usize,
@@ -122,17 +122,11 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
     let name = &ast.ident;
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    let name_rust = extract_rust_type(ty_generics, name_str.clone());
     quote! {
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
             fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
             }
-
-            fn type_name_rust() -> multiversx_sc::abi::TypeName {
-                #name_rust.into()
-            }
-
             #type_description_impl
         }
     }
@@ -188,16 +182,4 @@ pub fn get_discriminant(
     };
 
     quote! { #next_value}
-}
-
-fn extract_rust_type(ty_generics: &syn::TypeGenerics<'_>, mut output_name: String) -> String {
-    let mut ty_generics_tokens = proc_macro2::TokenStream::new();
-    ty_generics.to_tokens(&mut ty_generics_tokens);
-
-    if ty_generics_tokens.to_string().is_empty() {
-        return output_name;
-    }
-
-    output_name.push_str("<$API>");
-    output_name
 }

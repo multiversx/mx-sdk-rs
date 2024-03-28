@@ -2,7 +2,7 @@ use std::{fs::File, io::Write};
 
 use multiversx_sc::abi::{ContractAbi, EndpointAbi, InputAbi, OutputAbi};
 
-use super::proxy_naming::proxy_methods_type_name;
+use super::{proxy_gen_struct_enum::clean_paths, proxy_naming::proxy_methods_type_name};
 
 pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
     write_header_impl_constructor(file, &abi.name);
@@ -10,7 +10,11 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
         if i > 0 {
             writeln!(file).unwrap();
         }
-        write_constructor_header(file, constructor_abi.clone());
+        write_constructor_header(
+            file,
+            constructor_abi.clone(),
+            abi.build_info.contract_crate.name,
+        );
         write_constructor_content(file, constructor_abi.inputs);
         write_end_of_function(file);
     }
@@ -22,7 +26,11 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
         if i > 0 {
             writeln!(file).unwrap();
         }
-        write_upgrade_constructor_header(file, upgrade_abi.clone());
+        write_upgrade_constructor_header(
+            file,
+            upgrade_abi.clone(),
+            abi.build_info.contract_crate.name,
+        );
         write_upgrade_constructor_content(file, upgrade_abi.inputs);
         write_end_of_function(file);
     }
@@ -34,7 +42,11 @@ pub(crate) fn write_content(file: &mut File, abi: ContractAbi) {
         if i > 0 {
             writeln!(file).unwrap();
         }
-        write_endpoint_header(file, endpoint_abi.clone());
+        write_endpoint_header(
+            file,
+            endpoint_abi.clone(),
+            abi.build_info.contract_crate.name,
+        );
         write_endpoint_content(file, endpoint_abi.name, endpoint_abi.inputs);
         write_end_of_function(file);
     }
@@ -95,25 +107,29 @@ where
     .unwrap();
 }
 
-fn write_constructor_header(file: &mut File, constructor_abi: EndpointAbi) {
-    write_fn_signature(file, constructor_abi.clone());
-    write_constructor_output(file, constructor_abi.outputs);
+fn write_constructor_header(file: &mut File, constructor_abi: EndpointAbi, proxy_crate: &str) {
+    write_fn_signature(file, constructor_abi.clone(), proxy_crate);
+    write_constructor_output(file, constructor_abi.outputs, proxy_crate);
 }
 
-fn write_upgrade_constructor_header(file: &mut File, upgrade_constructor_abi: EndpointAbi) {
-    write_fn_signature(file, upgrade_constructor_abi.clone());
-    write_upgrade_constructor_output(file, upgrade_constructor_abi.outputs);
+fn write_upgrade_constructor_header(
+    file: &mut File,
+    upgrade_constructor_abi: EndpointAbi,
+    proxy_crate: &str,
+) {
+    write_fn_signature(file, upgrade_constructor_abi.clone(), proxy_crate);
+    write_upgrade_constructor_output(file, upgrade_constructor_abi.outputs, proxy_crate);
 }
 
-fn write_endpoint_header(file: &mut File, constructor_abi: EndpointAbi) {
-    write_fn_signature(file, constructor_abi.clone());
-    write_endpoint_output(file, constructor_abi.outputs);
+fn write_endpoint_header(file: &mut File, constructor_abi: EndpointAbi, proxy_crate: &str) {
+    write_fn_signature(file, constructor_abi.clone(), proxy_crate);
+    write_endpoint_output(file, constructor_abi.outputs, proxy_crate);
 }
 
-fn write_fn_signature(file: &mut File, endpoint_abi: EndpointAbi) {
+fn write_fn_signature(file: &mut File, endpoint_abi: EndpointAbi, proxy_crate: &str) {
     write_endpoint_docs(file, endpoint_abi.docs);
     write_function_header_endpoint(file, endpoint_abi.rust_method_name);
-    write_args(file, endpoint_abi.inputs.clone());
+    write_args(file, endpoint_abi.inputs.clone(), proxy_crate);
     write_parameters(file, endpoint_abi.inputs);
 }
 
@@ -126,26 +142,26 @@ fn write_parameters(file: &mut File, inputs: Vec<InputAbi>) {
     write!(file, "    ) ").unwrap();
 }
 
-fn write_constructor_output(file: &mut File, outputs: Vec<OutputAbi>) {
+fn write_constructor_output(file: &mut File, outputs: Vec<OutputAbi>, proxy_crate: &str) {
     write!(file, "-> TxProxyDeploy<Env, From, Gas, ").unwrap();
 
-    parse_and_write_outputs(file, outputs);
+    parse_and_write_outputs(file, outputs, proxy_crate);
 
     writeln!(file, "> {{").unwrap();
 }
 
-fn write_upgrade_constructor_output(file: &mut File, outputs: Vec<OutputAbi>) {
+fn write_upgrade_constructor_output(file: &mut File, outputs: Vec<OutputAbi>, proxy_crate: &str) {
     write!(file, "-> TxProxyUpgrade<Env, From, To, Gas, ").unwrap();
 
-    parse_and_write_outputs(file, outputs);
+    parse_and_write_outputs(file, outputs, proxy_crate);
 
     writeln!(file, "> {{").unwrap();
 }
 
-fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>) {
+fn write_endpoint_output(file: &mut File, outputs: Vec<OutputAbi>, proxy_crate: &str) {
     write!(file, "-> TxProxyCall<Env, From, To, Gas, ").unwrap();
 
-    parse_and_write_outputs(file, outputs);
+    parse_and_write_outputs(file, outputs, proxy_crate);
 
     writeln!(file, "> {{").unwrap();
 }
@@ -203,7 +219,7 @@ fn write_endpoint_docs(file: &mut File, docs: Vec<String>) {
     }
 }
 
-fn write_args(file: &mut File, inputs: Vec<InputAbi>) {
+fn write_args(file: &mut File, inputs: Vec<InputAbi>, proxy_crate: &str) {
     if inputs.is_empty() {
         return;
     }
@@ -211,14 +227,14 @@ fn write_args(file: &mut File, inputs: Vec<InputAbi>) {
     writeln!(file, "<").unwrap();
 
     for (index, input) in inputs.iter().enumerate() {
-        write_argument(file, index, &input.type_names.rust);
+        write_argument(file, index, &input.type_names.rust, proxy_crate);
     }
 
     write!(file, "    >").unwrap();
 }
 
-fn write_argument(file: &mut File, index: usize, rust_name: &str) {
-    let adjusted = adjust_type_name(rust_name);
+fn write_argument(file: &mut File, index: usize, rust_name: &str, proxy_crate: &str) {
+    let adjusted = adjust_type_name(rust_name, proxy_crate);
     writeln!(file, "        Arg{index}: CodecInto<{adjusted}>,").unwrap();
 }
 
@@ -226,20 +242,22 @@ fn write_end_of_function(file: &mut File) {
     writeln!(file, "    }}").unwrap();
 }
 
-fn adjust_type_name(original_rust_name: &str) -> String {
-    original_rust_name
-        .replace("multiversx_sc::api::uncallable::UncallableApi", "Env::Api")
-        .replace("$API", "Env::Api")
-        .to_string()
+pub fn adjust_type_name(original_rust_name: &str, proxy_crate: &str) -> String {
+    clean_paths(
+        proxy_crate,
+        &original_rust_name
+            .replace("multiversx_sc::api::uncallable::UncallableApi", "Env::Api")
+            .replace("$API", "Env::Api"),
+    )
 }
 
-fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
+fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>, proxy_crate: &str) {
     match outputs.len() {
         0 => {
             write!(file, "()").unwrap();
         },
         1 => {
-            let adjusted = adjust_type_name(&outputs[0].type_names.rust);
+            let adjusted = adjust_type_name(&outputs[0].type_names.rust, proxy_crate);
             write!(file, "{adjusted}").unwrap();
         },
         _ => {
@@ -248,7 +266,7 @@ fn parse_and_write_outputs(file: &mut File, outputs: Vec<OutputAbi>) {
                 if i > 0 {
                     write!(file, ", ").unwrap();
                 }
-                let adjusted = adjust_type_name(&output.type_names.rust);
+                let adjusted = adjust_type_name(&output.type_names.rust, proxy_crate);
                 write!(file, "{adjusted}").unwrap();
             }
             write!(file, ">").unwrap();
