@@ -1,6 +1,6 @@
 use crate::api::CallTypeApi;
 
-use super::{
+use crate::types::{
     FunctionCall, Tx, TxData, TxEmptyResultHandler, TxFrom, TxGas, TxPayment, TxScEnv,
     TxToSpecified,
 };

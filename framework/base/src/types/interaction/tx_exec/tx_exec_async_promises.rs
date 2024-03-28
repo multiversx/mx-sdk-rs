@@ -1,12 +1,11 @@
 use crate::{
     api::{const_handles, CallTypeApi},
     contract_base::SendRawWrapper,
-    types::{CallbackClosure, ManagedBuffer, ManagedType},
-};
-
-use super::{
-    callback_closure::CallbackClosureWithGas, ExplicitGas, FunctionCall, OriginalResultMarker, Tx,
-    TxGas, TxGasValue, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+    types::{
+        interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
+        FunctionCall, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas, TxGasValue,
+        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+    },
 };
 
 pub trait TxPromisesCallback<Api>: TxResultHandler<TxScEnv<Api>>

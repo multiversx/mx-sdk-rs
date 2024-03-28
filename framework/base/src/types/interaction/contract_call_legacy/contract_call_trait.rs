@@ -1,10 +1,10 @@
 use crate::{
     api::CallTypeApi,
     codec::{multi_types::IgnoreValue, TopDecodeMulti, TopEncodeMulti},
-    types::ManagedBuffer,
+    types::{AsyncCall, AsyncCallPromises, BackTransfers, ManagedArgBuffer, ManagedBuffer},
 };
 
-use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBuffer};
+use super::{ContractCallNoPayment, ContractCallWithEgld};
 
 pub trait ContractCallBase<SA>
 where
@@ -85,7 +85,7 @@ where
 
     /// Converts to an async promise.
     #[inline]
-    fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
+    fn async_call_promise(self) -> AsyncCallPromises<SA> {
         self.into_normalized().build_async_call_promise()
     }
 
@@ -104,7 +104,7 @@ where
     #[inline]
     fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (RequestedResult, super::BackTransfers<SA>)
+    ) -> (RequestedResult, BackTransfers<SA>)
     where
         RequestedResult: TopDecodeMulti,
     {
