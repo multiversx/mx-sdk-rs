@@ -15,7 +15,7 @@ use super::ManagedArgBuffer;
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
 /// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
-const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
+pub(crate) const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 
 #[must_use]
 pub struct ContractDeploy<SA, OriginalResult>

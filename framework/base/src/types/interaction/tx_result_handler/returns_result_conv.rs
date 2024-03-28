@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::{CodecFrom, TopEncodeMulti};
 
 use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItem,
-    RHListItemExec, SyncCallRawResult, TxEnv,
+    interaction::decode_result, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec,
+    SyncCallRawResult, TxEnv,
 };
 
 /// Indicates that result will be returned.

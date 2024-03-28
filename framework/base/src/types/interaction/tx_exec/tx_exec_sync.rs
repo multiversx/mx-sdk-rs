@@ -4,13 +4,11 @@ use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
     tuple_util::NestedTupleFlatten,
-    types::{ManagedBuffer, ManagedVec},
-};
-
-use super::{
-    contract_call_exec::decode_result, BackTransfers, ConsNoRet, ConsRet, OriginalResultMarker,
-    RHList, RHListExec, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas, TxPayment, TxScEnv,
-    TxToSpecified,
+    types::{
+        decode_result, BackTransfers, ConsNoRet, ConsRet, ManagedBuffer, ManagedVec,
+        OriginalResultMarker, RHList, RHListExec, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas,
+        TxPayment, TxScEnv, TxToSpecified,
+    },
 };
 
 pub struct SyncCallRawResult<Api>(pub ManagedVec<Api, ManagedBuffer<Api>>)

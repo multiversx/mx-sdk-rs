@@ -3,12 +3,10 @@ use core::marker::PhantomData;
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::BlockchainWrapper,
-    types::{ManagedAddress, ManagedBuffer},
-};
-
-use super::{
-    contract_call_exec::TRANSFER_EXECUTE_DEFAULT_LEFTOVER, display_u64, AnnotatedValue, Tx,
-    TxBaseWithEnv, TxEnv,
+    types::{
+        interaction::display_u64, AnnotatedValue, ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv,
+        TxEnv, TRANSFER_EXECUTE_DEFAULT_LEFTOVER,
+    },
 };
 
 pub struct TxScEnv<Api>

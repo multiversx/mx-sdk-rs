@@ -6,7 +6,8 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
-        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier,
+        EsdtTokenPayment, FunctionCall, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedVec, TokenIdentifier, Tx, TxScEnv,
     },
 };
 
@@ -14,8 +15,7 @@ use super::{
     contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
     contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
-    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, FunctionCall, ManagedArgBuffer,
-    Tx, TxScEnv,
+    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt,
 };
 
 /// Holds metadata for calling another contract, without payments.
@@ -29,11 +29,11 @@ pub struct ContractCallNoPayment<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(super) _phantom: PhantomData<SA>,
+    pub(crate) _phantom: PhantomData<SA>,
     pub to: ManagedAddress<SA>,
     pub function_call: FunctionCall<SA>,
     pub explicit_gas_limit: u64,
-    pub(super) _return_type: PhantomData<OriginalResult>,
+    pub(crate) _return_type: PhantomData<OriginalResult>,
 }
 
 impl<SA, OriginalResult> ContractCallBase<SA> for ContractCallNoPayment<SA, OriginalResult>
