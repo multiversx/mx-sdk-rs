@@ -30,21 +30,13 @@ pub trait ProxyTestFirst {
     #[endpoint(deploySecondContract)]
     fn deploy_second_contract(&self, code: ManagedBuffer) -> i32 {
         let payment = self.call_value().egld_value();
-        // let (address, init_result) = self
-        //     .tx()
-        //     .egld(payment)
-        //     .raw_deploy()
-        //     .code(code)
-        //     .code_metadata(CodeMetadata::UPGRADEABLE)
-        //     .argument(&123)
-        //     .returns(ReturnsNewAddress)
-        //     .returns(ReturnsResult)
-        //     .sync_call();
 
         let (address, init_result) = self
             .tx()
             .typed(message_me_proxy::MessageMeProxy)
             .init(123)
+            .code(code)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
             .returns(ReturnsNewAddress)
             .returns(ReturnsResult)
             .egld(payment)
