@@ -161,7 +161,7 @@ where
             env: self.env,
             from: self.from,
             to: self.to,
-            payment: payment,
+            payment,
             gas: self.gas,
             data: self.data,
             result_handler: self.result_handler,
