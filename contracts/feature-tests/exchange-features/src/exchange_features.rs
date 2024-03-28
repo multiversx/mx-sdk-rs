@@ -3,8 +3,6 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-pub const FULL_VALUE_SUPPLY: u64 = 16;
-
 #[derive(
     ManagedVecItem,
     TopEncode,
@@ -26,17 +24,14 @@ impl<M: ManagedTypeApi> FixedSupplyToken<M> for TokenAttributes<M> {
     }
 
     fn into_part(self, payment_amount: &BigUint<M>) -> Self {
-        let new_amount =
-            self.rule_of_three_non_zero_result(payment_amount, &BigUint::from(FULL_VALUE_SUPPLY));
-        TokenAttributes {
-            amount: new_amount.clone(),
-        }
+        let new_amount = self.rule_of_three_non_zero_result(payment_amount, &self.amount);
+        TokenAttributes { amount: new_amount }
     }
 }
 impl<M: ManagedTypeApi> Mergeable<M> for TokenAttributes<M> {
     #[inline]
-    fn can_merge_with(&self, other: &Self) -> bool {
-        other.amount > 0u64
+    fn can_merge_with(&self, _other: &Self) -> bool {
+        true
     }
 
     fn merge_with(&mut self, other: Self) {

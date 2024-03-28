@@ -78,6 +78,6 @@ fn exchange_features_blackbox_raw() {
                 .from("address:owner")
                 .to("sc:exchange-features")
                 .function("get_supply")
-                .expect(TxExpect::ok().result("6")),
+                .expect(TxExpect::ok().result("3")),
         );
 }
