@@ -12,7 +12,7 @@ impl<Env> TxPayment<Env> for EgldOrEsdtTokenPayment<Env::Api>
 where
     Env: TxEnv,
 {
-    fn is_no_payment(&self) -> bool {
+    fn is_no_payment(&self, _env: &Env) -> bool {
         self.amount == 0u32
     }
 
@@ -63,7 +63,7 @@ impl<Env> TxPayment<Env> for EgldOrMultiEsdtPayment<Env::Api>
 where
     Env: TxEnv,
 {
-    fn is_no_payment(&self) -> bool {
+    fn is_no_payment(&self, _env: &Env) -> bool {
         self.is_empty()
     }
 

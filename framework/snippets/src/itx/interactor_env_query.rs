@@ -5,12 +5,12 @@ use multiversx_sc_scenario::{
     multiversx_sc::{
         tuple_util::NestedTupleFlatten,
         types::{
-            AnnotatedValue, FunctionCall, ManagedAddress, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-            TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+            AnnotatedValue, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx,
+            TxBaseWithEnv, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
     scenario_env_util::*,
-    scenario_model::{ScQueryStep, TxResponse},
+    scenario_model::{ScQueryStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
@@ -24,12 +24,18 @@ pub struct InteractorEnvQuery<'w> {
 impl<'w> TxEnv for InteractorEnvQuery<'w> {
     type Api = StaticApi;
 
+    type RHExpect = TxExpect;
+
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
         panic!("Explicit sender address expected")
     }
 
-    fn default_gas(&self) -> u64 {
-        self.data.default_gas()
+    fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api> {
+        self.data.default_gas_annotation()
+    }
+
+    fn default_gas_value(&self) -> u64 {
+        self.data.default_gas_value()
     }
 }
 
@@ -74,9 +80,10 @@ where
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
-        let mut sc_call_step = self.sc_query_step;
-        self.world.sc_query(&mut sc_call_step).await;
-        process_result(sc_call_step.response, self.result_handler)
+        let mut step = self.sc_query_step;
+        step.expect = Some(self.result_handler.list_tx_expect());
+        self.world.sc_query(&mut step).await;
+        process_result(step.response, self.result_handler)
     }
 }
 
@@ -99,6 +106,7 @@ impl Interactor {
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
         let mut step = tx_to_sc_query_step(&tx.env, tx.to, tx.data);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         self.sc_query(&mut step).await;
         process_result(step.response, tx.result_handler);
         self

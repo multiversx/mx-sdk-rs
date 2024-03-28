@@ -8,7 +8,7 @@ use basic_interact_state::State;
 use clap::Parser;
 use multiversx_sc_snippets::{
     env_logger,
-    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsSimilar},
+    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsResultConv},
     multiversx_sc_scenario::{
         api::StaticApi,
         bech32,
@@ -17,7 +17,7 @@ use multiversx_sc_snippets::{
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
         scenario_model::{BytesValue, ScDeployStep, Scenario},
         standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo, WithRawTxResponse,
+        test_wallets, ContractInfo, NumExpr, WithRawTxResponse,
     },
     tokio, Interactor, InteractorPrepareAsync, StepBuffer,
 };
@@ -170,7 +170,7 @@ impl AdderInteract {
             .tx()
             .from(&self.wallet_address)
             .to(self.state.adder().to_address())
-            .egld(50000000000000000u64) // TODO: annotate "0,050000000000000000"
+            .egld(NumExpr("0,050000000000000000"))
             .prepare_async()
             .run()
             .await;
@@ -197,7 +197,7 @@ impl AdderInteract {
             .to(self.state.adder().to_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
-            .returns(ReturnsSimilar::<BigUint>::new())
+            .returns(ReturnsResultConv::<BigUint>::new())
             .prepare_async()
             .run()
             .await;

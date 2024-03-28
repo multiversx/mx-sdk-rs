@@ -1,8 +1,8 @@
 use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
-        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsExact, ReturnsNewAddress,
-        ReturnsSimilar, TxEnv, WithResultNewAddress, WithResultSimilar,
+        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsNewAddress, ReturnsResult,
+        ReturnsResultConv, TxEnv, WithNewAddress, WithResultConv,
     },
 };
 
@@ -13,7 +13,7 @@ use crate::{
 
 use super::ScenarioTxEnvData;
 
-impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsExact
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResult
 where
     Env: TxEnv,
     Original: TopDecodeMulti,
@@ -22,11 +22,11 @@ where
         let response = TypedResponse::<Original>::from_raw(tx_response);
         response
             .result
-            .expect("ReturnsExact expects that transaction is successful")
+            .expect("ReturnsResult expects that transaction is successful")
     }
 }
 
-impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsSimilar<T>
+impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultConv<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -36,11 +36,11 @@ where
         let response = TypedResponse::<T>::from_raw(tx_response);
         response
             .result
-            .expect("ReturnsSimilar expects that transaction is successful")
+            .expect("ReturnsResultConv expects that transaction is successful")
     }
 }
 
-impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultSimilar<T, F>
+impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultConv<T, F>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -51,7 +51,7 @@ where
         let response = TypedResponse::<T>::from_raw(tx_response);
         let value = response
             .result
-            .expect("ReturnsExact expects that transaction is successful");
+            .expect("ReturnsResult expects that transaction is successful");
         (self.f)(value);
     }
 }
@@ -70,7 +70,7 @@ where
     }
 }
 
-impl<Env, Original, F> RHListItemExec<TxResponse, Env, Original> for WithResultNewAddress<Env, F>
+impl<Env, Original, F> RHListItemExec<TxResponse, Env, Original> for WithNewAddress<Env, F>
 where
     Env: TxEnv,
     F: FnOnce(&ManagedAddress<Env::Api>),

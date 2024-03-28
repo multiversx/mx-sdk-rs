@@ -77,10 +77,11 @@ pub trait ProxyTestFirst {
         let payment = self.call_value().egld_value();
         let other_contract = self.get_other_contract();
 
-        self.message_me_proxy()
-            .init(456) // TODO: upgrade proxy
+        self.tx()
             .to(other_contract)
-            .with_egld_transfer(payment.clone_value())
+            .raw_upgrade()
+            .argument(&456)
+            .egld(payment)
             .upgrade_contract(&code, CodeMetadata::UPGRADEABLE);
     }
 

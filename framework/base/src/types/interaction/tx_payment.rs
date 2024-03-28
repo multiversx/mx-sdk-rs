@@ -9,6 +9,7 @@ mod tx_payment_single_esdt_ref;
 
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
+pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 
 use crate::{
     api::ManagedTypeApi,
@@ -19,7 +20,7 @@ use crate::{
     },
 };
 
-use super::{FunctionCall, TxEnv, TxFrom, TxToSpecified};
+use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
 
 /// Describes a payment that is part of a transaction.
 pub trait TxPayment<Env>
@@ -27,7 +28,7 @@ where
     Env: TxEnv,
 {
     /// Returns true if payment indicates transfer of either non-zero EGLD or ESDT amounts.
-    fn is_no_payment(&self) -> bool;
+    fn is_no_payment(&self, env: &Env) -> bool;
 
     /// Transfer-execute calls have different APIs for different payments types.
     /// This method selects between them.
@@ -58,15 +59,20 @@ where
 }
 
 /// Marks a payment object that only contains EGLD or nothing at all.
-pub trait TxPaymentEgldOnly<Env>: TxPayment<Env>
+pub trait TxPaymentEgldOnly<Env>: TxPayment<Env> + AnnotatedValue<Env, BigUint<Env::Api>>
 where
     Env: TxEnv,
 {
-    fn with_egld_value<F, R>(&self, f: F) -> R
+    fn with_egld_value<F, R>(&self, env: &Env, f: F) -> R
     where
-        F: FnOnce(&BigUint<Env::Api>) -> R;
+        F: FnOnce(&BigUint<Env::Api>) -> R,
+    {
+        self.with_value_ref(env, f)
+    }
 
-    fn into_egld_payment(self, env: &Env) -> BigUint<Env::Api>;
+    fn into_egld_payment(self, env: &Env) -> BigUint<Env::Api> {
+        self.into_value(env)
+    }
 }
 
 #[derive(Clone)]

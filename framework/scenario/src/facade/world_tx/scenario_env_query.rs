@@ -3,14 +3,15 @@ use std::path::PathBuf;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        AnnotatedValue, FunctionCall, ManagedAddress, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        AnnotatedValue, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv,
+        TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
 };
 
 use crate::{
-    api::StaticApi, scenario_model::TxResponse, ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun,
-    ScenarioWorld,
+    api::StaticApi,
+    scenario_model::{TxExpect, TxResponse},
+    ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
 
 use super::scenario_env_util::*;
@@ -23,12 +24,18 @@ pub struct ScenarioEnvQuery<'w> {
 impl<'w> TxEnv for ScenarioEnvQuery<'w> {
     type Api = StaticApi;
 
+    type RHExpect = TxExpect;
+
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
         panic!("Explicit sender address expected")
     }
 
-    fn default_gas(&self) -> u64 {
-        self.data.default_gas()
+    fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api> {
+        self.data.default_gas_annotation()
+    }
+
+    fn default_gas_value(&self) -> u64 {
+        self.data.default_gas_value()
     }
 }
 
@@ -49,6 +56,7 @@ where
 
     fn run(self) -> Self::Returns {
         let mut step = tx_to_sc_query_step(&self.env, self.to, self.data);
+        step.expect = Some(self.result_handler.list_tx_expect());
         self.env.world.sc_query(&mut step);
         process_result(step.response, self.result_handler)
     }
@@ -74,6 +82,7 @@ impl ScenarioWorld {
         let tx = f(tx_base);
         let mut step = tx_to_sc_query_step(&tx.env, tx.to, tx.data);
         self.sc_query(&mut step);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         process_result(step.response, tx.result_handler);
         self
     }

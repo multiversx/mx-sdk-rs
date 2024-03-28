@@ -9,13 +9,13 @@ publish = false
 path = "src/fractional_nfts.rs"
 
 [dependencies.multiversx-sc]
-version = "0.47.7"
+version = "0.48.0-alpha.1"
 path = "../../../framework/base"
 
 [dependencies.multiversx-sc-modules]
-version = "0.47.7"
+version = "0.48.0-alpha.1"
 path = "../../../contracts/modules"
 
 [dev-dependencies.multiversx-sc-scenario]
-version = "0.47.7"
+version = "0.48.0-alpha.1"
 path = "../../../framework/scenario"

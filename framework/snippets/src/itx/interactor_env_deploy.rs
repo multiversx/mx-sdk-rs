@@ -66,9 +66,10 @@ where
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
-        let mut sc_deploy_step = self.sc_deploy_step;
-        self.world.sc_deploy(&mut sc_deploy_step).await;
-        process_result(sc_deploy_step.response, self.result_handler)
+        let mut step = self.sc_deploy_step;
+        step.expect = Some(self.result_handler.list_tx_expect());
+        self.world.sc_deploy(&mut step).await;
+        process_result(step.response, self.result_handler)
     }
 }
 
@@ -96,6 +97,7 @@ impl Interactor {
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
         let mut step = tx_to_sc_deploy_step(&tx.env, tx.from, tx.payment, tx.gas, tx.data);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         self.sc_deploy(&mut step).await;
         process_result(step.response, tx.result_handler);
         self
@@ -128,6 +130,7 @@ impl Interactor {
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
         let mut step = tx_to_sc_deploy_step(&tx.env, tx.from, tx.payment, tx.gas, tx.data);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         self.sc_deploy(&mut step).await;
         process_result(step.response, tx.result_handler)
     }

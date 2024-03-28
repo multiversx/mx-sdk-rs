@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-derive"
-version = "0.47.7"
+version = "0.48.0-alpha.1"
 edition = "2021"
 
 authors = ["Andrei Marinica <andrei.marinica@multiversx.com>", "MultiversX <contact@multiversx.com>"]

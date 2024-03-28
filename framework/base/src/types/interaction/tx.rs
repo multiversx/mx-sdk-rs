@@ -1,22 +1,22 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    proxy_imports::{EgldOrMultiEsdtPaymentRefs, EsdtTokenPaymentRefs, TokenIdentifier},
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, ManagedAddress,
-        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPaymentRefs,
+        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedOption,
+        ManagedVec, MultiEsdtPayment, TokenIdentifier,
     },
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase, Code,
+    contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
     ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
     RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
-    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
+    TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -229,26 +229,10 @@ where
     }
 
     /// Adds a collection of ESDT payments to a transaction.
-    pub fn multi_esdt(
-        self,
-        payments: MultiEsdtPayment<Env::Api>, // TODO: references
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: payments,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
-    }
-
-    /// Sets a reference to multiple ESDT payments.
-    pub fn multi_esdt_ref(
-        self,
-        payments: &MultiEsdtPayment<Env::Api>,
-    ) -> Tx<Env, From, To, &MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    pub fn multi_esdt<Payment>(self, payments: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    where
+        Payment: TxPaymentMultiEsdt<Env>,
+    {
         Tx {
             env: self.env,
             from: self.from,
@@ -385,10 +369,30 @@ where
 {
     /// Sets an explicit gas limit to the call.
     #[inline]
+    pub fn gas<GasValue>(
+        self,
+        gas_value: GasValue,
+    ) -> Tx<Env, From, To, Payment, ExplicitGas<GasValue>, Data, RH>
+    where
+        GasValue: TxGasValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: ExplicitGas(gas_value),
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Backwards compatibility.
+    #[inline]
     pub fn with_gas_limit(
         self,
         gas_limit: u64,
-    ) -> Tx<Env, From, To, Payment, ExplicitGas, Data, RH> {
+    ) -> Tx<Env, From, To, Payment, ExplicitGas<u64>, Data, RH> {
         Tx {
             env: self.env,
             from: self.from,
@@ -667,6 +671,74 @@ where
     }
 }
 
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn raw_upgrade(self) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, RH> {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: UpgradeCall::default(),
+            result_handler: self.result_handler,
+        }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn code<CodeValue>(
+        self,
+        code: CodeValue,
+    ) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, Code<CodeValue>>, RH>
+    where
+        CodeValue: TxCodeValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data.code_source(Code(code)),
+            result_handler: self.result_handler,
+        }
+    }
+
+    pub fn from_source<FromSourceValue>(
+        self,
+        source_address: FromSourceValue,
+    ) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, FromSource<FromSourceValue>>, RH>
+    where
+        FromSourceValue: TxFromSourceValue<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data.code_source(FromSource(source_address)),
+            result_handler: self.result_handler,
+        }
+    }
+}
+
 impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, DeployCall<Env, ()>, RH>
 where
     Env: TxEnv,
@@ -715,6 +787,35 @@ where
 
 impl<Env, From, To, Payment, Gas, CodeSource, RH>
     Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    CodeSource: TxCodeSource<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn code_metadata(mut self, code_metadata: CodeMetadata) -> Self {
+        self.data = self.data.code_metadata(code_metadata);
+        self
+    }
+
+    #[inline]
+    pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
+        self.data = self.data.argument(arg);
+        self
+    }
+
+    #[inline]
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
+        self.data.arg_buffer = raw;
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, CodeSource>, RH>
 where
     Env: TxEnv,
     From: TxFrom<Env>,

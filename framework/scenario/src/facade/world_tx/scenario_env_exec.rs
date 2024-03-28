@@ -12,7 +12,7 @@ use multiversx_sc::{
 
 use crate::{
     api::StaticApi,
-    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
+    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
@@ -27,12 +27,18 @@ pub struct ScenarioEnvExec<'w> {
 impl<'w> TxEnv for ScenarioEnvExec<'w> {
     type Api = StaticApi;
 
+    type RHExpect = TxExpect;
+
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api> {
         panic!("Explicit sender address expected")
     }
 
-    fn default_gas(&self) -> u64 {
-        self.data.default_gas()
+    fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api> {
+        self.data.default_gas_annotation()
+    }
+
+    fn default_gas_value(&self) -> u64 {
+        self.data.default_gas_value()
     }
 }
 
@@ -63,6 +69,7 @@ where
             self.gas,
             self.data,
         );
+        step.expect = Some(self.result_handler.list_tx_expect());
         self.env.world.sc_call(&mut step);
         process_result(step.response, self.result_handler)
     }
@@ -91,6 +98,7 @@ impl ScenarioWorld {
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
         let mut step = tx_to_sc_call_step(&tx.env, tx.from, tx.to, tx.payment, tx.gas, tx.data);
+        step.expect = Some(tx.result_handler.list_tx_expect());
         self.sc_call(&mut step);
         process_result(step.response, tx.result_handler);
         self

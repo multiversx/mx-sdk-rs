@@ -12,7 +12,7 @@ impl<Env> TxPayment<Env> for ()
 where
     Env: TxEnv,
 {
-    fn is_no_payment(&self) -> bool {
+    fn is_no_payment(&self, _env: &Env) -> bool {
         true
     }
 
@@ -47,18 +47,4 @@ where
     }
 }
 
-impl<Env> TxPaymentEgldOnly<Env> for ()
-where
-    Env: TxEnv,
-{
-    fn with_egld_value<F, R>(&self, f: F) -> R
-    where
-        F: FnOnce(&BigUint<Env::Api>) -> R,
-    {
-        f(&BigUint::zero())
-    }
-
-    fn into_egld_payment(self, _env: &Env) -> BigUint<Env::Api> {
-        BigUint::zero()
-    }
-}
+impl<Env> TxPaymentEgldOnly<Env> for () where Env: TxEnv {}

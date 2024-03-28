@@ -1,4 +1,5 @@
 [settings]
+proxy-paths = ["tests/pmf_proxy.rs"]
 main = "main"
 
 [contracts.main]

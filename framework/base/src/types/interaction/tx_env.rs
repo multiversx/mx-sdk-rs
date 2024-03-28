@@ -1,9 +1,17 @@
-use crate::{api::CallTypeApi, types::ManagedAddress};
+use crate::{
+    api::CallTypeApi,
+    types::{ManagedAddress, ManagedBuffer},
+};
 
 pub trait TxEnv: Sized {
     type Api: CallTypeApi;
 
+    /// Type built by result handlers that translates into the "expect" section in scenarios.
+    type RHExpect: Default;
+
     fn resolve_sender_address(&self) -> ManagedAddress<Self::Api>;
 
-    fn default_gas(&self) -> u64;
+    fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api>;
+
+    fn default_gas_value(&self) -> u64;
 }

@@ -40,7 +40,7 @@ pub trait EsdtTransferWithFee {
         }
         self.paid_fees().clear();
 
-        self.tx().to(ToCaller).multi_esdt_ref(&fees).transfer();
+        self.tx().to(ToCaller).multi_esdt(&fees).transfer();
     }
 
     #[payable("*")]
