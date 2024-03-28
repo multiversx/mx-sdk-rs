@@ -12,7 +12,6 @@ pub mod crypto_features;
 pub mod echo;
 pub mod echo_managed;
 pub mod elliptic_curve_features;
-pub mod encode_error_proxy;
 pub mod event_features;
 pub mod macro_features;
 pub mod managed_address_features;
