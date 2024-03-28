@@ -39,7 +39,7 @@ pub use managed_vec_ref_iter::ManagedVecRefIterator;
 pub use randomness_source::RandomnessSource;
 pub use token_identifier::TokenIdentifier;
 
-pub use self::traits::{
+pub use traits::{
     fixed_token_supply::FixedSupplyToken,
     mergeable::{ExternallyMergeable, Mergeable},
 };

@@ -1,0 +1,17 @@
+[package]
+name = "exchange-features"
+version = "0.0.0"
+authors = ["you"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/exchange_features.rs"
+
+[dependencies.multiversx-sc]
+version = "0.47.8"
+path = "../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.47.8"
+path = "../../../framework/scenario"
