@@ -16,7 +16,7 @@ use super::{
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
     RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
     TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -229,26 +229,10 @@ where
     }
 
     /// Adds a collection of ESDT payments to a transaction.
-    pub fn multi_esdt(
-        self,
-        payments: MultiEsdtPayment<Env::Api>, // TODO: references
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: payments,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
-    }
-
-    /// Sets a reference to multiple ESDT payments.
-    pub fn multi_esdt_ref(
-        self,
-        payments: &MultiEsdtPayment<Env::Api>,
-    ) -> Tx<Env, From, To, &MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+    pub fn multi_esdt<Payment>(self, payments: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    where
+        Payment: TxPaymentMultiEsdt<Env>,
+    {
         Tx {
             env: self.env,
             from: self.from,

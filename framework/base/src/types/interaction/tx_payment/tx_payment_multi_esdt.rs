@@ -1,9 +1,26 @@
+use core::ops::Deref;
+
 use crate::{
     contract_base::SendRawWrapper,
+    proxy_imports::ManagedRef,
     types::{BigUint, ManagedAddress, ManagedVec, MultiEsdtPayment, TxFrom, TxToSpecified},
 };
 
 use super::{AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment};
+
+/// Indicates that a payment object contains a multi-ESDT payment.
+pub trait TxPaymentMultiEsdt<Env>: TxPayment<Env>
+where
+    Env: TxEnv,
+{
+}
+
+impl<Env> TxPaymentMultiEsdt<Env> for MultiEsdtPayment<Env::Api> where Env: TxEnv {}
+impl<Env> TxPaymentMultiEsdt<Env> for &MultiEsdtPayment<Env::Api> where Env: TxEnv {}
+impl<'a, Env> TxPaymentMultiEsdt<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>> where
+    Env: TxEnv
+{
+}
 
 impl<Env> TxPayment<Env> for &MultiEsdtPayment<Env::Api>
 where
@@ -57,6 +74,46 @@ where
             egld: None,
             multi_esdt: self.clone(),
         }
+    }
+}
+
+impl<'a, Env> TxPayment<Env> for ManagedRef<'a, Env::Api, MultiEsdtPayment<Env::Api>>
+where
+    Env: TxEnv,
+{
+    fn is_no_payment(&self, _env: &Env) -> bool {
+        self.deref().is_empty()
+    }
+
+    fn perform_transfer_execute(
+        self,
+        env: &Env,
+        to: &ManagedAddress<Env::Api>,
+        gas_limit: u64,
+        fc: FunctionCall<Env::Api>,
+    ) {
+        self.deref()
+            .perform_transfer_execute(env, to, gas_limit, fc)
+    }
+
+    fn with_normalized<From, To, F, R>(
+        self,
+        env: &Env,
+        from: &From,
+        to: To,
+        fc: FunctionCall<Env::Api>,
+        f: F,
+    ) -> R
+    where
+        From: TxFrom<Env>,
+        To: TxToSpecified<Env>,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+    {
+        self.deref().with_normalized(env, from, to, fc, f)
+    }
+
+    fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
+        self.deref().into_full_payment_data(env)
     }
 }
 

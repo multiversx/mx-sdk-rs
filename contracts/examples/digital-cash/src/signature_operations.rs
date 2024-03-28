@@ -83,7 +83,7 @@ pub trait SignatureOperationsModule: storage::StorageModule + helpers::HelpersMo
         if !deposit.esdt_funds.is_empty() {
             self.tx()
                 .to(&caller_address)
-                .multi_esdt_ref(&deposit.esdt_funds)
+                .multi_esdt(&deposit.esdt_funds)
                 .transfer();
         }
         if deposited_fee.amount > 0 {

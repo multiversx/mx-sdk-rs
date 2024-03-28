@@ -120,7 +120,7 @@ pub trait TokenMergeModule:
 
         self.tx()
             .to(ToCaller)
-            .multi_esdt_ref(&output_payments)
+            .multi_esdt(&output_payments)
             .transfer();
 
         output_payments
@@ -169,7 +169,7 @@ pub trait TokenMergeModule:
 
         self.tx()
             .to(ToCaller)
-            .multi_esdt_ref(&tokens_to_remove)
+            .multi_esdt(&tokens_to_remove)
             .transfer();
 
         tokens_to_remove
