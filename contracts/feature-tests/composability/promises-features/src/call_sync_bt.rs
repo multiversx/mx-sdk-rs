@@ -13,12 +13,13 @@ pub trait BackTransfersFeatureModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        let ((), back_transfers) = self
+        let back_transfers = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .execute_on_dest_context_with_back_transfers::<()>();
+            .returns(ReturnsBackTransfers)
+            .sync_call();
 
         require!(
             back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
@@ -39,12 +40,13 @@ pub trait BackTransfersFeatureModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        let ((), back_transfers) = self
+        let back_transfers = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .execute_on_dest_context_with_back_transfers::<()>();
+            .returns(ReturnsBackTransfers)
+            .sync_call();
 
         require!(
             back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
@@ -56,12 +58,13 @@ pub trait BackTransfersFeatureModule {
             &back_transfers.esdt_payments.into_multi_value(),
         );
 
-        let ((), back_transfers) = self
+        let back_transfers = self
             .tx()
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .execute_on_dest_context_with_back_transfers::<()>();
+            .returns(ReturnsBackTransfers)
+            .sync_call();
 
         require!(
             back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,

@@ -19,7 +19,6 @@ pub trait CallPromisesModule: common::CommonModule {
             .accept_funds()
             .with_gas_limit(gas_limit)
             .with_egld_or_single_esdt_transfer(payment)
-            .async_call()
             .register_promise();
     }
 
@@ -38,7 +37,6 @@ pub trait CallPromisesModule: common::CommonModule {
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .with_gas_limit(gas_limit)
-            .async_call()
             .with_callback(self.callbacks().retrieve_funds_callback())
             .with_extra_gas_for_callback(10_000_000)
             .register_promise();
