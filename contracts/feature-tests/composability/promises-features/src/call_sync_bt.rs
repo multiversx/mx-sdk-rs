@@ -1,11 +1,10 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 
 /// Not directly related to promises, but this contract already has the setup for VM 1.5.
 #[multiversx_sc::module]
 pub trait BackTransfersFeatureModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     fn forward_sync_retrieve_funds_bt(
         &self,
@@ -14,11 +13,13 @@ pub trait BackTransfersFeatureModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        let ((), back_transfers) = self
-            .vault_proxy()
-            .contract(to)
+        let back_transfers = self
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .execute_on_dest_context_with_back_transfers::<()>();
+            .returns(ReturnsBackTransfers)
+            .sync_call();
 
         require!(
             back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
@@ -39,11 +40,13 @@ pub trait BackTransfersFeatureModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        let ((), back_transfers) = self
-            .vault_proxy()
-            .contract(to.clone())
+        let back_transfers = self
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
-            .execute_on_dest_context_with_back_transfers::<()>();
+            .returns(ReturnsBackTransfers)
+            .sync_call();
 
         require!(
             back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,
@@ -55,11 +58,13 @@ pub trait BackTransfersFeatureModule {
             &back_transfers.esdt_payments.into_multi_value(),
         );
 
-        let ((), back_transfers) = self
-            .vault_proxy()
-            .contract(to)
+        let back_transfers = self
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .execute_on_dest_context_with_back_transfers::<()>();
+            .returns(ReturnsBackTransfers)
+            .sync_call();
 
         require!(
             back_transfers.esdt_payments.len() == 1 || back_transfers.total_egld_amount != 0,

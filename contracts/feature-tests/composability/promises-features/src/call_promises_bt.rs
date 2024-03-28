@@ -1,13 +1,12 @@
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-use crate::common::{self, CallbackData};
-
+use crate::{
+    common::{self, CallbackData},
+    vault_proxy,
+};
 #[multiversx_sc::module]
 pub trait CallPromisesBackTransfersModule: common::CommonModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     fn forward_promise_retrieve_funds_back_transfers(
         &self,
@@ -17,14 +16,15 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
         amount: BigUint,
     ) {
         let gas_limit = self.blockchain().get_gas_left() - 20_000_000;
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .with_gas_limit(gas_limit)
-            .async_call_promise()
+            .async_call()
             .with_callback(self.callbacks().retrieve_funds_back_transfers_callback())
             .with_extra_gas_for_callback(10_000_000)
-            .register_promise()
+            .register_promise();
     }
 
     #[promises_callback]
