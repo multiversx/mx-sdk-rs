@@ -1,11 +1,10 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 
 /// Not directly related to promises, but this contract already has the setup for VM 1.5.
 #[multiversx_sc::module]
 pub trait BackTransfersFeatureModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     fn forward_sync_retrieve_funds_bt(
         &self,
@@ -15,8 +14,9 @@ pub trait BackTransfersFeatureModule {
         amount: BigUint,
     ) {
         let ((), back_transfers) = self
-            .vault_proxy()
-            .contract(to)
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .execute_on_dest_context_with_back_transfers::<()>();
 
@@ -40,8 +40,9 @@ pub trait BackTransfersFeatureModule {
         amount: BigUint,
     ) {
         let ((), back_transfers) = self
-            .vault_proxy()
-            .contract(to.clone())
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token.clone(), token_nonce, amount.clone())
             .execute_on_dest_context_with_back_transfers::<()>();
 
@@ -56,8 +57,9 @@ pub trait BackTransfersFeatureModule {
         );
 
         let ((), back_transfers) = self
-            .vault_proxy()
-            .contract(to)
+            .tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .execute_on_dest_context_with_back_transfers::<()>();
 

@@ -1,6 +1,9 @@
 [settings]
 main = "main"
-proxy-paths = ["../forwarder/src/vault_proxy.rs"]
+proxy-paths = [
+    "../forwarder/src/vault_proxy.rs",
+    "../promises-features/src/vault_proxy.rs",
+]
 
 [contracts.main]
 name = "vault"
