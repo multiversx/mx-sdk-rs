@@ -79,7 +79,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
         where
             A: multiversx_sc::api::VMApi + 'static,
         {
-            pub address: multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+            _phantom: core::marker::PhantomData<A>,
         }
 
         impl<A> multiversx_sc::contract_base::ProxyObjBase for Proxy<A>
@@ -87,17 +87,7 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
             A: multiversx_sc::api::VMApi + 'static,
         {
             type Api = A;
-
-            fn new_proxy_obj() -> Self {
-                Proxy {
-                    address: multiversx_sc::types::ManagedOption::none(),
-                }
-            }
-
-            fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self {
-                self.address = multiversx_sc::types::ManagedOption::some(address);
-                self
-            }
+            type To = ();
 
             fn extract_opt_address(
                 &mut self,
@@ -105,11 +95,75 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
                 Self::Api,
                 multiversx_sc::types::ManagedAddress<Self::Api>,
             > {
-                core::mem::replace(&mut self.address, multiversx_sc::types::ManagedOption::none())
+                multiversx_sc::types::ManagedOption::none()
             }
 
             fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<Self::Api> {
-                self.extract_opt_address().unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
+                multiversx_sc::api::ErrorApiImpl::signal_error(
+                    &<A as multiversx_sc::api::ErrorApi>::error_api_impl(),
+                    multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET.as_bytes(),
+                )
+            }
+
+            fn extract_proxy_to(&mut self) -> Self::To {}
+        }
+
+        impl<A> multiversx_sc::contract_base::ProxyObjNew for Proxy<A>
+        where
+            A: multiversx_sc::api::VMApi + 'static,
+        {
+            type ProxyTo = ProxyTo<A>;
+
+            fn new_proxy_obj() -> Self {
+                Proxy {
+                    _phantom: core::marker::PhantomData,
+                }
+            }
+
+            fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self::ProxyTo {
+                ProxyTo {
+                    address: multiversx_sc::types::ManagedOption::some(address)
+                }
+            }
+        }
+
+        pub struct ProxyTo<A>
+        where
+            A: multiversx_sc::api::VMApi + 'static,
+        {
+            pub address:
+                multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+        }
+
+        impl<A> multiversx_sc::contract_base::ProxyObjBase for ProxyTo<A>
+        where
+            A: multiversx_sc::api::VMApi + 'static,
+        {
+            type Api = A;
+            type To = multiversx_sc::types::ManagedAddress<A>;
+
+            fn extract_opt_address(
+                &mut self,
+            ) -> multiversx_sc::types::ManagedOption<
+                Self::Api,
+                multiversx_sc::types::ManagedAddress<Self::Api>,
+            > {
+                core::mem::replace(
+                    &mut self.address,
+                    multiversx_sc::types::ManagedOption::none(),
+                )
+            }
+
+            fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<Self::Api> {
+                let address = core::mem::replace(
+                    &mut self.address,
+                    multiversx_sc::types::ManagedOption::none(),
+                );
+                address.unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
+            }
+
+            fn extract_proxy_to(&mut self) -> Self::To {
+                self.extract_address()
             }
         }
     }

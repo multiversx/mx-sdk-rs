@@ -107,6 +107,10 @@ impl TypeAbi for CodeMetadata {
     fn type_name() -> TypeName {
         "CodeMetadata".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "CodeMetadata".into()
+    }
 }
 
 impl SCDisplay for CodeMetadata {

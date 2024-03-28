@@ -2,6 +2,7 @@ use super::*;
 use crate::arrayvec::ArrayVec;
 use alloc::{
     boxed::Box,
+    format,
     string::{String, ToString},
     vec::Vec,
 };
@@ -19,6 +20,10 @@ impl<T: TypeAbi> TypeAbi for &T {
         T::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -27,6 +32,10 @@ impl<T: TypeAbi> TypeAbi for &T {
 impl<T: TypeAbi> TypeAbi for Box<T> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Box<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -46,6 +55,11 @@ impl<T: TypeAbi> TypeAbi for &[T] {
         repr
     }
 
+    fn type_name_rust() -> TypeName {
+        // we need to convert to an owned type
+        format!("Box<[{}]>", T::type_name_rust())
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -54,6 +68,10 @@ impl<T: TypeAbi> TypeAbi for &[T] {
 impl<T: TypeAbi> TypeAbi for Vec<T> {
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Vec<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -66,6 +84,10 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
         <&[T]>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        format!("ArrayVec<{}, {}usize>", T::type_name_rust(), CAP)
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
@@ -74,6 +96,10 @@ impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Box<[{}]>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -87,15 +113,23 @@ impl TypeAbi for String {
     }
 }
 
-impl TypeAbi for &str {
+impl TypeAbi for &'static str {
     fn type_name() -> TypeName {
-        TypeName::type_name()
+        String::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "&'static str".into()
     }
 }
 
 impl TypeAbi for Box<str> {
     fn type_name() -> TypeName {
-        TypeName::type_name()
+        String::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "Box<str>".into()
     }
 }
 
@@ -128,10 +162,11 @@ type_abi_name_only!(bool, "bool");
 
 impl<T: TypeAbi> TypeAbi for Option<T> {
     fn type_name() -> TypeName {
-        let mut repr = TypeName::from("Option<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        format!("Option<{}>", T::type_name())
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Option<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -142,6 +177,14 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "Result<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Similar to the SCResult implementation.
@@ -162,8 +205,7 @@ macro_rules! tuple_impls {
                 $($name: TypeAbi,)+
             {
 				fn type_name() -> TypeName {
-					let mut repr = TypeName::from("tuple");
-					repr.push_str("<");
+					let mut repr = TypeName::from("tuple<");
 					$(
 						if $n > 0 {
 							repr.push(',');
@@ -171,6 +213,18 @@ macro_rules! tuple_impls {
 						repr.push_str($name::type_name().as_str());
                     )+
 					repr.push('>');
+					repr
+				}
+
+                fn type_name_rust() -> TypeName {
+					let mut repr = TypeName::from("(");
+					$(
+						if $n > 0 {
+							repr.push_str(", ");
+						}
+						repr.push_str($name::type_name_rust().as_str());
+                    )+
+					repr.push(')');
 					repr
 				}
 
@@ -210,6 +264,15 @@ impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
         repr.push('<');
         repr.push_str(T::type_name().as_str());
         repr.push('>');
+        repr
+    }
+
+    fn type_name_rust() -> TypeName {
+        let mut repr = TypeName::from("[");
+        repr.push_str(T::type_name_rust().as_str());
+        repr.push_str("; ");
+        repr.push_str(N.to_string().as_str());
+        repr.push(']');
         repr
     }
 

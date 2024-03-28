@@ -27,6 +27,11 @@ pub fn generate_function_selector_body(contract: &ContractTrait) -> proc_macro2:
                 "init",
                 quote! { if !<Self::Api as multiversx_sc::api::VMApi>::external_view_init_override() },
             )),
+            PublicRole::Upgrade(_) => Some(endpoint_match_arm(
+                m,
+                "upgrade",
+                quote! {},
+            )),
             PublicRole::Endpoint(endpoint_metadata) => Some(endpoint_match_arm(
                 m,
                 endpoint_metadata.public_name.to_string().as_str(),

@@ -48,8 +48,16 @@ pub fn proxy(
 
 #[proc_macro_derive(TypeAbi)]
 pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let ast = syn::parse(input).unwrap();
-    type_abi_derive::type_abi_derive(&ast)
+    type_abi_derive::type_abi_derive(input).into()
+}
+
+#[proc_macro_attribute]
+pub fn type_abi(
+    args: proc_macro::TokenStream,
+    input: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    assert!(args.is_empty(), "#[type_abi] attribute takes no args");
+    type_abi_derive::type_abi_full(input).into()
 }
 
 #[proc_macro_derive(ManagedVecItem)]

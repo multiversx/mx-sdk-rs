@@ -106,6 +106,10 @@ where
         MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
     }
 
+    fn type_name_rust() -> TypeName {
+        "EsdtTokenPaymentMultiValue<$API>".into()
+    }
+
     fn is_variadic() -> bool {
         true
     }

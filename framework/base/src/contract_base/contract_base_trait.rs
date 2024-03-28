@@ -2,7 +2,10 @@ use super::{
     BlockchainWrapper, CallValueWrapper, CryptoWrapper, ErrorHelper, ManagedSerializer,
     SendRawWrapper, SendWrapper, StorageRawWrapper,
 };
-use crate::api::VMApi;
+use crate::{
+    api::VMApi,
+    types::{Tx, TxBaseWithEnv, TxScEnv},
+};
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -24,6 +27,12 @@ pub trait ContractBase: Sized {
     #[inline]
     fn send(&self) -> SendWrapper<Self::Api> {
         SendWrapper::new()
+    }
+
+    /// Starts the declaration of a new transaction.
+    #[inline]
+    fn tx(&self) -> TxBaseWithEnv<TxScEnv<Self::Api>> {
+        Tx::new_tx_from_sc()
     }
 
     /// Low-level functionality related to sending transactions from the current contract.

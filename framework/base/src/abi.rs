@@ -19,3 +19,18 @@ pub use type_description::*;
 pub use type_description_container::*;
 
 pub type TypeName = alloc::string::String;
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TypeNames {
+    pub abi: alloc::string::String,
+    pub rust: alloc::string::String,
+}
+
+impl TypeNames {
+    pub const fn new() -> Self {
+        TypeNames {
+            abi: alloc::string::String::new(),
+            rust: alloc::string::String::new(),
+        }
+    }
+}

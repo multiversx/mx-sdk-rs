@@ -98,11 +98,11 @@ impl ScDeployStep {
     /// Sets following fields based on the smart contract proxy:
     /// - "function"
     /// - "arguments"
-    pub fn call<OriginalResult>(
-        mut self,
-        contract_deploy: ContractDeploy<StaticApi, OriginalResult>,
-    ) -> TypedScDeploy<OriginalResult> {
-        let (_, mandos_args) = process_contract_deploy(contract_deploy);
+    pub fn call<OriginalResult, CD>(mut self, contract_deploy: CD) -> TypedScDeploy<OriginalResult>
+    where
+        CD: Into<ContractDeploy<StaticApi, OriginalResult>>,
+    {
+        let (_, mandos_args) = process_contract_deploy(contract_deploy.into());
         for arg in mandos_args {
             self = self.argument(arg.as_str());
         }

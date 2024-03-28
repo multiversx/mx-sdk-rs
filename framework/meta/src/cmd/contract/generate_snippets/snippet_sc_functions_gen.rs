@@ -133,7 +133,7 @@ fn write_endpoint_args_declaration(file: &mut File, inputs: &[InputAbi]) {
     }
 
     for input in inputs {
-        let rust_type = map_abi_type_to_rust_type(input.type_name.clone());
+        let rust_type = map_abi_type_to_rust_type(input.type_names.abi.clone());
         writeln!(
             file,
             "        let {} = {};",
@@ -205,7 +205,7 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
     .unwrap();
 }
 
-fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
+pub fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
     let results_len = outputs.len();
     if results_len == 0 {
         return "()".to_string();
@@ -220,7 +220,7 @@ fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
     }
 
     for (i, output) in outputs.iter().enumerate() {
-        input_str += &output.type_name;
+        input_str += &output.type_names.abi;
 
         if i < results_len - 1 {
             input_str += ",";

@@ -28,9 +28,20 @@ pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 ///
 /// In both cases the framework hides all the magic, the developer shouldn't worry about it.
 #[derive(TopEncode)]
-pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
+pub struct CallbackClosure<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
     pub(super) callback_name: &'static str,
     pub(super) closure_args: ManagedArgBuffer<M>,
+}
+
+pub struct CallbackClosureWithGas<M>
+where
+    M: ManagedTypeApi + ErrorApi,
+{
+    pub(super) closure: CallbackClosure<M>,
+    pub(super) gas_for_callback: u64,
 }
 
 /// Syntactical sugar to help macros to generate code easier.

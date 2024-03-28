@@ -1,10 +1,9 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait ChangeOwnerModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint(changeOwnerAddress)]
     fn change_owner(
         &self,
@@ -20,9 +19,11 @@ pub trait ChangeOwnerModule {
     }
 
     fn get_owner_of_vault_contract(&self, address: ManagedAddress) -> ManagedAddress {
-        self.vault_proxy()
-            .contract(address)
+        self.tx()
+            .to(&address)
+            .typed(vault_proxy::VaultProxy)
             .get_owner_address()
-            .execute_on_dest_context()
+            .returns(ReturnsResult)
+            .sync_call()
     }
 }

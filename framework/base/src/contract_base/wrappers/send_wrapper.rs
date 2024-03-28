@@ -14,7 +14,8 @@ use crate::{
     esdt::ESDTSystemSmartContractProxy,
     types::{
         BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-        ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, TokenIdentifier,
+        GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
+        ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
     },
 };
 
@@ -74,7 +75,7 @@ where
     /// Used especially for sending EGLD to regular accounts.
     #[inline]
     pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
-        self.send_raw_wrapper().direct_egld(to, amount, Empty)
+        Tx::new_tx_from_sc().to(to).egld(amount).transfer();
     }
 
     /// Sends EGLD to a given address, directly.
@@ -82,11 +83,10 @@ where
     ///
     /// If the amount is 0, it returns without error.
     pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
-        if amount == &0 {
-            return;
-        }
-
-        self.direct_egld(to, amount)
+        Tx::new_tx_from_sc()
+            .to(to)
+            .egld(amount)
+            .transfer_if_not_empty();
     }
 
     /// Sends either EGLD, ESDT or NFT to the target address,
@@ -188,16 +188,17 @@ where
     }
 
     /// Sends a single ESDT transfer to target address.
-    #[inline]
-    #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt(
         &self,
         to: &ManagedAddress<A>,
         token_identifier: &TokenIdentifier<A>,
-        nonce: u64,
+        token_nonce: u64,
         amount: &BigUint<A>,
     ) {
-        self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
+        Tx::new_tx_from_sc()
+            .to(to)
+            .single_esdt(token_identifier, token_nonce, amount)
+            .transfer();
     }
 
     /// Sends a single ESDT transfer to target address.
@@ -290,13 +291,7 @@ where
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
     ) {
-        let _ = self.send_raw_wrapper().multi_esdt_transfer_execute(
-            to,
-            payments,
-            0,
-            &ManagedBuffer::new(),
-            &ManagedArgBuffer::new(),
-        );
+        Tx::new_tx_from_sc().to(to).multi_esdt(payments).transfer();
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
@@ -314,10 +309,10 @@ where
         nonce: u64,
         amount: BigUint<A>,
     ) -> ! {
-        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-            .with_esdt_transfer((token, nonce, amount))
-            .async_call()
-            .call_and_exit_ignore_callback()
+        Tx::new_tx_from_sc()
+            .to(to)
+            .esdt((token, nonce, amount))
+            .async_call_and_exit()
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
@@ -339,10 +334,7 @@ where
         if amount == 0 {
             return;
         }
-        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-            .with_esdt_transfer((token, nonce, amount))
-            .async_call()
-            .call_and_exit_ignore_callback()
+        self.transfer_esdt_via_async_call(to, token, nonce, amount)
     }
 
     /// Sends multiple ESDT tokens to a target address, via an async call.
@@ -351,10 +343,10 @@ where
         to: ManagedAddress<A>,
         payments: ManagedVec<A, EsdtTokenPayment<A>>,
     ) -> ! {
-        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
-            .with_multi_token_transfer(payments)
-            .async_call()
-            .call_and_exit_ignore_callback()
+        Tx::new_tx_from_sc()
+            .to(to)
+            .multi_esdt(payments)
+            .async_call_and_exit()
     }
 
     /// Creates a call to the `ClaimDeveloperRewards` builtin function.
@@ -385,11 +377,31 @@ where
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<A>,
-        arg_buffer: &ManagedArgBuffer<A>,
+        endpoint_name: ManagedBuffer<A>,
+        arg_buffer: ManagedArgBuffer<A>,
     ) -> ManagedVec<A, ManagedBuffer<A>> {
-        self.send_raw_wrapper()
-            .call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(gas)
+            .raw_call()
+            .function_name(endpoint_name)
+            .arguments_raw(arg_buffer)
+            .returns(ReturnsRawResult)
+            .sync_call()
+    }
+
+    fn call_local_esdt_built_in_function_minimal(
+        &self,
+        function_name: &str,
+        arg_buffer: ManagedArgBuffer<A>,
+    ) {
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .raw_call()
+            .function_name(function_name)
+            .arguments_raw(arg_buffer)
+            .sync_call()
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -415,11 +427,7 @@ where
 
         arg_buffer.push_arg(amount);
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(func_name),
-            &arg_buffer,
-        );
+        self.call_local_esdt_built_in_function_minimal(func_name, arg_buffer);
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -461,11 +469,7 @@ where
 
         arg_buffer.push_arg(amount);
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(func_name),
-            &arg_buffer,
-        );
+        self.call_local_esdt_built_in_function_minimal(func_name, arg_buffer);
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.
@@ -554,8 +558,8 @@ where
 
         let output = self.call_local_esdt_built_in_function(
             A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
-            &arg_buffer,
+            ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
+            arg_buffer,
         );
 
         if let Some(first_result_bytes) = output.try_get(0) {
@@ -775,11 +779,7 @@ where
             arg_buffer.push_arg(uri);
         }
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(ESDT_NFT_ADD_URI_FUNC_NAME),
-            &arg_buffer,
-        );
+        self.call_local_esdt_built_in_function_minimal(ESDT_NFT_ADD_URI_FUNC_NAME, arg_buffer);
     }
 
     /// Changes attributes of an NFT, via a synchronous builtin function call.
@@ -794,10 +794,9 @@ where
         arg_buffer.push_arg(nft_nonce);
         arg_buffer.push_arg(new_attributes);
 
-        let _ = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            &ManagedBuffer::from(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME),
-            &arg_buffer,
+        self.call_local_esdt_built_in_function_minimal(
+            ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+            arg_buffer,
         );
     }
 }

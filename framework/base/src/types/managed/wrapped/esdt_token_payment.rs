@@ -10,12 +10,13 @@ use crate::{
         derive::{NestedEncode, TopEncode},
         IntoMultiValue, NestedDecode, TopDecode,
     },
-    derive::TypeAbi,
+    derive::type_abi,
 };
 
 use super::ManagedVec;
 
-#[derive(TopEncode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug)]
+#[type_abi]
+#[derive(TopEncode, NestedEncode, Clone, PartialEq, Eq, Debug)]
 pub struct EsdtTokenPayment<M: ManagedTypeApi> {
     pub token_identifier: TokenIdentifier<M>,
     pub token_nonce: u64,
@@ -219,5 +220,33 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         managed_vec_item_to_slice(&mut arr, &mut index, &self.amount);
 
         writer(&arr[..])
+    }
+}
+
+/// The version of `EsdtTokenPayment` that contains referrences instead of owned fields.
+pub struct EsdtTokenPaymentRefs<'a, M: ManagedTypeApi> {
+    pub token_identifier: &'a TokenIdentifier<M>,
+    pub token_nonce: u64,
+    pub amount: &'a BigUint<M>,
+}
+
+impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+    pub fn as_refs(&self) -> EsdtTokenPaymentRefs<'_, M> {
+        EsdtTokenPaymentRefs {
+            token_identifier: &self.token_identifier,
+            token_nonce: self.token_nonce,
+            amount: &self.amount,
+        }
+    }
+}
+
+impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
+    /// Will clone the referenced values.
+    pub fn to_owned_payment(&self) -> EsdtTokenPayment<M> {
+        EsdtTokenPayment {
+            token_identifier: self.token_identifier.clone(),
+            token_nonce: self.token_nonce,
+            amount: self.amount.clone(),
+        }
     }
 }

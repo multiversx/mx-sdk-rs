@@ -32,6 +32,7 @@ pub mod log_util;
 mod macros;
 pub mod non_zero_util;
 pub mod storage;
+pub mod tuple_util;
 pub mod types;
 
 pub use hex_call_data::*;
@@ -42,13 +43,13 @@ pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 pub mod imports {
     pub use crate::{
         abi::TypeAbi,
-        api::{ErrorApiImpl, ManagedTypeApi},
+        api::{ErrorApiImpl, ManagedTypeApi, VMApi},
         arrayvec::ArrayVec,
         codec::{
-            multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-            TopEncode,
+            multi_types::*, CodecFrom, CodecFromSelf, CodecInto, DecodeError, IntoMultiValue,
+            NestedDecode, NestedEncode, TopDecode, TopEncode,
         },
-        contract_base::{ContractBase, ProxyObjBase},
+        contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
         err_msg,
         esdt::*,
         io::*,
@@ -72,6 +73,11 @@ pub mod derive_imports {
             NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
             TopEncodeOrDefault,
         },
-        derive::{ManagedVecItem, TypeAbi},
+        derive::{type_abi, ManagedVecItem, TypeAbi},
     };
+}
+
+/// Conveniently groups all imports required for generated proxies.
+pub mod proxy_imports {
+    pub use crate::{derive_imports::*, imports::*};
 }

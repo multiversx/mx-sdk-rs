@@ -11,7 +11,7 @@ pub trait SendTxRepeat {
     #[endpoint]
     fn repeat(&self, to: ManagedAddress, amount: BigUint, times: usize) {
         for _ in 0..times {
-            self.send().direct_egld(&to, &amount);
+            self.tx().to(&to).egld(&amount).transfer();
         }
     }
 }

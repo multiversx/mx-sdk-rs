@@ -5,9 +5,10 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            3
+// Upgrade:                              1
+// Endpoints:                            2
 // Async Callback (empty):               1
-// Total number of exported functions:   5
+// Total number of exported functions:   4
 
 #![no_std]
 #![allow(internal_features)]
@@ -20,8 +21,8 @@ multiversx_sc_wasm_adapter::endpoints! {
     adder
     (
         init => init
-        getSum => sum
         upgrade => upgrade
+        getSum => sum
         add => add
     )
 }

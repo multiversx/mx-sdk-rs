@@ -14,6 +14,7 @@ files_include = [
     "tests",
     "Cargo.toml",
     "README.md",
+    "sc-config.toml",
     "multiversx.json",
     "interact/Cargo.toml",
     "interact/config.toml",

@@ -24,4 +24,9 @@ pub trait PanicMessageFeatures {
 
     #[event("before-panic")]
     fn before_panic(&self);
+
+    #[view]
+    fn sc_panic(&self) {
+        sc_panic!("sc_panic! test");
+    }
 }

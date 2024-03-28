@@ -172,6 +172,10 @@ where
     pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
         self.data
     }
+
+    pub fn iter_buffers(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
+        ManagedVecRefIterator::new(&self.data)
+    }
 }
 
 impl<M> ManagedArgBuffer<M>
@@ -302,5 +306,9 @@ where
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[ManagedBuffer<M>] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedArgBufer<$API>".into()
     }
 }

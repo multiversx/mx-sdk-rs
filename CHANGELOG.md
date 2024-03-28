@@ -26,6 +26,9 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.48.0-alpha.1] - 2024-03-27
+First pre-release of the unified syntax. Syntax not yet stabilized, should only be used for experimenting with various smart contracts.
+
 ## [sc 0.47.8] - 2024-03-22
 - Test coverage functionality in sc-meta.
 - Removed deprecation from legacy whitebox testing framework, since it is still used extensively.

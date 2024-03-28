@@ -2,6 +2,7 @@
 #[derive(Debug, Clone)]
 pub enum EndpointTypeMetadata {
     Init,
+    Upgrade,
     Endpoint,
     PromisesCallback,
 }
@@ -11,6 +12,9 @@ impl EndpointTypeMetadata {
         match self {
             EndpointTypeMetadata::Init => {
                 quote! { multiversx_sc::abi::EndpointTypeAbi::Init }
+            },
+            EndpointTypeMetadata::Upgrade => {
+                quote! { multiversx_sc::abi::EndpointTypeAbi::Upgrade }
             },
             EndpointTypeMetadata::Endpoint => {
                 quote! { multiversx_sc::abi::EndpointTypeAbi::Endpoint }

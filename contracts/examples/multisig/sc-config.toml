@@ -1,4 +1,5 @@
 [settings]
+proxy-paths = ["src/multisig_proxy.rs"]
 main = "main"
 
 [contracts.main]

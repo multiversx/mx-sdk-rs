@@ -13,6 +13,7 @@ pub mod nft;
 pub mod roles;
 pub mod sft;
 pub mod storage;
+pub mod vault_proxy;
 
 multiversx_sc::imports!();
 
@@ -36,6 +37,6 @@ pub trait Forwarder:
 
     #[endpoint]
     fn send_egld(&self, to: &ManagedAddress, amount: &BigUint) {
-        self.send().direct_egld(to, amount);
+        self.tx().to(to).egld(amount).transfer();
     }
 }

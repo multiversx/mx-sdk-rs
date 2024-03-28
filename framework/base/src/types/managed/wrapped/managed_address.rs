@@ -242,11 +242,21 @@ where
     fn type_name() -> TypeName {
         Address::type_name()
     }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedAddress<$API>".into()
+    }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         SCLowerHex::fmt(&self.bytes, f)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedAddress<M> {
+    pub fn hex_expr(&self) -> ManagedBuffer<M> {
+        self.bytes.buffer.hex_expr()
     }
 }
 

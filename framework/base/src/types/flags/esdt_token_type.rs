@@ -1,6 +1,9 @@
 use multiversx_sc_derive::ManagedVecItem;
 
-use crate::codec::*;
+use crate::{
+    codec,
+    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+};
 
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
 const ESDT_TYPE_NON_FUNGIBLE: &[u8] = b"NonFungibleESDT";
@@ -9,10 +12,14 @@ const ESDT_TYPE_META: &[u8] = b"MetaESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
-use crate::derive::TypeAbi;
+use crate::derive::type_abi;
 
 // Note: In the current implementation, SemiFungible is never returned
-#[derive(Clone, PartialEq, Eq, Debug, TypeAbi, ManagedVecItem)]
+
+#[type_abi]
+#[derive(
+    TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, ManagedVecItem,
+)]
 pub enum EsdtTokenType {
     Fungible,
     NonFungible,
@@ -78,47 +85,5 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
         } else {
             Self::Invalid
         }
-    }
-}
-
-impl NestedEncode for EsdtTokenType {
-    #[inline]
-    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
-    where
-        O: NestedEncodeOutput,
-        H: EncodeErrorHandler,
-    {
-        self.as_u8().dep_encode_or_handle_err(dest, h)
-    }
-}
-
-impl TopEncode for EsdtTokenType {
-    #[inline]
-    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
-    where
-        O: TopEncodeOutput,
-        H: EncodeErrorHandler,
-    {
-        self.as_u8().top_encode_or_handle_err(output, h)
-    }
-}
-
-impl NestedDecode for EsdtTokenType {
-    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
-    where
-        I: NestedDecodeInput,
-        H: DecodeErrorHandler,
-    {
-        Ok(Self::from(u8::dep_decode_or_handle_err(input, h)?))
-    }
-}
-
-impl TopDecode for EsdtTokenType {
-    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
-    where
-        I: TopDecodeInput,
-        H: DecodeErrorHandler,
-    {
-        Ok(Self::from(u8::top_decode_or_handle_err(input, h)?))
     }
 }

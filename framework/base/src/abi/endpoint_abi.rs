@@ -7,15 +7,14 @@ use alloc::{
 #[derive(Clone, Debug)]
 pub struct InputAbi {
     pub arg_name: String,
-    pub type_name: TypeName,
-    // pub original_type_name: TypeName,
+    pub type_names: TypeNames,
     pub multi_arg: bool,
 }
 
 #[derive(Clone, Debug)]
 pub struct OutputAbi {
     pub output_name: String,
-    pub type_name: TypeName,
+    pub type_names: TypeNames,
     pub multi_result: bool,
 }
 
@@ -33,6 +32,7 @@ pub enum EndpointMutabilityAbi {
 pub enum EndpointTypeAbi {
     #[default]
     Init,
+    Upgrade,
     Endpoint,
     PromisesCallback,
 }
@@ -89,7 +89,7 @@ impl EndpointAbi {
     pub fn add_input<T: TypeAbi>(&mut self, arg_name: &str) {
         self.inputs.push(InputAbi {
             arg_name: arg_name.to_string(),
-            type_name: T::type_name(),
+            type_names: T::type_names(),
             multi_arg: T::is_variadic(),
         });
     }

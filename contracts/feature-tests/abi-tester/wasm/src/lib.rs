@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
+// Upgrade:                              1
 // Endpoints:                           27
 // Async Callback (empty):               1
 // Total number of exported functions:  29
@@ -20,6 +21,7 @@ multiversx_sc_wasm_adapter::endpoints! {
     abi_tester
     (
         init => init
+        upgrade => upgrade
         echo_abi_test_type => echo_abi_test_type
         echo_enum => echo_enum
         take_managed_type => take_managed_type

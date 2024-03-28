@@ -66,6 +66,12 @@ pub enum ContractCliAction {
         about = "Generates a snippets project, based on the contract ABI."
     )]
     GenerateSnippets(GenerateSnippetsArgs),
+
+    #[command(
+        name = "proxy",
+        about = "Generates a proxy, based on the contract ABI."
+    )]
+    GenerateProxies,
 }
 
 impl CliArgsToRaw for ContractCliAction {
@@ -96,6 +102,9 @@ impl CliArgsToRaw for ContractCliAction {
             ContractCliAction::GenerateSnippets(args) => {
                 raw.push("snippets".to_string());
                 raw.append(&mut args.to_raw());
+            },
+            ContractCliAction::GenerateProxies => {
+                raw.push("proxy".to_string());
             },
         }
         raw

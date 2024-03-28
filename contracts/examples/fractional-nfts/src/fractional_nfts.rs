@@ -85,13 +85,14 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
             &uris,
         );
 
-        let caller = self.blockchain().get_caller();
-        self.send().direct_esdt(
-            &caller,
-            fractional_token,
-            fractional_nonce,
-            &initial_fractional_amount,
-        );
+        self.tx()
+            .to(ToCaller)
+            .single_esdt(
+                fractional_token,
+                fractional_nonce,
+                &initial_fractional_amount,
+            )
+            .transfer();
     }
 
     #[payable("*")]
@@ -123,13 +124,15 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
         );
 
         let original = fractional_info.original_payment;
-        let caller = self.blockchain().get_caller();
-        self.send().direct_esdt(
-            &caller,
-            &original.token_identifier,
-            original.token_nonce,
-            &original.amount,
-        );
+
+        self.tx()
+            .to(ToCaller)
+            .single_esdt(
+                &original.token_identifier,
+                original.token_nonce,
+                &original.amount,
+            )
+            .transfer();
     }
 
     #[view(getFractionalToken)]

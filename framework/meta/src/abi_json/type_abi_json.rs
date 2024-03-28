@@ -68,10 +68,10 @@ impl From<&TypeDescription> for TypeDescriptionJson {
 }
 
 impl TypeDescriptionJson {
-    pub fn to_type_description(&self, name: &str) -> TypeDescription {
+    pub fn to_type_description(&self, names: TypeNames) -> TypeDescription {
         TypeDescription {
             docs: self.docs.clone(),
-            name: name.to_string(),
+            names,
             contents: match self.content_type.as_str() {
                 TYPE_DESCRIPTION_JSON_TYPE_STRUCT => TypeContents::Struct(
                     self.fields
@@ -87,6 +87,7 @@ impl TypeDescriptionJson {
                 ),
                 _ => TypeContents::NotSpecified,
             },
+            macro_attributes: Vec::new(),
         }
     }
 }
@@ -108,7 +109,7 @@ impl From<&StructFieldDescription> for StructFieldDescriptionJson {
         StructFieldDescriptionJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
-            field_type: abi.field_type.clone(),
+            field_type: abi.field_type.abi.clone(),
         }
     }
 }
@@ -118,7 +119,10 @@ impl StructFieldDescriptionJson {
         StructFieldDescription {
             docs: self.docs.clone(),
             name: self.name.clone(),
-            field_type: self.field_type.clone(),
+            field_type: TypeNames {
+                abi: self.field_type.clone(),
+                rust: "<unspecified>".into(),
+            },
         }
     }
 }

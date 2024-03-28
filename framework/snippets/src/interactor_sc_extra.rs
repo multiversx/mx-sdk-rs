@@ -3,7 +3,7 @@ use multiversx_sc_scenario::{
     api::StaticApi,
     multiversx_sc::{
         codec::{CodecFrom, TopEncodeMulti},
-        types::{Address, ContractCall},
+        types::{Address, ContractCallBase},
     },
     scenario_model::{
         ScCallStep, ScDeployStep, ScQueryStep, TxResponse, TypedResponse, TypedScCall,
@@ -98,7 +98,7 @@ impl Interactor {
 
     pub async fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
-        CC: ContractCall<StaticApi>,
+        CC: ContractCallBase<StaticApi>,
         RequestedResult: CodecFrom<CC::OriginalResult>,
     {
         let mut typed_sc_query = ScQueryStep::new().call(contract_call);

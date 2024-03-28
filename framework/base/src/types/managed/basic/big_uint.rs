@@ -11,8 +11,8 @@ use crate::{
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput, TryStaticCast,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedType},
+    formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -291,6 +291,10 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
     fn type_name() -> TypeName {
         TypeName::from("BigUint")
     }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("BigUint<$API>")
+    }
 }
 
 impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
@@ -300,6 +304,15 @@ impl<M: ManagedTypeApi> SCDisplay for BigUint<M> {
         f.append_managed_buffer(&ManagedBuffer::from_handle(
             str_handle.cast_or_signal_error::<M, _>(),
         ));
+    }
+}
+
+impl<M: ManagedTypeApi> BigUint<M> {
+    /// Creates to a managed buffer containing the textual representation of the number.
+    pub fn to_display(&self) -> ManagedBuffer<M> {
+        let mut result = ManagedBufferCachedBuilder::new_from_slice(&[]);
+        result.append_display(self);
+        result.into_managed_buffer()
     }
 }
 

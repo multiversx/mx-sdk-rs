@@ -1,0 +1,93 @@
+mod pmf_proxy;
+use multiversx_sc::types::{AddressExpr, ScExpr};
+use multiversx_sc_scenario::{scenario_model::*, *};
+
+const OWNER: AddressExpr = AddressExpr("owner");
+const SC_PMF: ScExpr = ScExpr("pmf");
+const CODE_EXPR: &str = "mxsc:output/panic-message-features.mxsc.json";
+
+fn world() -> ScenarioWorld {
+    let mut blockchain = ScenarioWorld::new();
+    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
+
+    blockchain.register_contract(CODE_EXPR, panic_message_features::ContractBuilder);
+    blockchain
+}
+
+fn setup() -> ScenarioWorld {
+    let mut world = world();
+    let code = world.code_expression(CODE_EXPR);
+
+    world.set_state_step(
+        SetStateStep::new()
+            .put_account(OWNER, Account::new().nonce(1))
+            .put_account(SC_PMF, Account::new().code(code)),
+    );
+
+    world
+}
+
+// TODO: move to basic-features a testing framework tester
+#[test]
+fn tx_returns_error_test() {
+    let mut world = setup();
+
+    let (status, message) = world
+        .tx()
+        .from(OWNER)
+        .to(SC_PMF)
+        .typed(pmf_proxy::PanicMessageFeaturesProxy)
+        .sc_panic()
+        .returns(ReturnsStatus)
+        .returns(ReturnsMessage)
+        .run();
+
+    assert_eq!(status, 4);
+    assert_eq!(message, "sc_panic! test");
+}
+
+#[test]
+fn query_returns_error_test() {
+    let mut world = setup();
+
+    let (status, message) = world
+        .query()
+        .to(SC_PMF)
+        .typed(pmf_proxy::PanicMessageFeaturesProxy)
+        .sc_panic()
+        .returns(ReturnsStatus)
+        .returns(ReturnsMessage)
+        .run();
+
+    assert_eq!(status, 4);
+    assert_eq!(message, "sc_panic! test");
+}
+
+#[test]
+fn tx_expect_error_test() {
+    let mut world = setup();
+
+    world
+        .tx()
+        .from(OWNER)
+        .to(SC_PMF)
+        .typed(pmf_proxy::PanicMessageFeaturesProxy)
+        .sc_panic()
+        .returns(ExpectStatus(4))
+        .returns(ExpectMessage("sc_panic! test"))
+        .run();
+}
+
+#[test]
+fn query_expect_error_test() {
+    let mut world = setup();
+
+    world
+        .query()
+        .to(SC_PMF)
+        .typed(pmf_proxy::PanicMessageFeaturesProxy)
+        .sc_panic()
+        .returns(ExpectStatus(4))
+        .returns(ExpectMessage("sc_panic! test"))
+        .run();
+}

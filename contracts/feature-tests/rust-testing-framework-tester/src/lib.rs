@@ -88,12 +88,13 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("*")]
     #[endpoint]
     fn receive_esdt_half(&self) {
-        let caller = self.blockchain().get_caller();
         let payment = self.call_value().single_esdt();
         let amount = payment.amount / 2u32;
 
-        self.send()
-            .direct_esdt(&caller, &payment.token_identifier, 0, &amount);
+        self.tx()
+            .to(ToCaller)
+            .single_esdt(&payment.token_identifier, 0, &amount)
+            .transfer();
     }
 
     #[payable("*")]
@@ -111,7 +112,10 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
         nft_nonce: u64,
         amount: BigUint,
     ) {
-        self.send().direct_esdt(&to, &token_id, nft_nonce, &amount);
+        self.tx()
+            .to(&to)
+            .single_esdt(&token_id, nft_nonce, &amount)
+            .transfer();
     }
 
     #[endpoint]

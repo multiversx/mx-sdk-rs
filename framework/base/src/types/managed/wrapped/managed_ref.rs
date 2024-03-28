@@ -54,6 +54,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + Clone,
 {
+    /// Syntactic sugar for dereferencing and cloning the object.
     pub fn clone_value(&self) -> T {
         self.deref().clone()
     }

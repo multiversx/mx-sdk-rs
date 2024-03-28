@@ -29,7 +29,7 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
     /// Async calls are explicitly forbidden in upgrade constructors.
     ///
     /// TODO: write test once scenario tests support upgrades directly.
-    #[endpoint(upgrade)]
+    #[upgrade]
     #[label("init-async-call")]
     fn upgrade_async_call(
         &self,

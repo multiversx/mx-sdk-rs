@@ -8,7 +8,11 @@ use multiversx_sdk::{
     data::{address::Address as ErdrsAddress, network_config::NetworkConfig},
     wallet::Wallet,
 };
-use std::{collections::HashMap, path::Path, time::Duration};
+use std::{
+    collections::HashMap,
+    path::{Path, PathBuf},
+    time::Duration,
+};
 
 use crate::Sender;
 
@@ -22,6 +26,8 @@ pub struct Interactor {
     pub(crate) waiting_time_ms: u64,
     pub pre_runners: ScenarioRunnerList,
     pub post_runners: ScenarioRunnerList,
+
+    pub current_dir: PathBuf,
 }
 
 impl Interactor {
@@ -35,6 +41,7 @@ impl Interactor {
             waiting_time_ms: 0,
             pre_runners: ScenarioRunnerList::empty(),
             post_runners: ScenarioRunnerList::empty(),
+            current_dir: PathBuf::default(),
         }
     }
 

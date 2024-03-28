@@ -228,6 +228,10 @@ impl TypeAbi for H256 {
     fn type_name() -> TypeName {
         "H256".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "H256".into()
+    }
 }
 
 #[cfg(test)]

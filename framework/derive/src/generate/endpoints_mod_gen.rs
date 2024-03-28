@@ -67,6 +67,7 @@ fn generate_wasm_endpoints(contract_trait: &ContractTrait) -> Vec<proc_macro2::T
         .iter()
         .filter_map(|m| match &m.public_role {
             PublicRole::Init(_) => Some(generate_wasm_endpoint(m, &quote! { init })),
+            PublicRole::Upgrade(_) => Some(generate_wasm_endpoint(m, &quote! { upgrade })),
             PublicRole::Endpoint(endpoint_metadata) => {
                 let endpoint_ident = &endpoint_metadata.public_name;
                 Some(generate_wasm_endpoint(m, &quote! { #endpoint_ident }))

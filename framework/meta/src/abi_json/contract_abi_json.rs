@@ -21,6 +21,10 @@ pub struct ContractAbiJson {
     pub constructor: Option<ConstructorAbiJson>,
 
     #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub upgrade_constructor: Option<ConstructorAbiJson>,
+
+    #[serde(default)]
     pub endpoints: Vec<EndpointAbiJson>,
 
     #[serde(default)]
@@ -48,6 +52,10 @@ impl From<&ContractAbi> for ContractAbiJson {
             docs: abi.docs.iter().map(|d| d.to_string()).collect(),
             name: abi.name.to_string(),
             constructor: abi.constructors.first().map(ConstructorAbiJson::from),
+            upgrade_constructor: abi
+                .upgrade_constructors
+                .first()
+                .map(ConstructorAbiJson::from),
             endpoints: abi.endpoints.iter().map(EndpointAbiJson::from).collect(),
             promises_callback_names: abi
                 .promise_callbacks
@@ -70,10 +78,10 @@ pub fn convert_type_descriptions_to_json(
     type_descriptions: &TypeDescriptionContainerImpl,
 ) -> BTreeMap<String, TypeDescriptionJson> {
     let mut types = BTreeMap::new();
-    for (type_name, type_description) in type_descriptions.0.iter() {
+    for (type_names, type_description) in type_descriptions.0.iter() {
         if type_description.contents.is_specified() {
             types.insert(
-                type_name.clone(),
+                type_names.abi.clone(),
                 TypeDescriptionJson::from(type_description),
             );
         }

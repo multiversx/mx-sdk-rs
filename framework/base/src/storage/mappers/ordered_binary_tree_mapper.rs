@@ -3,10 +3,10 @@ use core::marker::PhantomData;
 use codec::Empty;
 
 use crate::{
-    api::StorageMapperApi,
-    imports::{ErrorApiImpl, ManagedType},
+    api::{ErrorApiImpl, StorageMapperApi},
     storage::StorageKey,
     storage_set,
+    types::ManagedType,
 };
 
 use super::{

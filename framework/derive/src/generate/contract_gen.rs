@@ -28,6 +28,7 @@ pub fn generate_call_methods(contract_trait: &ContractTrait) -> Vec<proc_macro2:
         .iter()
         .filter_map(|m| match &m.public_role {
             PublicRole::Init(_init_metadata) => Some(generate_call_method(m)),
+            PublicRole::Upgrade(_upgrade_metadata) => Some(generate_call_method(m)),
             PublicRole::Endpoint(_endpoint_metadata) => Some(generate_call_method(m)),
             PublicRole::CallbackPromise(_callback_metadata) => {
                 Some(generate_promises_callback_call_method(m))

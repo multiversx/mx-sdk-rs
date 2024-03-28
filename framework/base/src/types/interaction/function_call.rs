@@ -6,21 +6,21 @@ use multiversx_sc_codec::{
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{
-        ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
+        CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
-    formatter::SCLowerHex,
     types::{
-        EsdtTokenPayment, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder, ManagedVec,
+        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec,
         MultiValueEncoded,
     },
 };
 
-use super::ManagedArgBuffer;
+use super::{ContractCallNoPayment, ManagedArgBuffer, TypedFunctionCall};
 
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
 /// Can be used as a multi-argument, to embed a call within a call.
+#[derive(Clone)]
 pub struct FunctionCall<Api>
 where
     Api: ManagedTypeApi,
@@ -63,14 +63,34 @@ where
         self
     }
 
-    pub fn to_call_data_string(&self) -> ManagedBuffer<Api> {
-        let mut result = ManagedBufferCachedBuilder::default();
-        result.append_managed_buffer(&self.function_name);
-        for arg in self.arg_buffer.raw_arg_iter() {
-            result.append_bytes(b"@");
-            SCLowerHex::fmt(&*arg, &mut result);
-        }
-        result.into_managed_buffer()
+    pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Api>) -> Self {
+        self.arg_buffer = raw;
+        self
+    }
+
+    pub fn typed_result<R>(self) -> TypedFunctionCall<Api, R>
+    where
+        R: TopEncodeMulti + TopDecodeMulti,
+    {
+        self.into()
+    }
+}
+
+impl<Api> From<()> for FunctionCall<Api>
+where
+    Api: ManagedTypeApi,
+{
+    fn from(_: ()) -> Self {
+        FunctionCall::empty()
+    }
+}
+
+impl<Api, R> From<ContractCallNoPayment<Api, R>> for FunctionCall<Api>
+where
+    Api: CallTypeApi,
+{
+    fn from(ccnp: ContractCallNoPayment<Api, R>) -> Self {
+        ccnp.function_call
     }
 }
 
@@ -126,6 +146,10 @@ where
         crate::abi::type_name_variadic::<ManagedBuffer<Api>>()
     }
 
+    fn type_name_rust() -> TypeName {
+        "FunctionCall<$API>".into()
+    }
+
     fn is_variadic() -> bool {
         true
     }
@@ -138,7 +162,7 @@ where
     /// Constructs `ESDTTransfer` builtin function call.
     pub(super) fn convert_to_single_transfer_fungible_call(
         self,
-        payment: EsdtTokenPayment<Api>,
+        payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
@@ -156,7 +180,7 @@ where
     pub(super) fn convert_to_single_transfer_nft_call(
         self,
         to: &ManagedAddress<Api>,
-        payment: EsdtTokenPayment<Api>,
+        payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_NFT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
@@ -170,13 +194,13 @@ where
     pub(super) fn convert_to_multi_transfer_esdt_call(
         self,
         to: &ManagedAddress<Api>,
-        payments: ManagedVec<Api, EsdtTokenPayment<Api>>,
+        payments: &ManagedVec<Api, EsdtTokenPayment<Api>>,
     ) -> FunctionCall<Api> {
         let mut result = FunctionCall::new(ESDT_MULTI_TRANSFER_FUNC_NAME)
             .argument(&to)
             .argument(&payments.len());
 
-        for payment in payments.into_iter() {
+        for payment in payments {
             result = result
                 .argument(&payment.token_identifier)
                 .argument(&payment.token_nonce)

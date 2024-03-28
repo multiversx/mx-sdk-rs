@@ -10,9 +10,10 @@ use crate::{
         TopEncodeOutput, TryStaticCast,
     },
     formatter::{
-        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
+        hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCBinary, SCDisplay,
+        SCLowerHex,
     },
-    types::{heap::BoxedBytes, ManagedType, StaticBufferRef},
+    types::{heap::BoxedBytes, ManagedBufferCachedBuilder, ManagedType, StaticBufferRef},
 };
 
 /// A byte buffer managed by an external API.
@@ -156,6 +157,26 @@ where
     #[inline]
     fn from(bytes: crate::types::heap::Vec<u8>) -> Self {
         Self::new_from_bytes(bytes.as_slice())
+    }
+}
+
+impl<M> From<crate::types::heap::String> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(s: crate::types::heap::String) -> Self {
+        Self::new_from_bytes(s.as_bytes())
+    }
+}
+
+impl<M> From<&crate::types::heap::String> for ManagedBuffer<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(s: &crate::types::heap::String) -> Self {
+        Self::new_from_bytes(s.as_bytes())
     }
 }
 
@@ -310,6 +331,14 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
             Some(u64::from_be_bytes(bytes))
         }
     }
+
+    /// Produces a hex expression in another managed buffer,
+    /// made up of "0x" + the hex representation of the data.
+    pub fn hex_expr(&self) -> ManagedBuffer<M> {
+        let mut result = ManagedBufferCachedBuilder::new_from_slice(b"0x");
+        result.append_lower_hex(self);
+        result.into_managed_buffer()
+    }
 }
 
 impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
@@ -435,6 +464,10 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> TypeName {
         "bytes".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedBuffer<$API>".into()
     }
 }
 

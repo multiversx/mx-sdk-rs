@@ -26,7 +26,7 @@ use crate as multiversx_sc; // required by the ManagedVecItem derive
 #[repr(transparent)]
 #[derive(ManagedVecItem, Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
-    data: ManagedOption<M, TokenIdentifier<M>>,
+    pub(crate) data: ManagedOption<M, TokenIdentifier<M>>,
 }
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
@@ -213,6 +213,10 @@ impl<M> CodecFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
     fn type_name() -> TypeName {
         "EgldOrEsdtTokenIdentifier".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "EgldOrEsdtTokenIdentifier<$API>".into()
     }
 }
 

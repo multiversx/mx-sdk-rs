@@ -107,8 +107,8 @@ pub trait PingPong {
             UserStatus::Registered => {
                 self.user_status(user_id).set(UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
-                    self.send()
-                        .direct_egld(&user_address, &self.ping_amount().get());
+                    let amount = self.ping_amount().get();
+                    self.tx().to(user_address).egld(amount).transfer();
                     Result::Ok(())
                 } else {
                     Result::Err("unknown user")

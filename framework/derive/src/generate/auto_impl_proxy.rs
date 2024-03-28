@@ -3,7 +3,8 @@ use crate::{
     model::{AutoImpl, ContractTrait, Method, MethodImpl},
     parse::split_path_last,
 };
-use syn::{punctuated::Punctuated, token::PathSep};
+use proc_macro2::Ident;
+use syn::{punctuated::Punctuated, token::PathSep, Pat};
 
 /// Path to a Rust module containing a contract call proxy.
 pub type ProxyModulePath = Punctuated<syn::PathSegment, PathSep>;
@@ -34,16 +35,34 @@ pub fn proxy_getter_return_type(m: &Method) -> ProxyGetterReturnType {
     }
 }
 
-fn proxy_getter_address_snippet(m: &Method) -> proc_macro2::TokenStream {
+pub fn proxy_getter_return_type_token(m: &Method) -> proc_macro2::TokenStream {
+    let ProxyGetterReturnType {
+        module_path,
+        mut proxy_obj_name,
+    } = proxy_getter_return_type(m);
+    if proxy_getter_address_arg_name(m).is_some() {
+        // replace type name
+        let span = proxy_obj_name.ident.span(); // preserve span
+        proxy_obj_name.ident = Ident::new("ProxyTo", span);
+    }
+    quote! { #module_path #proxy_obj_name}
+}
+
+fn proxy_getter_address_arg_name(m: &Method) -> Option<Pat> {
     match m.method_args.len() {
-        0 => quote! {},
-        1 => {
-            let address_arg_name = &m.method_args[0].pat;
-            quote! {
-                .contract(#address_arg_name)
-            }
-        },
+        0 => None,
+        1 => Some(m.method_args[0].pat.clone()),
         _ => panic!("Proxy getter can have at most 1 argument, which is the target address"),
+    }
+}
+
+fn proxy_getter_address_snippet(m: &Method) -> proc_macro2::TokenStream {
+    if let Some(address_arg_name) = proxy_getter_address_arg_name(m) {
+        quote! {
+            .contract(#address_arg_name)
+        }
+    } else {
+        quote! {}
     }
 }
 
@@ -55,7 +74,7 @@ pub fn generate_proxy_getter_impl(m: &Method) -> proc_macro2::TokenStream {
 
     quote! {
         #msig {
-            #module_path Proxy::new_proxy_obj() #address_snippet
+            <#module_path Proxy<Self::Api> as multiversx_sc::contract_base::ProxyObjNew>::new_proxy_obj() #address_snippet
         }
     }
 }

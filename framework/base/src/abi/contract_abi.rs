@@ -10,6 +10,7 @@ pub struct ContractAbi {
     pub docs: Vec<String>,
     pub name: String,
     pub constructors: Vec<EndpointAbi>,
+    pub upgrade_constructors: Vec<EndpointAbi>,
     pub endpoints: Vec<EndpointAbi>,
     pub promise_callbacks: Vec<EndpointAbi>,
     pub events: Vec<EventAbi>,
@@ -26,6 +27,7 @@ impl ContractAbi {
             docs: docs.iter().map(|s| s.to_string()).collect(),
             name: name.to_string(),
             constructors: Vec::new(),
+            upgrade_constructors: Vec::new(),
             endpoints: Vec::new(),
             promise_callbacks: Vec::new(),
             events: Vec::new(),
@@ -39,6 +41,8 @@ impl ContractAbi {
         self.constructors
             .extend_from_slice(other.constructors.as_slice());
         self.endpoints.extend_from_slice(other.endpoints.as_slice());
+        self.upgrade_constructors
+            .extend_from_slice(other.upgrade_constructors.as_slice());
         self.events.extend_from_slice(other.events.as_slice());
         self.promise_callbacks
             .extend_from_slice(other.promise_callbacks.as_slice());
@@ -75,6 +79,7 @@ impl ContractAbi {
     pub fn iter_all_exports(&self) -> impl Iterator<Item = &EndpointAbi> {
         self.constructors
             .iter()
+            .chain(self.upgrade_constructors.iter())
             .chain(self.endpoints.iter())
             .chain(self.promise_callbacks.iter())
     }

@@ -1,5 +1,6 @@
 [settings]
 main = "main"
+proxy-paths = ["../forwarder/src/vault_proxy.rs"]
 
 [contracts.main]
 name = "vault"

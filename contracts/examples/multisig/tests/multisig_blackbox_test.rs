@@ -9,7 +9,7 @@ use multiversx_sc::{
         test_util::top_encode_to_vec_u8_or_panic,
     },
     storage::mappers::SingleValue,
-    types::{Address, CodeMetadata, ContractCallNoPayment, FunctionCall},
+    types::{Address, AddressExpr, CodeMetadata, FunctionCall, ReturnsResult},
 };
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -17,7 +17,7 @@ use multiversx_sc_scenario::{
         Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
         SetStateStep, TxExpect,
     },
-    ContractInfo, ScenarioWorld,
+    ContractInfo, ScenarioTxRun, ScenarioWorld,
 };
 use num_bigint::BigUint;
 
@@ -124,12 +124,15 @@ impl MultisigTestState {
     }
 
     fn propose_add_board_member(&mut self, board_member_address: Address) -> usize {
-        self.world.sc_call_get_result(
-            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+        self.world
+            .tx()
+            .from(AddressExpr("proposer"))
+            .call(
                 self.multisig_contract
                     .propose_add_board_member(board_member_address),
-            ),
-        )
+            )
+            .returns(ReturnsResult)
+            .run()
     }
 
     fn propose_add_proposer(&mut self, proposer_address: Address) -> usize {
@@ -153,32 +156,28 @@ impl MultisigTestState {
         &mut self,
         to: Address,
         egld_amount: u64,
-        contract_call: ContractCallNoPayment<StaticApi, ()>,
+        contract_call: FunctionCall<StaticApi>,
     ) -> usize {
-        self.world
-            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                self.multisig_contract.propose_transfer_execute(
-                    to,
-                    egld_amount,
-                    contract_call.into_function_call(),
-                ),
-            ))
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract
+                    .propose_transfer_execute(to, egld_amount, contract_call),
+            ),
+        )
     }
 
     fn propose_async_call(
         &mut self,
         to: Address,
         egld_amount: u64,
-        contract_call: ContractCallNoPayment<StaticApi, ()>,
+        contract_call: FunctionCall<StaticApi>,
     ) -> usize {
-        self.world
-            .sc_call_get_result(ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
-                self.multisig_contract.propose_async_call(
-                    to,
-                    egld_amount,
-                    contract_call.into_function_call(),
-                ),
-            ))
+        self.world.sc_call_get_result(
+            ScCallStep::new().from(PROPOSER_ADDRESS_EXPR).call(
+                self.multisig_contract
+                    .propose_async_call(to, egld_amount, contract_call),
+            ),
+        )
     }
 
     fn propose_remove_user(&mut self, user_address: Address) -> usize {
@@ -471,7 +470,7 @@ fn test_transfer_execute_sc_all() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
-    let adder_call = state.adder_contract.add(5u64);
+    let adder_call = state.adder_contract.add(5u64).into_function_call();
 
     let action_id = state.propose_transfer_execute(state.adder_address.clone(), 0u64, adder_call);
     state.sign(action_id);
@@ -489,7 +488,7 @@ fn test_async_call_to_sc() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
-    let adder_call = state.adder_contract.add(5u64);
+    let adder_call = state.adder_contract.add(5u64).into_function_call();
 
     let action_id = state.propose_async_call(state.adder_address.clone(), 0u64, adder_call);
     state.sign(action_id);
@@ -530,7 +529,7 @@ fn test_deploy_and_upgrade_from_source() {
             .expect_value(OptionalValue::Some(new_adder_address.clone())),
     );
 
-    let adder_call = state.adder_contract.add(5u64);
+    let adder_call = state.adder_contract.add(5u64).into_function_call();
 
     let action_id = state.propose_transfer_execute(new_adder_address, 0u64, adder_call);
     state.sign(action_id);

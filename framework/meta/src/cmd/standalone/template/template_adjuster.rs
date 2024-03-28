@@ -104,6 +104,8 @@ impl TemplateAdjuster {
         let old_name = self.metadata.name.to_case(Case::Snake);
         let new_package = format!("{new_name}::");
         let old_package = format!("{old_name}::");
+        let new_proxy_mod = format!("{new_name}_proxy");
+        let old_proxy_mod = format!("{old_name}_proxy");
 
         replace_in_files(
             &self.target.contract_dir(),
@@ -111,7 +113,14 @@ impl TemplateAdjuster {
             &[
                 Query::substring(old_trait, &new_trait),
                 Query::substring(&old_package, &new_package),
+                Query::substring(&old_proxy_mod, &new_proxy_mod),
             ][..],
+        );
+
+        replace_in_files(
+            &self.target.contract_dir(),
+            "*sc-config.toml",
+            &[Query::substring(&old_proxy_mod, &new_proxy_mod)][..],
         );
     }
 

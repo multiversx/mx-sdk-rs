@@ -183,7 +183,7 @@ fn get_abi_type(abi_type_str: &str) -> AbiType {
     }
 }
 
-fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
+pub fn handle_abi_type(type_string: &mut RustTypeString, abi_type_str: String) {
     let abi_type = get_abi_type(&abi_type_str);
     match abi_type {
         AbiType::UserDefined(user_type) => {
