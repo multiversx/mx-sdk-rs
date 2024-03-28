@@ -52,7 +52,7 @@ pub trait CodecErrorTest {
     /// It just covers contract init serialization errors.
     #[endpoint]
     fn codec_err_contract_init(&self) {
-        let _ = self.tx().raw_call().argument(&CodecErrorTestType);
+        let _ = self.tx().raw_deploy().argument(&CodecErrorTestType);
     }
 
     /// Never actually calls any async/sync call, so it is appropriate in this contract.
