@@ -5,10 +5,7 @@ use multiversx_sc::abi::{
     TypeDescriptionContainerImpl,
 };
 
-use crate::cmd::contract::generate_proxy::proxy_sc_functions_gen::adjust_type_name;
-
 const ZERO: &str = "0";
-const UNCALLABLE_API: &str = "multiversx_sc::api::uncallable::UncallableApi";
 
 /// Types defined in the framework don't need to be generated again in the proxy.
 const TYPES_FROM_FRAMEWORK: &[&str] = &[
@@ -28,20 +25,12 @@ pub(crate) fn write_types(
     proxy_crate: &str,
 ) {
     for (_, type_description) in &types.0 {
-        let type_rust_name = type_description.names.rust.replace(UNCALLABLE_API, "Api");
-        let type_name = type_rust_name.split("::").last().unwrap();
-
-        println!(
-            "1. inital {} | 2. altered {}",
-            type_description.names.rust,
-            adjust_type_name(&type_description.names.rust, proxy_crate)
-        );
-
-        if TYPES_FROM_FRAMEWORK.contains(&type_name) {
+        if proxy_crate != extract_struct_crate(type_description.names.rust.as_str()) {
             continue;
         }
 
-        if proxy_crate != extract_struct_crate(type_description.names.rust.as_str()) {
+        let type_name = adjust_type_name(&type_description.names.rust, proxy_crate);
+        if TYPES_FROM_FRAMEWORK.contains(&type_name.as_str()) {
             continue;
         }
 
@@ -50,14 +39,14 @@ pub(crate) fn write_types(
                 file,
                 enum_variants,
                 type_description,
-                type_name,
+                &type_name,
                 proxy_crate,
             ),
             TypeContents::Struct(struct_fields) => write_struct(
                 file,
                 struct_fields,
                 type_description,
-                type_name,
+                &type_name,
                 proxy_crate,
             ),
             TypeContents::NotSpecified => {},
@@ -73,7 +62,6 @@ fn start_write_type(
     name: &str,
 ) {
     writeln!(file).unwrap();
-    // let type_name = name.replace("multiversx_sc::api::uncallable::UncallableApi", "Api");
     write_macro_attributes(file, &type_description.macro_attributes);
     write!(file, r#"pub {type_type} {name}"#).unwrap();
 
@@ -102,18 +90,13 @@ fn write_struct(
     start_write_type(file, "struct", type_description, name);
 
     for field in struct_fields {
-        let field_rust_type = field.field_type.rust.replace("$API", "Api");
-        if proxy_crate != extract_struct_crate(type_description.names.rust.as_str()) {
-            writeln!(file, "    pub {}: {},", field.name, field_rust_type).unwrap()
-        } else {
-            writeln!(
-                file,
-                "    pub {}: {},",
-                field.name,
-                clean_paths(proxy_crate, &field_rust_type)
-            )
-            .unwrap();
-        }
+        writeln!(
+            file,
+            "    pub {}: {},",
+            field.name,
+            adjust_type_name(&field.field_type.rust, proxy_crate)
+        )
+        .unwrap();
     }
 
     writeln!(file, "}}").unwrap();
@@ -160,7 +143,7 @@ fn write_struct_in_variant(file: &mut File, fields: &[StructFieldDescription], p
             file,
             "        {}: {},",
             field.name,
-            adjust_type_name(&field.field_type.rust.replace("$API", "Api"), proxy_crate)
+            adjust_type_name(&field.field_type.rust, proxy_crate)
         )
         .unwrap();
     }
@@ -170,13 +153,18 @@ fn write_struct_in_variant(file: &mut File, fields: &[StructFieldDescription], p
 
 fn write_tuple_in_variant(file: &mut File, fields: &[StructFieldDescription], proxy_crate: &str) {
     write!(file, "(").unwrap();
-    write!(file, "{}", fields[0].field_type.rust.replace("$API", "Api")).unwrap();
+    write!(
+        file,
+        "{}",
+        adjust_type_name(&fields[0].field_type.rust, proxy_crate)
+    )
+    .unwrap();
 
     for field in &fields[1..] {
         write!(
             file,
             ", {}",
-            adjust_type_name(&field.field_type.rust.replace("$API", "Api"), proxy_crate)
+            adjust_type_name(&field.field_type.rust, proxy_crate)
         )
         .unwrap();
     }
@@ -187,7 +175,7 @@ fn write_tuple_in_variant(file: &mut File, fields: &[StructFieldDescription], pr
 fn extract_struct_crate(struct_path: &str) -> String {
     let struct_crate_name = struct_path
         .replace('_', "-")
-        .replace(UNCALLABLE_API, "Api")
+        .replace("multiversx_sc::api::uncallable::UncallableApi", "Api")
         .to_string();
     let crate_name = struct_crate_name
         .split("::")
@@ -202,10 +190,10 @@ pub(crate) fn clean_paths(proxy_crate: &str, rust_type: &str) -> String {
         .split(|c| delimiters.contains(c))
         .filter(|s| !s.is_empty())
         .collect();
+
     let mut words_replacer: Vec<String> = Vec::new();
     for word in &words {
         let type_rust_name = word.split("::").last().unwrap().to_string();
-        // println!("###### {}", type_rust_name);
         if proxy_crate == extract_struct_crate(word)
             || TYPES_FROM_FRAMEWORK.contains(&type_rust_name.as_str())
         {
@@ -224,4 +212,13 @@ pub(crate) fn clean_paths(proxy_crate: &str, rust_type: &str) -> String {
     }
 
     rust_type_with_cleaned_path
+}
+
+pub fn adjust_type_name(original_rust_name: &str, proxy_crate: &str) -> String {
+    clean_paths(
+        proxy_crate,
+        &original_rust_name
+            .replace("multiversx_sc::api::uncallable::UncallableApi", "Api")
+            .replace("$API", "Api"),
+    )
 }
