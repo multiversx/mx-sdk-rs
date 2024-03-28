@@ -2,7 +2,8 @@ use multiversx_sc::derive_imports::*;
 
 use random::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, TypeAbi, Default)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, Default)]
 pub struct Color {
     pub r: u8,
     pub g: u8,

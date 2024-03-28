@@ -3,7 +3,8 @@ use multiversx_sc::derive_imports::*;
 use super::color::*;
 use random::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, TypeAbi, Default)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, Default)]
 pub struct KittyGenes {
     pub fur_color: Color,
     pub eye_color: Color,

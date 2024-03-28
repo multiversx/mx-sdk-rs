@@ -12,7 +12,8 @@ pub mod kitty_genes;
 use color::*;
 use kitty_genes::*;
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Kitty {
     pub genes: KittyGenes,
     pub birth_time: u64,   // timestamp
