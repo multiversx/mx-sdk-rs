@@ -3,7 +3,9 @@ use alloc::borrow::ToOwned;
 use crate::{
     api::ManagedTypeApi,
     contract_base::SendRawWrapper,
-    proxy_imports::{AnnotatedValue, EgldOrMultiEsdtPayment, ManagedType},
+    proxy_imports::{
+        AnnotatedValue, EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs, ManagedType,
+    },
     types::{
         BigUint, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec,
         MultiEsdtPayment, TxFrom, TxToSpecified,
@@ -14,7 +16,7 @@ use super::{
     AnnotatedEgldPayment, Egld, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment,
 };
 
-impl<Env> TxPayment<Env> for EgldOrMultiEsdtPayment<Env::Api>
+impl<'a, Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'a, Env::Api>
 where
     Env: TxEnv,
 {
@@ -30,11 +32,11 @@ where
         fc: FunctionCall<Env::Api>,
     ) {
         match self {
-            EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                Egld(egld_amount).perform_transfer_execute(env, to, gas_limit, fc)
+            EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
+                Egld(egld_amount).perform_transfer_execute(env, to, gas_limit, fc);
             },
-            EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
-                multi_esdt_payment.perform_transfer_execute(env, to, gas_limit, fc)
+            EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
+                multi_esdt_payment.perform_transfer_execute(env, to, gas_limit, fc);
             },
         }
     }
@@ -53,10 +55,10 @@ where
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
     {
         match self {
-            EgldOrMultiEsdtPayment::Egld(egld_amount) => {
+            EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
                 Egld(egld_amount).with_normalized(env, from, to, fc, f)
             },
-            EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
+            EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
                 multi_esdt_payment.with_normalized(env, from, to, fc, f)
             },
         }
@@ -64,11 +66,11 @@ where
 
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api> {
         match self {
-            EgldOrMultiEsdtPayment::Egld(egld_amount) => {
-                TxPayment::<Env>::into_full_payment_data(Egld(egld_amount), env)
+            EgldOrMultiEsdtPaymentRefs::Egld(egld_amount) => {
+                Egld(egld_amount).into_full_payment_data(env)
             },
-            EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => {
-                TxPayment::<Env>::into_full_payment_data(multi_esdt_payment, env)
+            EgldOrMultiEsdtPaymentRefs::MultiEsdt(multi_esdt_payment) => {
+                multi_esdt_payment.into_full_payment_data(env)
             },
         }
     }
