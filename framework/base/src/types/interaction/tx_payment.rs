@@ -1,8 +1,10 @@
 mod tx_payment_egld;
+mod tx_payment_egld_or_esdt;
+mod tx_payment_egld_or_multi_esdt;
+mod tx_payment_egld_or_multi_esdt_ref;
 mod tx_payment_egld_value;
 mod tx_payment_multi_esdt;
 mod tx_payment_none;
-mod tx_payment_other;
 mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
 

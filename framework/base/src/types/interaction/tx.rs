@@ -1,10 +1,11 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
+    proxy_imports::EgldOrMultiEsdtPayment,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
-        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
-        TokenIdentifier,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPaymentRefs,
+        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedOption,
+        ManagedVec, MultiEsdtPayment, TokenIdentifier,
     },
 };
 
@@ -151,6 +152,25 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Adds any payment to a transaction, if no payment has been added before.
+    pub fn payment<Payment>(self, payment: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    where
+        Payment: TxPayment<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Adds EGLD value to a transaction.
+    ///
+    /// Accepts any type that can represent and EGLD amount: BigUint, &BigUint, etc.
     pub fn egld<EgldValue>(
         self,
         egld_value: EgldValue,
@@ -158,34 +178,17 @@ where
     where
         EgldValue: TxEgldValue<Env>,
     {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: Egld(egld_value),
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
+        self.payment(Egld(egld_value))
     }
 
+    /// Backwards compatibility. Use method `egld` instead.
     pub fn with_egld_transfer(
         self,
         egld_amount: BigUint<Env::Api>,
     ) -> Tx<Env, From, To, EgldPayment<Env::Api>, Gas, Data, RH> {
         self.egld(egld_amount)
     }
-}
 
-impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, (), Gas, Data, RH>
-where
-    Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-    Data: TxData<Env>,
-    RH: TxResultHandler<Env>,
-{
     /// Adds a single ESDT token transfer to a transaction.
     ///
     /// Since this is the first ESDT payment, a single payment tx is produced. Can be called again for multiple payments.
@@ -193,15 +196,7 @@ where
         self,
         payment: P,
     ) -> Tx<Env, From, To, EsdtTokenPayment<Env::Api>, Gas, Data, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: payment.into(),
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
+        self.payment(payment.into())
     }
 
     /// Sets a single token payment, with the token identifier and amount kept as references.
@@ -213,35 +208,21 @@ where
         token_nonce: u64,
         amount: &'a BigUint<Env::Api>,
     ) -> Tx<Env, From, To, EsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: EsdtTokenPaymentRefs {
-                token_identifier,
-                token_nonce,
-                amount,
-            },
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
+        self.payment(EsdtTokenPaymentRefs {
+            token_identifier,
+            token_nonce,
+            amount,
+        })
     }
 
-    /// Adds a collection of ESDT payments to a transaction.
+    /// Sets a collection of ESDT transfers as the payment of the transaction.
+    ///
+    /// Equivalend to just ``.payment(payments)`, but only accepts the multi-esdt types.
     pub fn multi_esdt<Payment>(self, payments: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
     where
         Payment: TxPaymentMultiEsdt<Env>,
     {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: payments,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
+        self.payment(payments)
     }
 
     /// Backwards compatibility.
@@ -256,15 +237,7 @@ where
         self,
         payment: P,
     ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: payment.into(),
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
+        self.payment(payment.into())
     }
 
     /// Backwards compatibility.
@@ -273,6 +246,13 @@ where
         payment: P,
     ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
         self.egld_or_single_esdt(payment)
+    }
+
+    pub fn egld_or_multi_esdt<P: Into<EgldOrMultiEsdtPayment<Env::Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Env, From, To, EgldOrMultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        self.payment(payment.into())
     }
 }
 
@@ -288,7 +268,7 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
-    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
+    pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
@@ -305,6 +285,14 @@ where
             result_handler: self.result_handler,
         }
     }
+
+    /// Backwards compatibility.
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        self.esdt(payment)
+    }
 }
 
 impl<Env, From, To, Gas, Data, RH> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
@@ -319,6 +307,15 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
+    pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
+        mut self,
+        payment: P,
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        self.payment.push(payment.into());
+        self
+    }
+
+    /// Backwards compatibility.
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
         mut self,
         payment: P,
