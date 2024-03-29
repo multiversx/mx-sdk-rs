@@ -1,12 +1,13 @@
 #![no_std]
 #![allow(clippy::suspicious_operation_groupings)]
 
-use multiversx_sc::imports::*;
+pub mod kitty_genetic_alg_proxy;
+pub mod structs;
 
+use crate::structs::*;
 use core::cmp::max;
-
-use kitty::{kitty_genes::*, Kitty};
-use random::*;
+use multiversx_sc::imports::*;
+use random::{Random, Randomizeable};
 
 #[multiversx_sc::contract]
 pub trait KittyOwnership {
@@ -323,6 +324,7 @@ pub trait KittyOwnership {
     fn give_birth(&self, matron_id: u32) {
         require!(self.is_valid_id(matron_id), "Invalid kitty id!");
 
+        let caller = self.blockchain().get_caller();
         let matron = self.kitty_by_id(matron_id).get();
 
         require!(
@@ -335,14 +337,15 @@ pub trait KittyOwnership {
 
         let gene_science_contract_address = self.get_gene_science_contract_address_or_default();
         if !gene_science_contract_address.is_zero() {
-            self.kitty_genetic_alg_proxy(gene_science_contract_address)
+            self.tx()
+                .to(&gene_science_contract_address)
+                .typed(kitty_genetic_alg_proxy::KittyGeneticAlgProxy)
                 .generate_kitty_genes(matron, sire)
-                .async_call()
                 .with_callback(
                     self.callbacks()
-                        .generate_kitty_genes_callback(matron_id, self.blockchain().get_caller()),
+                        .generate_kitty_genes_callback(matron_id, caller),
                 )
-                .call_and_exit()
+                .async_call_and_exit();
         } else {
             sc_panic!("Gene science contract address not set!")
         }
@@ -577,11 +580,6 @@ pub trait KittyOwnership {
             },
         }
     }
-
-    // proxy
-
-    #[proxy]
-    fn kitty_genetic_alg_proxy(&self, to: ManagedAddress) -> kitty_genetic_alg::Proxy<Self::Api>;
 
     // storage - General
 

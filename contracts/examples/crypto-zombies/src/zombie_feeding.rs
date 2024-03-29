@@ -1,7 +1,7 @@
 use multiversx_sc::imports::*;
 
 use crate::{
-    crypto_kitties_proxy::{self, Kitty},
+    kitty_ownership_proxy::{self, Kitty},
     storage, zombie_factory, zombie_helper,
 };
 
@@ -56,12 +56,11 @@ pub trait ZombieFeeding:
     #[endpoint]
     fn feed_on_kitty(&self, zombie_id: usize, kitty_id: u32) {
         let crypto_kitties_sc_address = self.crypto_kitties_sc_address().get();
-        self.kitty_proxy(crypto_kitties_sc_address)
+        self.tx()
+            .to(&crypto_kitties_sc_address)
+            .typed(kitty_ownership_proxy::KittyOwnershipProxy)
             .get_kitty_by_id_endpoint(kitty_id)
-            .async_call()
             .with_callback(self.callbacks().get_kitty_callback(zombie_id))
-            .call_and_exit();
+            .async_call_and_exit();
     }
-    #[proxy]
-    fn kitty_proxy(&self, to: ManagedAddress) -> crypto_kitties_proxy::Proxy<Self::Api>;
 }
