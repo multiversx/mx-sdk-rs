@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+
 use multiversx_sc::proxy_imports::*;
 
 pub struct NftMarketplaceProxy;
