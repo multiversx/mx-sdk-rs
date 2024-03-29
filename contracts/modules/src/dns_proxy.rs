@@ -2,23 +2,23 @@
 
 use multiversx_sc::proxy_imports::*;
 
-pub struct UserBuiltinProxy;
+pub struct DnsProxy;
 
-impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for UserBuiltinProxy
+impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for DnsProxy
 where
     Env: TxEnv,
     From: TxFrom<Env>,
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    type TxProxyMethods = UserBuiltinProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = DnsProxyMethods<Env, From, To, Gas>;
 
     fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
-        UserBuiltinProxyMethods { wrapped_tx: tx }
+        DnsProxyMethods { wrapped_tx: tx }
     }
 }
 
-pub struct UserBuiltinProxyMethods<Env, From, To, Gas>
+pub struct DnsProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -29,7 +29,7 @@ where
 }
 
 #[rustfmt::skip]
-impl<Env, From, To, Gas> UserBuiltinProxyMethods<Env, From, To, Gas>
+impl<Env, From, To, Gas> DnsProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     Env::Api: VMApi,
@@ -37,7 +37,7 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn set_user_name<
+    pub fn register<
         Arg0: CodecInto<ManagedBuffer<Env::Api>>,
     >(
         self,
@@ -45,17 +45,8 @@ where
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call()
-            .function_name("SetUserName")
+            .function_name("register")
             .argument(&name)
-            .original_result()
-    }
-
-    pub fn delete_user_name(
-        self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
-        self.wrapped_tx
-            .raw_call()
-            .function_name("DeleteUserName")
             .original_result()
     }
 }

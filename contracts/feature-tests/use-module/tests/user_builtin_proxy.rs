@@ -38,24 +38,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn set_user_name<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: CodecInto<BoxedBytes>,
     >(
         self,
         name: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
             .raw_call()
             .function_name("SetUserName")
             .argument(&name)
-            .original_result()
-    }
-
-    pub fn delete_user_name(
-        self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
-        self.wrapped_tx
-            .raw_call()
-            .function_name("DeleteUserName")
             .original_result()
     }
 }

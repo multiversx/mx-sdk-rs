@@ -1,30 +1,21 @@
-mod user_builtin {
-    multiversx_sc::imports!();
-
-    #[multiversx_sc::proxy]
-    pub trait UserBuiltin {
-        #[endpoint(SetUserName)]
-        fn set_user_name(&self, name: &BoxedBytes) -> BigUint;
-    }
-}
-
+pub mod user_builtin_proxy;
 mod dns_mock {
+    use crate::user_builtin_proxy;
+
     multiversx_sc::imports!();
 
     #[multiversx_sc::contract]
     pub trait DnsMock {
-        #[proxy]
-        fn user_builtin_proxy(&self, to: ManagedAddress) -> super::user_builtin::Proxy<Self::Api>;
-
         #[payable("EGLD")]
         #[endpoint]
         fn register(&self, name: BoxedBytes) {
             let _payment = self.call_value().egld_value();
             let address = self.blockchain().get_caller();
-            self.user_builtin_proxy(address)
+            self.tx()
+                .to(&address)
+                .typed(user_builtin_proxy::UserBuiltinProxy)
                 .set_user_name(&name)
-                .async_call()
-                .call_and_exit()
+                .async_call_and_exit();
         }
     }
 }
