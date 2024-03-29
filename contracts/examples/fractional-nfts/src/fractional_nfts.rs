@@ -5,6 +5,7 @@ use multiversx_sc::imports::*;
 use multiversx_sc_modules::default_issue_callbacks;
 mod fractional_uri_info;
 use fractional_uri_info::FractionalUriInfo;
+pub mod nft_marketplace_proxy;
 
 #[multiversx_sc::contract]
 pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
@@ -39,10 +40,11 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
         token_nonce: u64,
     ) {
         let caller = self.blockchain().get_caller();
-        self.marketplace_proxy(marketplace_address)
+        self.tx()
+            .to(&marketplace_address)
+            .typed(nft_marketplace_proxy::NftMarketplaceProxy)
             .claim_tokens(caller, token_id, token_nonce)
-            .async_call()
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     #[payable("*")]
@@ -138,25 +140,4 @@ pub trait FractionalNfts: default_issue_callbacks::DefaultIssueCallbacksModule {
     #[view(getFractionalToken)]
     #[storage_mapper("fractional_token")]
     fn fractional_token(&self) -> NonFungibleTokenMapper;
-
-    #[proxy]
-    fn marketplace_proxy(
-        &self,
-        sc_address: ManagedAddress,
-    ) -> nft_marketplace_proxy::Proxy<Self::Api>;
-}
-
-mod nft_marketplace_proxy {
-    use multiversx_sc::imports::*;
-
-    #[multiversx_sc::proxy]
-    pub trait NftMarketplace {
-        #[endpoint(claimTokens)]
-        fn claim_tokens(
-            &self,
-            claim_destination: &ManagedAddress,
-            token_id: &EgldOrEsdtTokenIdentifier,
-            token_nonce: u64,
-        ) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>>;
-    }
 }
