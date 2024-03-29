@@ -67,17 +67,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> SimpleErc20TokenProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     /// Total number of tokens in existence. 
     pub fn total_supply(
         self,
