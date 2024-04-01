@@ -1,11 +1,10 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    proxy_imports::EgldOrMultiEsdtPayment,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPaymentRefs,
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedOption,
-        ManagedVec, MultiEsdtPayment, TokenIdentifier,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
+        EgldOrMultiEsdtPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
+        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment, TokenIdentifier,
     },
 };
 

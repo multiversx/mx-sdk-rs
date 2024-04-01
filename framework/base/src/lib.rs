@@ -23,7 +23,6 @@ pub mod abi;
 pub mod api;
 pub mod contract_base;
 pub mod err_msg;
-pub mod esdt;
 pub mod external_view_contract;
 pub mod formatter;
 pub mod hex_call_data;
@@ -51,13 +50,12 @@ pub mod imports {
         },
         contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
         err_msg,
-        esdt::*,
         io::*,
         non_zero_usize,
         non_zero_util::*,
         require, sc_format, sc_panic, sc_print,
         storage::mappers::*,
-        types::*,
+        types::{system_proxy::*, *},
     };
     pub use core::ops::{
         Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,

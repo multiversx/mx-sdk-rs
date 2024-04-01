@@ -3,10 +3,9 @@ use alloc::borrow::ToOwned;
 use crate::{
     api::ManagedTypeApi,
     contract_base::SendRawWrapper,
-    proxy_imports::{AnnotatedValue, EgldOrMultiEsdtPayment, ManagedType},
     types::{
-        BigUint, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec,
-        MultiEsdtPayment, TxFrom, TxToSpecified,
+        AnnotatedValue, BigUint, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
+        ManagedAddress, ManagedType, ManagedVec, MultiEsdtPayment, TxFrom, TxToSpecified,
     },
 };
 
