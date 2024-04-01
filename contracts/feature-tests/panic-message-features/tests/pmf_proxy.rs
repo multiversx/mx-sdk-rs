@@ -61,6 +61,17 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+}
+
+#[rustfmt::skip]
+impl<Env, From, To, Gas> PanicMessageFeaturesProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    Env::Api: VMApi,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
     pub fn panic_with_message<
         Arg0: CodecInto<u32>,
     >(
@@ -68,8 +79,7 @@ where
         some_value: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("panicWithMessage")
+            .raw_call("panicWithMessage")
             .argument(&some_value)
             .original_result()
     }
@@ -79,8 +89,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("panicAfterLog")
+            .raw_call("panicAfterLog")
             .original_result()
     }
 
@@ -88,8 +97,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("sc_panic")
+            .raw_call("sc_panic")
             .original_result()
     }
 }

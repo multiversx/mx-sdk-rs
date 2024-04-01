@@ -179,8 +179,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
                 .to(self.extract_proxy_to())
                 .original_result()
-                .raw_call()
-                .function_name(#endpoint_name)
+                .raw_call(#endpoint_name)
                 #payment_init
                 #(#arg_push_snippets)*
         }

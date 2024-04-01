@@ -86,8 +86,7 @@ where
         arg1: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("payMe")
+            .raw_call("payMe")
             .argument(&arg1)
             .original_result()
     }
@@ -99,8 +98,7 @@ where
         arg1: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("payMeWithResult")
+            .raw_call("payMeWithResult")
             .argument(&arg1)
             .original_result()
     }

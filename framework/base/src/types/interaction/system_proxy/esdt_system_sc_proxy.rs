@@ -206,8 +206,7 @@ where
         };
 
         self.wrapped_tx
-            .raw_call()
-            .function_name(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME)
+            .raw_call(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME)
             .egld(issue_cost)
             .argument(&token_display_name)
             .argument(&token_ticker)
@@ -236,8 +235,7 @@ where
 
         let mut tx = self
             .wrapped_tx
-            .raw_call()
-            .function_name(endpoint_name)
+            .raw_call(endpoint_name)
             .egld(issue_cost)
             .argument(token_display_name)
             .argument(token_ticker);
@@ -280,8 +278,7 @@ where
         amount: &BigUint<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("mint")
+            .raw_call("mint")
             .argument(token_identifier)
             .argument(amount)
             .original_result()
@@ -295,8 +292,7 @@ where
         amount: &BigUint<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("ESDTBurn")
+            .raw_call("ESDTBurn")
             .argument(token_identifier)
             .argument(amount)
             .original_result()
@@ -309,8 +305,7 @@ where
         token_identifier: &TokenIdentifier<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("pause")
+            .raw_call("pause")
             .argument(token_identifier)
             .original_result()
     }
@@ -321,8 +316,7 @@ where
         token_identifier: &TokenIdentifier<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("unPause")
+            .raw_call("unPause")
             .argument(token_identifier)
             .original_result()
     }
@@ -336,8 +330,7 @@ where
         address: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("freeze")
+            .raw_call("freeze")
             .argument(token_identifier)
             .argument(address)
             .original_result()
@@ -350,8 +343,7 @@ where
         address: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("unFreeze")
+            .raw_call("unFreeze")
             .argument(token_identifier)
             .argument(address)
             .original_result()
@@ -367,8 +359,7 @@ where
         address: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("wipe")
+            .raw_call("wipe")
             .argument(token_identifier)
             .argument(address)
             .original_result()
@@ -384,8 +375,7 @@ where
         address: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("freezeSingleNFT")
+            .raw_call("freezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
             .argument(address)
@@ -400,8 +390,7 @@ where
         address: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("unFreezeSingleNFT")
+            .raw_call("unFreezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
             .argument(address)
@@ -419,8 +408,7 @@ where
         address: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("wipeSingleNFT")
+            .raw_call("wipeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
             .argument(address)
@@ -435,8 +423,7 @@ where
         num_decimals: usize,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("changeSFTToMetaESDT")
+            .raw_call("changeSFTToMetaESDT")
             .argument(&token_identifier)
             .argument(&num_decimals)
             .original_result()
@@ -454,8 +441,7 @@ where
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         let mut tx = self
             .wrapped_tx
-            .raw_call()
-            .function_name("setSpecialRole")
+            .raw_call("setSpecialRole")
             .argument(token_identifier)
             .argument(address);
         for role in roles_iter {
@@ -479,8 +465,7 @@ where
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         let mut tx = self
             .wrapped_tx
-            .raw_call()
-            .function_name("unSetSpecialRole")
+            .raw_call("unSetSpecialRole")
             .argument(token_identifier)
             .argument(address);
         for role in roles_iter {
@@ -498,8 +483,7 @@ where
         new_owner: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("transferOwnership")
+            .raw_call("transferOwnership")
             .argument(token_identifier)
             .argument(new_owner)
             .original_result()
@@ -512,8 +496,7 @@ where
         new_creator: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("transferNFTCreateRole")
+            .raw_call("transferNFTCreateRole")
             .argument(token_identifier)
             .argument(old_creator)
             .argument(new_creator)
@@ -527,8 +510,7 @@ where
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         let mut tx = self
             .wrapped_tx
-            .raw_call()
-            .function_name("controlChanges")
+            .raw_call("controlChanges")
             .argument(token_identifier);
         append_token_property_arguments(&mut tx.data, property_arguments);
         tx.original_result()

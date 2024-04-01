@@ -39,8 +39,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("pause")
+            .raw_call("pause")
             .original_result()
     }
 
@@ -48,8 +47,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("unpause")
+            .raw_call("unpause")
             .original_result()
     }
 }

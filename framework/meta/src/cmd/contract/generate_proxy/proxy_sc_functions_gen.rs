@@ -180,8 +180,7 @@ fn write_endpoint_content(file: &mut File, function_name: String, inputs: Vec<In
     writeln!(
         file,
         "        self.wrapped_tx
-            .raw_call()
-            .function_name(\"{}\")",
+            .raw_call(\"{}\")",
         function_name
     )
     .unwrap();

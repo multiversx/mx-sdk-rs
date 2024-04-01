@@ -94,8 +94,7 @@ where
         args: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("echo_arguments")
+            .raw_call("echo_arguments")
             .argument(&args)
             .original_result()
     }
@@ -107,8 +106,7 @@ where
         args: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("echo_arguments_without_storage")
+            .raw_call("echo_arguments_without_storage")
             .argument(&args)
             .original_result()
     }
@@ -117,8 +115,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("echo_caller")
+            .raw_call("echo_caller")
             .original_result()
     }
 
@@ -126,8 +123,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("accept_funds")
+            .raw_call("accept_funds")
             .original_result()
     }
 
@@ -135,8 +131,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("accept_funds_echo_payment")
+            .raw_call("accept_funds_echo_payment")
             .original_result()
     }
 
@@ -144,8 +139,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("accept_funds_single_esdt_transfer")
+            .raw_call("accept_funds_single_esdt_transfer")
             .original_result()
     }
 
@@ -153,8 +147,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("reject_funds")
+            .raw_call("reject_funds")
             .original_result()
     }
 
@@ -169,8 +162,7 @@ where
         opt_receive_func: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("retrieve_funds_with_transfer_exec")
+            .raw_call("retrieve_funds_with_transfer_exec")
             .argument(&token)
             .argument(&amount)
             .argument(&opt_receive_func)
@@ -186,8 +178,7 @@ where
         back_transfer_value: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("retrieve_funds_promises")
+            .raw_call("retrieve_funds_promises")
             .argument(&back_transfers)
             .argument(&back_transfer_value)
             .original_result()
@@ -204,8 +195,7 @@ where
         amount: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("retrieve_funds")
+            .raw_call("retrieve_funds")
             .argument(&token)
             .argument(&nonce)
             .argument(&amount)
@@ -219,8 +209,7 @@ where
         token_payments: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("retrieve_multi_funds_async")
+            .raw_call("retrieve_multi_funds_async")
             .argument(&token_payments)
             .original_result()
     }
@@ -229,8 +218,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("burn_and_create_retrive_async")
+            .raw_call("burn_and_create_retrive_async")
             .original_result()
     }
 
@@ -238,8 +226,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("get_owner_address")
+            .raw_call("get_owner_address")
             .original_result()
     }
 
@@ -252,8 +239,7 @@ where
         endpoint: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("call_counts")
+            .raw_call("call_counts")
             .argument(&endpoint)
             .original_result()
     }
@@ -262,8 +248,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("num_called_retrieve_funds_promises")
+            .raw_call("num_called_retrieve_funds_promises")
             .original_result()
     }
 
@@ -271,8 +256,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, usize> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("num_async_calls_sent_from_child")
+            .raw_call("num_async_calls_sent_from_child")
             .original_result()
     }
 }

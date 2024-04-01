@@ -83,8 +83,7 @@ where
         initial_supply: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("issueWrappedEgld")
+            .raw_call("issueWrappedEgld")
             .argument(&token_display_name)
             .argument(&token_ticker)
             .argument(&initial_supply)
@@ -95,8 +94,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getWrappedEgldTokenIdentifier")
+            .raw_call("getWrappedEgldTokenIdentifier")
             .original_result()
     }
 }
