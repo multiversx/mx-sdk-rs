@@ -2,8 +2,9 @@ use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
     types::{
-        CallbackClosure, OriginalResultMarker, Tx, TxData, TxDataFunctionCall, TxEnv, TxFrom,
-        TxGas, TxPayment, TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+        CallbackClosure, OriginalResultMarker, Tx, TxData, TxDataFunctionCall,
+        TxEmptyResultHandler, TxEnv, TxFrom, TxGas, TxPayment, TxResultHandler, TxScEnv, TxTo,
+        TxToSpecified,
     },
 };
 
@@ -62,13 +63,14 @@ where
     }
 }
 
-impl<Api, To, Payment, Gas, Data> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, ()>
+impl<Api, To, Payment, Gas, Data, EmptyRH> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, EmptyRH>
 where
     Api: CallTypeApi,
     To: TxTo<TxScEnv<Api>>,
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     Data: TxData<TxScEnv<Api>>,
+    EmptyRH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
     #[inline]
     pub fn callback<RH>(self, callback: RH) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, Data, RH>
@@ -87,14 +89,14 @@ where
     }
 }
 
-impl<Api, To, Payment, Gas, FC, OriginalResult>
-    Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, OriginalResultMarker<OriginalResult>>
+impl<Api, To, Payment, Gas, FC, EmptyRH> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, EmptyRH>
 where
     Api: CallTypeApi,
     To: TxToSpecified<TxScEnv<Api>>,
     Payment: TxPayment<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     FC: TxDataFunctionCall<TxScEnv<Api>>,
+    EmptyRH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
     /// Backwards compatibility.
     pub fn with_callback<RH>(self, callback: RH) -> Tx<TxScEnv<Api>, (), To, Payment, Gas, FC, RH>

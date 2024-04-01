@@ -1,20 +1,18 @@
 use core::marker::PhantomData;
 
-use super::properties::*;
+// use super::properties::*;
 use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},
+    proxy_imports::SystemSCAddress,
     types::{
         BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
         EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
     },
 };
 
-/// Address of the system smart contract that manages ESDT.
-/// Bech32: erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u
-pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000002ffff");
+use super::token_properties::*;
 
 const ISSUE_FUNGIBLE_ENDPOINT_NAME: &str = "issue";
 const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &str = "issueNonFungible";
@@ -25,6 +23,10 @@ const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
 /// so the proxy object doesn't really contain any data, it is more of a placeholder.
+#[deprecated(
+    since = "0.48.0",
+    note = "There is a new `SystemSCProxy`, which uses the new proxy model."
+)]
 pub struct ESDTSystemSmartContractProxy<SA>
 where
     SA: SendApi + 'static,
@@ -470,7 +472,7 @@ where
     }
 
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        ManagedAddress::new_from_bytes(&ESDT_SYSTEM_SC_ADDRESS_ARRAY)
+        SystemSCAddress.managed_address()
     }
 
     fn esdt_system_sc_call_no_args(
