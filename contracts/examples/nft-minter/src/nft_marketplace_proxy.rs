@@ -46,8 +46,7 @@ where
         claim_destination: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("claimTokens")
+            .raw_call("claimTokens")
             .argument(&token_id)
             .argument(&token_nonce)
             .argument(&claim_destination)

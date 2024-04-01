@@ -85,8 +85,7 @@ where
         counter: Arg3,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("recursive_send_funds")
+            .raw_call("recursive_send_funds")
             .argument(&to)
             .argument(&token_identifier)
             .argument(&amount)

@@ -65,8 +65,7 @@ where
         token_nonce: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("claimTokens")
+            .raw_call("claimTokens")
             .argument(&claim_destination)
             .argument(&token_id)
             .argument(&token_nonce)

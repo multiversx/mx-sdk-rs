@@ -68,6 +68,17 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+}
+
+#[rustfmt::skip]
+impl<Env, From, To, Gas> SeedNftMinterProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    Env::Api: VMApi,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
     pub fn create_nft<
         Arg0: CodecInto<ManagedBuffer<Env::Api>>,
         Arg1: CodecInto<BigUint<Env::Api>>,
@@ -85,8 +96,7 @@ where
         opt_token_used_as_payment_nonce: Arg5,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("createNft")
+            .raw_call("createNft")
             .argument(&name)
             .argument(&royalties)
             .argument(&uri)
@@ -105,8 +115,7 @@ where
         token_nonce: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("claimAndDistribute")
+            .raw_call("claimAndDistribute")
             .argument(&token_id)
             .argument(&token_nonce)
             .original_result()
@@ -116,8 +125,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getMarketplaces")
+            .raw_call("getMarketplaces")
             .original_result()
     }
 
@@ -125,8 +133,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, u64> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getNftCount")
+            .raw_call("getNftCount")
             .original_result()
     }
 
@@ -134,8 +141,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, Distribution<Env::Api>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getDistributionRules")
+            .raw_call("getDistributionRules")
             .original_result()
     }
 
@@ -148,8 +154,7 @@ where
         token_ticker: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("issueToken")
+            .raw_call("issueToken")
             .argument(&token_display_name)
             .argument(&token_ticker)
             .original_result()
@@ -162,8 +167,7 @@ where
         nft_nonce: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("buyNft")
+            .raw_call("buyNft")
             .argument(&nft_nonce)
             .original_result()
     }
@@ -175,8 +179,7 @@ where
         nft_nonce: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getNftPrice")
+            .raw_call("getNftPrice")
             .argument(&nft_nonce)
             .original_result()
     }
@@ -185,8 +188,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getNftTokenId")
+            .raw_call("getNftTokenId")
             .original_result()
     }
 }
