@@ -488,7 +488,7 @@ where
         writeln!(self.file, "    }},").unwrap();
     }
 
-    fn clean_paths(&mut self, proxy_crate: &str, rust_type: &str) -> String {
+    pub fn clean_paths(&mut self, proxy_crate: &str, rust_type: &str) -> String {
         let delimiters = "<>,()[] ";
         let words: Vec<&str> = rust_type
             .split(|c| delimiters.contains(c))
@@ -579,5 +579,83 @@ where
 
     fn write_end_of_function(&mut self) {
         writeln!(self.file, "    }}").unwrap();
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+
+    use std::{fs::File, mem::MaybeUninit};
+
+    use multiversx_sc::abi::{BuildInfoAbi, ContractAbi, ContractCrateBuildAbi, FrameworkBuildAbi};
+
+    use crate::cmd::contract::meta_config::MetaConfig;
+
+    use super::ProxyGenerator;
+
+    #[test]
+    fn clean_paths_unsanitized_test() {
+        let build_info = BuildInfoAbi {
+            contract_crate: ContractCrateBuildAbi {
+                name: "test",
+                version: "0.0.0",
+                git_version: "0.0.0",
+            },
+            framework: FrameworkBuildAbi::create(),
+        };
+
+        let original_contract_abi = ContractAbi::new(build_info, &[""], "test", false);
+        let meta_config = MetaConfig::create(original_contract_abi, false);
+        let file = unsafe { &mut *(MaybeUninit::<File>::uninit().as_mut_ptr()) };
+        let mut proxy_generator = ProxyGenerator::new(&meta_config, file);
+        let name = proxy_generator
+            .meta_config
+            .original_contract_abi
+            .build_info
+            .contract_crate
+            .name;
+
+        let cleaned_path_unsanitized = proxy_generator.clean_paths(
+            name,
+            "(testt::path::test::to::TestStruct, Option<path::to::test::Box<AbiTestType>>)",
+        );
+        let expected_result_unsanitized =
+            "(testt::path::test::to::TestStruct, Option<path::to::test::Box<AbiTestType>>)";
+
+        assert_eq!(
+            expected_result_unsanitized,
+            cleaned_path_unsanitized.as_str()
+        );
+    }
+
+    #[test]
+    fn clean_paths_sanitized_test() {
+        let build_info = BuildInfoAbi {
+            contract_crate: ContractCrateBuildAbi {
+                name: "test",
+                version: "0.0.0",
+                git_version: "0.0.0",
+            },
+            framework: FrameworkBuildAbi::create(),
+        };
+
+        let original_contract_abi = ContractAbi::new(build_info, &[""], "test", false);
+        let meta_config = MetaConfig::create(original_contract_abi, false);
+        let file = unsafe { &mut *(MaybeUninit::<File>::uninit().as_mut_ptr()) };
+        let mut proxy_generator = ProxyGenerator::new(&meta_config, file);
+        let name = proxy_generator
+            .meta_config
+            .original_contract_abi
+            .build_info
+            .contract_crate
+            .name;
+
+        let cleaned_path_sanitized = proxy_generator.clean_paths(
+            name,
+            "(test::path::test::to::TestStruct, Option<test::path::to::test::Box<AbiTestType>>)",
+        );
+        let expected_result_sanitized = "(TestStruct, Option<Box<AbiTestType>>)";
+
+        assert_eq!(expected_result_sanitized, cleaned_path_sanitized.as_str());
     }
 }
