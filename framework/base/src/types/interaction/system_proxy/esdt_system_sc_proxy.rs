@@ -40,14 +40,15 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    type TxProxyMethods = SystemSCProxyMethods<Env, From, To, Gas>;
+    type TxProxyMethods = ESDTSystemSCProxyMethods<Env, From, To, Gas>;
 
     fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
-        SystemSCProxyMethods { wrapped_tx: tx }
+        ESDTSystemSCProxyMethods { wrapped_tx: tx }
     }
 }
 
-pub struct SystemSCProxyMethods<Env, From, To, Gas>
+/// Method container of the ESDT system smart contract proxy.
+pub struct ESDTSystemSCProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,
@@ -57,7 +58,7 @@ where
     wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
 }
 
-impl<Env, From, To, Gas> SystemSCProxyMethods<Env, From, To, Gas>
+impl<Env, From, To, Gas> ESDTSystemSCProxyMethods<Env, From, To, Gas>
 where
     Env: TxEnv,
     From: TxFrom<Env>,

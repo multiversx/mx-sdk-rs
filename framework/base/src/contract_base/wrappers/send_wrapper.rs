@@ -12,10 +12,10 @@ use crate::{
     },
     codec,
     types::{
-        system_proxy, system_proxy::ESDTSystemSCProxy, BigUint, ContractCall,
-        ContractCallNoPayment, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-        GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
-        ReturnsRawResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
+        system_proxy, BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
+        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, GasLeft, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedType, ManagedVec, ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
+        TxScEnv,
     },
 };
 
@@ -54,7 +54,7 @@ where
     /// Backwards compatibility, synonymous to `esdt_system_sc_tx`, which is the more appropriate name now.
     pub fn esdt_system_sc_proxy(
         &self,
-    ) -> system_proxy::SystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
+    ) -> system_proxy::ESDTSystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
         self.esdt_system_sc_tx()
     }
 
@@ -62,10 +62,10 @@ where
     /// It has the destination address set, as well as the contract type (as specified in the proxy).
     pub fn esdt_system_sc_tx(
         &self,
-    ) -> system_proxy::SystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
+    ) -> system_proxy::ESDTSystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
         Tx::new_tx_from_sc()
             .to(ESDTSystemSCAddress)
-            .typed(ESDTSystemSCProxy)
+            .typed(system_proxy::ESDTSystemSCProxy)
     }
 
     /// Convenient way to quickly instance a minimal contract call (with no EGLD, no arguments, etc.)
