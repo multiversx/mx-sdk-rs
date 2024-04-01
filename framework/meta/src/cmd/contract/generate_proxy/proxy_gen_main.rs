@@ -5,16 +5,17 @@ use super::{
 const OUTPUT_PROXY_PATH: &str = "/output/proxy.rs";
 
 impl MetaConfig {
-    pub fn generate_proxy(&self) {
+    pub fn generate_proxy(&mut self) {
         write_proxy_with_explicit_path(OUTPUT_PROXY_PATH, self);
-        for path in &self.sc_config.proxy_paths {
-            write_proxy_with_explicit_path(path, self);
+        let proxy_paths = self.sc_config.proxy_paths.clone();
+        for path in proxy_paths {
+            write_proxy_with_explicit_path(&path, self);
         }
     }
 }
 
-fn write_proxy_with_explicit_path(path: &str, meta_config: &MetaConfig) {
-    let file = create_file(path);
-    let proxy_generator = ProxyGenerator::new(meta_config);
-    proxy_generator.write_proxy_to_file(file);
+fn write_proxy_with_explicit_path(path: &str, meta_config: &mut MetaConfig) {
+    let mut file = create_file(path);
+    let mut proxy_generator = ProxyGenerator::new(meta_config, &mut file);
+    proxy_generator.write_proxy_to_file();
 }
