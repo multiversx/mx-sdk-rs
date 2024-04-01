@@ -4,8 +4,8 @@ use crate::{
     codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
     types::{
-        system_proxy::{FungibleTokenProperties, SystemSCProxy},
-        SystemSCAddress, Tx,
+        system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
+        ESDTSystemSCAddress, Tx,
     },
 };
 
@@ -127,8 +127,8 @@ where
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_fungible(
                 issue_cost,
                 &token_display_name,
@@ -175,8 +175,8 @@ where
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_and_set_all_roles(
                 issue_cost,
                 token_display_name,

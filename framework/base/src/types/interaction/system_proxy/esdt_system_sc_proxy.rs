@@ -19,6 +19,7 @@ const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &str = "issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &str = "registerMetaESDT";
 const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 
+/// The specific `Tx` type produces by the issue operations of the ESDTSystemSCProxy.
 pub type IssueCall<Env, From, To, Gas> = Tx<
     Env,
     From,
@@ -30,9 +31,9 @@ pub type IssueCall<Env, From, To, Gas> = Tx<
 >;
 
 /// Proxy for the ESDT system smart contract.
-pub struct SystemSCProxy;
+pub struct ESDTSystemSCProxy;
 
-impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for SystemSCProxy
+impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for ESDTSystemSCProxy
 where
     Env: TxEnv,
     From: TxFrom<Env>,

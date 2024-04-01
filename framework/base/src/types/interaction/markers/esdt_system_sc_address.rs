@@ -18,9 +18,9 @@ const SYSTEM_SC_ADDRESS_ANNOTATION: &str =
     "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 
 /// Indicates the system SC address, which is the same on any MultiversX blockchain.
-pub struct SystemSCAddress;
+pub struct ESDTSystemSCAddress;
 
-impl SystemSCAddress {
+impl ESDTSystemSCAddress {
     pub fn managed_address<Api>(self) -> ManagedAddress<Api>
     where
         Api: ManagedTypeApi,
@@ -29,7 +29,7 @@ impl SystemSCAddress {
     }
 }
 
-impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for SystemSCAddress
+impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for ESDTSystemSCAddress
 where
     Api: CallTypeApi,
 {
@@ -38,9 +38,9 @@ where
     }
 
     fn to_value(&self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {
-        SystemSCAddress.managed_address()
+        ESDTSystemSCAddress.managed_address()
     }
 }
 
-impl<Api> TxTo<TxScEnv<Api>> for SystemSCAddress where Api: CallTypeApi {}
-impl<Api> TxToSpecified<TxScEnv<Api>> for SystemSCAddress where Api: CallTypeApi {}
+impl<Api> TxTo<TxScEnv<Api>> for ESDTSystemSCAddress where Api: CallTypeApi {}
+impl<Api> TxToSpecified<TxScEnv<Api>> for ESDTSystemSCAddress where Api: CallTypeApi {}

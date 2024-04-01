@@ -4,8 +4,8 @@ use crate::{
     storage::StorageKey,
     storage_get, storage_get_len, storage_set,
     types::{
-        system_proxy::SystemSCProxy, CallbackClosure, EsdtLocalRole, EsdtTokenPayment,
-        ManagedAddress, ManagedRef, ManagedVec, SystemSCAddress, TokenIdentifier, Tx,
+        system_proxy::ESDTSystemSCProxy, CallbackClosure, ESDTSystemSCAddress, EsdtLocalRole,
+        EsdtTokenPayment, ManagedAddress, ManagedRef, ManagedVec, TokenIdentifier, Tx,
     },
 };
 
@@ -82,8 +82,8 @@ where
 
         let token_id = self.get_token_id_ref();
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .set_special_roles(address, token_id, roles[..].iter().cloned())
             .callback(opt_callback)
             .call_and_exit()

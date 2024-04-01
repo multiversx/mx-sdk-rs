@@ -4,8 +4,8 @@ use crate::{
     },
     storage_clear, storage_get, storage_set,
     types::{
-        system_proxy::SystemSCProxy, EgldPayment, FunctionCall, OriginalResultMarker,
-        SystemSCAddress, Tx, TxScEnv,
+        system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
+        OriginalResultMarker, Tx, TxScEnv,
     },
 };
 
@@ -34,7 +34,7 @@ const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible i
 pub type IssueCallTo<Api> = Tx<
     TxScEnv<Api>,
     (),
-    SystemSCAddress,
+    ESDTSystemSCAddress,
     EgldPayment<Api>,
     (),
     FunctionCall<Api>,
@@ -192,8 +192,8 @@ where
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_and_set_all_roles(
                 issue_cost,
                 token_display_name,
@@ -230,8 +230,8 @@ where
         token_ticker: ManagedBuffer<SA>,
     ) -> IssueCallTo<SA> {
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_non_fungible(
                 issue_cost,
                 &token_display_name,
@@ -246,8 +246,8 @@ where
         token_ticker: ManagedBuffer<SA>,
     ) -> IssueCallTo<SA> {
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_semi_fungible(
                 issue_cost,
                 &token_display_name,
@@ -268,8 +268,8 @@ where
         };
 
         Tx::new_tx_from_sc()
-            .to(SystemSCAddress)
-            .typed(SystemSCProxy)
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .register_meta_esdt(issue_cost, &token_display_name, &token_ticker, properties)
     }
 

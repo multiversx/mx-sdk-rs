@@ -5,7 +5,7 @@ use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},
-    proxy_imports::SystemSCAddress,
+    proxy_imports::ESDTSystemSCAddress,
     types::{
         BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
         EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
@@ -25,7 +25,7 @@ const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 /// so the proxy object doesn't really contain any data, it is more of a placeholder.
 #[deprecated(
     since = "0.48.0",
-    note = "There is a new `SystemSCProxy`, which uses the new proxy model."
+    note = "There is a new `ESDTSystemSCProxy`, which uses the new proxy model."
 )]
 pub struct ESDTSystemSmartContractProxy<SA>
 where
@@ -472,7 +472,7 @@ where
     }
 
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        SystemSCAddress.managed_address()
+        ESDTSystemSCAddress.managed_address()
     }
 
     fn esdt_system_sc_call_no_args(
