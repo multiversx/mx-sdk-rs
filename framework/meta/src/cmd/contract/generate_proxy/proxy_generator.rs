@@ -319,8 +319,7 @@ where
         writeln!(
             self.file,
             "        self.wrapped_tx
-            .raw_call()
-            .function_name(\"{}\")",
+            .raw_call(\"{}\")",
             endpoint.name
         )
         .unwrap();

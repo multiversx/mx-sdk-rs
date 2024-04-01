@@ -3,8 +3,8 @@ use core::marker::PhantomData;
 use multiversx_sc_codec::TopDecodeMulti;
 
 use crate::types::{
-    interaction::contract_call_exec::decode_result, ManagedBuffer, ManagedVec, RHListItem,
-    RHListItemExec, SyncCallRawResult, TxEnv,
+    interaction::decode_result, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec,
+    SyncCallRawResult, TxEnv,
 };
 
 /// Defines a lambda function to be called on the decoded result.

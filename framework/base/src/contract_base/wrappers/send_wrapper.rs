@@ -11,11 +11,11 @@ use crate::{
         ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
     },
     codec,
-    esdt::ESDTSystemSmartContractProxy,
     types::{
-        BigUint, ContractCall, ContractCallNoPayment, EgldOrEsdtTokenIdentifier, EsdtTokenPayment,
-        GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec,
-        ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
+        system_proxy, BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
+        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, GasLeft, ManagedAddress, ManagedArgBuffer,
+        ManagedBuffer, ManagedType, ManagedVec, ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
+        TxScEnv,
     },
 };
 
@@ -51,12 +51,21 @@ where
         SendRawWrapper::new()
     }
 
-    /// A proxy for calling the system smart contract.
-    ///
-    /// Use the methods of this proxy to launch contract calls to the system SC.
-    #[inline]
-    pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {
-        ESDTSystemSmartContractProxy::new_proxy_obj()
+    /// Backwards compatibility, synonymous to `esdt_system_sc_tx`, which is the more appropriate name now.
+    pub fn esdt_system_sc_proxy(
+        &self,
+    ) -> system_proxy::ESDTSystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
+        self.esdt_system_sc_tx()
+    }
+
+    /// Prepares a proxy object to call the system SC.
+    /// It has the destination address set, as well as the contract type (as specified in the proxy).
+    pub fn esdt_system_sc_tx(
+        &self,
+    ) -> system_proxy::ESDTSystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(system_proxy::ESDTSystemSCProxy)
     }
 
     /// Convenient way to quickly instance a minimal contract call (with no EGLD, no arguments, etc.)
@@ -291,10 +300,7 @@ where
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
     ) {
-        Tx::new_tx_from_sc()
-            .to(to)
-            .multi_esdt_ref(payments)
-            .transfer();
+        Tx::new_tx_from_sc().to(to).multi_esdt(payments).transfer();
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
@@ -386,8 +392,7 @@ where
         Tx::new_tx_from_sc()
             .to(ToSelf)
             .gas(gas)
-            .raw_call()
-            .function_name(endpoint_name)
+            .raw_call(endpoint_name)
             .arguments_raw(arg_buffer)
             .returns(ReturnsRawResult)
             .sync_call()
@@ -401,8 +406,7 @@ where
         Tx::new_tx_from_sc()
             .to(ToSelf)
             .gas(GasLeft)
-            .raw_call()
-            .function_name(function_name)
+            .raw_call(function_name)
             .arguments_raw(arg_buffer)
             .sync_call()
     }

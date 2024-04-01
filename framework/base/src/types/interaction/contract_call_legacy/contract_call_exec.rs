@@ -1,29 +1,22 @@
 use crate::{
-    api::{use_raw_handle, StaticVarApiImpl, StorageWriteApi},
+    api::{use_raw_handle, BlockchainApiImpl, CallTypeApi, StaticVarApiImpl, StorageWriteApi},
     codec::TopDecodeMulti,
-};
-
-use crate::{
-    api::{BlockchainApiImpl, CallTypeApi},
     contract_base::SendRawWrapper,
     formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
-        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType,
-        ManagedVec,
+        decode_result, AsyncCall, AsyncCallPromises, BigUint, EsdtTokenPayment, ManagedBuffer,
+        ManagedBufferCachedBuilder, ManagedType, ManagedVec, Tx, TRANSFER_EXECUTE_DEFAULT_LEFTOVER,
     },
 };
 
-use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, Tx};
+use super::{ContractCallNoPayment, ContractCallWithEgld};
 use crate::api::managed_types::handles::HandleConstraints;
 
 /// Using max u64 to represent maximum possible gas,
 /// so that the value zero is not reserved and can be specified explicitly.
 /// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
 pub(super) const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
-
-/// In case of `transfer_execute`, we leave by default a little gas for the calling transaction to finish.
-pub(super) const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
 
 impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
@@ -83,8 +76,8 @@ impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
     SA: CallTypeApi + 'static,
 {
-    pub(super) fn build_async_call_promise(self) -> super::AsyncCallPromises<SA> {
-        super::AsyncCallPromises {
+    pub(super) fn build_async_call_promise(self) -> AsyncCallPromises<SA> {
+        AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
             function_call: self.basic.function_call,
@@ -223,18 +216,4 @@ where
             _ => self.transfer_execute_multi_esdt(payments),
         }
     }
-}
-
-pub(super) fn decode_result<SA, RequestedResult>(
-    raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
-) -> RequestedResult
-where
-    SA: CallTypeApi + 'static,
-    RequestedResult: TopDecodeMulti,
-{
-    let mut loader = ManagedResultArgLoader::new(raw_result);
-    let arg_id = ArgId::from(&b"sync result"[..]);
-    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
-    let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
-    result
 }

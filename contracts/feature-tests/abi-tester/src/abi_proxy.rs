@@ -103,8 +103,7 @@ where
         att: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, AbiTestType> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("echo_abi_test_type")
+            .raw_call("echo_abi_test_type")
             .argument(&att)
             .original_result()
     }
@@ -116,8 +115,7 @@ where
         e: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, AbiEnum> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("echo_enum")
+            .raw_call("echo_enum")
             .argument(&e)
             .original_result()
     }
@@ -129,8 +127,7 @@ where
         _arg: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("take_managed_type")
+            .raw_call("take_managed_type")
             .argument(&_arg)
             .original_result()
     }
@@ -139,8 +136,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValue3<i32, [u8; 3], BoxedBytes>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("multi_result_3")
+            .raw_call("multi_result_3")
             .original_result()
     }
 
@@ -148,8 +144,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValue4<i32, [u8; 3], BoxedBytes, OnlyShowsUpAsNested03>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("multi_result_4")
+            .raw_call("multi_result_4")
             .original_result()
     }
 
@@ -162,8 +157,7 @@ where
         _var_args: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("var_args")
+            .raw_call("var_args")
             .argument(&_simple_arg)
             .argument(&_var_args)
             .original_result()
@@ -173,8 +167,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValueVec<MultiValue3<OnlyShowsUpAsNested05, bool, ()>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("multi_result_vec")
+            .raw_call("multi_result_vec")
             .original_result()
     }
 
@@ -187,8 +180,7 @@ where
         _opt_args: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("optional_arg")
+            .raw_call("optional_arg")
             .argument(&_simple_arg)
             .argument(&_opt_args)
             .original_result()
@@ -198,8 +190,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<OnlyShowsUpAsNested07>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("optional_result")
+            .raw_call("optional_result")
             .original_result()
     }
 
@@ -212,8 +203,7 @@ where
         h256: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<Address, H256>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("address_vs_h256")
+            .raw_call("address_vs_h256")
             .argument(&address)
             .argument(&h256)
             .original_result()
@@ -228,8 +218,7 @@ where
         byte_array: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<ManagedAddress<Env::Api>, ManagedByteArray<Env::Api, 32usize>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("managed_address_vs_byte_array")
+            .raw_call("managed_address_vs_byte_array")
             .argument(&address)
             .argument(&byte_array)
             .original_result()
@@ -239,8 +228,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, EsdtLocalRole> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("esdt_local_role")
+            .raw_call("esdt_local_role")
             .original_result()
     }
 
@@ -248,8 +236,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, EsdtTokenPayment<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("esdt_token_payment")
+            .raw_call("esdt_token_payment")
             .original_result()
     }
 
@@ -257,8 +244,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, EsdtTokenData<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("esdt_token_data")
+            .raw_call("esdt_token_data")
             .original_result()
     }
 
@@ -266,8 +252,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, OnlyShowsUpAsNestedInSingleValueMapper> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("sample_storage_mapper")
+            .raw_call("sample_storage_mapper")
             .original_result()
     }
 
@@ -275,8 +260,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, Vec<OnlyShowsUpAsNestedInVec>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_vec")
+            .raw_call("item_for_vec")
             .original_result()
     }
 
@@ -284,8 +268,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ArrayVec<OnlyShowsUpAsNestedInArrayVec, 3usize>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_array_vec")
+            .raw_call("item_for_array_vec")
             .original_result()
     }
 
@@ -293,8 +276,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, AbiManagedVecItem>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_managed_vec")
+            .raw_call("item_for_managed_vec")
             .original_result()
     }
 
@@ -305,8 +287,7 @@ where
         _array: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_array")
+            .raw_call("item_for_array")
             .argument(&_array)
             .original_result()
     }
@@ -315,8 +296,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, Box<OnlyShowsUpAsNestedInBox>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_box")
+            .raw_call("item_for_box")
             .original_result()
     }
 
@@ -324,8 +304,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, Box<[OnlyShowsUpAsNestedInBoxedSlice]>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_boxed_slice")
+            .raw_call("item_for_boxed_slice")
             .original_result()
     }
 
@@ -336,8 +315,7 @@ where
         _ref: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_ref")
+            .raw_call("item_for_ref")
             .argument(&_ref)
             .original_result()
     }
@@ -349,8 +327,7 @@ where
         _ref: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_slice")
+            .raw_call("item_for_slice")
             .argument(&_ref)
             .original_result()
     }
@@ -359,8 +336,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, Option<OnlyShowsUpAsNestedInOption>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("item_for_option")
+            .raw_call("item_for_option")
             .original_result()
     }
 
@@ -368,8 +344,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("payable_egld")
+            .raw_call("payable_egld")
             .original_result()
     }
 
@@ -377,8 +352,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("payable_some_token")
+            .raw_call("payable_some_token")
             .original_result()
     }
 
@@ -386,8 +360,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("payable_any_token")
+            .raw_call("payable_any_token")
             .original_result()
     }
 
@@ -395,8 +368,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("external_view")
+            .raw_call("external_view")
             .original_result()
     }
 
@@ -404,8 +376,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("label_a")
+            .raw_call("label_a")
             .original_result()
     }
 
@@ -413,8 +384,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("label_b")
+            .raw_call("label_b")
             .original_result()
     }
 }
@@ -487,6 +457,28 @@ pub struct OnlyShowsUpAsNested06 {
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested07 {
+}
+
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
+pub enum EsdtLocalRole {
+    None,
+    Mint,
+    Burn,
+    NftCreate,
+    NftAddQuantity,
+    NftBurn,
+    NftAddUri,
+    NftUpdateAttributes,
+    Transfer,
+}
+
+#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, ManagedVecItem)]
+pub enum EsdtTokenType {
+    Fungible,
+    NonFungible,
+    SemiFungible,
+    Meta,
+    Invalid,
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]

@@ -2,13 +2,11 @@ use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
     tuple_util::NestedTupleFlatten,
-    types::{CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec},
-};
-
-use super::{
-    tx_from, Code, DeployRawResult, FromSource, RHListExec, Tx, TxCodeValue, TxEmptyResultHandler,
-    TxFrom, TxFromSourceValue, TxGas, TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo,
-    UpgradeCall,
+    types::{
+        Code, CodeMetadata, DeployRawResult, FromSource, ManagedAddress, ManagedBuffer, ManagedVec,
+        RHListExec, Tx, TxCodeValue, TxEmptyResultHandler, TxFrom, TxFromSourceValue, TxGas,
+        TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo, UpgradeCall,
+    },
 };
 
 impl<Api, Payment, Gas, CodeValue, RH>

@@ -1,0 +1,2 @@
+[settings]
+proxy-paths = ["../rewards-distribution/src/seed_nft_minter_proxy.rs"]

@@ -1,20 +1,17 @@
 use core::marker::PhantomData;
 
-use super::properties::*;
+use super::token_properties::*;
 use hex_literal::hex;
 
 use crate::{
-    api::{CallTypeApi, SendApi},
+    api::{CallTypeApi, SendApi, VMApi},
     types::{
-        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
+        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EgldPayment,
+        EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress, ManagedBuffer,
+        OriginalResultMarker, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas, TxProxyCall, TxProxyTrait,
+        TxTo,
     },
 };
-
-/// Address of the system smart contract that manages ESDT.
-/// Bech32: erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u
-pub const ESDT_SYSTEM_SC_ADDRESS_ARRAY: [u8; 32] =
-    hex!("000000000000000000010000000000000000000000000000000000000002ffff");
 
 const ISSUE_FUNGIBLE_ENDPOINT_NAME: &str = "issue";
 const ISSUE_NON_FUNGIBLE_ENDPOINT_NAME: &str = "issueNonFungible";
@@ -22,43 +19,62 @@ const ISSUE_SEMI_FUNGIBLE_ENDPOINT_NAME: &str = "issueSemiFungible";
 const REGISTER_META_ESDT_ENDPOINT_NAME: &str = "registerMetaESDT";
 const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 
-/// Proxy for the ESDT system smart contract.
-/// Unlike other contract proxies, this one has a fixed address,
-/// so the proxy object doesn't really contain any data, it is more of a placeholder.
-pub struct ESDTSystemSmartContractProxy<SA>
-where
-    SA: SendApi + 'static,
-{
-    _phantom: PhantomData<SA>,
-}
+/// The specific `Tx` type produces by the issue operations of the ESDTSystemSCProxy.
+pub type IssueCall<Env, From, To, Gas> = Tx<
+    Env,
+    From,
+    To,
+    EgldPayment<<Env as TxEnv>::Api>,
+    Gas,
+    FunctionCall<<Env as TxEnv>::Api>,
+    OriginalResultMarker<TokenIdentifier<<Env as TxEnv>::Api>>,
+>;
 
-impl<SA> ESDTSystemSmartContractProxy<SA>
+/// Proxy for the ESDT system smart contract.
+pub struct ESDTSystemSCProxy;
+
+impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for ESDTSystemSCProxy
 where
-    SA: SendApi + 'static,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
 {
-    /// Constructor.
-    /// TODO: consider moving this to a new Proxy contructor trait (bonus: better proxy constructor syntax).
-    pub fn new_proxy_obj() -> Self {
-        ESDTSystemSmartContractProxy {
-            _phantom: PhantomData,
-        }
+    type TxProxyMethods = ESDTSystemSCProxyMethods<Env, From, To, Gas>;
+
+    fn proxy_methods(self, tx: Tx<Env, From, To, (), Gas, (), ()>) -> Self::TxProxyMethods {
+        ESDTSystemSCProxyMethods { wrapped_tx: tx }
     }
 }
 
-impl<SA> ESDTSystemSmartContractProxy<SA>
+/// Method container of the ESDT system smart contract proxy.
+pub struct ESDTSystemSCProxyMethods<Env, From, To, Gas>
 where
-    SA: CallTypeApi + 'static,
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
+{
+    wrapped_tx: Tx<Env, From, To, (), Gas, (), ()>,
+}
+
+impl<Env, From, To, Gas> ESDTSystemSCProxyMethods<Env, From, To, Gas>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Gas: TxGas<Env>,
 {
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to issue a new fungible ESDT token.
     pub fn issue_fungible(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
-        initial_supply: &BigUint<SA>,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: &ManagedBuffer<Env::Api>,
+        token_ticker: &ManagedBuffer<Env::Api>,
+        initial_supply: &BigUint<Env::Api>,
         properties: FungibleTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> IssueCall<Env, From, To, Gas> {
         self.issue(
             issue_cost,
             EsdtTokenType::Fungible,
@@ -84,11 +100,11 @@ where
     /// which causes it to issue a new non-fungible ESDT token.
     pub fn issue_non_fungible(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: &ManagedBuffer<Env::Api>,
+        token_ticker: &ManagedBuffer<Env::Api>,
         properties: NonFungibleTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> IssueCall<Env, From, To, Gas> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -115,11 +131,11 @@ where
     /// which causes it to issue a new semi-fungible ESDT token.
     pub fn issue_semi_fungible(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: &ManagedBuffer<Env::Api>,
+        token_ticker: &ManagedBuffer<Env::Api>,
         properties: SemiFungibleTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> IssueCall<Env, From, To, Gas> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -146,11 +162,11 @@ where
     /// which causes it to register a new Meta ESDT token.
     pub fn register_meta_esdt(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: &ManagedBuffer<Env::Api>,
+        token_ticker: &ManagedBuffer<Env::Api>,
         properties: MetaTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> IssueCall<Env, From, To, Gas> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -175,14 +191,12 @@ where
 
     pub fn issue_and_set_all_roles(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
+        issue_cost: BigUint<Env::Api>,
+        token_display_name: ManagedBuffer<Env::Api>,
+        token_ticker: ManagedBuffer<Env::Api>,
         token_type: EsdtTokenType,
         num_decimals: usize,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let esdt_system_sc_address = self.esdt_system_sc_address();
-
+    ) -> IssueCall<Env, From, To, Gas> {
         let token_type_name = match token_type {
             EsdtTokenType::Fungible => "FNG",
             EsdtTokenType::NonFungible => "NFT",
@@ -191,29 +205,26 @@ where
             EsdtTokenType::Invalid => "",
         };
 
-        ContractCallWithEgld::new(
-            esdt_system_sc_address,
-            ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME,
-            issue_cost,
-        )
-        .argument(&token_display_name)
-        .argument(&token_ticker)
-        .argument(&token_type_name)
-        .argument(&num_decimals)
+        self.wrapped_tx
+            .raw_call(ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME)
+            .egld(issue_cost)
+            .argument(&token_display_name)
+            .argument(&token_ticker)
+            .argument(&token_type_name)
+            .argument(&num_decimals)
+            .original_result()
     }
 
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BigUint<Env::Api>,
         token_type: EsdtTokenType,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
-        initial_supply: &BigUint<SA>,
+        token_display_name: &ManagedBuffer<Env::Api>,
+        token_ticker: &ManagedBuffer<Env::Api>,
+        initial_supply: &BigUint<Env::Api>,
         properties: TokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let esdt_system_sc_address = self.esdt_system_sc_address();
-
+    ) -> IssueCall<Env, From, To, Gas> {
         let endpoint_name = match token_type {
             EsdtTokenType::Fungible => ISSUE_FUNGIBLE_ENDPOINT_NAME,
             EsdtTokenType::NonFungible => ISSUE_NON_FUNGIBLE_ENDPOINT_NAME,
@@ -222,17 +233,18 @@ where
             EsdtTokenType::Invalid => "",
         };
 
-        let mut contract_call =
-            ContractCallWithEgld::new(esdt_system_sc_address, endpoint_name, issue_cost);
-
-        contract_call.proxy_arg(token_display_name);
-        contract_call.proxy_arg(token_ticker);
+        let mut tx = self
+            .wrapped_tx
+            .raw_call(endpoint_name)
+            .egld(issue_cost)
+            .argument(token_display_name)
+            .argument(token_ticker);
 
         if token_type == EsdtTokenType::Fungible {
-            contract_call.proxy_arg(initial_supply);
-            contract_call.proxy_arg(&properties.num_decimals);
+            tx = tx.argument(initial_supply);
+            tx = tx.argument(&properties.num_decimals);
         } else if token_type == EsdtTokenType::Meta {
-            contract_call.proxy_arg(&properties.num_decimals);
+            tx = tx.argument(&properties.num_decimals);
         }
 
         let mut token_prop_args = TokenPropertyArguments {
@@ -252,9 +264,9 @@ where
             token_prop_args.can_transfer_create_role = Some(properties.can_transfer_create_role);
         }
 
-        append_token_property_arguments(&mut contract_call, &token_prop_args);
+        append_token_property_arguments(&mut tx.data, &token_prop_args);
 
-        contract_call
+        tx.original_result()
     }
 
     /// Produces a contract call to the ESDT system SC,
@@ -262,37 +274,51 @@ where
     /// It will fail if the SC is not the owner of the token.
     pub fn mint(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        amount: &BigUint<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("mint")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        amount: &BigUint<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("mint")
             .argument(token_identifier)
             .argument(amount)
+            .original_result()
     }
 
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to burn fungible ESDT tokens owned by the SC.
     pub fn burn(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        amount: &BigUint<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("ESDTBurn")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        amount: &BigUint<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("ESDTBurn")
             .argument(token_identifier)
             .argument(amount)
+            .original_result()
     }
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
-    pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("pause")
+    pub fn pause(
+        self,
+        token_identifier: &TokenIdentifier<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("pause")
             .argument(token_identifier)
+            .original_result()
     }
 
     /// The reverse operation of `pause`.
-    pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("unPause")
+    pub fn unpause(
+        self,
+        token_identifier: &TokenIdentifier<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("unPause")
             .argument(token_identifier)
+            .original_result()
     }
 
     /// The manager of an ESDT token may freeze the tokens held by a specific account.
@@ -300,23 +326,27 @@ where
     /// Freezing and unfreezing the tokens of an account are operations designed to help token managers to comply with regulations.
     pub fn freeze(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("freeze")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        address: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("freeze")
             .argument(token_identifier)
             .argument(address)
+            .original_result()
     }
 
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("unFreeze")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        address: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("unFreeze")
             .argument(token_identifier)
             .argument(address)
+            .original_result()
     }
 
     /// The manager of an ESDT token may wipe out all the tokens held by a frozen account.
@@ -325,12 +355,14 @@ where
     /// Wiping the tokens of an account is an operation designed to help token managers to comply with regulations.
     pub fn wipe(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("wipe")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        address: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("wipe")
             .argument(token_identifier)
             .argument(address)
+            .original_result()
     }
 
     /// The manager of an ESDT token may freeze the NFT held by a specific Account.
@@ -338,27 +370,31 @@ where
     /// Freezing and unfreezing a single NFT of an Account are operations designed to help token managers to comply with regulations.
     pub fn freeze_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("freezeSingleNFT")
+        address: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("freezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
             .argument(address)
+            .original_result()
     }
 
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("unFreezeSingleNFT")
+        address: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("unFreezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
             .argument(address)
+            .original_result()
     }
 
     /// The manager of an ESDT token may wipe out a single NFT held by a frozen Account.
@@ -367,26 +403,30 @@ where
     /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
     pub fn wipe_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("wipeSingleNFT")
+        address: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("wipeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
             .argument(address)
+            .original_result()
     }
 
     /// This function converts an SFT to a metaESDT by adding decimals to its structure in the metachain ESDT System SC.
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn change_sft_to_meta_esdt(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         num_decimals: usize,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("changeSFTToMetaESDT")
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("changeSFTToMetaESDT")
             .argument(&token_identifier)
             .argument(&num_decimals)
+            .original_result()
     }
 
     /// This function can be called only if canSetSpecialRoles was set to true.
@@ -395,21 +435,22 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn set_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
-        address: &ManagedAddress<SA>,
-        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<Env::Api>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         roles_iter: RoleIter,
-    ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self
-            .esdt_system_sc_call_no_args("setSpecialRole")
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        let mut tx = self
+            .wrapped_tx
+            .raw_call("setSpecialRole")
             .argument(token_identifier)
             .argument(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
-                contract_call.push_raw_argument(role.as_role_name());
+                tx = tx.argument(&role.as_role_name());
             }
         }
 
-        contract_call
+        tx.original_result()
     }
 
     /// This function can be called only if canSetSpecialRoles was set to true.
@@ -418,67 +459,61 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn unset_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
-        address: &ManagedAddress<SA>,
-        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<Env::Api>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         roles_iter: RoleIter,
-    ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self
-            .esdt_system_sc_call_no_args("unSetSpecialRole")
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        let mut tx = self
+            .wrapped_tx
+            .raw_call("unSetSpecialRole")
             .argument(token_identifier)
             .argument(address);
         for role in roles_iter {
             if role != EsdtLocalRole::None {
-                contract_call.push_raw_argument(role.as_role_name());
+                tx = tx.argument(&role.as_role_name());
             }
         }
 
-        contract_call
+        tx.original_result()
     }
 
     pub fn transfer_ownership(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        new_owner: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("transferOwnership")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        new_owner: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("transferOwnership")
             .argument(token_identifier)
             .argument(new_owner)
+            .original_result()
     }
 
     pub fn transfer_nft_create_role(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        old_creator: &ManagedAddress<SA>,
-        new_creator: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
-        self.esdt_system_sc_call_no_args("transferNFTCreateRole")
+        token_identifier: &TokenIdentifier<Env::Api>,
+        old_creator: &ManagedAddress<Env::Api>,
+        new_creator: &ManagedAddress<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("transferNFTCreateRole")
             .argument(token_identifier)
             .argument(old_creator)
             .argument(new_creator)
+            .original_result()
     }
 
     pub fn control_changes(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<Env::Api>,
         property_arguments: &TokenPropertyArguments,
-    ) -> ContractCallNoPayment<SA, ()> {
-        let mut contract_call = self
-            .esdt_system_sc_call_no_args("controlChanges")
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        let mut tx = self
+            .wrapped_tx
+            .raw_call("controlChanges")
             .argument(token_identifier);
-        append_token_property_arguments(&mut contract_call, property_arguments);
-        contract_call
-    }
-
-    pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        ManagedAddress::new_from_bytes(&ESDT_SYSTEM_SC_ADDRESS_ARRAY)
-    }
-
-    fn esdt_system_sc_call_no_args(
-        self,
-        endpoint_name: &'static str,
-    ) -> ContractCallNoPayment<SA, ()> {
-        let esdt_system_sc_address = self.esdt_system_sc_address();
-        ContractCallNoPayment::new(esdt_system_sc_address, endpoint_name)
+        append_token_property_arguments(&mut tx.data, property_arguments);
+        tx.original_result()
     }
 }
 
@@ -493,21 +528,21 @@ fn bool_name_bytes(b: bool) -> &'static str {
     }
 }
 
-fn set_token_property<SA, CC>(contract_call: &mut CC, name: &str, value: bool)
+fn set_token_property<Api>(contract_call: &mut FunctionCall<Api>, name: &str, value: bool)
 where
-    SA: CallTypeApi + 'static,
-    CC: ContractCall<SA>,
+    Api: CallTypeApi,
 {
-    contract_call.push_raw_argument(name);
-    contract_call.push_raw_argument(bool_name_bytes(value));
+    contract_call.arg_buffer.push_multi_arg(&name);
+    contract_call
+        .arg_buffer
+        .push_multi_arg(&bool_name_bytes(value));
 }
 
-fn append_token_property_arguments<SA, CC>(
-    contract_call: &mut CC,
+fn append_token_property_arguments<Api>(
+    contract_call: &mut FunctionCall<Api>,
     token_prop_args: &TokenPropertyArguments,
 ) where
-    SA: CallTypeApi + 'static,
-    CC: ContractCall<SA>,
+    Api: CallTypeApi,
 {
     if let Some(can_freeze) = token_prop_args.can_freeze {
         set_token_property(contract_call, "canFreeze", can_freeze);
