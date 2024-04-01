@@ -36,15 +36,19 @@ const TYPES_FROM_FRAMEWORK: &[&str] = &[
 
 pub struct ProxyGenerator<'a> {
     pub meta_config: &'a MetaConfig,
-    pub file: &'a mut File,
+    pub file: Option<&'a mut File>,
 }
 impl<'a> ProxyGenerator<'a> {
     pub fn new(meta_config: &'a MetaConfig, file: &'a mut File) -> Self {
-        Self { meta_config, file }
+        Self {
+            meta_config,
+            file: Some(file),
+        }
     }
 
     fn write(&mut self, s: impl Display) {
-        write!(self.file, "{s}").unwrap();
+        let file = self.file.as_mut().expect("output not configured");
+        write!(*file, "{s}").unwrap();
     }
 
     fn writeln(&mut self, s: impl Display) {
@@ -519,13 +523,11 @@ where
         self.write(format!(r#"pub {type_type} {name}"#));
 
         if name.contains("<Api>") {
-            writeln!(
-                self.file,
-                r#"
+            self.writeln(
+                "
 where
-    Api: ManagedTypeApi,"#
-            )
-            .unwrap();
+    Api: ManagedTypeApi,",
+            );
         } else {
             self.write(" ");
         }
@@ -574,16 +576,11 @@ where
 
 #[cfg(test)]
 pub mod tests {
-
-    use std::fs::File;
-
     use multiversx_sc::abi::{BuildInfoAbi, ContractAbi, ContractCrateBuildAbi, FrameworkBuildAbi};
 
     use crate::cmd::contract::meta_config::MetaConfig;
 
     use super::ProxyGenerator;
-
-    const CURRENT_FILE: &str = "src/cmd/contract/generate_proxy/proxy_generator.rs";
 
     #[test]
     fn clean_paths_unsanitized_test() {
@@ -598,8 +595,10 @@ pub mod tests {
 
         let original_contract_abi = ContractAbi::new(build_info, &[""], "test", false);
         let meta_config = MetaConfig::create(original_contract_abi, false);
-        let mut file = File::open(CURRENT_FILE).unwrap();
-        let mut proxy_generator = ProxyGenerator::new(&meta_config, &mut file);
+        let mut proxy_generator = ProxyGenerator {
+            meta_config: &meta_config,
+            file: None,
+        };
         let name = proxy_generator
             .meta_config
             .original_contract_abi
@@ -633,8 +632,10 @@ pub mod tests {
 
         let original_contract_abi = ContractAbi::new(build_info, &[""], "test", false);
         let meta_config = MetaConfig::create(original_contract_abi, false);
-        let mut file = File::open(CURRENT_FILE).unwrap();
-        let mut proxy_generator = ProxyGenerator::new(&meta_config, &mut file);
+        let mut proxy_generator = ProxyGenerator {
+            meta_config: &meta_config,
+            file: None,
+        };
         let name = proxy_generator
             .meta_config
             .original_contract_abi
