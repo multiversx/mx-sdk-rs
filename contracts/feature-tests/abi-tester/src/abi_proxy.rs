@@ -459,28 +459,6 @@ pub struct OnlyShowsUpAsNested06 {
 pub struct OnlyShowsUpAsNested07 {
 }
 
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, Copy)]
-pub enum EsdtLocalRole {
-    None,
-    Mint,
-    Burn,
-    NftCreate,
-    NftAddQuantity,
-    NftBurn,
-    NftAddUri,
-    NftUpdateAttributes,
-    Transfer,
-}
-
-#[derive(TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, ManagedVecItem)]
-pub enum EsdtTokenType {
-    Fungible,
-    NonFungible,
-    SemiFungible,
-    Meta,
-    Invalid,
-}
-
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNestedInSingleValueMapper {
 }

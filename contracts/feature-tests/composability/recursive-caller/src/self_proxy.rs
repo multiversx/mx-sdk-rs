@@ -61,17 +61,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> RecursiveCallerProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     pub fn recursive_send_funds<
         Arg0: CodecInto<ManagedAddress<Env::Api>>,
         Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,

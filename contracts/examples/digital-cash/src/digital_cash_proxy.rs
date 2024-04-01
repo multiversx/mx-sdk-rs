@@ -68,17 +68,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> DigitalCashProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     pub fn whitelist_fee_token<
         Arg0: CodecInto<BigUint<Env::Api>>,
         Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
