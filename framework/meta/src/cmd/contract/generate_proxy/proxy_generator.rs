@@ -492,7 +492,6 @@ where
         let mut words_replacer: Vec<String> = Vec::new();
         for word in &words {
             let type_rust_name = word.split("::").last().unwrap().to_string();
-            // println!("type_rust_name >> {type_rust_name}");
             if proxy_crate == extract_struct_crate(word)
                 || TYPES_FROM_FRAMEWORK.contains(&type_rust_name.as_str())
             {
