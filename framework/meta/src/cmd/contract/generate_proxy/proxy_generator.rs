@@ -492,6 +492,7 @@ where
         let mut words_replacer: Vec<String> = Vec::new();
         for word in &words {
             let type_rust_name = word.split("::").last().unwrap().to_string();
+            // println!("type_rust_name >> {type_rust_name}");
             if proxy_crate == extract_struct_crate(word)
                 || TYPES_FROM_FRAMEWORK.contains(&type_rust_name.as_str())
             {
@@ -586,14 +587,14 @@ pub mod tests {
     fn clean_paths_unsanitized_test() {
         let build_info = BuildInfoAbi {
             contract_crate: ContractCrateBuildAbi {
-                name: "test",
+                name: "contract-crate",
                 version: "0.0.0",
                 git_version: "0.0.0",
             },
             framework: FrameworkBuildAbi::create(),
         };
 
-        let original_contract_abi = ContractAbi::new(build_info, &[""], "test", false);
+        let original_contract_abi = ContractAbi::new(build_info, &[""], "contract-crate", false);
         let meta_config = MetaConfig::create(original_contract_abi, false);
         let mut proxy_generator = ProxyGenerator {
             meta_config: &meta_config,
@@ -608,10 +609,10 @@ pub mod tests {
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
             name,
-            "(testt::path::test::to::TestStruct, Option<path::to::test::Box<AbiTestType>>)",
+            "(other_crate::contract_crate::TestStruct, Option<contract_crate::other_crate::Box<AbiTestType>>)",
         );
         let expected_result_unsanitized =
-            "(testt::path::test::to::TestStruct, Option<path::to::test::Box<AbiTestType>>)";
+            "(other_crate::contract_crate::TestStruct, Option<Box<AbiTestType>>)";
 
         assert_eq!(
             expected_result_unsanitized,
@@ -623,14 +624,14 @@ pub mod tests {
     fn clean_paths_sanitized_test() {
         let build_info = BuildInfoAbi {
             contract_crate: ContractCrateBuildAbi {
-                name: "test",
+                name: "contract-crate",
                 version: "0.0.0",
                 git_version: "0.0.0",
             },
             framework: FrameworkBuildAbi::create(),
         };
 
-        let original_contract_abi = ContractAbi::new(build_info, &[""], "test", false);
+        let original_contract_abi = ContractAbi::new(build_info, &[""], "contract-crate", false);
         let meta_config = MetaConfig::create(original_contract_abi, false);
         let mut proxy_generator = ProxyGenerator {
             meta_config: &meta_config,
@@ -645,7 +646,7 @@ pub mod tests {
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(
             name,
-            "(test::path::test::to::TestStruct, Option<test::path::to::test::Box<AbiTestType>>)",
+            "(contract_crate::other_crate::TestStruct, Option<contract_crate::Box<AbiTestType>>)",
         );
         let expected_result_sanitized = "(TestStruct, Option<Box<AbiTestType>>)";
 
