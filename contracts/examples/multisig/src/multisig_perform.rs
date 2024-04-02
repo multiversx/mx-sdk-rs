@@ -195,7 +195,7 @@ pub trait MultisigPerformModule:
                     .raw_call(call_data.endpoint_name)
                     .arguments_raw(call_data.arguments.into())
                     .egld(call_data.egld_amount)
-                    .with_callback(self.callbacks().perform_async_call_callback())
+                    .callback(self.callbacks().perform_async_call_callback())
                     .async_call_and_exit();
             },
             Action::SCDeployFromSource {
