@@ -1,8 +1,5 @@
-use crate::{
-    interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs},
-    Interactor, InteractorStep, StepBuffer,
-};
-
+use super::interactor_multi_sc_process::{update_nonces_and_sign_tx, SenderSet, Txs};
+use crate::{Interactor, InteractorStep, StepBuffer};
 use multiversx_sc_scenario::scenario_model::TxResponse;
 use multiversx_sdk::data::transaction::Transaction;
 
