@@ -33,10 +33,11 @@ pub trait DistributionModule {
             if payment_amount == 0 {
                 continue;
             }
-            self.send()
-                .contract_call::<IgnoreValue>(distribution.address, distribution.endpoint)
-                .with_egld_or_single_esdt_transfer((token_id.clone(), token_nonce, payment_amount))
-                .with_gas_limit(distribution.gas_limit)
+            self.tx()
+                .to(&distribution.address)
+                .raw_call(distribution.endpoint)
+                .egld_or_single_esdt((token_id.clone(), token_nonce, payment_amount))
+                .gas(distribution.gas_limit)
                 .transfer_execute();
         }
     }

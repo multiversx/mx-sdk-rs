@@ -150,10 +150,11 @@ pub trait Vault {
         for _ in 0..nr_callbacks {
             self.num_async_calls_sent_from_child().update(|c| *c += 1);
 
-            self.send()
-                .contract_call::<()>(caller.clone(), endpoint_name.clone())
-                .with_egld_or_single_esdt_transfer(return_payment.clone())
-                .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            self.tx()
+                .to(&caller)
+                .raw_call(endpoint_name.clone())
+                .egld_or_single_esdt(return_payment.clone())
+                .gas(self.blockchain().get_gas_left() / 2)
                 .transfer_execute()
         }
     }
