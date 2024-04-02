@@ -1,11 +1,4 @@
-use std::path::PathBuf;
-
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    multiversx_sc::types::{AnnotatedValue, ManagedAddress, TxBaseWithEnv, TxEnv},
-    scenario_model::TxResponse,
-    ScenarioTxEnvData, ScenarioWorld,
-};
+use multiversx_sc_scenario::ScenarioTxEnvData;
 
 use crate::Interactor;
 
