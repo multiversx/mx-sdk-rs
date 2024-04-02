@@ -145,9 +145,7 @@ where
             if self
                 .meta_config
                 .original_contract_abi
-                .build_info
-                .contract_crate
-                .name
+                .get_crate_name_for_code()
                 != extract_struct_crate(type_description.names.rust.as_str())
             {
                 continue;
@@ -482,20 +480,24 @@ where
         self.writeln("    },");
     }
 
-    pub fn clean_paths(&mut self, proxy_crate: &str, rust_type: &str) -> String {
+    pub fn clean_paths(&mut self, rust_type: &str) -> String {
         let delimiters = "<>,()[] ";
         let words: Vec<&str> = rust_type
             .split(|c| delimiters.contains(c))
             .filter(|s| !s.is_empty())
             .collect();
 
+        let crate_name = self
+            .meta_config
+            .original_contract_abi
+            .get_crate_name_for_code();
         let mut words_replacer: Vec<String> = Vec::new();
         for word in &words {
-            let type_rust_name = word.split("::").last().unwrap().to_string();
-            if proxy_crate == extract_struct_crate(word)
-                || TYPES_FROM_FRAMEWORK.contains(&type_rust_name.as_str())
+            let type_rust_name = word.split("::").last().unwrap();
+            if crate_name == extract_struct_crate(word)
+                || TYPES_FROM_FRAMEWORK.contains(&type_rust_name)
             {
-                words_replacer.push(type_rust_name);
+                words_replacer.push(type_rust_name.to_string());
             } else {
                 words_replacer.push(word.to_string());
             }
@@ -545,11 +547,6 @@ where
 
     fn adjust_type_name_with_env_api(&mut self, original_rust_name: &str) -> String {
         self.clean_paths(
-            self.meta_config
-                .original_contract_abi
-                .build_info
-                .contract_crate
-                .name,
             &original_rust_name
                 .replace("multiversx_sc::api::uncallable::UncallableApi", "Env::Api")
                 .replace("$API", "Env::Api"),
@@ -558,11 +555,6 @@ where
 
     fn adjust_type_name_with_api(&mut self, original_rust_name: &str) -> String {
         self.clean_paths(
-            self.meta_config
-                .original_contract_abi
-                .build_info
-                .contract_crate
-                .name,
             &original_rust_name
                 .replace("multiversx_sc::api::uncallable::UncallableApi", "Api")
                 .replace("$API", "Api"),
@@ -599,15 +591,8 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
         };
-        let name = proxy_generator
-            .meta_config
-            .original_contract_abi
-            .build_info
-            .contract_crate
-            .name;
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
-            name,
             "(other_crate::contract_crate::TestStruct, Option<contract_crate::other_crate::Box<AbiTestType>>)",
         );
         let expected_result_unsanitized =
@@ -636,15 +621,8 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
         };
-        let name = proxy_generator
-            .meta_config
-            .original_contract_abi
-            .build_info
-            .contract_crate
-            .name;
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(
-            name,
             "(contract_crate::other_crate::TestStruct, Option<contract_crate::Box<AbiTestType>>)",
         );
         let expected_result_sanitized = "(TestStruct, Option<Box<AbiTestType>>)";
