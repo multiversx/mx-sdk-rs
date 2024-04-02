@@ -61,17 +61,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> PanicMessageFeaturesProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     pub fn panic_with_message<
         Arg0: CodecInto<u32>,
     >(

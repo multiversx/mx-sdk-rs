@@ -68,17 +68,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> SeedNftMinterProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     pub fn create_nft<
         Arg0: CodecInto<ManagedBuffer<Env::Api>>,
         Arg1: CodecInto<BigUint<Env::Api>>,
