@@ -5,10 +5,6 @@ use std::{
     path::Path,
 };
 
-/// Default adder address
-const DEFAULT_ADDER_ADDRESS: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-
 /// State file
 const STATE_FILE: &str = "state.toml";
 
@@ -45,11 +41,6 @@ impl State {
                 .clone()
                 .expect("no known adder contract, deploy first"),
         )
-    }
-
-    /// Returns the adder contract with default address
-    pub fn default_adder(&self) -> AdderContract {
-        AdderContract::new(DEFAULT_ADDER_ADDRESS)
     }
 }
 

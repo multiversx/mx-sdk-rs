@@ -160,12 +160,13 @@ impl MultisigInteract {
 
         let board = self.board();
 
+        let quorum = Config::load_config().quorum();
         let new_address = self
             .interactor
             .tx()
             .from(&self.wallet_address)
             .typed(multisig_proxy::MultisigProxy)
-            .init(&Config::load_config().quorum(), board)
+            .init(quorum, board)
             .code(&self.multisig_code)
             .gas(NumExpr("100,000,000"))
             .returns(ReturnsNewAddress)
@@ -189,40 +190,26 @@ impl MultisigInteract {
         println!("deploying {count} contracts...");
 
         let board = self.board();
-        let mut steps = Vec::new();
+        let quorum = Config::load_config().quorum();
+        let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..*count {
-            let typed_sc_deploy = ScDeployStep::new()
-                .call(
-                    self.state
-                        .default_multisig()
-                        .init(Config::load_config().quorum(), board.clone()),
-                )
-                .from(&self.wallet_address)
-                .code(&self.multisig_code)
-                .gas_limit("70,000,000");
-
-            steps.push(typed_sc_deploy);
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .typed(multisig_proxy::MultisigProxy)
+                    .init(quorum, board.clone())
+                    .code(&self.multisig_code)
+                    .gas(NumExpr("70,000,000"))
+                    .returns(ReturnsNewAddress)
+            });
         }
 
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
-            .await;
+        let results = buffer.run().await;
+        for result in results {
+            let new_address_bech32 = bech32::encode(&result.to_address());
+            println!("new address: {new_address_bech32}");
 
-        for step in steps.iter() {
-            // warning: multi deploy not yet fully supported
-            // only works with last deployed address
-            // will be addressed in future versions
-            let new_deployed_address = step.response().new_deployed_address.clone();
-            if let Some(new_address) = new_deployed_address {
-                let new_address_bech32 = bech32::encode(&new_address);
-                println!("new address: {new_address_bech32}");
-
-                let new_address_expr = format!("bech32:{new_address_bech32}");
-                self.state.set_multisig_address(&new_address_expr);
-            } else {
-                println!("deploy failed");
-                return;
-            }
+            let new_address_expr = format!("bech32:{new_address_bech32}");
+            self.state.set_multisig_address(&new_address_expr);
         }
     }
 

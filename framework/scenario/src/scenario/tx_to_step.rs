@@ -7,5 +7,5 @@ mod tx_to_step_trait;
 mod tx_to_step_transfer;
 
 pub use step_annotation::*;
-pub use step_wrapper::StepWrapper;
+pub use step_wrapper::{StepWithResponse, StepWrapper};
 pub use tx_to_step_trait::*;
