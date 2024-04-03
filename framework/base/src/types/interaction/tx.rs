@@ -1,7 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    proxy_imports::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentRefs},
+    proxy_imports::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentRefs, ManagedTypeApi},
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
         EgldOrMultiEsdtPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
@@ -15,9 +15,10 @@ use super::{
     contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
     ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
-    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
+    TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue,
+    TxPayment, TxPaymentEgldOnly, TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -62,6 +63,21 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxDataFunctionCall<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
+        self.data.to_call_data_string()
     }
 }
 

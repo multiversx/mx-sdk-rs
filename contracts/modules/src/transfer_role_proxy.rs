@@ -13,19 +13,26 @@ pub trait TransferRoleProxyModule {
         &self,
         original_caller: ManagedAddress,
         dest: ManagedAddress,
-        payments: PaymentsVec<Self::Api>,
+        payments: &PaymentsVec<Self::Api>,
         data: ManagedBuffer,
     ) -> ! {
-        let contract_call =
-            ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, data, payments.clone());
+        let transaction = self.tx().to(&dest).raw_call(data).payment(payments);
 
-        self.execute_async_call(original_caller, payments, contract_call, None);
+        self.execute_async_call(original_caller, payments, transaction, None)
     }
 
     fn transfer_to_contract_typed_call<T>(
         &self,
         original_caller: ManagedAddress,
-        contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
+        transaction: Tx<
+            TxScEnv<Self::Api>,
+            (),
+            &ManagedAddress,
+            &ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>,
+            (),
+            FunctionCall<Self::Api>,
+            (),
+        >,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> !
     where
@@ -33,8 +40,8 @@ pub trait TransferRoleProxyModule {
     {
         self.execute_async_call(
             original_caller,
-            contract_call.esdt_payments.clone(),
-            contract_call,
+            transaction.payment,
+            transaction,
             opt_custom_callback,
         );
     }
@@ -43,59 +50,55 @@ pub trait TransferRoleProxyModule {
         &self,
         original_caller: ManagedAddress,
         dest: ManagedAddress,
-        payments: PaymentsVec<Self::Api>,
+        payments: &PaymentsVec<Self::Api>,
         endpoint_name: ManagedBuffer,
         args: ManagedArgBuffer<Self::Api>,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
-        let contract_call =
-            ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, endpoint_name, payments.clone())
-                .with_raw_arguments(args);
+        let transaction = self
+            .tx()
+            .to(&dest)
+            .raw_call(endpoint_name)
+            .payment(payments)
+            .arguments_raw(args);
 
-        self.execute_async_call(
-            original_caller,
-            payments,
-            contract_call,
-            opt_custom_callback,
-        );
+        self.execute_async_call(original_caller, payments, transaction, opt_custom_callback)
     }
 
-    fn execute_async_call<T>(
+    fn execute_async_call(
         &self,
         original_caller: ManagedAddress,
-        initial_payments: PaymentsVec<Self::Api>,
-        contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
+        initial_payments: &PaymentsVec<Self::Api>,
+        transaction: Tx<
+            TxScEnv<Self::Api>,
+            (),
+            &ManagedAddress,
+            &ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>,
+            (),
+            FunctionCall<Self::Api>,
+            (),
+        >,
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
-    ) -> !
-    where
-        T: TopEncodeMulti,
-    {
+    ) -> ! {
         require!(
-            self.destination_whitelist()
-                .contains(&contract_call.basic.to),
+            self.destination_whitelist().contains(transaction.to),
             "Destination address not whitelisted"
         );
 
         let remaining_gas = self.blockchain().get_gas_left();
-        let cb_gas_needed =
-            CALLBACK_RESERVED_GAS_PER_TOKEN * contract_call.esdt_payments.len() as u64;
+        let cb_gas_needed = CALLBACK_RESERVED_GAS_PER_TOKEN * transaction.payment.len() as u64;
         require!(
             remaining_gas > cb_gas_needed,
             "Not enough gas to launch async call"
         );
 
-        let async_call_gas = remaining_gas - cb_gas_needed;
         let cb = match opt_custom_callback {
             Some(custom_cb) => custom_cb,
             None => TransferRoleProxyModule::callbacks(self)
-                .transfer_callback(original_caller, initial_payments),
+                .transfer_callback(original_caller, initial_payments.clone()),
         };
 
-        contract_call
-            .with_gas_limit(async_call_gas)
-            .async_call()
-            .with_callback(cb)
-            .call_and_exit()
+        transaction.callback(cb).async_call_and_exit()
     }
 
     #[callback]

@@ -193,7 +193,7 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn burn_and_create_retrive_async(&self) {
+    fn burn_and_create_retrieve_async(&self) {
         let payments = self.call_value().all_esdt_transfers();
         let mut uris = ManagedVec::new();
         uris.push(ManagedBuffer::new());
