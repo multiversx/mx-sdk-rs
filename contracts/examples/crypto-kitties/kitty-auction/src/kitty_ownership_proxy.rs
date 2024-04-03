@@ -78,8 +78,7 @@ where
         address: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("setGeneScienceContractAddress")
+            .raw_call("setGeneScienceContractAddress")
             .argument(&address)
             .original_result()
     }
@@ -91,8 +90,7 @@ where
         address: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("setKittyAuctionContractAddress")
+            .raw_call("setKittyAuctionContractAddress")
             .argument(&address)
             .original_result()
     }
@@ -101,8 +99,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("claim")
+            .raw_call("claim")
             .original_result()
     }
 
@@ -110,8 +107,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, u32> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("totalSupply")
+            .raw_call("totalSupply")
             .original_result()
     }
 
@@ -122,8 +118,7 @@ where
         address: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, u32> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("balanceOf")
+            .raw_call("balanceOf")
             .argument(&address)
             .original_result()
     }
@@ -135,8 +130,7 @@ where
         kitty_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("ownerOf")
+            .raw_call("ownerOf")
             .argument(&kitty_id)
             .original_result()
     }
@@ -150,8 +144,7 @@ where
         kitty_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("approve")
+            .raw_call("approve")
             .argument(&to)
             .argument(&kitty_id)
             .original_result()
@@ -166,8 +159,7 @@ where
         kitty_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("transfer")
+            .raw_call("transfer")
             .argument(&to)
             .argument(&kitty_id)
             .original_result()
@@ -184,8 +176,7 @@ where
         kitty_id: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("transfer_from")
+            .raw_call("transfer_from")
             .argument(&from)
             .argument(&to)
             .argument(&kitty_id)
@@ -199,8 +190,7 @@ where
         address: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, u32>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("tokensOfOwner")
+            .raw_call("tokensOfOwner")
             .argument(&address)
             .original_result()
     }
@@ -214,8 +204,7 @@ where
         kitty_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("allowAuctioning")
+            .raw_call("allowAuctioning")
             .argument(&by)
             .argument(&kitty_id)
             .original_result()
@@ -232,8 +221,7 @@ where
         kitty_id: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("approveSiringAndReturnKitty")
+            .raw_call("approveSiringAndReturnKitty")
             .argument(&approved_address)
             .argument(&kitty_owner)
             .argument(&kitty_id)
@@ -244,8 +232,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, u32> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("createGenZeroKitty")
+            .raw_call("createGenZeroKitty")
             .original_result()
     }
 
@@ -256,8 +243,7 @@ where
         kitty_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, Kitty> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getKittyById")
+            .raw_call("getKittyById")
             .argument(&kitty_id)
             .original_result()
     }
@@ -269,8 +255,7 @@ where
         kitty_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("isReadyToBreed")
+            .raw_call("isReadyToBreed")
             .argument(&kitty_id)
             .original_result()
     }
@@ -282,8 +267,7 @@ where
         kitty_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("isPregnant")
+            .raw_call("isPregnant")
             .argument(&kitty_id)
             .original_result()
     }
@@ -297,8 +281,7 @@ where
         sire_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("canBreedWith")
+            .raw_call("canBreedWith")
             .argument(&matron_id)
             .argument(&sire_id)
             .original_result()
@@ -313,8 +296,7 @@ where
         kitty_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("approveSiring")
+            .raw_call("approveSiring")
             .argument(&address)
             .argument(&kitty_id)
             .original_result()
@@ -329,8 +311,7 @@ where
         sire_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("breedWith")
+            .raw_call("breedWith")
             .argument(&matron_id)
             .argument(&sire_id)
             .original_result()
@@ -343,8 +324,7 @@ where
         matron_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("giveBirth")
+            .raw_call("giveBirth")
             .argument(&matron_id)
             .original_result()
     }
@@ -353,8 +333,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("birthFee")
+            .raw_call("birthFee")
             .original_result()
     }
 }

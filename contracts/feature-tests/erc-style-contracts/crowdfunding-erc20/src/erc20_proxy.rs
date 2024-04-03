@@ -72,8 +72,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("totalSupply")
+            .raw_call("totalSupply")
             .original_result()
     }
 
@@ -90,8 +89,7 @@ where
         address: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("balanceOf")
+            .raw_call("balanceOf")
             .argument(&address)
             .original_result()
     }
@@ -112,8 +110,7 @@ where
         spender: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("allowance")
+            .raw_call("allowance")
             .argument(&owner)
             .argument(&spender)
             .original_result()
@@ -134,8 +131,7 @@ where
         amount: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("transfer")
+            .raw_call("transfer")
             .argument(&to)
             .argument(&amount)
             .original_result()
@@ -160,8 +156,7 @@ where
         amount: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("transferFrom")
+            .raw_call("transferFrom")
             .argument(&sender)
             .argument(&recipient)
             .argument(&amount)
@@ -185,8 +180,7 @@ where
         amount: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("approve")
+            .raw_call("approve")
             .argument(&spender)
             .argument(&amount)
             .original_result()

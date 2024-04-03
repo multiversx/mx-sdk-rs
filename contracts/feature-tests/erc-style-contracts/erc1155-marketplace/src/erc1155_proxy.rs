@@ -77,8 +77,7 @@ where
         data: Arg4,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("safeTransferFrom")
+            .raw_call("safeTransferFrom")
             .argument(&from)
             .argument(&to)
             .argument(&type_id)
@@ -103,8 +102,7 @@ where
         data: Arg4,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("safeBatchTransferFrom")
+            .raw_call("safeBatchTransferFrom")
             .argument(&from)
             .argument(&to)
             .argument(&type_ids)
@@ -122,8 +120,7 @@ where
         approved: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("setApprovalForAll")
+            .raw_call("setApprovalForAll")
             .argument(&operator)
             .argument(&approved)
             .original_result()
@@ -140,8 +137,7 @@ where
         is_fungible: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("createToken")
+            .raw_call("createToken")
             .argument(&uri)
             .argument(&initial_supply)
             .argument(&is_fungible)
@@ -157,8 +153,7 @@ where
         amount: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("mint")
+            .raw_call("mint")
             .argument(&type_id)
             .argument(&amount)
             .original_result()
@@ -173,8 +168,7 @@ where
         amount: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("burn")
+            .raw_call("burn")
             .argument(&type_id)
             .argument(&amount)
             .original_result()
@@ -189,8 +183,7 @@ where
         type_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("balanceOf")
+            .raw_call("balanceOf")
             .argument(&owner)
             .argument(&type_id)
             .original_result()
@@ -203,8 +196,7 @@ where
         owner_type_id_pairs: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, BigUint<Env::Api>>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("balanceOfBatch")
+            .raw_call("balanceOfBatch")
             .argument(&owner_type_id_pairs)
             .original_result()
     }
@@ -218,8 +210,7 @@ where
         nft_id: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getTokenOwner")
+            .raw_call("getTokenOwner")
             .argument(&type_id)
             .argument(&nft_id)
             .original_result()
@@ -232,8 +223,7 @@ where
         type_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getTokenTypeCreator")
+            .raw_call("getTokenTypeCreator")
             .argument(&type_id)
             .original_result()
     }
@@ -245,8 +235,7 @@ where
         type_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, BoxedBytes> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getTokenTypeUri")
+            .raw_call("getTokenTypeUri")
             .argument(&type_id)
             .original_result()
     }
@@ -258,8 +247,7 @@ where
         type_id: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("isFungible")
+            .raw_call("isFungible")
             .argument(&type_id)
             .original_result()
     }
@@ -273,8 +261,7 @@ where
         owner: Arg1,
     ) -> TxProxyCall<Env, From, To, Gas, bool> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("isApprovedForAll")
+            .raw_call("isApprovedForAll")
             .argument(&operator)
             .argument(&owner)
             .original_result()

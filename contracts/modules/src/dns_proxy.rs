@@ -44,8 +44,7 @@ where
         name: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("register")
+            .raw_call("register")
             .argument(&name)
             .original_result()
     }

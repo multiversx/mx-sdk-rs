@@ -52,8 +52,7 @@ where
         data: Arg4,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("onERC1155Received")
+            .raw_call("onERC1155Received")
             .argument(&operator)
             .argument(&from)
             .argument(&type_id)
@@ -77,8 +76,7 @@ where
         data: Arg4,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("onERC1155BatchReceived")
+            .raw_call("onERC1155BatchReceived")
             .argument(&operator)
             .argument(&from)
             .argument(&type_ids)
