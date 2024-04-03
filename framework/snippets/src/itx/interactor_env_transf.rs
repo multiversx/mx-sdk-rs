@@ -10,7 +10,7 @@ use multiversx_sc_scenario::{
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
-    scenario_env_util::*,
+    scenario::tx_to_step::{StepWrapper, TxToStep},
     scenario_model::{
         AddressValue, BytesValue, ScCallStep, ScDeployStep, TransferStep, TxResponse,
     },
@@ -20,8 +20,7 @@ use multiversx_sc_scenario::{
 use crate::{Interactor, InteractorEnvExec, InteractorPrepareAsync};
 
 pub struct InteractorTransferStep<'w> {
-    world: &'w mut Interactor,
-    step: TransferStep,
+    step_wrapper: StepWrapper<InteractorEnvExec<'w>, TransferStep, ()>,
 }
 
 impl<'w, From, To, Payment, Gas> InteractorPrepareAsync
@@ -35,17 +34,18 @@ where
     type Exec = InteractorTransferStep<'w>;
 
     fn prepare_async(self) -> Self::Exec {
-        let mut sc_call_step =
-            tx_to_transfer_step(&self.env, self.from, self.to, self.payment, self.gas);
         InteractorTransferStep {
-            world: self.env.world,
-            step: sc_call_step,
+            step_wrapper: self.tx_to_step(),
         }
     }
 }
 
 impl<'w> InteractorTransferStep<'w> {
-    pub async fn run(self) {
-        self.world.transfer(self.step).await;
+    pub async fn run(mut self) {
+        self.step_wrapper
+            .env
+            .world
+            .transfer(self.step_wrapper.step)
+            .await;
     }
 }

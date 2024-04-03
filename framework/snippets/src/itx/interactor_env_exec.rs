@@ -10,7 +10,7 @@ use multiversx_sc_scenario::{
             TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
-    scenario_env_util::*,
+    scenario::tx_to_step::{StepWrapper, TxToStep},
     scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
@@ -52,9 +52,7 @@ where
     RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    world: &'w mut Interactor,
-    sc_call_step: ScCallStep,
-    result_handler: RH,
+    step_wrapper: StepWrapper<InteractorEnvExec<'w>, ScCallStep, RH>,
 }
 
 impl<'w, From, To, Payment, Gas, RH> InteractorPrepareAsync
@@ -70,18 +68,8 @@ where
     type Exec = InteractorCallStep<'w, RH>;
 
     fn prepare_async(self) -> Self::Exec {
-        let mut sc_call_step = tx_to_sc_call_step(
-            &self.env,
-            self.from,
-            self.to,
-            self.payment,
-            self.gas,
-            self.data,
-        );
         InteractorCallStep {
-            world: self.env.world,
-            sc_call_step,
-            result_handler: self.result_handler,
+            step_wrapper: self.tx_to_step(),
         }
     }
 }
@@ -91,11 +79,13 @@ where
     RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
-        let mut step = self.sc_call_step;
-        step.expect = Some(self.result_handler.list_tx_expect());
-        self.world.sc_call(&mut step).await;
-        process_result(step.response, self.result_handler)
+    pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.step_wrapper
+            .env
+            .world
+            .sc_call(&mut self.step_wrapper.step)
+            .await;
+        self.step_wrapper.process_result()
     }
 }
 
@@ -121,10 +111,11 @@ impl Interactor {
         let env = self.new_env_data();
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
-        let mut step = tx_to_sc_call_step(&tx.env, tx.from, tx.to, tx.payment, tx.gas, tx.data);
-        step.expect = Some(tx.result_handler.list_tx_expect());
-        self.sc_call(&mut step).await;
-        process_result(step.response, tx.result_handler);
+
+        let mut step_wrapper = tx.tx_to_step();
+        self.sc_call(&mut step_wrapper.step).await;
+        step_wrapper.process_result();
+        
         self
     }
 }

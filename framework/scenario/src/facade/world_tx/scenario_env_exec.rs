@@ -12,11 +12,12 @@ use multiversx_sc::{
 
 use crate::{
     api::StaticApi,
+    scenario::tx_to_step::TxToStep,
     scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
-use super::{scenario_env_util::*, ScenarioTxEnvData};
+use super::ScenarioTxEnvData;
 
 /// Environment for executing transactions.
 pub struct ScenarioEnvExec<'w> {
@@ -61,17 +62,9 @@ where
     type Returns = <RH::ListReturns as NestedTupleFlatten>::Unpacked;
 
     fn run(self) -> Self::Returns {
-        let mut step = tx_to_sc_call_step(
-            &self.env,
-            self.from,
-            self.to,
-            self.payment,
-            self.gas,
-            self.data,
-        );
-        step.expect = Some(self.result_handler.list_tx_expect());
-        self.env.world.sc_call(&mut step);
-        process_result(step.response, self.result_handler)
+        let mut step_wrapper = self.tx_to_step();
+        step_wrapper.env.world.sc_call(&mut step_wrapper.step);
+        step_wrapper.process_result()
     }
 }
 
@@ -97,10 +90,9 @@ impl ScenarioWorld {
         let env = self.new_env_data();
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
-        let mut step = tx_to_sc_call_step(&tx.env, tx.from, tx.to, tx.payment, tx.gas, tx.data);
-        step.expect = Some(tx.result_handler.list_tx_expect());
-        self.sc_call(&mut step);
-        process_result(step.response, tx.result_handler);
+        let mut step_wrapper = tx.tx_to_step();
+        self.sc_call(&mut step_wrapper.step);
+        step_wrapper.process_result();
         self
     }
 }

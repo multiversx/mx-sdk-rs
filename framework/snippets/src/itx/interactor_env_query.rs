@@ -9,7 +9,7 @@ use multiversx_sc_scenario::{
             TxBaseWithEnv, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
         },
     },
-    scenario_env_util::*,
+    scenario::tx_to_step::{StepWrapper, TxToQueryStep},
     scenario_model::{ScQueryStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxEnvData, ScenarioTxRun, ScenarioWorld,
 };
@@ -50,9 +50,7 @@ where
     RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    world: &'w mut Interactor,
-    sc_query_step: ScQueryStep,
-    result_handler: RH,
+    step_wrapper: StepWrapper<InteractorEnvQuery<'w>, ScQueryStep, RH>,
 }
 
 impl<'w, To, RH> InteractorPrepareAsync
@@ -65,11 +63,8 @@ where
     type Exec = InteractorQueryStep<'w, RH>;
 
     fn prepare_async(self) -> Self::Exec {
-        let mut sc_query_step = tx_to_sc_query_step(&self.env, self.to, self.data);
         InteractorQueryStep {
-            world: self.env.world,
-            sc_query_step,
-            result_handler: self.result_handler,
+            step_wrapper: self.tx_to_query_step(),
         }
     }
 }
@@ -79,11 +74,13 @@ where
     RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    pub async fn run(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
-        let mut step = self.sc_query_step;
-        step.expect = Some(self.result_handler.list_tx_expect());
-        self.world.sc_query(&mut step).await;
-        process_result(step.response, self.result_handler)
+    pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
+        self.step_wrapper
+            .env
+            .world
+            .sc_query(&mut self.step_wrapper.step)
+            .await;
+        self.step_wrapper.process_result()
     }
 }
 
@@ -105,10 +102,15 @@ impl Interactor {
         let env = self.new_env_data();
         let tx_base = TxBaseWithEnv::new_with_env(env);
         let tx = f(tx_base);
-        let mut step = tx_to_sc_query_step(&tx.env, tx.to, tx.data);
-        step.expect = Some(tx.result_handler.list_tx_expect());
-        self.sc_query(&mut step).await;
-        process_result(step.response, tx.result_handler);
+
+        let mut step_wrapper = tx.tx_to_query_step();
+        self.sc_query(&mut step_wrapper.step).await;
+        step_wrapper.process_result();
+
+        // let mut step = tx_to_sc_query_step(&tx.env, tx.to, tx.data);
+        // step.expect = Some(tx.result_handler.list_tx_expect());
+        // self.sc_query(&mut step).await;
+        // process_result(step.response, tx.result_handler);
         self
     }
 }
