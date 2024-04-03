@@ -14,63 +14,11 @@ permissions:
 jobs:
   contracts:
     name: Contracts
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v3.0.0
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v3.1.0
     with:
       rust-toolchain: nightly-2023-12-11
       path-to-sc-meta: framework/meta
       mx-scenario-go-version: v2.1.0-alpha
+      coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
       token: ${{ secrets.GITHUB_TOKEN }}
-
-  test_coverage:
-    name: Test Coverage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Install rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: nightly-2023-12-11
-
-      - name: Install prerequisites
-        run: |
-          rustup component add llvm-tools-preview
-          dirname $(find ~/.rustup -name llvm-cov) >> $GITHUB_PATH
-
-          echo $(dirname $(find ~/.rustup -name llvm-cov))
-
-      - name: Run tests and generate report
-        env:
-          RUSTFLAGS: ""
-        run: |
-          cargo run --bin sc-meta test-coverage \
-            --ignore-filename-regex='meta/src' \
-            --ignore-filename-regex='wasm-adapter' \
-            --ignore-filename-regex='benchmarks/' \
-            --ignore-filename-regex='tests/' \
-            --output ./coverage.md
-
-      - name: Upload the report
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage
-          path: coverage.md
-
-      - name: Find the comment containing the report
-        id: fc
-        uses: peter-evans/find-comment@v2
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: "github-actions[bot]"
-          body-includes: "Coverage Summary"
-
-      - name: Create or update the report comment
-        uses: peter-evans/create-or-update-comment@v2
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body-file: ./coverage.md
-          edit-mode: replace
