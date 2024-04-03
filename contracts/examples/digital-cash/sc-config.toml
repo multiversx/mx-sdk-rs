@@ -1,2 +1,2 @@
-[settings]
-proxy-paths = ["src/digital_cash_proxy.rs"]
+[[proxy]]
+path = "src/digital_cash_proxy.rs"
