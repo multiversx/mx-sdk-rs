@@ -1,2 +1,4 @@
 [settings]
-proxy-paths = ["src/adder_proxy.rs"]
+
+[[proxy]]
+path = "src/adder_proxy.rs"

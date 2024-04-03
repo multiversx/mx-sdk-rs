@@ -1,21 +1,21 @@
+use crate::cmd::contract::sc_config::ProxyConfigSerde;
+
 use super::{
     super::meta_config::MetaConfig, proxy_crate_gen::create_file, proxy_generator::ProxyGenerator,
 };
 
-const OUTPUT_PROXY_PATH: &str = "/output/proxy.rs";
-
 impl MetaConfig {
     pub fn generate_proxy(&mut self) {
-        write_proxy_with_explicit_path(OUTPUT_PROXY_PATH, self);
-        let proxy_paths = self.sc_config.proxy_paths.clone();
-        for path in proxy_paths {
-            write_proxy_with_explicit_path(&path, self);
+        let default_proxy = ProxyConfigSerde::new();
+        write_proxy_with_explicit_path(&default_proxy, self);
+        for proxy_config in self.sc_config.proxy_configs.clone() {
+            write_proxy_with_explicit_path(&proxy_config, self);
         }
     }
 }
 
-fn write_proxy_with_explicit_path(path: &str, meta_config: &mut MetaConfig) {
-    let mut file = create_file(path);
-    let mut proxy_generator = ProxyGenerator::new(meta_config, &mut file);
+fn write_proxy_with_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &mut MetaConfig) {
+    let mut file = create_file(&proxy_config.path);
+    let mut proxy_generator = ProxyGenerator::new(meta_config, &mut file, proxy_config);
     proxy_generator.write_proxy_to_file();
 }
