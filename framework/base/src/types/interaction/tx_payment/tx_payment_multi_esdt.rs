@@ -2,8 +2,9 @@ use core::ops::Deref;
 
 use crate::{
     contract_base::SendRawWrapper,
-    proxy_imports::ManagedRef,
-    types::{BigUint, ManagedAddress, ManagedVec, MultiEsdtPayment, TxFrom, TxToSpecified},
+    types::{
+        BigUint, ManagedAddress, ManagedRef, ManagedVec, MultiEsdtPayment, TxFrom, TxToSpecified,
+    },
 };
 
 use super::{AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment};

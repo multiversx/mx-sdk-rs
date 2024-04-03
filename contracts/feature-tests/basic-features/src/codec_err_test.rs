@@ -59,6 +59,6 @@ pub trait CodecErrorTest {
     /// It just covers contract call serialization errors.
     #[endpoint]
     fn codec_err_contract_call(&self) {
-        let _ = self.tx().raw_call().argument(&CodecErrorTestType);
+        let _ = self.tx().raw_call("dummy").argument(&CodecErrorTestType);
     }
 }

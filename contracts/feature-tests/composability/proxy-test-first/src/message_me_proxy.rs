@@ -96,8 +96,7 @@ where
         arg4: Arg3,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("messageMe")
+            .raw_call("messageMe")
             .argument(&arg1)
             .argument(&arg2)
             .argument(&arg3)

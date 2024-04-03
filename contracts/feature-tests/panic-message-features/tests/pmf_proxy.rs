@@ -68,8 +68,7 @@ where
         some_value: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("panicWithMessage")
+            .raw_call("panicWithMessage")
             .argument(&some_value)
             .original_result()
     }
@@ -79,8 +78,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("panicAfterLog")
+            .raw_call("panicAfterLog")
             .original_result()
     }
 
@@ -88,8 +86,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("sc_panic")
+            .raw_call("sc_panic")
             .original_result()
     }
 }

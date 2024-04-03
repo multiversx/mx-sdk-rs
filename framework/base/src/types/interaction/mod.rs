@@ -13,6 +13,7 @@ mod expr;
 mod function_call;
 mod managed_arg_buffer;
 mod markers;
+pub mod system_proxy;
 mod tx;
 mod tx_code_source;
 mod tx_data;

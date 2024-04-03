@@ -1,11 +1,10 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    proxy_imports::EgldOrMultiEsdtPayment,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPaymentRefs,
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedOption,
-        ManagedVec, MultiEsdtPayment, TokenIdentifier,
+        BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
+        EgldOrMultiEsdtPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
+        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment, TokenIdentifier,
     },
 };
 
@@ -382,14 +381,17 @@ where
     RH: TxResultHandler<Env>,
 {
     #[inline]
-    pub fn raw_call(self) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
+    pub fn raw_call<N: Into<ManagedBuffer<Env::Api>>>(
+        self,
+        function_name: N,
+    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
         Tx {
             env: self.env,
             from: self.from,
             to: self.to,
             payment: self.payment,
             gas: self.gas,
-            data: FunctionCall::empty(),
+            data: FunctionCall::new(function_name),
             result_handler: self.result_handler,
         }
     }

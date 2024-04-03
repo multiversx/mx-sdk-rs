@@ -61,17 +61,6 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-}
-
-#[rustfmt::skip]
-impl<Env, From, To, Gas> ChildProxyMethods<Env, From, To, Gas>
-where
-    Env: TxEnv,
-    Env::Api: VMApi,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Gas: TxGas<Env>,
-{
     pub fn issue_wrapped_egld<
         Arg0: CodecInto<ManagedBuffer<Env::Api>>,
         Arg1: CodecInto<ManagedBuffer<Env::Api>>,
@@ -83,8 +72,7 @@ where
         initial_supply: Arg2,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("issueWrappedEgld")
+            .raw_call("issueWrappedEgld")
             .argument(&token_display_name)
             .argument(&token_ticker)
             .argument(&initial_supply)
@@ -95,8 +83,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("getWrappedEgldTokenIdentifier")
+            .raw_call("getWrappedEgldTokenIdentifier")
             .original_result()
     }
 }

@@ -1,7 +1,6 @@
-#![allow(clippy::all)]
+use crate::proxy_imports::*;
 
-use multiversx_sc::proxy_imports::*;
-
+/// Proxy describing the user builtin function signatures.
 pub struct UserBuiltinProxy;
 
 impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for UserBuiltinProxy
@@ -44,8 +43,7 @@ where
         name: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("SetUserName")
+            .raw_call("SetUserName")
             .argument(&name)
             .original_result()
     }
@@ -54,8 +52,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call()
-            .function_name("DeleteUserName")
+            .raw_call("DeleteUserName")
             .original_result()
     }
 }
