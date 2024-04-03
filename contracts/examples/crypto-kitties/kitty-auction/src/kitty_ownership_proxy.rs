@@ -241,7 +241,7 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, Kitty> {
+    ) -> TxProxyCall<Env, From, To, Gas, kitty::Kitty> {
         self.wrapped_tx
             .raw_call("getKittyById")
             .argument(&kitty_id)
@@ -336,30 +336,4 @@ where
             .raw_call("birthFee")
             .original_result()
     }
-}
-
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct Kitty {
-    pub genes: KittyGenes,
-    pub birth_time: u64,
-    pub cooldown_end: u64,
-    pub matron_id: u32,
-    pub sire_id: u32,
-    pub siring_with_id: u32,
-    pub nr_children: u16,
-    pub generation: u16,
-}
-
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, Default)]
-pub struct KittyGenes {
-    pub fur_color: Color,
-    pub eye_color: Color,
-    pub meow_power: u8,
-}
-
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone, Default)]
-pub struct Color {
-    pub r: u8,
-    pub g: u8,
-    pub b: u8,
 }

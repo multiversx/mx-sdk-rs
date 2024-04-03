@@ -2,12 +2,12 @@
 #![allow(clippy::suspicious_operation_groupings)]
 
 pub mod kitty_genetic_alg_proxy;
-pub mod structs;
-
-use crate::structs::*;
-use core::cmp::max;
+use kitty::{kitty_genes::KittyGenes, Kitty};
 use multiversx_sc::imports::*;
-use random::{Random, Randomizeable};
+
+use core::cmp::max;
+
+use random::*;
 
 #[multiversx_sc::contract]
 pub trait KittyOwnership {
