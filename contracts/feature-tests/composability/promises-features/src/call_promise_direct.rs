@@ -17,7 +17,7 @@ pub trait CallPromisesDirectModule {
         self.tx()
             .to(&to)
             .raw_call(endpoint_name)
-            .egld_or_single_esdt(payment)
+            .payment(payment)
             .arguments_raw(args.to_arg_buffer())
             .gas(gas_limit)
             .async_call_promise()

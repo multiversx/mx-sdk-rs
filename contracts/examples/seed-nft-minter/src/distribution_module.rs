@@ -36,7 +36,7 @@ pub trait DistributionModule {
             self.tx()
                 .to(&distribution.address)
                 .raw_call(distribution.endpoint)
-                .egld_or_single_esdt((token_id.clone(), token_nonce, payment_amount))
+                .egld_or_single_esdt(token_id, token_nonce, &payment_amount)
                 .gas(distribution.gas_limit)
                 .transfer_execute();
         }

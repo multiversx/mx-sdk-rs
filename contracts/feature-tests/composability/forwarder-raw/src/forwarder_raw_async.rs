@@ -46,7 +46,11 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             .to(to)
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
-            .egld_or_single_esdt((payment_token, 0, payment_amount))
+            .payment(EgldOrEsdtTokenPayment::new(
+                payment_token,
+                0,
+                payment_amount,
+            ))
     }
 
     #[endpoint]

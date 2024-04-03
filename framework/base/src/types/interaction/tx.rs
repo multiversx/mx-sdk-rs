@@ -1,6 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
+    proxy_imports::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentRefs},
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
         EgldOrMultiEsdtPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
@@ -214,6 +215,20 @@ where
         })
     }
 
+    /// Syntactic sugar for `self.payment(EgldOrEsdtTokenPaymentRefs::new(...)`. Takes references.
+    pub fn egld_or_single_esdt<'a>(
+        self,
+        token_identifier: &'a EgldOrEsdtTokenIdentifier<Env::Api>,
+        token_nonce: u64,
+        amount: &'a BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EgldOrEsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {
+        self.payment(EgldOrEsdtTokenPaymentRefs::new(
+            token_identifier,
+            token_nonce,
+            amount,
+        ))
+    }
+
     /// Sets a collection of ESDT transfers as the payment of the transaction.
     ///
     /// Equivalend to just ``.payment(payments)`, but only accepts the multi-esdt types.
@@ -232,19 +247,12 @@ where
         self.multi_esdt(payments)
     }
 
-    pub fn egld_or_single_esdt<P: Into<EgldOrEsdtTokenPayment<Env::Api>>>(
-        self,
-        payment: P,
-    ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
-        self.payment(payment.into())
-    }
-
     /// Backwards compatibility.
     pub fn with_egld_or_single_esdt_transfer<P: Into<EgldOrEsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
     ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
-        self.egld_or_single_esdt(payment)
+        self.payment(payment.into())
     }
 
     pub fn egld_or_multi_esdt<P: Into<EgldOrMultiEsdtPayment<Env::Api>>>(

@@ -153,7 +153,7 @@ pub trait Vault {
             self.tx()
                 .to(&caller)
                 .raw_call(endpoint_name.clone())
-                .egld_or_single_esdt(return_payment.clone())
+                .payment(&return_payment)
                 .gas(self.blockchain().get_gas_left() / 2)
                 .transfer_execute()
         }
