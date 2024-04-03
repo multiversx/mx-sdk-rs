@@ -2,7 +2,7 @@ mod basic_interact_cli;
 mod basic_interact_config;
 mod basic_interact_state;
 
-use adder::{adder_proxy, ProxyTrait};
+use adder::adder_proxy;
 use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
@@ -15,11 +15,11 @@ use multiversx_sc_snippets::{
         mandos_system::ScenarioRunner,
         num_bigint::BigUint,
         scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, ScDeployStep, Scenario},
+        scenario_model::{BytesValue, Scenario},
         standalone::retrieve_account_as_scenario_set_state,
         test_wallets, ContractInfo, NumExpr, WithRawTxResponse,
     },
-    tokio, Interactor, InteractorPrepareAsync, StepBuffer,
+    tokio, Interactor, InteractorPrepareAsync,
 };
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
@@ -135,33 +135,25 @@ impl AdderInteract {
         self.set_state().await;
         println!("deploying {count} contracts...");
 
-        let mut steps = Vec::new();
+        let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..*count {
-            let typed_sc_deploy = ScDeployStep::new()
-                .call(self.state.default_adder().init(0u32))
-                .from(&self.wallet_address)
-                .code(&self.adder_code)
-                .gas_limit("70,000,000");
-
-            steps.push(typed_sc_deploy);
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .typed(adder_proxy::AdderProxy)
+                    .init(0u32)
+                    .code(&self.adder_code)
+                    .gas(NumExpr("70,000,000"))
+                    .returns(ReturnsNewAddress)
+            });
         }
 
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_deploy_vec(&mut steps))
-            .await;
+        let results = buffer.run().await;
+        for result in results {
+            let new_address_bech32 = bech32::encode(&result.to_address());
+            println!("new address: {new_address_bech32}");
 
-        for step in steps.iter() {
-            // warning: multi deploy not yet fully supported
-            // only works with last deployed address
-            // will be addressed in future versions
-            let new_deployed_address = step.response().new_deployed_address.clone();
-            if let Some(new_address) = new_deployed_address {
-                let new_address_bech32 = bech32::encode(&new_address);
-                println!("new address: {new_address_bech32}");
-            } else {
-                println!("deploy failed");
-                return;
-            }
+            let new_address_expr = format!("bech32:{new_address_bech32}");
+            self.state.set_adder_address(&new_address_expr);
         }
     }
 
