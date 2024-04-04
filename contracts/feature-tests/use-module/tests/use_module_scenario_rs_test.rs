@@ -1,7 +1,4 @@
-pub mod user_builtin_proxy;
 mod dns_mock {
-    use crate::user_builtin_proxy;
-
     multiversx_sc::imports!();
 
     #[multiversx_sc::contract]
@@ -13,7 +10,7 @@ mod dns_mock {
             let address = self.blockchain().get_caller();
             self.tx()
                 .to(&address)
-                .typed(user_builtin_proxy::UserBuiltinProxy)
+                .typed(system_proxy::UserBuiltinProxy)
                 .set_user_name(&name)
                 .async_call_and_exit();
         }
