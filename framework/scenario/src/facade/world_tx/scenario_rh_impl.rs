@@ -62,12 +62,10 @@ where
     Env: TxEnv,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
-        let new_address = tx_response
+        tx_response
             .new_deployed_address
             .clone()
-            .expect("missing returned address");
-
-        new_address
+            .expect("missing returned address")
     }
 }
 
