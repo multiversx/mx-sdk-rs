@@ -175,4 +175,7 @@ members = [
   "contracts/feature-tests/rust-testing-framework-tester/meta",
   "contracts/feature-tests/use-module",
   "contracts/feature-tests/use-module/meta",
+  "contracts/feature-tests/exchange-features",
+  "contracts/feature-tests/exchange-features/meta",
+
 ]

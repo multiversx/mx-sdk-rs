@@ -5,7 +5,6 @@ mod scenario_env;
 mod scenario_env_deploy;
 mod scenario_env_exec;
 mod scenario_env_query;
-pub mod scenario_env_util;
 mod scenario_rh_impl;
 
 pub use expr::*;

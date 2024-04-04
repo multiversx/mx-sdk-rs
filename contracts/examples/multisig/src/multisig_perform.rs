@@ -189,13 +189,14 @@ pub trait MultisigPerformModule:
                     &call_data.endpoint_name,
                     call_data.arguments.as_multi(),
                 );
-                self.send()
-                    .contract_call::<()>(call_data.to, call_data.endpoint_name)
-                    .with_egld_transfer(call_data.egld_amount)
-                    .with_raw_arguments(call_data.arguments.into())
-                    .async_call()
-                    .with_callback(self.callbacks().perform_async_call_callback())
-                    .call_and_exit()
+
+                self.tx()
+                    .to(&call_data.to)
+                    .raw_call(call_data.endpoint_name)
+                    .arguments_raw(call_data.arguments.into())
+                    .egld(call_data.egld_amount)
+                    .callback(self.callbacks().perform_async_call_callback())
+                    .async_call_and_exit();
             },
             Action::SCDeployFromSource {
                 amount,

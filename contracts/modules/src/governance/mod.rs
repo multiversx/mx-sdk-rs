@@ -278,16 +278,12 @@ pub trait GovernanceModule:
         self.clear_proposal(proposal_id);
 
         for action in proposal.actions {
-            let mut contract_call = self
-                .send()
-                .contract_call::<()>(action.dest_address, action.function_name)
-                .with_gas_limit(action.gas_limit);
-
-            for arg in &action.arguments {
-                contract_call.push_raw_argument(arg);
-            }
-
-            contract_call.transfer_execute();
+            self.tx()
+                .to(&action.dest_address)
+                .raw_call(action.function_name)
+                .gas(action.gas_limit)
+                .arguments_raw(action.arguments.into())
+                .transfer_execute()
         }
 
         self.proposal_executed_event(proposal_id);

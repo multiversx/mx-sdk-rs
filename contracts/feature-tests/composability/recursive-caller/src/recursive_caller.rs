@@ -25,7 +25,7 @@ pub trait RecursiveCaller {
             .to(to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .egld_or_single_esdt((token_identifier.clone(), 0, amount.clone()))
+            .egld_or_single_esdt(token_identifier, 0, amount)
             .async_call()
             .with_callback(self.callbacks().recursive_send_funds_callback(
                 to,

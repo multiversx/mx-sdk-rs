@@ -104,7 +104,7 @@ fn test_transfer_role() {
             sc.transfer_to_user(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&address_expr_to_address(OWNER_ADDRESS_EXPR)),
-                payments,
+                &payments,
                 managed_buffer!(b"enjoy"),
             );
         },
@@ -135,7 +135,7 @@ fn test_transfer_role() {
             sc.transfer_to_user(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&Address::zero()),
-                payments,
+                &payments,
                 managed_buffer!(b"enjoy"),
             );
         },
@@ -159,7 +159,7 @@ fn test_transfer_role() {
             sc.transfer_to_contract_raw(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&address_expr_to_address(VAULT_ADDRESS_EXPR)),
-                payments,
+                &payments,
                 managed_buffer!(ACCEPT_FUNDS_FUNC_NAME),
                 ManagedArgBuffer::new(),
                 None,
@@ -191,7 +191,7 @@ fn test_transfer_role() {
             sc.transfer_to_contract_raw(
                 managed_address!(&address_expr_to_address(USER_ADDRESS_EXPR)),
                 managed_address!(&address_expr_to_address(VAULT_ADDRESS_EXPR)),
-                payments,
+                &payments,
                 managed_buffer!(REJECT_FUNDS_FUNC_NAME),
                 ManagedArgBuffer::new(),
                 None,
