@@ -24,7 +24,7 @@ pub trait Parent {
             .raw_deploy()
             .code(code)
             .with_gas_limit(gas_left)
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsNewManagedAddress)
             .sync_call();
 
         self.child_contract_address().set(&child_contract_address);

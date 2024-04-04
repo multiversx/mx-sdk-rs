@@ -1,8 +1,9 @@
 use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
-        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsNewAddress, ReturnsResult,
-        ReturnsResultConv, TxEnv, WithNewAddress, WithResultConv,
+        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsNewAddress,
+        ReturnsNewManagedAddress, ReturnsResult, ReturnsResultConv, TxEnv, WithNewAddress,
+        WithResultConv,
     },
 };
 
@@ -57,6 +58,20 @@ where
 }
 
 impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsNewAddress
+where
+    Env: TxEnv,
+{
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
+        let new_address = tx_response
+            .new_deployed_address
+            .clone()
+            .expect("missing returned address");
+
+        new_address
+    }
+}
+
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsNewManagedAddress
 where
     Env: TxEnv,
 {

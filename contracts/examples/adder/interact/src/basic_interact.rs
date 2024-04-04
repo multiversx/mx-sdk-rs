@@ -119,7 +119,7 @@ impl AdderInteract {
             .run()
             .await;
 
-        let new_address_bech32 = bech32::encode(&new_address.to_address());
+        let new_address_bech32 = bech32::encode(&new_address);
         println!("new address: {new_address_bech32}");
 
         let new_address_expr = format!("bech32:{new_address_bech32}");
@@ -149,7 +149,7 @@ impl AdderInteract {
 
         let results = buffer.run().await;
         for result in results {
-            let new_address_bech32 = bech32::encode(&result.to_address());
+            let new_address_bech32 = bech32::encode(&result);
             println!("new address: {new_address_bech32}");
 
             let new_address_expr = format!("bech32:{new_address_bech32}");

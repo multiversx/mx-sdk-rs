@@ -39,7 +39,7 @@ pub trait DeployContractModule {
             .typed(vault_proxy::VaultProxy)
             .init(opt_arg)
             .code(code.clone())
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsNewManagedAddress)
             .returns(ReturnsResult)
             .sync_call()
     }
@@ -55,7 +55,7 @@ pub trait DeployContractModule {
             .init(opt_arg)
             .code_metadata(CodeMetadata::DEFAULT)
             .from_source(source_address)
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsNewManagedAddress)
             .returns(ReturnsResult)
             .sync_call()
             .into()

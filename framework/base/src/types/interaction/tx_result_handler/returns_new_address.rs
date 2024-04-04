@@ -1,5 +1,9 @@
-use crate::types::{
-    DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv,
+use crate::{
+    proxy_imports::Address,
+    types::{
+        DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec,
+        TxEnv,
+    },
 };
 
 /// Indicates that the newly deployed address will be returned after a deploy.
@@ -9,7 +13,7 @@ impl<Env, Original> RHListItem<Env, Original> for ReturnsNewAddress
 where
     Env: TxEnv,
 {
-    type Returns = ManagedAddress<Env::Api>;
+    type Returns = Address;
 }
 
 impl<Env, Original> RHListItemExec<DeployRawResult<Env::Api>, Env, Original> for ReturnsNewAddress
@@ -17,6 +21,6 @@ where
     Env: TxEnv,
 {
     fn item_process_result(self, raw_result: &DeployRawResult<Env::Api>) -> Self::Returns {
-        raw_result.new_address.clone()
+        raw_result.new_address.to_address()
     }
 }
