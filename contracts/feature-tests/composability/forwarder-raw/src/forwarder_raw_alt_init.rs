@@ -17,11 +17,11 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
-        self.send()
-            .contract_call::<()>(to, endpoint_name)
-            .with_raw_arguments(args.to_arg_buffer())
-            .async_call()
-            .call_and_exit();
+        self.tx()
+            .to(&to)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .async_call_and_exit();
     }
 
     /// Will not work, only written for VM testing.

@@ -140,7 +140,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
             payment_init = quote! { .egld(#payment_expr) };
         } else {
             payment_type = quote! { multiversx_sc::types::EgldOrEsdtTokenPayment<Self::Api> };
-            payment_init = quote! { .egld_or_single_esdt(
+            payment_init = quote! { .payment(
                 multiversx_sc::types::EgldOrEsdtTokenPayment::new(
                     #token_expr,
                     #nonce_expr,

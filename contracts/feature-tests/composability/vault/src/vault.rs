@@ -150,10 +150,11 @@ pub trait Vault {
         for _ in 0..nr_callbacks {
             self.num_async_calls_sent_from_child().update(|c| *c += 1);
 
-            self.send()
-                .contract_call::<()>(caller.clone(), endpoint_name.clone())
-                .with_egld_or_single_esdt_transfer(return_payment.clone())
-                .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            self.tx()
+                .to(&caller)
+                .raw_call(endpoint_name.clone())
+                .payment(&return_payment)
+                .gas(self.blockchain().get_gas_left() / 2)
                 .transfer_execute()
         }
     }
@@ -192,7 +193,7 @@ pub trait Vault {
 
     #[payable("*")]
     #[endpoint]
-    fn burn_and_create_retrive_async(&self) {
+    fn burn_and_create_retrieve_async(&self) {
         let payments = self.call_value().all_esdt_transfers();
         let mut uris = ManagedVec::new();
         uris.push(ManagedBuffer::new());

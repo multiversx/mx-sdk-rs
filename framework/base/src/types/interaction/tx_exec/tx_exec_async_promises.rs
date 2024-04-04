@@ -1,6 +1,7 @@
 use crate::{
     api::{const_handles, CallTypeApi},
     contract_base::SendRawWrapper,
+    proxy_imports::GasLeft,
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
         FunctionCall, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas, TxGasValue,
@@ -50,6 +51,24 @@ where
 
     fn gas_for_callback(&self) -> u64 {
         0
+    }
+}
+
+impl<Api> TxPromisesCallback<Api> for CallbackClosure<Api>
+where
+    Api: CallTypeApi,
+{
+    fn callback_name(&self) -> &'static str {
+        self.callback_name
+    }
+
+    fn overwrite_with_serialized_args(&self, cb_closure_args_serialized: &mut ManagedBuffer<Api>) {
+        self.closure_args
+            .serialize_overwrite(cb_closure_args_serialized);
+    }
+
+    fn gas_for_callback(&self) -> u64 {
+        0u64
     }
 }
 
