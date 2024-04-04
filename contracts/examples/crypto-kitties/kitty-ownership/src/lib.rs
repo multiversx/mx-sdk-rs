@@ -324,7 +324,6 @@ pub trait KittyOwnership {
     fn give_birth(&self, matron_id: u32) {
         require!(self.is_valid_id(matron_id), "Invalid kitty id!");
 
-        let caller = self.blockchain().get_caller();
         let matron = self.kitty_by_id(matron_id).get();
 
         require!(
@@ -337,6 +336,7 @@ pub trait KittyOwnership {
 
         let gene_science_contract_address = self.get_gene_science_contract_address_or_default();
         if !gene_science_contract_address.is_zero() {
+            let caller = self.blockchain().get_caller();
             self.tx()
                 .to(&gene_science_contract_address)
                 .typed(kitty_genetic_alg_proxy::KittyGeneticAlgProxy)

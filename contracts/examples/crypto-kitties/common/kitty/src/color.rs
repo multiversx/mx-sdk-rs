@@ -37,3 +37,9 @@ impl Randomizeable for Color {
         }
     }
 }
+
+impl Color {
+    pub fn as_u64(&self) -> u64 {
+        ((self.r.to_be() as u64) << 4 | self.r.to_be() as u64) << 4 | self.r.to_be() as u64
+    }
+}

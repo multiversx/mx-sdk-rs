@@ -245,7 +245,7 @@ pub trait KittyAuction {
             self.tx()
                 .to(&kitty_ownership_contract_address)
                 .typed(kitty_ownership_proxy::KittyOwnershipProxy)
-                .allow_auctioning(caller.clone(), kitty_id)
+                .allow_auctioning(&caller, kitty_id)
                 .with_callback(self.callbacks().allow_auctioning_callback(
                     auction_type,
                     kitty_id,

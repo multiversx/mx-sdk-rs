@@ -626,7 +626,6 @@ dependencies = [
  "kitty",
  "multiversx-sc",
  "multiversx-sc-scenario",
- "random",
 ]
 
 [[package]]

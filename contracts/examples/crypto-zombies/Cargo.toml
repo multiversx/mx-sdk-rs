@@ -19,7 +19,3 @@ path = "../../../framework/scenario"
 [dependencies.kitty]
 version = "0.0.0"
 path = "../../../contracts/examples/crypto-kitties/common/kitty"
-
-[dependencies.random]
-version = "0.0.0"
-path = "../../../contracts/examples/crypto-kitties/common/random"

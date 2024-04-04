@@ -1,18 +1,6 @@
 use multiversx_sc::imports::*;
 
-use crate::{
-    kitty_ownership_proxy::{self},
-    storage, zombie_factory, zombie_helper,
-};
-
-pub fn get_as_u64(kitty_genes: kitty::KittyGenes) -> u64 {
-    (as_u64(kitty_genes.fur_color) << 12 | as_u64(kitty_genes.eye_color)) << 4
-        | kitty_genes.meow_power.to_be() as u64
-}
-
-pub fn as_u64(color: kitty::Color) -> u64 {
-    ((color.r.to_be() as u64) << 4 | color.r.to_be() as u64) << 4 | color.r.to_be() as u64
-}
+use crate::{kitty_ownership_proxy, storage, zombie_factory, zombie_helper};
 
 #[multiversx_sc::module]
 pub trait ZombieFeeding:
@@ -55,7 +43,7 @@ pub trait ZombieFeeding:
     ) {
         match result {
             ManagedAsyncCallResult::Ok(kitty) => {
-                let kitty_dna = get_as_u64(kitty.genes);
+                let kitty_dna = kitty.genes.get_as_u64();
                 self.feed_and_multiply(zombie_id, kitty_dna, ManagedBuffer::from(b"kitty"));
             },
             ManagedAsyncCallResult::Err(_) => {},
