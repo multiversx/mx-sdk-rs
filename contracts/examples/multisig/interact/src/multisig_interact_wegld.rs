@@ -1,19 +1,16 @@
 use std::time::Duration;
 
 use multiversx_sc_scenario::{
-    multiversx_sc::types::{ContractCallBase, FunctionCall, ReturnsResult},
+    multiversx_sc::types::{FunctionCall, ManagedAddress, ReturnsResult},
     NumExpr,
 };
 #[allow(unused_imports)]
 use multiversx_sc_snippets::multiversx_sc::types::{
     EsdtTokenPayment, MultiValueEncoded, TokenIdentifier,
 };
-use multiversx_sc_snippets::{
-    multiversx_sc::types::ContractCallNoPayment,
-    multiversx_sc_scenario::{
-        mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
-        standalone::retrieve_account_as_scenario_set_state,
-    },
+use multiversx_sc_snippets::multiversx_sc_scenario::{
+    mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
+    standalone::retrieve_account_as_scenario_set_state,
 };
 
 use super::*;
@@ -85,16 +82,13 @@ impl MultisigInteract {
     }
 
     async fn propose_unwrap_egld(&mut self) -> usize {
-        let contract_call = ContractCallNoPayment::<StaticApi, ()>::new(
-            bech32::decode(WEGLD_SWAP_SC_BECH32).into(),
-            "unwrapEgld",
-        )
-        .with_esdt_transfer(EsdtTokenPayment::new(
+        let to = ManagedAddress::<StaticApi>::from(bech32::decode(WEGLD_SWAP_SC_BECH32));
+        let payment = EsdtTokenPayment::new(
             TokenIdentifier::from(WEGLD_TOKEN_IDENTIFIER),
             0u64,
             UNWRAP_AMOUNT.into(),
-        ))
-        .into_normalized();
+        );
+        let function_call = FunctionCall::new("unwrapEgld");
 
         let action_id = self
             .interactor
@@ -103,11 +97,8 @@ impl MultisigInteract {
             .to(&self.state.multisig().to_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(
-                contract_call.basic.to,
-                0u64,
-                contract_call.basic.function_call,
-            )
+            .propose_async_call(to, 0u64, function_call)
+            .esdt(payment)
             .returns(ReturnsResult)
             .prepare_async()
             .run()

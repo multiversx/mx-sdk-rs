@@ -232,15 +232,23 @@ pub struct EsdtTokenPaymentRefs<'a, M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     pub fn as_refs(&self) -> EsdtTokenPaymentRefs<'_, M> {
-        EsdtTokenPaymentRefs {
-            token_identifier: &self.token_identifier,
-            token_nonce: self.token_nonce,
-            amount: &self.amount,
-        }
+        EsdtTokenPaymentRefs::new(&self.token_identifier, self.token_nonce, &self.amount)
     }
 }
 
 impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
+    pub fn new(
+        token_identifier: &'a TokenIdentifier<M>,
+        token_nonce: u64,
+        amount: &'a BigUint<M>,
+    ) -> Self {
+        EsdtTokenPaymentRefs {
+            token_identifier,
+            token_nonce,
+            amount,
+        }
+    }
+
     /// Will clone the referenced values.
     pub fn to_owned_payment(&self) -> EsdtTokenPayment<M> {
         EsdtTokenPayment {

@@ -623,6 +623,7 @@ dependencies = [
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
+ "kitty",
  "multiversx-sc",
  "multiversx-sc-scenario",
 ]
@@ -905,6 +906,22 @@ name = "esdt-transfer-with-fee-meta"
 version = "0.0.0"
 dependencies = [
  "esdt-transfer-with-fee",
+ "multiversx-sc-meta",
+]
+
+[[package]]
+name = "exchange-features"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "exchange-features-meta"
+version = "0.0.0"
+dependencies = [
+ "exchange-features",
  "multiversx-sc-meta",
 ]
 

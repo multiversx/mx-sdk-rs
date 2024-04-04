@@ -1,6 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::BlockchainWrapper,
+    proxy_imports::{EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPaymentRefs, ManagedTypeApi},
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment,
         EgldOrMultiEsdtPaymentRefs, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
@@ -14,9 +15,10 @@ use super::{
     contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
     ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxEgldValue,
-    TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
+    TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue,
+    TxPayment, TxPaymentEgldOnly, TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -61,6 +63,21 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    Data: TxDataFunctionCall<Env>,
+    RH: TxResultHandler<Env>,
+{
+    pub fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
+        self.data.to_call_data_string()
     }
 }
 
@@ -214,6 +231,20 @@ where
         })
     }
 
+    /// Syntactic sugar for `self.payment(EgldOrEsdtTokenPaymentRefs::new(...)`. Takes references.
+    pub fn egld_or_single_esdt<'a>(
+        self,
+        token_identifier: &'a EgldOrEsdtTokenIdentifier<Env::Api>,
+        token_nonce: u64,
+        amount: &'a BigUint<Env::Api>,
+    ) -> Tx<Env, From, To, EgldOrEsdtTokenPaymentRefs<'a, Env::Api>, Gas, Data, RH> {
+        self.payment(EgldOrEsdtTokenPaymentRefs::new(
+            token_identifier,
+            token_nonce,
+            amount,
+        ))
+    }
+
     /// Sets a collection of ESDT transfers as the payment of the transaction.
     ///
     /// Equivalend to just ``.payment(payments)`, but only accepts the multi-esdt types.
@@ -232,19 +263,12 @@ where
         self.multi_esdt(payments)
     }
 
-    pub fn egld_or_single_esdt<P: Into<EgldOrEsdtTokenPayment<Env::Api>>>(
-        self,
-        payment: P,
-    ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
-        self.payment(payment.into())
-    }
-
     /// Backwards compatibility.
     pub fn with_egld_or_single_esdt_transfer<P: Into<EgldOrEsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
     ) -> Tx<Env, From, To, EgldOrEsdtTokenPayment<Env::Api>, Gas, Data, RH> {
-        self.egld_or_single_esdt(payment)
+        self.payment(payment.into())
     }
 
     pub fn egld_or_multi_esdt<P: Into<EgldOrMultiEsdtPayment<Env::Api>>>(

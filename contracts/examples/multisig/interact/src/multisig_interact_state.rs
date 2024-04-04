@@ -5,10 +5,6 @@ use std::{
     path::Path,
 };
 
-/// Default multisig address
-const DEFAULT_MULTISIG_ADDRESS: &str =
-    "0x0000000000000000000000000000000000000000000000000000000000000000";
-
 /// State file
 const STATE_FILE: &str = "state.toml";
 
@@ -41,11 +37,6 @@ impl State {
     /// Returns the multisig contract
     pub fn multisig(&self) -> MultisigContract {
         MultisigContract::new(self.multisig_address.clone().unwrap())
-    }
-
-    /// Returns the multisig contract with default address
-    pub fn default_multisig(&self) -> MultisigContract {
-        MultisigContract::new(DEFAULT_MULTISIG_ADDRESS)
     }
 }
 

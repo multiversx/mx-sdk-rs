@@ -1,10 +1,10 @@
 use multiversx_sc_scenario::scenario_model::{ScCallStep, ScDeployStep};
 
-use crate::TransactionSpec;
+use crate::InteractorStep;
 
 #[derive(Default)]
 pub struct StepBuffer<'a> {
-    pub refs: Vec<&'a mut dyn TransactionSpec>,
+    pub refs: Vec<&'a mut dyn InteractorStep>,
 }
 
 impl<'a> StepBuffer<'a> {
@@ -54,7 +54,7 @@ impl<'a> StepBuffer<'a> {
         buffer
     }
 
-    pub fn to_refs_vec(&'a self) -> Vec<&'a dyn TransactionSpec> {
+    pub fn to_refs_vec(&'a self) -> Vec<&'a dyn InteractorStep> {
         self.refs.iter().map(|r| &**r).collect()
     }
 }

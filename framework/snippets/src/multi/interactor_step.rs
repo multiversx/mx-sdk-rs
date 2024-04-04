@@ -6,22 +6,23 @@ use multiversx_sdk::data::transaction::Transaction;
 
 use crate::Interactor;
 
-pub trait TransactionSpec {
+/// Describes a scenario step that can be executed in an interactor.
+pub trait InteractorStep {
     fn to_transaction(&self, interactor: &Interactor) -> Transaction;
 
-    fn to_address(&self) -> &AddressValue;
+    fn sender_address(&self) -> &AddressValue;
 
     fn run_step(&mut self, step_runner: &mut dyn ScenarioRunner);
 
     fn set_response(&mut self, tx_response: TxResponse);
 }
 
-impl TransactionSpec for ScCallStep {
+impl InteractorStep for ScCallStep {
     fn to_transaction(&self, interactor: &Interactor) -> Transaction {
         interactor.tx_call_to_blockchain_tx(&self.tx)
     }
 
-    fn to_address(&self) -> &AddressValue {
+    fn sender_address(&self) -> &AddressValue {
         &self.tx.from
     }
 
@@ -35,12 +36,12 @@ impl TransactionSpec for ScCallStep {
     }
 }
 
-impl TransactionSpec for ScDeployStep {
+impl InteractorStep for ScDeployStep {
     fn to_transaction(&self, interactor: &Interactor) -> Transaction {
         interactor.sc_deploy_to_blockchain_tx(self)
     }
 
-    fn to_address(&self) -> &AddressValue {
+    fn sender_address(&self) -> &AddressValue {
         &self.tx.from
     }
 

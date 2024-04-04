@@ -1,0 +1,5 @@
+[settings]
+proxy-paths = [
+    "../kitty-auction/src/kitty_ownership_proxy.rs",
+    "../../crypto-zombies/src/kitty_ownership_proxy.rs",
+]

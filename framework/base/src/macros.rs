@@ -187,13 +187,6 @@ macro_rules! non_zero_usize {
 }
 
 #[macro_export]
-macro_rules! endpoints_proxy {
-    ($endpoint_name:ident, $address:ident) => {
-        multiversx_sc::types::ContractCallNoPayment::new($address, stringify!($endpoint_name));
-    };
-}
-
-#[macro_export]
 macro_rules! constructors_proxy {
     ($opt_address:ident) => {
         multiversx_sc::types::new_contract_deploy($opt_address);

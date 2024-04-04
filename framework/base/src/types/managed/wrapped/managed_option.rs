@@ -122,27 +122,27 @@ where
         }
     }
 
-    pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
+    pub fn map_or_else<Context, D, F, R>(self, context: Context, default: D, f: F) -> R
     where
-        D: FnOnce() -> U,
-        F: FnOnce(T) -> U,
+        D: FnOnce(Context) -> R,
+        F: FnOnce(Context, T) -> R,
     {
         if self.is_some() {
-            f(unsafe { self.unwrap_no_check() })
+            f(context, unsafe { self.unwrap_no_check() })
         } else {
-            default()
+            default(context)
         }
     }
 
-    pub fn map_ref_or_else<U, D, F>(&self, default: D, f: F) -> U
+    pub fn map_ref_or_else<Context, D, F, R>(&self, context: Context, default: D, f: F) -> R
     where
-        D: FnOnce() -> U,
-        F: FnOnce(&T) -> U,
+        D: FnOnce(Context) -> R,
+        F: FnOnce(Context, &T) -> R,
     {
         if self.is_some() {
-            f(&T::from_handle(self.handle.clone()))
+            f(context, &T::from_handle(self.handle.clone()))
         } else {
-            default()
+            default(context)
         }
     }
 }

@@ -1,0 +1,5 @@
+[settings]
+proxy-paths = [
+    "../crowdfunding-erc20/src/erc20_proxy.rs",
+    "../lottery-erc20/src/erc20_proxy.rs",
+]

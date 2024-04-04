@@ -214,11 +214,11 @@ where
             .original_result()
     }
 
-    pub fn burn_and_create_retrive_async(
+    pub fn burn_and_create_retrieve_async(
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call("burn_and_create_retrive_async")
+            .raw_call("burn_and_create_retrieve_async")
             .original_result()
     }
 

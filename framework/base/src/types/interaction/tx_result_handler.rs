@@ -1,5 +1,6 @@
 mod returns_bt;
 mod returns_new_address;
+mod returns_new_managed_address;
 mod returns_raw_result;
 mod returns_result;
 mod returns_result_conv;
@@ -10,6 +11,7 @@ mod with_result_conv;
 
 pub use returns_bt::*;
 pub use returns_new_address::*;
+pub use returns_new_managed_address::*;
 pub use returns_raw_result::*;
 pub use returns_result::*;
 pub use returns_result_conv::*;

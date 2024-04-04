@@ -153,8 +153,9 @@ where
     #[inline]
     pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
         token.map_ref_or_else(
-            || self.get_balance(&self.get_sc_address()),
-            |token_identifier| {
+            (),
+            |()| self.get_balance(&self.get_sc_address()),
+            |(), token_identifier| {
                 self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
             },
         )

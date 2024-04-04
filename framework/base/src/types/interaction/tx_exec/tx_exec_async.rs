@@ -1,6 +1,7 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
+    proxy_imports::{ExplicitGas, ManagedBuffer, TxGasValue},
     types::{
         CallbackClosure, OriginalResultMarker, Tx, TxData, TxDataFunctionCall,
         TxEmptyResultHandler, TxEnv, TxFrom, TxGas, TxPayment, TxResultHandler, TxScEnv, TxTo,
