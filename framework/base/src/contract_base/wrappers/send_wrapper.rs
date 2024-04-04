@@ -3,16 +3,17 @@ use core::marker::PhantomData;
 use crate::codec::Empty;
 
 use crate::{
-    api::{
-        BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi,
-        CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
-        ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
-        ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
-        ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
-    },
+    api::{BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi},
     codec,
     types::{
-        system_proxy, BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
+        system_proxy,
+        system_proxy::builtin_func_names::{
+            CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
+            ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
+            ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
+            ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+        },
+        BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
         EgldOrEsdtTokenIdentifier, EsdtTokenPayment, GasLeft, ManagedAddress, ManagedArgBuffer,
         ManagedBuffer, ManagedType, ManagedVec, ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
         TxScEnv,

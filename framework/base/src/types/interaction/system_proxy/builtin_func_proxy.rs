@@ -1,3 +1,9 @@
+use self::builtin_func_names::{
+    CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME, DELETE_USERNAME_FUNC_NAME,
+    ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
+    ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
+    ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, SET_USERNAME_FUNC_NAME,
+};
 use crate::proxy_imports::*;
 
 /// Proxy describing the user builtin function signatures.
@@ -43,7 +49,7 @@ where
         name: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call("SetUserName")
+            .raw_call(SET_USERNAME_FUNC_NAME)
             .argument(&name)
             .original_result()
     }
@@ -52,7 +58,7 @@ where
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
-            .raw_call("DeleteUserName")
+            .raw_call(DELETE_USERNAME_FUNC_NAME)
             .original_result()
     }
 }
