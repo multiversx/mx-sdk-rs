@@ -15,3 +15,11 @@ path = "../../../framework/base"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.48.0-alpha.1"
 path = "../../../framework/scenario"
+
+[dependencies.kitty]
+version = "0.0.0"
+path = "../crypto-kitties/common/kitty"
+
+[dependencies.random]
+version = "0.0.0"
+path = "../crypto-kitties/common/random"

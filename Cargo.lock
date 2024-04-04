@@ -623,8 +623,10 @@ dependencies = [
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
+ "kitty",
  "multiversx-sc",
  "multiversx-sc-scenario",
+ "random",
 ]
 
 [[package]]
