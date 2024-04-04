@@ -37,7 +37,7 @@ pub trait ProxyTestFirst {
             .init(123)
             .code(code)
             .code_metadata(CodeMetadata::UPGRADEABLE)
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsNewManagedAddress)
             .returns(ReturnsResult)
             .egld(payment)
             .sync_call();

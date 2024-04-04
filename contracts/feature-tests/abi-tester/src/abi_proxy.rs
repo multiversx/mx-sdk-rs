@@ -402,8 +402,7 @@ pub struct AbiTestType {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested01 {
-}
+pub struct OnlyShowsUpAsNested01 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct OnlyShowsUpAsNested02 {
@@ -415,19 +414,14 @@ pub enum AbiEnum {
     Nothing,
     Something(i32),
     SomethingMore(u8, OnlyShowsUpAsNested08),
-    SomeStruct {
-        a: u16,
-        b: OnlyShowsUpAsNested09,
-    },
+    SomeStruct { a: u16, b: OnlyShowsUpAsNested09 },
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested08 {
-}
+pub struct OnlyShowsUpAsNested08 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested09 {
-}
+pub struct OnlyShowsUpAsNested09 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct AbiManagedType<Api>
@@ -440,36 +434,28 @@ where
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested03 {
-}
+pub struct OnlyShowsUpAsNested03 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested04 {
-}
+pub struct OnlyShowsUpAsNested04 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested05 {
-}
+pub struct OnlyShowsUpAsNested05 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested06 {
-}
+pub struct OnlyShowsUpAsNested06 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested07 {
-}
+pub struct OnlyShowsUpAsNested07 {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInSingleValueMapper {
-}
+pub struct OnlyShowsUpAsNestedInSingleValueMapper {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInVec {
-}
+pub struct OnlyShowsUpAsNestedInVec {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInArrayVec {
-}
+pub struct OnlyShowsUpAsNestedInArrayVec {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, ManagedVecItem)]
 pub struct AbiManagedVecItem {
@@ -478,28 +464,22 @@ pub struct AbiManagedVecItem {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInArray {
-}
+pub struct OnlyShowsUpAsNestedInArray {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInBox {
-}
+pub struct OnlyShowsUpAsNestedInBox {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInBoxedSlice {
-}
+pub struct OnlyShowsUpAsNestedInBoxedSlice {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInRef {
-}
+pub struct OnlyShowsUpAsNestedInRef {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInSlice {
-}
+pub struct OnlyShowsUpAsNestedInSlice {}
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNestedInOption {
-}
+pub struct OnlyShowsUpAsNestedInOption {}
 
 #[derive(TopEncode, TopDecode)]
 pub struct OnlyShowsUpInEsdtAttr {
@@ -507,8 +487,7 @@ pub struct OnlyShowsUpInEsdtAttr {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
-pub struct OnlyShowsUpAsNested10 {
-}
+pub struct OnlyShowsUpAsNested10 {}
 
 #[derive(TopEncode, TopDecode)]
 pub enum ExplicitDiscriminant {
@@ -525,8 +504,5 @@ pub enum ExplicitDiscriminantMixed {
     Unit,
     Tuple(u16),
     Five,
-    Struct {
-        a: u8,
-        b: u16,
-    },
+    Struct { a: u8, b: u16 },
 }
