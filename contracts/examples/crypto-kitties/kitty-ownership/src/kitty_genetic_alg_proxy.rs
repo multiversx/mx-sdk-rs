@@ -68,7 +68,7 @@ where
         self,
         matron: Arg0,
         sire: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, kitty::kitty_genes::KittyGenes> {
+    ) -> TxProxyCall<Env, From, To, Gas, kitty::KittyGenes> {
         self.wrapped_tx
             .raw_call("generateKittyGenes")
             .argument(&matron)

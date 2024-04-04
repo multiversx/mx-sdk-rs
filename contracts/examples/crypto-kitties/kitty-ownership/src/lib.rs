@@ -2,7 +2,7 @@
 #![allow(clippy::suspicious_operation_groupings)]
 
 pub mod kitty_genetic_alg_proxy;
-use kitty::{kitty_genes::KittyGenes, Kitty};
+use kitty::{Kitty, KittyGenes};
 use multiversx_sc::imports::*;
 
 use core::cmp::max;

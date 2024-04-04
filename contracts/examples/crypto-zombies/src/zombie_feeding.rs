@@ -5,12 +5,12 @@ use crate::{
     storage, zombie_factory, zombie_helper,
 };
 
-pub fn get_as_u64(kitty_genes: kitty::kitty_genes::KittyGenes) -> u64 {
+pub fn get_as_u64(kitty_genes: kitty::KittyGenes) -> u64 {
     (as_u64(kitty_genes.fur_color) << 12 | as_u64(kitty_genes.eye_color)) << 4
         | kitty_genes.meow_power.to_be() as u64
 }
 
-pub fn as_u64(color: kitty::color::Color) -> u64 {
+pub fn as_u64(color: kitty::Color) -> u64 {
     ((color.r.to_be() as u64) << 4 | color.r.to_be() as u64) << 4 | color.r.to_be() as u64
 }
 
