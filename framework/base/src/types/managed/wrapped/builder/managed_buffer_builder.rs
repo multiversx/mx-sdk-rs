@@ -12,7 +12,7 @@ use crate::{
 const HEX_CONVERSION_BUFFER_LEN: usize = 32;
 const BIN_CONVERSION_BUFFER_LEN: usize = 32;
 
-pub struct ManagedBufferCachedBuilder<M>
+pub struct ManagedBufferBuilder<M>
 where
     M: ManagedTypeApi,
 {
@@ -20,7 +20,7 @@ where
     static_cache: Option<StaticBufferRef<M>>,
 }
 
-impl<M> ManagedBufferCachedBuilder<M>
+impl<M> ManagedBufferBuilder<M>
 where
     M: ManagedTypeApi,
 {
@@ -31,12 +31,12 @@ where
     pub fn new_from_slice(slice: &[u8]) -> Self {
         let static_cache = StaticBufferRef::try_new(slice);
         if static_cache.is_some() {
-            ManagedBufferCachedBuilder {
+            ManagedBufferBuilder {
                 managed_buffer: ManagedBuffer::new(),
                 static_cache,
             }
         } else {
-            ManagedBufferCachedBuilder {
+            ManagedBufferBuilder {
                 managed_buffer: slice.into(),
                 static_cache: None,
             }
@@ -44,7 +44,7 @@ where
     }
 }
 
-impl<M> Default for ManagedBufferCachedBuilder<M>
+impl<M> Default for ManagedBufferBuilder<M>
 where
     M: ManagedTypeApi,
 {
@@ -54,7 +54,7 @@ where
     }
 }
 
-impl<M> ManagedBufferCachedBuilder<M>
+impl<M> ManagedBufferBuilder<M>
 where
     M: ManagedTypeApi,
 {
@@ -125,7 +125,7 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
+impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferBuilder<M> {
     fn write(&mut self, bytes: &[u8]) {
         self.append_bytes(bytes);
     }
@@ -156,7 +156,7 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
     }
 }
 
-impl<M> FormatByteReceiver for ManagedBufferCachedBuilder<M>
+impl<M> FormatByteReceiver for ManagedBufferBuilder<M>
 where
     M: ManagedTypeApi,
 {
@@ -179,7 +179,7 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> FormatBuffer for ManagedBufferCachedBuilder<M> {
+impl<M: ManagedTypeApi> FormatBuffer for ManagedBufferBuilder<M> {
     fn append_ascii(&mut self, ascii: &[u8]) {
         self.append_bytes(ascii)
     }
