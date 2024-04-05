@@ -5,6 +5,7 @@ use crate::{
 
 use super::ManagedBufferBuilderImpl;
 
+/// A ManagedBuffer builder implementation that caches data to the static cache locally in the contract.
 pub struct ManagedBufferBuilderImplCached<M>
 where
     M: ManagedTypeApi,
