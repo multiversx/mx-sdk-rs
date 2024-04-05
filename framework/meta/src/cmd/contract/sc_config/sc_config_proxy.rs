@@ -14,7 +14,7 @@ pub struct ProxyConfigSerde {
 
     #[serde(default)]
     #[serde(rename = "path-rename")]
-    pub path_rename: Option<PathRename>,
+    pub path_rename: Option<Vec<PathRename>>,
 }
 
 impl ProxyConfigSerde {
