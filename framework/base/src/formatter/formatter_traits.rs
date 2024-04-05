@@ -19,7 +19,7 @@ pub trait FormatByteReceiver {
     fn append_managed_buffer_binary(&mut self, item: &ManagedBuffer<Self::Api>);
 }
 
-pub trait FormatBuffer {
+pub trait FormatBuffer: Default {
     fn append_ascii(&mut self, ascii: &[u8]);
 
     fn append_display<T: SCDisplay>(&mut self, item: &T);
