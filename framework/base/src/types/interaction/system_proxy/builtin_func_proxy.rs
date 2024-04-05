@@ -61,4 +61,15 @@ where
             .raw_call(DELETE_USERNAME_FUNC_NAME)
             .original_result()
     }
+
+    /// Creates a call to the `ClaimDeveloperRewards` builtin function.
+    ///
+    /// In itself, this does nothing. You need to then call turn the contract call into an async call.
+    pub fn claim_developer_rewards(
+        self,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call(CLAIM_DEVELOPER_REWARDS_FUNC_NAME)
+            .original_result()
+    }
 }

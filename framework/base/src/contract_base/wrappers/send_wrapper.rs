@@ -8,10 +8,9 @@ use crate::{
     types::{
         system_proxy,
         system_proxy::builtin_func_names::{
-            CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME,
-            ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
-            ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
-            ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
+            CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
+            ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
+            ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
         },
         BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
         EgldOrEsdtTokenIdentifier, EsdtTokenPayment, GasLeft, ManagedAddress, ManagedArgBuffer,
@@ -357,16 +356,6 @@ where
             .to(to)
             .multi_esdt(payments)
             .async_call_and_exit()
-    }
-
-    /// Creates a call to the `ClaimDeveloperRewards` builtin function.
-    ///
-    /// In itself, this does nothing. You need to then call turn the contract call into an async call.
-    pub fn claim_developer_rewards(
-        &self,
-        child_sc_address: ManagedAddress<A>,
-    ) -> ContractCallNoPayment<A, ()> {
-        ContractCallNoPayment::new(child_sc_address, CLAIM_DEVELOPER_REWARDS_FUNC_NAME)
     }
 
     /// Creates a call to the `ChangeOwnerAddress` builtin function.
