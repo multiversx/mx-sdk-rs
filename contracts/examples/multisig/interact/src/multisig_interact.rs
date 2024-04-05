@@ -5,15 +5,12 @@ mod multisig_interact_state;
 mod multisig_interact_wegld;
 
 use clap::Parser;
-use multisig::{multisig_perform::ProxyTrait as _, multisig_proxy, ProxyTrait as _};
+use multisig::multisig_proxy;
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
 use multiversx_sc_scenario::{
     mandos_system::ScenarioRunner,
-    multiversx_sc::{
-        imports::OptionalValue,
-        types::{BigUint, ReturnsNewAddress, ReturnsResult},
-    },
+    multiversx_sc::types::{BigUint, ReturnsNewAddress, ReturnsResult},
     scenario_format::interpret_trait::InterpretableFrom,
     standalone::retrieve_account_as_scenario_set_state,
     test_wallets, NumExpr,
@@ -25,7 +22,7 @@ use multiversx_sc_snippets::{
         api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
         scenario_model::*, ContractInfo,
     },
-    tokio, Interactor, InteractorPrepareAsync, StepBuffer,
+    tokio, Interactor, InteractorPrepareAsync,
 };
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
@@ -258,21 +255,26 @@ impl MultisigInteract {
     }
 
     async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: u64) {
-        let mut buffer = self.interactor.homogenous_call_buffer();
         let multisig_address = self.state.multisig().to_address();
-        let from = &self.wallet_address;
 
+        let mut pending_action_ids = Vec::<usize>::new();
         for &action_id in actions.iter() {
             if self.quorum_reached(action_id).await && self.sign(action_id).await {
-                buffer.push_tx(|tx| {
-                    tx.from(from)
-                        .to(&multisig_address)
-                        .gas(gas_expr)
-                        .typed(multisig_proxy::MultisigProxy)
-                        .perform_action_endpoint(action_id)
-                        .returns(ReturnsResult)
-                });
+                pending_action_ids.push(action_id);
             }
+        }
+
+        let from = &self.wallet_address;
+        let mut buffer = self.interactor.homogenous_call_buffer();
+        for action_id in pending_action_ids {
+            buffer.push_tx(|tx| {
+                tx.from(from)
+                    .to(&multisig_address)
+                    .gas(gas_expr)
+                    .typed(multisig_proxy::MultisigProxy)
+                    .perform_action_endpoint(action_id)
+                    .returns(ReturnsResult)
+            });
         }
 
         let deployed_addresses = buffer.run().await;
@@ -314,18 +316,22 @@ impl MultisigInteract {
 
     async fn sign(&mut self, action_id: usize) -> bool {
         println!("signing action `{action_id}`...");
-        let mut buffer = self.interactor.homogenous_call_buffer();
         let multisig_address = self.state.multisig().to_address();
 
+        let mut pending_signers = Vec::<Address>::new();
         for signer in self.board().iter() {
             if self.signed(signer, action_id).await {
                 println!(
                     "{} - already signed action `{action_id}`",
                     bech32::encode(signer)
                 );
-                continue;
+            } else {
+                pending_signers.push(signer.clone());
             }
+        }
 
+        let mut buffer = self.interactor.homogenous_call_buffer();
+        for signer in pending_signers {
             buffer.push_tx(|tx| {
                 tx.from(signer)
                     .to(&multisig_address)
