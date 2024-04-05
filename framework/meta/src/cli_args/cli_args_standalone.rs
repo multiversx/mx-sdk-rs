@@ -310,6 +310,9 @@ pub enum InstallCommand {
 
     #[command(name = "wasm32", about = "Installs the `wasm32` target")]
     Wasm32(InstallWasm32Args),
+
+    #[command(name = "wasm-opt", about = "Installs the `wasm-opt` tool")]
+    WasmOpt(InstallWasmOptArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -321,3 +324,6 @@ pub struct InstallMxScenarioGoArgs {
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
 pub struct InstallWasm32Args {}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallWasmOptArgs {}

@@ -10,3 +10,14 @@ pub fn install_wasm32_target() {
 
     println!("wasm32 target installed successfully");
 }
+
+pub fn install_wasm_opt() {
+    let cmd = Command::new("cargo")
+        .args(vec!["install", "wasm-opt"])
+        .status()
+        .expect("failed to execute `cargo`");
+
+    assert!(cmd.success(), "failed to install wasm-opt");
+
+    println!("wasm-opt installed successfully");
+}
