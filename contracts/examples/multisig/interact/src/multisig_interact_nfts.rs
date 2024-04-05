@@ -189,17 +189,20 @@ impl MultisigInteract {
         println!("creating items...");
 
         let multisig_address = self.state.multisig().to_address();
-        let mut steps = Vec::new();
 
+        let mut buffer = self.interactor.homogenous_call_buffer();
         for item_index in 0..NUM_ITEMS {
             let item_name = format!("Test collection item #{item_index}");
             let image_cid = format!(
                 "https://ipfs.io/ipfs/QmYyAaEf1phJS5mN6wfou5de5GbpUddBxTY1VekKcjd5PC/nft{item_index:02}.png"
             );
 
-            let typed_sc_call = ScCallStep::new()
-                .call(
-                    self.state.multisig().propose_async_call(
+            buffer.push_tx(|tx| {
+                tx.from(&self.wallet_address)
+                    .to(&multisig_address)
+                    .gas(10_000_000u64)
+                    .typed(multisig_proxy::MultisigProxy)
+                    .propose_async_call(
                         &multisig_address,
                         0u64,
                         FunctionCall::new("ESDTNFTCreate")
@@ -210,34 +213,16 @@ impl MultisigInteract {
                             .argument(&Empty)
                             .argument(&METADATA)
                             .argument(&image_cid),
-                    ),
-                )
-                .from(&self.wallet_address)
-                .gas_limit("10,000,000");
-
-            steps.push(typed_sc_call);
+                    )
+                    .returns(ReturnsResult)
+            });
         }
 
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
-            .await;
-
-        let mut actions = Vec::new();
-        for step in steps.iter() {
-            let result = step.result();
-            if result.is_err() {
-                println!(
-                    "propose ESDTNFTCreate failed with: {}",
-                    result.err().unwrap()
-                );
-                return;
-            }
-
-            let action_id = result.unwrap();
+        let action_ids = buffer.run().await;
+        for action_id in action_ids.iter() {
             println!("successfully proposed ESDTNFTCreate action `{action_id}`");
-            actions.push(action_id);
         }
 
-        self.perform_actions(actions, "30,000,000").await;
+        self.perform_actions(action_ids, 30_000_000u64).await;
     }
 }
