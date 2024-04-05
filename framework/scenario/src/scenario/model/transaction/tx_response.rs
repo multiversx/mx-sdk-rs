@@ -12,8 +12,6 @@ use super::{
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
 
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
-
 #[derive(Debug, Default, Clone)]
 /// The response of a transaction.
 pub struct TxResponse {
@@ -195,48 +193,26 @@ impl TxResponse {
     }
 
     fn process_new_issued_token_identifier(mut self) -> Self {
-        for scr in self.api_scrs.iter() {
-            if scr.sender.to_string() != SYSTEM_SC_BECH32 {
-                continue;
-            }
-
-            let Some(prev_tx) = self.api_scrs.iter().find(|e| e.hash == scr.prev_tx_hash) else {
-                continue;
-            };
-
-            let is_issue_fungible = prev_tx.data.starts_with("issue@");
-            let is_issue_semi_fungible = prev_tx.data.starts_with("issueSemiFungible@");
-            let is_issue_non_fungible = prev_tx.data.starts_with("issueNonFungible@");
-            let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
-
-            if !is_issue_fungible
-                && !is_issue_semi_fungible
-                && !is_issue_non_fungible
-                && !is_register_meta_esdt
-            {
-                continue;
-            }
-
-            if scr.data.starts_with("ESDTTransfer@") {
-                let encoded_tid = scr.data.split('@').nth(1);
-                if encoded_tid.is_none() {
-                    return self;
+        if let Some(logs) = &self.api_logs {
+            for event in logs.events.iter().cloned() {
+                if event.identifier != "performAction" {
+                    continue;
                 }
 
-                self.new_issued_token_identifier =
-                    Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
-
-                break;
-            } else if scr.data.starts_with("@00@") {
-                let encoded_tid = scr.data.split('@').nth(2);
-                if encoded_tid.is_none() {
-                    return self;
+                if event.topics.is_none() {
+                    continue;
                 }
 
-                self.new_issued_token_identifier =
-                    Some(String::from_utf8(hex::decode(encoded_tid.unwrap()).unwrap()).unwrap());
+                let topics = event.topics.unwrap();
 
-                break;
+                if topics.get(7).is_none() {
+                    continue;
+                }
+
+                let new_token_id = topics.get(7).unwrap();
+
+                self.new_issued_token_identifier =
+                    Some(String::from_utf8(base64_decode(new_token_id)).unwrap());
             }
         }
 

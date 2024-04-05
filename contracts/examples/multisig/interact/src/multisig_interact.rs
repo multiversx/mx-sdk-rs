@@ -104,7 +104,7 @@ impl MultisigInteract {
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
-        let wallet_address = interactor.register_wallet(test_wallets::mike());
+        let wallet_address = interactor.register_wallet(test_wallets::dan());
         let multisig_code = BytesValue::interpret_from(
             "mxsc:../output/multisig.mxsc.json",
             &InterpreterContext::default(),
@@ -195,7 +195,7 @@ impl MultisigInteract {
                     .typed(multisig_proxy::MultisigProxy)
                     .init(quorum, board.clone())
                     .code(&self.multisig_code)
-                    .gas(NumExpr("70,000,000"))
+                    .gas(NumExpr("100,000,000"))
                     .returns(ReturnsNewAddress)
             });
         }
