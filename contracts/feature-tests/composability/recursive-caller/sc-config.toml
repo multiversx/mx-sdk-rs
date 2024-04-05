@@ -1,2 +1,2 @@
-[settings]
-proxy-paths = ["src/self_proxy.rs"]
+[[proxy]]
+path = "src/self_proxy.rs"

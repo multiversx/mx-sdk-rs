@@ -1,7 +1,9 @@
 [settings]
-proxy-paths = ["tests/pmf_proxy.rs"]
 main = "main"
 
 [contracts.main]
 name = "panic-message-features"
 panic-message = true
+
+[[proxy]]
+path = "tests/pmf_proxy.rs"

@@ -1,2 +1,2 @@
-[settings]
-proxy-paths = ["../parent/src/child_proxy.rs"]
+[[proxy]]
+path = "../parent/src/child_proxy.rs"
