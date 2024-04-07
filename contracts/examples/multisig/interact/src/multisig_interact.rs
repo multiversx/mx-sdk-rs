@@ -235,8 +235,8 @@ impl MultisigInteract {
     }
 
     async fn perform_action(&mut self, action_id: usize, gas_expr: u64) {
-        if !self.quorum_reached(action_id).await && !self.sign(action_id).await {
-            return;
+        if !self.quorum_reached(action_id).await {
+            self.sign(&[action_id]).await
         }
         println!("quorum reached for action `{action_id}`");
 
@@ -254,19 +254,23 @@ impl MultisigInteract {
         println!("successfully performed action `{action_id}`");
     }
 
-    async fn perform_actions(&mut self, actions: Vec<usize>, gas_expr: u64) {
+    async fn perform_actions(&mut self, action_ids: Vec<usize>, gas_expr: u64) {
         let multisig_address = self.state.multisig().to_address();
 
-        let mut pending_action_ids = Vec::<usize>::new();
-        for &action_id in actions.iter() {
-            if self.quorum_reached(action_id).await && self.sign(action_id).await {
-                pending_action_ids.push(action_id);
+        let mut actions_no_quorum_reached = Vec::new();
+        for &action_id in &action_ids {
+            if self.quorum_reached(action_id).await {
+                println!("quorum reached for action `{action_id}`");
+            } else {
+                actions_no_quorum_reached.push(action_id)
             }
         }
 
+        self.sign(&actions_no_quorum_reached).await;
+
         let from = &self.wallet_address;
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for action_id in pending_action_ids {
+        for action_id in action_ids {
             buffer.push_tx(|tx| {
                 tx.from(from)
                     .to(&multisig_address)
@@ -314,24 +318,26 @@ impl MultisigInteract {
             .await
     }
 
-    async fn sign(&mut self, action_id: usize) -> bool {
-        println!("signing action `{action_id}`...");
+    async fn sign(&mut self, action_ids: &[usize]) {
+        println!("signing actions `{action_ids:?}`...");
         let multisig_address = self.state.multisig().to_address();
 
-        let mut pending_signers = Vec::<Address>::new();
-        for signer in self.board().iter() {
-            if self.signed(signer, action_id).await {
-                println!(
-                    "{} - already signed action `{action_id}`",
-                    bech32::encode(signer)
-                );
-            } else {
-                pending_signers.push(signer.clone());
+        let mut pending_signers = Vec::<(Address, usize)>::new();
+        for &action_id in action_ids {
+            for signer in self.board().iter() {
+                if self.signed(signer, action_id).await {
+                    println!(
+                        "{} - already signed action `{action_id}`",
+                        bech32::encode(signer)
+                    );
+                } else {
+                    pending_signers.push((signer.clone(), action_id));
+                }
             }
         }
 
         let mut buffer = self.interactor.homogenous_call_buffer();
-        for signer in pending_signers {
+        for (signer, action_id) in pending_signers {
             buffer.push_tx(|tx| {
                 tx.from(signer)
                     .to(&multisig_address)
@@ -343,8 +349,7 @@ impl MultisigInteract {
 
         buffer.run().await;
 
-        println!("successfully performed sign action `{action_id}`");
-        true
+        println!("successfully performed sign action `{action_ids:?}`");
     }
 
     async fn dns_register(&mut self, name: &str) {
