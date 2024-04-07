@@ -167,16 +167,13 @@ pub trait MultisigPerformModule:
                     &call_data.endpoint_name,
                     call_data.arguments.as_multi(),
                 );
-                let result = self.send_raw().direct_egld_execute(
-                    &call_data.to,
-                    &call_data.egld_amount,
-                    gas,
-                    &call_data.endpoint_name,
-                    &call_data.arguments.into(),
-                );
-                if let Result::Err(e) = result {
-                    sc_panic!(e);
-                }
+                self.tx()
+                    .to(call_data.to)
+                    .egld(call_data.egld_amount)
+                    .gas(gas)
+                    .raw_call(call_data.endpoint_name)
+                    .arguments_raw(call_data.arguments.into())
+                    .transfer_execute();
                 OptionalValue::None
             },
             Action::SendAsyncCall(call_data) => {
@@ -213,13 +210,16 @@ pub trait MultisigPerformModule:
                     gas_left,
                     arguments.as_multi(),
                 );
-                let (new_address, _) = self.send_raw().deploy_from_source_contract(
-                    gas_left,
-                    &amount,
-                    &source,
-                    code_metadata,
-                    &arguments.into(),
-                );
+                let new_address = self
+                    .tx()
+                    .egld(amount)
+                    .gas(gas_left)
+                    .raw_deploy()
+                    .from_source(source)
+                    .code_metadata(code_metadata)
+                    .arguments_raw(arguments.into())
+                    .returns(ReturnsNewManagedAddress)
+                    .sync_call();
                 OptionalValue::Some(new_address)
             },
             Action::SCUpgradeFromSource {
@@ -239,14 +239,15 @@ pub trait MultisigPerformModule:
                     gas_left,
                     arguments.as_multi(),
                 );
-                self.send_raw().upgrade_from_source_contract(
-                    &sc_address,
-                    gas_left,
-                    &amount,
-                    &source,
-                    code_metadata,
-                    &arguments.into(),
-                );
+                self.tx()
+                    .to(sc_address)
+                    .egld(amount)
+                    .gas(gas_left)
+                    .raw_upgrade()
+                    .from_source(source)
+                    .code_metadata(code_metadata)
+                    .arguments_raw(arguments.into())
+                    .upgrade_async_call_and_exit();
                 OptionalValue::None
             },
         }
