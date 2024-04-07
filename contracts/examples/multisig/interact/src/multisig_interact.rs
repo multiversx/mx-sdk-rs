@@ -352,6 +352,13 @@ impl MultisigInteract {
         println!("successfully performed sign action `{action_ids:?}`");
     }
 
+    async fn sign_if_quorum_not_reached(&mut self, action_id: usize) {
+        if !self.quorum_reached(action_id).await {
+            self.sign(&[action_id]).await;
+        }
+        println!("quorum reached for action `{action_id}`");
+    }
+
     async fn dns_register(&mut self, name: &str) {
         let dns_address = dns_address_for_name(name);
         self.interactor
