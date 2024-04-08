@@ -9,8 +9,7 @@ use crate::{
     formatter::SCLowerHex,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
     types::{
-        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType,
-        ManagedVec,
+        BigUint, EsdtTokenPayment, ManagedBuffer, ManagedBufferBuilder, ManagedType, ManagedVec,
     },
 };
 
@@ -56,7 +55,7 @@ where
     }
 
     pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
-        let mut result = ManagedBufferCachedBuilder::default();
+        let mut result = ManagedBufferBuilder::default();
         result.append_managed_buffer(&self.basic.function_call.function_name);
         for arg in self.basic.function_call.arg_buffer.raw_arg_iter() {
             result.append_bytes(b"@");

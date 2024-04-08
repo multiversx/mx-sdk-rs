@@ -8,6 +8,9 @@ publish = false
 [lib]
 path = "src/str_repeat.rs"
 
+[features]
+managed-buffer-builder-cached = ["multiversx-sc/managed-buffer-builder-cached"]
+
 [dependencies.multiversx-sc]
 version = "0.47.8"
 path = "../../../framework/base"
