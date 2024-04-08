@@ -8,14 +8,13 @@ use crate::{
     types::{
         system_proxy,
         system_proxy::builtin_func_names::{
-            CHANGE_OWNER_BUILTIN_FUNC_NAME, ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME,
-            ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME,
+            ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
             ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
         },
-        BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
-        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, OriginalResultMarker,
-        ReturnsRawResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
+        BigUint, ContractCallNoPayment, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier,
+        EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
+        ManagedType, ManagedVec, OriginalResultMarker, ReturnsRawResult, ToSelf, TokenIdentifier,
+        Tx, TxScEnv,
     },
 };
 
@@ -359,8 +358,6 @@ where
     }
 
     /// Creates a call to the `ClaimDeveloperRewards` builtin function.
-    ///
-    /// In itself, this does nothing. You need to then call turn the contract call into an async call.
     #[allow(clippy::type_complexity)]
     pub fn claim_developer_rewards(
         &self,
@@ -374,15 +371,17 @@ where
     }
 
     /// Creates a call to the `ChangeOwnerAddress` builtin function.
-    ///
-    /// In itself, this does nothing. You need to then call turn the contract call into an async call.
+    #[allow(clippy::type_complexity)]
     pub fn change_owner_address(
         &self,
         child_sc_address: ManagedAddress<A>,
         new_owner: &ManagedAddress<A>,
-    ) -> ContractCallNoPayment<A, ()> {
-        self.contract_call(child_sc_address, CHANGE_OWNER_BUILTIN_FUNC_NAME)
-            .argument(&new_owner)
+    ) -> Tx<TxScEnv<A>, (), ManagedAddress<A>, (), (), FunctionCall<A>, OriginalResultMarker<()>>
+    {
+        Tx::new_tx_from_sc()
+            .to(child_sc_address)
+            .typed(system_proxy::UserBuiltinProxy)
+            .change_owner_address(new_owner)
     }
 
     /// Allows synchronously calling a local function by name. Execution is resumed afterwards.
@@ -468,20 +467,12 @@ where
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed".
     pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        let func_name: &str;
-
-        arg_buffer.push_arg(token);
-        if nonce == 0 {
-            func_name = ESDT_LOCAL_BURN_FUNC_NAME;
-        } else {
-            func_name = ESDT_NFT_BURN_FUNC_NAME;
-            arg_buffer.push_arg(nonce);
-        }
-
-        arg_buffer.push_arg(amount);
-
-        self.call_local_esdt_built_in_function_minimal(func_name, arg_buffer);
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_local_burn(token, nonce, amount)
+            .sync_call()
     }
 
     /// Allows synchronous burning of ESDT/SFT/NFT (depending on nonce). Execution is resumed afterwards.

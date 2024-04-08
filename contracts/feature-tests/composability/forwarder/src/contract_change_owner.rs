@@ -13,7 +13,7 @@ pub trait ChangeOwnerModule {
         let () = self
             .send()
             .change_owner_address(child_sc_address.clone(), &new_owner)
-            .execute_on_dest_context();
+            .sync_call();
 
         self.get_owner_of_vault_contract(child_sc_address)
     }
