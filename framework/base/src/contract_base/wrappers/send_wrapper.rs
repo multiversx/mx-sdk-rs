@@ -358,6 +358,19 @@ where
             .async_call_and_exit()
     }
 
+    /// Creates a call to the `ClaimDeveloperRewards` builtin function.
+    ///
+    /// In itself, this does nothing. You need to then call turn the contract call into an async call.
+    pub fn claim_developer_rewards(
+        &self,
+        child_sc_address: ManagedAddress<A>,
+    ) -> system_proxy::UserBuiltinProxyMethods<TxScEnv<A>, (), ManagedAddress<A>, ()> {
+        Tx::new_tx_from_sc()
+            .to(child_sc_address)
+            .typed(system_proxy::UserBuiltinProxy)
+            .claim_developer_rewards()
+    }
+
     /// Creates a call to the `ChangeOwnerAddress` builtin function.
     ///
     /// In itself, this does nothing. You need to then call turn the contract call into an async call.
@@ -398,7 +411,7 @@ where
             .gas(GasLeft)
             .raw_call(function_name)
             .arguments_raw(arg_buffer)
-            .sync_call()
+        // .sync_call()
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
