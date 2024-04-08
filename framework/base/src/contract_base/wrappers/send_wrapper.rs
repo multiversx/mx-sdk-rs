@@ -13,9 +13,9 @@ use crate::{
             ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
         },
         BigUint, ContractCall, ContractCallNoPayment, ESDTSystemSCAddress,
-        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, GasLeft, ManagedAddress, ManagedArgBuffer,
-        ManagedBuffer, ManagedType, ManagedVec, ReturnsRawResult, ToSelf, TokenIdentifier, Tx,
-        TxScEnv,
+        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, OriginalResultMarker,
+        ReturnsRawResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
     },
 };
 
@@ -361,10 +361,12 @@ where
     /// Creates a call to the `ClaimDeveloperRewards` builtin function.
     ///
     /// In itself, this does nothing. You need to then call turn the contract call into an async call.
+    #[allow(clippy::type_complexity)]
     pub fn claim_developer_rewards(
         &self,
         child_sc_address: ManagedAddress<A>,
-    ) -> system_proxy::UserBuiltinProxyMethods<TxScEnv<A>, (), ManagedAddress<A>, ()> {
+    ) -> Tx<TxScEnv<A>, (), ManagedAddress<A>, (), (), FunctionCall<A>, OriginalResultMarker<()>>
+    {
         Tx::new_tx_from_sc()
             .to(child_sc_address)
             .typed(system_proxy::UserBuiltinProxy)
@@ -411,7 +413,7 @@ where
             .gas(GasLeft)
             .raw_call(function_name)
             .arguments_raw(arg_buffer)
-        // .sync_call()
+            .sync_call()
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
