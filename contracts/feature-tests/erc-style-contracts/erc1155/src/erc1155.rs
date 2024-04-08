@@ -354,7 +354,7 @@ pub trait Erc1155 {
             .to(to.clone())
             .typed(erc1155_user_proxy::Erc1155UserProxy)
             .on_erc1155_received(caller, from.clone(), type_id.clone(), value.clone(), data)
-            .with_callback(self.callbacks().transfer_callback(
+            .callback(self.callbacks().transfer_callback(
                 from,
                 to,
                 [type_id].to_vec(),
@@ -383,7 +383,7 @@ pub trait Erc1155 {
                 values.to_vec(),
                 data,
             )
-            .with_callback(self.callbacks().transfer_callback(
+            .callback(self.callbacks().transfer_callback(
                 from,
                 to,
                 type_ids.to_vec(),

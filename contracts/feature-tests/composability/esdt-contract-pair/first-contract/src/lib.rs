@@ -90,14 +90,13 @@ pub trait FirstContract {
             "Wrong esdt token"
         );
 
-        let _ = self.send_raw().transfer_esdt_execute(
-            &second_contract_address,
-            &expected_token_identifier,
-            &esdt_value,
-            self.blockchain().get_gas_left(),
-            &ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new(),
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        self.tx()
+            .to(&second_contract_address)
+            .gas(gas_left)
+            .raw_call(ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT))
+            .single_esdt(&expected_token_identifier, 0u64, &esdt_value)
+            .transfer_execute();
     }
 
     #[payable("*")]
@@ -112,14 +111,13 @@ pub trait FirstContract {
             "Wrong esdt token"
         );
 
-        let _ = self.send_raw().transfer_esdt_execute(
-            &second_contract_address,
-            &expected_token_identifier,
-            &esdt_value,
-            self.blockchain().get_gas_left(),
-            &ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT),
-            &ManagedArgBuffer::new(),
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        self.tx()
+            .to(&second_contract_address)
+            .gas(gas_left)
+            .raw_call(ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT))
+            .single_esdt(&expected_token_identifier, 0u64, &esdt_value)
+            .transfer_execute();
     }
 
     fn call_esdt_second_contract(
@@ -138,12 +136,11 @@ pub trait FirstContract {
             arg_buffer.push_arg_raw(arg);
         }
 
-        self.send_raw().async_call_raw(
-            to,
-            &BigUint::zero(),
-            &ManagedBuffer::from(ESDT_TRANSFER_STRING),
-            &arg_buffer,
-        );
+        self.tx()
+            .to(to)
+            .raw_call(ManagedBuffer::from(ESDT_TRANSFER_STRING))
+            .arguments_raw(arg_buffer)
+            .async_call_and_exit();
     }
 
     // storage

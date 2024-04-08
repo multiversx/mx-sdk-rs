@@ -18,7 +18,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
             .egld(payment)
             .raw_call(endpoint_name)
             .argument(&args)
-            .with_gas_limit(half_gas)
+            .gas(half_gas)
             .returns(ReturnsRawResult)
             .sync_call();
 
@@ -38,22 +38,28 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         let half_payment = &*payment / 2u32;
         let arg_buffer = args.to_arg_buffer();
 
-        let result = self.send_raw().execute_on_dest_context_raw(
-            one_third_gas,
-            &to,
-            &half_payment,
-            &endpoint_name,
-            &arg_buffer,
-        );
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(one_third_gas)
+            .egld(&half_payment)
+            .raw_call(endpoint_name.clone())
+            .arguments_raw(arg_buffer.clone())
+            .returns(ReturnsRawResult)
+            .sync_call();
+
         self.execute_on_dest_context_result(result);
 
-        let result = self.send_raw().execute_on_dest_context_raw(
-            one_third_gas,
-            &to,
-            &half_payment,
-            &endpoint_name,
-            &arg_buffer,
-        );
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(one_third_gas)
+            .egld(&half_payment)
+            .raw_call(endpoint_name)
+            .arguments_raw(arg_buffer)
+            .returns(ReturnsRawResult)
+            .sync_call();
+
         self.execute_on_dest_context_result(result);
     }
 
@@ -67,13 +73,16 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
     ) {
         let payment = self.call_value().egld_value();
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send_raw().execute_on_same_context_raw(
-            half_gas,
-            &to,
-            &payment,
-            &endpoint_name,
-            &args.to_arg_buffer(),
-        );
+
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(half_gas)
+            .egld(payment)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .returns(ReturnsRawResult)
+            .sync_call();
 
         self.execute_on_same_context_result(result);
     }
@@ -86,12 +95,14 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send_raw().execute_on_dest_context_readonly_raw(
-            half_gas,
-            &to,
-            &endpoint_name,
-            &args.to_arg_buffer(),
-        );
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(half_gas)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .returns(ReturnsRawResult)
+            .sync_call();
 
         self.execute_on_dest_context_result(result);
     }

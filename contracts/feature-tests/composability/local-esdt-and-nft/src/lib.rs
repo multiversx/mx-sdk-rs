@@ -157,15 +157,15 @@ pub trait LocalEsdtAndEsdtNft {
             arg_buffer.push_arg_raw(arg);
         }
 
-        let _ = self.send_raw().transfer_esdt_nft_execute(
-            &to,
-            &token_identifier,
-            nonce,
-            &amount,
-            self.blockchain().get_gas_left(),
-            &function,
-            &arg_buffer,
-        );
+        let gas_left = self.blockchain().get_gas_left();
+
+        self.tx()
+            .to(&to)
+            .gas(gas_left)
+            .raw_call(function)
+            .arguments_raw(arg_buffer)
+            .single_esdt(&token_identifier, nonce, &amount)
+            .transfer_execute();
     }
 
     // Semi-Fungible

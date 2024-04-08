@@ -1,8 +1,13 @@
 use multiversx_sc_codec::TopEncodeMulti;
 
-use crate::types::{CodeMetadata, ManagedBuffer, ManagedBufferCachedBuilder};
+use crate::{
+    proxy_imports::ManagedTypeApi,
+    types::{CodeMetadata, ManagedBuffer, ManagedBufferCachedBuilder},
+};
 
-use super::{ManagedArgBuffer, TxCodeSource, TxData, TxEnv};
+use super::{
+    FunctionCall, ManagedArgBuffer, TxCodeSource, TxData, TxDataFunctionCall, TxEnv, TxScEnv,
+};
 
 /// Holds deploy data: code, code metadata, and arguments.
 pub struct UpgradeCall<Env, CodeSource>

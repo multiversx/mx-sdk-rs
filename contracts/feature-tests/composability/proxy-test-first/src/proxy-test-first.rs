@@ -84,9 +84,8 @@ pub trait ProxyTestFirst {
             .typed(pay_me_proxy::PayMeProxy)
             .pay_me_with_result(0x56)
             .egld(payment)
-            .async_call()
-            .with_callback(self.callbacks().pay_callback())
-            .call_and_exit();
+            .callback(self.callbacks().pay_callback())
+            .async_call_and_exit();
     }
 
     #[endpoint(messageOtherContract)]
@@ -117,9 +116,8 @@ pub trait ProxyTestFirst {
                 [3u8; 3].to_vec(),
                 &ManagedAddress::from(&HARDCODED_ADDRESS),
             )
-            .async_call()
-            .with_callback(self.callbacks().message_callback())
-            .call_and_exit()
+            .callback(self.callbacks().message_callback())
+            .async_call_and_exit()
     }
 
     #[callback(payCallback)] // although uncommon, custom callback names are possible
