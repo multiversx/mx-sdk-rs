@@ -1413,7 +1413,9 @@ impl VMHooks for VMHooksDispatcher {
     }
 
     fn mbuffer_from_big_float(&self, m_buffer_handle: i32, big_float_handle: i32) -> i32 {
-        panic!("Unavailable: mbuffer_from_big_float")
+        self.handler
+            .mb_from_big_float(m_buffer_handle, big_float_handle);
+        0
     }
 
     fn mbuffer_storage_store(&self, key_handle: i32, source_handle: i32) -> i32 {

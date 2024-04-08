@@ -8,6 +8,11 @@ pub trait ManagedBufferFeatures {
     }
 
     #[endpoint]
+    fn mbuffer_from_big_float(&self, big_float: BigFloat) -> ManagedBuffer {
+        ManagedBuffer::from(big_float)
+    }
+
+    #[endpoint]
     fn mbuffer_concat(&self, mb1: ManagedBuffer, mb2: ManagedBuffer) -> ManagedBuffer {
         let mut result = mb1;
         result.append(&mb2);
