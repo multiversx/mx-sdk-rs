@@ -62,27 +62,23 @@ where
             .original_result()
     }
 
-    pub fn change_owner_address<Arg0: CodecInto<ManagedAddress<Env::Api>>>(
+    pub fn change_owner_address(
         self,
-        new_owner: Arg0,
+        new_owner: &ManagedAddress<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
         self.wrapped_tx
             .raw_call(CHANGE_OWNER_BUILTIN_FUNC_NAME)
-            .argument(&new_owner)
+            .argument(new_owner)
             .original_result()
     }
 
-    pub fn esdt_local_burn<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64> + core::cmp::PartialEq<u64>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-    >(
+    pub fn esdt_local_burn(
         self,
-        token: &Arg0,
-        nonce: Arg1,
-        amount: &Arg2,
+        token: &TokenIdentifier<Env::Api>,
+        nonce: u64,
+        amount: &BigUint<Env::Api>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
-        if nonce.eq(&0) {
+        if nonce == 0 {
             return self
                 .wrapped_tx
                 .raw_call(ESDT_LOCAL_BURN_FUNC_NAME)
@@ -96,6 +92,48 @@ where
             .argument(token)
             .argument(&nonce)
             .argument(amount)
+            .original_result()
+    }
+
+    pub fn esdt_local_mint(
+        self,
+        token: &TokenIdentifier<Env::Api>,
+        nonce: u64,
+        amount: &BigUint<Env::Api>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        if nonce == 0 {
+            return self
+                .wrapped_tx
+                .raw_call(ESDT_LOCAL_MINT_FUNC_NAME)
+                .argument(token)
+                .argument(amount)
+                .original_result();
+        }
+        self.wrapped_tx
+            .raw_call(ESDT_NFT_ADD_QUANTITY_FUNC_NAME)
+            .argument(token)
+            .argument(&nonce)
+            .argument(amount)
+            .original_result()
+    }
+
+    pub fn nft_add_multiple_uri(
+        self,
+        token_id: &TokenIdentifier<Env::Api>,
+        nft_nonce: u64,
+        new_uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        let mut arg_buffer = ManagedArgBuffer::new();
+        arg_buffer.push_arg(token_id);
+        arg_buffer.push_arg(nft_nonce);
+
+        for uri in new_uris {
+            arg_buffer.push_arg(uri);
+        }
+
+        self.wrapped_tx
+            .raw_call(ESDT_NFT_ADD_URI_FUNC_NAME)
+            .arguments_raw(arg_buffer)
             .original_result()
     }
 }

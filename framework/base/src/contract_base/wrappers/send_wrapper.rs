@@ -8,7 +8,6 @@ use crate::{
     types::{
         system_proxy,
         system_proxy::builtin_func_names::{
-            ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME, ESDT_NFT_ADD_URI_FUNC_NAME,
             ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
         },
         BigUint, ContractCallNoPayment, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier,
@@ -424,21 +423,12 @@ where
     ///
     /// This function cannot be used for NFTs.
     pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        let func_name: &str;
-
-        arg_buffer.push_arg(token);
-
-        if nonce == 0 {
-            func_name = ESDT_LOCAL_MINT_FUNC_NAME;
-        } else {
-            func_name = ESDT_NFT_ADD_QUANTITY_FUNC_NAME;
-            arg_buffer.push_arg(nonce);
-        }
-
-        arg_buffer.push_arg(amount);
-
-        self.call_local_esdt_built_in_function_minimal(func_name, arg_buffer);
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_local_mint(token, nonce, amount)
+            .sync_call()
     }
 
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
@@ -774,15 +764,12 @@ where
             return;
         }
 
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(token_id);
-        arg_buffer.push_arg(nft_nonce);
-
-        for uri in new_uris {
-            arg_buffer.push_arg(uri);
-        }
-
-        self.call_local_esdt_built_in_function_minimal(ESDT_NFT_ADD_URI_FUNC_NAME, arg_buffer);
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .nft_add_multiple_uri(token_id, nft_nonce, new_uris)
+            .sync_call()
     }
 
     /// Changes attributes of an NFT, via a synchronous builtin function call.
