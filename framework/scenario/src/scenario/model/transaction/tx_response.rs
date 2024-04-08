@@ -208,11 +208,13 @@ impl TxResponse {
             let is_issue_semi_fungible = prev_tx.data.starts_with("issueSemiFungible@");
             let is_issue_non_fungible = prev_tx.data.starts_with("issueNonFungible@");
             let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
+            let is_register_and_set_all_roles_esdt = prev_tx.data.starts_with("registerAndSetAllRoles@");
 
             if !is_issue_fungible
                 && !is_issue_semi_fungible
                 && !is_issue_non_fungible
                 && !is_register_meta_esdt
+                && !is_register_and_set_all_roles_esdt
             {
                 continue;
             }
@@ -2367,6 +2369,268 @@ mod tests {
         let tx_response = TxResponse::from_network_tx(tx_on_network);
 
         let expected: Option<String> = None;
+
+        assert_eq!(tx_response.new_issued_token_identifier, expected)
+    }
+
+    #[test]
+    fn test_multisig_issue_nft_and_set_all_roles() {
+        let data = r#"
+{
+  "data": {
+    "transaction": {
+      "type": "normal",
+      "processingTypeOnSource": "SCInvoking",
+      "processingTypeOnDestination": "SCInvoking",
+      "hash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+      "nonce": 53,
+      "round": 3050972,
+      "epoch": 1246,
+      "value": "0",
+      "receiver": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+      "sender": "erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+      "gasPrice": 1000000000,
+      "gasLimit": 80000000,
+      "gasUsed": 80000000,
+      "data": "cGVyZm9ybUFjdGlvbkAwMQ==",
+      "signature": "cb67645595cee5f7967d8d85af05bb7db73e80d9b97611796819249d87cd174b69b4abfc2a3fbe52df1aec965bdea921f7eb34d2b1118aa480699ad1dc85790a",
+      "sourceShard": 0,
+      "destinationShard": 0,
+      "blockNonce": 2984930,
+      "blockHash": "644ae8703b826a23e89429953919ec37f875e34a547ea9f7edd53fb71a99c746",
+      "notarizedAtSourceInMetaNonce": 2988311,
+      "NotarizedAtSourceInMetaHash": "4f608a72e654dd9f466801cd489be8ee1a73fbcd77b128559cd46182d3b9455a",
+      "notarizedAtDestinationInMetaNonce": 2988311,
+      "notarizedAtDestinationInMetaHash": "4f608a72e654dd9f466801cd489be8ee1a73fbcd77b128559cd46182d3b9455a",
+      "miniblockType": "TxBlock",
+      "miniblockHash": "c5a73671bc1d37835ddd15b926157721bc83203ec4e00cd48ae0d46015cb5f0b",
+      "hyperblockNonce": 2988311,
+      "hyperblockHash": "4f608a72e654dd9f466801cd489be8ee1a73fbcd77b128559cd46182d3b9455a",
+      "timestamp": 1712305832,
+      "smartContractResults": [
+        {
+          "hash": "b0b3c8df519c33b314c0ee3d25abae6f17c4432fb3382676ce17a42690811cff",
+          "nonce": 0,
+          "value": 50000000000000000,
+          "receiver": "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+          "sender": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+          "data": "registerAndSetAllRoles@54657374436f6c6c656374696f6e31@54455354434f4c4c31@4e4654@@98fa4ff554b9c6990ce577fbb816a271f690dcbd6b148f6583fe7692868ae538@08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd@5e2338",
+          "prevTxHash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+          "originalTxHash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+          "gasLimit": 73052300,
+          "gasPrice": 1000000000,
+          "callType": 1,
+          "originalSender": "erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+          "operation": "transfer",
+          "function": "registerAndSetAllRoles"
+        },
+        {
+          "hash": "5ae4f74e134e4fa63c8b92e06ff12b2a4b544233d01d80db6a922af35ee55356",
+          "nonce": 1,
+          "value": 196430610000000,
+          "receiver": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+          "sender": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+          "data": "@6f6b",
+          "prevTxHash": "c4a24b01b48d32308636310e2d335d6ed1f34dcbdfc1133aed7995e78e831c18",
+          "originalTxHash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+          "gasLimit": 0,
+          "gasPrice": 1000000000,
+          "callType": 0,
+          "operation": "transfer",
+          "isRefund": true
+        },
+        {
+          "hash": "7589c1ad622d8a9ab2f186731fc82aeeab0aea5a8198cb94b6eba85a966e7962",
+          "nonce": 0,
+          "value": 0,
+          "receiver": "erd1llllllllllllllllllllllllllllllllllllllllllllllllluqq2m3f0f",
+          "sender": "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+          "data": "ESDTSetBurnRoleForAll@54455354434f4c4c312d356161383063",
+          "prevTxHash": "b0b3c8df519c33b314c0ee3d25abae6f17c4432fb3382676ce17a42690811cff",
+          "originalTxHash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+          "gasLimit": 0,
+          "gasPrice": 1000000000,
+          "callType": 0,
+          "originalSender": "erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+          "logs": {
+            "address": "erd1llllllllllllllllllllllllllllllllllllllllllllllllluqq2m3f0f",
+            "events": [
+              {
+                "address": "erd1llllllllllllllllllllllllllllllllllllllllllllllllluqq2m3f0f",
+                "identifier": "completedTxEvent",
+                "topics": [
+                  "sLPI31GcM7MUwO49JauubxfEQy+zOCZ2zhekJpCBHP8="
+                ]
+              }
+            ]
+          },
+          "operation": "transfer"
+        },
+        {
+          "hash": "86d1ec3365ea1311dbde2f2366de4ea8627d7e49c29a974578c0869b66903cbc",
+          "nonce": 0,
+          "value": 0,
+          "receiver": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+          "sender": "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+          "data": "ESDTSetRole@54455354434f4c4c312d356161383063@45534454526f6c654e4654437265617465@45534454526f6c654e46544275726e@45534454526f6c654e465455706461746541747472696275746573@45534454526f6c654e4654416464555249",
+          "prevTxHash": "b0b3c8df519c33b314c0ee3d25abae6f17c4432fb3382676ce17a42690811cff",
+          "originalTxHash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+          "gasLimit": 0,
+          "gasPrice": 1000000000,
+          "callType": 0,
+          "originalSender": "erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+          "logs": {
+            "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+            "events": [
+              {
+                "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+                "identifier": "ESDTSetRole",
+                "topics": [
+                  "VEVTVENPTEwxLTVhYTgwYw==",
+                  "",
+                  "",
+                  "RVNEVFJvbGVORlRDcmVhdGU=",
+                  "RVNEVFJvbGVORlRCdXJu",
+                  "RVNEVFJvbGVORlRVcGRhdGVBdHRyaWJ1dGVz",
+                  "RVNEVFJvbGVORlRBZGRVUkk="
+                ]
+              },
+              {
+                "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+                "identifier": "completedTxEvent",
+                "topics": [
+                  "sLPI31GcM7MUwO49JauubxfEQy+zOCZ2zhekJpCBHP8="
+                ]
+              }
+            ]
+          },
+          "operation": "ESDTSetRole",
+          "function": "ESDTSetRole"
+        },
+        {
+          "hash": "c4a24b01b48d32308636310e2d335d6ed1f34dcbdfc1133aed7995e78e831c18",
+          "nonce": 0,
+          "value": 0,
+          "receiver": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+          "sender": "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u",
+          "data": "@00@54455354434f4c4c312d356161383063@3ec73c55022548038bbe06c0639156b3db70b7c770955e340f14fcfcd45df06a@98fa4ff554b9c6990ce577fbb816a271f690dcbd6b148f6583fe7692868ae538@08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd@00",
+          "prevTxHash": "b0b3c8df519c33b314c0ee3d25abae6f17c4432fb3382676ce17a42690811cff",
+          "originalTxHash": "08582bc19734ad82d7390be88463c948e5d9f026f4b8f0bfc57620957c3433bd",
+          "gasLimit": 23052300,
+          "gasPrice": 1000000000,
+          "callType": 2,
+          "originalSender": "erd1uv40ahysflse896x4ktnh6ecx43u7cmy9wnxnvcyp7deg299a4sq6vaywa",
+          "logs": {
+            "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+            "events": [
+              {
+                "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+                "identifier": "callBack",
+                "topics": [
+                  "YXN5bmNDYWxsU3VjY2Vzcw==",
+                  "VEVTVENPTEwxLTVhYTgwYw=="
+                ],
+                "additionalData": [
+                  ""
+                ]
+              },
+              {
+                "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+                "identifier": "completedTxEvent",
+                "topics": [
+                  "sLPI31GcM7MUwO49JauubxfEQy+zOCZ2zhekJpCBHP8="
+                ]
+              }
+            ]
+          },
+          "operation": "transfer"
+        }
+      ],
+      "logs": {
+        "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+        "events": [
+          {
+            "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+            "identifier": "performAction",
+            "topics": [
+              "c3RhcnRQZXJmb3JtQWN0aW9u"
+            ],
+            "data": "AAAAAQYAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAL//wAAAAexorwuxQAAAAAAFnJlZ2lzdGVyQW5kU2V0QWxsUm9sZXMAAAAEAAAAD1Rlc3RDb2xsZWN0aW9uMQAAAAlURVNUQ09MTDEAAAADTkZUAAAAAAAAAATjKv7ckE/hk5dGrZc76zg1Y89jZCumabMED5uUKKXtYLE6AXQjw2bK/4zs+3ehJhChMPSIgTQSLHk3/q4NbX0XOvjZyUI7JXfGJSciwdkCEqQRH3ID+XRPdvz6HQoxADOyoRVVzlIeSUTgmrF1SdhbSH3NJshLUBejnjGjZwiJug==",
+            "additionalData": [
+              "AAAAAQYAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAL//wAAAAexorwuxQAAAAAAFnJlZ2lzdGVyQW5kU2V0QWxsUm9sZXMAAAAEAAAAD1Rlc3RDb2xsZWN0aW9uMQAAAAlURVNUQ09MTDEAAAADTkZUAAAAAAAAAATjKv7ckE/hk5dGrZc76zg1Y89jZCumabMED5uUKKXtYLE6AXQjw2bK/4zs+3ehJhChMPSIgTQSLHk3/q4NbX0XOvjZyUI7JXfGJSciwdkCEqQRH3ID+XRPdvz6HQoxADOyoRVVzlIeSUTgmrF1SdhbSH3NJshLUBejnjGjZwiJug=="
+            ]
+          },
+          {
+            "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+            "identifier": "performAction",
+            "topics": [
+              "cGVyZm9ybUFzeW5jQ2FsbA==",
+              "AQ==",
+              "AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAC//8=",
+              "saK8LsUAAA==",
+              "BGa4HQ==",
+              "cmVnaXN0ZXJBbmRTZXRBbGxSb2xlcw==",
+              "VGVzdENvbGxlY3Rpb24x",
+              "VEVTVENPTEwx",
+              "TkZU",
+              ""
+            ],
+            "additionalData": [
+              ""
+            ]
+          },
+          {
+            "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+            "identifier": "transferValueOnly",
+            "topics": [
+              "saK8LsUAAA==",
+              "AAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAC//8="
+            ],
+            "data": "QXN5bmNDYWxs",
+            "additionalData": [
+              "QXN5bmNDYWxs",
+              "cmVnaXN0ZXJBbmRTZXRBbGxSb2xlcw==",
+              "VGVzdENvbGxlY3Rpb24x",
+              "VEVTVENPTEwx",
+              "TkZU",
+              ""
+            ]
+          },
+          {
+            "address": "erd1qqqqqqqqqqqqqpgqrp3n58vp2dmcaur4whazxngvuhac4xwqa4sq2pjl73",
+            "identifier": "writeLog",
+            "topics": [
+              "4yr+3JBP4ZOXRq2XO+s4NWPPY2QrpmmzBA+blCil7WA="
+            ],
+            "data": "QDZmNmI=",
+            "additionalData": [
+              "QDZmNmI="
+            ]
+          }
+        ]
+      },
+      "status": "success",
+      "operation": "transfer",
+      "function": "performAction",
+      "initiallyPaidFee": "873260000000000",
+      "fee": "873260000000000",
+      "chainID": "D",
+      "version": 1,
+      "options": 0
+    }
+  },
+  "code": "successful"
+}
+        "#;
+
+        let tx_on_network: TransactionOnNetwork = serde_json::from_str::<TransactionInfo>(data)
+            .unwrap()
+            .data
+            .unwrap()
+            .transaction;
+        let tx_response = TxResponse::from_network_tx(tx_on_network);
+
+        let expected = Some("TESTCOLL1-5aa80c".to_string());
 
         assert_eq!(tx_response.new_issued_token_identifier, expected)
     }

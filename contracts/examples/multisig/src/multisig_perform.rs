@@ -167,15 +167,13 @@ pub trait MultisigPerformModule:
                     &call_data.endpoint_name,
                     call_data.arguments.as_multi(),
                 );
-
                 self.tx()
-                    .to(&call_data.to)
+                    .to(call_data.to)
+                    .egld(call_data.egld_amount)
+                    .gas(gas)
                     .raw_call(call_data.endpoint_name)
                     .arguments_raw(call_data.arguments.into())
-                    .gas(gas)
-                    .egld(&call_data.egld_amount)
                     .transfer_execute();
-
                 OptionalValue::None
             },
             Action::SendAsyncCall(call_data) => {
@@ -214,15 +212,14 @@ pub trait MultisigPerformModule:
                 );
                 let new_address = self
                     .tx()
+                    .egld(amount)
                     .gas(gas_left)
-                    .egld(&amount)
                     .raw_deploy()
-                    .arguments_raw(arguments.into())
                     .from_source(source)
                     .code_metadata(code_metadata)
+                    .arguments_raw(arguments.into())
                     .returns(ReturnsNewManagedAddress)
                     .sync_call();
-
                 OptionalValue::Some(new_address)
             },
             Action::SCUpgradeFromSource {
@@ -242,16 +239,15 @@ pub trait MultisigPerformModule:
                     gas_left,
                     arguments.as_multi(),
                 );
-
                 self.tx()
-                    .to(&sc_address)
+                    .to(sc_address)
+                    .egld(amount)
+                    .gas(gas_left)
                     .raw_upgrade()
-                    .arguments_raw(arguments.into())
-                    .egld(&amount)
                     .from_source(source)
                     .code_metadata(code_metadata)
+                    .arguments_raw(arguments.into())
                     .upgrade_async_call_and_exit();
-
                 OptionalValue::None
             },
         }
