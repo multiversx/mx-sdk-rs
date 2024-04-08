@@ -1,6 +1,7 @@
 use crate::{
-    num_conv::universal_decode_number, transmute::vec_into_boxed_slice, DecodeError,
-    DecodeErrorHandler, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
+    num_conv::{universal_decode_number, universal_decode_number_unchecked},
+    transmute::vec_into_boxed_slice,
+    DecodeError, DecodeErrorHandler, NestedDecodeInput, OwnedBytesNestedDecodeInput, TryStaticCast,
 };
 use alloc::{boxed::Box, vec::Vec};
 
@@ -38,7 +39,7 @@ pub trait TopDecodeInput: Sized {
     {
         let mut buffer = [0u8; 8];
         let slice = self.into_max_size_buffer(&mut buffer, h)?;
-        Ok(universal_decode_number(slice, false))
+        Ok(universal_decode_number_unchecked(slice, false))
     }
 
     /// Retrieves the underlying data as a pre-parsed i64.
@@ -51,7 +52,7 @@ pub trait TopDecodeInput: Sized {
     {
         let mut buffer = [0u8; 8];
         let slice = self.into_max_size_buffer(&mut buffer, h)?;
-        Ok(universal_decode_number(slice, true) as i64)
+        Ok(universal_decode_number_unchecked(slice, true) as i64)
     }
 
     #[inline]

@@ -1,7 +1,7 @@
 use crate::{
-    dep_encode_num_mimic, num_conv::universal_decode_number, DecodeError, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    dep_encode_num_mimic, num_conv::universal_decode_number_unchecked, DecodeError,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 macro_rules! top_encode_num_signed {
@@ -42,7 +42,7 @@ macro_rules! dep_decode_num_signed {
             {
                 let mut bytes = [0u8; $num_bytes];
                 input.read_into(&mut bytes[..], h)?;
-                let num = universal_decode_number(&bytes[..], true) as $ty;
+                let num = universal_decode_number_unchecked(&bytes[..], true) as $ty;
                 Ok(num)
             }
         }
