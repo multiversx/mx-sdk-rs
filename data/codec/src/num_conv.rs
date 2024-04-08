@@ -113,27 +113,23 @@ pub fn universal_decode_number(bytes: &[u8], signed: bool) -> u64 {
     // it is almost impossible to get a slice longer than 8
     // just a basic overflow/underflow protection
     let safe_len = bytes.len() % 9;
-    universal_decode_number_impl(bytes, safe_len, signed)
+
+    unsafe { universal_decode_number_impl(bytes.as_ptr(), safe_len, signed) }
 }
 
 /// Same as [`universal_decode_number`], but assumes that the input length does not exceed 8.
 pub fn universal_decode_number_unchecked(bytes: &[u8], signed: bool) -> u64 {
-    universal_decode_number_impl(bytes, bytes.len(), signed)
+    unsafe { universal_decode_number_impl(bytes.as_ptr(), bytes.len(), signed) }
 }
 
-fn universal_decode_number_impl(bytes: &[u8], len: usize, signed: bool) -> u64 {
-    let negative = signed && len > 0 && msbit_is_one(bytes[0]);
+#[inline(never)]
+unsafe fn universal_decode_number_impl(bytes: *const u8, len: usize, signed: bool) -> u64 {
+    let negative = signed && len > 0 && msbit_is_one(*bytes);
     let skippable_byte = skippable_byte(negative);
 
     let mut extended_buffer = [skippable_byte; 8];
-    let offset = 8 - len;
-    unsafe {
-        core::ptr::copy_nonoverlapping(
-            bytes.as_ptr(),
-            extended_buffer.as_mut_ptr().add(offset),
-            len,
-        )
-    }
+    let offset = 8usize.wrapping_sub(len);
+    core::ptr::copy_nonoverlapping(bytes, extended_buffer.as_mut_ptr().add(offset), len);
 
     u64::from_be_bytes(extended_buffer)
 }
