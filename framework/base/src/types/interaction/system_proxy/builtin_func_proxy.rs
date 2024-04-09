@@ -1,10 +1,19 @@
-use self::builtin_func_names::{
+use multiversx_sc_codec::{CodecInto, Empty, TopEncode};
+
+use crate::{
+    api::VMApi,
+    types::{
+        BigUint, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, Tx, TxEnv, TxFrom,
+        TxGas, TxProxyCall, TxProxyTrait, TxTo,
+    },
+};
+
+use super::builtin_func_names::{
     CHANGE_OWNER_BUILTIN_FUNC_NAME, CLAIM_DEVELOPER_REWARDS_FUNC_NAME, DELETE_USERNAME_FUNC_NAME,
     ESDT_LOCAL_BURN_FUNC_NAME, ESDT_LOCAL_MINT_FUNC_NAME, ESDT_NFT_ADD_QUANTITY_FUNC_NAME,
     ESDT_NFT_ADD_URI_FUNC_NAME, ESDT_NFT_BURN_FUNC_NAME, ESDT_NFT_CREATE_FUNC_NAME,
     ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME, SET_USERNAME_FUNC_NAME,
 };
-use crate::proxy_imports::*;
 
 /// Proxy describing the user builtin function signatures.
 pub struct UserBuiltinProxy;
@@ -136,7 +145,7 @@ where
         tx.original_result()
     }
 
-    pub fn nft_update_attributes<T: codec::TopEncode>(
+    pub fn nft_update_attributes<T: TopEncode>(
         self,
         token_id: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
@@ -151,7 +160,7 @@ where
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_create<T: codec::TopEncode>(
+    pub fn esdt_nft_create<T: TopEncode>(
         self,
         token: &TokenIdentifier<Env::Api>,
         amount: &BigUint<Env::Api>,
@@ -173,7 +182,7 @@ where
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            tx = tx.argument(&codec::Empty);
+            tx = tx.argument(&Empty);
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument

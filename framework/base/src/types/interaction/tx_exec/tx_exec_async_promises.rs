@@ -1,11 +1,10 @@
 use crate::{
     api::{const_handles, CallTypeApi},
     contract_base::SendRawWrapper,
-    proxy_imports::GasLeft,
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
-        FunctionCall, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas, TxGasValue,
-        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+        FunctionCall, GasLeft, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas,
+        TxGasValue, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
     },
 };
 
