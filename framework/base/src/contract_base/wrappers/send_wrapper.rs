@@ -3,17 +3,13 @@ use core::marker::PhantomData;
 use crate::codec::Empty;
 
 use crate::{
-    api::{BlockchainApi, BlockchainApiImpl, CallTypeApi, StorageReadApi},
+    api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
     types::{
-        system_proxy,
-        system_proxy::builtin_func_names::{
-            ESDT_NFT_CREATE_FUNC_NAME, ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
-        },
-        BigUint, ContractCallNoPayment, ESDTSystemSCAddress, EgldOrEsdtTokenIdentifier,
-        EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress, ManagedArgBuffer, ManagedBuffer,
-        ManagedType, ManagedVec, OriginalResultMarker, ReturnsRawResult, ToSelf, TokenIdentifier,
-        Tx, TxScEnv,
+        system_proxy, BigUint, ContractCallNoPayment, ESDTSystemSCAddress,
+        EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, OriginalResultMarker,
+        ReturnsRawResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
     },
 };
 
@@ -401,19 +397,6 @@ where
             .sync_call()
     }
 
-    fn call_local_esdt_built_in_function_minimal(
-        &self,
-        function_name: &str,
-        arg_buffer: ManagedArgBuffer<A>,
-    ) {
-        Tx::new_tx_from_sc()
-            .to(ToSelf)
-            .gas(GasLeft)
-            .raw_call(function_name)
-            .arguments_raw(arg_buffer)
-            .sync_call()
-    }
-
     /// Allows synchronous minting of ESDT/SFT (depending on nonce). Execution is resumed afterwards.
     ///
     /// Note that the SC must have the ESDTLocalMint or ESDTNftAddQuantity roles set,
@@ -530,30 +513,13 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(token);
-        arg_buffer.push_arg(amount);
-        arg_buffer.push_arg(name);
-        arg_buffer.push_arg(royalties);
-        arg_buffer.push_arg(hash);
-        arg_buffer.push_arg(attributes);
-
-        if uris.is_empty() {
-            // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(codec::Empty);
-        } else {
-            // The API function has the last argument as variadic,
-            // so we top-encode each and send as separate argument
-            for uri in uris {
-                arg_buffer.push_arg(uri);
-            }
-        }
-
-        let output = self.call_local_esdt_built_in_function(
-            A::blockchain_api_impl().get_gas_left(),
-            ManagedBuffer::from(ESDT_NFT_CREATE_FUNC_NAME),
-            arg_buffer,
-        );
+        let output = Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .esdt_nft_create(token, amount, name, royalties, hash, attributes, uris)
+            .returns(ReturnsRawResult)
+            .sync_call();
 
         if let Some(first_result_bytes) = output.try_get(0) {
             first_result_bytes.parse_as_u64().unwrap_or_default()
@@ -779,14 +745,11 @@ where
         nft_nonce: u64,
         new_attributes: &T,
     ) {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(token_id);
-        arg_buffer.push_arg(nft_nonce);
-        arg_buffer.push_arg(new_attributes);
-
-        self.call_local_esdt_built_in_function_minimal(
-            ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME,
-            arg_buffer,
-        );
+        Tx::new_tx_from_sc()
+            .to(ToSelf)
+            .gas(GasLeft)
+            .typed(system_proxy::UserBuiltinProxy)
+            .nft_update_attributes(token_id, nft_nonce, new_attributes)
+            .sync_call()
     }
 }

@@ -136,4 +136,54 @@ where
             .arguments_raw(arg_buffer)
             .original_result()
     }
+
+    pub fn nft_update_attributes<T: codec::TopEncode>(
+        self,
+        token_id: &TokenIdentifier<Env::Api>,
+        nft_nonce: u64,
+        new_attributes: &T,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call(ESDT_NFT_UPDATE_ATTRIBUTES_FUNC_NAME)
+            .argument(token_id)
+            .argument(&nft_nonce)
+            .argument(new_attributes)
+            .original_result()
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn esdt_nft_create<T: codec::TopEncode>(
+        self,
+        token: &TokenIdentifier<Env::Api>,
+        amount: &BigUint<Env::Api>,
+        name: &ManagedBuffer<Env::Api>,
+        royalties: &BigUint<Env::Api>,
+        hash: &ManagedBuffer<Env::Api>,
+        attributes: &T,
+        uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        let mut arg_buffer = ManagedArgBuffer::new();
+        arg_buffer.push_arg(token);
+        arg_buffer.push_arg(amount);
+        arg_buffer.push_arg(name);
+        arg_buffer.push_arg(royalties);
+        arg_buffer.push_arg(hash);
+        arg_buffer.push_arg(attributes);
+
+        if uris.is_empty() {
+            // at least one URI is required, so we push an empty one
+            arg_buffer.push_arg(codec::Empty);
+        } else {
+            // The API function has the last argument as variadic,
+            // so we top-encode each and send as separate argument
+            for uri in uris {
+                arg_buffer.push_arg(uri);
+            }
+        }
+
+        self.wrapped_tx
+            .raw_call(ESDT_NFT_CREATE_FUNC_NAME)
+            .arguments_raw(arg_buffer)
+            .original_result()
+    }
 }
