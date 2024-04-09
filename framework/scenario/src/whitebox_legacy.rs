@@ -1,5 +1,3 @@
-#![allow(deprecated)]
-
 mod address_factory;
 mod contract_obj_wrapper;
 mod mandos_generator;

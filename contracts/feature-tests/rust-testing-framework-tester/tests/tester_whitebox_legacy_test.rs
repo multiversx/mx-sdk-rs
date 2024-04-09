@@ -1,5 +1,3 @@
-#![allow(deprecated)] // TODO: migrate tests
-
 use multiversx_sc_scenario::imports::*;
 use num_traits::ToPrimitive;
 
