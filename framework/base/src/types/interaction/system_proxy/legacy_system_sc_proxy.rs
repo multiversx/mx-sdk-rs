@@ -23,7 +23,7 @@ const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 /// Unlike other contract proxies, this one has a fixed address,
 /// so the proxy object doesn't really contain any data, it is more of a placeholder.
 #[deprecated(
-    since = "0.48.0",
+    since = "0.49.0",
     note = "There is a new `ESDTSystemSCProxy`, which uses the new proxy model."
 )]
 pub struct ESDTSystemSmartContractProxy<SA>
