@@ -94,7 +94,7 @@ pub trait FirstContract {
         self.tx()
             .to(&second_contract_address)
             .gas(gas_left)
-            .raw_call(ManagedBuffer::from(SECOND_CONTRACT_REJECT_ESDT_PAYMENT))
+            .raw_call(SECOND_CONTRACT_REJECT_ESDT_PAYMENT)
             .single_esdt(&expected_token_identifier, 0u64, &esdt_value)
             .transfer_execute();
     }

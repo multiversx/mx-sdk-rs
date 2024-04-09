@@ -193,13 +193,10 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn call_other_contract_add_async_call(&self, other_sc_address: ManagedAddress, value: BigUint) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(&value);
-
         self.tx()
             .to(&other_sc_address)
-            .raw_call("call")
-            .arguments_raw(args)
+            .raw_call("add")
+            .argument(&value)
             .async_call_and_exit();
     }
 
@@ -215,15 +212,12 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
 
     #[endpoint]
     fn execute_on_dest_add_value(&self, other_sc_address: ManagedAddress, value: BigUint) {
-        let mut args = ManagedArgBuffer::new();
-        args.push_arg(value);
-
         let gas_left = self.blockchain().get_gas_left();
         self.tx()
             .to(&other_sc_address)
             .gas(gas_left)
             .raw_call("addValue")
-            .arguments_raw(args)
+            .argument(&value)
             .sync_call();
     }
 
