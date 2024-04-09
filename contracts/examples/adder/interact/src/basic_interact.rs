@@ -92,15 +92,6 @@ impl AdderInteract {
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(&self.adder_code)
-            .with_result(WithRawTxResponse(|response| {
-                let err = &response.tx_error;
-                assert!(
-                    err.is_success(),
-                    "deploy failed: status: {}, message: {}",
-                    err.status,
-                    err.message
-                );
-            }))
             .returns(ReturnsNewAddress)
             .prepare_async()
             .run()
