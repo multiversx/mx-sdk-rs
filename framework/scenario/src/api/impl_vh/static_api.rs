@@ -1,7 +1,7 @@
 use multiversx_chain_vm::{
-    executor::VMHooks,
     vm_hooks::{StaticApiVMHooksHandler, VMHooksDispatcher, VMHooksHandler},
 };
+use multiversx_chain_vm::vm_hooks::CleanableVMHooks;
 use multiversx_sc::{api::RawHandle, types::Address};
 
 use crate::debug_executor::StaticVarData;
@@ -27,7 +27,7 @@ impl VMHooksApiBackend for StaticApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         STATIC_API_VH_CELL.with(|vh| f(vh))
     }

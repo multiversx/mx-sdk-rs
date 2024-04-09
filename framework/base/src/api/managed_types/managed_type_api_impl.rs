@@ -65,4 +65,10 @@ pub trait ManagedTypeApiImpl:
     fn get_token_ticker_len(&self, token_id_len: usize) -> usize {
         super::token_identifier_util::get_token_ticker_len(token_id_len)
     }
+
+    fn drop_managed_buffer_handle(&self, _handle: Self::ManagedBufferHandle) {}
+    fn drop_big_float_handle(&self, _handle: Self::BigFloatHandle) {}
+    fn drop_big_int_handle(&self, _handle: Self::BigIntHandle) {}
+    fn drop_elliptic_curve_handle(&self, _handle: Self::EllipticCurveHandle) {}
+    fn drop_managed_map_handle(&self, _handle: Self::ManagedMapHandle) {}
 }

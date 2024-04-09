@@ -94,4 +94,10 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
             )
         });
     }
+
+    fn drop_managed_buffer_handle(&self, handle: Self::ManagedBufferHandle) {
+        self.with_vm_hooks(|vh| {
+            vh.remove_managed_buffer(handle.get_raw_handle_unchecked())
+        })
+    }
 }

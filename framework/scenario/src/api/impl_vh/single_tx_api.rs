@@ -1,11 +1,11 @@
 use std::sync::Mutex;
 
 use multiversx_chain_vm::{
-    executor::VMHooks,
     types::VMAddress,
     vm_hooks::{SingleTxApiData, SingleTxApiVMHooksHandler, VMHooksDispatcher},
     world_mock::AccountData,
 };
+use multiversx_chain_vm::vm_hooks::CleanableVMHooks;
 use multiversx_sc::api::RawHandle;
 
 use crate::debug_executor::StaticVarData;
@@ -26,7 +26,7 @@ impl VMHooksApiBackend for SingleTxApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         SINGLE_TX_API_VH_CELL.with(|cell| {
             let handler = cell.lock().unwrap().clone();

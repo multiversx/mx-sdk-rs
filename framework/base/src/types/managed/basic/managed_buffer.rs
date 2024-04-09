@@ -14,11 +14,18 @@ use crate::{
     },
     types::{heap::BoxedBytes, ManagedType, StaticBufferRef},
 };
+use crate::api::ManagedTypeApiImpl;
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: M::ManagedBufferHandle,
+}
+
+impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
+    fn drop(&mut self) {
+        M::managed_type_impl().drop_managed_buffer_handle(self.get_handle());
+    }
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
