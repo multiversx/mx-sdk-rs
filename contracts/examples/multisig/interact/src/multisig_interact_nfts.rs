@@ -33,7 +33,6 @@ impl MultisigInteract {
     }
 
     pub async fn propose_issue_collection_with_all_roles(&mut self) -> usize {
-        let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let action_id = self
             .interactor
             .tx()
@@ -42,7 +41,7 @@ impl MultisigInteract {
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
-                system_sc_address,
+                ESDTSystemSCAddress,
                 ISSUE_COST,
                 FunctionCall::new("registerAndSetAllRoles")
                     .argument(&COLLECTION_NAME)
@@ -88,7 +87,6 @@ impl MultisigInteract {
     }
 
     pub async fn propose_issue_collection(&mut self) -> usize {
-        let system_sc_address = bech32::decode(SYSTEM_SC_BECH32);
         let action_id = self
             .interactor
             .tx()
@@ -97,7 +95,7 @@ impl MultisigInteract {
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
-                system_sc_address,
+                ESDTSystemSCAddress,
                 ISSUE_COST,
                 FunctionCall::new("issueNonFungible")
                     .argument(&COLLECTION_NAME)
@@ -150,7 +148,7 @@ impl MultisigInteract {
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
-                &self.system_sc_address,
+                ESDTSystemSCAddress,
                 0u64,
                 FunctionCall::new("setSpecialRole")
                     .argument(&self.collection_token_identifier)

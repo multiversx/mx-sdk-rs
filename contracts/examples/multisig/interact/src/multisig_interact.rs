@@ -11,7 +11,6 @@ use multisig_interact_state::State;
 
 use multiversx_sc_snippets::imports::*;
 
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
@@ -77,7 +76,6 @@ async fn main() {
 struct MultisigInteract {
     interactor: Interactor,
     wallet_address: Bech32Address,
-    system_sc_address: Address,
     collection_token_identifier: String,
     multisig_code: BytesValue,
     state: State,
@@ -99,7 +97,6 @@ impl MultisigInteract {
         Self {
             interactor,
             wallet_address: wallet_address.into(),
-            system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
             collection_token_identifier: String::new(),
             multisig_code,
             state: State::load_state(),
