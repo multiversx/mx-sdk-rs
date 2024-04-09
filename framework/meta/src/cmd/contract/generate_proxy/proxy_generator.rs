@@ -437,6 +437,10 @@ where
         type_description: &TypeDescription,
         name: &str,
     ) {
+        if self.enum_contains_struct_variant(enum_variants) {
+            self.write("\n#[rustfmt::skip]");
+        }
+
         self.start_write_type("enum", type_description, name);
 
         if enum_variants.is_empty() {
@@ -604,6 +608,20 @@ where
         }
 
         processed_paths
+    }
+
+    fn enum_contains_struct_variant(&self, enum_variants: &Vec<EnumVariantDescription>) -> bool {
+        for variant in enum_variants {
+            if variant.fields.is_empty() {
+                continue;
+            }
+
+            if variant.fields[0].name != ZERO {
+                return true;
+            }
+        }
+
+        false
     }
 }
 

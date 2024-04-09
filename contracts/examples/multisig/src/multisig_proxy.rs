@@ -501,6 +501,7 @@ where
     pub signers: ManagedVec<Api, ManagedAddress<Api>>,
 }
 
+#[rustfmt::skip]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
 pub enum Action<Api>
 where
