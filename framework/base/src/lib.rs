@@ -38,6 +38,13 @@ pub use hex_call_data::*;
 pub use hex_literal;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 
-// not to be used internally
-mod imports_reexport;
-pub use imports_reexport::{derive_imports, imports, proxy_imports};
+/// Conveniently groups all framework imports required by a smart contract form the framework.
+pub mod imports;
+
+/// Conveniently groups all imports required for deriving framework-related traits for types.
+pub mod derive_imports;
+
+/// Conveniently groups all imports required for generated proxies.
+pub mod proxy_imports {
+    pub use super::{derive_imports::*, imports::*};
+}
