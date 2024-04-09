@@ -1,7 +1,7 @@
 use crate::{mandos_to_erdrs_address, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
-    bech32,
+    imports::Bech32Address,
     mandos_system::ScenarioRunner,
     scenario_model::{ScDeployStep, SetStateStep, TxResponse},
 };
@@ -64,14 +64,11 @@ impl Interactor {
             .new_deployed_address
             .clone()
             .unwrap();
+        let deploy_address_bech32 = Bech32Address::from(deploy_address);
 
-        let set_state_step = SetStateStep::new().new_address(
-            addr,
-            nonce,
-            format!("0x{}", hex::encode(&deploy_address)).as_str(),
-        );
+        let set_state_step = SetStateStep::new().new_address(addr, nonce, &deploy_address_bech32);
 
-        println!("deploy address: {}", bech32::encode(&deploy_address));
+        println!("deploy address: {deploy_address_bech32}");
         self.pre_runners.run_set_state_step(&set_state_step);
         self.post_runners.run_set_state_step(&set_state_step);
 

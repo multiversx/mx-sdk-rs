@@ -38,7 +38,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
@@ -71,7 +71,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("80,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
@@ -93,7 +93,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
@@ -124,7 +124,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("80,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
@@ -141,12 +141,12 @@ impl MultisigInteract {
     }
 
     pub async fn propose_set_special_role(&mut self) -> usize {
-        let multisig_address = self.state.multisig().to_address();
+        let multisig_address = self.state.current_multisig_address();
         let action_id = self
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
@@ -154,7 +154,7 @@ impl MultisigInteract {
                 0u64,
                 FunctionCall::new("setSpecialRole")
                     .argument(&self.collection_token_identifier)
-                    .argument(&multisig_address)
+                    .argument(multisig_address)
                     .argument(&"ESDTRoleNFTCreate"),
             )
             .returns(ReturnsResult)
@@ -177,9 +177,8 @@ impl MultisigInteract {
     pub async fn create_items(&mut self) {
         println!("creating items...");
 
-        let multisig_address = self.state.multisig().to_address();
-
         let mut buffer = self.interactor.homogenous_call_buffer();
+        let multisig_address = self.state.current_multisig_address();
         for item_index in 0..NUM_ITEMS {
             let item_name = format!("Test collection item #{item_index}");
             let image_cid = format!(
@@ -188,11 +187,11 @@ impl MultisigInteract {
 
             buffer.push_tx(|tx| {
                 tx.from(&self.wallet_address)
-                    .to(&multisig_address)
+                    .to(multisig_address)
                     .gas(10_000_000u64)
                     .typed(multisig_proxy::MultisigProxy)
                     .propose_async_call(
-                        &multisig_address,
+                        multisig_address,
                         0u64,
                         FunctionCall::new("ESDTNFTCreate")
                             .argument(&self.collection_token_identifier)
