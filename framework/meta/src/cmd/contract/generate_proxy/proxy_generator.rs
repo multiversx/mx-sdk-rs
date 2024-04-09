@@ -438,8 +438,7 @@ where
         name: &str,
     ) {
         if self.enum_contains_struct_variant(enum_variants) {
-            self.writeln("");
-            self.write(r#"#[rustfmt::skip]"#);
+            self.write("\n#[rustfmt::skip]");
         }
 
         self.start_write_type("enum", type_description, name);
