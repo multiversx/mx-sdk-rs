@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.47.8"
+version = "0.48.0"
 edition = "2021"
 
 authors = [
@@ -40,12 +40,12 @@ path = "src/main.rs"
 run-go-tests = []
 
 [dependencies.multiversx-sc]
-version = "=0.47.8"
+version = "=0.48.0"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta]
-version = "=0.47.8"
+version = "=0.48.0"
 path = "../meta"
 
 [dependencies.multiversx-chain-scenario-format]
