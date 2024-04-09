@@ -1,6 +1,7 @@
+use multiversx_sc_scenario::imports::*;
+use num_bigint::BigUint;
+
 use adder::*;
-use multiversx_sc::types::{AddressExpr, ReturnsResultConv, ScExpr, WithNewAddress};
-use multiversx_sc_scenario::{api::StaticApi, num_bigint::BigUint, scenario_model::*, *};
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 

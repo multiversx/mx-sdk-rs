@@ -1,4 +1,7 @@
-use crate::imports::{ErrorApiImpl, EsdtTokenPayment, ManagedTypeApi, ManagedVec, ManagedVecItem};
+use crate::{
+    api::{ErrorApiImpl, ManagedTypeApi},
+    types::{EsdtTokenPayment, ManagedVec, ManagedVecItem},
+};
 
 pub static CANNOT_MERGE_ERR_MSG: &[u8] = b"Cannot merge";
 

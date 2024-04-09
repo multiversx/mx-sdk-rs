@@ -1,19 +1,7 @@
-use multiversx_sc::{
-    arrayvec::ArrayVec,
-    codec::{test_util::top_encode_to_vec_u8_or_panic, Empty},
-    contract_base::ContractBase,
-    storage::mappers::StorageTokenWrapper,
-    types::{Address, EsdtTokenPayment, ManagedVec},
-};
+use multiversx_sc_scenario::imports::*;
+
 use multiversx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
-};
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TxESDT,
-    },
-    ScenarioWorld, WhiteboxContract,
 };
 use use_module::token_merge_mod_impl::{CustomAttributes, TokenMergeModImpl};
 

@@ -8,22 +8,8 @@ use clap::Parser;
 use multisig::multisig_proxy;
 use multisig_interact_config::Config;
 use multisig_interact_state::State;
-use multiversx_sc_scenario::{
-    mandos_system::ScenarioRunner,
-    multiversx_sc::types::{BigUint, ReturnsNewAddress, ReturnsResult},
-    scenario_format::interpret_trait::InterpretableFrom,
-    standalone::retrieve_account_as_scenario_set_state,
-    test_wallets, NumExpr,
-};
-use multiversx_sc_snippets::{
-    dns_address_for_name, env_logger,
-    multiversx_sc::{codec::multi_types::MultiValueVec, types::Address},
-    multiversx_sc_scenario::{
-        api::StaticApi, bech32, scenario_format::interpret_trait::InterpreterContext,
-        scenario_model::*, ContractInfo,
-    },
-    tokio, Interactor, InteractorPrepareAsync,
-};
+
+use multiversx_sc_snippets::imports::*;
 
 const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";

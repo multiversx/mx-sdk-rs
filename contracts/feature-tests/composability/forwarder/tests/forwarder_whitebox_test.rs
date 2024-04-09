@@ -1,12 +1,5 @@
 use forwarder::nft::{Color, ForwarderNftModule};
-use multiversx_sc::{contract_base::ContractBase, types::Address};
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const FORWARDER_ADDRESS_EXPR: &str = "sc:forwarder";

@@ -5,10 +5,9 @@ use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},
-    proxy_imports::ESDTSystemSCAddress,
     types::{
-        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EsdtLocalRole,
-        EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
+        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, ESDTSystemSCAddress,
+        EsdtLocalRole, EsdtTokenType, ManagedAddress, ManagedBuffer, TokenIdentifier,
     },
 };
 

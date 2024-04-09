@@ -1,12 +1,6 @@
 use forwarder::nft::{Color, ProxyTrait as _};
 
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    scenario_model::{
-        Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TransferStep,
-    },
-    ContractInfo, ScenarioWorld,
-};
+use multiversx_sc_scenario::imports::*;
 
 const USER_ADDRESS_EXPR: &str = "address:user";
 const FORWARDER_ADDRESS_EXPR: &str = "sc:forwarder";

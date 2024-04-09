@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{scenario_model::*, *};
+use multiversx_sc_scenario::imports::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
