@@ -2,17 +2,9 @@ use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TokenPair},
     ContractObj, PriceAggregator, ProxyTrait as _,
 };
-use multiversx_sc::{
-    codec::multi_types::MultiValueVec, contract_base::ContractBase,
-    types::EgldOrEsdtTokenIdentifier,
-};
 use multiversx_sc_modules::{pause::ProxyTrait, staking::ProxyTrait as _};
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    managed_address, managed_buffer,
-    scenario_model::{Account, AddressValue, ScCallStep, ScDeployStep, SetStateStep},
-    ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
-};
+
+use multiversx_sc_scenario::imports::*;
 
 const DECIMALS: u8 = 0;
 const EGLD_TICKER: &[u8] = b"EGLD";

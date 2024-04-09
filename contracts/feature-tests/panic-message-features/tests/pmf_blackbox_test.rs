@@ -1,6 +1,6 @@
 mod pmf_proxy;
-use multiversx_sc::types::{AddressExpr, ScExpr};
-use multiversx_sc_scenario::{scenario_model::*, *};
+
+use multiversx_sc_scenario::imports::*;
 
 const OWNER: AddressExpr = AddressExpr("owner");
 const SC_PMF: ScExpr = ScExpr("pmf");

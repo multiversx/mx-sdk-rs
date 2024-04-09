@@ -1,12 +1,5 @@
-use multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier, ManagedVec};
 use multiversx_sc_modules::staking::StakingModule;
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 
 const STAKING_TOKEN_ID_EXPR: &str = "str:STAKE-123456";
 const STAKING_TOKEN_ID: &[u8] = b"STAKE-123456";

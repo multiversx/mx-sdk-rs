@@ -1,24 +1,8 @@
 mod mock_seed_nft_minter;
 mod utils;
 
+use multiversx_sc_scenario::imports::*;
 use std::iter::zip;
-
-use multiversx_sc::{
-    codec::multi_types::MultiValue2,
-    storage::mappers::SingleValue,
-    types::{
-        Address, BigUint, EgldOrEsdtTokenIdentifier, ManagedVec, MultiValueEncoded,
-        OperationCompletionStatus, TokenIdentifier,
-    },
-};
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
-        SetStateStep, TxESDT, TypedResponse,
-    },
-    ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
-};
 
 use crate::mock_seed_nft_minter::ProxyTrait as _;
 use rewards_distribution::{

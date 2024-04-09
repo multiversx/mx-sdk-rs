@@ -6,21 +6,8 @@ use adder::adder_proxy;
 use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
-use multiversx_sc_snippets::{
-    env_logger,
-    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsResultConv},
-    multiversx_sc_scenario::{
-        api::StaticApi,
-        bech32,
-        mandos_system::ScenarioRunner,
-        num_bigint::BigUint,
-        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, Scenario},
-        standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo, NumExpr, WithRawTxResponse,
-    },
-    tokio, Interactor, InteractorPrepareAsync,
-};
+
+use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -189,7 +176,7 @@ impl AdderInteract {
             .to(self.state.adder().to_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
-            .returns(ReturnsResultConv::<BigUint>::new())
+            .returns(ReturnsResultConv::<RustBigUint>::new())
             .prepare_async()
             .run()
             .await;

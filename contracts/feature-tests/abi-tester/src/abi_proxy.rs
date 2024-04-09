@@ -415,10 +415,7 @@ pub enum AbiEnum {
     Nothing,
     Something(i32),
     SomethingMore(u8, OnlyShowsUpAsNested08),
-    SomeStruct {
-        a: u16,
-        b: OnlyShowsUpAsNested09,
-    },
+    SomeStruct { a: u16, b: OnlyShowsUpAsNested09 },
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
@@ -509,8 +506,5 @@ pub enum ExplicitDiscriminantMixed {
     Unit,
     Tuple(u16),
     Five,
-    Struct {
-        a: u8,
-        b: u16,
-    },
+    Struct { a: u8, b: u16 },
 }

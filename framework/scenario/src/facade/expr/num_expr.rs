@@ -1,16 +1,12 @@
-use crate::{api::StaticApi, ScenarioEnvExec, ScenarioTxEnv, ScenarioTxEnvData};
-use core::ptr;
+use crate::ScenarioTxEnv;
+
 use multiversx_chain_scenario_format::{
     interpret_trait::InterpreterContext, value_interpreter::interpret_string,
 };
 use multiversx_sc::{
     api::ManagedTypeApi,
-    types::{
-        AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TxCodeValue, TxEgldValue, TxEnv,
-        TxFrom, TxFromSpecified, TxGasValue, TxTo, TxToSpecified,
-    },
+    types::{AnnotatedValue, BigUint, ManagedBuffer, TxEgldValue, TxGasValue},
 };
-use std::path::PathBuf;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct NumExpr<'a>(pub &'a str);
@@ -31,7 +27,7 @@ where
         self.0.into()
     }
 
-    fn to_value(&self, env: &Env) -> BigUint<Env::Api> {
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
         interpret_big_uint(self.0)
     }
 }
@@ -44,7 +40,7 @@ where
         self.0.into()
     }
 
-    fn to_value(&self, env: &Env) -> u64 {
+    fn to_value(&self, _env: &Env) -> u64 {
         interpret_big_uint::<Env::Api>(self.0).to_u64().unwrap()
     }
 }

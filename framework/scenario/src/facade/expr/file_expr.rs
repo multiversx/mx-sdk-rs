@@ -1,13 +1,7 @@
-use core::ptr;
-use std::path::PathBuf;
-
 use multiversx_chain_scenario_format::{
     interpret_trait::InterpreterContext, value_interpreter::interpret_string,
 };
-use multiversx_sc::types::{
-    AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
-    TxToSpecified,
-};
+use multiversx_sc::types::{AnnotatedValue, ManagedBuffer};
 
 use crate::{api::StaticApi, ScenarioTxEnvData};
 

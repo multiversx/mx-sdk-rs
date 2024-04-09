@@ -1,12 +1,6 @@
 use std::time::Duration;
 
-use multiversx_sc_scenario::{
-    multiversx_sc::{
-        codec::Empty,
-        types::{FunctionCall, ReturnsResult},
-    },
-    NumExpr, ReturnsNewTokenIdentifier,
-};
+use multiversx_sc_snippets::imports::*;
 
 use super::*;
 

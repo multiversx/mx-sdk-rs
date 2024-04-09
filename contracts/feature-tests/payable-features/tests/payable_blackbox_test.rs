@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{scenario_model::*, *};
+use multiversx_sc_scenario::imports::*;
 
 const PF_PATH_EXPR: &str = "mxsc:output/payable-features.mxsc.json";
 
