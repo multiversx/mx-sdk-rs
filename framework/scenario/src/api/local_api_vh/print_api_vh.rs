@@ -2,7 +2,7 @@ use std::cell::RefCell;
 
 use multiversx_sc::{
     api::{PrintApi, PrintApiImpl},
-    types::ManagedBufferCachedBuilder,
+    types::ManagedBufferBuilder,
 };
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
@@ -34,7 +34,7 @@ impl<VHB: VMHooksApiBackend> PrintApi for VMHooksApi<VHB> {
 }
 
 impl<VHB: VMHooksApiBackend> PrintApiImpl for VMHooksApi<VHB> {
-    type Buffer = ManagedBufferCachedBuilder<Self>;
+    type Buffer = ManagedBufferBuilder<Self>;
 
     fn print_buffer(&self, buffer: Self::Buffer) {
         let bytes = buffer.into_managed_buffer().to_boxed_bytes();
