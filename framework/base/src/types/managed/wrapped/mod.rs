@@ -1,3 +1,4 @@
+mod builder;
 mod egld_or_esdt_token_identifier;
 mod egld_or_esdt_token_payment;
 mod egld_or_multi_esdt_payment;
@@ -5,7 +6,6 @@ mod encoded_managed_vec_item;
 mod esdt_token_data;
 mod esdt_token_payment;
 mod managed_address;
-mod managed_buffer_cached_builder;
 mod managed_byte_array;
 mod managed_option;
 mod managed_ref;
@@ -19,6 +19,7 @@ mod randomness_source;
 mod token_identifier;
 mod traits;
 
+pub use builder::*;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
 pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
 pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs};
@@ -26,7 +27,6 @@ pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
 pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
 pub use managed_address::ManagedAddress;
-pub use managed_buffer_cached_builder::ManagedBufferCachedBuilder;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;
 pub use managed_option::ManagedOption;

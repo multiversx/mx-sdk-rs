@@ -1,3 +1,5 @@
+use core::marker::PhantomData;
+
 use crate::codec::{EncodeError, EncodeErrorHandler, NestedEncodeOutput, TryStaticCast};
 
 use crate::{
@@ -6,45 +8,41 @@ use crate::{
         hex_util::{byte_to_binary_digits, byte_to_hex_digits},
         FormatBuffer, FormatByteReceiver, SCBinary, SCCodec, SCDisplay, SCLowerHex,
     },
-    types::{BigInt, BigUint, ManagedBuffer, StaticBufferRef},
+    types::ManagedBuffer,
 };
+
+use super::{ManagedBufferBuilderImpl, ManagedBufferImplDefault};
 
 const HEX_CONVERSION_BUFFER_LEN: usize = 32;
 const BIN_CONVERSION_BUFFER_LEN: usize = 32;
 
-pub struct ManagedBufferCachedBuilder<M>
+pub struct ManagedBufferBuilder<M, Impl = ManagedBufferImplDefault<M>>
 where
     M: ManagedTypeApi,
+    Impl: ManagedBufferBuilderImpl<M>,
 {
-    managed_buffer: ManagedBuffer<M>,
-    static_cache: Option<StaticBufferRef<M>>,
+    _phantom: PhantomData<M>,
+    implementation: Impl,
 }
 
-impl<M> ManagedBufferCachedBuilder<M>
+impl<M, Impl> ManagedBufferBuilder<M, Impl>
 where
     M: ManagedTypeApi,
+    Impl: ManagedBufferBuilderImpl<M>,
 {
     /// Creates instance as lazily as possible.
     /// If possible, the slice is loaded into the static buffer.
     /// If not, it is saved into the managed buffer so that the data is not lost.
     /// Use `flush_to_managed_buffer` after this to ensure that the managed buffer is populated.
     pub fn new_from_slice(slice: &[u8]) -> Self {
-        let static_cache = StaticBufferRef::try_new(slice);
-        if static_cache.is_some() {
-            ManagedBufferCachedBuilder {
-                managed_buffer: ManagedBuffer::new(),
-                static_cache,
-            }
-        } else {
-            ManagedBufferCachedBuilder {
-                managed_buffer: slice.into(),
-                static_cache: None,
-            }
+        ManagedBufferBuilder {
+            _phantom: PhantomData,
+            implementation: Impl::new_from_slice(slice),
         }
     }
 }
 
-impl<M> Default for ManagedBufferCachedBuilder<M>
+impl<M> Default for ManagedBufferBuilder<M, ManagedBufferImplDefault<M>>
 where
     M: ManagedTypeApi,
 {
@@ -54,48 +52,21 @@ where
     }
 }
 
-impl<M> ManagedBufferCachedBuilder<M>
+impl<M, Impl> ManagedBufferBuilder<M, Impl>
 where
     M: ManagedTypeApi,
+    Impl: ManagedBufferBuilderImpl<M>,
 {
-    pub fn into_managed_buffer(mut self) -> ManagedBuffer<M> {
-        self.flush_to_managed_buffer();
-        self.managed_buffer
-    }
-
-    fn flush_to_managed_buffer(&mut self) {
-        let old_static_cache = core::mem::take(&mut self.static_cache);
-        if let Some(static_cache) = &old_static_cache {
-            static_cache.with_buffer_contents(|bytes| {
-                self.managed_buffer.append_bytes(bytes);
-            });
-        }
+    pub fn into_managed_buffer(self) -> ManagedBuffer<M> {
+        self.implementation.into_managed_buffer()
     }
 
     pub fn append_bytes(&mut self, bytes: &[u8]) {
-        if let Some(static_cache) = &mut self.static_cache {
-            let success = static_cache.try_extend_from_slice(bytes);
-            if !success {
-                self.flush_to_managed_buffer();
-                self.managed_buffer.append_bytes(bytes);
-            }
-        } else {
-            self.managed_buffer.append_bytes(bytes);
-        }
+        self.implementation.append_bytes(bytes);
     }
 
     pub fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
-        if let Some(static_cache) = &mut self.static_cache {
-            let success = static_cache.try_extend_from_copy_bytes(item.len(), |dest_slice| {
-                let _ = item.load_slice(0, dest_slice);
-            });
-            if !success {
-                self.flush_to_managed_buffer();
-                self.managed_buffer.append(item);
-            }
-        } else {
-            self.managed_buffer.append(item);
-        }
+        self.implementation.append_managed_buffer(item);
     }
 
     /// Converts the input to hex and adds it to the current buffer.
@@ -125,14 +96,18 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
+impl<M, Impl> NestedEncodeOutput for ManagedBufferBuilder<M, Impl>
+where
+    M: ManagedTypeApi,
+    Impl: ManagedBufferBuilderImpl<M>,
+{
     fn write(&mut self, bytes: &[u8]) {
         self.append_bytes(bytes);
     }
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<M>>()
     }
 
     #[inline]
@@ -156,9 +131,10 @@ impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBufferCachedBuilder<M> {
     }
 }
 
-impl<M> FormatByteReceiver for ManagedBufferCachedBuilder<M>
+impl<M, Impl> FormatByteReceiver for ManagedBufferBuilder<M, Impl>
 where
     M: ManagedTypeApi,
+    Impl: ManagedBufferBuilderImpl<M>,
 {
     type Api = M;
 
@@ -179,7 +155,10 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> FormatBuffer for ManagedBufferCachedBuilder<M> {
+impl<M> FormatBuffer for ManagedBufferBuilder<M, ManagedBufferImplDefault<M>>
+where
+    M: ManagedTypeApi,
+{
     fn append_ascii(&mut self, ascii: &[u8]) {
         self.append_bytes(ascii)
     }

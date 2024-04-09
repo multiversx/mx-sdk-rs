@@ -1,6 +1,6 @@
 use crate::{
     formatter::SCLowerHex,
-    types::{ManagedBuffer, ManagedBufferCachedBuilder},
+    types::{ManagedBuffer, ManagedBufferBuilder, ManagedBufferCachedBuilder},
 };
 
 use super::{FunctionCall, TxEnv};
@@ -44,7 +44,7 @@ where
     }
 
     fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
-        let mut result = ManagedBufferCachedBuilder::default();
+        let mut result = ManagedBufferBuilder::default();
         result.append_managed_buffer(&self.function_name);
         for arg in self.arg_buffer.raw_arg_iter() {
             result.append_bytes(b"@");

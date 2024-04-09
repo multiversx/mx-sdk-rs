@@ -208,7 +208,8 @@ impl TxResponse {
             let is_issue_semi_fungible = prev_tx.data.starts_with("issueSemiFungible@");
             let is_issue_non_fungible = prev_tx.data.starts_with("issueNonFungible@");
             let is_register_meta_esdt = prev_tx.data.starts_with("registerMetaESDT@");
-            let is_register_and_set_all_roles_esdt = prev_tx.data.starts_with("registerAndSetAllRoles@");
+            let is_register_and_set_all_roles_esdt =
+                prev_tx.data.starts_with("registerAndSetAllRoles@");
 
             if !is_issue_fungible
                 && !is_issue_semi_fungible

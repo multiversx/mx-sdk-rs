@@ -9,9 +9,10 @@ use crate::{
         CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
     },
+    formatter::SCLowerHex,
     types::{
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec,
-        MultiValueEncoded,
+        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer,
+        ManagedBufferBuilder, ManagedVec, MultiValueEncoded,
     },
 };
 

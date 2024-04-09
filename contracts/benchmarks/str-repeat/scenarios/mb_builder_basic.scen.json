@@ -1,0 +1,80 @@
+{
+    "name": "str-repeat",
+    "steps": [
+        {
+            "step": "setState",
+            "accounts": {
+                "address:owner": {
+                    "nonce": "0",
+                    "balance": "0"
+                },
+                "sc:contract": {
+                    "code": "mxsc:../output/str-repeat-mb-builder-basic.mxsc.json"
+                }
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "benchmark-mb-builder-basic-10",
+            "comment": "code is smaller, so basic wins here",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "mb_builder_benchmark",
+                "arguments": [
+                    "0x01020304",
+                    "10"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": "*",
+                "status": "",
+                "gas": "8855882"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "benchmark-mb-builder-basic-tipping-point",
+            "comment": "the caching optimization starts to compensate the larger code size",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "mb_builder_benchmark",
+                "arguments": [
+                    "0x01020304",
+                    "22"
+                ],
+                "gasLimit": "10,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": "*",
+                "status": "",
+                "gas": "8778242"
+            }
+        },
+        {
+            "step": "scCall",
+            "id": "benchmark-mb-builder-basic",
+            "comment": "for many repeats, the cached version wins",
+            "tx": {
+                "from": "address:owner",
+                "to": "sc:contract",
+                "function": "mb_builder_benchmark",
+                "arguments": [
+                    "0x01020304",
+                    "10000"
+                ],
+                "gasLimit": "10,000,000,000",
+                "gasPrice": "0"
+            },
+            "expect": {
+                "out": "*",
+                "status": "",
+                "gas": "9934220582"
+            }
+        }
+    ]
+}
