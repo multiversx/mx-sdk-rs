@@ -10,9 +10,9 @@ checksum = "96d30a06541fbafbc7f82ed10c06164cfbd2c401138f6addd8404629c4b16711"
 
 [[package]]
 name = "autocfg"
-version = "1.1.0"
+version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d468802bab17cbc0cc575e9b053f41e72aa36bfa6b7f55e3529ffa43161b97fa"
+checksum = "f1fdabc7756949593fe60f30ec81974b613357de856987752631dea1e3394c80"
 
 [[package]]
 name = "bitflags"
@@ -40,7 +40,7 @@ checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
 name = "multiversx-sc"
-version = "0.47.8"
+version = "0.48.0"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -69,7 +69,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.47.8"
+version = "0.48.0"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -80,14 +80,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.47.8"
+version = "0.48.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.47.8"
+version = "0.48.0"
 dependencies = [
  "multiversx-sc",
 ]
