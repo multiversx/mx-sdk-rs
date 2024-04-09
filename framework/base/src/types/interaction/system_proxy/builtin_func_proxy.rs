@@ -161,7 +161,7 @@ where
         hash: &ManagedBuffer<Env::Api>,
         attributes: &T,
         uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxProxyCall<Env, From, To, Gas, u64> {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(token);
         arg_buffer.push_arg(amount);

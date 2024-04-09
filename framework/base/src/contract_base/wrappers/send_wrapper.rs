@@ -9,7 +9,7 @@ use crate::{
         system_proxy, BigUint, ContractCallNoPayment, ESDTSystemSCAddress,
         EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
         ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, OriginalResultMarker,
-        ReturnsRawResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
+        ReturnsRawResult, ReturnsResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
     },
 };
 
@@ -513,19 +513,13 @@ where
         attributes: &T,
         uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
-        let output = Tx::new_tx_from_sc()
+        Tx::new_tx_from_sc()
             .to(ToSelf)
             .gas(GasLeft)
             .typed(system_proxy::UserBuiltinProxy)
             .esdt_nft_create(token, amount, name, royalties, hash, attributes, uris)
-            .returns(ReturnsRawResult)
-            .sync_call();
-
-        if let Some(first_result_bytes) = output.try_get(0) {
-            first_result_bytes.parse_as_u64().unwrap_or_default()
-        } else {
-            0
-        }
+            .returns(ReturnsResult)
+            .sync_call()
     }
 
     /// Creates a new NFT token of a certain type (determined by `token_identifier`).
