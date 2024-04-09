@@ -123,18 +123,17 @@ where
         nft_nonce: u64,
         new_uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(token_id);
-        arg_buffer.push_arg(nft_nonce);
+        let mut tx = self
+            .wrapped_tx
+            .raw_call(ESDT_NFT_ADD_URI_FUNC_NAME)
+            .argument(token_id)
+            .argument(&nft_nonce);
 
         for uri in new_uris {
-            arg_buffer.push_arg(uri);
+            tx = tx.argument(&uri);
         }
 
-        self.wrapped_tx
-            .raw_call(ESDT_NFT_ADD_URI_FUNC_NAME)
-            .arguments_raw(arg_buffer)
-            .original_result()
+        tx.original_result()
     }
 
     pub fn nft_update_attributes<T: codec::TopEncode>(
@@ -162,28 +161,27 @@ where
         attributes: &T,
         uris: &ManagedVec<Env::Api, ManagedBuffer<Env::Api>>,
     ) -> TxProxyCall<Env, From, To, Gas, u64> {
-        let mut arg_buffer = ManagedArgBuffer::new();
-        arg_buffer.push_arg(token);
-        arg_buffer.push_arg(amount);
-        arg_buffer.push_arg(name);
-        arg_buffer.push_arg(royalties);
-        arg_buffer.push_arg(hash);
-        arg_buffer.push_arg(attributes);
+        let mut tx = self
+            .wrapped_tx
+            .raw_call(ESDT_NFT_CREATE_FUNC_NAME)
+            .argument(token)
+            .argument(amount)
+            .argument(name)
+            .argument(royalties)
+            .argument(hash)
+            .argument(attributes);
 
         if uris.is_empty() {
             // at least one URI is required, so we push an empty one
-            arg_buffer.push_arg(codec::Empty);
+            tx = tx.argument(&codec::Empty);
         } else {
             // The API function has the last argument as variadic,
             // so we top-encode each and send as separate argument
             for uri in uris {
-                arg_buffer.push_arg(uri);
+                tx = tx.argument(&uri);
             }
         }
 
-        self.wrapped_tx
-            .raw_call(ESDT_NFT_CREATE_FUNC_NAME)
-            .arguments_raw(arg_buffer)
-            .original_result()
+        tx.original_result()
     }
 }
