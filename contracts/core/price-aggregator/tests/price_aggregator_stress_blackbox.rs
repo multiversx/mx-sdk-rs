@@ -1,8 +1,7 @@
 use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TokenPair},
-    ContractObj, PriceAggregator, ProxyTrait as _,
+    ContractObj, PriceAggregator,
 };
-use multiversx_sc_modules::{pause::ProxyTrait, staking::ProxyTrait as _};
 
 use multiversx_sc_scenario::imports::*;
 
@@ -17,6 +16,8 @@ const SLASH_QUORUM: usize = 3;
 const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 50;
 const USD_TICKER: &[u8] = b"USDC";
+
+mod price_aggregator_proxy;
 
 type PriceAggregatorContract = ContractInfo<multiversx_price_aggregator_sc::Proxy<StaticApi>>;
 
@@ -86,65 +87,73 @@ impl PriceAggregatorTestState {
                 .collect::<Vec<_>>(),
         );
 
-        self.world.sc_deploy(
-            ScDeployStep::new()
-                .from(OWNER_ADDRESS_EXPR)
-                .code(price_aggregator_code)
-                .call(self.price_aggregator_contract.init(
-                    EgldOrEsdtTokenIdentifier::egld(),
-                    STAKE_AMOUNT,
-                    SLASH_AMOUNT,
-                    SLASH_QUORUM,
-                    SUBMISSION_COUNT,
-                    oracles,
-                ))
-                .gas_limit("120,000,000"),
-        );
+        self.world
+            .tx()
+            .from(AddressExpr("owner"))
+            .gas(120_000_000u64)
+            .typed(price_aggregator_proxy::PriceAggregatorProxy)
+            .init(
+                EgldOrEsdtTokenIdentifier::egld(),
+                STAKE_AMOUNT,
+                SLASH_AMOUNT,
+                SLASH_QUORUM,
+                SUBMISSION_COUNT,
+                oracles,
+            )
+            .code(price_aggregator_code)
+            .run();
 
         for address in self.oracles.iter() {
-            self.world.sc_call(
-                ScCallStep::new()
-                    .from(address)
-                    .egld_value(STAKE_AMOUNT)
-                    .call(self.price_aggregator_contract.stake())
-                    .gas_limit("5,000,000"),
-            );
+            self.world
+                .tx()
+                .from(&address.to_address())
+                .to(&self.price_aggregator_contract.to_address())
+                .gas(5_000_000u64)
+                .typed(price_aggregator_proxy::PriceAggregatorProxy)
+                .stake()
+                .egld(STAKE_AMOUNT)
+                .run();
         }
 
         self
     }
 
     fn set_pair_decimals(&mut self) {
-        self.world.sc_call(
-            ScCallStep::new().from(OWNER_ADDRESS_EXPR).call(
-                self.price_aggregator_contract
-                    .set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS),
-            ),
-        );
+        self.world
+            .tx()
+            .from(AddressExpr("owner"))
+            .to(&self.price_aggregator_contract.to_address())
+            .typed(price_aggregator_proxy::PriceAggregatorProxy)
+            .set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS)
+            .run();
     }
 
     fn unpause_endpoint(&mut self) {
-        self.world.sc_call(
-            ScCallStep::new()
-                .from(OWNER_ADDRESS_EXPR)
-                .call(self.price_aggregator_contract.unpause_endpoint())
-                .gas_limit("5,000,000"),
-        );
+        self.world
+            .tx()
+            .from(AddressExpr("owner"))
+            .to(&self.price_aggregator_contract.to_address())
+            .gas(5_000_000u64)
+            .typed(price_aggregator_proxy::PriceAggregatorProxy)
+            .unpause_endpoint()
+            .run();
     }
 
     fn submit(&mut self, from: &AddressValue, submission_timestamp: u64, price: u64) {
-        self.world.sc_call(
-            ScCallStep::new()
-                .from(from)
-                .call(self.price_aggregator_contract.submit(
-                    EGLD_TICKER,
-                    USD_TICKER,
-                    submission_timestamp,
-                    price,
-                    DECIMALS,
-                ))
-                .gas_limit("7,000,000"),
-        );
+        self.world
+            .tx()
+            .from(&from.to_address())
+            .to(&self.price_aggregator_contract.to_address())
+            .gas(7_000_000u64)
+            .typed(price_aggregator_proxy::PriceAggregatorProxy)
+            .submit(
+                EGLD_TICKER,
+                USD_TICKER,
+                submission_timestamp,
+                price,
+                DECIMALS,
+            )
+            .run();
     }
 }
 
