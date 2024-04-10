@@ -31,16 +31,16 @@ fn adder_blackbox() {
             .new_address(owner_address, 1, "sc:adder"),
     );
 
-    world
+    let new_address = world
         .tx()
         .from(OWNER)
         .typed(adder_proxy::AdderProxy)
         .init(5u32)
         .code(CODE_EXPR)
-        .with_result(WithNewAddress::new(|new_address| {
-            assert_eq!(new_address.to_address(), adder_contract.to_address());
-        }))
+        .returns(ReturnsNewAddress)
         .run();
+
+    assert_eq!(new_address, adder_contract.to_address());
 
     let value = world
         .query()
@@ -57,9 +57,6 @@ fn adder_blackbox() {
         .to(SC_ADDER)
         .typed(adder_proxy::AdderProxy)
         .add(1u32)
-        .with_result(WithRawTxResponse(|response| {
-            assert!(response.tx_error.is_success());
-        }))
         .run();
 
     world.check_state_step(
