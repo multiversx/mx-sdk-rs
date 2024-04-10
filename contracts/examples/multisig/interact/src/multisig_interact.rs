@@ -11,7 +11,6 @@ use multisig_interact_state::State;
 
 use multiversx_sc_snippets::imports::*;
 
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
 #[tokio::main]
@@ -76,8 +75,7 @@ async fn main() {
 
 struct MultisigInteract {
     interactor: Interactor,
-    wallet_address: Address,
-    system_sc_address: Address,
+    wallet_address: Bech32Address,
     collection_token_identifier: String,
     multisig_code: BytesValue,
     state: State,
@@ -98,8 +96,7 @@ impl MultisigInteract {
 
         Self {
             interactor,
-            wallet_address,
-            system_sc_address: bech32::decode(SYSTEM_SC_BECH32),
+            wallet_address: wallet_address.into(),
             collection_token_identifier: String::new(),
             multisig_code,
             state: State::load_state(),
@@ -152,16 +149,14 @@ impl MultisigInteract {
             .init(quorum, board)
             .code(&self.multisig_code)
             .gas(NumExpr("100,000,000"))
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsNewBech32Address)
             .prepare_async()
             .run()
             .await;
 
-        let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {new_address_bech32}");
+        println!("new address: {new_address}");
 
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_multisig_address(&new_address_expr);
+        self.state.set_multisig_address(new_address);
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -182,17 +177,14 @@ impl MultisigInteract {
                     .init(quorum, board.clone())
                     .code(&self.multisig_code)
                     .gas(NumExpr("70,000,000"))
-                    .returns(ReturnsNewAddress)
+                    .returns(ReturnsNewBech32Address)
             });
         }
 
         let results = buffer.run().await;
-        for result in results {
-            let new_address_bech32 = bech32::encode(&result);
-            println!("new address: {new_address_bech32}");
-
-            let new_address_expr = format!("bech32:{new_address_bech32}");
-            self.state.set_multisig_address(&new_address_expr);
+        for new_address in results {
+            println!("new address: {new_address}");
+            self.state.set_multisig_address(new_address);
         }
     }
 
@@ -202,7 +194,7 @@ impl MultisigInteract {
         let eve = test_wallets::eve();
 
         MultiValueVec::from([
-            self.wallet_address.clone(),
+            self.wallet_address.to_address(),
             carol.address().to_bytes().into(),
             dan.address().to_bytes().into(),
             eve.address().to_bytes().into(),
@@ -213,7 +205,7 @@ impl MultisigInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .egld(BigUint::from(50_000_000_000_000_000u64)) // 0,05 or 5 * 10^16
             .prepare_async()
             .run()
@@ -229,7 +221,7 @@ impl MultisigInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(gas_expr)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
@@ -241,8 +233,6 @@ impl MultisigInteract {
     }
 
     async fn perform_actions(&mut self, action_ids: Vec<usize>, gas_expr: u64) {
-        let multisig_address = self.state.multisig().to_address();
-
         let mut actions_no_quorum_reached = Vec::new();
         for &action_id in &action_ids {
             if self.quorum_reached(action_id).await {
@@ -256,10 +246,11 @@ impl MultisigInteract {
 
         let from = &self.wallet_address;
         let mut buffer = self.interactor.homogenous_call_buffer();
+        let multisig_address = self.state.current_multisig_address();
         for action_id in action_ids {
             buffer.push_tx(|tx| {
                 tx.from(from)
-                    .to(&multisig_address)
+                    .to(multisig_address)
                     .gas(gas_expr)
                     .typed(multisig_proxy::MultisigProxy)
                     .perform_action_endpoint(action_id)
@@ -283,7 +274,7 @@ impl MultisigInteract {
     async fn quorum_reached(&mut self, action_id: usize) -> bool {
         self.interactor
             .query()
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .typed(multisig_proxy::MultisigProxy)
             .quorum_reached(action_id)
             .returns(ReturnsResult)
@@ -295,7 +286,7 @@ impl MultisigInteract {
     async fn signed(&mut self, signer: &Address, action_id: usize) -> bool {
         self.interactor
             .query()
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .typed(multisig_proxy::MultisigProxy)
             .signed(signer, action_id)
             .returns(ReturnsResult)
@@ -306,7 +297,6 @@ impl MultisigInteract {
 
     async fn sign(&mut self, action_ids: &[usize]) {
         println!("signing actions `{action_ids:?}`...");
-        let multisig_address = self.state.multisig().to_address();
 
         let mut pending_signers = Vec::<(Address, usize)>::new();
         for &action_id in action_ids {
@@ -323,10 +313,11 @@ impl MultisigInteract {
         }
 
         let mut buffer = self.interactor.homogenous_call_buffer();
+        let multisig_address = self.state.current_multisig_address();
         for (signer, action_id) in pending_signers {
             buffer.push_tx(|tx| {
                 tx.from(signer)
-                    .to(&multisig_address)
+                    .to(multisig_address)
                     .gas(15_000_000u64)
                     .typed(multisig_proxy::MultisigProxy)
                     .sign(action_id)
@@ -350,7 +341,7 @@ impl MultisigInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("30,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .dns_register(dns_address, name)
@@ -365,7 +356,7 @@ impl MultisigInteract {
         let quorum = self
             .interactor
             .query()
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .typed(multisig_proxy::MultisigProxy)
             .quorum()
             .returns(ReturnsResult)
@@ -380,7 +371,7 @@ impl MultisigInteract {
         let board = self
             .interactor
             .query()
-            .to(self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .typed(multisig_proxy::MultisigProxy)
             .num_board_members()
             .returns(ReturnsResult)

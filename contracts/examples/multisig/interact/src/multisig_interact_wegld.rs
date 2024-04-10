@@ -53,7 +53,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(
@@ -83,7 +83,7 @@ impl MultisigInteract {
             .interactor
             .tx()
             .from(&self.wallet_address)
-            .to(&self.state.multisig().to_address())
+            .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
             .propose_async_call(to, 0u64, function_call)

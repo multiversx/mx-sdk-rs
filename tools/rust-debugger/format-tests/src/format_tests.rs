@@ -65,7 +65,7 @@ fn main() {
     let token_identifier: TokenIdentifier<DebugApi> = TokenIdentifier::from("MYTOK-123456");
     push!(to_check, token_identifier, "\"MYTOK-123456\"");
 
-    let managed_address = ESDTSystemSCAddress.managed_address::<DebugApi>();
+    let managed_address = ESDTSystemSCAddress.to_managed_address::<DebugApi>();
     push!(
         to_check,
         managed_address,
