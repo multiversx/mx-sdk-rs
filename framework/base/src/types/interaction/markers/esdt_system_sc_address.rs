@@ -24,11 +24,19 @@ const SYSTEM_SC_ADDRESS_ANNOTATION: &str =
 pub struct ESDTSystemSCAddress;
 
 impl ESDTSystemSCAddress {
-    pub fn managed_address<Api>(self) -> ManagedAddress<Api>
+    pub fn to_managed_address<Api>(self) -> ManagedAddress<Api>
     where
         Api: ManagedTypeApi,
     {
         ManagedAddress::from(SYSTEM_SC_ADDRESS_BYTES)
+    }
+
+    pub fn to_bech32_str(&self) -> &str {
+        SYSTEM_SC_ADDRESS_BECH32
+    }
+
+    pub fn to_bech32_string(&self) -> alloc::string::String {
+        SYSTEM_SC_ADDRESS_BECH32.into()
     }
 }
 
@@ -41,7 +49,7 @@ where
     }
 
     fn to_value(&self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {
-        ESDTSystemSCAddress.managed_address()
+        ESDTSystemSCAddress.to_managed_address()
     }
 }
 

@@ -471,7 +471,7 @@ where
     }
 
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        ESDTSystemSCAddress.managed_address()
+        ESDTSystemSCAddress.to_managed_address()
     }
 
     fn esdt_system_sc_call_no_args(

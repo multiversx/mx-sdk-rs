@@ -194,7 +194,7 @@ impl TxResponse {
 
     fn process_new_issued_token_identifier(mut self) -> Self {
         for scr in self.api_scrs.iter() {
-            if scr.sender.to_string() != ESDTSystemSCAddress.to_string() {
+            if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
                 continue;
             }
 
