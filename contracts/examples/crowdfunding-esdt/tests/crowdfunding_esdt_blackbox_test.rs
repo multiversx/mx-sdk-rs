@@ -1,4 +1,4 @@
-use crowdfunding_esdt::{ProxyTrait as _, Status};
+use crowdfunding_esdt::{crowdfunding_esdt_proxy, ProxyTrait as _, Status};
 
 use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
@@ -9,8 +9,13 @@ const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
 const CROWDFUNDING_ESDT_ADDRESS_EXPR: &str = "sc:crowdfunding-esdt";
 const CROWDFUNDING_ESDT_PATH_EXPR: &str = "mxsc:output/crowdfunding-esdt.mxsc.json";
 const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";
+const FIRST_USER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("first-user");
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
+const OWNER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("owner");
 const SECOND_USER_ADDRESS_EXPR: &str = "address:second-user";
+const SECOND_USER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("second-user");
+const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
+const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
 
 type CrowdfundingESDTContract = ContractInfo<crowdfunding_esdt::Proxy<StaticApi>>;
 
@@ -35,20 +40,21 @@ struct CrowdfundingESDTTestState {
 impl CrowdfundingESDTTestState {
     fn new() -> Self {
         let mut world = world();
+        let owner_address = "address:owner";
 
         world.set_state_step(
             SetStateStep::new()
-                .put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1))
-                .new_address(OWNER_ADDRESS_EXPR, 1, CROWDFUNDING_ESDT_ADDRESS_EXPR)
+                .put_account(OWNER_ADDRESS_EXPR_REPL, Account::new().nonce(1))
+                .new_address(owner_address, 1, CROWDFUNDING_ESDT_ADDRESS_EXPR)
                 .put_account(
-                    FIRST_USER_ADDRESS_EXPR,
+                    FIRST_USER_ADDRESS_EXPR_REPL,
                     Account::new()
                         .nonce(1)
                         .balance("1_000")
                         .esdt_balance(CF_TOKEN_ID_EXPR, "1_000"),
                 )
                 .put_account(
-                    SECOND_USER_ADDRESS_EXPR,
+                    SECOND_USER_ADDRESS_EXPR_REPL,
                     Account::new()
                         .nonce(1)
                         .esdt_balance(CF_TOKEN_ID_EXPR, "1_000"),
@@ -69,32 +75,33 @@ impl CrowdfundingESDTTestState {
         }
     }
 
-    fn deploy(&mut self) -> &mut Self {
-        let crowdfunding_esdt_code = self.world.code_expression(CROWDFUNDING_ESDT_PATH_EXPR);
-
-        self.world.sc_deploy(
-            ScDeployStep::new()
-                .from(OWNER_ADDRESS_EXPR)
-                .code(crowdfunding_esdt_code)
-                .call(self.crowdfunding_esdt_contract.init(
-                    2_000u32,
-                    CF_DEADLINE,
-                    EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
-                )),
-        );
-
-        self
+    fn deploy(&mut self) {
+        self.world
+            .tx()
+            .from(OWNER_ADDRESS_EXPR_REPL)
+            .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
+            .init(
+                2_000u32,
+                CF_DEADLINE,
+                EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
+            )
+            .code(CODE_EXPR)
+            .run();
     }
 
-    fn fund(&mut self, address: &str, amount: &str) -> &mut Self {
-        self.world.sc_call(
-            ScCallStep::new()
-                .from(address)
-                .esdt_transfer(CF_TOKEN_ID_EXPR, 0, amount)
-                .call(self.crowdfunding_esdt_contract.fund()),
-        );
-
-        self
+    fn fund(&mut self, address: AddressExpr, amount: u64) {
+        self.world
+            .tx()
+            .from(address)
+            .to(SC_CROWDFUNDING_ESDT_EXPR)
+            .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
+            .fund()
+            .single_esdt(
+                &TokenIdentifier::from(CF_TOKEN_ID_EXPR),
+                0u64,
+                &multiversx_sc::proxy_imports::BigUint::from(amount),
+            )
+            .run();
     }
 
     fn check_deposit(&mut self, donor: Address, amount: u64) -> &mut Self {
@@ -150,7 +157,7 @@ fn test_fund() {
     let mut state = CrowdfundingESDTTestState::new();
     state.deploy();
 
-    state.fund(FIRST_USER_ADDRESS_EXPR, "1000");
+    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1_000);
     state.check_deposit(state.first_user_address.clone(), 1_000);
 }
 
@@ -191,11 +198,11 @@ fn test_successful_cf() {
     state.deploy();
 
     // first user fund
-    state.fund(FIRST_USER_ADDRESS_EXPR, "1_000");
+    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1000);
     state.check_deposit(state.first_user_address.clone(), 1_000);
 
     // second user fund
-    state.fund(SECOND_USER_ADDRESS_EXPR, "1_000");
+    state.fund(SECOND_USER_ADDRESS_EXPR_REPL, 1000);
     state.check_deposit(state.second_user_address.clone(), 1_000);
 
     // set block timestamp after deadline
@@ -228,11 +235,11 @@ fn test_failed_cf() {
     state.deploy();
 
     // first user fund
-    state.fund(FIRST_USER_ADDRESS_EXPR, "300");
+    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 300);
     state.check_deposit(state.first_user_address.clone(), 300u64);
 
     // second user fund
-    state.fund(SECOND_USER_ADDRESS_EXPR, "600");
+    state.fund(SECOND_USER_ADDRESS_EXPR_REPL, 600);
     state.check_deposit(state.second_user_address.clone(), 600u64);
 
     // set block timestamp after deadline
