@@ -1,7 +1,7 @@
 use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
 
-use adder::*;
+use scenario_tester::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
@@ -12,15 +12,15 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
 
-    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    blockchain.register_contract(ADDER_PATH_EXPR, scenario_tester::ContractBuilder);
     blockchain
 }
 
 #[test]
-fn adder_blackbox_legacy_proxy() {
+fn st_blackbox_legacy_proxy() {
     let mut world = world();
     let owner_address = "address:owner";
-    let mut adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let mut st_contract = ContractInfo::<scenario_tester::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace();
 
@@ -33,24 +33,24 @@ fn adder_blackbox_legacy_proxy() {
     world
         .tx()
         .from(OWNER)
-        .typed(adder_proxy::AdderProxy)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .init(5u32)
         .code(CODE_EXPR)
         .with_result(WithNewAddress::new(|new_address| {
-            assert_eq!(new_address.to_address(), adder_contract.to_address());
+            assert_eq!(new_address.to_address(), st_contract.to_address());
         }))
         .run();
 
     world.sc_query(
         ScQueryStep::new()
-            .to(&adder_contract)
-            .call(adder_contract.sum())
+            .to(&st_contract)
+            .call(st_contract.sum())
             .expect_value(SingleValue::from(BigUint::from(5u32))),
     );
 
     let value = world
         .query()
-        .call(adder_contract.sum())
+        .call(st_contract.sum())
         .returns(ReturnsResultConv::<SingleValue<BigUint>>::new())
         .run();
     assert_eq!(value.into(), BigUint::from(5u32));
@@ -58,7 +58,7 @@ fn adder_blackbox_legacy_proxy() {
     world
         .tx()
         .from(OWNER)
-        .call(adder_contract.add(3u32))
+        .call(st_contract.add(3u32))
         .with_result(WithRawTxResponse(|response| {
             assert!(response.tx_error.is_success());
         }))
@@ -68,7 +68,7 @@ fn adder_blackbox_legacy_proxy() {
         CheckStateStep::new()
             .put_account(owner_address, CheckAccount::new())
             .put_account(
-                &adder_contract,
+                &st_contract,
                 CheckAccount::new().check_storage("str:sum", "8"),
             ),
     );

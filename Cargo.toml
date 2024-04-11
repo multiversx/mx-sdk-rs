@@ -178,4 +178,7 @@ members = [
   "contracts/feature-tests/exchange-features",
   "contracts/feature-tests/exchange-features/meta",
 
+  "contracts/feature-tests/scenario-tester",
+  "contracts/feature-tests/scenario-tester/meta"
+
 ]
