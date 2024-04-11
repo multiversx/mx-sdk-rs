@@ -119,17 +119,9 @@ impl MultisigInteract {
                 "board member address: {}",
                 bech32::encode(board_member_address)
             );
-            let scenario_raw = retrieve_account_as_scenario_set_state(
-                Config::load_config().gateway().to_string(),
-                bech32::encode(board_member_address),
-                true,
-            )
-            .await;
-
-            let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-            self.interactor.pre_runners.run_scenario(&scenario);
-            self.interactor.post_runners.run_scenario(&scenario);
+            self.interactor
+                .retrieve_account(&board_member_address.into())
+                .await;
         }
 
         self.wegld_swap_set_state().await;

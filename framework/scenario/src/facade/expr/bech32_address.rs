@@ -32,6 +32,16 @@ impl From<Address> for Bech32Address {
     }
 }
 
+impl From<&Address> for Bech32Address {
+    fn from(value: &Address) -> Self {
+        let bech32 = bech32::encode(value);
+        Bech32Address {
+            address: value.clone(),
+            bech32,
+        }
+    }
+}
+
 impl Bech32Address {
     pub fn from_bech32_string(bech32: String) -> Self {
         let address = bech32::decode(&bech32);

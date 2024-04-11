@@ -35,17 +35,11 @@ impl MultisigInteract {
     }
 
     pub async fn wegld_swap_set_state(&mut self) {
-        let scenario_raw = retrieve_account_as_scenario_set_state(
-            Config::load_config().gateway().to_string(),
-            WEGLD_SWAP_SC_BECH32.to_string(),
-            true,
-        )
-        .await;
-
-        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-        self.interactor.pre_runners.run_scenario(&scenario);
-        self.interactor.post_runners.run_scenario(&scenario);
+        self.interactor
+            .retrieve_account(&Bech32Address::from_bech32_string(
+                WEGLD_SWAP_SC_BECH32.to_owned(),
+            ))
+            .await;
     }
 
     async fn propose_wrap_egld(&mut self) -> usize {
