@@ -5,7 +5,7 @@
 # ##########################################
 
 [package]
-name = "scenario_tester-wasm"
+name = "scenario-tester-wasm"
 version = "0.0.0"
 edition = "2021"
 publish = false
@@ -21,7 +21,7 @@ debug = false
 panic = "abort"
 overflow-checks = false
 
-[dependencies.scenario_tester]
+[dependencies.scenario-tester]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]

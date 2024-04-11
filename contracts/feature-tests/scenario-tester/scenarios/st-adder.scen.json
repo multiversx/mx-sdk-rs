@@ -24,7 +24,7 @@
             "id": "1",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "mxsc:../output/adder.mxsc.json",
+                "contractCode": "mxsc:../output/scenario-tester.mxsc.json",
                 "arguments": [
                     "5"
                 ],
@@ -91,7 +91,7 @@
                     "storage": {
                         "str:sum": "8"
                     },
-                    "code": "mxsc:../output/adder.mxsc.json"
+                    "code": "mxsc:../output/scenario-tester.mxsc.json"
                 }
             }
         }

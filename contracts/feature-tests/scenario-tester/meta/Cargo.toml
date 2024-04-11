@@ -4,7 +4,7 @@ version = "0.0.0"
 edition = "2021"
 publish = false
 
-[dependencies.scenario_tester]
+[dependencies.scenario-tester]
 path = ".."
 
 [dependencies.multiversx-sc-meta]

@@ -132,18 +132,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "scenario_tester"
+name = "scenario-tester"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
-name = "scenario_tester-wasm"
+name = "scenario-tester-wasm"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc-wasm-adapter",
- "scenario_tester",
+ "scenario-tester",
 ]
 
 [[package]]

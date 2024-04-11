@@ -18,10 +18,10 @@ fn world() -> ScenarioWorld {
 }
 
 #[test]
-fn adder_blackbox() {
+fn st_blackbox() {
     let mut world = world();
     let owner_address = "address:owner";
-    let adder_contract = ContractInfo::<scenario_tester::Proxy<StaticApi>>::new("sc:scenario-tester");
+    let st_contract = ContractInfo::<scenario_tester::Proxy<StaticApi>>::new("sc:scenario-tester");
 
     world.start_trace();
 
@@ -40,7 +40,7 @@ fn adder_blackbox() {
         .returns(ReturnsNewAddress)
         .run();
 
-    assert_eq!(new_address, adder_contract.to_address());
+    assert_eq!(new_address, st_contract.to_address());
 
     let value = world
         .query()
@@ -63,7 +63,7 @@ fn adder_blackbox() {
         CheckStateStep::new()
             .put_account(owner_address, CheckAccount::new())
             .put_account(
-                &adder_contract,
+                &st_contract,
                 CheckAccount::new().check_storage("str:sum", "6"),
             ),
     );
