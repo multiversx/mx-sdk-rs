@@ -22,28 +22,35 @@ pub async fn print_account_as_scenario_set_state(
 
 pub async fn retrieve_account_as_scenario_set_state(
     api: &CommunicationProxy,
-    addr: &Bech32Address,
+    address: &Bech32Address,
 ) -> SetStateStep {
-    let address = Address::from_bech32_string(addr.to_bech32_str()).unwrap();
-    let account = api.get_account(&address).await.unwrap();
+    let sdk_address = Address::from_bech32_string(address.to_bech32_str()).unwrap();
+    let sdk_account = api.get_account(&sdk_address).await.unwrap();
 
     let account_esdt = api
-        .get_account_esdt_tokens(&address)
+        .get_account_esdt_tokens(&sdk_address)
         .await
-        .unwrap_or_else(|err| panic!("failed to retrieve ESDT tokens for address {addr}: {err}"));
+        .unwrap_or_else(|err| {
+            panic!("failed to retrieve ESDT tokens for address {address}: {err}")
+        });
     let account_esdt_roles = api
-        .get_account_esdt_roles(&address)
+        .get_account_esdt_roles(&sdk_address)
         .await
-        .unwrap_or_else(|err| panic!("failed to retrieve ESDT roles for address {addr}: {err}"));
+        .unwrap_or_else(|err| panic!("failed to retrieve ESDT roles for address {address}: {err}"));
     let account_storage = api
-        .get_account_storage_keys(&address)
+        .get_account_storage_keys(&sdk_address)
         .await
-        .unwrap_or_else(|err| panic!("failed to retrieve storage for address {addr}: {err}"));
+        .unwrap_or_else(|err| panic!("failed to retrieve storage for address {address}: {err}"));
 
-    let account_state = set_account(account, account_storage, account_esdt, account_esdt_roles);
+    let account_state = set_account(
+        sdk_account,
+        account_storage,
+        account_esdt,
+        account_esdt_roles,
+    );
 
     let set_state_step = SetStateStep::new();
-    set_state_step.put_account(key_hex(&address.to_bytes()), account_state)
+    set_state_step.put_account(address, account_state)
 }
 
 pub fn build_scenario(set_state: SetStateStep) -> Scenario {
