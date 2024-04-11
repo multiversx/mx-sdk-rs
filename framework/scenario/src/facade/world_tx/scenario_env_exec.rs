@@ -1,4 +1,4 @@
-use std::{ops::Add, path::PathBuf};
+use std::{collections::btree_map::Entry, ops::Add, path::PathBuf};
 
 use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::{
@@ -126,7 +126,7 @@ impl<'w> SetStateBuilder<'w> {
     where
         AddressKey: From<A>,
     {
-        if &self.address_expr != &AddressKey::default() {
+        if self.address_expr != AddressKey::default() {
             self.set_state_step
                 .accounts
                 .insert(self.address_expr, self.current_account);
@@ -307,15 +307,9 @@ impl<'w> SetStateBuilder<'w> {
     }
 
     pub fn commit(mut self) {
-        if !self
-            .set_state_step
-            .accounts
-            .contains_key(&self.address_expr)
-        {
-            self.set_state_step
-                .accounts
-                .insert(self.address_expr, self.current_account);
-        }
+        if let Entry::Vacant(entry) = self.set_state_step.accounts.entry(self.address_expr) {
+            entry.insert(self.current_account);
+        };
         self.world.run_set_state_step(&self.set_state_step);
     }
 }
