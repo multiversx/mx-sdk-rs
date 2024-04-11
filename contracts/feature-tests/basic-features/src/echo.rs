@@ -69,8 +69,8 @@ pub trait EchoTypes {
     #[endpoint]
     fn echo_multi_value_u32(
         &self,
-        m: MultiValueManagedVec<u32>,
-    ) -> MultiValue2<usize, MultiValueManagedVec<u32>> {
+        m: MultiValueManagedVec<'a, u32>,
+    ) -> MultiValue2<usize, MultiValueManagedVec<'a, u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }

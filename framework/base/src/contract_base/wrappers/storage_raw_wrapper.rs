@@ -15,16 +15,16 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct StorageRawWrapper<A>
+pub struct StorageRawWrapper<'a, A>
 where
-    A: StorageReadApi + ManagedTypeApi + ErrorApi,
+    A: StorageReadApi + ManagedTypeApi<'a> + ErrorApi,
 {
     _phantom: PhantomData<A>,
 }
 
-impl<A> StorageRawWrapper<A>
+impl<'a, A> StorageRawWrapper<'a, A>
 where
-    A: StorageReadApi + StorageWriteApi + ManagedTypeApi + ErrorApi,
+    A: StorageReadApi + StorageWriteApi + ManagedTypeApi<'a> + ErrorApi,
 {
     pub fn new() -> Self {
         StorageRawWrapper {
@@ -38,10 +38,10 @@ where
     #[inline]
     pub fn read<K, V>(&self, storage_key: K) -> V
     where
-        K: Into<StorageKey<A>>,
+        K: Into<StorageKey<'a, A>>,
         V: TopDecode,
     {
-        let key: StorageKey<A> = storage_key.into();
+        let key: StorageKey<'a, A> = storage_key.into();
         storage_get(key.as_ref())
     }
 
@@ -50,13 +50,13 @@ where
     ///
     /// This is a synchronous call, so it only works when
     /// both the current contract and the destination are in the same shard.
-    pub fn read_from_address<K, V>(&self, address: &ManagedAddress<A>, storage_key: K) -> V
+    pub fn read_from_address<K, V>(&self, address: &ManagedAddress<'a, A>, storage_key: K) -> V
     where
-        K: Into<StorageKey<A>>,
+        K: Into<StorageKey<'a, A>>,
         V: TopDecode,
     {
-        let key: StorageKey<A> = storage_key.into();
-        let result_buffer = ManagedBuffer::<A>::from_handle(use_raw_handle(MBUF_TEMPORARY_1));
+        let key: StorageKey<'a, A> = storage_key.into();
+        let result_buffer = ManagedBuffer::<'a, A>::from_handle(use_raw_handle(MBUF_TEMPORARY_1));
         A::storage_read_api_impl().storage_load_from_address(
             address.get_handle(),
             key.get_handle(),
@@ -64,7 +64,7 @@ where
         );
 
         let Ok(value) =
-            V::top_decode_or_handle_err(result_buffer, StorageGetErrorHandler::<A>::default());
+            V::top_decode_or_handle_err(result_buffer, StorageGetErrorHandler::<'a, A>::default());
         value
     }
 
@@ -74,10 +74,10 @@ where
     #[inline]
     pub fn write<K, V>(&self, storage_key: K, value: &V)
     where
-        K: Into<StorageKey<A>>,
+        K: Into<StorageKey<'a, A>>,
         V: TopEncode,
     {
-        let key: StorageKey<A> = storage_key.into();
+        let key: StorageKey<'a, A> = storage_key.into();
         storage_set(key.as_ref(), value);
     }
 }

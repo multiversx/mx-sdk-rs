@@ -9,5 +9,5 @@ pub trait CallableContract: Send + Sync {
 
 /// Describes objects that can create instances of contract objects, with the given API.
 pub trait CallableContractBuilder {
-    fn new_contract_obj<A: VMApi + Send + Sync>(&self) -> Box<dyn CallableContract>;
+    fn new_contract_obj<'a, A: VMApi<'a> + Send + Sync>(&self) -> Box<dyn CallableContract>;
 }

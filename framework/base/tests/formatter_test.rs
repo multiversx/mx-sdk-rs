@@ -143,7 +143,7 @@ fn test_display_code_metadata() {
     check_code_metadata_display(CodeMetadata::DEFAULT, "Default");
 }
 
-fn check_lower_hex_eq<T: SCLowerHex>(item: T, expected: &str) {
+fn check_lower_hex_eq<T: SCLowerHex<'a>>(item: T, expected: &str) {
     let mut receiver = SimpleReceiver::default();
     SCLowerHex::fmt(&item, &mut receiver);
     assert_eq!(receiver.0.as_str(), expected);
@@ -215,7 +215,7 @@ fn test_lower_hex_code_metadata() {
     );
 }
 
-fn check_binary_eq<T: SCBinary>(item: T, expected: &str) {
+fn check_binary_eq<T: SCBinary<'a>>(item: T, expected: &str) {
     let mut receiver = SimpleReceiver::default();
     SCBinary::fmt(&item, &mut receiver);
     assert_eq!(receiver.0.as_str(), expected);

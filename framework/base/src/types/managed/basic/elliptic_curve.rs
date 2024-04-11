@@ -17,30 +17,34 @@ pub const ELLIPTIC_CURVE_P384_NAME: &str = "p384";
 pub const ELLIPTIC_CURVE_P521_INT: u32 = 521;
 pub const ELLIPTIC_CURVE_P521_NAME: &str = "p521";
 
-pub type EllipticCurveComponents<M> = (
-    BigUint<M>,
-    BigUint<M>,
-    BigUint<M>,
-    BigUint<M>,
-    BigUint<M>,
+pub type EllipticCurveComponents<'a, M> = (
+    BigUint<'a, M>,
+    BigUint<'a, M>,
+    BigUint<'a, M>,
+    BigUint<'a, M>,
+    BigUint<'a, M>,
     u32,
 );
 
 #[repr(transparent)]
 #[derive(Debug)]
-pub struct EllipticCurve<M: ManagedTypeApi> {
+pub struct EllipticCurve<'a, M: ManagedTypeApi<'a>> {
     pub(super) handle: M::EllipticCurveHandle,
 }
 
-impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
+impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for EllipticCurve<'a, M> {
     type OwnHandle = M::EllipticCurveHandle;
 
     fn from_handle(handle: M::EllipticCurveHandle) -> Self {
         EllipticCurve { handle }
     }
 
-    fn get_handle(&self) -> M::EllipticCurveHandle {
+    unsafe fn get_handle(&self) -> M::EllipticCurveHandle {
         self.handle.clone()
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        core::mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::EllipticCurveHandle) -> &Self {
@@ -48,8 +52,8 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
     }
 }
 
-impl<M: ManagedTypeApi> EllipticCurve<M> {
-    pub fn from_name(name: &ManagedBuffer<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> EllipticCurve<'a, M> {
+    pub fn from_name(name: &ManagedBuffer<'a, M>) -> Self {
         let handle = M::managed_type_impl().ec_create_from_name_mb(name.get_handle());
         EllipticCurve::from_handle(handle)
     }
@@ -69,7 +73,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         }
     }
 
-    pub fn get_values(&self) -> EllipticCurveComponents<M> {
+    pub fn get_values(&self) -> EllipticCurveComponents<'a, M> {
         let api = M::managed_type_impl();
         let field_order_handle = api.bi_new_zero();
         let base_point_order_handle = api.bi_new_zero();
@@ -106,11 +110,11 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn add(
         &self,
-        x_first_point: BigUint<M>,
-        y_first_point: BigUint<M>,
-        x_second_point: BigUint<M>,
-        y_second_point: BigUint<M>,
-    ) -> (BigUint<M>, BigUint<M>) {
+        x_first_point: BigUint<'a, M>,
+        y_first_point: BigUint<'a, M>,
+        x_second_point: BigUint<'a, M>,
+        y_second_point: BigUint<'a, M>,
+    ) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
@@ -129,7 +133,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn double(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> (BigUint<M>, BigUint<M>) {
+    pub fn double(&self, x_point: BigUint<'a, M>, y_point: BigUint<'a, M>) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
@@ -146,7 +150,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn is_on_curve(&self, x_point: BigUint<M>, y_point: BigUint<M>) -> bool {
+    pub fn is_on_curve(&self, x_point: BigUint<'a, M>, y_point: BigUint<'a, M>) -> bool {
         let api = M::managed_type_impl();
         api.ec_is_on_curve(self.handle.clone(), x_point.handle, y_point.handle)
     }
@@ -154,10 +158,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     #[deprecated(since = "0.41.0", note = "Please use method `scalar_mult` instead.")]
     pub fn scalar_mult_legacy(
         &self,
-        x_point: BigUint<M>,
-        y_point: BigUint<M>,
+        x_point: BigUint<'a, M>,
+        y_point: BigUint<'a, M>,
         data: &[u8],
-    ) -> (BigUint<M>, BigUint<M>) {
+    ) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
@@ -177,10 +181,10 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     pub fn scalar_mult(
         &self,
-        x_point: BigUint<M>,
-        y_point: BigUint<M>,
-        data: &ManagedBuffer<M>,
-    ) -> (BigUint<M>, BigUint<M>) {
+        x_point: BigUint<'a, M>,
+        y_point: BigUint<'a, M>,
+        data: &ManagedBuffer<'a, M>,
+    ) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
@@ -202,7 +206,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         since = "0.41.0",
         note = "Please use method `scalar_base_mult` instead."
     )]
-    pub fn scalar_base_mult_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+    pub fn scalar_base_mult_legacy(&self, data: &[u8]) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
@@ -218,7 +222,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn scalar_base_mult(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
+    pub fn scalar_base_mult(&self, data: &ManagedBuffer<'a, M>) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_result_handle = api.bi_new_zero();
         let y_result_handle = api.bi_new_zero();
@@ -238,14 +242,14 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     #[cfg(feature = "alloc")]
     pub fn marshal_legacy(
         &self,
-        x_pair: BigUint<M>,
-        y_pair: BigUint<M>,
+        x_pair: BigUint<'a, M>,
+        y_pair: BigUint<'a, M>,
     ) -> crate::types::heap::BoxedBytes {
         let api = M::managed_type_impl();
         api.ec_marshal_legacy(self.handle.clone(), x_pair.handle, y_pair.handle)
     }
 
-    pub fn marshal(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
+    pub fn marshal(&self, x_pair: BigUint<'a, M>, y_pair: BigUint<'a, M>) -> ManagedBuffer<'a, M> {
         let result_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().ec_marshal(
@@ -264,14 +268,14 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     #[cfg(feature = "alloc")]
     pub fn marshal_compressed_legacy(
         &self,
-        x_pair: BigUint<M>,
-        y_pair: BigUint<M>,
+        x_pair: BigUint<'a, M>,
+        y_pair: BigUint<'a, M>,
     ) -> crate::types::heap::BoxedBytes {
         let api = M::managed_type_impl();
         api.ec_marshal_compressed_legacy(self.handle.clone(), x_pair.handle, y_pair.handle)
     }
 
-    pub fn marshal_compressed(&self, x_pair: BigUint<M>, y_pair: BigUint<M>) -> ManagedBuffer<M> {
+    pub fn marshal_compressed(&self, x_pair: BigUint<'a, M>, y_pair: BigUint<'a, M>) -> ManagedBuffer<'a, M> {
         let result_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().ec_marshal_compressed(
@@ -284,7 +288,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     }
 
     #[deprecated(since = "0.41.0", note = "Please use method `unmarshal` instead.")]
-    pub fn unmarshal_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+    pub fn unmarshal_legacy(&self, data: &[u8]) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
         let y_pair_handle = api.bi_new_zero();
@@ -300,7 +304,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn unmarshal(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
+    pub fn unmarshal(&self, data: &ManagedBuffer<'a, M>) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
         let y_pair_handle = api.bi_new_zero();
@@ -320,7 +324,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         since = "0.41.0",
         note = "Please use method `unmarshal_compressed` instead."
     )]
-    pub fn unmarshal_compressed_legacy(&self, data: &[u8]) -> (BigUint<M>, BigUint<M>) {
+    pub fn unmarshal_compressed_legacy(&self, data: &[u8]) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
         let y_pair_handle = api.bi_new_zero();
@@ -336,7 +340,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn unmarshal_compressed(&self, data: &ManagedBuffer<M>) -> (BigUint<M>, BigUint<M>) {
+    pub fn unmarshal_compressed(&self, data: &ManagedBuffer<'a, M>) -> (BigUint<'a, M>, BigUint<'a, M>) {
         let api = M::managed_type_impl();
         let x_pair_handle = api.bi_new_zero();
         let y_pair_handle = api.bi_new_zero();
@@ -354,7 +358,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
 
     #[deprecated(since = "0.41.0", note = "Please use method `generate_key` instead.")]
     #[cfg(feature = "alloc")]
-    pub fn generate_key_legacy(&self) -> (BigUint<M>, BigUint<M>, crate::types::heap::BoxedBytes) {
+    pub fn generate_key_legacy(&self) -> (BigUint<'a, M>, BigUint<'a, M>, crate::types::heap::BoxedBytes) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
         let y_pub_key_handle = api.bi_new_zero();
@@ -370,7 +374,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
         )
     }
 
-    pub fn generate_key(&self) -> (BigUint<M>, BigUint<M>, ManagedBuffer<M>) {
+    pub fn generate_key(&self) -> (BigUint<'a, M>, BigUint<'a, M>, ManagedBuffer<'a, M>) {
         let api = M::managed_type_impl();
         let x_pub_key_handle = api.bi_new_zero();
         let y_pub_key_handle = api.bi_new_zero();
@@ -390,7 +394,7 @@ impl<M: ManagedTypeApi> EllipticCurve<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncode for EllipticCurve<M> {
+impl<'a, M: ManagedTypeApi<'a>> NestedEncode for EllipticCurve<'a, M> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -408,7 +412,7 @@ impl<M: ManagedTypeApi> NestedEncode for EllipticCurve<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
+impl<'a, M: ManagedTypeApi<'a>> TopEncode for EllipticCurve<'a, M> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -418,7 +422,7 @@ impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
+impl<'a, M: ManagedTypeApi<'a>> TypeAbi for EllipticCurve<'a, M> {
     fn type_name() -> TypeName {
         TypeName::from("EllipticCurve")
     }

@@ -24,9 +24,9 @@ pub(super) const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 /// In case of `transfer_execute`, we leave by default a little gas for the calling transaction to finish.
 pub(super) const TRANSFER_EXECUTE_DEFAULT_LEFTOVER: u64 = 100_000;
 
-impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
+impl<'a, SA, OriginalResult> ContractCallWithEgld<'a, SA, OriginalResult>
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
 {
     pub fn resolve_gas_limit(&self) -> u64 {
         if self.basic.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
@@ -37,7 +37,7 @@ where
     }
 
     #[inline]
-    pub fn get_back_transfers(&self) -> (BigUint<SA>, ManagedVec<SA, EsdtTokenPayment<SA>>) {
+    pub fn get_back_transfers(&self) -> (BigUint<'a, SA>, ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>) {
         let esdt_transfer_value_handle: SA::BigIntHandle =
             use_raw_handle(SA::static_var_api_impl().next_handle());
         let call_value_handle: SA::BigIntHandle =
@@ -54,7 +54,7 @@ where
         )
     }
 
-    pub fn to_call_data_string(&self) -> ManagedBuffer<SA> {
+    pub fn to_call_data_string(&self) -> ManagedBuffer<'a, SA> {
         let mut result = ManagedBufferBuilder::default();
         result.append_managed_buffer(&self.basic.function_call.function_name);
         for arg in self.basic.function_call.arg_buffer.raw_arg_iter() {
@@ -64,7 +64,7 @@ where
         result.into_managed_buffer()
     }
 
-    pub(super) fn async_call(self) -> AsyncCall<SA> {
+    pub(super) fn async_call(self) -> AsyncCall<'a, SA> {
         AsyncCall {
             to: self.basic.to,
             egld_payment: self.egld_payment,
@@ -73,7 +73,7 @@ where
         }
     }
 
-    pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
+    pub(super) fn async_call_promise(self) -> super::AsyncCallPromises<'a, SA> {
         super::AsyncCallPromises {
             to: self.basic.to,
             egld_payment: self.egld_payment,
@@ -90,7 +90,7 @@ where
     where
         RequestedResult: TopDecodeMulti,
     {
-        let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_raw(
+        let raw_result = SendRawWrapper::<'a, SA>::new().execute_on_dest_context_raw(
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.egld_payment,
@@ -98,7 +98,7 @@ where
             &self.basic.function_call.arg_buffer,
         );
 
-        SendRawWrapper::<SA>::new().clean_return_data();
+        SendRawWrapper::<'a, SA>::new().clean_return_data();
 
         decode_result(raw_result)
     }
@@ -107,14 +107,14 @@ where
     where
         RequestedResult: TopDecodeMulti,
     {
-        let raw_result = SendRawWrapper::<SA>::new().execute_on_dest_context_readonly_raw(
+        let raw_result = SendRawWrapper::<'a, SA>::new().execute_on_dest_context_readonly_raw(
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.basic.function_call.function_name,
             &self.basic.function_call.arg_buffer,
         );
 
-        SendRawWrapper::<SA>::new().clean_return_data();
+        SendRawWrapper::<'a, SA>::new().clean_return_data();
 
         decode_result(raw_result)
     }
@@ -123,7 +123,7 @@ where
     where
         RequestedResult: TopDecodeMulti,
     {
-        let raw_result = SendRawWrapper::<SA>::new().execute_on_same_context_raw(
+        let raw_result = SendRawWrapper::<'a, SA>::new().execute_on_same_context_raw(
             self.resolve_gas_limit(),
             &self.basic.to,
             &self.egld_payment,
@@ -131,15 +131,15 @@ where
             &self.basic.function_call.arg_buffer,
         );
 
-        SendRawWrapper::<SA>::new().clean_return_data();
+        SendRawWrapper::<'a, SA>::new().clean_return_data();
 
         decode_result(raw_result)
     }
 }
 
-impl<SA, OriginalResult> ContractCallNoPayment<SA, OriginalResult>
+impl<'a, SA, OriginalResult> ContractCallNoPayment<'a, SA, OriginalResult>
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
 {
     pub(super) fn resolve_gas_limit_with_leftover(&self) -> u64 {
         if self.explicit_gas_limit == UNSPECIFIED_GAS_LIMIT {
@@ -153,10 +153,10 @@ where
         }
     }
 
-    pub(super) fn transfer_execute_egld(self, egld_payment: BigUint<SA>) {
+    pub(super) fn transfer_execute_egld(self, egld_payment: BigUint<'a, SA>) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
-        let _ = SendRawWrapper::<SA>::new().direct_egld_execute(
+        let _ = SendRawWrapper::<'a, SA>::new().direct_egld_execute(
             &self.to,
             &egld_payment,
             gas_limit,
@@ -165,12 +165,12 @@ where
         );
     }
 
-    pub(super) fn transfer_execute_single_esdt(self, payment: EsdtTokenPayment<SA>) {
+    pub(super) fn transfer_execute_single_esdt(self, payment: EsdtTokenPayment<'a, SA>) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
 
         if payment.token_nonce == 0 {
             // fungible ESDT
-            let _ = SendRawWrapper::<SA>::new().transfer_esdt_execute(
+            let _ = SendRawWrapper::<'a, SA>::new().transfer_esdt_execute(
                 &self.to,
                 &payment.token_identifier,
                 &payment.amount,
@@ -180,7 +180,7 @@ where
             );
         } else {
             // non-fungible/semi-fungible ESDT
-            let _ = SendRawWrapper::<SA>::new().transfer_esdt_nft_execute(
+            let _ = SendRawWrapper::<'a, SA>::new().transfer_esdt_nft_execute(
                 &self.to,
                 &payment.token_identifier,
                 payment.token_nonce,
@@ -194,10 +194,10 @@ where
 
     pub(super) fn transfer_execute_multi_esdt(
         self,
-        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+        payments: ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>,
     ) {
         let gas_limit = self.resolve_gas_limit_with_leftover();
-        let _ = SendRawWrapper::<SA>::new().multi_esdt_transfer_execute(
+        let _ = SendRawWrapper::<'a, SA>::new().multi_esdt_transfer_execute(
             &self.to,
             &payments,
             gas_limit,
@@ -206,7 +206,7 @@ where
         );
     }
 
-    pub(super) fn transfer_execute_esdt(self, payments: ManagedVec<SA, EsdtTokenPayment<SA>>) {
+    pub(super) fn transfer_execute_esdt(self, payments: ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>) {
         match payments.len() {
             0 => self.transfer_execute_egld(BigUint::zero()),
             1 => self.transfer_execute_single_esdt(payments.get(0)),
@@ -215,16 +215,16 @@ where
     }
 }
 
-fn decode_result<SA, RequestedResult>(
-    raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
+fn decode_result<'a, SA, RequestedResult>(
+    raw_result: ManagedVec<'a, SA, ManagedBuffer<'a, SA>>,
 ) -> RequestedResult
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
     RequestedResult: TopDecodeMulti,
 {
     let mut loader = ManagedResultArgLoader::new(raw_result);
     let arg_id = ArgId::from(&b"sync result"[..]);
-    let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
+    let h: ArgErrorHandler<'a, SA> = ArgErrorHandler::<'a, SA>::from(arg_id);
     let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
     result
 }

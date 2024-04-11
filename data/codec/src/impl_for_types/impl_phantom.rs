@@ -65,7 +65,7 @@ pub mod tests {
     use multiversx_sc_codec_derive::{NestedDecode, NestedEncode, TopDecode, TopEncode};
 
     #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug)]
-    pub struct TestStructWithPhantom<M> {
+    pub struct TestStructWithPhantom<'a, M> {
         x: u32,
         y: u64,
         _phantom: PhantomData<M>,

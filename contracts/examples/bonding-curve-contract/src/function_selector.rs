@@ -8,20 +8,20 @@ use crate::bonding_curve::{
 #[derive(
     TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone, Default,
 )]
-pub enum FunctionSelector<M: ManagedTypeApi> {
-    Linear(LinearFunction<M>),
-    CustomExample(BigUint<M>),
+pub enum FunctionSelector<'a, M: ManagedTypeApi<'a>> {
+    Linear(LinearFunction<'a, M>),
+    CustomExample(BigUint<'a, M>),
     #[default]
     None,
 }
 
-impl<M: ManagedTypeApi> CurveFunction<M> for FunctionSelector<M> {
+impl<'a, M: ManagedTypeApi<'a>> CurveFunction<'a, M> for FunctionSelector<'a, M> {
     fn calculate_price(
         &self,
-        token_start: &BigUint<M>,
-        amount: &BigUint<M>,
-        arguments: &CurveArguments<M>,
-    ) -> BigUint<M> {
+        token_start: &BigUint<'a, M>,
+        amount: &BigUint<'a, M>,
+        arguments: &CurveArguments<'a, M>,
+    ) -> BigUint<'a, M> {
         match &self {
             FunctionSelector::Linear(linear_function) => {
                 linear_function.calculate_price(token_start, amount, arguments)

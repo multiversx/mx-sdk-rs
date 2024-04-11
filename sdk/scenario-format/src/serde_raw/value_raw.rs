@@ -97,7 +97,7 @@ impl<'de> Visitor<'de> for ValueSubTreeVisitor {
         Ok(ValueSubTree::Str(String::from(value)))
     }
 
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    fn visit_seq<'a, A>(self, mut seq: A) -> Result<Self::Value, A::Error>
     where
         A: SeqAccess<'de>,
     {
@@ -110,7 +110,7 @@ impl<'de> Visitor<'de> for ValueSubTreeVisitor {
         Ok(ValueSubTree::List(list))
     }
 
-    fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, mut access: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

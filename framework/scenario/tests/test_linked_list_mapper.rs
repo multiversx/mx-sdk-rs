@@ -4,7 +4,7 @@ use multiversx_sc::storage::{
 };
 use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_list() -> LinkedListMapper<SingleTxApi, u64> {
+fn create_list() -> LinkedListMapper<'a, SingleTxApi, u64> {
     let base_key = StorageKey::new(&b"my_list"[..]);
     LinkedListMapper::new(base_key)
 }
@@ -32,7 +32,7 @@ fn test_list_simple() {
     assert!(list.check_internal_consistency());
 }
 
-fn check_list(list: &LinkedListMapper<SingleTxApi, u64>, expected: Vec<u64>) {
+fn check_list(list: &LinkedListMapper<'a, SingleTxApi, u64>, expected: Vec<u64>) {
     assert_eq!(list.len(), expected.len());
     let vec: Vec<u64> = list.iter().map(|x| x.into_value()).collect();
     assert_eq!(vec, expected);

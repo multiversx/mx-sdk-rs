@@ -23,16 +23,16 @@ use crate::{
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
 #[derive(Default)]
-pub struct BlockchainWrapper<A>
+pub struct BlockchainWrapper<'a, A>
 where
-    A: BlockchainApi + ManagedTypeApi + ErrorApi,
+    A: BlockchainApi<'a> + ManagedTypeApi<'a> + ErrorApi,
 {
     _phantom: PhantomData<A>,
 }
 
-impl<A> BlockchainWrapper<A>
+impl<'a, A> BlockchainWrapper<'a, A>
 where
-    A: BlockchainApi + ManagedTypeApi + ErrorApi,
+    A: BlockchainApi<'a> + ManagedTypeApi<'a> + ErrorApi,
 {
     pub fn new() -> Self {
         BlockchainWrapper {
@@ -48,7 +48,7 @@ where
     }
 
     #[inline]
-    pub fn get_caller(&self) -> ManagedAddress<A> {
+    pub fn get_caller(&self) -> ManagedAddress<'a, A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_caller_managed(handle.clone());
         ManagedAddress::from_handle(handle)
@@ -62,14 +62,14 @@ where
     }
 
     #[inline]
-    pub fn get_sc_address(&self) -> ManagedAddress<A> {
+    pub fn get_sc_address(&self) -> ManagedAddress<'a, A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_sc_address_managed(handle.clone());
         ManagedAddress::from_handle(handle)
     }
 
     #[inline]
-    pub fn get_owner_address(&self) -> ManagedAddress<A> {
+    pub fn get_owner_address(&self) -> ManagedAddress<'a, A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_owner_address_managed(handle.clone());
         ManagedAddress::from_handle(handle)
@@ -100,7 +100,7 @@ where
     }
 
     #[inline]
-    pub fn get_shard_of_address(&self, address: &ManagedAddress<A>) -> u32 {
+    pub fn get_shard_of_address(&self, address: &ManagedAddress<'a, A>) -> u32 {
         A::blockchain_api_impl().get_shard_of_address(address.get_handle())
     }
 
@@ -115,43 +115,43 @@ where
     }
 
     #[inline]
-    pub fn is_smart_contract(&self, address: &ManagedAddress<A>) -> bool {
+    pub fn is_smart_contract(&self, address: &ManagedAddress<'a, A>) -> bool {
         A::blockchain_api_impl().is_smart_contract(address.get_handle())
     }
 
     #[deprecated(since = "0.41.0", note = "Please use method `get_balance` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
-    pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
+    pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<'a, A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance_legacy(handle.clone(), address);
         BigUint::from_handle(handle)
     }
 
     #[inline]
-    pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
+    pub fn get_balance(&self, address: &ManagedAddress<'a, A>) -> BigUint<'a, A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
         BigUint::from_handle(handle)
     }
 
     #[inline]
-    pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
+    pub fn get_code_metadata(&self, address: &ManagedAddress<'a, A>) -> CodeMetadata {
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::blockchain_api_impl()
             .managed_get_code_metadata(address.get_handle(), mbuf_temp_1.clone());
         let mut buffer = [0u8; 2];
-        ManagedBuffer::<A>::from_handle(mbuf_temp_1).load_to_byte_array(&mut buffer);
+        ManagedBuffer::<'a, A>::from_handle(mbuf_temp_1).load_to_byte_array(&mut buffer);
         CodeMetadata::from(buffer)
     }
 
     #[inline]
-    pub fn is_builtin_function(&self, function_name: &ManagedBuffer<A>) -> bool {
+    pub fn is_builtin_function(&self, function_name: &ManagedBuffer<'a, A>) -> bool {
         A::blockchain_api_impl().managed_is_builtin_function(function_name.get_handle())
     }
 
     #[inline]
-    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
+    pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<'a, A>, nonce: u64) -> BigUint<'a, A> {
         token.map_ref_or_else(
             || self.get_balance(&self.get_sc_address()),
             |token_identifier| {
@@ -171,7 +171,7 @@ where
     }
 
     #[inline]
-    pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
+    pub fn get_state_root_hash(&self) -> ManagedByteArray<'a, A, 32> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_state_root_hash_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
@@ -185,7 +185,7 @@ where
     }
 
     #[inline]
-    pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
+    pub fn get_tx_hash(&self) -> ManagedByteArray<'a, A, 32> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_tx_hash_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
@@ -227,7 +227,7 @@ where
     }
 
     #[inline]
-    pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
+    pub fn get_block_random_seed(&self) -> ManagedByteArray<'a, A, 48> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_block_random_seed_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
@@ -264,7 +264,7 @@ where
     }
 
     #[inline]
-    pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
+    pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<'a, A, 48> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_prev_block_random_seed_managed(handle.clone());
         ManagedByteArray::from_handle(handle)
@@ -273,8 +273,8 @@ where
     #[inline]
     pub fn get_current_esdt_nft_nonce(
         &self,
-        address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        address: &ManagedAddress<'a, A>,
+        token_id: &TokenIdentifier<'a, A>,
     ) -> u64 {
         A::blockchain_api_impl()
             .get_current_esdt_nft_nonce(address.get_handle(), token_id.get_handle())
@@ -283,10 +283,10 @@ where
     #[inline]
     pub fn get_esdt_balance(
         &self,
-        address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        address: &ManagedAddress<'a, A>,
+        token_id: &TokenIdentifier<'a, A>,
         nonce: u64,
-    ) -> BigUint<A> {
+    ) -> BigUint<'a, A> {
         let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_esdt_balance(
             address.get_handle(),
@@ -299,10 +299,10 @@ where
 
     pub fn get_esdt_token_data(
         &self,
-        address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        address: &ManagedAddress<'a, A>,
+        token_id: &TokenIdentifier<'a, A>,
         nonce: u64,
-    ) -> EsdtTokenData<A> {
+    ) -> EsdtTokenData<'a, A> {
         // initializing outputs
         // the current version of VM does not set/overwrite them if the token is missing,
         // which is why we need to initialize them explicitly
@@ -363,7 +363,7 @@ where
     /// Works after:
     /// - synchronous calls
     /// - asynchronous calls too, in callbacks.
-    pub fn get_back_transfers(&self) -> BackTransfers<A> {
+    pub fn get_back_transfers(&self) -> BackTransfers<'a, A> {
         let esdt_transfer_value_handle: A::BigIntHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         let call_value_handle: A::BigIntHandle =
@@ -383,7 +383,7 @@ where
     /// Retrieves and deserializes token attributes from the SC account, with given token identifier and nonce.
     pub fn get_token_attributes<T: TopDecode>(
         &self,
-        token_id: &TokenIdentifier<A>,
+        token_id: &TokenIdentifier<'a, A>,
         token_nonce: u64,
     ) -> T {
         let own_sc_address = self.get_sc_address();
@@ -394,8 +394,8 @@ where
     #[inline]
     pub fn is_esdt_frozen(
         &self,
-        address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        address: &ManagedAddress<'a, A>,
+        token_id: &TokenIdentifier<'a, A>,
         nonce: u64,
     ) -> bool {
         A::blockchain_api_impl().check_esdt_frozen(
@@ -406,28 +406,28 @@ where
     }
 
     #[inline]
-    pub fn is_esdt_paused(&self, token_id: &TokenIdentifier<A>) -> bool {
+    pub fn is_esdt_paused(&self, token_id: &TokenIdentifier<'a, A>) -> bool {
         A::blockchain_api_impl().check_esdt_paused(token_id.get_handle())
     }
 
     #[inline]
-    pub fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier<A>) -> bool {
+    pub fn is_esdt_limited_transfer(&self, token_id: &TokenIdentifier<'a, A>) -> bool {
         A::blockchain_api_impl().check_esdt_limited_transfer(token_id.get_handle())
     }
 
     #[inline]
-    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<A>) -> EsdtLocalRoleFlags {
+    pub fn get_esdt_local_roles(&self, token_id: &TokenIdentifier<'a, A>) -> EsdtLocalRoleFlags {
         A::blockchain_api_impl().load_esdt_local_roles(token_id.get_handle())
     }
 }
 
-impl<A> BlockchainWrapper<A>
+impl<'a, A> BlockchainWrapper<'a, A>
 where
-    A: BlockchainApi + StorageReadApi + ManagedTypeApi + ErrorApi,
+    A: BlockchainApi<'a> + StorageReadApi + ManagedTypeApi<'a> + ErrorApi,
 {
     /// Retrieves validator rewards, as set by the protocol.
     #[inline]
-    pub fn get_cumulated_validator_rewards(&self) -> BigUint<A> {
+    pub fn get_cumulated_validator_rewards(&self) -> BigUint<'a, A> {
         let temp_handle_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         let temp_handle_2: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_2);
 

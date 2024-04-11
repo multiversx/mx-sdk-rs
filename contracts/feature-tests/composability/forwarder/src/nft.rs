@@ -12,12 +12,12 @@ pub struct Color {
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, PartialEq, Eq, Clone)]
-pub struct ComplexAttributes<M: ManagedTypeApi> {
-    pub biguint: BigUint<M>,
-    pub vec_u8: ManagedBuffer<M>,
-    pub token_id: TokenIdentifier<M>,
+pub struct ComplexAttributes<'a, M: ManagedTypeApi<'a>> {
+    pub biguint: BigUint<'a, M>,
+    pub vec_u8: ManagedBuffer<'a, M>,
+    pub token_id: TokenIdentifier<'a, M>,
     pub boolean: bool,
-    pub boxed_bytes: ManagedBuffer<M>,
+    pub boxed_bytes: ManagedBuffer<'a, M>,
 }
 
 #[multiversx_sc::module]

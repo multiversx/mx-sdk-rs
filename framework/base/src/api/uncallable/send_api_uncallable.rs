@@ -2,7 +2,7 @@ use crate::api::{RawHandle, SendApi, SendApiImpl};
 
 use super::UncallableApi;
 
-impl SendApi for UncallableApi {
+impl<'a> SendApi<'a> for UncallableApi {
     type SendApiImpl = UncallableApi;
 
     fn send_api_impl() -> Self::SendApiImpl {
@@ -10,7 +10,7 @@ impl SendApi for UncallableApi {
     }
 }
 
-impl SendApiImpl for UncallableApi {
+impl<'a> SendApiImpl<'a> for UncallableApi {
     fn transfer_value_execute(
         &self,
         _to_handle: RawHandle,

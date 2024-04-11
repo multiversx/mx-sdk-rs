@@ -9,20 +9,20 @@ use super::{AsyncCall, ContractCallNoPayment, ContractCallWithEgld, ManagedArgBu
 /// Defines a contract call object, which is the basis for all calls to other contracts.
 ///
 /// Its implementations differ on the type of payment that gets sent with the call.
-pub trait ContractCall<SA>: Sized
+pub trait ContractCall<'a, SA>: Sized
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
 {
     type OriginalResult: TopEncodeMulti;
 
     /// Converts any ESDT transfers into builtin function calls,
     /// thus reducing it to a simple transaction with optional EGLD value.
     #[doc(hidden)]
-    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult>;
+    fn into_normalized(self) -> ContractCallWithEgld<'a, SA, Self::OriginalResult>;
 
     /// Mutable access to the common base.
     #[doc(hidden)]
-    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, Self::OriginalResult>;
+    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<'a, SA, Self::OriginalResult>;
 
     /// Used by the generated proxies to add arguments to a call.
     #[doc(hidden)]
@@ -48,7 +48,7 @@ where
     /// For cases where we build the contract call by hand.
     ///
     /// No serialization occurs, just direct conversion to ManagedBuffer.
-    fn push_raw_argument<RawArg: Into<ManagedBuffer<SA>>>(&mut self, raw_arg: RawArg) {
+    fn push_raw_argument<RawArg: Into<ManagedBuffer<'a, SA>>>(&mut self, raw_arg: RawArg) {
         self.get_mut_basic()
             .function_call
             .arg_buffer
@@ -56,7 +56,7 @@ where
     }
 
     /// For cases where we build the contract call by hand.
-    fn with_raw_arguments(mut self, raw_argument_buffer: ManagedArgBuffer<SA>) -> Self {
+    fn with_raw_arguments(mut self, raw_argument_buffer: ManagedArgBuffer<'a, SA>) -> Self {
         self.get_mut_basic().function_call.arg_buffer = raw_argument_buffer;
         self
     }
@@ -68,19 +68,19 @@ where
         self
     }
 
-    fn into_call_data_string(self) -> ManagedBuffer<SA> {
+    fn into_call_data_string(self) -> ManagedBuffer<'a, SA> {
         self.into_normalized().to_call_data_string()
     }
 
     /// Converts to a legacy async call.
     #[inline]
-    fn async_call(self) -> AsyncCall<SA> {
+    fn async_call(self) -> AsyncCall<'a, SA> {
         self.into_normalized().async_call()
     }
 
     /// Converts to an async promise.
     #[inline]
-    fn async_call_promise(self) -> super::AsyncCallPromises<SA> {
+    fn async_call_promise(self) -> super::AsyncCallPromises<'a, SA> {
         self.into_normalized().async_call_promise()
     }
 
@@ -99,13 +99,13 @@ where
     #[inline]
     fn execute_on_dest_context_with_back_transfers<RequestedResult>(
         self,
-    ) -> (RequestedResult, super::BackTransfers<SA>)
+    ) -> (RequestedResult, super::BackTransfers<'a, SA>)
     where
         RequestedResult: TopDecodeMulti,
     {
         let result = self.execute_on_dest_context();
         let back_transfers =
-            crate::contract_base::BlockchainWrapper::<SA>::new().get_back_transfers();
+            crate::contract_base::BlockchainWrapper::<'a, SA>::new().get_back_transfers();
 
         (result, back_transfers)
     }

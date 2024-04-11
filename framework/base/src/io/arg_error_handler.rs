@@ -7,19 +7,19 @@ use crate::{
 };
 
 #[derive(Clone)]
-pub struct ArgErrorHandler<M>
+pub struct ArgErrorHandler<'a, M>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeApi<'a> + ErrorApi,
 {
     _phantom: PhantomData<M>,
     pub arg_id: ArgId,
 }
 
-impl<M> Copy for ArgErrorHandler<M> where M: ManagedTypeApi + ErrorApi {}
+impl<'a, M> Copy for ArgErrorHandler<'a, M> where M: ManagedTypeApi<'a> + ErrorApi {}
 
-impl<M> From<ArgId> for ArgErrorHandler<M>
+impl<'a, M> From<ArgId> for ArgErrorHandler<'a, M>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeApi<'a> + ErrorApi,
 {
     fn from(arg_id: ArgId) -> Self {
         ArgErrorHandler {
@@ -29,14 +29,14 @@ where
     }
 }
 
-impl<M> DecodeErrorHandler for ArgErrorHandler<M>
+impl<'a, M> DecodeErrorHandler for ArgErrorHandler<'a, M>
 where
-    M: ManagedTypeApi + ErrorApi,
+    M: ManagedTypeApi<'a> + ErrorApi,
 {
     type HandledErr = !;
 
     #[inline(always)]
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
-        signal_arg_de_error::<M>(self.arg_id, err)
+        signal_arg_de_error::<'a, M>(self.arg_id, err)
     }
 }

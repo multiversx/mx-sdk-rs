@@ -7,22 +7,22 @@ use crate::{
 use super::FunctionCall;
 
 #[must_use]
-pub struct AsyncCall<SA>
+pub struct AsyncCall<'a, SA>
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
 {
-    pub(crate) to: ManagedAddress<SA>,
-    pub(crate) egld_payment: BigUint<SA>,
-    pub(crate) function_call: FunctionCall<SA>,
-    pub(crate) callback_call: Option<CallbackClosure<SA>>,
+    pub(crate) to: ManagedAddress<'a, SA>,
+    pub(crate) egld_payment: BigUint<'a, SA>,
+    pub(crate) function_call: FunctionCall<'a, SA>,
+    pub(crate) callback_call: Option<CallbackClosure<'a, SA>>,
 }
 
 #[allow(clippy::return_self_not_must_use)]
-impl<SA> AsyncCall<SA>
+impl<'a, SA> AsyncCall<'a, SA>
 where
-    SA: CallTypeApi,
+    SA: CallTypeApi<'a>,
 {
-    pub fn with_callback(self, callback_call: CallbackClosure<SA>) -> Self {
+    pub fn with_callback(self, callback_call: CallbackClosure<'a, SA>) -> Self {
         AsyncCall {
             callback_call: Some(callback_call),
             ..self
@@ -30,12 +30,12 @@ where
     }
 }
 
-impl<SA> AsyncCall<SA>
+impl<'a, SA> AsyncCall<'a, SA>
 where
-    SA: CallTypeApi,
+    SA: CallTypeApi<'a>,
 {
     pub fn call_and_exit_ignore_callback(&self) -> ! {
-        SendRawWrapper::<SA>::new().async_call_raw(
+        SendRawWrapper::<'a, SA>::new().async_call_raw(
             &self.to,
             &self.egld_payment,
             &self.function_call.function_name,
@@ -44,14 +44,14 @@ where
     }
 }
 
-impl<SA> AsyncCall<SA>
+impl<'a, SA> AsyncCall<'a, SA>
 where
-    SA: CallTypeApi + StorageWriteApi,
+    SA: CallTypeApi<'a> + StorageWriteApi,
 {
     pub fn call_and_exit(&self) -> ! {
         // first, save the callback closure
         if let Some(callback_call) = &self.callback_call {
-            callback_call.save_to_storage::<SA>();
+            callback_call.save_to_storage::<'a, SA>();
         }
 
         // last, send the async call, which will kill the execution

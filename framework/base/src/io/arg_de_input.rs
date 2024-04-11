@@ -22,17 +22,17 @@ use crate::{
 /// This is a performance-critical struct.
 /// Since the wasm EndpointArgumentApi (VmApiImpl) is zero-size,
 /// it means that this structures translates to a single glorified i32 in wasm.
-pub struct ArgDecodeInput<AA>
+pub struct ArgDecodeInput<'a, AA>
 where
-    AA: ManagedTypeApi + EndpointArgumentApi,
+    AA: ManagedTypeApi<'a> + EndpointArgumentApi<'a>,
 {
     _phantom: PhantomData<AA>,
     arg_index: i32,
 }
 
-impl<AA> ArgDecodeInput<AA>
+impl<'a, AA> ArgDecodeInput<'a, AA>
 where
-    AA: ManagedTypeApi + EndpointArgumentApi,
+    AA: ManagedTypeApi<'a> + EndpointArgumentApi<'a>,
 {
     #[inline]
     pub fn new(arg_index: i32) -> Self {
@@ -42,31 +42,31 @@ where
         }
     }
 
-    fn to_managed_buffer(&self) -> ManagedBuffer<AA> {
+    fn to_managed_buffer(&self) -> ManagedBuffer<'a, AA> {
         let mbuf_handle: AA::ManagedBufferHandle =
             use_raw_handle(AA::static_var_api_impl().next_handle());
         AA::argument_api_impl().load_argument_managed_buffer(self.arg_index, mbuf_handle.clone());
         ManagedBuffer::from_handle(mbuf_handle)
     }
 
-    fn to_big_int(&self) -> BigInt<AA> {
+    fn to_big_int(&self) -> BigInt<'a, AA> {
         let bi_handle: AA::BigIntHandle = use_raw_handle(AA::static_var_api_impl().next_handle());
         AA::argument_api_impl().load_argument_big_int_signed(self.arg_index, bi_handle.clone());
         BigInt::from_handle(bi_handle)
     }
 
-    fn to_big_uint(&self) -> BigUint<AA> {
+    fn to_big_uint(&self) -> BigUint<'a, AA> {
         let bi_handle: AA::BigIntHandle = use_raw_handle(AA::static_var_api_impl().next_handle());
         AA::argument_api_impl().load_argument_big_int_unsigned(self.arg_index, bi_handle.clone());
         BigUint::from_handle(bi_handle)
     }
 }
 
-impl<AA> TopDecodeInput for ArgDecodeInput<AA>
+impl<'a, AA> TopDecodeInput for ArgDecodeInput<'a, AA>
 where
-    AA: ManagedTypeApi + EndpointArgumentApi,
+    AA: ManagedTypeApi<'a> + EndpointArgumentApi<'a>,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<AA>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<'a, AA>;
 
     #[inline]
     fn byte_len(&self) -> usize {
@@ -110,9 +110,9 @@ where
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<AA>>()
-            || T::type_eq::<BigUint<AA>>()
-            || T::type_eq::<BigInt<AA>>()
+        T::type_eq::<ManagedBuffer<'a, AA>>()
+            || T::type_eq::<BigUint<'a, AA>>()
+            || T::type_eq::<BigInt<'a, AA>>()
     }
 
     #[inline]

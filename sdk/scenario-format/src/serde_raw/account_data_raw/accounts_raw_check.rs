@@ -37,7 +37,7 @@ impl<'de> Visitor<'de> for CheckAccountsRawVisitor {
         formatter.write_str("serialized CheckAccountsRaw")
     }
 
-    fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, mut access: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {
@@ -91,7 +91,7 @@ impl<'de> Visitor<'de> for CheckAccountRawOrNothingVisitor {
         Ok(CheckAccountRawOrNothing(None))
     }
 
-    fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, map: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

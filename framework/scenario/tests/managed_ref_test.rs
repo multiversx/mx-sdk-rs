@@ -8,10 +8,10 @@ use multiversx_sc::{
 };
 use multiversx_sc_scenario::api::StaticApi;
 
-fn test_managed_ref_for_type<M, T>(obj: T)
+fn test_managed_ref_for_type<'a, M, T>(obj: T)
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + Clone + Debug + Eq,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + Clone + Debug + Eq,
 {
     let obj_ref = obj.as_ref();
     assert_eq!(

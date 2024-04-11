@@ -36,17 +36,17 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
         )
     }
 
-    pub fn from<A>(mut self, address: A) -> Self
+    pub fn from<'a, A>(mut self, address: A) -> Self
     where
-        AddressValue: From<A>,
+        AddressValue: From<'a, A>,
     {
         self.sc_deploy_step = self.sc_deploy_step.from(address);
         self
     }
 
-    pub fn egld_value<A>(mut self, amount: A) -> Self
+    pub fn egld_value<'a, A>(mut self, amount: A) -> Self
     where
-        BigUintValue: From<A>,
+        BigUintValue: From<'a, A>,
     {
         self.sc_deploy_step = self.sc_deploy_step.egld_value(amount);
         self

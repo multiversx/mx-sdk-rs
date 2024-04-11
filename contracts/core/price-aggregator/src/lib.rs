@@ -248,7 +248,7 @@ pub trait PriceAggregator:
     fn create_new_round(
         &self,
         token_pair: TokenPair<Self::Api>,
-        mut submissions: MapMapper<ManagedAddress, BigUint>,
+        mut submissions: MapMapper<'a, ManagedAddress, BigUint>,
         decimals: u8,
     ) {
         let submissions_len = submissions.len();
@@ -411,12 +411,12 @@ pub trait PriceAggregator:
     fn submission_count(&self) -> SingleValueMapper<usize>;
 
     #[storage_mapper("oracle_status")]
-    fn oracle_status(&self) -> MapMapper<ManagedAddress, OracleStatus>;
+    fn oracle_status(&self) -> MapMapper<'a, ManagedAddress, OracleStatus>;
 
     #[storage_mapper("rounds")]
     fn rounds(
         &self,
-    ) -> MapStorageMapper<TokenPair<Self::Api>, VecMapper<TimestampedPrice<Self::Api>>>;
+    ) -> MapStorageMapper<'a, TokenPair<Self::Api>, VecMapper<TimestampedPrice<Self::Api>>>;
 
     #[storage_mapper("first_submission_timestamp")]
     fn first_submission_timestamp(
@@ -433,5 +433,5 @@ pub trait PriceAggregator:
     #[storage_mapper("submissions")]
     fn submissions(
         &self,
-    ) -> MapStorageMapper<TokenPair<Self::Api>, MapMapper<ManagedAddress, BigUint>>;
+    ) -> MapStorageMapper<'a, TokenPair<Self::Api>, MapMapper<'a, ManagedAddress, BigUint>>;
 }

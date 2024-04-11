@@ -38,14 +38,14 @@ pub trait FeaturesModule {
 multiversx_sc::derive_imports!();
 
 #[derive(TopEncode)]
-pub struct FeatureName<M>(ManagedBuffer<M>)
+pub struct FeatureName<'a, M>(ManagedBuffer<'a, M>)
 where
     M: ManagedTypeApi;
 
 use multiversx_sc::codec::*;
-impl<M> NestedEncode for FeatureName<M>
+impl<'a, M> NestedEncode for FeatureName<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>

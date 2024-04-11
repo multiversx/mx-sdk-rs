@@ -8,10 +8,10 @@ use multiversx_sc::{
 };
 use multiversx_sc_scenario::api::StaticApi;
 
-fn test_some_for_value<M, T, F>(f: F)
+fn test_some_for_value<'a, M, T, F>(f: F)
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + Clone + Debug + Eq,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + Clone + Debug + Eq,
     F: Fn() -> T,
 {
     assert!(ManagedOption::some(f()).is_some());
@@ -19,19 +19,19 @@ where
     assert_eq!(ManagedOption::some(f()), ManagedOption::some(f()));
     assert_eq!(ManagedOption::from(Some(f())), ManagedOption::some(f()));
     assert_eq!(ManagedOption::some(f()).into_option(), Some(f()));
-    assert_ne!(ManagedOption::some(f()), ManagedOption::<M, T>::none());
+    assert_ne!(ManagedOption::some(f()), ManagedOption::<'a, M, T>::none());
 }
 
-fn test_none_for_type<M, T>()
+fn test_none_for_type<'a, M, T>()
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + Clone + Debug + Eq,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + Clone + Debug + Eq,
 {
-    assert!(ManagedOption::<M, T>::none().is_none());
-    assert_eq!(ManagedOption::<M, T>::none(), ManagedOption::<M, T>::none());
-    assert_eq!(ManagedOption::<M, T>::none(), ManagedOption::<M, T>::none());
-    assert_eq!(ManagedOption::from(None), ManagedOption::<M, T>::none());
-    assert_eq!(ManagedOption::<M, T>::none().into_option(), None);
+    assert!(ManagedOption::<'a, M, T>::none().is_none());
+    assert_eq!(ManagedOption::<'a, M, T>::none(), ManagedOption::<'a, M, T>::none());
+    assert_eq!(ManagedOption::<'a, M, T>::none(), ManagedOption::<'a, M, T>::none());
+    assert_eq!(ManagedOption::from(None), ManagedOption::<'a, M, T>::none());
+    assert_eq!(ManagedOption::<'a, M, T>::none().into_option(), None);
 }
 
 #[test]

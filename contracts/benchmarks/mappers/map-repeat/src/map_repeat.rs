@@ -32,7 +32,7 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[storage_mapper("benchmark")]
-    fn bench(&self) -> MapMapper<ManagedBuffer, ManagedBuffer>;
+    fn bench(&self) -> MapMapper<'a, ManagedBuffer, ManagedBuffer>;
 
     #[endpoint]
     fn add_struct(
@@ -62,5 +62,5 @@ pub trait MapRepeat: benchmark_common::BenchmarkCommon {
     }
 
     #[storage_mapper("bench_struct")]
-    fn bench_struct(&self) -> MapMapper<ExampleStruct<Self::Api>, ExampleStruct<Self::Api>>;
+    fn bench_struct(&self) -> MapMapper<'a, ExampleStruct<Self::Api>, ExampleStruct<Self::Api>>;
 }

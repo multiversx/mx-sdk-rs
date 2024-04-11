@@ -11,17 +11,17 @@ use crate::{
 ///
 /// Only used in `ArgNestedTuple`, do not use directly.
 #[derive(Default)]
-pub(super) struct EndpointSingleArgLoader<AA>
+pub(super) struct EndpointSingleArgLoader<'a, AA>
 where
-    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
+    AA: ManagedTypeApi<'a> + ErrorApi + EndpointArgumentApi<'a>,
 {
     _phantom: PhantomData<AA>,
     current_index: i32,
 }
 
-impl<AA> EndpointSingleArgLoader<AA>
+impl<'a, AA> EndpointSingleArgLoader<'a, AA>
 where
-    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
+    AA: ManagedTypeApi<'a> + ErrorApi + EndpointArgumentApi<'a>,
 {
     pub fn new(index: i32) -> Self {
         EndpointSingleArgLoader {
@@ -31,11 +31,11 @@ where
     }
 }
 
-impl<AA> TopDecodeMultiInput for EndpointSingleArgLoader<AA>
+impl<'a, AA> TopDecodeMultiInput for EndpointSingleArgLoader<'a, AA>
 where
-    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
+    AA: ManagedTypeApi<'a> + ErrorApi + EndpointArgumentApi<'a>,
 {
-    type ValueInput = ArgDecodeInput<AA>;
+    type ValueInput = ArgDecodeInput<'a, AA>;
 
     fn has_next(&self) -> bool {
         false

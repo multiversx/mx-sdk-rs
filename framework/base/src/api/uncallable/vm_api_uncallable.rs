@@ -2,9 +2,9 @@ use crate::api::{CallTypeApi, HandleTypeInfo, StorageMapperApi, VMApi};
 
 use super::UncallableApi;
 
-impl CallTypeApi for UncallableApi {}
+impl<'a> CallTypeApi<'a> for UncallableApi {}
 
-impl StorageMapperApi for UncallableApi {}
+impl<'a> StorageMapperApi<'a> for UncallableApi {}
 
 impl PartialEq for UncallableApi {
     fn eq(&self, _: &Self) -> bool {
@@ -14,7 +14,7 @@ impl PartialEq for UncallableApi {
 
 impl Eq for UncallableApi {}
 
-impl VMApi for UncallableApi {}
+impl<'a> VMApi<'a> for UncallableApi {}
 
 impl HandleTypeInfo for UncallableApi {
     type ManagedBufferHandle = i32;

@@ -8,8 +8,8 @@ pub const RIPEMD_RESULT_LEN: usize = 20;
 pub const ED25519_KEY_BYTE_LEN: usize = 32;
 pub const ED25519_SIGNATURE_BYTE_LEN: usize = 64;
 
-pub trait CryptoApi: ManagedTypeApi {
-    type CryptoApiImpl: CryptoApiImpl
+pub trait CryptoApi<'a>: ManagedTypeApi<'a> {
+    type CryptoApiImpl: CryptoApiImpl<'a>
         + HandleTypeInfo<
             ManagedBufferHandle = Self::ManagedBufferHandle,
             BigIntHandle = Self::BigIntHandle,
@@ -20,7 +20,7 @@ pub trait CryptoApi: ManagedTypeApi {
     fn crypto_api_impl() -> Self::CryptoApiImpl;
 }
 
-pub trait CryptoApiImpl: ManagedTypeApiImpl {
+pub trait CryptoApiImpl<'a>: ManagedTypeApiImpl<'a> {
     fn sha256_managed(
         &self,
         dest: Self::ManagedBufferHandle,

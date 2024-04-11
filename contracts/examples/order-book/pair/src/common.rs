@@ -15,15 +15,15 @@ pub enum OrderType {
 }
 
 #[derive(ManagedVecItem, Clone)]
-pub struct Payment<M: ManagedTypeApi> {
-    pub token_id: TokenIdentifier<M>,
-    pub amount: BigUint<M>,
+pub struct Payment<'a, M: ManagedTypeApi<'a>> {
+    pub token_id: TokenIdentifier<'a, M>,
+    pub amount: BigUint<'a, M>,
 }
 
 #[derive(ManagedVecItem, Clone)]
-pub struct Transfer<M: ManagedTypeApi> {
-    pub to: ManagedAddress<M>,
-    pub payment: Payment<M>,
+pub struct Transfer<'a, M: ManagedTypeApi<'a>> {
+    pub to: ManagedAddress<'a, M>,
+    pub payment: Payment<'a, M>,
 }
 
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
@@ -33,9 +33,9 @@ pub enum FeeConfigEnum {
 }
 
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct FeeConfig<M: ManagedTypeApi> {
+pub struct FeeConfig<'a, M: ManagedTypeApi<'a>> {
     pub fee_type: FeeConfigEnum,
-    pub fixed_fee: BigUint<M>,
+    pub fixed_fee: BigUint<'a, M>,
     pub percent_fee: u64,
 }
 
@@ -47,21 +47,21 @@ pub struct DealConfig {
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, Clone)]
-pub struct OrderInputParams<M: ManagedTypeApi> {
-    pub amount: BigUint<M>,
-    pub match_provider: ManagedAddress<M>,
-    pub fee_config: FeeConfig<M>,
+pub struct OrderInputParams<'a, M: ManagedTypeApi<'a>> {
+    pub amount: BigUint<'a, M>,
+    pub match_provider: ManagedAddress<'a, M>,
+    pub fee_config: FeeConfig<'a, M>,
     pub deal_config: DealConfig,
 }
 
 #[derive(ManagedVecItem, TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct Order<M: ManagedTypeApi> {
+pub struct Order<'a, M: ManagedTypeApi<'a>> {
     pub id: u64,
-    pub creator: ManagedAddress<M>,
-    pub match_provider: ManagedAddress<M>,
-    pub input_amount: BigUint<M>,
-    pub output_amount: BigUint<M>,
-    pub fee_config: FeeConfig<M>,
+    pub creator: ManagedAddress<'a, M>,
+    pub match_provider: ManagedAddress<'a, M>,
+    pub input_amount: BigUint<'a, M>,
+    pub output_amount: BigUint<'a, M>,
+    pub fee_config: FeeConfig<'a, M>,
     pub deal_config: DealConfig,
     pub create_epoch: u64,
     pub order_type: OrderType,

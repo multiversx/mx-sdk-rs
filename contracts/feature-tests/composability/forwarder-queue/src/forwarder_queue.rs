@@ -13,13 +13,13 @@ pub enum QueuedCallType {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct QueuedCall<M: ManagedTypeApi> {
+pub struct QueuedCall<'a, M: ManagedTypeApi<'a>> {
     pub call_type: QueuedCallType,
-    pub to: ManagedAddress<M>,
+    pub to: ManagedAddress<'a, M>,
     pub gas_limit: u64,
-    pub endpoint_name: ManagedBuffer<M>,
-    pub args: ManagedArgBuffer<M>,
-    pub payments: EgldOrMultiEsdtPayment<M>,
+    pub endpoint_name: ManagedBuffer<'a, M>,
+    pub args: ManagedArgBuffer<'a, M>,
+    pub payments: EgldOrMultiEsdtPayment<'a, M>,
 }
 
 /// Testing multiple calls per transaction.
@@ -30,7 +30,7 @@ pub trait ForwarderQueue {
 
     #[view]
     #[storage_mapper("queued_calls")]
-    fn queued_calls(&self) -> LinkedListMapper<QueuedCall<Self::Api>>;
+    fn queued_calls(&self) -> LinkedListMapper<'a, QueuedCall<Self::Api>>;
 
     #[endpoint]
     #[payable("*")]

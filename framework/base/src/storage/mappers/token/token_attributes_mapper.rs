@@ -23,19 +23,19 @@ const VALUE_NOT_PREVIOUSLY_SET_ERROR_MESSAGE: &[u8] = b"A value was not previous
 const COUNTER_OVERFLOW_ERROR_MESSAGE: &[u8] =
     b"Counter overflow. This module can hold evidence for maximum u8::MAX different token IDs";
 
-pub struct TokenAttributesMapper<SA>
+pub struct TokenAttributesMapper<'a, SA>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
     _phantom_api: PhantomData<SA>,
-    base_key: StorageKey<SA>,
+    base_key: StorageKey<'a, SA>,
 }
 
-impl<SA> StorageMapper<SA> for TokenAttributesMapper<SA>
+impl<'a, SA> StorageMapper<'a, SA> for TokenAttributesMapper<'a, SA>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         TokenAttributesMapper {
             _phantom_api: PhantomData,
             base_key,
@@ -43,13 +43,13 @@ where
     }
 }
 
-impl<SA> TokenAttributesMapper<SA>
+impl<'a, SA> TokenAttributesMapper<'a, SA>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    pub fn set<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
+    pub fn set<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         token_nonce: u64,
         attributes: &T,
     ) {
@@ -79,9 +79,9 @@ where
     }
 
     ///Use carefully. Update should be used mainly when backed up by the protocol.
-    pub fn update<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
+    pub fn update<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         token_nonce: u64,
         attributes: &T,
     ) {
@@ -103,9 +103,9 @@ where
         self.set_attributes_to_nonce_mapping(mapping, attributes, token_nonce);
     }
 
-    pub fn clear<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
+    pub fn clear<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         token_nonce: u64,
     ) {
         let has_mapping = self.has_mapping_value(token_id);
@@ -124,9 +124,9 @@ where
         self.clear_attributes_to_nonce_mapping(mapping, &attr);
     }
 
-    pub fn has_attributes<M: ManagedTypeApi>(
+    pub fn has_attributes<M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         token_nonce: u64,
     ) -> bool {
         let has_mapping = self.has_mapping_value(token_id);
@@ -138,9 +138,9 @@ where
         self.is_empty_token_attributes_value(mapping, token_nonce)
     }
 
-    pub fn has_nonce<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
+    pub fn has_nonce<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         attr: &T,
     ) -> bool {
         let has_mapping = self.has_mapping_value(token_id);
@@ -154,10 +154,10 @@ where
 
     pub fn get_attributes<
         T: TopEncode + TopDecode + NestedEncode + NestedDecode,
-        M: ManagedTypeApi,
+        M: ManagedTypeApi<'a>,
     >(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         token_nonce: u64,
     ) -> T {
         let has_mapping = self.has_mapping_value(token_id);
@@ -174,9 +174,9 @@ where
         self.get_token_attributes_value(mapping, token_nonce)
     }
 
-    pub fn get_nonce<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi>(
+    pub fn get_nonce<T: TopEncode + TopDecode + NestedEncode + NestedDecode, M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
+        token_id: &TokenIdentifier<'a, M>,
         attr: &T,
     ) -> u64 {
         let has_mapping = self.has_mapping_value(token_id);
@@ -193,7 +193,7 @@ where
         self.get_attributes_to_nonce_mapping(mapping, attr)
     }
 
-    fn has_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
+    fn has_mapping_value<M: ManagedTypeApi<'a>>(&self, token_id: &TokenIdentifier<'a, M>) -> bool {
         !self.is_empty_mapping_value(token_id)
     }
 
@@ -209,23 +209,23 @@ where
         !self.is_empty_attributes_to_nonce_mapping(mapping, attr)
     }
 
-    fn build_key_token_id_counter(&self) -> StorageKey<SA> {
+    fn build_key_token_id_counter(&self) -> StorageKey<'a, SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(COUNTER_SUFFIX);
         key
     }
 
-    fn build_key_token_id_mapping<M: ManagedTypeApi>(
+    fn build_key_token_id_mapping<M: ManagedTypeApi<'a>>(
         &self,
-        token_id: &TokenIdentifier<M>,
-    ) -> StorageKey<SA> {
+        token_id: &TokenIdentifier<'a, M>,
+    ) -> StorageKey<'a, SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(MAPPING_SUFFIX);
         key.append_item(token_id);
         key
     }
 
-    fn build_key_token_attr_value(&self, mapping: u8, token_nonce: u64) -> StorageKey<SA> {
+    fn build_key_token_attr_value(&self, mapping: u8, token_nonce: u64) -> StorageKey<'a, SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(ATTR_SUFFIX);
         key.append_item(&mapping);
@@ -237,7 +237,7 @@ where
         &self,
         mapping: u8,
         attr: &T,
-    ) -> StorageKey<SA> {
+    ) -> StorageKey<'a, SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(NONCE_SUFFIX);
         key.append_item(&mapping);
@@ -253,15 +253,15 @@ where
         storage_set(self.build_key_token_id_counter().as_ref(), &value);
     }
 
-    fn get_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> u8 {
+    fn get_mapping_value<M: ManagedTypeApi<'a>>(&self, token_id: &TokenIdentifier<'a, M>) -> u8 {
         storage_get(self.build_key_token_id_mapping(token_id).as_ref())
     }
 
-    fn set_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>, value: u8) {
+    fn set_mapping_value<M: ManagedTypeApi<'a>>(&self, token_id: &TokenIdentifier<'a, M>, value: u8) {
         storage_set(self.build_key_token_id_mapping(token_id).as_ref(), &value);
     }
 
-    fn is_empty_mapping_value<M: ManagedTypeApi>(&self, token_id: &TokenIdentifier<M>) -> bool {
+    fn is_empty_mapping_value<M: ManagedTypeApi<'a>>(&self, token_id: &TokenIdentifier<'a, M>) -> bool {
         storage_get_len(self.build_key_token_id_mapping(token_id).as_ref()) == 0
     }
 

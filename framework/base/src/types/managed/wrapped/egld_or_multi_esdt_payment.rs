@@ -18,9 +18,9 @@ use crate::derive::TypeAbi;
 #[derive(
     TopDecode, TopEncode, TypeAbi, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug,
 )]
-pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {
-    Egld(BigUint<M>),
-    MultiEsdt(ManagedVec<M, EsdtTokenPayment<M>>),
+pub enum EgldOrMultiEsdtPayment<'a, M: ManagedTypeApi<'a>> {
+    Egld(BigUint<'a, M>),
+    MultiEsdt(ManagedVec<'a, M, EsdtTokenPayment<'a, M>>),
 }
 
-impl<M> CodecFromSelf for EgldOrMultiEsdtPayment<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFromSelf for EgldOrMultiEsdtPayment<'a, M> where M: ManagedTypeApi<'a> {}

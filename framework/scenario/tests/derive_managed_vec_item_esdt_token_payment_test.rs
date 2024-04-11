@@ -15,11 +15,11 @@ const ETH_ADDR_WIDTH: usize = 20;
 #[derive(
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
-pub struct ManagedStructWithToken<M: ManagedTypeApi> {
-    pub token: multiversx_sc::types::EsdtTokenPayment<M>,
+pub struct ManagedStructWithToken<'a, M: ManagedTypeApi<'a>> {
+    pub token: multiversx_sc::types::EsdtTokenPayment<'a, M>,
     pub num: u32,
-    pub eth_address_1: ManagedByteArray<M, ETH_ADDR_WIDTH>,
-    pub eth_address_2: ManagedByteArray<M, 20>, // const generic also works
+    pub eth_address_1: ManagedByteArray<'a, M, ETH_ADDR_WIDTH>,
+    pub eth_address_2: ManagedByteArray<'a, M, 20>, // const generic also works
 }
 
 #[test]

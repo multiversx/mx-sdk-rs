@@ -11,8 +11,8 @@ use crate::{api::ManagedTypeApi, types::ManagedType};
 /// It copies the handle and knows how to deref back.
 pub struct ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M>,
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) _phantom_t: PhantomData<&'a T>,
@@ -21,8 +21,8 @@ where
 
 impl<'a, M, T> ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M>,
 {
     pub fn new(value: &'a T) -> Self {
         Self {
@@ -51,8 +51,8 @@ where
 
 impl<'a, M, T> ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + Clone,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + Clone,
 {
     pub fn clone_value(&self) -> T {
         self.deref().clone()
@@ -61,8 +61,8 @@ where
 
 impl<'a, M, T> Clone for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M>,
 {
     #[inline]
     fn clone(&self) -> Self {
@@ -76,8 +76,8 @@ where
 
 impl<'a, M, T> Deref for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M>,
 {
     type Target = T;
 
@@ -89,8 +89,8 @@ where
 
 impl<'a, M, T> Borrow<T> for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M>,
 {
     #[inline]
     fn borrow(&self) -> &T {
@@ -100,8 +100,8 @@ where
 
 impl<'a, M, T> From<&'a T> for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M>,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M>,
 {
     #[inline]
     fn from(value_ref: &'a T) -> Self {
@@ -111,8 +111,8 @@ where
 
 impl<'a, M, T> PartialEq for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + PartialEq,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + PartialEq,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -122,15 +122,15 @@ where
 
 impl<'a, M, T> Eq for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + PartialEq,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + PartialEq,
 {
 }
 
 impl<'a, M, T> TopEncode for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + TopEncode,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + TopEncode,
 {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -144,8 +144,8 @@ where
 
 impl<'a, M, T> NestedEncode for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + NestedEncode,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + NestedEncode,
 {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -159,8 +159,8 @@ where
 
 impl<'a, M, T> core::fmt::Debug for ManagedRef<'a, M, T>
 where
-    M: ManagedTypeApi,
-    T: ManagedType<M> + core::fmt::Debug,
+    M: ManagedTypeApi<'a>,
+    T: ManagedType<'a, M> + core::fmt::Debug,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_tuple("ManagedRef").field(self.deref()).finish()

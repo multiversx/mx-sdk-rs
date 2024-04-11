@@ -13,7 +13,7 @@ use crate::{
 /// in the underlying managed buffer.
 /// Not all data needs to be stored as payload, for instance for most managed types
 /// the payload is just the handle, whereas the mai ndata is kept by the VM.
-pub trait ManagedVecItem: 'static {
+pub trait ManagedVecItem: 'static + Sized {
     /// Size of the data stored in the underlying `ManagedBuffer`.
     const PAYLOAD_SIZE: usize;
 
@@ -30,7 +30,7 @@ pub trait ManagedVecItem: 'static {
     /// - For managed types, ManagedRef does the job.
     /// - For any other types, `Self` is currently used, although this is technically unsafe.
     /// TODO: wrap other types in readonly wrapper.
-    type Ref<'a>: Borrow<Self>;
+    type Ref<'b>: Borrow<Self>;
 
     /// Parses given bytes as a an owned object.
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
@@ -40,11 +40,13 @@ pub trait ManagedVecItem: 'static {
     /// # Safety
     ///
     /// In certain cases this involves practically disregarding the lifetimes, hence it is unsafe.
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a>;
+    ) -> Self::Ref<'b>;
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R;
+
+    fn take_handle_ownership(self);
 }
 
 macro_rules! impl_int {
@@ -52,15 +54,15 @@ macro_rules! impl_int {
         impl ManagedVecItem for $ty {
             const PAYLOAD_SIZE: usize = $payload_size;
             const SKIPS_RESERIALIZATION: bool = true;
-            type Ref<'a> = Self;
+            type Ref<'b> = Self;
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
                 let mut arr: [u8; $payload_size] = [0u8; $payload_size];
                 reader(&mut arr[..]);
                 $ty::from_be_bytes(arr)
             }
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+            unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
-            ) -> Self::Ref<'a> {
+            ) -> Self::Ref<'b> {
                 Self::from_byte_reader(reader)
             }
 
@@ -68,6 +70,8 @@ macro_rules! impl_int {
                 let bytes = self.to_be_bytes();
                 writer(&bytes)
             }
+
+            fn take_handle_ownership(self) {}
         }
     };
 }
@@ -81,7 +85,7 @@ impl_int! {i64, 8}
 impl ManagedVecItem for usize {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = true;
-    type Ref<'a> = Self;
+    type Ref<'b> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
         let mut arr: [u8; 4] = [0u8; 4];
@@ -89,9 +93,9 @@ impl ManagedVecItem for usize {
         u32::from_be_bytes(arr) as usize
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         Self::from_byte_reader(reader)
     }
 
@@ -99,20 +103,22 @@ impl ManagedVecItem for usize {
         let bytes = (*self as u32).to_be_bytes();
         writer(&bytes)
     }
+
+    fn take_handle_ownership(self) {}
 }
 
 impl ManagedVecItem for bool {
     const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = true;
-    type Ref<'a> = Self;
+    type Ref<'b> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         u8::from_byte_reader(reader) > 0
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         Self::from_byte_reader(reader)
     }
 
@@ -122,6 +128,8 @@ impl ManagedVecItem for bool {
         let u8_value = u8::from(*self);
         <u8 as ManagedVecItem>::to_byte_writer(&u8_value, writer)
     }
+
+    fn take_handle_ownership(self) {}
 }
 
 impl<T> ManagedVecItem for Option<T>
@@ -131,7 +139,7 @@ where
 {
     const PAYLOAD_SIZE: usize = 1 + T::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = Self;
+    type Ref<'b> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
         let mut byte_arr: [u8; 1 + T::PAYLOAD_SIZE] = [0u8; 1 + T::PAYLOAD_SIZE];
@@ -145,9 +153,9 @@ where
         }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         Self::from_byte_reader(reader)
     }
 
@@ -161,29 +169,39 @@ where
         }
         writer(&byte_arr[..])
     }
+
+    fn take_handle_ownership(self) {
+        if let Some(value) = self {
+            value.take_handle_ownership();
+        }
+    }
 }
 
 macro_rules! impl_managed_type {
     ($ty:ident) => {
-        impl<M: ManagedTypeApi> ManagedVecItem for $ty<M> {
+        impl<'a, M: ManagedTypeApi<'a>> ManagedVecItem for $ty<'a, M> {
             const PAYLOAD_SIZE: usize = 4;
             const SKIPS_RESERIALIZATION: bool = false;
-            type Ref<'a> = ManagedRef<'a, M, Self>;
+            type Ref<'b> = ManagedRef<'a, M, Self>;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+                let handle = <$ty<'a, M> as ManagedType<'a, M>>::OwnHandle::from_byte_reader(reader);
                 $ty::from_handle(handle)
             }
 
-            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+            unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
                 reader: Reader,
-            ) -> Self::Ref<'a> {
-                let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+            ) -> Self::Ref<'b> {
+                let handle = <$ty<'a, M> as ManagedType<'a, M>>::OwnHandle::from_byte_reader(reader);
                 ManagedRef::wrap_handle(handle)
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-                <$ty<M> as ManagedType<M>>::OwnHandle::to_byte_writer(&self.get_handle(), writer)
+                <$ty<'a, M> as ManagedType<'a, M>>::OwnHandle::to_byte_writer(&self.get_handle(), writer)
+            }
+
+            fn take_handle_ownership(self) {
+               self.take_handle();
             }
         }
     };
@@ -196,31 +214,35 @@ impl_managed_type! {EllipticCurve}
 impl_managed_type! {ManagedAddress}
 impl_managed_type! {TokenIdentifier}
 
-impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
+impl<'a, M, const N: usize> ManagedVecItem for ManagedByteArray<'a, M, N>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = ManagedRef<'a, M, Self>;
+    type Ref<'b> = ManagedRef<'a, M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
-        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+        let handle = <Self as ManagedType<'a, M>>::OwnHandle::from_byte_reader(reader);
         Self::from_handle(handle)
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
-        let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
+    ) -> Self::Ref<'b> {
+        let handle = <Self as ManagedType<'a, M>>::OwnHandle::from_byte_reader(reader);
         ManagedRef::wrap_handle(handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <<Self as ManagedType<M>>::OwnHandle as ManagedVecItem>::to_byte_writer(
+        <<Self as ManagedType<'a, M>>::OwnHandle as ManagedVecItem>::to_byte_writer(
             &self.get_handle(),
             writer,
         )
+    }
+
+    fn take_handle_ownership(self) {
+        self.buffer.take_handle_ownership()
     }
 }
 
@@ -231,7 +253,7 @@ where
 {
     const PAYLOAD_SIZE: usize = T::PAYLOAD_SIZE * N;
     const SKIPS_RESERIALIZATION: bool = T::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
+    type Ref<'b> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
         let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
@@ -248,9 +270,9 @@ where
         result
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         Self::from_byte_reader(reader)
     }
 
@@ -266,30 +288,36 @@ where
         }
         writer(&byte_arr[..])
     }
+
+    fn take_handle_ownership(self) {}
 }
 
-impl<M, T> ManagedVecItem for ManagedVec<M, T>
+impl<'a, M, T> ManagedVecItem for ManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = ManagedRef<'a, M, Self>;
+    type Ref<'b> = ManagedRef<'a, M, Self>;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = M::ManagedBufferHandle::from_byte_reader(reader);
         Self::from_handle(handle)
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         let handle = M::ManagedBufferHandle::from_byte_reader(reader);
         ManagedRef::wrap_handle(handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         <M::ManagedBufferHandle as ManagedVecItem>::to_byte_writer(&self.get_handle(), writer)
+    }
+
+    fn take_handle_ownership(self) {
+        self.buffer.take_handle_ownership()
     }
 }

@@ -2,12 +2,12 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct CallbackData<M: ManagedTypeApi> {
-    callback_name: ManagedBuffer<M>,
-    token_identifier: EgldOrEsdtTokenIdentifier<M>,
+pub struct CallbackData<'a, M: ManagedTypeApi<'a>> {
+    callback_name: ManagedBuffer<'a, M>,
+    token_identifier: EgldOrEsdtTokenIdentifier<'a, M>,
     token_nonce: u64,
-    token_amount: BigUint<M>,
-    args: ManagedVec<M, ManagedBuffer<M>>,
+    token_amount: BigUint<'a, M>,
+    args: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
 }
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
@@ -209,7 +209,7 @@ pub trait ForwarderAsyncCallModule {
         EgldOrEsdtTokenIdentifier,
         u64,
         BigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
+        MultiValueManagedVec<'a, Self::Api, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);
         (

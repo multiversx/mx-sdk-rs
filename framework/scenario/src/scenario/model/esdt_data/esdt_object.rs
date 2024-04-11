@@ -25,7 +25,7 @@ impl EsdtObject {
     pub fn set_balance<N, A>(&mut self, token_nonce_expr: N, amount_expr: A)
     where
         U64Value: From<N>,
-        BigUintValue: From<A>,
+        BigUintValue: From<'a, A>,
     {
         let amount = BigUintValue::from(amount_expr);
         let inst_for_nonce = self.get_or_insert_instance_for_nonce(token_nonce_expr);

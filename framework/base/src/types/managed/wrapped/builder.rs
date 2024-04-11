@@ -9,10 +9,10 @@ pub use managed_buffer_builder_impl_basic::ManagedBufferBuilderImplBasic;
 pub use managed_buffer_builder_impl_cached::ManagedBufferBuilderImplCached;
 
 #[deprecated(since = "0.48.0", note = "Renamed to ManagedBufferBuilder.")]
-pub type ManagedBufferCachedBuilder<M> = ManagedBufferBuilder<M>;
+pub type ManagedBufferCachedBuilder<'a, M> = ManagedBufferBuilder<'a, M>;
 
 #[cfg(feature = "managed-buffer-builder-cached")]
-pub type ManagedBufferImplDefault<M> = ManagedBufferBuilderImplCached<M>;
+pub type ManagedBufferImplDefault<'a, M> = ManagedBufferBuilderImplCached<'a, M>;
 
 #[cfg(not(feature = "managed-buffer-builder-cached"))]
-pub type ManagedBufferImplDefault<M> = ManagedBufferBuilderImplBasic<M>;
+pub type ManagedBufferImplDefault<'a, M> = ManagedBufferBuilderImplBasic<'a, M>;

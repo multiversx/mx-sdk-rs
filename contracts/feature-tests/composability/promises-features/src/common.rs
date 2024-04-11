@@ -2,12 +2,12 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct CallbackData<M: ManagedTypeApi> {
-    pub callback_name: ManagedBuffer<M>,
-    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
+pub struct CallbackData<'a, M: ManagedTypeApi<'a>> {
+    pub callback_name: ManagedBuffer<'a, M>,
+    pub token_identifier: EgldOrEsdtTokenIdentifier<'a, M>,
     pub token_nonce: u64,
-    pub token_amount: BigUint<M>,
-    pub args: ManagedVec<M, ManagedBuffer<M>>,
+    pub token_amount: BigUint<'a, M>,
+    pub args: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
 }
 
 #[multiversx_sc::module]
@@ -33,7 +33,7 @@ pub trait CommonModule {
         EgldOrEsdtTokenIdentifier,
         u64,
         BigUint,
-        MultiValueManagedVec<Self::Api, ManagedBuffer>,
+        MultiValueManagedVec<'a, Self::Api, ManagedBuffer>,
     > {
         let cb_data = self.callback_data().get(index);
         (

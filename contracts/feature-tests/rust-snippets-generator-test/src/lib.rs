@@ -19,8 +19,8 @@ multiversx_sc::derive_imports!();
 #[derive(
     TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, ManagedVecItem, Debug, Clone,
 )]
-pub struct MyCoolStruct<M: ManagedTypeApi> {
-    pub awesome: BigUint<M>,
+pub struct MyCoolStruct<'a, M: ManagedTypeApi<'a>> {
+    pub awesome: BigUint<'a, M>,
 }
 
 #[multiversx_sc::contract]

@@ -36,17 +36,17 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
         self
     }
 
-    pub fn argument<A>(mut self, expr: A) -> Self
+    pub fn argument<'a, A>(mut self, expr: A) -> Self
     where
-        BytesValue: From<A>,
+        BytesValue: From<'a, A>,
     {
         self.sc_query_step.tx.arguments.push(BytesValue::from(expr));
         self
     }
 
-    pub fn to<A>(mut self, address: A) -> Self
+    pub fn to<'a, A>(mut self, address: A) -> Self
     where
-        AddressValue: From<A>,
+        AddressValue: From<'a, A>,
     {
         self.sc_query_step.tx.to = AddressValue::from(address);
         self

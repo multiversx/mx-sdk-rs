@@ -56,25 +56,25 @@ where
     }
 }
 
-pub struct OrderedBinaryTreeMapper<SA, T, A = CurrentStorage>
+pub struct OrderedBinaryTreeMapper<'a, SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
     address: A,
-    key: StorageKey<SA>,
+    key: StorageKey<'a, SA>,
     _phantom_api: PhantomData<SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for OrderedBinaryTreeMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageMapper<'a, SA> for OrderedBinaryTreeMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone + 'static,
 {
     #[inline]
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         OrderedBinaryTreeMapper {
             address: CurrentStorage,
             key: base_key,
@@ -84,10 +84,10 @@ where
     }
 }
 
-impl<SA, T, A> OrderedBinaryTreeMapper<SA, T, A>
+impl<'a, SA, T, A> OrderedBinaryTreeMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
     pub fn get_root(&self) -> Option<OrderedBinaryTreeNode<T>> {
@@ -391,10 +391,10 @@ where
     }
 }
 
-impl<SA, T, A> OrderedBinaryTreeMapper<SA, T, A>
+impl<'a, SA, T, A> OrderedBinaryTreeMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: NestedEncode + NestedDecode + PartialOrd + PartialEq + Clone,
 {
     fn get_node_by_id(&self, id: NodeId) -> Option<OrderedBinaryTreeNode<T>> {
@@ -420,14 +420,14 @@ where
         unsafe { opt_node.unwrap_unchecked() }
     }
 
-    fn build_root_id_key(&self) -> StorageKey<SA> {
+    fn build_root_id_key(&self) -> StorageKey<'a, SA> {
         let mut key = self.key.clone();
         key.append_bytes(ROOT_ID_SUFFIX);
 
         key
     }
 
-    fn build_root_key(&self) -> StorageKey<SA> {
+    fn build_root_key(&self) -> StorageKey<'a, SA> {
         let mut key = self.key.clone();
         key.append_bytes(ROOT_ID_SUFFIX);
 
@@ -436,7 +436,7 @@ where
         self.build_key_for_item(root_id)
     }
 
-    fn build_key_for_item(&self, id: NodeId) -> StorageKey<SA> {
+    fn build_key_for_item(&self, id: NodeId) -> StorageKey<'a, SA> {
         let mut item_key = self.key.clone();
         item_key.append_bytes(ID_SUFFIX);
         item_key.append_item(&id);
@@ -444,7 +444,7 @@ where
         item_key
     }
 
-    fn build_last_id_key(&self) -> StorageKey<SA> {
+    fn build_last_id_key(&self) -> StorageKey<'a, SA> {
         let mut key = self.key.clone();
         key.append_bytes(LAST_ID_KEY_SUFFIX);
 

@@ -4,7 +4,7 @@ use crate::api::{use_raw_handle, BigFloatApiImpl, ManagedTypeApi, StaticVarApiIm
 
 use super::{BigFloat, BigInt};
 
-impl<M: ManagedTypeApi> PartialEq for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialEq for BigFloat<'a, M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         M::managed_type_impl()
@@ -13,23 +13,23 @@ impl<M: ManagedTypeApi> PartialEq for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> Eq for BigFloat<M> {}
+impl<'a, M: ManagedTypeApi<'a>> Eq for BigFloat<'a, M> {}
 
-impl<M: ManagedTypeApi> PartialOrd for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialOrd for BigFloat<'a, M> {
     #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl<M: ManagedTypeApi> Ord for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> Ord for BigFloat<'a, M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         M::managed_type_impl().bf_cmp(self.handle.clone(), other.handle.clone())
     }
 }
 
-fn cmp_i64<M: ManagedTypeApi>(bf: &BigFloat<M>, other: i64) -> Ordering {
+fn cmp_i64<'a, M: ManagedTypeApi<'a>>(bf: &BigFloat<'a, M>, other: i64) -> Ordering {
     if other == 0 {
         match M::managed_type_impl().bf_sign(bf.handle.clone()) {
             crate::api::Sign::Plus => Ordering::Greater,
@@ -44,36 +44,36 @@ fn cmp_i64<M: ManagedTypeApi>(bf: &BigFloat<M>, other: i64) -> Ordering {
     }
 }
 
-fn cmp_bi<M: ManagedTypeApi>(bf: &BigFloat<M>, other: &BigInt<M>) -> Ordering {
+fn cmp_bi<'a, M: ManagedTypeApi<'a>>(bf: &BigFloat<'a, M>, other: &BigInt<'a, M>) -> Ordering {
     let new_bf_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
     M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), other.handle.clone());
     M::managed_type_impl().bf_cmp(bf.handle.clone(), new_bf_handle)
 }
 
-impl<M: ManagedTypeApi> PartialEq<i64> for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialEq<i64> for BigFloat<'a, M> {
     #[inline]
     fn eq(&self, other: &i64) -> bool {
         cmp_i64(self, *other).is_eq()
     }
 }
 
-impl<M: ManagedTypeApi> PartialOrd<i64> for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialOrd<i64> for BigFloat<'a, M> {
     #[inline]
     fn partial_cmp(&self, other: &i64) -> Option<Ordering> {
         Some(cmp_i64(self, *other))
     }
 }
 
-impl<M: ManagedTypeApi> PartialEq<BigInt<M>> for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialEq<BigInt<'a, M>> for BigFloat<'a, M> {
     #[inline]
-    fn eq(&self, other: &BigInt<M>) -> bool {
+    fn eq(&self, other: &BigInt<'a, M>) -> bool {
         cmp_bi(self, other).is_eq()
     }
 }
 
-impl<M: ManagedTypeApi> PartialOrd<BigInt<M>> for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialOrd<BigInt<'a, M>> for BigFloat<'a, M> {
     #[inline]
-    fn partial_cmp(&self, other: &BigInt<M>) -> Option<Ordering> {
+    fn partial_cmp(&self, other: &BigInt<'a, M>) -> Option<Ordering> {
         Some(cmp_bi(self, other))
     }
 }

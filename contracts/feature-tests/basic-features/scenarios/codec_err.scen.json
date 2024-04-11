@@ -12,6 +12,20 @@
             }
         },
         {
+            "step": "scQuery",
+            "id": "codec_err_storage_key",
+            "tx": {
+                "to": "sc:basic-features",
+                "function": "codec_err_storage_key",
+                "arguments": []
+            },
+            "expect": {
+                "out": [],
+                "status": "4",
+                "message": "str:storage key encode error: deliberate nested encode error"
+            }
+        },
+        {
             "step": "scCall",
             "id": "codec_err_finish",
             "tx": {
@@ -26,20 +40,6 @@
                 "out": [],
                 "status": "4",
                 "message": "str:endpoint result encode error: deliberate top encode error"
-            }
-        },
-        {
-            "step": "scQuery",
-            "id": "codec_err_storage_key",
-            "tx": {
-                "to": "sc:basic-features",
-                "function": "codec_err_storage_key",
-                "arguments": []
-            },
-            "expect": {
-                "out": [],
-                "status": "4",
-                "message": "str:storage key encode error: deliberate nested encode error"
             }
         },
         {

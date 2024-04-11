@@ -19,19 +19,19 @@ const DECODE_ATTRIBUTE_ERROR_PREFIX: &[u8] = b"error decoding ESDT attributes: "
 #[derive(
     Clone, TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Debug, ManagedVecItem,
 )]
-pub struct EsdtTokenData<M: ManagedTypeApi> {
+pub struct EsdtTokenData<'a, M: ManagedTypeApi<'a>> {
     pub token_type: EsdtTokenType,
-    pub amount: BigUint<M>,
+    pub amount: BigUint<'a, M>,
     pub frozen: bool,
-    pub hash: ManagedBuffer<M>,
-    pub name: ManagedBuffer<M>,
-    pub attributes: ManagedBuffer<M>,
-    pub creator: ManagedAddress<M>,
-    pub royalties: BigUint<M>,
-    pub uris: ManagedVec<M, ManagedBuffer<M>>,
+    pub hash: ManagedBuffer<'a, M>,
+    pub name: ManagedBuffer<'a, M>,
+    pub attributes: ManagedBuffer<'a, M>,
+    pub creator: ManagedAddress<'a, M>,
+    pub royalties: BigUint<'a, M>,
+    pub uris: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
 }
 
-impl<M: ManagedTypeApi> Default for EsdtTokenData<M> {
+impl<'a, M: ManagedTypeApi<'a>> Default for EsdtTokenData<'a, M> {
     fn default() -> Self {
         EsdtTokenData {
             token_type: EsdtTokenType::Fungible,
@@ -47,7 +47,7 @@ impl<M: ManagedTypeApi> Default for EsdtTokenData<M> {
     }
 }
 
-impl<M: ManagedTypeApi> EsdtTokenData<M> {
+impl<'a, M: ManagedTypeApi<'a>> EsdtTokenData<'a, M> {
     pub fn try_decode_attributes<T: TopDecode>(&self) -> Result<T, DecodeError> {
         T::top_decode(self.attributes.clone()) // TODO: remove clone
     }
@@ -55,7 +55,7 @@ impl<M: ManagedTypeApi> EsdtTokenData<M> {
     pub fn decode_attributes<T: TopDecode>(&self) -> T {
         let Ok(value) = T::top_decode_or_handle_err(
             self.attributes.clone(), // TODO: remove clone
-            ExitCodecErrorHandler::<M>::from(DECODE_ATTRIBUTE_ERROR_PREFIX),
+            ExitCodecErrorHandler::<'a, M>::from(DECODE_ATTRIBUTE_ERROR_PREFIX),
         );
         value
     }

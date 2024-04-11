@@ -2,9 +2,9 @@ use crate::api::ManagedTypeApi;
 
 use super::{ManagedVec, ManagedVecItem};
 
-impl<'a, M, T> IntoIterator for &'a ManagedVec<M, T>
+impl<'a, M, T> IntoIterator for &'a ManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     type Item = T;
@@ -16,20 +16,20 @@ where
 
 pub struct ManagedVecOwnedIterator<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
-    managed_vec: &'a ManagedVec<M, T>,
+    managed_vec: &'a ManagedVec<'a, M, T>,
     byte_start: usize,
     byte_end: usize,
 }
 
 impl<'a, M, T> ManagedVecOwnedIterator<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
-    pub(crate) fn new(managed_vec: &'a ManagedVec<M, T>) -> Self {
+    pub(crate) fn new(managed_vec: &'a ManagedVec<'a, M, T>) -> Self {
         let byte_end = managed_vec.byte_len();
         ManagedVecOwnedIterator {
             managed_vec,
@@ -41,7 +41,7 @@ where
 
 impl<'a, M, T> Iterator for ManagedVecOwnedIterator<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     type Item = T;
@@ -71,14 +71,14 @@ where
 
 impl<'a, M, T> ExactSizeIterator for ManagedVecOwnedIterator<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
 }
 
 impl<'a, M, T> DoubleEndedIterator for ManagedVecOwnedIterator<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
@@ -100,7 +100,7 @@ where
 
 impl<'a, M, T> Clone for ManagedVecOwnedIterator<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     fn clone(&self) -> Self {

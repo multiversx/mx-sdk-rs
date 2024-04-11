@@ -7,7 +7,7 @@ use crate::{
 
 use super::UncallableApi;
 
-impl BlockchainApi for UncallableApi {
+impl<'a> BlockchainApi<'a> for UncallableApi {
     type BlockchainApiImpl = UncallableApi;
 
     fn blockchain_api_impl() -> Self::BlockchainApiImpl {
@@ -15,7 +15,7 @@ impl BlockchainApi for UncallableApi {
     }
 }
 
-impl BlockchainApiImpl for UncallableApi {
+impl<'a> BlockchainApiImpl<'a> for UncallableApi {
     fn get_sc_address_legacy(&self) -> Address {
         unreachable!()
     }

@@ -69,7 +69,7 @@ impl<'de> Visitor<'de> for CheckEsdtInstancesRawVisitor {
         }
     }
 
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    fn visit_seq<'a, A>(self, mut seq: A) -> Result<Self::Value, A::Error>
     where
         A: SeqAccess<'de>,
     {

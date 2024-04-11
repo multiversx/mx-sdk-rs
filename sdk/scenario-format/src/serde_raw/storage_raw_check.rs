@@ -67,7 +67,7 @@ impl<'de> Visitor<'de> for CheckStorageRawVisitor {
         }
     }
 
-    fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, map: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

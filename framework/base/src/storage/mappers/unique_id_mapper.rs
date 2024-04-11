@@ -24,21 +24,21 @@ const EMPTY_ENTRY: UniqueId = 0;
 /// Holds the values from 1 to N with as little storage interaction as possible
 /// If Mapper[i] = i, then it stores nothing, i.e. "0"
 /// If Mapper[i] is equal to another value, then it stores the value
-pub struct UniqueIdMapper<SA, A = CurrentStorage>
+pub struct UniqueIdMapper<'a, SA, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     _address: A,
-    base_key: StorageKey<SA>,
-    vec_mapper: VecMapper<SA, UniqueId, A>,
+    base_key: StorageKey<'a, SA>,
+    vec_mapper: VecMapper<'a, SA, UniqueId, A>,
 }
 
-impl<SA> StorageMapper<SA> for UniqueIdMapper<SA, CurrentStorage>
+impl<'a, SA> StorageMapper<'a, SA> for UniqueIdMapper<'a, SA, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         Self {
             _address: CurrentStorage,
             base_key: base_key.clone(),
@@ -47,11 +47,11 @@ where
     }
 }
 
-impl<SA> UniqueIdMapper<SA, ManagedAddress<SA>>
+impl<'a, SA> UniqueIdMapper<'a, SA, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         Self {
             _address: address.clone(),
             base_key: base_key.clone(),
@@ -60,10 +60,10 @@ where
     }
 }
 
-impl<SA, A> UniqueIdMapper<SA, A>
+impl<'a, SA, A> UniqueIdMapper<'a, SA, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     #[inline]
     pub fn len(&self) -> usize {
@@ -86,14 +86,14 @@ where
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, A> {
+    pub fn iter(&self) -> Iter<'a, SA, A> {
         Iter::new(self)
     }
 }
 
-impl<SA> UniqueIdMapper<SA, CurrentStorage>
+impl<'a, SA> UniqueIdMapper<'a, SA, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
     /// Initializes the mapper's length. This may not be set again afterwards.
     pub fn set_initial_len(&mut self, len: usize) {
@@ -142,10 +142,10 @@ where
     }
 }
 
-impl<'a, SA, A> IntoIterator for &'a UniqueIdMapper<SA, A>
+impl<'a, SA, A> IntoIterator for &'a UniqueIdMapper<'a, SA, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     type Item = usize;
 
@@ -158,20 +158,20 @@ where
 
 pub struct Iter<'a, SA, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     index: usize,
     len: usize,
-    id_mapper: &'a UniqueIdMapper<SA, A>,
+    id_mapper: &'a UniqueIdMapper<'a, SA, A>,
 }
 
 impl<'a, SA, A> Iter<'a, SA, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
-    fn new(id_mapper: &'a UniqueIdMapper<SA, A>) -> Iter<'a, SA, A> {
+    fn new(id_mapper: &'a UniqueIdMapper<'a, SA, A>) -> Iter<'a, SA, A> {
         Iter {
             index: 1,
             len: id_mapper.len(),
@@ -182,8 +182,8 @@ where
 
 impl<'a, SA, A> Iterator for Iter<'a, SA, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     type Item = usize;
 
@@ -200,9 +200,9 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA> TopEncodeMulti for UniqueIdMapper<SA, CurrentStorage>
+impl<'a, SA> TopEncodeMulti for UniqueIdMapper<'a, SA, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -213,15 +213,15 @@ where
     }
 }
 
-impl<SA> CodecFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, usize> where
-    SA: StorageMapperApi
+impl<'a, SA> CodecFrom<UniqueIdMapper<'a, SA, CurrentStorage>> for MultiValueEncoded<'a, SA, usize> where
+    SA: StorageMapperApi<'a>
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA> TypeAbi for UniqueIdMapper<SA, CurrentStorage>
+impl<'a, SA> TypeAbi for UniqueIdMapper<'a, SA, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<usize>()

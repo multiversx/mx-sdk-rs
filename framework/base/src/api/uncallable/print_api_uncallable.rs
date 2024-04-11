@@ -5,7 +5,7 @@ use crate::{
 
 use super::UncallableApi;
 
-impl PrintApi for UncallableApi {
+impl<'a> PrintApi<'a> for UncallableApi {
     type PrintApiImpl = UncallableApi;
 
     fn print_api_impl() -> Self::PrintApiImpl {
@@ -13,6 +13,6 @@ impl PrintApi for UncallableApi {
     }
 }
 
-impl PrintApiImpl for UncallableApi {
+impl<'a> PrintApiImpl<'a> for UncallableApi {
     type Buffer = FormatBufferIgnore;
 }

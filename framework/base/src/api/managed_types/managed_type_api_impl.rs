@@ -5,47 +5,47 @@ use super::{
     EllipticCurveApiImpl, ManagedBufferApiImpl, ManagedMapApiImpl,
 };
 
-pub trait ManagedTypeApiImpl:
+pub trait ManagedTypeApiImpl<'a>:
     BigIntApiImpl
     + BigFloatApiImpl
     + EllipticCurveApiImpl
-    + ManagedBufferApiImpl
+    + ManagedBufferApiImpl<'a>
     + ManagedMapApiImpl
     + ErrorApi
 {
     fn mb_to_big_int_unsigned(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
+        buffer_handle: &'a Self::ManagedBufferHandle,
         dest: Self::BigIntHandle,
     );
 
     fn mb_to_big_int_signed(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
+        buffer_handle: &'a Self::ManagedBufferHandle,
         dest: Self::BigIntHandle,
     );
 
     fn mb_from_big_int_unsigned(
         &self,
-        big_int_handle: Self::BigIntHandle,
+        big_int_handle: &'a Self::BigIntHandle,
         dest: Self::ManagedBufferHandle,
     );
 
     fn mb_from_big_int_signed(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        dest: Self::ManagedBufferHandle,
+        big_int_handle: &'a Self::BigIntHandle,
+        dest: &'a Self::ManagedBufferHandle,
     );
 
-    fn mb_to_big_float(&self, buffer_handle: Self::ManagedBufferHandle, dest: Self::BigFloatHandle);
+    fn mb_to_big_float(&self, buffer_handle: &'a Self::ManagedBufferHandle, dest: Self::BigFloatHandle);
 
     fn mb_from_big_float(
         &self,
         big_float_handle: Self::BigFloatHandle,
-        dest: Self::ManagedBufferHandle,
+        dest: &'a Self::ManagedBufferHandle,
     );
 
-    fn validate_token_identifier(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
+    fn validate_token_identifier(&self, token_id_handle: &'a Self::ManagedBufferHandle) -> bool {
         let token_id_len = self.mb_len(token_id_handle.clone());
         if token_id_len > IDENTIFIER_MAX_LENGTH {
             return false;

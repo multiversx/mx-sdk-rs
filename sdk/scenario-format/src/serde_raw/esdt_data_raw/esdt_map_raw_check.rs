@@ -66,7 +66,7 @@ impl<'de> Visitor<'de> for CheckEsdtMapRawVisitor {
         }
     }
 
-    fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, map: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

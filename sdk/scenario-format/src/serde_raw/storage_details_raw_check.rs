@@ -45,7 +45,7 @@ impl<'de> Visitor<'de> for CheckStorageDetailsRawVisitor {
         formatter.write_str("CheckAccountRaw or nothing")
     }
 
-    fn visit_map<M>(self, mut access: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, mut access: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

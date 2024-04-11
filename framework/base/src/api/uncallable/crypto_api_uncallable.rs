@@ -4,7 +4,7 @@ use crate::{
     types::MessageHashType,
 };
 
-impl CryptoApi for UncallableApi {
+impl<'a> CryptoApi<'a> for UncallableApi {
     type CryptoApiImpl = UncallableApi;
 
     fn crypto_api_impl() -> Self::CryptoApiImpl {
@@ -12,7 +12,7 @@ impl CryptoApi for UncallableApi {
     }
 }
 
-impl CryptoApiImpl for UncallableApi {
+impl<'a> CryptoApiImpl<'a> for UncallableApi {
     fn sha256_managed(
         &self,
         _dest: Self::ManagedBufferHandle,

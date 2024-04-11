@@ -13,16 +13,16 @@ use super::ContractBase;
 ///
 /// When generating WASM, this contract implementation is used.
 /// This makes sure no monomorphization-induced code duplication occurs in relation to modules.
-pub struct UniversalContractObj<A>
+pub struct UniversalContractObj<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     _phantom: PhantomData<A>,
 }
 
-impl<A> UniversalContractObj<A>
+impl<'a, A> UniversalContractObj<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     pub fn new() -> Self {
         Self {
@@ -31,18 +31,18 @@ where
     }
 }
 
-impl<A> Default for UniversalContractObj<A>
+impl<'a, A> Default for UniversalContractObj<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<A> ContractBase for UniversalContractObj<A>
+impl<'a, A> ContractBase<'a> for UniversalContractObj<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type Api = A;
 }

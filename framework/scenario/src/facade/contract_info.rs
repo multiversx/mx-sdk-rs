@@ -17,9 +17,9 @@ pub struct ContractInfo<P: ProxyObjBase> {
 }
 
 impl<P: ProxyObjBase> ContractInfo<P> {
-    pub fn new<A>(address_expr: A) -> Self
+    pub fn new<'a, A>(address_expr: A) -> Self
     where
-        AddressKey: From<A>,
+        AddressKey: From<'a, A>,
     {
         let mandos_address_expr = AddressKey::from(address_expr);
         let proxy_inst = P::new_proxy_obj().contract(mandos_address_expr.value.clone().into());
@@ -88,5 +88,5 @@ impl<P: ProxyObjBase> TopEncode for ContractInfo<P> {
 
 impl<P: ProxyObjBase> CodecFrom<ContractInfo<P>> for Address {}
 impl<P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for Address {}
-impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
-impl<M: ManagedTypeApi, P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
+impl<'a, M: ManagedTypeApi<'a>, P: ProxyObjBase> CodecFrom<ContractInfo<P>> for ManagedAddress<'a, M> {}
+impl<'a, M: ManagedTypeApi<'a>, P: ProxyObjBase> CodecFrom<&ContractInfo<P>> for ManagedAddress<'a, M> {}

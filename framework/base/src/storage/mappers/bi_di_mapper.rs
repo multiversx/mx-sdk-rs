@@ -29,27 +29,27 @@ type Keys<'a, SA, T, A> = unordered_set_mapper::Iter<'a, SA, T, A>;
 
 /// A bi-directional map, from values to ids and viceversa.
 /// The mapper is based on UnorderedSetMapper, reason why the remove is done by swap_remove
-pub struct BiDiMapper<SA, K, V, A = CurrentStorage>
+pub struct BiDiMapper<'a, SA, K, V, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    id_set_mapper: UnorderedSetMapper<SA, K, A>,
-    value_set_mapper: UnorderedSetMapper<SA, V, A>,
-    base_key: StorageKey<SA>,
+    id_set_mapper: UnorderedSetMapper<'a, SA, K, A>,
+    value_set_mapper: UnorderedSetMapper<'a, SA, V, A>,
+    base_key: StorageKey<'a, SA>,
 }
 
-impl<SA, K, V> StorageMapper<SA> for BiDiMapper<SA, K, V, CurrentStorage>
+impl<'a, SA, K, V> StorageMapper<'a, SA> for BiDiMapper<'a, SA, K, V, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         let mut id_key = base_key.clone();
         id_key.append_bytes(ID_SUFIX);
 
@@ -58,20 +58,20 @@ where
         BiDiMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
-            id_set_mapper: UnorderedSetMapper::<SA, K>::new(id_key),
-            value_set_mapper: UnorderedSetMapper::<SA, V>::new(value_key),
+            id_set_mapper: UnorderedSetMapper::<'a, SA, K>::new(id_key),
+            value_set_mapper: UnorderedSetMapper::<'a, SA, V>::new(value_key),
             base_key,
         }
     }
 }
 
-impl<SA, K, V> BiDiMapper<SA, K, V, ManagedAddress<SA>>
+impl<'a, SA, K, V> BiDiMapper<'a, SA, K, V, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         let mut id_key = base_key.clone();
         id_key.append_bytes(ID_SUFIX);
 
@@ -87,21 +87,21 @@ where
     }
 }
 
-impl<SA, K, V, A> BiDiMapper<SA, K, V, A>
+impl<'a, SA, K, V, A> BiDiMapper<'a, SA, K, V, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    fn get_id_key(&self, value: &V) -> StorageKey<SA> {
+    fn get_id_key(&self, value: &V) -> StorageKey<'a, SA> {
         let mut key = self.base_key.clone();
         key.append_bytes(VALUE_TO_ID_SUFFIX);
         key.append_item(value);
         key
     }
 
-    fn get_value_key(&self, key: &K) -> StorageKey<SA> {
+    fn get_value_key(&self, key: &K) -> StorageKey<'a, SA> {
         let mut value = self.base_key.clone();
         value.append_bytes(ID_TO_VALUE_SUFFIX);
         value.append_item(&key);
@@ -126,15 +126,15 @@ where
         self.value_set_mapper.contains(value)
     }
 
-    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<SA, V, A> {
+    pub fn get_all_values(&self) -> unordered_set_mapper::Iter<'a, SA, V, A> {
         self.value_set_mapper.iter()
     }
 
-    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<SA, K, A> {
+    pub fn get_all_ids(&self) -> unordered_set_mapper::Iter<'a, SA, K, A> {
         self.id_set_mapper.iter()
     }
 
-    pub fn iter(&self) -> Iter<SA, K, V, A> {
+    pub fn iter(&self) -> Iter<'a, SA, K, V, A> {
         Iter::new(self)
     }
 
@@ -147,9 +147,9 @@ where
     }
 }
 
-impl<SA, K, V> BiDiMapper<SA, K, V, CurrentStorage>
+impl<'a, SA, K, V> BiDiMapper<'a, SA, K, V, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
@@ -221,10 +221,10 @@ where
     }
 }
 
-impl<'a, SA, K, V, A> IntoIterator for &'a BiDiMapper<SA, K, V, A>
+impl<'a, SA, K, V, A> IntoIterator for &'a BiDiMapper<'a, SA, K, V, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
@@ -239,23 +239,23 @@ where
 
 pub struct Iter<'a, SA, K, V, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
     key_iter: Keys<'a, SA, K, A>,
-    hash_map: &'a BiDiMapper<SA, K, V, A>,
+    hash_map: &'a BiDiMapper<'a, SA, K, V, A>,
 }
 
 impl<'a, SA, K, V, A> Iter<'a, SA, K, V, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
-    fn new(hash_map: &'a BiDiMapper<SA, K, V, A>) -> Iter<'a, SA, K, V, A> {
+    fn new(hash_map: &'a BiDiMapper<'a, SA, K, V, A>) -> Iter<'a, SA, K, V, A> {
         Iter {
             key_iter: hash_map.get_all_ids(),
             hash_map,
@@ -265,8 +265,8 @@ where
 
 impl<'a, SA, K, V, A> Iterator for Iter<'a, SA, K, V, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
@@ -282,9 +282,9 @@ where
     }
 }
 
-impl<SA, K, V> TopEncodeMulti for BiDiMapper<SA, K, V, CurrentStorage>
+impl<'a, SA, K, V> TopEncodeMulti for BiDiMapper<'a, SA, K, V, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
@@ -298,18 +298,18 @@ where
     }
 }
 
-impl<SA, K, V> CodecFrom<BiDiMapper<SA, K, V, CurrentStorage>>
-    for MultiValueEncoded<SA, MultiValue2<K, V>>
+impl<'a, SA, K, V> CodecFrom<BiDiMapper<'a, SA, K, V, CurrentStorage>>
+    for MultiValueEncoded<'a, SA, MultiValue2<K, V>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
     V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
 {
 }
 
-impl<SA, K, V> TypeAbi for BiDiMapper<SA, K, V, CurrentStorage>
+impl<'a, SA, K, V> TypeAbi for BiDiMapper<'a, SA, K, V, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     K: TopEncode
         + TopDecode
         + NestedEncode
@@ -328,7 +328,7 @@ where
         + TypeAbi,
 {
     fn type_name() -> TypeName {
-        MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
+        MultiValueEncoded::<'a, SA, MultiValue2<K, V>>::type_name()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

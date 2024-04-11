@@ -4,21 +4,21 @@ use super::{
     StorageReadApiImpl, StorageWriteApi,
 };
 
-pub trait VMApi:
-    ManagedTypeApi
-    + BlockchainApi
-    + CallValueApi
-    + CryptoApi
-    + EndpointArgumentApi
+pub trait VMApi<'a>:
+    ManagedTypeApi<'a>
+    + BlockchainApi<'a>
+    + CallValueApi<'a>
+    + CryptoApi<'a>
+    + EndpointArgumentApi<'a>
     + EndpointFinishApi
     + ErrorApi
     + LogApi
-    + SendApi
+    + SendApi<'a>
     + StorageReadApi
     + StorageWriteApi
-    + PrintApi
-    + CallTypeApi
-    + StorageMapperApi
+    + PrintApi<'a>
+    + CallTypeApi<'a>
+    + StorageMapperApi<'a>
     + Clone // TODO: remove
     + PartialEq // for helping derive PartialEq for managed types
     + Eq

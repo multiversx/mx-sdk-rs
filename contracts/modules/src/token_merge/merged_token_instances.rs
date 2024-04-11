@@ -9,14 +9,14 @@ pub static TOO_MANY_TOKENS_ERR_MSG: &[u8] = b"Too many tokens to merge";
 pub static INSUFFICIENT_BALANCE_IN_MERGED_INST_ERR_MSG: &[u8] =
     b"Insufficient token balance to deduct from merged instance";
 
-pub type InstanceArray<M> = ArrayVec<EsdtTokenPayment<M>, MAX_MERGED_TOKENS>;
+pub type InstanceArray<'a, M> = ArrayVec<EsdtTokenPayment<'a, M>, MAX_MERGED_TOKENS>;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MergedTokenInstances<M: ManagedTypeApi> {
-    instances: InstanceArray<M>,
+pub struct MergedTokenInstances<'a, M: ManagedTypeApi<'a>> {
+    instances: InstanceArray<'a, M>,
 }
 
-impl<M: ManagedTypeApi> Default for MergedTokenInstances<M> {
+impl<'a, M: ManagedTypeApi<'a>> Default for MergedTokenInstances<'a, M> {
     #[inline]
     fn default() -> Self {
         Self {
@@ -25,20 +25,20 @@ impl<M: ManagedTypeApi> Default for MergedTokenInstances<M> {
     }
 }
 
-impl<M: ManagedTypeApi> MergedTokenInstances<M> {
+impl<'a, M: ManagedTypeApi<'a>> MergedTokenInstances<'a, M> {
     #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
     #[inline]
-    pub fn new_from_instances(instances: InstanceArray<M>) -> Self {
+    pub fn new_from_instances(instances: InstanceArray<'a, M>) -> Self {
         Self { instances }
     }
 
-    pub fn decode_from_first_uri(uris: &ManagedVec<M, ManagedBuffer<M>>) -> Self {
+    pub fn decode_from_first_uri(uris: &ManagedVec<'a, M, ManagedBuffer<'a, M>>) -> Self {
         let first_uri = uris.get(0);
-        let decode_result = InstanceArray::<M>::top_decode(first_uri.deref().clone());
+        let decode_result = InstanceArray::<'a, M>::top_decode(first_uri.deref().clone());
         match decode_result {
             core::result::Result::Ok(instances) => Self::new_from_instances(instances),
             core::result::Result::Err(_) => {
@@ -48,11 +48,11 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
     }
 
     #[inline]
-    pub fn get_instances(&self) -> &InstanceArray<M> {
+    pub fn get_instances(&self) -> &InstanceArray<'a, M> {
         &self.instances
     }
 
-    pub fn add_or_update_instance(&mut self, new_instance: EsdtTokenPayment<M>) {
+    pub fn add_or_update_instance(&mut self, new_instance: EsdtTokenPayment<'a, M>) {
         let search_result =
             self.find_instance(&new_instance.token_identifier, new_instance.token_nonce);
         match search_result {
@@ -77,7 +77,7 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
         }
     }
 
-    pub fn deduct_balance_for_instance(&mut self, tokens_to_deduct: &EsdtTokenPayment<M>) {
+    pub fn deduct_balance_for_instance(&mut self, tokens_to_deduct: &EsdtTokenPayment<'a, M>) {
         let search_result = self.find_instance(
             &tokens_to_deduct.token_identifier,
             tokens_to_deduct.token_nonce,
@@ -99,13 +99,13 @@ impl<M: ManagedTypeApi> MergedTokenInstances<M> {
     }
 
     #[inline]
-    pub fn into_instances(self) -> InstanceArray<M> {
+    pub fn into_instances(self) -> InstanceArray<'a, M> {
         self.instances
     }
 
     fn find_instance(
         &self,
-        original_token_id: &TokenIdentifier<M>,
+        original_token_id: &TokenIdentifier<'a, M>,
         original_token_nonce: u64,
     ) -> Option<usize> {
         self.instances.iter().position(|item| {

@@ -12,7 +12,7 @@ pub trait EventsModule {
         self.order_event(caller, epoch, order_type, order);
     }
 
-    fn emit_cancel_order_events(&self, orders: MultiValueManagedVec<Order<Self::Api>>) {
+    fn emit_cancel_order_events(&self, orders: MultiValueManagedVec<'a, Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 
@@ -24,7 +24,7 @@ pub trait EventsModule {
         }
     }
 
-    fn emit_match_order_events(&self, orders: MultiValueManagedVec<Order<Self::Api>>) {
+    fn emit_match_order_events(&self, orders: MultiValueManagedVec<'a, Order<Self::Api>>) {
         let caller = self.blockchain().get_caller();
         let epoch = self.blockchain().get_block_epoch();
 

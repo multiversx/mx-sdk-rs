@@ -3,9 +3,9 @@ multiversx_sc::derive_imports!();
 
 /// Returns the sorted middle, or the average of the two middle indexed items if the
 /// vector has an even number of elements.
-pub fn calculate<M: ManagedTypeApi>(
-    list: &mut [BigUint<M>],
-) -> Result<Option<BigUint<M>>, StaticSCError> {
+pub fn calculate<'a, M: ManagedTypeApi<'a>>(
+    list: &mut [BigUint<'a, M>],
+) -> Result<Option<BigUint<'a, M>>, StaticSCError> {
     if list.is_empty() {
         return Result::Ok(None);
     }

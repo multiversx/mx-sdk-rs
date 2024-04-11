@@ -13,8 +13,8 @@ use multiversx_sc_scenario::api::StaticApi;
 #[derive(
     ManagedVecItem, NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, Clone, Debug,
 )]
-pub struct ManagedStructWithBigUint<M: ManagedTypeApi> {
-    pub big_uint: multiversx_sc::types::BigUint<M>,
+pub struct ManagedStructWithBigUint<'a, M: ManagedTypeApi<'a>> {
+    pub big_uint: multiversx_sc::types::BigUint<'a, M>,
     pub num: u32,
 }
 

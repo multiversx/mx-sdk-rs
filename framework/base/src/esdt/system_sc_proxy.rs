@@ -25,16 +25,16 @@ const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 /// Proxy for the ESDT system smart contract.
 /// Unlike other contract proxies, this one has a fixed address,
 /// so the proxy object doesn't really contain any data, it is more of a placeholder.
-pub struct ESDTSystemSmartContractProxy<SA>
+pub struct ESDTSystemSmartContractProxy<'a, SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi<'a>,
 {
     _phantom: PhantomData<SA>,
 }
 
-impl<SA> ESDTSystemSmartContractProxy<SA>
+impl<'a, SA> ESDTSystemSmartContractProxy<'a, SA>
 where
-    SA: SendApi + 'static,
+    SA: SendApi<'a>,
 {
     /// Constructor.
     /// TODO: consider moving this to a new Proxy contructor trait (bonus: better proxy constructor syntax).
@@ -45,20 +45,20 @@ where
     }
 }
 
-impl<SA> ESDTSystemSmartContractProxy<SA>
+impl<'a, SA> ESDTSystemSmartContractProxy<'a, SA>
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a>,
 {
     /// Produces a contract call to the ESDT system SC,
     /// which causes it to issue a new fungible ESDT token.
     pub fn issue_fungible(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
-        initial_supply: &BigUint<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: &ManagedBuffer<'a, SA>,
+        token_ticker: &ManagedBuffer<'a, SA>,
+        initial_supply: &BigUint<'a, SA>,
         properties: FungibleTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> ContractCallWithEgld<'a, SA, ()> {
         self.issue(
             issue_cost,
             EsdtTokenType::Fungible,
@@ -84,11 +84,11 @@ where
     /// which causes it to issue a new non-fungible ESDT token.
     pub fn issue_non_fungible(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: &ManagedBuffer<'a, SA>,
+        token_ticker: &ManagedBuffer<'a, SA>,
         properties: NonFungibleTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> ContractCallWithEgld<'a, SA, ()> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -115,11 +115,11 @@ where
     /// which causes it to issue a new semi-fungible ESDT token.
     pub fn issue_semi_fungible(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: &ManagedBuffer<'a, SA>,
+        token_ticker: &ManagedBuffer<'a, SA>,
         properties: SemiFungibleTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> ContractCallWithEgld<'a, SA, ()> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -146,11 +146,11 @@ where
     /// which causes it to register a new Meta ESDT token.
     pub fn register_meta_esdt(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: &ManagedBuffer<'a, SA>,
+        token_ticker: &ManagedBuffer<'a, SA>,
         properties: MetaTokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> ContractCallWithEgld<'a, SA, ()> {
         let zero = BigUint::zero();
         self.issue(
             issue_cost,
@@ -175,12 +175,12 @@ where
 
     pub fn issue_and_set_all_roles(
         self,
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: ManagedBuffer<'a, SA>,
+        token_ticker: ManagedBuffer<'a, SA>,
         token_type: EsdtTokenType,
         num_decimals: usize,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> ContractCallWithEgld<'a, SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
         let token_type_name = match token_type {
@@ -205,13 +205,13 @@ where
     /// Deduplicates code from all the possible issue functions
     fn issue(
         self,
-        issue_cost: BigUint<SA>,
+        issue_cost: BigUint<'a, SA>,
         token_type: EsdtTokenType,
-        token_display_name: &ManagedBuffer<SA>,
-        token_ticker: &ManagedBuffer<SA>,
-        initial_supply: &BigUint<SA>,
+        token_display_name: &ManagedBuffer<'a, SA>,
+        token_ticker: &ManagedBuffer<'a, SA>,
+        initial_supply: &BigUint<'a, SA>,
         properties: TokenProperties,
-    ) -> ContractCallWithEgld<SA, ()> {
+    ) -> ContractCallWithEgld<'a, SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
 
         let endpoint_name = match token_type {
@@ -262,9 +262,9 @@ where
     /// It will fail if the SC is not the owner of the token.
     pub fn mint(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        amount: &BigUint<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        amount: &BigUint<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("mint")
             .argument(token_identifier)
             .argument(amount)
@@ -274,9 +274,9 @@ where
     /// which causes it to burn fungible ESDT tokens owned by the SC.
     pub fn burn(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        amount: &BigUint<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        amount: &BigUint<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("ESDTBurn")
             .argument(token_identifier)
             .argument(amount)
@@ -284,13 +284,13 @@ where
 
     /// The manager of an ESDT token may choose to suspend all transactions of the token,
     /// except minting, freezing/unfreezing and wiping.
-    pub fn pause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
+    pub fn pause(self, token_identifier: &TokenIdentifier<'a, SA>) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("pause")
             .argument(token_identifier)
     }
 
     /// The reverse operation of `pause`.
-    pub fn unpause(self, token_identifier: &TokenIdentifier<SA>) -> ContractCallNoPayment<SA, ()> {
+    pub fn unpause(self, token_identifier: &TokenIdentifier<'a, SA>) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("unPause")
             .argument(token_identifier)
     }
@@ -300,9 +300,9 @@ where
     /// Freezing and unfreezing the tokens of an account are operations designed to help token managers to comply with regulations.
     pub fn freeze(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        address: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("freeze")
             .argument(token_identifier)
             .argument(address)
@@ -311,9 +311,9 @@ where
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        address: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("unFreeze")
             .argument(token_identifier)
             .argument(address)
@@ -325,9 +325,9 @@ where
     /// Wiping the tokens of an account is an operation designed to help token managers to comply with regulations.
     pub fn wipe(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        address: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("wipe")
             .argument(token_identifier)
             .argument(address)
@@ -338,10 +338,10 @@ where
     /// Freezing and unfreezing a single NFT of an Account are operations designed to help token managers to comply with regulations.
     pub fn freeze_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         nft_nonce: u64,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        address: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("freezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
@@ -351,10 +351,10 @@ where
     /// The reverse operation of `freeze`, unfreezing, will allow further transfers to and from the account.
     pub fn unfreeze_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         nft_nonce: u64,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        address: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("unFreezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
@@ -367,10 +367,10 @@ where
     /// Wiping the tokens of an Account is an operation designed to help token managers to comply with regulations.
     pub fn wipe_nft(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         nft_nonce: u64,
-        address: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        address: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("wipeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
@@ -381,9 +381,9 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn change_sft_to_meta_esdt(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         num_decimals: usize,
-    ) -> ContractCallNoPayment<SA, ()> {
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("changeSFTToMetaESDT")
             .argument(&token_identifier)
             .argument(&num_decimals)
@@ -395,10 +395,10 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn set_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
-        address: &ManagedAddress<SA>,
-        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<'a, SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         roles_iter: RoleIter,
-    ) -> ContractCallNoPayment<SA, ()> {
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         let mut contract_call = self
             .esdt_system_sc_call_no_args("setSpecialRole")
             .argument(token_identifier)
@@ -418,10 +418,10 @@ where
     /// This function as almost all in case of ESDT can be called only by the owner.
     pub fn unset_special_roles<RoleIter: Iterator<Item = EsdtLocalRole>>(
         self,
-        address: &ManagedAddress<SA>,
-        token_identifier: &TokenIdentifier<SA>,
+        address: &ManagedAddress<'a, SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         roles_iter: RoleIter,
-    ) -> ContractCallNoPayment<SA, ()> {
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         let mut contract_call = self
             .esdt_system_sc_call_no_args("unSetSpecialRole")
             .argument(token_identifier)
@@ -437,9 +437,9 @@ where
 
     pub fn transfer_ownership(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        new_owner: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        new_owner: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("transferOwnership")
             .argument(token_identifier)
             .argument(new_owner)
@@ -447,10 +447,10 @@ where
 
     pub fn transfer_nft_create_role(
         self,
-        token_identifier: &TokenIdentifier<SA>,
-        old_creator: &ManagedAddress<SA>,
-        new_creator: &ManagedAddress<SA>,
-    ) -> ContractCallNoPayment<SA, ()> {
+        token_identifier: &TokenIdentifier<'a, SA>,
+        old_creator: &ManagedAddress<'a, SA>,
+        new_creator: &ManagedAddress<'a, SA>,
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         self.esdt_system_sc_call_no_args("transferNFTCreateRole")
             .argument(token_identifier)
             .argument(old_creator)
@@ -459,9 +459,9 @@ where
 
     pub fn control_changes(
         self,
-        token_identifier: &TokenIdentifier<SA>,
+        token_identifier: &TokenIdentifier<'a, SA>,
         property_arguments: &TokenPropertyArguments,
-    ) -> ContractCallNoPayment<SA, ()> {
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         let mut contract_call = self
             .esdt_system_sc_call_no_args("controlChanges")
             .argument(token_identifier);
@@ -469,14 +469,14 @@ where
         contract_call
     }
 
-    pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
+    pub fn esdt_system_sc_address(&self) -> ManagedAddress<'a, SA> {
         ManagedAddress::new_from_bytes(&ESDT_SYSTEM_SC_ADDRESS_ARRAY)
     }
 
     fn esdt_system_sc_call_no_args(
         self,
         endpoint_name: &'static str,
-    ) -> ContractCallNoPayment<SA, ()> {
+    ) -> ContractCallNoPayment<'a, SA, ()> {
         let esdt_system_sc_address = self.esdt_system_sc_address();
         ContractCallNoPayment::new(esdt_system_sc_address, endpoint_name)
     }
@@ -493,21 +493,21 @@ fn bool_name_bytes(b: bool) -> &'static str {
     }
 }
 
-fn set_token_property<SA, CC>(contract_call: &mut CC, name: &str, value: bool)
+fn set_token_property<'a, SA, CC>(contract_call: &mut CC, name: &str, value: bool)
 where
-    SA: CallTypeApi + 'static,
-    CC: ContractCall<SA>,
+    SA: CallTypeApi<'a>,
+    CC: ContractCall<'a, SA>,
 {
     contract_call.push_raw_argument(name);
     contract_call.push_raw_argument(bool_name_bytes(value));
 }
 
-fn append_token_property_arguments<SA, CC>(
+fn append_token_property_arguments<'a, SA, CC>(
     contract_call: &mut CC,
     token_prop_args: &TokenPropertyArguments,
 ) where
-    SA: CallTypeApi + 'static,
-    CC: ContractCall<SA>,
+    SA: CallTypeApi<'a>,
+    CC: ContractCall<'a, SA>,
 {
     if let Some(can_freeze) = token_prop_args.can_freeze {
         set_token_property(contract_call, "canFreeze", can_freeze);

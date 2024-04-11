@@ -4,10 +4,10 @@ use crate::{
 };
 
 /// Holding back-transfer data, as retrieved from the VM.
-pub struct BackTransfers<A>
+pub struct BackTransfers<'a, A>
 where
-    A: ManagedTypeApi,
+    A: ManagedTypeApi<'a>,
 {
-    pub total_egld_amount: BigUint<A>,
-    pub esdt_payments: MultiEsdtPayment<A>,
+    pub total_egld_amount: BigUint<'a, A>,
+    pub esdt_payments: MultiEsdtPayment<'a, A>,
 }

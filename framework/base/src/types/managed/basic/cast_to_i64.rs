@@ -5,9 +5,9 @@ use crate::{
     err_msg,
 };
 
-pub(crate) fn cast_to_i64<M, T>(value: T) -> i64
+pub(crate) fn cast_to_i64<'a, M, T>(value: T) -> i64
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: TryInto<i64>,
 {
     value

@@ -109,8 +109,8 @@ impl TypeAbi for CodeMetadata {
     }
 }
 
-impl SCDisplay for CodeMetadata {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a> SCDisplay<'a> for CodeMetadata {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         let mut nothing_printed: bool = true;
         verify_metadata_and_append(
             self.is_upgradeable(),
@@ -132,23 +132,23 @@ impl SCDisplay for CodeMetadata {
     }
 }
 
-impl SCLowerHex for CodeMetadata {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a> SCLowerHex<'a> for CodeMetadata {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         let num = self.bits().to_be_bytes();
         f.append_bytes(&hex_util::byte_to_hex_digits(num[0])[..]);
         f.append_bytes(&hex_util::byte_to_hex_digits(num[1])[..]);
     }
 }
 
-impl SCBinary for CodeMetadata {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a> SCBinary<'a> for CodeMetadata {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         let num = self.bits().to_be_bytes();
         f.append_bytes(&hex_util::byte_to_binary_digits(num[0])[..]);
         f.append_bytes(&hex_util::byte_to_binary_digits(num[1])[..]);
     }
 }
 
-fn verify_metadata_and_append<F: FormatByteReceiver>(
+fn verify_metadata_and_append<'a, F: FormatByteReceiver<'a>>(
     constraint: bool,
     f: &mut F,
     bytes_to_append: &[u8],

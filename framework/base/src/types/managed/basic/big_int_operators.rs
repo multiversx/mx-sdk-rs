@@ -9,10 +9,10 @@ use crate::{
 
 macro_rules! binary_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait for BigInt<M> {
-            type Output = BigInt<M>;
+        impl<'a, M: ManagedTypeApi<'a>> $trait for BigInt<'a, M> {
+            type Output = BigInt<'a, M>;
 
-            fn $method(self, other: BigInt<M>) -> BigInt<M> {
+            fn $method(self, other: BigInt<'a, M>) -> BigInt<'a, M> {
                 let api = M::managed_type_impl();
                 api.$api_func(
                     self.handle.clone(),
@@ -23,26 +23,26 @@ macro_rules! binary_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<BigUint<M>> for BigInt<M> {
-            type Output = BigInt<M>;
+        impl<'a, M: ManagedTypeApi<'a>> $trait<BigUint<'a, M>> for BigInt<'a, M> {
+            type Output = BigInt<'a, M>;
 
-            fn $method(self, other: BigUint<M>) -> BigInt<M> {
+            fn $method(self, other: BigUint<'a, M>) -> BigInt<'a, M> {
                 self.$method(BigInt::from_biguint(Sign::Plus, other))
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigUint<M> {
-            type Output = BigInt<M>;
+        impl<'a, M: ManagedTypeApi<'a>> $trait<BigInt<'a, M>> for BigUint<'a, M> {
+            type Output = BigInt<'a, M>;
 
-            fn $method(self, other: BigInt<M>) -> BigInt<M> {
+            fn $method(self, other: BigInt<'a, M>) -> BigInt<'a, M> {
                 BigInt::from_biguint(Sign::Plus, self).$method(other)
             }
         }
 
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BigInt<M> {
-            type Output = BigInt<M>;
+        impl<'a, 'b, M: ManagedTypeApi<'a>> $trait<&'b BigInt<'a, M>> for &'a BigInt<'a, M> {
+            type Output = BigInt<'a, M>;
 
-            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
+            fn $method(self, other: &BigInt<'a, M>) -> BigInt<'a, M> {
                 let api = M::managed_type_impl();
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
@@ -55,18 +55,18 @@ macro_rules! binary_operator {
             }
         }
 
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigInt<M> {
-            type Output = BigInt<M>;
+        impl<'a, 'b, M: ManagedTypeApi<'a>> $trait<&'b BigUint<'a, M>> for &'a BigInt<'a, M> {
+            type Output = BigInt<'a, M>;
 
-            fn $method(self, other: &BigUint<M>) -> BigInt<M> {
+            fn $method(self, other: &BigUint<'a, M>) -> BigInt<'a, M> {
                 self.$method(&BigInt::from_handle(other.get_handle()))
             }
         }
 
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BigUint<M> {
-            type Output = BigInt<M>;
+        impl<'a, 'b, M: ManagedTypeApi<'a>> $trait<&'b BigInt<'a, M>> for &'a BigUint<'a, M> {
+            type Output = BigInt<'a, M>;
 
-            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
+            fn $method(self, other: &BigInt<'a, M>) -> BigInt<'a, M> {
                 (&BigInt::from_handle(self.get_handle())).$method(other)
             }
         }
@@ -81,7 +81,7 @@ binary_operator! {Rem, rem, bi_t_mod}
 
 macro_rules! binary_assign_operator {
     ($trait:ident, $method:ident, $api_func:ident) => {
-        impl<M: ManagedTypeApi> $trait<BigInt<M>> for BigInt<M> {
+        impl<'a, M: ManagedTypeApi<'a>> $trait<BigInt<'a, M>> for BigInt<'a, M> {
             #[inline]
             fn $method(&mut self, other: Self) {
                 let api = M::managed_type_impl();
@@ -93,9 +93,9 @@ macro_rules! binary_assign_operator {
             }
         }
 
-        impl<M: ManagedTypeApi> $trait<&BigInt<M>> for BigInt<M> {
+        impl<'a, M: ManagedTypeApi<'a>> $trait<&BigInt<'a, M>> for BigInt<'a, M> {
             #[inline]
-            fn $method(&mut self, other: &BigInt<M>) {
+            fn $method(&mut self, other: &BigInt<'a, M>) {
                 let api = M::managed_type_impl();
                 api.$api_func(
                     self.handle.clone(),
@@ -113,8 +113,8 @@ binary_assign_operator! {MulAssign, mul_assign, bi_mul}
 binary_assign_operator! {DivAssign, div_assign, bi_t_div}
 binary_assign_operator! {RemAssign, rem_assign, bi_t_mod}
 
-impl<M: ManagedTypeApi> Neg for BigInt<M> {
-    type Output = BigInt<M>;
+impl<'a, M: ManagedTypeApi<'a>> Neg for BigInt<'a, M> {
+    type Output = BigInt<'a, M>;
 
     fn neg(self) -> Self::Output {
         let api = M::managed_type_impl();

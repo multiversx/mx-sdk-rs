@@ -1,7 +1,7 @@
 use super::{BlockchainApi, HandleTypeInfo, ManagedTypeApi, ManagedTypeApiImpl, RawHandle};
 
-pub trait SendApi: ManagedTypeApi + BlockchainApi {
-    type SendApiImpl: SendApiImpl
+pub trait SendApi<'a>: ManagedTypeApi<'a> + BlockchainApi<'a> {
+    type SendApiImpl: SendApiImpl<'a>
         + HandleTypeInfo<
             ManagedBufferHandle = Self::ManagedBufferHandle,
             BigIntHandle = Self::BigIntHandle,
@@ -13,7 +13,7 @@ pub trait SendApi: ManagedTypeApi + BlockchainApi {
 }
 
 /// API that groups methods that either send EGLD or ESDT, or that call other contracts.
-pub trait SendApiImpl: ManagedTypeApiImpl {
+pub trait SendApiImpl<'a>: ManagedTypeApiImpl<'a> {
     /// Sends EGLD to an address (optionally) and executes like an async call, but without callback.
     fn transfer_value_execute(
         &self,

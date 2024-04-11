@@ -32,7 +32,7 @@ pub trait MultisigEventsModule {
         #[indexed] egld_value: &BigUint,
         #[indexed] gas: u64,
         #[indexed] endpoint: &ManagedBuffer,
-        #[indexed] arguments: &MultiValueManagedVec<ManagedBuffer>,
+        #[indexed] arguments: &MultiValueManagedVec<'a, ManagedBuffer>,
     );
 
     #[event("performTransferExecute")]
@@ -43,7 +43,7 @@ pub trait MultisigEventsModule {
         #[indexed] egld_value: &BigUint,
         #[indexed] gas: u64,
         #[indexed] endpoint: &ManagedBuffer,
-        #[indexed] arguments: &MultiValueManagedVec<ManagedBuffer>,
+        #[indexed] arguments: &MultiValueManagedVec<'a, ManagedBuffer>,
     );
 
     #[event("performDeployFromSource")]
@@ -54,7 +54,7 @@ pub trait MultisigEventsModule {
         #[indexed] source_address: &ManagedAddress,
         #[indexed] code_metadata: CodeMetadata,
         #[indexed] gas: u64,
-        #[indexed] arguments: &MultiValueManagedVec<ManagedBuffer>,
+        #[indexed] arguments: &MultiValueManagedVec<'a, ManagedBuffer>,
     );
 
     #[event("performUpgradeFromSource")]
@@ -66,6 +66,6 @@ pub trait MultisigEventsModule {
         #[indexed] source_address: &ManagedAddress,
         #[indexed] code_metadata: CodeMetadata,
         #[indexed] gas: u64,
-        #[indexed] arguments: &MultiValueManagedVec<ManagedBuffer>,
+        #[indexed] arguments: &MultiValueManagedVec<'a, ManagedBuffer>,
     );
 }

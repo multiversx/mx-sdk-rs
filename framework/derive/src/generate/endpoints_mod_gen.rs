@@ -32,12 +32,12 @@ pub fn generate_endpoints_mod(
 
     let wasm_callback_fn = if is_contract_main {
         quote! {
-            pub fn callBack<A>()
+            pub fn callBack<'a, A>()
             where
                 A: multiversx_sc::api::VMApi ,
             {
                 super::EndpointWrappers::callback(
-                    &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                    &multiversx_sc::contract_base::UniversalContractObj::<'a, A>::new(),
                 );
             }
         }
@@ -87,12 +87,12 @@ fn generate_wasm_endpoint(
     let fn_ident = &m.name;
     let call_method_ident = generate_call_method_name(fn_ident);
     quote! {
-        pub fn #fn_ident<A>()
+        pub fn #fn_ident<'a, A>()
         where
             A: multiversx_sc::api::VMApi,
         {
             super::EndpointWrappers::#call_method_ident(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &multiversx_sc::contract_base::UniversalContractObj::<'a, A>::new(),
             );
         }
     }

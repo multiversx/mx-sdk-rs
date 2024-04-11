@@ -9,16 +9,16 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct CryptoWrapper<A>
+pub struct CryptoWrapper<'a, A>
 where
-    A: CryptoApi,
+    A: CryptoApi<'a>,
 {
     _phantom: PhantomData<A>,
 }
 
-impl<A> CryptoWrapper<A>
+impl<'a, A> CryptoWrapper<'a, A>
 where
-    A: CryptoApi,
+    A: CryptoApi<'a>,
 {
     pub fn new() -> Self {
         CryptoWrapper {
@@ -26,30 +26,30 @@ where
         }
     }
 
-    pub fn sha256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
+    pub fn sha256<B: core::borrow::Borrow<ManagedBuffer<'a, A>>>(
         &self,
         data: B,
-    ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
+    ) -> ManagedByteArray<'a, A, SHA256_RESULT_LEN> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().sha256_managed(new_handle.clone(), data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
 
-    pub fn keccak256<B: core::borrow::Borrow<ManagedBuffer<A>>>(
+    pub fn keccak256<B: core::borrow::Borrow<ManagedBuffer<'a, A>>>(
         &self,
         data: B,
-    ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
+    ) -> ManagedByteArray<'a, A, KECCAK256_RESULT_LEN> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().keccak256_managed(new_handle.clone(), data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
 
-    pub fn ripemd160<B: core::borrow::Borrow<ManagedBuffer<A>>>(
+    pub fn ripemd160<B: core::borrow::Borrow<ManagedBuffer<'a, A>>>(
         &self,
         data: B,
-    ) -> ManagedByteArray<A, { crate::api::RIPEMD_RESULT_LEN }> {
+    ) -> ManagedByteArray<'a, A, { crate::api::RIPEMD_RESULT_LEN }> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().ripemd160_managed(new_handle.clone(), data.borrow().get_handle());
@@ -58,9 +58,9 @@ where
 
     pub fn verify_bls(
         &self,
-        key: &ManagedBuffer<A>,
-        message: &ManagedBuffer<A>,
-        signature: &ManagedBuffer<A>,
+        key: &ManagedBuffer<'a, A>,
+        message: &ManagedBuffer<'a, A>,
+        signature: &ManagedBuffer<'a, A>,
     ) -> bool {
         A::crypto_api_impl().verify_bls_managed(
             key.get_handle(),
@@ -74,9 +74,9 @@ where
     /// The error comes straight form the VM, the message is "invalid signature".
     pub fn verify_ed25519(
         &self,
-        key: &ManagedBuffer<A>,
-        message: &ManagedBuffer<A>,
-        signature: &ManagedBuffer<A>,
+        key: &ManagedBuffer<'a, A>,
+        message: &ManagedBuffer<'a, A>,
+        signature: &ManagedBuffer<'a, A>,
     ) {
         A::crypto_api_impl().verify_ed25519_managed(
             key.get_handle(),
@@ -89,9 +89,9 @@ where
     /// the second byte encodes the length of the remaining signature bytes.
     pub fn verify_secp256k1(
         &self,
-        key: &ManagedBuffer<A>,
-        message: &ManagedBuffer<A>,
-        signature: &ManagedBuffer<A>,
+        key: &ManagedBuffer<'a, A>,
+        message: &ManagedBuffer<'a, A>,
+        signature: &ManagedBuffer<'a, A>,
     ) -> bool {
         A::crypto_api_impl().verify_secp256k1_managed(
             key.get_handle(),
@@ -102,9 +102,9 @@ where
 
     pub fn verify_custom_secp256k1(
         &self,
-        key: &ManagedBuffer<A>,
-        message: &ManagedBuffer<A>,
-        signature: &ManagedBuffer<A>,
+        key: &ManagedBuffer<'a, A>,
+        message: &ManagedBuffer<'a, A>,
+        signature: &ManagedBuffer<'a, A>,
         hash_type: MessageHashType,
     ) -> bool {
         A::crypto_api_impl().verify_custom_secp256k1_managed(
@@ -117,9 +117,9 @@ where
 
     pub fn encode_secp256k1_der_signature(
         &self,
-        r: &ManagedBuffer<A>,
-        s: &ManagedBuffer<A>,
-    ) -> ManagedBuffer<A> {
+        r: &ManagedBuffer<'a, A>,
+        s: &ManagedBuffer<'a, A>,
+    ) -> ManagedBuffer<'a, A> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         A::crypto_api_impl().encode_secp256k1_der_signature_managed(

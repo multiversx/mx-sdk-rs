@@ -20,39 +20,39 @@ use crate::{
 const ITEM_INDEX: &[u8] = b".index";
 const NULL_ENTRY: usize = 0;
 
-pub struct UnorderedSetMapper<SA, T, A = CurrentStorage>
+pub struct UnorderedSetMapper<'a, SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    base_key: StorageKey<SA>,
-    vec_mapper: VecMapper<SA, T, A>,
+    base_key: StorageKey<'a, SA>,
+    vec_mapper: VecMapper<'a, SA, T, A>,
 }
 
-impl<SA, T> StorageMapper<SA> for UnorderedSetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageMapper<'a, SA> for UnorderedSetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         UnorderedSetMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
             base_key: base_key.clone(),
-            vec_mapper: VecMapper::<SA, T>::new(base_key),
+            vec_mapper: VecMapper::<'a, SA, T>::new(base_key),
         }
     }
 }
 
-impl<SA, T> UnorderedSetMapper<SA, T, ManagedAddress<SA>>
+impl<'a, SA, T> UnorderedSetMapper<'a, SA, T, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         UnorderedSetMapper {
             _phantom_api: PhantomData,
             address: address.clone(),
@@ -62,9 +62,9 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for UnorderedSetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageClearable for UnorderedSetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
@@ -75,13 +75,13 @@ where
     }
 }
 
-impl<SA, T, A> UnorderedSetMapper<SA, T, A>
+impl<'a, SA, T, A> UnorderedSetMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn item_index_key(&self, value: &T) -> StorageKey<SA> {
+    fn item_index_key(&self, value: &T) -> StorageKey<'a, SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(ITEM_INDEX);
         item_key.append_item(value);
@@ -118,14 +118,14 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'a, SA, T, A> {
         self.vec_mapper.iter()
     }
 }
 
-impl<SA, T> UnorderedSetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> UnorderedSetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn set_index(&self, value: &T, index: usize) {
@@ -180,10 +180,10 @@ where
     }
 }
 
-impl<'a, SA, T, A> IntoIterator for &'a UnorderedSetMapper<SA, T, A>
+impl<'a, SA, T, A> IntoIterator for &'a UnorderedSetMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     type Item = T;
@@ -195,9 +195,9 @@ where
     }
 }
 
-impl<SA, T> Extend<T> for UnorderedSetMapper<SA, T>
+impl<'a, SA, T> Extend<T> for UnorderedSetMapper<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     fn extend<I>(&mut self, iter: I)
@@ -211,9 +211,9 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for UnorderedSetMapper<SA, T>
+impl<'a, SA, T> TopEncodeMulti for UnorderedSetMapper<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -225,17 +225,17 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<UnorderedSetMapper<SA, T>> for MultiValueEncoded<SA, T>
+impl<'a, SA, T> CodecFrom<UnorderedSetMapper<'a, SA, T>> for MultiValueEncoded<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for UnorderedSetMapper<SA, T>
+impl<'a, SA, T> TypeAbi for UnorderedSetMapper<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

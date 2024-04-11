@@ -14,21 +14,21 @@ multiversx_sc::derive_imports!();
     PartialEq,
     Debug,
 )]
-pub struct TokenAttributes<M: ManagedTypeApi> {
-    pub amount: BigUint<M>,
+pub struct TokenAttributes<'a, M: ManagedTypeApi<'a>> {
+    pub amount: BigUint<'a, M>,
 }
 
-impl<M: ManagedTypeApi> FixedSupplyToken<M> for TokenAttributes<M> {
-    fn get_total_supply(&self) -> BigUint<M> {
+impl<'a, M: ManagedTypeApi<'a>> FixedSupplyToken<'a, M> for TokenAttributes<'a, M> {
+    fn get_total_supply(&self) -> BigUint<'a, M> {
         self.amount.clone()
     }
 
-    fn into_part(self, payment_amount: &BigUint<M>) -> Self {
+    fn into_part(self, payment_amount: &BigUint<'a, M>) -> Self {
         let new_amount = self.rule_of_three_non_zero_result(payment_amount, &self.amount);
         TokenAttributes { amount: new_amount }
     }
 }
-impl<M: ManagedTypeApi> Mergeable<M> for TokenAttributes<M> {
+impl<'a, M: ManagedTypeApi<'a>> Mergeable<'a, M> for TokenAttributes<'a, M> {
     #[inline]
     fn can_merge_with(&self, _other: &Self) -> bool {
         true

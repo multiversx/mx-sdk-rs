@@ -76,8 +76,8 @@ pub trait EchoManagedTypes {
     #[endpoint]
     fn echo_varags_managed_eager(
         &self,
-        m: MultiValueManagedVec<Self::Api, u32>,
-    ) -> MultiValue2<usize, MultiValueManagedVec<Self::Api, u32>> {
+        m: MultiValueManagedVec<'a, Self::Api, u32>,
+    ) -> MultiValue2<usize, MultiValueManagedVec<'a, Self::Api, u32>> {
         let v = m.into_vec();
         (v.len(), v.into()).into()
     }

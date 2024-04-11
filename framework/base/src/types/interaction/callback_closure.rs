@@ -28,21 +28,21 @@ pub const CALLBACK_CLOSURE_STORAGE_BASE_KEY: &[u8] = b"CB_CLOSURE";
 ///
 /// In both cases the framework hides all the magic, the developer shouldn't worry about it.
 #[derive(TopEncode)]
-pub struct CallbackClosure<M: ManagedTypeApi + ErrorApi> {
+pub struct CallbackClosure<'a, M: ManagedTypeApi<'a> + ErrorApi> {
     pub(super) callback_name: &'static str,
-    pub(super) closure_args: ManagedArgBuffer<M>,
+    pub(super) closure_args: ManagedArgBuffer<'a, M>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
-/// Unlike calling `CallbackClosure::<SA, R>::new`, here types can be inferred from the context.
-pub fn new_callback_call<A>(callback_name: &'static str) -> CallbackClosure<A>
+/// Unlike calling `CallbackClosure::<'a, SA, R>::new`, here types can be inferred from the context.
+pub fn new_callback_call<'a, A>(callback_name: &'static str) -> CallbackClosure<'a, A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi<'a> + ErrorApi,
 {
     CallbackClosure::new(callback_name)
 }
 
-impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
+impl<'a, M: ManagedTypeApi<'a> + ErrorApi> CallbackClosure<'a, M> {
     pub fn new(callback_name: &'static str) -> Self {
         CallbackClosure {
             callback_name,
@@ -51,18 +51,18 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosure<M> {
     }
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let h = ExitCodecErrorHandler::<'a, M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
         let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.closure_args, h);
     }
 
-    pub fn save_to_storage<A: BlockchainApi + StorageWriteApi>(&self) {
-        let storage_key = cb_closure_storage_key::<A>();
+    pub fn save_to_storage<A: BlockchainApi<'a> + StorageWriteApi>(&self) {
+        let storage_key = cb_closure_storage_key::<'a, A>();
         storage_set(storage_key.as_ref(), self);
     }
 }
 
-pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
-    let tx_hash = BlockchainWrapper::<A>::new().get_tx_hash();
+pub(super) fn cb_closure_storage_key<'a, A: BlockchainApi<'a>>() -> StorageKey<'a, A> {
+    let tx_hash = BlockchainWrapper::<'a, A>::new().get_tx_hash();
     let mut storage_key = StorageKey::new(CALLBACK_CLOSURE_STORAGE_BASE_KEY);
     storage_key.append_managed_buffer(tx_hash.as_managed_buffer());
     storage_key
@@ -75,12 +75,12 @@ pub(super) fn cb_closure_storage_key<A: BlockchainApi>() -> StorageKey<A> {
 ///
 /// It is a separate type from `CallbackClosure`, because we want a different representation of the endpoint name.
 #[derive(TopDecode)]
-pub struct CallbackClosureForDeser<M: ManagedTypeApi + ErrorApi> {
-    callback_name: ManagedBuffer<M>,
-    closure_args: ManagedArgBuffer<M>,
+pub struct CallbackClosureForDeser<'a, M: ManagedTypeApi<'a> + ErrorApi> {
+    callback_name: ManagedBuffer<'a, M>,
+    closure_args: ManagedArgBuffer<'a, M>,
 }
 
-impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
+impl<'a, M: ManagedTypeApi<'a> + ErrorApi> CallbackClosureForDeser<'a, M> {
     /// Used by callback_raw.
     /// TODO: avoid creating any new managed buffers.
     pub fn no_callback() -> Self {
@@ -90,12 +90,12 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
         }
     }
 
-    pub fn storage_load_and_clear<A: BlockchainApi + StorageReadApi + StorageWriteApi>(
+    pub fn storage_load_and_clear<A: BlockchainApi<'a> + StorageReadApi + StorageWriteApi>(
     ) -> Option<Self> {
-        let storage_key = cb_closure_storage_key::<A>();
-        let storage_value_raw: ManagedBuffer<A> = storage_get(storage_key.as_ref());
+        let storage_key = cb_closure_storage_key::<'a, A>();
+        let storage_value_raw: ManagedBuffer<'a, A> = storage_get(storage_key.as_ref());
         if !storage_value_raw.is_empty() {
-            let serializer = ManagedSerializer::<A>::new();
+            let serializer = ManagedSerializer::<'a, A>::new();
             let closure = serializer.top_decode_from_managed_buffer(&storage_value_raw);
             storage_clear(storage_key.as_ref());
             Some(closure)
@@ -110,7 +110,7 @@ impl<M: ManagedTypeApi + ErrorApi> CallbackClosureForDeser<M> {
         CallbackClosureMatcher::new(&self.callback_name)
     }
 
-    pub fn into_arg_loader(self) -> ManagedResultArgLoader<M> {
+    pub fn into_arg_loader(self) -> ManagedResultArgLoader<'a, M> {
         ManagedResultArgLoader::new(self.closure_args.data)
     }
 }
@@ -124,7 +124,7 @@ pub struct CallbackClosureMatcher<const CB_NAME_MAX_LENGTH: usize> {
 }
 
 impl<const CB_NAME_MAX_LENGTH: usize> CallbackClosureMatcher<CB_NAME_MAX_LENGTH> {
-    pub fn new<M: ManagedTypeApi + ErrorApi>(callback_name: &ManagedBuffer<M>) -> Self {
+    pub fn new<'a, M: ManagedTypeApi<'a> + ErrorApi>(callback_name: &ManagedBuffer<'a, M>) -> Self {
         let mut compare_buffer = [0u8; CB_NAME_MAX_LENGTH];
         let name_len = callback_name.len();
         let _ = callback_name.load_slice(0, &mut compare_buffer[..name_len]);

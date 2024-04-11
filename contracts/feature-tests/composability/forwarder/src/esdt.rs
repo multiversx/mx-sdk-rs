@@ -4,16 +4,16 @@ use super::storage;
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
-pub type EsdtTokenDataMultiValue<M> = MultiValue9<
+pub type EsdtTokenDataMultiValue<'a, M> = MultiValue9<
     EsdtTokenType,
-    BigUint<M>,
+    BigUint<'a, M>,
     bool,
-    ManagedBuffer<M>,
-    ManagedBuffer<M>,
-    ManagedBuffer<M>,
-    ManagedAddress<M>,
-    BigUint<M>,
-    ManagedVec<M, ManagedBuffer<M>>,
+    ManagedBuffer<'a, M>,
+    ManagedBuffer<'a, M>,
+    ManagedBuffer<'a, M>,
+    ManagedAddress<'a, M>,
+    BigUint<'a, M>,
+    ManagedVec<'a, M, ManagedBuffer<'a, M>>,
 >;
 
 #[multiversx_sc::module]

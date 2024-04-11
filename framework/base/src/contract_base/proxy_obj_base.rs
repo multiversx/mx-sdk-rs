@@ -3,8 +3,8 @@ use crate::{
     types::{ManagedAddress, ManagedOption},
 };
 
-pub trait ProxyObjBase {
-    type Api: VMApi;
+pub trait ProxyObjBase<'a> {
+    type Api: VMApi<'a>;
 
     #[doc(hidden)]
     fn new_proxy_obj() -> Self;

@@ -3,9 +3,9 @@
 use multiversx_sc::{derive_imports::*, imports::*};
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct TokenIdPair<M: ManagedTypeApi> {
-    first_token_id: TokenIdentifier<M>,
-    second_token_id: TokenIdentifier<M>,
+pub struct TokenIdPair<'a, M: ManagedTypeApi<'a>> {
+    first_token_id: TokenIdentifier<'a, M>,
+    second_token_id: TokenIdentifier<'a, M>,
 }
 
 #[multiversx_sc::contract]
@@ -53,5 +53,5 @@ pub trait Factory {
     fn pair_template_address(&self) -> SingleValueMapper<ManagedAddress>;
 
     #[storage_mapper("pairs")]
-    fn pairs(&self) -> MapMapper<TokenIdPair<Self::Api>, ManagedAddress>;
+    fn pairs(&self) -> MapMapper<'a, TokenIdPair<Self::Api>, ManagedAddress>;
 }

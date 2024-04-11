@@ -5,6 +5,7 @@ use multiversx_sc::{
     types::ManagedVecItem,
 };
 use std::sync::Arc;
+use multiversx_sc::api::const_handles;
 
 #[derive(Clone)]
 pub struct DebugHandle {
@@ -32,6 +33,15 @@ impl DebugHandle {
 impl core::fmt::Debug for DebugHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         RawHandle::fmt(&self.raw_handle, f)
+    }
+}
+
+impl Default for DebugHandle {
+    fn default() -> Self {
+        Self {
+            context: TxContextStack::static_peek(),
+            raw_handle: const_handles::UNINITIALIZED_HANDLE
+        }
     }
 }
 
@@ -81,20 +91,24 @@ impl ManagedVecItem for DebugHandle {
 
     const SKIPS_RESERIALIZATION: bool = <RawHandle as ManagedVecItem>::SKIPS_RESERIALIZATION;
 
-    type Ref<'a> = Self;
+    type Ref<'b> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         use_raw_handle(RawHandle::from_byte_reader(reader))
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         use_raw_handle(RawHandle::from_byte_reader(reader))
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         RawHandle::to_byte_writer(&self.get_raw_handle(), writer)
+    }
+
+    fn take_handle_ownership(self) {
+        self.raw_handle.take_handle_ownership()
     }
 }
 

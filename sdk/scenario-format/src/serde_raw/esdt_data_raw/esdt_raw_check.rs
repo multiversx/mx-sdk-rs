@@ -49,7 +49,7 @@ impl<'de> Visitor<'de> for CheckEsdtRawVisitor {
         Ok(CheckEsdtRaw::Short(ValueSubTree::Str(value.to_string())))
     }
 
-    fn visit_map<M>(self, map: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, map: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

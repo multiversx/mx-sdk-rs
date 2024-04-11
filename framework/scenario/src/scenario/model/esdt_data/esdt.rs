@@ -33,7 +33,7 @@ impl Esdt {
     pub fn set_balance<N, A>(&mut self, token_nonce_expr: N, amount_expr: A)
     where
         U64Value: From<N>,
-        BigUintValue: From<A>,
+        BigUintValue: From<'a, A>,
     {
         self.convert_to_full();
 

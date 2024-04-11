@@ -84,7 +84,7 @@ impl TxExpect {
         self
     }
 
-    pub fn additional_error_message<A>(mut self, message: A) -> Self
+    pub fn additional_error_message<'a, A>(mut self, message: A) -> Self
     where
         A: AsRef<str>,
     {

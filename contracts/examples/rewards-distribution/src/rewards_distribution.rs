@@ -18,17 +18,17 @@ pub struct Bracket {
 }
 
 #[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
-pub struct ComputedBracket<M: ManagedTypeApi> {
+pub struct ComputedBracket<'a, M: ManagedTypeApi<'a>> {
     pub end_index: u64,
-    pub nft_reward_percent: BigUint<M>,
+    pub nft_reward_percent: BigUint<'a, M>,
 }
 
 #[derive(NestedEncode, NestedDecode)]
-pub struct RaffleProgress<M: ManagedTypeApi> {
+pub struct RaffleProgress<'a, M: ManagedTypeApi<'a>> {
     pub raffle_id: u64,
     pub ticket_position: u64,
     pub ticket_count: u64,
-    pub computed_brackets: ManagedVec<M, ComputedBracket<M>>,
+    pub computed_brackets: ManagedVec<'a, M, ComputedBracket<'a, M>>,
 }
 
 #[multiversx_sc::contract]

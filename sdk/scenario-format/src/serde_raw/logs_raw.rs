@@ -82,7 +82,7 @@ impl<'de> Visitor<'de> for CheckLogElementVisitor {
         }
     }
 
-    fn visit_map<A>(self, map: A) -> Result<Self::Value, A::Error>
+    fn visit_map<'a, A>(self, map: A) -> Result<Self::Value, A::Error>
     where
         A: de::MapAccess<'de>,
     {
@@ -121,7 +121,7 @@ impl<'de> Visitor<'de> for CheckLogsVisitor {
         }
     }
 
-    fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+    fn visit_seq<'a, A>(self, mut seq: A) -> Result<Self::Value, A::Error>
     where
         A: SeqAccess<'de>,
     {

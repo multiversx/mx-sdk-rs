@@ -16,19 +16,23 @@ use crate::codec::{
 
 #[derive(Debug)]
 #[repr(transparent)]
-pub struct BigFloat<M: ManagedTypeApi> {
+pub struct BigFloat<'a, M: ManagedTypeApi<'a>> {
     pub(crate) handle: M::BigFloatHandle,
 }
 
-impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for BigFloat<'a, M> {
     type OwnHandle = M::BigFloatHandle;
 
     fn from_handle(handle: M::BigFloatHandle) -> Self {
         BigFloat { handle }
     }
 
-    fn get_handle(&self) -> M::BigFloatHandle {
+    unsafe fn get_handle(&self) -> M::BigFloatHandle {
         self.handle.clone()
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        core::mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigFloatHandle) -> &Self {
@@ -36,45 +40,45 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> From<&ManagedBuffer<M>> for BigFloat<M> {
-    fn from(item: &ManagedBuffer<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> From<&ManagedBuffer<'a, M>> for BigFloat<'a, M> {
+    fn from(item: &ManagedBuffer<'a, M>) -> Self {
         BigFloat::from_buffer(item)
     }
 }
 
-impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for BigFloat<M> {
-    fn from(item: ManagedBuffer<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> From<ManagedBuffer<'a, M>> for BigFloat<'a, M> {
+    fn from(item: ManagedBuffer<'a, M>) -> Self {
         BigFloat::from_buffer(&item)
     }
 }
 
-impl<M: ManagedTypeApi> From<&BigUint<M>> for BigFloat<M> {
-    fn from(item: &BigUint<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> From<&BigUint<'a, M>> for BigFloat<'a, M> {
+    fn from(item: &BigUint<'a, M>) -> Self {
         BigFloat::from_big_uint(item)
     }
 }
 
-impl<M: ManagedTypeApi> From<BigUint<M>> for BigFloat<M> {
-    fn from(item: BigUint<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> From<BigUint<'a, M>> for BigFloat<'a, M> {
+    fn from(item: BigUint<'a, M>) -> Self {
         BigFloat::from_big_uint(&item)
     }
 }
 
-impl<M: ManagedTypeApi> From<&BigInt<M>> for BigFloat<M> {
-    fn from(item: &BigInt<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> From<&BigInt<'a, M>> for BigFloat<'a, M> {
+    fn from(item: &BigInt<'a, M>) -> Self {
         BigFloat::from_big_int(item)
     }
 }
 
-impl<M: ManagedTypeApi> From<BigInt<M>> for BigFloat<M> {
-    fn from(item: BigInt<M>) -> Self {
+impl<'a, M: ManagedTypeApi<'a>> From<BigInt<'a, M>> for BigFloat<'a, M> {
+    fn from(item: BigInt<'a, M>) -> Self {
         BigFloat::from_big_int(&item)
     }
 }
 
 macro_rules! big_float_conv_num {
     ($num_ty:ty) => {
-        impl<M: ManagedTypeApi> From<$num_ty> for BigFloat<M> {
+        impl<'a, M: ManagedTypeApi<'a>> From<$num_ty> for BigFloat<'a, M> {
             #[inline]
             fn from(value: $num_ty) -> Self {
                 let new_bf_handle: M::BigFloatHandle =
@@ -92,9 +96,9 @@ big_float_conv_num! {isize}
 big_float_conv_num! {i16}
 big_float_conv_num! {i8}
 
-impl<M> CodecFromSelf for BigFloat<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFromSelf for BigFloat<'a, M> where M: ManagedTypeApi<'a> {}
 
-impl<M: ManagedTypeApi> BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> BigFloat<'a, M> {
     #[inline]
     pub fn neg(&self) -> Self {
         let new_bf_handle: M::BigFloatHandle =
@@ -104,7 +108,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     #[inline]
-    pub fn from_big_uint(big_uint: &BigUint<M>) -> Self {
+    pub fn from_big_uint(big_uint: &BigUint<'a, M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_uint.handle.clone());
@@ -112,7 +116,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     #[inline]
-    pub fn from_big_int(big_int: &BigInt<M>) -> Self {
+    pub fn from_big_int(big_int: &BigInt<'a, M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_set_bi(new_bf_handle.clone(), big_int.handle.clone());
@@ -145,39 +149,39 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_bf_handle)
     }
 
-    pub fn trunc(&self) -> BigInt<M> {
+    pub fn trunc(&self) -> BigInt<'a, M> {
         let result: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let api = M::managed_type_impl();
         api.bf_trunc(result.clone(), self.handle.clone());
         BigInt::from_handle(result)
     }
 
-    pub fn floor(&self) -> BigInt<M> {
+    pub fn floor(&self) -> BigInt<'a, M> {
         let result: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let api = M::managed_type_impl();
         api.bf_floor(result.clone(), self.handle.clone());
         BigInt::from_handle(result)
     }
 
-    pub fn ceil(&self) -> BigInt<M> {
+    pub fn ceil(&self) -> BigInt<'a, M> {
         let result: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         let api = M::managed_type_impl();
         api.bf_ceil(result.clone(), self.handle.clone());
         BigInt::from_handle(result)
     }
 
-    pub fn to_fixed_point(&self, denominator: &BigFloat<M>) -> BigInt<M> {
+    pub fn to_fixed_point(&self, denominator: &BigFloat<'a, M>) -> BigInt<'a, M> {
         (self * denominator).trunc()
     }
 }
 
-impl<M: ManagedTypeApi> BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> BigFloat<'a, M> {
     #[inline]
     pub fn zero() -> Self {
         BigFloat::from_handle(M::managed_type_impl().bf_new_zero())
     }
 
-    pub fn from_buffer(managed_buffer: &ManagedBuffer<M>) -> Self {
+    pub fn from_buffer(managed_buffer: &ManagedBuffer<'a, M>) -> Self {
         let new_bf_handle: M::BigFloatHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl()
@@ -185,7 +189,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
         BigFloat::from_handle(new_bf_handle)
     }
 
-    pub fn to_buffer(&self) -> ManagedBuffer<M> {
+    pub fn to_buffer(&self) -> ManagedBuffer<'a, M> {
         let new_man_buf_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mb_from_big_float(self.handle.clone(), new_man_buf_handle.clone());
@@ -193,7 +197,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> BigFloat<'a, M> {
     pub fn sqrt(&self) -> Self {
         let api = M::managed_type_impl();
         let new_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
@@ -218,7 +222,7 @@ impl<M: ManagedTypeApi> BigFloat<M> {
     }
 
     /// Returns the magnitude of the `BigFloat`
-    pub fn magnitude(&self) -> BigFloat<M> {
+    pub fn magnitude(&self) -> BigFloat<'a, M> {
         let result: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_abs(result.clone(), self.handle.clone());
         BigFloat::from_handle(result)
@@ -226,12 +230,12 @@ impl<M: ManagedTypeApi> BigFloat<M> {
 
     /// Convert this `BigFloat` into its `Sign` and its magnitude,
     /// the reverse of `BigInt::from_biguint`.
-    pub fn to_parts(self) -> (Sign, BigFloat<M>) {
+    pub fn to_parts(self) -> (Sign, BigFloat<'a, M>) {
         (self.sign(), self.magnitude())
     }
 }
 
-impl<M: ManagedTypeApi> Clone for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> Clone for BigFloat<'a, M> {
     fn clone(&self) -> Self {
         let new_handle: M::BigFloatHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bf_clone(new_handle.clone(), self.handle.clone());
@@ -239,9 +243,9 @@ impl<M: ManagedTypeApi> Clone for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TryStaticCast for BigFloat<M> {}
+impl<'a, M: ManagedTypeApi<'a>> TryStaticCast for BigFloat<'a, M> {}
 
-impl<M: ManagedTypeApi> TopEncode for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> TopEncode for BigFloat<'a, M> {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
         O: TopEncodeOutput,
@@ -251,7 +255,7 @@ impl<M: ManagedTypeApi> TopEncode for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> TopDecode for BigFloat<'a, M> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -263,7 +267,7 @@ impl<M: ManagedTypeApi> TopDecode for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedEncode for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> NestedEncode for BigFloat<'a, M> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -273,7 +277,7 @@ impl<M: ManagedTypeApi> NestedEncode for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedDecode for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> NestedDecode for BigFloat<'a, M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -285,7 +289,7 @@ impl<M: ManagedTypeApi> NestedDecode for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigFloat<M> {
+impl<'a, M: ManagedTypeApi<'a>> crate::abi::TypeAbi for BigFloat<'a, M> {
     fn type_name() -> String {
         String::from("BigFloat")
     }

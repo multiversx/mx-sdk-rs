@@ -6,38 +6,38 @@ use multiversx_sc::{
 use multiversx_sc::derive_imports::*;
 
 #[derive(NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct CallActionData<M: ManagedTypeApi> {
-    pub to: ManagedAddress<M>,
-    pub egld_amount: BigUint<M>,
-    pub endpoint_name: ManagedBuffer<M>,
-    pub arguments: ManagedVec<M, ManagedBuffer<M>>,
+pub struct CallActionData<'a, M: ManagedTypeApi<'a>> {
+    pub to: ManagedAddress<'a, M>,
+    pub egld_amount: BigUint<'a, M>,
+    pub endpoint_name: ManagedBuffer<'a, M>,
+    pub arguments: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Clone)]
-pub enum Action<M: ManagedTypeApi> {
+pub enum Action<'a, M: ManagedTypeApi<'a>> {
     Nothing,
-    AddBoardMember(ManagedAddress<M>),
-    AddProposer(ManagedAddress<M>),
-    RemoveUser(ManagedAddress<M>),
+    AddBoardMember(ManagedAddress<'a, M>),
+    AddProposer(ManagedAddress<'a, M>),
+    RemoveUser(ManagedAddress<'a, M>),
     ChangeQuorum(usize),
-    SendTransferExecute(CallActionData<M>),
-    SendAsyncCall(CallActionData<M>),
+    SendTransferExecute(CallActionData<'a, M>),
+    SendAsyncCall(CallActionData<'a, M>),
     SCDeployFromSource {
-        amount: BigUint<M>,
-        source: ManagedAddress<M>,
+        amount: BigUint<'a, M>,
+        source: ManagedAddress<'a, M>,
         code_metadata: CodeMetadata,
-        arguments: ManagedVec<M, ManagedBuffer<M>>,
+        arguments: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
     },
     SCUpgradeFromSource {
-        sc_address: ManagedAddress<M>,
-        amount: BigUint<M>,
-        source: ManagedAddress<M>,
+        sc_address: ManagedAddress<'a, M>,
+        amount: BigUint<'a, M>,
+        source: ManagedAddress<'a, M>,
         code_metadata: CodeMetadata,
-        arguments: ManagedVec<M, ManagedBuffer<M>>,
+        arguments: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
     },
 }
 
-impl<M: ManagedTypeApi> Action<M> {
+impl<'a, M: ManagedTypeApi<'a>> Action<'a, M> {
     /// Only pending actions are kept in storage,
     /// both executed and discarded actions are removed (converted to `Nothing`).
     /// So this is equivalent to `action != Action::Nothing`.
@@ -48,10 +48,10 @@ impl<M: ManagedTypeApi> Action<M> {
 
 /// Not used internally, just to retrieve results via endpoint.
 #[derive(TopEncode, TypeAbi)]
-pub struct ActionFullInfo<M: ManagedTypeApi> {
+pub struct ActionFullInfo<'a, M: ManagedTypeApi<'a>> {
     pub action_id: usize,
-    pub action_data: Action<M>,
-    pub signers: ManagedVec<M, ManagedAddress<M>>,
+    pub action_data: Action<'a, M>,
+    pub signers: ManagedVec<'a, M, ManagedAddress<'a, M>>,
 }
 
 #[cfg(test)]

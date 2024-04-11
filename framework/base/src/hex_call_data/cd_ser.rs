@@ -33,9 +33,9 @@ impl HexCallDataSerializer {
         hex_data
     }
 
-    pub fn from_managed_arg_buffer<M: ManagedTypeApi>(
-        endpoint_name: &ManagedBuffer<M>,
-        arg_buffer: &ManagedArgBuffer<M>,
+    pub fn from_managed_arg_buffer<'a, M: ManagedTypeApi<'a>>(
+        endpoint_name: &ManagedBuffer<'a, M>,
+        arg_buffer: &ManagedArgBuffer<'a, M>,
     ) -> Self {
         let mut hex_data = HexCallDataSerializer::new(endpoint_name.to_boxed_bytes().as_slice());
         for arg in arg_buffer.raw_arg_iter() {

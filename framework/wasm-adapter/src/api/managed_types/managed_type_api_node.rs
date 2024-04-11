@@ -12,7 +12,7 @@ extern "C" {
     fn validateTokenIdentifier(token_id_handle: i32) -> i32;
 }
 
-impl ManagedTypeApi for VmApiImpl {
+impl<'a> ManagedTypeApi<'a> for VmApiImpl {
     type ManagedTypeApiImpl = VmApiImpl;
 
     fn managed_type_impl() -> Self {

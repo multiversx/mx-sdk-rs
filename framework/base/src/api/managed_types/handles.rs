@@ -18,7 +18,7 @@ use crate::{
 pub type RawHandle = i32;
 
 pub trait HandleConstraints:
-    ManagedVecItem + TryStaticCast + Debug + Clone + From<RawHandle> + PartialEq + PartialEq<RawHandle>
+    ManagedVecItem + TryStaticCast + Debug + Clone + From<RawHandle> + PartialEq + PartialEq<RawHandle> + Default
 {
     fn new(handle: RawHandle) -> Self;
     fn to_be_bytes(&self) -> [u8; 4];

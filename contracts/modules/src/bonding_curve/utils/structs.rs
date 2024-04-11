@@ -4,34 +4,34 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
-pub struct CurveArguments<M: ManagedTypeApi> {
-    pub available_supply: BigUint<M>,
-    pub balance: BigUint<M>,
+pub struct CurveArguments<'a, M: ManagedTypeApi<'a>> {
+    pub available_supply: BigUint<'a, M>,
+    pub balance: BigUint<'a, M>,
 }
 
-impl<M: ManagedTypeApi> CurveArguments<M> {
-    pub fn first_token_available(&self) -> BigUint<M> {
+impl<'a, M: ManagedTypeApi<'a>> CurveArguments<'a, M> {
+    pub fn first_token_available(&self) -> BigUint<'a, M> {
         &self.available_supply - &self.balance
     }
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
 pub struct BondingCurve<
-    M: ManagedTypeApi,
-    T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+    M: ManagedTypeApi<'a>,
+    T: CurveFunction<'a, M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 > {
     pub curve: T,
-    pub arguments: CurveArguments<M>,
+    pub arguments: CurveArguments<'a, M>,
     pub sell_availability: bool,
-    pub payment: EgldOrEsdtTokenPayment<M>,
+    pub payment: EgldOrEsdtTokenPayment<'a, M>,
 }
 
 impl<
-        M: ManagedTypeApi,
-        T: CurveFunction<M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
-    > BondingCurve<M, T>
+        M: ManagedTypeApi<'a>,
+        T: CurveFunction<'a, M> + TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
+    > BondingCurve<'a, M, T>
 {
-    pub fn payment_token(&self) -> EgldOrEsdtTokenIdentifier<M> {
+    pub fn payment_token(&self) -> EgldOrEsdtTokenIdentifier<'a, M> {
         self.payment.token_identifier.clone()
     }
     pub fn payment_is_egld(&self) -> bool {
@@ -40,12 +40,12 @@ impl<
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, PartialEq, Eq, Clone)]
-pub struct TokenOwnershipData<M: ManagedTypeApi> {
-    pub token_nonces: ManagedVec<M, u64>,
-    pub owner: ManagedAddress<M>,
+pub struct TokenOwnershipData<'a, M: ManagedTypeApi<'a>> {
+    pub token_nonces: ManagedVec<'a, M, u64>,
+    pub owner: ManagedAddress<'a, M>,
 }
 
-impl<M: ManagedTypeApi> TokenOwnershipData<M> {
+impl<'a, M: ManagedTypeApi<'a>> TokenOwnershipData<'a, M> {
     pub fn add_nonce(&mut self, nonce: u64) {
         if !self.token_nonces.contains(&nonce) {
             self.token_nonces.push(nonce);

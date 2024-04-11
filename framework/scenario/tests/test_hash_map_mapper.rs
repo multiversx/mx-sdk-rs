@@ -4,7 +4,7 @@ use multiversx_sc::storage::{
 };
 use multiversx_sc_scenario::api::SingleTxApi;
 
-fn create_map() -> MapMapper<SingleTxApi, u64, u64> {
+fn create_map() -> MapMapper<'a, SingleTxApi, u64, u64> {
     let base_key = StorageKey::new(&b"my_map"[..]);
     MapMapper::new(base_key)
 }

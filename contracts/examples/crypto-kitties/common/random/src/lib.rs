@@ -24,9 +24,9 @@ pub trait Randomizeable {
 
 impl Random {
     /// block random seed + salt creates a stronger randomness source
-    pub fn new<M: ManagedTypeApi>(
-        seed: ManagedByteArray<M, SEED_SIZE>,
-        salt: ManagedByteArray<M, SALT_SIZE>,
+    pub fn new<'a, M: ManagedTypeApi<'a>>(
+        seed: ManagedByteArray<'a, M, SEED_SIZE>,
+        salt: ManagedByteArray<'a, M, SALT_SIZE>,
     ) -> Self {
         unsafe {
             // it's more efficient to load all the data in static buffers

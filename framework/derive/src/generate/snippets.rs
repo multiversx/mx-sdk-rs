@@ -1,6 +1,6 @@
 pub fn contract_object_def() -> proc_macro2::TokenStream {
     quote! {
-        pub struct ContractObj<A>
+        pub struct ContractObj<'a, A>
         where
             A: multiversx_sc::api::VMApi,
         {
@@ -11,7 +11,7 @@ pub fn contract_object_def() -> proc_macro2::TokenStream {
 
 pub fn impl_contract_base() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> multiversx_sc::contract_base::ContractBase for ContractObj<A>
+        impl<'a, A> multiversx_sc::contract_base::ContractBase for ContractObj<'a, A>
         where
             A: multiversx_sc::api::VMApi,
         {
@@ -22,7 +22,7 @@ pub fn impl_contract_base() -> proc_macro2::TokenStream {
 
 pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
     quote! {
-        pub fn contract_obj<A>() -> ContractObj<A>
+        pub fn contract_obj<'a, A>() -> ContractObj<'a, A>
         where
             A: multiversx_sc::api::VMApi,
         {
@@ -37,7 +37,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
             fn new_contract_obj<A: multiversx_sc::api::VMApi + Send + Sync>(
                 &self,
             ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract> {
-                multiversx_sc::types::heap::Box::new(ContractObj::<A> {
+                multiversx_sc::types::heap::Box::new(ContractObj::<'a, A> {
                     _phantom: core::marker::PhantomData,
                 })
             }
@@ -49,7 +49,7 @@ pub fn new_contract_object_fn() -> proc_macro2::TokenStream {
 #[allow(dead_code)]
 pub fn impl_auto_impl() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> AutoImpl for ContractObj<A> where
+        impl<'a, A> AutoImpl for ContractObj<'a, A> where
             A: multiversx_sc::contract_base::ContractBase
                 + multiversx_sc::api::ErrorApi
                 + multiversx_sc::api::EndpointArgumentApi
@@ -62,7 +62,7 @@ pub fn impl_auto_impl() -> proc_macro2::TokenStream {
 
 pub fn impl_callable_contract() -> proc_macro2::TokenStream {
     quote! {
-        impl<A> multiversx_sc::contract_base::CallableContract for ContractObj<A>
+        impl<'a, A> multiversx_sc::contract_base::CallableContract for ContractObj<'a, A>
         where
             A: multiversx_sc::api::VMApi + Send + Sync,
         {
@@ -75,14 +75,14 @@ pub fn impl_callable_contract() -> proc_macro2::TokenStream {
 
 pub fn proxy_object_def() -> proc_macro2::TokenStream {
     quote! {
-        pub struct Proxy<A>
+        pub struct Proxy<'a, A>
         where
             A: multiversx_sc::api::VMApi + 'static,
         {
-            pub address: multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+            pub address: multiversx_sc::types::ManagedOption<'a, A, multiversx_sc::types::ManagedAddress<'a, A>>,
         }
 
-        impl<A> multiversx_sc::contract_base::ProxyObjBase for Proxy<A>
+        impl<'a, A> multiversx_sc::contract_base::ProxyObjBase for Proxy<'a, A>
         where
             A: multiversx_sc::api::VMApi + 'static,
         {
@@ -117,14 +117,14 @@ pub fn proxy_object_def() -> proc_macro2::TokenStream {
 
 pub fn callback_proxy_object_def() -> proc_macro2::TokenStream {
     quote! {
-        pub struct CallbackProxyObj<A>
+        pub struct CallbackProxyObj<'a, A>
         where
             A: multiversx_sc::api::VMApi + 'static,
         {
             _phantom: core::marker::PhantomData<A>,
         }
 
-        impl<A> multiversx_sc::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
+        impl<'a, A> multiversx_sc::contract_base::CallbackProxyObjBase for CallbackProxyObj<'a, A>
         where
             A: multiversx_sc::api::VMApi + 'static,
         {

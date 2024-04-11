@@ -91,24 +91,24 @@ impl LinkedListInfo {
     }
 }
 
-pub struct LinkedListMapper<SA, T, A = CurrentStorage>
+pub struct LinkedListMapper<'a, SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    base_key: StorageKey<SA>,
+    base_key: StorageKey<'a, SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for LinkedListMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageMapper<'a, SA> for LinkedListMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         LinkedListMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
@@ -118,12 +118,12 @@ where
     }
 }
 
-impl<SA, T> LinkedListMapper<SA, T, ManagedAddress<SA>>
+impl<'a, SA, T> LinkedListMapper<'a, SA, T, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         LinkedListMapper {
             _phantom_api: PhantomData,
             address,
@@ -133,9 +133,9 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for LinkedListMapper<SA, T>
+impl<'a, SA, T> StorageClearable for LinkedListMapper<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn clear(&mut self) {
@@ -152,20 +152,20 @@ where
     }
 }
 
-impl<SA, T, A> LinkedListMapper<SA, T, A>
+impl<'a, SA, T, A> LinkedListMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
+    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<'a, SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);
         named_key.append_item(&node_id);
         named_key
     }
 
-    fn build_name_key(&self, name: &[u8]) -> StorageKey<SA> {
+    fn build_name_key(&self, name: &[u8]) -> StorageKey<'a, SA> {
         let mut name_key = self.base_key.clone();
         name_key.append_bytes(name);
         name_key
@@ -218,11 +218,11 @@ where
         Some(self.get_node(node_id))
     }
 
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'a, SA, T, A> {
         Iter::new(self)
     }
 
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, T, A> {
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<'a, SA, T, A> {
         Iter::new_from_node_id(self, node_id)
     }
 
@@ -287,9 +287,9 @@ where
     }
 }
 
-impl<SA, T> LinkedListMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> LinkedListMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn set_info(&mut self, value: LinkedListInfo) {
@@ -529,10 +529,10 @@ where
     }
 }
 
-impl<'a, SA, T, A> IntoIterator for &'a LinkedListMapper<SA, T, A>
+impl<'a, SA, T, A> IntoIterator for &'a LinkedListMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     type Item = LinkedListNode<T>;
@@ -546,21 +546,21 @@ where
 
 pub struct Iter<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     node_opt: Option<LinkedListNode<T>>,
-    linked_list: &'a LinkedListMapper<SA, T, A>,
+    linked_list: &'a LinkedListMapper<'a, SA, T, A>,
 }
 
 impl<'a, SA, T, A> Iter<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
-    fn new(linked_list: &'a LinkedListMapper<SA, T, A>) -> Iter<'a, SA, T, A> {
+    fn new(linked_list: &'a LinkedListMapper<'a, SA, T, A>) -> Iter<'a, SA, T, A> {
         Iter {
             node_opt: linked_list.front(),
             linked_list,
@@ -568,7 +568,7 @@ where
     }
 
     fn new_from_node_id(
-        linked_list: &'a LinkedListMapper<SA, T, A>,
+        linked_list: &'a LinkedListMapper<'a, SA, T, A>,
         node_id: u32,
     ) -> Iter<'a, SA, T, A> {
         Iter {
@@ -580,8 +580,8 @@ where
 
 impl<'a, SA, T, A> Iterator for Iter<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + 'static,
 {
     type Item = LinkedListNode<T>;
@@ -595,9 +595,9 @@ where
     }
 }
 
-impl<SA, T> TopEncodeMulti for LinkedListMapper<SA, T>
+impl<'a, SA, T> TopEncodeMulti for LinkedListMapper<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -612,17 +612,17 @@ where
     }
 }
 
-impl<SA, T, U> CodecFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, U>
+impl<'a, SA, T, U> CodecFrom<LinkedListMapper<'a, SA, T>> for MultiValueEncoded<'a, SA, U>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     U: CodecFrom<T>,
 {
 }
 
-impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
+impl<'a, SA, T> TypeAbi for LinkedListMapper<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
     fn type_name() -> TypeName {

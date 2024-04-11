@@ -84,8 +84,8 @@ pub trait StorageLoadFeatures {
         let value_handle: <<Self as ContractBase>::Api as HandleTypeInfo>::ManagedBufferHandle =
             use_raw_handle(Self::Api::static_var_api_impl().next_handle());
         Self::Api::storage_read_api_impl().storage_load_from_address(
-            address.get_handle(),
-            key.get_handle(),
+            address.take_handle(),
+            key.take_handle(),
             value_handle.clone(),
         );
         ManagedBuffer::from_handle(value_handle)

@@ -64,7 +64,7 @@ pub trait OrdersModule:
         self.cancel_orders(order_ids_not_empty);
     }
 
-    fn cancel_orders(&self, order_ids: MultiValueManagedVec<u64>) {
+    fn cancel_orders(&self, order_ids: MultiValueManagedVec<'a, u64>) {
         let caller = &self.blockchain().get_caller();
         let address_order_ids = self.get_address_order_ids(caller);
         self.require_contains_all(&address_order_ids, &order_ids);
@@ -73,7 +73,7 @@ pub trait OrdersModule:
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+        let mut order_ids_not_empty: MultiValueManagedVec<'a, Self::Api, u64> =
             MultiValueManagedVec::new();
         for order in order_ids.iter() {
             if !self.orders(order).is_empty() {
@@ -103,7 +103,7 @@ pub trait OrdersModule:
         self.emit_cancel_order_events(orders);
     }
 
-    fn free_orders(&self, order_ids: MultiValueManagedVec<u64>) {
+    fn free_orders(&self, order_ids: MultiValueManagedVec<'a, u64>) {
         let caller = &self.blockchain().get_caller();
         let address_order_ids = self.get_address_order_ids(caller);
         self.require_contains_none(&address_order_ids, &order_ids);
@@ -112,7 +112,7 @@ pub trait OrdersModule:
         let second_token_id = &self.second_token_id().get();
         let epoch = self.blockchain().get_block_epoch();
 
-        let mut order_ids_not_empty: MultiValueManagedVec<Self::Api, u64> =
+        let mut order_ids_not_empty: MultiValueManagedVec<'a, Self::Api, u64> =
             MultiValueManagedVec::new();
         for order in order_ids.iter() {
             if !self.orders(order).is_empty() {
@@ -219,7 +219,7 @@ pub trait OrdersModule:
         order
     }
 
-    fn load_orders(&self, order_ids: &ManagedVec<u64>) -> MultiValueManagedVec<Order<Self::Api>> {
+    fn load_orders(&self, order_ids: &ManagedVec<u64>) -> MultiValueManagedVec<'a, Order<Self::Api>> {
         let mut orders_vec = MultiValueManagedVec::new();
         for order in order_ids.iter() {
             if !self.orders(order).is_empty() {
@@ -232,7 +232,7 @@ pub trait OrdersModule:
 
     fn create_transfers(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
+        orders: &MultiValueManagedVec<'a, Order<Self::Api>>,
     ) -> ManagedVec<Transfer<Self::Api>> {
         let mut transfers: ManagedVec<Self::Api, Transfer<Self::Api>> = ManagedVec::new();
         let first_token_id = self.first_token_id().get();
@@ -276,9 +276,9 @@ pub trait OrdersModule:
 
     fn get_orders_with_type(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
+        orders: &MultiValueManagedVec<'a, Order<Self::Api>>,
         order_type: OrderType,
-    ) -> MultiValueManagedVec<Order<Self::Api>> {
+    ) -> MultiValueManagedVec<'a, Order<Self::Api>> {
         let mut orders_vec = MultiValueManagedVec::new();
         for order in orders.iter() {
             if order.order_type == order_type {
@@ -291,7 +291,7 @@ pub trait OrdersModule:
 
     fn get_orders_sum_up(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
+        orders: &MultiValueManagedVec<'a, Order<Self::Api>>,
     ) -> (BigUint, BigUint) {
         let mut amount_paid = BigUint::zero();
         let mut amount_requested = BigUint::zero();
@@ -306,7 +306,7 @@ pub trait OrdersModule:
 
     fn calculate_transfers(
         &self,
-        orders: MultiValueManagedVec<Order<Self::Api>>,
+        orders: MultiValueManagedVec<'a, Order<Self::Api>>,
         total_paid: BigUint,
         token_requested: TokenIdentifier,
         leftover: BigUint,
@@ -374,7 +374,7 @@ pub trait OrdersModule:
     }
 
     #[view(getAddressOrderIds)]
-    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiValueManagedVec<u64> {
+    fn get_address_order_ids(&self, address: &ManagedAddress) -> MultiValueManagedVec<'a, u64> {
         let mut orders_vec = MultiValueManagedVec::new();
         for order in self.address_order_ids(address).get().iter() {
             if !self.orders(order).is_empty() {

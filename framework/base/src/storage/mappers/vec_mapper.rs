@@ -25,24 +25,24 @@ static INDEX_OUT_OF_RANGE_ERR_MSG: &[u8] = b"index out of range";
 /// Indexes start from 1, instead of 0. (We avoid 0-value indexes to prevent confusion between an uninitialized variable and zero.)
 /// It also stores the count separately, at what would be index 0.
 /// The count is always kept in sync automatically.
-pub struct VecMapper<SA, T, A = CurrentStorage>
+pub struct VecMapper<'a, SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    base_key: StorageKey<SA>,
-    len_key: StorageKey<SA>,
+    base_key: StorageKey<'a, SA>,
+    len_key: StorageKey<'a, SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for VecMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageMapper<'a, SA> for VecMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         let mut len_key = base_key.clone();
         len_key.append_bytes(LEN_SUFFIX);
 
@@ -56,12 +56,12 @@ where
     }
 }
 
-impl<SA, T> VecMapper<SA, T, ManagedAddress<SA>>
+impl<'a, SA, T> VecMapper<'a, SA, T, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         let mut len_key = base_key.clone();
         len_key.append_bytes(LEN_SUFFIX);
 
@@ -75,9 +75,9 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for VecMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageClearable for VecMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
     fn clear(&mut self) {
@@ -85,13 +85,13 @@ where
     }
 }
 
-impl<SA, T, A> VecMapper<SA, T, A>
+impl<'a, SA, T, A> VecMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode,
 {
-    fn item_key(&self, index: usize) -> StorageKey<SA> {
+    fn item_key(&self, index: usize) -> StorageKey<'a, SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(ITEM_SUFFIX);
         item_key.append_item(&index);
@@ -163,14 +163,14 @@ where
     }
 
     /// Provides a forward iterator.
-    pub fn iter(&self) -> Iter<SA, T, A> {
+    pub fn iter(&self) -> Iter<'a, SA, T, A> {
         Iter::new(self)
     }
 }
 
-impl<SA, T> VecMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> VecMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
     fn save_count(&self, new_len: usize) {
@@ -265,10 +265,10 @@ where
     }
 }
 
-impl<'a, SA, T, A> IntoIterator for &'a VecMapper<SA, T, A>
+impl<'a, SA, T, A> IntoIterator for &'a VecMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -286,22 +286,22 @@ where
 /// documentation for more.
 pub struct Iter<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     index: usize,
     len: usize,
-    vec: &'a VecMapper<SA, T, A>,
+    vec: &'a VecMapper<'a, SA, T, A>,
 }
 
 impl<'a, SA, T, A> Iter<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
-    fn new(vec: &'a VecMapper<SA, T, A>) -> Iter<'a, SA, T, A> {
+    fn new(vec: &'a VecMapper<'a, SA, T, A>) -> Iter<'a, SA, T, A> {
         Iter {
             index: 1,
             len: vec.len(),
@@ -312,8 +312,8 @@ where
 
 impl<'a, SA, T, A> Iterator for Iter<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -330,9 +330,9 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for VecMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> TopEncodeMulti for VecMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -344,17 +344,17 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<VecMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+impl<'a, SA, T> CodecFrom<VecMapper<'a, SA, T, CurrentStorage>> for MultiValueEncoded<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for VecMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> TypeAbi for VecMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

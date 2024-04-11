@@ -21,10 +21,10 @@ pub struct AbiTestType {
 
 /// Its only purpose is to test that the ABI generator works fine.
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct AbiManagedType<M: ManagedTypeApi> {
-    pub big_uint: BigUint<M>,
+pub struct AbiManagedType<'a, M: ManagedTypeApi<'a>> {
+    pub big_uint: BigUint<'a, M>,
     pub integer: i32,
-    pub managed_buffer: ManagedBuffer<M>,
+    pub managed_buffer: ManagedBuffer<'a, M>,
 }
 
 /// Its only purpose is to test that the ABI generator works fine.

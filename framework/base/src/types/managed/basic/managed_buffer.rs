@@ -18,17 +18,17 @@ use crate::api::ManagedTypeApiImpl;
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
-pub struct ManagedBuffer<M: ManagedTypeApi> {
+pub struct ManagedBuffer<'a, M: ManagedTypeApi<'a>> {
     pub(crate) handle: M::ManagedBufferHandle,
 }
 
-impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> Drop for ManagedBuffer<'a, M> {
     fn drop(&mut self) {
         M::managed_type_impl().drop_managed_buffer_handle(self.get_handle());
     }
 }
 
-impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for ManagedBuffer<'a, M> {
     type OwnHandle = M::ManagedBufferHandle;
 
     #[inline]
@@ -36,8 +36,12 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         ManagedBuffer { handle }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    unsafe fn get_handle(&self) -> M::ManagedBufferHandle {
         self.handle.clone()
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        core::mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -45,7 +49,7 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> ManagedBuffer<'a, M> {
     #[inline]
     pub fn new() -> Self {
         let new_handle: M::ManagedBufferHandle =
@@ -71,9 +75,9 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         ManagedBuffer::from_handle(new_handle)
     }
 
-    fn load_static_cache(&self) -> StaticBufferRef<M>
+    fn load_static_cache(&self) -> StaticBufferRef<'a, M>
     where
-        M: ManagedTypeApi,
+        M: ManagedTypeApi<'a>,
     {
         StaticBufferRef::try_new_from_copy_bytes(self.len(), |dest_slice| {
             let _ = self.load_slice(0, dest_slice);
@@ -85,7 +89,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     pub fn with_buffer_contents<R, F>(&self, f: F) -> R
     where
-        M: ManagedTypeApi,
+        M: ManagedTypeApi<'a>,
         F: FnOnce(&[u8]) -> R,
     {
         let static_cache = self.load_static_cache();
@@ -94,7 +98,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     pub fn with_buffer_contents_mut<F>(&mut self, f: F)
     where
-        M: ManagedTypeApi,
+        M: ManagedTypeApi<'a>,
         F: FnOnce(&mut [u8]) -> &[u8],
     {
         let static_cache = self.load_static_cache();
@@ -105,9 +109,9 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 }
 
-impl<M> From<&[u8]> for ManagedBuffer<M>
+impl<'a, M> From<&[u8]> for ManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(bytes: &[u8]) -> Self {
@@ -115,9 +119,9 @@ where
     }
 }
 
-impl<M> From<&str> for ManagedBuffer<M>
+impl<'a, M> From<&str> for ManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(s: &str) -> Self {
@@ -125,9 +129,9 @@ where
     }
 }
 
-impl<M> From<BoxedBytes> for ManagedBuffer<M>
+impl<'a, M> From<BoxedBytes> for ManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(bytes: BoxedBytes) -> Self {
@@ -135,9 +139,9 @@ where
     }
 }
 
-impl<M> From<Empty> for ManagedBuffer<M>
+impl<'a, M> From<Empty> for ManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(_: Empty) -> Self {
@@ -146,9 +150,9 @@ where
 }
 
 /// Syntactic sugar only.
-impl<M, const N: usize> From<&[u8; N]> for ManagedBuffer<M>
+impl<'a, M, const N: usize> From<&[u8; N]> for ManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(bytes: &[u8; N]) -> Self {
@@ -156,9 +160,9 @@ where
     }
 }
 
-impl<M> From<crate::types::heap::Vec<u8>> for ManagedBuffer<M>
+impl<'a, M> From<crate::types::heap::Vec<u8>> for ManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(bytes: crate::types::heap::Vec<u8>) -> Self {
@@ -166,14 +170,14 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> Default for ManagedBuffer<'a, M> {
     #[inline]
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<M: ManagedTypeApi> ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> ManagedBuffer<'a, M> {
     #[inline]
     pub fn len(&self) -> usize {
         M::managed_type_impl().mb_len(self.handle.clone())
@@ -209,7 +213,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         &self,
         starting_position: usize,
         slice_len: usize,
-    ) -> Option<ManagedBuffer<M>> {
+    ) -> Option<ManagedBuffer<'a, M>> {
         let api = M::managed_type_impl();
         let result_handle = api.mb_new_empty();
         let err_result = api.mb_copy_slice(
@@ -225,7 +229,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
     }
 
-    pub fn load_to_byte_array<'a, const N: usize>(&self, array: &'a mut [u8; N]) -> &'a [u8] {
+    pub fn load_to_byte_array<const N: usize>(&self, array: &'a mut [u8; N]) -> &'a [u8] {
         let len = self.len();
         if len > N {
             M::error_api_impl().signal_error(&b"failed to load to byte array"[..]);
@@ -276,7 +280,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     #[inline]
-    pub fn append(&mut self, other: &ManagedBuffer<M>) {
+    pub fn append(&mut self, other: &ManagedBuffer<'a, M>) {
         M::managed_type_impl().mb_append(self.handle.clone(), other.handle.clone());
     }
 
@@ -293,7 +297,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     /// Concatenates 2 managed buffers. Consumes both arguments in the process.
     #[inline]
     #[must_use]
-    pub fn concat(mut self, other: ManagedBuffer<M>) -> Self {
+    pub fn concat(mut self, other: ManagedBuffer<'a, M>) -> Self {
         self.append(&other);
         self
     }
@@ -319,7 +323,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> Clone for ManagedBuffer<'a, M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle = api.mb_new_empty();
@@ -328,16 +332,16 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialEq for ManagedBuffer<'a, M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         M::managed_type_impl().mb_eq(self.handle.clone(), other.handle.clone())
     }
 }
 
-impl<M: ManagedTypeApi> Eq for ManagedBuffer<M> {}
+impl<'a, M: ManagedTypeApi<'a>> Eq for ManagedBuffer<'a, M> {}
 
-impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<'a, M> {
     #[allow(clippy::op_ref)] // clippy is wrong here, it is not needless
     fn eq(&self, other: &&[u8; N]) -> bool {
         if self.len() != N {
@@ -349,7 +353,7 @@ impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M>
     }
 }
 
-impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> PartialEq<[u8]> for ManagedBuffer<'a, M> {
     fn eq(&self, other: &[u8]) -> bool {
         // TODO: push this to the api and optimize by using a temporary handle
         let other_mb = ManagedBuffer::new_from_bytes(other);
@@ -357,9 +361,9 @@ impl<M: ManagedTypeApi> PartialEq<[u8]> for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TryStaticCast for ManagedBuffer<M> {}
+impl<'a, M: ManagedTypeApi<'a>> TryStaticCast for ManagedBuffer<'a, M> {}
 
-impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> NestedEncode for ManagedBuffer<'a, M> {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
         O: NestedEncodeOutput,
@@ -375,7 +379,7 @@ impl<M: ManagedTypeApi> NestedEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> TopEncode for ManagedBuffer<'a, M> {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
     where
@@ -391,18 +395,18 @@ impl<M: ManagedTypeApi> TopEncode for ManagedBuffer<M> {
     }
 }
 
-impl<M> CodecFromSelf for ManagedBuffer<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFromSelf for ManagedBuffer<'a, M> where M: ManagedTypeApi<'a> {}
 
-impl<M> CodecFrom<&[u8]> for ManagedBuffer<M> where M: ManagedTypeApi {}
-impl<M> CodecFrom<&str> for ManagedBuffer<M> where M: ManagedTypeApi {}
-impl<M, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFrom<&[u8]> for ManagedBuffer<'a, M> where M: ManagedTypeApi<'a> {}
+impl<'a, M> CodecFrom<&str> for ManagedBuffer<'a, M> where M: ManagedTypeApi<'a> {}
+impl<'a, M, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<'a, M> where M: ManagedTypeApi<'a> {}
 
 macro_rules! managed_buffer_codec_from_impl_bi_di {
     ($other_ty:ty) => {
-        impl<M: ManagedTypeApi> CodecFrom<$other_ty> for ManagedBuffer<M> {}
-        impl<M: ManagedTypeApi> CodecFrom<&$other_ty> for ManagedBuffer<M> {}
-        impl<M: ManagedTypeApi> CodecFrom<ManagedBuffer<M>> for $other_ty {}
-        impl<M: ManagedTypeApi> CodecFrom<&ManagedBuffer<M>> for $other_ty {}
+        impl<'a, M: ManagedTypeApi<'a>> CodecFrom<$other_ty> for ManagedBuffer<'a, M> {}
+        impl<'a, M: ManagedTypeApi<'a>> CodecFrom<&$other_ty> for ManagedBuffer<'a, M> {}
+        impl<'a, M: ManagedTypeApi<'a>> CodecFrom<ManagedBuffer<'a, M>> for $other_ty {}
+        impl<'a, M: ManagedTypeApi<'a>> CodecFrom<&ManagedBuffer<'a, M>> for $other_ty {}
     };
 }
 
@@ -410,7 +414,7 @@ managed_buffer_codec_from_impl_bi_di! {crate::types::heap::Vec<u8>}
 managed_buffer_codec_from_impl_bi_di! {crate::types::heap::BoxedBytes}
 managed_buffer_codec_from_impl_bi_di! {crate::types::heap::String}
 
-impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> NestedDecode for ManagedBuffer<'a, M> {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
@@ -425,7 +429,7 @@ impl<M: ManagedTypeApi> NestedDecode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> TopDecode for ManagedBuffer<'a, M> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: TopDecodeInput,
@@ -439,41 +443,41 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
     }
 }
 
-impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> crate::abi::TypeAbi for ManagedBuffer<'a, M> {
     fn type_name() -> TypeName {
         "bytes".into()
     }
 }
 
-impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a, M: ManagedTypeApi<'a>> SCDisplay<'a> for ManagedBuffer<'a, M> {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
+            self.get_handle().cast_or_signal_error::<'a, M, _>(),
         ));
     }
 }
 
-impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a, M: ManagedTypeApi<'a>> SCLowerHex<'a> for ManagedBuffer<'a, M> {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         let hex_handle: M::ManagedBufferHandle =
             use_raw_handle(crate::api::const_handles::MBUF_TEMPORARY_1);
         M::managed_type_impl().mb_to_hex(self.handle.clone(), hex_handle.clone());
         f.append_managed_buffer(&ManagedBuffer::from_handle(
-            hex_handle.cast_or_signal_error::<M, _>(),
+            hex_handle.cast_or_signal_error::<'a, M, _>(),
         ));
     }
 }
 
-impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a, M: ManagedTypeApi<'a>> SCBinary<'a> for ManagedBuffer<'a, M> {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
         f.append_managed_buffer_binary(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
+            self.get_handle().cast_or_signal_error::<'a, M, _>(),
         ));
     }
 }
 
-impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> core::fmt::Debug for ManagedBuffer<'a, M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedBuffer")
             .field("handle", &self.handle.clone())
@@ -486,12 +490,12 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
 }
 
 #[cfg(feature = "alloc")]
-impl<M: ManagedTypeApi> core::fmt::Display for ManagedBuffer<M> {
+impl<'a, M: ManagedTypeApi<'a>> core::fmt::Display for ManagedBuffer<'a, M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         use crate::contract_base::ErrorHelper;
 
         let s = alloc::string::String::from_utf8(self.to_boxed_bytes().into_vec())
-            .unwrap_or_else(|err| ErrorHelper::<M>::signal_error_with_message(err.as_bytes()));
+            .unwrap_or_else(|err| ErrorHelper::<'a, M>::signal_error_with_message(err.as_bytes()));
 
         s.fmt(f)
     }

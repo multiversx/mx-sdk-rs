@@ -10,8 +10,8 @@ use crate::api::VMApi;
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait ContractBase: Sized {
-    type Api: VMApi;
+pub trait ContractBase<'a>: Sized {
+    type Api: VMApi<'a>;
 
     /// Gateway into the call value retrieval functionality.
     /// The payment annotations should normally be the ones to handle this,

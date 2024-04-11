@@ -35,7 +35,7 @@ pub trait LinkedListRepeat: benchmark_common::BenchmarkCommon {
 
     #[view]
     #[storage_mapper("benchmark")]
-    fn bench(&self) -> LinkedListMapper<ManagedBuffer>;
+    fn bench(&self) -> LinkedListMapper<'a, ManagedBuffer>;
 
     #[endpoint]
     fn add_struct(&self, num_repeats: usize, value: ExampleStruct<Self::Api>) {
@@ -63,5 +63,5 @@ pub trait LinkedListRepeat: benchmark_common::BenchmarkCommon {
 
     #[view]
     #[storage_mapper("bench_struct")]
-    fn bench_struct(&self) -> LinkedListMapper<ExampleStruct<Self::Api>>;
+    fn bench_struct(&self) -> LinkedListMapper<'a, ExampleStruct<Self::Api>>;
 }

@@ -8,15 +8,15 @@ use crate::{
 
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCallWithEgld};
 
-impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
+impl<'a, SA, OriginalResult> ContractCallWithEgld<'a, SA, OriginalResult>
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
 {
     /// If this is an ESDT call, it converts it to a regular call to ESDTTransfer.
     /// Async calls require this step, but not `transfer_esdt_execute`.
     pub fn convert_to_esdt_transfer_call(
         self,
-        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+        payments: ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>,
     ) -> Self {
         match payments.len() {
             0 => self,
@@ -27,7 +27,7 @@ where
 
     pub(super) fn convert_to_single_transfer_esdt_call(
         self,
-        payment: EsdtTokenPayment<SA>,
+        payment: EsdtTokenPayment<'a, SA>,
     ) -> Self {
         if payment.token_nonce == 0 {
             // fungible ESDT
@@ -46,7 +46,7 @@ where
             }
         } else {
             // nft transfer is sent to self, sender = receiver
-            let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
+            let recipient_addr = BlockchainWrapper::<'a, SA>::new().get_sc_address();
 
             ContractCallWithEgld {
                 basic: ContractCallNoPayment {
@@ -66,10 +66,10 @@ where
 
     fn convert_to_multi_transfer_esdt_call(
         self,
-        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
+        payments: ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>,
     ) -> Self {
         // multi transfer is sent to self, sender = receiver
-        let recipient_addr = BlockchainWrapper::<SA>::new().get_sc_address();
+        let recipient_addr = BlockchainWrapper::<'a, SA>::new().get_sc_address();
 
         ContractCallWithEgld {
             basic: ContractCallNoPayment {

@@ -25,25 +25,25 @@ impl TransferStep {
         Self::default().gas_limit("50,000")
     }
 
-    pub fn from<A>(mut self, address: A) -> Self
+    pub fn from<'a, A>(mut self, address: A) -> Self
     where
-        AddressValue: From<A>,
+        AddressValue: From<'a, A>,
     {
         self.tx.from = AddressValue::from(address);
         self
     }
 
-    pub fn to<A>(mut self, address: A) -> Self
+    pub fn to<'a, A>(mut self, address: A) -> Self
     where
-        AddressValue: From<A>,
+        AddressValue: From<'a, A>,
     {
         self.tx.to = AddressValue::from(address);
         self
     }
 
-    pub fn egld_value<A>(mut self, amount: A) -> Self
+    pub fn egld_value<'a, A>(mut self, amount: A) -> Self
     where
-        BigUintValue: From<A>,
+        BigUintValue: From<'a, A>,
     {
         if !self.tx.esdt_value.is_empty() {
             panic!("Cannot transfer both EGLD and ESDT");
@@ -57,7 +57,7 @@ impl TransferStep {
     where
         BytesValue: From<T>,
         U64Value: From<N>,
-        BigUintValue: From<A>,
+        BigUintValue: From<'a, A>,
     {
         if self.tx.egld_value.value > 0u32.into() {
             panic!("Cannot transfer both EGLD and ESDT");

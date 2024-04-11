@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 const CALLBACK_RESERVED_GAS_PER_TOKEN: u64 = 1_000_000;
 static ERR_CALLBACK_MSG: &[u8] = b"Error received in callback:";
 
-pub type PaymentsVec<M> = ManagedVec<M, EsdtTokenPayment<M>>;
+pub type PaymentsVec<'a, M> = ManagedVec<'a, M, EsdtTokenPayment<'a, M>>;
 
 #[multiversx_sc::module]
 pub trait TransferRoleProxyModule {
@@ -26,7 +26,7 @@ pub trait TransferRoleProxyModule {
         &self,
         original_caller: ManagedAddress,
         contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
-        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
+        opt_custom_callback: Option<CallbackClosure<'a, Self::Api>>,
     ) -> !
     where
         T: TopEncodeMulti,
@@ -46,7 +46,7 @@ pub trait TransferRoleProxyModule {
         payments: PaymentsVec<Self::Api>,
         endpoint_name: ManagedBuffer,
         args: ManagedArgBuffer<Self::Api>,
-        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
+        opt_custom_callback: Option<CallbackClosure<'a, Self::Api>>,
     ) -> ! {
         let contract_call =
             ContractCallWithMultiEsdt::<Self::Api, ()>::new(dest, endpoint_name, payments.clone())
@@ -65,7 +65,7 @@ pub trait TransferRoleProxyModule {
         original_caller: ManagedAddress,
         initial_payments: PaymentsVec<Self::Api>,
         contract_call: ContractCallWithMultiEsdt<Self::Api, T>,
-        opt_custom_callback: Option<CallbackClosure<Self::Api>>,
+        opt_custom_callback: Option<CallbackClosure<'a, Self::Api>>,
     ) -> !
     where
         T: TopEncodeMulti,

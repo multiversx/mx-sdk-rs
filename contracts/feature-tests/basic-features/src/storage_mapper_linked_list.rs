@@ -5,7 +5,7 @@ multiversx_sc::imports!();
 pub trait LinkedListMapperFeatures {
     #[view(getListMapper)]
     #[storage_mapper("list_mapper")]
-    fn list_mapper(&self) -> LinkedListMapper<u32>;
+    fn list_mapper(&self) -> LinkedListMapper<'a, u32>;
 
     #[endpoint(listMapperPushBack)]
     fn list_mapper_push_back(&self, item: u32) {

@@ -130,5 +130,5 @@ pub trait EsdtTransferWithFee {
 
     #[view(getPaidFees)]
     #[storage_mapper("paid_fees")]
-    fn paid_fees(&self) -> MapMapper<(TokenIdentifier, u64), BigUint>;
+    fn paid_fees(&self) -> MapMapper<'a, (TokenIdentifier, u64), BigUint>;
 }

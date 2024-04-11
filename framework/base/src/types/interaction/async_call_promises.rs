@@ -8,24 +8,24 @@ use super::FunctionCall;
 
 /// Will be renamed to `AsyncCall` and `AsyncCall` to `AsyncCallLegacy` when the promises end up on the mainnet.
 #[must_use]
-pub struct AsyncCallPromises<SA>
+pub struct AsyncCallPromises<'a, SA>
 where
-    SA: CallTypeApi + 'static,
+    SA: CallTypeApi<'a> + 'static,
 {
-    pub(crate) to: ManagedAddress<SA>,
-    pub(crate) egld_payment: BigUint<SA>,
-    pub(crate) function_call: FunctionCall<SA>,
+    pub(crate) to: ManagedAddress<'a, SA>,
+    pub(crate) egld_payment: BigUint<'a, SA>,
+    pub(crate) function_call: FunctionCall<'a, SA>,
     pub(crate) explicit_gas_limit: u64,
     pub(crate) extra_gas_for_callback: u64,
-    pub(crate) callback_call: Option<CallbackClosure<SA>>,
+    pub(crate) callback_call: Option<CallbackClosure<'a, SA>>,
 }
 
 #[allow(clippy::return_self_not_must_use)]
-impl<SA> AsyncCallPromises<SA>
+impl<'a, SA> AsyncCallPromises<'a, SA>
 where
-    SA: CallTypeApi,
+    SA: CallTypeApi<'a>,
 {
-    pub fn with_callback(self, callback_call: CallbackClosure<SA>) -> Self {
+    pub fn with_callback(self, callback_call: CallbackClosure<'a, SA>) -> Self {
         AsyncCallPromises {
             callback_call: Some(callback_call),
             ..self
@@ -42,7 +42,7 @@ where
         use crate::{api::const_handles, types::ManagedType};
 
         let mut cb_closure_args_serialized =
-            ManagedBuffer::<SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
+            ManagedBuffer::<'a, SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
         let callback_name;
         if let Some(callback_call) = self.callback_call {
             callback_name = callback_call.callback_name;
@@ -54,7 +54,7 @@ where
             cb_closure_args_serialized.overwrite(&[]);
         }
 
-        SendRawWrapper::<SA>::new().create_async_call_raw(
+        SendRawWrapper::<'a, SA>::new().create_async_call_raw(
             &self.to,
             &self.egld_payment,
             &self.function_call.function_name,

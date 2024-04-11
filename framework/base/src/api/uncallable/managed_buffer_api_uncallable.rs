@@ -3,7 +3,7 @@ use crate::{
     types::heap::BoxedBytes,
 };
 
-impl ManagedBufferApiImpl for super::UncallableApi {
+impl<'a> ManagedBufferApiImpl<'a> for super::UncallableApi {
     fn mb_new_empty(&self) -> Self::ManagedBufferHandle {
         unreachable!()
     }

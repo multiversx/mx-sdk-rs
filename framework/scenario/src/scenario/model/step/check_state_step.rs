@@ -11,9 +11,9 @@ impl CheckStateStep {
         Self::default()
     }
 
-    pub fn put_account<A>(mut self, address_expr: A, account: CheckAccount) -> Self
+    pub fn put_account<'a, A>(mut self, address_expr: A, account: CheckAccount) -> Self
     where
-        AddressKey: From<A>,
+        AddressKey: From<'a, A>,
     {
         let address_key = AddressKey::from(address_expr);
         self.accounts.accounts.insert(address_key, account);

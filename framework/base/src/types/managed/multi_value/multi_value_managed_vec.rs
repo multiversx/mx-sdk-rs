@@ -11,34 +11,34 @@ use crate::{
 use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
 
 #[derive(Clone, Default)]
-pub struct MultiValueManagedVec<M: ManagedTypeApi, T: ManagedVecItem>(ManagedVec<M, T>);
+pub struct MultiValueManagedVec<'a, M: ManagedTypeApi<'a>, T: ManagedVecItem>(ManagedVec<'a, M, T>);
 
 #[deprecated(
     since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVec`"
 )]
-pub type ManagedVarArgsEager<M, T> = MultiValueManagedVec<M, T>;
+pub type ManagedVarArgsEager<'a, M, T> = MultiValueManagedVec<'a, M, T>;
 
 #[deprecated(
     since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVec`"
 )]
-pub type ManagedMultiResultVecEager<M, T> = MultiValueManagedVec<M, T>;
+pub type ManagedMultiResultVecEager<'a, M, T> = MultiValueManagedVec<'a, M, T>;
 
-impl<M, T> From<ManagedVec<M, T>> for MultiValueManagedVec<M, T>
+impl<'a, M, T> From<ManagedVec<'a, M, T>> for MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
-    fn from(managed_vec: ManagedVec<M, T>) -> Self {
+    fn from(managed_vec: ManagedVec<'a, M, T>) -> Self {
         MultiValueManagedVec(managed_vec)
     }
 }
 
-impl<M, T> ManagedType<M> for MultiValueManagedVec<M, T>
+impl<'a, M, T> ManagedType<'a, M> for MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     type OwnHandle = M::ManagedBufferHandle;
@@ -48,8 +48,12 @@ where
         Self(ManagedVec::from_handle(handle))
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    unsafe fn get_handle(&self) -> M::ManagedBufferHandle {
         self.0.get_handle()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.0.take_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -57,9 +61,9 @@ where
     }
 }
 
-impl<M, T> MultiValueManagedVec<M, T>
+impl<'a, M, T> MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
@@ -107,7 +111,7 @@ where
         self.0.overwrite_with_single_item(item)
     }
 
-    pub fn append_vec(&mut self, item: MultiValueManagedVec<M, T>) {
+    pub fn append_vec(&mut self, item: MultiValueManagedVec<'a, M, T>) {
         self.0.append_vec(item.0)
     }
 
@@ -115,7 +119,7 @@ where
         self.0.clear()
     }
 
-    pub fn into_vec(self) -> ManagedVec<M, T> {
+    pub fn into_vec(self) -> ManagedVec<'a, M, T> {
         self.0
     }
 
@@ -127,14 +131,14 @@ where
         self.0.with_self_as_vec(f)
     }
 
-    pub fn iter(&self) -> ManagedVecRefIterator<M, T> {
+    pub fn iter(&self) -> ManagedVecRefIterator<'a, M, T> {
         ManagedVecRefIterator::new(&self.0)
     }
 }
 
-impl<'a, M, T> IntoIterator for &'a MultiValueManagedVec<M, T>
+impl<'a, M, T> IntoIterator for &'a MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     type Item = T::Ref<'a>;
@@ -146,9 +150,9 @@ where
     }
 }
 
-impl<M, T, I> From<Vec<I>> for MultiValueManagedVec<M, T>
+impl<'a, M, T, I> From<Vec<I>> for MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
     I: Into<T>,
 {
@@ -161,9 +165,9 @@ where
     }
 }
 
-impl<M, T> TopEncodeMulti for &MultiValueManagedVec<M, T>
+impl<'a, M, T> TopEncodeMulti for &MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem + TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -178,9 +182,9 @@ where
     }
 }
 
-impl<M, T> TopEncodeMulti for MultiValueManagedVec<M, T>
+impl<'a, M, T> TopEncodeMulti for MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem + TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -192,9 +196,9 @@ where
     }
 }
 
-impl<M, T> TopDecodeMulti for MultiValueManagedVec<M, T>
+impl<'a, M, T> TopDecodeMulti for MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem + TopDecodeMulti,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -202,7 +206,7 @@ where
         I: TopDecodeMultiInput,
         H: DecodeErrorHandler,
     {
-        let mut result_vec: ManagedVec<M, T> = ManagedVec::new();
+        let mut result_vec: ManagedVec<'a, M, T> = ManagedVec::new();
         while input.has_next() {
             result_vec.push(T::multi_decode_or_handle_err(input, h)?);
         }
@@ -210,9 +214,9 @@ where
     }
 }
 
-impl<M, T: TypeAbi> TypeAbi for MultiValueManagedVec<M, T>
+impl<'a, M, T: TypeAbi> TypeAbi for MultiValueManagedVec<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     fn type_name() -> TypeName {

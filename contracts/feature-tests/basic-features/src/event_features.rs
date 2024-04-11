@@ -32,7 +32,7 @@ pub trait EventFeatures {
         &self,
         arg1: &BigUint,
         arg2: &ManagedAddress,
-        data: MultiValueManagedVec<ManagedBuffer>,
+        data: MultiValueManagedVec<'a, ManagedBuffer>,
     ) {
         self.event_b(arg1, arg2, data.into_vec());
     }

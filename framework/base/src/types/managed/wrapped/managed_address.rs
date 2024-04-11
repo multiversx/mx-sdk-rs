@@ -14,13 +14,13 @@ use crate::{
 
 #[repr(transparent)]
 #[derive(Clone)]
-pub struct ManagedAddress<M: ManagedTypeApi> {
-    bytes: ManagedByteArray<M, 32>,
+pub struct ManagedAddress<'a, M: ManagedTypeApi<'a>> {
+    bytes: ManagedByteArray<'a, M, 32>,
 }
 
-impl<M> ManagedAddress<M>
+impl<'a, M> ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     pub fn from_address(address: &Address) -> Self {
@@ -51,12 +51,12 @@ where
     }
 
     #[inline]
-    pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
+    pub fn as_managed_buffer(&self) -> &ManagedBuffer<'a, M> {
         self.bytes.as_managed_buffer()
     }
 
     #[inline]
-    pub fn as_managed_byte_array(&self) -> &ManagedByteArray<M, 32> {
+    pub fn as_managed_byte_array(&self) -> &ManagedByteArray<'a, M, 32> {
         &self.bytes
     }
 
@@ -66,9 +66,9 @@ where
     }
 }
 
-impl<M> From<&Address> for ManagedAddress<M>
+impl<'a, M> From<&Address> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(address: &Address) -> Self {
@@ -76,9 +76,9 @@ where
     }
 }
 
-impl<M> From<Address> for ManagedAddress<M>
+impl<'a, M> From<Address> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(address: Address) -> Self {
@@ -86,9 +86,9 @@ where
     }
 }
 
-impl<M> From<&[u8; 32]> for ManagedAddress<M>
+impl<'a, M> From<&[u8; 32]> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(bytes: &[u8; 32]) -> Self {
@@ -96,9 +96,9 @@ where
     }
 }
 
-impl<M> From<[u8; 32]> for ManagedAddress<M>
+impl<'a, M> From<[u8; 32]> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn from(bytes: [u8; 32]) -> Self {
@@ -106,30 +106,30 @@ where
     }
 }
 
-impl<M> From<ManagedByteArray<M, 32>> for ManagedAddress<M>
+impl<'a, M> From<ManagedByteArray<'a, M, 32>> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
-    fn from(value: ManagedByteArray<M, 32>) -> Self {
+    fn from(value: ManagedByteArray<'a, M, 32>) -> Self {
         Self { bytes: value }
     }
 }
 
-impl<M> TryFrom<ManagedBuffer<M>> for ManagedAddress<M>
+impl<'a, M> TryFrom<ManagedBuffer<'a, M>> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     type Error = DecodeError;
 
-    fn try_from(value: ManagedBuffer<M>) -> Result<Self, Self::Error> {
-        let bytes: ManagedByteArray<M, 32> = value.try_into()?;
+    fn try_from(value: ManagedBuffer<'a, M>) -> Result<Self, Self::Error> {
+        let bytes: ManagedByteArray<'a, M, 32> = value.try_into()?;
         Ok(bytes.into())
     }
 }
 
-impl<M> ManagedType<M> for ManagedAddress<M>
+impl<'a, M> ManagedType<'a, M> for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     type OwnHandle = M::ManagedBufferHandle;
 
@@ -140,8 +140,12 @@ where
         }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    unsafe fn get_handle(&self) -> M::ManagedBufferHandle {
         self.bytes.get_handle()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.bytes.take_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -149,9 +153,9 @@ where
     }
 }
 
-impl<M> Default for ManagedAddress<M>
+impl<'a, M> Default for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn default() -> Self {
@@ -159,9 +163,9 @@ where
     }
 }
 
-impl<M> PartialEq for ManagedAddress<M>
+impl<'a, M> PartialEq for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -169,11 +173,11 @@ where
     }
 }
 
-impl<M> Eq for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<'a, M> Eq for ManagedAddress<'a, M> where M: ManagedTypeApi<'a> {}
 
-impl<M> TopEncode for ManagedAddress<M>
+impl<'a, M> TopEncode for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -185,9 +189,9 @@ where
     }
 }
 
-impl<M> TopDecode for ManagedAddress<M>
+impl<'a, M> TopDecode for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -205,9 +209,9 @@ pub(crate) struct ManagedBufferSizeContext(pub usize);
 
 impl TryStaticCast for ManagedBufferSizeContext {}
 
-impl<M> NestedEncode for ManagedAddress<M>
+impl<'a, M> NestedEncode for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -219,9 +223,9 @@ where
     }
 }
 
-impl<M> NestedDecode for ManagedAddress<M>
+impl<'a, M> NestedDecode for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -234,9 +238,9 @@ where
     }
 }
 
-impl<M> TypeAbi for ManagedAddress<M>
+impl<'a, M> TypeAbi for ManagedAddress<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {
@@ -244,13 +248,13 @@ where
     }
 }
 
-impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
-    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+impl<'a, M: ManagedTypeApi<'a>> SCLowerHex<'a> for ManagedAddress<'a, M> {
+    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
         SCLowerHex::fmt(&self.bytes, f)
     }
 }
 
-impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
+impl<'a, M: ManagedTypeApi<'a>> core::fmt::Debug for ManagedAddress<'a, M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedAddress")
             .field("handle", &self.bytes.buffer.handle)
@@ -259,18 +263,18 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
     }
 }
 
-impl<M> CodecFromSelf for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFromSelf for ManagedAddress<'a, M> where M: ManagedTypeApi<'a> {}
 
-impl<M> CodecFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
-
-#[cfg(feature = "alloc")]
-impl<M> CodecFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFrom<[u8; 32]> for ManagedAddress<'a, M> where M: ManagedTypeApi<'a> {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<'a, M> CodecFrom<Address> for ManagedAddress<'a, M> where M: ManagedTypeApi<'a> {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+impl<'a, M> CodecFrom<&Address> for ManagedAddress<'a, M> where M: ManagedTypeApi<'a> {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+impl<'a, M> CodecFrom<ManagedAddress<'a, M>> for Address where M: ManagedTypeApi<'a> {}
+
+#[cfg(feature = "alloc")]
+impl<'a, M> CodecFrom<&ManagedAddress<'a, M>> for Address where M: ManagedTypeApi<'a> {}

@@ -51,7 +51,7 @@ fn generate_callback_proxy_method(
         fn #method_name(
             self,
             #(#arg_decl),*
-        ) -> multiversx_sc::types::CallbackClosure<Self::Api> {
+        ) -> multiversx_sc::types::CallbackClosure<'a, Self::Api> {
             let mut ___callback_call___ =
                 multiversx_sc::types::new_callback_call::<Self::Api>(#cb_name_literal);
             #(#cb_arg_push_snippets)*
@@ -83,7 +83,7 @@ pub fn generate_callback_proxies_object(methods: &[Method]) -> proc_macro2::Toke
             #(#proxy_methods)*
         }
 
-        impl<A> self::CallbackProxy for CallbackProxyObj<A> where A: multiversx_sc::api::VMApi + 'static {}
+        impl<'a, A> self::CallbackProxy for CallbackProxyObj<'a, A> where A: multiversx_sc::api::VMApi + 'static {}
     }
 }
 

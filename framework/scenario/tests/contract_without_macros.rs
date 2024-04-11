@@ -50,7 +50,7 @@ mod module_1 {
         fn callback(&self) {}
     }
 
-    impl<A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<A> where
+    impl<'a, A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<'a, A> where
         A: multiversx_sc::api::VMApi
     {
     }
@@ -86,7 +86,7 @@ mod module_1 {
         }
     }
 
-    impl<A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<A> where
+    impl<'a, A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<'a, A> where
         A: multiversx_sc::api::VMApi
     {
     }
@@ -162,7 +162,7 @@ mod sample_adder {
         }
     }
 
-    impl<A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<A> where
+    impl<'a, A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<'a, A> where
         A: multiversx_sc::api::VMApi
     {
     }
@@ -228,7 +228,7 @@ mod sample_adder {
         }
     }
 
-    impl<A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<A> where
+    impl<'a, A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<'a, A> where
         A: multiversx_sc::api::VMApi
     {
     }
@@ -257,7 +257,7 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT ////////////////////////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    pub struct ContractObj<A>
+    pub struct ContractObj<'a, A>
     where
         A: multiversx_sc::api::VMApi,
     {
@@ -267,28 +267,28 @@ mod sample_adder {
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //////// CONTRACT OBJECT as CONTRACT BASE ///////////////////////////////////////////////////////
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    impl<A> multiversx_sc::contract_base::ContractBase for ContractObj<A>
+    impl<'a, A> multiversx_sc::contract_base::ContractBase for ContractObj<'a, A>
     where
         A: multiversx_sc::api::VMApi,
     {
         type Api = A;
     }
 
-    impl<A> super::module_1::AutoImpl for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl<'a, A> super::module_1::AutoImpl for ContractObj<'a, A> where A: multiversx_sc::api::VMApi {}
 
-    impl<A> AutoImpl for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl<'a, A> AutoImpl for ContractObj<'a, A> where A: multiversx_sc::api::VMApi {}
 
-    impl<A> super::module_1::EndpointWrappers for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl<'a, A> super::module_1::EndpointWrappers for ContractObj<'a, A> where A: multiversx_sc::api::VMApi {}
 
-    impl<A> EndpointWrappers for ContractObj<A> where A: multiversx_sc::api::VMApi {}
+    impl<'a, A> EndpointWrappers for ContractObj<'a, A> where A: multiversx_sc::api::VMApi {}
 
-    impl<A> multiversx_sc::contract_base::CallableContract for ContractObj<A>
+    impl<'a, A> multiversx_sc::contract_base::CallableContract for ContractObj<'a, A>
     where
         A: multiversx_sc::api::VMApi,
     {
         fn call(&self, fn_name: &str) -> bool {
             EndpointWrappers::call(
-                &multiversx_sc::contract_base::UniversalContractObj::<A>::new(),
+                &multiversx_sc::contract_base::UniversalContractObj::<'a, A>::new(),
                 fn_name,
             )
         }
@@ -301,7 +301,7 @@ mod sample_adder {
             &self,
         ) -> multiversx_sc::types::heap::Box<dyn multiversx_sc::contract_base::CallableContract>
         {
-            multiversx_sc::types::heap::Box::new(ContractObj::<A> {
+            multiversx_sc::types::heap::Box::new(ContractObj::<'a, A> {
                 _phantom: core::marker::PhantomData,
             })
         }
@@ -317,7 +317,7 @@ mod sample_adder {
         }
     }
 
-    pub fn contract_obj<A>() -> ContractObj<A>
+    pub fn contract_obj<'a, A>() -> ContractObj<'a, A>
     where
         A: multiversx_sc::api::VMApi,
     {
@@ -326,15 +326,15 @@ mod sample_adder {
         }
     }
 
-    pub struct Proxy<A>
+    pub struct Proxy<'a, A>
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
         pub address:
-            multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+            multiversx_sc::types::ManagedOption<'a, A, multiversx_sc::types::ManagedAddress<'a, A>>,
     }
 
-    impl<A> multiversx_sc::contract_base::ProxyObjBase for Proxy<A>
+    impl<'a, A> multiversx_sc::contract_base::ProxyObjBase for Proxy<'a, A>
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
@@ -372,18 +372,18 @@ mod sample_adder {
         }
     }
 
-    impl<A> super::module_1::ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<'a, A> super::module_1::ProxyTrait for Proxy<'a, A> where A: multiversx_sc::api::VMApi {}
 
-    impl<A> ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<'a, A> ProxyTrait for Proxy<'a, A> where A: multiversx_sc::api::VMApi {}
 
-    pub struct CallbackProxyObj<A>
+    pub struct CallbackProxyObj<'a, A>
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
         _phantom: core::marker::PhantomData<A>,
     }
 
-    impl<A> multiversx_sc::contract_base::CallbackProxyObjBase for CallbackProxyObj<A>
+    impl<'a, A> multiversx_sc::contract_base::CallbackProxyObjBase for CallbackProxyObj<'a, A>
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
@@ -397,14 +397,14 @@ mod sample_adder {
     }
 
     pub trait CallbackProxy: multiversx_sc::contract_base::CallbackProxyObjBase + Sized {
-        fn my_callback(self, caller: &Address) -> multiversx_sc::types::CallbackClosure<Self::Api> {
+        fn my_callback(self, caller: &Address) -> multiversx_sc::types::CallbackClosure<'a, Self::Api> {
             let mut ___callback_call___ =
                 multiversx_sc::types::new_callback_call::<Self::Api>("my_callback");
             ___callback_call___.push_endpoint_arg(caller);
             ___callback_call___
         }
     }
-    impl<A> self::CallbackProxy for CallbackProxyObj<A> where A: multiversx_sc::api::VMApi + 'static {}
+    impl<'a, A> self::CallbackProxy for CallbackProxyObj<'a, A> where A: multiversx_sc::api::VMApi + 'static {}
 }
 
 #[test]

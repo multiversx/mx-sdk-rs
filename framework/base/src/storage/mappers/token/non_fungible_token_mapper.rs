@@ -29,19 +29,19 @@ use crate::{
 
 const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible issue";
 
-pub struct NonFungibleTokenMapper<SA>
+pub struct NonFungibleTokenMapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
-    key: StorageKey<SA>,
-    token_state: TokenMapperState<SA>,
+    key: StorageKey<'a, SA>,
+    token_state: TokenMapperState<'a, SA>,
 }
 
-impl<SA> StorageMapper<SA> for NonFungibleTokenMapper<SA>
+impl<'a, SA> StorageMapper<'a, SA> for NonFungibleTokenMapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         Self {
             token_state: storage_get(base_key.as_ref()),
             key: base_key,
@@ -49,19 +49,19 @@ where
     }
 }
 
-impl<SA> StorageTokenWrapper<SA> for NonFungibleTokenMapper<SA>
+impl<'a, SA> StorageTokenWrapper<'a, SA> for NonFungibleTokenMapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
-    fn get_storage_key(&self) -> crate::types::ManagedRef<SA, StorageKey<SA>> {
+    fn get_storage_key(&self) -> crate::types::ManagedRef<'a, SA, StorageKey<'a, SA>> {
         self.key.as_ref()
     }
 
-    fn get_token_state(&self) -> TokenMapperState<SA> {
+    fn get_token_state(&self) -> TokenMapperState<'a, SA> {
         self.token_state.clone()
     }
 
-    fn get_token_id(&self) -> TokenIdentifier<SA> {
+    fn get_token_id(&self) -> TokenIdentifier<'a, SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token.clone()
         } else {
@@ -69,7 +69,7 @@ where
         }
     }
 
-    fn get_token_id_ref(&self) -> &TokenIdentifier<SA> {
+    fn get_token_id_ref(&self) -> &TokenIdentifier<'a, SA> {
         if let TokenMapperState::Token(token) = &self.token_state {
             token
         } else {
@@ -77,15 +77,15 @@ where
         }
     }
 
-    fn set_token_id(&mut self, token_id: TokenIdentifier<SA>) {
+    fn set_token_id(&mut self, token_id: TokenIdentifier<'a, SA>) {
         store_token_id(self, &token_id);
         self.token_state = TokenMapperState::Token(token_id);
     }
 }
 
-impl<SA> NonFungibleTokenMapper<SA>
+impl<'a, SA> NonFungibleTokenMapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
     /// Important: If you use custom callback, remember to save the token ID in the callback and clear the mapper in case of error! Clear is unusable outside this specific case.
     ///
@@ -108,11 +108,11 @@ where
     pub fn issue(
         &self,
         token_type: EsdtTokenType,
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: ManagedBuffer<'a, SA>,
+        token_ticker: ManagedBuffer<'a, SA>,
         num_decimals: usize,
-        opt_callback: Option<CallbackClosure<SA>>,
+        opt_callback: Option<CallbackClosure<'a, SA>>,
     ) -> ! {
         check_not_set(self);
 
@@ -133,7 +133,7 @@ where
             _ => SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG),
         };
 
-        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
+        storage_set(self.get_storage_key(), &TokenMapperState::<'a, SA>::Pending);
         contract_call
             .async_call()
             .with_callback(callback)
@@ -161,11 +161,11 @@ where
     pub fn issue_and_set_all_roles(
         &self,
         token_type: EsdtTokenType,
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: ManagedBuffer<'a, SA>,
+        token_ticker: ManagedBuffer<'a, SA>,
         num_decimals: usize,
-        opt_callback: Option<CallbackClosure<SA>>,
+        opt_callback: Option<CallbackClosure<'a, SA>>,
     ) -> ! {
         check_not_set(self);
 
@@ -173,13 +173,13 @@ where
             SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
         }
 
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<'a, SA>::new_proxy_obj();
         let callback = match opt_callback {
             Some(cb) => cb,
             None => self.default_callback_closure_obj(),
         };
 
-        storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
+        storage_set(self.get_storage_key(), &TokenMapperState::<'a, SA>::Pending);
         system_sc_proxy
             .issue_and_set_all_roles(
                 issue_cost,
@@ -194,14 +194,14 @@ where
     }
 
     pub fn clear(&mut self) {
-        let state: TokenMapperState<SA> = storage_get(self.key.as_ref());
+        let state: TokenMapperState<'a, SA> = storage_get(self.key.as_ref());
         if state.is_pending() {
             storage_clear(self.key.as_ref());
         }
     }
 
-    fn default_callback_closure_obj(&self) -> CallbackClosure<SA> {
-        let initial_caller = BlockchainWrapper::<SA>::new().get_caller();
+    fn default_callback_closure_obj(&self) -> CallbackClosure<'a, SA> {
+        let initial_caller = BlockchainWrapper::<'a, SA>::new().get_caller();
         let cb_name = DEFAULT_ISSUE_CALLBACK_NAME;
 
         let mut cb_closure = CallbackClosure::new(cb_name);
@@ -212,11 +212,11 @@ where
     }
 
     fn nft_issue(
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: ManagedBuffer<'a, SA>,
+        token_ticker: ManagedBuffer<'a, SA>,
+    ) -> ContractCallWithEgld<'a, SA, ()> {
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<'a, SA>::new_proxy_obj();
         system_sc_proxy.issue_non_fungible(
             issue_cost,
             &token_display_name,
@@ -226,11 +226,11 @@ where
     }
 
     fn sft_issue(
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: ManagedBuffer<'a, SA>,
+        token_ticker: ManagedBuffer<'a, SA>,
+    ) -> ContractCallWithEgld<'a, SA, ()> {
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<'a, SA>::new_proxy_obj();
         system_sc_proxy.issue_semi_fungible(
             issue_cost,
             &token_display_name,
@@ -240,12 +240,12 @@ where
     }
 
     fn meta_issue(
-        issue_cost: BigUint<SA>,
-        token_display_name: ManagedBuffer<SA>,
-        token_ticker: ManagedBuffer<SA>,
+        issue_cost: BigUint<'a, SA>,
+        token_display_name: ManagedBuffer<'a, SA>,
+        token_ticker: ManagedBuffer<'a, SA>,
         num_decimals: usize,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+    ) -> ContractCallWithEgld<'a, SA, ()> {
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<'a, SA>::new_proxy_obj();
         let properties = MetaTokenProperties {
             num_decimals,
             ..Default::default()
@@ -261,10 +261,10 @@ where
 
     pub fn nft_create<T: TopEncode>(
         &self,
-        amount: BigUint<SA>,
+        amount: BigUint<'a, SA>,
         attributes: &T,
-    ) -> EsdtTokenPayment<SA> {
-        let send_wrapper = SendWrapper::<SA>::new();
+    ) -> EsdtTokenPayment<'a, SA> {
+        let send_wrapper = SendWrapper::<'a, SA>::new();
         let token_id = self.get_token_id();
 
         let token_nonce = send_wrapper.esdt_nft_create_compact(&token_id, &amount, attributes);
@@ -274,11 +274,11 @@ where
 
     pub fn nft_create_named<T: TopEncode>(
         &self,
-        amount: BigUint<SA>,
-        name: &ManagedBuffer<SA>,
+        amount: BigUint<'a, SA>,
+        name: &ManagedBuffer<'a, SA>,
         attributes: &T,
-    ) -> EsdtTokenPayment<SA> {
-        let send_wrapper = SendWrapper::<SA>::new();
+    ) -> EsdtTokenPayment<'a, SA> {
+        let send_wrapper = SendWrapper::<'a, SA>::new();
         let token_id = self.get_token_id();
 
         let token_nonce =
@@ -289,10 +289,10 @@ where
 
     pub fn nft_create_and_send<T: TopEncode>(
         &self,
-        to: &ManagedAddress<SA>,
-        amount: BigUint<SA>,
+        to: &ManagedAddress<'a, SA>,
+        amount: BigUint<'a, SA>,
         attributes: &T,
-    ) -> EsdtTokenPayment<SA> {
+    ) -> EsdtTokenPayment<'a, SA> {
         let payment = self.nft_create(amount, attributes);
         self.send_payment(to, &payment);
 
@@ -301,19 +301,19 @@ where
 
     pub fn nft_create_and_send_named<T: TopEncode>(
         &self,
-        to: &ManagedAddress<SA>,
-        amount: BigUint<SA>,
-        name: &ManagedBuffer<SA>,
+        to: &ManagedAddress<'a, SA>,
+        amount: BigUint<'a, SA>,
+        name: &ManagedBuffer<'a, SA>,
         attributes: &T,
-    ) -> EsdtTokenPayment<SA> {
+    ) -> EsdtTokenPayment<'a, SA> {
         let payment = self.nft_create_named(amount, name, attributes);
         self.send_payment(to, &payment);
 
         payment
     }
 
-    pub fn nft_add_quantity(&self, token_nonce: u64, amount: BigUint<SA>) -> EsdtTokenPayment<SA> {
-        let send_wrapper = SendWrapper::<SA>::new();
+    pub fn nft_add_quantity(&self, token_nonce: u64, amount: BigUint<'a, SA>) -> EsdtTokenPayment<'a, SA> {
+        let send_wrapper = SendWrapper::<'a, SA>::new();
         let token_id = self.get_token_id();
 
         send_wrapper.esdt_local_mint(&token_id, token_nonce, &amount);
@@ -323,10 +323,10 @@ where
 
     pub fn nft_add_quantity_and_send(
         &self,
-        to: &ManagedAddress<SA>,
+        to: &ManagedAddress<'a, SA>,
         token_nonce: u64,
-        amount: BigUint<SA>,
-    ) -> EsdtTokenPayment<SA> {
+        amount: BigUint<'a, SA>,
+    ) -> EsdtTokenPayment<'a, SA> {
         let payment = self.nft_add_quantity(token_nonce, amount);
         self.send_payment(to, &payment);
 
@@ -334,19 +334,19 @@ where
     }
 
     pub fn nft_update_attributes<T: TopEncode>(&self, token_nonce: u64, new_attributes: &T) {
-        let send_wrapper = SendWrapper::<SA>::new();
+        let send_wrapper = SendWrapper::<'a, SA>::new();
         let token_id = self.get_token_id_ref();
         send_wrapper.nft_update_attributes(token_id, token_nonce, new_attributes);
     }
 
-    pub fn nft_burn(&self, token_nonce: u64, amount: &BigUint<SA>) {
-        let send_wrapper = SendWrapper::<SA>::new();
+    pub fn nft_burn(&self, token_nonce: u64, amount: &BigUint<'a, SA>) {
+        let send_wrapper = SendWrapper::<'a, SA>::new();
         let token_id = self.get_token_id_ref();
 
         send_wrapper.esdt_local_burn(token_id, token_nonce, amount);
     }
 
-    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<SA> {
+    pub fn get_all_token_data(&self, token_nonce: u64) -> EsdtTokenData<'a, SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
         let token_id = self.get_token_id_ref();
@@ -354,7 +354,7 @@ where
         b_wrapper.get_esdt_token_data(&own_sc_address, token_id, token_nonce)
     }
 
-    pub fn get_balance(&self, token_nonce: u64) -> BigUint<SA> {
+    pub fn get_balance(&self, token_nonce: u64) -> BigUint<'a, SA> {
         let b_wrapper = BlockchainWrapper::new();
         let own_sc_address = Self::get_sc_address();
         let token_id = self.get_token_id_ref();
@@ -367,8 +367,8 @@ where
         token_data.decode_attributes()
     }
 
-    fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
-        let send_wrapper = SendWrapper::<SA>::new();
+    fn send_payment(&self, to: &ManagedAddress<'a, SA>, payment: &EsdtTokenPayment<'a, SA>) {
+        let send_wrapper = SendWrapper::<'a, SA>::new();
         send_wrapper.direct_esdt(
             to,
             &payment.token_identifier,
@@ -378,9 +378,9 @@ where
     }
 }
 
-impl<SA> TopEncodeMulti for NonFungibleTokenMapper<SA>
+impl<'a, SA> TopEncodeMulti for NonFungibleTokenMapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -388,28 +388,28 @@ where
         H: EncodeErrorHandler,
     {
         if self.is_empty() {
-            output.push_single_value(&ManagedBuffer::<SA>::new(), h)
+            output.push_single_value(&ManagedBuffer::<'a, SA>::new(), h)
         } else {
             output.push_single_value(&self.get_token_id(), h)
         }
     }
 }
 
-impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
-    SA: StorageMapperApi + CallTypeApi
+impl<'a, SA> CodecFrom<NonFungibleTokenMapper<'a, SA>> for TokenIdentifier<'a, SA> where
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>
 {
 }
 
-impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
+impl<'a, SA> TypeAbi for NonFungibleTokenMapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
     fn type_name() -> TypeName {
-        TokenIdentifier::<SA>::type_name()
+        TokenIdentifier::<'a, SA>::type_name()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-        TokenIdentifier::<SA>::provide_type_descriptions(accumulator);
+        TokenIdentifier::<'a, SA>::provide_type_descriptions(accumulator);
     }
 
     fn is_variadic() -> bool {

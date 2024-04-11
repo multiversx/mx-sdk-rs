@@ -19,60 +19,60 @@ use crate::{
 const NULL_ENTRY: u32 = 0;
 const NODE_ID_IDENTIFIER: &[u8] = b".node_id";
 
-pub trait StorageAddress<SA>
+pub trait StorageAddress<'a, SA>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T;
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize;
+    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<'a, SA>>) -> T;
+    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<'a, SA>>) -> usize;
 }
 
 pub struct CurrentStorage;
 
-impl<SA> StorageAddress<SA> for CurrentStorage
+impl<'a, SA> StorageAddress<'a, SA> for CurrentStorage
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
+    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<'a, SA>>) -> T {
         storage_get(key)
     }
 
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
+    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<'a, SA>>) -> usize {
         storage_get_len(key)
     }
 }
 
-impl<SA> StorageAddress<SA> for ManagedAddress<SA>
+impl<'a, SA> StorageAddress<'a, SA> for ManagedAddress<'a, SA>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> T {
+    fn address_storage_get<T: TopDecode>(&self, key: ManagedRef<'_, SA, StorageKey<'a, SA>>) -> T {
         storage_get_from_address(self.as_ref(), key)
     }
 
-    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<SA>>) -> usize {
+    fn address_storage_get_len(&self, key: ManagedRef<'_, SA, StorageKey<'a, SA>>) -> usize {
         storage_get_len_from_address(self.as_ref(), key)
     }
 }
 
-pub struct SetMapper<SA, T, A = CurrentStorage>
+pub struct SetMapper<'a, SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    base_key: StorageKey<SA>,
-    queue_mapper: QueueMapper<SA, T, A>,
+    base_key: StorageKey<'a, SA>,
+    queue_mapper: QueueMapper<'a, SA, T, A>,
 }
 
-impl<SA, T> StorageMapper<SA> for SetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageMapper<'a, SA> for SetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         SetMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
@@ -82,9 +82,9 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for SetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageClearable for SetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn clear(&mut self) {
@@ -95,12 +95,12 @@ where
     }
 }
 
-impl<SA, T> SetMapper<SA, T, ManagedAddress<SA>>
+impl<'a, SA, T> SetMapper<'a, SA, T, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         SetMapper {
             _phantom_api: PhantomData,
             address: address.clone(),
@@ -110,9 +110,9 @@ where
     }
 }
 
-impl<SA, T> SetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> SetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
     fn set_node_id(&self, value: &T, node_id: u32) {
@@ -167,13 +167,13 @@ where
     }
 }
 
-impl<SA, A, T> SetMapper<SA, T, A>
+impl<'a, SA, A, T> SetMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode,
 {
-    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<SA> {
+    pub fn build_named_value_key(&self, name: &[u8], value: &T) -> StorageKey<'a, SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);
         named_key.append_item(value);
@@ -182,11 +182,11 @@ where
 
     /// An iterator visiting all elements in arbitrary order.
     /// The iterator element type is `&'a T`.
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'a, SA, A, T> {
         self.queue_mapper.iter()
     }
 
-    pub fn iter_from(&self, value: &T) -> Iter<SA, A, T> {
+    pub fn iter_from(&self, value: &T) -> Iter<'a, SA, A, T> {
         let node_id = self.get_node_id(value);
         self.queue_mapper.iter_from_node_id(node_id)
     }
@@ -249,10 +249,10 @@ where
     }
 }
 
-impl<'a, SA, A, T> IntoIterator for &'a SetMapper<SA, T, A>
+impl<'a, SA, A, T> IntoIterator for &'a SetMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     type Item = T;
@@ -264,9 +264,9 @@ where
     }
 }
 
-impl<SA, T> Extend<T> for SetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> Extend<T> for SetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     fn extend<I>(&mut self, iter: I)
@@ -280,9 +280,9 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for SetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> TopEncodeMulti for SetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -294,17 +294,17 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<SetMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+impl<'a, SA, T> CodecFrom<SetMapper<'a, SA, T, CurrentStorage>> for MultiValueEncoded<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for SetMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> TypeAbi for SetMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

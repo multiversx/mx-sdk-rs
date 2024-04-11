@@ -12,23 +12,23 @@ pub enum AuctionType {
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct Auction<M: ManagedTypeApi> {
+pub struct Auction<'a, M: ManagedTypeApi<'a>> {
     pub auction_type: AuctionType,
-    pub starting_price: BigUint<M>,
-    pub ending_price: BigUint<M>,
+    pub starting_price: BigUint<'a, M>,
+    pub ending_price: BigUint<'a, M>,
     pub deadline: u64,
-    pub kitty_owner: ManagedAddress<M>,
-    pub current_bid: BigUint<M>,
-    pub current_winner: ManagedAddress<M>,
+    pub kitty_owner: ManagedAddress<'a, M>,
+    pub current_bid: BigUint<'a, M>,
+    pub current_winner: ManagedAddress<'a, M>,
 }
 
-impl<M: ManagedTypeApi> Auction<M> {
+impl<'a, M: ManagedTypeApi<'a>> Auction<'a, M> {
     pub fn new(
         auction_type: AuctionType,
-        starting_price: BigUint<M>,
-        ending_price: BigUint<M>,
+        starting_price: BigUint<'a, M>,
+        ending_price: BigUint<'a, M>,
         deadline: u64,
-        kitty_owner: ManagedAddress<M>,
+        kitty_owner: ManagedAddress<'a, M>,
     ) -> Self {
         Auction {
             auction_type,

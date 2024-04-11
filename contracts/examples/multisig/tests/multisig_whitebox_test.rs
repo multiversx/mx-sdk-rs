@@ -846,9 +846,9 @@ fn address_expr_to_address(address_expr: &str) -> Address {
     AddressValue::from(address_expr).to_address()
 }
 
-fn boxed_bytes_vec_to_managed<M: ManagedTypeApi>(
+fn boxed_bytes_vec_to_managed<'a, M: ManagedTypeApi<'a>>(
     raw_vec: Vec<BoxedBytes>,
-) -> ManagedVec<M, ManagedBuffer<M>> {
+) -> ManagedVec<'a, M, ManagedBuffer<'a, M>> {
     let mut managed = ManagedVec::new();
     for elem in raw_vec {
         managed.push(ManagedBuffer::new_from_bytes(elem.as_slice()));

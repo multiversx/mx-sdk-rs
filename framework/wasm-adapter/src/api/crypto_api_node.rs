@@ -27,7 +27,7 @@ extern "C" {
     fn managedEncodeSecp256k1DerSignature(rHandle: i32, sHandle: i32, sigHandle: i32) -> i32;
 }
 
-impl CryptoApi for VmApiImpl {
+impl<'a> CryptoApi<'a> for VmApiImpl {
     type CryptoApiImpl = VmApiImpl;
 
     #[inline]
@@ -36,7 +36,7 @@ impl CryptoApi for VmApiImpl {
     }
 }
 
-impl CryptoApiImpl for VmApiImpl {
+impl<'a> CryptoApi<'a>Impl for VmApiImpl {
     fn sha256_managed(
         &self,
         result_handle: Self::ManagedBufferHandle,

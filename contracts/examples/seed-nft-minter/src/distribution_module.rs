@@ -3,10 +3,10 @@ use multiversx_sc::{derive_imports::*, imports::*};
 pub const MAX_DISTRIBUTION_PERCENTAGE: u64 = 100_000; // 100%
 
 #[derive(ManagedVecItem, NestedEncode, NestedDecode, TypeAbi)]
-pub struct Distribution<M: ManagedTypeApi> {
-    pub address: ManagedAddress<M>,
+pub struct Distribution<'a, M: ManagedTypeApi<'a>> {
+    pub address: ManagedAddress<'a, M>,
     pub percentage: u64,
-    pub endpoint: ManagedBuffer<M>,
+    pub endpoint: ManagedBuffer<'a, M>,
     pub gas_limit: u64,
 }
 

@@ -1,4 +1,4 @@
-use multiversx_sc::api::{CallTypeApi, StorageMapperApi, VMApi};
+use multiversx_sc::api::{CallTypeApi, StorageMapperApi<'a>, VMApi};
 
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 

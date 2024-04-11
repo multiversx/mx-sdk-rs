@@ -94,20 +94,20 @@ pub trait ValidationModule: common::CommonModule {
         require!(order_ids.len() >= 2, "Should be at least two order ids");
     }
 
-    fn require_not_max_size(&self, address_order_ids: &MultiValueManagedVec<u64>) {
+    fn require_not_max_size(&self, address_order_ids: &MultiValueManagedVec<'a, u64>) {
         require!(
             address_order_ids.len() < MAX_ORDERS_PER_USER,
             "Cannot place more orders"
         );
     }
 
-    fn require_order_ids_not_empty(&self, order_ids: &MultiValueManagedVec<u64>) {
+    fn require_order_ids_not_empty(&self, order_ids: &MultiValueManagedVec<'a, u64>) {
         require!(!order_ids.is_empty(), "Order ids vec is empty");
     }
 
     fn require_match_provider_empty_or_caller(
         &self,
-        orders: &MultiValueManagedVec<Order<Self::Api>>,
+        orders: &MultiValueManagedVec<'a, Order<Self::Api>>,
     ) {
         let caller = &self.blockchain().get_caller();
 
@@ -125,8 +125,8 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_contains_all(
         &self,
-        vec_base: &MultiValueManagedVec<u64>,
-        items: &MultiValueManagedVec<u64>,
+        vec_base: &MultiValueManagedVec<'a, u64>,
+        items: &MultiValueManagedVec<'a, u64>,
     ) {
         for item in items.iter() {
             let mut check_item = false;
@@ -142,8 +142,8 @@ pub trait ValidationModule: common::CommonModule {
 
     fn require_contains_none(
         &self,
-        vec_base: &MultiValueManagedVec<u64>,
-        items: &MultiValueManagedVec<u64>,
+        vec_base: &MultiValueManagedVec<'a, u64>,
+        items: &MultiValueManagedVec<'a, u64>,
     ) {
         for item in items.iter() {
             let mut check_item = false;

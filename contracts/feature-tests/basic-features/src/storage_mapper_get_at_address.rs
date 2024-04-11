@@ -73,7 +73,7 @@ pub trait StorageMapperGetAtAddress {
     #[endpoint]
     fn keys_at_address(&self) -> ManagedVec<u32> {
         let address = self.contract_address().get();
-        let mapper: MapMapper<u32, u32, _> =
+        let mapper: MapMapper<'a, u32, u32, _> =
             MapMapper::new_from_address(address, StorageKey::from("map_mapper"));
         mapper.keys().collect()
     }
@@ -81,7 +81,7 @@ pub trait StorageMapperGetAtAddress {
     #[endpoint]
     fn values_at_address(&self) -> ManagedVec<u32> {
         let address = self.contract_address().get();
-        let mapper: MapMapper<u32, u32, _> =
+        let mapper: MapMapper<'a, u32, u32, _> =
             MapMapper::new_from_address(address, StorageKey::from("map_mapper"));
         mapper.values().collect()
     }
@@ -92,7 +92,7 @@ pub trait StorageMapperGetAtAddress {
     fn set_mapper(&self) -> SetMapper<u32>;
 
     #[storage_mapper("map_mapper")]
-    fn map_mapper(&self) -> MapMapper<u32, u32>;
+    fn map_mapper(&self) -> MapMapper<'a, u32, u32>;
 
     #[endpoint]
     fn fill_set_mapper(&self, value: u32) {

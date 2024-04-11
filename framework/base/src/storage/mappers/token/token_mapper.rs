@@ -18,25 +18,25 @@ pub(crate) const MUST_SET_TOKEN_ID_ERR_MSG: &[u8] = b"Must issue or set token ID
 pub(crate) const INVALID_TOKEN_ID_ERR_MSG: &[u8] = b"Invalid token ID";
 pub(crate) const INVALID_PAYMENT_TOKEN_ERR_MSG: &[u8] = b"Invalid payment token";
 
-pub trait StorageTokenWrapper<SA>
+pub trait StorageTokenWrapper<'a, SA>
 where
-    SA: StorageMapperApi + CallTypeApi,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
 {
-    fn get_storage_key(&self) -> ManagedRef<SA, StorageKey<SA>>;
+    fn get_storage_key(&self) -> ManagedRef<'a, SA, StorageKey<'a, SA>>;
 
     fn is_empty(&self) -> bool {
         storage_get_len(self.get_storage_key()) == 0
     }
 
-    fn get_token_state(&self) -> TokenMapperState<SA>;
+    fn get_token_state(&self) -> TokenMapperState<'a, SA>;
 
-    fn get_token_id(&self) -> TokenIdentifier<SA>;
+    fn get_token_id(&self) -> TokenIdentifier<'a, SA>;
 
-    fn get_token_id_ref(&self) -> &TokenIdentifier<SA>;
+    fn get_token_id_ref(&self) -> &TokenIdentifier<'a, SA>;
 
-    fn set_token_id(&mut self, token_id: TokenIdentifier<SA>);
+    fn set_token_id(&mut self, token_id: TokenIdentifier<'a, SA>);
 
-    fn set_if_empty(&mut self, token_id: TokenIdentifier<SA>) {
+    fn set_if_empty(&mut self, token_id: TokenIdentifier<'a, SA>) {
         if self.is_empty() {
             self.set_token_id(token_id);
         }
@@ -48,14 +48,14 @@ where
         }
     }
 
-    fn require_same_token(&self, expected_token_id: &TokenIdentifier<SA>) {
+    fn require_same_token(&self, expected_token_id: &TokenIdentifier<'a, SA>) {
         let actual_token_id = self.get_token_id_ref();
         if actual_token_id != expected_token_id {
             SA::error_api_impl().signal_error(INVALID_PAYMENT_TOKEN_ERR_MSG);
         }
     }
 
-    fn require_all_same_token(&self, payments: &ManagedVec<SA, EsdtTokenPayment<SA>>) {
+    fn require_all_same_token(&self, payments: &ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>) {
         let actual_token_id = self.get_token_id_ref();
         for p in payments {
             if actual_token_id != &p.token_identifier {
@@ -67,7 +67,7 @@ where
     fn set_local_roles(
         &self,
         roles: &[EsdtLocalRole],
-        opt_callback: Option<CallbackClosure<SA>>,
+        opt_callback: Option<CallbackClosure<'a, SA>>,
     ) -> ! {
         let own_sc_address = Self::get_sc_address();
         self.set_local_roles_for_address(&own_sc_address, roles, opt_callback);
@@ -75,13 +75,13 @@ where
 
     fn set_local_roles_for_address(
         &self,
-        address: &ManagedAddress<SA>,
+        address: &ManagedAddress<'a, SA>,
         roles: &[EsdtLocalRole],
-        opt_callback: Option<CallbackClosure<SA>>,
+        opt_callback: Option<CallbackClosure<'a, SA>>,
     ) -> ! {
         self.require_issued_or_set();
 
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+        let system_sc_proxy = ESDTSystemSmartContractProxy::<'a, SA>::new_proxy_obj();
         let token_id = self.get_token_id_ref();
         let mut async_call = system_sc_proxy
             .set_special_roles(address, token_id, roles[..].iter().cloned())
@@ -94,18 +94,19 @@ where
         async_call.call_and_exit()
     }
 
-    fn get_sc_address() -> ManagedAddress<SA> {
+    fn get_sc_address() -> ManagedAddress<'a, SA> {
         let b_wrapper = BlockchainWrapper::new();
         b_wrapper.get_sc_address()
     }
 }
 
 pub(crate) fn store_token_id<
-    SA: StorageMapperApi + CallTypeApi,
-    Mapper: StorageTokenWrapper<SA>,
+    'a,
+    SA: StorageMapperApi<'a> + CallTypeApi<'a>,
+    Mapper: StorageTokenWrapper<'a, SA>,
 >(
     mapper: &Mapper,
-    token_id: &TokenIdentifier<SA>,
+    token_id: &TokenIdentifier<'a, SA>,
 ) {
     if mapper.get_token_state().is_set() {
         SA::error_api_impl().signal_error(TOKEN_ID_ALREADY_SET_ERR_MSG);
@@ -118,10 +119,10 @@ pub(crate) fn store_token_id<
         &TokenMapperState::Token(token_id.clone()),
     );
 }
-pub(crate) fn check_not_set<SA: StorageMapperApi + CallTypeApi, Mapper: StorageTokenWrapper<SA>>(
+pub(crate) fn check_not_set<'a, SA: StorageMapperApi<'a> + CallTypeApi<'a>, Mapper: StorageTokenWrapper<'a, SA>>(
     mapper: &Mapper,
 ) {
-    let storage_value: TokenMapperState<SA> = storage_get(mapper.get_storage_key());
+    let storage_value: TokenMapperState<'a, SA> = storage_get(mapper.get_storage_key());
     match storage_value {
         TokenMapperState::NotSet => {},
         TokenMapperState::Pending => {

@@ -9,7 +9,7 @@ use core::{
 
 pub struct ManagedVecRef<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     _phantom_m: PhantomData<M>,
@@ -21,11 +21,11 @@ where
 
 impl<'a, M, T> ManagedVecRef<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
-    fn wrap_as_managed_vec(managed_vec_handle: M::ManagedBufferHandle) -> ManagedVec<M, T> {
+    fn wrap_as_managed_vec(managed_vec_handle: M::ManagedBufferHandle) -> ManagedVec<'a, M, T> {
         ManagedVec::from_handle(managed_vec_handle)
     }
 
@@ -44,7 +44,7 @@ where
 
 impl<'a, M, T> Drop for ManagedVecRef<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
@@ -55,7 +55,7 @@ where
 
 impl<'a, M, T> Deref for ManagedVecRef<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     type Target = T;
@@ -67,7 +67,7 @@ where
 
 impl<'a, M, T> DerefMut for ManagedVecRef<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     fn deref_mut(&mut self) -> &mut Self::Target {

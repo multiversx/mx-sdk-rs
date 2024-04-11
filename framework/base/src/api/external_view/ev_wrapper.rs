@@ -7,21 +7,21 @@ use crate::api::{
 };
 
 #[derive(Clone)]
-pub struct ExternalViewApi<A: VMApi> {
-    _phantom: PhantomData<A>,
+pub struct ExternalViewApi<'a, A: VMApi<'a>> {
+    _phantom: PhantomData<&'a A>,
 }
 
-impl<A: VMApi> ExternalViewApi<A> {
+impl<'a, A: VMApi<'a>> ExternalViewApi<'a, A> {
     pub(super) fn new() -> Self {
         ExternalViewApi {
-            _phantom: PhantomData,
+            _phantom: PhantomData
         }
     }
 }
 
-impl<A> HandleTypeInfo for ExternalViewApi<A>
+impl<'a, A> HandleTypeInfo for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type ManagedBufferHandle = <A as HandleTypeInfo>::ManagedBufferHandle;
 
@@ -34,9 +34,9 @@ where
     type ManagedMapHandle = <A as HandleTypeInfo>::ManagedMapHandle;
 }
 
-impl<A> BlockchainApi for ExternalViewApi<A>
+impl<'a, A> BlockchainApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type BlockchainApiImpl = A::BlockchainApiImpl;
 
@@ -45,9 +45,9 @@ where
     }
 }
 
-impl<A> CallValueApi for ExternalViewApi<A>
+impl<'a, A> CallValueApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type CallValueApiImpl = A::CallValueApiImpl;
 
@@ -56,9 +56,9 @@ where
     }
 }
 
-impl<A> CryptoApi for ExternalViewApi<A>
+impl<'a, A> CryptoApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type CryptoApiImpl = A::CryptoApiImpl;
 
@@ -67,9 +67,9 @@ where
     }
 }
 
-impl<A> EndpointArgumentApi for ExternalViewApi<A>
+impl<'a, A> EndpointArgumentApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type EndpointArgumentApiImpl = A::EndpointArgumentApiImpl;
 
@@ -78,9 +78,9 @@ where
     }
 }
 
-impl<A> EndpointFinishApi for ExternalViewApi<A>
+impl<'a, A> EndpointFinishApi for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type EndpointFinishApiImpl = A::EndpointFinishApiImpl;
 
@@ -89,9 +89,9 @@ where
     }
 }
 
-impl<A> ErrorApi for super::ExternalViewApi<A>
+impl<'a, A> ErrorApi for super::ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type ErrorApiImpl = A::ErrorApiImpl;
 
@@ -100,9 +100,9 @@ where
     }
 }
 
-impl<A> LogApi for ExternalViewApi<A>
+impl<'a, A> LogApi for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type LogApiImpl = A::LogApiImpl;
 
@@ -111,9 +111,9 @@ where
     }
 }
 
-impl<A> ManagedTypeApi for ExternalViewApi<A>
+impl<'a, A> ManagedTypeApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type ManagedTypeApiImpl = A::ManagedTypeApiImpl;
 
@@ -122,9 +122,9 @@ where
     }
 }
 
-impl<A> PrintApi for ExternalViewApi<A>
+impl<'a, A> PrintApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type PrintApiImpl = A::PrintApiImpl;
 
@@ -133,9 +133,9 @@ where
     }
 }
 
-impl<A> SendApi for ExternalViewApi<A>
+impl<'a, A> SendApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type SendApiImpl = A::SendApiImpl;
 
@@ -144,9 +144,9 @@ where
     }
 }
 
-impl<A> StaticVarApi for ExternalViewApi<A>
+impl<'a, A> StaticVarApi for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type StaticVarApiImpl = A::StaticVarApiImpl;
 
@@ -155,9 +155,9 @@ where
     }
 }
 
-impl<A> StorageWriteApi for ExternalViewApi<A>
+impl<'a, A> StorageWriteApi for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     type StorageWriteApiImpl = A::StorageWriteApiImpl;
 
@@ -166,26 +166,26 @@ where
     }
 }
 
-impl<A> CallTypeApi for ExternalViewApi<A> where A: VMApi {}
+impl<'a, A> CallTypeApi<'a> for ExternalViewApi<'a, A> where A: VMApi<'a> {}
 
-impl<A> StorageMapperApi for ExternalViewApi<A> where A: VMApi {}
+impl<'a, A> StorageMapperApi<'a> for ExternalViewApi<'a, A> where A: VMApi<'a> {}
 
-impl<A> VMApi for ExternalViewApi<A>
+impl<'a, A> VMApi<'a> for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     fn external_view_init_override() -> bool {
         true
     }
 }
 
-impl<A> PartialEq for ExternalViewApi<A>
+impl<'a, A> PartialEq for ExternalViewApi<'a, A>
 where
-    A: VMApi,
+    A: VMApi<'a>,
 {
     fn eq(&self, _: &Self) -> bool {
         true
     }
 }
 
-impl<A> Eq for ExternalViewApi<A> where A: VMApi {}
+impl<'a, A> Eq for ExternalViewApi<'a, A> where A: VMApi<'a> {}

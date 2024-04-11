@@ -9,10 +9,10 @@ pub enum SampleEnum {
     Value2,
 }
 #[derive(TypeAbi, TopEncode, TopDecode, NestedEncode, NestedDecode, Clone)]
-pub struct Structure<M: ManagedTypeApi> {
-    pub field1: ManagedBuffer<M>,
+pub struct Structure<'a, M: ManagedTypeApi<'a>> {
+    pub field1: ManagedBuffer<'a, M>,
     pub field2: SampleEnum,
-    pub field3: ManagedBuffer<M>,
+    pub field3: ManagedBuffer<'a, M>,
 }
 
 #[multiversx_sc::contract]

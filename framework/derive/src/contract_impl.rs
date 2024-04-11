@@ -59,7 +59,7 @@ pub fn contract_implementation(
             #callbacks_impl
         }
 
-        impl<A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<A> where
+        impl<'a, A> AutoImpl for multiversx_sc::contract_base::UniversalContractObj<'a, A> where
             A: multiversx_sc::api::VMApi
         {
         }
@@ -79,7 +79,7 @@ pub fn contract_implementation(
                 #function_selector_body
             }
 
-            fn callback_selector(&self, mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<Self::Api>) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
+            fn callback_selector(&self, mut ___cb_closure___: multiversx_sc::types::CallbackClosureForDeser<'a, Self::Api>) -> multiversx_sc::types::CallbackSelectorResult<Self::Api> {
                 #callback_selector_body
             }
 
@@ -88,7 +88,7 @@ pub fn contract_implementation(
             }
         }
 
-        impl<A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<A> where
+        impl<'a, A> EndpointWrappers for multiversx_sc::contract_base::UniversalContractObj<'a, A> where
             A: multiversx_sc::api::VMApi
         {
         }

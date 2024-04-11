@@ -1,7 +1,7 @@
 use super::{ErrorApiImpl, HandleTypeInfo, ManagedTypeApiImpl};
 
-pub trait CallValueApi: HandleTypeInfo {
-    type CallValueApiImpl: CallValueApiImpl
+pub trait CallValueApi<'a>: HandleTypeInfo {
+    type CallValueApiImpl: CallValueApiImpl<'a>
         + HandleTypeInfo<
             ManagedBufferHandle = Self::ManagedBufferHandle,
             BigIntHandle = Self::BigIntHandle,
@@ -12,7 +12,7 @@ pub trait CallValueApi: HandleTypeInfo {
     fn call_value_api_impl() -> Self::CallValueApiImpl;
 }
 
-pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl + Sized {
+pub trait CallValueApiImpl<'a>: ErrorApiImpl + ManagedTypeApiImpl<'a> + Sized {
     fn check_not_payable(&self);
 
     /// Retrieves the EGLD call value from the VM.

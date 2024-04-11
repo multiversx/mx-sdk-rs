@@ -9,18 +9,18 @@ use crate::{
 };
 
 /// Consumes a vector of `BoxedBytes` and deserializes from the vector one by one.
-pub struct BytesArgLoader<A>
+pub struct BytesArgLoader<'a, A>
 where
-    A: ManagedTypeApi,
+    A: ManagedTypeApi<'a>,
 {
     bytes_vec: Vec<BoxedBytes>,
     next_index: usize,
     _phantom: PhantomData<A>,
 }
 
-impl<A> BytesArgLoader<A>
+impl<'a, A> BytesArgLoader<'a, A>
 where
-    A: ManagedTypeApi,
+    A: ManagedTypeApi<'a>,
 {
     pub fn new(bytes_vec: Vec<BoxedBytes>) -> Self {
         BytesArgLoader {
@@ -31,9 +31,9 @@ where
     }
 }
 
-impl<A> TopDecodeMultiInput for BytesArgLoader<A>
+impl<'a, A> TopDecodeMultiInput for BytesArgLoader<'a, A>
 where
-    A: ManagedTypeApi + ErrorApi,
+    A: ManagedTypeApi<'a> + ErrorApi,
 {
     type ValueInput = Box<[u8]>;
 

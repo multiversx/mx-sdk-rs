@@ -3,20 +3,20 @@ use crate::{
     types::{ManagedBuffer, StaticBufferRef},
 };
 
-pub(crate) struct PreloadedManagedBuffer<M>
+pub(crate) struct PreloadedManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
-    pub managed_buffer: ManagedBuffer<M>,
+    pub managed_buffer: ManagedBuffer<'a, M>,
     pub buffer_len: usize,
-    static_cache: Option<StaticBufferRef<M>>,
+    static_cache: Option<StaticBufferRef<'a, M>>,
 }
 
-impl<M> PreloadedManagedBuffer<M>
+impl<'a, M> PreloadedManagedBuffer<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
-    pub fn new(managed_buffer: ManagedBuffer<M>) -> Self {
+    pub fn new(managed_buffer: ManagedBuffer<'a, M>) -> Self {
         let buffer_len = managed_buffer.len();
         Self {
             managed_buffer,
@@ -54,7 +54,7 @@ where
         &self,
         starting_position: usize,
         slice_len: usize,
-    ) -> Option<ManagedBuffer<M>> {
+    ) -> Option<ManagedBuffer<'a, M>> {
         self.managed_buffer.copy_slice(starting_position, slice_len)
     }
 }

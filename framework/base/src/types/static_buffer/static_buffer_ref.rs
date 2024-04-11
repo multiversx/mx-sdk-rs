@@ -4,14 +4,14 @@ use crate::api::{InvalidSliceError, StaticVarApi, StaticVarApiImpl};
 
 use super::LockableStaticBuffer;
 
-pub struct StaticBufferRef<M>
+pub struct StaticBufferRef<'a, M>
 where
     M: StaticVarApi,
 {
     _phantom: PhantomData<M>,
 }
 
-impl<M> StaticBufferRef<M>
+impl<'a, M> StaticBufferRef<'a, M>
 where
     M: StaticVarApi,
 {
@@ -39,7 +39,7 @@ where
     }
 }
 
-impl<M: StaticVarApi> Drop for StaticBufferRef<M> {
+impl<'a, M: StaticVarApi> Drop for StaticBufferRef<'a, M> {
     fn drop(&mut self) {
         M::static_var_api_impl().with_lockable_static_buffer(|lsb| {
             lsb.unlock();
@@ -47,7 +47,7 @@ impl<M: StaticVarApi> Drop for StaticBufferRef<M> {
     }
 }
 
-impl<M: StaticVarApi> StaticBufferRef<M> {
+impl<'a, M: StaticVarApi> StaticBufferRef<'a, M> {
     pub fn len(&self) -> usize {
         M::static_var_api_impl().with_lockable_static_buffer(|lsb| lsb.len())
     }

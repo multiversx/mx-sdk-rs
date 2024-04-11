@@ -11,9 +11,9 @@ pub struct NftDummyAttributes {
     pub cool_factor: u8,
 }
 
-pub struct StructWithManagedTypes<M: ManagedTypeApi> {
-    pub big_uint: BigUint<M>,
-    pub buffer: ManagedBuffer<M>,
+pub struct StructWithManagedTypes<'a, M: ManagedTypeApi<'a>> {
+    pub big_uint: BigUint<'a, M>,
+    pub buffer: ManagedBuffer<'a, M>,
 }
 
 #[multiversx_sc::contract]

@@ -65,24 +65,24 @@ impl QueueMapperInfo {
 ///
 /// The `QueueMapper` allows pushing and popping elements at either end
 /// in constant time.
-pub struct QueueMapper<SA, T, A = CurrentStorage>
+pub struct QueueMapper<'a, SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    base_key: StorageKey<SA>,
+    base_key: StorageKey<'a, SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<SA, T> StorageMapper<SA> for QueueMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageMapper<'a, SA> for QueueMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         QueueMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
@@ -92,9 +92,9 @@ where
     }
 }
 
-impl<SA, T> StorageClearable for QueueMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> StorageClearable for QueueMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
     fn clear(&mut self) {
@@ -110,9 +110,9 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> QueueMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
     fn set_info(&mut self, value: QueueMapperInfo) {
@@ -271,14 +271,14 @@ where
     }
 }
 
-impl<SA, T> QueueMapper<SA, T, ManagedAddress<SA>>
+impl<'a, SA, T> QueueMapper<'a, SA, T, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         QueueMapper {
-            _phantom_api: PhantomData::<SA>,
+            _phantom_api: PhantomData::<'a, SA>,
             address,
             base_key,
             _phantom_item: PhantomData::<T>,
@@ -286,30 +286,30 @@ where
     }
 }
 
-impl<SA, A, T> QueueMapper<SA, T, A>
+impl<'a, SA, A, T> QueueMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
-    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<SA> {
+    fn build_node_id_named_key(&self, name: &[u8], node_id: u32) -> StorageKey<'a, SA> {
         let mut named_key = self.base_key.clone();
         named_key.append_bytes(name);
         named_key.append_item(&node_id);
         named_key
     }
 
-    fn build_name_key(&self, name: &[u8]) -> StorageKey<SA> {
+    fn build_name_key(&self, name: &[u8]) -> StorageKey<'a, SA> {
         let mut name_key = self.base_key.clone();
         name_key.append_bytes(name);
         name_key
     }
 
-    pub fn iter(&self) -> Iter<SA, A, T> {
+    pub fn iter(&self) -> Iter<'a, SA, A, T> {
         Iter::new(self)
     }
 
-    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<SA, A, T> {
+    pub fn iter_from_node_id(&self, node_id: u32) -> Iter<'a, SA, A, T> {
         Iter::new_from_node_id(self, node_id)
     }
 
@@ -437,10 +437,10 @@ where
     }
 }
 
-impl<'a, SA, A, T> IntoIterator for &'a QueueMapper<SA, T, A>
+impl<'a, SA, A, T> IntoIterator for &'a QueueMapper<'a, SA, T, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -458,36 +458,36 @@ where
 /// documentation for more.
 pub struct Iter<'a, SA, A, T>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     node_id: u32,
-    queue: &'a QueueMapper<SA, T, A>,
+    queue: &'a QueueMapper<'a, SA, T, A>,
 }
 
 impl<'a, SA, A, T> Iter<'a, SA, A, T>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
-    fn new(queue: &'a QueueMapper<SA, T, A>) -> Iter<'a, SA, A, T> {
+    fn new(queue: &'a QueueMapper<'a, SA, T, A>) -> Iter<'a, SA, A, T> {
         Iter {
             node_id: queue.get_info().front,
             queue,
         }
     }
 
-    pub fn new_from_node_id(queue: &'a QueueMapper<SA, T, A>, node_id: u32) -> Iter<'a, SA, A, T> {
+    pub fn new_from_node_id(queue: &'a QueueMapper<'a, SA, T, A>, node_id: u32) -> Iter<'a, SA, A, T> {
         Iter { node_id, queue }
     }
 }
 
 impl<'a, SA, A, T> Iterator for Iter<'a, SA, A, T>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
     T: TopEncode + TopDecode + 'static,
 {
     type Item = T;
@@ -504,9 +504,9 @@ where
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TopEncodeMulti for QueueMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> TopEncodeMulti for QueueMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -518,17 +518,17 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<QueueMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+impl<'a, SA, T> CodecFrom<QueueMapper<'a, SA, T, CurrentStorage>> for MultiValueEncoded<'a, SA, T>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode,
 {
 }
 
 /// Behaves like a MultiResultVec when an endpoint result.
-impl<SA, T> TypeAbi for QueueMapper<SA, T, CurrentStorage>
+impl<'a, SA, T> TypeAbi for QueueMapper<'a, SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

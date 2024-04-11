@@ -15,21 +15,21 @@ use crate::{
 
 /// Nested decode buffer based on a managed buffer.
 /// Uses the load/copy slice API to extract pieces of the managed buffer for deserialization.
-pub struct ManagedBufferNestedDecodeInput<M>
+pub struct ManagedBufferNestedDecodeInput<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
-    buffer: PreloadedManagedBuffer<M>,
+    buffer: PreloadedManagedBuffer<'a, M>,
     decode_index: usize,
     buffer_len: usize,
     _phantom: PhantomData<M>,
 }
 
-impl<M> ManagedBufferNestedDecodeInput<M>
+impl<'a, M> ManagedBufferNestedDecodeInput<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
-    pub fn new(managed_buffer: ManagedBuffer<M>) -> Self {
+    pub fn new(managed_buffer: ManagedBuffer<'a, M>) -> Self {
         // retrieves buffer length eagerly because:
         // - it always gets called anyway at the end to check that no leftover bytes remain
         // - it is sometimes required multiple times during serialization
@@ -48,7 +48,7 @@ where
         &mut self,
         size: usize,
         h: H,
-    ) -> Result<ManagedBuffer<M>, H::HandledErr>
+    ) -> Result<ManagedBuffer<'a, M>, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
@@ -60,7 +60,7 @@ where
         }
     }
 
-    fn read_managed_buffer<H>(&mut self, h: H) -> Result<ManagedBuffer<M>, H::HandledErr>
+    fn read_managed_buffer<H>(&mut self, h: H) -> Result<ManagedBuffer<'a, M>, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
@@ -68,20 +68,20 @@ where
         self.read_managed_buffer_of_size(size, h)
     }
 
-    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigUint<M>, H::HandledErr> {
+    fn read_big_uint<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigUint<'a, M>, H::HandledErr> {
         Ok(BigUint::from_bytes_be_buffer(&self.read_managed_buffer(h)?))
     }
 
-    fn read_big_int<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigInt<M>, H::HandledErr> {
+    fn read_big_int<H: DecodeErrorHandler>(&mut self, h: H) -> Result<BigInt<'a, M>, H::HandledErr> {
         Ok(BigInt::from_signed_bytes_be_buffer(
             &self.read_managed_buffer(h)?,
         ))
     }
 }
 
-impl<M> NestedDecodeInput for ManagedBufferNestedDecodeInput<M>
+impl<'a, M> NestedDecodeInput for ManagedBufferNestedDecodeInput<'a, M>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
 {
     fn remaining_len(&self) -> usize {
         self.buffer_len - self.decode_index
@@ -106,7 +106,7 @@ where
     }
 
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
+        T::type_eq::<ManagedBuffer<'a, M>>() || T::type_eq::<BigUint<'a, M>>() || T::type_eq::<BigInt<'a, M>>()
     }
 
     fn read_specialized<T, C, H>(&mut self, context: C, h: H) -> Result<T, H::HandledErr>

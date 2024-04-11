@@ -4,8 +4,8 @@ multiversx_sc::derive_imports!();
 use crate::price_aggregator_data::{TimestampedPrice, TokenPair};
 
 #[derive(TypeAbi, TopEncode)]
-pub struct NewRoundEvent<M: ManagedTypeApi> {
-    price: BigUint<M>,
+pub struct NewRoundEvent<'a, M: ManagedTypeApi<'a>> {
+    price: BigUint<'a, M>,
     timestamp: u64,
     decimals: u8,
     block: u64,

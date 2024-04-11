@@ -58,7 +58,7 @@ impl<'de> Visitor<'de> for CheckBytesValueRawVisitor {
         }
     }
 
-    fn visit_seq<A>(self, seq: A) -> Result<Self::Value, A::Error>
+    fn visit_seq<'a, A>(self, seq: A) -> Result<Self::Value, A::Error>
     where
         A: SeqAccess<'de>,
     {
@@ -66,7 +66,7 @@ impl<'de> Visitor<'de> for CheckBytesValueRawVisitor {
         Ok(CheckBytesValueRaw::Equal(vst))
     }
 
-    fn visit_map<M>(self, access: M) -> Result<Self::Value, M::Error>
+    fn visit_map<'a, M>(self, access: M) -> Result<Self::Value, M::Error>
     where
         M: MapAccess<'de>,
     {

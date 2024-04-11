@@ -5,10 +5,10 @@ multiversx_sc::imports!();
 pub trait MapMapperFeatures {
     #[view]
     #[storage_mapper("map_mapper")]
-    fn map_mapper(&self) -> MapMapper<u32, u32>;
+    fn map_mapper(&self) -> MapMapper<'a, u32, u32>;
 
     #[view]
-    fn map_mapper_keys(&self) -> MultiValueManagedVec<u32> {
+    fn map_mapper_keys(&self) -> MultiValueManagedVec<'a, u32> {
         // TODO: implement FromIterator and make this more compact
         let mut result = MultiValueManagedVec::new();
         for key in self.map_mapper().keys() {
@@ -18,7 +18,7 @@ pub trait MapMapperFeatures {
     }
 
     #[view]
-    fn map_mapper_values(&self) -> MultiValueManagedVec<u32> {
+    fn map_mapper_values(&self) -> MultiValueManagedVec<'a, u32> {
         // TODO: implement FromIterator and make this more compact
         let mut result = MultiValueManagedVec::new();
         for value in self.map_mapper().values() {

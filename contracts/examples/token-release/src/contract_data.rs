@@ -3,9 +3,9 @@ use multiversx_sc::{api::ManagedTypeApi, types::BigUint};
 use multiversx_sc::derive_imports::*;
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, PartialEq, Eq, TypeAbi, Clone)]
-pub enum UnlockType<M: ManagedTypeApi> {
+pub enum UnlockType<'a, M: ManagedTypeApi<'a>> {
     FixedAmount {
-        period_unlock_amount: BigUint<M>,
+        period_unlock_amount: BigUint<'a, M>,
         release_period: u64,
         release_ticks: u64,
     },
@@ -17,7 +17,7 @@ pub enum UnlockType<M: ManagedTypeApi> {
 }
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, PartialEq, Eq, TypeAbi, Clone)]
-pub struct Schedule<M: ManagedTypeApi> {
-    pub group_total_amount: BigUint<M>,
-    pub unlock_type: UnlockType<M>,
+pub struct Schedule<'a, M: ManagedTypeApi<'a>> {
+    pub group_total_amount: BigUint<'a, M>,
+    pub unlock_type: UnlockType<'a, M>,
 }

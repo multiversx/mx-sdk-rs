@@ -2,24 +2,24 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi, Clone)]
-pub struct TokenPair<M: ManagedTypeApi> {
-    pub from: ManagedBuffer<M>,
-    pub to: ManagedBuffer<M>,
+pub struct TokenPair<'a, M: ManagedTypeApi<'a>> {
+    pub from: ManagedBuffer<'a, M>,
+    pub to: ManagedBuffer<'a, M>,
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct PriceFeed<M: ManagedTypeApi> {
+pub struct PriceFeed<'a, M: ManagedTypeApi<'a>> {
     pub round_id: u32,
-    pub from: ManagedBuffer<M>,
-    pub to: ManagedBuffer<M>,
+    pub from: ManagedBuffer<'a, M>,
+    pub to: ManagedBuffer<'a, M>,
     pub timestamp: u64,
-    pub price: BigUint<M>,
+    pub price: BigUint<'a, M>,
     pub decimals: u8,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi, Debug, PartialEq, Eq)]
-pub struct TimestampedPrice<M: ManagedTypeApi> {
-    pub price: BigUint<M>,
+pub struct TimestampedPrice<'a, M: ManagedTypeApi<'a>> {
+    pub price: BigUint<'a, M>,
     pub timestamp: u64,
     pub decimals: u8,
 }

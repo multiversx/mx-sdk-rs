@@ -43,9 +43,9 @@ impl ScQueryStep {
         Self::default()
     }
 
-    pub fn to<A>(mut self, address: A) -> Self
+    pub fn to<'a, A>(mut self, address: A) -> Self
     where
-        AddressValue: From<A>,
+        AddressValue: From<'a, A>,
     {
         self.tx.to = AddressValue::from(address);
         self

@@ -19,21 +19,21 @@ static UNKNOWN_ADDR_ERR_MSG: &[u8] = b"Unknown address";
 pub type AddressId = u64;
 pub const NULL_ID: AddressId = 0;
 
-pub struct AddressToIdMapper<SA, A = CurrentStorage>
+pub struct AddressToIdMapper<'a, SA, A = CurrentStorage>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     _phantom_api: PhantomData<SA>,
     address: A,
-    base_key: StorageKey<SA>,
+    base_key: StorageKey<'a, SA>,
 }
 
-impl<SA> StorageMapper<SA> for AddressToIdMapper<SA>
+impl<'a, SA> StorageMapper<'a, SA> for AddressToIdMapper<'a, SA>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    fn new(base_key: StorageKey<SA>) -> Self {
+    fn new(base_key: StorageKey<'a, SA>) -> Self {
         AddressToIdMapper {
             _phantom_api: PhantomData,
             address: CurrentStorage,
@@ -42,11 +42,11 @@ where
     }
 }
 
-impl<SA> AddressToIdMapper<SA, ManagedAddress<SA>>
+impl<'a, SA> AddressToIdMapper<'a, SA, ManagedAddress<'a, SA>>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
         AddressToIdMapper {
             _phantom_api: PhantomData,
             address,
@@ -55,22 +55,22 @@ where
     }
 }
 
-impl<SA, A> AddressToIdMapper<SA, A>
+impl<'a, SA, A> AddressToIdMapper<'a, SA, A>
 where
-    SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    SA: StorageMapperApi<'a>,
+    A: StorageAddress<'a, SA>,
 {
     pub fn contains_id(&self, id: AddressId) -> bool {
         let key = self.id_to_address_key(id);
         self.address.address_storage_get_len(key.as_ref()) != 0
     }
 
-    pub fn get_id(&self, address: &ManagedAddress<SA>) -> AddressId {
+    pub fn get_id(&self, address: &ManagedAddress<'a, SA>) -> AddressId {
         let key = self.address_to_id_key(address);
         self.address.address_storage_get(key.as_ref())
     }
 
-    pub fn get_id_non_zero(&self, address: &ManagedAddress<SA>) -> AddressId {
+    pub fn get_id_non_zero(&self, address: &ManagedAddress<'a, SA>) -> AddressId {
         let id = self.get_id(address);
         if id == NULL_ID {
             SA::error_api_impl().signal_error(UNKNOWN_ADDR_ERR_MSG);
@@ -79,7 +79,7 @@ where
         id
     }
 
-    pub fn get_address(&self, id: AddressId) -> Option<ManagedAddress<SA>> {
+    pub fn get_address(&self, id: AddressId) -> Option<ManagedAddress<'a, SA>> {
         let key = self.id_to_address_key(id);
         if self.address.address_storage_get_len(key.as_ref()) == 0 {
             return None;
@@ -89,7 +89,7 @@ where
         Some(addr)
     }
 
-    fn id_to_address_key(&self, id: AddressId) -> StorageKey<SA> {
+    fn id_to_address_key(&self, id: AddressId) -> StorageKey<'a, SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(ID_SUFFIX);
         item_key.append_item(&id);
@@ -97,7 +97,7 @@ where
         item_key
     }
 
-    fn address_to_id_key(&self, address: &ManagedAddress<SA>) -> StorageKey<SA> {
+    fn address_to_id_key(&self, address: &ManagedAddress<'a, SA>) -> StorageKey<'a, SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(ADDRESS_SUFFIX);
         item_key.append_item(address);
@@ -105,7 +105,7 @@ where
         item_key
     }
 
-    fn last_id_key(&self) -> StorageKey<SA> {
+    fn last_id_key(&self) -> StorageKey<'a, SA> {
         let mut item_key = self.base_key.clone();
         item_key.append_bytes(LAST_ID_SUFFIX);
 
@@ -118,11 +118,11 @@ where
     }
 }
 
-impl<SA> AddressToIdMapper<SA, CurrentStorage>
+impl<'a, SA> AddressToIdMapper<'a, SA, CurrentStorage>
 where
-    SA: StorageMapperApi,
+    SA: StorageMapperApi<'a>,
 {
-    pub fn get_id_or_insert(&self, address: &ManagedAddress<SA>) -> AddressId {
+    pub fn get_id_or_insert(&self, address: &ManagedAddress<'a, SA>) -> AddressId {
         let current_id = self
             .address
             .address_storage_get(self.address_to_id_key(address).as_ref());
@@ -133,7 +133,7 @@ where
         self.insert_address(address)
     }
 
-    pub fn insert_new(&self, address: &ManagedAddress<SA>) -> AddressId {
+    pub fn insert_new(&self, address: &ManagedAddress<'a, SA>) -> AddressId {
         let existing_id = self.get_id(address);
         if existing_id != NULL_ID {
             SA::error_api_impl().signal_error(b"Address already registered");
@@ -142,14 +142,14 @@ where
         self.insert_address(address)
     }
 
-    pub fn remove_by_id(&self, id: AddressId) -> Option<ManagedAddress<SA>> {
+    pub fn remove_by_id(&self, id: AddressId) -> Option<ManagedAddress<'a, SA>> {
         let address = self.get_address(id)?;
         self.remove_entry(id, &address);
 
         Some(address)
     }
 
-    pub fn remove_by_address(&self, address: &ManagedAddress<SA>) -> AddressId {
+    pub fn remove_by_address(&self, address: &ManagedAddress<'a, SA>) -> AddressId {
         let current_id = self.get_id(address);
         if current_id != NULL_ID {
             self.remove_entry(current_id, address);
@@ -158,7 +158,7 @@ where
         current_id
     }
 
-    fn insert_address(&self, address: &ManagedAddress<SA>) -> AddressId {
+    fn insert_address(&self, address: &ManagedAddress<'a, SA>) -> AddressId {
         let new_id = self.get_last_id() + 1;
         storage_set(self.address_to_id_key(address).as_ref(), &new_id);
         storage_set(self.id_to_address_key(new_id).as_ref(), address);
@@ -176,7 +176,7 @@ where
         storage_set(self.last_id_key().as_ref(), &last_id);
     }
 
-    fn remove_entry(&self, id: AddressId, address: &ManagedAddress<SA>) {
+    fn remove_entry(&self, id: AddressId, address: &ManagedAddress<'a, SA>) {
         storage_clear(self.address_to_id_key(address).as_ref());
         storage_clear(self.id_to_address_key(id).as_ref());
     }

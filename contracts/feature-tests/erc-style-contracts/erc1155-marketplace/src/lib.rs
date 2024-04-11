@@ -6,21 +6,21 @@ multiversx_sc::derive_imports!();
 const PERCENTAGE_TOTAL: u8 = 100;
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct Auction<M: ManagedTypeApi> {
-    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    pub min_bid: BigUint<M>,
-    pub max_bid: BigUint<M>,
+pub struct Auction<'a, M: ManagedTypeApi<'a>> {
+    pub token_identifier: EgldOrEsdtTokenIdentifier<'a, M>,
+    pub min_bid: BigUint<'a, M>,
+    pub max_bid: BigUint<'a, M>,
     pub deadline: u64,
-    pub original_owner: ManagedAddress<M>,
-    pub current_bid: BigUint<M>,
-    pub current_winner: ManagedAddress<M>,
+    pub original_owner: ManagedAddress<'a, M>,
+    pub current_bid: BigUint<'a, M>,
+    pub current_winner: ManagedAddress<'a, M>,
 }
 
 #[derive(TopEncode, TopDecode, TypeAbi)]
-pub struct AuctionArgument<M: ManagedTypeApi> {
-    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
-    pub min_bid: BigUint<M>,
-    pub max_bid: BigUint<M>,
+pub struct AuctionArgument<'a, M: ManagedTypeApi<'a>> {
+    pub token_identifier: EgldOrEsdtTokenIdentifier<'a, M>,
+    pub min_bid: BigUint<'a, M>,
+    pub max_bid: BigUint<'a, M>,
     pub deadline: u64,
 }
 
@@ -353,7 +353,7 @@ pub trait Erc1155Marketplace {
     // claimable funds - only after an auction ended and the fixed percentage has been reserved by the SC
 
     #[storage_mapper("claimableFunds")]
-    fn get_claimable_funds_mapper(&self) -> MapMapper<EgldOrEsdtTokenIdentifier, BigUint>;
+    fn get_claimable_funds_mapper(&self) -> MapMapper<'a, EgldOrEsdtTokenIdentifier, BigUint>;
 
     // auction properties for each token
 

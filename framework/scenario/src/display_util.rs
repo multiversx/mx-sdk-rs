@@ -6,11 +6,11 @@ use multiversx_sc::{
 use std::fmt;
 
 /// Only seems to be used in tests, we can probably remove it.
-pub struct BigUintPrinter<M: ManagedTypeApi> {
-    pub value: BigUint<M>,
+pub struct BigUintPrinter<'a, M: ManagedTypeApi<'a>> {
+    pub value: BigUint<'a, M>,
 }
 
-impl<M: ManagedTypeApi> fmt::Debug for BigUintPrinter<M> {
+impl<'a, M: ManagedTypeApi<'a>> fmt::Debug for BigUintPrinter<'a, M> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let handle = self.value.get_handle();
         let mut bytes = self.value.to_bytes_be();

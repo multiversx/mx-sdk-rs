@@ -13,9 +13,9 @@ use crate::{
     },
 };
 
-pub fn finish_multi<FA, T>(item: &T)
+pub fn finish_multi<'a, FA, T>(item: &T)
 where
-    FA: ManagedTypeApi + EndpointFinishApi,
+    FA: ManagedTypeApi<'a> + EndpointFinishApi,
     T: TopEncodeMulti,
 {
     let h = ExitCodecErrorHandler::<FA>::from(err_msg::FINISH_ENCODE_ERROR);
@@ -24,16 +24,16 @@ where
 }
 
 #[derive(Clone)]
-pub struct ApiOutputAdapter<FA>
+pub struct ApiOutputAdapter<'a, FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi,
+    FA: ManagedTypeApi<'a> + EndpointFinishApi,
 {
     _phantom: PhantomData<FA>,
 }
 
-impl<FA> Default for ApiOutputAdapter<FA>
+impl<'a, FA> Default for ApiOutputAdapter<'a, FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi,
+    FA: ManagedTypeApi<'a> + EndpointFinishApi,
 {
     #[inline]
     fn default() -> Self {
@@ -43,11 +43,11 @@ where
     }
 }
 
-impl<FA> TopEncodeOutput for ApiOutputAdapter<FA>
+impl<'a, FA> TopEncodeOutput for ApiOutputAdapter<'a, FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi,
+    FA: ManagedTypeApi<'a> + EndpointFinishApi,
 {
-    type NestedBuffer = ManagedBufferBuilder<FA>;
+    type NestedBuffer = ManagedBufferBuilder<'a, FA>;
 
     fn set_slice_u8(self, bytes: &[u8]) {
         FA::finish_api_impl().finish_slice_u8(bytes);
@@ -102,9 +102,9 @@ where
     }
 }
 
-impl<FA> TopEncodeMultiOutput for ApiOutputAdapter<FA>
+impl<'a, FA> TopEncodeMultiOutput for ApiOutputAdapter<'a, FA>
 where
-    FA: ManagedTypeApi + EndpointFinishApi,
+    FA: ManagedTypeApi<'a> + EndpointFinishApi,
 {
     fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
     where

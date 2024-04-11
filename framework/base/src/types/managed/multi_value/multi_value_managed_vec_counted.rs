@@ -12,29 +12,29 @@ use crate::{
 /// Think of it as a `VarArgs` preceded by the count.
 /// Unlike `MultiValueManagedVec` it deserializes eagerly.
 #[derive(Clone, Default)]
-pub struct MultiValueManagedVecCounted<M, T>
+pub struct MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
-    pub(super) contents: ManagedVec<M, T>,
+    pub(super) contents: ManagedVec<'a, M, T>,
 }
 
 #[deprecated(
     since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVecCounted`"
 )]
-pub type ManagedCountedVarArgs<M, T> = MultiValueManagedVecCounted<M, T>;
+pub type ManagedCountedVarArgs<'a, M, T> = MultiValueManagedVecCounted<'a, M, T>;
 
 #[deprecated(
     since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueManagedVecCounted`"
 )]
-pub type ManagedCountedMultiResultVec<M, T> = MultiValueManagedVecCounted<M, T>;
+pub type ManagedCountedMultiResultVec<'a, M, T> = MultiValueManagedVecCounted<'a, M, T>;
 
-impl<M, T> MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
@@ -43,9 +43,9 @@ where
     }
 }
 
-impl<M, T> MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
@@ -59,9 +59,9 @@ where
     }
 }
 
-impl<M, T> MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
@@ -70,28 +70,28 @@ where
     }
 
     #[inline]
-    pub fn into_vec(self) -> ManagedVec<M, T> {
+    pub fn into_vec(self) -> ManagedVec<'a, M, T> {
         self.contents
     }
 }
 
-impl<M, T> From<ManagedVec<M, T>> for MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> From<ManagedVec<'a, M, T>> for MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem,
 {
     #[inline]
     #[rustfmt::skip]
-    fn from(v: ManagedVec<M, T>) -> Self {
+    fn from(v: ManagedVec<'a, M, T>) -> Self {
         MultiValueManagedVecCounted {
             contents: v,
         }
     }
 }
 
-impl<M, T> TopEncodeMulti for MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> TopEncodeMulti for MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem + TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -107,9 +107,9 @@ where
     }
 }
 
-impl<M, T> TopDecodeMulti for MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> TopDecodeMulti for MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem + TopDecodeMulti,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -126,9 +126,9 @@ where
     }
 }
 
-impl<M, T> TypeAbi for MultiValueManagedVecCounted<M, T>
+impl<'a, M, T> TypeAbi for MultiValueManagedVecCounted<'a, M, T>
 where
-    M: ManagedTypeApi,
+    M: ManagedTypeApi<'a>,
     T: ManagedVecItem + TypeAbi,
 {
     fn type_name() -> TypeName {

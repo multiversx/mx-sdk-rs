@@ -16,18 +16,18 @@ use crate::{
 use super::ManagedVec;
 
 #[derive(TopEncode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug)]
-pub struct EsdtTokenPayment<M: ManagedTypeApi> {
-    pub token_identifier: TokenIdentifier<M>,
+pub struct EsdtTokenPayment<'a, M: ManagedTypeApi<'a>> {
+    pub token_identifier: TokenIdentifier<'a, M>,
     pub token_nonce: u64,
-    pub amount: BigUint<M>,
+    pub amount: BigUint<'a, M>,
 }
 
 /// Alias for a list of payments.
-pub type MultiEsdtPayment<Api> = ManagedVec<Api, EsdtTokenPayment<Api>>;
+pub type MultiEsdtPayment<'a, Api> = ManagedVec<'a, Api, EsdtTokenPayment<'a, Api>>;
 
-impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+impl<'a, M: ManagedTypeApi<'a>> EsdtTokenPayment<'a, M> {
     #[inline]
-    pub fn new(token_identifier: TokenIdentifier<M>, token_nonce: u64, amount: BigUint<M>) -> Self {
+    pub fn new(token_identifier: TokenIdentifier<'a, M>, token_nonce: u64, amount: BigUint<'a, M>) -> Self {
         EsdtTokenPayment {
             token_identifier,
             token_nonce,
@@ -50,20 +50,20 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
     }
 
     #[inline]
-    pub fn into_tuple(self) -> (TokenIdentifier<M>, u64, BigUint<M>) {
+    pub fn into_tuple(self) -> (TokenIdentifier<'a, M>, u64, BigUint<'a, M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 }
 
-impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for EsdtTokenPayment<M> {
+impl<'a, M: ManagedTypeApi<'a>> From<(TokenIdentifier<'a, M>, u64, BigUint<'a, M>)> for EsdtTokenPayment<'a, M> {
     #[inline]
-    fn from(value: (TokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+    fn from(value: (TokenIdentifier<'a, M>, u64, BigUint<'a, M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
     }
 }
 
-impl<M: ManagedTypeApi> TopDecode for EsdtTokenPayment<M> {
+impl<'a, M: ManagedTypeApi<'a>> TopDecode for EsdtTokenPayment<'a, M> {
     fn top_decode_or_handle_err<I, H>(top_input: I, h: H) -> Result<Self, H::HandledErr>
     where
         I: codec::TopDecodeInput,
@@ -78,7 +78,7 @@ impl<M: ManagedTypeApi> TopDecode for EsdtTokenPayment<M> {
     }
 }
 
-impl<M: ManagedTypeApi> NestedDecode for EsdtTokenPayment<M> {
+impl<'a, M: ManagedTypeApi<'a>> NestedDecode for EsdtTokenPayment<'a, M> {
     #[cfg(not(feature = "esdt-token-payment-legacy-decode"))]
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -98,7 +98,7 @@ impl<M: ManagedTypeApi> NestedDecode for EsdtTokenPayment<M> {
     }
 }
 
-impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
+impl<'a, M: ManagedTypeApi<'a>> EsdtTokenPayment<'a, M> {
     #[doc(hidden)]
     pub fn regular_dep_decode_or_handle_err<I, H>(
         input: &mut I,
@@ -109,9 +109,9 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
         H: codec::DecodeErrorHandler,
     {
         Ok(EsdtTokenPayment {
-            token_identifier: TokenIdentifier::<M>::dep_decode_or_handle_err(input, h)?,
+            token_identifier: TokenIdentifier::<'a, M>::dep_decode_or_handle_err(input, h)?,
             token_nonce: <u64>::dep_decode_or_handle_err(input, h)?,
-            amount: BigUint::<M>::dep_decode_or_handle_err(input, h)?,
+            amount: BigUint::<'a, M>::dep_decode_or_handle_err(input, h)?,
         })
     }
 
@@ -174,8 +174,8 @@ where
     });
 }
 
-impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
-    type MultiValue = EsdtTokenPaymentMultiValue<M>;
+impl<'a, M: ManagedTypeApi<'a>> IntoMultiValue for EsdtTokenPayment<'a, M> {
+    type MultiValue = EsdtTokenPaymentMultiValue<'a, M>;
 
     #[inline]
     fn into_multi_value(self) -> Self::MultiValue {
@@ -183,10 +183,10 @@ impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
     }
 }
 
-impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
+impl<'a, M: ManagedTypeApi<'a>> ManagedVecItem for EsdtTokenPayment<'a, M> {
     const PAYLOAD_SIZE: usize = 16;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'a> = Self;
+    type Ref<'b> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
         let mut arr: [u8; 16] = [0u8; 16];
@@ -204,9 +204,9 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         }
     }
 
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'a> {
+    ) -> Self::Ref<'b> {
         Self::from_byte_reader(reader)
     }
 
@@ -219,5 +219,11 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
         managed_vec_item_to_slice(&mut arr, &mut index, &self.amount);
 
         writer(&arr[..])
+    }
+
+    fn take_handle_ownership(self) {
+        self.token_identifier.take_handle_ownership();
+        self.token_nonce.take_handle_ownership();
+        self.amount.take_handle_ownership();
     }
 }
