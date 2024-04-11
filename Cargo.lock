@@ -2756,6 +2756,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "scenario-tester"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "scenario-tester-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta",
+ "scenario-tester",
+]
+
+[[package]]
 name = "schannel"
 version = "0.1.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"

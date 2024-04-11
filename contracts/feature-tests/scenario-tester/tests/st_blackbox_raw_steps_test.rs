@@ -1,43 +1,43 @@
 use multiversx_sc_scenario::imports::*;
 
-const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+const SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
 
-    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    blockchain.register_contract(SCENARIO_TESTER_PATH_EXPR, scenario_tester::ContractBuilder);
     blockchain
 }
 
 #[test]
-fn adder_blackbox_raw() {
+fn scenario_tester_blackbox_raw() {
     let mut world = world();
-    let adder_code = world.code_expression(ADDER_PATH_EXPR);
+    let scenario_tester_code = world.code_expression(SCENARIO_TESTER_PATH_EXPR);
 
     world
         .set_state_step(
             SetStateStep::new()
                 .put_account("address:owner", Account::new().nonce(1))
-                .new_address("address:owner", 1, "sc:adder"),
+                .new_address("address:owner", 1, "sc:scenario-tester"),
         )
         .sc_deploy(
             ScDeployStep::new()
                 .from("address:owner")
-                .code(adder_code)
+                .code(scenario_tester_code)
                 .argument("5")
                 .expect(TxExpect::ok().no_result()),
         )
         .sc_query(
             ScQueryStep::new()
-                .to("sc:adder")
+                .to("sc:scenario-tester")
                 .function("getSum")
                 .expect(TxExpect::ok().result("5")),
         )
         .sc_call(
             ScCallStep::new()
                 .from("address:owner")
-                .to("sc:adder")
+                .to("sc:scenario-tester")
                 .function("add")
                 .argument("3")
                 .expect(TxExpect::ok().no_result()),
@@ -46,7 +46,7 @@ fn adder_blackbox_raw() {
             CheckStateStep::new()
                 .put_account("address:owner", CheckAccount::new())
                 .put_account(
-                    "sc:adder",
+                    "sc:scenario-tester",
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         );

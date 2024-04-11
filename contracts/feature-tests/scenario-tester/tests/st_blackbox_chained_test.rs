@@ -1,23 +1,23 @@
 use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
 
-use adder::*;
+use scenario_tester::*;
 
-const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+const ADDER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
 
-    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    blockchain.register_contract(ADDER_PATH_EXPR, scenario_tester::ContractBuilder);
     blockchain
 }
 
 #[test]
-fn adder_blackbox_chained() {
+fn st_blackbox_chained() {
     let mut world = world();
     let owner_address = "address:owner";
-    let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
+    let st_contract = ContractInfo::<scenario_tester::Proxy<StaticApi>>::new("sc:adder");
 
     world
         .start_trace()
@@ -28,16 +28,16 @@ fn adder_blackbox_chained() {
         )
         .chain_deploy(|tx| {
             tx.from(AddressExpr("owner"))
-                .typed(adder_proxy::AdderProxy)
+                .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .init(5u32)
-                .code(MxscExpr("output/adder.mxsc.json"))
+                .code(MxscExpr("output/scenario-tester.mxsc.json"))
                 .with_result(WithNewAddress::new(|new_address| {
-                    assert_eq!(new_address.to_address(), adder_contract.to_address());
+                    assert_eq!(new_address.to_address(), st_contract.to_address());
                 }))
         })
         .chain_query(|tx| {
             tx.to(ScExpr("adder"))
-                .typed(adder_proxy::AdderProxy)
+                .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .sum()
                 .with_result(WithResultConv::new(|value: BigUint| {
                     assert_eq!(value, BigUint::from(5u32));
@@ -46,7 +46,7 @@ fn adder_blackbox_chained() {
         .chain_call(|tx| {
             tx.from(AddressExpr("owner"))
                 .to(ScExpr("adder"))
-                .typed(adder_proxy::AdderProxy)
+                .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .add(3u32)
                 .with_result(WithRawTxResponse(|response| {
                     assert!(response.tx_error.is_success());
@@ -56,7 +56,7 @@ fn adder_blackbox_chained() {
             CheckStateStep::new()
                 .put_account(owner_address, CheckAccount::new())
                 .put_account(
-                    &adder_contract,
+                    &st_contract,
                     CheckAccount::new().check_storage("str:sum", "8"),
                 ),
         )
