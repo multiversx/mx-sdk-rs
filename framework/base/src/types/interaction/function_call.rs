@@ -21,22 +21,22 @@ use super::ManagedArgBuffer;
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
 /// Can be used as a multi-argument, to embed a call within a call.
-pub struct FunctionCall<'a, Api>
+pub struct FunctionCall<Api>
 where
-    Api: ManagedTypeApi<'a>,
+    Api: ManagedTypeApi,
 {
-    pub function_name: ManagedBuffer<'a, Api>,
-    pub arg_buffer: ManagedArgBuffer<'a, Api>,
+    pub function_name: ManagedBuffer<Api>,
+    pub arg_buffer: ManagedArgBuffer<Api>,
 }
 
-impl<'a, Api> FunctionCall<'a, Api>
+impl<Api> FunctionCall<Api>
 where
-    Api: ManagedTypeApi<'a>,
+    Api: ManagedTypeApi,
 {
     /// Initializes a new function call with a function call name.
     ///
     /// The arguments will need to be added afterwards.
-    pub fn new<N: Into<ManagedBuffer<'a, Api>>>(function_name: N) -> Self {
+    pub fn new<N: Into<ManagedBuffer<Api>>>(function_name: N) -> Self {
         FunctionCall {
             function_name: function_name.into(),
             arg_buffer: ManagedArgBuffer::new(),
@@ -63,7 +63,7 @@ where
         self
     }
 
-    pub fn to_call_data_string(&self) -> ManagedBuffer<'a, Api> {
+    pub fn to_call_data_string(&self) -> ManagedBuffer<Api> {
         let mut result = ManagedBufferBuilder::default();
         result.append_managed_buffer(&self.function_name);
         for arg in self.arg_buffer.raw_arg_iter() {
@@ -74,9 +74,9 @@ where
     }
 }
 
-impl<'a, Api> TopEncodeMulti for FunctionCall<'a, Api>
+impl<Api> TopEncodeMulti for FunctionCall<Api>
 where
-    Api: ManagedTypeApi<'a>,
+    Api: ManagedTypeApi,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -95,9 +95,9 @@ where
     }
 }
 
-impl<'a, Api> TopDecodeMulti for FunctionCall<'a, Api>
+impl<Api> TopDecodeMulti for FunctionCall<Api>
 where
-    Api: ManagedTypeApi<'a>,
+    Api: ManagedTypeApi,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -110,7 +110,7 @@ where
 
         let function_name = ManagedBuffer::<Api>::multi_decode_or_handle_err(input, h)?;
         let args =
-            MultiValueEncoded::<Api, ManagedBuffer<'a, Api>>::multi_decode_or_handle_err(input, h)?;
+            MultiValueEncoded::<Api, ManagedBuffer<Api>>::multi_decode_or_handle_err(input, h)?;
         Ok(FunctionCall {
             function_name,
             arg_buffer: args.to_arg_buffer(),
@@ -118,12 +118,12 @@ where
     }
 }
 
-impl<'a, Api> TypeAbi for FunctionCall<'a, Api>
+impl<Api> TypeAbi for FunctionCall<Api>
 where
-    Api: ManagedTypeApi<'a>,
+    Api: ManagedTypeApi,
 {
     fn type_name() -> TypeName {
-        crate::abi::type_name_variadic::<ManagedBuffer<'a, Api>>()
+        crate::abi::type_name_variadic::<ManagedBuffer<Api>>()
     }
 
     fn is_variadic() -> bool {
@@ -131,15 +131,15 @@ where
     }
 }
 
-impl<'a, Api> FunctionCall<'a, Api>
+impl<Api> FunctionCall<Api>
 where
-    Api: ManagedTypeApi<'a>,
+    Api: ManagedTypeApi,
 {
     /// Constructs `ESDTTransfer` builtin function call.
     pub(super) fn convert_to_single_transfer_fungible_call(
         self,
         payment: EsdtTokenPayment<Api>,
-    ) -> FunctionCall<'a, Api> {
+    ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
             .argument(&payment.amount)
@@ -157,7 +157,7 @@ where
         self,
         to: &ManagedAddress<Api>,
         payment: EsdtTokenPayment<Api>,
-    ) -> FunctionCall<'a, Api> {
+    ) -> FunctionCall<Api> {
         FunctionCall::new(ESDT_NFT_TRANSFER_FUNC_NAME)
             .argument(&payment.token_identifier)
             .argument(&payment.token_nonce)
@@ -171,7 +171,7 @@ where
         self,
         to: &ManagedAddress<Api>,
         payments: ManagedVec<Api, EsdtTokenPayment<Api>>,
-    ) -> FunctionCall<'a, Api> {
+    ) -> FunctionCall<Api> {
         let mut result = FunctionCall::new(ESDT_MULTI_TRANSFER_FUNC_NAME)
             .argument(&to)
             .argument(&payments.len());

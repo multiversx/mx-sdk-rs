@@ -5,11 +5,11 @@ const U16_BYTES: usize = 2;
 const U32_BYTES: usize = 4;
 const U64_BYTES: usize = 8;
 
-pub struct RandomnessSource<'a, M: ManagedTypeApi<'a>> {
-    buffer: ManagedBuffer<'a, M>,
+pub struct RandomnessSource<M: ManagedTypeApi> {
+    buffer: ManagedBuffer<M>,
 }
 
-impl<'a, M: ManagedTypeApi<'a>> Default for RandomnessSource<'a, M> {
+impl<M: ManagedTypeApi> Default for RandomnessSource<M> {
     fn default() -> Self {
         Self {
             buffer: ManagedBuffer::new(),
@@ -17,7 +17,7 @@ impl<'a, M: ManagedTypeApi<'a>> Default for RandomnessSource<'a, M> {
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> RandomnessSource<'a, M> {
+impl<M: ManagedTypeApi> RandomnessSource<M> {
     #[inline]
     pub fn new() -> Self {
         Self::default()
@@ -98,7 +98,7 @@ impl<'a, M: ManagedTypeApi<'a>> RandomnessSource<'a, M> {
         min + rand % (max - min)
     }
 
-    pub fn next_bytes(&mut self, len: usize) -> ManagedBuffer<'a, M> {
+    pub fn next_bytes(&mut self, len: usize) -> ManagedBuffer<M> {
         self.buffer.set_random(len);
 
         self.buffer.clone()

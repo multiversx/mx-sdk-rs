@@ -24,11 +24,11 @@ use core::{iter::FromIterator, marker::PhantomData};
 /// Since it can contain multi-values, the number of actual items it contains cannot be determined without fully decoding.
 ///
 #[derive(Clone, Default, Debug, PartialEq)]
-pub struct MultiValueEncoded<'a, M, T>
+pub struct MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    pub(super) raw_buffers: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
+    pub(super) raw_buffers: ManagedVec<M, ManagedBuffer<M>>,
     _phantom: PhantomData<T>,
 }
 
@@ -36,20 +36,20 @@ where
     since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueEncoded`"
 )]
-pub type ManagedVarArgs<'a, M, T> = MultiValueEncoded<'a, M, T>;
+pub type ManagedVarArgs<M, T> = MultiValueEncoded<M, T>;
 
 #[deprecated(
     since = "0.29.0",
     note = "Alias kept for backwards compatibility. Replace with `MultiValueEncoded`"
 )]
-pub type ManagedMultiResultVec<'a, M, T> = MultiValueEncoded<'a, M, T>;
+pub type ManagedMultiResultVec<M, T> = MultiValueEncoded<M, T>;
 
-impl<'a, M, T> MultiValueEncoded<'a, M, T>
+impl<M, T> MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
-    fn from_raw_vec(raw_buffers: ManagedVec<'a, M, ManagedBuffer<'a, M>>) -> Self {
+    fn from_raw_vec(raw_buffers: ManagedVec<M, ManagedBuffer<M>>) -> Self {
         MultiValueEncoded {
             raw_buffers,
             _phantom: PhantomData,
@@ -62,27 +62,27 @@ where
     }
 }
 
-impl<'a, M, T> MultiValueEncoded<'a, M, T>
+impl<M, T> MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
 {
     pub fn push(&mut self, item: T) {
         let Ok(()) = item.multi_encode_or_handle_err(
             &mut self.raw_buffers,
-            ExitCodecErrorHandler::<'a, M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
         );
     }
 }
 
-impl<'a, M, T> From<ManagedVec<'a, M, T>> for MultiValueEncoded<'a, M, T>
+impl<M, T> From<ManagedVec<M, T>> for MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     T: ManagedVecItem + TopEncode + 'static,
 {
     #[inline]
     #[rustfmt::skip]
-    fn from(v: ManagedVec<'a, M, T>) -> Self {
+    fn from(v: ManagedVec<M, T>) -> Self {
         try_cast_execute_or_else(
             v,
             MultiValueEncoded::from_raw_vec,
@@ -91,13 +91,13 @@ where
     }
 }
 
-impl<'a, M, T> From<&ManagedVec<'a, M, T>> for MultiValueEncoded<'a, M, T>
+impl<M, T> From<&ManagedVec<M, T>> for MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     T: ManagedVecItem + TopEncode,
 {
     #[inline]
-    fn from(v: &ManagedVec<'a, M, T>) -> Self {
+    fn from(v: &ManagedVec<M, T>) -> Self {
         let mut result = MultiValueEncoded::new();
         for item in v.into_iter() {
             result.push(item);
@@ -106,27 +106,27 @@ where
     }
 }
 
-impl<'a, M, T> MultiValueEncoded<'a, M, T>
+impl<M, T> MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    pub fn to_arg_buffer(self) -> ManagedArgBuffer<'a, M> {
-        ManagedArgBuffer::from_handle(self.raw_buffers.take_handle())
+    pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
+        ManagedArgBuffer::from_handle(self.raw_buffers.get_handle())
     }
 }
 
-impl<'a, M> MultiValueEncoded<'a, M, ManagedBuffer<'a, M>>
+impl<M> MultiValueEncoded<M, ManagedBuffer<M>>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    pub fn into_vec_of_buffers(self) -> ManagedVec<'a, M, ManagedBuffer<'a, M>> {
+    pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
         self.raw_buffers
     }
 }
 
-impl<'a, M, T> MultiValueEncoded<'a, M, T>
+impl<M, T> MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     /// Length of the underlying data.
     ///
@@ -143,9 +143,9 @@ where
     }
 }
 
-impl<'a, M, T> MultiValueEncoded<'a, M, T>
+impl<M, T> MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMultiLength,
 {
     /// Number of items. Only available for multi-encode items.
@@ -155,14 +155,14 @@ where
     }
 }
 
-impl<'a, M, T> MultiValueEncoded<'a, M, T>
+impl<M, T> MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: ManagedVecItem + TopDecode,
 {
-    pub fn to_vec(&self) -> ManagedVec<'a, M, T> {
+    pub fn to_vec(&self) -> ManagedVec<M, T> {
         let mut result = ManagedVec::new();
-        let serializer = ManagedSerializer::<'a, M>::new();
+        let serializer = ManagedSerializer::<M>::new();
         for item in self.raw_buffers.into_iter() {
             result.push(serializer.top_decode_from_managed_buffer(&item));
         }
@@ -170,9 +170,9 @@ where
     }
 }
 
-impl<'a, M, T> TopEncodeMulti for &MultiValueEncoded<'a, M, T>
+impl<M, T> TopEncodeMulti for &MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -187,9 +187,9 @@ where
     }
 }
 
-impl<'a, M, T> TopEncodeMulti for MultiValueEncoded<'a, M, T>
+impl<M, T> TopEncodeMulti for MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -201,9 +201,9 @@ where
     }
 }
 
-impl<'a, M, T> TopDecodeMulti for MultiValueEncoded<'a, M, T>
+impl<M, T> TopDecodeMulti for MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopDecodeMulti,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -222,9 +222,9 @@ where
     }
 }
 
-impl<'a, M, T> TypeAbi for MultiValueEncoded<'a, M, T>
+impl<M, T> TypeAbi for MultiValueEncoded<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     T: TypeAbi,
 {
     fn type_name() -> TypeName {
@@ -240,36 +240,36 @@ where
     }
 }
 
-impl<'a, M, T> CodecFromSelf for MultiValueEncoded<'a, M, T> where M: ManagedTypeApi<'a> {}
+impl<M, T> CodecFromSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
 use crate::codec::{multi_types::MultiValueVec, CodecFrom};
 
 #[cfg(feature = "alloc")]
-impl<'a, M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<'a, M, U>
+impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: CodecFrom<T>,
 {
 }
 
 #[cfg(feature = "alloc")]
-impl<'a, M, T, U> CodecFrom<MultiValueEncoded<'a, M, T>> for MultiValueVec<U>
+impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: CodecFrom<T>,
 {
 }
 
-impl<'a, M, V> FromIterator<V> for MultiValueEncoded<'a, M, V>
+impl<M, V> FromIterator<V> for MultiValueEncoded<M, V>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     V: TopEncodeMulti,
 {
     fn from_iter<T: IntoIterator<Item = V>>(iter: T) -> Self {
-        let mut result: MultiValueEncoded<'a, M, V> = MultiValueEncoded::new();
+        let mut result: MultiValueEncoded<M, V> = MultiValueEncoded::new();
         iter.into_iter().for_each(|f| result.push(f));
         result
     }

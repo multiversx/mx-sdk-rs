@@ -8,63 +8,63 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct ErrorHelper<'a, M: ManagedTypeApi<'a>> {
+pub struct ErrorHelper<M: ManagedTypeApi> {
     _phantom: PhantomData<M>,
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ErrorHelper<'a, M> {
+impl<M: ManagedTypeApi> ErrorHelper<M> {
     pub fn new() -> Self {
         ErrorHelper {
             _phantom: PhantomData,
         }
     }
 
-    pub fn new_error(&self) -> ManagedSCError<'a, M> {
+    pub fn new_error(&self) -> ManagedSCError<M> {
         ManagedSCError::new_empty()
     }
 
     pub fn signal_error_with_message<T>(message: T) -> !
     where
-        T: IntoSignalError<'a, M>,
+        T: IntoSignalError<M>,
     {
         message.signal_error_with_message()
     }
 }
 
 /// Indicates how an object can be used as the basis for performing `signal_error` with itself as message.
-pub trait IntoSignalError<'a, M: ManagedTypeApi<'a>> {
+pub trait IntoSignalError<M: ManagedTypeApi> {
     fn signal_error_with_message(self) -> !;
 }
 
-impl<'a, M: ManagedTypeApi<'a>> IntoSignalError<'a, M> for &str {
+impl<M: ManagedTypeApi> IntoSignalError<M> for &str {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.as_bytes())
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> IntoSignalError<'a, M> for &[u8] {
+impl<M: ManagedTypeApi> IntoSignalError<M> for &[u8] {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self)
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> IntoSignalError<'a, M> for BoxedBytes {
+impl<M: ManagedTypeApi> IntoSignalError<M> for BoxedBytes {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.as_slice())
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> IntoSignalError<'a, M> for EncodeError {
+impl<M: ManagedTypeApi> IntoSignalError<M> for EncodeError {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.message_bytes())
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> IntoSignalError<'a, M> for DecodeError {
+impl<M: ManagedTypeApi> IntoSignalError<M> for DecodeError {
     #[inline]
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error(self.message_bytes())
@@ -72,10 +72,10 @@ impl<'a, M: ManagedTypeApi<'a>> IntoSignalError<'a, M> for DecodeError {
 }
 
 // Handles `ManagedBuffer`, `&ManagedBuffer` and `ManagedRef<ManagedBuffer>`.
-impl<'a, M, B> IntoSignalError<'a, M> for B
+impl<M, B> IntoSignalError<M> for B
 where
-    M: ManagedTypeApi<'a>,
-    B: Borrow<ManagedBuffer<'a, M>>,
+    M: ManagedTypeApi,
+    B: Borrow<ManagedBuffer<M>>,
 {
     fn signal_error_with_message(self) -> ! {
         M::error_api_impl().signal_error_from_buffer(self.borrow().get_handle())

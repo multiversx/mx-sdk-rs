@@ -10,29 +10,29 @@ use crate::{
 use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, ContractCallWithEgld};
 
 #[must_use]
-pub struct ContractCallWithMultiEsdt<'a, SA, OriginalResult>
+pub struct ContractCallWithMultiEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
-    pub basic: ContractCallNoPayment<'a, SA, OriginalResult>,
-    pub esdt_payments: ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>,
+    pub basic: ContractCallNoPayment<SA, OriginalResult>,
+    pub esdt_payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
 }
 
-impl<'a, SA, OriginalResult> ContractCall<'a, SA> for ContractCallWithMultiEsdt<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithMultiEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
     type OriginalResult = OriginalResult;
 
-    fn into_normalized(self) -> ContractCallWithEgld<'a, SA, Self::OriginalResult> {
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
         self.basic
             .into_normalized()
             .convert_to_esdt_transfer_call(self.esdt_payments)
     }
 
     #[inline]
-    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<'a, SA, OriginalResult> {
+    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic
     }
 
@@ -41,19 +41,19 @@ where
     }
 }
 
-impl<'a, SA, OriginalResult> ContractCallWithMultiEsdt<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallWithMultiEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
     /// Creates a new instance directly.
     ///
     /// The constructor is mostly for hand-written proxies,
     /// the usual way of constructing this object is via the builder methods of other contract call types,
     /// especially `with_esdt_transfer` or `with_multi_token_transfer`.
-    pub fn new<N: Into<ManagedBuffer<'a, SA>>>(
-        to: ManagedAddress<'a, SA>,
+    pub fn new<N: Into<ManagedBuffer<SA>>>(
+        to: ManagedAddress<SA>,
         endpoint_name: N,
-        payments: ManagedVec<'a, SA, EsdtTokenPayment<'a, SA>>,
+        payments: ManagedVec<SA, EsdtTokenPayment<SA>>,
     ) -> Self {
         ContractCallWithMultiEsdt {
             basic: ContractCallNoPayment::new(to, endpoint_name),
@@ -64,7 +64,7 @@ where
     /// Adds a single ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
-    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<'a, SA>>>(mut self, payment: P) -> Self {
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<SA>>>(mut self, payment: P) -> Self {
         self.esdt_payments.push(payment.into());
         self
     }
@@ -76,9 +76,9 @@ where
     )]
     pub fn add_esdt_token_transfer(
         self,
-        payment_token: TokenIdentifier<'a, SA>,
+        payment_token: TokenIdentifier<SA>,
         payment_nonce: u64,
-        payment_amount: BigUint<'a, SA>,
+        payment_amount: BigUint<SA>,
     ) -> Self {
         self.with_esdt_transfer((payment_token, payment_nonce, payment_amount))
     }

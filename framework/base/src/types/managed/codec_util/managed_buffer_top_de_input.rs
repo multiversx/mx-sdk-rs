@@ -10,11 +10,11 @@ use crate::{
 
 use super::ManagedBufferNestedDecodeInput;
 
-impl<'a, M> TopDecodeInput for ManagedBuffer<'a, M>
+impl<M> TopDecodeInput for ManagedBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    type NestedBuffer = ManagedBufferNestedDecodeInput<'a, M>;
+    type NestedBuffer = ManagedBufferNestedDecodeInput<M>;
 
     fn byte_len(&self) -> usize {
         self.len()
@@ -43,7 +43,7 @@ where
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<'a, M>>() || T::type_eq::<BigUint<'a, M>>() || T::type_eq::<BigInt<'a, M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     #[inline]

@@ -7,11 +7,11 @@ use super::ManagedBuffer;
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
-pub struct ManagedMap<'a, M: ManagedTypeApi<'a>> {
+pub struct ManagedMap<M: ManagedTypeApi> {
     pub(crate) handle: M::ManagedMapHandle,
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for ManagedMap<'a, M> {
+impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
     type OwnHandle = M::ManagedMapHandle;
 
     #[inline]
@@ -19,12 +19,8 @@ impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for ManagedMap<'a, M> {
         ManagedMap { handle }
     }
 
-    unsafe fn get_handle(&self) -> M::ManagedMapHandle {
+    fn get_handle(&self) -> M::ManagedMapHandle {
         self.handle.clone()
-    }
-
-    fn take_handle(mut self) -> Self::OwnHandle {
-        core::mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {
@@ -32,29 +28,29 @@ impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for ManagedMap<'a, M> {
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ManagedMap<'a, M> {
+impl<M: ManagedTypeApi> ManagedMap<M> {
     pub fn new() -> Self {
         let new_handle = M::managed_type_impl().mm_new();
         ManagedMap::from_handle(new_handle)
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> Default for ManagedMap<'a, M> {
+impl<M: ManagedTypeApi> Default for ManagedMap<M> {
     #[inline]
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ManagedMap<'a, M> {
-    pub fn get(&self, key: &ManagedBuffer<'a, M>) -> ManagedBuffer<'a, M> {
+impl<M: ManagedTypeApi> ManagedMap<M> {
+    pub fn get(&self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mm_get(self.handle.clone(), key.handle.clone(), new_handle.clone());
         ManagedBuffer::from_handle(new_handle)
     }
 
-    pub fn put(&mut self, key: &ManagedBuffer<'a, M>, value: &ManagedBuffer<'a, M>) {
+    pub fn put(&mut self, key: &ManagedBuffer<M>, value: &ManagedBuffer<M>) {
         M::managed_type_impl().mm_put(
             self.handle.clone(),
             key.handle.clone(),
@@ -62,7 +58,7 @@ impl<'a, M: ManagedTypeApi<'a>> ManagedMap<'a, M> {
         );
     }
 
-    pub fn remove(&mut self, key: &ManagedBuffer<'a, M>) -> ManagedBuffer<'a, M> {
+    pub fn remove(&mut self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mm_remove(
@@ -73,7 +69,7 @@ impl<'a, M: ManagedTypeApi<'a>> ManagedMap<'a, M> {
         ManagedBuffer::from_handle(new_handle)
     }
 
-    pub fn contains(&self, key: &ManagedBuffer<'a, M>) -> bool {
+    pub fn contains(&self, key: &ManagedBuffer<M>) -> bool {
         M::managed_type_impl().mm_contains(self.handle.clone(), key.handle.clone())
     }
 }

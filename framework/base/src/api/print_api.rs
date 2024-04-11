@@ -2,15 +2,15 @@ use crate::formatter::FormatBuffer;
 
 use super::ManagedTypeApi;
 
-pub trait PrintApi<'a>: ManagedTypeApi<'a> {
-    type PrintApiImpl: PrintApiImpl<'a>;
+pub trait PrintApi: ManagedTypeApi {
+    type PrintApiImpl: PrintApiImpl;
 
     fn print_api_impl() -> Self::PrintApiImpl;
 }
 
-pub trait PrintApiImpl<'a> {
+pub trait PrintApiImpl {
     /// Buffer used for printing only.
-    type Buffer: FormatBuffer<'a>;
+    type Buffer: FormatBuffer;
 
     #[inline]
     fn print_buffer(&self, _buffer: Self::Buffer) {}

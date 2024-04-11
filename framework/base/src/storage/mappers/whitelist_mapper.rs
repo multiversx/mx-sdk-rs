@@ -13,30 +13,30 @@ use crate::{
     types::ManagedAddress,
 };
 
-type FlagMapper<'a, SA, A> = SingleValueMapper<'a, SA, bool, A>;
+type FlagMapper<SA, A> = SingleValueMapper<SA, bool, A>;
 
 static ITEM_NOT_WHITELISTED_ERR_MSG: &[u8] = b"Item not whitelisted";
 
 /// A non-iterable whitelist mapper.
 /// Very efficient for storing a whitelist, as each item requires only one storage key.
 /// If you need to iterate over the keys, use UnorderedSetMapper or SetMapper instead.
-pub struct WhitelistMapper<'a, SA, T, A = CurrentStorage>
+pub struct WhitelistMapper<SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
-    A: StorageAddress<'a, SA>,
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: NestedEncode + 'static,
 {
     address: A,
-    base_key: StorageKey<'a, SA>,
+    base_key: StorageKey<SA>,
     _phantom: PhantomData<T>,
 }
 
-impl<'a, SA, T> StorageMapper<'a, SA> for WhitelistMapper<'a, SA, T, CurrentStorage>
+impl<SA, T> StorageMapper<SA> for WhitelistMapper<SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: NestedEncode + 'static,
 {
-    fn new(base_key: StorageKey<'a, SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         Self {
             address: CurrentStorage,
             base_key,
@@ -45,12 +45,12 @@ where
     }
 }
 
-impl<'a, SA, T> WhitelistMapper<'a, SA, T, ManagedAddress<'a, SA>>
+impl<SA, T> WhitelistMapper<SA, T, ManagedAddress<SA>>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: NestedEncode + 'static,
 {
-    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         Self {
             address,
             base_key,
@@ -59,9 +59,9 @@ where
     }
 }
 
-impl<'a, SA, T> WhitelistMapper<'a, SA, T, ManagedAddress<'a, SA>>
+impl<SA, T> WhitelistMapper<SA, T, ManagedAddress<SA>>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopDecode + TopEncode + NestedEncode + 'static,
 {
     pub fn contains(&self, item: &T) -> bool {
@@ -75,17 +75,17 @@ where
         }
     }
 
-    fn build_mapper_for_item(&self, item: &T) -> FlagMapper<'a, SA, ManagedAddress<'a, SA>> {
+    fn build_mapper_for_item(&self, item: &T) -> FlagMapper<SA, ManagedAddress<SA>> {
         let mut key = self.base_key.clone();
         key.append_item(item);
 
-        FlagMapper::<'a, SA, ManagedAddress<'a, SA>>::new_from_address(self.address.clone(), key)
+        FlagMapper::<SA, ManagedAddress<SA>>::new_from_address(self.address.clone(), key)
     }
 }
 
-impl<'a, SA, T> WhitelistMapper<'a, SA, T, CurrentStorage>
+impl<SA, T> WhitelistMapper<SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopDecode + TopEncode + NestedEncode + 'static,
 {
     pub fn contains(&self, item: &T) -> bool {
@@ -109,10 +109,10 @@ where
         mapper.clear();
     }
 
-    fn build_mapper_for_item(&self, item: &T) -> FlagMapper<'a, SA, CurrentStorage> {
+    fn build_mapper_for_item(&self, item: &T) -> FlagMapper<SA, CurrentStorage> {
         let mut key = self.base_key.clone();
         key.append_item(item);
 
-        FlagMapper::<'a, SA, CurrentStorage>::new(key)
+        FlagMapper::<SA, CurrentStorage>::new(key)
     }
 }

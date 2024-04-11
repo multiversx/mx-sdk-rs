@@ -6,16 +6,16 @@ use crate::{
     *,
 };
 
-pub struct StorageKey<'a, A>
+pub struct StorageKey<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi + 'static,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
-    pub(crate) buffer: ManagedBuffer<'a, A>,
+    pub(crate) buffer: ManagedBuffer<A>,
 }
 
-impl<'a, A> ManagedType<'a, A> for StorageKey<'a, A>
+impl<A> ManagedType<A> for StorageKey<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi + 'static,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
     type OwnHandle = A::ManagedBufferHandle;
 
@@ -26,12 +26,8 @@ where
         }
     }
 
-    unsafe fn get_handle(&self) -> A::ManagedBufferHandle {
+    fn get_handle(&self) -> A::ManagedBufferHandle {
         self.buffer.get_handle()
-    }
-
-    fn take_handle(self) -> Self::OwnHandle {
-        self.buffer.take_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &A::ManagedBufferHandle) -> &Self {
@@ -39,9 +35,9 @@ where
     }
 }
 
-impl<'a, A> StorageKey<'a, A>
+impl<A> StorageKey<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi + 'static,
+    A: ManagedTypeApi + ErrorApi + 'static,
 {
     #[inline]
     pub fn new(base_key: &[u8]) -> Self {
@@ -56,7 +52,7 @@ where
     }
 
     #[inline]
-    pub fn append_managed_buffer(&mut self, buffer: &ManagedBuffer<'a, A>) {
+    pub fn append_managed_buffer(&mut self, buffer: &ManagedBuffer<A>) {
         self.buffer.append(buffer);
     }
 
@@ -66,7 +62,7 @@ where
     {
         let Ok(()) = item.dep_encode_or_handle_err(
             &mut self.buffer,
-            ExitCodecErrorHandler::<'a, A>::from(err_msg::STORAGE_KEY_ENCODE_ERROR),
+            ExitCodecErrorHandler::<A>::from(err_msg::STORAGE_KEY_ENCODE_ERROR),
         );
     }
 
@@ -76,14 +72,14 @@ where
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> From<ManagedBuffer<'a, M>> for StorageKey<'a, M> {
+impl<M: ManagedTypeApi> From<ManagedBuffer<M>> for StorageKey<M> {
     #[inline]
-    fn from(buffer: ManagedBuffer<'a, M>) -> Self {
+    fn from(buffer: ManagedBuffer<M>) -> Self {
         StorageKey { buffer }
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> From<&str> for StorageKey<'a, M> {
+impl<M: ManagedTypeApi> From<&str> for StorageKey<M> {
     #[inline]
     fn from(s: &str) -> Self {
         StorageKey {
@@ -92,17 +88,17 @@ impl<'a, M: ManagedTypeApi<'a>> From<&str> for StorageKey<'a, M> {
     }
 }
 
-impl<'a, M, const N: usize> From<ManagedByteArray<'a, M, N>> for StorageKey<'a, M>
+impl<M, const N: usize> From<ManagedByteArray<M, N>> for StorageKey<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     #[inline]
-    fn from(mba: ManagedByteArray<'a, M, N>) -> Self {
+    fn from(mba: ManagedByteArray<M, N>) -> Self {
         StorageKey { buffer: mba.buffer }
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> Clone for StorageKey<'a, M> {
+impl<M: ManagedTypeApi> Clone for StorageKey<M> {
     fn clone(&self) -> Self {
         StorageKey {
             buffer: self.buffer.clone(),

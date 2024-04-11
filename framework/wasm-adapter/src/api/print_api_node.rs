@@ -4,7 +4,7 @@ use multiversx_sc::{
     formatter::FormatBufferIgnore,
 };
 
-impl<'a> PrintApi<'a> for VmApiImpl {
+impl PrintApi for VmApiImpl {
     type PrintApiImpl = VmApiImpl;
 
     fn print_api_impl() -> Self::PrintApiImpl {
@@ -12,6 +12,6 @@ impl<'a> PrintApi<'a> for VmApiImpl {
     }
 }
 
-impl<'a> PrintApiImpl<'a> for VmApiImpl {
+impl PrintApiImpl for VmApiImpl {
     type Buffer = FormatBufferIgnore;
 }

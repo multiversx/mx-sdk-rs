@@ -1,26 +1,23 @@
-use core::marker::PhantomData;
 use crate::api::{HandleConstraints, ManagedTypeApi, RawHandle};
 
 use super::ManagedRef;
 
 /// Commonalities between all managed types.
-pub trait ManagedType<'a, M: ManagedTypeApi<'a>>: Sized {
+pub trait ManagedType<M: ManagedTypeApi>: Sized {
     type OwnHandle: HandleConstraints;
 
     #[doc(hidden)]
     fn from_handle(handle: Self::OwnHandle) -> Self;
 
-    unsafe fn get_handle(&self) -> Self::OwnHandle;
-
-    fn take_handle(self) -> Self::OwnHandle;
+    fn get_handle(&self) -> Self::OwnHandle;
 
     #[doc(hidden)]
     fn from_raw_handle(handle: RawHandle) -> Self {
         Self::from_handle(Self::OwnHandle::new(handle))
     }
 
-    unsafe fn get_raw_handle(&self) -> RawHandle {
-        self.get_handle().cast_or_signal_error::<'a, M, _>()
+    fn get_raw_handle(&self) -> RawHandle {
+        self.get_handle().cast_or_signal_error::<M, _>()
     }
 
     /// Implement carefully, since the underlying transmutation is an unsafe operation.
@@ -31,33 +28,5 @@ pub trait ManagedType<'a, M: ManagedTypeApi<'a>>: Sized {
 
     fn as_ref(&self) -> ManagedRef<'_, M, Self> {
         ManagedRef::new(self)
-    }
-}
-
-pub struct ManagedTypeHandleWrapper<'a, T, M, HC>
-where
-    T: ManagedType<'a, M, OwnHandle = HC>,
-    M: ManagedTypeApi<'a>,
-    HC: HandleConstraints
-{
-    value: &'a T,
-    _phantom: PhantomData<M>
-}
-
-impl<'a, T, M, HC> ManagedTypeHandleWrapper<'a, T, M, HC>
-    where
-        T: ManagedType<'a, M, OwnHandle = HC>,
-        M: ManagedTypeApi<'a>,
-        HC: HandleConstraints
-{
-    pub fn new(value: &'a T) -> Self {
-        Self {
-            value,
-            _phantom: PhantomData
-        }
-    }
-
-    pub fn get_handle(self) -> &'a T::OwnHandle {
-        unsafe { self.get_handle() }
     }
 }

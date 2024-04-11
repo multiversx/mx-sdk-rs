@@ -4,21 +4,21 @@ multiversx_sc::derive_imports!();
 pub type Nonce = u64;
 
 #[derive(TopEncode, TopDecode, NestedEncode, NestedDecode, TypeAbi, Clone)]
-pub struct ExampleStruct<'a, M>
+pub struct ExampleStruct<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    pub first_token_id: TokenIdentifier<'a, M>,
+    pub first_token_id: TokenIdentifier<M>,
     pub first_token_nonce: Nonce,
-    pub first_token_amount: BigUint<'a, M>,
-    pub second_token_id: TokenIdentifier<'a, M>,
+    pub first_token_amount: BigUint<M>,
+    pub second_token_id: TokenIdentifier<M>,
     pub second_token_nonce: Nonce,
-    pub second_token_amount: BigUint<'a, M>,
+    pub second_token_amount: BigUint<M>,
 }
 
-impl<'a, M> PartialEq for ExampleStruct<'a, M>
+impl<M> PartialEq for ExampleStruct<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn eq(&self, other: &Self) -> bool {
         self.first_token_id == other.first_token_id

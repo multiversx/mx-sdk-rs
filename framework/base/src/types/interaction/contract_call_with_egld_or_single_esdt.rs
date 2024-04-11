@@ -13,41 +13,41 @@ use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, Contr
 ///
 /// Gets created when chaining method `with_egld_or_single_esdt_transfer`.
 #[must_use]
-pub struct ContractCallWithEgldOrSingleEsdt<'a, SA, OriginalResult>
+pub struct ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
-    pub(super) basic: ContractCallNoPayment<'a, SA, OriginalResult>,
-    pub payment: EgldOrEsdtTokenPayment<'a, SA>,
+    pub(super) basic: ContractCallNoPayment<SA, OriginalResult>,
+    pub payment: EgldOrEsdtTokenPayment<SA>,
 }
 
-impl<'a, SA, OriginalResult> ContractCallWithEgldOrSingleEsdt<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
-    fn into_normalized_egld(self) -> ContractCallWithEgld<'a, SA, OriginalResult> {
+    fn into_normalized_egld(self) -> ContractCallWithEgld<SA, OriginalResult> {
         ContractCallWithEgld {
             basic: self.basic,
             egld_payment: self.payment.amount,
         }
     }
 
-    fn into_normalized_esdt(self) -> ContractCallWithEgld<'a, SA, OriginalResult> {
+    fn into_normalized_esdt(self) -> ContractCallWithEgld<SA, OriginalResult> {
         self.basic
             .into_normalized()
             .convert_to_single_transfer_esdt_call(self.payment.unwrap_esdt())
     }
 }
 
-impl<'a, SA, OriginalResult> ContractCall<'a, SA> for ContractCallWithEgldOrSingleEsdt<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
     type OriginalResult = OriginalResult;
 
-    fn into_normalized(self) -> ContractCallWithEgld<'a, SA, Self::OriginalResult> {
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
         if self.payment.token_identifier.is_egld() {
             self.into_normalized_egld()
         } else {
@@ -58,7 +58,7 @@ where
     }
 
     #[inline]
-    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<'a, SA, OriginalResult> {
+    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic
     }
 
@@ -72,9 +72,9 @@ where
     }
 }
 
-impl<'a, SA, OriginalResult> ContractCallWithEgldOrSingleEsdt<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
     /// Creates a new instance directly.
@@ -82,12 +82,12 @@ where
     /// The constructor is mostly for hand-written proxies,
     /// the usual way of constructing this object is via the builder methods of other contract call types,
     /// especially `with_egld_or_single_esdt_transfer`.
-    pub fn new<N: Into<ManagedBuffer<'a, SA>>>(
-        to: ManagedAddress<'a, SA>,
+    pub fn new<N: Into<ManagedBuffer<SA>>>(
+        to: ManagedAddress<SA>,
         endpoint_name: N,
-        token_identifier: EgldOrEsdtTokenIdentifier<'a, SA>,
+        token_identifier: EgldOrEsdtTokenIdentifier<SA>,
         token_nonce: u64,
-        amount: BigUint<'a, SA>,
+        amount: BigUint<SA>,
     ) -> Self {
         ContractCallWithEgldOrSingleEsdt {
             basic: ContractCallNoPayment::new(to, endpoint_name),

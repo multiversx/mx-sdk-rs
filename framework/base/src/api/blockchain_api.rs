@@ -4,8 +4,8 @@ use crate::types::{
     EsdtLocalRoleFlags,
 };
 
-pub trait BlockchainApi<'a>: ManagedTypeApi<'a> {
-    type BlockchainApiImpl: BlockchainApiImpl<'a>
+pub trait BlockchainApi: ManagedTypeApi {
+    type BlockchainApiImpl: BlockchainApiImpl
         + HandleTypeInfo<
             ManagedBufferHandle = Self::ManagedBufferHandle,
             BigIntHandle = Self::BigIntHandle,
@@ -22,7 +22,7 @@ pub trait BlockchainApi<'a>: ManagedTypeApi<'a> {
 /// They simply pass on/retrieve data to/from the protocol.
 /// When mocking the blockchain state, we use the Rc/RefCell pattern
 /// to isolate mock state mutability from the contract interface.
-pub trait BlockchainApiImpl<'a>: ManagedTypeApiImpl<'a> {
+pub trait BlockchainApiImpl: ManagedTypeApiImpl {
     fn get_caller_legacy(&self) -> Address;
 
     fn load_caller_managed(&self, dest: Self::ManagedBufferHandle) {

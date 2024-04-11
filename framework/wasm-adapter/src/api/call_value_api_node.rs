@@ -11,7 +11,7 @@ extern "C" {
     fn getNumESDTTransfers() -> i32;
 }
 
-impl<'a> CallValueApi<'a> for VmApiImpl {
+impl CallValueApi for VmApiImpl {
     type CallValueApiImpl = VmApiImpl;
 
     #[inline]
@@ -20,7 +20,7 @@ impl<'a> CallValueApi<'a> for VmApiImpl {
     }
 }
 
-impl<'a> CallValueApi<'a>Impl for VmApiImpl {
+impl CallValueApiImpl for VmApiImpl {
     #[inline]
     fn check_not_payable(&self) {
         unsafe {

@@ -18,34 +18,34 @@ use super::ManagedArgBuffer;
 const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 
 #[must_use]
-pub struct ContractDeploy<'a, SA, OriginalResult>
+pub struct ContractDeploy<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
     _phantom: PhantomData<SA>,
-    pub to: ManagedOption<'a, SA, ManagedAddress<'a, SA>>, // only used for Upgrade, ignored for Deploy
-    pub egld_payment: BigUint<'a, SA>,
+    pub to: ManagedOption<SA, ManagedAddress<SA>>, // only used for Upgrade, ignored for Deploy
+    pub egld_payment: BigUint<SA>,
     pub explicit_gas_limit: u64,
-    pub arg_buffer: ManagedArgBuffer<'a, SA>,
+    pub arg_buffer: ManagedArgBuffer<SA>,
     _return_type: PhantomData<OriginalResult>,
 }
 
 /// Syntactical sugar to help macros to generate code easier.
-/// Unlike calling `ContractDeploy::<'a, SA>::new`, here types can be inferred from the context.
-pub fn new_contract_deploy<'a, SA, OriginalResult>(
-    to: ManagedOption<'a, SA, ManagedAddress<'a, SA>>,
-) -> ContractDeploy<'a, SA, OriginalResult>
+/// Unlike calling `ContractDeploy::<SA>::new`, here types can be inferred from the context.
+pub fn new_contract_deploy<SA, OriginalResult>(
+    to: ManagedOption<SA, ManagedAddress<SA>>,
+) -> ContractDeploy<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
     let mut contract_deploy = ContractDeploy::new();
     contract_deploy.to = to;
     contract_deploy
 }
 
-impl<'a, SA, OriginalResult> Default for ContractDeploy<'a, SA, OriginalResult>
+impl<SA, OriginalResult> Default for ContractDeploy<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
     fn default() -> Self {
         let zero = BigUint::zero();
@@ -62,15 +62,15 @@ where
 }
 
 #[allow(clippy::return_self_not_must_use)]
-impl<'a, SA, OriginalResult> ContractDeploy<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractDeploy<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
     pub fn new() -> Self {
         Self::default()
     }
 
-    pub fn with_egld_transfer(mut self, payment_amount: BigUint<'a, SA>) -> Self {
+    pub fn with_egld_transfer(mut self, payment_amount: BigUint<SA>) -> Self {
         self.egld_payment = payment_amount;
         self
     }
@@ -81,7 +81,7 @@ where
     }
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
-        let h = ExitCodecErrorHandler::<'a, SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
         let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
     }
 
@@ -94,20 +94,20 @@ where
     }
 }
 
-impl<'a, SA, OriginalResult> ContractDeploy<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractDeploy<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
     fn decode_result<RequestedResult>(
-        raw_result: ManagedVec<'a, SA, ManagedBuffer<'a, SA>>,
+        raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
     ) -> RequestedResult
     where
         RequestedResult: CodecFrom<OriginalResult>,
     {
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"init result"[..]);
-        let h = ArgErrorHandler::<'a, SA>::from(arg_id);
+        let h = ArgErrorHandler::<SA>::from(arg_id);
         let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
         result
     }
@@ -116,13 +116,13 @@ where
     /// Will return None if the deploy fails.  
     pub fn deploy_contract<RequestedResult>(
         self,
-        code: &ManagedBuffer<'a, SA>,
+        code: &ManagedBuffer<SA>,
         code_metadata: CodeMetadata,
-    ) -> (ManagedAddress<'a, SA>, RequestedResult)
+    ) -> (ManagedAddress<SA>, RequestedResult)
     where
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let (address, raw_result) = SendRawWrapper::<'a, SA>::new().deploy_contract(
+        let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             code,
@@ -130,20 +130,20 @@ where
             &self.arg_buffer,
         );
 
-        SendRawWrapper::<'a, SA>::new().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
 
         (address, Self::decode_result(raw_result))
     }
 
     pub fn deploy_from_source<RequestedResult>(
         self,
-        source_address: &ManagedAddress<'a, SA>,
+        source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
-    ) -> (ManagedAddress<'a, SA>, RequestedResult)
+    ) -> (ManagedAddress<SA>, RequestedResult)
     where
         RequestedResult: CodecFrom<OriginalResult>,
     {
-        let (address, raw_result) = SendRawWrapper::<'a, SA>::new().deploy_from_source_contract(
+        let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_from_source_contract(
             self.resolve_gas_limit(),
             &self.egld_payment,
             source_address,
@@ -151,21 +151,21 @@ where
             &self.arg_buffer,
         );
 
-        SendRawWrapper::<'a, SA>::new().clean_return_data();
+        SendRawWrapper::<SA>::new().clean_return_data();
 
         (address, Self::decode_result(raw_result))
     }
 
     pub fn upgrade_from_source(
         self,
-        source_address: &ManagedAddress<'a, SA>,
+        source_address: &ManagedAddress<SA>,
         code_metadata: CodeMetadata,
     ) {
         let gas = self.resolve_gas_limit();
         let sc_address = &self
             .to
             .unwrap_or_sc_panic(err_msg::RECIPIENT_ADDRESS_NOT_SET);
-        SendRawWrapper::<'a, SA>::new().upgrade_from_source_contract(
+        SendRawWrapper::<SA>::new().upgrade_from_source_contract(
             sc_address,
             gas,
             &self.egld_payment,
@@ -175,12 +175,12 @@ where
         );
     }
 
-    pub fn upgrade_contract(self, code: &ManagedBuffer<'a, SA>, code_metadata: CodeMetadata) {
+    pub fn upgrade_contract(self, code: &ManagedBuffer<SA>, code_metadata: CodeMetadata) {
         let gas = self.resolve_gas_limit();
         let sc_address = &self
             .to
             .unwrap_or_sc_panic(err_msg::RECIPIENT_ADDRESS_NOT_SET);
-        SendRawWrapper::<'a, SA>::new().upgrade_contract(
+        SendRawWrapper::<SA>::new().upgrade_contract(
             sc_address,
             gas,
             &self.egld_payment,

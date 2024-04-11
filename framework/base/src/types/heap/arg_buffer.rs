@@ -83,11 +83,11 @@ impl From<&[BoxedBytes]> for ArgBuffer {
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> From<&ManagedArgBuffer<'a, M>> for ArgBuffer
+impl<M: ManagedTypeApi> From<&ManagedArgBuffer<M>> for ArgBuffer
 where
-    M: ManagedTypeApi<'a> + 'static,
+    M: ManagedTypeApi + 'static,
 {
-    fn from(managed_arg_buffer: &ManagedArgBuffer<'a, M>) -> Self {
+    fn from(managed_arg_buffer: &ManagedArgBuffer<M>) -> Self {
         let mut result = Self::new();
         for m_arg in managed_arg_buffer.data.into_iter() {
             result.push_argument_bytes(m_arg.to_boxed_bytes().as_slice());

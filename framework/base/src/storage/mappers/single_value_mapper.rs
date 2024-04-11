@@ -17,25 +17,25 @@ use crate::{
 };
 
 /// Manages a single serializable item in storage.
-pub struct SingleValueMapper<'a, SA, T, A = CurrentStorage>
+pub struct SingleValueMapper<SA, T, A = CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
-    A: StorageAddress<'a, SA>,
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode + 'static,
 {
     address: A,
-    key: StorageKey<'a, SA>,
+    key: StorageKey<SA>,
     _phantom_api: PhantomData<SA>,
     _phantom_item: PhantomData<T>,
 }
 
-impl<'a, SA, T> StorageMapper<'a, SA> for SingleValueMapper<'a, SA, T, CurrentStorage>
+impl<SA, T> StorageMapper<SA> for SingleValueMapper<SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     #[inline]
-    fn new(base_key: StorageKey<'a, SA>) -> Self {
+    fn new(base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
             address: CurrentStorage,
             key: base_key,
@@ -45,13 +45,13 @@ where
     }
 }
 
-impl<'a, SA, T> SingleValueMapper<'a, SA, T, ManagedAddress<'a, SA>>
+impl<SA, T> SingleValueMapper<SA, T, ManagedAddress<SA>>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     #[inline]
-    pub fn new_from_address(address: ManagedAddress<'a, SA>, base_key: StorageKey<'a, SA>) -> Self {
+    pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         SingleValueMapper {
             address,
             key: base_key,
@@ -61,10 +61,10 @@ where
     }
 }
 
-impl<'a, SA, T, A> SingleValueMapper<'a, SA, T, A>
+impl<SA, T, A> SingleValueMapper<SA, T, A>
 where
-    SA: StorageMapperApi<'a>,
-    A: StorageAddress<'a, SA>,
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode,
 {
     /// Retrieves current value from storage.
@@ -82,9 +82,9 @@ where
     }
 }
 
-impl<'a, SA, T> SingleValueMapper<'a, SA, T, CurrentStorage>
+impl<SA, T> SingleValueMapper<SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     /// Saves argument to storage.
@@ -142,9 +142,9 @@ where
     }
 }
 
-impl<'a, SA, T> TopEncodeMulti for SingleValueMapper<'a, SA, T, CurrentStorage>
+impl<SA, T> TopEncodeMulti for SingleValueMapper<SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -194,32 +194,32 @@ impl<T: TopDecode> SingleValue<T> {
     }
 }
 
-impl<'a, SA, T, A> !CodecFromSelf for SingleValueMapper<'a, SA, T, A>
+impl<SA, T, A> !CodecFromSelf for SingleValueMapper<SA, T, A>
 where
-    SA: StorageMapperApi<'a>,
-    A: StorageAddress<'a, SA>,
+    SA: StorageMapperApi,
+    A: StorageAddress<SA>,
     T: TopEncode + TopDecode,
 {
 }
 
-impl<'a, SA, T, R> CodecFrom<SingleValueMapper<'a, SA, T, CurrentStorage>> for SingleValue<R>
+impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T, CurrentStorage>> for SingleValue<R>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
     R: TopDecode + CodecFrom<T>,
 {
 }
 
-impl<'a, SA, T> CodecFrom<SingleValueMapper<'a, SA, T>> for PlaceholderOutput
+impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
 }
 
-impl<'a, SA, T> TypeAbi for SingleValueMapper<'a, SA, T, CurrentStorage>
+impl<SA, T> TypeAbi for SingleValueMapper<SA, T, CurrentStorage>
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
     fn type_name() -> TypeName {

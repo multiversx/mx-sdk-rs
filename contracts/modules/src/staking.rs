@@ -2,9 +2,9 @@ multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
 #[derive(TopEncode, TopDecode)]
-pub struct TokenAmountPair<'a, M: ManagedTypeApi<'a>> {
-    pub token_id: TokenIdentifier<'a, M>,
-    pub amount: BigUint<'a, M>,
+pub struct TokenAmountPair<M: ManagedTypeApi> {
+    pub token_id: TokenIdentifier<M>,
+    pub amount: BigUint<M>,
 }
 
 static NOT_ENOUGH_STAKE_ERR_MSG: &[u8] = b"Not enough stake";

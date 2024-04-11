@@ -2,8 +2,8 @@ use crate::api::ErrorApi;
 
 use super::{HandleTypeInfo, ManagedTypeApiImpl, StaticVarApi};
 
-pub trait ManagedTypeApi<'a>: HandleTypeInfo + StaticVarApi + ErrorApi + Clone + 'static {
-    type ManagedTypeApiImpl: ManagedTypeApiImpl<'a>
+pub trait ManagedTypeApi: HandleTypeInfo + StaticVarApi + ErrorApi + Clone + 'static {
+    type ManagedTypeApiImpl: ManagedTypeApiImpl
         + HandleTypeInfo<
             ManagedBufferHandle = Self::ManagedBufferHandle,
             BigIntHandle = Self::BigIntHandle,

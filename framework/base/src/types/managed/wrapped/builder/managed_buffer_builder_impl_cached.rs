@@ -6,17 +6,17 @@ use crate::{
 use super::ManagedBufferBuilderImpl;
 
 /// A ManagedBuffer builder implementation that caches data to the static cache locally in the contract.
-pub struct ManagedBufferBuilderImplCached<'a, M>
+pub struct ManagedBufferBuilderImplCached<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    managed_buffer: ManagedBuffer<'a, M>,
-    static_cache: Option<StaticBufferRef<'a, M>>,
+    managed_buffer: ManagedBuffer<M>,
+    static_cache: Option<StaticBufferRef<M>>,
 }
 
-impl<'a, M> ManagedBufferBuilderImplCached<'a, M>
+impl<M> ManagedBufferBuilderImplCached<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn flush_to_managed_buffer(&mut self) {
         let old_static_cache = core::mem::take(&mut self.static_cache);
@@ -28,9 +28,9 @@ where
     }
 }
 
-impl<'a, M> ManagedBufferBuilderImpl<'a, M> for ManagedBufferBuilderImplCached<'a, M>
+impl<M> ManagedBufferBuilderImpl<M> for ManagedBufferBuilderImplCached<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     /// Creates instance as lazily as possible.
     /// If possible, the slice is loaded into the static buffer.
@@ -51,7 +51,7 @@ where
         }
     }
 
-    fn into_managed_buffer(mut self) -> ManagedBuffer<'a, M> {
+    fn into_managed_buffer(mut self) -> ManagedBuffer<M> {
         self.flush_to_managed_buffer();
         self.managed_buffer
     }
@@ -68,7 +68,7 @@ where
         }
     }
 
-    fn append_managed_buffer(&mut self, item: &ManagedBuffer<'a, M>) {
+    fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>) {
         if let Some(static_cache) = &mut self.static_cache {
             let success = static_cache.try_extend_from_copy_bytes(item.len(), |dest_slice| {
                 let _ = item.load_slice(0, dest_slice);

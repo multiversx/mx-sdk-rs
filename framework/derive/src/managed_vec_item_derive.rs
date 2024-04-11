@@ -92,24 +92,6 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
     }
 }
 
-fn generate_take_handle_ownership_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
-    match fields {
-        syn::Fields::Named(fields_named) => fields_named
-            .named
-            .iter()
-            .map(|field| {
-                let field_ident = &field.ident;
-                quote! {
-                    self.#field_ident.take_handle_ownership();
-                }
-            })
-            .collect(),
-        _ => {
-            panic!("ManagedVecItem only supports named fields")
-        }
-    }
-}
-
 fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
     let self_expr = if ast.generics.params.is_empty() {
@@ -150,7 +132,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             const PAYLOAD_SIZE: usize = 1;
             const SKIPS_RESERIALIZATION: bool = true;
-            type Ref<'b> = Self;
+            type Ref<'a> = Self;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
                 let mut arr: [u8; 1] = [0u8; 1];
@@ -160,7 +142,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 }
             }
 
-            unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'b> {
+            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
                 Self::from_byte_reader(reader)
             }
 
@@ -171,8 +153,6 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 };
                 writer(&arr[..])
             }
-
-            fn take_handle_ownership(self) {}
         }
     };
     gen.into()
@@ -186,7 +166,6 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
         generate_skips_reserialization_snippets(&data_struct.fields);
     let from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
     let to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
-    let take_handle_ownership_snippets = generate_take_handle_ownership_snippets(&data_struct.fields);
 
     let array_init_snippet = generate_array_init_snippet(ast);
 
@@ -194,7 +173,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
-            type Ref<'b> = Self;
+            type Ref<'a> = Self;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
                 #array_init_snippet
@@ -206,7 +185,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 }
             }
 
-            unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'b> {
+            unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(reader: Reader) -> Self::Ref<'a> {
                 Self::from_byte_reader(reader)
             }
 
@@ -217,10 +196,6 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 #(#to_byte_writer_snippets)*
 
                 writer(&arr[..])
-            }
-
-            fn take_handle_ownership(mut self) {
-               #(#take_handle_ownership_snippets)*
             }
         }
     };

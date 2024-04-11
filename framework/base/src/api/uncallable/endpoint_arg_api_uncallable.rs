@@ -2,7 +2,7 @@ use crate::api::{endpoint_arg_api::EndpointArgumentApiImpl, EndpointArgumentApi}
 
 use super::UncallableApi;
 
-impl<'a> EndpointArgumentApi<'a> for UncallableApi {
+impl EndpointArgumentApi for UncallableApi {
     type EndpointArgumentApiImpl = UncallableApi;
 
     fn argument_api_impl() -> Self::EndpointArgumentApiImpl {
@@ -10,7 +10,7 @@ impl<'a> EndpointArgumentApi<'a> for UncallableApi {
     }
 }
 
-impl<'a> EndpointArgumentApiImpl<'a> for UncallableApi {
+impl EndpointArgumentApiImpl for UncallableApi {
     fn get_num_arguments(&self) -> i32 {
         unreachable!()
     }

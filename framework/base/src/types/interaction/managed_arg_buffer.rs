@@ -18,16 +18,16 @@ use multiversx_sc_codec::TopEncodeMulti;
 
 #[derive(Debug, Default, Clone)]
 #[repr(transparent)]
-pub struct ManagedArgBuffer<'a, M>
+pub struct ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + 'static,
+    M: ManagedTypeApi + 'static,
 {
-    pub(crate) data: ManagedVec<'a, M, ManagedBuffer<'a, M>>,
+    pub(crate) data: ManagedVec<M, ManagedBuffer<M>>,
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ManagedType<'a, M> for ManagedArgBuffer<'a, M>
+impl<M: ManagedTypeApi> ManagedType<M> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + 'static,
+    M: ManagedTypeApi + 'static,
 {
     type OwnHandle = M::ManagedBufferHandle;
 
@@ -38,12 +38,8 @@ where
         }
     }
 
-    unsafe fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> M::ManagedBufferHandle {
         self.data.get_handle()
-    }
-
-    fn take_handle(self) -> Self::OwnHandle {
-        self.data.take_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -51,9 +47,9 @@ where
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ManagedArgBuffer<'a, M>
+impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + 'static,
+    M: ManagedTypeApi + 'static,
 {
     #[inline]
     pub fn new() -> Self {
@@ -63,20 +59,20 @@ where
     }
 }
 
-impl<'a, M, I> From<Vec<I>> for ManagedArgBuffer<'a, M>
+impl<M, I> From<Vec<I>> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
-    I: Into<ManagedBuffer<'a, M>>,
+    M: ManagedTypeApi,
+    I: Into<ManagedBuffer<M>>,
 {
     fn from(v: Vec<I>) -> Self {
         ManagedArgBuffer { data: v.into() }
     }
 }
 
-impl<'a, M, I> From<&[I]> for ManagedArgBuffer<'a, M>
+impl<M, I> From<&[I]> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
-    I: Into<ManagedBuffer<'a, M>> + TopEncode,
+    M: ManagedTypeApi,
+    I: Into<ManagedBuffer<M>> + TopEncode,
 {
     fn from(arguments: &[I]) -> Self {
         let mut arg_buffer = Self::new();
@@ -87,9 +83,9 @@ where
     }
 }
 
-impl<'a, M> From<ArgBuffer> for ManagedArgBuffer<'a, M>
+impl<M> From<ArgBuffer> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn from(arg_buffer: ArgBuffer) -> Self {
         let mut data = ManagedVec::new();
@@ -101,9 +97,9 @@ where
     }
 }
 
-impl<'a, M> From<&ArgBuffer> for ManagedArgBuffer<'a, M>
+impl<M> From<&ArgBuffer> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn from(arg_buffer: &ArgBuffer) -> Self {
         let mut data = ManagedVec::new();
@@ -115,18 +111,18 @@ where
     }
 }
 
-impl<'a, M> From<ManagedVec<'a, M, ManagedBuffer<'a, M>>> for ManagedArgBuffer<'a, M>
+impl<M> From<ManagedVec<M, ManagedBuffer<M>>> for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    fn from(data: ManagedVec<'a, M, ManagedBuffer<'a, M>>) -> Self {
+    fn from(data: ManagedVec<M, ManagedBuffer<M>>) -> Self {
         ManagedArgBuffer { data }
     }
 }
 
-impl<'a, M> ManagedArgBuffer<'a, M>
+impl<M> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + 'static,
+    M: ManagedTypeApi + 'static,
 {
     #[inline]
     pub fn len(&self) -> usize {
@@ -138,12 +134,12 @@ where
         self.data.is_empty()
     }
 
-    pub fn get(&self, index: usize) -> ManagedRef<'_, M, ManagedBuffer<'a, M>> {
+    pub fn get(&self, index: usize) -> ManagedRef<'_, M, ManagedBuffer<M>> {
         self.data.get(index)
     }
 
     #[inline]
-    pub fn push_arg_raw(&mut self, raw_arg: ManagedBuffer<'a, M>) {
+    pub fn push_arg_raw(&mut self, raw_arg: ManagedBuffer<M>) {
         self.data.push(raw_arg);
     }
 
@@ -155,7 +151,7 @@ where
     /// Concatenates 2 managed arg buffers. Consumes both arguments in the process.
     #[inline]
     #[must_use]
-    pub fn concat(mut self, other: ManagedArgBuffer<'a, M>) -> Self {
+    pub fn concat(mut self, other: ManagedArgBuffer<M>) -> Self {
         self.data.append_vec(other.data);
         self
     }
@@ -169,46 +165,46 @@ where
         v
     }
 
-    pub fn into_multi_value_encoded(self) -> MultiValueEncoded<'a, M, ManagedBuffer<'a, M>> {
+    pub fn into_multi_value_encoded(self) -> MultiValueEncoded<M, ManagedBuffer<M>> {
         self.data.into()
     }
 
-    pub fn into_vec_of_buffers(self) -> ManagedVec<'a, M, ManagedBuffer<'a, M>> {
+    pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
         self.data
     }
 }
 
-impl<'a, M> ManagedArgBuffer<'a, M>
+impl<M> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi + 'static,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     pub fn push_arg<T: TopEncode>(&mut self, arg: T) {
         let mut encoded_buffer = ManagedBuffer::new();
         let Ok(()) = arg.top_encode_or_handle_err(
             &mut encoded_buffer,
-            ExitCodecErrorHandler::<'a, M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
+            ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
         );
         self.push_arg_raw(encoded_buffer);
     }
 
     pub fn push_multi_arg<T: TopEncodeMulti>(&mut self, arg: &T) {
-        let h = ExitCodecErrorHandler::<'a, M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
         let Ok(()) = arg.multi_encode_or_handle_err(self, h);
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> ManagedArgBuffer<'a, M>
+impl<M: ManagedTypeApi> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + 'static,
+    M: ManagedTypeApi + 'static,
 {
-    pub fn raw_arg_iter(&self) -> ManagedVecRefIterator<'a, M, ManagedBuffer<'a, M>> {
+    pub fn raw_arg_iter(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
         self.data.iter()
     }
 }
 
-impl<'a, M> TopEncodeMultiOutput for ManagedArgBuffer<'a, M>
+impl<M> TopEncodeMultiOutput for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn push_single_value<T, H>(&mut self, arg: &T, h: H) -> Result<(), H::HandledErr>
@@ -220,9 +216,9 @@ where
     }
 }
 
-impl<'a, M> TopEncode for ManagedArgBuffer<'a, M>
+impl<M> TopEncode for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -234,9 +230,9 @@ where
     }
 }
 
-impl<'a, M> NestedEncode for ManagedArgBuffer<'a, M>
+impl<M> NestedEncode for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -248,9 +244,9 @@ where
     }
 }
 
-impl<'a, M> TopDecode for ManagedArgBuffer<'a, M>
+impl<M> TopDecode for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -261,9 +257,9 @@ where
     }
 }
 
-impl<'a, M> NestedDecode for ManagedArgBuffer<'a, M>
+impl<M> NestedDecode for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -274,22 +270,22 @@ where
     }
 }
 
-impl<'a, M> ManagedArgBuffer<'a, M>
+impl<M> ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi + 'static,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     /// Serializes itself into a managed buffer without allocating a new handle.
     /// Any data lying in the target buffer is overwritten.
-    pub fn serialize_overwrite(&self, dest: &mut ManagedBuffer<'a, M>) {
+    pub fn serialize_overwrite(&self, dest: &mut ManagedBuffer<M>) {
         dest.overwrite(&[]);
-        let h = ExitCodecErrorHandler::<'a, M>::from(err_msg::SERIALIZER_ENCODE_ERROR);
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR);
         let Ok(()) = self.top_encode_or_handle_err(dest, h);
     }
 
     /// Deserializes self from a managed buffer in-place, without creating a new handle.
     /// Any data lying in self is overwritten.
-    pub fn deserialize_overwrite(&mut self, source: ManagedBuffer<'a, M>) {
-        let h = ExitCodecErrorHandler::<'a, M>::from(err_msg::SERIALIZER_DECODE_ERROR);
+    pub fn deserialize_overwrite(&mut self, source: ManagedBuffer<M>) {
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR);
         self.clear();
         let mut nested_de_input = ManagedBufferNestedDecodeInput::new(source);
         while nested_de_input.remaining_len() > 0 {
@@ -299,12 +295,12 @@ where
     }
 }
 
-impl<'a, M> TypeAbi for ManagedArgBuffer<'a, M>
+impl<M> TypeAbi for ManagedArgBuffer<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
-        <&[ManagedBuffer<'a, M>] as TypeAbi>::type_name()
+        <&[ManagedBuffer<M>] as TypeAbi>::type_name()
     }
 }

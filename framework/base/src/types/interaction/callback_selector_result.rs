@@ -4,10 +4,10 @@ use super::CallbackClosureForDeser;
 
 /// Used internally between the `callback` and `callback_selector` methods.
 /// It is likely to be removed in the future.
-pub enum CallbackSelectorResult<'a, A>
+pub enum CallbackSelectorResult<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
     Processed,
-    NotProcessed(CallbackClosureForDeser<'a, A>),
+    NotProcessed(CallbackClosureForDeser<A>),
 }

@@ -140,21 +140,19 @@ impl<'a> From<&'a [u8]> for EsdtLocalRole {
 impl ManagedVecItem for EsdtLocalRole {
     const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = false; // TODO: might be ok to be true, but needs testing
-    type Ref<'b> = Self;
+    type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         u16::from_byte_reader(reader).into()
     }
 
-    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'b> {
+    ) -> Self::Ref<'a> {
         Self::from_byte_reader(reader)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         <u16 as ManagedVecItem>::to_byte_writer(&self.as_u16(), writer)
     }
-
-    fn take_handle_ownership(self) {}
 }

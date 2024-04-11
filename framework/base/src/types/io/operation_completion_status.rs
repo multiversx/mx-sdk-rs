@@ -71,7 +71,7 @@ impl TopDecode for OperationCompletionStatus {
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> CodecFrom<OperationCompletionStatus> for ManagedBuffer<'a, M> {}
+impl<M: ManagedTypeApi> CodecFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
 impl CodecFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
 impl CodecFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
 

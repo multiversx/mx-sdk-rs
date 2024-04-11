@@ -7,14 +7,14 @@ use crate::{
 const PENDING_ENCODING: &[u8; 7] = b"pending";
 
 #[derive(Default, Clone)]
-pub enum TokenMapperState<'a, M: ManagedTypeApi<'a>> {
+pub enum TokenMapperState<M: ManagedTypeApi> {
     #[default]
     NotSet,
     Pending,
-    Token(TokenIdentifier<'a, M>),
+    Token(TokenIdentifier<M>),
 }
 
-impl<'a, M: ManagedTypeApi<'a>> TokenMapperState<'a, M> {
+impl<M: ManagedTypeApi> TokenMapperState<M> {
     pub fn is_set(&self) -> bool {
         matches!(self, TokenMapperState::Token(_))
     }
@@ -32,7 +32,7 @@ impl<'a, M: ManagedTypeApi<'a>> TokenMapperState<'a, M> {
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> codec::TopEncode for TokenMapperState<'a, M> {
+impl<M: ManagedTypeApi> codec::TopEncode for TokenMapperState<M> {
     fn top_encode_or_handle_err<O, H>(
         &self,
         output: O,
@@ -54,7 +54,7 @@ impl<'a, M: ManagedTypeApi<'a>> codec::TopEncode for TokenMapperState<'a, M> {
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> codec::TopDecode for TokenMapperState<'a, M> {
+impl<M: ManagedTypeApi> codec::TopDecode for TokenMapperState<M> {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> core::result::Result<Self, H::HandledErr>
     where
         I: codec::TopDecodeInput,

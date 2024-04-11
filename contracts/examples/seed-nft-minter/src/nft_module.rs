@@ -8,10 +8,10 @@ const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000; // 100%
 
 #[derive(TypeAbi, TopEncode, TopDecode)]
-pub struct PriceTag<'a, M: ManagedTypeApi<'a>> {
-    pub token: EgldOrEsdtTokenIdentifier<'a, M>,
+pub struct PriceTag<M: ManagedTypeApi> {
+    pub token: EgldOrEsdtTokenIdentifier<M>,
     pub nonce: u64,
-    pub amount: BigUint<'a, M>,
+    pub amount: BigUint<M>,
 }
 
 #[multiversx_sc::module]

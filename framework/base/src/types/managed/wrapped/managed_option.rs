@@ -16,19 +16,19 @@ use super::ManagedVecItem;
 /// A very efficient optional managed type.
 ///
 /// `None` is flagged by a special invalid handle.
-pub struct ManagedOption<'a, M, T>
+pub struct ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M>,
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) handle: T::OwnHandle,
 }
 
-impl<'a, M, T> ManagedOption<'a, M, T>
+impl<M, T> ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M>,
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
 {
     fn new_with_handle(handle: T::OwnHandle) -> Self {
         Self {
@@ -38,7 +38,7 @@ where
     }
 
     pub fn some(value: T) -> Self {
-        Self::new_with_handle(value.take_handle())
+        Self::new_with_handle(value.get_handle())
     }
 
     pub fn none() -> Self {
@@ -46,10 +46,10 @@ where
     }
 }
 
-impl<'a, M, T> From<Option<T>> for ManagedOption<'a, M, T>
+impl<M, T> From<Option<T>> for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M>,
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
 {
     fn from(opt: Option<T>) -> Self {
         if let Some(value) = opt {
@@ -60,10 +60,10 @@ where
     }
 }
 
-impl<'a, M, T> ManagedOption<'a, M, T>
+impl<M, T> ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M>,
+    M: ManagedTypeApi,
+    T: ManagedType<M>,
 {
     pub fn is_none(&self) -> bool {
         self.handle.clone() == const_handles::MANAGED_OPTION_NONE
@@ -101,15 +101,15 @@ where
         self.unwrap_or_else(|| M::error_api_impl().signal_error(panic_message.as_bytes()))
     }
 
-    pub fn map<U, F>(self, f: F) -> ManagedOption<'a, M, U>
+    pub fn map<U, F>(self, f: F) -> ManagedOption<M, U>
     where
-        U: ManagedType<'a, M>,
+        U: ManagedType<M>,
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            ManagedOption::<'a, M, U>::some(f(T::from_handle(self.handle)))
+            ManagedOption::<M, U>::some(f(T::from_handle(self.handle)))
         } else {
-            ManagedOption::<'a, M, U>::none()
+            ManagedOption::<M, U>::none()
         }
     }
 
@@ -138,10 +138,10 @@ where
     }
 }
 
-impl<'a, M, T> Clone for ManagedOption<'a, M, T>
+impl<M, T> Clone for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + Clone,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + Clone,
 {
     #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
@@ -153,10 +153,10 @@ where
     }
 }
 
-impl<'a, M, T> PartialEq for ManagedOption<'a, M, T>
+impl<M, T> PartialEq for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + PartialEq,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + PartialEq,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -171,46 +171,42 @@ where
     }
 }
 
-impl<'a, M, T> Eq for ManagedOption<'a, M, T>
+impl<M, T> Eq for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + PartialEq,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + PartialEq,
 {
 }
 
-impl<'a, M, T> ManagedVecItem for ManagedOption<'a, M, T>
+impl<M, T> ManagedVecItem for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + 'static,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + 'static,
 {
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
-    type Ref<'b> = Self;
+    type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self {
         let handle = T::OwnHandle::from_byte_reader(reader);
         Self::new_with_handle(handle)
     }
 
-    unsafe fn from_byte_reader_as_borrow<'b, Reader: FnMut(&mut [u8])>(
+    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
         reader: Reader,
-    ) -> Self::Ref<'b> {
+    ) -> Self::Ref<'a> {
         Self::from_byte_reader(reader)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle.clone(), writer)
     }
-
-    fn take_handle_ownership(self) {
-        self.handle.take_handle_ownership()
-    }
 }
 
-impl<'a, M, T> TopEncode for ManagedOption<'a, M, T>
+impl<M, T> TopEncode for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + NestedEncode,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + NestedEncode,
 {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -222,10 +218,10 @@ where
     }
 }
 
-impl<'a, M, T> NestedEncode for ManagedOption<'a, M, T>
+impl<M, T> NestedEncode for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + NestedEncode,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + NestedEncode,
 {
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
     where
@@ -236,10 +232,10 @@ where
     }
 }
 
-impl<'a, M, T> TopDecode for ManagedOption<'a, M, T>
+impl<M, T> TopDecode for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + NestedDecode,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + NestedDecode,
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -250,10 +246,10 @@ where
     }
 }
 
-impl<'a, M, T> NestedDecode for ManagedOption<'a, M, T>
+impl<M, T> NestedDecode for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + NestedDecode,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + NestedDecode,
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -264,10 +260,10 @@ where
     }
 }
 
-impl<'a, M, T> TypeAbi for ManagedOption<'a, M, T>
+impl<M, T> TypeAbi for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + TypeAbi,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + TypeAbi,
 {
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
@@ -279,10 +275,10 @@ where
     }
 }
 
-impl<'a, M, T> core::fmt::Debug for ManagedOption<'a, M, T>
+impl<M, T> core::fmt::Debug for ManagedOption<M, T>
 where
-    M: ManagedTypeApi<'a>,
-    T: ManagedType<'a, M> + core::fmt::Debug,
+    M: ManagedTypeApi,
+    T: ManagedType<M> + core::fmt::Debug,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if self.is_some() {

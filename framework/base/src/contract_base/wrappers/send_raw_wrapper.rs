@@ -12,16 +12,16 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct SendRawWrapper<'a, A>
+pub struct SendRawWrapper<A>
 where
-    A: CallTypeApi<'a>,
+    A: CallTypeApi,
 {
     _phantom: PhantomData<A>,
 }
 
-impl<'a, A> SendRawWrapper<'a, A>
+impl<A> SendRawWrapper<A>
 where
-    A: CallTypeApi<'a>,
+    A: CallTypeApi,
 {
     pub fn new() -> Self {
         SendRawWrapper {
@@ -41,9 +41,9 @@ where
         );
     }
 
-    pub fn direct_egld<D>(&self, to: &ManagedAddress<'a, A>, egld_value: &BigUint<'a, A>, data: D)
+    pub fn direct_egld<D>(&self, to: &ManagedAddress<A>, egld_value: &BigUint<A>, data: D)
     where
-        D: Into<ManagedBuffer<'a, A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         let empty_mb_handle: A::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
@@ -60,11 +60,11 @@ where
 
     pub fn direct_egld_execute(
         &self,
-        to: &ManagedAddress<'a, A>,
-        egld_value: &BigUint<'a, A>,
+        to: &ManagedAddress<A>,
+        egld_value: &BigUint<A>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
         A::send_api_impl().transfer_value_execute(
             to.get_handle().get_raw_handle(),
@@ -77,12 +77,12 @@ where
 
     pub fn transfer_esdt_execute(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token: &TokenIdentifier<'a, A>,
-        egld_value: &BigUint<'a, A>,
+        to: &ManagedAddress<A>,
+        token: &TokenIdentifier<A>,
+        egld_value: &BigUint<A>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
         self.transfer_esdt_nft_execute(
             to,
@@ -98,15 +98,15 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn transfer_esdt_nft_execute(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token: &TokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token: &TokenIdentifier<A>,
         nonce: u64,
-        egld_value: &BigUint<'a, A>,
+        egld_value: &BigUint<A>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        let mut payments: ManagedVec<'a, A, EsdtTokenPayment<'a, A>> = ManagedVec::new();
+        let mut payments: ManagedVec<A, EsdtTokenPayment<A>> = ManagedVec::new();
         payments.push(EsdtTokenPayment::new(
             token.clone(),
             nonce,
@@ -117,11 +117,11 @@ where
 
     pub fn multi_esdt_transfer_execute(
         &self,
-        to: &ManagedAddress<'a, A>,
-        payments: &ManagedVec<'a, A, EsdtTokenPayment<'a, A>>,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
         gas_limit: u64,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
         A::send_api_impl().multi_transfer_esdt_nft_execute(
             to.get_handle().get_raw_handle(),
@@ -134,10 +134,10 @@ where
 
     pub fn async_call_raw(
         &self,
-        to: &ManagedAddress<'a, A>,
-        egld_value: &BigUint<'a, A>,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        to: &ManagedAddress<A>,
+        egld_value: &BigUint<A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) -> ! {
         A::send_api_impl().async_call_raw(
             to.get_handle().get_raw_handle(),
@@ -150,15 +150,15 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn create_async_call_raw(
         &self,
-        to: &ManagedAddress<'a, A>,
-        egld_value: &BigUint<'a, A>,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        to: &ManagedAddress<A>,
+        egld_value: &BigUint<A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
         success_callback: &'static str,
         error_callback: &'static str,
         gas: u64,
         extra_gas_for_callback: u64,
-        serialized_callback_closure_args: &ManagedBuffer<'a, A>,
+        serialized_callback_closure_args: &ManagedBuffer<A>,
     ) {
         A::send_api_impl().create_async_call_raw(
             to.get_handle().get_raw_handle(),
@@ -182,11 +182,11 @@ where
     pub fn deploy_contract(
         &self,
         gas: u64,
-        egld_value: &BigUint<'a, A>,
-        code: &ManagedBuffer<'a, A>,
+        egld_value: &BigUint<A>,
+        code: &ManagedBuffer<A>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> (ManagedAddress<'a, A>, ManagedVec<'a, A, ManagedBuffer<'a, A>>) {
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> (ManagedAddress<A>, ManagedVec<A, ManagedBuffer<A>>) {
         let code_metadata_handle = const_handles::MBUF_TEMPORARY_1;
         self.load_code_metadata_to_mb(code_metadata, code_metadata_handle);
         let new_address_handle = A::static_var_api_impl().next_handle();
@@ -212,11 +212,11 @@ where
     pub fn deploy_from_source_contract(
         &self,
         gas: u64,
-        egld_value: &BigUint<'a, A>,
-        source_contract_address: &ManagedAddress<'a, A>,
+        egld_value: &BigUint<A>,
+        source_contract_address: &ManagedAddress<A>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> (ManagedAddress<'a, A>, ManagedVec<'a, A, ManagedBuffer<'a, A>>) {
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> (ManagedAddress<A>, ManagedVec<A, ManagedBuffer<A>>) {
         let code_metadata_handle = const_handles::MBUF_TEMPORARY_1;
         self.load_code_metadata_to_mb(code_metadata, code_metadata_handle);
         let new_address_handle = A::static_var_api_impl().next_handle();
@@ -238,12 +238,12 @@ where
 
     pub fn upgrade_from_source_contract(
         &self,
-        sc_address: &ManagedAddress<'a, A>,
+        sc_address: &ManagedAddress<A>,
         gas: u64,
-        egld_value: &BigUint<'a, A>,
-        source_contract_address: &ManagedAddress<'a, A>,
+        egld_value: &BigUint<A>,
+        source_contract_address: &ManagedAddress<A>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) {
         let code_metadata_handle = const_handles::MBUF_TEMPORARY_1;
         self.load_code_metadata_to_mb(code_metadata, code_metadata_handle);
@@ -262,12 +262,12 @@ where
     /// The child contract's new init function will be called with the provided arguments
     pub fn upgrade_contract(
         &self,
-        sc_address: &ManagedAddress<'a, A>,
+        sc_address: &ManagedAddress<A>,
         gas: u64,
-        egld_value: &BigUint<'a, A>,
-        code: &ManagedBuffer<'a, A>,
+        egld_value: &BigUint<A>,
+        code: &ManagedBuffer<A>,
         code_metadata: CodeMetadata,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
+        arg_buffer: &ManagedArgBuffer<A>,
     ) {
         let code_metadata_handle = const_handles::MBUF_TEMPORARY_1;
         self.load_code_metadata_to_mb(code_metadata, code_metadata_handle);
@@ -285,11 +285,11 @@ where
     pub fn execute_on_dest_context_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<'a, A>,
-        value: &BigUint<'a, A>,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> ManagedVec<'a, A, ManagedBuffer<'a, A>> {
+        address: &ManagedAddress<A>,
+        value: &BigUint<A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> ManagedVec<A, ManagedBuffer<A>> {
         let result_handle = A::static_var_api_impl().next_handle();
         A::send_api_impl().execute_on_dest_context_raw(
             gas,
@@ -305,11 +305,11 @@ where
     pub fn execute_on_same_context_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<'a, A>,
-        value: &BigUint<'a, A>,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> ManagedVec<'a, A, ManagedBuffer<'a, A>> {
+        address: &ManagedAddress<A>,
+        value: &BigUint<A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> ManagedVec<A, ManagedBuffer<A>> {
         let result_handle = A::static_var_api_impl().next_handle();
         A::send_api_impl().execute_on_same_context_raw(
             gas,
@@ -326,10 +326,10 @@ where
     pub fn execute_on_dest_context_readonly_raw(
         &self,
         gas: u64,
-        address: &ManagedAddress<'a, A>,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> ManagedVec<'a, A, ManagedBuffer<'a, A>> {
+        address: &ManagedAddress<A>,
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> ManagedVec<A, ManagedBuffer<A>> {
         let result_handle = A::static_var_api_impl().next_handle();
         A::send_api_impl().execute_on_dest_context_readonly_raw(
             gas,
@@ -345,9 +345,9 @@ where
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        function_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> ManagedVec<'a, A, ManagedBuffer<'a, A>> {
+        function_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> ManagedVec<A, ManagedBuffer<A>> {
         // account-level built-in function, so the destination address is the contract itself
         let own_address_handle: A::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);

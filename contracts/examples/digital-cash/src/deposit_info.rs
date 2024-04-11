@@ -1,18 +1,18 @@
 use multiversx_sc::{derive_imports::*, imports::*};
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct DepositInfo<'a, M: ManagedTypeApi<'a>> {
-    pub depositor_address: ManagedAddress<'a, M>,
-    pub esdt_funds: ManagedVec<'a, M, EsdtTokenPayment<'a, M>>,
-    pub egld_funds: BigUint<'a, M>,
+pub struct DepositInfo<M: ManagedTypeApi> {
+    pub depositor_address: ManagedAddress<M>,
+    pub esdt_funds: ManagedVec<M, EsdtTokenPayment<M>>,
+    pub egld_funds: BigUint<M>,
     pub valability: u64,
     pub expiration_round: u64,
-    pub fees: Fee<'a, M>,
+    pub fees: Fee<M>,
 }
 
-impl<'a, M> DepositInfo<'a, M>
+impl<M> DepositInfo<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     pub fn get_num_tokens(&self) -> usize {
         let mut amount = self.esdt_funds.len();
@@ -25,7 +25,7 @@ where
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
-pub struct Fee<'a, M: ManagedTypeApi<'a>> {
+pub struct Fee<M: ManagedTypeApi> {
     pub num_token_to_transfer: usize,
-    pub value: EgldOrEsdtTokenPayment<'a, M>,
+    pub value: EgldOrEsdtTokenPayment<M>,
 }

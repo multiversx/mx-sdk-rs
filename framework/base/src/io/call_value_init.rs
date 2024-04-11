@@ -11,24 +11,24 @@ use crate::{
 };
 
 /// Called initially in the generated code whenever no payable annotation is provided.
-pub fn not_payable<'a, A>()
+pub fn not_payable<A>()
 where
-    A: CallValueApi<'a>,
+    A: CallValueApi,
 {
     A::call_value_api_impl().check_not_payable();
 }
 
 /// Called initially in the generated code whenever `#[payable("*")]` annotation is provided.
-pub fn payable_any<'a, A>()
+pub fn payable_any<A>()
 where
-    A: CallValueApi<'a>,
+    A: CallValueApi,
 {
 }
 
 /// Called initially in the generated code whenever `#[payable("EGLD")]` annotation is provided.
-pub fn payable_egld<'a, A>()
+pub fn payable_egld<A>()
 where
-    A: CallValueApi<'a> + ErrorApi,
+    A: CallValueApi + ErrorApi,
 {
     if A::call_value_api_impl().esdt_num_transfers() > 0 {
         A::error_api_impl().signal_error(err_msg::NON_PAYABLE_FUNC_ESDT.as_bytes());
@@ -38,11 +38,11 @@ where
 /// Called initially in the generated code whenever `#[payable("<token identifier>")]` annotation is provided.
 ///
 /// Was never really used, expected to be deprecated/removed.
-pub fn payable_single_specific_token<'a, A>(expected_tokend_identifier: &str)
+pub fn payable_single_specific_token<A>(expected_tokend_identifier: &str)
 where
-    A: CallValueApi<'a> + ManagedTypeApi<'a> + ErrorApi,
+    A: CallValueApi + ManagedTypeApi + ErrorApi,
 {
-    let transfers = CallValueWrapper::<'a, A>::new().all_esdt_transfers();
+    let transfers = CallValueWrapper::<A>::new().all_esdt_transfers();
     if transfers.len() != 1 {
         A::error_api_impl().signal_error(err_msg::SINGLE_ESDT_EXPECTED.as_bytes());
     }
@@ -62,37 +62,37 @@ where
 }
 
 /// Initializes an argument annotated with `#[payment_amount]` or `#[payment]`.
-pub fn arg_payment_amount<'a, A>() -> BigUint<'a, A>
+pub fn arg_payment_amount<A>() -> BigUint<A>
 where
-    A: CallValueApi<'a> + ManagedTypeApi<'a>,
+    A: CallValueApi + ManagedTypeApi,
 {
-    CallValueWrapper::<'a, A>::new().egld_or_single_esdt().amount
+    CallValueWrapper::<A>::new().egld_or_single_esdt().amount
 }
 
 /// Initializes an argument annotated with `#[payment_token]`.
-pub fn arg_payment_token<'a, A>() -> EgldOrEsdtTokenIdentifier<'a, A>
+pub fn arg_payment_token<A>() -> EgldOrEsdtTokenIdentifier<A>
 where
-    A: CallValueApi<'a> + ManagedTypeApi<'a>,
+    A: CallValueApi + ManagedTypeApi,
 {
-    CallValueWrapper::<'a, A>::new()
+    CallValueWrapper::<A>::new()
         .egld_or_single_esdt()
         .token_identifier
 }
 
 /// Initializes an argument annotated with `#[payment_nonce]`.
-pub fn arg_payment_nonce<'a, A>() -> u64
+pub fn arg_payment_nonce<A>() -> u64
 where
-    A: CallValueApi<'a> + ManagedTypeApi<'a>,
+    A: CallValueApi + ManagedTypeApi,
 {
-    CallValueWrapper::<'a, A>::new()
+    CallValueWrapper::<A>::new()
         .egld_or_single_esdt()
         .token_nonce
 }
 
 /// Initializes an argument annotated with `#[payment_multi]`.
-pub fn arg_payment_multi<'a, A>() -> ManagedRef<'static, A, ManagedVec<'a, A, EsdtTokenPayment<'a, A>>>
+pub fn arg_payment_multi<A>() -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>>
 where
-    A: CallValueApi<'a> + ManagedTypeApi<'a>,
+    A: CallValueApi + ManagedTypeApi,
 {
-    CallValueWrapper::<'a, A>::new().all_esdt_transfers()
+    CallValueWrapper::<A>::new().all_esdt_transfers()
 }

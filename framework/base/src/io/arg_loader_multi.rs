@@ -12,17 +12,17 @@ use crate::{
 ///
 /// Only used in `ArgNestedTuple`, do not use directly.
 #[derive(Default)]
-pub(super) struct EndpointDynArgLoader<'a, AA>
+pub(super) struct EndpointDynArgLoader<AA>
 where
-    AA: ManagedTypeApi<'a> + ErrorApi + EndpointArgumentApi<'a>,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     _phantom: PhantomData<AA>,
     current_index: i32,
 }
 
-impl<'a, AA> EndpointDynArgLoader<'a, AA>
+impl<AA> EndpointDynArgLoader<AA>
 where
-    AA: ManagedTypeApi<'a> + ErrorApi + EndpointArgumentApi<'a>,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
     pub fn new_at_index(current_index: i32) -> Self {
         EndpointDynArgLoader {
@@ -47,11 +47,11 @@ where
     }
 }
 
-impl<'a, AA> TopDecodeMultiInput for EndpointDynArgLoader<'a, AA>
+impl<AA> TopDecodeMultiInput for EndpointDynArgLoader<AA>
 where
-    AA: ManagedTypeApi<'a> + ErrorApi + EndpointArgumentApi<'a>,
+    AA: ManagedTypeApi + ErrorApi + EndpointArgumentApi,
 {
-    type ValueInput = ArgDecodeInput<'a, AA>;
+    type ValueInput = ArgDecodeInput<AA>;
 
     fn has_next(&self) -> bool {
         self.current_index < Self::num_arguments()

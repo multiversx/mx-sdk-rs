@@ -7,20 +7,20 @@ use super::ExternalViewApi;
 
 pub const EXTERNAL_VIEW_TARGET_ADRESS_KEY: &[u8] = b"external-view-target-address";
 
-impl<'a, A> StorageReadApi for ExternalViewApi<'a, A>
+impl<A> StorageReadApi for ExternalViewApi<A>
 where
-    A: VMApi<'a>,
+    A: VMApi,
 {
-    type StorageReadApiImpl = ExternalViewApi<'a, A>;
+    type StorageReadApiImpl = ExternalViewApi<A>;
 
     fn storage_read_api_impl() -> Self::StorageReadApiImpl {
         ExternalViewApi::new()
     }
 }
 
-impl<'a, A> ExternalViewApi<'a, A>
+impl<A> ExternalViewApi<A>
 where
-    A: VMApi<'a>,
+    A: VMApi,
 {
     /// Reads what lies in storage at `external-view-target-address` and loads into a managed buffer.
     /// The same managed buffer will be used for all reads in the tx.
@@ -43,7 +43,7 @@ where
     }
 }
 
-impl<'a, A: VMApi<'a>> StorageReadApiImpl for ExternalViewApi<'a, A> {
+impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
     fn storage_read_api_init(&self) {
         self.load_external_view_target_key_handle();
     }

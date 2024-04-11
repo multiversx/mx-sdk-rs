@@ -16,19 +16,19 @@ const DECODE_ERROR_BAD_LENGTH: &str = "bad array length";
 
 /// A list of items that lives inside a managed buffer.
 /// Items can be either stored there in full (e.g. `u32`),
-/// or just via handle (e.g. `BigUint<'a, M>`).
+/// or just via handle (e.g. `BigUint<M>`).
 #[repr(transparent)]
 #[derive(Clone)]
-pub struct ManagedByteArray<'a, M, const N: usize>
+pub struct ManagedByteArray<M, const N: usize>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    pub(crate) buffer: ManagedBuffer<'a, M>,
+    pub(crate) buffer: ManagedBuffer<M>,
 }
 
-impl<'a, M, const N: usize> ManagedType<'a, M> for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> ManagedType<M> for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     type OwnHandle = M::ManagedBufferHandle;
 
@@ -39,12 +39,8 @@ where
         }
     }
 
-    unsafe fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> M::ManagedBufferHandle {
         self.buffer.get_handle()
-    }
-
-    fn take_handle(self) -> Self::OwnHandle {
-        self.buffer.take_handle()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -52,9 +48,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> Default for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> Default for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn default() -> Self {
@@ -62,9 +58,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> From<&[u8; N]> for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> From<&[u8; N]> for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn from(bytes: &[u8; N]) -> Self {
@@ -72,9 +68,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> ManagedByteArray<'a, M, N>
+impl<M, const N: usize> ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     pub fn new_from_bytes(bytes: &[u8; N]) -> Self {
@@ -95,7 +91,7 @@ where
     }
 
     #[inline]
-    pub fn as_managed_buffer(&self) -> &ManagedBuffer<'a, M> {
+    pub fn as_managed_buffer(&self) -> &ManagedBuffer<M> {
         &self.buffer
     }
 
@@ -107,9 +103,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> PartialEq for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> PartialEq for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
@@ -117,15 +113,15 @@ where
     }
 }
 
-impl<'a, M, const N: usize> Eq for ManagedByteArray<'a, M, N> where M: ManagedTypeApi<'a> {}
+impl<M, const N: usize> Eq for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
-impl<'a, M, const N: usize> TryFrom<ManagedBuffer<'a, M>> for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> TryFrom<ManagedBuffer<M>> for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     type Error = DecodeError;
 
-    fn try_from(value: ManagedBuffer<'a, M>) -> Result<Self, Self::Error> {
+    fn try_from(value: ManagedBuffer<M>) -> Result<Self, Self::Error> {
         if value.len() != N {
             return Err(DecodeError::from(DECODE_ERROR_BAD_LENGTH));
         }
@@ -133,9 +129,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> TopEncode for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> TopEncode for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
@@ -147,9 +143,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> TopDecode for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> TopDecode for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
     where
@@ -169,9 +165,9 @@ pub(crate) struct ManagedBufferSizeContext(pub usize);
 
 impl TryStaticCast for ManagedBufferSizeContext {}
 
-impl<'a, M, const N: usize> NestedEncode for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> NestedEncode for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -179,7 +175,7 @@ where
         O: NestedEncodeOutput,
         H: EncodeErrorHandler,
     {
-        if O::supports_specialized_type::<ManagedBuffer<'a, M>>() {
+        if O::supports_specialized_type::<ManagedBuffer<M>>() {
             dest.push_specialized((), &self.buffer, h)
         } else {
             dest.write(self.buffer.to_boxed_bytes().as_slice());
@@ -188,16 +184,16 @@ where
     }
 }
 
-impl<'a, M, const N: usize> NestedDecode for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> NestedDecode for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
     where
         I: NestedDecodeInput,
         H: DecodeErrorHandler,
     {
-        let buffer = if I::supports_specialized_type::<ManagedBuffer<'a, M>>() {
+        let buffer = if I::supports_specialized_type::<ManagedBuffer<M>>() {
             input.read_specialized(ManagedBufferSizeContext(N), h)?
         } else {
             let byte_array = <[u8; N]>::dep_decode_or_handle_err(input, h)?;
@@ -207,9 +203,9 @@ where
     }
 }
 
-impl<'a, M, const N: usize> TypeAbi for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> TypeAbi for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> TypeName {
@@ -217,18 +213,18 @@ where
     }
 }
 
-impl<'a, M, const N: usize> SCLowerHex<'a> for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> SCLowerHex for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
-    fn fmt<F: FormatByteReceiver<'a>>(&self, f: &mut F) {
+    fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         SCLowerHex::fmt(&self.buffer, f)
     }
 }
 
-impl<'a, M, const N: usize> core::fmt::Debug for ManagedByteArray<'a, M, N>
+impl<M, const N: usize> core::fmt::Debug for ManagedByteArray<M, N>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedByteArray")

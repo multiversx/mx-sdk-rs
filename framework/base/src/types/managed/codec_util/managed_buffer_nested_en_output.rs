@@ -5,14 +5,14 @@ use crate::{
     types::{BigInt, BigUint, ManagedBuffer},
 };
 
-impl<'a, M: ManagedTypeApi<'a>> NestedEncodeOutput for ManagedBuffer<'a, M> {
+impl<M: ManagedTypeApi> NestedEncodeOutput for ManagedBuffer<M> {
     fn write(&mut self, bytes: &[u8]) {
         self.append_bytes(bytes);
     }
 
     #[inline]
     fn supports_specialized_type<T: TryStaticCast>() -> bool {
-        T::type_eq::<ManagedBuffer<'a, M>>() || T::type_eq::<BigUint<'a, M>>() || T::type_eq::<BigInt<'a, M>>()
+        T::type_eq::<ManagedBuffer<M>>() || T::type_eq::<BigUint<M>>() || T::type_eq::<BigInt<M>>()
     }
 
     #[inline]
@@ -27,7 +27,7 @@ impl<'a, M: ManagedTypeApi<'a>> NestedEncodeOutput for ManagedBuffer<'a, M> {
         C: TryStaticCast,
         H: EncodeErrorHandler,
     {
-        if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<'a, M>>() {
+        if let Some(managed_buffer) = value.try_cast_ref::<ManagedBuffer<M>>() {
             self.append(managed_buffer);
             Ok(())
         } else {

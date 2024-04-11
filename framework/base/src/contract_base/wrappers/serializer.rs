@@ -11,16 +11,16 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct ManagedSerializer<'a, M>
+pub struct ManagedSerializer<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi + 'static,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     _phantom: PhantomData<M>,
 }
 
-impl<'a, M> ManagedSerializer<'a, M>
+impl<M> ManagedSerializer<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi + 'static,
+    M: ManagedTypeApi + ErrorApi + 'static,
 {
     pub fn new() -> Self {
         ManagedSerializer {
@@ -28,11 +28,11 @@ where
         }
     }
 
-    pub fn top_encode_to_managed_buffer<T: TopEncode>(&self, value: &T) -> ManagedBuffer<'a, M> {
+    pub fn top_encode_to_managed_buffer<T: TopEncode>(&self, value: &T) -> ManagedBuffer<M> {
         let mut result = ManagedBuffer::new();
         let Ok(()) = value.top_encode_or_handle_err(
             &mut result,
-            ExitCodecErrorHandler::<'a, M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
         );
         result
     }
@@ -41,23 +41,23 @@ where
         let mut result = BoxedBytes::empty();
         let Ok(()) = value.top_encode_or_handle_err(
             &mut result,
-            ExitCodecErrorHandler::<'a, M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
+            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
         );
         result
     }
 
-    pub fn top_decode_from_managed_buffer<T: TopDecode>(&self, buffer: &ManagedBuffer<'a, M>) -> T {
+    pub fn top_decode_from_managed_buffer<T: TopDecode>(&self, buffer: &ManagedBuffer<M>) -> T {
         self.top_decode_from_managed_buffer_custom_message(buffer, err_msg::SERIALIZER_DECODE_ERROR)
     }
 
     pub fn top_decode_from_managed_buffer_custom_message<T: TopDecode>(
         &self,
-        buffer: &ManagedBuffer<'a, M>,
+        buffer: &ManagedBuffer<M>,
         error_message: &'static [u8],
     ) -> T {
         let Ok(value) = T::top_decode_or_handle_err(
             buffer.clone(), // TODO: remove clone
-            ExitCodecErrorHandler::<'a, M>::from(error_message),
+            ExitCodecErrorHandler::<M>::from(error_message),
         );
         value
     }
@@ -65,26 +65,26 @@ where
     pub fn top_decode_from_byte_slice<T: TopDecode>(&self, slice: &[u8]) -> T {
         let Ok(value) = T::top_decode_or_handle_err(
             slice,
-            ExitCodecErrorHandler::<'a, M>::from(err_msg::SERIALIZER_DECODE_ERROR),
+            ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_DECODE_ERROR),
         );
         value
     }
 }
 
 #[derive(Clone)]
-pub struct ExitCodecErrorHandler<'a, M>
+pub struct ExitCodecErrorHandler<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     _phantom: PhantomData<M>,
     pub base_message: &'static [u8],
 }
 
-impl<'a, M> Copy for ExitCodecErrorHandler<'a, M> where M: ManagedTypeApi<'a> + ErrorApi {}
+impl<M> Copy for ExitCodecErrorHandler<M> where M: ManagedTypeApi + ErrorApi {}
 
-impl<'a, M> From<&'static [u8]> for ExitCodecErrorHandler<'a, M>
+impl<M> From<&'static [u8]> for ExitCodecErrorHandler<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     fn from(base_message: &'static [u8]) -> Self {
         ExitCodecErrorHandler {
@@ -94,28 +94,28 @@ where
     }
 }
 
-impl<'a, M> EncodeErrorHandler for ExitCodecErrorHandler<'a, M>
+impl<M> EncodeErrorHandler for ExitCodecErrorHandler<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     type HandledErr = !;
 
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
-        let mut message_buffer = ManagedBuffer::<'a, M>::new_from_bytes(self.base_message);
+        let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);
         message_buffer.append_bytes(err.message_bytes());
-        M::error_api_impl().signal_error_from_buffer(message_buffer.take_handle())
+        M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
     }
 }
 
-impl<'a, M> DecodeErrorHandler for ExitCodecErrorHandler<'a, M>
+impl<M> DecodeErrorHandler for ExitCodecErrorHandler<M>
 where
-    M: ManagedTypeApi<'a> + ErrorApi,
+    M: ManagedTypeApi + ErrorApi,
 {
     type HandledErr = !;
 
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
-        let mut message_buffer = ManagedBuffer::<'a, M>::new_from_bytes(self.base_message);
+        let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);
         message_buffer.append_bytes(err.message_bytes());
-        M::error_api_impl().signal_error_from_buffer(message_buffer.take_handle())
+        M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
     }
 }

@@ -23,8 +23,8 @@ Custom functions can be defined by adding the name of it in `FunctionSelector`, 
 ```rust
 pub enum FunctionSelector<Self::Api>
 {
-	Linear(LinearFunction<'a, M>),
-	CustomExample(BigUint<'a, M>),
+	Linear(LinearFunction<M>),
+	CustomExample(BigUint<M>),
 	None,
 }
 ```

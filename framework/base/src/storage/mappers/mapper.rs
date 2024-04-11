@@ -1,11 +1,11 @@
 use crate::{api::StorageMapperApi, storage::StorageKey};
 
-pub trait StorageMapper<'a, SA>: 'static
+pub trait StorageMapper<SA>: 'static
 where
-    SA: StorageMapperApi<'a>,
+    SA: StorageMapperApi,
 {
     /// Will be called automatically by the `#[storage_mapper]` annotation generated code.
-    fn new(base_key: StorageKey<'a, SA>) -> Self;
+    fn new(base_key: StorageKey<SA>) -> Self;
 }
 
 pub trait StorageClearable {

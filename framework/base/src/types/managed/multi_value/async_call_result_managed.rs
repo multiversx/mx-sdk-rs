@@ -11,25 +11,25 @@ use crate::{
 const SAME_SHARD_SUCCESS_CODE: u32 = 0;
 const CROSS_SHARD_SUCCESS_CODE: u32 = 0x00006f6b; // "ok"
 
-pub struct ManagedAsyncCallError<'a, M>
+pub struct ManagedAsyncCallError<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     pub err_code: u32,
-    pub err_msg: ManagedBuffer<'a, M>,
+    pub err_msg: ManagedBuffer<M>,
 }
 
-pub enum ManagedAsyncCallResult<'a, M, T>
+pub enum ManagedAsyncCallResult<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     Ok(T),
-    Err(ManagedAsyncCallError<'a, M>),
+    Err(ManagedAsyncCallError<M>),
 }
 
-impl<'a, M, T> ManagedAsyncCallResult<'a, M, T>
+impl<M, T> ManagedAsyncCallResult<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     #[inline]
     pub fn is_ok(&self) -> bool {
@@ -42,9 +42,9 @@ where
     }
 }
 
-impl<'a, M, T> TopDecodeMulti for ManagedAsyncCallResult<'a, M, T>
+impl<M, T> TopDecodeMulti for ManagedAsyncCallResult<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     T: TopDecodeMulti,
 {
     fn multi_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
@@ -69,9 +69,9 @@ where
     }
 }
 
-impl<'a, M, T> TopEncodeMulti for ManagedAsyncCallResult<'a, M, T>
+impl<M, T> TopEncodeMulti for ManagedAsyncCallResult<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     T: TopEncodeMulti,
 {
     fn multi_encode_or_handle_err<O, H>(&self, output: &mut O, h: H) -> Result<(), H::HandledErr>
@@ -97,9 +97,9 @@ where
     }
 }
 
-impl<'a, M, T> TypeAbi for ManagedAsyncCallResult<'a, M, T>
+impl<M, T> TypeAbi for ManagedAsyncCallResult<M, T>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
     T: TypeAbi,
 {
     fn type_name() -> TypeName {

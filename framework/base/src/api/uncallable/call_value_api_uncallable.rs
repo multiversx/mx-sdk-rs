@@ -2,7 +2,7 @@ use crate::api::{CallValueApi, CallValueApiImpl};
 
 use super::UncallableApi;
 
-impl<'a> CallValueApi<'a> for UncallableApi {
+impl CallValueApi for UncallableApi {
     type CallValueApiImpl = UncallableApi;
 
     fn call_value_api_impl() -> Self::CallValueApiImpl {
@@ -10,7 +10,7 @@ impl<'a> CallValueApi<'a> for UncallableApi {
     }
 }
 
-impl<'a> CallValueApiImpl<'a> for UncallableApi {
+impl CallValueApiImpl for UncallableApi {
     fn check_not_payable(&self) {
         unreachable!()
     }

@@ -5,20 +5,20 @@ use crate::{
     types::{ManagedBuffer, ManagedVec},
 };
 
-pub struct ManagedResultArgLoader<'a, A>
+pub struct ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-    data: ManagedVec<'a, A, ManagedBuffer<'a, A>>,
+    data: ManagedVec<A, ManagedBuffer<A>>,
     data_len: usize,
     next_index: usize,
 }
 
-impl<'a, A> ManagedResultArgLoader<'a, A>
+impl<A> ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-    pub fn new(data: ManagedVec<'a, A, ManagedBuffer<'a, A>>) -> Self {
+    pub fn new(data: ManagedVec<A, ManagedBuffer<A>>) -> Self {
         let data_len = data.len();
         ManagedResultArgLoader {
             data,
@@ -28,11 +28,11 @@ where
     }
 }
 
-impl<'a, A> TopDecodeMultiInput for ManagedResultArgLoader<'a, A>
+impl<A> TopDecodeMultiInput for ManagedResultArgLoader<A>
 where
-    A: ManagedTypeApi<'a> + ErrorApi,
+    A: ManagedTypeApi + ErrorApi,
 {
-    type ValueInput = ManagedBuffer<'a, A>;
+    type ValueInput = ManagedBuffer<A>;
 
     fn has_next(&self) -> bool {
         self.next_index < self.data_len

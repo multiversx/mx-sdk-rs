@@ -1,7 +1,7 @@
 use crate::api::VMApi;
 
 pub trait CallbackProxyObjBase {
-    type Api<'a>: VMApi<'a>;
+    type Api: VMApi;
 
     fn new_cb_proxy_obj() -> Self;
 }

@@ -11,22 +11,22 @@ use super::{contract_call_no_payment::ContractCallNoPayment, ContractCall, Contr
 ///
 /// Gets created when chaining method `with_any_payment`.
 #[must_use]
-pub struct ContractCallWithAnyPayment<'a, SA, OriginalResult>
+pub struct ContractCallWithAnyPayment<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
-    pub basic: ContractCallNoPayment<'a, SA, OriginalResult>,
-    pub payment: EgldOrMultiEsdtPayment<'a, SA>,
+    pub basic: ContractCallNoPayment<SA, OriginalResult>,
+    pub payment: EgldOrMultiEsdtPayment<SA>,
 }
 
-impl<'a, SA, OriginalResult> ContractCall<'a, SA> for ContractCallWithAnyPayment<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCall<SA> for ContractCallWithAnyPayment<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
     OriginalResult: TopEncodeMulti,
 {
     type OriginalResult = OriginalResult;
 
-    fn into_normalized(self) -> ContractCallWithEgld<'a, SA, Self::OriginalResult> {
+    fn into_normalized(self) -> ContractCallWithEgld<SA, Self::OriginalResult> {
         match self.payment {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => self.basic.with_egld_transfer(egld_amount),
             EgldOrMultiEsdtPayment::MultiEsdt(multi_esdt_payment) => self
@@ -37,7 +37,7 @@ where
     }
 
     #[inline]
-    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<'a, SA, OriginalResult> {
+    fn get_mut_basic(&mut self) -> &mut ContractCallNoPayment<SA, OriginalResult> {
         &mut self.basic
     }
 
@@ -53,15 +53,15 @@ where
     }
 }
 
-impl<'a, SA, OriginalResult> ContractCallWithAnyPayment<'a, SA, OriginalResult>
+impl<SA, OriginalResult> ContractCallWithAnyPayment<SA, OriginalResult>
 where
-    SA: CallTypeApi<'a> + 'static,
+    SA: CallTypeApi + 'static,
 {
     /// Creates a new instance directly.
-    pub fn new<N: Into<ManagedBuffer<'a, SA>>>(
-        to: ManagedAddress<'a, SA>,
+    pub fn new<N: Into<ManagedBuffer<SA>>>(
+        to: ManagedAddress<SA>,
         endpoint_name: N,
-        payment: EgldOrMultiEsdtPayment<'a, SA>,
+        payment: EgldOrMultiEsdtPayment<SA>,
     ) -> Self {
         ContractCallWithAnyPayment {
             basic: ContractCallNoPayment::new(to, endpoint_name),

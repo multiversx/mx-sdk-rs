@@ -1,14 +1,14 @@
 use crate::{api::ManagedTypeApi, types::ManagedBuffer};
 
-pub trait ManagedBufferBuilderImpl<'a, M>
+pub trait ManagedBufferBuilderImpl<M>
 where
-    M: ManagedTypeApi<'a>,
+    M: ManagedTypeApi,
 {
     fn new_from_slice(slice: &[u8]) -> Self;
 
-    fn into_managed_buffer(self) -> ManagedBuffer<'a, M>;
+    fn into_managed_buffer(self) -> ManagedBuffer<M>;
 
     fn append_bytes(&mut self, bytes: &[u8]);
 
-    fn append_managed_buffer(&mut self, item: &ManagedBuffer<'a, M>);
+    fn append_managed_buffer(&mut self, item: &ManagedBuffer<M>);
 }

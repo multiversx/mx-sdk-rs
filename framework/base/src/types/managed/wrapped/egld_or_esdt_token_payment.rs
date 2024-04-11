@@ -17,13 +17,13 @@ use super::EsdtTokenPayment;
 #[derive(
     TopDecode, TopEncode, NestedDecode, NestedEncode, TypeAbi, Clone, PartialEq, Eq, Debug,
 )]
-pub struct EgldOrEsdtTokenPayment<'a, M: ManagedTypeApi<'a>> {
-    pub token_identifier: EgldOrEsdtTokenIdentifier<'a, M>,
+pub struct EgldOrEsdtTokenPayment<M: ManagedTypeApi> {
+    pub token_identifier: EgldOrEsdtTokenIdentifier<M>,
     pub token_nonce: u64,
-    pub amount: BigUint<'a, M>,
+    pub amount: BigUint<M>,
 }
 
-impl<'a, M: ManagedTypeApi<'a>> EgldOrEsdtTokenPayment<'a, M> {
+impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
     pub fn no_payment() -> Self {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::egld(),
@@ -33,9 +33,9 @@ impl<'a, M: ManagedTypeApi<'a>> EgldOrEsdtTokenPayment<'a, M> {
     }
 
     pub fn new(
-        token_identifier: EgldOrEsdtTokenIdentifier<'a, M>,
+        token_identifier: EgldOrEsdtTokenIdentifier<M>,
         token_nonce: u64,
-        amount: BigUint<'a, M>,
+        amount: BigUint<M>,
     ) -> Self {
         EgldOrEsdtTokenPayment {
             token_identifier,
@@ -45,7 +45,7 @@ impl<'a, M: ManagedTypeApi<'a>> EgldOrEsdtTokenPayment<'a, M> {
     }
 
     /// Will convert to just ESDT or terminate execution if the token is EGLD.
-    pub fn unwrap_esdt(self) -> EsdtTokenPayment<'a, M> {
+    pub fn unwrap_esdt(self) -> EsdtTokenPayment<M> {
         EsdtTokenPayment::new(
             self.token_identifier.unwrap_esdt(),
             self.token_nonce,
@@ -53,23 +53,23 @@ impl<'a, M: ManagedTypeApi<'a>> EgldOrEsdtTokenPayment<'a, M> {
         )
     }
 
-    pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<'a, M>, u64, BigUint<'a, M>) {
+    pub fn into_tuple(self) -> (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>) {
         (self.token_identifier, self.token_nonce, self.amount)
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> From<(EgldOrEsdtTokenIdentifier<'a, M>, u64, BigUint<'a, M>)>
-    for EgldOrEsdtTokenPayment<'a, M>
+impl<M: ManagedTypeApi> From<(EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>)>
+    for EgldOrEsdtTokenPayment<M>
 {
     #[inline]
-    fn from(value: (EgldOrEsdtTokenIdentifier<'a, M>, u64, BigUint<'a, M>)) -> Self {
+    fn from(value: (EgldOrEsdtTokenIdentifier<M>, u64, BigUint<M>)) -> Self {
         let (token_identifier, token_nonce, amount) = value;
         Self::new(token_identifier, token_nonce, amount)
     }
 }
 
-impl<'a, M: ManagedTypeApi<'a>> From<EsdtTokenPayment<'a, M>> for EgldOrEsdtTokenPayment<'a, M> {
-    fn from(esdt_payment: EsdtTokenPayment<'a, M>) -> Self {
+impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EgldOrEsdtTokenPayment<M> {
+    fn from(esdt_payment: EsdtTokenPayment<M>) -> Self {
         EgldOrEsdtTokenPayment {
             token_identifier: EgldOrEsdtTokenIdentifier::esdt(esdt_payment.token_identifier),
             token_nonce: esdt_payment.token_nonce,
@@ -78,6 +78,6 @@ impl<'a, M: ManagedTypeApi<'a>> From<EsdtTokenPayment<'a, M>> for EgldOrEsdtToke
     }
 }
 
-impl<'a, M> CodecFromSelf for EgldOrEsdtTokenPayment<'a, M> where M: ManagedTypeApi<'a> {}
+impl<M> CodecFromSelf for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}
 
-impl<'a, M> CodecFrom<&[u8]> for EgldOrEsdtTokenPayment<'a, M> where M: ManagedTypeApi<'a> {}
+impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}

@@ -2,7 +2,7 @@ use crate::api::{ManagedTypeApi, ManagedTypeApiImpl};
 
 use super::UncallableApi;
 
-impl<'a> ManagedTypeApi<'a> for UncallableApi {
+impl ManagedTypeApi for UncallableApi {
     type ManagedTypeApiImpl = Self;
 
     fn managed_type_impl() -> Self::ManagedTypeApiImpl {
@@ -10,7 +10,7 @@ impl<'a> ManagedTypeApi<'a> for UncallableApi {
     }
 }
 
-impl<'a> ManagedTypeApiImpl<'a> for UncallableApi {
+impl ManagedTypeApiImpl for UncallableApi {
     fn mb_to_big_int_unsigned(
         &self,
         _buffer_handle: Self::ManagedBufferHandle,

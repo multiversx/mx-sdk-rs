@@ -28,16 +28,16 @@ use super::SendRawWrapper;
 // pub trait SendApi: Clone + Sized {
 
 #[derive(Default)]
-pub struct SendWrapper<'a, A>
+pub struct SendWrapper<A>
 where
-    A: CallTypeApi<'a> + StorageReadApi + BlockchainApi<'a>,
+    A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
     _phantom: PhantomData<A>,
 }
 
-impl<'a, A> SendWrapper<'a, A>
+impl<A> SendWrapper<A>
 where
-    A: CallTypeApi<'a> + StorageReadApi + BlockchainApi<'a>,
+    A: CallTypeApi + StorageReadApi + BlockchainApi,
 {
     pub fn new() -> Self {
         SendWrapper {
@@ -46,7 +46,7 @@ where
     }
 
     #[inline]
-    fn send_raw_wrapper(&self) -> SendRawWrapper<'a, A> {
+    fn send_raw_wrapper(&self) -> SendRawWrapper<A> {
         SendRawWrapper::new()
     }
 
@@ -54,7 +54,7 @@ where
     ///
     /// Use the methods of this proxy to launch contract calls to the system SC.
     #[inline]
-    pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<'a, A> {
+    pub fn esdt_system_sc_proxy(&self) -> ESDTSystemSmartContractProxy<A> {
         ESDTSystemSmartContractProxy::new_proxy_obj()
     }
 
@@ -64,16 +64,16 @@ where
     #[inline]
     pub fn contract_call<R>(
         &self,
-        to: ManagedAddress<'a, A>,
-        endpoint_name: impl Into<ManagedBuffer<'a, A>>,
-    ) -> ContractCallNoPayment<'a, A, R> {
+        to: ManagedAddress<A>,
+        endpoint_name: impl Into<ManagedBuffer<A>>,
+    ) -> ContractCallNoPayment<A, R> {
         ContractCallNoPayment::new(to, endpoint_name)
     }
 
     /// Sends EGLD to a given address, directly.
     /// Used especially for sending EGLD to regular accounts.
     #[inline]
-    pub fn direct_egld(&self, to: &ManagedAddress<'a, A>, amount: &BigUint<'a, A>) {
+    pub fn direct_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
         self.send_raw_wrapper().direct_egld(to, amount, Empty)
     }
 
@@ -81,7 +81,7 @@ where
     /// Used especially for sending EGLD to regular accounts.
     ///
     /// If the amount is 0, it returns without error.
-    pub fn direct_non_zero_egld(&self, to: &ManagedAddress<'a, A>, amount: &BigUint<'a, A>) {
+    pub fn direct_non_zero_egld(&self, to: &ManagedAddress<A>, amount: &BigUint<A>) {
         if amount == &0 {
             return;
         }
@@ -94,10 +94,10 @@ where
     #[inline]
     pub fn direct(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token: &EgldOrEsdtTokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
     ) {
         self.direct_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
@@ -109,10 +109,10 @@ where
     #[inline]
     pub fn direct_non_zero(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token: &EgldOrEsdtTokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
     ) {
         self.direct_non_zero_with_gas_limit(to, token, nonce, amount, 0, Empty, &[]);
     }
@@ -123,15 +123,15 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt_with_gas_limit<D>(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token_identifier: &TokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token_identifier: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
         gas: u64,
         endpoint_name: D,
-        arguments: &[ManagedBuffer<'a, A>],
+        arguments: &[ManagedBuffer<A>],
     ) where
-        D: Into<ManagedBuffer<'a, A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         if nonce == 0 {
             let _ = self.send_raw_wrapper().transfer_esdt_execute(
@@ -163,15 +163,15 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn direct_non_zero_esdt_with_gas_limit<D>(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token_identifier: &TokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token_identifier: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
         gas: u64,
         endpoint_name: D,
-        arguments: &[ManagedBuffer<'a, A>],
+        arguments: &[ManagedBuffer<A>],
     ) where
-        D: Into<ManagedBuffer<'a, A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         if amount == &0 {
             return;
@@ -192,10 +192,10 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn direct_esdt(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token_identifier: &TokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token_identifier: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
     ) {
         self.direct_esdt_with_gas_limit(to, token_identifier, nonce, amount, 0, Empty, &[]);
     }
@@ -205,8 +205,8 @@ where
     /// If the amount is 0, it returns without error.
     pub fn direct_non_zero_esdt_payment(
         &self,
-        to: &ManagedAddress<'a, A>,
-        payment: &EsdtTokenPayment<'a, A>,
+        to: &ManagedAddress<A>,
+        payment: &EsdtTokenPayment<A>,
     ) {
         if payment.amount == 0 {
             return;
@@ -228,15 +228,15 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn direct_with_gas_limit<D>(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token: &EgldOrEsdtTokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
         gas: u64,
         endpoint_name: D,
-        arguments: &[ManagedBuffer<'a, A>],
+        arguments: &[ManagedBuffer<A>],
     ) where
-        D: Into<ManagedBuffer<'a, A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         if let Some(esdt_token_identifier) = token.as_esdt_option() {
             self.direct_esdt_with_gas_limit(
@@ -268,15 +268,15 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn direct_non_zero_with_gas_limit<D>(
         &self,
-        to: &ManagedAddress<'a, A>,
-        token: &EgldOrEsdtTokenIdentifier<'a, A>,
+        to: &ManagedAddress<A>,
+        token: &EgldOrEsdtTokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
         gas: u64,
         endpoint_name: D,
-        arguments: &[ManagedBuffer<'a, A>],
+        arguments: &[ManagedBuffer<A>],
     ) where
-        D: Into<ManagedBuffer<'a, A>>,
+        D: Into<ManagedBuffer<A>>,
     {
         if amount == &0 {
             return;
@@ -287,8 +287,8 @@ where
     /// Sends multiple ESDT tokens to a target address.
     pub fn direct_multi(
         &self,
-        to: &ManagedAddress<'a, A>,
-        payments: &ManagedVec<'a, A, EsdtTokenPayment<'a, A>>,
+        to: &ManagedAddress<A>,
+        payments: &ManagedVec<A, EsdtTokenPayment<A>>,
     ) {
         let _ = self.send_raw_wrapper().multi_esdt_transfer_execute(
             to,
@@ -309,12 +309,12 @@ where
     /// Note that EGLD can NOT be transfered with this function.  
     pub fn transfer_esdt_via_async_call(
         &self,
-        to: ManagedAddress<'a, A>,
-        token: TokenIdentifier<'a, A>,
+        to: ManagedAddress<A>,
+        token: TokenIdentifier<A>,
         nonce: u64,
-        amount: BigUint<'a, A>,
+        amount: BigUint<A>,
     ) -> ! {
-        ContractCallNoPayment::<'a, A, ()>::new(to, ManagedBuffer::new())
+        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_esdt_transfer((token, nonce, amount))
             .async_call()
             .call_and_exit_ignore_callback()
@@ -331,15 +331,15 @@ where
     /// If the amount is 0, it returns without error.
     pub fn transfer_esdt_non_zero_via_async_call(
         &self,
-        to: ManagedAddress<'a, A>,
-        token: TokenIdentifier<'a, A>,
+        to: ManagedAddress<A>,
+        token: TokenIdentifier<A>,
         nonce: u64,
-        amount: BigUint<'a, A>,
+        amount: BigUint<A>,
     ) {
         if amount == 0 {
             return;
         }
-        ContractCallNoPayment::<'a, A, ()>::new(to, ManagedBuffer::new())
+        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_esdt_transfer((token, nonce, amount))
             .async_call()
             .call_and_exit_ignore_callback()
@@ -348,10 +348,10 @@ where
     /// Sends multiple ESDT tokens to a target address, via an async call.
     pub fn transfer_multiple_esdt_via_async_call(
         &self,
-        to: ManagedAddress<'a, A>,
-        payments: ManagedVec<'a, A, EsdtTokenPayment<'a, A>>,
+        to: ManagedAddress<A>,
+        payments: ManagedVec<A, EsdtTokenPayment<A>>,
     ) -> ! {
-        ContractCallNoPayment::<'a, A, ()>::new(to, ManagedBuffer::new())
+        ContractCallNoPayment::<A, ()>::new(to, ManagedBuffer::new())
             .with_multi_token_transfer(payments)
             .async_call()
             .call_and_exit_ignore_callback()
@@ -362,8 +362,8 @@ where
     /// In itself, this does nothing. You need to then call turn the contract call into an async call.
     pub fn claim_developer_rewards(
         &self,
-        child_sc_address: ManagedAddress<'a, A>,
-    ) -> ContractCallNoPayment<'a, A, ()> {
+        child_sc_address: ManagedAddress<A>,
+    ) -> ContractCallNoPayment<A, ()> {
         ContractCallNoPayment::new(child_sc_address, CLAIM_DEVELOPER_REWARDS_FUNC_NAME)
     }
 
@@ -372,9 +372,9 @@ where
     /// In itself, this does nothing. You need to then call turn the contract call into an async call.
     pub fn change_owner_address(
         &self,
-        child_sc_address: ManagedAddress<'a, A>,
-        new_owner: &ManagedAddress<'a, A>,
-    ) -> ContractCallNoPayment<'a, A, ()> {
+        child_sc_address: ManagedAddress<A>,
+        new_owner: &ManagedAddress<A>,
+    ) -> ContractCallNoPayment<A, ()> {
         self.contract_call(child_sc_address, CHANGE_OWNER_BUILTIN_FUNC_NAME)
             .argument(&new_owner)
     }
@@ -385,9 +385,9 @@ where
     pub fn call_local_esdt_built_in_function(
         &self,
         gas: u64,
-        endpoint_name: &ManagedBuffer<'a, A>,
-        arg_buffer: &ManagedArgBuffer<'a, A>,
-    ) -> ManagedVec<'a, A, ManagedBuffer<'a, A>> {
+        endpoint_name: &ManagedBuffer<A>,
+        arg_buffer: &ManagedArgBuffer<A>,
+    ) -> ManagedVec<A, ManagedBuffer<A>> {
         self.send_raw_wrapper()
             .call_local_esdt_built_in_function(gas, endpoint_name, arg_buffer)
     }
@@ -400,7 +400,7 @@ where
     /// For SFTs, you must use `self.send().esdt_nft_create()` before adding additional quantity.
     ///
     /// This function cannot be used for NFTs.
-    pub fn esdt_local_mint(&self, token: &TokenIdentifier<'a, A>, nonce: u64, amount: &BigUint<'a, A>) {
+    pub fn esdt_local_mint(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new();
         let func_name: &str;
 
@@ -433,9 +433,9 @@ where
     /// If the amount is 0, it returns without error.
     pub fn esdt_non_zero_local_mint(
         &self,
-        token: &TokenIdentifier<'a, A>,
+        token: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
     ) {
         if amount == &0 {
             return;
@@ -447,7 +447,7 @@ where
     ///
     /// Note that the SC must have the ESDTLocalBurn or ESDTNftBurn roles set,
     /// or this will fail with "action is not allowed".
-    pub fn esdt_local_burn(&self, token: &TokenIdentifier<'a, A>, nonce: u64, amount: &BigUint<'a, A>) {
+    pub fn esdt_local_burn(&self, token: &TokenIdentifier<A>, nonce: u64, amount: &BigUint<A>) {
         let mut arg_buffer = ManagedArgBuffer::new();
         let func_name: &str;
 
@@ -476,9 +476,9 @@ where
     /// If the amount is 0, it returns without error.
     pub fn esdt_non_zero_local_burn(
         &self,
-        token: &TokenIdentifier<'a, A>,
+        token: &TokenIdentifier<A>,
         nonce: u64,
-        amount: &BigUint<'a, A>,
+        amount: &BigUint<A>,
     ) {
         if amount == &0 {
             return;
@@ -489,7 +489,7 @@ where
     /// Allows burning of multiple ESDT tokens at once.
     ///
     /// Will execute a synchronous call to the appropriate burn builtin function for each.
-    pub fn esdt_local_burn_multi(&self, payments: &ManagedVec<'a, A, EsdtTokenPayment<'a, A>>) {
+    pub fn esdt_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
         for payment in payments {
             self.esdt_local_burn(
                 &payment.token_identifier,
@@ -504,7 +504,7 @@ where
     /// Will execute a synchronous call to the appropriate burn builtin function for each.
     ///
     /// If any of the token amounts is 0 skips that token without throwing error.
-    pub fn esdt_non_zero_local_burn_multi(&self, payments: &ManagedVec<'a, A, EsdtTokenPayment<'a, A>>) {
+    pub fn esdt_non_zero_local_burn_multi(&self, payments: &ManagedVec<A, EsdtTokenPayment<A>>) {
         for payment in payments {
             self.esdt_non_zero_local_burn(
                 &payment.token_identifier,
@@ -525,13 +525,13 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_create<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<'a, A>,
-        amount: &BigUint<'a, A>,
-        name: &ManagedBuffer<'a, A>,
-        royalties: &BigUint<'a, A>,
-        hash: &ManagedBuffer<'a, A>,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
+        royalties: &BigUint<A>,
+        hash: &ManagedBuffer<A>,
         attributes: &T,
-        uris: &ManagedVec<'a, A, ManagedBuffer<'a, A>>,
+        uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
         let mut arg_buffer = ManagedArgBuffer::new();
         arg_buffer.push_arg(token);
@@ -578,13 +578,13 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_non_zero_nft_create<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<'a, A>,
-        amount: &BigUint<'a, A>,
-        name: &ManagedBuffer<'a, A>,
-        royalties: &BigUint<'a, A>,
-        hash: &ManagedBuffer<'a, A>,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
+        royalties: &BigUint<A>,
+        hash: &ManagedBuffer<A>,
         attributes: &T,
-        uris: &ManagedVec<'a, A, ManagedBuffer<'a, A>>,
+        uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) -> u64 {
         if amount == &0 {
             0
@@ -599,8 +599,8 @@ where
     #[inline]
     pub fn esdt_nft_create_compact<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<'a, A>,
-        amount: &BigUint<'a, A>,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
         attributes: &T,
     ) -> u64 {
         self.esdt_nft_create_compact_named(token, amount, &ManagedBuffer::new(), attributes)
@@ -611,9 +611,9 @@ where
     /// Returns the new NFT nonce.
     pub fn esdt_nft_create_compact_named<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<'a, A>,
-        amount: &BigUint<'a, A>,
-        name: &ManagedBuffer<'a, A>,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
         attributes: &T,
     ) -> u64 {
         let big_zero = BigUint::zero();
@@ -639,8 +639,8 @@ where
     #[inline]
     pub fn esdt_non_zero_nft_create_compact<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<'a, A>,
-        amount: &BigUint<'a, A>,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
         attributes: &T,
     ) -> u64 {
         self.esdt_non_zero_nft_create_compact_named(
@@ -658,9 +658,9 @@ where
     /// If the amount is 0, it returns without error.
     pub fn esdt_non_zero_nft_create_compact_named<T: codec::TopEncode>(
         &self,
-        token: &TokenIdentifier<'a, A>,
-        amount: &BigUint<'a, A>,
-        name: &ManagedBuffer<'a, A>,
+        token: &TokenIdentifier<A>,
+        amount: &BigUint<A>,
+        name: &ManagedBuffer<A>,
         attributes: &T,
     ) -> u64 {
         if amount == &0 {
@@ -676,16 +676,16 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft(
         &self,
-        nft_id: &TokenIdentifier<'a, A>,
+        nft_id: &TokenIdentifier<A>,
         nft_nonce: u64,
-        nft_amount: &BigUint<'a, A>,
-        buyer: &ManagedAddress<'a, A>,
-        payment_token: &EgldOrEsdtTokenIdentifier<'a, A>,
+        nft_amount: &BigUint<A>,
+        buyer: &ManagedAddress<A>,
+        payment_token: &EgldOrEsdtTokenIdentifier<A>,
         payment_nonce: u64,
-        payment_amount: &BigUint<'a, A>,
-    ) -> BigUint<'a, A> {
-        let nft_token_data = BlockchainWrapper::<'a, A>::new().get_esdt_token_data(
-            &BlockchainWrapper::<'a, A>::new().get_sc_address(),
+        payment_amount: &BigUint<A>,
+    ) -> BigUint<A> {
+        let nft_token_data = BlockchainWrapper::<A>::new().get_esdt_token_data(
+            &BlockchainWrapper::<A>::new().get_sc_address(),
             nft_id,
             nft_nonce,
         );
@@ -723,14 +723,14 @@ where
     #[allow(clippy::too_many_arguments)]
     pub fn sell_nft_non_zero(
         &self,
-        nft_id: &TokenIdentifier<'a, A>,
+        nft_id: &TokenIdentifier<A>,
         nft_nonce: u64,
-        nft_amount: &BigUint<'a, A>,
-        buyer: &ManagedAddress<'a, A>,
-        payment_token: &EgldOrEsdtTokenIdentifier<'a, A>,
+        nft_amount: &BigUint<A>,
+        buyer: &ManagedAddress<A>,
+        payment_token: &EgldOrEsdtTokenIdentifier<A>,
         payment_nonce: u64,
-        payment_amount: &BigUint<'a, A>,
-    ) -> BigUint<'a, A> {
+        payment_amount: &BigUint<A>,
+    ) -> BigUint<A> {
         if nft_amount == &0 || payment_amount == &0 {
             payment_amount.clone()
         } else {
@@ -749,9 +749,9 @@ where
     /// Adds a new URI to an NFT, via a synchronous builtin function call.
     pub fn nft_add_uri(
         &self,
-        token_id: &TokenIdentifier<'a, A>,
+        token_id: &TokenIdentifier<A>,
         nft_nonce: u64,
-        new_uri: ManagedBuffer<'a, A>,
+        new_uri: ManagedBuffer<A>,
     ) {
         self.nft_add_multiple_uri(token_id, nft_nonce, &ManagedVec::from_single_item(new_uri));
     }
@@ -759,9 +759,9 @@ where
     /// Adds a multiple URIs to an NFT, via a synchronous builtin function call.
     pub fn nft_add_multiple_uri(
         &self,
-        token_id: &TokenIdentifier<'a, A>,
+        token_id: &TokenIdentifier<A>,
         nft_nonce: u64,
-        new_uris: &ManagedVec<'a, A, ManagedBuffer<'a, A>>,
+        new_uris: &ManagedVec<A, ManagedBuffer<A>>,
     ) {
         if new_uris.is_empty() {
             return;
@@ -785,7 +785,7 @@ where
     /// Changes attributes of an NFT, via a synchronous builtin function call.
     pub fn nft_update_attributes<T: codec::TopEncode>(
         &self,
-        token_id: &TokenIdentifier<'a, A>,
+        token_id: &TokenIdentifier<A>,
         nft_nonce: u64,
         new_attributes: &T,
     ) {
