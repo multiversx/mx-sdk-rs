@@ -1,54 +1,46 @@
-use super::scenario_cli::AccountArgs;
+use crate::imports::Bech32Address;
+
 use multiversx_chain_scenario_format::serde_raw::{
     AccountRaw, EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, ScenarioRaw, StepRaw, ValueSubTree,
 };
+use multiversx_chain_vm::display_util::key_hex;
 use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address, esdt::EsdtBalance},
 };
 use std::collections::{BTreeMap, HashMap};
 
-pub async fn print_account_as_scenario_set_state(api: String, args: &AccountArgs) {
-    let scenario_raw =
-        retrieve_account_as_scenario_set_state(api, args.address.clone(), false).await;
+pub async fn print_account_as_scenario_set_state(
+    api: &CommunicationProxy,
+    address: &Bech32Address,
+) {
+    let scenario_raw = retrieve_account_as_scenario_set_state(api, address).await;
     println!("{}", scenario_raw.to_json_string());
 }
 
 pub async fn retrieve_account_as_scenario_set_state(
-    api: String,
-    addr: String,
-    hex_encoded: bool,
+    api: &CommunicationProxy,
+    addr: &Bech32Address,
 ) -> ScenarioRaw {
-    let address = Address::from_bech32_string(&addr).unwrap();
-    let blockchain = CommunicationProxy::new(api);
-    let account = blockchain.get_account(&address).await.unwrap();
+    let address = Address::from_bech32_string(addr.to_bech32_str()).unwrap();
+    let account = api.get_account(&address).await.unwrap();
 
-    let account_esdt = blockchain
+    let account_esdt = api
         .get_account_esdt_tokens(&address)
         .await
         .unwrap_or_else(|err| panic!("failed to retrieve ESDT tokens for address {addr}: {err}"));
-    let account_esdt_roles = blockchain
+    let account_esdt_roles = api
         .get_account_esdt_roles(&address)
         .await
         .unwrap_or_else(|err| panic!("failed to retrieve ESDT roles for address {addr}: {err}"));
-    let account_storage = blockchain
+    let account_storage = api
         .get_account_storage_keys(&address)
         .await
         .unwrap_or_else(|err| panic!("failed to retrieve storage for address {addr}: {err}"));
 
-    let addr_pretty = if !hex_encoded {
-        if account.code.is_empty() {
-            format!("address:{addr}")
-        } else {
-            format!("sc:{addr}")
-        }
-    } else {
-        format!("0x{}", hex::encode(address.to_bytes()))
-    };
-
     let mut accounts = BTreeMap::new();
     accounts.insert(
-        addr_pretty,
+        key_hex(&address.to_bytes()),
         AccountRaw {
             nonce: Some(ValueSubTree::Str(account.nonce.to_string())),
             balance: Some(ValueSubTree::Str(account.balance.to_string())),
