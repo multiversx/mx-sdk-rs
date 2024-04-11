@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{imports::*, scenario_model::U64Value};
+use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
 
 use adder::*;
@@ -6,7 +6,6 @@ use adder::*;
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
 const OWNER: AddressExpr = AddressExpr("owner");
-const OTHER: AddressExpr = AddressExpr("other");
 const SC_ADDER: ScExpr = ScExpr("adder");
 const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
 
@@ -22,39 +21,14 @@ fn world() -> ScenarioWorld {
 fn adder_blackbox() {
     let mut world = world();
     let owner_address = "address:owner";
-    let other_address = "address:other";
-
     let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace();
 
-    world
-        .set_state()
-        .account(owner_address)
-        .nonce(1)
-        .balance("100")
-        .new_address(owner_address, 1, "sc:adder")
-        .account(other_address)
-        .nonce(2)
-        .balance("300")
-        .esdt_balance("str:TOKEN-123456", "500")
-        .commit();
-
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(
-                owner_address,
-                CheckAccount::new()
-                    .nonce(U64Value::from(1u64))
-                    .balance("100"),
-            )
-            .put_account(
-                other_address,
-                CheckAccount::new()
-                    .nonce(U64Value::from(2u64))
-                    .balance("300")
-                    .esdt_balance("str:TOKEN-123456", "500"),
-            ),
+    world.set_state_step(
+        SetStateStep::new()
+            .put_account(owner_address, Account::new().nonce(1))
+            .new_address(owner_address, 1, "sc:adder"),
     );
 
     let new_address = world
@@ -79,14 +53,6 @@ fn adder_blackbox() {
 
     world
         .tx()
-        .from(OTHER)
-        .to(SC_ADDER)
-        .typed(adder_proxy::AdderProxy)
-        .add(1u32)
-        .run();
-
-    world
-        .tx()
         .from(OWNER)
         .to(SC_ADDER)
         .typed(adder_proxy::AdderProxy)
@@ -98,7 +64,7 @@ fn adder_blackbox() {
             .put_account(owner_address, CheckAccount::new())
             .put_account(
                 &adder_contract,
-                CheckAccount::new().check_storage("str:sum", "7"),
+                CheckAccount::new().check_storage("str:sum", "6"),
             ),
     );
 

@@ -100,8 +100,22 @@ impl ScenarioWorld {
         self
     }
 
-    pub fn set_state(&mut self) -> SetStateBuilder<'_> {
-        SetStateBuilder::new(self)
+    pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_>
+    where
+        AddressKey: From<A>,
+    {
+        let mut builder = SetStateBuilder::new(self);
+        if builder.address_expr != AddressKey::default() {
+            builder
+                .set_state_step
+                .accounts
+                .insert(builder.address_expr, builder.current_account);
+        }
+
+        builder.current_account = Account::new();
+        builder.address_expr = AddressKey::from(address_expr);
+
+        builder
     }
 }
 
@@ -120,22 +134,6 @@ impl<'w> SetStateBuilder<'w> {
             set_state_step: SetStateStep::new(),
             address_expr: AddressKey::default(),
         }
-    }
-
-    pub fn account<A>(mut self, address_expr: A) -> Self
-    where
-        AddressKey: From<A>,
-    {
-        if self.address_expr != AddressKey::default() {
-            self.set_state_step
-                .accounts
-                .insert(self.address_expr, self.current_account);
-        }
-
-        self.current_account = Account::new();
-        self.address_expr = AddressKey::from(address_expr);
-
-        self
     }
 
     pub fn nonce<V>(mut self, nonce: V) -> Self
@@ -284,25 +282,6 @@ impl<'w> SetStateBuilder<'w> {
         AddressValue: From<V>,
     {
         self.current_account.owner = Some(AddressValue::from(owner_expr));
-        self
-    }
-
-    pub fn new_address<CA, NA>(
-        mut self,
-        creator_address_expr: CA,
-        creator_nonce_expr: u64,
-        new_address_expr: NA,
-    ) -> Self
-    where
-        AddressValue: From<CA>,
-        AddressValue: From<NA>,
-    {
-        self.set_state_step.new_addresses.push(NewAddress {
-            creator_address: AddressValue::from(creator_address_expr),
-            creator_nonce: U64Value::from(creator_nonce_expr),
-            new_address: AddressValue::from(new_address_expr),
-        });
-
         self
     }
 
