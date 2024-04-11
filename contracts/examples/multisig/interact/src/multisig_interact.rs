@@ -120,7 +120,7 @@ impl MultisigInteract {
                 bech32::encode(board_member_address)
             );
             self.interactor
-                .retrieve_account(&Bech32Address::from(board_member_address))
+                .retrieve_account(&board_member_address.into())
                 .await;
         }
 

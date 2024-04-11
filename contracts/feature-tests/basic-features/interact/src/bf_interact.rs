@@ -73,7 +73,9 @@ impl BasicFeaturesInteract {
 
     async fn set_state(&mut self) {
         println!("wallet address: {}", bech32::encode(&self.wallet_address));
-        self.interactor.retrieve_account(&Bech32Address::from(&self.wallet_address)).await;
+        self.interactor
+            .retrieve_account(&Bech32Address::from(&self.wallet_address))
+            .await;
     }
 
     async fn deploy(&mut self) {

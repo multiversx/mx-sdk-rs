@@ -4,7 +4,6 @@ use crate::{
 };
 
 use multiversx_chain_scenario_format::interpret_trait::IntoRaw;
-use multiversx_chain_vm::display_util::key_hex;
 use multiversx_sdk::{
     blockchain::CommunicationProxy,
     data::{address::Address, esdt::EsdtBalance},
@@ -18,6 +17,15 @@ pub async fn print_account_as_scenario_set_state(
     let set_state = retrieve_account_as_scenario_set_state(api, address).await;
     let scenario = build_scenario(set_state);
     println!("{}", scenario.into_raw().to_json_string());
+}
+
+fn build_scenario(set_state: SetStateStep) -> Scenario {
+    Scenario {
+        name: None,
+        comment: None,
+        check_gas: None,
+        steps: vec![crate::scenario_model::Step::SetState(set_state)],
+    }
 }
 
 pub async fn retrieve_account_as_scenario_set_state(
@@ -51,15 +59,6 @@ pub async fn retrieve_account_as_scenario_set_state(
 
     let set_state_step = SetStateStep::new();
     set_state_step.put_account(address, account_state)
-}
-
-pub fn build_scenario(set_state: SetStateStep) -> Scenario {
-    Scenario {
-        name: None,
-        comment: None,
-        check_gas: None,
-        steps: vec![crate::scenario_model::Step::SetState(set_state)],
-    }
 }
 
 pub fn set_account(
