@@ -4,7 +4,7 @@ use crate::scenario_model::TransferStep;
 
 use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
 
-impl<Env, From, To, Payment, Gas> TxToStep for Tx<Env, From, To, Payment, Gas, (), ()>
+impl<Env, From, To, Payment, Gas> TxToStep<Env, ()> for Tx<Env, From, To, Payment, Gas, (), ()>
 where
     Env: TxEnv,
     From: TxFromSpecified<Env>,
@@ -12,13 +12,9 @@ where
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
 {
-    type Env = Env;
-
     type Step = TransferStep;
 
-    type RH = ();
-
-    fn tx_to_step(self) -> StepWrapper<Self::Env, Self::Step, Self::RH> {
+    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, ()> {
         let step = tx_to_transfer_step(&self.env, self.from, self.to, self.payment, self.gas);
 
         StepWrapper {

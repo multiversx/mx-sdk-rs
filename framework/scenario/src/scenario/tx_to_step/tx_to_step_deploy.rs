@@ -6,7 +6,7 @@ use crate::scenario_model::{ScDeployStep, TxExpect, TxResponse};
 
 use super::{address_annotated, code_annotated, gas_annotated, StepWrapper, TxToStep};
 
-impl<Env, From, Payment, Gas, CodeValue, RH> TxToStep
+impl<Env, From, Payment, Gas, CodeValue, RH> TxToStep<Env, RH>
     for Tx<Env, From, (), Payment, Gas, DeployCall<Env, Code<CodeValue>>, RH>
 where
     Env: TxEnv<RHExpect = TxExpect>,
@@ -16,13 +16,9 @@ where
     CodeValue: TxCodeValue<Env>,
     RH: RHListExec<TxResponse, Env>,
 {
-    type Env = Env;
-
     type Step = ScDeployStep;
 
-    type RH = RH;
-
-    fn tx_to_step(self) -> StepWrapper<Self::Env, Self::Step, Self::RH> {
+    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step =
             tx_to_sc_deploy_step(&self.env, self.from, self.payment, self.gas, self.data);
         step.expect = Some(self.result_handler.list_tx_expect());
