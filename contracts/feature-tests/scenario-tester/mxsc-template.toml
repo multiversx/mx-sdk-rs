@@ -1,0 +1,24 @@
+name = "scenario_tester"
+contract_trait = "Adder"
+src_file = "adder.rs"
+rename_pairs = [
+    [
+        "blockchain.set_current_dir_from_workspace(\"contracts/examples/adder\");",
+        "// blockchain.set_current_dir_from_workspace(\"relative path to your workspace, if applicable\");",
+    ],
+]
+files_include = [
+    "meta",
+    "scenarios",
+    "src",
+    "tests",
+    "Cargo.toml",
+    "README.md",
+    "sc-config.toml",
+    "multiversx.json",
+    "interact/Cargo.toml",
+    "interact/config.toml",
+    "interact/.gitignore",
+    "interact/src",
+]
+has_interactor = true
