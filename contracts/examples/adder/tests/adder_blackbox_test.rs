@@ -6,6 +6,7 @@ use adder::*;
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
 const OWNER: AddressExpr = AddressExpr("owner");
+const OTHER: AddressExpr = AddressExpr("other");
 const SC_ADDER: ScExpr = ScExpr("adder");
 const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
 
@@ -26,12 +27,6 @@ fn adder_blackbox() {
     let adder_contract = ContractInfo::<adder::Proxy<StaticApi>>::new("sc:adder");
 
     world.start_trace();
-
-    // world.set_state_step(
-    //     SetStateStep::new()
-    //         .put_account(owner_address, Account::new().nonce(1))
-    //         .new_address(owner_address, 1, "sc:adder"),
-    // );
 
     world
         .set_state()
@@ -84,6 +79,14 @@ fn adder_blackbox() {
 
     world
         .tx()
+        .from(OTHER)
+        .to(SC_ADDER)
+        .typed(adder_proxy::AdderProxy)
+        .add(1u32)
+        .run();
+
+    world
+        .tx()
         .from(OWNER)
         .to(SC_ADDER)
         .typed(adder_proxy::AdderProxy)
@@ -95,7 +98,7 @@ fn adder_blackbox() {
             .put_account(owner_address, CheckAccount::new())
             .put_account(
                 &adder_contract,
-                CheckAccount::new().check_storage("str:sum", "6"),
+                CheckAccount::new().check_storage("str:sum", "7"),
             ),
     );
 

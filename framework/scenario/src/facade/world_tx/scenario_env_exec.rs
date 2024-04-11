@@ -108,6 +108,7 @@ impl ScenarioWorld {
 pub struct SetStateBuilder<'w> {
     world: &'w mut ScenarioWorld,
     set_state_step: SetStateStep,
+    current_account: Account,
     address_expr: AddressKey,
 }
 
@@ -115,6 +116,7 @@ impl<'w> SetStateBuilder<'w> {
     pub fn new(world: &'w mut ScenarioWorld) -> SetStateBuilder<'w> {
         SetStateBuilder {
             world,
+            current_account: Account::new(),
             set_state_step: SetStateStep::new(),
             address_expr: AddressKey::default(),
         }
@@ -124,11 +126,15 @@ impl<'w> SetStateBuilder<'w> {
     where
         AddressKey: From<A>,
     {
-        let account = Account::new();
-        let address_key = AddressKey::from(address_expr);
+        if &self.address_expr != &AddressKey::default() {
+            self.set_state_step
+                .accounts
+                .insert(self.address_expr, self.current_account);
+        }
 
-        self.address_expr = address_key.clone();
-        self.set_state_step.accounts.insert(address_key, account);
+        self.current_account = Account::new();
+        self.address_expr = AddressKey::from(address_expr);
+
         self
     }
 
@@ -136,13 +142,7 @@ impl<'w> SetStateBuilder<'w> {
     where
         U64Value: From<V>,
     {
-        self.set_state_step
-            .accounts
-            .entry(self.address_expr.clone())
-            .and_modify(|entry| {
-                entry.nonce = Some(U64Value::from(nonce));
-            });
-
+        self.current_account.nonce = Some(U64Value::from(nonce));
         self
     }
 
@@ -150,12 +150,7 @@ impl<'w> SetStateBuilder<'w> {
     where
         BigUintValue: From<V>,
     {
-        self.set_state_step
-            .accounts
-            .entry(self.address_expr.clone())
-            .and_modify(|entry| {
-                entry.balance = Some(BigUintValue::from(balance_expr));
-            });
+        self.current_account.balance = Some(BigUintValue::from(balance_expr));
         self
     }
 
@@ -267,32 +262,20 @@ impl<'w> SetStateBuilder<'w> {
     }
 
     fn get_esdt_data_or_create(&mut self, token_id: &BytesKey) -> &mut Esdt {
-        let entry = self
-            .set_state_step
-            .accounts
-            .entry(self.address_expr.clone())
-            .or_default();
-
-        if !entry.esdt.contains_key(token_id) {
-            let _ = entry
+        if !self.current_account.esdt.contains_key(token_id) {
+            self.current_account
                 .esdt
                 .insert(token_id.clone(), Esdt::Full(EsdtObject::default()));
         }
 
-        entry.esdt.get_mut(token_id).unwrap()
+        self.current_account.esdt.get_mut(token_id).unwrap()
     }
 
     pub fn code<V>(mut self, code_expr: V) -> Self
     where
         BytesValue: From<V>,
     {
-        self.set_state_step
-            .accounts
-            .entry(self.address_expr.clone())
-            .and_modify(|entry| {
-                entry.code = Some(BytesValue::from(code_expr));
-            });
-
+        self.current_account.code = Some(BytesValue::from(code_expr));
         self
     }
 
@@ -300,13 +283,7 @@ impl<'w> SetStateBuilder<'w> {
     where
         AddressValue: From<V>,
     {
-        self.set_state_step
-            .accounts
-            .entry(self.address_expr.clone())
-            .and_modify(|entry| {
-                entry.owner = Some(AddressValue::from(owner_expr));
-            });
-
+        self.current_account.owner = Some(AddressValue::from(owner_expr));
         self
     }
 
@@ -329,7 +306,16 @@ impl<'w> SetStateBuilder<'w> {
         self
     }
 
-    pub fn commit(self) {
+    pub fn commit(mut self) {
+        if !self
+            .set_state_step
+            .accounts
+            .contains_key(&self.address_expr)
+        {
+            self.set_state_step
+                .accounts
+                .insert(self.address_expr, self.current_account);
+        }
         self.world.run_set_state_step(&self.set_state_step);
     }
 }
