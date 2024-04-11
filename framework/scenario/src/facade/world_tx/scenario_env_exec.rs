@@ -104,18 +104,7 @@ impl ScenarioWorld {
     where
         AddressKey: From<A>,
     {
-        let mut builder = SetStateBuilder::new(self);
-        if builder.address_expr != AddressKey::default() {
-            builder
-                .set_state_step
-                .accounts
-                .insert(builder.address_expr, builder.current_account);
-        }
-
-        builder.current_account = Account::new();
-        builder.address_expr = AddressKey::from(address_expr);
-
-        builder
+        SetStateBuilder::new(self, address_expr.into())
     }
 }
 
@@ -123,17 +112,60 @@ pub struct SetStateBuilder<'w> {
     world: &'w mut ScenarioWorld,
     set_state_step: SetStateStep,
     current_account: Account,
-    address_expr: AddressKey,
+    current_address: AddressKey,
 }
 
 impl<'w> SetStateBuilder<'w> {
-    pub fn new(world: &'w mut ScenarioWorld) -> SetStateBuilder<'w> {
-        SetStateBuilder {
+    pub(crate) fn new(world: &'w mut ScenarioWorld, address: AddressKey) -> SetStateBuilder<'w> {
+        let mut builder = SetStateBuilder {
             world,
-            current_account: Account::new(),
             set_state_step: SetStateStep::new(),
-            address_expr: AddressKey::default(),
-        }
+            current_address: AddressKey::default(),
+            current_account: Account::new(),
+        };
+        builder.reset_account(address);
+        builder
+    }
+
+    fn add_current_acount(&mut self) {
+        if let Entry::Vacant(entry) = self
+            .set_state_step
+            .accounts
+            .entry(core::mem::take(&mut self.current_address))
+        {
+            entry.insert(core::mem::take(&mut self.current_account));
+        };
+    }
+
+    fn reset_account(&mut self, address: AddressKey) {
+        assert!(
+            self.world
+                .get_debugger_backend()
+                .vm_runner
+                .blockchain_mock
+                .state
+                .account_exists(&address.to_vm_address()),
+            "updating existing accounts currently not supported"
+        );
+
+        self.current_address = address;
+        self.current_account = Account::default();
+    }
+
+    /// Starts building of a new account.
+    pub fn account<A>(mut self, address_expr: A) -> Self
+    where
+        AddressKey: From<A>,
+    {
+        self.add_current_acount();
+        self.reset_account(address_expr.into());
+        self
+    }
+
+    /// Finished and sets all account in the blockchain mock.
+    pub fn commit(mut self) {
+        self.add_current_acount();
+        self.world.run_set_state_step(&self.set_state_step);
     }
 
     pub fn nonce<V>(mut self, nonce: V) -> Self
@@ -283,12 +315,5 @@ impl<'w> SetStateBuilder<'w> {
     {
         self.current_account.owner = Some(AddressValue::from(owner_expr));
         self
-    }
-
-    pub fn commit(mut self) {
-        if let Entry::Vacant(entry) = self.set_state_step.accounts.entry(self.address_expr) {
-            entry.insert(self.current_account);
-        };
-        self.world.run_set_state_step(&self.set_state_step);
     }
 }
