@@ -107,3 +107,108 @@ fn st_blackbox() {
 
     world.write_scenario_trace("trace1.scen.json");
 }
+
+#[test]
+fn set_state_test() {
+    let mut world = world();
+    let first = "address:first";
+    let second = "address:second";
+    let third = "address:third";
+    let fourth = "address:fourth";
+    let fifth = "address:fifth";
+    let sixth = "address:sixth";
+
+    world.start_trace();
+
+    world
+        .account(first)
+        .nonce(1)
+        .balance("100")
+        .account(second)
+        .nonce(2)
+        .balance("300")
+        .esdt_balance("str:TOKEN-123456", "500")
+        .commit();
+
+    world.check_state_step(
+        CheckStateStep::new()
+            .put_account(
+                first,
+                CheckAccount::new()
+                    .nonce(U64Value::from(1u64))
+                    .balance("100"),
+            )
+            .put_account(
+                second,
+                CheckAccount::new()
+                    .nonce(U64Value::from(2u64))
+                    .balance("300")
+                    .esdt_balance("str:TOKEN-123456", "500"),
+            ),
+    );
+
+    world
+        .account(third)
+        .nonce(3)
+        .balance("50")
+        .esdt_nft_balance("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
+        .commit();
+
+    world.check_state_step(
+        CheckStateStep::new().put_account(
+            third,
+            CheckAccount::new()
+                .nonce(U64Value::from(3u64))
+                .balance("50")
+                .esdt_nft_balance_and_attributes(
+                    "str:NFT-123456",
+                    "2",
+                    "1",
+                    Some(Vec::<u8>::new()),
+                ),
+        ),
+    );
+
+    // using no commit should drop the value naturally
+    world
+        .account(fourth)
+        .nonce(4)
+        .balance("400")
+        .account(fifth)
+        .nonce(5)
+        .balance("250")
+        .esdt_balance("str:TOKEN-123456", "2");
+
+    world.check_state_step(
+        CheckStateStep::new()
+            .put_account(
+                fourth,
+                CheckAccount::new()
+                    .nonce(U64Value::from(4u64))
+                    .balance("400"),
+            )
+            .put_account(
+                fifth,
+                CheckAccount::new()
+                    .nonce(U64Value::from(5u64))
+                    .balance("250")
+                    .esdt_balance("str:TOKEN-123456", "2"),
+            ),
+    );
+
+    world
+        .account(sixth)
+        .nonce(6)
+        .balance("600")
+        .esdt_balance("str:TOKEN-123456", "60");
+
+    world.check_state_step(
+        CheckStateStep::new().put_account(
+            sixth,
+            CheckAccount::new()
+                .nonce(U64Value::from(6u64))
+                .balance("600")
+                .esdt_balance("str:TOKEN-123456", "60"),
+        ),
+    );
+}
