@@ -258,3 +258,24 @@ impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
         }
     }
 }
+
+impl<M: ManagedTypeApi> From<()> for MultiEsdtPayment<M> {
+    #[inline]
+    fn from(_value: ()) -> Self {
+        MultiEsdtPayment::new()
+    }
+}
+
+impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for MultiEsdtPayment<M> {
+    #[inline]
+    fn from(value: EsdtTokenPayment<M>) -> Self {
+        MultiEsdtPayment::from_single_item(value)
+    }
+}
+
+impl<M: ManagedTypeApi> From<(TokenIdentifier<M>, u64, BigUint<M>)> for MultiEsdtPayment<M> {
+    #[inline]
+    fn from(value: (TokenIdentifier<M>, u64, BigUint<M>)) -> Self {
+        MultiEsdtPayment::from_single_item(value.into())
+    }
+}

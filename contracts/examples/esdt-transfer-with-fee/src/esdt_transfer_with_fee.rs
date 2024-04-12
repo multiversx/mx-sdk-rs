@@ -40,7 +40,7 @@ pub trait EsdtTransferWithFee {
         }
         self.paid_fees().clear();
 
-        self.tx().to(ToCaller).multi_esdt(&fees).transfer();
+        self.tx().to(ToCaller).payment(fees).transfer();
     }
 
     #[payable("*")]
@@ -81,7 +81,7 @@ pub trait EsdtTransferWithFee {
                 },
             }
         }
-        self.tx().to(&address).multi_esdt(new_payments).transfer();
+        self.tx().to(&address).payment(new_payments).transfer();
     }
 
     fn get_payment_after_fees(

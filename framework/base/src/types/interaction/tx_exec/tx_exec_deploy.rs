@@ -220,9 +220,9 @@ where
     OriginalResult: TopEncodeMulti,
 {
     /// Backwards compatibility, immitates the old API.
-    /// 
+    ///
     /// Should no longer be used, which is why unlike all the rest of the old syntax, was deprecated.
-    /// 
+    ///
     /// Uses a `DeployCall` instead of the correct `UpgradeCall`, because the old syntax did not know about upgrades.
     ///
     /// Note that the data type (the `DeployCall`) doesn't have the code set.
@@ -249,9 +249,9 @@ where
     }
 
     /// Backwards compatibility, immitates the old API.
-    /// 
+    ///
     /// Should no longer be used, which is why unlike all the rest of the old syntax, was deprecated.
-    /// 
+    ///
     /// Uses a `DeployCall` instead of the correct `UpgradeCall`, because the old syntax did not know about upgrades.
     ///
     /// Note that the data type (the `DeployCall`) doesn't have the code set.

@@ -110,6 +110,27 @@ pub trait ForwarderTransferExecuteModule {
     }
 
     #[endpoint]
+    fn transf_exec_multi_accept_funds_v2(
+        &self,
+        to: ManagedAddress,
+        token_payments: MultiValueEncoded<MultiValue3<TokenIdentifier, u64, BigUint>>,
+    ) {
+        let mut tx = self
+            .vault_proxy()
+            .contract(to)
+            .accept_funds()
+            .multi_esdt(());
+
+        for multi_arg in token_payments.into_iter() {
+            let (token_identifier, token_nonce, amount) = multi_arg.into_tuple();
+            let payment_triple = (token_identifier, token_nonce, amount);
+            tx = tx.with_esdt_transfer(payment_triple);
+        }
+
+        tx.transfer_execute()
+    }
+
+    #[endpoint]
     fn forward_transf_exec_reject_funds_multi_transfer(
         &self,
         to: ManagedAddress,
