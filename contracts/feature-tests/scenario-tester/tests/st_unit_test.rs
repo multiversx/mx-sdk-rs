@@ -1,6 +1,6 @@
-use scenario_tester::*;
 use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::api::SingleTxApi;
+use scenario_tester::*;
 
 #[test]
 fn st_unit_test() {
