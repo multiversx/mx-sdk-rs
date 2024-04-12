@@ -11,6 +11,9 @@ path = "builtin-func-features"
 [dev-dependencies.forwarder]
 path = "forwarder"
 
+[dev-dependencies.forwarder-legacy]
+path = "forwarder-legacy"
+
 [dev-dependencies.forwarder-queue]
 path = "forwarder-queue"
 

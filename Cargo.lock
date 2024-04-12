@@ -469,6 +469,7 @@ version = "0.0.0"
 dependencies = [
  "builtin-func-features",
  "forwarder",
+ "forwarder-legacy",
  "forwarder-queue",
  "forwarder-raw",
  "multiversx-sc",
@@ -1035,6 +1036,23 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
  "vault",
+]
+
+[[package]]
+name = "forwarder-legacy"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+ "vault",
+]
+
+[[package]]
+name = "forwarder-legacy-meta"
+version = "0.0.0"
+dependencies = [
+ "forwarder-legacy",
+ "multiversx-sc-meta",
 ]
 
 [[package]]
