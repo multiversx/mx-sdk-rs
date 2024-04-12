@@ -27,7 +27,7 @@ fn st_blackbox() {
 
     world.set_state_step(
         SetStateStep::new()
-            .put_account(owner_address, Account::new().nonce(1))
+            .put_account(owner_address, Account::new().nonce(1).balance("100"))
             .new_address(owner_address, 1, "sc:scenario-tester"),
     );
 
@@ -59,14 +59,13 @@ fn st_blackbox() {
         .add(1u32)
         .run();
 
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(owner_address, CheckAccount::new())
-            .put_account(
-                &st_contract,
-                CheckAccount::new().check_storage("str:sum", "6"),
-            ),
-    );
+    world
+        .check_state_account(owner_address)
+        .nonce("3")
+        .balance("100")
+        .check_state_account(st_contract)
+        .check_storage("str:sum", "6")
+        .commit();
 
     world.write_scenario_trace("trace1.scen.json");
 }
