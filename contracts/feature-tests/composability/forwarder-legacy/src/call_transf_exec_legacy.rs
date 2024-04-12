@@ -18,6 +18,20 @@ pub trait ForwarderTransferExecuteModule {
             .transfer_execute();
     }
 
+    /// Tests triple as ESDTTokenPayment.
+    ///
+    /// TODO: move somewhere else after release
+    #[endpoint]
+    #[payable("*")]
+    fn forward_transf_exec_accept_single_esdt(&self, to: ManagedAddress) {
+        let payment = self.call_value().single_esdt();
+        self.vault_proxy()
+            .contract(to)
+            .accept_funds()
+            .payment((payment.token_identifier, 0, payment.amount))
+            .transfer_execute();
+    }
+
     #[endpoint]
     #[payable("*")]
     fn forward_transf_execu_accept_funds_with_fees(
