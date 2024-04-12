@@ -278,11 +278,8 @@ pub trait RewardsDistribution:
         }
 
         self.tx().to(&caller).egld(total_egld_reward).transfer();
-        self.tx().to(&caller).multi_esdt(rewards).transfer();
-        self.tx()
-            .to(&caller)
-            .multi_esdt(nfts.clone_value())
-            .transfer();
+        self.tx().to(&caller).payment(rewards).transfer();
+        self.tx().to(&caller).payment(nfts).transfer();
     }
 
     fn claim_reward_token(

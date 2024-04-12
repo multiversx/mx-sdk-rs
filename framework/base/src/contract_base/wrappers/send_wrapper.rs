@@ -294,7 +294,7 @@ where
         to: &ManagedAddress<A>,
         payments: &ManagedVec<A, EsdtTokenPayment<A>>,
     ) {
-        Tx::new_tx_from_sc().to(to).multi_esdt(payments).transfer();
+        Tx::new_tx_from_sc().to(to).payment(payments).transfer();
     }
 
     /// Performs a simple ESDT/NFT transfer, but via async call.  
@@ -348,7 +348,7 @@ where
     ) -> ! {
         Tx::new_tx_from_sc()
             .to(to)
-            .multi_esdt(payments)
+            .payment(payments)
             .async_call_and_exit()
     }
 

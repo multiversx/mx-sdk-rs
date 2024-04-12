@@ -1,0 +1,21 @@
+[package]
+name = "forwarder-legacy"
+version = "0.0.0"
+authors = ["Andrei Marinica <andrei.marinica@multiversx.com>"]
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/forwarder_legacy_main.rs"
+
+[dependencies.vault]
+path = "../vault"
+
+[dependencies.multiversx-sc]
+version = "0.49.0-alpha.2"
+path = "../../../../framework/base"
+
+[dev-dependencies.multiversx-sc-scenario]
+version = "0.49.0-alpha.2"
+path = "../../../../framework/scenario"
+
