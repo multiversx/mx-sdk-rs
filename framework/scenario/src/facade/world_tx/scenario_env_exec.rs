@@ -163,10 +163,13 @@ impl<'w> SetStateBuilder<'w> {
     }
 
     /// Finished and sets all account in the blockchain mock.
-    pub fn commit(mut self) {
+    fn commit_accounts(&mut self) {
         self.add_current_acount();
         self.world.run_set_state_step(&self.set_state_step);
     }
+
+    /// Forces value drop and commit accounts.
+    pub fn commit(self) {}
 
     pub fn nonce<V>(mut self, nonce: V) -> Self
     where
@@ -315,5 +318,11 @@ impl<'w> SetStateBuilder<'w> {
     {
         self.current_account.owner = Some(AddressValue::from(owner_expr));
         self
+    }
+}
+
+impl<'w> Drop for SetStateBuilder<'w> {
+    fn drop(&mut self) {
+        self.commit_accounts();
     }
 }
