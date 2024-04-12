@@ -54,10 +54,13 @@ pub trait ProxyTestFirst {
 
         self.tx()
             .to(other_contract)
-            .raw_upgrade()
+            .typed(pay_me_proxy::PayMeProxy)
+            .upgrade()
             .argument(&456)
             .egld(payment)
-            .upgrade_contract(&code, CodeMetadata::UPGRADEABLE);
+            .code(code)
+            .code_metadata(CodeMetadata::UPGRADEABLE)
+            .upgrade_async_call_and_exit();
     }
 
     #[payable("EGLD")]

@@ -1,24 +1,23 @@
-use crate::vault_proxy;
-
 multiversx_sc::imports!();
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
 #[multiversx_sc::module]
 pub trait ForwarderSyncCallModule {
+    #[proxy]
+    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
+
     #[endpoint]
     #[payable("*")]
     fn echo_arguments_sync(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        let result = self
-            .tx()
-            .to(&to)
-            .with_gas_limit(half_gas)
-            .typed(vault_proxy::VaultProxy)
+        let result: MultiValueEncoded<ManagedBuffer> = self
+            .vault_proxy()
+            .contract(to)
             .echo_arguments(args)
-            .returns(ReturnsResult)
-            .sync_call();
+            .with_gas_limit(half_gas)
+            .execute_on_dest_context();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
     }
@@ -32,25 +31,21 @@ pub trait ForwarderSyncCallModule {
     ) {
         let one_third_gas = self.blockchain().get_gas_left() / 3;
 
-        let result = self
-            .tx()
-            .to(&to)
+        let result: MultiValueEncoded<ManagedBuffer> = self
+            .vault_proxy()
+            .contract(to.clone())
+            .echo_arguments(&args)
             .with_gas_limit(one_third_gas)
-            .typed(vault_proxy::VaultProxy)
-            .echo_arguments(args.clone())
-            .returns(ReturnsResult)
-            .sync_call();
+            .execute_on_dest_context();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
 
-        let result = self
-            .tx()
-            .to(&to)
+        let result: MultiValueEncoded<ManagedBuffer> = self
+            .vault_proxy()
+            .contract(to)
+            .echo_arguments(&args)
             .with_gas_limit(one_third_gas)
-            .typed(vault_proxy::VaultProxy)
-            .echo_arguments(args)
-            .returns(ReturnsResult)
-            .sync_call();
+            .execute_on_dest_context();
 
         self.execute_on_dest_context_result_event(&result.into_vec_of_buffers());
     }
@@ -64,16 +59,13 @@ pub trait ForwarderSyncCallModule {
         let payment = self.call_value().egld_or_single_esdt();
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        let result = self
-            .tx()
-            .to(&to)
-            .with_gas_limit(half_gas)
-            .typed(vault_proxy::VaultProxy)
+        let result: MultiValue2<BigUint, MultiValueEncoded<EsdtTokenPaymentMultiValue>> = self
+            .vault_proxy()
+            .contract(to)
             .accept_funds_echo_payment()
             .with_egld_or_single_esdt_transfer(payment)
-            .returns(ReturnsResult)
-            .sync_call();
-
+            .with_gas_limit(half_gas)
+            .execute_on_dest_context();
         let (egld_value, esdt_transfers_multi) = result.into_tuple();
 
         self.accept_funds_sync_result_event(&egld_value, &esdt_transfers_multi);
@@ -86,13 +78,12 @@ pub trait ForwarderSyncCallModule {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
+        let () = self
+            .vault_proxy()
+            .contract(to)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_id, 0u64, amount_to_send))
-            .returns(ReturnsResult)
-            .sync_call();
+            .with_egld_or_single_esdt_transfer((token_id, 0, amount_to_send))
+            .execute_on_dest_context();
     }
 
     #[event("accept_funds_sync_result")]
@@ -106,19 +97,17 @@ pub trait ForwarderSyncCallModule {
     #[payable("*")]
     fn forward_sync_accept_funds_then_read(&self, to: ManagedAddress) -> usize {
         let payment = self.call_value().egld_or_single_esdt();
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
+        self.vault_proxy()
+            .contract(to.clone())
             .accept_funds()
             .with_egld_or_single_esdt_transfer(payment)
-            .sync_call();
+            .execute_on_dest_context::<()>();
 
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
+        self.vault_proxy()
+            .contract(to)
             .call_counts(b"accept_funds")
-            .returns(ReturnsResult)
-            .sync_call()
+            .execute_on_dest_context::<SingleValue<usize>>()
+            .into()
     }
 
     #[endpoint]
@@ -129,11 +118,10 @@ pub trait ForwarderSyncCallModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
+        self.vault_proxy()
+            .contract(to)
             .retrieve_funds(token, token_nonce, amount)
-            .sync_call();
+            .execute_on_dest_context::<()>();
     }
 
     #[payable("*")]
@@ -146,16 +134,15 @@ pub trait ForwarderSyncCallModule {
     ) {
         let payments = self.call_value().all_esdt_transfers();
 
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
+        self.vault_proxy()
+            .contract(to)
             .retrieve_funds_with_transfer_exec(
                 token,
                 amount,
                 OptionalValue::<ManagedBuffer>::Some(b"accept_funds_func".into()),
             )
-            .payment(payments.clone_value())
-            .sync_call();
+            .with_multi_token_transfer(payments.clone_value())
+            .execute_on_dest_context::<()>();
     }
 
     #[payable("*")]
@@ -176,11 +163,11 @@ pub trait ForwarderSyncCallModule {
             all_token_payments.push(payment);
         }
 
-        self.tx()
-            .to(&to)
-            .typed(vault_proxy::VaultProxy)
+        let () = self
+            .vault_proxy()
+            .contract(to)
             .accept_funds()
-            .payment(all_token_payments)
-            .sync_call();
+            .with_multi_token_transfer(all_token_payments)
+            .execute_on_dest_context();
     }
 }
