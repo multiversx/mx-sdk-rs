@@ -3,27 +3,26 @@ use multiversx_sc::types::{RHListItem, RHListItemExec, TxEnv};
 
 use crate::scenario_model::{BytesValue, CheckValue, TxExpect, TxResponse};
 
-/// Verifies that transaction result error matches the given one.
+/// Verifies that transaction result message matches the given one.
 ///
 /// Can only be used in tests and interactors, not available in contracts.
-pub struct ExpectError<'a>(pub u64, pub &'a str);
+pub struct ExpectMessage<'a>(pub &'a str);
 
-impl<'a, Env, Original> RHListItem<Env, Original> for ExpectError<'a>
+impl<'a, Env, Original> RHListItem<Env, Original> for ExpectMessage<'a>
 where
     Env: TxEnv,
 {
     type Returns = ();
 }
 
-impl<'a, Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectError<'a>
+impl<'a, Env, Original> RHListItemExec<TxResponse, Env, Original> for ExpectMessage<'a>
 where
     Env: TxEnv<RHExpect = TxExpect>,
 {
     fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
-        prev.status = CheckValue::Equal(self.0.into());
         let expect_message_expr = BytesValue {
-            value: self.1.to_string().into_bytes(),
-            original: ValueSubTree::Str(format!("str:{}", self.1)),
+            value: self.0.to_string().into_bytes(),
+            original: ValueSubTree::Str(format!("str:{}", self.0)),
         };
         prev.message = CheckValue::Equal(expect_message_expr);
         prev
