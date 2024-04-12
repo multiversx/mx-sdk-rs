@@ -61,7 +61,6 @@ fn st_blackbox() {
         .code(CODE_EXPR)
         .returns(ReturnsNewAddress)
         .run();
-
     assert_eq!(new_address, st_contract.to_address());
 
     let value = world
@@ -124,10 +123,10 @@ fn set_state_test() {
 
     world
         .check_state_account(first)
-        .nonce("1")
+        .nonce(1)
         .balance("100")
         .check_state_account(second)
-        .nonce("2")
+        .nonce(2)
         .balance("300")
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
@@ -141,7 +140,7 @@ fn set_state_test() {
 
     world
         .check_state_account(third)
-        .nonce("3")
+        .nonce(3)
         .balance("50")
         .esdt_nft_balance_and_attributes("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
         .commit();
@@ -158,10 +157,10 @@ fn set_state_test() {
 
     world
         .check_state_account(fourth)
-        .nonce("4")
+        .nonce(4)
         .balance("400")
         .check_state_account(fifth)
-        .nonce("5")
+        .nonce(5)
         .balance("250")
         .esdt_balance("str:TOKEN-123456", "2");
 
@@ -173,7 +172,7 @@ fn set_state_test() {
 
     world
         .check_state_account(sixth)
-        .nonce("6")
+        .nonce(6)
         .balance("600")
         .esdt_balance("str:TOKEN-123456", "60");
 }
