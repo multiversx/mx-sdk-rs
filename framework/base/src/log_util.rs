@@ -40,9 +40,9 @@ where
     data_buffer
 }
 
-pub fn write_log<A>(topics: &ManagedVec<A, ManagedBuffer<A>>, data: &ManagedBuffer<A>)
+pub fn write_log<A>(topics: ManagedVec<A, ManagedBuffer<A>>, data: ManagedBuffer<A>)
 where
     A: LogApi + ManagedTypeApi,
 {
-    A::log_api_impl().managed_write_log(topics.get_handle(), data.get_handle());
+    A::log_api_impl().managed_write_log(topics.take_handle(), data.take_handle());
 }

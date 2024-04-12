@@ -11,11 +11,11 @@ impl StorageReadApi for UncallableApi {
 }
 
 impl StorageReadApiImpl for UncallableApi {
-    fn storage_load_managed_buffer_raw(&self, _key_handle: i32, _dest: i32) {
+    fn storage_load_managed_buffer_raw(&self, _key_handle: &i32, _dest: &i32) {
         unreachable!()
     }
 
-    fn storage_load_from_address(&self, _address_handle: i32, _key_handle: i32, _dest: i32) {
+    fn storage_load_from_address(&self, _address_handle: &i32, _key_handle: &i32, _dest: &i32) {
         unreachable!()
     }
 }
@@ -31,8 +31,8 @@ impl StorageWriteApi for UncallableApi {
 impl StorageWriteApiImpl for super::UncallableApi {
     fn storage_store_managed_buffer_raw(
         &self,
-        _key_handle: Self::ManagedBufferHandle,
-        _value_handle: Self::ManagedBufferHandle,
+        _key_handle: &Self::ManagedBufferHandle,
+        _value_handle: &Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }

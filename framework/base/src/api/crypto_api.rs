@@ -23,57 +23,57 @@ pub trait CryptoApi: ManagedTypeApi {
 pub trait CryptoApiImpl: ManagedTypeApiImpl {
     fn sha256_managed(
         &self,
-        dest: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     );
 
     fn keccak256_managed(
         &self,
-        dest: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     );
 
     fn ripemd160_managed(
         &self,
-        dest: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     );
 
     fn verify_bls_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
     ) -> bool;
 
     fn verify_ed25519_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
     );
 
     /// Note: the signature is minimum 2 bytes in length,
     /// the second byte encodes the length of the remaining signature bytes.
     fn verify_secp256k1_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
     ) -> bool;
 
     fn verify_custom_secp256k1_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
         hash_type: MessageHashType,
     ) -> bool;
 
     fn encode_secp256k1_der_signature_managed(
         &self,
-        r: Self::ManagedBufferHandle,
-        s: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        r: &Self::ManagedBufferHandle,
+        s: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 }

@@ -30,7 +30,7 @@ where
     fn set_managed_buffer(&self, managed_buffer: &ManagedBuffer<A>) {
         A::storage_write_api_impl().storage_store_managed_buffer_raw(
             self.key.buffer.get_handle(),
-            managed_buffer.handle.clone(),
+            &managed_buffer.handle,
         );
     }
 }
@@ -98,7 +98,7 @@ where
     A: StorageWriteApi + ManagedTypeApi + ErrorApi,
 {
     let value_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_CONST_EMPTY);
-    A::managed_type_impl().mb_overwrite(value_handle.clone(), &[]);
+    A::managed_type_impl().mb_overwrite(&value_handle, &[]);
 
-    A::storage_write_api_impl().storage_store_managed_buffer_raw(key.get_handle(), value_handle);
+    A::storage_write_api_impl().storage_store_managed_buffer_raw(key.get_handle(), &value_handle);
 }

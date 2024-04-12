@@ -19,8 +19,8 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
         ManagedMap { handle }
     }
 
-    fn get_handle(&self) -> M::ManagedMapHandle {
-        self.handle.clone()
+    fn get_handle(&self) -> &M::ManagedMapHandle {
+        &self.handle
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {

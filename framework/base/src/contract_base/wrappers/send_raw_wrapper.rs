@@ -36,7 +36,7 @@ where
     ) {
         let code_metadata_bytes = code_metadata.to_byte_array();
         A::managed_type_impl().mb_overwrite(
-            use_raw_handle(code_metadata_handle),
+            &use_raw_handle(code_metadata_handle),
             &code_metadata_bytes[..],
         );
     }
@@ -47,7 +47,7 @@ where
     {
         let empty_mb_handle: A::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        A::managed_type_impl().mb_overwrite(empty_mb_handle.clone(), &[]);
+        A::managed_type_impl().mb_overwrite(&empty_mb_handle, &[]);
 
         let _ = A::send_api_impl().transfer_value_execute(
             to.get_handle().get_raw_handle(),
@@ -351,7 +351,7 @@ where
         // account-level built-in function, so the destination address is the contract itself
         let own_address_handle: A::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        A::blockchain_api_impl().load_sc_address_managed(own_address_handle.clone());
+        A::blockchain_api_impl().load_sc_address_managed(&own_address_handle);
         let egld_value_handle = A::managed_type_impl().bi_new_zero();
 
         let result_handle = A::static_var_api_impl().next_handle();

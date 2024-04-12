@@ -15,11 +15,11 @@ macro_rules! binary_operator {
             fn $method(self, other: BigInt<M>) -> BigInt<M> {
                 let api = M::managed_type_impl();
                 api.$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    &self.handle,
+                    &self.handle,
+                    &other.handle,
                 );
-                BigInt::from_handle(self.handle.clone())
+                BigInt::from_handle(self.handle)
             }
         }
 
@@ -47,27 +47,11 @@ macro_rules! binary_operator {
                 let result_handle: M::BigIntHandle =
                     use_raw_handle(M::static_var_api_impl().next_handle());
                 api.$api_func(
-                    result_handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    &result_handle,
+                    &self.handle,
+                    &other.handle,
                 );
                 BigInt::from_handle(result_handle)
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigInt<M> {
-            type Output = BigInt<M>;
-
-            fn $method(self, other: &BigUint<M>) -> BigInt<M> {
-                self.$method(&BigInt::from_handle(other.get_handle()))
-            }
-        }
-
-        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BigUint<M> {
-            type Output = BigInt<M>;
-
-            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
-                (&BigInt::from_handle(self.get_handle())).$method(other)
             }
         }
     };
@@ -86,9 +70,9 @@ macro_rules! binary_assign_operator {
             fn $method(&mut self, other: Self) {
                 let api = M::managed_type_impl();
                 api.$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    &self.handle,
+                    &self.handle,
+                    &other.handle,
                 );
             }
         }
@@ -98,9 +82,9 @@ macro_rules! binary_assign_operator {
             fn $method(&mut self, other: &BigInt<M>) {
                 let api = M::managed_type_impl();
                 api.$api_func(
-                    self.handle.clone(),
-                    self.handle.clone(),
-                    other.handle.clone(),
+                    &self.handle,
+                    &self.handle,
+                    &other.handle,
                 );
             }
         }
@@ -119,7 +103,7 @@ impl<M: ManagedTypeApi> Neg for BigInt<M> {
     fn neg(self) -> Self::Output {
         let api = M::managed_type_impl();
         let result_handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
-        api.bi_neg(result_handle.clone(), self.handle);
+        api.bi_neg(&result_handle, &self.handle);
         BigInt::from_handle(result_handle)
     }
 }

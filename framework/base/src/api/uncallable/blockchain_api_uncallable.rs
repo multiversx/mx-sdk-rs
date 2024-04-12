@@ -93,16 +93,16 @@ impl BlockchainApiImpl for UncallableApi {
 
     fn get_current_esdt_nft_nonce(
         &self,
-        _address_handle: Self::ManagedBufferHandle,
-        _token_id_handle: Self::ManagedBufferHandle,
+        _address_handle: &Self::ManagedBufferHandle,
+        _token_id_handle: &Self::ManagedBufferHandle,
     ) -> u64 {
         unreachable!()
     }
 
     fn load_esdt_balance(
         &self,
-        _address_handle: Self::ManagedBufferHandle,
-        _token_id_handle: Self::ManagedBufferHandle,
+        _address_handle: &Self::ManagedBufferHandle,
+        _token_id_handle: &Self::ManagedBufferHandle,
         _nonce: u64,
         _dest: Self::BigIntHandle,
     ) {
@@ -136,39 +136,39 @@ impl BlockchainApiImpl for UncallableApi {
 
     fn check_esdt_frozen(
         &self,
-        _address_handle: Self::ManagedBufferHandle,
-        _token_id_handle: Self::ManagedBufferHandle,
+        _address_handle: &Self::ManagedBufferHandle,
+        _token_id_handle: &Self::ManagedBufferHandle,
         _nonce: u64,
     ) -> bool {
         unreachable!()
     }
 
-    fn check_esdt_paused(&self, _token_id_handle: Self::ManagedBufferHandle) -> bool {
+    fn check_esdt_paused(&self, _token_id_handle: &Self::ManagedBufferHandle) -> bool {
         unreachable!()
     }
 
-    fn check_esdt_limited_transfer(&self, _token_id_handle: Self::ManagedBufferHandle) -> bool {
+    fn check_esdt_limited_transfer(&self, _token_id_handle: &Self::ManagedBufferHandle) -> bool {
         unreachable!()
     }
 
     fn load_esdt_local_roles(
         &self,
-        _token_id_handle: Self::ManagedBufferHandle,
+        _token_id_handle: &Self::ManagedBufferHandle,
     ) -> crate::types::EsdtLocalRoleFlags {
         unreachable!()
     }
 
     fn managed_get_code_metadata(
         &self,
-        _address_handle: Self::ManagedBufferHandle,
-        _response_handle: Self::ManagedBufferHandle,
+        _address_handle: &Self::ManagedBufferHandle,
+        _response_handle: &Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }
 
     fn managed_is_builtin_function(
         &self,
-        _function_name_handle: Self::ManagedBufferHandle,
+        _function_name_handle: &Self::ManagedBufferHandle,
     ) -> bool {
         unreachable!()
     }

@@ -352,16 +352,16 @@ impl BlockchainApiImpl for VmApiImpl {
         unsafe { managedIsESDTPaused(token_id_handle) > 0 }
     }
 
-    fn check_esdt_limited_transfer(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
-        unsafe { managedIsESDTLimitedTransfer(token_id_handle) > 0 }
+    fn check_esdt_limited_transfer(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {
+        unsafe { managedIsESDTLimitedTransfer(*token_id_handle) > 0 }
     }
 
     fn load_esdt_local_roles(
         &self,
-        token_id_handle: Self::ManagedBufferHandle,
+        token_id_handle: &Self::ManagedBufferHandle,
     ) -> multiversx_sc::types::EsdtLocalRoleFlags {
         multiversx_sc::types::EsdtLocalRoleFlags::from_bits_retain(unsafe {
-            getESDTLocalRoles(token_id_handle)
+            getESDTLocalRoles(*token_id_handle)
         } as u64)
     }
 

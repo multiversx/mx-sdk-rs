@@ -140,7 +140,7 @@ where
         }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
         self.bytes.get_handle()
     }
 

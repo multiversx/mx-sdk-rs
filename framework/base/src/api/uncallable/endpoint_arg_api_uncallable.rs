@@ -15,7 +15,7 @@ impl EndpointArgumentApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_argument_managed_buffer(&self, _arg_id: i32, _dest: Self::ManagedBufferHandle) {
+    fn load_argument_managed_buffer(&self, _arg_id: i32, _dest: &Self::ManagedBufferHandle) {
         unreachable!()
     }
 

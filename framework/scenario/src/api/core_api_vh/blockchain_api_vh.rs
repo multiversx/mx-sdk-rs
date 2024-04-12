@@ -248,7 +248,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         i32_to_bool(result)
     }
 
-    fn check_esdt_limited_transfer(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
+    fn check_esdt_limited_transfer(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {
         self.assert_live_handle(&token_id_handle);
         let result = self.with_vm_hooks(|vh| {
             vh.managed_is_esdt_limited_transfer(token_id_handle.get_raw_handle_unchecked())
@@ -258,7 +258,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
 
     fn load_esdt_local_roles(
         &self,
-        token_id_handle: Self::ManagedBufferHandle,
+        token_id_handle: &Self::ManagedBufferHandle,
     ) -> EsdtLocalRoleFlags {
         self.assert_live_handle(&token_id_handle);
         let result = self.with_vm_hooks(|vh| {

@@ -1,3 +1,4 @@
+use core::mem;
 use crate::{
     abi::TypeName,
     api::{
@@ -24,7 +25,7 @@ pub struct ManagedBuffer<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
     fn drop(&mut self) {
-        M::managed_type_impl().drop_managed_buffer_handle(self.get_handle());
+        M::managed_type_impl().drop_managed_buffer_handle(mem::take(&mut self.handle));
     }
 }
 
@@ -36,8 +37,8 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         ManagedBuffer { handle }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
-        self.handle.clone()
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
+        &self.handle
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -51,7 +52,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         // TODO: remove after VM no longer crashes with "unknown handle":
-        M::managed_type_impl().mb_overwrite(new_handle.clone(), &[]);
+        M::managed_type_impl().mb_overwrite(&new_handle, &[]);
         ManagedBuffer::from_handle(new_handle)
     }
 
@@ -59,7 +60,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_overwrite(new_handle.clone(), bytes);
+        M::managed_type_impl().mb_overwrite(&new_handle, bytes);
         ManagedBuffer::from_handle(new_handle)
     }
 
@@ -176,7 +177,7 @@ impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn len(&self) -> usize {
-        M::managed_type_impl().mb_len(self.handle.clone())
+        M::managed_type_impl().mb_len(&self.handle)
     }
 
     #[inline]
@@ -186,7 +187,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     /// Method provided for convenience in tests, not to be used in contracts.
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
-        M::managed_type_impl().mb_to_boxed_bytes(self.handle.clone())
+        M::managed_type_impl().mb_to_boxed_bytes(&self.handle)
     }
 
     /// Method provided for convenience in tests, not to be used in contracts.
@@ -202,7 +203,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        M::managed_type_impl().mb_load_slice(self.handle.clone(), starting_position, dest_slice)
+        M::managed_type_impl().mb_load_slice(&self.handle, starting_position, dest_slice)
     }
 
     pub fn copy_slice(
@@ -252,7 +253,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
-        M::managed_type_impl().mb_overwrite(self.handle.clone(), value);
+        M::managed_type_impl().mb_overwrite(&self.handle, value);
     }
 
     pub fn set_slice(
@@ -309,7 +310,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
         let mut bytes = [0u8; U64_NUM_BYTES];
         if M::managed_type_impl()
-            .mb_load_slice(self.handle.clone(), 0, &mut bytes[U64_NUM_BYTES - l..])
+            .mb_load_slice(&self.handle, 0, &mut bytes[U64_NUM_BYTES - l..])
             .is_err()
         {
             None
@@ -331,7 +332,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        M::managed_type_impl().mb_eq(self.handle.clone(), other.handle.clone())
+        M::managed_type_impl().mb_eq(&self.handle, &other.handle)
     }
 }
 
@@ -344,7 +345,7 @@ impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M>
             return false;
         }
         let mut self_bytes = [0u8; N];
-        let _ = M::managed_type_impl().mb_load_slice(self.handle.clone(), 0, &mut self_bytes[..]);
+        let _ = M::managed_type_impl().mb_load_slice(&self.handle, 0, &mut self_bytes[..]);
         &self_bytes[..] == &other[..]
     }
 }
@@ -476,7 +477,7 @@ impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedBuffer")
-            .field("handle", &self.handle.clone())
+            .field("handle", &self.handle)
             .field(
                 "hex-value",
                 &encode_bytes_as_hex(self.to_boxed_bytes().as_slice()),

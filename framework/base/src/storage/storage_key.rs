@@ -26,7 +26,7 @@ where
         }
     }
 
-    fn get_handle(&self) -> A::ManagedBufferHandle {
+    fn get_handle(&self) -> &A::ManagedBufferHandle {
         self.buffer.get_handle()
     }
 

@@ -17,15 +17,15 @@ pub trait StorageReadApiImpl: HandleTypeInfo {
 
     fn storage_load_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 
     fn storage_load_from_address(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 }
 
@@ -44,7 +44,7 @@ pub trait StorageWriteApi: HandleTypeInfo {
 pub trait StorageWriteApiImpl: HandleTypeInfo {
     fn storage_store_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        value_handle: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        value_handle: &Self::ManagedBufferHandle,
     );
 }

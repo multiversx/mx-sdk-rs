@@ -38,7 +38,7 @@ where
     }
 
     pub fn some(value: T) -> Self {
-        Self::new_with_handle(value.get_handle())
+        Self::new_with_handle(value.take_handle())
     }
 
     pub fn none() -> Self {
@@ -83,7 +83,7 @@ where
 
     pub fn as_option(&self) -> Option<ManagedRef<'_, M, T>> {
         if self.is_some() {
-            unsafe { Some(ManagedRef::wrap_handle(self.handle.clone())) }
+            Some(ManagedRef::wrap_handle(&self.handle))
         } else {
             None
         }
@@ -199,7 +199,7 @@ where
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
-        <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle.clone(), writer)
+        <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
     }
 }
 

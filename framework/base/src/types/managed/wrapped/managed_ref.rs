@@ -16,7 +16,7 @@ where
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) _phantom_t: PhantomData<&'a T>,
-    pub(super) handle: T::OwnHandle,
+    pub(super) handle: &'a T::OwnHandle,
 }
 
 impl<'a, M, T> ManagedRef<'a, M, T>
@@ -32,9 +32,8 @@ where
         }
     }
 
-    /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(crate) unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
+    pub(crate) fn wrap_handle(handle: &'a T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -44,7 +43,7 @@ where
 
     #[doc(hidden)]
     #[inline]
-    pub fn get_raw_handle_of_ref(self) -> T::OwnHandle {
+    pub fn get_raw_handle_of_ref(self) -> &'a T::OwnHandle {
         self.handle
     }
 }
@@ -69,7 +68,7 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: self.handle.clone(),
+            handle: &self.handle.clone(),
         }
     }
 }

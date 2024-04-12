@@ -12,17 +12,17 @@ impl ManagedBufferApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn mb_len(&self, _handle: Self::ManagedBufferHandle) -> usize {
+    fn mb_len(&self, _handle: &Self::ManagedBufferHandle) -> usize {
         unreachable!()
     }
 
-    fn mb_to_boxed_bytes(&self, _handle: Self::ManagedBufferHandle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, _handle: &Self::ManagedBufferHandle) -> BoxedBytes {
         unreachable!()
     }
 
     fn mb_load_slice(
         &self,
-        _source_handle: Self::ManagedBufferHandle,
+        _source_handle: &Self::ManagedBufferHandle,
         _starting_position: usize,
         _dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
@@ -39,7 +39,7 @@ impl ManagedBufferApiImpl for super::UncallableApi {
         unreachable!()
     }
 
-    fn mb_overwrite(&self, _handle: Self::ManagedBufferHandle, _value: &[u8]) {
+    fn mb_overwrite(&self, _handle: &Self::ManagedBufferHandle, _value: &[u8]) {
         unreachable!()
     }
 
@@ -70,8 +70,8 @@ impl ManagedBufferApiImpl for super::UncallableApi {
 
     fn mb_eq(
         &self,
-        _handle1: Self::ManagedBufferHandle,
-        _handle2: Self::ManagedBufferHandle,
+        _handle1: &Self::ManagedBufferHandle,
+        _handle2: &Self::ManagedBufferHandle,
     ) -> bool {
         unreachable!()
     }

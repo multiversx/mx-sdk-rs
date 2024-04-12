@@ -35,7 +35,7 @@ where
         let mbuf_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), mbuf_handle.clone());
+            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), &mbuf_handle);
         ManagedBuffer::from_handle(mbuf_handle)
     }
 
@@ -50,8 +50,8 @@ where
     fn load_len_managed_buffer(&self) -> usize {
         let value_handle: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), value_handle.clone());
-        A::managed_type_impl().mb_len(value_handle)
+            .storage_load_managed_buffer_raw(self.key.buffer.get_handle(), &value_handle);
+        A::managed_type_impl().mb_len(&value_handle)
     }
 }
 
@@ -163,6 +163,6 @@ where
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(err_msg::STORAGE_DECODE_ERROR);
         message_buffer.append_bytes(err.message_bytes());
-        M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
+        M::error_api_impl().signal_error_from_buffer(message_buffer.take_handle())
     }
 }

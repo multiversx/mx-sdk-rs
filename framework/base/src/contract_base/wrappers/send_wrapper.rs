@@ -617,8 +617,9 @@ where
         attributes: &T,
     ) -> u64 {
         let big_zero = BigUint::zero();
+        let empty_buffer = ManagedBuffer::<A>::new();
+        let empty_vec = ManagedVec::from_handle(empty_buffer.take_handle());
         let empty_buffer = ManagedBuffer::new();
-        let empty_vec = ManagedVec::from_handle(empty_buffer.get_handle());
 
         self.esdt_nft_create(
             token,

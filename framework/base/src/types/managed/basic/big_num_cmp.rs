@@ -21,7 +21,7 @@ where
         }
     } else {
         let big_int_temp_1 = BigInt::<M>::make_temp(const_handles::BIG_INT_TEMPORARY_1, other);
-        api.bi_cmp(bi.get_handle(), big_int_temp_1)
+        api.bi_cmp(bi.get_handle(), &big_int_temp_1)
     }
 }
 

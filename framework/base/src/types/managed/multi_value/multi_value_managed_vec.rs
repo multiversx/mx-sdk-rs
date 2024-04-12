@@ -48,7 +48,7 @@ where
         Self(ManagedVec::from_handle(handle))
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
         self.0.get_handle()
     }
 

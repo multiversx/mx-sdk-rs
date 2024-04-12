@@ -179,7 +179,7 @@ macro_rules! impl_managed_type {
                 reader: Reader,
             ) -> Self::Ref<'a> {
                 let handle = <$ty<M> as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-                ManagedRef::wrap_handle(handle)
+                ManagedRef::wrap_handle(&handle)
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -213,7 +213,7 @@ where
         reader: Reader,
     ) -> Self::Ref<'a> {
         let handle = <Self as ManagedType<M>>::OwnHandle::from_byte_reader(reader);
-        ManagedRef::wrap_handle(handle)
+        ManagedRef::wrap_handle(&handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
@@ -286,7 +286,7 @@ where
         reader: Reader,
     ) -> Self::Ref<'a> {
         let handle = M::ManagedBufferHandle::from_byte_reader(reader);
-        ManagedRef::wrap_handle(handle)
+        ManagedRef::wrap_handle(&handle)
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {

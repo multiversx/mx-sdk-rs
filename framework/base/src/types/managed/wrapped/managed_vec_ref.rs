@@ -14,7 +14,7 @@ where
 {
     _phantom_m: PhantomData<M>,
     _phantom_t: PhantomData<&'a mut T>, // needed for the lifetime, even though T is present
-    managed_vec_handle: M::ManagedBufferHandle,
+    managed_vec_handle: &'a M::ManagedBufferHandle,
     item_index: usize,
     item: T,
 }
@@ -29,7 +29,7 @@ where
         ManagedVec::from_handle(managed_vec_handle)
     }
 
-    pub(super) fn new(managed_vec_handle: M::ManagedBufferHandle, item_index: usize) -> Self {
+    pub(super) fn new(managed_vec_handle: &'a M::ManagedBufferHandle, item_index: usize) -> Self {
         let item =
             unsafe { Self::wrap_as_managed_vec(managed_vec_handle.clone()).get_unsafe(item_index) };
         Self {

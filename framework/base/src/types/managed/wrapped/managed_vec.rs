@@ -52,7 +52,7 @@ where
         }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
         self.buffer.get_handle()
     }
 
