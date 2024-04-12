@@ -7,7 +7,7 @@ pub mod call_sync_legacy;
 pub mod call_transf_exec_legacy;
 pub mod contract_change_owner_legacy;
 pub mod contract_deploy_legacy;
-// pub mod contract_upgrade_legacy;
+pub mod contract_upgrade_legacy;
 pub mod esdt_legacy;
 pub mod nft_legacy;
 pub mod roles_legacy;
@@ -24,7 +24,7 @@ pub trait ForwarderLegacy:
     + call_transf_exec_legacy::ForwarderTransferExecuteModule
     + contract_change_owner_legacy::ChangeOwnerModule
     + contract_deploy_legacy::DeployContractModule
-    // + contract_upgrade_legacy::UpgradeContractModule
+    + contract_upgrade_legacy::UpgradeContractModule
     + esdt_legacy::ForwarderEsdtModule
     + sft_legacy::ForwarderSftModule
     + nft_legacy::ForwarderNftModule

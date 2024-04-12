@@ -87,13 +87,17 @@ where
     Gas: TxGas<TxScEnv<Api>>,
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
-    /// Backwards compatibility, immitates the old API.
+    /// Transition syntax, immitates the old API.
     ///
     /// Note that the data type (the `UpgradeCall`) doesn't have the code set.
     /// This is because the old API was passing it as paramter, so we use it from the `code` argument.
     ///
     /// Also note that the code metadata is taken from the `code_metadata` argument.
     /// If another one was previously set in the `Tx` object, that one will be ignored.
+    #[deprecated(
+        since = "0.49.0",
+        note = "This is a transition syntax, it would not have been reachable before 0.49.0. Use [upgrade_async_call_and_exit] instead."
+    )]
     pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
         self.payment.with_egld_value(&self.env, |egld_value| {
@@ -108,13 +112,17 @@ where
         });
     }
 
-    /// Backwards compatibility, immitates the old API.
+    /// Transition syntax, immitates the old API.
     ///
     /// Note that the data type (the `UpgradeCall`) doesn't have the code set.
     /// This is because the old API was passing it as paramter, so we use it from the `code` argument.
     ///
     /// Also note that the code metadata is taken from the `code_metadata` argument.
     /// If another one was previously set in the `Tx` object, that one will be ignored.
+    #[deprecated(
+        since = "0.49.0",
+        note = "This is a transition syntax, it would not have been reachable before 0.49.0. Use [upgrade_async_call_and_exit] instead."
+    )]
     pub fn upgrade_from_source(
         self,
         source_address: &ManagedAddress<Api>,

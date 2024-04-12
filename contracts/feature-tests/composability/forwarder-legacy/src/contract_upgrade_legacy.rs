@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
