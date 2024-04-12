@@ -5,7 +5,6 @@ mod back_transfers;
 mod callback_closure;
 mod callback_selector_result;
 mod contract_call_legacy;
-mod contract_deploy;
 mod deploy_call;
 mod expr;
 mod function_call;
@@ -37,7 +36,6 @@ pub use callback_closure::{
 };
 pub use callback_selector_result::CallbackSelectorResult;
 pub use contract_call_legacy::*;
-pub use contract_deploy::{new_contract_deploy, ContractDeploy};
 pub use deploy_call::*;
 pub use expr::*;
 pub use function_call::FunctionCall;
