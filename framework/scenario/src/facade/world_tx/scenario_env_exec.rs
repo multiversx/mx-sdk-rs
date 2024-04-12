@@ -138,15 +138,16 @@ impl<'w> SetStateBuilder<'w> {
     }
 
     fn reset_account(&mut self, address: AddressKey) {
-        // assert!(
-        //     self.world
-        //         .get_debugger_backend()
-        //         .vm_runner
-        //         .blockchain_mock
-        //         .state
-        //         .account_exists(&address.to_vm_address()),
-        //     "updating existing accounts currently not supported"
-        // );
+        assert!(
+            !self
+                .world
+                .get_debugger_backend()
+                .vm_runner
+                .blockchain_mock
+                .state
+                .account_exists(&address.to_vm_address()),
+            "updating existing accounts currently not supported"
+        );
 
         self.current_address = address;
         self.current_account = Account::default();
