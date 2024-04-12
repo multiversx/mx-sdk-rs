@@ -1,24 +1,23 @@
 use crate::{
-    api::{CallTypeApi, ManagedTypeApi},
+    api::CallTypeApi,
     contract_base::BlockchainWrapper,
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs,
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedOption,
-        ManagedVec, MultiEsdtPayment, TokenIdentifier,
+        EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
+        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        TokenIdentifier,
     },
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
-    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
-    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue,
-    TxPayment, TxPaymentEgldOnly, TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
-    TxToSpecified, UpgradeCall,
+    contract_deploy::UNSPECIFIED_GAS_LIMIT, Code, ContractCallBase, ContractCallNoPayment,
+    ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource,
+    FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
+    RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall,
+    TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
+    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -264,7 +263,7 @@ where
 
     /// Backwards compatibility.
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
-        mut self,
+        self,
         payment: P,
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
         self.payment(MultiEsdtPayment::new())
@@ -354,7 +353,7 @@ where
     ///
     /// Can be called multiple times.
     pub fn multi_esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
-        mut self,
+        self,
         payment: P,
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
         self.esdt(payment)
@@ -362,7 +361,7 @@ where
 
     /// Backwards compatibility.
     pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
-        mut self,
+        self,
         payment: P,
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
         self.multi_esdt(payment)

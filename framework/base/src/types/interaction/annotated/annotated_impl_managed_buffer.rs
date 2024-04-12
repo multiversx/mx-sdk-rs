@@ -1,4 +1,4 @@
-use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedRef};
+use crate::types::ManagedBuffer;
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -18,7 +18,7 @@ where
         self
     }
 
-    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedBuffer<Env::Api>) -> R,
     {

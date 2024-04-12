@@ -16,11 +16,7 @@ pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 
 use crate::{
     api::ManagedTypeApi,
-    contract_base::SendRawWrapper,
-    types::{
-        BigUint, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedAddress,
-        ManagedBuffer, MultiEsdtPayment,
-    },
+    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEsdtPayment},
 };
 
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};

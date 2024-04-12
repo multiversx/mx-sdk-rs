@@ -1,13 +1,11 @@
 use crate::{
-    api::ManagedTypeApi,
     contract_base::SendRawWrapper,
     types::{
-        BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedVec, MultiEsdtPayment,
-        TokenIdentifier, TxFrom, TxToSpecified,
+        BigUint, EsdtTokenPaymentRefs, ManagedAddress, MultiEsdtPayment, TxFrom, TxToSpecified,
     },
 };
 
-use super::{AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment};
+use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
 impl<'a, Env> TxPayment<Env> for EsdtTokenPaymentRefs<'a, Env::Api>
 where
@@ -19,7 +17,7 @@ where
 
     fn perform_transfer_execute(
         self,
-        env: &Env,
+        _env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,
