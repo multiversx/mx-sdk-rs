@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-wasm-adapter"
-version = "0.49.0-alpha.2"
+version = "0.49.0-alpha.3"
 edition = "2021"
 
 authors = [
@@ -22,5 +22,5 @@ categories = [
 ]
 
 [dependencies.multiversx-sc]
-version = "=0.49.0-alpha.2"
+version = "=0.49.0-alpha.3"
 path = "../base"
