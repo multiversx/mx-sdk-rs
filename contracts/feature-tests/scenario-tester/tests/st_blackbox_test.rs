@@ -1,4 +1,4 @@
-use multiversx_sc_scenario::{imports::*, scenario_model::U64Value};
+use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
 
 use scenario_tester::*;
@@ -41,22 +41,15 @@ fn st_blackbox() {
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(
-                owner_address,
-                CheckAccount::new()
-                    .nonce(U64Value::from(1u64))
-                    .balance("100"),
-            )
-            .put_account(
-                other_address,
-                CheckAccount::new()
-                    .nonce(U64Value::from(2u64))
-                    .balance("300")
-                    .esdt_balance("str:TOKEN-123456", "500"),
-            ),
-    );
+    world
+        .check_state_account(owner_address)
+        .nonce("1")
+        .balance("100")
+        .check_state_account(other_address)
+        .nonce("2")
+        .balance("300")
+        .esdt_balance("str:TOKEN-123456", "500")
+        .commit();
 
     world.set_state_step(SetStateStep::new().new_address(owner_address, 1, "sc:scenario-tester"));
 
@@ -68,7 +61,6 @@ fn st_blackbox() {
         .code(CODE_EXPR)
         .returns(ReturnsNewAddress)
         .run();
-
     assert_eq!(new_address, st_contract.to_address());
 
     let value = world
@@ -88,14 +80,13 @@ fn st_blackbox() {
         .add(1u32)
         .run();
 
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(owner_address, CheckAccount::new())
-            .put_account(
-                &st_contract,
-                CheckAccount::new().check_storage("str:sum", "6"),
-            ),
-    );
+    world
+        .check_state_account(owner_address)
+        .nonce("3")
+        .balance("100")
+        .check_state_account(st_contract)
+        .check_storage("str:sum", "6")
+        .commit();
 
     world
         .tx()
@@ -130,22 +121,15 @@ fn set_state_test() {
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(
-                first,
-                CheckAccount::new()
-                    .nonce(U64Value::from(1u64))
-                    .balance("100"),
-            )
-            .put_account(
-                second,
-                CheckAccount::new()
-                    .nonce(U64Value::from(2u64))
-                    .balance("300")
-                    .esdt_balance("str:TOKEN-123456", "500"),
-            ),
-    );
+    world
+        .check_state_account(first)
+        .nonce(1)
+        .balance("100")
+        .check_state_account(second)
+        .nonce(2)
+        .balance("300")
+        .esdt_balance("str:TOKEN-123456", "500")
+        .commit();
 
     world
         .account(third)
@@ -154,20 +138,12 @@ fn set_state_test() {
         .esdt_nft_balance("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
         .commit();
 
-    world.check_state_step(
-        CheckStateStep::new().put_account(
-            third,
-            CheckAccount::new()
-                .nonce(U64Value::from(3u64))
-                .balance("50")
-                .esdt_nft_balance_and_attributes(
-                    "str:NFT-123456",
-                    "2",
-                    "1",
-                    Some(Vec::<u8>::new()),
-                ),
-        ),
-    );
+    world
+        .check_state_account(third)
+        .nonce(3)
+        .balance("50")
+        .esdt_nft_balance_and_attributes("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
+        .commit();
 
     // using no commit should drop the value naturally
     world
@@ -179,22 +155,14 @@ fn set_state_test() {
         .balance("250")
         .esdt_balance("str:TOKEN-123456", "2");
 
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(
-                fourth,
-                CheckAccount::new()
-                    .nonce(U64Value::from(4u64))
-                    .balance("400"),
-            )
-            .put_account(
-                fifth,
-                CheckAccount::new()
-                    .nonce(U64Value::from(5u64))
-                    .balance("250")
-                    .esdt_balance("str:TOKEN-123456", "2"),
-            ),
-    );
+    world
+        .check_state_account(fourth)
+        .nonce(4)
+        .balance("400")
+        .check_state_account(fifth)
+        .nonce(5)
+        .balance("250")
+        .esdt_balance("str:TOKEN-123456", "2");
 
     world
         .account(sixth)
@@ -202,13 +170,9 @@ fn set_state_test() {
         .balance("600")
         .esdt_balance("str:TOKEN-123456", "60");
 
-    world.check_state_step(
-        CheckStateStep::new().put_account(
-            sixth,
-            CheckAccount::new()
-                .nonce(U64Value::from(6u64))
-                .balance("600")
-                .esdt_balance("str:TOKEN-123456", "60"),
-        ),
-    );
+    world
+        .check_state_account(sixth)
+        .nonce(6)
+        .balance("600")
+        .esdt_balance("str:TOKEN-123456", "60");
 }
