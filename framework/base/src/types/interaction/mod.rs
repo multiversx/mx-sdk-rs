@@ -1,5 +1,3 @@
-#![allow(unused)] // TEMP
-
 mod annotated;
 mod async_call;
 mod async_call_promises;

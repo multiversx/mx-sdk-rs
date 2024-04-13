@@ -1,11 +1,9 @@
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
-    tuple_util::NestedTupleFlatten,
     types::{
-        Code, CodeMetadata, DeployRawResult, FromSource, ManagedAddress, ManagedBuffer, ManagedVec,
-        RHListExec, Tx, TxCodeValue, TxEmptyResultHandler, TxFrom, TxFromSourceValue, TxGas,
-        TxPaymentEgldOnly, TxResultHandler, TxScEnv, TxTo, UpgradeCall,
+        Code, CodeMetadata, FromSource, ManagedAddress, ManagedBuffer, Tx, TxCodeValue,
+        TxEmptyResultHandler, TxFromSourceValue, TxGas, TxPaymentEgldOnly, TxScEnv, UpgradeCall,
     },
 };
 

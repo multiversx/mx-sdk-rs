@@ -21,7 +21,7 @@ where
         BlockchainWrapper::<Api>::new().get_sc_address()
     }
 
-    fn with_value_ref<F, R>(&self, env: &TxScEnv<Api>, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &TxScEnv<Api>, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Api>) -> R,
     {

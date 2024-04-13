@@ -16,6 +16,8 @@ pub use returns_raw_result::*;
 pub use returns_result::*;
 pub use returns_result_conv::*;
 pub use with_new_address::*;
+pub use with_raw_result::WithRawResult;
+pub use with_result::WithResult;
 pub use with_result_conv::*;
 
 use super::TxEnv;

@@ -2,14 +2,8 @@ use hex_literal::hex;
 use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
-    api::{
-        const_handles, use_raw_handle, BlockchainApi, BlockchainApiImpl, CallTypeApi,
-        ManagedTypeApi,
-    },
-    contract_base::BlockchainWrapper,
-    types::{
-        AnnotatedValue, ManagedAddress, ManagedBuffer, ManagedType, TxScEnv, TxTo, TxToSpecified,
-    },
+    api::{CallTypeApi, ManagedTypeApi},
+    types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxScEnv, TxTo, TxToSpecified},
 };
 
 /// Address of the system smart contract that manages ESDT.
@@ -44,7 +38,7 @@ impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for ESDTSystemSCAddr
 where
     Api: CallTypeApi,
 {
-    fn annotation(&self, env: &TxScEnv<Api>) -> ManagedBuffer<Api> {
+    fn annotation(&self, _env: &TxScEnv<Api>) -> ManagedBuffer<Api> {
         ManagedBuffer::from(SYSTEM_SC_ADDRESS_ANNOTATION)
     }
 

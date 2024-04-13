@@ -1,12 +1,8 @@
-use crate::{
-    contract_base::SendRawWrapper,
-    types::{
-        BigUint, EsdtTokenPayment, ManagedAddress, ManagedVec, MultiEsdtPayment, TokenIdentifier,
-        TxFrom, TxToSpecified,
-    },
+use crate::types::{
+    BigUint, EsdtTokenPayment, ManagedAddress, TokenIdentifier, TxFrom, TxToSpecified,
 };
 
-use super::{AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment};
+use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
 impl<Env> TxPayment<Env> for (TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>)
 where

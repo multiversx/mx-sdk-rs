@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 
 // use super::properties::*;
-use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},

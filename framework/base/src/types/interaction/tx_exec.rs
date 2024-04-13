@@ -11,7 +11,6 @@ pub use tx_exec_async::*;
 pub use tx_exec_async_promises::*;
 pub use tx_exec_deploy::*;
 pub use tx_exec_sync::*;
-pub use tx_exec_upgrade::*;
 
 use crate::{
     api::CallTypeApi,

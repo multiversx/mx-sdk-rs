@@ -1035,7 +1035,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
- "vault",
 ]
 
 [[package]]
@@ -1070,7 +1069,6 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
  "multiversx-sc-wasm-adapter",
- "vault",
 ]
 
 [[package]]
@@ -2234,7 +2232,6 @@ dependencies = [
 name = "parent"
 version = "0.0.0"
 dependencies = [
- "child",
  "multiversx-sc",
  "multiversx-sc-scenario",
 ]
@@ -2372,7 +2369,6 @@ name = "promises-features"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "vault",
 ]
 
 [[package]]

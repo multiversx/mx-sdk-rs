@@ -1,4 +1,4 @@
-use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedRef};
+use crate::types::{heap::Address, ManagedAddress, ManagedBuffer};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -10,7 +10,7 @@ where
         self.hex_expr()
     }
 
-    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         self.clone()
     }
 
@@ -18,7 +18,7 @@ where
         self
     }
 
-    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -34,7 +34,7 @@ where
         self.hex_expr()
     }
 
-    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         (*self).clone()
     }
 
@@ -42,7 +42,7 @@ where
         self.clone()
     }
 
-    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedAddress<Env::Api>) -> R,
     {
@@ -58,7 +58,7 @@ where
         ManagedAddress::from(self).hex_expr()
     }
 
-    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         ManagedAddress::from(self)
     }
 }
@@ -71,7 +71,7 @@ where
         ManagedAddress::from(*self).hex_expr()
     }
 
-    fn to_value(&self, env: &Env) -> ManagedAddress<Env::Api> {
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
         ManagedAddress::from(*self)
     }
 }

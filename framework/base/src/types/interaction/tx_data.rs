@@ -1,6 +1,6 @@
 use crate::{
     formatter::SCLowerHex,
-    types::{ManagedBuffer, ManagedBufferBuilder, ManagedBufferCachedBuilder},
+    types::{ManagedBuffer, ManagedBufferBuilder},
 };
 
 use super::{FunctionCall, TxEnv};

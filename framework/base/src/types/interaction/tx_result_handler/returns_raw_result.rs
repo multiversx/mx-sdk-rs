@@ -1,6 +1,6 @@
 use crate::types::{
-    DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec,
-    SyncCallRawResult, TxEnv,
+    DeployRawResult, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, SyncCallRawResult,
+    TxEnv,
 };
 
 /// Indicates that the raw result data will be returned.
