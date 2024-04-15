@@ -54,6 +54,32 @@ macro_rules! binary_operator {
                 BigInt::from_handle(result_handle)
             }
         }
+
+        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigUint<M>> for &'a BigInt<M> {
+            type Output = BigInt<M>;
+
+            fn $method(self, other: &BigUint<M>) -> BigInt<M> {
+                let rhs = unsafe { BigInt::from_handle(other.get_unsafe_handle()) };
+                let result = self.$method(&rhs);
+
+                let _ = rhs.take_handle();
+
+                result
+            }
+        }
+
+        impl<'a, 'b, M: ManagedTypeApi> $trait<&'b BigInt<M>> for &'a BigUint<M> {
+            type Output = BigInt<M>;
+
+            fn $method(self, other: &BigInt<M>) -> BigInt<M> {
+                let lhs = unsafe { BigInt::from_handle(self.get_unsafe_handle()) };
+                let result = (&lhs).$method(other);
+
+                let _ = lhs.take_handle();
+
+                result
+            }
+        }
     };
 }
 

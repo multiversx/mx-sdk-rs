@@ -35,7 +35,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.mb_overwrite(dest, self.get_sc_address_legacy().as_bytes())
     }
 
-    fn load_owner_address_managed(&self, dest: Self::ManagedBufferHandle);
+    fn load_owner_address_managed(&self, dest: &Self::ManagedBufferHandle);
 
     fn get_shard_of_address_legacy(&self, address: &Address) -> u32;
 
@@ -61,7 +61,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.load_balance_legacy(dest, &address);
     }
 
-    fn load_state_root_hash_managed(&self, dest: Self::ManagedBufferHandle);
+    fn load_state_root_hash_managed(&self, dest: &Self::ManagedBufferHandle);
 
     fn get_tx_hash_legacy(&self) -> H256;
 
@@ -79,7 +79,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
 
     fn get_block_epoch(&self) -> u64;
 
-    fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle);
+    fn load_block_random_seed_managed(&self, dest: &Self::ManagedBufferHandle);
 
     fn get_prev_block_timestamp(&self) -> u64;
 

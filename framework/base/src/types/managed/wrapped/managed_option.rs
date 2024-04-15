@@ -1,4 +1,5 @@
 use core::marker::PhantomData;
+use core::mem;
 
 use crate::codec::{
     DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -83,7 +84,7 @@ where
 
     pub fn as_option(&self) -> Option<ManagedRef<'_, M, T>> {
         if self.is_some() {
-            Some(ManagedRef::wrap_handle(&self.handle))
+            Some(ManagedRef::wrap_handle_ref(&self.handle))
         } else {
             None
         }
@@ -200,6 +201,10 @@ where
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
+    }
+
+    fn take_handle_ownership(mut self) {
+        mem::take(&mut self.handle);
     }
 }
 

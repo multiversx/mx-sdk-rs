@@ -39,88 +39,88 @@ impl CryptoApi for VmApiImpl {
 impl CryptoApiImpl for VmApiImpl {
     fn sha256_managed(
         &self,
-        result_handle: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        result_handle: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedSha256(data_handle, result_handle);
+            let _ = managedSha256(*data_handle, *result_handle);
         }
     }
 
     fn keccak256_managed(
         &self,
-        result_handle: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        result_handle: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedKeccak256(data_handle, result_handle);
+            let _ = managedKeccak256(*data_handle, *result_handle);
         }
     }
 
     #[inline]
     fn ripemd160_managed(
         &self,
-        dest: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedRipemd160(data_handle, dest);
+            let _ = managedRipemd160(*data_handle, *dest);
         }
     }
 
     #[inline]
     fn verify_bls_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
     ) -> bool {
-        unsafe { managedVerifyBLS(key, message, signature) == 0 }
+        unsafe { managedVerifyBLS(*key, *message, *signature) == 0 }
     }
 
     #[inline]
     fn verify_ed25519_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            managedVerifyEd25519(key, message, signature);
+            managedVerifyEd25519(*key, *message, *signature);
         }
     }
 
     #[inline]
     fn verify_secp256k1_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
     ) -> bool {
-        unsafe { managedVerifySecp256k1(key, message, signature) == 0 }
+        unsafe { managedVerifySecp256k1(*key, *message, *signature) == 0 }
     }
 
     #[inline]
     fn verify_custom_secp256k1_managed(
         &self,
-        key: Self::ManagedBufferHandle,
-        message: Self::ManagedBufferHandle,
-        signature: Self::ManagedBufferHandle,
+        key: &Self::ManagedBufferHandle,
+        message: &Self::ManagedBufferHandle,
+        signature: &Self::ManagedBufferHandle,
         hash_type: MessageHashType,
     ) -> bool {
         unsafe {
-            managedVerifyCustomSecp256k1(key, message, signature, hash_type.as_u8() as i32) == 0
+            managedVerifyCustomSecp256k1(*key, *message, *signature, hash_type.as_u8() as i32) == 0
         }
     }
 
     fn encode_secp256k1_der_signature_managed(
         &self,
-        r: Self::ManagedBufferHandle,
-        s: Self::ManagedBufferHandle,
-        dest_sig_handle: Self::ManagedBufferHandle,
+        r: &Self::ManagedBufferHandle,
+        s: &Self::ManagedBufferHandle,
+        dest_sig_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedEncodeSecp256k1DerSignature(r, s, dest_sig_handle);
+            let _ = managedEncodeSecp256k1DerSignature(*r, *s, *dest_sig_handle);
         }
     }
 }

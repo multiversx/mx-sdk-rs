@@ -19,7 +19,7 @@ impl EndpointArgumentApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_callback_closure_buffer(&self, _dest: Self::ManagedBufferHandle) {
+    fn load_callback_closure_buffer(&self, _dest: &Self::ManagedBufferHandle) {
         unreachable!()
     }
 }

@@ -6,6 +6,31 @@ use crate::codec::{
 
 use crate::{api::ManagedTypeApi, types::ManagedType};
 
+pub(super) enum ValueOrRef<'a, T> {
+    Value(T),
+    Ref(&'a T),
+}
+
+impl<'a, T> Deref for ValueOrRef<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        match *self {
+            ValueOrRef::Value(ref val) => val,
+            ValueOrRef::Ref(ref_val) => ref_val,
+        }
+    }
+}
+
+impl<'a, T: Clone> Clone for ValueOrRef<'a, T> {
+    fn clone(&self) -> Self {
+        match self {
+            ValueOrRef::Value(value) => { ValueOrRef::Value(value.clone()) }
+            ValueOrRef::Ref(reference) => { ValueOrRef::Ref(reference) }
+        }
+    }
+}
+
 /// A very efficient reference to a managed type, with copy semantics.
 ///
 /// It copies the handle and knows how to deref back.
@@ -16,7 +41,7 @@ where
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) _phantom_t: PhantomData<&'a T>,
-    pub(super) handle: &'a T::OwnHandle,
+    pub(super) handle: ValueOrRef<'a, T::OwnHandle>,
 }
 
 impl<'a, M, T> ManagedRef<'a, M, T>
@@ -28,23 +53,32 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: value.get_handle(),
+            handle: ValueOrRef::Ref(value.get_handle()),
         }
     }
 
     #[doc(hidden)]
-    pub(crate) fn wrap_handle(handle: &'a T::OwnHandle) -> Self {
+    pub(crate) fn wrap_handle_ref(handle_ref: &'a T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle,
+            handle: ValueOrRef::Ref(handle_ref),
+        }
+    }
+
+    #[doc(hidden)]
+    pub(crate) fn wrap_handle(handle: T::OwnHandle) -> Self {
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle: ValueOrRef::Value(handle),
         }
     }
 
     #[doc(hidden)]
     #[inline]
-    pub fn get_raw_handle_of_ref(self) -> &'a T::OwnHandle {
-        self.handle
+    pub fn get_raw_handle_of_ref(&'a self) -> &'a T::OwnHandle {
+        &self.handle
     }
 }
 
@@ -68,7 +102,7 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: &self.handle.clone(),
+            handle: self.handle.clone(),
         }
     }
 }

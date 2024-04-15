@@ -71,7 +71,7 @@ where
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_owner_address_managed(handle.clone());
+        A::blockchain_api_impl().load_owner_address_managed(&handle);
         ManagedAddress::from_handle(handle)
     }
 
@@ -173,7 +173,7 @@ where
     #[inline]
     pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_state_root_hash_managed(handle.clone());
+        A::blockchain_api_impl().load_state_root_hash_managed(&handle);
         ManagedByteArray::from_handle(handle)
     }
 
@@ -229,7 +229,7 @@ where
     #[inline]
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_block_random_seed_managed(handle.clone());
+        A::blockchain_api_impl().load_block_random_seed_managed(&handle);
         ManagedByteArray::from_handle(handle)
     }
 
@@ -345,16 +345,18 @@ where
         let _ = managed_api_impl.mb_load_slice(&properties_handle, 0, &mut properties_bytes[..]);
         let frozen = esdt_is_frozen(&properties_bytes);
 
-        EsdtTokenData {
-            token_type,
-            amount: BigUint::from_raw_handle(value_handle.get_raw_handle()),
-            frozen,
-            hash: ManagedBuffer::from_raw_handle(hash_handle.get_raw_handle()),
-            name: ManagedBuffer::from_raw_handle(name_handle.get_raw_handle()),
-            attributes: ManagedBuffer::from_raw_handle(attributes_handle.get_raw_handle()),
-            creator: ManagedAddress::from_raw_handle(creator_handle.get_raw_handle()),
-            royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
-            uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
+        unsafe {
+            EsdtTokenData {
+                token_type,
+                amount: BigUint::from_raw_handle(value_handle.get_raw_handle()),
+                frozen,
+                hash: ManagedBuffer::from_raw_handle(hash_handle.get_raw_handle()),
+                name: ManagedBuffer::from_raw_handle(name_handle.get_raw_handle()),
+                attributes: ManagedBuffer::from_raw_handle(attributes_handle.get_raw_handle()),
+                creator: ManagedAddress::from_raw_handle(creator_handle.get_raw_handle()),
+                royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
+                uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
+            }
         }
     }
 
@@ -374,9 +376,11 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        BackTransfers {
-            total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
-            esdt_payments: ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        unsafe {
+            BackTransfers {
+                total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+                esdt_payments: ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+            }
         }
     }
 

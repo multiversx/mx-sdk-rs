@@ -15,8 +15,8 @@ impl<VHB: VMHooksApiBackend> StorageReadApi for VMHooksApi<VHB> {
 impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
     fn storage_load_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     ) {
         self.assert_live_handle(&key_handle);
         self.assert_live_handle(&dest);
@@ -30,9 +30,9 @@ impl<VHB: VMHooksApiBackend> StorageReadApiImpl for VMHooksApi<VHB> {
 
     fn storage_load_from_address(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     ) {
         self.assert_live_handle(&address_handle);
         self.assert_live_handle(&key_handle);
@@ -58,8 +58,8 @@ impl<VHB: VMHooksApiBackend> StorageWriteApi for VMHooksApi<VHB> {
 impl<VHB: VMHooksApiBackend> StorageWriteApiImpl for VMHooksApi<VHB> {
     fn storage_store_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        value_handle: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        value_handle: &Self::ManagedBufferHandle,
     ) {
         self.assert_live_handle(&key_handle);
         self.assert_live_handle(&value_handle);

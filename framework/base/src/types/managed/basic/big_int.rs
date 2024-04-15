@@ -1,4 +1,4 @@
-use core::{convert::TryInto, marker::PhantomData};
+use core::{convert::TryInto, marker::PhantomData, mem};
 
 use crate::{
     abi::TypeName,
@@ -35,6 +35,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
 
     fn get_handle(&self) -> &M::BigIntHandle {
         &self.handle
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {

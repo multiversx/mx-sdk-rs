@@ -19,8 +19,8 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApi for VMHooksApi<VHB> {
 impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
     fn mb_to_big_int_unsigned(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        big_int_handle: Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
     ) {
         self.with_vm_hooks_ctx_2(&buffer_handle, &big_int_handle, |vh| {
             vh.mbuffer_to_big_int_unsigned(
@@ -32,8 +32,8 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
 
     fn mb_to_big_int_signed(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        big_int_handle: Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
     ) {
         self.with_vm_hooks_ctx_2(&buffer_handle, &big_int_handle, |vh| {
             vh.mbuffer_to_big_int_signed(
@@ -45,8 +45,8 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
 
     fn mb_from_big_int_unsigned(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        buffer_handle: Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_2(&buffer_handle, &big_int_handle, |vh| {
             vh.mbuffer_from_big_int_unsigned(
@@ -58,8 +58,8 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
 
     fn mb_from_big_int_signed(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        buffer_handle: Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_2(&buffer_handle, &big_int_handle, |vh| {
             vh.mbuffer_from_big_int_signed(

@@ -92,6 +92,24 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
     }
 }
 
+fn generate_take_handle_ownership_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
+    match fields {
+        syn::Fields::Named(fields_named) => fields_named
+            .named
+            .iter()
+            .map(|field| {
+                let field_ident = &field.ident;
+                quote! {
+                    self.#field_ident.take_handle_ownership();
+                }
+            })
+            .collect(),
+        _ => {
+            panic!("ManagedVecItem only supports named fields")
+        }
+    }
+}
+
 fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
     let name = &ast.ident;
     let self_expr = if ast.generics.params.is_empty() {
@@ -153,6 +171,8 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 };
                 writer(&arr[..])
             }
+
+            fn take_handle_ownership(self) {}
         }
     };
     gen.into()
@@ -166,6 +186,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
         generate_skips_reserialization_snippets(&data_struct.fields);
     let from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
     let to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
+    let take_handle_ownership_snippets = generate_take_handle_ownership_snippets(&data_struct.fields);
 
     let array_init_snippet = generate_array_init_snippet(ast);
 
@@ -196,6 +217,10 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 #(#to_byte_writer_snippets)*
 
                 writer(&arr[..])
+            }
+
+            fn take_handle_ownership(self) {
+                #(#take_handle_ownership_snippets)*
             }
         }
     };

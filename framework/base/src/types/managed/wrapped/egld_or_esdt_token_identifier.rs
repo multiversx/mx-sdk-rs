@@ -219,9 +219,12 @@ impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            ));
+            let buffer = ManagedBuffer::from_handle(
+                unsafe { token_identifier.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+            );
+            f.append_managed_buffer(&buffer);
+
+            let _ = buffer.take_handle();
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         }
@@ -233,9 +236,12 @@ const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
 impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            ));
+            let buffer = ManagedBuffer::from_handle(
+                unsafe { token_identifier.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+            );
+            f.append_managed_buffer(&buffer);
+
+            let _ = buffer.take_handle();
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         }

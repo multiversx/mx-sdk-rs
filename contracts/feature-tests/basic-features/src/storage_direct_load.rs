@@ -86,7 +86,7 @@ pub trait StorageLoadFeatures {
         Self::Api::storage_read_api_impl().storage_load_from_address(
             address.get_handle(),
             key.get_handle(),
-            value_handle.clone(),
+            &value_handle,
         );
         ManagedBuffer::from_handle(value_handle)
     }

@@ -24,44 +24,44 @@ impl ManagedTypeApiImpl for VmApiImpl {
     #[inline]
     fn mb_to_big_int_unsigned(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        big_int_handle: Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
     ) {
         unsafe {
-            mBufferToBigIntUnsigned(buffer_handle, big_int_handle);
+            mBufferToBigIntUnsigned(*buffer_handle, *big_int_handle);
         }
     }
 
     #[inline]
     fn mb_to_big_int_signed(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        big_int_handle: Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
     ) {
         unsafe {
-            mBufferToBigIntSigned(buffer_handle, big_int_handle);
+            mBufferToBigIntSigned(*buffer_handle, *big_int_handle);
         }
     }
 
     #[inline]
     fn mb_from_big_int_unsigned(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        buffer_handle: Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            mBufferFromBigIntUnsigned(buffer_handle, big_int_handle);
+            mBufferFromBigIntUnsigned(*buffer_handle, *big_int_handle);
         }
     }
 
     #[inline]
     fn mb_from_big_int_signed(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        buffer_handle: Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            mBufferFromBigIntSigned(buffer_handle, big_int_handle);
+            mBufferFromBigIntSigned(*buffer_handle, *big_int_handle);
         }
     }
 
@@ -88,7 +88,7 @@ impl ManagedTypeApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn validate_token_identifier(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
-        unsafe { validateTokenIdentifier(token_id_handle) != 0 }
+    fn validate_token_identifier(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {
+        unsafe { validateTokenIdentifier(*token_id_handle) != 0 }
     }
 }

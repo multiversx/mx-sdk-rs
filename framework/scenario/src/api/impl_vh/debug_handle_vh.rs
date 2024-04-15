@@ -5,6 +5,7 @@ use multiversx_sc::{
     types::ManagedVecItem,
 };
 use std::sync::Arc;
+use multiversx_sc::api::const_handles;
 
 #[derive(Clone)]
 pub struct DebugHandle {
@@ -32,6 +33,15 @@ impl DebugHandle {
 impl core::fmt::Debug for DebugHandle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         RawHandle::fmt(&self.raw_handle, f)
+    }
+}
+
+impl Default for DebugHandle {
+    fn default() -> Self {
+        Self {
+            context: TxContextStack::static_peek(),
+            raw_handle: const_handles::UNINITIALIZED_HANDLE
+        }
     }
 }
 
@@ -96,6 +106,8 @@ impl ManagedVecItem for DebugHandle {
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         RawHandle::to_byte_writer(&self.get_raw_handle(), writer)
     }
+
+    fn take_handle_ownership(self) {}
 }
 
 impl TryStaticCast for DebugHandle {}

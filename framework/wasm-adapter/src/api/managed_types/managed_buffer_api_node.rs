@@ -51,16 +51,16 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     }
 
     #[inline]
-    fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
-        unsafe { mBufferGetLength(handle) as usize }
+    fn mb_len(&self, handle: &Self::ManagedBufferHandle) -> usize {
+        unsafe { mBufferGetLength(*handle) as usize }
     }
 
-    fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, handle: &Self::ManagedBufferHandle) -> BoxedBytes {
         unsafe {
-            let len = mBufferGetLength(handle);
+            let len = mBufferGetLength(*handle);
             let mut res = BoxedBytes::allocate(len as usize);
             if len > 0 {
-                let _ = mBufferGetBytes(handle, res.as_mut_ptr());
+                let _ = mBufferGetBytes(*handle, res.as_mut_ptr());
             }
             res
         }
@@ -68,13 +68,13 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
 
     fn mb_load_slice(
         &self,
-        source_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
         unsafe {
             let err = mBufferGetByteSlice(
-                source_handle,
+                *source_handle,
                 starting_position as i32,
                 dest_slice.len() as i32,
                 dest_slice.as_mut_ptr(),
@@ -111,9 +111,9 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     }
 
     #[inline]
-    fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, bytes: &[u8]) {
+    fn mb_overwrite(&self, handle: &Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferSetBytes(handle, bytes.as_ptr(), bytes.len() as i32);
+            let _ = mBufferSetBytes(*handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
@@ -166,10 +166,10 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
 
     fn mb_eq(
         &self,
-        handle1: Self::ManagedBufferHandle,
-        handle2: Self::ManagedBufferHandle,
+        handle1: &Self::ManagedBufferHandle,
+        handle2: &Self::ManagedBufferHandle,
     ) -> bool {
-        unsafe { mBufferEq(handle1, handle2) > 0 }
+        unsafe { mBufferEq(*handle1, *handle2) > 0 }
     }
 
     fn mb_to_hex(

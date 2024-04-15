@@ -109,9 +109,9 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_caller_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_caller_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedCaller(dest);
+            managedCaller(*dest);
         }
     }
 
@@ -125,16 +125,16 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_sc_address_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_sc_address_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedSCAddress(dest);
+            managedSCAddress(*dest);
         }
     }
 
     #[inline]
-    fn load_owner_address_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_owner_address_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedOwnerAddress(dest);
+            managedOwnerAddress(*dest);
         }
     }
 
@@ -144,8 +144,8 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn get_shard_of_address(&self, address_handle: Self::ManagedBufferHandle) -> u32 {
-        unsafe { getShardOfAddress(unsafe_buffer_load_address(address_handle)) as u32 }
+    fn get_shard_of_address(&self, address_handle: &Self::ManagedBufferHandle) -> u32 {
+        unsafe { getShardOfAddress(unsafe_buffer_load_address(*address_handle)) as u32 }
     }
 
     #[inline]
@@ -154,8 +154,8 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn is_smart_contract(&self, address_handle: Self::ManagedBufferHandle) -> bool {
-        unsafe { isSmartContract(unsafe_buffer_load_address(address_handle)) > 0 }
+    fn is_smart_contract(&self, address_handle: &Self::ManagedBufferHandle) -> bool {
+        unsafe { isSmartContract(unsafe_buffer_load_address(*address_handle)) > 0 }
     }
 
     #[inline]
@@ -166,16 +166,16 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_balance(&self, dest: Self::BigIntHandle, address_handle: Self::ManagedBufferHandle) {
+    fn load_balance(&self, dest: Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
         unsafe {
-            bigIntGetExternalBalance(unsafe_buffer_load_address(address_handle), dest);
+            bigIntGetExternalBalance(unsafe_buffer_load_address(*address_handle), dest);
         }
     }
 
     #[inline]
-    fn load_state_root_hash_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_state_root_hash_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedGetStateRootHash(dest);
+            managedGetStateRootHash(*dest);
         }
     }
 
@@ -189,9 +189,9 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_tx_hash_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_tx_hash_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedGetOriginalTxHash(dest);
+            managedGetOriginalTxHash(*dest);
         }
     }
 
@@ -221,9 +221,9 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_block_random_seed_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedGetBlockRandomSeed(dest);
+            managedGetBlockRandomSeed(*dest);
         }
     }
 
@@ -257,23 +257,23 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_prev_block_random_seed_managed(&self, dest: Self::ManagedBufferHandle) {
+    fn load_prev_block_random_seed_managed(&self, dest: &Self::ManagedBufferHandle) {
         unsafe {
-            managedGetPrevBlockRandomSeed(dest);
+            managedGetPrevBlockRandomSeed(*dest);
         }
     }
 
     #[inline]
     fn get_current_esdt_nft_nonce(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        token_id_handle: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        token_id_handle: &Self::ManagedBufferHandle,
     ) -> u64 {
         unsafe {
             let token_identifier_len = self.mb_len(token_id_handle);
             getCurrentESDTNFTNonce(
-                unsafe_buffer_load_address(address_handle),
-                unsafe_buffer_load_token_identifier(token_id_handle),
+                unsafe_buffer_load_address(*address_handle),
+                unsafe_buffer_load_token_identifier(*token_id_handle),
                 token_identifier_len as i32,
             ) as u64
         }
@@ -281,16 +281,16 @@ impl BlockchainApiImpl for VmApiImpl {
 
     fn load_esdt_balance(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        token_id_handle: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        token_id_handle: &Self::ManagedBufferHandle,
         nonce: u64,
         dest: Self::BigIntHandle,
     ) {
         let token_identifier_len = self.mb_len(token_id_handle);
         unsafe {
             bigIntGetESDTExternalBalance(
-                unsafe_buffer_load_address(address_handle),
-                unsafe_buffer_load_token_identifier(token_id_handle),
+                unsafe_buffer_load_address(*address_handle),
+                unsafe_buffer_load_token_identifier(*token_id_handle),
                 token_identifier_len as i32,
                 nonce as i64,
                 dest,
@@ -341,15 +341,15 @@ impl BlockchainApiImpl for VmApiImpl {
 
     fn check_esdt_frozen(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        token_id_handle: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        token_id_handle: &Self::ManagedBufferHandle,
         nonce: u64,
     ) -> bool {
-        unsafe { managedIsESDTFrozen(address_handle, token_id_handle, nonce as i64) > 0 }
+        unsafe { managedIsESDTFrozen(*address_handle, *token_id_handle, nonce as i64) > 0 }
     }
 
-    fn check_esdt_paused(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
-        unsafe { managedIsESDTPaused(token_id_handle) > 0 }
+    fn check_esdt_paused(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {
+        unsafe { managedIsESDTPaused(*token_id_handle) > 0 }
     }
 
     fn check_esdt_limited_transfer(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {
@@ -365,17 +365,17 @@ impl BlockchainApiImpl for VmApiImpl {
         } as u64)
     }
 
-    fn managed_is_builtin_function(&self, function_name_handle: Self::ManagedBufferHandle) -> bool {
-        unsafe { managedIsBuiltinFunction(function_name_handle) }
+    fn managed_is_builtin_function(&self, function_name_handle: &Self::ManagedBufferHandle) -> bool {
+        unsafe { managedIsBuiltinFunction(*function_name_handle) }
     }
 
     fn managed_get_code_metadata(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        response_handle: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        response_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            managedGetCodeMetadata(address_handle, response_handle);
+            managedGetCodeMetadata(*address_handle, *response_handle);
         }
     }
 }

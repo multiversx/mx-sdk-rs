@@ -1,3 +1,4 @@
+use core::mem;
 use crate::{
     abi::{TypeAbi, TypeName},
     api::{use_raw_handle, BigIntApiImpl, EllipticCurveApiImpl, ManagedTypeApi},
@@ -41,6 +42,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
 
     fn get_handle(&self) -> &M::EllipticCurveHandle {
         &self.handle
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::EllipticCurveHandle) -> &Self {

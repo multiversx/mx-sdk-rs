@@ -43,7 +43,7 @@ pub fn generate_event_impl(m: &Method, event_identifier: &str) -> proc_macro2::T
             );
             #(#topic_push_snippets)*
             #data_buffer_snippet
-            multiversx_sc::log_util::write_log(&___topic_accumulator___, &___data_buffer___);
+            multiversx_sc::log_util::write_log(___topic_accumulator___, ___data_buffer___);
         }
     }
 }

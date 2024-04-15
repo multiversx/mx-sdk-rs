@@ -56,6 +56,10 @@ where
         self.buffer.get_handle()
     }
 
+    fn take_handle(self) -> Self::OwnHandle {
+        self.buffer.take_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
@@ -208,6 +212,8 @@ where
         item.to_byte_writer(|bytes| {
             self.buffer.append_bytes(bytes);
         });
+
+        item.take_handle_ownership();
     }
 
     pub fn remove(&mut self, index: usize) {

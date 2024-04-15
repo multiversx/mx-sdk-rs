@@ -7,6 +7,7 @@ use crate::{
     types::{BigInt, BigUint, ManagedType},
 };
 use alloc::string::String;
+use core::mem;
 
 use crate::codec::{
     CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -29,6 +30,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigFloat<M> {
 
     fn get_handle(&self) -> &M::BigFloatHandle {
         &self.handle
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigFloatHandle) -> &Self {

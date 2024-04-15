@@ -25,23 +25,23 @@ impl StorageReadApiImpl for VmApiImpl {
     #[inline]
     fn storage_load_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            mBufferStorageLoad(key_handle, dest);
+            mBufferStorageLoad(*key_handle, *dest);
         }
     }
 
     #[inline]
     fn storage_load_from_address(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            mBufferStorageLoadFromAddress(address_handle, key_handle, dest);
+            mBufferStorageLoadFromAddress(*address_handle, *key_handle, *dest);
         }
     }
 }
@@ -58,11 +58,11 @@ impl StorageWriteApi for VmApiImpl {
 impl StorageWriteApiImpl for VmApiImpl {
     fn storage_store_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        value_handle: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        value_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            mBufferStorageStore(key_handle, value_handle);
+            mBufferStorageStore(*key_handle, *value_handle);
         }
     }
 }

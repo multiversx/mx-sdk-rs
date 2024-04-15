@@ -11,7 +11,13 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
 
     fn get_handle(&self) -> &Self::OwnHandle;
 
-    fn take_handle(self) -> Self::OwnHandle { Default::default() }
+    /// Totally discard lifetimes, the handle might become available once the struct is dropped.
+    /// Consider using the safe get_handle method.
+    unsafe fn get_unsafe_handle(&self) -> <Self as ManagedType<M>>::OwnHandle {
+        self.get_handle().clone()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle;
 
     #[doc(hidden)]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {

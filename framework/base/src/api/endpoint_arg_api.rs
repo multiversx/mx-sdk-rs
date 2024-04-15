@@ -73,5 +73,5 @@ pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
         }
     }
 
-    fn load_callback_closure_buffer(&self, dest: Self::ManagedBufferHandle);
+    fn load_callback_closure_buffer(&self, dest: &Self::ManagedBufferHandle);
 }

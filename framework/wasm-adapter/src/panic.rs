@@ -25,7 +25,7 @@ pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
         panic_msg.append_str("unknown panic occurred");
     };
 
-    VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.get_handle())
+    VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.take_handle())
 }
 
 #[derive(Default)]

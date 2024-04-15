@@ -87,7 +87,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// The buffer is 32 bytes long, enough for both addresses and token identifiers.
     pub(crate) fn with_temp_buffer_ptr<R, F>(
         &self,
-        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        handle: &<Self as HandleTypeInfo>::ManagedBufferHandle,
         length: usize,
         f: F,
     ) -> R
@@ -95,7 +95,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         F: FnOnce(MemPtr) -> R,
     {
         let mut temp_buffer = [0u8; 32];
-        self.mb_load_slice(handle, 0, &mut temp_buffer[..length])
+        self.mb_load_slice(&handle, 0, &mut temp_buffer[..length])
             .expect("error extracting address bytes");
         f(temp_buffer.as_ptr() as MemPtr)
     }
@@ -103,7 +103,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// Convenience method for calling VM hooks with a pointer to a temporary buffer in which we load an address.
     pub(crate) fn with_temp_address_ptr<R, F>(
         &self,
-        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        handle: &<Self as HandleTypeInfo>::ManagedBufferHandle,
         f: F,
     ) -> R
     where

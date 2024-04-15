@@ -20,7 +20,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_owner_address_managed(&self, _dest: Self::ManagedBufferHandle) {
+    fn load_owner_address_managed(&self, _dest: &Self::ManagedBufferHandle) {
         unreachable!()
     }
     fn get_shard_of_address_legacy(&self, _address: &Address) -> u32 {
@@ -39,7 +39,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_state_root_hash_managed(&self, _dest: Self::ManagedBufferHandle) {
+    fn load_state_root_hash_managed(&self, _dest: &Self::ManagedBufferHandle) {
         unreachable!()
     }
 
@@ -67,7 +67,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_block_random_seed_managed(&self, _dest: Self::ManagedBufferHandle) {
+    fn load_block_random_seed_managed(&self, _dest: &Self::ManagedBufferHandle) {
         unreachable!()
     }
 

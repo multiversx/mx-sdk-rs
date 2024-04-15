@@ -20,13 +20,13 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         use_raw_handle(raw_handle)
     }
 
-    fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
+    fn mb_len(&self, handle: &Self::ManagedBufferHandle) -> usize {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize
         })
     }
 
-    fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, handle: &Self::ManagedBufferHandle) -> BoxedBytes {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize;
             unsafe {
@@ -44,7 +44,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_load_slice(
         &self,
-        source_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
@@ -87,7 +87,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         }
     }
 
-    fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
+    fn mb_overwrite(&self, handle: &Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             mem_conv::with_mem_ptr(value, |offset, length| {
                 vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length);
@@ -151,8 +151,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_eq(
         &self,
-        handle1: Self::ManagedBufferHandle,
-        handle2: Self::ManagedBufferHandle,
+        handle1: &Self::ManagedBufferHandle,
+        handle2: &Self::ManagedBufferHandle,
     ) -> bool {
         i32_to_bool(self.with_vm_hooks_ctx_2(&handle1, &handle2, |vh| {
             vh.mbuffer_eq(

@@ -1,14 +1,15 @@
 use crate::{
     api::{
-        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedBufferApiImpl, ManagedTypeApi,
+        CallValueApi, CallValueApiImpl, const_handles, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
+        ManagedTypeApi, use_raw_handle,
     },
     contract_base::CallValueWrapper,
     err_msg,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedRef, ManagedType, ManagedVec,
+        BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedType, ManagedVec,
     },
 };
+use crate::types::ManagedRef;
 
 /// Called initially in the generated code whenever no payable annotation is provided.
 pub fn not_payable<A>()
@@ -90,7 +91,7 @@ where
 }
 
 /// Initializes an argument annotated with `#[payment_multi]`.
-pub fn arg_payment_multi<A>() -> ManagedVec<A, EsdtTokenPayment<A>>
+pub fn arg_payment_multi<A>() -> ManagedRef<'static, A, ManagedVec<A, EsdtTokenPayment<A>>>
 where
     A: CallValueApi + ManagedTypeApi,
 {

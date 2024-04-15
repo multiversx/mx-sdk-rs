@@ -37,12 +37,12 @@ macro_rules! binary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
         fn $method_name(
             &self,
-            dest: Self::BigIntHandle,
-            x: Self::BigIntHandle,
-            y: Self::BigIntHandle,
+            dest: &Self::BigIntHandle,
+            x: &Self::BigIntHandle,
+            y: &Self::BigIntHandle,
         ) {
             unsafe {
-                $hook_name(dest, x, y);
+                $hook_name(*dest, *x, *y);
             }
         }
     };
@@ -50,9 +50,9 @@ macro_rules! binary_op_wrapper {
 
 macro_rules! unary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle) {
+        fn $method_name(&self, dest: &Self::BigIntHandle, x: &Self::BigIntHandle) {
             unsafe {
-                $hook_name(dest, x);
+                $hook_name(*dest, *x);
             }
         }
     };
@@ -65,17 +65,17 @@ impl BigIntApiImpl for crate::api::VmApiImpl {
     }
 
     #[inline]
-    fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
+    fn bi_set_int64(&self, destination: &Self::BigIntHandle, value: i64) {
         unsafe {
-            bigIntSetInt64(destination, value);
+            bigIntSetInt64(*destination, value);
         }
     }
 
-    fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
+    fn bi_to_i64(&self, reference: &Self::BigIntHandle) -> Option<i64> {
         unsafe {
-            let is_i64_result = bigIntIsInt64(reference);
+            let is_i64_result = bigIntIsInt64(*reference);
             if is_i64_result > 0 {
-                Some(bigIntGetInt64(reference))
+                Some(bigIntGetInt64(*reference))
             } else {
                 None
             }
@@ -91,9 +91,9 @@ impl BigIntApiImpl for crate::api::VmApiImpl {
     unary_op_wrapper! {bi_abs, bigIntAbs}
     unary_op_wrapper! {bi_neg, bigIntNeg}
 
-    fn bi_sign(&self, x: Self::BigIntHandle) -> Sign {
+    fn bi_sign(&self, x: &Self::BigIntHandle) -> Sign {
         unsafe {
-            match bigIntSign(x).cmp(&0) {
+            match bigIntSign(*x).cmp(&0) {
                 Ordering::Greater => Sign::Plus,
                 Ordering::Equal => Sign::NoSign,
                 Ordering::Less => Sign::Minus,
@@ -102,40 +102,40 @@ impl BigIntApiImpl for crate::api::VmApiImpl {
     }
 
     #[inline]
-    fn bi_cmp(&self, x: Self::BigIntHandle, y: Self::BigIntHandle) -> Ordering {
-        unsafe { bigIntCmp(x, y).cmp(&0) }
+    fn bi_cmp(&self, x: &Self::BigIntHandle, y: &Self::BigIntHandle) -> Ordering {
+        unsafe { bigIntCmp(*x, *y).cmp(&0) }
     }
 
     unary_op_wrapper! {bi_sqrt, bigIntSqrt}
     binary_op_wrapper! {bi_pow, bigIntPow}
 
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
-        unsafe { bigIntLog2(x) as u32 }
+    fn bi_log2(&self, x: &Self::BigIntHandle) -> u32 {
+        unsafe { bigIntLog2(*x) as u32 }
     }
 
     binary_op_wrapper! {bi_and, bigIntAnd}
     binary_op_wrapper! {bi_or, bigIntOr}
     binary_op_wrapper! {bi_xor, bigIntXor}
 
-    fn bi_shr(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
+    fn bi_shr(&self, dest: &Self::BigIntHandle, x: &Self::BigIntHandle, bits: usize) {
         unsafe {
-            bigIntShr(dest, x, bits as i32);
+            bigIntShr(*dest, *x, bits as i32);
         }
     }
 
-    fn bi_shl(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
+    fn bi_shl(&self, dest: &Self::BigIntHandle, x: &Self::BigIntHandle, bits: usize) {
         unsafe {
-            bigIntShl(dest, x, bits as i32);
+            bigIntShl(*dest, *x, bits as i32);
         }
     }
 
     fn bi_to_string(
         &self,
-        bi_handle: Self::BigIntHandle,
-        result_handle: Self::ManagedBufferHandle,
+        bi_handle: &Self::BigIntHandle,
+        result_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            bigIntToString(bi_handle, result_handle);
+            bigIntToString(*bi_handle, *result_handle);
         }
     }
 }

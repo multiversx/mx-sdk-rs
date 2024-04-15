@@ -41,6 +41,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         &self.handle
     }
 
+    fn take_handle(mut self) -> Self::OwnHandle {
+        mem::take(&mut self.handle)
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }
@@ -448,9 +452,12 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        let buffer = ManagedBuffer::from_handle(
+            unsafe { self.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+        );
+        f.append_managed_buffer(&buffer);
+
+        let _ = buffer.take_handle();
     }
 }
 
@@ -467,10 +474,14 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let buffer = ManagedBuffer::from_handle(
+            unsafe { self.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+        );
         // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_binary(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        f.append_managed_buffer_binary(&buffer);
+
+        let _ = buffer.take_handle();
+
     }
 }
 

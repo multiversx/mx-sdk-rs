@@ -42,6 +42,10 @@ where
         self.data.get_handle()
     }
 
+    fn take_handle(self) -> Self::OwnHandle {
+        self.data.take_handle()
+    }
+
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
         unsafe { core::mem::transmute(handle_ref) }
     }

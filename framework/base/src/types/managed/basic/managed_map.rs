@@ -1,3 +1,4 @@
+use core::mem;
 use crate::{
     api::{use_raw_handle, ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl},
     types::ManagedType,
@@ -21,6 +22,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
 
     fn get_handle(&self) -> &M::ManagedMapHandle {
         &self.handle
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        mem::take(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {
