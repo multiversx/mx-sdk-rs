@@ -57,6 +57,10 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         self.0.managed_types.lock().unwrap()
     }
 
+    fn is_m_types_accessible(&self) -> bool {
+        !self.0.managed_types.is_poisoned()
+    }
+
     fn halt_with_error(&self, status: u64, message: &str) -> ! {
         panic!("VM error occured, status: {status}, message: {message}")
     }

@@ -10,6 +10,8 @@ use crate::{
 pub trait VMHooksHandlerSource: Debug {
     fn m_types_lock(&self) -> MutexGuard<TxManagedTypes>;
 
+    fn is_m_types_accessible(&self) -> bool;
+
     fn halt_with_error(&self, status: u64, message: &str) -> !;
 
     fn vm_error(&self, message: &str) -> ! {

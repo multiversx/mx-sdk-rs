@@ -36,6 +36,10 @@ impl VMHooksHandlerSource for DebugApiVMHooksHandler {
         self.0.m_types_lock()
     }
 
+    fn is_m_types_accessible(&self) -> bool {
+        !self.0.managed_types.is_poisoned()
+    }
+
     fn halt_with_error(&self, status: u64, message: &str) -> ! {
         *self.0.result_lock() = TxResult::from_panic_obj(&TxPanic::new(status, message));
         let breakpoint = match status {
