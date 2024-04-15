@@ -2,7 +2,6 @@ use multiversx_price_aggregator_sc::{
     price_aggregator_data::{OracleStatus, TimestampedPrice, TokenPair},
     ContractObj, PriceAggregator, MAX_ROUND_DURATION_SECONDS,
 };
-use multiversx_sc_modules::staking::ProxyTrait as _;
 
 use multiversx_sc_scenario::imports::*;
 
@@ -23,8 +22,6 @@ const USD_TICKER: &[u8] = b"USDC";
 const PRICE_AGGREGATOR: ScExpr = ScExpr("price-aggregator");
 const OWNER: AddressExpr = AddressExpr("owner");
 
-type PriceAggregatorContract = ContractInfo<multiversx_price_aggregator_sc::Proxy<StaticApi>>;
-
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
@@ -40,7 +37,6 @@ fn world() -> ScenarioWorld {
 struct PriceAggregatorTestState {
     world: ScenarioWorld,
     oracles: Vec<AddressValue>,
-    price_aggregator_contract: PriceAggregatorContract,
     price_aggregator_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
 }
 
@@ -67,7 +63,7 @@ impl PriceAggregatorTestState {
         }
         world.set_state_step(set_state_step);
 
-        let price_aggregator_contract = PriceAggregatorContract::new(PRICE_AGGREGATOR_ADDRESS_EXPR);
+        // let price_aggregator_contract = PriceAggregatorContract::new(PRICE_AGGREGATOR_ADDRESS_EXPR);
         let price_aggregator_whitebox = WhiteboxContract::new(
             PRICE_AGGREGATOR_ADDRESS_EXPR,
             multiversx_price_aggregator_sc::contract_obj,
@@ -76,7 +72,6 @@ impl PriceAggregatorTestState {
         Self {
             world,
             oracles,
-            price_aggregator_contract,
             price_aggregator_whitebox,
         }
     }
@@ -380,13 +375,14 @@ fn test_price_aggregator_slashing() {
     state.vote_slash_member(&state.oracles[2].clone(), state.oracles[1].to_address());
     state.vote_slash_member(&state.oracles[3].clone(), state.oracles[1].to_address());
 
-    state.world.sc_call(
-        ScCallStep::new().from(&state.oracles[0]).call(
-            state
-                .price_aggregator_contract
-                .slash_member(state.oracles[1].to_address()),
-        ),
-    );
+    state
+        .world
+        .tx()
+        .from(&state.oracles[0].to_address())
+        .to(PRICE_AGGREGATOR)
+        .typed(price_aggregator_proxy::PriceAggregatorProxy)
+        .slash_member(state.oracles[1].to_address())
+        .run();
 
     // oracle 1 try submit after slashing
     state.submit_and_expect_err(
