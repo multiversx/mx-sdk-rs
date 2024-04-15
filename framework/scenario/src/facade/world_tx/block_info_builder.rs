@@ -13,13 +13,12 @@ pub struct BlockInfoBuilder<'w> {
 
 impl<'w> BlockInfoBuilder<'w> {
     pub(crate) fn new(world: &'w mut ScenarioWorld) -> BlockInfoBuilder<'w> {
-        let mut builder = BlockInfoBuilder {
+        BlockInfoBuilder {
             world,
             set_state_step: SetStateStep::new(),
             current_block: BlockInfo::default(),
             previous_block: BlockInfo::default(),
-        };
-        builder
+        }
     }
 
     // Forces value drop and commit block info.
