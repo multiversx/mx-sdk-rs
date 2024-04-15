@@ -1,5 +1,6 @@
 #![allow(unused)] // TEMP
 
+mod block_info_builder;
 mod scenario_env;
 mod scenario_env_deploy;
 mod scenario_env_exec;

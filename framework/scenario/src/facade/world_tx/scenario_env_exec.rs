@@ -21,7 +21,7 @@ use crate::{
     ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
-use super::ScenarioTxEnvData;
+use super::{block_info_builder::BlockInfoBuilder, ScenarioTxEnvData};
 
 /// Environment for executing transactions.
 pub struct ScenarioEnvExec<'w> {
@@ -105,6 +105,10 @@ impl ScenarioWorld {
         AddressKey: From<A>,
     {
         SetStateBuilder::new(self, address_expr.into())
+    }
+
+    pub fn block_info(&mut self) -> BlockInfoBuilder<'_> {
+        BlockInfoBuilder::new(self)
     }
 }
 
