@@ -198,7 +198,7 @@ pub trait ForwarderAsyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .async_call()
             .call_and_exit();
     }

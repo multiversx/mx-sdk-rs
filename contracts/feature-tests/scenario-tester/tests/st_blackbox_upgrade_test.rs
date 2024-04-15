@@ -1,19 +1,22 @@
 use multiversx_sc_scenario::imports::*;
 
-const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
+const ADDER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/adder");
+    blockchain.set_current_dir_from_workspace("contracts/feature-tests/scenario-tester");
 
-    blockchain.register_contract("mxsc:output/adder.mxsc.json", adder::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:output/scenario-tester.mxsc.json",
+        scenario_tester::ContractBuilder,
+    );
     blockchain
 }
 
 #[test]
-fn adder_blackbox_upgrade() {
+fn st_blackbox_upgrade() {
     let mut world = world();
-    let adder_code = world.code_expression(ADDER_PATH_EXPR);
+    let st_code = world.code_expression(ADDER_PATH_EXPR);
 
     world
         .set_state_step(
@@ -24,7 +27,7 @@ fn adder_blackbox_upgrade() {
         .sc_deploy(
             ScDeployStep::new()
                 .from("address:owner")
-                .code(&adder_code)
+                .code(&st_code)
                 .argument("5")
                 .gas_limit("5,000,000")
                 .expect(TxExpect::ok().no_result()),
@@ -34,7 +37,7 @@ fn adder_blackbox_upgrade() {
                 .from("address:owner")
                 .to("sc:adder")
                 .function("upgradeContract")
-                .argument(&adder_code)
+                .argument(&st_code)
                 .argument("0x0502") // codeMetadata
                 .argument("8") // contract argument
                 .expect(TxExpect::ok().no_result()),

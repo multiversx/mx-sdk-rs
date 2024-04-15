@@ -1,4 +1,7 @@
 use clap::{Args, Parser, Subcommand};
+use multiversx_sdk::blockchain::CommunicationProxy;
+
+use crate::imports::Bech32Address;
 
 use super::account_tool;
 
@@ -34,10 +37,14 @@ pub struct AccountArgs {
 /// Entry point in the program when calling it as a standalone tool.
 pub async fn cli_main() {
     let cli_args = ScenarioCliArgs::parse();
-    let api = cli_args.api.expect("API needs tp be specified");
+    let api = CommunicationProxy::new(cli_args.api.expect("API needs tp be specified"));
     match &cli_args.command {
         Some(ScenarioCliAction::Account(args)) => {
-            account_tool::print_account_as_scenario_set_state(api, args).await;
+            account_tool::print_account_as_scenario_set_state(
+                &api,
+                &Bech32Address::from_bech32_string(args.address.to_string()),
+            )
+            .await;
         },
         None => {},
     }

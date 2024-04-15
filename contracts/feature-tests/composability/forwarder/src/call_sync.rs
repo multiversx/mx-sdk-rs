@@ -154,7 +154,7 @@ pub trait ForwarderSyncCallModule {
                 amount,
                 OptionalValue::<ManagedBuffer>::Some(b"accept_funds_func".into()),
             )
-            .with_multi_token_transfer(payments.clone_value())
+            .payment(payments.clone_value())
             .sync_call();
     }
 
@@ -180,7 +180,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .sync_call();
     }
 }

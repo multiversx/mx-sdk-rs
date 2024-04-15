@@ -73,8 +73,9 @@ fn tx_expect_error_test() {
         .to(SC_PMF)
         .typed(pmf_proxy::PanicMessageFeaturesProxy)
         .sc_panic()
-        .returns(ExpectStatus(4))
-        .returns(ExpectMessage("sc_panic! test"))
+        .with_result(ExpectStatus(4))
+        .with_result(ExpectMessage("sc_panic! test"))
+        .with_result(ExpectError(4, "sc_panic! test"))
         .run();
 }
 
@@ -87,7 +88,8 @@ fn query_expect_error_test() {
         .to(SC_PMF)
         .typed(pmf_proxy::PanicMessageFeaturesProxy)
         .sc_panic()
-        .returns(ExpectStatus(4))
-        .returns(ExpectMessage("sc_panic! test"))
+        .with_result(ExpectStatus(4))
+        .with_result(ExpectMessage("sc_panic! test"))
+        .with_result(ExpectError(4, "sc_panic! test"))
         .run();
 }

@@ -1,17 +1,13 @@
 use super::StepWrapper;
 
-pub trait TxToStep {
-    type Env;
+pub trait TxToStep<Env, RH> {
     type Step;
-    type RH;
 
-    fn tx_to_step(self) -> StepWrapper<Self::Env, Self::Step, Self::RH>;
+    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH>;
 }
 
-pub trait TxToQueryStep {
-    type Env;
+pub trait TxToQueryStep<Env, RH> {
     type Step;
-    type RH;
 
-    fn tx_to_query_step(self) -> StepWrapper<Self::Env, Self::Step, Self::RH>;
+    fn tx_to_query_step(self) -> StepWrapper<Env, Self::Step, RH>;
 }

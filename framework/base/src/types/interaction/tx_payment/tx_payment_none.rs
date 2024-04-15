@@ -1,12 +1,6 @@
-use crate::{
-    contract_base::SendRawWrapper,
-    types::{BigUint, ManagedAddress, ManagedVec, TxFrom, TxToSpecified},
-};
+use crate::types::{BigUint, ManagedAddress, TxFrom, TxToSpecified};
 
-use super::{
-    AnnotatedEgldPayment, Egld, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment,
-    TxPaymentEgldOnly,
-};
+use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment, TxPaymentEgldOnly};
 
 impl<Env> TxPayment<Env> for ()
 where

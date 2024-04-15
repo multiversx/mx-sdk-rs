@@ -1,4 +1,4 @@
-use crate::types::{heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedRef};
+use crate::types::{BigUint, ManagedBuffer, ManagedRef};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -18,7 +18,7 @@ where
         self
     }
 
-    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,
     {
@@ -42,7 +42,7 @@ where
         self.clone()
     }
 
-    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,
     {
@@ -66,7 +66,7 @@ where
         self.clone_value()
     }
 
-    fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,
     {
@@ -78,7 +78,7 @@ impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for u64
 where
     Env: TxEnv,
 {
-    fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         BigUint::from(*self).to_display()
     }
 
@@ -91,7 +91,7 @@ impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for ()
 where
     Env: TxEnv,
 {
-    fn annotation(&self, env: &Env) -> ManagedBuffer<Env::Api> {
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         ManagedBuffer::from("0")
     }
 

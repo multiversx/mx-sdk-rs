@@ -1,7 +1,4 @@
-use crate::{
-    api::CallTypeApi,
-    types::{ManagedBuffer, OriginalResultMarker, TxEnv},
-};
+use crate::types::{OriginalResultMarker, TxEnv};
 
 use super::{ConsNoRet, ConsRet, RHList, RHListItem};
 

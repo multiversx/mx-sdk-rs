@@ -6,10 +6,7 @@ mod annotated_impl_u64;
 use crate::{
     api::ManagedTypeApi,
     formatter::FormatBuffer,
-    types::{
-        heap::Address, BigUint, ManagedAddress, ManagedBuffer, ManagedBufferCachedBuilder,
-        ManagedRef,
-    },
+    types::{ManagedBuffer, ManagedBufferCachedBuilder},
 };
 
 use super::TxEnv;

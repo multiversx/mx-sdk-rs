@@ -1,5 +1,5 @@
 use multiversx_chain_vm::{crypto_functions::keccak256, tx_mock::TxResult};
-use multiversx_sc::types::Address;
+use multiversx_sc::types::{Address, ESDTSystemSCAddress};
 use multiversx_sdk::{
     data::transaction::{ApiLogs, ApiSmartContractResult, Events, TransactionOnNetwork},
     utils::base64_decode,
@@ -11,8 +11,6 @@ use super::{
 
 const SC_DEPLOY_PROCESSING_TYPE: &str = "SCDeployment";
 const LOG_IDENTIFIER_SIGNAL_ERROR: &str = "signalError";
-
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 
 #[derive(Debug, Default, Clone)]
 /// The response of a transaction.
@@ -196,7 +194,7 @@ impl TxResponse {
 
     fn process_new_issued_token_identifier(mut self) -> Self {
         for scr in self.api_scrs.iter() {
-            if scr.sender.to_string() != SYSTEM_SC_BECH32 {
+            if scr.sender.to_bech32_string().unwrap() != ESDTSystemSCAddress.to_bech32_string() {
                 continue;
             }
 

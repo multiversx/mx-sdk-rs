@@ -73,17 +73,9 @@ impl BasicFeaturesInteract {
 
     async fn set_state(&mut self) {
         println!("wallet address: {}", bech32::encode(&self.wallet_address));
-        let scenario_raw = retrieve_account_as_scenario_set_state(
-            Config::load_config().gateway().to_string(),
-            bech32::encode(&self.wallet_address),
-            true,
-        )
-        .await;
-
-        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-        self.interactor.pre_runners.run_scenario(&scenario);
-        self.interactor.post_runners.run_scenario(&scenario);
+        self.interactor
+            .retrieve_account(&Bech32Address::from(&self.wallet_address))
+            .await;
     }
 
     async fn deploy(&mut self) {

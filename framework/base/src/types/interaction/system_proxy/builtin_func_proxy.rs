@@ -1,11 +1,8 @@
 use multiversx_sc_codec::{CodecInto, Empty, TopEncode};
 
-use crate::{
-    api::VMApi,
-    types::{
-        BigUint, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, Tx, TxEnv, TxFrom,
-        TxGas, TxProxyCall, TxProxyTrait, TxTo,
-    },
+use crate::types::{
+    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas,
+    TxProxyCall, TxProxyTrait, TxTo,
 };
 
 use super::builtin_func_names::{

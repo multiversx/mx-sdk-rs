@@ -8,6 +8,7 @@ mod tx_payment_multi_esdt;
 mod tx_payment_none;
 mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
+mod tx_payment_single_esdt_triple;
 
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
@@ -15,11 +16,7 @@ pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 
 use crate::{
     api::ManagedTypeApi,
-    contract_base::SendRawWrapper,
-    types::{
-        BigUint, EgldOrEsdtTokenPayment, EgldOrMultiEsdtPayment, EsdtTokenPayment, ManagedAddress,
-        ManagedBuffer, MultiEsdtPayment,
-    },
+    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEsdtPayment},
 };
 
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};

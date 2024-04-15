@@ -2,9 +2,9 @@ use crate::{
     api::{CallTypeApi, StorageWriteApi},
     contract_base::SendRawWrapper,
     types::{
-        CallbackClosure, ExplicitGas, ManagedBuffer, OriginalResultMarker, Tx, TxData,
-        TxDataFunctionCall, TxEmptyResultHandler, TxEnv, TxFrom, TxGas, TxGasValue, TxPayment,
-        TxResultHandler, TxScEnv, TxTo, TxToSpecified,
+        CallbackClosure, OriginalResultMarker, Tx, TxData, TxDataFunctionCall,
+        TxEmptyResultHandler, TxEnv, TxFrom, TxGas, TxPayment, TxResultHandler, TxScEnv, TxTo,
+        TxToSpecified,
     },
 };
 

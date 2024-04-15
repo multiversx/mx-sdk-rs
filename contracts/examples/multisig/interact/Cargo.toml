@@ -18,13 +18,13 @@ toml = "0.8.6"
 path = ".."
 
 [dependencies.multiversx-sc-modules]
-version = "0.48.0"
+version = "0.49.0-alpha.3"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.48.0"
+version = "0.49.0-alpha.3"
 path = "../../../../framework/snippets"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.48.0"
+version = "=0.49.0-alpha.3"
 path = "../../../../framework/scenario"

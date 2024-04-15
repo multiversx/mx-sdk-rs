@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 
 // use super::properties::*;
-use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},
@@ -23,7 +22,7 @@ const ISSUE_AND_SET_ALL_ROLES_ENDPOINT_NAME: &str = "registerAndSetAllRoles";
 /// Unlike other contract proxies, this one has a fixed address,
 /// so the proxy object doesn't really contain any data, it is more of a placeholder.
 #[deprecated(
-    since = "0.48.0",
+    since = "0.49.0",
     note = "There is a new `ESDTSystemSCProxy`, which uses the new proxy model."
 )]
 pub struct ESDTSystemSmartContractProxy<SA>
@@ -471,7 +470,7 @@ where
     }
 
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        ESDTSystemSCAddress.managed_address()
+        ESDTSystemSCAddress.to_managed_address()
     }
 
     fn esdt_system_sc_call_no_args(
