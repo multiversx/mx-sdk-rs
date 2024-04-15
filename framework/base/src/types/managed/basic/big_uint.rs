@@ -12,6 +12,7 @@ use crate::{
         TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
+    proxy_imports::ManagedRef,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
 
@@ -144,6 +145,12 @@ impl<M: ManagedTypeApi> BigUint<M> {
         let handle: M::BigIntHandle = use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().bi_set_int64(handle.clone(), 0);
         BigUint::from_handle(handle)
+    }
+
+    pub fn zero_ref() -> ManagedRef<'static, M, BigUint<M>> {
+        let handle: M::BigIntHandle = use_raw_handle(const_handles::BIG_INT_CONST_ZERO);
+        M::managed_type_impl().bi_set_int64(handle.clone(), 0);
+        unsafe { ManagedRef::wrap_handle(handle) }
     }
 
     #[inline]
