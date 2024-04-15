@@ -1,4 +1,5 @@
 use multiversx_sc_scenario::{
+    imports::{retrieve_account_as_scenario_set_state, Bech32Address, ScenarioRunner},
     mandos_system::{run_list::ScenarioRunnerList, run_trace::ScenarioTraceFile},
     multiversx_sc::types::Address,
     scenario_model::AddressValue,
@@ -66,6 +67,12 @@ impl Interactor {
     pub async fn with_tracer<P: AsRef<Path>>(mut self, path: P) -> Self {
         self.post_runners.push(ScenarioTraceFile::new(path));
         self
+    }
+
+    pub async fn retrieve_account(&mut self, wallet_address: &Bech32Address) {
+        let set_state = retrieve_account_as_scenario_set_state(&self.proxy, wallet_address).await;
+        self.pre_runners.run_set_state_step(&set_state);
+        self.post_runners.run_set_state_step(&set_state);
     }
 }
 

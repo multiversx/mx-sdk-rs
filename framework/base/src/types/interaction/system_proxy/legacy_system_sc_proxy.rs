@@ -1,7 +1,6 @@
 use core::marker::PhantomData;
 
 // use super::properties::*;
-use hex_literal::hex;
 
 use crate::{
     api::{CallTypeApi, SendApi},
@@ -471,7 +470,7 @@ where
     }
 
     pub fn esdt_system_sc_address(&self) -> ManagedAddress<SA> {
-        ESDTSystemSCAddress.managed_address()
+        ESDTSystemSCAddress.to_managed_address()
     }
 
     fn esdt_system_sc_call_no_args(

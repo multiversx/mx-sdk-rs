@@ -1,8 +1,6 @@
 use crate::{
     contract_base::BlockchainWrapper,
-    types::{
-        BackTransfers, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv,
-    },
+    types::{BackTransfers, RHListItem, RHListItemExec, TxEnv},
 };
 
 /// Indicates that back-transfers will be returned.

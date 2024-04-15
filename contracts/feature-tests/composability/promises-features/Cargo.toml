@@ -8,10 +8,7 @@ publish = false
 [lib]
 path = "src/promises_main.rs"
 
-[dependencies.vault]
-path = "../vault"
-
 [dependencies.multiversx-sc]
-version = "0.49.0-alpha.2"
+version = "0.49.0-alpha.3"
 path = "../../../../framework/base"
 

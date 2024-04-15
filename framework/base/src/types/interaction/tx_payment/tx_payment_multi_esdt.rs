@@ -2,12 +2,10 @@ use core::ops::Deref;
 
 use crate::{
     contract_base::SendRawWrapper,
-    types::{
-        BigUint, ManagedAddress, ManagedRef, ManagedVec, MultiEsdtPayment, TxFrom, TxToSpecified,
-    },
+    types::{BigUint, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom, TxToSpecified},
 };
 
-use super::{AnnotatedEgldPayment, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment};
+use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
 /// Indicates that a payment object contains a multi-ESDT payment.
 pub trait TxPaymentMultiEsdt<Env>: TxPayment<Env>
@@ -33,7 +31,7 @@ where
 
     fn perform_transfer_execute(
         self,
-        env: &Env,
+        _env: &Env,
         to: &ManagedAddress<Env::Api>,
         gas_limit: u64,
         fc: FunctionCall<Env::Api>,

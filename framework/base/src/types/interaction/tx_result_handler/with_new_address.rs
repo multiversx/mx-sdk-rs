@@ -1,8 +1,6 @@
 use core::marker::PhantomData;
 
-use crate::types::{
-    DeployRawResult, ManagedAddress, ManagedBuffer, ManagedVec, RHListItem, RHListItemExec, TxEnv,
-};
+use crate::types::{DeployRawResult, ManagedAddress, RHListItem, RHListItemExec, TxEnv};
 
 /// Defines a lambda function to be called on the newly deployed address, after a deploy.
 pub struct WithNewAddress<Env, F>

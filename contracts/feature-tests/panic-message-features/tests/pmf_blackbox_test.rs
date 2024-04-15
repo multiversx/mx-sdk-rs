@@ -75,6 +75,7 @@ fn tx_expect_error_test() {
         .sc_panic()
         .with_result(ExpectStatus(4))
         .with_result(ExpectMessage("sc_panic! test"))
+        .with_result(ExpectError(4, "sc_panic! test"))
         .run();
 }
 
@@ -89,5 +90,6 @@ fn query_expect_error_test() {
         .sc_panic()
         .with_result(ExpectStatus(4))
         .with_result(ExpectMessage("sc_panic! test"))
+        .with_result(ExpectError(4, "sc_panic! test"))
         .run();
 }

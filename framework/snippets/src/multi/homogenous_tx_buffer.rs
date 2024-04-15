@@ -38,7 +38,7 @@ where
 {
     pub fn push_tx<Tx, F>(&mut self, f: F) -> &mut Self
     where
-        Tx: TxToStep<Env = ScenarioTxEnvData, Step = Step, RH = RH>,
+        Tx: TxToStep<ScenarioTxEnvData, RH, Step = Step>,
         F: FnOnce(TxBaseWithEnv<ScenarioTxEnvData>) -> Tx,
     {
         let env = self.env.world.new_env_data();

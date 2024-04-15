@@ -8,7 +8,6 @@ const GATEWAY: &str = sdk::blockchain::DEVNET_GATEWAY;
 const PEM: &str = "alice.pem";
 const SC_ADDRESS: &str = "";
 
-const SYSTEM_SC_BECH32: &str = "erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqzllls8a5w6u";
 const DEFAULT_ADDRESS_EXPR: &str =
     "0x0000000000000000000000000000000000000000000000000000000000000000";
 const TOKEN_ISSUE_COST: u64 = 50_000_000_000_000_000;

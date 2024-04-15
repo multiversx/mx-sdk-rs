@@ -110,7 +110,7 @@ pub trait ForwarderTransferExecuteModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .transfer_execute()
     }
 
@@ -133,7 +133,7 @@ pub trait ForwarderTransferExecuteModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .transfer_execute()
     }
 
@@ -156,7 +156,7 @@ pub trait ForwarderTransferExecuteModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .reject_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .transfer_execute()
     }
 }

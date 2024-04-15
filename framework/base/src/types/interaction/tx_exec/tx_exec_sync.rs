@@ -5,9 +5,8 @@ use crate::{
     contract_base::SendRawWrapper,
     tuple_util::NestedTupleFlatten,
     types::{
-        decode_result, BackTransfers, ConsNoRet, ConsRet, ManagedBuffer, ManagedVec,
-        OriginalResultMarker, RHList, RHListExec, RHListItem, Tx, TxDataFunctionCall, TxEnv, TxGas,
-        TxPayment, TxScEnv, TxToSpecified,
+        decode_result, BackTransfers, ManagedBuffer, ManagedVec, OriginalResultMarker, RHListExec,
+        Tx, TxDataFunctionCall, TxGas, TxPayment, TxScEnv, TxToSpecified,
     },
 };
 

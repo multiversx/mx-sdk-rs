@@ -26,6 +26,9 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.49.0-alpha.3] - 2024-04-13
+Third pre-release of the unified syntax, includes backwards compatibility fixes and testing set state/check state.
+
 ## [sc 0.49.0-alpha.2] - 2024-04-09
 Second pre-release of the unified syntax. Most features done, including fully featured interactors.
 Still missing: set state/check state in tests.

@@ -3,8 +3,8 @@ use crate::{
     contract_base::SendRawWrapper,
     types::{
         interaction::callback_closure::CallbackClosureWithGas, CallbackClosure, ExplicitGas,
-        FunctionCall, GasLeft, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas,
-        TxGasValue, TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
+        FunctionCall, ManagedBuffer, ManagedType, OriginalResultMarker, Tx, TxGas, TxGasValue,
+        TxPayment, TxResultHandler, TxScEnv, TxToSpecified,
     },
 };
 

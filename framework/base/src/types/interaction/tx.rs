@@ -1,24 +1,23 @@
 use crate::{
-    api::{CallTypeApi, ManagedTypeApi},
+    api::CallTypeApi,
     contract_base::BlockchainWrapper,
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
-        EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs,
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedOption,
-        ManagedVec, MultiEsdtPayment, TokenIdentifier,
+        EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
+        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        TokenIdentifier,
     },
 };
 
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
-    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
-    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue,
-    TxPayment, TxPaymentEgldOnly, TxPaymentMultiEsdt, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
-    TxToSpecified, UpgradeCall,
+    contract_deploy::UNSPECIFIED_GAS_LIMIT, Code, ContractCallBase, ContractCallNoPayment,
+    ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource,
+    FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
+    RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall,
+    TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
+    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -205,9 +204,11 @@ where
         self.egld(egld_amount)
     }
 
-    /// Adds a single ESDT token transfer to a transaction.
+    /// Adds the first single, owned ESDT token payment to a transaction.
     ///
-    /// Since this is the first ESDT payment, a single payment tx is produced. Can be called again for multiple payments.
+    /// Since this is the first ESDT payment, a single payment tx is produced.
+    ///
+    /// Can subsequently be called again for multiple payments.
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -247,18 +248,32 @@ where
 
     /// Sets a collection of ESDT transfers as the payment of the transaction.
     ///
-    /// Equivalend to just ``.payment(payments)`, but only accepts the multi-esdt types.
-    pub fn multi_esdt<Payment>(self, payments: Payment) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    /// Can be formed from single ESDT payments, but the result will always be a collection.
+    ///
+    /// Always converts the argument into an owned collection of ESDT payments. For work with references, use `.payment(&p)` instead.
+    pub fn multi_esdt<IntoMulti>(
+        self,
+        payments: IntoMulti,
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH>
     where
-        Payment: TxPaymentMultiEsdt<Env>,
+        IntoMulti: Into<MultiEsdtPayment<Env::Api>>,
     {
-        self.payment(payments)
+        self.payment(payments.into())
+    }
+
+    /// Backwards compatibility.
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        self.payment(MultiEsdtPayment::new())
+            .with_esdt_transfer(payment)
     }
 
     /// Backwards compatibility.
     pub fn with_multi_token_transfer(
         self,
-        payments: MultiEsdtPayment<Env::Api>, // TODO: references
+        payments: MultiEsdtPayment<Env::Api>,
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
         self.multi_esdt(payments)
     }
@@ -288,9 +303,12 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
-    /// Adds a single ESDT token transfer to a contract call.
+    /// Adds the second ESDT token transfer to a contract call.
     ///
     /// Can be called multiple times on the same call.
+    ///
+    /// When the Tx already contains a single (owned) ESDT payment,
+    /// adding the second one will convert it to a list.
     pub fn esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
         self,
         payment: P,
@@ -307,14 +325,6 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
-    }
-
-    /// Backwards compatibility.
-    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
-        self,
-        payment: P,
-    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
-        self.esdt(payment)
     }
 }
 
@@ -338,13 +348,23 @@ where
         self
     }
 
-    /// Backwards compatibility.
-    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
-        mut self,
+    /// When the Tx already contains an owned collection of ESDT payments,
+    /// calling `multi_esdt` is equivalent to `esdt`, it just adds another payment to the list.
+    ///
+    /// Can be called multiple times.
+    pub fn multi_esdt<P: Into<EsdtTokenPayment<Env::Api>>>(
+        self,
         payment: P,
     ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
-        self.payment.push(payment.into());
-        self
+        self.esdt(payment)
+    }
+
+    /// Backwards compatibility.
+    pub fn with_esdt_transfer<P: Into<EsdtTokenPayment<Env::Api>>>(
+        self,
+        payment: P,
+    ) -> Tx<Env, From, To, MultiEsdtPayment<Env::Api>, Gas, Data, RH> {
+        self.multi_esdt(payment)
     }
 }
 

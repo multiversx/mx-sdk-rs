@@ -114,7 +114,7 @@ pub trait TransferRoleProxyModule {
                 if !initial_payments.is_empty() {
                     self.tx()
                         .to(&original_caller)
-                        .multi_esdt(initial_payments)
+                        .payment(initial_payments)
                         .transfer();
                 }
 
