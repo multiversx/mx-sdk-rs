@@ -165,7 +165,7 @@ impl<'a, M: ManagedTypeApi> EgldOrEsdtTokenPaymentRefs<'a, M> {
     }
 
     pub fn is_empty(&self) -> bool {
-        self.amount == &BigUint::zero()
+        self.amount == &0u32
     }
 
     pub fn map_egld_or_esdt<Context, D, F, U>(self, context: Context, for_egld: D, for_esdt: F) -> U
