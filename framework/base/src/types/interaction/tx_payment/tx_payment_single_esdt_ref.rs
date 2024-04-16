@@ -11,6 +11,7 @@ impl<'a, Env> TxPayment<Env> for EsdtTokenPaymentRefs<'a, Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
         self.amount == &0u32
     }
