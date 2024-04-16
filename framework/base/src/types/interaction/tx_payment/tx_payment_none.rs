@@ -26,7 +26,7 @@ where
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
-        _from: &From,
+        _from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
         f: F,

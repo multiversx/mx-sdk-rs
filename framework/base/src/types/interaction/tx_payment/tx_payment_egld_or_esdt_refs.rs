@@ -27,7 +27,7 @@ where
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
-        from: &From,
+        from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
         f: F,
@@ -42,9 +42,9 @@ where
         ) -> R
     {
         self.map_egld_or_esdt(
-            (to, fc, f),
-            |(to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
-            |(to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
+            (from, to, fc, f),
+            |(from, to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
+            |(from, to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
         )
     }
 

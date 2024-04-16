@@ -29,7 +29,7 @@ where
 
         let raw_result = self.payment.with_normalized(
             &self.env,
-            &self.from,
+            self.from,
             self.to,
             self.data.into(),
             |norm_to, norm_egld, norm_fc| {

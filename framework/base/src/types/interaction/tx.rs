@@ -645,7 +645,7 @@ where
     fn into_normalized(self) -> ContractCallWithEgld<Api, OriginalResult> {
         self.payment.with_normalized(
             &self.env,
-            &self.from,
+            self.from,
             self.to,
             self.data,
             |norm_to, norm_egld, norm_fc| ContractCallWithEgld {
