@@ -237,6 +237,7 @@ impl<M: ManagedTypeApi> EsdtTokenPayment<M> {
 }
 
 impl<'a, M: ManagedTypeApi> EsdtTokenPaymentRefs<'a, M> {
+    #[inline]
     pub fn new(
         token_identifier: &'a TokenIdentifier<M>,
         token_nonce: u64,
