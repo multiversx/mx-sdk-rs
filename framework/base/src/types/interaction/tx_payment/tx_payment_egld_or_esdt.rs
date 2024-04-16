@@ -57,10 +57,12 @@ impl<Env> TxPayment<Env> for EgldOrEsdtTokenPayment<Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, env: &Env) -> bool {
         (&self).is_no_payment(env)
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,

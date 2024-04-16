@@ -62,16 +62,6 @@ pub trait TxPaymentEgldOnly<Env>: TxPayment<Env> + AnnotatedValue<Env, BigUint<E
 where
     Env: TxEnv,
 {
-    fn with_egld_value<F, R>(&self, env: &Env, f: F) -> R
-    where
-        F: FnOnce(&BigUint<Env::Api>) -> R,
-    {
-        self.with_value_ref(env, f)
-    }
-
-    fn into_egld_payment(self, env: &Env) -> BigUint<Env::Api> {
-        self.into_value(env)
-    }
 }
 
 #[derive(Clone)]

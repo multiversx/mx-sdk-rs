@@ -29,7 +29,7 @@ where
     /// TODO: change return type to `!`.
     pub fn upgrade_async_call_and_exit(self) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        self.payment.with_egld_value(&self.env, |egld_value| {
+        self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().upgrade_contract(
                 &self.to,
                 gas,
@@ -64,7 +64,7 @@ where
     /// TODO: change return type to `!`.
     pub fn upgrade_async_call_and_exit(self) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        self.payment.with_egld_value(&self.env, |egld_value| {
+        self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().upgrade_from_source_contract(
                 &self.to,
                 gas,
@@ -98,7 +98,7 @@ where
     )]
     pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        self.payment.with_egld_value(&self.env, |egld_value| {
+        self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().upgrade_contract(
                 &self.to,
                 gas,
@@ -127,7 +127,7 @@ where
         code_metadata: CodeMetadata,
     ) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        self.payment.with_egld_value(&self.env, |egld_value| {
+        self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().upgrade_from_source_contract(
                 &self.to,
                 gas,

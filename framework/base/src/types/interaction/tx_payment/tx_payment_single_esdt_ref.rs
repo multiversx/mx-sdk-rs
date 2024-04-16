@@ -11,6 +11,7 @@ impl<'a, Env> TxPayment<Env> for EsdtTokenPaymentRefs<'a, Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
         self.amount == &0u32
     }
@@ -59,13 +60,13 @@ where
         To: TxToSpecified<Env>,
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| {
+        to.with_value_ref(env, |to_addr| {
             if self.token_nonce == 0 {
                 let fc_conv = fc.convert_to_single_transfer_fungible_call(self);
-                f(to_addr, &BigUint::zero(), &fc_conv)
+                f(to_addr, &*BigUint::zero_ref(), &fc_conv)
             } else {
                 let fc_conv = fc.convert_to_single_transfer_nft_call(to_addr, self);
-                f(&from.resolve_address(env), &BigUint::zero(), &fc_conv)
+                f(&from.resolve_address(env), &*BigUint::zero_ref(), &fc_conv)
             }
         })
     }
