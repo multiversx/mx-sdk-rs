@@ -31,7 +31,7 @@ where
     fn execute_deploy_raw(self) -> (ManagedAddress<Api>, ManagedVec<Api, ManagedBuffer<Api>>, RH) {
         let gas_limit = self.gas.gas_value(&self.env);
 
-        let (new_address, raw_results) = self.payment.with_egld_value(&self.env, |egld_value| {
+        let (new_address, raw_results) = self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().deploy_contract(
                 gas_limit,
                 egld_value,
@@ -69,7 +69,7 @@ where
     ) -> (ManagedAddress<Api>, ManagedVec<Api, ManagedBuffer<Api>>, RH) {
         let gas_limit = self.gas.gas_value(&self.env);
 
-        let (new_address, raw_results) = self.payment.with_egld_value(&self.env, |egld_value| {
+        let (new_address, raw_results) = self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().deploy_from_source_contract(
                 gas_limit,
                 egld_value,
@@ -235,7 +235,7 @@ where
     )]
     pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        self.payment.with_egld_value(&self.env, |egld_value| {
+        self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().upgrade_contract(
                 &self.to,
                 gas,
@@ -268,7 +268,7 @@ where
         code_metadata: CodeMetadata,
     ) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
-        self.payment.with_egld_value(&self.env, |egld_value| {
+        self.payment.with_value_ref(&self.env, |egld_value| {
             SendRawWrapper::<Api>::new().upgrade_from_source_contract(
                 &self.to,
                 gas,

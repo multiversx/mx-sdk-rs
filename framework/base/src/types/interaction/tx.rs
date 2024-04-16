@@ -888,7 +888,7 @@ where
         ContractDeploy {
             _phantom: core::marker::PhantomData,
             to: ManagedOption::none(),
-            egld_payment: value.payment.into_egld_payment(&value.env),
+            egld_payment: value.payment.into_value(&value.env),
             explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
             arg_buffer: value.data.arg_buffer,
             _return_type: core::marker::PhantomData,
