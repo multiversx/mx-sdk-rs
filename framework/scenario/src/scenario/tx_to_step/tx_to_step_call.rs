@@ -2,7 +2,7 @@ use multiversx_sc::types::{
     FunctionCall, RHListExec, Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
 };
 
-use crate::scenario_model::{ScCallStep, TxExpect, TxResponse};
+use crate::scenario_model::{ScCallStep, TxESDT, TxExpect, TxResponse};
 
 use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
 
@@ -65,6 +65,12 @@ where
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
+    } else {
+        step.tx.esdt_value = full_payment_data
+            .multi_esdt
+            .iter()
+            .map(TxESDT::from)
+            .collect();
     }
 
     step
