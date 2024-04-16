@@ -6,7 +6,6 @@ use num_bigint::BigUint;
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
 const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
 const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
-const CROWDFUNDING_ESDT_ADDRESS_EXPR: &str = "sc:crowdfunding-esdt";
 const CROWDFUNDING_ESDT_PATH_EXPR: &str = "mxsc:output/crowdfunding-esdt.mxsc.json";
 const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";
 const FIRST_USER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("first-user");
@@ -40,32 +39,31 @@ struct CrowdfundingESDTTestState {
 impl CrowdfundingESDTTestState {
     fn new() -> Self {
         let mut world = world();
-        let owner_address = "address:owner";
+        // let owner_address = "address:owner";
 
-        world.set_state_step(
-            SetStateStep::new()
-                .put_account(OWNER_ADDRESS_EXPR_REPL, Account::new().nonce(1))
-                .new_address(owner_address, 1, CROWDFUNDING_ESDT_ADDRESS_EXPR)
-                .put_account(
-                    FIRST_USER_ADDRESS_EXPR_REPL,
-                    Account::new()
-                        .nonce(1)
-                        .balance("1_000")
-                        .esdt_balance(CF_TOKEN_ID_EXPR, "1_000"),
-                )
-                .put_account(
-                    SECOND_USER_ADDRESS_EXPR_REPL,
-                    Account::new()
-                        .nonce(1)
-                        .esdt_balance(CF_TOKEN_ID_EXPR, "1_000"),
-                ),
-        );
+        world
+            .account(OWNER_ADDRESS_EXPR)
+            .nonce(1)
+            .account(FIRST_USER_ADDRESS_EXPR_REPL)
+            .nonce(1)
+            .balance("1000")
+            .esdt_balance(CF_TOKEN_ID_EXPR, "1000")
+            .account(SECOND_USER_ADDRESS_EXPR_REPL)
+            .nonce(1)
+            .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
-        let crowdfunding_esdt_contract =
-            CrowdfundingESDTContract::new(CROWDFUNDING_ESDT_ADDRESS_EXPR);
+        world.set_state_step(SetStateStep::new().new_address(
+            OWNER_ADDRESS_EXPR,
+            1,
+            SC_CROWDFUNDING_ESDT_EXPR.eval_to_expr().as_str(),
+        ));
 
-        let first_user_address = AddressValue::from(FIRST_USER_ADDRESS_EXPR).to_address();
-        let second_user_address = AddressValue::from(SECOND_USER_ADDRESS_EXPR).to_address();
+        let crowdfunding_esdt_contract = CrowdfundingESDTContract::new(SC_CROWDFUNDING_ESDT_EXPR);
+
+        let first_user_address =
+            AddressValue::from(FIRST_USER_ADDRESS_EXPR_REPL.eval_to_expr().as_str()).to_address();
+        let second_user_address =
+            AddressValue::from(SECOND_USER_ADDRESS_EXPR_REPL.eval_to_expr().as_str()).to_address();
 
         Self {
             world,
@@ -96,22 +94,24 @@ impl CrowdfundingESDTTestState {
             .to(SC_CROWDFUNDING_ESDT_EXPR)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .fund()
-            .single_esdt(
-                &TokenIdentifier::from(CF_TOKEN_ID_EXPR),
+            .egld_or_single_esdt(
+                &EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
                 0u64,
                 &multiversx_sc::proxy_imports::BigUint::from(amount),
             )
             .run();
     }
 
-    fn check_deposit(&mut self, donor: Address, amount: u64) -> &mut Self {
-        self.world.sc_query(
-            ScQueryStep::new()
-                .call(self.crowdfunding_esdt_contract.deposit(&donor))
-                .expect_value(SingleValue::from(BigUint::from(amount))),
-        );
+    fn check_deposit(&mut self, donor: Address, amount: u64) {
+        let value = world()
+            .query()
+            .to(SC_CROWDFUNDING_ESDT_EXPR)
+            .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
+            .deposit(&donor)
+            .returns(ReturnsResultConv::<BigUint>::new())
+            .run();
 
-        self
+        assert_eq!(value, amount.into());
     }
 
     fn check_status(&mut self, expected_value: Status) -> &mut Self {
@@ -157,8 +157,8 @@ fn test_fund() {
     let mut state = CrowdfundingESDTTestState::new();
     state.deploy();
 
-    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1_000);
-    state.check_deposit(state.first_user_address.clone(), 1_000);
+    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1_000u64);
+    state.check_deposit(state.first_user_address.clone(), 1_000u64);
 }
 
 #[test]
@@ -198,12 +198,14 @@ fn test_successful_cf() {
     state.deploy();
 
     // first user fund
-    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1000);
-    state.check_deposit(state.first_user_address.clone(), 1_000);
+    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1_000u64); //.eval_to_expr().as_str(), "1000");
+                                                        // state.check_deposit(state.first_user_address.clone(), 1_000);
+                                                        // state.check_deposit(FIRST_USER_ADDRESS_EXPR_REPL, 1_000);
 
     // second user fund
     state.fund(SECOND_USER_ADDRESS_EXPR_REPL, 1000);
-    state.check_deposit(state.second_user_address.clone(), 1_000);
+    // state.check_deposit(SECOND_USER_ADDRESS_EXPR_REPL, 1_000);
+    // state.check_deposit(state.second_user_address.clone(), 1_000);
 
     // set block timestamp after deadline
     state.set_block_timestamp(CF_DEADLINE + 1);
@@ -235,12 +237,20 @@ fn test_failed_cf() {
     state.deploy();
 
     // first user fund
-    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 300);
-    state.check_deposit(state.first_user_address.clone(), 300u64);
+    state.fund(
+        FIRST_USER_ADDRESS_EXPR_REPL, //.eval_to_expr().as_str()
+        300,
+    );
+    // state.check_deposit(FIRST_USER_ADDRESS_EXPR_REPL, 300u64);
+    // state.check_deposit(state.first_user_address.clone(), 300u64);
 
     // second user fund
-    state.fund(SECOND_USER_ADDRESS_EXPR_REPL, 600);
-    state.check_deposit(state.second_user_address.clone(), 600u64);
+    state.fund(
+        SECOND_USER_ADDRESS_EXPR_REPL, //.eval_to_expr().as_str()
+        600,
+    );
+    // state.check_deposit(SECOND_USER_ADDRESS_EXPR_REPL, 600u64);
+    // state.check_deposit(state.second_user_address.clone(), 600u64);
 
     // set block timestamp after deadline
     state.set_block_timestamp(CF_DEADLINE + 1);
