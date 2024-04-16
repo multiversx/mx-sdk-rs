@@ -61,7 +61,7 @@ where
         match self.len() {
             0 => ().with_normalized(env, from, to, fc, f),
             1 => self.get(0).as_refs().with_normalized(env, from, to, fc, f),
-            _ => to.with_address_ref(env, |to_addr| {
+            _ => to.with_value_ref(env, |to_addr| {
                 let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
                 f(&from.resolve_address(env), &*BigUint::zero_ref(), &fc_conv)
             }),

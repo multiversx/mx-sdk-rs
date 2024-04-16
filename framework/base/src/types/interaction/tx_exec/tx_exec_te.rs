@@ -16,7 +16,7 @@ where
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
 {
     fn transfer_execute_with_gas(self, gas_limit: u64) {
-        self.to.with_address_ref(&self.env, |to| {
+        self.to.with_value_ref(&self.env, |to| {
             self.payment
                 .perform_transfer_execute(&self.env, to, gas_limit, self.data.into());
         });

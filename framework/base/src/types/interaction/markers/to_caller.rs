@@ -14,7 +14,7 @@ where
     Api: CallTypeApi + BlockchainApi,
 {
     fn annotation(&self, env: &TxScEnv<Api>) -> ManagedBuffer<Api> {
-        self.with_address_ref(env, |addr_ref| addr_ref.hex_expr())
+        self.with_value_ref(env, |addr_ref| addr_ref.hex_expr())
     }
 
     fn to_value(&self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {

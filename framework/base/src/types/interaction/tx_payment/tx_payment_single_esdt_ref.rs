@@ -60,7 +60,7 @@ where
         To: TxToSpecified<Env>,
         F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| {
+        to.with_value_ref(env, |to_addr| {
             if self.token_nonce == 0 {
                 let fc_conv = fc.convert_to_single_transfer_fungible_call(self);
                 f(to_addr, &*BigUint::zero_ref(), &fc_conv)

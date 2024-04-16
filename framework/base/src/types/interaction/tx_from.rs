@@ -20,6 +20,7 @@ impl<Env> TxFrom<Env> for ()
 where
     Env: TxEnv,
 {
+    #[inline]
     fn resolve_address(&self, env: &Env) -> ManagedAddress<Env::Api> {
         env.resolve_sender_address()
     }

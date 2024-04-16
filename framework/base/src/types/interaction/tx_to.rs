@@ -14,16 +14,6 @@ pub trait TxToSpecified<Env>: TxTo<Env> + AnnotatedValue<Env, ManagedAddress<Env
 where
     Env: TxEnv,
 {
-    /// Avoids a clone when performing transfer-execute.
-    ///
-    /// Other than that, does thesame as `AnnotatedValue::into_value`.
-    #[inline]
-    fn with_address_ref<F, R>(&self, env: &Env, f: F) -> R
-    where
-        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
-    {
-        self.with_value_ref(env, f)
-    }
 }
 
 impl<Env> TxTo<Env> for ManagedAddress<Env::Api> where Env: TxEnv {}
