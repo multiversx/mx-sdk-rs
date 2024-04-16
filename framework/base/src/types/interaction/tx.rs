@@ -651,12 +651,12 @@ where
             |norm_to, norm_egld, norm_fc| ContractCallWithEgld {
                 basic: ContractCallNoPayment {
                     _phantom: core::marker::PhantomData,
-                    to: norm_to.clone(),
+                    to: norm_to.clone_value(),
                     function_call: norm_fc.clone(),
                     explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
                     _return_type: core::marker::PhantomData,
                 },
-                egld_payment: norm_egld.clone(),
+                egld_payment: norm_egld.clone_value(),
             },
         )
     }

@@ -16,7 +16,7 @@ pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
 
 use crate::{
     api::ManagedTypeApi,
-    types::{BigUint, ManagedAddress, ManagedBuffer, MultiEsdtPayment},
+    types::{BigUint, ManagedAddress, ManagedBuffer, ManagedRef, MultiEsdtPayment},
 };
 
 use super::{AnnotatedValue, FunctionCall, TxEnv, TxFrom, TxToSpecified};
@@ -51,7 +51,11 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R;
+        F: FnOnce(
+            ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
+            ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
+            &FunctionCall<Env::Api>,
+        ) -> R;
 
     /// Payment data to be used by the testing framework. Will be refactored.
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api>;

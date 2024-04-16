@@ -159,8 +159,8 @@ where
             self.data,
             |norm_to, norm_egld, norm_fc| {
                 SendRawWrapper::<Api>::new().create_async_call_raw(
-                    norm_to,
-                    norm_egld,
+                    &norm_to,
+                    &norm_egld,
                     &norm_fc.function_name,
                     &norm_fc.arg_buffer,
                     callback_name,

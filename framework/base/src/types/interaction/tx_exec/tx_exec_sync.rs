@@ -35,8 +35,8 @@ where
             |norm_to, norm_egld, norm_fc| {
                 SendRawWrapper::<Api>::new().execute_on_dest_context_raw(
                     gas_limit,
-                    norm_to,
-                    norm_egld,
+                    &norm_to,
+                    &norm_egld,
                     &norm_fc.function_name,
                     &norm_fc.arg_buffer,
                 )

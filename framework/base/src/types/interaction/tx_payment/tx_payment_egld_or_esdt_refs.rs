@@ -1,4 +1,4 @@
-use crate::types::{BigUint, EgldOrEsdtTokenPaymentRefs, ManagedAddress, TxFrom, TxToSpecified};
+use crate::types::{BigUint, EgldOrEsdtTokenPaymentRefs, ManagedAddress, ManagedRef, TxFrom, TxToSpecified};
 
 use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
@@ -35,7 +35,11 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(
+            ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
+            ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
+            &FunctionCall<Env::Api>,
+        ) -> R
     {
         self.map_egld_or_esdt(
             (to, fc, f),

@@ -12,7 +12,7 @@ use crate::{
         TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
-    proxy_imports::ManagedRef,
+    types::ManagedRef,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
 };
 
