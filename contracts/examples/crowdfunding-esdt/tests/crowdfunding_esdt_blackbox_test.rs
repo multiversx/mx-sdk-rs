@@ -6,9 +6,9 @@ use num_bigint::BigUint;
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
 const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
 const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
-const FIRST_USER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("first-user");
-const OWNER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("owner");
-const SECOND_USER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("second-user");
+const FIRST_USER_ADDRESS: AddressExpr = AddressExpr("first-user");
+const OWNER_ADDRESS: AddressExpr = AddressExpr("owner");
+const SECOND_USER_ADDRESS: AddressExpr = AddressExpr("second-user");
 const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
 const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
 
@@ -34,11 +34,11 @@ impl CrowdfundingESDTTestState {
         world
             .account(owner_address)
             .nonce(1)
-            .account(FIRST_USER_ADDRESS_EXPR_REPL)
+            .account(FIRST_USER_ADDRESS)
             .nonce(1)
             .balance("1000")
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000")
-            .account(SECOND_USER_ADDRESS_EXPR_REPL)
+            .account(SECOND_USER_ADDRESS)
             .nonce(1)
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
@@ -54,7 +54,7 @@ impl CrowdfundingESDTTestState {
     fn deploy(&mut self) {
         self.world
             .tx()
-            .from(OWNER_ADDRESS_EXPR_REPL)
+            .from(OWNER_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .init(
                 2_000u32,
@@ -133,8 +133,8 @@ fn test_fund() {
     let mut state = CrowdfundingESDTTestState::new();
     state.deploy();
 
-    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1_000u64);
-    state.check_deposit(FIRST_USER_ADDRESS_EXPR_REPL, 1_000u64);
+    state.fund(FIRST_USER_ADDRESS, 1_000u64);
+    state.check_deposit(FIRST_USER_ADDRESS, 1_000u64);
 }
 
 #[test]
@@ -153,7 +153,7 @@ fn test_sc_error() {
     state
         .world
         .tx()
-        .from(FIRST_USER_ADDRESS_EXPR_REPL)
+        .from(FIRST_USER_ADDRESS)
         .to(SC_CROWDFUNDING_ESDT_EXPR)
         .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
         .fund()
@@ -161,7 +161,7 @@ fn test_sc_error() {
         .with_result(ExpectError(4, "wrong token"))
         .run();
 
-    state.check_deposit(FIRST_USER_ADDRESS_EXPR_REPL, 0);
+    state.check_deposit(FIRST_USER_ADDRESS, 0);
 }
 
 #[test]
@@ -170,12 +170,12 @@ fn test_successful_cf() {
     state.deploy();
 
     // first user fund
-    state.fund(FIRST_USER_ADDRESS_EXPR_REPL, 1_000u64);
-    state.check_deposit(FIRST_USER_ADDRESS_EXPR_REPL, 1_000);
+    state.fund(FIRST_USER_ADDRESS, 1_000u64);
+    state.check_deposit(FIRST_USER_ADDRESS, 1_000);
 
     // second user fund
-    state.fund(SECOND_USER_ADDRESS_EXPR_REPL, 1000);
-    state.check_deposit(SECOND_USER_ADDRESS_EXPR_REPL, 1_000);
+    state.fund(SECOND_USER_ADDRESS, 1000);
+    state.check_deposit(SECOND_USER_ADDRESS, 1_000);
 
     // set block timestamp after deadline
     state.set_block_timestamp(CF_DEADLINE + 1);
@@ -186,7 +186,7 @@ fn test_successful_cf() {
     state
         .world
         .tx()
-        .from(FIRST_USER_ADDRESS_EXPR_REPL)
+        .from(FIRST_USER_ADDRESS)
         .to(SC_CROWDFUNDING_ESDT_EXPR)
         .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
         .claim()
@@ -194,11 +194,11 @@ fn test_successful_cf() {
         .run();
 
     // owner claim
-    state.claim(OWNER_ADDRESS_EXPR_REPL);
+    state.claim(OWNER_ADDRESS);
 
-    state.check_esdt_balance(OWNER_ADDRESS_EXPR_REPL, "2_000");
-    state.check_esdt_balance(FIRST_USER_ADDRESS_EXPR_REPL, "0");
-    state.check_esdt_balance(SECOND_USER_ADDRESS_EXPR_REPL, "0");
+    state.check_esdt_balance(OWNER_ADDRESS, "2_000");
+    state.check_esdt_balance(FIRST_USER_ADDRESS, "0");
+    state.check_esdt_balance(SECOND_USER_ADDRESS, "0");
 }
 
 #[test]
@@ -208,17 +208,17 @@ fn test_failed_cf() {
 
     // first user fund
     state.fund(
-        FIRST_USER_ADDRESS_EXPR_REPL, //.eval_to_expr().as_str()
+        FIRST_USER_ADDRESS, //.eval_to_expr().as_str()
         300,
     );
-    state.check_deposit(FIRST_USER_ADDRESS_EXPR_REPL, 300u64);
+    state.check_deposit(FIRST_USER_ADDRESS, 300u64);
 
     // second user fund
     state.fund(
-        SECOND_USER_ADDRESS_EXPR_REPL, //.eval_to_expr().as_str()
+        SECOND_USER_ADDRESS, //.eval_to_expr().as_str()
         600,
     );
-    state.check_deposit(SECOND_USER_ADDRESS_EXPR_REPL, 600u64);
+    state.check_deposit(SECOND_USER_ADDRESS, 600u64);
 
     // set block timestamp after deadline
     state.set_block_timestamp(CF_DEADLINE + 1);
@@ -227,12 +227,12 @@ fn test_failed_cf() {
     state.check_status(crowdfunding_esdt_proxy::Status::Failed);
 
     // first user claim
-    state.claim(FIRST_USER_ADDRESS_EXPR_REPL);
+    state.claim(FIRST_USER_ADDRESS);
 
     // second user claim
-    state.claim(SECOND_USER_ADDRESS_EXPR_REPL);
+    state.claim(SECOND_USER_ADDRESS);
 
-    state.check_esdt_balance(OWNER_ADDRESS_EXPR_REPL, "0");
-    state.check_esdt_balance(FIRST_USER_ADDRESS_EXPR_REPL, "1_000");
-    state.check_esdt_balance(SECOND_USER_ADDRESS_EXPR_REPL, "1_000");
+    state.check_esdt_balance(OWNER_ADDRESS, "0");
+    state.check_esdt_balance(FIRST_USER_ADDRESS, "1_000");
+    state.check_esdt_balance(SECOND_USER_ADDRESS, "1_000");
 }
