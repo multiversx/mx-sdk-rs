@@ -118,7 +118,7 @@ impl CrowdfundingESDTTestState {
 
     fn check_esdt_balance(&mut self, address: AddressExpr, balance_expr: &str) {
         self.world
-            .check_state_account(address)
+            .check_account(address)
             .esdt_balance(CF_TOKEN_ID_EXPR, balance_expr);
     }
 
