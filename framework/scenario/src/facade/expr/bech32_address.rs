@@ -56,6 +56,10 @@ impl Bech32Address {
         self.bech32.to_owned()
     }
 
+    pub fn to_hex(&self) -> String {
+        hex::encode(&self.address)
+    }
+
     pub fn as_address(&self) -> &Address {
         &self.address
     }
