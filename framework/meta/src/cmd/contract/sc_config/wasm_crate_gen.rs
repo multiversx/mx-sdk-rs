@@ -18,6 +18,7 @@ const PREFIX_AUTO_GENERATED: &str =
 ";
 
 const NUM_INIT: usize = 1;
+const NUM_UPGRADE: usize = 1;
 const NUM_ASYNC_CB: usize = 1;
 
 const VER_1_71: &str = "1.71.0-nightly";
@@ -117,7 +118,8 @@ impl ContractVariant {
             total += NUM_INIT;
         }
         if !self.abi.upgrade_constructors.is_empty() {
-            write_stat_comment(wasm_lib_file, "Upgrade:", NUM_INIT);
+            write_stat_comment(wasm_lib_file, "Upgrade:", NUM_UPGRADE);
+            total += NUM_UPGRADE;
         }
 
         write_stat_comment(wasm_lib_file, "Endpoints:", self.abi.endpoints.len());
