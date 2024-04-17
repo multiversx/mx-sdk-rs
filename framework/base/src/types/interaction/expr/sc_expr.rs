@@ -1,11 +1,8 @@
 use core::ptr;
 
-use crate::{
-    proxy_imports::Address,
-    types::{
-        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
-        TxToSpecified,
-    },
+use crate::types::{
+    heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified,
+    TxTo, TxToSpecified,
 };
 
 const SC_PREFIX: &str = "sc:";
