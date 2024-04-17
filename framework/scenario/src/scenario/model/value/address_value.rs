@@ -1,6 +1,6 @@
 use std::fmt;
 
-use crate::multiversx_sc::types::Address;
+use crate::multiversx_sc::types::{Address, AddressExpr, ScExpr};
 
 use crate::{
     facade::expr::Bech32Address,
@@ -131,5 +131,23 @@ impl From<Bech32Address> for AddressValue {
 impl From<&str> for AddressValue {
     fn from(from: &str) -> Self {
         AddressValue::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
+impl From<AddressExpr> for AddressValue {
+    fn from(from: AddressExpr) -> Self {
+        AddressValue {
+            value: from.eval_to_array().into(),
+            original: ValueSubTree::Str(from.eval_to_expr()),
+        }
+    }
+}
+
+impl From<ScExpr<'_>> for AddressValue {
+    fn from(from: ScExpr) -> Self {
+        AddressValue {
+            value: from.eval_to_array().into(),
+            original: ValueSubTree::Str(from.eval_to_expr()),
+        }
     }
 }

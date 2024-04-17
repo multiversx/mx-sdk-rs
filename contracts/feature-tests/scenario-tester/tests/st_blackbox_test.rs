@@ -42,10 +42,10 @@ fn st_blackbox() {
         .commit();
 
     world
-        .check_state_account(owner_address)
+        .check_account(owner_address)
         .nonce("1")
         .balance("100")
-        .check_state_account(other_address)
+        .check_account(other_address)
         .nonce("2")
         .balance("300")
         .esdt_balance("str:TOKEN-123456", "500")
@@ -81,10 +81,10 @@ fn st_blackbox() {
         .run();
 
     world
-        .check_state_account(owner_address)
+        .check_account(owner_address)
         .nonce("3")
         .balance("100")
-        .check_state_account(st_contract)
+        .check_account(st_contract)
         .check_storage("str:sum", "6")
         .commit();
 
@@ -122,10 +122,10 @@ fn set_state_test() {
         .commit();
 
     world
-        .check_state_account(first)
+        .check_account(first)
         .nonce(1)
         .balance("100")
-        .check_state_account(second)
+        .check_account(second)
         .nonce(2)
         .balance("300")
         .esdt_balance("str:TOKEN-123456", "500")
@@ -139,7 +139,7 @@ fn set_state_test() {
         .commit();
 
     world
-        .check_state_account(third)
+        .check_account(third)
         .nonce(3)
         .balance("50")
         .esdt_nft_balance_and_attributes("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
@@ -156,10 +156,10 @@ fn set_state_test() {
         .esdt_balance("str:TOKEN-123456", "2");
 
     world
-        .check_state_account(fourth)
+        .check_account(fourth)
         .nonce(4)
         .balance("400")
-        .check_state_account(fifth)
+        .check_account(fifth)
         .nonce(5)
         .balance("250")
         .esdt_balance("str:TOKEN-123456", "2");
@@ -171,7 +171,7 @@ fn set_state_test() {
         .esdt_balance("str:TOKEN-123456", "60");
 
     world
-        .check_state_account(sixth)
+        .check_account(sixth)
         .nonce(6)
         .balance("600")
         .esdt_balance("str:TOKEN-123456", "60");
