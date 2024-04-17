@@ -14,7 +14,7 @@ use crate::{
 };
 
 impl ScenarioWorld {
-    pub fn check_state_account<A>(&mut self, address: A) -> CheckStateBuilder<'_>
+    pub fn check_account<A>(&mut self, address: A) -> CheckStateBuilder<'_>
     where
         AddressKey: From<A>,
     {
@@ -42,7 +42,7 @@ impl<'w> CheckStateBuilder<'w> {
     }
 
     /// Starts building of a new account.
-    pub fn check_state_account<A>(mut self, address_expr: A) -> Self
+    pub fn check_account<A>(mut self, address_expr: A) -> Self
     where
         AddressKey: From<A>,
     {

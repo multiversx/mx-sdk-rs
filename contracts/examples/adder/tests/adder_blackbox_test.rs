@@ -61,11 +61,9 @@ fn adder_blackbox() {
         .returns(ExpectValue(6u32))
         .run();
 
-    world.check_state_step(
-        CheckStateStep::new()
-            .put_account(OWNER, CheckAccount::new())
-            .put_account(SC_ADDER, CheckAccount::new().check_storage("str:sum", "6")),
-    );
+    world.check_account(OWNER);
+
+    world.check_account(SC_ADDER).check_storage("str:sum", "6");
 
     world.write_scenario_trace("trace1.scen.json");
 }
