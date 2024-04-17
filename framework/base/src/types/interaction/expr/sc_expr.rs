@@ -1,8 +1,11 @@
 use core::ptr;
 
-use crate::types::{
-    AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
-    TxToSpecified,
+use crate::{
+    proxy_imports::Address,
+    types::{
+        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+        TxToSpecified,
+    },
 };
 
 const SC_PREFIX: &str = "sc:";
@@ -23,6 +26,13 @@ where
     }
 
     fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        let expr: [u8; 32] = self.eval_to_array();
+        expr.into()
+    }
+}
+
+impl<'a> ScExpr<'a> {
+    pub fn to_address(&self) -> Address {
         let expr: [u8; 32] = self.eval_to_array();
         expr.into()
     }
