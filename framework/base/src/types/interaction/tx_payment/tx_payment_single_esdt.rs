@@ -1,5 +1,5 @@
 use crate::types::{
-    BigUint, EsdtTokenPayment, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom, TxToSpecified
+    BigUint, EsdtTokenPayment, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom, TxToSpecified,
 };
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
@@ -28,7 +28,7 @@ where
     #[inline]
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -40,8 +40,8 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
@@ -78,7 +78,7 @@ where
     #[inline]
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -90,8 +90,8 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         self.as_refs().with_normalized(env, from, to, fc, f)
     }

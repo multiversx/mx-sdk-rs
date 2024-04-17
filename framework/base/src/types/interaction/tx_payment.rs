@@ -42,7 +42,7 @@ where
     /// Converts an ESDT call to a built-in function call, if necessary.
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -54,7 +54,7 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
+            FunctionCall<Env::Api>,
         ) -> R;
 
     /// Payment data to be used by the testing framework. Will be refactored.

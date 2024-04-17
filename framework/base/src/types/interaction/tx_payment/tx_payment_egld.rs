@@ -1,7 +1,8 @@
 use crate::{
     contract_base::SendRawWrapper,
     types::{
-        AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, ManagedRef, ManagedVec, TxFrom, TxToSpecified
+        AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, ManagedRef, ManagedVec, TxFrom,
+        TxToSpecified,
     },
 };
 
@@ -45,7 +46,7 @@ where
     #[inline]
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         _from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -57,12 +58,12 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
-        to.with_value_ref(env, |to_addr| {
+        to.with_value_ref(&env, |to_addr| {
             self.0
-                .with_value_ref(env, |egld_value| f(to_addr.into(), egld_value.into(), &fc))
+                .with_value_ref(&env, |egld_value| f(to_addr.into(), egld_value.into(), fc))
         })
     }
 

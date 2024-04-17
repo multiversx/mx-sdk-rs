@@ -126,7 +126,7 @@ where
     pub fn async_call_and_exit(self) -> ! {
         self.result_handler.save_callback_closure_to_storage();
         self.payment.with_normalized(
-            &self.env,
+            self.env,
             self.from,
             self.to,
             self.data.into(),

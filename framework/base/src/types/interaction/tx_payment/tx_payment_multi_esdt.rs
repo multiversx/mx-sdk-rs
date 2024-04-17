@@ -47,7 +47,7 @@ where
 
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -59,15 +59,19 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         match self.len() {
             0 => ().with_normalized(env, from, to, fc, f),
             1 => self.get(0).as_refs().with_normalized(env, from, to, fc, f),
-            _ => to.with_value_ref(env, |to_addr| {
+            _ => to.with_value_ref(&env, |to_addr| {
                 let fc_conv = fc.convert_to_multi_transfer_esdt_call(to_addr, self);
-                f((&from.resolve_address(env)).into(), BigUint::zero_ref(), &fc_conv)
+                f(
+                    (&from.resolve_address(&env)).into(),
+                    BigUint::zero_ref(),
+                    fc_conv,
+                )
             }),
         }
     }
@@ -104,7 +108,7 @@ where
     #[inline]
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -116,8 +120,8 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         self.deref().with_normalized(env, from, to, fc, f)
     }
@@ -150,7 +154,7 @@ where
     #[inline]
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -162,8 +166,8 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         (&self).with_normalized(env, from, to, fc, f)
     }

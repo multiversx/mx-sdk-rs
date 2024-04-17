@@ -1,7 +1,8 @@
 use crate::{
     contract_base::SendRawWrapper,
     types::{
-        BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom, TxToSpecified
+        BigUint, EsdtTokenPaymentRefs, ManagedAddress, ManagedRef, MultiEsdtPayment, TxFrom,
+        TxToSpecified,
     },
 };
 
@@ -49,7 +50,7 @@ where
 
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -61,16 +62,20 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
-        to.with_value_ref(env, |to_addr| {
+        to.with_value_ref(&env, |to_addr| {
             if self.token_nonce == 0 {
                 let fc_conv = fc.convert_to_single_transfer_fungible_call(self);
-                f(to_addr.into(), BigUint::zero_ref(), &fc_conv)
+                f(to_addr.into(), BigUint::zero_ref(), fc_conv)
             } else {
                 let fc_conv = fc.convert_to_single_transfer_nft_call(to_addr, self);
-                f(ManagedRef::from(&from.resolve_address(env)), BigUint::zero_ref(), &fc_conv)
+                f(
+                    ManagedRef::from(&from.resolve_address(&env)),
+                    BigUint::zero_ref(),
+                    fc_conv,
+                )
             }
         })
     }

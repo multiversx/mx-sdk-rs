@@ -153,7 +153,7 @@ where
         let gas = self.gas.gas_value(&self.env);
 
         self.payment.with_normalized(
-            &self.env,
+            self.env,
             self.from,
             self.to,
             self.data,

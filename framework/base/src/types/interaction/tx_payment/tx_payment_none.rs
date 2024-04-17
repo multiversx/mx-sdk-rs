@@ -25,7 +25,7 @@ where
     #[inline]
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
+        env: Env,
         _from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
@@ -37,10 +37,10 @@ where
         F: FnOnce(
             ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
             ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
-            &FunctionCall<Env::Api>,
-        ) -> R
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
-        to.with_value_ref(env, |to_addr| f(to_addr.into(), BigUint::zero_ref(), &fc))
+        to.with_value_ref(&env, |to_addr| f(to_addr.into(), BigUint::zero_ref(), fc))
     }
 
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {

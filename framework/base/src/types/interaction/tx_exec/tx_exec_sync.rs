@@ -28,7 +28,7 @@ where
         let gas_limit = self.gas.gas_value(&self.env);
 
         let raw_result = self.payment.with_normalized(
-            &self.env,
+            self.env,
             self.from,
             self.to,
             self.data.into(),
