@@ -1,4 +1,6 @@
-use crate::types::{BigUint, Egld, EgldOrEsdtTokenPayment, ManagedAddress, TxFrom, TxToSpecified};
+use crate::types::{
+    BigUint, Egld, EgldOrEsdtTokenPayment, ManagedAddress, ManagedRef, TxFrom, TxToSpecified,
+};
 
 use super::{FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
@@ -26,8 +28,8 @@ where
 
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
-        from: &From,
+        env: Env,
+        from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
         f: F,
@@ -35,12 +37,16 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(
+            ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
+            ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         self.map_ref_egld_or_esdt(
-            (to, fc, f),
-            |(to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
-            |(to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
+            (env, from, to, fc, f),
+            |(env, from, to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
+            |(env, from, to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
         )
     }
 
@@ -75,8 +81,8 @@ where
 
     fn with_normalized<From, To, F, R>(
         self,
-        env: &Env,
-        from: &From,
+        env: Env,
+        from: From,
         to: To,
         fc: FunctionCall<Env::Api>,
         f: F,
@@ -84,12 +90,16 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(
+            ManagedRef<'_, Env::Api, ManagedAddress<Env::Api>>,
+            ManagedRef<'_, Env::Api, BigUint<Env::Api>>,
+            FunctionCall<Env::Api>,
+        ) -> R,
     {
         self.map_egld_or_esdt(
-            (to, fc, f),
-            |(to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
-            |(to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
+            (env, from, to, fc, f),
+            |(env, from, to, fc, f), amount| Egld(amount).with_normalized(env, from, to, fc, f),
+            |(env, from, to, fc, f), esdt_payment| esdt_payment.with_normalized(env, from, to, fc, f),
         )
     }
 

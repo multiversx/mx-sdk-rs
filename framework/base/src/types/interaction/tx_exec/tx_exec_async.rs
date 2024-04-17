@@ -126,14 +126,14 @@ where
     pub fn async_call_and_exit(self) -> ! {
         self.result_handler.save_callback_closure_to_storage();
         self.payment.with_normalized(
-            &self.env,
-            &self.from,
+            self.env,
+            self.from,
             self.to,
             self.data.into(),
             |norm_to, norm_egld, norm_fc| {
                 SendRawWrapper::<Api>::new().async_call_raw(
-                    norm_to,
-                    norm_egld,
+                    &norm_to,
+                    &norm_egld,
                     &norm_fc.function_name,
                     &norm_fc.arg_buffer,
                 )

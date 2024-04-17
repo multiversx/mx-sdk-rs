@@ -153,14 +153,14 @@ where
         let gas = self.gas.gas_value(&self.env);
 
         self.payment.with_normalized(
-            &self.env,
-            &self.from,
+            self.env,
+            self.from,
             self.to,
             self.data,
             |norm_to, norm_egld, norm_fc| {
                 SendRawWrapper::<Api>::new().create_async_call_raw(
-                    norm_to,
-                    norm_egld,
+                    &norm_to,
+                    &norm_egld,
                     &norm_fc.function_name,
                     &norm_fc.arg_buffer,
                     callback_name,

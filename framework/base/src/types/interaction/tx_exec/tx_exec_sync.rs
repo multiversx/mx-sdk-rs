@@ -28,15 +28,15 @@ where
         let gas_limit = self.gas.gas_value(&self.env);
 
         let raw_result = self.payment.with_normalized(
-            &self.env,
-            &self.from,
+            self.env,
+            self.from,
             self.to,
             self.data.into(),
             |norm_to, norm_egld, norm_fc| {
                 SendRawWrapper::<Api>::new().execute_on_dest_context_raw(
                     gas_limit,
-                    norm_to,
-                    norm_egld,
+                    &norm_to,
+                    &norm_egld,
                     &norm_fc.function_name,
                     &norm_fc.arg_buffer,
                 )

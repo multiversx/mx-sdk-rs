@@ -9,6 +9,7 @@ use crate::{api::ManagedTypeApi, types::ManagedType};
 /// A very efficient reference to a managed type, with copy semantics.
 ///
 /// It copies the handle and knows how to deref back.
+#[repr(transparent)]
 pub struct ManagedRef<'a, M, T>
 where
     M: ManagedTypeApi,
@@ -24,6 +25,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M>,
 {
+    #[inline]
     pub fn new(value: &'a T) -> Self {
         Self {
             _phantom_m: PhantomData,

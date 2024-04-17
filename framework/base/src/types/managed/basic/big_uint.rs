@@ -12,8 +12,7 @@ use crate::{
         TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
-    proxy_imports::ManagedRef,
-    types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
+    types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedRef, ManagedType},
 };
 
 use super::cast_to_i64::cast_to_i64;
