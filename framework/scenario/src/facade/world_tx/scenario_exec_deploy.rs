@@ -1,20 +1,14 @@
-use std::path::PathBuf;
-
-use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        AnnotatedValue, Code, DeployCall, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec,
-        Tx, TxBaseWithEnv, TxCodeSource, TxCodeSourceSpecified, TxCodeValue, TxEnv,
-        TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        Code, DeployCall, RHListExec, Tx, TxBaseWithEnv, TxCodeValue, TxFromSpecified, TxGas,
+        TxPayment,
     },
 };
 
 use crate::{
-    api::StaticApi,
-    scenario::tx_to_step::TxToStep,
-    scenario_model::{AddressValue, BytesValue, ScCallStep, ScDeployStep, TxResponse},
-    ScenarioEnvExec, ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
+    scenario::tx_to_step::TxToStep, scenario_model::TxResponse, ScenarioEnvExec, ScenarioTxRun,
+    ScenarioWorld,
 };
 
 use super::ScenarioTxEnvData;
