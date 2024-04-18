@@ -1,14 +1,16 @@
 mod scenario_set_account;
 mod scenario_set_block;
+mod scenario_set_new_address;
 
 use crate::{
     scenario::ScenarioRunner,
-    scenario_model::{AddressKey, SetStateStep},
+    scenario_model::{AddressKey, AddressValue, NewAddress, SetStateStep, U64Value},
     ScenarioWorld,
 };
 
 use scenario_set_account::AccountItem;
 use scenario_set_block::BlockItem;
+use scenario_set_new_address::NewAddressItem;
 
 impl ScenarioWorld {
     fn empty_builder(&mut self) -> SetStateBuilder<'_, ()> {
@@ -23,6 +25,21 @@ impl ScenarioWorld {
         AddressKey: From<A>,
     {
         self.empty_builder().account(address_expr)
+    }
+
+    pub fn new_address<CA, CN, NA>(
+        &mut self,
+        creator_address_expr: CA,
+        creator_nonce_expr: CN,
+        new_address_expr: NA,
+    ) -> SetStateBuilder<'_, NewAddressItem>
+    where
+        AddressValue: From<CA>,
+        U64Value: From<CN>,
+        AddressValue: From<NA>,
+    {
+        self.empty_builder()
+            .new_address(creator_address_expr, creator_nonce_expr, new_address_expr)
     }
 
     pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
@@ -96,6 +113,31 @@ where
         SetStateBuilder {
             base: Some(base),
             item,
+        }
+    }
+
+    pub fn new_address<CA, CN, NA>(
+        mut self,
+        creator_address_expr: CA,
+        creator_nonce_expr: CN,
+        new_address_expr: NA,
+    ) -> SetStateBuilder<'w, NewAddressItem>
+    where
+        AddressValue: From<CA>,
+        U64Value: From<CN>,
+        AddressValue: From<NA>,
+    {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: NewAddressItem {
+                new_address: NewAddress {
+                    creator_address: AddressValue::from(creator_address_expr),
+                    creator_nonce: U64Value::from(creator_nonce_expr),
+                    new_address: AddressValue::from(new_address_expr),
+                },
+            },
         }
     }
 
