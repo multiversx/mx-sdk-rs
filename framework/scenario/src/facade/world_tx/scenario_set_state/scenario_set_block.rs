@@ -1,28 +1,28 @@
 use crate::scenario_model::{BlockInfo, BytesValue, SetStateStep, U64Value};
 
-use super::scenario_set_state::{SetStateBuilder, SetStateBuilderItem};
+use super::{SetStateBuilder, SetStateBuilderItem};
 
-pub enum BlockInfoTarget {
+pub enum BlockItemTarget {
     Current,
     Previous,
 }
 
 pub struct BlockItem {
-    target: BlockInfoTarget,
+    target: BlockItemTarget,
     block_info: BlockInfo,
 }
 
 impl BlockItem {
     pub fn new_current() -> Self {
         BlockItem {
-            target: BlockInfoTarget::Current,
+            target: BlockItemTarget::Current,
             block_info: BlockInfo::default(),
         }
     }
 
     pub fn new_prev() -> Self {
         BlockItem {
-            target: BlockInfoTarget::Previous,
+            target: BlockItemTarget::Previous,
             block_info: BlockInfo::default(),
         }
     }
@@ -32,10 +32,10 @@ impl SetStateBuilderItem for BlockItem {
     fn commit_to_step(&mut self, step: &mut SetStateStep) {
         let block_info = core::mem::take(&mut self.block_info);
         match self.target {
-            BlockInfoTarget::Current => {
+            BlockItemTarget::Current => {
                 step.current_block_info = Box::new(Some(block_info));
             },
-            BlockInfoTarget::Previous => {
+            BlockItemTarget::Previous => {
                 step.previous_block_info = Box::new(Some(block_info));
             },
         }

@@ -5,14 +5,23 @@ use crate::scenario_model::{
     SetStateStep, U64Value,
 };
 
-use super::scenario_set_state::{SetStateBuilder, SetStateBuilderItem};
+use super::{SetStateBuilder, SetStateBuilderItem};
 
-pub struct CurrentAccount {
-    pub(crate) address: AddressKey,
-    pub(crate) account: Account,
+pub struct AccountItem {
+    address: AddressKey,
+    account: Account,
 }
 
-impl SetStateBuilderItem for CurrentAccount {
+impl AccountItem {
+    pub fn new(address: AddressKey) -> Self {
+        AccountItem {
+            address,
+            account: Account::default(),
+        }
+    }
+}
+
+impl SetStateBuilderItem for AccountItem {
     fn commit_to_step(&mut self, step: &mut SetStateStep) {
         if let Entry::Vacant(entry) = step.accounts.entry(core::mem::take(&mut self.address)) {
             entry.insert(core::mem::take(&mut self.account));
@@ -20,7 +29,7 @@ impl SetStateBuilderItem for CurrentAccount {
     }
 }
 
-impl<'w> SetStateBuilder<'w, CurrentAccount> {
+impl<'w> SetStateBuilder<'w, AccountItem> {
     pub fn nonce<V>(mut self, nonce: V) -> Self
     where
         U64Value: From<V>,

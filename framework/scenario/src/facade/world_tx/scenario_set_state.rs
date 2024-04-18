@@ -1,13 +1,17 @@
+mod scenario_set_account;
+mod scenario_set_block;
+
 use crate::{
     scenario::ScenarioRunner,
-    scenario_model::{Account, AddressKey, SetStateStep},
+    scenario_model::{AddressKey, SetStateStep},
     ScenarioWorld,
 };
 
-use super::{block_info_builder::BlockItem, scenario_set_state_account::CurrentAccount};
+use scenario_set_account::AccountItem;
+use scenario_set_block::BlockItem;
 
 impl ScenarioWorld {
-    pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_, CurrentAccount>
+    pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_, AccountItem>
     where
         AddressKey: From<A>,
     {
@@ -63,7 +67,7 @@ impl<'w> SetStateBuilderBase<'w> {
         }
     }
 
-    fn start_account(&self, address: AddressKey) -> CurrentAccount {
+    fn start_account(&self, address: AddressKey) -> AccountItem {
         assert!(
             !self
                 .world
@@ -75,10 +79,7 @@ impl<'w> SetStateBuilderBase<'w> {
             "updating existing accounts currently not supported"
         );
 
-        CurrentAccount {
-            address,
-            account: Account::default(),
-        }
+        AccountItem::new(address)
     }
 }
 
@@ -89,7 +90,7 @@ where
     Item: SetStateBuilderItem,
 {
     /// Starts building of a new account.
-    pub fn account<A>(mut self, address_expr: A) -> SetStateBuilder<'w, CurrentAccount>
+    pub fn account<A>(mut self, address_expr: A) -> SetStateBuilder<'w, AccountItem>
     where
         AddressKey: From<A>,
     {
