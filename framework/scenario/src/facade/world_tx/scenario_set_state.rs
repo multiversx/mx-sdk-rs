@@ -11,30 +11,26 @@ use scenario_set_account::AccountItem;
 use scenario_set_block::BlockItem;
 
 impl ScenarioWorld {
+    fn empty_builder(&mut self) -> SetStateBuilder<'_, ()> {
+        SetStateBuilder {
+            base: Some(SetStateBuilderBase::new(self)),
+            item: (),
+        }
+    }
+
     pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_, AccountItem>
     where
         AddressKey: From<A>,
     {
-        let base = SetStateBuilderBase::new(self);
-        let item = base.start_account(address_expr.into());
-        SetStateBuilder {
-            base: Some(base),
-            item,
-        }
+        self.empty_builder().account(address_expr)
     }
 
     pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
-        SetStateBuilder {
-            base: Some(SetStateBuilderBase::new(self)),
-            item: BlockItem::new_current(),
-        }
+        self.empty_builder().current_block()
     }
 
     pub fn previous_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
-        SetStateBuilder {
-            base: Some(SetStateBuilderBase::new(self)),
-            item: BlockItem::new_current(),
-        }
+        self.empty_builder().previous_block()
     }
 }
 
@@ -100,6 +96,24 @@ where
         SetStateBuilder {
             base: Some(base),
             item,
+        }
+    }
+
+    pub fn current_block(&mut self) -> SetStateBuilder<'w, BlockItem> {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: BlockItem::new_current(),
+        }
+    }
+
+    pub fn previous_block(&mut self) -> SetStateBuilder<'w, BlockItem> {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: BlockItem::new_prev(),
         }
     }
 
