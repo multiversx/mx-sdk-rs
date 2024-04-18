@@ -59,17 +59,17 @@ impl SetStateBuilderItem for () {
     fn commit_to_step(&mut self, _step: &mut SetStateStep) {}
 }
 
-pub(crate) struct SetStateBuilderBase<'w> {
-    pub(crate) world: &'w mut ScenarioWorld,
-    pub(crate) set_state_step: SetStateStep,
+struct SetStateBuilderBase<'w> {
+    world: &'w mut ScenarioWorld,
+    set_state_step: SetStateStep,
 }
 
 pub struct SetStateBuilder<'w, Current>
 where
     Current: SetStateBuilderItem,
 {
-    pub(crate) base: Option<SetStateBuilderBase<'w>>,
-    pub(crate) item: Current,
+    base: Option<SetStateBuilderBase<'w>>,
+    item: Current,
 }
 
 impl<'w> SetStateBuilderBase<'w> {
