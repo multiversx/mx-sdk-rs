@@ -2,3 +2,6 @@
 
 [[proxy]]
 path = "src/adder_proxy.rs"
+
+[[proxy]]
+path = "../multisig/src/adder_proxy.rs"
