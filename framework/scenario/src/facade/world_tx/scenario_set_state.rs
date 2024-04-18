@@ -4,7 +4,7 @@ use crate::{
     ScenarioWorld,
 };
 
-use super::{block_info_builder::BlockInfoBuilder, scenario_set_state_account::CurrentAccount};
+use super::{block_info_builder::BlockItem, scenario_set_state_account::CurrentAccount};
 
 impl ScenarioWorld {
     pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_, CurrentAccount>
@@ -19,8 +19,18 @@ impl ScenarioWorld {
         }
     }
 
-    pub fn block_info(&mut self) -> BlockInfoBuilder<'_> {
-        BlockInfoBuilder::new(self)
+    pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
+        SetStateBuilder {
+            base: Some(SetStateBuilderBase::new(self)),
+            item: BlockItem::new_current(),
+        }
+    }
+
+    pub fn previous_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
+        SetStateBuilder {
+            base: Some(SetStateBuilderBase::new(self)),
+            item: BlockItem::new_current(),
+        }
     }
 }
 
