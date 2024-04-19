@@ -20,17 +20,17 @@ impl<VHB: VMHooksApiBackend> EndpointFinishApiImpl for VMHooksApi<VHB> {
         })
     }
 
-    fn finish_big_int_raw(&self, handle: Self::BigIntHandle) {
+    fn finish_big_int_raw(&self, handle: &Self::BigIntHandle) {
         self.assert_live_handle(&handle);
         self.with_vm_hooks(|vh| vh.big_int_finish_signed(handle.get_raw_handle_unchecked()));
     }
 
-    fn finish_big_uint_raw(&self, handle: Self::BigIntHandle) {
+    fn finish_big_uint_raw(&self, handle: &Self::BigIntHandle) {
         self.assert_live_handle(&handle);
         self.with_vm_hooks(|vh| vh.big_int_finish_unsigned(handle.get_raw_handle_unchecked()));
     }
 
-    fn finish_managed_buffer_raw(&self, handle: Self::ManagedBufferHandle) {
+    fn finish_managed_buffer_raw(&self, handle: &Self::ManagedBufferHandle) {
         self.assert_live_handle(&handle);
         self.with_vm_hooks(|vh| vh.mbuffer_finish(handle.get_raw_handle_unchecked()));
     }

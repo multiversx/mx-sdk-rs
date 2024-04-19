@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use multiversx_chain_vm::executor::MemPtr;
 use multiversx_chain_vm::vm_hooks::CleanableVMHooks;
-use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl};
+use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl, UnsafeClone};
 
 use crate::debug_executor::StaticVarData;
 
@@ -33,7 +33,9 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     where
         F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
-        VHB::with_vm_hooks_ctx_1(handle.clone(), f)
+        // It's fine to clone because the handle won't be wrapped in a new ManagedType
+        let handle = unsafe { handle.unsafe_clone() };
+        VHB::with_vm_hooks_ctx_1(handle, f)
     }
 
     /// Works with the VM hooks given by the context of 2 handles.
@@ -46,7 +48,9 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     where
         F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
-        VHB::with_vm_hooks_ctx_2(handle1.clone(), handle2.clone(), f)
+        // It's fine to clone because the handles won't be wrapped in new ManagedTypes
+        let (handle1, handle2) = unsafe { (handle1.unsafe_clone(), handle2.unsafe_clone()) };
+        VHB::with_vm_hooks_ctx_2(handle1, handle2, f)
     }
 
     /// Works with the VM hooks given by the context of 3 handles.
@@ -60,7 +64,9 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     where
         F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
-        VHB::with_vm_hooks_ctx_3(handle1.clone(), handle2.clone(), handle3.clone(), f)
+        // It's fine to clone because the handles won't be wrapped in new ManagedTypes
+        let (handle1, handle2, handle3) = unsafe { (handle1.unsafe_clone(), handle2.unsafe_clone(), handle3.unsafe_clone()) };
+        VHB::with_vm_hooks_ctx_3(handle1, handle2, handle3, f)
     }
 
     /// Checks that the handle refers to the current active context (if possible).

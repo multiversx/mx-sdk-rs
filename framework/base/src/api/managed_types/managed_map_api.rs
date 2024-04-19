@@ -7,28 +7,28 @@ pub trait ManagedMapApiImpl: HandleTypeInfo {
 
     fn mm_get(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        value_handle: &Self::ManagedBufferHandle,
     );
 
     fn mm_put(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     );
 
     fn mm_remove(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     );
 
     fn mm_contains(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
     ) -> bool;
 }

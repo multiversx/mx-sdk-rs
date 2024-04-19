@@ -39,7 +39,7 @@ where
         A::storage_read_api_impl().storage_load_from_address(
             self.addr.get_handle(),
             self.key.buffer.get_handle(),
-            &mbuf_handle.clone(),
+            &mbuf_handle,
         );
 
         ManagedBuffer::from_handle(mbuf_handle)

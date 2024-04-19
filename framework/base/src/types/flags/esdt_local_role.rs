@@ -156,5 +156,5 @@ impl ManagedVecItem for EsdtLocalRole {
         <u16 as ManagedVecItem>::to_byte_writer(&self.as_u16(), writer)
     }
 
-    fn take_handle_ownership(self) {}
+    fn take_handle_ownership(&mut self) {}
 }

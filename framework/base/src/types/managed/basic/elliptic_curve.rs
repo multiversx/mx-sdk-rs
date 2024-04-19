@@ -1,12 +1,10 @@
-use core::mem;
 use crate::{
     abi::{TypeAbi, TypeName},
-    api::{use_raw_handle, BigIntApiImpl, EllipticCurveApiImpl, ManagedTypeApi},
+    api::{BigIntApiImpl, EllipticCurveApiImpl, ManagedTypeApi, use_raw_handle},
     types::{BigUint, ManagedType},
 };
-
 use crate::{api::StaticVarApiImpl, types::ManagedBuffer};
-
+use crate::api::HandleConstraints;
 use crate::codec::*;
 
 pub const ELLIPTIC_CURVE_P224_INT: u32 = 224;
@@ -44,8 +42,12 @@ impl<M: ManagedTypeApi> ManagedType<M> for EllipticCurve<M> {
         &self.handle
     }
 
-    fn take_handle(mut self) -> Self::OwnHandle {
-        mem::take(&mut self.handle)
+    fn take_handle(self) -> Self::OwnHandle {
+        Self::OwnHandle::take_handle(self.handle)
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        Self::OwnHandle::take_handle_ref(&mut self.handle)
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::EllipticCurveHandle) -> &Self {

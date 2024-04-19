@@ -37,12 +37,12 @@ pub trait ManagedTypeApiImpl:
         dest: &Self::ManagedBufferHandle,
     );
 
-    fn mb_to_big_float(&self, buffer_handle: Self::ManagedBufferHandle, dest: Self::BigFloatHandle);
+    fn mb_to_big_float(&self, buffer_handle: &Self::ManagedBufferHandle, dest: &Self::BigFloatHandle);
 
     fn mb_from_big_float(
         &self,
-        big_float_handle: Self::BigFloatHandle,
-        dest: Self::ManagedBufferHandle,
+        big_float_handle: &Self::BigFloatHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 
     fn validate_token_identifier(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {

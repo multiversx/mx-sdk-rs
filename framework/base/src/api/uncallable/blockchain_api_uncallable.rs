@@ -35,7 +35,7 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_balance_legacy(&self, _dest: Self::BigIntHandle, _address: &Address) {
+    fn load_balance_legacy(&self, _dest: &Self::BigIntHandle, _address: &Address) {
         unreachable!()
     }
 
@@ -104,7 +104,7 @@ impl BlockchainApiImpl for UncallableApi {
         _address_handle: &Self::ManagedBufferHandle,
         _token_id_handle: &Self::ManagedBufferHandle,
         _nonce: u64,
-        _dest: Self::BigIntHandle,
+        _dest: &Self::BigIntHandle,
     ) {
         unreachable!()
     }

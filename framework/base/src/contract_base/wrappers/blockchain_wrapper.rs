@@ -15,6 +15,7 @@ use crate::{
         ManagedVec, TokenIdentifier,
     },
 };
+use crate::imports::AsTokenIdentifierHandle;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -124,14 +125,14 @@ where
     #[inline]
     pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_balance_legacy(handle.clone(), address);
+        A::blockchain_api_impl().load_balance_legacy(&handle, address);
         BigUint::from_handle(handle)
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
+        A::blockchain_api_impl().load_balance(&handle, address.get_handle());
         BigUint::from_handle(handle)
     }
 
@@ -152,12 +153,11 @@ where
 
     #[inline]
     pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
-        token.map_ref_or_else(
-            || self.get_balance(&self.get_sc_address()),
-            |token_identifier| {
-                self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
-            },
-        )
+        if token.is_egld() {
+            self.get_balance(&self.get_sc_address())
+        } else {
+            self.get_esdt_balance(&self.get_sc_address(), &token.unwrap_esdt_ref(), nonce)
+        }
     }
 
     #[deprecated(
@@ -281,18 +281,21 @@ where
     }
 
     #[inline]
-    pub fn get_esdt_balance(
+    pub fn get_esdt_balance<H>(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &H,
         nonce: u64,
-    ) -> BigUint<A> {
+    ) -> BigUint<A>
+    where
+        H: AsTokenIdentifierHandle<A>
+    {
         let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_esdt_balance(
             address.get_handle(),
-            token_id.get_handle(),
+            token_id.as_token_identifier_handle(),
             nonce,
-            result_handle.clone(),
+            &result_handle,
         );
         BigUint::from_handle(result_handle)
     }

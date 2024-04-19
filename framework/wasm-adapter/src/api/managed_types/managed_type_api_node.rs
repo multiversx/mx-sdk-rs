@@ -68,22 +68,22 @@ impl ManagedTypeApiImpl for VmApiImpl {
     #[inline]
     fn mb_to_big_float(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        big_float_handle: Self::BigFloatHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        big_float_handle: &Self::BigFloatHandle,
     ) {
         unsafe {
-            mBufferToBigFloat(buffer_handle, big_float_handle);
+            mBufferToBigFloat(*buffer_handle, *big_float_handle);
         }
     }
 
     #[inline]
     fn mb_from_big_float(
         &self,
-        big_float_handle: Self::BigFloatHandle,
-        buffer_handle: Self::ManagedBufferHandle,
+        big_float_handle: &Self::BigFloatHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            mBufferFromBigFloat(buffer_handle, big_float_handle);
+            mBufferFromBigFloat(*buffer_handle, *big_float_handle);
         }
     }
 

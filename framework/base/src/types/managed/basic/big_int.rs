@@ -1,18 +1,18 @@
-use core::{convert::TryInto, marker::PhantomData, mem};
+use core::{convert::TryInto, marker::PhantomData};
 
 use crate::{
     abi::TypeName,
     api::{
-        const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
-        ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
+        BigIntApiImpl, const_handles, HandleConstraints, ManagedBufferApiImpl, ManagedTypeApi,
+        ManagedTypeApiImpl, RawHandle, StaticVarApiImpl, use_raw_handle,
     },
     codec::{
         CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
         NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
         TopEncodeOutput, TryStaticCast,
     },
-    formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCDisplay},
-    types::{heap::BoxedBytes, BigUint, ManagedBuffer, ManagedOption, ManagedType, Sign},
+    formatter::{FormatByteReceiver, hex_util::encode_bytes_as_hex, SCDisplay},
+    types::{BigUint, heap::BoxedBytes, ManagedBuffer, ManagedOption, ManagedType, Sign},
 };
 
 use super::cast_to_i64::cast_to_i64;
@@ -37,8 +37,12 @@ impl<M: ManagedTypeApi> ManagedType<M> for BigInt<M> {
         &self.handle
     }
 
-    fn take_handle(mut self) -> Self::OwnHandle {
-        mem::take(&mut self.handle)
+    fn take_handle(self) -> Self::OwnHandle {
+        self.handle.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.handle.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::BigIntHandle) -> &Self {

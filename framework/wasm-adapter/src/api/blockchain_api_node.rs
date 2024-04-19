@@ -159,16 +159,16 @@ impl BlockchainApiImpl for VmApiImpl {
     }
 
     #[inline]
-    fn load_balance_legacy(&self, dest: Self::BigIntHandle, address: &Address) {
+    fn load_balance_legacy(&self, dest: &Self::BigIntHandle, address: &Address) {
         unsafe {
-            bigIntGetExternalBalance(address.as_ref().as_ptr(), dest);
+            bigIntGetExternalBalance(address.as_ref().as_ptr(), *dest);
         }
     }
 
     #[inline]
-    fn load_balance(&self, dest: Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
+    fn load_balance(&self, dest: &Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
         unsafe {
-            bigIntGetExternalBalance(unsafe_buffer_load_address(*address_handle), dest);
+            bigIntGetExternalBalance(unsafe_buffer_load_address(*address_handle), *dest);
         }
     }
 
@@ -284,7 +284,7 @@ impl BlockchainApiImpl for VmApiImpl {
         address_handle: &Self::ManagedBufferHandle,
         token_id_handle: &Self::ManagedBufferHandle,
         nonce: u64,
-        dest: Self::BigIntHandle,
+        dest: &Self::BigIntHandle,
     ) {
         let token_identifier_len = self.mb_len(token_id_handle);
         unsafe {
@@ -293,7 +293,7 @@ impl BlockchainApiImpl for VmApiImpl {
                 unsafe_buffer_load_token_identifier(*token_id_handle),
                 token_identifier_len as i32,
                 nonce as i64,
-                dest,
+                *dest,
             );
         }
     }

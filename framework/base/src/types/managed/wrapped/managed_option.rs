@@ -1,15 +1,14 @@
 use core::marker::PhantomData;
-use core::mem;
-
-use crate::codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-};
 
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
-    api::{const_handles, use_raw_handle, ErrorApiImpl, ManagedTypeApi},
+    api::{const_handles, ErrorApiImpl, ManagedTypeApi, use_raw_handle},
     types::{ManagedRef, ManagedType},
+};
+use crate::api::{HandleConstraints, UnsafeClone};
+use crate::codec::{
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
 };
 
 use super::ManagedVecItem;
@@ -67,7 +66,7 @@ where
     T: ManagedType<M>,
 {
     pub fn is_none(&self) -> bool {
-        self.handle.clone() == const_handles::MANAGED_OPTION_NONE
+        self.handle == const_handles::MANAGED_OPTION_NONE
     }
 
     pub fn is_some(&self) -> bool {
@@ -125,18 +124,6 @@ where
             default()
         }
     }
-
-    pub fn map_ref_or_else<U, D, F>(&self, default: D, f: F) -> U
-    where
-        D: FnOnce() -> U,
-        F: FnOnce(&T) -> U,
-    {
-        if self.is_some() {
-            f(&T::from_handle(self.handle.clone()))
-        } else {
-            default()
-        }
-    }
 }
 
 impl<M, T> Clone for ManagedOption<M, T>
@@ -147,7 +134,15 @@ where
     #[allow(clippy::redundant_clone)] // the clone is not redundant
     fn clone(&self) -> Self {
         if self.is_some() {
-            Self::some(T::from_handle(self.handle.clone()).clone())
+            let cloned_type = unsafe {
+                let managed_type = T::from_handle(self.handle.unsafe_clone());
+                let cloned = managed_type.clone();
+                managed_type.take_handle();
+
+                cloned
+            };
+
+            Self::some(cloned_type)
         } else {
             Self::none()
         }
@@ -161,12 +156,21 @@ where
 {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        if self.handle.clone() == other.handle.clone() {
+        if self.handle == other.handle {
             // also catches None == None
             return true;
         }
         if self.is_some() && other.is_some() {
-            return T::from_handle(self.handle.clone()) == T::from_handle(other.handle.clone());
+            return unsafe {
+                let self_type = T::from_handle(self.handle.unsafe_clone());
+                let other_type = T::from_handle(other.handle.unsafe_clone());
+                let result = self_type == other_type;
+
+                self_type.take_handle();
+                other_type.take_handle();
+
+                result
+            }
         }
         false
     }
@@ -203,8 +207,8 @@ where
         <T::OwnHandle as ManagedVecItem>::to_byte_writer(&self.handle, writer)
     }
 
-    fn take_handle_ownership(mut self) {
-        mem::take(&mut self.handle);
+    fn take_handle_ownership(&mut self) {
+        self.handle.take_handle_ref();
     }
 }
 
@@ -287,9 +291,16 @@ where
 {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         if self.is_some() {
-            f.debug_tuple("ManagedOption::Some")
-                .field(&T::from_handle(self.handle.clone()))
-                .finish()
+            unsafe {
+                let managed_type = T::from_handle(self.handle.unsafe_clone());
+                let result = f.debug_tuple("ManagedOption::Some")
+                    .field(&managed_type)
+                    .finish();
+
+                managed_type.take_handle();
+
+                result
+            }
         } else {
             f.write_str("ManagedOption::None")
         }

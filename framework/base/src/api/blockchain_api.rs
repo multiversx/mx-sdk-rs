@@ -53,9 +53,9 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         self.is_smart_contract_legacy(&address)
     }
 
-    fn load_balance_legacy(&self, dest: Self::BigIntHandle, address: &Address);
+    fn load_balance_legacy(&self, dest: &Self::BigIntHandle, address: &Address);
 
-    fn load_balance(&self, dest: Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
+    fn load_balance(&self, dest: &Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
         let mut address = Address::zero();
         let _ = self.mb_load_slice(address_handle, 0, address.as_mut());
         self.load_balance_legacy(dest, &address);
@@ -106,7 +106,7 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         address_handle: &Self::ManagedBufferHandle,
         token_id_handle: &Self::ManagedBufferHandle,
         nonce: u64,
-        dest: Self::BigIntHandle,
+        dest: &Self::BigIntHandle,
     );
 
     #[allow(clippy::too_many_arguments)]

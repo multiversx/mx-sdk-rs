@@ -17,10 +17,10 @@ pub trait CallValueApiImpl: ErrorApiImpl + ManagedTypeApiImpl + Sized {
 
     /// Retrieves the EGLD call value from the VM.
     /// Will return 0 in case of an ESDT transfer (cannot have both EGLD and ESDT transfer simultaneously).
-    fn load_egld_value(&self, dest_handle: Self::BigIntHandle);
+    fn load_egld_value(&self, dest_handle: &Self::BigIntHandle);
 
     /// Loads all ESDT call values into a managed vec. Overwrites destination.
-    fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle);
+    fn load_all_esdt_transfers(&self, dest_handle: &Self::ManagedBufferHandle);
 
     /// Gets the total number of ESDT transfers (Fungible/SFT/NFT).
     ///

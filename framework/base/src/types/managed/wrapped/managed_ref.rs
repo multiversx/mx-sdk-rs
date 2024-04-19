@@ -5,6 +5,7 @@ use crate::codec::{
 };
 
 use crate::{api::ManagedTypeApi, types::ManagedType};
+use crate::api::UnsafeClone;
 
 pub(super) enum ValueOrRef<'a, T> {
     Value(T),
@@ -22,10 +23,10 @@ impl<'a, T> Deref for ValueOrRef<'a, T> {
     }
 }
 
-impl<'a, T: Clone> Clone for ValueOrRef<'a, T> {
-    fn clone(&self) -> Self {
+impl<'a, T: UnsafeClone> UnsafeClone for ValueOrRef<'a, T> {
+    unsafe fn unsafe_clone(&self) -> Self {
         match self {
-            ValueOrRef::Value(value) => { ValueOrRef::Value(value.clone()) }
+            ValueOrRef::Value(value) => { ValueOrRef::Value(value.unsafe_clone()) }
             ValueOrRef::Ref(reference) => { ValueOrRef::Ref(reference) }
         }
     }
@@ -102,7 +103,7 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: self.handle.clone(),
+            handle: unsafe { self.handle.unsafe_clone() }, // Fine thanks to the lifetime 'a which ensures the handle won't be dropped
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::api::{HandleConstraints, ManagedTypeApi, RawHandle};
+use crate::api::{HandleConstraints, ManagedTypeApi, RawHandle, UnsafeClone};
 
 use super::ManagedRef;
 
@@ -14,10 +14,12 @@ pub trait ManagedType<M: ManagedTypeApi>: Sized {
     /// Totally discard lifetimes, the handle might become available once the struct is dropped.
     /// Consider using the safe get_handle method.
     unsafe fn get_unsafe_handle(&self) -> <Self as ManagedType<M>>::OwnHandle {
-        self.get_handle().clone()
+        self.get_handle().unsafe_clone()
     }
 
     fn take_handle(self) -> Self::OwnHandle;
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle;
 
     #[doc(hidden)]
     unsafe fn from_raw_handle(handle: RawHandle) -> Self {

@@ -5,7 +5,7 @@ use multiversx_sc::{
     types::ManagedVecItem,
 };
 use std::sync::Arc;
-use multiversx_sc::api::const_handles;
+use multiversx_sc::api::{const_handles, UnsafeClone};
 
 #[derive(Clone)]
 pub struct DebugHandle {
@@ -36,11 +36,11 @@ impl core::fmt::Debug for DebugHandle {
     }
 }
 
-impl Default for DebugHandle {
-    fn default() -> Self {
+impl UnsafeClone for DebugHandle {
+    unsafe fn unsafe_clone(&self) -> Self {
         Self {
-            context: TxContextStack::static_peek(),
-            raw_handle: const_handles::UNINITIALIZED_HANDLE
+            context: self.context.clone(),
+            raw_handle: self.raw_handle.unsafe_clone(),
         }
     }
 }
@@ -61,6 +61,24 @@ impl HandleConstraints for DebugHandle {
     fn get_raw_handle(&self) -> RawHandle {
         self.assert_current_context();
         self.raw_handle
+    }
+
+    fn take_handle(mut self) -> Self {
+        let default_handle = Self {
+            context: TxContextStack::static_peek(),
+            raw_handle: const_handles::UNINITIALIZED_HANDLE,
+        };
+
+        core::mem::replace(&mut self, default_handle)
+    }
+
+    fn take_handle_ref(&mut self) -> Self {
+        let default_handle = Self {
+            context: TxContextStack::static_peek(),
+            raw_handle: const_handles::UNINITIALIZED_HANDLE,
+        };
+
+        core::mem::replace(self, default_handle)
     }
 
     fn get_raw_handle_unchecked(&self) -> RawHandle {
@@ -107,7 +125,7 @@ impl ManagedVecItem for DebugHandle {
         RawHandle::to_byte_writer(&self.get_raw_handle(), writer)
     }
 
-    fn take_handle_ownership(self) {}
+    fn take_handle_ownership(&mut self) {}
 }
 
 impl TryStaticCast for DebugHandle {}

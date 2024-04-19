@@ -10,9 +10,9 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
 
     fn mm_get(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_3(&map_handle, &key_handle, &out_value_handle, |vh| {
             vh.managed_map_get(
@@ -25,9 +25,9 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
 
     fn mm_put(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        value_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_3(&map_handle, &key_handle, &value_handle, |vh| {
             vh.managed_map_put(
@@ -40,9 +40,9 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
 
     fn mm_remove(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_3(&map_handle, &key_handle, &out_value_handle, |vh| {
             vh.managed_map_remove(
@@ -55,8 +55,8 @@ impl<VHB: VMHooksApiBackend> ManagedMapApiImpl for VMHooksApi<VHB> {
 
     fn mm_contains(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
     ) -> bool {
         i32_to_bool(self.with_vm_hooks_ctx_2(&map_handle, &key_handle, |vh| {
             vh.managed_map_contains(

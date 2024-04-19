@@ -30,37 +30,37 @@ pub trait ManagedBufferApiImpl: HandleTypeInfo {
     /// TODO: investigate the impact of using `Result<(), ()>` on the wasm output.
     fn mb_copy_slice(
         &self,
-        source_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         slice_len: usize,
-        dest_handle: Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError>;
 
     fn mb_overwrite(&self, handle: &Self::ManagedBufferHandle, value: &[u8]);
 
     fn mb_set_slice(
         &self,
-        dest_handle: Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError>;
 
-    fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize);
+    fn mb_set_random(&self, dest_handle: &Self::ManagedBufferHandle, length: usize);
 
     fn mb_append(
         &self,
-        accumulator_handle: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        accumulator_handle: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     );
 
-    fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]);
+    fn mb_append_bytes(&self, accumulator_handle: &Self::ManagedBufferHandle, bytes: &[u8]);
 
     fn mb_eq(&self, handle1: &Self::ManagedBufferHandle, handle2: &Self::ManagedBufferHandle)
         -> bool;
 
     fn mb_to_hex(
         &self,
-        source_handle: Self::ManagedBufferHandle,
-        dest_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
     );
 }

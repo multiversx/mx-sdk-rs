@@ -6,6 +6,7 @@ use crate::{
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
     types::{ManagedBuffer, ManagedType},
 };
+use crate::api::ManagedBufferApiImpl;
 
 use super::EgldOrEsdtTokenIdentifier;
 
@@ -36,6 +37,10 @@ impl<M: ManagedTypeApi> ManagedType<M> for TokenIdentifier<M> {
 
     fn take_handle(self) -> Self::OwnHandle {
         self.buffer.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.buffer.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -112,10 +117,11 @@ impl<M: ManagedTypeApi> Eq for TokenIdentifier<M> {}
 impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &EgldOrEsdtTokenIdentifier<M>) -> bool {
-        other.map_ref_or_else(
-            || false,
-            |esdt_token_identifier| esdt_token_identifier == self,
-        )
+        if other.is_egld() {
+            false
+        } else {
+            M::managed_type_impl().mb_eq(other.unwrap_esdt_ref().as_token_identifier_handle(), self.as_token_identifier_handle())
+        }
     }
 }
 
@@ -213,5 +219,15 @@ impl<M: ManagedTypeApi> core::fmt::Debug for TokenIdentifier<M> {
         f.debug_tuple("TokenIdentifier")
             .field(&self.to_string())
             .finish()
+    }
+}
+
+pub trait AsTokenIdentifierHandle<M: ErrorApi + ManagedTypeApi> {
+    fn as_token_identifier_handle(&self) -> &M::ManagedBufferHandle;
+}
+
+impl<M: ErrorApi + ManagedTypeApi> AsTokenIdentifierHandle<M> for TokenIdentifier<M> {
+    fn as_token_identifier_handle(&self) -> &M::ManagedBufferHandle {
+        self.get_handle()
     }
 }

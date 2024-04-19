@@ -6,6 +6,7 @@ use core::{
     marker::PhantomData,
     ops::{Deref, DerefMut},
 };
+use crate::api::UnsafeClone;
 
 pub struct ManagedVecRef<'a, M, T>
 where
@@ -30,8 +31,9 @@ where
     }
 
     pub(super) fn new(managed_vec_handle: &'a M::ManagedBufferHandle, item_index: usize) -> Self {
+        // Be careful, when using unsafe_clone we have to ensure the handle is taken off the ManagedType in the drop function
         let item =
-            unsafe { Self::wrap_as_managed_vec(managed_vec_handle.clone()).get_unsafe(item_index) };
+            unsafe { Self::wrap_as_managed_vec(managed_vec_handle.unsafe_clone()).get_unsafe(item_index) };
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
@@ -48,8 +50,15 @@ where
     T: ManagedVecItem,
 {
     fn drop(&mut self) {
-        let _ = Self::wrap_as_managed_vec(self.managed_vec_handle.clone())
-            .set(self.item_index, &self.item);
+        self.item.take_handle_ownership();
+
+        unsafe {
+            let mut vec = Self::wrap_as_managed_vec(self.managed_vec_handle.unsafe_clone());
+
+            let _ = vec.set(self.item_index, &self.item);
+
+            vec.take_handle_ownership()
+        }
     }
 }
 

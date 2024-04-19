@@ -45,16 +45,16 @@ impl ManagedTypeApiImpl for UncallableApi {
 
     fn mb_to_big_float(
         &self,
-        _buffer_handle: Self::ManagedBufferHandle,
-        _dest: Self::BigFloatHandle,
+        _buffer_handle: &Self::ManagedBufferHandle,
+        _dest: &Self::BigFloatHandle,
     ) {
         unreachable!()
     }
 
     fn mb_from_big_float(
         &self,
-        _big_float_handle: Self::BigFloatHandle,
-        _dest: Self::ManagedBufferHandle,
+        _big_float_handle: &Self::BigFloatHandle,
+        _dest: &Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }

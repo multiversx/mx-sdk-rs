@@ -59,11 +59,11 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         i32_to_bool(result)
     }
 
-    fn load_balance_legacy(&self, _dest: Self::BigIntHandle, _address: &Address) {
+    fn load_balance_legacy(&self, _dest: &Self::BigIntHandle, _address: &Address) {
         panic!("legacy BlockchainApi functionality no longer supported")
     }
 
-    fn load_balance(&self, dest: Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
+    fn load_balance(&self, dest: &Self::BigIntHandle, address_handle: &Self::ManagedBufferHandle) {
         self.assert_live_handle(&dest);
         self.assert_live_handle(&address_handle);
         self.with_temp_address_ptr(address_handle, |address_ptr: isize| {
@@ -161,7 +161,7 @@ impl<VHB: VMHooksApiBackend> BlockchainApiImpl for VMHooksApi<VHB> {
         address_handle: &Self::ManagedBufferHandle,
         token_id_handle: &Self::ManagedBufferHandle,
         nonce: u64,
-        dest: Self::BigIntHandle,
+        dest: &Self::BigIntHandle,
     ) {
         self.assert_live_handle(&address_handle);
         self.assert_live_handle(&token_id_handle);

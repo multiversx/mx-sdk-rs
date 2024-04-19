@@ -172,7 +172,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
                 writer(&arr[..])
             }
 
-            fn take_handle_ownership(self) {}
+            fn take_handle_ownership(&mut self) {}
         }
     };
     gen.into()
@@ -219,7 +219,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
                 writer(&arr[..])
             }
 
-            fn take_handle_ownership(self) {
+            fn take_handle_ownership(&mut self) {
                 #(#take_handle_ownership_snippets)*
             }
         }

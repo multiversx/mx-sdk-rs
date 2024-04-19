@@ -46,7 +46,7 @@ pub trait ManagedVecItem: 'static where Self: Sized {
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R;
 
-    fn take_handle_ownership(self);
+    fn take_handle_ownership(&mut self);
 }
 
 macro_rules! impl_int {
@@ -71,7 +71,7 @@ macro_rules! impl_int {
                 writer(&bytes)
             }
 
-            fn take_handle_ownership(self) {}
+            fn take_handle_ownership(&mut self) {}
         }
     };
 }
@@ -104,7 +104,7 @@ impl ManagedVecItem for usize {
         writer(&bytes)
     }
 
-    fn take_handle_ownership(self) {}
+    fn take_handle_ownership(&mut self) {}
 }
 
 impl ManagedVecItem for bool {
@@ -129,7 +129,7 @@ impl ManagedVecItem for bool {
         <u8 as ManagedVecItem>::to_byte_writer(&u8_value, writer)
     }
 
-    fn take_handle_ownership(self) {}
+    fn take_handle_ownership(&mut self) {}
 }
 
 impl<T> ManagedVecItem for Option<T>
@@ -170,7 +170,7 @@ where
         writer(&byte_arr[..])
     }
 
-    fn take_handle_ownership(self) {
+    fn take_handle_ownership(&mut self) {
         if let Some(value) = self {
             value.take_handle_ownership()
         }
@@ -200,8 +200,8 @@ macro_rules! impl_managed_type {
                 <$ty<M> as ManagedType<M>>::OwnHandle::to_byte_writer(&self.get_handle(), writer)
             }
 
-            fn take_handle_ownership(self) {
-                self.take_handle();
+            fn take_handle_ownership(&mut self) {
+                self.take_handle_ref();
             }
         }
     };
@@ -241,7 +241,7 @@ where
         )
     }
 
-    fn take_handle_ownership(self) {
+    fn take_handle_ownership(&mut self) {
         self.buffer.take_handle_ownership()
     }
 }
@@ -289,7 +289,7 @@ where
         writer(&byte_arr[..])
     }
 
-    fn take_handle_ownership(self) {
+    fn take_handle_ownership(&mut self) {
         for item in self {
             item.take_handle_ownership()
         }
@@ -321,7 +321,7 @@ where
         <M::ManagedBufferHandle as ManagedVecItem>::to_byte_writer(&self.get_handle(), writer)
     }
 
-    fn take_handle_ownership(self) {
-        self.take_handle();
+    fn take_handle_ownership(&mut self) {
+        self.take_handle_ref();
     }
 }

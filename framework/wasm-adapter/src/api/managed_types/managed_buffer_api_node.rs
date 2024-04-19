@@ -90,17 +90,17 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     #[inline]
     fn mb_copy_slice(
         &self,
-        source_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
         starting_pos: usize,
         slice_len: usize,
-        dest_handle: Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError> {
         unsafe {
             let err = mBufferCopyByteSlice(
-                source_handle,
+                *source_handle,
                 starting_pos as i32,
                 slice_len as i32,
-                dest_handle,
+                *dest_handle,
             );
             if err == 0 {
                 Ok(())
@@ -120,13 +120,13 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     #[inline]
     fn mb_set_slice(
         &self,
-        dest_handle: Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
         unsafe {
             let err = mBufferSetByteSlice(
-                dest_handle,
+                *dest_handle,
                 starting_position as i32,
                 source_slice.len() as i32,
                 source_slice.as_ptr(),
@@ -140,27 +140,27 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
     }
 
     #[inline]
-    fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
+    fn mb_set_random(&self, dest_handle: &Self::ManagedBufferHandle, length: usize) {
         unsafe {
-            let _ = mBufferSetRandom(dest_handle, length as i32);
+            let _ = mBufferSetRandom(*dest_handle, length as i32);
         }
     }
 
     #[inline]
     fn mb_append(
         &self,
-        accumulator_handle: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        accumulator_handle: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = mBufferAppend(accumulator_handle, data_handle);
+            let _ = mBufferAppend(*accumulator_handle, *data_handle);
         }
     }
 
     #[inline]
-    fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
+    fn mb_append_bytes(&self, accumulator_handle: &Self::ManagedBufferHandle, bytes: &[u8]) {
         unsafe {
-            let _ = mBufferAppendBytes(accumulator_handle, bytes.as_ptr(), bytes.len() as i32);
+            let _ = mBufferAppendBytes(*accumulator_handle, bytes.as_ptr(), bytes.len() as i32);
         }
     }
 
@@ -174,11 +174,11 @@ impl ManagedBufferApiImpl for crate::api::VmApiImpl {
 
     fn mb_to_hex(
         &self,
-        source_handle: Self::ManagedBufferHandle,
-        dest_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            managedBufferToHex(source_handle, dest_handle);
+            managedBufferToHex(*source_handle, *dest_handle);
         }
     }
 }

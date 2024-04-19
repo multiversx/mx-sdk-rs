@@ -15,11 +15,11 @@ impl CallValueApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn load_egld_value(&self, _dest: Self::BigIntHandle) {
+    fn load_egld_value(&self, _dest: &Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn load_all_esdt_transfers(&self, _dest_handle: Self::ManagedBufferHandle) {
+    fn load_all_esdt_transfers(&self, _dest_handle: &Self::ManagedBufferHandle) {
         unreachable!()
     }
 

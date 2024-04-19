@@ -14,11 +14,16 @@ use crate::{
     api::{ErrorApi, ErrorApiImpl},
     types::ManagedVecItem,
 };
+use crate::api::const_handles;
 
 pub type RawHandle = i32;
 
+pub trait UnsafeClone {
+    unsafe fn unsafe_clone(&self) -> Self;
+}
+
 pub trait HandleConstraints:
-    ManagedVecItem + TryStaticCast + Debug + Clone + Default + From<RawHandle> + PartialEq + PartialEq<RawHandle>
+    ManagedVecItem + TryStaticCast + Debug + UnsafeClone + From<RawHandle> + PartialEq + PartialEq<RawHandle>
 {
     fn new(handle: RawHandle) -> Self;
     fn to_be_bytes(&self) -> [u8; 4];
@@ -32,6 +37,9 @@ pub trait HandleConstraints:
         }
     }
 
+    fn take_handle(self) -> Self;
+    fn take_handle_ref(&mut self) -> Self;
+
     fn get_raw_handle_unchecked(&self) -> RawHandle {
         self.get_raw_handle()
     }
@@ -42,6 +50,12 @@ where
     H: HandleConstraints,
 {
     H::new(handle)
+}
+
+impl UnsafeClone for i32 {
+    unsafe fn unsafe_clone(&self) -> Self {
+        *self
+    }
 }
 
 impl HandleConstraints for i32 {
@@ -55,6 +69,14 @@ impl HandleConstraints for i32 {
 
     fn get_raw_handle(&self) -> RawHandle {
         *self
+    }
+
+    fn take_handle(mut self) -> Self {
+        core::mem::replace(&mut self, const_handles::UNINITIALIZED_HANDLE)
+    }
+
+    fn take_handle_ref(&mut self) -> Self {
+        core::mem::replace(self, const_handles::UNINITIALIZED_HANDLE)
     }
 }
 

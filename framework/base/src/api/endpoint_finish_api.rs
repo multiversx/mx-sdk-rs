@@ -17,11 +17,11 @@ pub trait EndpointFinishApi: HandleTypeInfo + ErrorApi {
 pub trait EndpointFinishApiImpl: HandleTypeInfo {
     fn finish_slice_u8(&self, slice: &[u8]);
 
-    fn finish_big_int_raw(&self, handle: Self::BigIntHandle);
+    fn finish_big_int_raw(&self, handle: &Self::BigIntHandle);
 
-    fn finish_big_uint_raw(&self, handle: Self::BigIntHandle);
+    fn finish_big_uint_raw(&self, handle: &Self::BigIntHandle);
 
-    fn finish_managed_buffer_raw(&self, handle: Self::ManagedBufferHandle);
+    fn finish_managed_buffer_raw(&self, handle: &Self::ManagedBufferHandle);
 
     fn finish_u64(&self, value: u64);
 

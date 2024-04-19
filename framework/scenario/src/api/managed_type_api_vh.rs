@@ -71,8 +71,8 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
 
     fn mb_to_big_float(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        big_float_handle: Self::BigFloatHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        big_float_handle: &Self::BigFloatHandle,
     ) {
         self.with_vm_hooks_ctx_2(&buffer_handle, &big_float_handle, |vh| {
             vh.mbuffer_to_big_float(
@@ -84,8 +84,8 @@ impl<VHB: VMHooksApiBackend> ManagedTypeApiImpl for VMHooksApi<VHB> {
 
     fn mb_from_big_float(
         &self,
-        big_float_handle: Self::BigFloatHandle,
-        buffer_handle: Self::ManagedBufferHandle,
+        big_float_handle: &Self::BigFloatHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_2(&buffer_handle, &big_float_handle, |vh| {
             vh.mbuffer_from_big_float(

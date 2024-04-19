@@ -58,7 +58,7 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
         self.obj.to_byte_writer(writer)
     }
 
-    fn take_handle_ownership(self) {
+    fn take_handle_ownership(&mut self) {
         self.obj.take_handle_ownership()
     }
 }

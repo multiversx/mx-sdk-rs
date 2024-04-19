@@ -31,10 +31,10 @@ impl ManagedBufferApiImpl for super::UncallableApi {
 
     fn mb_copy_slice(
         &self,
-        _source_handle: Self::ManagedBufferHandle,
+        _source_handle: &Self::ManagedBufferHandle,
         _starting_pos: usize,
         _slice_len: usize,
-        _dest_handle: Self::ManagedBufferHandle,
+        _dest_handle: &Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError> {
         unreachable!()
     }
@@ -45,26 +45,26 @@ impl ManagedBufferApiImpl for super::UncallableApi {
 
     fn mb_set_slice(
         &self,
-        _dest_handle: Self::ManagedBufferHandle,
+        _dest_handle: &Self::ManagedBufferHandle,
         _starting_position: usize,
         _source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
         unreachable!()
     }
 
-    fn mb_set_random(&self, _dest_handle: Self::ManagedBufferHandle, _length: usize) {
+    fn mb_set_random(&self, _dest_handle: &Self::ManagedBufferHandle, _length: usize) {
         unreachable!()
     }
 
     fn mb_append(
         &self,
-        _accumulator_handle: Self::ManagedBufferHandle,
-        _data_handle: Self::ManagedBufferHandle,
+        _accumulator_handle: &Self::ManagedBufferHandle,
+        _data_handle: &Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }
 
-    fn mb_append_bytes(&self, _accumulator_handle: Self::ManagedBufferHandle, _bytes: &[u8]) {
+    fn mb_append_bytes(&self, _accumulator_handle: &Self::ManagedBufferHandle, _bytes: &[u8]) {
         unreachable!()
     }
 
@@ -78,8 +78,8 @@ impl ManagedBufferApiImpl for super::UncallableApi {
 
     fn mb_to_hex(
         &self,
-        _source_handle: Self::ManagedBufferHandle,
-        _dest_handle: Self::ManagedBufferHandle,
+        _source_handle: &Self::ManagedBufferHandle,
+        _dest_handle: &Self::ManagedBufferHandle,
     ) {
         unreachable!()
     }

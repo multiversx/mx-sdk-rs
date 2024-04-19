@@ -20,85 +20,85 @@ impl BigFloatApiImpl for super::UncallableApi {
 
     fn bf_add(
         &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
+        _dest: &Self::BigFloatHandle,
+        _x: &Self::BigFloatHandle,
+        _y: &Self::BigFloatHandle,
     ) {
         unreachable!()
     }
     fn bf_sub(
         &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
+        _dest: &Self::BigFloatHandle,
+        _x: &Self::BigFloatHandle,
+        _y: &Self::BigFloatHandle,
     ) {
         unreachable!()
     }
     fn bf_mul(
         &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
+        _dest: &Self::BigFloatHandle,
+        _x: &Self::BigFloatHandle,
+        _y: &Self::BigFloatHandle,
     ) {
         unreachable!()
     }
     fn bf_div(
         &self,
-        _dest: Self::BigFloatHandle,
-        _x: Self::BigFloatHandle,
-        _y: Self::BigFloatHandle,
+        _dest: &Self::BigFloatHandle,
+        _x: &Self::BigFloatHandle,
+        _y: &Self::BigFloatHandle,
     ) {
         unreachable!()
     }
 
-    fn bf_abs(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
+    fn bf_abs(&self, _dest: &Self::BigFloatHandle, _x: &Self::BigFloatHandle) {
         unreachable!()
     }
-    fn bf_neg(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
+    fn bf_neg(&self, _dest: &Self::BigFloatHandle, _x: &Self::BigFloatHandle) {
         unreachable!()
     }
-    fn bf_cmp(&self, _x: Self::BigFloatHandle, _y: Self::BigFloatHandle) -> Ordering {
+    fn bf_cmp(&self, _x: &Self::BigFloatHandle, _y: &Self::BigFloatHandle) -> Ordering {
         unreachable!()
     }
-    fn bf_sign(&self, _x: Self::BigFloatHandle) -> Sign {
+    fn bf_sign(&self, _x: &Self::BigFloatHandle) -> Sign {
         unreachable!()
     }
-    fn bf_clone(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
+    fn bf_clone(&self, _dest: &Self::BigFloatHandle, _x: &Self::BigFloatHandle) {
         unreachable!()
     }
-    fn bf_sqrt(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle) {
+    fn bf_sqrt(&self, _dest: &Self::BigFloatHandle, _x: &Self::BigFloatHandle) {
         unreachable!()
     }
-    fn bf_pow(&self, _dest: Self::BigFloatHandle, _x: Self::BigFloatHandle, _exp: i32) {
-        unreachable!()
-    }
-
-    fn bf_floor(&self, _dest: Self::BigIntHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_ceil(&self, _dest: Self::BigIntHandle, _x: Self::BigFloatHandle) {
-        unreachable!()
-    }
-    fn bf_trunc(&self, _dest: Self::BigIntHandle, _x: Self::BigFloatHandle) {
+    fn bf_pow(&self, _dest: &Self::BigFloatHandle, _x: &Self::BigFloatHandle, _exp: i32) {
         unreachable!()
     }
 
-    fn bf_is_bi(&self, _x: Self::BigFloatHandle) -> bool {
+    fn bf_floor(&self, _dest: &Self::BigIntHandle, _x: &Self::BigFloatHandle) {
+        unreachable!()
+    }
+    fn bf_ceil(&self, _dest: &Self::BigIntHandle, _x: &Self::BigFloatHandle) {
+        unreachable!()
+    }
+    fn bf_trunc(&self, _dest: &Self::BigIntHandle, _x: &Self::BigFloatHandle) {
         unreachable!()
     }
 
-    fn bf_set_i64(&self, _dest: Self::BigFloatHandle, _value: i64) {
+    fn bf_is_bi(&self, _x: &Self::BigFloatHandle) -> bool {
         unreachable!()
     }
 
-    fn bf_set_bi(&self, _dest: Self::BigFloatHandle, _bi: Self::BigIntHandle) {
+    fn bf_set_i64(&self, _dest: &Self::BigFloatHandle, _value: i64) {
         unreachable!()
     }
 
-    fn bf_get_const_pi(&self, _dest: Self::BigFloatHandle) {
+    fn bf_set_bi(&self, _dest: &Self::BigFloatHandle, _bi: &Self::BigIntHandle) {
         unreachable!()
     }
-    fn bf_get_const_e(&self, _dest: Self::BigFloatHandle) {
+
+    fn bf_get_const_pi(&self, _dest: &Self::BigFloatHandle) {
+        unreachable!()
+    }
+    fn bf_get_const_e(&self, _dest: &Self::BigFloatHandle) {
         unreachable!()
     }
 }
