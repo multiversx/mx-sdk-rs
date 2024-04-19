@@ -6,32 +6,38 @@ use std::iter::zip;
 
 use crate::mock_seed_nft_minter::ProxyTrait as _;
 use rewards_distribution::{
-    Bracket, ContractObj, ProxyTrait as _, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
+    rewards_distribution_proxy, ContractObj, ProxyTrait as _, RewardsDistribution,
+    DIVISION_SAFETY_CONSTANT,
 };
 
 const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
 const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
 
 const ALICE_ADDRESS_EXPR: &str = "address:alice";
+const ALICE_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("alice");
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
+const OWNER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("owner");
 const REWARDS_DISTRIBUTION_ADDRESS_EXPR: &str = "sc:rewards-distribution";
-const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "mxsc:output/rewards-distribution.mxsc.json";
+const REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL: ScExpr = ScExpr("rewards-distribution");
+const REWARDS_DISTRIBUTION_PATH_EXPR: MxscExpr = MxscExpr("output/rewards-distribution.mxsc.json");
 const SEED_NFT_MINTER_ADDRESS_EXPR: &str = "sc:seed-nft-minter";
+const SEED_NFT_MINTER_ADDRESS_EXPR_REPL: ScExpr = ScExpr("seed-nft-minter");
 const SEED_NFT_MINTER_PATH_EXPR: &str = "mxsc:../seed-nft-minter/output/seed-nft-minter.mxsc.json";
+const SEED_NFT_MINTER_PATH_EXPR_REPL: MxscExpr =
+    MxscExpr("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
 
 type RewardsDistributionContract = ContractInfo<rewards_distribution::Proxy<StaticApi>>;
 type SeedNFTMinterContract = ContractInfo<mock_seed_nft_minter::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/rewards-distribution");
 
     blockchain.register_contract(
-        REWARDS_DISTRIBUTION_PATH_EXPR,
+        REWARDS_DISTRIBUTION_PATH_EXPR.eval_to_expr().as_str(),
         rewards_distribution::ContractBuilder,
     );
     blockchain.register_contract(
-        SEED_NFT_MINTER_PATH_EXPR,
+        SEED_NFT_MINTER_PATH_EXPR_REPL.eval_to_expr().as_str(),
         mock_seed_nft_minter::ContractBuilder,
     );
     blockchain
@@ -39,7 +45,6 @@ fn world() -> ScenarioWorld {
 
 struct RewardsDistributionTestState {
     world: ScenarioWorld,
-    seed_nft_minter_address: Address,
     seed_nft_minter_contract: SeedNFTMinterContract,
     rewards_distribution_contract: RewardsDistributionContract,
     rewards_distribution_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
@@ -49,23 +54,19 @@ impl RewardsDistributionTestState {
     fn new() -> Self {
         let mut world = world();
 
-        world.set_state_step(
-            SetStateStep::new().put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1)),
-        );
+        world.account(OWNER_ADDRESS_EXPR_REPL).nonce(1);
 
-        let seed_nft_minter_address = AddressValue::from(SEED_NFT_MINTER_ADDRESS_EXPR).to_address();
-
-        let seed_nft_minter_contract = SeedNFTMinterContract::new(SEED_NFT_MINTER_ADDRESS_EXPR);
+        let seed_nft_minter_contract =
+            SeedNFTMinterContract::new(SEED_NFT_MINTER_ADDRESS_EXPR_REPL);
         let rewards_distribution_contract =
-            RewardsDistributionContract::new(REWARDS_DISTRIBUTION_ADDRESS_EXPR);
+            RewardsDistributionContract::new(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL);
         let rewards_distribution_whitebox = WhiteboxContract::new(
-            REWARDS_DISTRIBUTION_ADDRESS_EXPR,
+            REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL,
             rewards_distribution::contract_obj,
         );
 
         Self {
             world,
-            seed_nft_minter_address,
             seed_nft_minter_contract,
             rewards_distribution_contract,
             rewards_distribution_whitebox,
@@ -95,8 +96,6 @@ impl RewardsDistributionTestState {
     }
 
     fn deploy_rewards_distribution_contract(&mut self) -> &mut Self {
-        let rewards_distribution_code = self.world.code_expression(REWARDS_DISTRIBUTION_PATH_EXPR);
-
         let brackets_vec = &[
             (10, 2_000),
             (90, 6_000),
@@ -105,22 +104,20 @@ impl RewardsDistributionTestState {
             (25_000, 35_000),
             (72_000, 40_000),
         ];
-        let mut brackets = ManagedVec::<StaticApi, Bracket>::new();
+        let mut brackets = ManagedVec::new();
         for (index_percent, bracket_reward_percent) in brackets_vec.iter().cloned() {
-            brackets.push(Bracket {
+            brackets.push(rewards_distribution_proxy::Bracket {
                 index_percent,
                 bracket_reward_percent,
             });
         }
-        self.world.sc_deploy(
-            ScDeployStep::new()
-                .from(OWNER_ADDRESS_EXPR)
-                .code(rewards_distribution_code)
-                .call(
-                    self.rewards_distribution_contract
-                        .init(self.seed_nft_minter_address.clone(), brackets),
-                ),
-        );
+        self.world
+            .tx()
+            .from(OWNER_ADDRESS_EXPR_REPL)
+            .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+            .init(SEED_NFT_MINTER_ADDRESS_EXPR_REPL.to_address(), brackets)
+            .code(REWARDS_DISTRIBUTION_PATH_EXPR)
+            .run();
 
         self
     }
@@ -130,18 +127,17 @@ impl RewardsDistributionTestState {
 fn test_compute_brackets() {
     let mut state = RewardsDistributionTestState::new();
 
-    let rewards_distribution_code = state.world.code_expression(REWARDS_DISTRIBUTION_PATH_EXPR);
+    let rewards_distribution_code = state
+        .world
+        .code_expression(REWARDS_DISTRIBUTION_PATH_EXPR.eval_to_expr().as_str());
 
-    state.world.set_state_step(
-        SetStateStep::new().put_account(
-            REWARDS_DISTRIBUTION_ADDRESS_EXPR,
-            Account::new()
-                .nonce(1)
-                .owner(OWNER_ADDRESS_EXPR)
-                .code(rewards_distribution_code)
-                .balance("0"),
-        ),
-    );
+    state
+        .world
+        .account(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+        .nonce(1)
+        .owner(OWNER_ADDRESS_EXPR_REPL)
+        .code(rewards_distribution_code)
+        .balance("0");
 
     state.world.whitebox_call(
         &state.rewards_distribution_whitebox,
@@ -182,24 +178,26 @@ fn test_raffle_and_claim() {
     let mut state = RewardsDistributionTestState::new();
 
     let nft_nonces: [u64; 6] = [1, 2, 3, 4, 5, 6];
-    let nft_payments: Vec<TxESDT> = nft_nonces
-        .iter()
-        .map(|nonce| TxESDT {
-            esdt_token_identifier: NFT_TOKEN_ID.into(),
-            nonce: (*nonce).into(),
-            esdt_value: 1u64.into(),
-        })
-        .collect();
-
-    let mut alice_account = Account::new().nonce(1).balance("2_070_000_000");
-    for nonce in nft_nonces.iter() {
-        alice_account =
-            alice_account.esdt_nft_balance(NFT_TOKEN_ID_EXPR, *nonce, "1", Option::<&[u8]>::None);
+    let mut nft_payments = ManagedVec::new();
+    for nonce in nft_nonces.into_iter() {
+        let payment = EsdtTokenPayment::new(NFT_TOKEN_ID.into(), nonce, 1u64.into());
+        nft_payments.push(payment);
     }
+
+    state
+        .world
+        .account(ALICE_ADDRESS_EXPR)
+        .nonce(1)
+        .balance("2_070_000_000")
+        .esdt_nft_balance(NFT_TOKEN_ID_EXPR, nft_nonces[0], "1", Option::<&[u8]>::None)
+        .esdt_nft_balance(NFT_TOKEN_ID_EXPR, nft_nonces[1], "1", Option::<&[u8]>::None)
+        .esdt_nft_balance(NFT_TOKEN_ID_EXPR, nft_nonces[2], "1", Option::<&[u8]>::None)
+        .esdt_nft_balance(NFT_TOKEN_ID_EXPR, nft_nonces[3], "1", Option::<&[u8]>::None)
+        .esdt_nft_balance(NFT_TOKEN_ID_EXPR, nft_nonces[4], "1", Option::<&[u8]>::None)
+        .esdt_nft_balance(NFT_TOKEN_ID_EXPR, nft_nonces[5], "1", Option::<&[u8]>::None);
 
     state.world.set_state_step(
         SetStateStep::new()
-            .put_account(ALICE_ADDRESS_EXPR, alice_account)
             .new_address(OWNER_ADDRESS_EXPR, 1, SEED_NFT_MINTER_ADDRESS_EXPR)
             .new_address(OWNER_ADDRESS_EXPR, 3, REWARDS_DISTRIBUTION_ADDRESS_EXPR),
     );
@@ -209,12 +207,15 @@ fn test_raffle_and_claim() {
         .deploy_rewards_distribution_contract();
 
     // deposit royalties
-    state.world.sc_call(
-        ScCallStep::new()
-            .from(ALICE_ADDRESS_EXPR)
-            .egld_value("2_070_000_000")
-            .call(state.rewards_distribution_contract.deposit_royalties()),
-    );
+    state
+        .world
+        .tx()
+        .from(ALICE_ADDRESS_EXPR_REPL)
+        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+        .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+        .deposit_royalties()
+        .egld(2_070_000_000)
+        .run();
 
     // run the raffle
     state.world.sc_call(
@@ -225,22 +226,19 @@ fn test_raffle_and_claim() {
             .expect_value(OperationCompletionStatus::Completed),
     );
 
-    let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
+    let mut rewards = Vec::new();
     // post-raffle reward amount frequency checksstate
     for nonce in 1u64..=10_000u64 {
-        state.world.sc_call_use_result(
-            ScCallStep::new().from(ALICE_ADDRESS_EXPR).call(
-                state
-                    .rewards_distribution_contract
-                    .compute_claimable_amount(
-                        0u64,
-                        &EgldOrEsdtTokenIdentifier::egld(),
-                        0u64,
-                        nonce,
-                    ),
-            ),
-            |r: TypedResponse<BigUint<StaticApi>>| rewards.push(r.result.unwrap()),
-        );
+        let reward = state
+            .world
+            .tx()
+            .from(ALICE_ADDRESS_EXPR_REPL)
+            .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+            .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+            .compute_claimable_amount(0u64, &EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
+            .returns(ReturnsResult)
+            .run();
+        rewards.push(reward);
     }
 
     assert_eq!(rewards.len() as u64, 10_000u64);
@@ -272,21 +270,15 @@ fn test_raffle_and_claim() {
     let expected_rewards = [114_999, 114_999, 114_999, 828_000, 114_999, 114_999];
 
     for (nonce, expected_reward) in std::iter::zip(nft_nonces, expected_rewards) {
-        state.world.sc_call_use_result(
-            ScCallStep::new().from(ALICE_ADDRESS_EXPR).call(
-                state
-                    .rewards_distribution_contract
-                    .compute_claimable_amount(
-                        0u64,
-                        &EgldOrEsdtTokenIdentifier::egld(),
-                        0u64,
-                        nonce,
-                    ),
-            ),
-            |r: TypedResponse<BigUint<StaticApi>>| {
-                assert_eq!(r.result.unwrap().to_u64().unwrap(), expected_reward);
-            },
-        );
+        state
+            .world
+            .tx()
+            .from(ALICE_ADDRESS_EXPR_REPL)
+            .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+            .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+            .compute_claimable_amount(0u64, &EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
+            .returns(ExpectValue(expected_reward))
+            .run();
     }
 
     // claim rewards
@@ -295,29 +287,26 @@ fn test_raffle_and_claim() {
         MultiValue2<EgldOrEsdtTokenIdentifier<StaticApi>, u64>,
     > = MultiValueEncoded::new();
     reward_tokens.push((EgldOrEsdtTokenIdentifier::egld(), 0).into());
-    state.world.sc_call(
-        ScCallStep::new()
-            .from(ALICE_ADDRESS_EXPR)
-            .multi_esdt_transfer(nft_payments.clone())
-            .call(
-                state
-                    .rewards_distribution_contract
-                    .claim_rewards(0u64, 0u64, reward_tokens),
-            ),
-    );
+    state
+        .world
+        .tx()
+        .from(ALICE_ADDRESS_EXPR_REPL)
+        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+        .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+        .claim_rewards(0u64, 0u64, reward_tokens)
+        .with_multi_token_transfer(nft_payments.clone())
+        .run();
 
     // check that the rewards were claimed
     for nonce in nft_nonces.iter() {
-        state.world.sc_query(
-            ScQueryStep::new()
-                .call(state.rewards_distribution_contract.was_claimed(
-                    0u64,
-                    &EgldOrEsdtTokenIdentifier::egld(),
-                    0u64,
-                    nonce,
-                ))
-                .expect_value(SingleValue::from(true)),
-        );
+        state
+            .world
+            .query()
+            .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+            .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+            .was_claimed(0u64, &EgldOrEsdtTokenIdentifier::egld(), 0u64, nonce)
+            .returns(ExpectValue(true))
+            .run();
     }
 
     // confirm the received amount matches the sum of the queried rewards
@@ -326,10 +315,8 @@ fn test_raffle_and_claim() {
 
     state
         .world
-        .check_state_step(CheckStateStep::new().put_account(
-            ALICE_ADDRESS_EXPR,
-            CheckAccount::new().balance(balance_expr.as_str()),
-        ));
+        .check_account(ALICE_ADDRESS_EXPR_REPL)
+        .balance(balance_expr.as_str());
 
     // a second claim with the same nfts should succeed, but return no more rewards
     let mut reward_tokens: MultiValueEncoded<
@@ -337,21 +324,18 @@ fn test_raffle_and_claim() {
         MultiValue2<EgldOrEsdtTokenIdentifier<StaticApi>, u64>,
     > = MultiValueEncoded::new();
     reward_tokens.push((EgldOrEsdtTokenIdentifier::egld(), 0).into());
-    state.world.sc_call(
-        ScCallStep::new()
-            .from(ALICE_ADDRESS_EXPR)
-            .multi_esdt_transfer(nft_payments)
-            .call(
-                state
-                    .rewards_distribution_contract
-                    .claim_rewards(0u64, 0u64, reward_tokens),
-            ),
-    );
+    state
+        .world
+        .tx()
+        .from(ALICE_ADDRESS_EXPR_REPL)
+        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+        .typed(rewards_distribution_proxy::RewardsDistributionProxy)
+        .claim_rewards(0u64, 0u64, reward_tokens)
+        .with_multi_token_transfer(nft_payments)
+        .run();
 
     state
         .world
-        .check_state_step(CheckStateStep::new().put_account(
-            ALICE_ADDRESS_EXPR,
-            CheckAccount::new().balance(balance_expr.as_str()),
-        ));
+        .check_account(ALICE_ADDRESS_EXPR_REPL)
+        .balance(balance_expr.as_str());
 }
