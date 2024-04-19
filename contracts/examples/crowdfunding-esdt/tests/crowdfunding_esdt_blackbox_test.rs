@@ -12,12 +12,12 @@ const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
 const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
-    let contract_path: &str = "mxsc:output/crowdfunding-esdt.mxsc.json";
-
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/crowdfunding-esdt");
 
-    blockchain.register_contract(contract_path, crowdfunding_esdt::ContractBuilder);
+    blockchain.register_contract(
+        CODE_EXPR.eval_to_expr().as_str(),
+        crowdfunding_esdt::ContractBuilder,
+    );
     blockchain
 }
 
@@ -41,9 +41,9 @@ impl CrowdfundingESDTTestState {
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
         world.set_state_step(SetStateStep::new().new_address(
-            OWNER_ADDRESS.eval_to_expr().as_str(),
+            OWNER_ADDRESS,
             1,
-            SC_CROWDFUNDING_ESDT_EXPR.eval_to_expr().as_str(),
+            SC_CROWDFUNDING_ESDT_EXPR,
         ));
 
         Self { world }

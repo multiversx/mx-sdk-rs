@@ -1,43 +1,38 @@
 use multiversx_sc::codec::top_encode_to_vec_u8_or_panic;
 use multiversx_sc_scenario::imports::*;
 
-use adder::{adder_proxy, ProxyTrait as _};
-use multisig::{multisig_perform::ProxyTrait as _, multisig_proxy};
+use adder::adder_proxy;
+use multisig::multisig_proxy;
 use num_bigint::BigUint;
 
-const ADDER_ADDRESS_EXPR: &str = "sc:adder";
 const SC_ADDER_EXPR: ScExpr = ScExpr("adder");
 const ADDER_OWNER_ADDRESS_EXPR: AddressExpr = AddressExpr("adder-owner");
-const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 const ADDER_CODE_EXPR: MxscExpr = MxscExpr("test-contracts/adder.mxsc.json");
-const BOARD_MEMBER_ADDRESS_EXPR: &str = "address:board-member";
-const BOARD_MEMBER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("board-member");
-const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
+const BOARD_MEMBER_ADDRESS_EXPR: AddressExpr = AddressExpr("board-member");
 const SC_MULTISIG_EXPR: ScExpr = ScExpr("multisig");
-const MULTISIG_PATH_EXPR: &str = "mxsc:output/multisig.mxsc.json";
 const MULTISIG_CODE_EXPR: MxscExpr = MxscExpr("output/multisig.mxsc.json");
-const OWNER_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("owner");
+const OWNER_ADDRESS_EXPR: AddressExpr = AddressExpr("owner");
 const PROPOSER_ADDRESS_EXPR: AddressExpr = AddressExpr("proposer");
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
 const QUORUM_SIZE: usize = 1;
-
-type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
-type AdderContract = ContractInfo<adder::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract(MULTISIG_PATH_EXPR, multisig::ContractBuilder);
-    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    blockchain.register_contract(
+        MULTISIG_CODE_EXPR.eval_to_expr().as_str(),
+        multisig::ContractBuilder,
+    );
+    blockchain.register_contract(
+        ADDER_CODE_EXPR.eval_to_expr().as_str(),
+        adder::ContractBuilder,
+    );
     blockchain
 }
 
 struct MultisigTestState {
     world: ScenarioWorld,
-    multisig_contract: MultisigContract,
-    adder_contract: AdderContract,
-    adder_address: Address,
 }
 
 impl MultisigTestState {
@@ -45,47 +40,37 @@ impl MultisigTestState {
         let mut world = world();
 
         world
-            .account(OWNER_ADDRESS_EXPR_REPL)
+            .account(OWNER_ADDRESS_EXPR)
             .nonce(1)
             .account(PROPOSER_ADDRESS_EXPR)
             .nonce(1)
             .balance(PROPOSER_BALANCE_EXPR)
-            .account(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+            .account(BOARD_MEMBER_ADDRESS_EXPR)
             .nonce(1)
             .account(ADDER_OWNER_ADDRESS_EXPR)
             .nonce(1);
 
         world.set_state_step(SetStateStep::new().new_address(
-            OWNER_ADDRESS_EXPR_REPL.eval_to_expr().as_str(),
+            OWNER_ADDRESS_EXPR,
             1,
-            SC_MULTISIG_EXPR.eval_to_expr().as_str(),
+            SC_MULTISIG_EXPR,
         ));
 
         world.set_state_step(SetStateStep::new().new_address(
-            ADDER_OWNER_ADDRESS_EXPR.eval_to_expr().as_str(),
+            ADDER_OWNER_ADDRESS_EXPR,
             1,
-            SC_ADDER_EXPR.eval_to_expr().as_str(),
+            SC_ADDER_EXPR,
         ));
 
-        let multisig_contract = MultisigContract::new(SC_MULTISIG_EXPR.eval_to_expr().as_str());
-        let adder_contract = AdderContract::new(SC_ADDER_EXPR.eval_to_expr().as_str());
-        let adder_address = AddressValue::from(SC_ADDER_EXPR.eval_to_expr().as_str()).to_address();
-
-        Self {
-            world,
-            multisig_contract,
-            adder_contract,
-            adder_address,
-        }
+        Self { world }
     }
 
     fn deploy_multisig_contract(&mut self) -> &mut Self {
-        let board_members =
-            MultiValueVec::from(vec![BOARD_MEMBER_ADDRESS_EXPR_REPL.eval_to_array()]);
+        let board_members = MultiValueVec::from(vec![BOARD_MEMBER_ADDRESS_EXPR.eval_to_array()]);
 
         self.world
             .tx()
-            .from(OWNER_ADDRESS_EXPR_REPL)
+            .from(OWNER_ADDRESS_EXPR)
             .typed(multisig_proxy::MultisigProxy)
             .init(QUORUM_SIZE, board_members)
             .code(MULTISIG_CODE_EXPR)
@@ -94,7 +79,7 @@ impl MultisigTestState {
         let action_id: usize = self
             .world
             .tx()
-            .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
             .propose_add_proposer(PROPOSER_ADDRESS_EXPR.eval_to_array())
@@ -154,7 +139,7 @@ impl MultisigTestState {
 
     fn propose_transfer_execute(
         &mut self,
-        to: Address,
+        to: ScExpr,
         egld_amount: u64,
         contract_call: FunctionCall<StaticApi>,
     ) -> usize {
@@ -163,14 +148,14 @@ impl MultisigTestState {
             .from(PROPOSER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
-            .propose_transfer_execute(to, egld_amount, contract_call)
+            .propose_transfer_execute(to.eval_to_array(), egld_amount, contract_call)
             .returns(ReturnsResult)
             .run()
     }
 
     fn propose_async_call(
         &mut self,
-        to: Address,
+        to: ScExpr,
         egld_amount: u64,
         contract_call: FunctionCall<StaticApi>,
     ) -> usize {
@@ -179,7 +164,7 @@ impl MultisigTestState {
             .from(PROPOSER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(to, egld_amount, contract_call)
+            .propose_async_call(to.eval_to_array(), egld_amount, contract_call)
             .returns(ReturnsResult)
             .run()
     }
@@ -198,7 +183,7 @@ impl MultisigTestState {
     fn propose_sc_deploy_from_source(
         &mut self,
         amount: u64,
-        source: Address,
+        source: ScExpr,
         code_metadata: CodeMetadata,
         arguments: MultiValueVec<Vec<u8>>,
     ) -> usize {
@@ -207,16 +192,16 @@ impl MultisigTestState {
             .from(PROPOSER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
-            .propose_sc_deploy_from_source(amount, source, code_metadata, arguments)
+            .propose_sc_deploy_from_source(amount, source.eval_to_array(), code_metadata, arguments)
             .returns(ReturnsResult)
             .run()
     }
 
     fn propose_sc_upgrade_from_source(
         &mut self,
-        sc_address: Address,
+        sc_address: ScExpr,
         amount: u64,
-        source: Address,
+        source: ScExpr,
         code_metadata: CodeMetadata,
         arguments: MultiValueVec<Vec<u8>>,
     ) -> usize {
@@ -225,7 +210,13 @@ impl MultisigTestState {
             .from(PROPOSER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
-            .propose_sc_upgrade_from_source(sc_address, amount, source, code_metadata, arguments)
+            .propose_sc_upgrade_from_source(
+                sc_address.eval_to_array(),
+                amount,
+                source.eval_to_array(),
+                code_metadata,
+                arguments,
+            )
             .returns(ReturnsResult)
             .run()
     }
@@ -233,7 +224,7 @@ impl MultisigTestState {
     fn perform(&mut self, action_id: usize) {
         self.world
             .tx()
-            .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
@@ -243,7 +234,7 @@ impl MultisigTestState {
     fn perform_and_expect_err(&mut self, action_id: usize, err_message: &str) {
         self.world
             .tx()
-            .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
             .perform_action_endpoint(action_id)
@@ -254,7 +245,7 @@ impl MultisigTestState {
     fn sign(&mut self, action_id: usize) {
         self.world
             .tx()
-            .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+            .from(BOARD_MEMBER_ADDRESS_EXPR)
             .to(SC_MULTISIG_EXPR)
             .typed(multisig_proxy::MultisigProxy)
             .sign(action_id)
@@ -292,7 +283,7 @@ fn test_add_board_member() {
     state.perform(action_id);
 
     let expected_value = MultiValueVec::from(vec![
-        BOARD_MEMBER_ADDRESS_EXPR_REPL.eval_to_array(),
+        BOARD_MEMBER_ADDRESS_EXPR.eval_to_array(),
         new_board_member_expr.eval_to_array(),
     ]);
 
@@ -368,7 +359,7 @@ fn test_try_remove_all_board_members() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    let action_id = state.propose_remove_user(BOARD_MEMBER_ADDRESS_EXPR_REPL);
+    let action_id = state.propose_remove_user(BOARD_MEMBER_ADDRESS_EXPR);
     state.sign(action_id);
     state.perform_and_expect_err(action_id, "quorum cannot exceed board size")
 }
@@ -388,7 +379,7 @@ fn test_change_quorum() {
     state
         .world
         .tx()
-        .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+        .from(BOARD_MEMBER_ADDRESS_EXPR)
         .to(SC_MULTISIG_EXPR)
         .typed(multisig_proxy::MultisigProxy)
         .discard_action(action_id)
@@ -402,7 +393,7 @@ fn test_change_quorum() {
     state
         .world
         .tx()
-        .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+        .from(BOARD_MEMBER_ADDRESS_EXPR)
         .to(SC_MULTISIG_EXPR)
         .typed(multisig_proxy::MultisigProxy)
         .unsign(action_id)
@@ -411,7 +402,7 @@ fn test_change_quorum() {
     state
         .world
         .tx()
-        .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+        .from(BOARD_MEMBER_ADDRESS_EXPR)
         .to(SC_MULTISIG_EXPR)
         .typed(multisig_proxy::MultisigProxy)
         .discard_action(action_id)
@@ -421,7 +412,7 @@ fn test_change_quorum() {
     state
         .world
         .tx()
-        .from(BOARD_MEMBER_ADDRESS_EXPR_REPL)
+        .from(BOARD_MEMBER_ADDRESS_EXPR)
         .to(SC_MULTISIG_EXPR)
         .typed(multisig_proxy::MultisigProxy)
         .sign(action_id)
@@ -517,9 +508,8 @@ fn test_transfer_execute_sc_all() {
         .typed(adder_proxy::AdderProxy)
         .add(5u64)
         .into_function_call();
-    let adder_address = AddressValue::from(SC_ADDER_EXPR.eval_to_expr().as_str()).to_address();
 
-    let action_id = state.propose_transfer_execute(adder_address, 0u64, adder_call);
+    let action_id = state.propose_transfer_execute(SC_ADDER_EXPR, 0u64, adder_call);
     state.sign(action_id);
     state.perform(action_id);
 
@@ -538,9 +528,14 @@ fn test_async_call_to_sc() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
-    let adder_call = state.adder_contract.add(5u64).into_function_call();
+    let adder_call = state
+        .world
+        .tx()
+        .typed(adder_proxy::AdderProxy)
+        .add(5u64)
+        .into_function_call();
 
-    let action_id = state.propose_async_call(state.adder_address.clone(), 0u64, adder_call);
+    let action_id = state.propose_async_call(SC_ADDER_EXPR, 0u64, adder_call);
     state.sign(action_id);
     state.perform(action_id);
 
@@ -559,69 +554,82 @@ fn test_deploy_and_upgrade_from_source() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
-    const NEW_ADDER_ADDRESS_EXPR: &str = "sc:new-adder";
+    let new_adder_address_expr: ScExpr = ScExpr("new-adder");
     state.world.set_state_step(SetStateStep::new().new_address(
-        MULTISIG_ADDRESS_EXPR,
+        SC_MULTISIG_EXPR,
         0,
-        NEW_ADDER_ADDRESS_EXPR,
+        new_adder_address_expr,
     ));
-
-    let new_adder_address = AddressValue::from(NEW_ADDER_ADDRESS_EXPR).to_address();
 
     let action_id = state.propose_sc_deploy_from_source(
         0u64,
-        state.adder_address.clone(),
+        SC_ADDER_EXPR,
         CodeMetadata::all(),
         MultiValueVec::from([top_encode_to_vec_u8_or_panic(&5u64)]),
     );
     state.sign(action_id);
-    state.world.sc_call(
-        ScCallStep::new()
-            .from(BOARD_MEMBER_ADDRESS_EXPR)
-            .call(state.multisig_contract.perform_action_endpoint(action_id))
-            .expect_value(OptionalValue::Some(new_adder_address.clone())),
-    );
+    state
+        .world
+        .tx()
+        .from(BOARD_MEMBER_ADDRESS_EXPR)
+        .to(SC_MULTISIG_EXPR)
+        .typed(multisig_proxy::MultisigProxy)
+        .perform_action_endpoint(action_id)
+        .returns(ExpectValue(OptionalValue::Some(
+            new_adder_address_expr.to_address(),
+        )))
+        .run();
 
-    let adder_call = state.adder_contract.add(5u64).into_function_call();
+    let adder_call = state
+        .world
+        .tx()
+        .to(SC_ADDER_EXPR)
+        .typed(adder_proxy::AdderProxy)
+        .add(5u64)
+        .into_function_call();
 
-    let action_id = state.propose_transfer_execute(new_adder_address, 0u64, adder_call);
+    let action_id = state.propose_transfer_execute(new_adder_address_expr, 0u64, adder_call);
     state.sign(action_id);
     state.perform(action_id);
 
-    let mut new_adder_contract = AdderContract::new(NEW_ADDER_ADDRESS_EXPR);
+    state
+        .world
+        .query()
+        .to(new_adder_address_expr)
+        .typed(adder_proxy::AdderProxy)
+        .sum()
+        .returns(ExpectValue(BigUint::from(10u64)))
+        .run();
 
-    state.world.sc_query(
-        ScQueryStep::new()
-            .call(new_adder_contract.sum())
-            .expect_value(SingleValue::from(BigUint::from(10u64))),
+    let factorial_address_expr: ScExpr = ScExpr("factorial");
+    let factorial_path_expr: MxscExpr = MxscExpr("test-contracts/factorial.mxsc.json");
+
+    let factorial_code = state
+        .world
+        .code_expression(factorial_path_expr.eval_to_expr().as_str());
+
+    state.world.register_contract(
+        factorial_path_expr.eval_to_expr().as_str(),
+        factorial::ContractBuilder,
     );
-
-    const FACTORIAL_ADDRESS_EXPR: &str = "sc:factorial";
-    const FACTORIAL_PATH_EXPR: &str = "mxsc:test-contracts/factorial.mxsc.json";
-
-    let factorial_code = state.world.code_expression(FACTORIAL_PATH_EXPR);
-    let factorial_address = AddressValue::from(FACTORIAL_ADDRESS_EXPR).to_address();
 
     state
         .world
-        .register_contract(FACTORIAL_PATH_EXPR, factorial::ContractBuilder);
-    state.world.set_state_step(SetStateStep::new().put_account(
-        FACTORIAL_ADDRESS_EXPR,
-        Account::new().nonce(1).code(factorial_code.clone()),
-    ));
+        .account(factorial_address_expr)
+        .code(factorial_code.clone());
 
     let action_id = state.propose_sc_upgrade_from_source(
-        state.adder_address.clone(),
+        SC_ADDER_EXPR,
         0u64,
-        factorial_address,
+        factorial_address_expr,
         CodeMetadata::all(),
         MultiValueVec::new(),
     );
     state.sign(action_id);
     state.perform(action_id);
 
-    state.world.check_state_step(
-        CheckStateStep::new()
-            .put_account(ADDER_ADDRESS_EXPR, CheckAccount::new().code(factorial_code)),
-    );
+    state
+        .world
+        .check_account(SC_ADDER_EXPR)
+        .code(factorial_path_expr.eval_to_expr().as_str());
 }
