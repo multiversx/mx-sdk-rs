@@ -82,7 +82,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
             .returns(ReturnsRawResult)
-            .sync_call();
+            .sync_call_same_context();
 
         self.execute_on_same_context_result(result);
     }
@@ -102,7 +102,7 @@ pub trait ForwarderRawSync: super::forwarder_raw_common::ForwarderRawCommon {
             .raw_call(endpoint_name)
             .arguments_raw(args.to_arg_buffer())
             .returns(ReturnsRawResult)
-            .sync_call();
+            .sync_call_readonly();
 
         self.execute_on_dest_context_result(result);
     }
