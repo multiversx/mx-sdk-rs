@@ -1,18 +1,12 @@
 use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
-        ManagedAddress, RHList, RHListItem, RHListItemExec, ReturnsNewAddress,
-        ReturnsNewManagedAddress, ReturnsResult, ReturnsResultConv, TxEnv, WithNewAddress,
-        WithResultConv,
+        ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress, ReturnsResult,
+        ReturnsResultConv, TxEnv, WithNewAddress, WithResultConv,
     },
 };
 
-use crate::{
-    api::StaticApi,
-    scenario_model::{TxResponse, TypedResponse},
-};
-
-use super::ScenarioTxEnvData;
+use crate::scenario_model::{TxResponse, TypedResponse};
 
 impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResult
 where

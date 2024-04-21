@@ -1,11 +1,14 @@
 use std::fmt;
 
-use crate::multiversx_sc::types::Address;
+use crate::multiversx_sc::types::{Address, AddressExpr, ScExpr};
 
-use crate::scenario_format::{
-    interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
-    serde_raw::ValueSubTree,
-    value_interpreter::{interpret_string, interpret_subtree},
+use crate::{
+    facade::expr::Bech32Address,
+    scenario_format::{
+        interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
+        serde_raw::ValueSubTree,
+        value_interpreter::{interpret_string, interpret_subtree},
+    },
 };
 
 use super::AddressKey;
@@ -107,8 +110,44 @@ impl From<&Address> for AddressValue {
     }
 }
 
+impl From<&Bech32Address> for AddressValue {
+    fn from(from: &Bech32Address) -> Self {
+        AddressValue {
+            value: from.to_address().clone(),
+            original: ValueSubTree::Str(from.to_bech32_expr()),
+        }
+    }
+}
+
+impl From<Bech32Address> for AddressValue {
+    fn from(from: Bech32Address) -> Self {
+        AddressValue {
+            original: ValueSubTree::Str(from.to_bech32_expr()),
+            value: from.into_address(),
+        }
+    }
+}
+
 impl From<&str> for AddressValue {
     fn from(from: &str) -> Self {
         AddressValue::interpret_from(from, &InterpreterContext::default())
+    }
+}
+
+impl From<AddressExpr> for AddressValue {
+    fn from(from: AddressExpr) -> Self {
+        AddressValue {
+            value: from.eval_to_array().into(),
+            original: ValueSubTree::Str(from.eval_to_expr()),
+        }
+    }
+}
+
+impl From<ScExpr<'_>> for AddressValue {
+    fn from(from: ScExpr) -> Self {
+        AddressValue {
+            value: from.eval_to_array().into(),
+            original: ValueSubTree::Str(from.eval_to_expr()),
+        }
     }
 }

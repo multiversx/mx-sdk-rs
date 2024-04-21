@@ -184,7 +184,7 @@ pub trait Vault {
             all_payments.push(EsdtTokenPayment::new(token_id, nonce, amount));
         }
 
-        self.tx().to(caller).multi_esdt(all_payments).transfer();
+        self.tx().to(caller).payment(all_payments).transfer();
     }
 
     #[payable("*")]
@@ -222,7 +222,7 @@ pub trait Vault {
             ));
         }
 
-        self.tx().to_caller().multi_esdt(new_tokens).transfer();
+        self.tx().to_caller().payment(new_tokens).transfer();
     }
 
     #[event("accept_funds")]

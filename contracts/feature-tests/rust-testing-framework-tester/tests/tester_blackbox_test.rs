@@ -1,5 +1,5 @@
-use multiversx_sc_scenario::{api::StaticApi, scenario_model::*, *};
-use rust_testing_framework_tester::*; // TODO: clean up imports
+use multiversx_sc_scenario::imports::*;
+use rust_testing_framework_tester::*;
 
 const WASM_PATH_EXPR: &str = "mxsc:output/rust-testing-framework-tester.mxsc.json";
 

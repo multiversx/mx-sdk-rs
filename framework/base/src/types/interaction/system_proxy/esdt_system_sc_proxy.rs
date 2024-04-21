@@ -1,15 +1,11 @@
-use core::marker::PhantomData;
-
 use super::token_properties::*;
-use hex_literal::hex;
 
 use crate::{
-    api::{CallTypeApi, SendApi, VMApi},
+    api::CallTypeApi,
     types::{
-        BigUint, ContractCall, ContractCallNoPayment, ContractCallWithEgld, EgldPayment,
-        EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress, ManagedBuffer,
-        OriginalResultMarker, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas, TxProxyCall, TxProxyTrait,
-        TxTo,
+        BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
+        ManagedBuffer, OriginalResultMarker, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas,
+        TxProxyCall, TxProxyTrait, TxTo,
     },
 };
 

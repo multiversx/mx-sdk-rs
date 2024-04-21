@@ -1,4 +1,4 @@
-use crate::{ContractInfo, StaticApi};
+use multiversx_sc_scenario::imports::Bech32Address;
 use serde::{Deserialize, Serialize};
 use std::{
     io::{Read, Write},
@@ -8,12 +8,10 @@ use std::{
 /// State file
 const STATE_FILE: &str = "state.toml";
 
-pub type MultisigContract = ContractInfo<multisig::Proxy<StaticApi>>;
-
 /// Multisig Interact state
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct State {
-    multisig_address: Option<String>,
+    multisig_address: Option<Bech32Address>,
 }
 
 impl State {
@@ -30,13 +28,14 @@ impl State {
     }
 
     /// Sets the multisig address
-    pub fn set_multisig_address(&mut self, address: &str) {
-        self.multisig_address = Some(String::from(address));
+    pub fn set_multisig_address(&mut self, address: Bech32Address) {
+        self.multisig_address = Some(address);
     }
 
-    /// Returns the multisig contract
-    pub fn multisig(&self) -> MultisigContract {
-        MultisigContract::new(self.multisig_address.clone().unwrap())
+    pub fn current_multisig_address(&self) -> &Bech32Address {
+        self.multisig_address
+            .as_ref()
+            .expect("no known multisig contract, deploy first")
     }
 }
 

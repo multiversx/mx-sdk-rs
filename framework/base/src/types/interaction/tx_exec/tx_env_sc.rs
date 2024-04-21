@@ -4,8 +4,8 @@ use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
     contract_base::BlockchainWrapper,
     types::{
-        interaction::display_u64, AnnotatedValue, ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv,
-        TxEnv, TRANSFER_EXECUTE_DEFAULT_LEFTOVER,
+        interaction::display_u64, ManagedAddress, ManagedBuffer, Tx, TxBaseWithEnv, TxEnv,
+        TRANSFER_EXECUTE_DEFAULT_LEFTOVER,
     },
 };
 

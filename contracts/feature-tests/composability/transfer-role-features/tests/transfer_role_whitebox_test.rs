@@ -1,14 +1,5 @@
-use multiversx_sc::types::{
-    Address, EsdtTokenPayment, ManagedArgBuffer, ManagedVec, MultiValueEncoded,
-};
 use multiversx_sc_modules::transfer_role_proxy::TransferRoleProxyModule;
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 use transfer_role_features::TransferRoleFeatures;
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";

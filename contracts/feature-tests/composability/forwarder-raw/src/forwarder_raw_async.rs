@@ -23,7 +23,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     #[payable("*")]
     fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
-        self.tx().to(&to).multi_esdt(payments).transfer();
+        self.tx().to(&to).payment(payments).transfer();
     }
 
     fn forward_contract_call(

@@ -4,19 +4,15 @@ use crate::scenario_model::{ScQueryStep, TxExpect, TxResponse};
 
 use super::{address_annotated, StepWrapper, TxToQueryStep};
 
-impl<Env, To, RH> TxToQueryStep for Tx<Env, (), To, (), (), FunctionCall<Env::Api>, RH>
+impl<Env, To, RH> TxToQueryStep<Env, RH> for Tx<Env, (), To, (), (), FunctionCall<Env::Api>, RH>
 where
     Env: TxEnv<RHExpect = TxExpect>,
     To: TxToSpecified<Env>,
     RH: RHListExec<TxResponse, Env>,
 {
-    type Env = Env;
-
     type Step = ScQueryStep;
 
-    type RH = RH;
-
-    fn tx_to_query_step(self) -> StepWrapper<Self::Env, Self::Step, Self::RH> {
+    fn tx_to_query_step(self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step = tx_to_sc_query_step(&self.env, self.to, self.data);
         step.expect = Some(self.result_handler.list_tx_expect());
 

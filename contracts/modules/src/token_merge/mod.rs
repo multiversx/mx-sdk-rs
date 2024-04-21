@@ -118,10 +118,7 @@ pub trait TokenMergeModule:
                 .esdt_local_burn(&token.token_identifier, token.token_nonce, &token.amount);
         }
 
-        self.tx()
-            .to(ToCaller)
-            .multi_esdt(&output_payments)
-            .transfer();
+        self.tx().to(ToCaller).payment(&output_payments).transfer();
 
         output_payments
     }
@@ -167,10 +164,7 @@ pub trait TokenMergeModule:
         );
         tokens_to_remove.push(new_merged_token);
 
-        self.tx()
-            .to(ToCaller)
-            .multi_esdt(&tokens_to_remove)
-            .transfer();
+        self.tx().to(ToCaller).payment(&tokens_to_remove).transfer();
 
         tokens_to_remove
     }

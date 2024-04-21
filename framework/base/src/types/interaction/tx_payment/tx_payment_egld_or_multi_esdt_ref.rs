@@ -1,18 +1,6 @@
-use alloc::borrow::ToOwned;
+use crate::types::{BigUint, EgldOrMultiEsdtPaymentRefs, ManagedAddress, TxFrom, TxToSpecified};
 
-use crate::{
-    api::ManagedTypeApi,
-    contract_base::SendRawWrapper,
-    types::{
-        AnnotatedValue, BigUint, EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs,
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedType, ManagedVec,
-        MultiEsdtPayment, TxFrom, TxToSpecified,
-    },
-};
-
-use super::{
-    AnnotatedEgldPayment, Egld, FullPaymentData, FunctionCall, TxEgldValue, TxEnv, TxPayment,
-};
+use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment};
 
 impl<'a, Env> TxPayment<Env> for EgldOrMultiEsdtPaymentRefs<'a, Env::Api>
 where

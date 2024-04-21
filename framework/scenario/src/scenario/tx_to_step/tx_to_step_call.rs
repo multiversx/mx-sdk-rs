@@ -2,11 +2,11 @@ use multiversx_sc::types::{
     FunctionCall, RHListExec, Tx, TxEnv, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
 };
 
-use crate::scenario_model::{ScCallStep, TxExpect, TxResponse};
+use crate::scenario_model::{ScCallStep, TxESDT, TxExpect, TxResponse};
 
 use super::{address_annotated, gas_annotated, StepWrapper, TxToStep};
 
-impl<Env, From, To, Payment, Gas, RH> TxToStep
+impl<Env, From, To, Payment, Gas, RH> TxToStep<Env, RH>
     for Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
 where
     Env: TxEnv<RHExpect = TxExpect>,
@@ -16,13 +16,9 @@ where
     Gas: TxGas<Env>,
     RH: RHListExec<TxResponse, Env>,
 {
-    type Env = Env;
-
     type Step = ScCallStep;
 
-    type RH = RH;
-
-    fn tx_to_step(self) -> StepWrapper<Self::Env, Self::Step, Self::RH> {
+    fn tx_to_step(self) -> StepWrapper<Env, Self::Step, RH> {
         let mut step = tx_to_sc_call_step(
             &self.env,
             self.from,
@@ -69,6 +65,12 @@ where
     let full_payment_data = payment.into_full_payment_data(env);
     if let Some(annotated_egld_payment) = full_payment_data.egld {
         step.tx.egld_value = annotated_egld_payment.into();
+    } else {
+        step.tx.esdt_value = full_payment_data
+            .multi_esdt
+            .iter()
+            .map(TxESDT::from)
+            .collect();
     }
 
     step

@@ -84,7 +84,7 @@ pub trait ForwarderEsdtModule: storage::ForwarderStorageModule {
             all_token_payments.push(payment);
         }
 
-        self.tx().to(&to).multi_esdt(all_token_payments).transfer();
+        self.tx().to(&to).payment(all_token_payments).transfer();
     }
 
     #[payable("EGLD")]

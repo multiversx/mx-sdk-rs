@@ -5,10 +5,9 @@ use crate::{
     contract_base::SendRawWrapper,
     tuple_util::NestedTupleFlatten,
     types::{
-        decode_result, Code, CodeMetadata, ConsNoRet, ConsRet, DeployCall, FromSource,
-        ManagedAddress, ManagedBuffer, ManagedVec, OriginalResultMarker, RHList, RHListExec,
-        RHListItem, Tx, TxCodeValue, TxEmptyResultHandler, TxEnv, TxFromSourceValue, TxGas,
-        TxPaymentEgldOnly, TxResultHandler, TxScEnv, UpgradeCall,
+        decode_result, Code, CodeMetadata, DeployCall, FromSource, ManagedAddress, ManagedBuffer,
+        ManagedVec, OriginalResultMarker, RHListExec, Tx, TxCodeValue, TxFromSourceValue, TxGas,
+        TxPaymentEgldOnly, TxResultHandler, TxScEnv,
     },
 };
 
@@ -200,5 +199,84 @@ where
             .execute_deploy_from_source_raw();
 
         (new_address, decode_result(raw_results))
+    }
+}
+
+impl<Api, Payment, Gas, OriginalResult>
+    Tx<
+        TxScEnv<Api>,
+        (),
+        ManagedAddress<Api>,
+        Payment,
+        Gas,
+        DeployCall<TxScEnv<Api>, ()>,
+        OriginalResultMarker<OriginalResult>,
+    >
+where
+    Api: CallTypeApi,
+    Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
+    Gas: TxGas<TxScEnv<Api>>,
+    OriginalResult: TopEncodeMulti,
+{
+    /// Backwards compatibility, immitates the old API.
+    ///
+    /// Should no longer be used, which is why unlike all the rest of the old syntax, was deprecated.
+    ///
+    /// Uses a `DeployCall` instead of the correct `UpgradeCall`, because the old syntax did not know about upgrades.
+    ///
+    /// Note that the data type (the `DeployCall`) doesn't have the code set.
+    /// This is because the old API was passing it as paramter, so we use it from the `code` argument.
+    ///
+    /// Also note that the code metadata is taken from the `code_metadata` argument.
+    /// If another one was previously set in the `Tx` object, that one will be ignored.
+    #[deprecated(
+        since = "0.49.0",
+        note = "The legacy upgrade method does not correctly take the upgrade constructor into account. Please switch to the new syntax."
+    )]
+    pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        self.payment.with_egld_value(&self.env, |egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_contract(
+                &self.to,
+                gas,
+                egld_value,
+                code,
+                code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
+    }
+
+    /// Backwards compatibility, immitates the old API.
+    ///
+    /// Should no longer be used, which is why unlike all the rest of the old syntax, was deprecated.
+    ///
+    /// Uses a `DeployCall` instead of the correct `UpgradeCall`, because the old syntax did not know about upgrades.
+    ///
+    /// Note that the data type (the `DeployCall`) doesn't have the code set.
+    /// This is because the old API was passing it as paramter, so we use it from the `code` argument.
+    ///
+    /// Also note that the code metadata is taken from the `code_metadata` argument.
+    /// If another one was previously set in the `Tx` object, that one will be ignored.
+    #[deprecated(
+        since = "0.49.0",
+        note = "The legacy upgrade method does not correctly take the upgrade constructor into account. Please switch to the new syntax."
+    )]
+    pub fn upgrade_from_source(
+        self,
+        source_address: &ManagedAddress<Api>,
+        code_metadata: CodeMetadata,
+    ) {
+        let gas = self.gas.explicit_or_gas_left(&self.env);
+        self.payment.with_egld_value(&self.env, |egld_value| {
+            SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+                &self.to,
+                gas,
+                egld_value,
+                source_address,
+                code_metadata,
+                &self.data.arg_buffer,
+            );
+        });
     }
 }

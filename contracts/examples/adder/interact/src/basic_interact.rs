@@ -6,21 +6,8 @@ use adder::adder_proxy;
 use basic_interact_config::Config;
 use basic_interact_state::State;
 use clap::Parser;
-use multiversx_sc_snippets::{
-    env_logger,
-    multiversx_sc::types::{Address, ReturnsNewAddress, ReturnsResultConv},
-    multiversx_sc_scenario::{
-        api::StaticApi,
-        bech32,
-        mandos_system::ScenarioRunner,
-        num_bigint::BigUint,
-        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, Scenario},
-        standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo, NumExpr, WithRawTxResponse,
-    },
-    tokio, Interactor, InteractorPrepareAsync,
-};
+
+use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -54,7 +41,7 @@ async fn main() {
 #[allow(unused)]
 struct AdderInteract {
     interactor: Interactor,
-    wallet_address: Address,
+    wallet_address: Bech32Address,
     adder_code: BytesValue,
     state: State,
 }
@@ -74,25 +61,15 @@ impl AdderInteract {
 
         Self {
             interactor,
-            wallet_address,
+            wallet_address: wallet_address.into(),
             adder_code,
             state: State::load_state(),
         }
     }
 
     async fn set_state(&mut self) {
-        println!("wallet address: {}", bech32::encode(&self.wallet_address));
-        let scenario_raw = retrieve_account_as_scenario_set_state(
-            Config::load_config().gateway().to_string(),
-            bech32::encode(&self.wallet_address),
-            true,
-        )
-        .await;
-
-        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-        self.interactor.pre_runners.run_scenario(&scenario);
-        self.interactor.post_runners.run_scenario(&scenario);
+        println!("wallet address: {}", self.wallet_address);
+        self.interactor.retrieve_account(&self.wallet_address).await;
     }
 
     async fn deploy(&mut self) {
@@ -105,25 +82,13 @@ impl AdderInteract {
             .typed(adder_proxy::AdderProxy)
             .init(0u32)
             .code(&self.adder_code)
-            .with_result(WithRawTxResponse(|response| {
-                let err = &response.tx_error;
-                assert!(
-                    err.is_success(),
-                    "deploy failed: status: {}, message: {}",
-                    err.status,
-                    err.message
-                );
-            }))
-            .returns(ReturnsNewAddress)
+            .returns(ReturnsNewBech32Address)
             .prepare_async()
             .run()
             .await;
 
-        let new_address_bech32 = bech32::encode(&new_address);
-        println!("new address: {new_address_bech32}");
-
-        let new_address_expr = format!("bech32:{new_address_bech32}");
-        self.state.set_adder_address(&new_address_expr);
+        println!("new address: {new_address}");
+        self.state.set_adder_address(new_address);
     }
 
     async fn multi_deploy(&mut self, count: &u8) {
@@ -143,17 +108,15 @@ impl AdderInteract {
                     .init(0u32)
                     .code(&self.adder_code)
                     .gas(NumExpr("70,000,000"))
-                    .returns(ReturnsNewAddress)
+                    .returns(ReturnsNewBech32Address)
             });
         }
 
         let results = buffer.run().await;
-        for result in results {
-            let new_address_bech32 = bech32::encode(&result);
-            println!("new address: {new_address_bech32}");
+        for new_address in results {
+            println!("new address: {new_address}");
 
-            let new_address_expr = format!("bech32:{new_address_bech32}");
-            self.state.set_adder_address(&new_address_expr);
+            self.state.set_adder_address(new_address);
         }
     }
 
@@ -161,7 +124,7 @@ impl AdderInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.adder().to_address())
+            .to(self.state.current_adder_address())
             .egld(NumExpr("0,050000000000000000"))
             .prepare_async()
             .run()
@@ -172,7 +135,7 @@ impl AdderInteract {
         self.interactor
             .tx()
             .from(&self.wallet_address)
-            .to(self.state.adder().to_address())
+            .to(self.state.current_adder_address())
             .typed(adder_proxy::AdderProxy)
             .add(value)
             .prepare_async()
@@ -186,10 +149,10 @@ impl AdderInteract {
         let sum = self
             .interactor
             .query()
-            .to(self.state.adder().to_address())
+            .to(self.state.current_adder_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
-            .returns(ReturnsResultConv::<BigUint>::new())
+            .returns(ReturnsResultConv::<RustBigUint>::new())
             .prepare_async()
             .run()
             .await;

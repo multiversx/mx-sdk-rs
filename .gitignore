@@ -8,6 +8,7 @@
 # The root Cargo.lock is kept for dependabot.
 contracts/**/Cargo.lock
 !contracts/**/wasm*/Cargo.lock
+contracts/**/output*/
 data/**/Cargo.lock
 framework/**/Cargo.lock
 sdk/**/Cargo.lock

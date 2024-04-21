@@ -39,43 +39,12 @@ pub use hex_literal;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 
 /// Conveniently groups all framework imports required by a smart contract form the framework.
-pub mod imports {
-    pub use crate::{
-        abi::TypeAbi,
-        api::{ErrorApiImpl, ManagedTypeApi, VMApi},
-        arrayvec::ArrayVec,
-        codec::{
-            multi_types::*, CodecFrom, CodecFromSelf, CodecInto, DecodeError, IntoMultiValue,
-            NestedDecode, NestedEncode, TopDecode, TopEncode,
-        },
-        contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
-        err_msg,
-        io::*,
-        non_zero_usize,
-        non_zero_util::*,
-        require, sc_format, sc_panic, sc_print,
-        storage::mappers::*,
-        types::{system_proxy::*, *},
-    };
-    pub use core::ops::{
-        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
-    };
-}
+pub mod imports;
 
 /// Conveniently groups all imports required for deriving framework-related traits for types.
-pub mod derive_imports {
-    pub use crate::{
-        codec,
-        codec::derive::{
-            NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
-            TopEncodeOrDefault,
-        },
-        derive::{type_abi, ManagedVecItem, TypeAbi},
-    };
-}
+pub mod derive_imports;
 
 /// Conveniently groups all imports required for generated proxies.
 pub mod proxy_imports {
-    pub use crate::{derive_imports::*, imports::*};
+    pub use super::{derive_imports::*, imports::*};
 }

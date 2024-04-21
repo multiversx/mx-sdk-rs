@@ -8,7 +8,7 @@ pub mod display_util;
 mod facade;
 pub mod managed_test_util;
 pub mod scenario;
-mod scenario_macros;
+pub mod scenario_macros;
 pub mod standalone;
 pub mod test_wallets;
 mod vm_go_tool;
@@ -42,6 +42,9 @@ pub use multiversx_chain_scenario_format as scenario_format;
 pub use facade::{result_handlers::*, world_tx::*, ContractInfo, ScenarioWorld, WhiteboxContract};
 
 use std::path::Path;
+
+/// Imports normally needed in integration tests, grouped together.
+pub mod imports;
 
 /// Legacy function for running a scenario test using the Go VM tool.
 ///

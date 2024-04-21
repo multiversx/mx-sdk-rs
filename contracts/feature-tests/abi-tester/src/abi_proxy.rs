@@ -409,15 +409,13 @@ pub struct OnlyShowsUpAsNested02 {
     pub something: [u8; 0],
 }
 
+#[rustfmt::skip]
 #[derive(TopEncode, TopDecode)]
 pub enum AbiEnum {
     Nothing,
     Something(i32),
     SomethingMore(u8, OnlyShowsUpAsNested08),
-    SomeStruct {
-        a: u16,
-        b: OnlyShowsUpAsNested09,
-    },
+    SomeStruct { a: u16, b: OnlyShowsUpAsNested09 },
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
@@ -501,14 +499,12 @@ pub enum ExplicitDiscriminant {
     FiftyOne,
 }
 
+#[rustfmt::skip]
 #[derive(TopEncode, TopDecode)]
 pub enum ExplicitDiscriminantMixed {
     Zero,
     Unit,
     Tuple(u16),
     Five,
-    Struct {
-        a: u8,
-        b: u16,
-    },
+    Struct { a: u8, b: u16 },
 }

@@ -307,6 +307,12 @@ pub enum InstallCommand {
 
     #[command(about = "Installs the `mx-scenario-go` tool")]
     MxScenarioGo(InstallMxScenarioGoArgs),
+
+    #[command(name = "wasm32", about = "Installs the `wasm32` target")]
+    Wasm32(InstallWasm32Args),
+
+    #[command(name = "wasm-opt", about = "Installs the `wasm-opt` tool")]
+    WasmOpt(InstallWasmOptArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -315,3 +321,9 @@ pub struct InstallMxScenarioGoArgs {
     #[arg(long, verbatim_doc_comment)]
     pub tag: Option<String>,
 }
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallWasm32Args {}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallWasmOptArgs {}
