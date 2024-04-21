@@ -2,9 +2,9 @@
 
 multiversx_sc::imports!();
 
-const ESDT_TRANSFER_STRING: &[u8] = b"ESDTTransfer";
-const SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT: &[u8] = b"acceptEsdtPayment";
-const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &[u8] = b"rejectEsdtPayment";
+const ESDT_TRANSFER_STRING: &str = "ESDTTransfer";
+const SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT: &str = "acceptEsdtPayment";
+const SECOND_CONTRACT_REJECT_ESDT_PAYMENT: &str = "rejectEsdtPayment";
 
 #[multiversx_sc::contract]
 pub trait FirstContract {
@@ -115,7 +115,7 @@ pub trait FirstContract {
         self.tx()
             .to(&second_contract_address)
             .gas(gas_left)
-            .raw_call(ManagedBuffer::from(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT))
+            .raw_call(SECOND_CONTRACT_ACCEPT_ESDT_PAYMENT)
             .single_esdt(&expected_token_identifier, 0u64, &esdt_value)
             .transfer_execute();
     }
@@ -138,7 +138,7 @@ pub trait FirstContract {
 
         self.tx()
             .to(to)
-            .raw_call(ManagedBuffer::from(ESDT_TRANSFER_STRING))
+            .raw_call(ESDT_TRANSFER_STRING)
             .arguments_raw(arg_buffer)
             .async_call_and_exit();
     }
