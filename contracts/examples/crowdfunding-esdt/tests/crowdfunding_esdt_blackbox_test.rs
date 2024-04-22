@@ -1,7 +1,6 @@
 use crowdfunding_esdt::crowdfunding_esdt_proxy;
 
 use multiversx_sc_scenario::imports::*;
-use num_bigint::BigUint;
 
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
 const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
@@ -13,12 +12,12 @@ const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
 const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
-    let contract_path: &str = "mxsc:output/crowdfunding-esdt.mxsc.json";
-
     let mut blockchain = ScenarioWorld::new();
-    blockchain.set_current_dir_from_workspace("contracts/examples/crowdfunding-esdt");
 
-    blockchain.register_contract(contract_path, crowdfunding_esdt::ContractBuilder);
+    blockchain.register_contract(
+        CODE_EXPR.eval_to_expr().as_str(),
+        crowdfunding_esdt::ContractBuilder,
+    );
     blockchain
 }
 
@@ -29,10 +28,9 @@ struct CrowdfundingESDTTestState {
 impl CrowdfundingESDTTestState {
     fn new() -> Self {
         let mut world = world();
-        let owner_address: &str = "address:owner";
 
         world
-            .account(owner_address)
+            .account(OWNER_ADDRESS)
             .nonce(1)
             .account(FIRST_USER_ADDRESS)
             .nonce(1)
@@ -43,7 +41,7 @@ impl CrowdfundingESDTTestState {
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
         world.new_address(
-            owner_address,
+            OWNER_ADDRESS,
             1,
             SC_CROWDFUNDING_ESDT_EXPR.eval_to_expr().as_str(),
         );
@@ -81,29 +79,23 @@ impl CrowdfundingESDTTestState {
     }
 
     fn check_deposit(&mut self, donor: AddressExpr, amount: u64) {
-        let value = self
-            .world
+        self.world
             .query()
             .to(SC_CROWDFUNDING_ESDT_EXPR)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .deposit(donor.eval_to_array())
-            .returns(ReturnsResultConv::<BigUint>::new())
+            .returns(ExpectValue(amount))
             .run();
-
-        assert_eq!(value, amount.into());
     }
 
     fn check_status(&mut self, expected_value: crowdfunding_esdt_proxy::Status) {
-        let status = self
-            .world
+        self.world
             .query()
             .to(SC_CROWDFUNDING_ESDT_EXPR)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .status()
-            .returns(ReturnsResult)
+            .returns(ExpectValue(expected_value))
             .run();
-
-        assert_eq!(status, expected_value);
     }
 
     fn claim(&mut self, address: AddressExpr) {

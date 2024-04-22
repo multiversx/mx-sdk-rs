@@ -30,3 +30,23 @@ where
 }
 
 impl<'a, Env> TxCodeValue<Env> for MxscExpr<'a> where Env: ScenarioTxEnv {}
+
+impl<'a> MxscExpr<'a> {
+    pub fn eval_to_expr(&self) -> String {
+        format!("{MXSC_PREFIX}{}", self.0)
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use crate::imports::MxscExpr;
+
+    fn assert_eq_eval(expr: &'static str, expected: &str) {
+        assert_eq!(&MxscExpr(expr).eval_to_expr(), expected);
+    }
+
+    #[test]
+    fn test_address_value() {
+        assert_eq_eval("output/adder.mxsc.json", "mxsc:output/adder.mxsc.json");
+    }
+}
