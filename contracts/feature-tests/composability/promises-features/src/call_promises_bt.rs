@@ -20,10 +20,10 @@ pub trait CallPromisesBackTransfersModule: common::CommonModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
-            .with_gas_limit(gas_limit)
+            .gas(gas_limit)
             .async_call()
-            .with_callback(self.callbacks().retrieve_funds_back_transfers_callback())
-            .with_extra_gas_for_callback(10_000_000)
+            .callback(self.callbacks().retrieve_funds_back_transfers_callback())
+            .gas_for_callback(10_000_000)
             .register_promise();
     }
 

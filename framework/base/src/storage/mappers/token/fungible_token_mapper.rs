@@ -184,7 +184,7 @@ where
                 EsdtTokenType::Fungible,
                 num_decimals,
             )
-            .with_callback(callback)
+            .callback(callback)
             .async_call_and_exit();
     }
 

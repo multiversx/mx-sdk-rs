@@ -1,6 +1,7 @@
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
+    proxy_imports::TxToSpecified,
     types::{
         Code, CodeMetadata, FromSource, ManagedAddress, ManagedBuffer, Tx, TxCodeValue,
         TxEmptyResultHandler, TxFromSourceValue, TxGas, TxPaymentEgldOnly, TxScEnv, UpgradeCall,
@@ -77,10 +78,11 @@ where
     }
 }
 
-impl<Api, Payment, Gas, RH>
-    Tx<TxScEnv<Api>, (), ManagedAddress<Api>, Payment, Gas, UpgradeCall<TxScEnv<Api>, ()>, RH>
+impl<Api, To, Payment, Gas, RH>
+    Tx<TxScEnv<Api>, (), To, Payment, Gas, UpgradeCall<TxScEnv<Api>, ()>, RH>
 where
     Api: CallTypeApi,
+    To: TxToSpecified<TxScEnv<Api>>,
     Payment: TxPaymentEgldOnly<TxScEnv<Api>>,
     Gas: TxGas<TxScEnv<Api>>,
     RH: TxEmptyResultHandler<TxScEnv<Api>>,
@@ -99,14 +101,16 @@ where
     pub fn upgrade_contract(self, code: &ManagedBuffer<Api>, code_metadata: CodeMetadata) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
         self.payment.with_egld_value(&self.env, |egld_value| {
-            SendRawWrapper::<Api>::new().upgrade_contract(
-                &self.to,
-                gas,
-                egld_value,
-                code,
-                code_metadata,
-                &self.data.arg_buffer,
-            );
+            self.to.with_value_ref(&self.env, |to| {
+                SendRawWrapper::<Api>::new().upgrade_contract(
+                    to,
+                    gas,
+                    egld_value,
+                    code,
+                    code_metadata,
+                    &self.data.arg_buffer,
+                );
+            });
         });
     }
 
@@ -128,14 +132,16 @@ where
     ) {
         let gas = self.gas.explicit_or_gas_left(&self.env);
         self.payment.with_egld_value(&self.env, |egld_value| {
-            SendRawWrapper::<Api>::new().upgrade_from_source_contract(
-                &self.to,
-                gas,
-                egld_value,
-                source_address,
-                code_metadata,
-                &self.data.arg_buffer,
-            );
+            self.to.with_value_ref(&self.env, |to| {
+                SendRawWrapper::<Api>::new().upgrade_from_source_contract(
+                    to,
+                    gas,
+                    egld_value,
+                    source_address,
+                    code_metadata,
+                    &self.data.arg_buffer,
+                );
+            });
         });
     }
 }

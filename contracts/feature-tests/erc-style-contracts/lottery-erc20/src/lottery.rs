@@ -214,7 +214,7 @@ pub trait Lottery {
             .to(&erc20_address)
             .typed(erc20_proxy::SimpleErc20TokenProxy)
             .transfer_from(caller.clone(), lottery_contract_address, token_amount)
-            .with_callback(
+            .callback(
                 self.callbacks()
                     .transfer_from_callback(lottery_name, &caller),
             )
@@ -285,7 +285,7 @@ pub trait Lottery {
             .to(&erc20_address)
             .typed(erc20_proxy::SimpleErc20TokenProxy)
             .transfer(winner_address, prize)
-            .with_callback(self.callbacks().distribute_prizes_callback(lottery_name))
+            .callback(self.callbacks().distribute_prizes_callback(lottery_name))
             .async_call_and_exit();
     }
 
