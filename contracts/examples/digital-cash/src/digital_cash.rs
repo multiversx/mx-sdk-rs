@@ -1,11 +1,11 @@
 #![no_std]
 #![allow(unused_attributes)]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 mod constants;
 mod deposit_info;
+pub mod digital_cash_proxy;
 mod helpers;
 mod pay_fee_and_fund;
 mod signature_operations;
@@ -55,15 +55,17 @@ pub trait DigitalCash:
                 continue;
             }
             if token == EgldOrEsdtTokenIdentifier::egld() {
-                self.send().direct_egld(&caller_address, &fee);
+                self.tx().to(&caller_address).egld(&fee).transfer();
             } else {
                 let collected_fee = EsdtTokenPayment::new(token.unwrap_esdt(), 0, fee);
                 collected_esdt_fees.push(collected_fee);
             }
         }
         if !collected_esdt_fees.is_empty() {
-            self.send()
-                .direct_multi(&caller_address, &collected_esdt_fees);
+            self.tx()
+                .to(&caller_address)
+                .payment(&collected_esdt_fees)
+                .transfer();
         }
     }
 

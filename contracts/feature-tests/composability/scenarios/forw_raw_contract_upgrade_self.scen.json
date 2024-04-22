@@ -6,11 +6,11 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:forwarder": {
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm",
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json",
                     "owner": "sc:forwarder"
                 },
-                "sc:vault": {
-                    "code": "file:../vault/output/vault.wasm"
+                "sc:reference": {
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
                 }
             }
         },
@@ -23,13 +23,16 @@
                 "function": "call_upgrade_from_source",
                 "arguments": [
                     "sc:forwarder",
-                    "sc:vault"
+                    "sc:reference",
+                    "0x0102"
                 ],
                 "gasLimit": "500,000,000",
                 "gasPrice": "0"
             },
             "expect": {
-                "out": []
+                "out": [
+                    "str:upgraded"
+                ]
             }
         },
         {
@@ -39,11 +42,12 @@
                     "nonce": "*"
                 },
                 "sc:forwarder": {
-                    "code": "file:../vault/output/vault.wasm",
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json",
+                    "codeMetadata": "0x0102",
                     "owner": "sc:forwarder"
                 },
-                "sc:vault": {
-                    "code": "file:../vault/output/vault.wasm"
+                "sc:reference": {
+                    "code": "mxsc:../vault/output/vault-upgrade.mxsc.json"
                 }
             }
         }

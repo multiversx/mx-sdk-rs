@@ -7,12 +7,12 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "sc:extra-instance": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -73,13 +73,13 @@
                     "storage": {
                         "str:whitelistMapper|nested:str:item": "true"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "sc:extra-instance": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -167,13 +167,13 @@
                         "str:whitelistMapper|nested:str:item": "true",
                         "str:whitelistMapper|nested:str:item2": "true"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "sc:extra-instance": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -213,13 +213,13 @@
                     "storage": {
                         "str:whitelistMapper|nested:str:item2": "true"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "sc:extra-instance": {
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",

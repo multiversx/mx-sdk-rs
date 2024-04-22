@@ -1,0 +1,13 @@
+[package]
+name = "exchange-features-meta"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies.exchange-features]
+path = ".."
+
+[dependencies.multiversx-sc-meta]
+version = "0.49.0-alpha.3"
+path = "../../../../framework/meta"
+default-features = false

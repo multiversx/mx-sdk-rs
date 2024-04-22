@@ -84,12 +84,14 @@ pub trait GovernanceModule:
         for fee_entry in fees_to_send.iter() {
             let payment = fee_entry.tokens.clone();
 
-            self.send().direct_esdt(
-                &fee_entry.depositor_addr,
-                &payment.token_identifier,
-                payment.token_nonce,
-                &payment.amount,
-            );
+            self.tx()
+                .to(&fee_entry.depositor_addr)
+                .single_esdt(
+                    &payment.token_identifier,
+                    payment.token_nonce,
+                    &payment.amount,
+                )
+                .transfer();
             self.user_claim_event(&caller, proposal_id, &fee_entry.tokens);
         }
     }
@@ -276,16 +278,12 @@ pub trait GovernanceModule:
         self.clear_proposal(proposal_id);
 
         for action in proposal.actions {
-            let mut contract_call = self
-                .send()
-                .contract_call::<()>(action.dest_address, action.function_name)
-                .with_gas_limit(action.gas_limit);
-
-            for arg in &action.arguments {
-                contract_call.push_raw_argument(arg);
-            }
-
-            contract_call.transfer_execute();
+            self.tx()
+                .to(&action.dest_address)
+                .raw_call(action.function_name)
+                .gas(action.gas_limit)
+                .arguments_raw(action.arguments.into())
+                .transfer_execute()
         }
 
         self.proposal_executed_event(proposal_id);
@@ -420,12 +418,14 @@ pub trait GovernanceModule:
 
         for fee_entry in payments.entries.iter() {
             let payment = fee_entry.tokens;
-            self.send().direct_esdt(
-                &fee_entry.depositor_addr,
-                &payment.token_identifier,
-                payment.token_nonce,
-                &payment.amount,
-            );
+            self.tx()
+                .to(&fee_entry.depositor_addr)
+                .single_esdt(
+                    &payment.token_identifier,
+                    payment.token_nonce,
+                    &payment.amount,
+                )
+                .transfer();
         }
     }
 

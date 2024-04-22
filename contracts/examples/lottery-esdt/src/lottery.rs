@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 mod lottery_info;
 mod status;
@@ -17,6 +17,7 @@ pub trait Lottery {
     #[init]
     fn init(&self) {}
 
+    #[allow_multiple_var_args]
     #[endpoint]
     fn start(
         &self,
@@ -43,6 +44,7 @@ pub trait Lottery {
         );
     }
 
+    #[allow_multiple_var_args]
     #[endpoint(createLotteryPool)]
     fn create_lottery_pool(
         &self,
@@ -69,6 +71,7 @@ pub trait Lottery {
         );
     }
 
+    #[allow_multiple_var_args]
     #[allow(clippy::too_many_arguments)]
     fn start_lottery(
         &self,
@@ -288,19 +291,19 @@ pub trait Lottery {
                 &BigUint::from(info.prize_distribution.get(i)),
             );
 
-            self.send()
-                .direct(&winner_address, &info.token_identifier, 0, &prize);
+            self.tx()
+                .to(&winner_address)
+                .egld_or_single_esdt(&info.token_identifier, 0, &prize)
+                .transfer();
             info.prize_pool -= prize;
         }
 
         // send leftover to first place
         let first_place_winner = ticket_holders_mapper.get(winning_tickets[0]);
-        self.send().direct(
-            &first_place_winner,
-            &info.token_identifier,
-            0,
-            &info.prize_pool,
-        );
+        self.tx()
+            .to(&first_place_winner)
+            .egld_or_single_esdt(&info.token_identifier, 0, &info.prize_pool)
+            .transfer();
     }
 
     fn clear_storage(&self, lottery_name: &ManagedBuffer) {

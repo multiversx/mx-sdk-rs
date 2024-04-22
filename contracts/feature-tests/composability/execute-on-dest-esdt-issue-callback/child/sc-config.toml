@@ -1,0 +1,2 @@
+[[proxy]]
+path = "../parent/src/child_proxy.rs"

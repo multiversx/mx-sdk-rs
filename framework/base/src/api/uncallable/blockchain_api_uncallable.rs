@@ -126,6 +126,14 @@ impl BlockchainApiImpl for UncallableApi {
         unreachable!()
     }
 
+    fn managed_get_back_transfers(
+        &self,
+        _esdt_transfer_value_handle: RawHandle,
+        _call_value_handle: RawHandle,
+    ) {
+        unreachable!()
+    }
+
     fn check_esdt_frozen(
         &self,
         _address_handle: Self::ManagedBufferHandle,
@@ -147,6 +155,21 @@ impl BlockchainApiImpl for UncallableApi {
         &self,
         _token_id_handle: Self::ManagedBufferHandle,
     ) -> crate::types::EsdtLocalRoleFlags {
+        unreachable!()
+    }
+
+    fn managed_get_code_metadata(
+        &self,
+        _address_handle: Self::ManagedBufferHandle,
+        _response_handle: Self::ManagedBufferHandle,
+    ) {
+        unreachable!()
+    }
+
+    fn managed_is_builtin_function(
+        &self,
+        _function_name_handle: Self::ManagedBufferHandle,
+    ) -> bool {
         unreachable!()
     }
 }

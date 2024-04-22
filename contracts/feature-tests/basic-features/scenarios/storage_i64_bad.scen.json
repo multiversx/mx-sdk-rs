@@ -11,7 +11,7 @@
                     "storage": {
                         "str:i64": "0x008000000000000000"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",

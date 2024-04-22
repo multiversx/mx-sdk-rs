@@ -109,8 +109,9 @@ impl<M: ManagedTypeApi> PartialEq<EgldOrEsdtTokenIdentifier<M>> for TokenIdentif
     #[inline]
     fn eq(&self, other: &EgldOrEsdtTokenIdentifier<M>) -> bool {
         other.map_ref_or_else(
-            || false,
-            |esdt_token_identifier| esdt_token_identifier == self,
+            (),
+            |()| false,
+            |(), esdt_token_identifier| esdt_token_identifier == self,
         )
     }
 }
@@ -170,6 +171,10 @@ impl<M> CodecFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
     fn type_name() -> TypeName {
         "TokenIdentifier".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "TokenIdentifier<$API>".into()
     }
 }
 

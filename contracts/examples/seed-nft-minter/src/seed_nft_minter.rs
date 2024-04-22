@@ -1,9 +1,9 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, imports::*};
 
 mod distribution_module;
+pub mod nft_marketplace_proxy;
 mod nft_module;
 
 use distribution_module::Distribution;
@@ -30,6 +30,7 @@ pub trait SeedNftMinter:
         self.init_distribution(distribution);
     }
 
+    #[allow_multiple_var_args]
     #[only_owner]
     #[endpoint(createNft)]
     fn create_nft(
@@ -86,10 +87,13 @@ pub trait SeedNftMinter:
         let claim_destination = self.blockchain().get_sc_address();
         let mut total_amount = BigUint::zero();
         for address in self.marketplaces().iter() {
-            let results: MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>> = self
-                .marketplace_proxy(address)
+            let results = self
+                .tx()
+                .to(&address)
+                .typed(nft_marketplace_proxy::NftMarketplaceProxy)
                 .claim_tokens(&claim_destination, token_id, token_nonce)
-                .execute_on_dest_context();
+                .returns(ReturnsResult)
+                .sync_call();
 
             let (egld_amount, esdt_payments) = results.into_tuple();
             let amount = if token_id.is_egld() {
@@ -113,25 +117,4 @@ pub trait SeedNftMinter:
     #[view(getNftCount)]
     #[storage_mapper("nftCount")]
     fn nft_count(&self) -> SingleValueMapper<u64>;
-
-    #[proxy]
-    fn marketplace_proxy(
-        &self,
-        sc_address: ManagedAddress,
-    ) -> nft_marketplace_proxy::Proxy<Self::Api>;
-}
-
-mod nft_marketplace_proxy {
-    multiversx_sc::imports!();
-
-    #[multiversx_sc::proxy]
-    pub trait NftMarketplace {
-        #[endpoint(claimTokens)]
-        fn claim_tokens(
-            &self,
-            claim_destination: &ManagedAddress,
-            token_id: &EgldOrEsdtTokenIdentifier,
-            token_nonce: u64,
-        ) -> MultiValue2<BigUint, ManagedVec<EsdtTokenPayment>>;
-    }
 }

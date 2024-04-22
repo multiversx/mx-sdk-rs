@@ -1,19 +1,7 @@
-use multiversx_sc::{
-    arrayvec::ArrayVec,
-    codec::{test_util::top_encode_to_vec_u8_or_panic, Empty},
-    contract_base::ContractBase,
-    storage::mappers::StorageTokenWrapper,
-    types::{Address, EsdtTokenPayment, ManagedVec},
-};
+use multiversx_sc_scenario::imports::*;
+
 use multiversx_sc_modules::token_merge::{
     merged_token_instances::MergedTokenInstances, merged_token_setup::MergedTokenSetupModule,
-};
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, SetStateStep, TxESDT,
-    },
-    ScenarioWorld, WhiteboxContract,
 };
 use use_module::token_merge_mod_impl::{CustomAttributes, TokenMergeModImpl};
 
@@ -21,7 +9,7 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const USER_ADDRESS_EXPR: &str = "address:user";
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
+const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
 
 const MERGED_TOKEN_ID_EXPR: &str = "str:MERGED-123456";
 const MERGED_TOKEN_ID: &[u8] = b"MERGED-123456";
@@ -136,7 +124,7 @@ fn test_token_merge() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .multi_esdt_transfer(nft_transfers.clone()),
+            .multi_esdt_transfer(nft_transfers),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -266,7 +254,7 @@ fn test_token_merge() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .multi_esdt_transfer(esdt_transfers.clone()),
+            .multi_esdt_transfer(esdt_transfers),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -331,7 +319,7 @@ fn test_token_merge() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .multi_esdt_transfer(combined_transfers.clone()),
+            .multi_esdt_transfer(combined_transfers),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -529,7 +517,7 @@ fn test_partial_split() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .multi_esdt_transfer(esdt_transfers.clone()),
+            .multi_esdt_transfer(esdt_transfers),
         |sc| {
             let merged_token = sc.merge_tokens_endpoint();
             assert_eq!(
@@ -747,7 +735,7 @@ fn test_custom_attributes() {
         &use_module_whitebox,
         ScCallStep::new()
             .from(USER_ADDRESS_EXPR)
-            .multi_esdt_transfer(nft_transfers.clone()),
+            .multi_esdt_transfer(nft_transfers),
         |sc| {
             let merged_token = sc.merge_tokens_custom_attributes_endpoint();
             assert_eq!(

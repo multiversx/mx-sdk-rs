@@ -1,29 +1,12 @@
-use std::{path::Path, process::Command};
+use std::process::Command;
 
 use colored::Colorize;
 
-pub fn print_all_count(num_contract_crates: usize) {
-    println!(
-        "\n{}",
-        format!("Found {num_contract_crates} contract crates.").truecolor(128, 128, 128),
-    );
-}
-
-pub fn print_all_index(contract_crates_index: usize, num_contract_crates: usize) {
-    println!(
-        "\n{}",
-        format!("({contract_crates_index}/{num_contract_crates})").truecolor(128, 128, 128),
-    );
-}
-
-pub fn print_all_command(meta_path: &Path, cargo_run_args: &[String]) {
-    println!(
-        "{} {}\n{} `cargo {}`",
-        "In".green(),
-        meta_path.display(),
-        "Calling".green(),
-        cargo_run_args.join(" "),
-    );
+/// Just for convenience, since we seem to be printing many things in green.
+///
+/// The argument is of type `String` because the argument is always a `format!` expression.
+pub fn println_green(s: String) {
+    println!("{}", s.green());
 }
 
 pub fn format_command(command: &Command) -> String {
@@ -65,18 +48,15 @@ pub fn print_copy_contract(source_wasm_path: &str, output_wasm_path: &str) {
 }
 
 pub fn print_call_wasm_opt(wasm_path: &str) {
-    println!("{}", format!("Calling wasm-opt on {wasm_path} ...").green(),);
+    println_green(format!("Calling wasm-opt on {wasm_path} ..."));
 }
 
 pub fn print_call_wasm2wat(wasm_path: &str, wat_path: &str) {
-    println!(
-        "{}",
-        format!("Extracting wat from {wasm_path} to {wat_path} ...").green(),
-    );
+    println_green(format!("Extracting wat from {wasm_path} to {wat_path} ..."));
 }
 
 pub fn print_pack_mxsc_file(output_mxsc_path: &str) {
-    println!("{}", format!("\nPacking {output_mxsc_path} ...").green(),);
+    println_green(format!("Packing {output_mxsc_path} ..."));
 }
 
 pub fn print_contract_size(size: usize) {
@@ -84,10 +64,7 @@ pub fn print_contract_size(size: usize) {
 }
 
 pub fn print_extract_imports(imports_path: &str) {
-    println!(
-        "{}",
-        format!("Extracting imports to {imports_path} ...").green(),
-    );
+    println_green(format!("Extracting imports to {imports_path} ..."));
 }
 
 pub fn print_check_ei(ei_version: &str) {
@@ -112,4 +89,10 @@ pub fn print_check_ei_ok() {
 
 pub fn print_ignore_ei_check() {
     println!("{}", "EI version check explicitly ignored".yellow(),);
+}
+
+pub fn print_workspace_target_dir(target_path_str: &str) {
+    println_green(format!(
+        "Using workspace target directory: {target_path_str} ..."
+    ));
 }

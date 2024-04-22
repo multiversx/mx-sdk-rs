@@ -1,16 +1,6 @@
 use std::time::Duration;
 
-#[allow(unused_imports)]
-use multiversx_sc_snippets::multiversx_sc::types::{
-    EsdtTokenPayment, MultiValueEncoded, TokenIdentifier,
-};
-use multiversx_sc_snippets::{
-    multiversx_sc::types::{ContractCall, ContractCallNoPayment},
-    multiversx_sc_scenario::{
-        mandos_system::ScenarioRunner, scenario_format::interpret_trait::InterpretableFrom,
-        standalone::retrieve_account_as_scenario_set_state,
-    },
-};
+use multiversx_sc_snippets::imports::*;
 
 use super::*;
 
@@ -33,7 +23,7 @@ impl MultisigInteract {
         let action_id = self.propose_wrap_egld().await;
 
         println!("perfoming wrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        self.perform_action(action_id, 15_000_000u64).await;
     }
 
     pub async fn unwrap_egld(&mut self) {
@@ -41,73 +31,61 @@ impl MultisigInteract {
         let action_id = self.propose_unwrap_egld().await;
 
         println!("perfoming unwrap egld action `{action_id}`...");
-        self.perform_action(action_id, "15,000,000").await;
+        self.perform_action(action_id, 15_000_000u64).await;
     }
 
     pub async fn wegld_swap_set_state(&mut self) {
-        let scenario_raw = retrieve_account_as_scenario_set_state(
-            Config::load_config().gateway().to_string(),
-            WEGLD_SWAP_SC_BECH32.to_string(),
-            true,
-        )
-        .await;
-
-        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-        self.interactor.pre_runners.run_scenario(&scenario);
-        self.interactor.post_runners.run_scenario(&scenario);
+        self.interactor
+            .retrieve_account(&Bech32Address::from_bech32_string(
+                WEGLD_SWAP_SC_BECH32.to_owned(),
+            ))
+            .await;
     }
 
     async fn propose_wrap_egld(&mut self) -> usize {
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        bech32::decode(WEGLD_SWAP_SC_BECH32),
-                        WRAP_AMOUNT,
-                        "wrapEgld".to_string(),
-                        MultiValueEncoded::new(),
-                    ))
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_multisig_address())
+            .gas(NumExpr("10,000,000"))
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(
+                bech32::decode(WEGLD_SWAP_SC_BECH32),
+                WRAP_AMOUNT,
+                FunctionCall::new("wrapEgld"),
             )
-            .await
-            .result
-            .unwrap();
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed wrap egld action `{action_id}`");
         action_id
     }
 
     async fn propose_unwrap_egld(&mut self) -> usize {
-        let contract_call = ContractCallNoPayment::<StaticApi, ()>::new(
-            bech32::decode(WEGLD_SWAP_SC_BECH32).into(),
-            "unwrapEgld",
-        )
-        .with_esdt_transfer(EsdtTokenPayment::new(
+        let to = ManagedAddress::<StaticApi>::from(bech32::decode(WEGLD_SWAP_SC_BECH32));
+        let payment = EsdtTokenPayment::new(
             TokenIdentifier::from(WEGLD_TOKEN_IDENTIFIER),
             0u64,
             UNWRAP_AMOUNT.into(),
-        ))
-        .into_normalized();
+        );
+        let function_call = FunctionCall::new("unwrapEgld");
 
         let action_id = self
             .interactor
-            .sc_call_get_result(
-                ScCallStep::new()
-                    .call(self.state.multisig().propose_async_call(
-                        contract_call.basic.to,
-                        0u64,
-                        contract_call.basic.endpoint_name,
-                        contract_call.basic.arg_buffer.into_multi_value_encoded(),
-                    ))
-                    .from(&self.wallet_address)
-                    .gas_limit("10,000,000"),
-            )
-            .await
-            .result
-            .unwrap();
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_multisig_address())
+            .gas(NumExpr("10,000,000"))
+            .typed(multisig_proxy::MultisigProxy)
+            .propose_async_call(to, 0u64, function_call)
+            .esdt(payment)
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
 
         println!("successfully proposed unwrap egld action `{action_id}`");
         action_id

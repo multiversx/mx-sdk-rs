@@ -1,15 +1,8 @@
-use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
 use multiversx_sc_modules::governance::{
     governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
     GovernanceModule,
 };
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 
 const GOV_TOKEN_ID_EXPR: &str = "str:GOV-123456";
 const GOV_TOKEN_ID: &[u8] = b"GOV-123456";
@@ -23,7 +16,7 @@ const INITIAL_GOV_TOKEN_BALANCE: u64 = 1_000;
 const GAS_LIMIT: u64 = 1_000_000;
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
+const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const FIRST_USER_ADDRESS_EXPR: &str = "address:first-user";

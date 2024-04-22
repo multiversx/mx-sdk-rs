@@ -14,12 +14,12 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.43.4"
+            "version": "0.49.0-alpha.3"
         }
     },
     "docs": [
         "Contract whose sole purpose is to verify that",
-        "the ABI generation framework works sa expected.",
+        "the ABI generation framework works as expected.",
         "",
         "Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,",
         "including Rust docs."
@@ -97,6 +97,40 @@
                     "indexed": true
                 }
             ]
+        }
+    ],
+    "esdtAttributes": [
+        {
+            "ticker": "TICKER1",
+            "type": "BigUint"
+        },
+        {
+            "ticker": "TICKER2",
+            "type": "bytes"
+        },
+        {
+            "ticker": "TICKER3",
+            "type": "u32"
+        },
+        {
+            "ticker": "STRUCT1",
+            "type": "AbiEnum"
+        },
+        {
+            "ticker": "STRUCT2",
+            "type": "AbiManagedType"
+        },
+        {
+            "ticker": "OnlyInEsdt",
+            "type": "OnlyShowsUpInEsdtAttr"
+        },
+        {
+            "ticker": "ExplicitDiscriminant",
+            "type": "ExplicitDiscriminant"
+        },
+        {
+            "ticker": "ExplicitDiscriminantMixed",
+            "type": "ExplicitDiscriminantMixed"
         }
     ],
     "hasCallback": false,
@@ -341,6 +375,78 @@
                 }
             ]
         },
+        "ExplicitDiscriminant": {
+            "type": "enum",
+            "docs": [
+                "An enum with similar explicit discriminants"
+            ],
+            "variants": [
+                {
+                    "name": "Zero",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Thirty",
+                    "discriminant": 30
+                },
+                {
+                    "name": "Twelve",
+                    "discriminant": 12
+                },
+                {
+                    "name": "Fifty",
+                    "discriminant": 50
+                },
+                {
+                    "name": "FiftyOne",
+                    "discriminant": 51
+                }
+            ]
+        },
+        "ExplicitDiscriminantMixed": {
+            "type": "enum",
+            "docs": [
+                "An enum with different explicit discriminants"
+            ],
+            "variants": [
+                {
+                    "name": "Zero",
+                    "discriminant": 0
+                },
+                {
+                    "name": "Unit",
+                    "discriminant": 3
+                },
+                {
+                    "name": "Tuple",
+                    "discriminant": 4,
+                    "fields": [
+                        {
+                            "name": "0",
+                            "type": "u16"
+                        }
+                    ]
+                },
+                {
+                    "name": "Five",
+                    "discriminant": 5
+                },
+                {
+                    "name": "Struct",
+                    "discriminant": 1,
+                    "fields": [
+                        {
+                            "name": "a",
+                            "type": "u8"
+                        },
+                        {
+                            "name": "b",
+                            "type": "u16"
+                        }
+                    ]
+                }
+            ]
+        },
         "OnlyShowsUpAsNested01": {
             "type": "struct",
             "docs": [
@@ -396,6 +502,12 @@
             ]
         },
         "OnlyShowsUpAsNested09": {
+            "type": "struct",
+            "docs": [
+                "Tests that the ABI generator also fetches types that only appear as fields."
+            ]
+        },
+        "OnlyShowsUpAsNested10": {
             "type": "struct",
             "docs": [
                 "Tests that the ABI generator also fetches types that only appear as fields."
@@ -464,6 +576,15 @@
                 {
                     "name": "something",
                     "type": "()"
+                }
+            ]
+        },
+        "OnlyShowsUpInEsdtAttr": {
+            "type": "struct",
+            "fields": [
+                {
+                    "name": "field",
+                    "type": "OnlyShowsUpAsNested10"
                 }
             ]
         }

@@ -1,0 +1,4 @@
+[settings]
+
+[[proxy]]
+path = "src/st_proxy.rs"

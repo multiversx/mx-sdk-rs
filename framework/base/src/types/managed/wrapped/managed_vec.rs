@@ -1,3 +1,4 @@
+use super::EncodedManagedVecItem;
 use crate::{
     abi::{TypeAbi, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
@@ -11,10 +12,15 @@ use crate::{
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
-use alloc::vec::Vec;
-use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
-
-use super::EncodedManagedVecItem;
+use alloc::{format, vec::Vec};
+use core::{
+    borrow::Borrow,
+    cmp::Ordering,
+    fmt::Debug,
+    iter::FromIterator,
+    marker::PhantomData,
+    mem::{transmute_copy, ManuallyDrop, MaybeUninit},
+};
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -147,12 +153,14 @@ where
             return None;
         }
 
-        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        let mut result_uninit =
+            unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
+
         for (index, value) in self.iter().enumerate() {
             result_uninit[index].write(value);
         }
 
-        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
         Some(result)
     }
 
@@ -227,6 +235,12 @@ where
 
         self.buffer = part_before.buffer;
         self.buffer.append(&part_after.buffer);
+    }
+
+    pub fn take(&mut self, index: usize) -> T {
+        let item = unsafe { self.get_unsafe(index) };
+        self.remove(index);
+        item
     }
 
     /// New `ManagedVec` instance with 1 element in it.
@@ -418,24 +432,29 @@ where
     }
 
     pub fn is_sorted(&self) -> bool {
-        self.with_self_as_slice(|slice| slice.is_sorted())
-    }
-
-    pub fn is_sorted_by<F>(&self, mut compare: F) -> bool
-    where
-        F: FnMut(&T, &T) -> Option<Ordering>,
-    {
         self.with_self_as_slice(|slice| {
-            slice.is_sorted_by(|a, b| compare(&a.decode(), &b.decode()))
-        })
-    }
+            let mut slice_iter = slice.iter();
+            #[inline]
+            fn check<'a, T>(
+                last: &'a mut T,
+                mut compare: impl FnMut(&T, &T) -> Option<Ordering> + 'a,
+            ) -> impl FnMut(T) -> bool + 'a {
+                move |curr| {
+                    if let Some(Ordering::Greater) | None = compare(last, &curr) {
+                        return false;
+                    }
+                    *last = curr;
+                    true
+                }
+            }
 
-    pub fn is_sorted_by_key<K, F>(&self, mut f: F) -> bool
-    where
-        F: FnMut(&T) -> K,
-        K: Ord,
-    {
-        self.with_self_as_slice(|slice| slice.is_sorted_by_key(|a| f(&a.decode())))
+            let mut last = match slice_iter.next() {
+                Some(e) => e,
+                None => return true,
+            };
+
+            slice_iter.all(check(&mut last, PartialOrd::partial_cmp))
+        })
     }
 }
 
@@ -449,7 +468,32 @@ where
         [(); T::PAYLOAD_SIZE]:,
     {
         self.with_self_as_slice_mut(|slice| {
-            let (dedup, _) = slice.partition_dedup();
+            let same_bucket = |a, b| a == b;
+            let len = slice.len();
+            if len <= 1 {
+                return slice;
+            }
+
+            let ptr = slice.as_mut_ptr();
+            let mut next_read: usize = 1;
+            let mut next_write: usize = 1;
+            unsafe {
+                // Avoid bounds checks by using raw pointers.
+                while next_read < len {
+                    let ptr_read = ptr.add(next_read);
+                    let prev_ptr_write = ptr.add(next_write - 1);
+                    if !same_bucket(&mut *ptr_read, &mut *prev_ptr_write) {
+                        if next_read != next_write {
+                            let ptr_write = prev_ptr_write.add(1);
+                            core::ptr::swap(ptr_read, ptr_write);
+                        }
+                        next_write += 1;
+                    }
+                    next_read += 1;
+                }
+            }
+
+            let (dedup, _) = slice.split_at_mut(next_write);
             dedup
         })
     }
@@ -642,6 +686,10 @@ where
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

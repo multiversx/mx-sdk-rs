@@ -125,6 +125,12 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         uris_handle: RawHandle,
     );
 
+    fn managed_get_back_transfers(
+        &self,
+        esdt_transfer_value_handle: RawHandle,
+        call_value_handle: RawHandle,
+    );
+
     fn check_esdt_frozen(
         &self,
         address_handle: Self::ManagedBufferHandle,
@@ -140,4 +146,12 @@ pub trait BlockchainApiImpl: ManagedTypeApiImpl {
         &self,
         token_id_handle: Self::ManagedBufferHandle,
     ) -> EsdtLocalRoleFlags;
+
+    fn managed_get_code_metadata(
+        &self,
+        address_handle: Self::ManagedBufferHandle,
+        response_handle: Self::ManagedBufferHandle,
+    );
+
+    fn managed_is_builtin_function(&self, function_name_handle: Self::ManagedBufferHandle) -> bool;
 }

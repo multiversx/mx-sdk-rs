@@ -1,24 +1,8 @@
 mod mock_seed_nft_minter;
 mod utils;
 
+use multiversx_sc_scenario::imports::*;
 use std::iter::zip;
-
-use multiversx_sc::{
-    codec::multi_types::MultiValue2,
-    storage::mappers::SingleValue,
-    types::{
-        Address, BigUint, EgldOrEsdtTokenIdentifier, ManagedVec, MultiValueEncoded,
-        OperationCompletionStatus, TokenIdentifier,
-    },
-};
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
-        SetStateStep, TxESDT, TypedResponse,
-    },
-    ContractInfo, DebugApi, ScenarioWorld, WhiteboxContract,
-};
 
 use crate::mock_seed_nft_minter::ProxyTrait as _;
 use rewards_distribution::{
@@ -31,9 +15,9 @@ const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
 const ALICE_ADDRESS_EXPR: &str = "address:alice";
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const REWARDS_DISTRIBUTION_ADDRESS_EXPR: &str = "sc:rewards-distribution";
-const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "file:output/rewards-distribution.wasm";
+const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "mxsc:output/rewards-distribution.mxsc.json";
 const SEED_NFT_MINTER_ADDRESS_EXPR: &str = "sc:seed-nft-minter";
-const SEED_NFT_MINTER_PATH_EXPR: &str = "file:../seed-nft-minter/output/seed-nft-minter.wasm";
+const SEED_NFT_MINTER_PATH_EXPR: &str = "mxsc:../seed-nft-minter/output/seed-nft-minter.mxsc.json";
 
 type RewardsDistributionContract = ContractInfo<rewards_distribution::Proxy<StaticApi>>;
 type SeedNFTMinterContract = ContractInfo<mock_seed_nft_minter::Proxy<StaticApi>>;
@@ -154,7 +138,7 @@ fn test_compute_brackets() {
             Account::new()
                 .nonce(1)
                 .owner(OWNER_ADDRESS_EXPR)
-                .code(rewards_distribution_code.clone())
+                .code(rewards_distribution_code)
                 .balance("0"),
         ),
     );
@@ -356,7 +340,7 @@ fn test_raffle_and_claim() {
     state.world.sc_call(
         ScCallStep::new()
             .from(ALICE_ADDRESS_EXPR)
-            .multi_esdt_transfer(nft_payments.clone())
+            .multi_esdt_transfer(nft_payments)
             .call(
                 state
                     .rewards_distribution_contract

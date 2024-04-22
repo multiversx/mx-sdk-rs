@@ -1,4 +1,4 @@
-use multiversx_sc::types::H256;
+use multiversx_sc::types::{ContractCallBase, H256};
 
 use crate::{
     api::StaticApi,
@@ -138,7 +138,7 @@ impl ScCallStep {
     /// - "arguments"
     pub fn call<CC>(mut self, contract_call: CC) -> TypedScCall<CC::OriginalResult>
     where
-        CC: ContractCall<StaticApi>,
+        CC: ContractCallBase<StaticApi>,
     {
         let (to_str, function, egld_value_expr, scenario_args) =
             process_contract_call(contract_call);
@@ -224,7 +224,7 @@ pub(super) fn process_contract_call<CC>(
     contract_call: CC,
 ) -> (String, String, BigUintValue, Vec<String>)
 where
-    CC: ContractCall<StaticApi>,
+    CC: ContractCallBase<StaticApi>,
 {
     let normalized_cc = contract_call.into_normalized();
     let to_str = format!(
@@ -234,13 +234,14 @@ where
     let function = String::from_utf8(
         normalized_cc
             .basic
-            .endpoint_name
+            .function_call
+            .function_name
             .to_boxed_bytes()
             .into_vec(),
     )
     .unwrap();
     let egld_value_expr = BigUintValue::from(normalized_cc.egld_payment);
-    let scenario_args = convert_call_args(&normalized_cc.basic.arg_buffer);
+    let scenario_args = convert_call_args(&normalized_cc.basic.function_call.arg_buffer);
     (to_str, function, egld_value_expr, scenario_args)
 }
 

@@ -73,9 +73,18 @@ where
         !self.is_none()
     }
 
+    /// Assumes that value is Some and unwraps without checking.
+    ///
+    /// # Safety
+    ///
+    /// Must always be called under an `if` checking `.is_some()`, otherwise will lead to undefined behaviour.
+    pub unsafe fn unwrap_no_check(self) -> T {
+        T::from_handle(self.handle)
+    }
+
     pub fn into_option(self) -> Option<T> {
         if self.is_some() {
-            Some(T::from_handle(self.handle))
+            Some(unsafe { self.unwrap_no_check() })
         } else {
             None
         }
@@ -91,7 +100,7 @@ where
 
     pub fn unwrap_or_else<F: Fn() -> T>(self, f: F) -> T {
         if self.is_some() {
-            T::from_handle(self.handle)
+            unsafe { self.unwrap_no_check() }
         } else {
             f()
         }
@@ -107,33 +116,33 @@ where
         F: FnOnce(T) -> U,
     {
         if self.is_some() {
-            ManagedOption::<M, U>::some(f(T::from_handle(self.handle)))
+            ManagedOption::<M, U>::some(f(unsafe { self.unwrap_no_check() }))
         } else {
             ManagedOption::<M, U>::none()
         }
     }
 
-    pub fn map_or_else<U, D, F>(self, default: D, f: F) -> U
+    pub fn map_or_else<Context, D, F, R>(self, context: Context, default: D, f: F) -> R
     where
-        D: FnOnce() -> U,
-        F: FnOnce(T) -> U,
+        D: FnOnce(Context) -> R,
+        F: FnOnce(Context, T) -> R,
     {
         if self.is_some() {
-            f(T::from_handle(self.handle))
+            f(context, unsafe { self.unwrap_no_check() })
         } else {
-            default()
+            default(context)
         }
     }
 
-    pub fn map_ref_or_else<U, D, F>(&self, default: D, f: F) -> U
+    pub fn map_ref_or_else<Context, D, F, R>(&self, context: Context, default: D, f: F) -> R
     where
-        D: FnOnce() -> U,
-        F: FnOnce(&T) -> U,
+        D: FnOnce(Context) -> R,
+        F: FnOnce(Context, &T) -> R,
     {
         if self.is_some() {
-            f(&T::from_handle(self.handle.clone()))
+            f(context, &T::from_handle(self.handle.clone()))
         } else {
-            default()
+            default(context)
         }
     }
 }
@@ -268,6 +277,10 @@ where
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         Option::<T>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        Option::<T>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

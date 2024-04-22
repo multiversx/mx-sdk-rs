@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.43.4"
+            "version": "0.49.0-alpha.3"
         }
     },
     "docs": [
@@ -1000,6 +1000,20 @@
                     "type": "EsdtTokenPayment"
                 }
             ]
+        }
+    ],
+    "esdtAttributes": [
+        {
+            "ticker": "INMODULE",
+            "type": "u32"
+        },
+        {
+            "ticker": "TICKER1",
+            "type": "BigUint"
+        },
+        {
+            "ticker": "TICKER2",
+            "type": "bytes"
         }
     ],
     "hasCallback": true,

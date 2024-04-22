@@ -5,7 +5,7 @@
             "accounts": {
                 "address:a_user": {},
                 "sc:use_module": {
-                    "code": "file:../output/use-module.wasm"
+                    "code": "mxsc:../output/use-module.mxsc.json"
                 }
             }
         },
@@ -39,7 +39,7 @@
                     "storage": {
                         "str:ongoing_operation:currentOngoingOperation": ""
                     },
-                    "code": "file:../output/use-module.wasm"
+                    "code": "mxsc:../output/use-module.mxsc.json"
                 },
                 "+": ""
             }
@@ -52,7 +52,7 @@
                 "to": "sc:use_module",
                 "function": "countTo100",
                 "arguments": [],
-                "gasLimit": "5,350,000",
+                "gasLimit": "4,500,000",
                 "gasPrice": "0"
             },
             "expect": {
@@ -74,7 +74,7 @@
                     "storage": {
                         "str:ongoing_operation:currentOngoingOperation": "1"
                     },
-                    "code": "file:../output/use-module.wasm"
+                    "code": "mxsc:../output/use-module.mxsc.json"
                 },
                 "+": ""
             }
@@ -109,7 +109,7 @@
                     "storage": {
                         "str:ongoing_operation:currentOngoingOperation": ""
                     },
-                    "code": "file:../output/use-module.wasm"
+                    "code": "mxsc:../output/use-module.mxsc.json"
                 },
                 "+": ""
             }

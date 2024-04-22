@@ -3,9 +3,6 @@ multiversx_sc::imports!();
 /// Test contract for investigating the new async call framework.
 #[multiversx_sc::module]
 pub trait CallPromisesDirectModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     #[payable("*")]
     fn promise_raw_single_token(
@@ -17,14 +14,15 @@ pub trait CallPromisesDirectModule {
         args: MultiValueEncoded<ManagedBuffer>,
     ) {
         let payment = self.call_value().egld_or_single_esdt();
-        self.send()
-            .contract_call::<()>(to, endpoint_name)
-            .with_egld_or_single_esdt_transfer(payment)
-            .with_raw_arguments(args.to_arg_buffer())
-            .with_gas_limit(gas_limit)
+        self.tx()
+            .to(&to)
+            .raw_call(endpoint_name)
+            .payment(payment)
+            .arguments_raw(args.to_arg_buffer())
+            .gas(gas_limit)
             .async_call_promise()
-            .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_callback(self.callbacks().the_one_callback(1001, 1002))
+            .callback(self.callbacks().the_one_callback(1001, 1002u32.into()))
+            .gas_for_callback(extra_gas_for_callback)
             .register_promise();
     }
 
@@ -43,13 +41,14 @@ pub trait CallPromisesDirectModule {
 
         let gas_limit = (self.blockchain().get_gas_left() - extra_gas_for_callback) * 9 / 10;
 
-        self.send()
-            .contract_call::<()>(to, endpoint_name)
-            .with_multi_token_transfer(token_payments_vec)
-            .with_gas_limit(gas_limit)
+        self.tx()
+            .to(&to)
+            .raw_call(endpoint_name)
+            .egld_or_multi_esdt(EgldOrMultiEsdtPayment::MultiEsdt(token_payments_vec))
+            .gas(gas_limit)
             .async_call_promise()
-            .with_extra_gas_for_callback(extra_gas_for_callback)
-            .with_callback(self.callbacks().the_one_callback(2001, 2002))
+            .callback(self.callbacks().the_one_callback(2001, 2002u32.into()))
+            .gas_for_callback(extra_gas_for_callback)
             .register_promise();
     }
 
@@ -58,7 +57,7 @@ pub trait CallPromisesDirectModule {
         &self,
         #[call_result] result: MultiValueEncoded<ManagedBuffer>,
         arg1: usize,
-        arg2: usize,
+        arg2: BigUint,
     ) {
         self.async_call_event_callback(arg1, arg2, &result.into_vec_of_buffers());
     }
@@ -67,7 +66,7 @@ pub trait CallPromisesDirectModule {
     fn async_call_event_callback(
         &self,
         #[indexed] arg1: usize,
-        #[indexed] arg2: usize,
+        #[indexed] arg2: BigUint,
         arguments: &ManagedVec<Self::Api, ManagedBuffer>,
     );
 }

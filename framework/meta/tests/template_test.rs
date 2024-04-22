@@ -1,13 +1,12 @@
+use std::{fs, process::Command};
+
+use convert_case::{Case, Casing};
 use multiversx_sc_meta::{
-    template::{
+    cmd::standalone::template::{
         template_names_from_repo, ContractCreator, ContractCreatorTarget, RepoSource, RepoVersion,
     },
-    version_history,
-};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    process::Command,
+    find_workspace::find_current_workspace,
+    version_history::{self, LAST_TEMPLATE_VERSION},
 };
 
 const TEMPLATE_TEMP_DIR_NAME: &str = "template-test";
@@ -15,7 +14,7 @@ const BUILD_CONTRACTS: bool = true;
 
 #[test]
 fn test_template_list() {
-    let workspace_path = find_workspace();
+    let workspace_path = find_current_workspace().unwrap();
     let repo_source = RepoSource::from_local_path(workspace_path);
     let mut template_names = template_names_from_repo(&repo_source);
     template_names.sort();
@@ -24,7 +23,8 @@ fn test_template_list() {
         [
             "adder".to_string(),
             "crypto-zombies".to_string(),
-            "empty".to_string()
+            "empty".to_string(),
+            "ping-pong-egld".to_string(),
         ]
     );
 }
@@ -33,6 +33,8 @@ fn test_template_list() {
 #[cfg_attr(not(feature = "template-test-current"), ignore)]
 fn template_current_adder() {
     template_test_current("adder", "examples", "new-adder");
+
+    cargo_check_interactor("examples", "new-adder");
 }
 
 #[test]
@@ -47,14 +49,31 @@ fn template_current_empty() {
     template_test_current("empty", "examples", "new-empty");
 }
 
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn template_current_ping_pong_egld() {
+    template_test_current("ping-pong-egld", "examples", "new-ping-pong-egld");
+}
+
+#[test]
+#[cfg_attr(not(feature = "template-test-current"), ignore)]
+fn test_correct_naming() {
+    assert_eq!(
+        "myNew42-correct_Empty".to_string().to_case(Case::Kebab),
+        "my-new-42-correct-empty"
+    );
+
+    template_test_current("empty", "examples", "my1New2_3-correct_Empty");
+}
+
 /// Recreates the folder structure in `contracts`, on the same level.
 /// This way, the relative paths are still valid in this case,
 /// and we can test the templates with the framework version of the current branch.
 fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
-    let workspace_path = find_workspace();
+    let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME).join(sub_path),
-        new_name: new_name.to_string(),
+        new_name: new_name.to_string().to_case(Case::Kebab),
     };
 
     let repo_source = RepoSource::from_local_path(workspace_path);
@@ -67,7 +86,7 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
         target.clone(),
         true,
     )
-    .create_contract();
+    .create_contract(LAST_TEMPLATE_VERSION);
 
     if BUILD_CONTRACTS {
         build_contract(&target);
@@ -75,22 +94,24 @@ fn template_test_current(template_name: &str, sub_path: &str, new_name: &str) {
     cargo_test(&target);
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_released_adder() {
-    template_test_released("adder", "released-adder").await;
+fn template_released_adder() {
+    template_test_released("adder", "released-adder");
+
+    cargo_check_interactor("", "released-adder");
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_released_crypto_zombies() {
-    template_test_released("crypto-zombies", "released-crypto-zombies").await;
+fn template_released_crypto_zombies() {
+    template_test_released("crypto-zombies", "released-crypto-zombies");
 }
 
-#[tokio::test]
+#[test]
 #[cfg_attr(not(feature = "template-test-released"), ignore)]
-async fn template_released_empty() {
-    template_test_released("empty", "released-empty").await;
+fn template_released_empty() {
+    template_test_released("empty", "released-empty");
 }
 
 /// These tests fully replicate the templating process. They
@@ -98,8 +119,8 @@ async fn template_released_empty() {
 /// - create proper contracts,
 /// - build the newly created contracts (to wasm)
 /// - run all tests (including Go scenarios) on them.
-async fn template_test_released(template_name: &str, new_name: &str) {
-    let workspace_path = find_workspace();
+fn template_test_released(template_name: &str, new_name: &str) {
+    let workspace_path = find_current_workspace().unwrap();
     let target = ContractCreatorTarget {
         target_path: workspace_path.join(TEMPLATE_TEMP_DIR_NAME),
         new_name: new_name.to_string(),
@@ -112,8 +133,7 @@ async fn template_test_released(template_name: &str, new_name: &str) {
     let repo_source = RepoSource::download_from_github(
         RepoVersion::Tag(version_history::LAST_TEMPLATE_VERSION.to_string()),
         temp_dir_path,
-    )
-    .await;
+    );
 
     prepare_target_dir(&target);
 
@@ -123,7 +143,7 @@ async fn template_test_released(template_name: &str, new_name: &str) {
         target.clone(),
         false,
     )
-    .create_contract();
+    .create_contract(LAST_TEMPLATE_VERSION);
 
     if BUILD_CONTRACTS {
         build_contract(&target);
@@ -141,7 +161,7 @@ fn prepare_target_dir(target: &ContractCreatorTarget) {
 }
 
 pub fn cargo_test(target: &ContractCreatorTarget) {
-    let workspace_target_dir = find_workspace().join("target");
+    let workspace_target_dir = find_current_workspace().unwrap().join("target");
 
     let mut args = vec![
         "test",
@@ -165,7 +185,7 @@ pub fn cargo_test(target: &ContractCreatorTarget) {
 }
 
 pub fn build_contract(target: &ContractCreatorTarget) {
-    let workspace_target_dir = find_workspace().join("target");
+    let workspace_target_dir = find_current_workspace().unwrap().join("target");
 
     let exit_status = Command::new("cargo")
         .args([
@@ -183,20 +203,21 @@ pub fn build_contract(target: &ContractCreatorTarget) {
     assert!(exit_status.success(), "contract build process failed");
 }
 
-/// Finds the workspace by taking the `current_exe` and working its way up.
-/// Works in debug mode too.
-///
-/// TODO: duplicated code from scenario_world. De-duplicate after dependencies are reorganized.
-pub fn find_workspace() -> PathBuf {
-    let current_exe = std::env::current_exe().unwrap();
-    let mut path = current_exe.as_path();
-    while !is_target(path) {
-        path = path.parent().unwrap();
-    }
+fn cargo_check_interactor(sub_path: &str, new_name: &str) {
+    let workspace_path = find_current_workspace().unwrap();
+    let target_path = workspace_path
+        .join(TEMPLATE_TEMP_DIR_NAME)
+        .join(sub_path)
+        .join(new_name)
+        .join("interact");
 
-    path.parent().unwrap().into()
-}
+    let exit_status = Command::new("cargo")
+        .arg("check")
+        .current_dir(target_path)
+        .spawn()
+        .expect("failed to spawn contract clean process")
+        .wait()
+        .expect("contract test process was not running");
 
-fn is_target(path_buf: &Path) -> bool {
-    path_buf.file_name().unwrap() == "target"
+    assert!(exit_status.success(), "contract test process failed");
 }

@@ -1,7 +1,0 @@
-[settings]
-main = "main"
-
-[contracts.main]
-name = "panic-message-features"
-add-unlabelled = true
-panic-message = true

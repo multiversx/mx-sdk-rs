@@ -3,6 +3,7 @@
 multiversx_sc::imports!();
 
 mod abi_enum;
+pub mod abi_proxy;
 mod abi_test_type;
 mod only_nested;
 
@@ -11,16 +12,30 @@ use abi_test_type::*;
 use only_nested::*;
 
 /// Contract whose sole purpose is to verify that
-/// the ABI generation framework works sa expected.
+/// the ABI generation framework works as expected.
 ///
 /// Note: any change in this contract must also be reflected in `abi_test_expected.abi.json`,
 /// including Rust docs.
 #[multiversx_sc::contract]
+#[esdt_attribute("TICKER1", BigUint)]
+#[esdt_attribute("TICKER2", ManagedBuffer)]
+#[esdt_attribute("TICKER3", u32)]
+#[esdt_attribute("STRUCT1", AbiEnum)]
+#[esdt_attribute("STRUCT2", AbiManagedType<Self::Api>)]
+#[esdt_attribute("OnlyInEsdt", OnlyShowsUpInEsdtAttr)]
+#[esdt_attribute["ExplicitDiscriminant", ExplicitDiscriminant]]
+#[esdt_attribute["ExplicitDiscriminantMixed", ExplicitDiscriminantMixed]]
 pub trait AbiTester {
     /// Contract constructor.
     #[init]
     #[payable("EGLD")]
     fn init(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {}
+
+    /// Upgrade constructor.
+    #[upgrade]
+    fn upgrade(&self, _constructor_arg_1: i32, _constructor_arg_2: OnlyShowsUpInConstructor) {
+        self.init(_constructor_arg_1, _constructor_arg_2)
+    }
 
     /// Example endpoint docs.
     #[endpoint]

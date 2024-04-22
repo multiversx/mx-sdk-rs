@@ -1,0 +1,16 @@
+[settings]
+main = "str-repeat"
+
+[contracts.str-repeat]
+allocator = "leaking"
+
+[contracts.str-repeat-mb-builder-basic]
+add-unlabelled = false
+add-labels = ["mb-builder"]
+add-endpoints = ["init"]
+
+[contracts.str-repeat-mb-builder-cached]
+add-unlabelled = false
+add-labels = ["mb-builder"]
+add-endpoints = ["init"]
+features = ["managed-buffer-builder-cached"]

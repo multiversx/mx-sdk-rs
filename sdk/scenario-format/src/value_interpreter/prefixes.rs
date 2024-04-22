@@ -3,6 +3,7 @@ pub(super) const STR_PREFIXES: &[&str] = &["str:", "``", "''"];
 pub(super) const ADDR_PREFIX: &str = "address:";
 pub(super) const SC_ADDR_PREFIX: &str = "sc:";
 pub(super) const FILE_PREFIX: &str = "file:";
+pub(super) const MXSC_PREFIX: &str = "mxsc:";
 pub(super) const KECCAK256_PREFIX: &str = "keccak256:";
 pub(super) const BECH32_PREFIX: &str = "bech32:";
 

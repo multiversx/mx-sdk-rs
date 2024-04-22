@@ -4,13 +4,14 @@ pub mod action;
 pub mod multisig_events;
 pub mod multisig_perform;
 pub mod multisig_propose;
+pub mod multisig_proxy;
 pub mod multisig_state;
 pub mod user_role;
 
 use action::ActionFullInfo;
 use user_role::UserRole;
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 /// Multi-signature smart contract implementation.
 /// Acts like a wallet that needs multiple signers for any action performed.
@@ -39,6 +40,11 @@ pub trait Multisig:
             "quorum cannot exceed board size"
         );
         self.quorum().set(quorum);
+    }
+
+    #[upgrade]
+    fn upgrade(&self, quorum: usize, board: MultiValueEncoded<ManagedAddress>) {
+        self.init(quorum, board)
     }
 
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol.

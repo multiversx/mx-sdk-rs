@@ -57,7 +57,7 @@
                             ]
                         }
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
         },
@@ -116,7 +116,7 @@
                         },
                         "str:burnPercentageForLottery|nested:str:lottery_name": "50"
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 },
                 "+": ""
             }
@@ -218,7 +218,7 @@
                         "str:ticketHolder|nested:str:lottery_name|str:.item|u32:2": "address:acc1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc1": "2"
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 },
                 "+": ""
             }
@@ -270,7 +270,7 @@
                         "str:lotteryInfo|nested:str:lottery_name": "",
                         "str:burnPercentageForLottery|nested:str:lottery_name": "0"
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 },
                 "+": ""
             }
