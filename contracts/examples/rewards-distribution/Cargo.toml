@@ -19,3 +19,6 @@ path = "../../../contracts/modules"
 [dev-dependencies.multiversx-sc-scenario]
 version = "0.49.0-alpha.3"
 path = "../../../framework/scenario"
+
+[dev-dependencies.seed-nft-minter]
+path = "../seed-nft-minter"

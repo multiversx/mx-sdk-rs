@@ -2654,6 +2654,7 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
  "multiversx-sc-scenario",
+ "seed-nft-minter",
 ]
 
 [[package]]
