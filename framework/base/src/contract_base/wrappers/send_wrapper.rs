@@ -5,6 +5,7 @@ use crate::codec::Empty;
 use crate::{
     api::{BlockchainApi, CallTypeApi, StorageReadApi},
     codec,
+    proxy_imports::ManagedRef,
     types::{
         system_proxy, BigUint, ContractCallNoPayment, ESDTSystemSCAddress,
         EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
@@ -48,7 +49,12 @@ where
     /// Backwards compatibility, synonymous to `esdt_system_sc_tx`, which is the more appropriate name now.
     pub fn esdt_system_sc_proxy(
         &self,
-    ) -> system_proxy::ESDTSystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
+    ) -> system_proxy::ESDTSystemSCProxyMethods<
+        TxScEnv<A>,
+        (),
+        ManagedRef<'static, A, ManagedAddress<A>>,
+        (),
+    > {
         self.esdt_system_sc_tx()
     }
 
@@ -56,7 +62,12 @@ where
     /// It has the destination address set, as well as the contract type (as specified in the proxy).
     pub fn esdt_system_sc_tx(
         &self,
-    ) -> system_proxy::ESDTSystemSCProxyMethods<TxScEnv<A>, (), ESDTSystemSCAddress, ()> {
+    ) -> system_proxy::ESDTSystemSCProxyMethods<
+        TxScEnv<A>,
+        (),
+        ManagedRef<'static, A, ManagedAddress<A>>,
+        (),
+    > {
         Tx::new_tx_from_sc()
             .to(ESDTSystemSCAddress)
             .typed(system_proxy::ESDTSystemSCProxy)

@@ -1,7 +1,7 @@
 use std::ops::{Deref, DerefMut};
 
 use multiversx_sc::types::{
-    AnnotatedValue, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified,
+    AnnotatedValue, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToInto, TxToSpecified,
 };
 
 use crate::multiversx_sc::{
@@ -148,4 +148,16 @@ where
     Env: TxEnv,
     P: ProxyObjNew,
 {
+}
+
+impl<P, Env> TxToInto<Env> for &ContractInfo<P>
+where
+    Env: TxEnv,
+    P: ProxyObjNew,
+{
+    type Into = Self;
+
+    fn into_recipient(self) -> Self::Into {
+        self
+    }
 }

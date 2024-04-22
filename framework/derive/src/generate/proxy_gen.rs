@@ -177,7 +177,7 @@ pub fn generate_proxy_endpoint(m: &Method, endpoint_name: String) -> proc_macro2
         #[allow(clippy::type_complexity)]
         #msig {
             multiversx_sc::types::TxBaseWithEnv::new_tx_from_sc()
-                .to(self.extract_proxy_to())
+                .override_to(self.extract_proxy_to())
                 .original_result()
                 .raw_call(#endpoint_name)
                 #payment_init
@@ -260,7 +260,7 @@ pub fn generate_proxy_deploy(init_method: &Method) -> proc_macro2::TokenStream {
                 #payment_init
                 #(#arg_push_snippets)*
                 .original_result()
-                .to(self.extract_proxy_to()) // still accepted, until we separate the upgrade constructor completely
+                .override_to(self.extract_proxy_to()) // still accepted, until we separate the upgrade constructor completely
         }
     };
 

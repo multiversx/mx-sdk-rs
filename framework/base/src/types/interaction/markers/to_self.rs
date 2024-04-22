@@ -1,36 +1,19 @@
 use crate::{
-    api::{const_handles, use_raw_handle, BlockchainApi, BlockchainApiImpl, CallTypeApi},
+    api::CallTypeApi,
     contract_base::BlockchainWrapper,
-    types::{
-        AnnotatedValue, ManagedAddress, ManagedBuffer, ManagedType, TxScEnv, TxTo, TxToSpecified,
-    },
+    types::{ManagedAddress, ManagedRef, TxScEnv, TxToInto},
 };
 
 /// Indicates that transaction should be sent to itself.
 pub struct ToSelf;
 
-impl<Api> AnnotatedValue<TxScEnv<Api>, ManagedAddress<Api>> for ToSelf
+impl<Api> TxToInto<TxScEnv<Api>> for ToSelf
 where
-    Api: CallTypeApi + BlockchainApi,
+    Api: CallTypeApi,
 {
-    fn annotation(&self, env: &TxScEnv<Api>) -> ManagedBuffer<Api> {
-        self.with_address_ref(env, |addr_ref| addr_ref.hex_expr())
-    }
+    type Into = ManagedRef<'static, Api, ManagedAddress<Api>>;
 
-    fn to_value(&self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {
-        BlockchainWrapper::<Api>::new().get_sc_address()
-    }
-
-    fn with_value_ref<F, R>(&self, _env: &TxScEnv<Api>, f: F) -> R
-    where
-        F: FnOnce(&ManagedAddress<Api>) -> R,
-    {
-        let sc_address_handle: Api::ManagedBufferHandle =
-            use_raw_handle(const_handles::ADDRESS_CALLER);
-        Api::blockchain_api_impl().load_sc_address_managed(sc_address_handle.clone());
-        f(&ManagedAddress::from_handle(sc_address_handle))
+    fn into_recipient(self) -> Self::Into {
+        BlockchainWrapper::<Api>::new().get_sc_address_ref()
     }
 }
-
-impl<Api> TxTo<TxScEnv<Api>> for ToSelf where Api: CallTypeApi + BlockchainApi {}
-impl<Api> TxToSpecified<TxScEnv<Api>> for ToSelf where Api: CallTypeApi + BlockchainApi {}

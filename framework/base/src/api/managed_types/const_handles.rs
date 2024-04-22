@@ -24,6 +24,7 @@ pub const MBUF_TEMPORARY_2: RawHandle = -26;
 
 pub const ADDRESS_CALLER: RawHandle = -30;
 pub const ADDRESS_SELF: RawHandle = -31;
+pub const ADDRESS_ESDT_SYSTEM: RawHandle = -32;
 
 pub const NEW_HANDLE_START_FROM: RawHandle = -100; // > -100 reserved for APIs
 

@@ -2,7 +2,8 @@ use hex_literal::hex;
 use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
-    api::{CallTypeApi, ManagedTypeApi},
+    api::{const_handles, use_raw_handle, CallTypeApi, ManagedBufferApiImpl, ManagedTypeApi},
+    proxy_imports::{ManagedRef, TxToInto},
     types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxScEnv, TxTo, TxToSpecified},
 };
 
@@ -49,6 +50,18 @@ where
 
 impl<Api> TxTo<TxScEnv<Api>> for ESDTSystemSCAddress where Api: CallTypeApi {}
 impl<Api> TxToSpecified<TxScEnv<Api>> for ESDTSystemSCAddress where Api: CallTypeApi {}
+impl<Api> TxToInto<TxScEnv<Api>> for ESDTSystemSCAddress
+where
+    Api: CallTypeApi,
+{
+    type Into = ManagedRef<'static, Api, ManagedAddress<Api>>;
+
+    fn into_recipient(self) -> Self::Into {
+        let handle: Api::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_ESDT_SYSTEM);
+        Api::managed_type_impl().mb_overwrite(handle.clone(), &SYSTEM_SC_ADDRESS_BYTES);
+        unsafe { ManagedRef::wrap_handle(handle) }
+    }
+}
 
 impl TopEncode for ESDTSystemSCAddress {
     fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
