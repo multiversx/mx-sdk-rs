@@ -44,26 +44,24 @@ impl PriceAggregatorTestState {
     fn new() -> Self {
         let mut world = world();
 
-        let mut set_state_step = SetStateStep::new()
-            .put_account(OWNER, Account::new().nonce(1))
-            .new_address(OWNER_ADDRESS_EXPR, 1, PRICE_AGGREGATOR_ADDRESS_EXPR)
-            .block_timestamp(100);
+        world.account(OWNER).nonce(1);
+        world.current_block().block_timestamp(100);
+
+        world.set_state_step(SetStateStep::new()).new_address(
+            OWNER_ADDRESS_EXPR,
+            1,
+            PRICE_AGGREGATOR_ADDRESS_EXPR,
+        );
 
         let mut oracles = Vec::new();
         for i in 1..=NR_ORACLES {
             let address_expr = format!("address:oracle{}", i);
             let address_value = AddressValue::from(address_expr.as_str());
 
-            set_state_step = set_state_step.put_account(
-                address_expr.as_str(),
-                Account::new().nonce(1).balance(STAKE_AMOUNT),
-            );
-
+            world.account(address_expr).nonce(1).balance(STAKE_AMOUNT);
             oracles.push(address_value);
         }
-        world.set_state_step(set_state_step);
 
-        // let price_aggregator_contract = PriceAggregatorContract::new(PRICE_AGGREGATOR_ADDRESS_EXPR);
         let price_aggregator_whitebox = WhiteboxContract::new(
             PRICE_AGGREGATOR_ADDRESS_EXPR,
             multiversx_price_aggregator_sc::contract_obj,
@@ -104,7 +102,7 @@ impl PriceAggregatorTestState {
         for address in self.oracles.iter() {
             self.world
                 .tx()
-                .from(&address.to_address())
+                .from(address)
                 .to(PRICE_AGGREGATOR)
                 .typed(price_aggregator_proxy::PriceAggregatorProxy)
                 .stake()
@@ -138,7 +136,7 @@ impl PriceAggregatorTestState {
     fn submit(&mut self, from: &AddressValue, submission_timestamp: u64, price: u64) {
         self.world
             .tx()
-            .from(&from.to_address())
+            .from(from)
             .to(PRICE_AGGREGATOR)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .submit(
@@ -160,7 +158,7 @@ impl PriceAggregatorTestState {
     ) {
         self.world
             .tx()
-            .from(&from.to_address())
+            .from(from)
             .to(PRICE_AGGREGATOR)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .submit(
@@ -178,7 +176,7 @@ impl PriceAggregatorTestState {
     fn vote_slash_member(&mut self, from: &AddressValue, member_to_slash: Address) {
         self.world
             .tx()
-            .from(&from.to_address())
+            .from(from)
             .to(PRICE_AGGREGATOR)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .vote_slash_member(member_to_slash)
@@ -283,7 +281,8 @@ fn test_price_aggregator_submit_round_ok() {
     let current_timestamp = 110;
     state
         .world
-        .set_state_step(SetStateStep::new().block_timestamp(current_timestamp));
+        .current_block()
+        .block_timestamp(current_timestamp);
 
     // submit second
     state.submit(&state.oracles[1].clone(), 101, 11_000);
@@ -340,7 +339,8 @@ fn test_price_aggregator_discarded_round() {
     let current_timestamp = 100 + MAX_ROUND_DURATION_SECONDS + 1;
     state
         .world
-        .set_state_step(SetStateStep::new().block_timestamp(current_timestamp));
+        .current_block()
+        .block_timestamp(current_timestamp);
 
     // submit second - this will discard the previous submission
     state.submit(&state.oracles[1].clone(), current_timestamp - 1, 11_000);
@@ -378,7 +378,7 @@ fn test_price_aggregator_slashing() {
     state
         .world
         .tx()
-        .from(&state.oracles[0].to_address())
+        .from(&state.oracles[0])
         .to(PRICE_AGGREGATOR)
         .typed(price_aggregator_proxy::PriceAggregatorProxy)
         .slash_member(state.oracles[1].to_address())

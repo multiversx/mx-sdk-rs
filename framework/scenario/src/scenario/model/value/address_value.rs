@@ -1,3 +1,7 @@
+use multiversx_sc::{
+    api::ManagedTypeApi,
+    types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified},
+};
 use std::fmt;
 
 use crate::multiversx_sc::types::{Address, AddressExpr, ScExpr};
@@ -151,3 +155,83 @@ impl From<ScExpr<'_>> for AddressValue {
         }
     }
 }
+
+impl<M> From<&AddressValue> for ManagedAddress<M>
+where
+    M: ManagedTypeApi,
+{
+    #[inline]
+    fn from(address_value: &AddressValue) -> Self {
+        ManagedAddress::from_address(&address_value.value)
+    }
+}
+
+impl<Env> TxFrom<Env> for AddressValue
+where
+    Env: TxEnv,
+{
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        self.into()
+    }
+}
+
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for AddressValue
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> multiversx_sc::types::ManagedBuffer<Env::Api> {
+        ManagedBuffer::from(self.original.to_string())
+    }
+
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from_address(&self.value)
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from_address(&self.value)
+    }
+
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
+    where
+        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
+    {
+        f(&ManagedAddress::from_address(&self.value))
+    }
+}
+
+impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &AddressValue
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> multiversx_sc::types::ManagedBuffer<Env::Api> {
+        ManagedBuffer::from(self.original.to_string())
+    }
+
+    fn to_value(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from_address(&self.value)
+    }
+
+    fn into_value(self, _env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from_address(&self.value)
+    }
+
+    fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
+    where
+        F: FnOnce(&ManagedAddress<Env::Api>) -> R,
+    {
+        f(&ManagedAddress::from_address(&self.value))
+    }
+}
+
+impl<Env> TxFromSpecified<Env> for AddressValue where Env: TxEnv {}
+
+impl<Env> TxFrom<Env> for &AddressValue
+where
+    Env: TxEnv,
+{
+    fn resolve_address(&self, _env: &Env) -> ManagedAddress<Env::Api> {
+        ManagedAddress::from_address(&self.value)
+    }
+}
+
+impl<Env> TxFromSpecified<Env> for &AddressValue where Env: TxEnv {}
