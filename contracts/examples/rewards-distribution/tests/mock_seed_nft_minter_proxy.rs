@@ -67,20 +67,4 @@ where
             .argument(&nft_count)
             .original_result()
     }
-
-    pub fn nft_count(
-        self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
-        self.wrapped_tx
-            .raw_call("getNftCount")
-            .original_result()
-    }
-
-    pub fn nft_token_id(
-        self,
-    ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
-        self.wrapped_tx
-            .raw_call("getNftTokenId")
-            .original_result()
-    }
 }
