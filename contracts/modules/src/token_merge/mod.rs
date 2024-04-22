@@ -74,9 +74,11 @@ pub trait TokenMergeModule:
 
         let merged_token_payment =
             self.create_merged_token(merged_token_id, &all_merged_instances, attr_creator);
-        let caller = self.blockchain().get_caller();
-        self.send()
-            .direct_non_zero_esdt_payment(&caller, &merged_token_payment);
+
+        self.tx()
+            .to(ToCaller)
+            .payment(&merged_token_payment)
+            .transfer_if_not_empty();
 
         merged_token_payment
     }

@@ -62,14 +62,8 @@ pub trait RustTestingFrameworkTester: dummy_module::DummyModule {
     #[payable("EGLD")]
     #[endpoint]
     fn recieve_egld_half(&self) {
-        let caller = self.blockchain().get_caller();
         let payment_amount = &*self.call_value().egld_value() / 2u32;
-        self.send().direct(
-            &caller,
-            &EgldOrEsdtTokenIdentifier::egld(),
-            0,
-            &payment_amount,
-        );
+        self.tx().to(ToCaller).egld(payment_amount).transfer();
     }
 
     #[payable("*")]

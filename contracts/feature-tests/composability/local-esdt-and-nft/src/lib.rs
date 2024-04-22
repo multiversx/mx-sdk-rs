@@ -138,8 +138,10 @@ pub trait LocalEsdtAndEsdtNft {
         nonce: u64,
         amount: BigUint,
     ) {
-        self.send()
-            .transfer_esdt_via_async_call(to, token_identifier, nonce, amount);
+        self.tx()
+            .to(to)
+            .esdt((token_identifier, nonce, amount))
+            .async_call_and_exit();
     }
 
     #[endpoint]
