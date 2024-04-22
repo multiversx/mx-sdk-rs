@@ -340,7 +340,7 @@ where
     }
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct PriceFeed<Api>
 where
     Api: ManagedTypeApi,
@@ -353,7 +353,7 @@ where
     pub decimals: u8,
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode)]
 pub struct NewRoundEvent<Api>
 where
     Api: ManagedTypeApi,
