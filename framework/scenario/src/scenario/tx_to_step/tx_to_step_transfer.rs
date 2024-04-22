@@ -40,8 +40,8 @@ where
     Gas: TxGas<Env>,
 {
     let mut step = TransferStep::new()
-        .from(address_annotated(env, from))
-        .to(address_annotated(env, to));
+        .from(address_annotated(env, &from))
+        .to(address_annotated(env, &to));
 
     step.tx.gas_limit = gas_annotated(env, gas);
 

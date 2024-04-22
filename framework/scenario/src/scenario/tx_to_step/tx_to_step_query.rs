@@ -30,7 +30,7 @@ where
     To: TxToSpecified<Env>,
 {
     let mut step = ScQueryStep::new()
-        .to(address_annotated(env, to))
+        .to(address_annotated(env, &to))
         .function(data.function_name.to_string().as_str());
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());

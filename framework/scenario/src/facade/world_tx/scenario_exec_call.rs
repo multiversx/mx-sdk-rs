@@ -2,14 +2,14 @@ use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
         FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        TxEnvMockDeployAddress, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
 };
 
 use crate::{
     api::StaticApi,
-    scenario::tx_to_step::TxToStep,
-    scenario_model::{TxExpect, TxResponse},
+    scenario::tx_to_step::{address_annotated, TxToStep},
+    scenario_model::{SetStateStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
@@ -36,6 +36,30 @@ impl<'w> TxEnv for ScenarioEnvExec<'w> {
 
     fn default_gas_value(&self) -> u64 {
         self.data.default_gas_value()
+    }
+}
+
+impl<'w> TxEnvMockDeployAddress for ScenarioEnvExec<'w> {
+    fn mock_deploy_new_address<From, NA>(&mut self, from: &From, new_address: NA)
+    where
+        From: TxFromSpecified<Self>,
+        NA: multiversx_sc::types::AnnotatedValue<Self, ManagedAddress<Self::Api>>,
+    {
+        let from_value = address_annotated(self, from);
+        let sender_nonce = self
+            .world
+            .get_state()
+            .accounts
+            .get(&from_value.to_vm_address())
+            .expect("sender does not exist")
+            .nonce;
+        let new_address_value = address_annotated(self, &new_address);
+
+        self.world.set_state_step(SetStateStep::new().new_address(
+            from_value,
+            sender_nonce,
+            new_address_value,
+        ));
     }
 }
 

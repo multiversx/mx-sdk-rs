@@ -3,14 +3,14 @@ use multiversx_sc::types::{AnnotatedValue, Code, ManagedAddress, TxCodeValue, Tx
 
 use crate::scenario_model::{AddressValue, BytesValue, U64Value};
 
-pub fn address_annotated<Env, Addr>(env: &Env, from: Addr) -> AddressValue
+pub fn address_annotated<Env, Addr>(env: &Env, from: &Addr) -> AddressValue
 where
     Env: TxEnv,
     Addr: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
 {
     let annotation = from.annotation(env).to_string();
     AddressValue {
-        value: from.into_value(env).to_address(),
+        value: from.to_value(env).to_address(),
         original: ValueSubTree::Str(annotation),
     }
 }

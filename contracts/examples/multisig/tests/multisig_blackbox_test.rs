@@ -50,18 +50,6 @@ impl MultisigTestState {
             .account(ADDER_OWNER_ADDRESS_EXPR)
             .nonce(1);
 
-        world.set_state_step(SetStateStep::new().new_address(
-            OWNER_ADDRESS_EXPR,
-            1,
-            SC_MULTISIG_EXPR,
-        ));
-
-        world.set_state_step(SetStateStep::new().new_address(
-            ADDER_OWNER_ADDRESS_EXPR,
-            1,
-            SC_ADDER_EXPR,
-        ));
-
         Self { world }
     }
 
@@ -74,6 +62,7 @@ impl MultisigTestState {
             .typed(multisig_proxy::MultisigProxy)
             .init(QUORUM_SIZE, board_members)
             .code(MULTISIG_CODE_EXPR)
+            .new_address(SC_MULTISIG_EXPR)
             .run();
 
         let action_id: usize = self
@@ -101,6 +90,7 @@ impl MultisigTestState {
             .typed(adder_proxy::AdderProxy)
             .init(5u64)
             .code(ADDER_CODE_EXPR)
+            .new_address(SC_ADDER_EXPR)
             .run();
     }
 
@@ -555,11 +545,10 @@ fn test_deploy_and_upgrade_from_source() {
     state.deploy_multisig_contract().deploy_adder_contract();
 
     let new_adder_address_expr: ScExpr = ScExpr("new-adder");
-    state.world.set_state_step(SetStateStep::new().new_address(
-        SC_MULTISIG_EXPR,
-        0,
-        new_adder_address_expr,
-    ));
+
+    state
+        .world
+        .new_address(SC_MULTISIG_EXPR, 0, new_adder_address_expr);
 
     let action_id = state.propose_sc_deploy_from_source(
         0u64,

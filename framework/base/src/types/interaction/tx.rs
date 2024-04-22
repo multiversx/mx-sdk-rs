@@ -12,12 +12,13 @@ use crate::{
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_deploy::UNSPECIFIED_GAS_LIMIT, Code, ContractCallBase, ContractCallNoPayment,
-    ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource,
-    FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
-    RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall,
-    TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
+    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
+    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
+    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
+    TxDataFunctionCall, TxEgldValue, TxEnv, TxEnvMockDeployAddress, TxFrom, TxFromSourceValue,
+    TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
+    TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -823,6 +824,29 @@ where
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+where
+    Env: TxEnvMockDeployAddress,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    CodeSource: TxCodeSource<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the new mock address to be used for the newly deployed contract.
+    ///
+    /// Only allowed in tests.
+    pub fn new_address<NA>(mut self, new_address: NA) -> Self
+    where
+        NA: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+    {
+        self.env.mock_deploy_new_address(&self.from, new_address);
         self
     }
 }
