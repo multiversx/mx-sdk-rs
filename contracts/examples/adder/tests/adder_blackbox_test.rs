@@ -24,7 +24,7 @@ fn adder_blackbox() {
 
     world.account(OWNER).nonce(1);
 
-    world.set_state_step(SetStateStep::new().new_address(OWNER, 1, SC_ADDER));
+    world.new_address(OWNER, 1, SC_ADDER);
 
     let new_address = world
         .tx()
