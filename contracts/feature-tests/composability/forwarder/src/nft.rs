@@ -238,15 +238,14 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let _ = self.send_raw().transfer_esdt_nft_execute(
-            &to,
-            &token_identifier,
-            nonce,
-            &amount,
-            self.blockchain().get_gas_left(),
-            &function,
-            &arguments.to_arg_buffer(),
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        self.tx()
+            .to(&to)
+            .gas(gas_left)
+            .raw_call(function)
+            .arguments_raw(arguments.to_arg_buffer())
+            .single_esdt(&token_identifier, nonce, &amount)
+            .transfer_execute();
     }
 
     #[endpoint]

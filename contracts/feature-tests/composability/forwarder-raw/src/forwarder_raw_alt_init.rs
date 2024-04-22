@@ -54,13 +54,16 @@ pub trait ForwarderRawAlterativeInit: super::forwarder_raw_common::ForwarderRawC
     ) {
         let payment = self.call_value().egld_value();
         let half_gas = self.blockchain().get_gas_left() / 2;
-        let result = self.send_raw().execute_on_dest_context_raw(
-            half_gas,
-            &to,
-            &payment,
-            &endpoint_name,
-            &args.to_arg_buffer(),
-        );
+
+        let result = self
+            .tx()
+            .to(&to)
+            .gas(half_gas)
+            .egld(payment)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .returns(ReturnsRawResult)
+            .sync_call();
 
         self.execute_on_dest_context_result(result);
     }

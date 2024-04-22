@@ -48,8 +48,11 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
         self.nonce_amount(&offered_token, nonce)
             .update(|val| *val += sell_amount);
 
-        self.send()
-            .direct(&caller, &payment_token, 0u64, &calculated_price);
+        self.tx()
+            .to(&caller)
+            .egld_or_single_esdt(&payment_token, 0u64, &calculated_price)
+            .transfer();
+
         self.token_details(&offered_token)
             .update(|details| details.add_nonce(nonce));
 
@@ -116,12 +119,10 @@ pub trait UserEndpointsModule: storage::StorageModule + events::EventsModule {
             },
         };
 
-        self.send().direct(
-            &caller,
-            &offered_token,
-            0u64,
-            &(&payment - &calculated_price),
-        );
+        self.tx()
+            .to(&caller)
+            .egld_or_single_esdt(&offered_token, 0u64, &(&payment - &calculated_price))
+            .transfer();
 
         self.buy_token_event(&caller, &calculated_price);
     }

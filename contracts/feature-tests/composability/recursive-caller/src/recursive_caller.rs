@@ -26,14 +26,13 @@ pub trait RecursiveCaller {
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
             .egld_or_single_esdt(token_identifier, 0, amount)
-            .async_call()
-            .with_callback(self.callbacks().recursive_send_funds_callback(
+            .callback(self.callbacks().recursive_send_funds_callback(
                 to,
                 token_identifier,
                 amount,
                 counter,
             ))
-            .call_and_exit();
+            .async_call_and_exit();
     }
 
     #[callback]

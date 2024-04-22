@@ -107,16 +107,12 @@ pub trait Vault {
         let caller = self.blockchain().get_caller();
         let func_name = opt_receive_func.into_option().unwrap_or_default();
 
-        self.send_raw()
-            .transfer_esdt_execute(
-                &caller,
-                &token,
-                &amount,
-                50_000_000,
-                &func_name,
-                &ManagedArgBuffer::new(),
-            )
-            .unwrap_or_else(|_| sc_panic!("ESDT transfer failed"));
+        self.tx()
+            .to(&caller)
+            .gas(50_000_000u64)
+            .raw_call(func_name)
+            .single_esdt(&token, 0u64, &amount)
+            .transfer_execute();
     }
 
     #[allow_multiple_var_args]

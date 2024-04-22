@@ -22,9 +22,8 @@ pub trait ForwarderAsyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args)
-            .async_call()
-            .with_callback(self.callbacks().echo_args_callback())
-            .call_and_exit();
+            .callback(self.callbacks().echo_args_callback())
+            .async_call_and_exit();
     }
 
     #[callback]
@@ -61,7 +60,7 @@ pub trait ForwarderAsyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .async_call()
             .call_and_exit()
     }
@@ -75,11 +74,11 @@ pub trait ForwarderAsyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((
-                payment.token_identifier,
+            .egld_or_single_esdt(
+                &payment.token_identifier,
                 payment.token_nonce,
-                half_payment,
-            ))
+                &half_payment,
+            )
             .async_call()
             .call_and_exit()
     }
@@ -95,13 +94,12 @@ pub trait ForwarderAsyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((
-                payment.token_identifier,
+            .egld_or_single_esdt(
+                &payment.token_identifier,
                 payment.token_nonce,
-                amount_to_send,
-            ))
-            .async_call()
-            .call_and_exit()
+                &amount_to_send,
+            )
+            .async_call_and_exit();
     }
 
     #[endpoint]
@@ -117,7 +115,7 @@ pub trait ForwarderAsyncCallModule {
             .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .async_call()
-            .with_callback(self.callbacks().retrieve_funds_callback())
+            .callback(self.callbacks().retrieve_funds_callback())
             .call_and_exit()
     }
 
@@ -154,13 +152,12 @@ pub trait ForwarderAsyncCallModule {
             .to(to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_identifier.clone(), 0u64, amount.clone()))
-            .async_call()
-            .with_callback(
+            .egld_or_single_esdt(token_identifier, 0u64, amount)
+            .callback(
                 self.callbacks()
                     .send_funds_twice_callback(to, token_identifier, amount),
             )
-            .call_and_exit();
+            .async_call_and_exit();
     }
 
     #[callback]
@@ -174,9 +171,8 @@ pub trait ForwarderAsyncCallModule {
             .to(to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_identifier.clone(), 0u64, cb_amount.clone()))
-            .async_call()
-            .call_and_exit();
+            .egld_or_single_esdt(token_identifier, 0u64, cb_amount)
+            .async_call_and_exit();
     }
 
     #[endpoint]

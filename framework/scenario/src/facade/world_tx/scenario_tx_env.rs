@@ -1,12 +1,8 @@
 use std::path::PathBuf;
 
-use multiversx_sc::types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxBaseWithEnv, TxEnv};
+use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv};
 
-use crate::{
-    api::StaticApi,
-    scenario_model::{TxExpect, TxResponse},
-    ScenarioWorld,
-};
+use crate::{api::StaticApi, scenario_model::TxExpect, ScenarioWorld};
 
 /// Designates a tx environment suitable for running scenarios locally.
 pub trait ScenarioTxEnv: TxEnv {

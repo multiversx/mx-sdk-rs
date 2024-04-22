@@ -202,7 +202,7 @@ where
                 num_decimals,
             )
             .async_call()
-            .with_callback(callback)
+            .callback(callback)
             .call_and_exit()
     }
 
