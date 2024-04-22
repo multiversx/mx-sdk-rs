@@ -23,7 +23,7 @@ pub trait Parent {
             .tx()
             .raw_deploy()
             .code(code)
-            .with_gas_limit(gas_left)
+            .gas(gas_left)
             .returns(ReturnsNewManagedAddress)
             .sync_call();
 
@@ -46,7 +46,7 @@ pub trait Parent {
             .typed(child_proxy::ChildProxy)
             .issue_wrapped_egld(token_display_name, token_ticker, initial_supply)
             .egld(issue_cost)
-            .with_gas_limit(ISSUE_EXPECTED_GAS_COST)
+            .gas(ISSUE_EXPECTED_GAS_COST)
             .sync_call();
     }
 

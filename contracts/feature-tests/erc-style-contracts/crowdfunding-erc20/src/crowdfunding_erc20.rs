@@ -36,7 +36,7 @@ pub trait Crowdfunding {
             .to(&erc20_address)
             .typed(erc20_proxy::SimpleErc20TokenProxy)
             .transfer_from(caller.clone(), cf_contract_address, token_amount.clone())
-            .with_callback(
+            .callback(
                 self.callbacks()
                     .transfer_from_callback(caller, token_amount),
             )

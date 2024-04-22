@@ -1,53 +1,86 @@
-use std::collections::btree_map::Entry;
+mod scenario_set_account;
+mod scenario_set_block;
+mod scenario_set_new_address;
 
 use crate::{
     scenario::ScenarioRunner,
-    scenario_model::{
-        Account, AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject,
-        SetStateStep, U64Value,
-    },
+    scenario_model::{AddressKey, AddressValue, NewAddress, SetStateStep, U64Value},
     ScenarioWorld,
 };
 
+use scenario_set_account::AccountItem;
+use scenario_set_block::BlockItem;
+use scenario_set_new_address::NewAddressItem;
+
 impl ScenarioWorld {
-    pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_>
+    fn empty_builder(&mut self) -> SetStateBuilder<'_, ()> {
+        SetStateBuilder {
+            base: Some(SetStateBuilderBase::new(self)),
+            item: (),
+        }
+    }
+
+    pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_, AccountItem>
     where
         AddressKey: From<A>,
     {
-        SetStateBuilder::new(self, address_expr.into())
+        self.empty_builder().account(address_expr)
+    }
+
+    pub fn new_address<CA, CN, NA>(
+        &mut self,
+        creator_address_expr: CA,
+        creator_nonce_expr: CN,
+        new_address_expr: NA,
+    ) -> SetStateBuilder<'_, NewAddressItem>
+    where
+        AddressValue: From<CA>,
+        U64Value: From<CN>,
+        AddressValue: From<NA>,
+    {
+        self.empty_builder()
+            .new_address(creator_address_expr, creator_nonce_expr, new_address_expr)
+    }
+
+    pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
+        self.empty_builder().current_block()
+    }
+
+    pub fn previous_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
+        self.empty_builder().previous_block()
     }
 }
 
-pub struct SetStateBuilder<'w> {
+pub trait SetStateBuilderItem {
+    fn commit_to_step(&mut self, step: &mut SetStateStep);
+}
+
+impl SetStateBuilderItem for () {
+    fn commit_to_step(&mut self, _step: &mut SetStateStep) {}
+}
+
+struct SetStateBuilderBase<'w> {
     world: &'w mut ScenarioWorld,
     set_state_step: SetStateStep,
-    current_account: Account,
-    current_address: AddressKey,
 }
 
-impl<'w> SetStateBuilder<'w> {
-    pub(crate) fn new(world: &'w mut ScenarioWorld, address: AddressKey) -> SetStateBuilder<'w> {
-        let mut builder = SetStateBuilder {
+pub struct SetStateBuilder<'w, Current>
+where
+    Current: SetStateBuilderItem,
+{
+    base: Option<SetStateBuilderBase<'w>>,
+    item: Current,
+}
+
+impl<'w> SetStateBuilderBase<'w> {
+    fn new(world: &'w mut ScenarioWorld) -> Self {
+        SetStateBuilderBase {
             world,
             set_state_step: SetStateStep::new(),
-            current_address: AddressKey::default(),
-            current_account: Account::new(),
-        };
-        builder.reset_account(address);
-        builder
+        }
     }
 
-    fn add_current_acount(&mut self) {
-        if let Entry::Vacant(entry) = self
-            .set_state_step
-            .accounts
-            .entry(core::mem::take(&mut self.current_address))
-        {
-            entry.insert(core::mem::take(&mut self.current_account));
-        };
-    }
-
-    fn reset_account(&mut self, address: AddressKey) {
+    fn start_account(&self, address: AddressKey) -> AccountItem {
         assert!(
             !self
                 .world
@@ -59,181 +92,85 @@ impl<'w> SetStateBuilder<'w> {
             "updating existing accounts currently not supported"
         );
 
-        self.current_address = address;
-        self.current_account = Account::default();
+        AccountItem::new(address)
     }
+}
 
+impl<'w> SetStateBuilder<'w, ()> {}
+
+impl<'w, Item> SetStateBuilder<'w, Item>
+where
+    Item: SetStateBuilderItem,
+{
     /// Starts building of a new account.
-    pub fn account<A>(mut self, address_expr: A) -> Self
+    pub fn account<A>(mut self, address_expr: A) -> SetStateBuilder<'w, AccountItem>
     where
         AddressKey: From<A>,
     {
-        self.add_current_acount();
-        self.reset_account(address_expr.into());
-        self
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        let item = base.start_account(address_expr.into());
+        SetStateBuilder {
+            base: Some(base),
+            item,
+        }
     }
 
-    /// Finished and sets all account in the blockchain mock.
-    fn commit_accounts(&mut self) {
-        self.add_current_acount();
-        self.world.run_set_state_step(&self.set_state_step);
+    pub fn new_address<CA, CN, NA>(
+        mut self,
+        creator_address_expr: CA,
+        creator_nonce_expr: CN,
+        new_address_expr: NA,
+    ) -> SetStateBuilder<'w, NewAddressItem>
+    where
+        AddressValue: From<CA>,
+        U64Value: From<CN>,
+        AddressValue: From<NA>,
+    {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: NewAddressItem {
+                new_address: NewAddress {
+                    creator_address: AddressValue::from(creator_address_expr),
+                    creator_nonce: U64Value::from(creator_nonce_expr),
+                    new_address: AddressValue::from(new_address_expr),
+                },
+            },
+        }
+    }
+
+    pub fn current_block(&mut self) -> SetStateBuilder<'w, BlockItem> {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: BlockItem::new_current(),
+        }
+    }
+
+    pub fn previous_block(&mut self) -> SetStateBuilder<'w, BlockItem> {
+        let mut base = core::mem::take(&mut self.base).unwrap();
+        self.item.commit_to_step(&mut base.set_state_step);
+        SetStateBuilder {
+            base: Some(base),
+            item: BlockItem::new_prev(),
+        }
     }
 
     /// Forces value drop and commit accounts.
     pub fn commit(self) {}
-
-    pub fn nonce<V>(mut self, nonce: V) -> Self
-    where
-        U64Value: From<V>,
-    {
-        self.current_account.nonce = Some(U64Value::from(nonce));
-        self
-    }
-
-    pub fn balance<V>(mut self, balance_expr: V) -> Self
-    where
-        BigUintValue: From<V>,
-    {
-        self.current_account.balance = Some(BigUintValue::from(balance_expr));
-        self
-    }
-
-    pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
-    where
-        BytesKey: From<K>,
-        BigUintValue: From<V>,
-    {
-        let token_id = BytesKey::from(token_id_expr);
-        let esdt_data_ref = self.get_esdt_data_or_create(&token_id);
-        esdt_data_ref.set_balance(0u64, balance_expr);
-
-        self
-    }
-
-    pub fn esdt_nft_balance<K, N, V, T>(
-        mut self,
-        token_id_expr: K,
-        nonce_expr: N,
-        balance_expr: V,
-        opt_attributes_expr: Option<T>,
-    ) -> Self
-    where
-        N: Clone,
-        BytesKey: From<K>,
-        U64Value: From<N>,
-        BigUintValue: From<V>,
-        BytesValue: From<T>,
-    {
-        let token_id = BytesKey::from(token_id_expr);
-
-        let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
-            .get_mut_esdt_object();
-        esdt_obj_ref.set_balance(nonce_expr.clone(), balance_expr);
-
-        if let Some(attributes_expr) = opt_attributes_expr {
-            esdt_obj_ref.set_token_attributes(nonce_expr, attributes_expr);
-        }
-
-        self
-    }
-
-    #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_all_properties<K, N, V, T>(
-        mut self,
-        token_id_expr: K,
-        nonce_expr: N,
-        balance_expr: V,
-        opt_attributes_expr: Option<T>,
-        royalties_expr: N,
-        creator_expr: Option<T>,
-        hash_expr: Option<T>,
-        uris_expr: Vec<T>,
-    ) -> Self
-    where
-        BytesKey: From<K>,
-        U64Value: From<N>,
-        BigUintValue: From<V>,
-        BytesValue: From<T>,
-    {
-        let token_id = BytesKey::from(token_id_expr);
-
-        let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
-            .get_mut_esdt_object();
-
-        esdt_obj_ref.set_token_all_properties(
-            nonce_expr,
-            balance_expr,
-            opt_attributes_expr,
-            royalties_expr,
-            creator_expr,
-            hash_expr,
-            uris_expr,
-        );
-
-        self
-    }
-
-    pub fn esdt_nft_last_nonce<K, N>(mut self, token_id_expr: K, last_nonce_expr: N) -> Self
-    where
-        BytesKey: From<K>,
-        U64Value: From<N>,
-    {
-        let token_id = BytesKey::from(token_id_expr);
-
-        let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
-            .get_mut_esdt_object();
-        esdt_obj_ref.set_last_nonce(last_nonce_expr);
-
-        self
-    }
-
-    // TODO: Find a better way to pass roles
-    pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
-    where
-        BytesKey: From<K>,
-    {
-        let token_id = BytesKey::from(token_id_expr);
-
-        let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
-            .get_mut_esdt_object();
-        esdt_obj_ref.set_roles(roles);
-
-        self
-    }
-
-    fn get_esdt_data_or_create(&mut self, token_id: &BytesKey) -> &mut Esdt {
-        if !self.current_account.esdt.contains_key(token_id) {
-            self.current_account
-                .esdt
-                .insert(token_id.clone(), Esdt::Full(EsdtObject::default()));
-        }
-
-        self.current_account.esdt.get_mut(token_id).unwrap()
-    }
-
-    pub fn code<V>(mut self, code_expr: V) -> Self
-    where
-        BytesValue: From<V>,
-    {
-        self.current_account.code = Some(BytesValue::from(code_expr));
-        self
-    }
-
-    pub fn owner<V>(mut self, owner_expr: V) -> Self
-    where
-        AddressValue: From<V>,
-    {
-        self.current_account.owner = Some(AddressValue::from(owner_expr));
-        self
-    }
 }
 
-impl<'w> Drop for SetStateBuilder<'w> {
+impl<'w, Current> Drop for SetStateBuilder<'w, Current>
+where
+    Current: SetStateBuilderItem,
+{
     fn drop(&mut self) {
-        self.commit_accounts();
+        if let Some(base) = &mut self.base {
+            self.item.commit_to_step(&mut base.set_state_step);
+            base.world.run_set_state_step(&base.set_state_step);
+        }
     }
 }

@@ -6,7 +6,10 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     #[payable("*")]
     fn forward_payment(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        self.send().direct(&to, &token, 0, &payment);
+        self.tx()
+            .to(to)
+            .egld_or_single_esdt(&token, 0, &payment)
+            .transfer();
     }
 
     #[endpoint]
@@ -98,7 +101,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             endpoint_name,
             args,
         )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .gas(self.blockchain().get_gas_left() / 2)
         .transfer_execute();
     }
 
@@ -118,7 +121,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             endpoint_name,
             args,
         )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .gas(self.blockchain().get_gas_left() / 2)
         .transfer_execute();
     }
 
@@ -132,7 +135,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     ) {
         let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
         self.forward_contract_call(to, token, payment, endpoint_name, args)
-            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .gas(self.blockchain().get_gas_left() / 2)
             .transfer_execute();
     }
 
@@ -153,10 +156,10 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             endpoint_name.clone(),
             args.clone(),
         )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .gas(self.blockchain().get_gas_left() / 2)
         .transfer_execute();
         self.forward_contract_call(to, token, half_payment, endpoint_name, args)
-            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .gas(self.blockchain().get_gas_left() / 2)
             .transfer_execute();
     }
 
@@ -175,12 +178,11 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             arg_buffer.push_arg(amount);
         }
 
-        self.send_raw().async_call_raw(
-            &to,
-            &BigUint::zero(),
-            &ManagedBuffer::from(&b"retrieve_multi_funds_async"[..]),
-            &arg_buffer,
-        );
+        self.tx()
+            .to(&to)
+            .raw_call("retrieve_multi_funds_async")
+            .arguments_raw(arg_buffer)
+            .async_call_and_exit();
     }
 
     #[endpoint]

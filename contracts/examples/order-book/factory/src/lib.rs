@@ -23,13 +23,19 @@ pub trait Factory {
         arguments.push_arg(&token_id_pair.first_token_id);
         arguments.push_arg(&token_id_pair.second_token_id);
 
-        let (pair_address, _) = self.send_raw().deploy_from_source_contract(
-            self.blockchain().get_gas_left(),
-            &BigUint::zero(),
-            &self.pair_template_address().get(),
-            CodeMetadata::DEFAULT,
-            &arguments,
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        let source = self.pair_template_address().get();
+
+        let pair_address = self
+            .tx()
+            .gas(gas_left)
+            .raw_deploy()
+            .arguments_raw(arguments)
+            .from_source(source)
+            .code_metadata(CodeMetadata::DEFAULT)
+            .returns(ReturnsNewManagedAddress)
+            .sync_call();
+
         self.pairs().insert(token_id_pair, pair_address.clone());
 
         pair_address

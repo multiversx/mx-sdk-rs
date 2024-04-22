@@ -341,7 +341,7 @@ pub trait KittyOwnership {
                 .to(&gene_science_contract_address)
                 .typed(kitty_genetic_alg_proxy::KittyGeneticAlgProxy)
                 .generate_kitty_genes(matron, sire)
-                .with_callback(
+                .callback(
                     self.callbacks()
                         .generate_kitty_genes_callback(matron_id, caller),
                 )

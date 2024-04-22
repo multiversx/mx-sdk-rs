@@ -40,11 +40,11 @@ impl CrowdfundingESDTTestState {
             .nonce(1)
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
-        world.set_state_step(SetStateStep::new().new_address(
+        world.new_address(
             OWNER_ADDRESS,
             1,
-            SC_CROWDFUNDING_ESDT_EXPR,
-        ));
+            SC_CROWDFUNDING_ESDT_EXPR.eval_to_expr().as_str(),
+        );
 
         Self { world }
     }
