@@ -76,7 +76,7 @@ pub fn set_account(
 
     for (_, esdt_balance) in account_esdt.iter() {
         account_state = account_state.esdt_balance(
-            esdt_balance.token_identifier.as_str(),
+            format!("str:{}", esdt_balance.token_identifier).as_str(),
             esdt_balance.balance.as_str(),
         );
     }
