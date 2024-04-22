@@ -1,7 +1,7 @@
 use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::types::{RHListItem, RHListItemExec, TxEnv};
 
-use crate::scenario_model::{BytesValue, CheckValue, TxExpect, TxResponse};
+use crate::scenario_model::{BytesValue, CheckValue, TxExpect, TxResponse, U64Value};
 
 /// Verifies that transaction result message matches the given one.
 ///
@@ -20,6 +20,10 @@ where
     Env: TxEnv<RHExpect = TxExpect>,
 {
     fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
+        if prev.status.is_equal_to(U64Value::empty()) {
+            prev.status = CheckValue::Star;
+        }
+
         let expect_message_expr = BytesValue {
             value: self.0.to_string().into_bytes(),
             original: ValueSubTree::Str(format!("str:{}", self.0)),
