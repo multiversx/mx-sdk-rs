@@ -9,7 +9,7 @@
 #![allow(unused)]
 
 use multiversx_sc::{
-    contract_base::ProxyObjBase,
+    contract_base::ProxyObjNew,
     types::{BigInt, ManagedAddress},
 };
 use multiversx_sc_scenario::api::{SingleTxApi, StaticApi};
@@ -123,15 +123,14 @@ mod sample_adder {
         fn init(&self, initial_value: &BigInt<Self::Api>) {
             self.set_sum(initial_value);
         }
-        fn add(&self, value: BigInt<Self::Api>) -> SCResult<()> {
+        fn add(&self, value: BigInt<Self::Api>) {
             let mut sum = self.get_sum();
             sum.add_assign(value);
             self.set_sum(&sum);
-            Ok(())
         }
         fn get_sum(&self) -> BigInt<Self::Api>;
         fn set_sum(&self, sum: &BigInt<Self::Api>);
-        fn add_version(&self) -> SCResult<()> {
+        fn add_version(&self) {
             self.add(self.version())
         }
         fn callback(&self);
@@ -197,8 +196,7 @@ mod sample_adder {
                 Self::Api,
                 (multiversx_sc::types::BigInt<Self::Api>, ()),
             >(("value", ()));
-            let result = self.add(value);
-            multiversx_sc::io::finish_multi::<Self::Api, _>(&result);
+            self.add(value);
         }
 
         fn call(&self, fn_name: &str) -> bool {
@@ -332,8 +330,7 @@ mod sample_adder {
     where
         A: multiversx_sc::api::VMApi + 'static,
     {
-        pub address:
-            multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+        _phantom: core::marker::PhantomData<A>,
     }
 
     impl<A> multiversx_sc::contract_base::ProxyObjBase for Proxy<A>
@@ -341,17 +338,63 @@ mod sample_adder {
         A: multiversx_sc::api::VMApi + 'static,
     {
         type Api = A;
+        type To = ();
+
+        fn extract_opt_address(
+            &mut self,
+        ) -> multiversx_sc::types::ManagedOption<
+            Self::Api,
+            multiversx_sc::types::ManagedAddress<Self::Api>,
+        > {
+            multiversx_sc::types::ManagedOption::none()
+        }
+
+        fn extract_address(&mut self) -> multiversx_sc::types::ManagedAddress<Self::Api> {
+            multiversx_sc::api::ErrorApiImpl::signal_error(
+                &<A as multiversx_sc::api::ErrorApi>::error_api_impl(),
+                multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET.as_bytes(),
+            )
+        }
+
+        fn extract_proxy_to(&mut self) -> Self::To {}
+    }
+
+    impl<A> multiversx_sc::contract_base::ProxyObjNew for Proxy<A>
+    where
+        A: multiversx_sc::api::VMApi + 'static,
+    {
+        type ProxyTo = ProxyTo<A>;
 
         fn new_proxy_obj() -> Self {
             Proxy {
-                address: multiversx_sc::types::ManagedOption::none(),
+                _phantom: core::marker::PhantomData,
             }
         }
 
-        fn contract(mut self, address: multiversx_sc::types::ManagedAddress<Self::Api>) -> Self {
-            self.address = multiversx_sc::types::ManagedOption::some(address);
-            self
+        fn contract(
+            mut self,
+            address: multiversx_sc::types::ManagedAddress<Self::Api>,
+        ) -> Self::ProxyTo {
+            ProxyTo {
+                address: multiversx_sc::types::ManagedOption::some(address),
+            }
         }
+    }
+
+    pub struct ProxyTo<A>
+    where
+        A: multiversx_sc::api::VMApi + 'static,
+    {
+        pub address:
+            multiversx_sc::types::ManagedOption<A, multiversx_sc::types::ManagedAddress<A>>,
+    }
+
+    impl<A> multiversx_sc::contract_base::ProxyObjBase for ProxyTo<A>
+    where
+        A: multiversx_sc::api::VMApi + 'static,
+    {
+        type Api = A;
+        type To = multiversx_sc::types::ManagedAddress<A>;
 
         fn extract_opt_address(
             &mut self,
@@ -372,11 +415,17 @@ mod sample_adder {
             );
             address.unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
         }
+
+        fn extract_proxy_to(&mut self) -> Self::To {
+            self.extract_address()
+        }
     }
 
     impl<A> super::module_1::ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<A> super::module_1::ProxyTrait for ProxyTo<A> where A: multiversx_sc::api::VMApi {}
 
     impl<A> ProxyTrait for Proxy<A> where A: multiversx_sc::api::VMApi {}
+    impl<A> ProxyTrait for ProxyTo<A> where A: multiversx_sc::api::VMApi {}
 
     pub struct CallbackProxyObj<A>
     where
@@ -418,15 +467,15 @@ fn contract_without_macros_basic() {
     adder.init(&BigInt::from(5));
     assert_eq!(BigInt::from(5), adder.get_sum());
 
-    let _ = adder.add(BigInt::from(7));
+    adder.add(BigInt::from(7));
     assert_eq!(BigInt::from(12), adder.get_sum());
 
-    let _ = adder.add(BigInt::from(-1));
+    adder.add(BigInt::from(-1));
     assert_eq!(BigInt::from(11), adder.get_sum());
 
     assert_eq!(BigInt::from(100), adder.version());
 
-    let _ = adder.add_version();
+    adder.add_version();
     assert_eq!(BigInt::from(111), adder.get_sum());
 
     assert!(!adder.call("invalid_endpoint"));
@@ -443,7 +492,7 @@ fn contract_without_macros_basic() {
 fn world() -> multiversx_sc_scenario::ScenarioWorld {
     let mut blockchain = multiversx_sc_scenario::ScenarioWorld::new();
     blockchain.register_contract(
-        "file:../../contracts/examples/adder/output/adder.wasm",
+        "mxsc:../../contracts/examples/adder/output/adder.mxsc.json",
         sample_adder::ContractBuilder,
     );
     blockchain

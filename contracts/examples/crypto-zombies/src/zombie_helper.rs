@@ -1,4 +1,4 @@
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 use crate::storage;
 
@@ -31,7 +31,10 @@ pub trait ZombieHelper: storage::Storage {
     fn withdraw(&self) {
         let caller_address = self.blockchain().get_caller();
         let collected_fees = self.collected_fees().get();
-        self.send().direct_egld(&caller_address, &collected_fees);
+        self.tx()
+            .to(&caller_address)
+            .egld(&collected_fees)
+            .transfer();
         self.collected_fees().clear();
     }
 

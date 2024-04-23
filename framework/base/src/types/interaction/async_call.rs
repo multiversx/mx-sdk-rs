@@ -1,59 +1,36 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
-    contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedArgBuffer, ManagedBuffer},
+    types::{CallbackClosure, EgldPayment, ManagedAddress},
 };
 
-#[must_use]
-pub struct AsyncCall<SA>
-where
-    SA: CallTypeApi + 'static,
-{
-    pub(crate) to: ManagedAddress<SA>,
-    pub(crate) egld_payment: BigUint<SA>,
-    pub(crate) endpoint_name: ManagedBuffer<SA>,
-    pub(crate) arg_buffer: ManagedArgBuffer<SA>,
-    pub(crate) callback_call: Option<CallbackClosure<SA>>,
-}
+use super::{FunctionCall, Tx, TxScEnv};
+
+pub type AsyncCall<Api> = Tx<
+    TxScEnv<Api>,
+    (),
+    ManagedAddress<Api>,
+    EgldPayment<Api>,
+    (),
+    FunctionCall<Api>,
+    Option<CallbackClosure<Api>>,
+>;
 
 #[allow(clippy::return_self_not_must_use)]
-impl<SA> AsyncCall<SA>
+impl<Api> AsyncCall<Api>
 where
-    SA: CallTypeApi,
+    Api: CallTypeApi,
 {
-    pub fn with_callback(self, callback_call: CallbackClosure<SA>) -> Self {
-        AsyncCall {
-            callback_call: Some(callback_call),
-            ..self
-        }
+    pub fn with_callback(mut self, callback_call: CallbackClosure<Api>) -> Self {
+        self.result_handler = Some(callback_call);
+        self
     }
 }
 
-impl<SA> AsyncCall<SA>
+impl<Api> AsyncCall<Api>
 where
-    SA: CallTypeApi,
+    Api: CallTypeApi + StorageWriteApi,
 {
-    pub fn call_and_exit_ignore_callback(&self) -> ! {
-        SendRawWrapper::<SA>::new().async_call_raw(
-            &self.to,
-            &self.egld_payment,
-            &self.endpoint_name,
-            &self.arg_buffer,
-        )
-    }
-}
-
-impl<SA> AsyncCall<SA>
-where
-    SA: CallTypeApi + StorageWriteApi,
-{
-    pub fn call_and_exit(&self) -> ! {
-        // first, save the callback closure
-        if let Some(callback_call) = &self.callback_call {
-            callback_call.save_to_storage::<SA>();
-        }
-
-        // last, send the async call, which will kill the execution
-        self.call_and_exit_ignore_callback()
+    pub fn call_and_exit_ignore_callback(self) -> ! {
+        self.async_call_and_exit()
     }
 }

@@ -6,7 +6,7 @@
                 "sc:alloc-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/alloc-features.wasm"
+                    "code": "mxsc:../output/alloc-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",

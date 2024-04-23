@@ -2,7 +2,7 @@ extern crate rand;
 
 use anyhow::Result;
 use bip39::{Language, Mnemonic};
-use hmac::{Hmac, Mac, NewMac};
+use hmac::{Hmac, Mac};
 use pbkdf2::pbkdf2;
 use serde_json::json;
 use sha2::{Digest, Sha512};
@@ -40,7 +40,7 @@ impl Wallet {
 
         let mut seed = [0u8; 64];
 
-        pbkdf2::<Hmac<Sha512>>(
+        let _ = pbkdf2::<Hmac<Sha512>>(
             mnemonic.to_string().as_bytes(),
             salt.as_bytes(),
             2048,
@@ -105,7 +105,7 @@ impl Wallet {
 
     pub fn from_pem_file_contents(contents: String) -> Result<Self> {
         let x = pem::parse(contents)?;
-        let x = x.contents[..PRIVATE_KEY_LENGTH].to_vec();
+        let x = x.contents()[..PRIVATE_KEY_LENGTH].to_vec();
         let priv_key_str = std::str::from_utf8(x.as_slice())?;
         let pri_key = PrivateKey::from_hex_str(priv_key_str)?;
         Ok(Self { priv_key: pri_key })

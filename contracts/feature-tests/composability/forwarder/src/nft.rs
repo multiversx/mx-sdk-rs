@@ -90,7 +90,7 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
                 let (token_identifier, returned_tokens) =
                     self.call_value().egld_or_single_fungible_esdt();
                 if token_identifier.is_egld() && returned_tokens > 0 {
-                    self.send().direct_egld(caller, &returned_tokens);
+                    self.tx().to(caller).egld(&returned_tokens).transfer();
                 }
 
                 self.last_error_message().set(&message.err_msg);
@@ -238,15 +238,14 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
         function: ManagedBuffer,
         arguments: MultiValueEncoded<ManagedBuffer>,
     ) {
-        let _ = self.send_raw().transfer_esdt_nft_execute(
-            &to,
-            &token_identifier,
-            nonce,
-            &amount,
-            self.blockchain().get_gas_left(),
-            &function,
-            &arguments.to_arg_buffer(),
-        );
+        let gas_left = self.blockchain().get_gas_left();
+        self.tx()
+            .to(&to)
+            .gas(gas_left)
+            .raw_call(function)
+            .arguments_raw(arguments.to_arg_buffer())
+            .single_esdt(&token_identifier, nonce, &amount)
+            .transfer_execute();
     }
 
     #[endpoint]
@@ -271,8 +270,10 @@ pub trait ForwarderNftModule: storage::ForwarderStorageModule {
             uri,
         );
 
-        self.send()
-            .direct_esdt(&to, &token_identifier, token_nonce, &amount);
+        self.tx()
+            .to(&to)
+            .single_esdt(&token_identifier, token_nonce, &amount)
+            .transfer();
 
         self.send_event(&to, &token_identifier, token_nonce, &amount);
     }

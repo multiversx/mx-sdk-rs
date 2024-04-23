@@ -1,12 +1,5 @@
-use multiversx_sc::types::{Address, EgldOrEsdtTokenIdentifier, ManagedVec};
 use multiversx_sc_modules::staking::StakingModule;
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 
 const STAKING_TOKEN_ID_EXPR: &str = "str:STAKE-123456";
 const STAKING_TOKEN_ID: &[u8] = b"STAKE-123456";
@@ -24,7 +17,7 @@ const PAUL_ADDRESS_EXPR: &str = "address:paul";
 const SALLY_ADDRESS_EXPR: &str = "address:sally";
 
 const USE_MODULE_ADDRESS_EXPR: &str = "sc:use-module";
-const USE_MODULE_PATH_EXPR: &str = "file:output/use-module.wasm";
+const USE_MODULE_PATH_EXPR: &str = "mxsc:output/use-module.mxsc.json";
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

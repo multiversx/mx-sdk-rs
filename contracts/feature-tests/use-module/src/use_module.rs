@@ -24,6 +24,8 @@ multiversx_sc::imports!();
 /// - GovernanceModule
 /// - PauseModule
 #[multiversx_sc::contract]
+#[esdt_attribute("TICKER1", BigUint)]
+#[esdt_attribute("TICKER2", ManagedBuffer)]
 pub trait UseModule:
     ContractBase
     + contract_base_full_path_mod::ContractBaseFullPathTestModule
@@ -61,7 +63,7 @@ pub trait UseModule:
     }
 
     #[endpoint(checkPause)]
-    fn check_pause(&self) -> SCResult<bool> {
-        Ok(self.is_paused())
+    fn check_pause(&self) -> bool {
+        self.is_paused()
     }
 }

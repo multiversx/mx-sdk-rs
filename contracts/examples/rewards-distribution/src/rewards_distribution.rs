@@ -1,10 +1,11 @@
 #![no_std]
 
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, imports::*};
 use multiversx_sc_modules::ongoing_operation::{
     CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
 };
+
+pub mod seed_nft_minter_proxy;
 
 type Epoch = u64;
 
@@ -40,10 +41,14 @@ pub trait RewardsDistribution:
     fn init(&self, seed_nft_minter_address: ManagedAddress, brackets: ManagedVec<Bracket>) {
         self.seed_nft_minter_address().set(&seed_nft_minter_address);
 
-        let nft_token_id: TokenIdentifier = self
-            .seed_nft_minter_proxy(seed_nft_minter_address)
-            .get_nft_token_id()
-            .execute_on_dest_context();
+        let nft_token_id = self
+            .tx()
+            .to(&seed_nft_minter_address)
+            .typed(seed_nft_minter_proxy::SeedNftMinterProxy)
+            .nft_token_id()
+            .returns(ReturnsResult)
+            .sync_call();
+
         self.nft_token_id().set(nft_token_id);
 
         self.validate_brackets(&brackets);
@@ -176,10 +181,15 @@ pub trait RewardsDistribution:
         });
 
         let seed_nft_minter_address = self.seed_nft_minter_address().get();
-        let ticket_count: u64 = self
-            .seed_nft_minter_proxy(seed_nft_minter_address)
-            .get_nft_count()
-            .execute_on_dest_context();
+
+        let ticket_count = self
+            .tx()
+            .to(&seed_nft_minter_address)
+            .typed(seed_nft_minter_proxy::SeedNftMinterProxy)
+            .nft_count()
+            .returns(ReturnsResult)
+            .sync_call();
+
         let brackets = self.brackets().get();
 
         let computed_brackets = self.compute_brackets(brackets, ticket_count);
@@ -267,10 +277,9 @@ pub trait RewardsDistribution:
             }
         }
 
-        self.send()
-            .direct_non_zero_egld(&caller, &total_egld_reward);
-        self.send().direct_multi(&caller, &rewards);
-        self.send().direct_multi(&caller, &nfts);
+        self.tx().to(&caller).egld(total_egld_reward).transfer();
+        self.tx().to(&caller).payment(rewards).transfer();
+        self.tx().to(&caller).payment(nfts).transfer();
     }
 
     fn claim_reward_token(
@@ -418,9 +427,6 @@ pub trait RewardsDistribution:
 
     #[storage_mapper("raffleProgress")]
     fn raffle_progress(&self) -> SingleValueMapper<Option<RaffleProgress<Self::Api>>>;
-
-    #[proxy]
-    fn seed_nft_minter_proxy(&self, address: ManagedAddress) -> seed_nft_minter::Proxy<Self::Api>;
 }
 
 fn ticket_to_storage(position: u64, ticket_id: u64) -> u64 {
@@ -436,18 +442,5 @@ fn ticket_from_storage(position: u64, ticket_id: u64) -> u64 {
         position
     } else {
         ticket_id
-    }
-}
-
-mod seed_nft_minter {
-    multiversx_sc::imports!();
-
-    #[multiversx_sc::proxy]
-    pub trait SeedNftMinter {
-        #[endpoint(getNftCount)]
-        fn get_nft_count(&self) -> u64;
-
-        #[endpoint(getNftTokenId)]
-        fn get_nft_token_id(&self) -> TokenIdentifier;
     }
 }

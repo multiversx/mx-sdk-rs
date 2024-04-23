@@ -9,7 +9,7 @@
             "id": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../output/multisig.wasm",
+                "contractCode": "mxsc:../output/multisig.mxsc.json",
                 "arguments": [
                     "1",
                     "address:alice"

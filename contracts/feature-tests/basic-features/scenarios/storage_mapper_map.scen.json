@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -72,7 +72,7 @@
                         "str:map_mapper.mapped|u32:123": "456",
                         "str:map_mapper.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -209,7 +209,7 @@
                         "str:map_mapper.mapped|u32:111": "222",
                         "str:map_mapper.info": "u32:2|u32:1|u32:2|u32:2"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -296,7 +296,7 @@
                         "str:map_mapper.mapped|u32:111": "222",
                         "str:map_mapper.info": "u32:1|u32:2|u32:2|u32:2"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -336,7 +336,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -376,7 +376,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -423,7 +423,7 @@
                         "str:map_mapper.value|u32:1": "123",
                         "str:map_mapper.mapped|u32:123": "50"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -470,7 +470,7 @@
                         "str:map_mapper.value|u32:1": "123",
                         "str:map_mapper.mapped|u32:123": "92"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -517,7 +517,7 @@
                         "str:map_mapper.value|u32:1": "123",
                         "str:map_mapper.mapped|u32:123": "92"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -568,7 +568,7 @@
                         "str:map_mapper.value|u32:2": "142",
                         "str:map_mapper.mapped|u32:142": "60"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -649,7 +649,7 @@
                         "str:map_mapper.value|u32:3": "167",
                         "str:map_mapper.mapped|u32:167": "400"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -732,7 +732,7 @@
                         "str:map_mapper.value|u32:4": "78",
                         "str:map_mapper.mapped|u32:78": "1078"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",

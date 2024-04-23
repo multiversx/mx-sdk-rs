@@ -11,7 +11,7 @@
                     "storage": {
                         "str:usize": "0x0100000000"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",

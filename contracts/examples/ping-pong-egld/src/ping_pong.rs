@@ -1,6 +1,6 @@
 #![no_std]
 
-multiversx_sc::imports!();
+use multiversx_sc::imports::*;
 
 mod user_status;
 
@@ -29,6 +29,7 @@ pub trait PingPong {
     /// `duration_in_seconds` - how much time (in seconds) until contract expires.
     /// `opt_activation_timestamp` - optionally specify the contract to only actvivate at a later date.
     /// `max_funds` - optional funding cap, no more funds than this can be added to the contract.
+    #[allow_multiple_var_args]
     #[init]
     fn init(
         &self,
@@ -45,6 +46,9 @@ pub trait PingPong {
         self.activation_timestamp().set(activation_timestamp);
         self.max_funds().set(max_funds.into_option());
     }
+
+    #[upgrade]
+    fn upgrade(&self) {}
 
     /// User sends some EGLD to be locked in the contract for a period of time.
     /// Optional `_data` argument is ignored.
@@ -103,8 +107,8 @@ pub trait PingPong {
             UserStatus::Registered => {
                 self.user_status(user_id).set(UserStatus::Withdrawn);
                 if let Some(user_address) = self.user_mapper().get_user_address(user_id) {
-                    self.send()
-                        .direct_egld(&user_address, &self.ping_amount().get());
+                    let amount = self.ping_amount().get();
+                    self.tx().to(user_address).egld(amount).transfer();
                     Result::Ok(())
                 } else {
                     Result::Err("unknown user")

@@ -55,13 +55,13 @@ fn deploy_duplicate_bm_go() {
 }
 
 #[test]
-#[ignore = "system SC not yet implemented"]
+#[ignore = "missing 'newTokenIdentifiers' syntax"]
 fn interactor_nft_go() {
     world().run("scenarios/interactor_nft.scen.json");
 }
 
 #[test]
-#[ignore = "system SC not yet implemented"]
+#[ignore = "missing 'newTokenIdentifiers' syntax"]
 fn interactor_nft_all_roles_go() {
     world().run("scenarios/interactor_nft_all_roles.scen.json");
 }

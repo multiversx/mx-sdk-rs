@@ -7,11 +7,14 @@ fn world() -> ScenarioWorld {
     );
 
     blockchain.register_contract(
-        "file:output/lottery-erc20.wasm",
+        "mxsc:output/lottery-erc20.mxsc.json",
         lottery_erc20::ContractBuilder,
     );
 
-    blockchain.register_contract("file:../erc20/output/erc20.wasm", erc20::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:../erc20/output/erc20.mxsc.json",
+        erc20::ContractBuilder,
+    );
 
     blockchain
 }

@@ -9,6 +9,7 @@ use crate::{
         EsdtFullRaw, EsdtInstanceRaw, EsdtRaw, TxCallRaw, TxESDTRaw, TxExpectRaw, TxQueryRaw,
         ValueSubTree,
     },
+    scenario_model::U64Value,
 };
 use multiversx_chain_vm::{
     types::VMAddress,
@@ -46,10 +47,11 @@ pub(crate) fn account_as_raw(acc: &AccountData) -> AccountRaw {
 
     AccountRaw {
         balance: balance_raw,
-        code: code_raw,
         comment: None,
         esdt: all_esdt_raw,
         nonce: Some(u64_as_raw(acc.nonce)),
+        code: code_raw,
+        code_metadata: Some(bytes_as_raw(acc.code_metadata.to_vec())),
         owner: acc.contract_owner.as_ref().map(vm_address_as_raw),
         storage: storage_raw,
         username: None, // TODO: Add if needed
@@ -76,10 +78,10 @@ pub(crate) fn esdt_data_as_raw(esdt: &EsdtData) -> EsdtRaw {
             attributes: Some(bytes_as_raw(&inst.metadata.attributes)),
             balance: Some(rust_biguint_as_raw(&inst.balance)),
             creator: inst.metadata.creator.as_ref().map(vm_address_as_raw),
-            hash: inst.metadata.hash.as_ref().map(|h| bytes_as_raw(h)),
+            hash: inst.metadata.hash.as_ref().map(bytes_as_raw),
             nonce: Some(u64_as_raw(inst.nonce)),
             royalties: Some(u64_as_raw(inst.metadata.royalties)),
-            uri: inst.metadata.uri.iter().map(|u| bytes_as_raw(u)).collect(),
+            uri: inst.metadata.uri.iter().map(bytes_as_raw).collect(),
         };
 
         instances_raw.push(inst_raw);
@@ -123,7 +125,7 @@ pub(crate) fn tx_call_as_raw(tx_call: &ScCallMandos) -> TxCallRaw {
         function: tx_call.function.clone(),
         arguments: arguments_raw,
         gas_limit: u64_as_raw(tx_call.gas_limit),
-        gas_price: u64_as_raw(tx_call.gas_price),
+        gas_price: u64_as_raw_opt(tx_call.gas_price),
     }
 }
 
@@ -243,6 +245,7 @@ pub(crate) fn account_as_check_state_raw(acc: &AccountData) -> CheckAccountsRaw 
         developer_rewards: CheckBytesValueRaw::Equal(rust_biguint_as_raw(&acc.developer_rewards)),
         storage: CheckStorageRaw::Equal(check_storage_raw),
         code: CheckBytesValueRaw::Star,
+        code_metadata: CheckBytesValueRaw::Star,
         async_call_data: CheckBytesValueRaw::Unspecified,
         comment: None,
         username: CheckBytesValueRaw::Unspecified,
@@ -299,10 +302,20 @@ pub(crate) fn u64_as_raw(value: u64) -> ValueSubTree {
     ValueSubTree::Str(value.to_string())
 }
 
-pub(crate) fn bytes_as_raw(bytes: &[u8]) -> ValueSubTree {
+pub(crate) fn u64_as_raw_opt(value: u64) -> Option<ValueSubTree> {
+    U64Value::from(value).into_raw_opt()
+}
+
+pub(crate) fn bytes_as_raw<B>(bytes: B) -> ValueSubTree
+where
+    B: AsRef<[u8]>,
+{
     ValueSubTree::Str(bytes_to_hex(bytes))
 }
 
-pub(crate) fn bytes_to_hex(bytes: &[u8]) -> String {
+pub(crate) fn bytes_to_hex<B>(bytes: B) -> String
+where
+    B: AsRef<[u8]>,
+{
     format!("0x{}", hex::encode(bytes))
 }

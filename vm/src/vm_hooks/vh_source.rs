@@ -1,7 +1,7 @@
 use std::{fmt::Debug, sync::MutexGuard};
 
 use crate::{
-    tx_mock::{TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
+    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxLog, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata, H256},
     world_mock::{AccountData, BlockInfo},
 };
@@ -47,16 +47,19 @@ pub trait VMHooksHandlerSource: Debug {
 
     fn get_current_block_info(&self) -> &BlockInfo;
 
+    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers>;
+
     /// For ownership reasons, needs to return a clone.
     ///
     /// Can be optimized, but is not a priority right now.
-    fn account_data(&self, address: &VMAddress) -> AccountData;
+    fn account_data(&self, address: &VMAddress) -> Option<AccountData>;
 
     /// For ownership reasons, needs to return a clone.
     ///
     /// Can be optimized, but is not a priority right now.
     fn current_account_data(&self) -> AccountData {
         self.account_data(&self.input_ref().to)
+            .expect("missing current account")
     }
 
     fn account_code(&self, address: &VMAddress) -> Vec<u8>;

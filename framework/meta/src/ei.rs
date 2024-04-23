@@ -8,4 +8,4 @@ pub use ei_1_0::EI_1_0_NAMES;
 pub use ei_1_1::EI_1_1_NAMES;
 pub use ei_1_2::EI_1_2_NAMES;
 pub use ei_1_3::EI_1_3_NAMES;
-pub use ei_version::EIVersion;
+pub use ei_version::{parse_check_ei, EIVersion};

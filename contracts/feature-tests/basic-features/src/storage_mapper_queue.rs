@@ -20,9 +20,9 @@ pub trait QueueMapperFeatures {
     }
 
     #[endpoint]
-    fn queue_mapper_front(&self) -> SCResult<u32> {
+    fn queue_mapper_front(&self) -> u32 {
         if let Some(front) = self.queue_mapper().front() {
-            return Ok(front);
+            return front;
         }
         sc_panic!("Queue empty!")
     }

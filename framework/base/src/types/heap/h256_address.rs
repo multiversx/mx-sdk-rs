@@ -206,6 +206,10 @@ impl TypeAbi for Address {
     fn type_name() -> TypeName {
         "Address".into()
     }
+
+    fn type_name_rust() -> TypeName {
+        "Address".into()
+    }
 }
 
 #[cfg(test)]

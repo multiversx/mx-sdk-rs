@@ -30,6 +30,11 @@ fn big_uint_from_u_64_go() {
 }
 
 #[test]
+fn big_uint_pow_go() {
+    world().run("scenarios/big_uint_pow.scen.json");
+}
+
+#[test]
 fn big_uint_sqrt_go() {
     world().run("scenarios/big_uint_sqrt.scen.json");
 }
@@ -195,6 +200,11 @@ fn get_caller_go() {
 }
 
 #[test]
+fn get_code_metadata_go() {
+    world().run("scenarios/get_code_metadata.scen.json");
+}
+
+#[test]
 fn get_cumulated_validator_rewards_go() {
     world().run("scenarios/get_cumulated_validator_rewards.scen.json");
 }
@@ -203,6 +213,11 @@ fn get_cumulated_validator_rewards_go() {
 #[ignore = "TODO: missing support from scenario-go"]
 fn get_shard_of_address_go() {
     world().run("scenarios/get_shard_of_address.scen.json");
+}
+
+#[test]
+fn is_builtin_function_go() {
+    world().run("scenarios/is_builtin_function.scen.json");
 }
 
 #[test]
@@ -251,6 +266,11 @@ fn managed_vec_biguint_push_go() {
 }
 
 #[test]
+fn new_address_go() {
+    world().run("scenarios/new_address.scen.json");
+}
+
+#[test]
 fn only_owner_go() {
     world().run("scenarios/only_owner.scen.json");
 }
@@ -278,6 +298,11 @@ fn return_codes_go() {
 #[test]
 fn sc_properties_go() {
     world().run("scenarios/sc_properties.scen.json");
+}
+
+#[test]
+fn small_num_overflow_go() {
+    world().run("scenarios/small_num_overflow.scen.json");
 }
 
 #[test]
@@ -336,8 +361,19 @@ fn storage_map_3_go() {
 }
 
 #[test]
+fn storage_mapper_address_to_id_go() {
+    world().run("scenarios/storage_mapper_address_to_id.scen.json");
+}
+
+#[test]
+#[ignore = "currently not supported. TODO: investigate"]
 fn storage_mapper_fungible_token_go() {
     world().run("scenarios/storage_mapper_fungible_token.scen.json");
+}
+
+#[test]
+fn storage_mapper_get_at_address_go() {
+    world().run("scenarios/storage_mapper_get_at_address.scen.json");
 }
 
 #[test]
@@ -406,7 +442,6 @@ fn storage_raw_api_features_go() {
 }
 
 #[test]
-#[ignore = "the error message has changed, re-enable when we move to VM 1.5"]
 fn storage_reserved_go() {
     world().run("scenarios/storage_reserved.scen.json");
 }

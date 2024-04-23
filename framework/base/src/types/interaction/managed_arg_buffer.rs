@@ -14,6 +14,7 @@ use crate::{
     },
 };
 use alloc::vec::Vec;
+use multiversx_sc_codec::TopEncodeMulti;
 
 #[derive(Debug, Default, Clone)]
 #[repr(transparent)]
@@ -167,6 +168,14 @@ where
     pub fn into_multi_value_encoded(self) -> MultiValueEncoded<M, ManagedBuffer<M>> {
         self.data.into()
     }
+
+    pub fn into_vec_of_buffers(self) -> ManagedVec<M, ManagedBuffer<M>> {
+        self.data
+    }
+
+    pub fn iter_buffers(&self) -> ManagedVecRefIterator<M, ManagedBuffer<M>> {
+        ManagedVecRefIterator::new(&self.data)
+    }
 }
 
 impl<M> ManagedArgBuffer<M>
@@ -180,6 +189,11 @@ where
             ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR),
         );
         self.push_arg_raw(encoded_buffer);
+    }
+
+    pub fn push_multi_arg<T: TopEncodeMulti>(&mut self, arg: &T) {
+        let h = ExitCodecErrorHandler::<M>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
+        let Ok(()) = arg.multi_encode_or_handle_err(self, h);
     }
 }
 
@@ -292,5 +306,9 @@ where
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[ManagedBuffer<M>] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedArgBufer<$API>".into()
     }
 }

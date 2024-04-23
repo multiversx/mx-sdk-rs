@@ -15,7 +15,7 @@
                     "storage": {
                         "str:playerBalance|address:acc1": "0x100"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "0",
@@ -41,14 +41,13 @@
                 "status": "",
                 "logs": [
                     {
-                        "address": "*",
+                        "address": "sc:crypto_bubbles",
                         "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "sc:crypto_bubbles",
-                            "address:acc1",
-                            "0x10"
+                            "0x10",
+                            "address:acc1"
                         ],
-                        "data": ""
+                        "data": "*"
                     },
                     {
                         "address": "sc:crypto_bubbles",
@@ -57,7 +56,9 @@
                             "str:withdraw",
                             "address:acc1"
                         ],
-                        "data": "0x10"
+                        "data": [
+                            "0x10"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -79,7 +80,7 @@
                     "storage": {
                         "str:playerBalance|address:acc1": "0xf0"
                     },
-                    "code": "file:../output/crypto-bubbles.wasm"
+                    "code": "mxsc:../output/crypto-bubbles.mxsc.json"
                 },
                 "address:acc1": {
                     "nonce": "1",

@@ -166,7 +166,7 @@
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc4": "1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc5": "1"
                     },
-                    "code": "file:../output/lottery-erc20.wasm"
+                    "code": "mxsc:../output/lottery-erc20.mxsc.json"
                 },
                 "sc:erc20": {
                     "nonce": "0",
@@ -187,7 +187,7 @@
                         "str:allowance|address:acc5|sc:lottery": "0",
                         "str:totalSupply": "1,000,000,000"
                     },
-                    "code": "file:../../erc20/output/erc20.wasm"
+                    "code": "mxsc:../../erc20/output/erc20.mxsc.json"
                 },
                 "address:erc20_owner": {
                     "nonce": "1",

@@ -1,4 +1,4 @@
-multiversx_sc::derive_imports!();
+use multiversx_sc::derive_imports::*;
 
 use multiversx_sc::{
     api::ManagedTypeApi,
@@ -11,7 +11,8 @@ pub enum AuctionType {
     Siring,
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Auction<M: ManagedTypeApi> {
     pub auction_type: AuctionType,
     pub starting_price: BigUint<M>,

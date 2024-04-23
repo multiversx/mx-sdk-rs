@@ -1,5 +1,4 @@
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::{derive_imports::*, imports::*};
 
 const NFT_AMOUNT: u32 = 1;
 const ROYALTIES_MAX: u32 = 10_000;
@@ -89,21 +88,14 @@ pub trait NftModule {
         self.price_tag(nft_nonce).clear();
 
         let nft_token_id = self.nft_token_id().get();
-        let caller = self.blockchain().get_caller();
-        self.send().direct_esdt(
-            &caller,
-            &nft_token_id,
-            nft_nonce,
-            &BigUint::from(NFT_AMOUNT),
-        );
+
+        self.tx()
+            .to(ToCaller)
+            .single_esdt(&nft_token_id, nft_nonce, &BigUint::from(NFT_AMOUNT))
+            .transfer();
 
         let owner = self.blockchain().get_owner_address();
-        self.send().direct(
-            &owner,
-            &payment.token_identifier,
-            payment.token_nonce,
-            &payment.amount,
-        );
+        self.tx().to(owner).payment(payment).transfer();
     }
 
     // views
@@ -136,11 +128,9 @@ pub trait NftModule {
                 self.nft_token_id().set(&token_id.unwrap_esdt());
             },
             ManagedAsyncCallResult::Err(_) => {
-                let caller = self.blockchain().get_owner_address();
                 let returned = self.call_value().egld_or_single_esdt();
                 if returned.token_identifier.is_egld() && returned.amount > 0 {
-                    self.send()
-                        .direct(&caller, &returned.token_identifier, 0, &returned.amount);
+                    self.tx().to(ToCaller).egld(returned.amount).transfer();
                 }
             },
         }

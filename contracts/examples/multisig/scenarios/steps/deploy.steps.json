@@ -7,7 +7,7 @@
             "id": "multisig-deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../../output/multisig.wasm",
+                "contractCode": "mxsc:../../output/multisig.mxsc.json",
                 "arguments": [
                     "2",
                     "address:alice",
@@ -30,7 +30,7 @@
             "id": "multisig-view-deploy",
             "tx": {
                 "from": "address:owner",
-                "contractCode": "file:../../output/multisig-view.wasm",
+                "contractCode": "mxsc:../../output/multisig-view.mxsc.json",
                 "arguments": [
                     "sc:multisig"
                 ],
@@ -107,7 +107,7 @@
                         "str:num_board_members": "3",
                         "str:quorum": "2"
                     },
-                    "code": "file:../../output/multisig.wasm"
+                    "code": "mxsc:../../output/multisig.mxsc.json"
                 },
                 "+": ""
             }

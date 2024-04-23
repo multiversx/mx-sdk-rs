@@ -16,7 +16,7 @@
                         "str:balance|address:account_1": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         },
@@ -46,7 +46,9 @@
                             "address:account_1",
                             "address:account_2"
                         ],
-                        "data": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        "data": [
+                            "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -69,7 +71,7 @@
                         "str:balance|address:account_2": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                         "str:totalSupply": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
                     },
-                    "code": "file:../output/erc20.wasm"
+                    "code": "mxsc:../output/erc20.mxsc.json"
                 }
             }
         }

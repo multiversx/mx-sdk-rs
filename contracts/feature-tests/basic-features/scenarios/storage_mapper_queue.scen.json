@@ -8,7 +8,7 @@
                 "sc:basic-features": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "0",
@@ -67,7 +67,7 @@
                         "str:queue_mapper.value|u32:1": "123",
                         "str:queue_mapper.info": "u32:1|u32:1|u32:1|u32:1"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -154,7 +154,7 @@
                         "str:queue_mapper.value|u32:2": "111",
                         "str:queue_mapper.info": "u32:2|u32:1|u32:2|u32:2"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -217,7 +217,7 @@
                         "str:queue_mapper.value|u32:2": "111",
                         "str:queue_mapper.info": "u32:1|u32:2|u32:2|u32:2"
                     },
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",
@@ -255,7 +255,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/basic-features.wasm"
+                    "code": "mxsc:../output/basic-features.mxsc.json"
                 },
                 "address:an_account": {
                     "nonce": "*",

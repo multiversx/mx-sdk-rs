@@ -11,12 +11,12 @@
                 "sc:vault": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../vault/output/vault.wasm"
+                    "code": "mxsc:../vault/output/vault.mxsc.json"
                 },
                 "sc:forwarder": {
                     "nonce": "0",
                     "balance": "0",
-                    "code": "file:../forwarder-raw/output/forwarder-raw.wasm"
+                    "code": "mxsc:../forwarder-raw/output/forwarder-raw.mxsc.json"
                 }
             }
         },
@@ -37,24 +37,37 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
                     {
                         "address": "sc:forwarder",
                         "endpoint": "str:call_execute_on_dest_context",
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            {
+                                "0-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",
@@ -78,26 +91,22 @@
                 "gasPrice": "0"
             },
             "expect": {
-                "out": [
-                    "1",
-                    "2",
-                    "1",
-                    "2"
-                ],
+                "out": [],
                 "status": "0",
                 "logs": [
                     {
                         "address": "sc:forwarder",
-                        "endpoint": "str:call_execute_on_dest_context_twice",
+                        "endpoint": "str:transferValueOnly",
                         "topics": [
-                            "str:execute_on_dest_context_result"
+                            "0",
+                            "sc:vault"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
                     },
                     {
                         "address": "sc:forwarder",
@@ -105,12 +114,43 @@
                         "topics": [
                             "str:execute_on_dest_context_result"
                         ],
-                        "data": {
-                            "0-echoed-args": [
-                                "biguint:1",
-                                "biguint:2"
-                            ]
-                        }
+                        "data": [
+                            {
+                                "0-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:transferValueOnly",
+                        "topics": [
+                            "0",
+                            "sc:vault"
+                        ],
+                        "data": [
+                            "str:ExecuteOnDestContext",
+                            "str:echo_arguments",
+                            "1",
+                            "2"
+                        ]
+                    },
+                    {
+                        "address": "sc:forwarder",
+                        "endpoint": "str:call_execute_on_dest_context_twice",
+                        "topics": [
+                            "str:execute_on_dest_context_result"
+                        ],
+                        "data": [
+                            {
+                                "0-echoed-args": [
+                                    "biguint:1",
+                                    "biguint:2"
+                                ]
+                            }
+                        ]
                     }
                 ],
                 "gas": "*",

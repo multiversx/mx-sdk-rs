@@ -4,10 +4,13 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/proxy-pause");
 
-    blockchain.register_contract("file:output/proxy-pause.wasm", proxy_pause::ContractBuilder);
+    blockchain.register_contract(
+        "mxsc:output/proxy-pause.mxsc.json",
+        proxy_pause::ContractBuilder,
+    );
 
     blockchain.register_contract(
-        "file:../check-pause/output/check-pause.wasm",
+        "mxsc:../check-pause/output/check-pause.mxsc.json",
         check_pause::ContractBuilder,
     );
     blockchain

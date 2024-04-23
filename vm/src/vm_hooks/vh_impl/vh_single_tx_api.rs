@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    tx_mock::{TxFunctionName, TxInput, TxManagedTypes, TxResult},
+    tx_mock::{BackTransfers, TxFunctionName, TxInput, TxManagedTypes, TxResult},
     types::{VMAddress, VMCodeMetadata},
     vm_hooks::{
         VMHooksBigFloat, VMHooksBigInt, VMHooksBlockchain, VMHooksCallValue, VMHooksCrypto,
@@ -93,8 +93,12 @@ impl VMHooksHandlerSource for SingleTxApiVMHooksHandler {
         &self.0.current_block_info
     }
 
-    fn account_data(&self, address: &VMAddress) -> AccountData {
-        self.0.with_account_mut(address, |account| account.clone())
+    fn back_transfers_lock(&self) -> MutexGuard<BackTransfers> {
+        panic!("cannot access back transfers in the SingleTxApi")
+    }
+
+    fn account_data(&self, address: &VMAddress) -> Option<AccountData> {
+        Some(self.0.with_account_mut(address, |account| account.clone()))
     }
 
     fn account_code(&self, _address: &VMAddress) -> Vec<u8> {

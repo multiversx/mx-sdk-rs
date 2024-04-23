@@ -302,6 +302,10 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
     fn type_name() -> TypeName {
         TypeName::from("BigInt")
     }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("BigInt<$API>")
+    }
 }
 
 impl<M: ManagedTypeApi> BigInt<M> {

@@ -88,7 +88,7 @@
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc9": "1",
                         "str:numberOfEntriesForUser|u32:12|str:lottery_name|address:acc10": "1"
                     },
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             },
             "currentBlockInfo": {
@@ -177,7 +177,7 @@
                     "nonce": "0",
                     "balance": "0",
                     "storage": {},
-                    "code": "file:../output/lottery-esdt.wasm"
+                    "code": "mxsc:../output/lottery-esdt.mxsc.json"
                 }
             }
         }

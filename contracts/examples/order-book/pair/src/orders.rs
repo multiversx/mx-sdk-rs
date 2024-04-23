@@ -1,5 +1,4 @@
-multiversx_sc::imports!();
-multiversx_sc::derive_imports!();
+use multiversx_sc::imports::*;
 
 use crate::common::{FEE_PENALTY_INCREASE_EPOCHS, FEE_PENALTY_INCREASE_PERCENT};
 
@@ -354,12 +353,10 @@ pub trait OrdersModule:
     fn execute_transfers(&self, transfers: ManagedVec<Transfer<Self::Api>>) {
         for transfer in &transfers {
             if transfer.payment.amount > 0 {
-                self.send().direct_esdt(
-                    &transfer.to,
-                    &transfer.payment.token_id,
-                    0,
-                    &transfer.payment.amount,
-                )
+                self.tx()
+                    .to(&transfer.to)
+                    .single_esdt(&transfer.payment.token_id, 0, &transfer.payment.amount)
+                    .transfer();
             }
         }
     }

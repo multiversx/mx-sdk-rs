@@ -1,5 +1,6 @@
 #![allow(unused)]
 
+use multiversx_sc_scenario::imports::*;
 use std::borrow::Borrow;
 
 use adder::Adder;
@@ -8,31 +9,12 @@ use multisig::{
     multisig_perform::MultisigPerformModule, multisig_propose::MultisigProposeModule,
     user_role::UserRole, Multisig,
 };
-use multiversx_sc::{
-    api::ManagedTypeApi,
-    codec::multi_types::OptionalValue,
-    storage::mappers::SingleValue,
-    types::{
-        Address, BigUint, BoxedBytes, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedVec,
-    },
-};
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint,
-    multiversx_chain_vm::types::VMAddress,
-    rust_biguint,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, ScQueryStep,
-        SetStateStep, TxExpect, TypedScQuery,
-    },
-    testing_framework::TxResult,
-    DebugApi, ScenarioWorld, WhiteboxContract,
-};
 
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const PROPOSER_ADDRESS_EXPR: &str = "address:proposer";
 const BOARD_MEMBER_ADDRESS_EXPR: &str = "address:board-member";
 const MULTISIG_ADDRESS_EXPR: &str = "sc:multisig";
-const MULTISIG_PATH_EXPR: &str = "file:output/multisig.wasm";
+const MULTISIG_PATH_EXPR: &str = "mxsc:output/multisig.mxsc.json";
 const QUORUM_SIZE: usize = 1;
 
 type RustBigUint = num_bigint::BigUint;
@@ -155,38 +137,22 @@ fn call_propose(
                 ActionRaw::AddProposer(addr) => sc.propose_add_proposer(managed_address!(&addr)),
                 ActionRaw::RemoveUser(addr) => sc.propose_remove_user(managed_address!(&addr)),
                 ActionRaw::ChangeQuorum(new_size) => sc.propose_change_quorum(new_size),
-                ActionRaw::SendTransferExecute(call_data) => {
-                    let opt_endpoint = if call_data.endpoint_name.is_empty() {
-                        OptionalValue::None
-                    } else {
-                        OptionalValue::Some(ManagedBuffer::new_from_bytes(
-                            call_data.endpoint_name.as_slice(),
-                        ))
-                    };
-
-                    sc.propose_transfer_execute(
-                        managed_address!(&call_data.to),
-                        BigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
-                        opt_endpoint,
-                        boxed_bytes_vec_to_managed(call_data.arguments).into(),
-                    )
-                },
-                ActionRaw::SendAsyncCall(call_data) => {
-                    let opt_endpoint = if call_data.endpoint_name.is_empty() {
-                        OptionalValue::None
-                    } else {
-                        OptionalValue::Some(ManagedBuffer::new_from_bytes(
-                            call_data.endpoint_name.as_slice(),
-                        ))
-                    };
-
-                    sc.propose_async_call(
-                        managed_address!(&call_data.to),
-                        BigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
-                        opt_endpoint,
-                        boxed_bytes_vec_to_managed(call_data.arguments).into(),
-                    )
-                },
+                ActionRaw::SendTransferExecute(call_data) => sc.propose_transfer_execute(
+                    managed_address!(&call_data.to),
+                    BigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
+                    FunctionCall {
+                        function_name: call_data.endpoint_name.into(),
+                        arg_buffer: call_data.arguments.into(),
+                    },
+                ),
+                ActionRaw::SendAsyncCall(call_data) => sc.propose_async_call(
+                    managed_address!(&call_data.to),
+                    BigUint::from_bytes_be(&call_data.egld_amount.to_bytes_be()),
+                    FunctionCall {
+                        function_name: call_data.endpoint_name.into(),
+                        arg_buffer: call_data.arguments.into(),
+                    },
+                ),
                 ActionRaw::SCDeployFromSource {
                     amount,
                     source,
@@ -609,7 +575,7 @@ fn test_transfer_execute_sc_all() {
 
     const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
     const ADDER_ADDRESS_EXPR: &str = "sc:adder";
-    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+    const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.set_state_step(
@@ -670,7 +636,7 @@ fn test_async_call_to_sc() {
 
     const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
     const ADDER_ADDRESS_EXPR: &str = "sc:adder";
-    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+    const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.set_state_step(
@@ -734,7 +700,7 @@ fn test_deploy_and_upgrade_from_source() {
     const ADDER_OWNER_ADDRESS_EXPR: &str = "address:adder-owner";
     const ADDER_ADDRESS_EXPR: &str = "sc:adder";
     const NEW_ADDER_ADDRESS_EXPR: &str = "sc:new-adder";
-    const ADDER_PATH_EXPR: &str = "file:test-contracts/adder.wasm";
+    const ADDER_PATH_EXPR: &str = "mxsc:test-contracts/adder.mxsc.json";
 
     world.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
     world.set_state_step(
@@ -817,7 +783,7 @@ fn test_deploy_and_upgrade_from_source() {
     let factorial_code = world.code_expression(FACTORIAL_PATH_EXPR);
 
     const FACTORIAL_ADDRESS_EXPR: &str = "sc:factorial";
-    const FACTORIAL_PATH_EXPR: &str = "file:test-contracts/factorial.wasm";
+    const FACTORIAL_PATH_EXPR: &str = "mxsc:test-contracts/factorial.mxsc.json";
 
     world.register_contract(FACTORIAL_PATH_EXPR, factorial::ContractBuilder);
     world.set_state_step(SetStateStep::new().put_account(

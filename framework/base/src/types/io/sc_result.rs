@@ -1,3 +1,5 @@
+use alloc::format;
+
 use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
 
 use crate::{
@@ -12,6 +14,10 @@ use core::{
 use super::{SCError, StaticSCError};
 
 /// Default way to optionally return an error from a smart contract endpoint.
+#[deprecated(
+    since = "0.48.0",
+    note = "Use in-place error handling instead, such as `require!` or `sc_panic!`"
+)]
 #[must_use]
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SCResult<T, E = StaticSCError> {
@@ -126,6 +132,14 @@ where
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "SCResult<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Gives `SCResult<()>` the possibility to produce 0 output ABIs,

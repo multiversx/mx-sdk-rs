@@ -26,7 +26,7 @@
                 "arguments": [
                     "0",
                     "sc:multisig",
-                    "0x0000",
+                    "0x0100",
                     "1",
                     "address:paul"
                 ],
@@ -132,7 +132,7 @@
                         "str:num_board_members": "1",
                         "str:quorum": "1"
                     },
-                    "code": "file:../output/multisig.wasm"
+                    "code": "mxsc:../output/multisig.mxsc.json"
                 },
                 "+": ""
             }

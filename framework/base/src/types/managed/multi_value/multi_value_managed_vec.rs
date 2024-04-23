@@ -216,10 +216,11 @@ where
     T: ManagedVecItem,
 {
     fn type_name() -> TypeName {
-        let mut repr = TypeName::from("variadic<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        alloc::format!("MultiValueManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

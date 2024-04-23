@@ -1,13 +1,4 @@
-mod dns_proxy {
-    multiversx_sc::imports!();
-
-    #[multiversx_sc::proxy]
-    pub trait Dns {
-        #[payable("EGLD")]
-        #[endpoint]
-        fn register(&self, name: &ManagedBuffer);
-    }
-}
+use crate::dns_proxy;
 
 multiversx_sc::imports!();
 
@@ -18,18 +9,16 @@ multiversx_sc::imports!();
 ///
 #[multiversx_sc::module]
 pub trait DnsModule {
-    #[proxy]
-    fn dns_proxy(&self, to: ManagedAddress) -> dns_proxy::Proxy<Self::Api>;
-
     #[payable("EGLD")]
     #[only_owner]
     #[endpoint(dnsRegister)]
     fn dns_register(&self, dns_address: ManagedAddress, name: ManagedBuffer) {
         let payment = self.call_value().egld_value().clone_value();
-        self.dns_proxy(dns_address)
-            .register(&name)
-            .with_egld_transfer(payment)
-            .async_call()
-            .call_and_exit()
+        self.tx()
+            .to(&dns_address)
+            .typed(dns_proxy::DnsProxy)
+            .register(name)
+            .egld(payment)
+            .async_call_and_exit();
     }
 }

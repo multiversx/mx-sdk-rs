@@ -20,7 +20,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           default: true
-          toolchain: nightly-2023-05-26
+          toolchain: nightly-2023-12-11
           target: wasm32-unknown-unknown
 
       - name: Setup the PATH variable
@@ -42,12 +42,6 @@ jobs:
           which wasm-opt
           which wasm2wat
           which run-scenarios
-
-      - name: Install libtinfo5
-        if: inputs.install-libtinfo5
-        run: |
-          sudo apt update
-          sudo apt install -y libtinfo5
 
       - name: Build project example outputs
         run: |
