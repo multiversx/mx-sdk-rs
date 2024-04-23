@@ -1,8 +1,11 @@
 use core::ptr;
 
-use crate::types::{
-    AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
-    TxToSpecified,
+use crate::{
+    proxy_imports::TxToInto,
+    types::{
+        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+        TxToSpecified,
+    },
 };
 
 const ADDRESS_PREFIX: &str = "address:";
@@ -38,6 +41,16 @@ where
 impl<Env> TxFromSpecified<Env> for AddressExpr where Env: TxEnv {}
 impl<Env> TxTo<Env> for AddressExpr where Env: TxEnv {}
 impl<Env> TxToSpecified<Env> for AddressExpr where Env: TxEnv {}
+impl<Env> TxToInto<Env> for AddressExpr
+where
+    Env: TxEnv,
+{
+    type Into = Self;
+
+    fn into_recipient(self) -> Self::Into {
+        self
+    }
+}
 
 impl AddressExpr {
     pub const fn eval_to_array(&self) -> [u8; 32] {

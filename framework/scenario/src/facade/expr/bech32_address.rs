@@ -6,7 +6,7 @@ use multiversx_sc::{
     codec::*,
     types::{
         Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified,
-        TxTo, TxToSpecified,
+        TxTo, TxToInto, TxToSpecified,
     },
 };
 use serde::{Deserialize, Serialize};
@@ -101,6 +101,16 @@ where
 impl<Env> TxFromSpecified<Env> for Bech32Address where Env: TxEnv {}
 impl<Env> TxTo<Env> for Bech32Address where Env: TxEnv {}
 impl<Env> TxToSpecified<Env> for Bech32Address where Env: TxEnv {}
+impl<Env> TxToInto<Env> for Bech32Address
+where
+    Env: TxEnv,
+{
+    type Into = Self;
+
+    fn into_recipient(self) -> Self::Into {
+        self
+    }
+}
 
 impl<Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &Bech32Address
 where
@@ -126,6 +136,16 @@ where
 impl<Env> TxFromSpecified<Env> for &Bech32Address where Env: TxEnv {}
 impl<Env> TxTo<Env> for &Bech32Address where Env: TxEnv {}
 impl<Env> TxToSpecified<Env> for &Bech32Address where Env: TxEnv {}
+impl<Env> TxToInto<Env> for &Bech32Address
+where
+    Env: TxEnv,
+{
+    type Into = Self;
+
+    fn into_recipient(self) -> Self::Into {
+        self
+    }
+}
 
 impl Display for Bech32Address {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {

@@ -8,11 +8,11 @@ use crate::{
     },
     codec::TopDecode,
     err_msg::{ONLY_OWNER_CALLER, ONLY_USER_ACCOUNT_CALLER},
-    storage::{self},
+    storage,
     types::{
         BackTransfers, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EsdtLocalRoleFlags,
-        EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedType,
-        ManagedVec, TokenIdentifier,
+        EsdtTokenData, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedByteArray, ManagedRef,
+        ManagedType, ManagedVec, TokenIdentifier,
     },
 };
 
@@ -54,6 +54,13 @@ where
         ManagedAddress::from_handle(handle)
     }
 
+    #[inline]
+    pub fn get_caller_ref(&self) -> ManagedRef<'static, A, ManagedAddress<A>> {
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_CALLER);
+        A::blockchain_api_impl().load_caller_managed(handle.clone());
+        unsafe { ManagedRef::wrap_handle(handle) }
+    }
+
     #[deprecated(since = "0.41.0", note = "Please use method `get_sc_address` instead.")]
     #[cfg(feature = "alloc")]
     #[inline]
@@ -66,6 +73,13 @@ where
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_sc_address_managed(handle.clone());
         ManagedAddress::from_handle(handle)
+    }
+
+    #[inline]
+    pub fn get_sc_address_ref(&self) -> ManagedRef<'static, A, ManagedAddress<A>> {
+        let handle: A::ManagedBufferHandle = use_raw_handle(const_handles::ADDRESS_SELF);
+        A::blockchain_api_impl().load_sc_address_managed(handle.clone());
+        unsafe { ManagedRef::wrap_handle(handle) }
     }
 
     #[inline]

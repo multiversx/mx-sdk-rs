@@ -1,8 +1,11 @@
 use core::ptr;
 
-use crate::types::{
-    heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified,
-    TxTo, TxToSpecified,
+use crate::{
+    proxy_imports::TxToInto,
+    types::{
+        heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom,
+        TxFromSpecified, TxTo, TxToSpecified,
+    },
 };
 
 const SC_PREFIX: &str = "sc:";
@@ -47,6 +50,16 @@ where
 impl<'a, Env> TxFromSpecified<Env> for ScExpr<'a> where Env: TxEnv {}
 impl<'a, Env> TxTo<Env> for ScExpr<'a> where Env: TxEnv {}
 impl<'a, Env> TxToSpecified<Env> for ScExpr<'a> where Env: TxEnv {}
+impl<'a, Env> TxToInto<Env> for ScExpr<'a>
+where
+    Env: TxEnv,
+{
+    type Into = Self;
+
+    fn into_recipient(self) -> Self::Into {
+        self
+    }
+}
 
 impl<'a> ScExpr<'a> {
     pub const fn eval_to_array(&self) -> [u8; 32] {

@@ -15,7 +15,7 @@ use super::{
     FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
     RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall,
     TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToInto, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -135,7 +135,30 @@ where
     /// Specifies the recipient of the transaction.
     ///
     /// Allows argument to also be `()`.
-    pub fn to<To>(self, to: To) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    pub fn to<To>(self, to: To) -> Tx<Env, From, To::Into, Payment, Gas, Data, RH>
+    where
+        To: TxToInto<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: to.into_recipient(),
+            payment: self.payment,
+            gas: self.gas,
+            data: self.data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Only needed for the old proxies.
+    ///
+    /// Bypasses the `TxToInto` mechanism.
+    ///
+    /// Can also be called with `()` argument.
+    ///
+    /// Don't call directly, use `.to(...)` instead.
+    #[doc(hidden)]
+    pub fn override_to<To>(self, to: To) -> Tx<Env, From, To, Payment, Gas, Data, RH>
     where
         To: TxTo<Env>,
     {

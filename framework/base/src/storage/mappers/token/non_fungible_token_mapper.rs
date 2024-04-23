@@ -5,7 +5,7 @@ use crate::{
     storage_clear, storage_get, storage_set,
     types::{
         system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
-        OriginalResultMarker, Tx, TxScEnv,
+        ManagedRef, OriginalResultMarker, Tx, TxScEnv,
     },
 };
 
@@ -34,7 +34,7 @@ const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible i
 pub type IssueCallTo<Api> = Tx<
     TxScEnv<Api>,
     (),
-    ESDTSystemSCAddress,
+    ManagedRef<'static, Api, ManagedAddress<Api>>,
     EgldPayment<Api>,
     (),
     FunctionCall<Api>,

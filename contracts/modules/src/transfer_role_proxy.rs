@@ -27,7 +27,7 @@ pub trait TransferRoleProxyModule {
         transaction: Tx<
             TxScEnv<Self::Api>,
             (),
-            &ManagedAddress,
+            ManagedRef<'_, ManagedAddress<Self::Api>>,
             &ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>,
             (),
             FunctionCall<Self::Api>,
@@ -72,7 +72,7 @@ pub trait TransferRoleProxyModule {
         transaction: Tx<
             TxScEnv<Self::Api>,
             (),
-            &ManagedAddress,
+            ManagedRef<'_, ManagedAddress<Self::Api>>,
             &ManagedVec<Self::Api, EsdtTokenPayment<Self::Api>>,
             (),
             FunctionCall<Self::Api>,
@@ -81,7 +81,7 @@ pub trait TransferRoleProxyModule {
         opt_custom_callback: Option<CallbackClosure<Self::Api>>,
     ) -> ! {
         require!(
-            self.destination_whitelist().contains(transaction.to),
+            self.destination_whitelist().contains(&transaction.to),
             "Destination address not whitelisted"
         );
 
