@@ -1815,7 +1815,7 @@ checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "arrayvec",
  "getrandom 0.2.12",
@@ -1836,7 +1836,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "bitflags 2.4.2",
  "hex-literal",
@@ -1866,7 +1866,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1877,7 +1877,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "clap",
  "colored",
@@ -1903,14 +1903,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "base64",
  "bech32",
@@ -1936,7 +1936,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "base64",
  "env_logger",
@@ -1951,14 +1951,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.3.2"
+version = "0.4.0-alpha.4"
 dependencies = [
  "anyhow",
  "base64",
@@ -1982,7 +1982,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
