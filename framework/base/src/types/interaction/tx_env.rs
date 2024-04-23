@@ -3,6 +3,8 @@ use crate::{
     types::{ManagedAddress, ManagedBuffer},
 };
 
+use super::{AnnotatedValue, TxFromSpecified};
+
 pub trait TxEnv: Sized {
     type Api: CallTypeApi;
 
@@ -14,4 +16,11 @@ pub trait TxEnv: Sized {
     fn default_gas_annotation(&self) -> ManagedBuffer<Self::Api>;
 
     fn default_gas_value(&self) -> u64;
+}
+
+pub trait TxEnvMockDeployAddress: TxEnv {
+    fn mock_deploy_new_address<From, NA>(&mut self, from: &From, new_address: NA)
+    where
+        From: TxFromSpecified<Self>,
+        NA: AnnotatedValue<Self, ManagedAddress<Self::Api>>;
 }

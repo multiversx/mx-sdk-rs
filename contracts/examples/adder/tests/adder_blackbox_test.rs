@@ -24,14 +24,13 @@ fn adder_blackbox() {
 
     world.account(OWNER).nonce(1);
 
-    world.new_address(OWNER, 1, SC_ADDER);
-
     let new_address = world
         .tx()
         .from(OWNER)
         .typed(adder_proxy::AdderProxy)
         .init(5u32)
         .code(CODE_EXPR)
+        .new_address(SC_ADDER)
         .returns(ReturnsNewAddress)
         .run();
 
