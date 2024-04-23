@@ -1,11 +1,9 @@
 use crate::{
     api::CallTypeApi,
-    contract_base::BlockchainWrapper,
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
-        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
-        TokenIdentifier,
+        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment, TokenIdentifier,
     },
 };
 
@@ -150,11 +148,6 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
-    }
-
-    pub fn to_caller(self) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data, RH> {
-        let caller = BlockchainWrapper::<Env::Api>::new().get_caller();
-        self.to(caller)
     }
 }
 
