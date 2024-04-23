@@ -1,6 +1,6 @@
 use crate::{
     api::CallTypeApi,
-    types::{ManagedAddress, ManagedBuffer},
+    types::{heap::H256, ManagedAddress, ManagedBuffer},
 };
 
 use super::{AnnotatedValue, TxFromSpecified};
@@ -26,7 +26,5 @@ pub trait TxEnvMockDeployAddress: TxEnv {
 }
 
 pub trait TxEnvWithTxHash: TxEnv {
-    fn set_tx_hash<TH>(&mut self, tx_hash: TH)
-    where
-        TH: AnnotatedValue<Self, ManagedBuffer<Self::Api>>;
+    fn set_tx_hash(&mut self, tx_hash: H256);
 }

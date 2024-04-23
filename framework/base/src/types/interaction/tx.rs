@@ -1,7 +1,7 @@
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+        heap::H256, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
         ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
         TokenIdentifier,
@@ -845,10 +845,10 @@ where
     }
 }
 
-impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+impl<Env, From_, To, Payment, Gas, Data, RH> Tx<Env, From_, To, Payment, Gas, Data, RH>
 where
     Env: TxEnvWithTxHash,
-    From: TxFromSpecified<Env>,
+    From_: TxFromSpecified<Env>,
     To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
@@ -858,11 +858,11 @@ where
     /// Sets the new mock address to be used for the newly deployed contract.
     ///
     /// Only allowed in tests.
-    pub fn tx_hash<TH>(mut self, tx_hash: TH) -> Self
+    pub fn tx_hash<H>(mut self, tx_hash: H) -> Self
     where
-        TH: AnnotatedValue<Env, ManagedBuffer<Env::Api>>,
+        H256: From<H>,
     {
-        self.env.set_tx_hash(tx_hash);
+        self.env.set_tx_hash(H256::from(tx_hash));
         self
     }
 }
