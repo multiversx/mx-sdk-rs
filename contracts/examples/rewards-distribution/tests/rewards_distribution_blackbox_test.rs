@@ -124,8 +124,7 @@ fn test_compute_brackets() {
         .account(REWARDS_DISTRIBUTION_ADDRESS_EXPR)
         .nonce(1)
         .owner(OWNER_ADDRESS_EXPR)
-        .code(rewards_distribution_code)
-        .balance("0");
+        .code(rewards_distribution_code);
 
     state.world.whitebox_call(
         &state.rewards_distribution_whitebox,
