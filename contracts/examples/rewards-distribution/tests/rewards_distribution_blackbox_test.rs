@@ -18,12 +18,8 @@ const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const REWARDS_DISTRIBUTION_ADDRESS_EXPR: &str = "sc:rewards-distribution";
 const REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL: ScExpr = ScExpr("rewards-distribution");
 const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "mxsc:output/rewards-distribution.mxsc.json";
-const REWARDS_DISTRIBUTION_PATH_EXPR_REPL: MxscExpr =
-    MxscExpr("output/rewards-distribution.mxsc.json");
 const SEED_NFT_MINTER_ADDRESS_EXPR: &str = "sc:seed-nft-minter";
 const SEED_NFT_MINTER_PATH_EXPR: &str = "mxsc:../seed-nft-minter/output/seed-nft-minter.mxsc.json";
-const SEED_NFT_MINTER_PATH_EXPR_REPL: MxscExpr =
-    MxscExpr("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
 
 type RewardsDistributionContract = ContractInfo<rewards_distribution::Proxy<StaticApi>>;
 type SeedNFTMinterContract = ContractInfo<mock_seed_nft_minter::Proxy<StaticApi>>;
@@ -222,7 +218,6 @@ fn test_raffle_and_claim() {
             .call(state.rewards_distribution_contract.deposit_royalties()),
     );
 
-    let vect = &[0u8; 32];
     // run the raffle
     state
         .world
@@ -231,7 +226,7 @@ fn test_raffle_and_claim() {
         .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
         .typed(proxy::RewardsDistributionProxy)
         .raffle()
-        .tx_hash(ManagedBuffer::from(vect))
+        .tx_hash(&[0u8; 32])
         .run();
 
     let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
