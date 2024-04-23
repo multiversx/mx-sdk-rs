@@ -863,7 +863,6 @@ where
         TH: AnnotatedValue<Env, ManagedBuffer<Env::Api>>,
     {
         self.env.set_tx_hash(tx_hash);
-        let str = "str";
         self
     }
 }
