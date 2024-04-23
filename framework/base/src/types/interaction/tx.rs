@@ -3,7 +3,8 @@ use crate::{
     types::{
         BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
-        ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment, TokenIdentifier,
+        ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
+        TokenIdentifier,
     },
 };
 
@@ -14,9 +15,9 @@ use super::{
     ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
     RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEgldValue, TxEnv, TxEnvMockDeployAddress, TxFrom, TxFromSourceValue,
-    TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    TxDataFunctionCall, TxEgldValue, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom,
+    TxFromSourceValue, TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
+    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -840,6 +841,29 @@ where
         NA: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
     {
         self.env.mock_deploy_new_address(&self.from, new_address);
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnvWithTxHash,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    Data: TxDataFunctionCall<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the new mock address to be used for the newly deployed contract.
+    ///
+    /// Only allowed in tests.
+    pub fn tx_hash<TH>(mut self, tx_hash: TH) -> Self
+    where
+        TH: AnnotatedValue<Env, ManagedBuffer<Env::Api>>,
+    {
+        self.env.set_tx_hash(tx_hash);
+        let str = "str";
         self
     }
 }

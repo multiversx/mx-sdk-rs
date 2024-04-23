@@ -2,7 +2,11 @@ use std::path::PathBuf;
 
 use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv};
 
-use crate::{api::StaticApi, scenario_model::TxExpect, ScenarioWorld};
+use crate::{
+    api::StaticApi,
+    scenario_model::{BytesValue, TxExpect},
+    ScenarioWorld,
+};
 
 /// Designates a tx environment suitable for running scenarios locally.
 pub trait ScenarioTxEnv: TxEnv {
@@ -13,6 +17,7 @@ pub trait ScenarioTxEnv: TxEnv {
 #[derive(Default, Debug, Clone)]
 pub struct ScenarioTxEnvData {
     pub context_path: PathBuf,
+    pub tx_hash: Option<BytesValue>,
 }
 
 impl TxEnv for ScenarioTxEnvData {
@@ -43,6 +48,7 @@ impl ScenarioWorld {
     pub(crate) fn new_env_data(&self) -> ScenarioTxEnvData {
         ScenarioTxEnvData {
             context_path: self.current_dir.clone(),
+            tx_hash: None,
         }
     }
 }

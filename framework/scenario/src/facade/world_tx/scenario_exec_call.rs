@@ -2,14 +2,14 @@ use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
         FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxEnvMockDeployAddress, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
     },
 };
 
 use crate::{
     api::StaticApi,
     scenario::tx_to_step::{address_annotated, TxToStep},
-    scenario_model::{SetStateStep, TxExpect, TxResponse},
+    scenario_model::{BytesValue, SetStateStep, TxExpect, TxResponse},
     ScenarioTxEnv, ScenarioTxRun, ScenarioWorld,
 };
 
@@ -85,6 +85,16 @@ where
         let mut step_wrapper = self.tx_to_step();
         step_wrapper.env.world.sc_call(&mut step_wrapper.step);
         step_wrapper.process_result()
+    }
+}
+
+impl<'w> TxEnvWithTxHash for ScenarioEnvExec<'w> {
+    fn set_tx_hash<TH>(&mut self, tx_hash: TH)
+    where
+        TH: multiversx_sc::types::AnnotatedValue<Self, ManagedBuffer<Self::Api>>,
+    {
+        let bytes_tx_hash = BytesValue::from(tx_hash.into_value(&self).to_vec());
+        self.data.tx_hash = Some(bytes_tx_hash);
     }
 }
 

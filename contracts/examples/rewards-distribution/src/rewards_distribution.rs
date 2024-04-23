@@ -5,8 +5,8 @@ use multiversx_sc_modules::ongoing_operation::{
     CONTINUE_OP, DEFAULT_MIN_GAS_TO_SAVE_PROGRESS, STOP_OP,
 };
 
+pub mod proxy;
 pub mod seed_nft_minter_proxy;
-
 type Epoch = u64;
 
 pub const EPOCHS_IN_WEEK: Epoch = 7;

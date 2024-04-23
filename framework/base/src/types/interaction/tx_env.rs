@@ -24,3 +24,9 @@ pub trait TxEnvMockDeployAddress: TxEnv {
         From: TxFromSpecified<Self>,
         NA: AnnotatedValue<Self, ManagedAddress<Self::Api>>;
 }
+
+pub trait TxEnvWithTxHash: TxEnv {
+    fn set_tx_hash<TH>(&mut self, tx_hash: TH)
+    where
+        TH: AnnotatedValue<Self, ManagedBuffer<Self::Api>>;
+}
