@@ -46,6 +46,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "adder-pt"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc 0.49.0-alpha.3",
+ "multiversx-sc-scenario 0.49.0-alpha.3",
+ "num-bigint",
+]
+
+[[package]]
+name = "adder-pt-meta"
+version = "0.0.0"
+dependencies = [
+ "adder-pt",
+ "multiversx-sc-meta 0.49.0-alpha.3",
+]
+
+[[package]]
 name = "addercaller"
 version = "0.0.0"
 dependencies = [
@@ -1848,6 +1865,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "multisig-pt"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc 0.49.0-alpha.3",
+ "multiversx-sc-scenario 0.49.0-alpha.3",
+ "num-bigint",
+]
+
+[[package]]
+name = "multisig-pt-meta"
+version = "0.0.0"
+dependencies = [
+ "multisig-pt",
+ "multiversx-sc-meta 0.49.0-alpha.3",
+]
+
+[[package]]
 name = "multiversx-chain-scenario-format"
 version = "0.22.2"
 dependencies = [
@@ -3364,23 +3398,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "test-adder"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc 0.49.0-alpha.3",
- "multiversx-sc-scenario 0.49.0-alpha.3",
- "num-bigint",
-]
-
-[[package]]
-name = "test-adder-meta"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc-meta 0.49.0-alpha.3",
- "test-adder",
-]
-
-[[package]]
 name = "test-testapi"
 version = "0.0.0"
 dependencies = [
@@ -3395,23 +3412,6 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc-meta 0.49.0-alpha.3",
  "test-testapi",
-]
-
-[[package]]
-name = "test_multisig"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc 0.49.0-alpha.3",
- "multiversx-sc-scenario 0.49.0-alpha.3",
- "num-bigint",
-]
-
-[[package]]
-name = "test_multisig-meta"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc-meta 0.49.0-alpha.3",
- "test_multisig",
 ]
 
 [[package]]
