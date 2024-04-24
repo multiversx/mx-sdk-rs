@@ -1,6 +1,4 @@
 mod annotated;
-mod async_call;
-mod async_call_promises;
 mod back_transfers;
 mod callback_closure;
 mod callback_selector_result;
@@ -28,8 +26,6 @@ mod typed_function_call;
 mod upgrade_call;
 
 pub use annotated::*;
-pub use async_call::AsyncCall;
-pub use async_call_promises::AsyncCallPromises;
 pub use back_transfers::BackTransfers;
 pub use callback_closure::{
     new_callback_call, CallbackClosure, CallbackClosureForDeser, CallbackClosureMatcher,

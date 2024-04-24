@@ -1,3 +1,5 @@
+mod async_call;
+mod async_call_promises;
 mod contract_call_convert;
 mod contract_call_exec;
 mod contract_call_no_payment;
@@ -8,6 +10,8 @@ mod contract_call_with_egld_or_single_esdt;
 mod contract_call_with_multi_esdt;
 mod contract_deploy;
 
+pub use async_call::AsyncCall;
+pub use async_call_promises::AsyncCallPromises;
 pub use contract_call_no_payment::ContractCallNoPayment;
 pub use contract_call_trait::{ContractCall, ContractCallBase};
 pub use contract_call_with_any_payment::ContractCallWithAnyPayment;
