@@ -1,12 +1,10 @@
 use core::marker::PhantomData;
 
 use crate::api::ManagedTypeApi;
+use crate::types::FunctionCall;
 
-use super::FunctionCall;
-
-/// Encodes a function call on the blockchain, together with the original result type.
-///
-/// Can be used as a multi-argument, to embed a call within a call.
+/// Old attempt at grouping FunctionCall + OriginalTypeMarker.
+#[deprecated(since = "0.49.0", note = "Not clear if it still used anywhere, will delete soon.")]
 pub struct TypedFunctionCall<Api, OriginalResult>
 where
     Api: ManagedTypeApi,

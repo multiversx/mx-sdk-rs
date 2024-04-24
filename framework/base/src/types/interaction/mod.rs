@@ -22,7 +22,6 @@ mod tx_result_handler;
 mod tx_rh_list;
 mod tx_rh_original_result;
 mod tx_to;
-mod typed_function_call;
 mod upgrade_call;
 
 pub use annotated::*;
@@ -50,7 +49,6 @@ pub use tx_result_handler::*;
 pub use tx_rh_list::*;
 pub use tx_rh_original_result::*;
 pub use tx_to::*;
-pub use typed_function_call::*;
 pub use upgrade_call::*;
 
 pub type TxScBase<Api> = TxBaseWithEnv<TxScEnv<Api>>;
