@@ -1,7 +1,7 @@
 use crate::{
     api::CallTypeApi,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+        heap::H256, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
         ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
         TokenIdentifier,
@@ -15,9 +15,9 @@ use super::{
     ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
     ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
     RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEgldValue, TxEnv, TxEnvMockDeployAddress, TxFrom, TxFromSourceValue,
-    TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait,
-    TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    TxDataFunctionCall, TxEgldValue, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom,
+    TxFromSourceValue, TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
+    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
 };
 
 #[must_use]
@@ -841,6 +841,28 @@ where
         NA: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
     {
         self.env.mock_deploy_new_address(&self.from, new_address);
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnvWithTxHash,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    Data: TxDataFunctionCall<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the mock transaction hash to be used in a test.
+    ///
+    /// Only allowed in tests.
+    pub fn tx_hash<H>(mut self, tx_hash: H) -> Self
+    where
+        H256: core::convert::From<H>,
+    {
+        self.env.set_tx_hash(H256::from(tx_hash));
         self
     }
 }

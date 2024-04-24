@@ -6,15 +6,17 @@ use std::iter::zip;
 
 use crate::mock_seed_nft_minter::ProxyTrait as _;
 use rewards_distribution::{
-    Bracket, ContractObj, ProxyTrait as _, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
+    proxy, Bracket, ContractObj, ProxyTrait as _, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
 };
 
 const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
 const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
 
 const ALICE_ADDRESS_EXPR: &str = "address:alice";
+const ALICE_ADDRESS_EXPR_REPL: AddressExpr = AddressExpr("alice");
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const REWARDS_DISTRIBUTION_ADDRESS_EXPR: &str = "sc:rewards-distribution";
+const REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL: ScExpr = ScExpr("rewards-distribution");
 const REWARDS_DISTRIBUTION_PATH_EXPR: &str = "mxsc:output/rewards-distribution.mxsc.json";
 const SEED_NFT_MINTER_ADDRESS_EXPR: &str = "sc:seed-nft-minter";
 const SEED_NFT_MINTER_PATH_EXPR: &str = "mxsc:../seed-nft-minter/output/seed-nft-minter.mxsc.json";
@@ -217,13 +219,15 @@ fn test_raffle_and_claim() {
     );
 
     // run the raffle
-    state.world.sc_call(
-        ScCallStep::new()
-            .from(ALICE_ADDRESS_EXPR)
-            .tx_hash(&[0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
-            .call(state.rewards_distribution_contract.raffle())
-            .expect_value(OperationCompletionStatus::Completed),
-    );
+    state
+        .world
+        .tx()
+        .from(ALICE_ADDRESS_EXPR_REPL)
+        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+        .typed(proxy::RewardsDistributionProxy)
+        .raffle()
+        .tx_hash([0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
+        .run();
 
     let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
     // post-raffle reward amount frequency checksstate

@@ -1,8 +1,9 @@
 use multiversx_sc::{
     tuple_util::NestedTupleFlatten,
     types::{
-        FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv, TxEnv,
-        TxEnvMockDeployAddress, TxFromSpecified, TxGas, TxPayment, TxToSpecified,
+        heap::H256, FunctionCall, ManagedAddress, ManagedBuffer, RHListExec, Tx, TxBaseWithEnv,
+        TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFromSpecified, TxGas, TxPayment,
+        TxToSpecified,
     },
 };
 
@@ -83,8 +84,16 @@ where
 
     fn run(self) -> Self::Returns {
         let mut step_wrapper = self.tx_to_step();
+        step_wrapper.step.explicit_tx_hash = core::mem::take(&mut step_wrapper.env.data.tx_hash);
         step_wrapper.env.world.sc_call(&mut step_wrapper.step);
         step_wrapper.process_result()
+    }
+}
+
+impl<'w> TxEnvWithTxHash for ScenarioEnvExec<'w> {
+    fn set_tx_hash(&mut self, tx_hash: H256) {
+        assert!(self.data.tx_hash.is_none(), "tx hash set twice");
+        self.data.tx_hash = Some(tx_hash);
     }
 }
 
