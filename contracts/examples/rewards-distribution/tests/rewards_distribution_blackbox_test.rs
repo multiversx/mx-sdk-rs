@@ -226,7 +226,7 @@ fn test_raffle_and_claim() {
         .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
         .typed(proxy::RewardsDistributionProxy)
         .raffle()
-        .tx_hash(&[0u8; 32])
+        .tx_hash([0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
         .run();
 
     let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
