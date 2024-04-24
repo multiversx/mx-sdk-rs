@@ -40,7 +40,7 @@ checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
 name = "multiversx-sc"
-version = "0.48.0"
+version = "0.49.0-alpha.4"
 dependencies = [
  "bitflags",
  "hex-literal",
@@ -69,7 +69,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.48.0"
+version = "0.49.0-alpha.4"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -80,14 +80,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.48.0"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.48.0"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
 ]
