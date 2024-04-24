@@ -1,9 +1,19 @@
+mod deploy_call;
+mod function_call;
+mod tx_code_source;
+mod upgrade_call;
+
+pub use deploy_call::DeployCall;
+pub use function_call::FunctionCall;
+pub use tx_code_source::*;
+pub use upgrade_call::UpgradeCall;
+
 use crate::{
     formatter::SCLowerHex,
     types::{ManagedBuffer, ManagedBufferBuilder},
 };
 
-use super::{FunctionCall, TxEnv};
+use super::TxEnv;
 
 pub trait TxData<Env>
 where

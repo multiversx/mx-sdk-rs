@@ -10,12 +10,10 @@ use crate::{
         ESDT_TRANSFER_FUNC_NAME,
     },
     types::{
-        EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress, ManagedBuffer, ManagedVec,
-        MultiValueEncoded,
+        ContractCallNoPayment, EsdtTokenPayment, EsdtTokenPaymentRefs, ManagedAddress,
+        ManagedArgBuffer, ManagedBuffer, ManagedVec, MultiValueEncoded, TypedFunctionCall,
     },
 };
-
-use super::{ContractCallNoPayment, ManagedArgBuffer, TypedFunctionCall};
 
 /// Encodes a function call on the blockchain, composed of a function name and its encoded arguments.
 ///
@@ -160,7 +158,7 @@ where
     Api: ManagedTypeApi,
 {
     /// Constructs `ESDTTransfer` builtin function call.
-    pub(super) fn convert_to_single_transfer_fungible_call(
+    pub(crate) fn convert_to_single_transfer_fungible_call(
         self,
         payment: EsdtTokenPaymentRefs<'_, Api>,
     ) -> FunctionCall<Api> {
@@ -177,7 +175,7 @@ where
     /// arg1 - nonce
     /// arg2 - quantity to transfer
     /// arg3 - destination address
-    pub(super) fn convert_to_single_transfer_nft_call(
+    pub(crate) fn convert_to_single_transfer_nft_call(
         self,
         to: &ManagedAddress<Api>,
         payment: EsdtTokenPaymentRefs<'_, Api>,
@@ -191,7 +189,7 @@ where
     }
 
     /// Constructs `MultiESDTNFTTransfer` builtin function call.
-    pub(super) fn convert_to_multi_transfer_esdt_call(
+    pub(crate) fn convert_to_multi_transfer_esdt_call(
         self,
         to: &ManagedAddress<Api>,
         payments: &ManagedVec<Api, EsdtTokenPayment<Api>>,

@@ -1,10 +1,12 @@
 use core::marker::PhantomData;
 
-use crate::api::ManagedTypeApi;
-use crate::types::FunctionCall;
+use crate::{api::ManagedTypeApi, types::FunctionCall};
 
 /// Old attempt at grouping FunctionCall + OriginalTypeMarker.
-#[deprecated(since = "0.49.0", note = "Not clear if it still used anywhere, will delete soon.")]
+#[deprecated(
+    since = "0.49.0",
+    note = "Not clear if it still used anywhere, will delete soon."
+)]
 pub struct TypedFunctionCall<Api, OriginalResult>
 where
     Api: ManagedTypeApi,
