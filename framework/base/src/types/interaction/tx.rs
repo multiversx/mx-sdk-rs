@@ -845,22 +845,22 @@ where
     }
 }
 
-impl<Env, From_, To, Payment, Gas, Data, RH> Tx<Env, From_, To, Payment, Gas, Data, RH>
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
 where
     Env: TxEnvWithTxHash,
-    From_: TxFromSpecified<Env>,
+    From: TxFromSpecified<Env>,
     To: TxTo<Env>,
     Payment: TxPaymentEgldOnly<Env>,
     Gas: TxGas<Env>,
     Data: TxDataFunctionCall<Env>,
     RH: TxResultHandler<Env>,
 {
-    /// Sets the new mock address to be used for the newly deployed contract.
+    /// Sets the mock transaction hash to be used in a test.
     ///
     /// Only allowed in tests.
     pub fn tx_hash<H>(mut self, tx_hash: H) -> Self
     where
-        H256: From<H>,
+        H256: core::convert::From<H>,
     {
         self.env.set_tx_hash(H256::from(tx_hash));
         self
