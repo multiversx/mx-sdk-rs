@@ -6,8 +6,7 @@ use multiversx_sc_scenario::imports::*;
 use std::iter::zip;
 
 use rewards_distribution::{
-    rewards_distribution_proxy, ContractObj, ProxyTrait as _, RewardsDistribution,
-    DIVISION_SAFETY_CONSTANT,
+    rewards_distribution_proxy, ContractObj, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
 };
 
 const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
@@ -20,8 +19,6 @@ const REWARDS_DISTRIBUTION_PATH_EXPR: MxscExpr = MxscExpr("output/rewards-distri
 const SEED_NFT_MINTER_ADDRESS_EXPR: ScExpr = ScExpr("seed-nft-minter");
 const SEED_NFT_MINTER_PATH_EXPR: MxscExpr =
     MxscExpr("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
-
-type RewardsDistributionContract = ContractInfo<rewards_distribution::Proxy<StaticApi>>;
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -39,7 +36,6 @@ fn world() -> ScenarioWorld {
 
 struct RewardsDistributionTestState {
     world: ScenarioWorld,
-    rewards_distribution_contract: RewardsDistributionContract,
     rewards_distribution_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
 }
 
@@ -49,8 +45,6 @@ impl RewardsDistributionTestState {
 
         world.account(OWNER_ADDRESS_EXPR).nonce(1);
 
-        let rewards_distribution_contract =
-            RewardsDistributionContract::new(REWARDS_DISTRIBUTION_ADDRESS_EXPR);
         let rewards_distribution_whitebox = WhiteboxContract::new(
             REWARDS_DISTRIBUTION_ADDRESS_EXPR,
             rewards_distribution::contract_obj,
@@ -58,7 +52,6 @@ impl RewardsDistributionTestState {
 
         Self {
             world,
-            rewards_distribution_contract,
             rewards_distribution_whitebox,
         }
     }
@@ -212,9 +205,9 @@ fn test_raffle_and_claim() {
     state
         .world
         .tx()
-        .from(ALICE_ADDRESS_EXPR_REPL)
-        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
-        .typed(proxy::RewardsDistributionProxy)
+        .from(ALICE_ADDRESS_EXPR)
+        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR)
+        .typed(rewards_distribution_proxy::RewardsDistributionProxy)
         .raffle()
         .tx_hash([0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
         .run();
