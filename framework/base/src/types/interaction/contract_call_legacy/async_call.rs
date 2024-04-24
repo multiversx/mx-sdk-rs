@@ -1,9 +1,7 @@
 use crate::{
     api::{CallTypeApi, StorageWriteApi},
-    types::{CallbackClosure, EgldPayment, ManagedAddress},
+    types::{CallbackClosure, EgldPayment, FunctionCall, ManagedAddress, Tx, TxScEnv},
 };
-
-use super::{FunctionCall, Tx, TxScEnv};
 
 pub type AsyncCall<Api> = Tx<
     TxScEnv<Api>,

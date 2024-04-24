@@ -11,13 +11,13 @@ use crate::{
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_deploy::UNSPECIFIED_GAS_LIMIT, AnnotatedValue, Code, ContractCallBase,
-    ContractCallNoPayment, ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment,
-    ExplicitGas, FromSource, FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList,
-    RHListAppendNoRet, RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData,
-    TxDataFunctionCall, TxEgldValue, TxEnv, TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom,
-    TxFromSourceValue, TxFromSpecified, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    AnnotatedValue, Code, ContractCallBase, ContractCallNoPayment, ContractCallWithEgld,
+    ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
+    ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem,
+    TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
+    TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas,
+    TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified, UpgradeCall, UNSPECIFIED_GAS_LIMIT,
 };
 
 #[must_use]

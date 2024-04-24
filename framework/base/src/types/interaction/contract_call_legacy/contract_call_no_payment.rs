@@ -12,10 +12,9 @@ use crate::{
 };
 
 use super::{
-    contract_call_exec::UNSPECIFIED_GAS_LIMIT, contract_call_trait::ContractCallBase,
-    contract_call_with_egld::ContractCallWithEgld,
+    contract_call_trait::ContractCallBase, contract_call_with_egld::ContractCallWithEgld,
     contract_call_with_multi_esdt::ContractCallWithMultiEsdt, ContractCall,
-    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt,
+    ContractCallWithAnyPayment, ContractCallWithEgldOrSingleEsdt, UNSPECIFIED_GAS_LIMIT,
 };
 
 /// Holds metadata for calling another contract, without payments.
