@@ -4,7 +4,7 @@ mod scenario_set_new_address;
 
 use crate::{
     scenario::ScenarioRunner,
-    scenario_model::{AddressKey, AddressValue, NewAddress, SetStateStep, U64Value},
+    scenario_model::{AddressKey, AddressValue, BigUintValue, NewAddress, SetStateStep, U64Value},
     ScenarioWorld,
 };
 
@@ -40,6 +40,18 @@ impl ScenarioWorld {
     {
         self.empty_builder()
             .new_address(creator_address_expr, creator_nonce_expr, new_address_expr)
+    }
+
+    pub fn create_account_raw<CA, V>(
+        &mut self,
+        address: CA,
+        egld_balance: V,
+    ) -> SetStateBuilder<'_, AccountItem>
+    where
+        AddressKey: From<CA>,
+        BigUintValue: From<V>,
+    {
+        self.empty_builder().account(address).balance(egld_balance)
     }
 
     pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {

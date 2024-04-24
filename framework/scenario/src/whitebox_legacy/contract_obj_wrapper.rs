@@ -180,7 +180,7 @@ impl BlockchainStateWrapper {
 impl BlockchainStateWrapper {
     pub fn create_user_account(&mut self, egld_balance: &num_bigint::BigUint) -> Address {
         let address = self.address_factory.new_address();
-        self.create_account_raw(&address, egld_balance, None, None, None);
+        self.world.create_account_raw(&address, egld_balance);
 
         address
     }
@@ -190,7 +190,7 @@ impl BlockchainStateWrapper {
         address: &Address,
         egld_balance: &num_bigint::BigUint,
     ) {
-        self.create_account_raw(address, egld_balance, None, None, None);
+        self.world.create_account_raw(address, egld_balance);
     }
 
     pub fn create_sc_account<CB, ContractObjBuilder>(
