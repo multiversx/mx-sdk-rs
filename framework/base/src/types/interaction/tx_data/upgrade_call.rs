@@ -1,11 +1,12 @@
 use multiversx_sc_codec::TopEncodeMulti;
 
-use crate::types::{CodeMetadata, ManagedBuffer, ManagedBufferCachedBuilder};
-
-use super::{ManagedArgBuffer, TxCodeSource, TxData, TxEnv};
+use crate::types::{
+    CodeMetadata, ManagedArgBuffer, ManagedBuffer, ManagedBufferCachedBuilder, TxCodeSource,
+    TxData, TxEnv,
+};
 
 /// Holds deploy data: code, code metadata, and arguments.
-pub struct DeployCall<Env, CodeSource>
+pub struct UpgradeCall<Env, CodeSource>
 where
     Env: TxEnv,
     CodeSource: TxCodeSource<Env>,
@@ -15,12 +16,12 @@ where
     pub arg_buffer: ManagedArgBuffer<Env::Api>,
 }
 
-impl<Env> Default for DeployCall<Env, ()>
+impl<Env> Default for UpgradeCall<Env, ()>
 where
     Env: TxEnv,
 {
-    fn default() -> DeployCall<Env, ()> {
-        DeployCall {
+    fn default() -> UpgradeCall<Env, ()> {
+        UpgradeCall {
             code_source: (),
             code_metadata: CodeMetadata::DEFAULT,
             arg_buffer: ManagedArgBuffer::new(),
@@ -28,7 +29,7 @@ where
     }
 }
 
-impl<Env, CodeSource> TxData<Env> for DeployCall<Env, CodeSource>
+impl<Env, CodeSource> TxData<Env> for UpgradeCall<Env, CodeSource>
 where
     Env: TxEnv,
     CodeSource: TxCodeSource<Env>,
@@ -46,15 +47,15 @@ where
     }
 }
 
-impl<Env> DeployCall<Env, ()>
+impl<Env> UpgradeCall<Env, ()>
 where
     Env: TxEnv,
 {
-    pub fn code_source<CodeSource>(self, code_source: CodeSource) -> DeployCall<Env, CodeSource>
+    pub fn code_source<CodeSource>(self, code_source: CodeSource) -> UpgradeCall<Env, CodeSource>
     where
         CodeSource: TxCodeSource<Env>,
     {
-        DeployCall {
+        UpgradeCall {
             code_source,
             code_metadata: self.code_metadata,
             arg_buffer: self.arg_buffer,
@@ -62,7 +63,7 @@ where
     }
 }
 
-impl<Env, CodeSource> DeployCall<Env, CodeSource>
+impl<Env, CodeSource> UpgradeCall<Env, CodeSource>
 where
     Env: TxEnv,
     CodeSource: TxCodeSource<Env>,

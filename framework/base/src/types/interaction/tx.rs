@@ -1,8 +1,7 @@
 use crate::{
     api::CallTypeApi,
-    contract_base::BlockchainWrapper,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+        heap::H256, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
         ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
         TokenIdentifier,
@@ -12,12 +11,13 @@ use crate::{
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_deploy::UNSPECIFIED_GAS_LIMIT, Code, ContractCallBase, ContractCallNoPayment,
-    ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource,
-    FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
-    RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall,
-    TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    AnnotatedValue, Code, ContractCallBase, ContractCallNoPayment, ContractCallWithEgld,
+    ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
+    ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem,
+    TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
+    TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas,
+    TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified, UpgradeCall, UNSPECIFIED_GAS_LIMIT,
 };
 
 #[must_use]
@@ -150,11 +150,6 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
-    }
-
-    pub fn to_caller(self) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data, RH> {
-        let caller = BlockchainWrapper::<Env::Api>::new().get_caller();
-        self.to(caller)
     }
 }
 
@@ -823,6 +818,51 @@ where
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+where
+    Env: TxEnvMockDeployAddress,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    CodeSource: TxCodeSource<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the new mock address to be used for the newly deployed contract.
+    ///
+    /// Only allowed in tests.
+    pub fn new_address<NA>(mut self, new_address: NA) -> Self
+    where
+        NA: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+    {
+        self.env.mock_deploy_new_address(&self.from, new_address);
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnvWithTxHash,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    Data: TxDataFunctionCall<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the mock transaction hash to be used in a test.
+    ///
+    /// Only allowed in tests.
+    pub fn tx_hash<H>(mut self, tx_hash: H) -> Self
+    where
+        H256: core::convert::From<H>,
+    {
+        self.env.set_tx_hash(H256::from(tx_hash));
         self
     }
 }

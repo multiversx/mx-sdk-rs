@@ -209,13 +209,15 @@ fn test_raffle_and_claim() {
         .run();
 
     // run the raffle
-    state.world.sc_call(
-        ScCallStep::new()
-            .from(ALICE_ADDRESS_EXPR)
-            .tx_hash(&[0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
-            .call(state.rewards_distribution_contract.raffle())
-            .expect_value(OperationCompletionStatus::Completed),
-    );
+    state
+        .world
+        .tx()
+        .from(ALICE_ADDRESS_EXPR_REPL)
+        .to(REWARDS_DISTRIBUTION_ADDRESS_EXPR_REPL)
+        .typed(proxy::RewardsDistributionProxy)
+        .raffle()
+        .tx_hash([0u8; 32]) // blockchain rng is deterministic, so we can use a fixed hash
+        .run();
 
     let mut rewards: Vec<BigUint<StaticApi>> = Vec::new();
     // post-raffle reward amount frequency checksstate

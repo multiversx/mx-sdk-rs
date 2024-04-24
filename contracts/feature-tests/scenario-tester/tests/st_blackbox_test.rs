@@ -51,7 +51,7 @@ fn st_blackbox() {
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
-    world.set_state_step(SetStateStep::new().new_address(owner_address, 1, "sc:scenario-tester"));
+    world.new_address(owner_address, 1, "sc:scenario-tester");
 
     let new_address = world
         .tx()

@@ -7,7 +7,6 @@ use multiversx_sc_modules::ongoing_operation::{
 
 pub mod rewards_distribution_proxy;
 pub mod seed_nft_minter_proxy;
-
 type Epoch = u64;
 
 pub const EPOCHS_IN_WEEK: Epoch = 7;

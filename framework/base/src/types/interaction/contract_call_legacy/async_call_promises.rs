@@ -1,10 +1,8 @@
 use crate::{
     api::CallTypeApi,
     contract_base::SendRawWrapper,
-    types::{BigUint, CallbackClosure, ManagedAddress, ManagedBuffer},
+    types::{BigUint, CallbackClosure, FunctionCall, ManagedAddress, ManagedBuffer},
 };
-
-use super::FunctionCall;
 
 /// Will be renamed to `AsyncCall` and `AsyncCall` to `AsyncCallLegacy` when the promises end up on the mainnet.
 #[must_use]
