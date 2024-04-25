@@ -344,19 +344,7 @@ impl BlockchainStateWrapper {
     }
 
     pub fn set_egld_balance(&mut self, address: &Address, balance: &num_bigint::BigUint) {
-        let vm_address = to_vm_address(address);
-        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
-            Some(acc) => {
-                acc.egld_balance = balance.clone();
-
-                self.add_mandos_set_account(address);
-            },
-
-            None => panic!(
-                "set_egld_balance: Account {:?} does not exist",
-                address_to_hex(address)
-            ),
-        }
+        self.world.set_egld_balance(address, balance);
     }
 
     pub fn set_esdt_balance(
@@ -365,23 +353,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         balance: &num_bigint::BigUint,
     ) {
-        let vm_address = to_vm_address(address);
-        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
-            Some(acc) => {
-                acc.esdt.set_esdt_balance(
-                    token_id.to_vec(),
-                    0,
-                    balance,
-                    EsdtInstanceMetadata::default(),
-                );
-
-                self.add_mandos_set_account(address);
-            },
-            None => panic!(
-                "set_esdt_balance: Account {:?} does not exist",
-                address_to_hex(address)
-            ),
-        }
+        self.world.set_esdt_balance(address, token_id, balance);
     }
 
     pub fn set_nft_balance<T: TopEncode>(
@@ -392,7 +364,7 @@ impl BlockchainStateWrapper {
         balance: &num_bigint::BigUint,
         attributes: &T,
     ) {
-        self.set_nft_balance_all_properties(
+        self.world.set_nft_balance_all_properties(
             address,
             token_id,
             nonce,
@@ -404,6 +376,18 @@ impl BlockchainStateWrapper {
             None,
             &[],
         );
+        // self.set_nft_balance_all_properties(
+        //     address,
+        //     token_id,
+        //     nonce,
+        //     balance,
+        //     attributes,
+        //     0,
+        //     None,
+        //     None,
+        //     None,
+        //     &[],
+        // );
     }
 
     pub fn set_developer_rewards(

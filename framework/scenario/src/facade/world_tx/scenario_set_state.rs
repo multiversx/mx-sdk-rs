@@ -8,6 +8,8 @@ use crate::{
     ScenarioWorld,
 };
 
+use multiversx_chain_vm::world_mock::EsdtInstanceMetadata;
+use multiversx_sc::codec::TopEncode;
 use scenario_set_account::AccountItem;
 use scenario_set_block::BlockItem;
 use scenario_set_new_address::NewAddressItem;
@@ -42,16 +44,91 @@ impl ScenarioWorld {
             .new_address(creator_address_expr, creator_nonce_expr, new_address_expr)
     }
 
-    pub fn create_account_raw<CA, V>(
+    pub fn create_account_raw<A, V>(
         &mut self,
-        address: CA,
+        address: A,
         egld_balance: V,
     ) -> SetStateBuilder<'_, AccountItem>
     where
-        AddressKey: From<CA>,
+        AddressKey: From<A>,
         BigUintValue: From<V>,
     {
         self.empty_builder().account(address).balance(egld_balance)
+    }
+
+    pub fn set_egld_balance<A: Copy, V: Copy>(&mut self, address: A, balance: V)
+    where
+        AddressKey: From<A>,
+        BigUintValue: From<V>,
+    {
+        let vm_address = AddressKey::from(address).to_vm_address();
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address_key, account) in accounts.iter_mut() {
+            if vm_address_key == &vm_address {
+                account.egld_balance = BigUintValue::from(balance).value.clone();
+            }
+        }
+    }
+
+    pub fn set_esdt_balance<A: Copy, V: Copy>(&mut self, address: A, token_id: &[u8], balance: V)
+    where
+        AddressKey: From<A>,
+        BigUintValue: From<V>,
+    {
+        // let token_id = BytesKey::from(token_id);
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &AddressKey::from(address).to_vm_address() {
+                account.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    0,
+                    &BigUintValue::from(balance).value.clone(),
+                    EsdtInstanceMetadata::default(),
+                )
+            }
+        }
+    }
+
+    pub fn set_nft_balance_all_properties<A: Copy, V: Copy, NR: Copy, T: TopEncode>(
+        &mut self,
+        address: A,
+        token_id: &[u8],
+        nonce: NR,
+        balance: V,
+        attributes: &T,
+        royalties: NR,
+        creator: Option<A>,
+        name: Option<&[u8]>,
+        hash: Option<&[u8]>,
+        uris: &[Vec<u8>],
+    ) where
+        AddressKey: From<A>,
+        BigUintValue: From<V>,
+        U64Value: From<NR>,
+    {
+        let mut esdt_attributes = Vec::new();
+        let _ = attributes.top_encode(&mut esdt_attributes);
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &AddressKey::from(address).to_vm_address() {
+                account.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    U64Value::from(nonce).value,
+                    &BigUintValue::from(balance).value.clone(),
+                    EsdtInstanceMetadata {
+                        creator: match creator {
+                            Some(c) => Some(AddressKey::from(c).to_vm_address()),
+                            None => None,
+                        },
+                        attributes: esdt_attributes.clone(),
+                        royalties: U64Value::from(royalties).value,
+                        name: name.unwrap_or_default().to_vec(),
+                        hash: hash.map(|h| h.to_vec()),
+                        uri: uris.to_vec(),
+                    },
+                )
+            }
+        }
     }
 
     pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {

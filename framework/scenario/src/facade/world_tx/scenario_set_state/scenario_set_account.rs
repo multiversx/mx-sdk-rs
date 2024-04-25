@@ -180,11 +180,4 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         self
     }
 
-    pub fn set_egld_balance<V>(mut self, balance: V) -> Self
-    where
-        BigUintValue: From<V>,
-    {
-        self.item.account.balance = Some(BigUintValue::from(balance));
-        self
-    }
 }
