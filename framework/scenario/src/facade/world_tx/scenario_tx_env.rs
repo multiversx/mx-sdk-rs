@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
 use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv, H256};
 
 use crate::{api::StaticApi, scenario_model::TxExpect, ScenarioWorld};
@@ -31,6 +32,14 @@ impl TxEnv for ScenarioTxEnvData {
 
     fn default_gas_value(&self) -> u64 {
         5_000_000
+    }
+}
+
+impl ScenarioTxEnvData {
+    pub fn interpreter_context(&self) -> InterpreterContext {
+        InterpreterContext::default()
+            .with_dir(self.context_path.clone())
+            .with_allowed_missing_files()
     }
 }
 

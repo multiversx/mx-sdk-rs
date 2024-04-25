@@ -2,8 +2,6 @@ use multiversx_sc_scenario::imports::*;
 
 use adder::*;
 
-const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
-
 const OWNER: AddressExpr = AddressExpr("owner");
 const SC_ADDER: ScExpr = ScExpr("adder");
 const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
@@ -12,7 +10,7 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/adder");
 
-    blockchain.register_contract(ADDER_PATH_EXPR, adder::ContractBuilder);
+    blockchain.register_contract(CODE_EXPR, adder::ContractBuilder);
     blockchain
 }
 

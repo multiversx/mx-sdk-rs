@@ -5,13 +5,15 @@ use crate::{
         api,
         contract_base::{CallableContractBuilder, ContractAbiProvider},
     },
-    scenario_format::{interpret_trait::InterpreterContext, value_interpreter::interpret_string},
+    scenario_format::interpret_trait::InterpreterContext,
     scenario_model::BytesValue,
     ScenarioWorld,
 };
 use multiversx_chain_scenario_format::interpret_trait::InterpretableFrom;
 
 use multiversx_sc_meta::cmd::contract::sc_config::ContractVariant;
+
+use super::expr::RegisterCodeSource;
 
 impl ScenarioWorld {
     pub fn interpreter_context(&self) -> InterpreterContext {
@@ -28,10 +30,10 @@ impl ScenarioWorld {
 
     pub fn register_contract_container(
         &mut self,
-        expression: &str,
+        expression: impl RegisterCodeSource,
         contract_container: ContractContainer,
     ) {
-        let contract_bytes = interpret_string(expression, &self.interpreter_context());
+        let contract_bytes = expression.into_code(self.new_env_data());
         self.get_mut_debugger_backend()
             .vm_runner
             .contract_map_ref
@@ -42,7 +44,7 @@ impl ScenarioWorld {
     /// Links a contract path in a test to a contract implementation.
     pub fn register_contract<B: CallableContractBuilder>(
         &mut self,
-        expression: &str,
+        expression: impl RegisterCodeSource,
         contract_builder: B,
     ) {
         self.register_contract_container(
@@ -68,7 +70,7 @@ impl ScenarioWorld {
     /// This simulates the effects of building such a contract with only part of the endpoints.
     pub fn register_partial_contract<Abi, B>(
         &mut self,
-        expression: &str,
+        expression: impl RegisterCodeSource,
         contract_builder: B,
         sub_contract_name: &str,
     ) where
@@ -86,7 +88,7 @@ impl ScenarioWorld {
     /// This simulates the effects of building such a contract with only part of the endpoints.
     pub fn register_contract_variant<B>(
         &mut self,
-        expression: &str,
+        expression: impl RegisterCodeSource,
         contract_builder: B,
         contract_variant: &ContractVariant,
     ) where
