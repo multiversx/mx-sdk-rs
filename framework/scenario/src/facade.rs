@@ -3,6 +3,7 @@ mod debugger_backend;
 pub mod expr;
 pub mod result_handlers;
 mod scenario_world;
+mod scenario_world_register;
 mod scenario_world_runner;
 mod scenario_world_steps;
 mod scenario_world_steps_deprecated;
