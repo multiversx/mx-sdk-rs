@@ -217,3 +217,17 @@ macro_rules! const_address_expr {
         const $const_name: AddressExpr = AddressExpr::new($name);
     };
 }
+
+#[macro_export]
+macro_rules! const_sc_expr {
+    ($const_name:ident = $name:expr) => {
+        const $const_name: ScExpr = ScExpr::new($name);
+    };
+}
+
+#[macro_export]
+macro_rules! const_expr {
+    ($const_name:ident = address $name:expr) => {
+        const $const_name: ScExpr = ScExpr::new($name);
+    };
+}

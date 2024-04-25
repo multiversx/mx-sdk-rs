@@ -36,7 +36,7 @@ fn st_blackbox_chained() {
                 }))
         })
         .chain_query(|tx| {
-            tx.to(ScExpr("adder"))
+            tx.to(ScExpr::new("adder"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .sum()
                 .with_result(WithResultConv::new(|value: BigUint| {
@@ -45,7 +45,7 @@ fn st_blackbox_chained() {
         })
         .chain_call(|tx| {
             tx.from(AddressExpr::new("owner"))
-                .to(ScExpr("adder"))
+                .to(ScExpr::new("adder"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .add(3u32)
                 .with_result(WithRawTxResponse(|response| {

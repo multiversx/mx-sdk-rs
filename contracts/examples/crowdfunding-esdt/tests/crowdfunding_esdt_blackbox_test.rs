@@ -9,7 +9,7 @@ const_address_expr!(FIRST_USER_ADDRESS = "first-user");
 const_address_expr!(OWNER_ADDRESS = "owner");
 const_address_expr!(SECOND_USER_ADDRESS = "second-user");
 const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
-const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
+const_sc_expr!(SC_CROWDFUNDING_ESDT_EXPR = "crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

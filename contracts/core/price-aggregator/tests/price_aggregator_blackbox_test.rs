@@ -19,7 +19,7 @@ const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
 
-const PRICE_AGGREGATOR: ScExpr = ScExpr("price-aggregator");
+const_sc_expr!(PRICE_AGGREGATOR = "price-aggregator");
 const_address_expr!(OWNER = "owner");
 
 fn world() -> ScenarioWorld {

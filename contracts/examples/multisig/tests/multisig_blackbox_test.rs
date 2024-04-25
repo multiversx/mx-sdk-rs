@@ -5,11 +5,11 @@ use adder::adder_proxy;
 use multisig::multisig_proxy;
 use num_bigint::BigUint;
 
-const SC_ADDER_EXPR: ScExpr = ScExpr("adder");
+const_sc_expr!(SC_ADDER_EXPR = "adder");
 const_address_expr!(ADDER_OWNER_ADDRESS_EXPR = "adder-owner");
 const ADDER_CODE_EXPR: MxscExpr = MxscExpr("test-contracts/adder.mxsc.json");
 const_address_expr!(BOARD_MEMBER_ADDRESS_EXPR = "board-member");
-const SC_MULTISIG_EXPR: ScExpr = ScExpr("multisig");
+const_sc_expr!(SC_MULTISIG_EXPR = "multisig");
 const MULTISIG_CODE_EXPR: MxscExpr = MxscExpr("output/multisig.mxsc.json");
 const_address_expr!(OWNER_ADDRESS_EXPR = "owner");
 const_address_expr!(PROPOSER_ADDRESS_EXPR = "proposer");
@@ -538,7 +538,7 @@ fn test_deploy_and_upgrade_from_source() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
-    let new_adder_address_expr: ScExpr = ScExpr("new-adder");
+    let new_adder_address_expr = ScExpr::new("new-adder");
 
     state
         .world
@@ -584,7 +584,7 @@ fn test_deploy_and_upgrade_from_source() {
         .returns(ExpectValue(BigUint::from(10u64)))
         .run();
 
-    let factorial_address_expr: ScExpr = ScExpr("factorial");
+    let factorial_address_expr: ScExpr = ScExpr::new("factorial");
     let factorial_path_expr: MxscExpr = MxscExpr("test-contracts/factorial.mxsc.json");
 
     let factorial_code = state
