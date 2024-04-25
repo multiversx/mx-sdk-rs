@@ -27,7 +27,7 @@ fn st_blackbox_chained() {
                 .new_address(owner_address, 1, "sc:adder"),
         )
         .chain_deploy(|tx| {
-            tx.from(AddressExpr("owner"))
+            tx.from(AddressExpr::new("owner"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .init(5u32)
                 .code(MxscExpr("output/scenario-tester.mxsc.json"))
@@ -44,7 +44,7 @@ fn st_blackbox_chained() {
                 }))
         })
         .chain_call(|tx| {
-            tx.from(AddressExpr("owner"))
+            tx.from(AddressExpr::new("owner"))
                 .to(ScExpr("adder"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .add(3u32)

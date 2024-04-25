@@ -2,7 +2,7 @@ mod pmf_proxy;
 
 use multiversx_sc_scenario::imports::*;
 
-const OWNER: AddressExpr = AddressExpr("owner");
+const_address_expr!(OWNER = "owner");
 const SC_PMF: ScExpr = ScExpr("pmf");
 const CODE_EXPR: &str = "mxsc:output/panic-message-features.mxsc.json";
 

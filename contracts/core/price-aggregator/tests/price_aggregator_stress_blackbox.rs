@@ -9,6 +9,7 @@ const DECIMALS: u8 = 0;
 const EGLD_TICKER: &[u8] = b"EGLD";
 const NR_ORACLES: usize = 50;
 const OWNER_ADDRESS_EXPR: &str = "address:owner";
+const_address_expr!(OWNER = "owner");
 const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
 const PRICE_AGGREGATOR_PATH_EXPR: &str = "mxsc:../output/multiversx-price-aggregator-sc.mxsc.json";
 const SLASH_AMOUNT: u64 = 10;
@@ -89,7 +90,7 @@ impl PriceAggregatorTestState {
 
         self.world
             .tx()
-            .from(AddressExpr("owner"))
+            .from(OWNER)
             .gas(120_000_000u64)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .init(
@@ -121,7 +122,7 @@ impl PriceAggregatorTestState {
     fn set_pair_decimals(&mut self) {
         self.world
             .tx()
-            .from(AddressExpr("owner"))
+            .from(OWNER)
             .to(&self.price_aggregator_contract.to_address())
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS)
@@ -131,7 +132,7 @@ impl PriceAggregatorTestState {
     fn unpause_endpoint(&mut self) {
         self.world
             .tx()
-            .from(AddressExpr("owner"))
+            .from(OWNER)
             .to(&self.price_aggregator_contract.to_address())
             .gas(5_000_000u64)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)

@@ -9,6 +9,10 @@ const SC_PREFIX: &str = "sc:";
 const VM_TYPE_LEN: usize = 2;
 const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 
+/// Encodes a dummy address, to be used for tests.
+///
+/// It is designed to be usable from contracts (especiall test contracts), with a minimal footprint.
+/// For this reason, its inner structure is subject to change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ScExpr<'a>(pub &'a str);
 

@@ -5,8 +5,8 @@ use scenario_tester::*;
 
 const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
-const OWNER: AddressExpr = AddressExpr("owner");
-const OTHER: AddressExpr = AddressExpr("other");
+const_address_expr!(OWNER = "owner");
+const_address_expr!(OTHER = "other");
 const SC_SCENARIO_TESTER: ScExpr = ScExpr("scenario-tester");
 const CODE_EXPR: MxscExpr = MxscExpr("output/scenario-tester.mxsc.json");
 

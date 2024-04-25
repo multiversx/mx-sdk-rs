@@ -135,7 +135,7 @@ impl From<Bech32Address> for AddressKey {
     }
 }
 
-impl From<AddressExpr> for AddressKey {
+impl From<AddressExpr<'_>> for AddressKey {
     fn from(from: AddressExpr) -> Self {
         AddressKey {
             value: from.eval_to_array().into(),

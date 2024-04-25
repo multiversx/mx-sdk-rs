@@ -138,7 +138,7 @@ impl From<&str> for AddressValue {
     }
 }
 
-impl From<AddressExpr> for AddressValue {
+impl From<AddressExpr<'_>> for AddressValue {
     fn from(from: AddressExpr) -> Self {
         AddressValue {
             value: from.eval_to_array().into(),

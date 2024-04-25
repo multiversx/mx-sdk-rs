@@ -6,13 +6,13 @@ use multisig::multisig_proxy;
 use num_bigint::BigUint;
 
 const SC_ADDER_EXPR: ScExpr = ScExpr("adder");
-const ADDER_OWNER_ADDRESS_EXPR: AddressExpr = AddressExpr("adder-owner");
+const_address_expr!(ADDER_OWNER_ADDRESS_EXPR = "adder-owner");
 const ADDER_CODE_EXPR: MxscExpr = MxscExpr("test-contracts/adder.mxsc.json");
-const BOARD_MEMBER_ADDRESS_EXPR: AddressExpr = AddressExpr("board-member");
+const_address_expr!(BOARD_MEMBER_ADDRESS_EXPR = "board-member");
 const SC_MULTISIG_EXPR: ScExpr = ScExpr("multisig");
 const MULTISIG_CODE_EXPR: MxscExpr = MxscExpr("output/multisig.mxsc.json");
-const OWNER_ADDRESS_EXPR: AddressExpr = AddressExpr("owner");
-const PROPOSER_ADDRESS_EXPR: AddressExpr = AddressExpr("proposer");
+const_address_expr!(OWNER_ADDRESS_EXPR = "owner");
+const_address_expr!(PROPOSER_ADDRESS_EXPR = "proposer");
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
 const QUORUM_SIZE: usize = 1;
 
@@ -256,7 +256,7 @@ fn test_add_board_member() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    let new_board_member_expr: AddressExpr = AddressExpr("new-board-member");
+    let new_board_member_expr: AddressExpr = AddressExpr::new("new-board-member");
 
     state.world.account(new_board_member_expr).nonce(1);
 
@@ -287,7 +287,7 @@ fn test_add_proposer() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    let new_proposer_address_expr: AddressExpr = AddressExpr("new-proposer");
+    let new_proposer_address_expr = AddressExpr::new("new-proposer");
 
     state.world.account(new_proposer_address_expr).nonce(1);
 
@@ -404,7 +404,7 @@ fn test_change_quorum() {
         .run();
 
     // add another board member
-    let new_board_member_address_expr: AddressExpr = AddressExpr("new-board-member");
+    let new_board_member_address_expr = AddressExpr::new("new-board-member");
 
     state.world.account(new_board_member_address_expr).nonce(1);
 
@@ -423,7 +423,7 @@ fn test_transfer_execute_to_user() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract();
 
-    let new_user_address_expr: AddressExpr = AddressExpr("new-user");
+    let new_user_address_expr = AddressExpr::new("new-user");
     state.world.account(new_user_address_expr).nonce(1);
 
     let amount: u64 = 100;

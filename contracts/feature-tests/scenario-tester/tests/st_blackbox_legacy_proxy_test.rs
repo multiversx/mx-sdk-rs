@@ -5,7 +5,7 @@ use scenario_tester::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
-const OWNER: AddressExpr = AddressExpr("owner");
+const_address_expr!(OWNER = "owner");
 const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {

@@ -5,9 +5,9 @@ use multiversx_sc_scenario::imports::*;
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
 const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
 const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
-const FIRST_USER_ADDRESS: AddressExpr = AddressExpr("first-user");
-const OWNER_ADDRESS: AddressExpr = AddressExpr("owner");
-const SECOND_USER_ADDRESS: AddressExpr = AddressExpr("second-user");
+const_address_expr!(FIRST_USER_ADDRESS = "first-user");
+const_address_expr!(OWNER_ADDRESS = "owner");
+const_address_expr!(SECOND_USER_ADDRESS = "second-user");
 const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
 const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
 

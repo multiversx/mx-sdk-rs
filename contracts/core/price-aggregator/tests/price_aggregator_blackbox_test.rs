@@ -20,7 +20,7 @@ const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
 
 const PRICE_AGGREGATOR: ScExpr = ScExpr("price-aggregator");
-const OWNER: AddressExpr = AddressExpr("owner");
+const_address_expr!(OWNER = "owner");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

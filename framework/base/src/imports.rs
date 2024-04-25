@@ -6,6 +6,7 @@ pub use crate::{
         multi_types::*, CodecFrom, CodecFromSelf, CodecInto, DecodeError, Empty, IntoMultiValue,
         NestedDecode, NestedEncode, TopDecode, TopEncode,
     },
+    const_address_expr,
     contract_base::{ContractBase, ProxyObjBase, ProxyObjNew},
     err_msg,
     io::*,

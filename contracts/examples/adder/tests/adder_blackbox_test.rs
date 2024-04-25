@@ -2,7 +2,7 @@ use multiversx_sc_scenario::imports::*;
 
 use adder::*;
 
-const OWNER: AddressExpr = AddressExpr("owner");
+const_address_expr!(OWNER = "owner");
 const SC_ADDER: ScExpr = ScExpr("adder");
 const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
 
