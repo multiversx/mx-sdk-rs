@@ -7,10 +7,10 @@ use num_bigint::BigUint;
 
 const_sc_expr!(SC_ADDER_EXPR = "adder");
 const_address_expr!(ADDER_OWNER_ADDRESS_EXPR = "adder-owner");
-const ADDER_CODE_EXPR: MxscExpr = MxscExpr("test-contracts/adder.mxsc.json");
+const_mxsc_expr!(ADDER_CODE_EXPR = "test-contracts/adder.mxsc.json");
 const_address_expr!(BOARD_MEMBER_ADDRESS_EXPR = "board-member");
 const_sc_expr!(SC_MULTISIG_EXPR = "multisig");
-const MULTISIG_CODE_EXPR: MxscExpr = MxscExpr("output/multisig.mxsc.json");
+const_mxsc_expr!(MULTISIG_CODE_EXPR = "output/multisig.mxsc.json");
 const_address_expr!(OWNER_ADDRESS_EXPR = "owner");
 const_address_expr!(PROPOSER_ADDRESS_EXPR = "proposer");
 const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
@@ -585,7 +585,7 @@ fn test_deploy_and_upgrade_from_source() {
         .run();
 
     let factorial_address_expr: ScExpr = ScExpr::new("factorial");
-    let factorial_path_expr: MxscExpr = MxscExpr("test-contracts/factorial.mxsc.json");
+    let factorial_path_expr: MxscExpr = MxscExpr::new("test-contracts/factorial.mxsc.json");
 
     let factorial_code = state
         .world

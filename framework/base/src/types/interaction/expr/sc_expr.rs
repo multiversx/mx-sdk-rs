@@ -14,7 +14,6 @@ const DEFAULT_VM_TYPE: &[u8] = &[5, 0];
 /// It is designed to be usable from contracts (especiall test contracts), with a minimal footprint.
 /// For this reason, its inner structure is subject to change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-
 pub struct ScExpr<'a> {
     name: &'a str,
 }

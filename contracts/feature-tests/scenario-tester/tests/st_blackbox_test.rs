@@ -8,7 +8,7 @@ const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.jso
 const_address_expr!(OWNER = "owner");
 const_address_expr!(OTHER = "other");
 const_sc_expr!(SC_SCENARIO_TESTER = "scenario-tester");
-const CODE_EXPR: MxscExpr = MxscExpr("output/scenario-tester.mxsc.json");
+const_mxsc_expr!(CODE_EXPR = "output/scenario-tester.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

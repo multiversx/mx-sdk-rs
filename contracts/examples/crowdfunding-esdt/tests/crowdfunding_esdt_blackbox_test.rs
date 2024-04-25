@@ -8,7 +8,7 @@ const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
 const_address_expr!(FIRST_USER_ADDRESS = "first-user");
 const_address_expr!(OWNER_ADDRESS = "owner");
 const_address_expr!(SECOND_USER_ADDRESS = "second-user");
-const CODE_EXPR: MxscExpr = MxscExpr("output/crowdfunding-esdt.mxsc.json");
+const_mxsc_expr!(CODE_EXPR = "output/crowdfunding-esdt.mxsc.json");
 const_sc_expr!(SC_CROWDFUNDING_ESDT_EXPR = "crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {

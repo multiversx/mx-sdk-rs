@@ -30,7 +30,7 @@ fn st_blackbox_chained() {
             tx.from(AddressExpr::new("owner"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .init(5u32)
-                .code(MxscExpr("output/scenario-tester.mxsc.json"))
+                .code(MxscExpr::new("output/scenario-tester.mxsc.json"))
                 .with_result(WithNewAddress::new(|new_address| {
                     assert_eq!(new_address.to_address(), st_contract.to_address());
                 }))

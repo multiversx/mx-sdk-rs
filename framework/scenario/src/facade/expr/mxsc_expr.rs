@@ -10,15 +10,23 @@ use super::RegisterCodeSource;
 const MXSC_PREFIX: &str = "mxsc:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MxscExpr<'a>(pub &'a str);
+pub struct MxscExpr<'a> {
+    path: &'a str,
+}
+
+impl<'a> MxscExpr<'a> {
+    pub const fn new(path: &'a str) -> Self {
+        MxscExpr { path }
+    }
+}
 
 impl<'a> MxscExpr<'a> {
     pub fn eval_to_expr(&self) -> String {
-        format!("{MXSC_PREFIX}{}", self.0)
+        format!("{MXSC_PREFIX}{}", self.path)
     }
 
     pub fn resolve_contents(&self, context: &InterpreterContext) -> Vec<u8> {
-        interpret_string(&format!("{MXSC_PREFIX}{}", self.0), context)
+        interpret_string(&format!("{MXSC_PREFIX}{}", self.path), context)
     }
 }
 
@@ -49,7 +57,7 @@ pub mod tests {
     use crate::imports::MxscExpr;
 
     fn assert_eq_eval(expr: &'static str, expected: &str) {
-        assert_eq!(&MxscExpr(expr).eval_to_expr(), expected);
+        assert_eq!(&MxscExpr::new(expr).eval_to_expr(), expected);
     }
 
     #[test]

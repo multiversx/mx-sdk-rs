@@ -4,7 +4,7 @@ use adder::*;
 
 const_address_expr!(OWNER = "owner");
 const_sc_expr!(SC_ADDER = "adder");
-const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
+const_mxsc_expr!(CODE_EXPR = "output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

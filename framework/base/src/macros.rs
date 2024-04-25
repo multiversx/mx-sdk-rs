@@ -226,8 +226,8 @@ macro_rules! const_sc_expr {
 }
 
 #[macro_export]
-macro_rules! const_expr {
-    ($const_name:ident = address $name:expr) => {
-        const $const_name: ScExpr = ScExpr::new($name);
+macro_rules! const_mxsc_expr {
+    ($const_name:ident = $name:expr) => {
+        const $const_name: MxscExpr = MxscExpr::new($name);
     };
 }
