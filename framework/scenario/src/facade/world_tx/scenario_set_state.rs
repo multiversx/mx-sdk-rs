@@ -4,7 +4,10 @@ mod scenario_set_new_address;
 
 use crate::{
     scenario::ScenarioRunner,
-    scenario_model::{AddressKey, AddressValue, BigUintValue, NewAddress, SetStateStep, U64Value},
+    scenario_model::{
+        AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, NewAddress, SetStateStep,
+        U64Value,
+    },
     ScenarioWorld,
 };
 
@@ -75,7 +78,6 @@ impl ScenarioWorld {
         AddressKey: From<A>,
         BigUintValue: From<V>,
     {
-        // let token_id = BytesKey::from(token_id);
         let accounts = &mut self.get_mut_state().accounts;
         for (vm_address, account) in accounts.iter_mut() {
             if vm_address == &AddressKey::from(address).to_vm_address() {
@@ -89,6 +91,7 @@ impl ScenarioWorld {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn set_nft_balance_all_properties<A: Copy, V: Copy, NR: Copy, T: TopEncode>(
         &mut self,
         address: A,
@@ -116,10 +119,7 @@ impl ScenarioWorld {
                     U64Value::from(nonce).value,
                     &BigUintValue::from(balance).value.clone(),
                     EsdtInstanceMetadata {
-                        creator: match creator {
-                            Some(c) => Some(AddressKey::from(c).to_vm_address()),
-                            None => None,
-                        },
+                        creator: creator.map(|c| AddressKey::from(c).to_vm_address()),
                         attributes: esdt_attributes.clone(),
                         royalties: U64Value::from(royalties).value,
                         name: name.unwrap_or_default().to_vec(),
@@ -127,6 +127,19 @@ impl ScenarioWorld {
                         uri: uris.to_vec(),
                     },
                 )
+            }
+        }
+    }
+
+    pub fn set_developer_rewards<A: Copy, V: Copy>(&mut self, address: A, developer_rewards: V)
+    where
+        AddressKey: From<A>,
+        BigUintValue: From<V>,
+    {
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &AddressKey::from(address).to_vm_address() {
+                account.developer_rewards = BigUintValue::from(developer_rewards).value.clone();
             }
         }
     }
