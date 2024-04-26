@@ -27,16 +27,16 @@ fn st_blackbox_chained() {
                 .new_address(owner_address, 1, "sc:adder"),
         )
         .chain_deploy(|tx| {
-            tx.from(AddressExpr("owner"))
+            tx.from(TestAddress::new("owner"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .init(5u32)
-                .code(MxscExpr("output/scenario-tester.mxsc.json"))
+                .code(MxscPath::new("output/scenario-tester.mxsc.json"))
                 .with_result(WithNewAddress::new(|new_address| {
                     assert_eq!(new_address.to_address(), st_contract.to_address());
                 }))
         })
         .chain_query(|tx| {
-            tx.to(ScExpr("adder"))
+            tx.to(TestSCAddress::new("adder"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .sum()
                 .with_result(WithResultConv::new(|value: BigUint| {
@@ -44,8 +44,8 @@ fn st_blackbox_chained() {
                 }))
         })
         .chain_call(|tx| {
-            tx.from(AddressExpr("owner"))
-                .to(ScExpr("adder"))
+            tx.from(TestAddress::new("owner"))
+                .to(TestSCAddress::new("adder"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .add(3u32)
                 .with_result(WithRawTxResponse(|response| {

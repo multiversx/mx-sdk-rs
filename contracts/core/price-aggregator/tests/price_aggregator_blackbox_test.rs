@@ -19,8 +19,8 @@ const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
 
-const PRICE_AGGREGATOR: ScExpr = ScExpr("price-aggregator");
-const OWNER: AddressExpr = AddressExpr("owner");
+const PRICE_AGGREGATOR_ADDRESS: TestSCAddress = TestSCAddress::new("price-aggregator");
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -44,7 +44,7 @@ impl PriceAggregatorTestState {
     fn new() -> Self {
         let mut world = world();
 
-        world.account(OWNER).nonce(1);
+        world.account(OWNER_ADDRESS).nonce(1);
         world.current_block().block_timestamp(100);
 
         world.set_state_step(SetStateStep::new()).new_address(
@@ -86,7 +86,7 @@ impl PriceAggregatorTestState {
 
         self.world
             .tx()
-            .from(OWNER)
+            .from(OWNER_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .init(
                 EgldOrEsdtTokenIdentifier::egld(),
@@ -103,7 +103,7 @@ impl PriceAggregatorTestState {
             self.world
                 .tx()
                 .from(address)
-                .to(PRICE_AGGREGATOR)
+                .to(PRICE_AGGREGATOR_ADDRESS)
                 .typed(price_aggregator_proxy::PriceAggregatorProxy)
                 .stake()
                 .egld(STAKE_AMOUNT)
@@ -116,8 +116,8 @@ impl PriceAggregatorTestState {
     fn set_pair_decimals(&mut self) {
         self.world
             .tx()
-            .from(OWNER)
-            .to(PRICE_AGGREGATOR)
+            .from(OWNER_ADDRESS)
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS)
             .run();
@@ -126,8 +126,8 @@ impl PriceAggregatorTestState {
     fn unpause_endpoint(&mut self) {
         self.world
             .tx()
-            .from(OWNER)
-            .to(PRICE_AGGREGATOR)
+            .from(OWNER_ADDRESS)
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .unpause_endpoint()
             .run();
@@ -137,7 +137,7 @@ impl PriceAggregatorTestState {
         self.world
             .tx()
             .from(from)
-            .to(PRICE_AGGREGATOR)
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .submit(
                 EGLD_TICKER,
@@ -159,7 +159,7 @@ impl PriceAggregatorTestState {
         self.world
             .tx()
             .from(from)
-            .to(PRICE_AGGREGATOR)
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .submit(
                 EGLD_TICKER,
@@ -177,7 +177,7 @@ impl PriceAggregatorTestState {
         self.world
             .tx()
             .from(from)
-            .to(PRICE_AGGREGATOR)
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .vote_slash_member(member_to_slash)
             .run();
@@ -379,7 +379,7 @@ fn test_price_aggregator_slashing() {
         .world
         .tx()
         .from(&state.oracles[0])
-        .to(PRICE_AGGREGATOR)
+        .to(PRICE_AGGREGATOR_ADDRESS)
         .typed(price_aggregator_proxy::PriceAggregatorProxy)
         .slash_member(state.oracles[1].to_address())
         .run();

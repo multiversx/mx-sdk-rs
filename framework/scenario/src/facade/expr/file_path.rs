@@ -7,22 +7,22 @@ use crate::{ScenarioTxEnv, ScenarioTxEnvData};
 
 use super::RegisterCodeSource;
 
-const MXSC_PREFIX: &str = "mxsc:";
+const FILE_PREFIX: &str = "file:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MxscExpr<'a>(pub &'a str);
+pub struct FilePath<'a>(pub &'a str);
 
-impl<'a> MxscExpr<'a> {
+impl<'a> FilePath<'a> {
     pub fn eval_to_expr(&self) -> String {
-        format!("{MXSC_PREFIX}{}", self.0)
+        format!("{FILE_PREFIX}{}", self.0)
     }
 
     pub fn resolve_contents(&self, context: &InterpreterContext) -> Vec<u8> {
-        interpret_string(&format!("{MXSC_PREFIX}{}", self.0), context)
+        interpret_string(&format!("{FILE_PREFIX}{}", self.0), context)
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for MxscExpr<'a>
+impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for FilePath<'a>
 where
     Env: ScenarioTxEnv,
 {
@@ -36,24 +36,10 @@ where
     }
 }
 
-impl<'a, Env> TxCodeValue<Env> for MxscExpr<'a> where Env: ScenarioTxEnv {}
+impl<'a, Env> TxCodeValue<Env> for FilePath<'a> where Env: ScenarioTxEnv {}
 
-impl<'a> RegisterCodeSource for MxscExpr<'a> {
+impl<'a> RegisterCodeSource for FilePath<'a> {
     fn into_code(self, env_data: ScenarioTxEnvData) -> Vec<u8> {
         self.resolve_contents(&env_data.interpreter_context())
-    }
-}
-
-#[cfg(test)]
-pub mod tests {
-    use crate::imports::MxscExpr;
-
-    fn assert_eq_eval(expr: &'static str, expected: &str) {
-        assert_eq!(&MxscExpr(expr).eval_to_expr(), expected);
-    }
-
-    #[test]
-    fn test_address_value() {
-        assert_eq_eval("output/adder.mxsc.json", "mxsc:output/adder.mxsc.json");
     }
 }
