@@ -4,12 +4,15 @@ use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, Inter
 use multiversx_sc::{
     codec::test_util::top_encode_to_vec_u8_or_panic,
     proxy_imports::TopEncode,
-    types::{AnnotatedValue, ManagedAddress},
+    types::{AnnotatedValue, BigUint, ManagedAddress},
 };
 
 use crate::{
     api::StaticApi,
-    scenario::{tx_to_step::address_annotated, ScenarioRunner},
+    scenario::{
+        tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
+        ScenarioRunner,
+    },
     scenario_model::{
         AddressKey, BigUintValue, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
         CheckEsdtInstances, CheckEsdtMap, CheckEsdtMapContents, CheckStateStep, CheckStorage,
@@ -47,13 +50,17 @@ impl<'w> CheckStateBuilder<'w> {
         builder
     }
 
+    fn new_env_data(&self) -> ScenarioTxEnvData {
+        self.world.new_env_data()
+    }
+
     /// Starts building of a new account.
     pub fn check_account<A>(mut self, address: A) -> Self
     where
         A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         self.add_current_acount();
-        let env = self.world.new_env_data();
+        let env = self.new_env_data();
         let address_value = address_annotated(&env, &address);
         self.reset_account(address_value.into());
         self
@@ -86,23 +93,19 @@ impl<'w> CheckStateBuilder<'w> {
 
     pub fn nonce<V>(mut self, nonce: V) -> Self
     where
-        U64Value: InterpretableFrom<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        self.current_account.nonce = CheckValue::Equal(U64Value::interpret_from(
-            nonce,
-            &InterpreterContext::default(),
-        ));
+        let env = self.new_env_data();
+        self.current_account.nonce = CheckValue::Equal(u64_annotated(&env, &nonce));
         self
     }
 
-    pub fn balance<V>(mut self, balance_expr: V) -> Self
+    pub fn balance<V>(mut self, balance: V) -> Self
     where
-        BigUintValue: InterpretableFrom<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
-        self.current_account.balance = CheckValue::Equal(BigUintValue::interpret_from(
-            balance_expr,
-            &InterpreterContext::default(),
-        ));
+        let env = self.new_env_data();
+        self.current_account.balance = CheckValue::Equal(big_uint_annotated(&env, &balance));
         self
     }
 

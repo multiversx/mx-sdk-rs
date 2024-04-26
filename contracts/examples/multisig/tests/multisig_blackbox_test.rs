@@ -13,7 +13,7 @@ const MULTISIG_ADDRESS: TestSCAddress = TestSCAddress::new("multisig");
 const MULTISIG_CODE_PATH: MxscPath = MxscPath::new("output/multisig.mxsc.json");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const PROPOSER_ADDRESS: TestAddress = TestAddress::new("proposer");
-const PROPOSER_BALANCE_EXPR: &str = "100,000,000";
+const PROPOSER_BALANCE: u64 = 100_000_000;
 const QUORUM_SIZE: usize = 1;
 
 fn world() -> ScenarioWorld {
@@ -38,7 +38,7 @@ impl MultisigTestState {
             .nonce(1)
             .account(PROPOSER_ADDRESS)
             .nonce(1)
-            .balance(PROPOSER_BALANCE_EXPR)
+            .balance(PROPOSER_BALANCE)
             .account(BOARD_MEMBER_ADDRESS)
             .nonce(1)
             .account(ADDER_OWNER_ADDRESS)
@@ -438,10 +438,7 @@ fn test_transfer_execute_to_user() {
         .egld(amount)
         .run();
 
-    state
-        .world
-        .check_account(MULTISIG_ADDRESS)
-        .balance(amount.to_string().as_str());
+    state.world.check_account(MULTISIG_ADDRESS).balance(amount);
 
     // failed attempt
     state
@@ -478,7 +475,7 @@ fn test_transfer_execute_to_user() {
     state
         .world
         .check_account(new_user_address_expr)
-        .balance(amount.to_string().as_str());
+        .balance(amount);
 }
 
 #[test]

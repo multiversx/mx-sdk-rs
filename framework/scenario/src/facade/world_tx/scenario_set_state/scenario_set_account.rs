@@ -1,8 +1,15 @@
 use std::collections::btree_map::Entry;
 
-use crate::scenario_model::{
-    Account, AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject,
-    SetStateStep, U64Value,
+use multiversx_sc::types::{AnnotatedValue, BigUint};
+
+use crate::{
+    imports::StaticApi,
+    scenario::tx_to_step::{big_uint_annotated, u64_annotated},
+    scenario_model::{
+        Account, AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject,
+        SetStateStep, U64Value,
+    },
+    ScenarioTxEnvData,
 };
 
 use super::{SetStateBuilder, SetStateBuilderItem};
@@ -32,17 +39,19 @@ impl SetStateBuilderItem for AccountItem {
 impl<'w> SetStateBuilder<'w, AccountItem> {
     pub fn nonce<V>(mut self, nonce: V) -> Self
     where
-        U64Value: From<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        self.item.account.nonce = Some(U64Value::from(nonce));
+        let env = self.new_env_data();
+        self.item.account.nonce = Some(u64_annotated(&env, &nonce));
         self
     }
 
     pub fn balance<V>(mut self, balance_expr: V) -> Self
     where
-        BigUintValue: From<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
-        self.item.account.balance = Some(BigUintValue::from(balance_expr));
+        let env = self.new_env_data();
+        self.item.account.balance = Some(big_uint_annotated(&env, &balance_expr));
         self
     }
 

@@ -107,6 +107,10 @@ impl<'w, Item> SetStateBuilder<'w, Item>
 where
     Item: SetStateBuilderItem,
 {
+    fn new_env_data(&self) -> ScenarioTxEnvData {
+        self.base.as_ref().unwrap().world.new_env_data()
+    }
+
     /// Starts building of a new account.
     pub fn account<A>(mut self, address_expr: A) -> SetStateBuilder<'w, AccountItem>
     where

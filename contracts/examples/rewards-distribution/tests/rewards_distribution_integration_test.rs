@@ -169,7 +169,7 @@ fn test_raffle_and_claim() {
             .world
             .account(ALICE_ADDRESS)
             .nonce(1)
-            .balance("2_070_000_000");
+            .balance(2_070_000_000);
         for nft_nonce in nft_nonces {
             account_setter = account_setter.esdt_nft_balance(
                 NFT_TOKEN_ID_EXPR,
@@ -297,12 +297,11 @@ fn test_raffle_and_claim() {
 
     // confirm the received amount matches the sum of the queried rewards
     let alice_balance_after_claim: u64 = expected_rewards.iter().sum();
-    let balance_expr: &str = &alice_balance_after_claim.to_string();
 
     state
         .world
         .check_account(ALICE_ADDRESS)
-        .balance(balance_expr);
+        .balance(alice_balance_after_claim);
 
     // a second claim with the same nfts should succeed, but return no more rewards
     let mut reward_tokens: MultiValueEncoded<
@@ -323,5 +322,5 @@ fn test_raffle_and_claim() {
     state
         .world
         .check_account(ALICE_ADDRESS)
-        .balance(balance_expr);
+        .balance(alice_balance_after_claim);
 }

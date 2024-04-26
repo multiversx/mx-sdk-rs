@@ -1,7 +1,9 @@
 use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
-use multiversx_sc::types::{AnnotatedValue, Code, ManagedAddress, TxCodeValue, TxEnv, TxGas};
+use multiversx_sc::types::{
+    AnnotatedValue, BigUint, Code, ManagedAddress, ManagedBuffer, TxCodeValue, TxEnv, TxGas,
+};
 
-use crate::scenario_model::{AddressValue, BytesValue, U64Value};
+use crate::scenario_model::{AddressValue, BigUintValue, BytesValue, U64Value};
 
 pub fn address_annotated<Env, Addr>(env: &Env, from: &Addr) -> AddressValue
 where
@@ -15,14 +17,38 @@ where
     }
 }
 
-pub fn u64_annotated<Env, Num>(env: &Env, from: &Num) -> U64Value
+pub fn u64_annotated<Env, T>(env: &Env, from: &T) -> U64Value
 where
     Env: TxEnv,
-    Num: AnnotatedValue<Env, u64>,
+    T: AnnotatedValue<Env, u64>,
 {
     let annotation = from.annotation(env).to_string();
     U64Value {
         value: from.to_value(env),
+        original: ValueSubTree::Str(annotation),
+    }
+}
+
+pub fn big_uint_annotated<Env, T>(env: &Env, from: &T) -> BigUintValue
+where
+    Env: TxEnv,
+    T: AnnotatedValue<Env, BigUint<Env::Api>>,
+{
+    let annotation = from.annotation(env).to_string();
+    BigUintValue {
+        value: from.to_value(env).to_alloc(),
+        original: ValueSubTree::Str(annotation),
+    }
+}
+
+pub fn bytes_annotated<Env, T>(env: &Env, value: T) -> BytesValue
+where
+    Env: TxEnv,
+    T: AnnotatedValue<Env, ManagedBuffer<Env::Api>>,
+{
+    let annotation = value.annotation(env).to_string();
+    BytesValue {
+        value: value.into_value(env).to_vec(),
         original: ValueSubTree::Str(annotation),
     }
 }
@@ -32,11 +58,7 @@ where
     Env: TxEnv,
     CodeValue: TxCodeValue<Env>,
 {
-    let annotation = code.0.annotation(env).to_string();
-    BytesValue {
-        value: code.0.into_value(env).to_vec(),
-        original: ValueSubTree::Str(annotation),
-    }
+    bytes_annotated(env, code.0)
 }
 
 pub fn gas_annotated<Env, Gas>(env: &Env, gas: Gas) -> U64Value

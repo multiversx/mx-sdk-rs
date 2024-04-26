@@ -30,20 +30,20 @@ fn st_blackbox() {
     world
         .account(OWNER_ADDRESS)
         .nonce(1)
-        .balance("100")
+        .balance(100)
         .account(OTHER_ADDRESS)
         .nonce(2)
-        .balance("300")
+        .balance(300)
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
     world
         .check_account(OWNER_ADDRESS)
-        .nonce("1")
-        .balance("100")
+        .nonce(1)
+        .balance(100)
         .check_account(OTHER_ADDRESS)
-        .nonce("2")
-        .balance("300")
+        .nonce(2)
+        .balance(300)
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
@@ -78,8 +78,8 @@ fn st_blackbox() {
 
     world
         .check_account(OWNER_ADDRESS)
-        .nonce("3")
-        .balance("100")
+        .nonce(3)
+        .balance(100)
         .check_account(ST_ADDRESS)
         .check_storage("str:sum", "6")
         .commit();
@@ -110,34 +110,34 @@ fn set_state_test() {
     world
         .account(first)
         .nonce(1)
-        .balance("100")
+        .balance(100)
         .account(second)
         .nonce(2)
-        .balance("300")
+        .balance(300)
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
     world
         .check_account(first)
         .nonce(1)
-        .balance("100")
+        .balance(100)
         .check_account(second)
         .nonce(2)
-        .balance("300")
+        .balance(300)
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
     world
         .account(third)
         .nonce(3)
-        .balance("50")
+        .balance(50)
         .esdt_nft_balance("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
         .commit();
 
     world
         .check_account(third)
         .nonce(3)
-        .balance("50")
+        .balance(50)
         .esdt_nft_balance_and_attributes("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
         .commit();
 
@@ -145,30 +145,30 @@ fn set_state_test() {
     world
         .account(fourth)
         .nonce(4)
-        .balance("400")
+        .balance(400)
         .account(fifth)
         .nonce(5)
-        .balance("250")
+        .balance(250)
         .esdt_balance("str:TOKEN-123456", "2");
 
     world
         .check_account(fourth)
         .nonce(4)
-        .balance("400")
+        .balance(400)
         .check_account(fifth)
         .nonce(5)
-        .balance("250")
+        .balance(250)
         .esdt_balance("str:TOKEN-123456", "2");
 
     world
         .account(sixth)
         .nonce(6)
-        .balance("600")
+        .balance(600)
         .esdt_balance("str:TOKEN-123456", "60");
 
     world
         .check_account(sixth)
         .nonce(6)
-        .balance("600")
+        .balance(600)
         .esdt_balance("str:TOKEN-123456", "60");
 }

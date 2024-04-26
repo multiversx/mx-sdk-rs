@@ -31,7 +31,7 @@ impl CrowdfundingESDTTestState {
             .nonce(1)
             .account(FIRST_USER_ADDRESS)
             .nonce(1)
-            .balance("1000")
+            .balance(1000)
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000")
             .account(SECOND_USER_ADDRESS)
             .nonce(1)
