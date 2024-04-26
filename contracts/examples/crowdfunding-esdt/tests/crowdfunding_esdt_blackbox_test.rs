@@ -14,10 +14,7 @@ const SC_CROWDFUNDING_ESDT_EXPR: ScExpr = ScExpr("crowdfunding-esdt");
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.register_contract(
-        CODE_EXPR.eval_to_expr().as_str(),
-        crowdfunding_esdt::ContractBuilder,
-    );
+    blockchain.register_contract(CODE_EXPR, crowdfunding_esdt::ContractBuilder);
     blockchain
 }
 
@@ -40,11 +37,7 @@ impl CrowdfundingESDTTestState {
             .nonce(1)
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
-        world.new_address(
-            OWNER_ADDRESS,
-            1,
-            SC_CROWDFUNDING_ESDT_EXPR.eval_to_expr().as_str(),
-        );
+        world.new_address(OWNER_ADDRESS, 1, SC_CROWDFUNDING_ESDT_EXPR);
 
         Self { world }
     }
@@ -199,17 +192,11 @@ fn test_failed_cf() {
     state.deploy();
 
     // first user fund
-    state.fund(
-        FIRST_USER_ADDRESS, //.eval_to_expr().as_str()
-        300,
-    );
+    state.fund(FIRST_USER_ADDRESS, 300);
     state.check_deposit(FIRST_USER_ADDRESS, 300u64);
 
     // second user fund
-    state.fund(
-        SECOND_USER_ADDRESS, //.eval_to_expr().as_str()
-        600,
-    );
+    state.fund(SECOND_USER_ADDRESS, 600);
     state.check_deposit(SECOND_USER_ADDRESS, 600u64);
 
     // set block timestamp after deadline

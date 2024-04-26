@@ -20,14 +20,8 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
     blockchain.set_current_dir_from_workspace("contracts/examples/multisig");
 
-    blockchain.register_contract(
-        MULTISIG_CODE_EXPR.eval_to_expr().as_str(),
-        multisig::ContractBuilder,
-    );
-    blockchain.register_contract(
-        ADDER_CODE_EXPR.eval_to_expr().as_str(),
-        adder::ContractBuilder,
-    );
+    blockchain.register_contract(MULTISIG_CODE_EXPR, multisig::ContractBuilder);
+    blockchain.register_contract(ADDER_CODE_EXPR, adder::ContractBuilder);
     blockchain
 }
 
@@ -597,10 +591,9 @@ fn test_deploy_and_upgrade_from_source() {
         .world
         .code_expression(factorial_path_expr.eval_to_expr().as_str());
 
-    state.world.register_contract(
-        factorial_path_expr.eval_to_expr().as_str(),
-        factorial::ContractBuilder,
-    );
+    state
+        .world
+        .register_contract(factorial_path_expr, factorial::ContractBuilder);
 
     state
         .world

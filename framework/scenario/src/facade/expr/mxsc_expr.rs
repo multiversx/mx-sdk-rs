@@ -3,37 +3,44 @@ use multiversx_chain_scenario_format::{
 };
 use multiversx_sc::types::{AnnotatedValue, ManagedBuffer, TxCodeValue};
 
-use crate::ScenarioTxEnv;
+use crate::{ScenarioTxEnv, ScenarioTxEnvData};
+
+use super::RegisterCodeSource;
 
 const MXSC_PREFIX: &str = "mxsc:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct MxscExpr<'a>(pub &'a str);
 
+impl<'a> MxscExpr<'a> {
+    pub fn eval_to_expr(&self) -> String {
+        format!("{MXSC_PREFIX}{}", self.0)
+    }
+
+    pub fn resolve_contents(&self, context: &InterpreterContext) -> Vec<u8> {
+        interpret_string(&format!("{MXSC_PREFIX}{}", self.0), context)
+    }
+}
+
 impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for MxscExpr<'a>
 where
     Env: ScenarioTxEnv,
 {
     fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
-        let mut result = ManagedBuffer::new_from_bytes(MXSC_PREFIX.as_bytes());
-        result.append_bytes(self.0.as_bytes());
-        result
+        self.eval_to_expr().into()
     }
 
     fn to_value(&self, env: &Env) -> ManagedBuffer<Env::Api> {
-        let context = InterpreterContext::new()
-            .with_dir(env.env_data().context_path.clone())
-            .with_allowed_missing_files();
-        let value = interpret_string(&format!("{MXSC_PREFIX}{}", self.0), &context);
-        value.into()
+        self.resolve_contents(&env.env_data().interpreter_context())
+            .into()
     }
 }
 
 impl<'a, Env> TxCodeValue<Env> for MxscExpr<'a> where Env: ScenarioTxEnv {}
 
-impl<'a> MxscExpr<'a> {
-    pub fn eval_to_expr(&self) -> String {
-        format!("{MXSC_PREFIX}{}", self.0)
+impl<'a> RegisterCodeSource for MxscExpr<'a> {
+    fn into_code(self, env_data: ScenarioTxEnvData) -> Vec<u8> {
+        self.resolve_contents(&env_data.interpreter_context())
     }
 }
 
