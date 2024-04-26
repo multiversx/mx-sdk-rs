@@ -2,7 +2,7 @@ mod pmf_proxy;
 
 use multiversx_sc_scenario::imports::*;
 
-const OWNER: TestAddress = TestAddress::new("owner");
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const SC_PMF: TestSCAddress = TestSCAddress::new("pmf");
 const CODE_EXPR: &str = "mxsc:output/panic-message-features.mxsc.json";
 
@@ -20,7 +20,7 @@ fn setup() -> ScenarioWorld {
 
     world.set_state_step(
         SetStateStep::new()
-            .put_account(OWNER, Account::new().nonce(1))
+            .put_account(OWNER_ADDRESS, Account::new().nonce(1))
             .put_account(SC_PMF, Account::new().code(code)),
     );
 
@@ -34,7 +34,7 @@ fn tx_returns_error_test() {
 
     let (status, message) = world
         .tx()
-        .from(OWNER)
+        .from(OWNER_ADDRESS)
         .to(SC_PMF)
         .typed(pmf_proxy::PanicMessageFeaturesProxy)
         .sc_panic()
@@ -69,7 +69,7 @@ fn tx_expect_error_test() {
 
     world
         .tx()
-        .from(OWNER)
+        .from(OWNER_ADDRESS)
         .to(SC_PMF)
         .typed(pmf_proxy::PanicMessageFeaturesProxy)
         .sc_panic()

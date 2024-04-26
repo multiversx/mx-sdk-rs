@@ -8,13 +8,13 @@ const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
 const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
-const CODE_EXPR: MxscPath = MxscPath::new("output/crowdfunding-esdt.mxsc.json");
-const SC_CROWDFUNDING_ESDT_EXPR: TestSCAddress = TestSCAddress::new("crowdfunding-esdt");
+const CODE_PATH: MxscPath = MxscPath::new("output/crowdfunding-esdt.mxsc.json");
+const CROWDFUNDING_ADDRESS: TestSCAddress = TestSCAddress::new("crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.register_contract(CODE_EXPR, crowdfunding_esdt::ContractBuilder);
+    blockchain.register_contract(CODE_PATH, crowdfunding_esdt::ContractBuilder);
     blockchain
 }
 
@@ -37,7 +37,7 @@ impl CrowdfundingESDTTestState {
             .nonce(1)
             .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
 
-        world.new_address(OWNER_ADDRESS, 1, SC_CROWDFUNDING_ESDT_EXPR);
+        world.new_address(OWNER_ADDRESS, 1, CROWDFUNDING_ADDRESS);
 
         Self { world }
     }
@@ -52,7 +52,7 @@ impl CrowdfundingESDTTestState {
                 CF_DEADLINE,
                 EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
             )
-            .code(CODE_EXPR)
+            .code(CODE_PATH)
             .run();
     }
 
@@ -60,7 +60,7 @@ impl CrowdfundingESDTTestState {
         self.world
             .tx()
             .from(address)
-            .to(SC_CROWDFUNDING_ESDT_EXPR)
+            .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .fund()
             .egld_or_single_esdt(
@@ -74,7 +74,7 @@ impl CrowdfundingESDTTestState {
     fn check_deposit(&mut self, donor: TestAddress, amount: u64) {
         self.world
             .query()
-            .to(SC_CROWDFUNDING_ESDT_EXPR)
+            .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .deposit(donor.eval_to_array())
             .returns(ExpectValue(amount))
@@ -84,7 +84,7 @@ impl CrowdfundingESDTTestState {
     fn check_status(&mut self, expected_value: crowdfunding_esdt_proxy::Status) {
         self.world
             .query()
-            .to(SC_CROWDFUNDING_ESDT_EXPR)
+            .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .status()
             .returns(ExpectValue(expected_value))
@@ -95,7 +95,7 @@ impl CrowdfundingESDTTestState {
         self.world
             .tx()
             .from(address)
-            .to(SC_CROWDFUNDING_ESDT_EXPR)
+            .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
             .claim()
             .run();
@@ -139,7 +139,7 @@ fn test_sc_error() {
         .world
         .tx()
         .from(FIRST_USER_ADDRESS)
-        .to(SC_CROWDFUNDING_ESDT_EXPR)
+        .to(CROWDFUNDING_ADDRESS)
         .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
         .fund()
         .egld(1000)
@@ -172,7 +172,7 @@ fn test_successful_cf() {
         .world
         .tx()
         .from(FIRST_USER_ADDRESS)
-        .to(SC_CROWDFUNDING_ESDT_EXPR)
+        .to(CROWDFUNDING_ADDRESS)
         .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
         .claim()
         .with_result(ExpectError(4, "only owner can claim successful funding"))

@@ -5,10 +5,10 @@ use scenario_tester::*;
 
 const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
-const OWNER: TestAddress = TestAddress::new("owner");
-const OTHER: TestAddress = TestAddress::new("other");
-const SC_SCENARIO_TESTER: TestSCAddress = TestSCAddress::new("scenario-tester");
-const CODE_EXPR: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
+const OTHER_ADDRESS: TestAddress = TestAddress::new("other");
+const SC_SCENARIO_TESTER_ADDRESS: TestSCAddress = TestSCAddress::new("scenario-tester");
+const CODE_PATH: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -55,17 +55,17 @@ fn st_blackbox() {
 
     let new_address = world
         .tx()
-        .from(OWNER)
+        .from(OWNER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .init(5u32)
-        .code(CODE_EXPR)
+        .code(CODE_PATH)
         .returns(ReturnsNewAddress)
         .run();
     assert_eq!(new_address, st_contract.to_address());
 
     let value = world
         .query()
-        .to(SC_SCENARIO_TESTER)
+        .to(SC_SCENARIO_TESTER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
         .returns(ReturnsResultConv::<BigUint>::new())
@@ -74,8 +74,8 @@ fn st_blackbox() {
 
     world
         .tx()
-        .from(OWNER)
-        .to(SC_SCENARIO_TESTER)
+        .from(OWNER_ADDRESS)
+        .to(SC_SCENARIO_TESTER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .add(1u32)
         .run();
@@ -90,8 +90,8 @@ fn st_blackbox() {
 
     world
         .tx()
-        .from(OTHER)
-        .to(SC_SCENARIO_TESTER)
+        .from(OTHER_ADDRESS)
+        .to(SC_SCENARIO_TESTER_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .add(1u32)
         .run();
