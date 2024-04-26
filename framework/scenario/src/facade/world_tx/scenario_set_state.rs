@@ -3,11 +3,16 @@ mod scenario_set_block;
 mod scenario_set_new_address;
 
 use crate::{
-    scenario::ScenarioRunner,
-    scenario_model::{AddressKey, AddressValue, NewAddress, SetStateStep, U64Value},
-    ScenarioWorld,
+    imports::StaticApi,
+    scenario::{
+        tx_to_step::{address_annotated, u64_annotated},
+        ScenarioRunner,
+    },
+    scenario_model::{AddressKey, NewAddress, SetStateStep},
+    ScenarioTxEnvData, ScenarioWorld,
 };
 
+use multiversx_sc::types::{AnnotatedValue, ManagedAddress};
 use scenario_set_account::AccountItem;
 use scenario_set_block::BlockItem;
 use scenario_set_new_address::NewAddressItem;
@@ -22,7 +27,7 @@ impl ScenarioWorld {
 
     pub fn account<A>(&mut self, address_expr: A) -> SetStateBuilder<'_, AccountItem>
     where
-        AddressKey: From<A>,
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         self.empty_builder().account(address_expr)
     }
@@ -34,9 +39,9 @@ impl ScenarioWorld {
         new_address_expr: NA,
     ) -> SetStateBuilder<'_, NewAddressItem>
     where
-        AddressValue: From<CA>,
-        U64Value: From<CN>,
-        AddressValue: From<NA>,
+        CA: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        CN: AnnotatedValue<ScenarioTxEnvData, u64>,
+        NA: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         self.empty_builder()
             .new_address(creator_address_expr, creator_nonce_expr, new_address_expr)
@@ -105,11 +110,13 @@ where
     /// Starts building of a new account.
     pub fn account<A>(mut self, address_expr: A) -> SetStateBuilder<'w, AccountItem>
     where
-        AddressKey: From<A>,
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         let mut base = core::mem::take(&mut self.base).unwrap();
+        let env = base.world.new_env_data();
+        let address_value = address_annotated(&env, &address_expr);
         self.item.commit_to_step(&mut base.set_state_step);
-        let item = base.start_account(address_expr.into());
+        let item = base.start_account(address_value.into());
         SetStateBuilder {
             base: Some(base),
             item,
@@ -123,19 +130,20 @@ where
         new_address_expr: NA,
     ) -> SetStateBuilder<'w, NewAddressItem>
     where
-        AddressValue: From<CA>,
-        U64Value: From<CN>,
-        AddressValue: From<NA>,
+        CA: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        CN: AnnotatedValue<ScenarioTxEnvData, u64>,
+        NA: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         let mut base = core::mem::take(&mut self.base).unwrap();
         self.item.commit_to_step(&mut base.set_state_step);
+        let env = base.world.new_env_data();
         SetStateBuilder {
             base: Some(base),
             item: NewAddressItem {
                 new_address: NewAddress {
-                    creator_address: AddressValue::from(creator_address_expr),
-                    creator_nonce: U64Value::from(creator_nonce_expr),
-                    new_address: AddressValue::from(new_address_expr),
+                    creator_address: address_annotated(&env, &creator_address_expr),
+                    creator_nonce: u64_annotated(&env, &creator_nonce_expr),
+                    new_address: address_annotated(&env, &new_address_expr),
                 },
             },
         }

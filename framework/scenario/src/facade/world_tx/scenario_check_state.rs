@@ -1,24 +1,30 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
-use multiversx_sc::{codec::test_util::top_encode_to_vec_u8_or_panic, proxy_imports::TopEncode};
+use multiversx_sc::{
+    codec::test_util::top_encode_to_vec_u8_or_panic,
+    proxy_imports::TopEncode,
+    types::{AnnotatedValue, ManagedAddress},
+};
 
 use crate::{
-    scenario::ScenarioRunner,
+    api::StaticApi,
+    scenario::{tx_to_step::address_annotated, ScenarioRunner},
     scenario_model::{
         AddressKey, BigUintValue, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
         CheckEsdtInstances, CheckEsdtMap, CheckEsdtMapContents, CheckStateStep, CheckStorage,
         CheckStorageDetails, CheckValue, U64Value,
     },
-    ScenarioWorld,
+    ScenarioTxEnvData, ScenarioWorld,
 };
 
 impl ScenarioWorld {
     pub fn check_account<A>(&mut self, address: A) -> CheckStateBuilder<'_>
     where
-        AddressKey: From<A>,
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
-        CheckStateBuilder::new(self, address.into())
+        let address_value = address_annotated(&self.new_env_data(), &address);
+        CheckStateBuilder::new(self, address_value.into())
     }
 }
 
@@ -42,12 +48,14 @@ impl<'w> CheckStateBuilder<'w> {
     }
 
     /// Starts building of a new account.
-    pub fn check_account<A>(mut self, address_expr: A) -> Self
+    pub fn check_account<A>(mut self, address: A) -> Self
     where
-        AddressKey: From<A>,
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         self.add_current_acount();
-        self.reset_account(address_expr.into());
+        let env = self.world.new_env_data();
+        let address_value = address_annotated(&env, &address);
+        self.reset_account(address_value.into());
         self
     }
 

@@ -15,6 +15,18 @@ where
     }
 }
 
+pub fn u64_annotated<Env, Num>(env: &Env, from: &Num) -> U64Value
+where
+    Env: TxEnv,
+    Num: AnnotatedValue<Env, u64>,
+{
+    let annotation = from.annotation(env).to_string();
+    U64Value {
+        value: from.to_value(env),
+        original: ValueSubTree::Str(annotation),
+    }
+}
+
 pub fn code_annotated<Env, CodeValue>(env: &Env, code: Code<CodeValue>) -> BytesValue
 where
     Env: TxEnv,

@@ -7,7 +7,7 @@ const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.jso
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const OTHER_ADDRESS: TestAddress = TestAddress::new("other");
-const SC_SCENARIO_TESTER_ADDRESS: TestSCAddress = TestSCAddress::new("scenario-tester");
+const ST_ADDRESS: TestSCAddress = TestSCAddress::new("scenario-tester");
 const CODE_PATH: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 
 fn world() -> ScenarioWorld {
@@ -24,34 +24,30 @@ fn world() -> ScenarioWorld {
 #[test]
 fn st_blackbox() {
     let mut world = world();
-    let owner_address = "address:owner";
-    let other_address = "address:other";
-
-    let st_contract = ContractInfo::<scenario_tester::Proxy<StaticApi>>::new("sc:scenario-tester");
 
     world.start_trace();
 
     world
-        .account(owner_address)
+        .account(OWNER_ADDRESS)
         .nonce(1)
         .balance("100")
-        .account(other_address)
+        .account(OTHER_ADDRESS)
         .nonce(2)
         .balance("300")
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
     world
-        .check_account(owner_address)
+        .check_account(OWNER_ADDRESS)
         .nonce("1")
         .balance("100")
-        .check_account(other_address)
+        .check_account(OTHER_ADDRESS)
         .nonce("2")
         .balance("300")
         .esdt_balance("str:TOKEN-123456", "500")
         .commit();
 
-    world.new_address(owner_address, 1, "sc:scenario-tester");
+    world.new_address(OWNER_ADDRESS, 1, ST_ADDRESS);
 
     let new_address = world
         .tx()
@@ -61,11 +57,11 @@ fn st_blackbox() {
         .code(CODE_PATH)
         .returns(ReturnsNewAddress)
         .run();
-    assert_eq!(new_address, st_contract.to_address());
+    assert_eq!(new_address, ST_ADDRESS.to_address());
 
     let value = world
         .query()
-        .to(SC_SCENARIO_TESTER_ADDRESS)
+        .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
         .returns(ReturnsResultConv::<BigUint>::new())
@@ -75,23 +71,23 @@ fn st_blackbox() {
     world
         .tx()
         .from(OWNER_ADDRESS)
-        .to(SC_SCENARIO_TESTER_ADDRESS)
+        .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .add(1u32)
         .run();
 
     world
-        .check_account(owner_address)
+        .check_account(OWNER_ADDRESS)
         .nonce("3")
         .balance("100")
-        .check_account(st_contract)
+        .check_account(ST_ADDRESS)
         .check_storage("str:sum", "6")
         .commit();
 
     world
         .tx()
         .from(OTHER_ADDRESS)
-        .to(SC_SCENARIO_TESTER_ADDRESS)
+        .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .add(1u32)
         .run();
@@ -102,12 +98,12 @@ fn st_blackbox() {
 #[test]
 fn set_state_test() {
     let mut world = world();
-    let first = "address:first";
-    let second = "address:second";
-    let third = "address:third";
-    let fourth = "address:fourth";
-    let fifth = "address:fifth";
-    let sixth = "address:sixth";
+    let first = TestAddress::new("first");
+    let second = TestAddress::new("second");
+    let third = TestAddress::new("third");
+    let fourth = TestAddress::new("fourth");
+    let fifth = TestAddress::new("fifth");
+    let sixth = TestAddress::new("sixth");
 
     world.start_trace();
 
