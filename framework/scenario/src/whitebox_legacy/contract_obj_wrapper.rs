@@ -287,15 +287,7 @@ impl BlockchainStateWrapper {
         _sc_identifier: Option<Vec<u8>>,
         _sc_mandos_path_expr: Option<Vec<u8>>,
     ) {
-        let vm_address = to_vm_address(address);
-        if self.world.get_state().account_exists(&vm_address) {
-            panic!("Address already used: {:?}", address_to_hex(address));
-        }
-
-        let account = Account::new().balance(egld_balance);
-
-        self.world
-            .set_state_step(SetStateStep::new().put_account(address, account));
+        self.world.create_account_raw(address, egld_balance);
     }
 
     // Has to be used before perfoming a deploy from a SC
@@ -411,22 +403,7 @@ impl BlockchainStateWrapper {
         token_id: &[u8],
         roles: &[EsdtLocalRole],
     ) {
-        let vm_address = to_vm_address(address);
-        match self.world.get_mut_state().accounts.get_mut(&vm_address) {
-            Some(acc) => {
-                let mut roles_raw = Vec::new();
-                for role in roles {
-                    roles_raw.push(role.as_role_name().to_vec());
-                }
-                acc.esdt.set_roles(token_id.to_vec(), roles_raw);
-
-                self.add_mandos_set_account(address);
-            },
-            None => panic!(
-                "set_esdt_local_roles: Account {:?} does not exist",
-                address_to_hex(address)
-            ),
-        }
+        self.world.set_esdt_local_roles(address, token_id, roles);
     }
 
     pub fn set_block_epoch(&mut self, block_epoch: u64) {
@@ -795,15 +772,6 @@ impl BlockchainStateWrapper {
 fn address_to_hex(address: &Address) -> String {
     hex::encode(address.as_bytes())
 }
-
-// fn serialize_attributes<T: TopEncode>(attributes: &T) -> Vec<u8> {
-//     let mut serialized_attributes = Vec::new();
-//     if let Result::Err(err) = attributes.top_encode(&mut serialized_attributes) {
-//         panic!("Failed to encode attributes: {err:?}")
-//     }
-
-//     serialized_attributes
-// }
 
 fn print_token_balance_raw(
     token_nonce: u64,

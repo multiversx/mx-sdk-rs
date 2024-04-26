@@ -4,15 +4,12 @@ mod scenario_set_new_address;
 
 use crate::{
     scenario::ScenarioRunner,
-    scenario_model::{
-        AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, NewAddress, SetStateStep,
-        U64Value,
-    },
+    scenario_model::{AddressKey, AddressValue, BigUintValue, NewAddress, SetStateStep, U64Value},
     ScenarioWorld,
 };
 
 use multiversx_chain_vm::world_mock::EsdtInstanceMetadata;
-use multiversx_sc::codec::TopEncode;
+use multiversx_sc::{codec::TopEncode, types::EsdtLocalRole};
 use scenario_set_account::AccountItem;
 use scenario_set_block::BlockItem;
 use scenario_set_new_address::NewAddressItem;
@@ -140,6 +137,28 @@ impl ScenarioWorld {
         for (vm_address, account) in accounts.iter_mut() {
             if vm_address == &AddressKey::from(address).to_vm_address() {
                 account.developer_rewards = BigUintValue::from(developer_rewards).value.clone();
+            }
+        }
+    }
+
+    pub fn set_esdt_local_roles<A: Copy>(
+        &mut self,
+        address: A,
+        token_id: &[u8],
+        roles: &[EsdtLocalRole],
+    ) where
+        AddressKey: From<A>,
+    {
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &AddressKey::from(address).to_vm_address() {
+                account.esdt.set_roles(
+                    token_id.to_vec(),
+                    roles
+                        .iter()
+                        .map(|role| role.as_role_name().to_vec())
+                        .collect(),
+                );
             }
         }
     }

@@ -179,5 +179,4 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         self.item.account.owner = Some(AddressValue::from(owner_expr));
         self
     }
-
 }
