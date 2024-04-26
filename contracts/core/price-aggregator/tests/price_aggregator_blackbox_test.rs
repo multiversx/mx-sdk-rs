@@ -19,8 +19,8 @@ const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
 
-const_sc_expr!(PRICE_AGGREGATOR = "price-aggregator");
-const_address_expr!(OWNER = "owner");
+const PRICE_AGGREGATOR: TestScAddress = TestScAddress::new("price-aggregator");
+const OWNER: TestAddress = TestAddress::new("owner");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

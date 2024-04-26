@@ -12,13 +12,14 @@ use rewards_distribution::{
 const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
 const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
 
-const ALICE_ADDRESS_EXPR: AddressExpr = AddressExpr("alice");
-const OWNER_ADDRESS_EXPR: AddressExpr = AddressExpr("owner");
-const REWARDS_DISTRIBUTION_ADDRESS_EXPR: ScExpr = ScExpr("rewards-distribution");
-const REWARDS_DISTRIBUTION_PATH_EXPR: MxscExpr = MxscExpr("output/rewards-distribution.mxsc.json");
-const SEED_NFT_MINTER_ADDRESS_EXPR: ScExpr = ScExpr("seed-nft-minter");
-const SEED_NFT_MINTER_PATH_EXPR: MxscExpr =
-    MxscExpr("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
+const ALICE_ADDRESS_EXPR: TestAddress = TestAddress::new("alice");
+const OWNER_ADDRESS_EXPR: TestAddress = TestAddress::new("owner");
+const REWARDS_DISTRIBUTION_ADDRESS_EXPR: TestScAddress = TestScAddress::new("rewards-distribution");
+const REWARDS_DISTRIBUTION_PATH_EXPR: MxscPath =
+    MxscPath::new("output/rewards-distribution.mxsc.json");
+const SEED_NFT_MINTER_ADDRESS_EXPR: TestScAddress = TestScAddress::new("seed-nft-minter");
+const SEED_NFT_MINTER_PATH_EXPR: MxscPath =
+    MxscPath::new("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

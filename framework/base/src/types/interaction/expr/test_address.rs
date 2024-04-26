@@ -12,13 +12,13 @@ const ADDRESS_PREFIX: &str = "address:";
 /// It is designed to be usable from contracts (especiall test contracts), with a minimal footprint.
 /// For this reason, its inner structure is subject to change.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct AddressExpr<'a> {
+pub struct TestAddress<'a> {
     name: &'a str,
 }
 
-impl<'a> AddressExpr<'a> {
+impl<'a> TestAddress<'a> {
     pub const fn new(name: &'a str) -> Self {
-        AddressExpr { name }
+        TestAddress { name }
     }
 
     pub const fn eval_to_array(&self) -> [u8; 32] {
@@ -40,7 +40,7 @@ impl<'a> AddressExpr<'a> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for AddressExpr<'a>
+impl<'a, Env> AnnotatedValue<Env, ManagedAddress<Env::Api>> for TestAddress<'a>
 where
     Env: TxEnv,
 {
@@ -56,7 +56,7 @@ where
     }
 }
 
-impl<'a, Env> TxFrom<Env> for AddressExpr<'a>
+impl<'a, Env> TxFrom<Env> for TestAddress<'a>
 where
     Env: TxEnv,
 {
@@ -65,16 +65,16 @@ where
         expr.into()
     }
 }
-impl<'a, Env> TxFromSpecified<Env> for AddressExpr<'a> where Env: TxEnv {}
-impl<'a, Env> TxTo<Env> for AddressExpr<'a> where Env: TxEnv {}
-impl<'a, Env> TxToSpecified<Env> for AddressExpr<'a> where Env: TxEnv {}
+impl<'a, Env> TxFromSpecified<Env> for TestAddress<'a> where Env: TxEnv {}
+impl<'a, Env> TxTo<Env> for TestAddress<'a> where Env: TxEnv {}
+impl<'a, Env> TxToSpecified<Env> for TestAddress<'a> where Env: TxEnv {}
 
 #[cfg(test)]
 pub mod tests {
     use super::*;
 
     fn assert_eq_eval(expr: &'static str, expected: &[u8; 32]) {
-        assert_eq!(&AddressExpr::new(expr).eval_to_array(), expected);
+        assert_eq!(&TestAddress::new(expr).eval_to_array(), expected);
     }
 
     #[test]

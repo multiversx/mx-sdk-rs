@@ -5,11 +5,11 @@ use multiversx_sc_scenario::imports::*;
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
 const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
 const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
-const_address_expr!(FIRST_USER_ADDRESS = "first-user");
-const_address_expr!(OWNER_ADDRESS = "owner");
-const_address_expr!(SECOND_USER_ADDRESS = "second-user");
-const_mxsc_expr!(CODE_EXPR = "output/crowdfunding-esdt.mxsc.json");
-const_sc_expr!(SC_CROWDFUNDING_ESDT_EXPR = "crowdfunding-esdt");
+const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
+const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
+const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
+const CODE_EXPR: MxscPath = MxscPath::new("output/crowdfunding-esdt.mxsc.json");
+const SC_CROWDFUNDING_ESDT_EXPR: TestScAddress = TestScAddress::new("crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -56,7 +56,7 @@ impl CrowdfundingESDTTestState {
             .run();
     }
 
-    fn fund(&mut self, address: AddressExpr, amount: u64) {
+    fn fund(&mut self, address: TestAddress, amount: u64) {
         self.world
             .tx()
             .from(address)
@@ -71,7 +71,7 @@ impl CrowdfundingESDTTestState {
             .run();
     }
 
-    fn check_deposit(&mut self, donor: AddressExpr, amount: u64) {
+    fn check_deposit(&mut self, donor: TestAddress, amount: u64) {
         self.world
             .query()
             .to(SC_CROWDFUNDING_ESDT_EXPR)
@@ -91,7 +91,7 @@ impl CrowdfundingESDTTestState {
             .run();
     }
 
-    fn claim(&mut self, address: AddressExpr) {
+    fn claim(&mut self, address: TestAddress) {
         self.world
             .tx()
             .from(address)
@@ -101,7 +101,7 @@ impl CrowdfundingESDTTestState {
             .run();
     }
 
-    fn check_esdt_balance(&mut self, address: AddressExpr, balance_expr: &str) {
+    fn check_esdt_balance(&mut self, address: TestAddress, balance_expr: &str) {
         self.world
             .check_account(address)
             .esdt_balance(CF_TOKEN_ID_EXPR, balance_expr);

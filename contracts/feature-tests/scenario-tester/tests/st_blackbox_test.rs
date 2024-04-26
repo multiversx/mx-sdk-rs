@@ -5,10 +5,10 @@ use scenario_tester::*;
 
 const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
 
-const_address_expr!(OWNER = "owner");
-const_address_expr!(OTHER = "other");
-const_sc_expr!(SC_SCENARIO_TESTER = "scenario-tester");
-const_mxsc_expr!(CODE_EXPR = "output/scenario-tester.mxsc.json");
+const OWNER: TestAddress = TestAddress::new("owner");
+const OTHER: TestAddress = TestAddress::new("other");
+const SC_SCENARIO_TESTER: TestScAddress = TestScAddress::new("scenario-tester");
+const CODE_EXPR: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

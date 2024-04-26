@@ -2,9 +2,9 @@ use multiversx_sc_scenario::imports::*;
 
 use adder::*;
 
-const_address_expr!(OWNER = "owner");
-const_sc_expr!(SC_ADDER = "adder");
-const_mxsc_expr!(CODE_EXPR = "output/adder.mxsc.json");
+const OWNER: TestAddress = TestAddress::new("owner");
+const SC_ADDER: TestScAddress = TestScAddress::new("adder");
+const CODE_EXPR: MxscPath = MxscPath::new("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

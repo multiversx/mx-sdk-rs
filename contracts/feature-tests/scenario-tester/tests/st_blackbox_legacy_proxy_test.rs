@@ -5,8 +5,8 @@ use scenario_tester::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
-const_address_expr!(OWNER = "owner");
-const_mxsc_expr!(CODE_EXPR = "output/adder.mxsc.json");
+const OWNER: TestAddress = TestAddress::new("owner");
+const CODE_EXPR: MxscPath = MxscPath::new("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

@@ -210,24 +210,3 @@ macro_rules! extract_address {
             .unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
     }};
 }
-
-#[macro_export]
-macro_rules! const_address_expr {
-    ($const_name:ident = $name:expr) => {
-        const $const_name: AddressExpr = AddressExpr::new($name);
-    };
-}
-
-#[macro_export]
-macro_rules! const_sc_expr {
-    ($const_name:ident = $name:expr) => {
-        const $const_name: ScExpr = ScExpr::new($name);
-    };
-}
-
-#[macro_export]
-macro_rules! const_mxsc_expr {
-    ($const_name:ident = $name:expr) => {
-        const $const_name: MxscExpr = MxscExpr::new($name);
-    };
-}

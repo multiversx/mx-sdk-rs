@@ -10,17 +10,17 @@ use super::RegisterCodeSource;
 const MXSC_PREFIX: &str = "mxsc:";
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct MxscExpr<'a> {
+pub struct MxscPath<'a> {
     path: &'a str,
 }
 
-impl<'a> MxscExpr<'a> {
+impl<'a> MxscPath<'a> {
     pub const fn new(path: &'a str) -> Self {
-        MxscExpr { path }
+        MxscPath { path }
     }
 }
 
-impl<'a> MxscExpr<'a> {
+impl<'a> MxscPath<'a> {
     pub fn eval_to_expr(&self) -> String {
         format!("{MXSC_PREFIX}{}", self.path)
     }
@@ -30,7 +30,7 @@ impl<'a> MxscExpr<'a> {
     }
 }
 
-impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for MxscExpr<'a>
+impl<'a, Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for MxscPath<'a>
 where
     Env: ScenarioTxEnv,
 {
@@ -44,9 +44,9 @@ where
     }
 }
 
-impl<'a, Env> TxCodeValue<Env> for MxscExpr<'a> where Env: ScenarioTxEnv {}
+impl<'a, Env> TxCodeValue<Env> for MxscPath<'a> where Env: ScenarioTxEnv {}
 
-impl<'a> RegisterCodeSource for MxscExpr<'a> {
+impl<'a> RegisterCodeSource for MxscPath<'a> {
     fn into_code(self, env_data: ScenarioTxEnvData) -> Vec<u8> {
         self.resolve_contents(&env_data.interpreter_context())
     }
@@ -54,10 +54,10 @@ impl<'a> RegisterCodeSource for MxscExpr<'a> {
 
 #[cfg(test)]
 pub mod tests {
-    use crate::imports::MxscExpr;
+    use crate::imports::MxscPath;
 
     fn assert_eq_eval(expr: &'static str, expected: &str) {
-        assert_eq!(&MxscExpr::new(expr).eval_to_expr(), expected);
+        assert_eq!(&MxscPath::new(expr).eval_to_expr(), expected);
     }
 
     #[test]
