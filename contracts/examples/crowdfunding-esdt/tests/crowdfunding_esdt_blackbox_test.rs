@@ -9,7 +9,7 @@ const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
 const CODE_EXPR: MxscPath = MxscPath::new("output/crowdfunding-esdt.mxsc.json");
-const SC_CROWDFUNDING_ESDT_EXPR: TestScAddress = TestScAddress::new("crowdfunding-esdt");
+const SC_CROWDFUNDING_ESDT_EXPR: TestSCAddress = TestSCAddress::new("crowdfunding-esdt");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();

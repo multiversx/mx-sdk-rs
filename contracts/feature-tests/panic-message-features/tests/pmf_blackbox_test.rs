@@ -3,7 +3,7 @@ mod pmf_proxy;
 use multiversx_sc_scenario::imports::*;
 
 const OWNER: TestAddress = TestAddress::new("owner");
-const SC_PMF: TestScAddress = TestScAddress::new("pmf");
+const SC_PMF: TestSCAddress = TestSCAddress::new("pmf");
 const CODE_EXPR: &str = "mxsc:output/panic-message-features.mxsc.json";
 
 fn world() -> ScenarioWorld {

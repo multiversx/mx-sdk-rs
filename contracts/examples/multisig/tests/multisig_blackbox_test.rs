@@ -5,11 +5,11 @@ use adder::adder_proxy;
 use multisig::multisig_proxy;
 use num_bigint::BigUint;
 
-const SC_ADDER_EXPR: TestScAddress = TestScAddress::new("adder");
+const SC_ADDER_EXPR: TestSCAddress = TestSCAddress::new("adder");
 const ADDER_OWNER_ADDRESS_EXPR: TestAddress = TestAddress::new("adder-owner");
 const ADDER_CODE_EXPR: MxscPath = MxscPath::new("test-contracts/adder.mxsc.json");
 const BOARD_MEMBER_ADDRESS_EXPR: TestAddress = TestAddress::new("board-member");
-const SC_MULTISIG_EXPR: TestScAddress = TestScAddress::new("multisig");
+const SC_MULTISIG_EXPR: TestSCAddress = TestSCAddress::new("multisig");
 const MULTISIG_CODE_EXPR: MxscPath = MxscPath::new("output/multisig.mxsc.json");
 const OWNER_ADDRESS_EXPR: TestAddress = TestAddress::new("owner");
 const PROPOSER_ADDRESS_EXPR: TestAddress = TestAddress::new("proposer");
@@ -123,7 +123,7 @@ impl MultisigTestState {
 
     fn propose_transfer_execute(
         &mut self,
-        to: TestScAddress,
+        to: TestSCAddress,
         egld_amount: u64,
         contract_call: FunctionCall<StaticApi>,
     ) -> usize {
@@ -139,7 +139,7 @@ impl MultisigTestState {
 
     fn propose_async_call(
         &mut self,
-        to: TestScAddress,
+        to: TestSCAddress,
         egld_amount: u64,
         contract_call: FunctionCall<StaticApi>,
     ) -> usize {
@@ -167,7 +167,7 @@ impl MultisigTestState {
     fn propose_sc_deploy_from_source(
         &mut self,
         amount: u64,
-        source: TestScAddress,
+        source: TestSCAddress,
         code_metadata: CodeMetadata,
         arguments: MultiValueVec<Vec<u8>>,
     ) -> usize {
@@ -183,9 +183,9 @@ impl MultisigTestState {
 
     fn propose_sc_upgrade_from_source(
         &mut self,
-        sc_address: TestScAddress,
+        sc_address: TestSCAddress,
         amount: u64,
-        source: TestScAddress,
+        source: TestSCAddress,
         code_metadata: CodeMetadata,
         arguments: MultiValueVec<Vec<u8>>,
     ) -> usize {
@@ -538,7 +538,7 @@ fn test_deploy_and_upgrade_from_source() {
     let mut state = MultisigTestState::new();
     state.deploy_multisig_contract().deploy_adder_contract();
 
-    let new_adder_address_expr = TestScAddress::new("new-adder");
+    let new_adder_address_expr = TestSCAddress::new("new-adder");
 
     state
         .world
@@ -584,7 +584,7 @@ fn test_deploy_and_upgrade_from_source() {
         .returns(ExpectValue(BigUint::from(10u64)))
         .run();
 
-    let factorial_address_expr: TestScAddress = TestScAddress::new("factorial");
+    let factorial_address_expr: TestSCAddress = TestSCAddress::new("factorial");
     let factorial_path_expr: MxscPath = MxscPath::new("test-contracts/factorial.mxsc.json");
 
     let factorial_code = state

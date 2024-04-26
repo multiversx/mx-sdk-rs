@@ -4,7 +4,7 @@ use multiversx_sc::{
 };
 use std::fmt;
 
-use crate::multiversx_sc::types::{Address, TestAddress, TestScAddress};
+use crate::multiversx_sc::types::{Address, TestAddress, TestSCAddress};
 
 use crate::{
     facade::expr::Bech32Address,
@@ -147,8 +147,8 @@ impl From<TestAddress<'_>> for AddressValue {
     }
 }
 
-impl From<TestScAddress<'_>> for AddressValue {
-    fn from(from: TestScAddress) -> Self {
+impl From<TestSCAddress<'_>> for AddressValue {
+    fn from(from: TestSCAddress) -> Self {
         AddressValue {
             value: from.eval_to_array().into(),
             original: ValueSubTree::Str(from.eval_to_expr()),

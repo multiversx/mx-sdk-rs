@@ -7,7 +7,7 @@ const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.jso
 
 const OWNER: TestAddress = TestAddress::new("owner");
 const OTHER: TestAddress = TestAddress::new("other");
-const SC_SCENARIO_TESTER: TestScAddress = TestScAddress::new("scenario-tester");
+const SC_SCENARIO_TESTER: TestSCAddress = TestSCAddress::new("scenario-tester");
 const CODE_EXPR: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 
 fn world() -> ScenarioWorld {

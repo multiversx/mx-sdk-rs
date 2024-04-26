@@ -3,7 +3,7 @@ use multiversx_sc_scenario::imports::*;
 use adder::*;
 
 const OWNER: TestAddress = TestAddress::new("owner");
-const SC_ADDER: TestScAddress = TestScAddress::new("adder");
+const SC_ADDER: TestSCAddress = TestSCAddress::new("adder");
 const CODE_EXPR: MxscPath = MxscPath::new("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {

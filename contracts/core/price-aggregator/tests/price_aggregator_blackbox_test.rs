@@ -19,7 +19,7 @@ const STAKE_AMOUNT: u64 = 20;
 const SUBMISSION_COUNT: usize = 3;
 const USD_TICKER: &[u8] = b"USDC";
 
-const PRICE_AGGREGATOR: TestScAddress = TestScAddress::new("price-aggregator");
+const PRICE_AGGREGATOR: TestSCAddress = TestSCAddress::new("price-aggregator");
 const OWNER: TestAddress = TestAddress::new("owner");
 
 fn world() -> ScenarioWorld {
