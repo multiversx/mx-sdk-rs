@@ -3,8 +3,7 @@ use crowdfunding_esdt::crowdfunding_esdt_proxy;
 use multiversx_sc_scenario::imports::*;
 
 const CF_DEADLINE: u64 = 7 * 24 * 60 * 60; // 1 week in seconds
-const CF_TOKEN_ID: &[u8] = b"CROWD-123456";
-const CF_TOKEN_ID_EXPR: &str = "str:CROWD-123456";
+const CF_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("CROWD-123456");
 const FIRST_USER_ADDRESS: TestAddress = TestAddress::new("first-user");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const SECOND_USER_ADDRESS: TestAddress = TestAddress::new("second-user");
@@ -26,18 +25,18 @@ impl CrowdfundingESDTTestState {
     fn new() -> Self {
         let mut world = world();
 
+        world.account(OWNER_ADDRESS).nonce(1);
+
         world
-            .account(OWNER_ADDRESS)
-            .nonce(1)
             .account(FIRST_USER_ADDRESS)
             .nonce(1)
             .balance(1000)
-            .esdt_balance(CF_TOKEN_ID_EXPR, "1000")
+            .esdt_balance(CF_TOKEN_ID, 1000);
+
+        world
             .account(SECOND_USER_ADDRESS)
             .nonce(1)
-            .esdt_balance(CF_TOKEN_ID_EXPR, "1000");
-
-        world.new_address(OWNER_ADDRESS, 1, CROWDFUNDING_ADDRESS);
+            .esdt_balance(CF_TOKEN_ID, 1000);
 
         Self { world }
     }
@@ -53,6 +52,7 @@ impl CrowdfundingESDTTestState {
                 EgldOrEsdtTokenIdentifier::esdt(CF_TOKEN_ID),
             )
             .code(CODE_PATH)
+            .new_address(CROWDFUNDING_ADDRESS)
             .run();
     }
 
@@ -101,10 +101,10 @@ impl CrowdfundingESDTTestState {
             .run();
     }
 
-    fn check_esdt_balance(&mut self, address: TestAddress, balance_expr: &str) {
+    fn check_esdt_balance(&mut self, address: TestAddress, balance: u64) {
         self.world
             .check_account(address)
-            .esdt_balance(CF_TOKEN_ID_EXPR, balance_expr);
+            .esdt_balance(CF_TOKEN_ID, balance);
     }
 
     fn set_block_timestamp(&mut self, block_timestamp_expr: u64) {
@@ -181,9 +181,9 @@ fn test_successful_cf() {
     // owner claim
     state.claim(OWNER_ADDRESS);
 
-    state.check_esdt_balance(OWNER_ADDRESS, "2_000");
-    state.check_esdt_balance(FIRST_USER_ADDRESS, "0");
-    state.check_esdt_balance(SECOND_USER_ADDRESS, "0");
+    state.check_esdt_balance(OWNER_ADDRESS, 2000);
+    state.check_esdt_balance(FIRST_USER_ADDRESS, 0);
+    state.check_esdt_balance(SECOND_USER_ADDRESS, 0);
 }
 
 #[test]
@@ -211,7 +211,7 @@ fn test_failed_cf() {
     // second user claim
     state.claim(SECOND_USER_ADDRESS);
 
-    state.check_esdt_balance(OWNER_ADDRESS, "0");
-    state.check_esdt_balance(FIRST_USER_ADDRESS, "1_000");
-    state.check_esdt_balance(SECOND_USER_ADDRESS, "1_000");
+    state.check_esdt_balance(OWNER_ADDRESS, 0);
+    state.check_esdt_balance(FIRST_USER_ADDRESS, 1000);
+    state.check_esdt_balance(SECOND_USER_ADDRESS, 1000);
 }

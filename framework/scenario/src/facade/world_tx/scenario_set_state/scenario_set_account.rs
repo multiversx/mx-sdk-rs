@@ -1,10 +1,10 @@
 use std::collections::btree_map::Entry;
 
-use multiversx_sc::types::{AnnotatedValue, BigUint};
+use multiversx_sc::types::{AnnotatedValue, BigUint, TokenIdentifier};
 
 use crate::{
     imports::StaticApi,
-    scenario::tx_to_step::{big_uint_annotated, u64_annotated},
+    scenario::tx_to_step::{big_uint_annotated, token_identifier_annotated, u64_annotated},
     scenario_model::{
         Account, AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject,
         SetStateStep, U64Value,
@@ -46,23 +46,26 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         self
     }
 
-    pub fn balance<V>(mut self, balance_expr: V) -> Self
+    pub fn balance<V>(mut self, balance: V) -> Self
     where
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
         let env = self.new_env_data();
-        self.item.account.balance = Some(big_uint_annotated(&env, &balance_expr));
+        self.item.account.balance = Some(big_uint_annotated(&env, &balance));
         self
     }
 
-    pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
+    pub fn esdt_balance<K, V>(mut self, token_id: K, balance: V) -> Self
     where
-        BytesKey: From<K>,
-        BigUintValue: From<V>,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
-        let esdt_data_ref = self.get_esdt_data_or_create(&token_id);
-        esdt_data_ref.set_balance(0u64, balance_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let balance_value = big_uint_annotated(&env, &balance);
+
+        let esdt_data_ref = self.get_esdt_data_or_create(&token_id_key);
+        esdt_data_ref.set_balance(0u64, balance_value);
 
         self
     }

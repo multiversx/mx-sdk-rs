@@ -9,6 +9,7 @@ const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const OTHER_ADDRESS: TestAddress = TestAddress::new("other");
 const ST_ADDRESS: TestSCAddress = TestSCAddress::new("scenario-tester");
 const CODE_PATH: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
+const TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("TOKEN-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -34,7 +35,7 @@ fn st_blackbox() {
         .account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance("str:TOKEN-123456", "500")
+        .esdt_balance(TOKEN_ID, 500)
         .commit();
 
     world
@@ -44,7 +45,7 @@ fn st_blackbox() {
         .check_account(OTHER_ADDRESS)
         .nonce(2)
         .balance(300)
-        .esdt_balance("str:TOKEN-123456", "500")
+        .esdt_balance(TOKEN_ID, 500)
         .commit();
 
     world.new_address(OWNER_ADDRESS, 1, ST_ADDRESS);
@@ -114,7 +115,7 @@ fn set_state_test() {
         .account(second)
         .nonce(2)
         .balance(300)
-        .esdt_balance("str:TOKEN-123456", "500")
+        .esdt_balance(TOKEN_ID, 500)
         .commit();
 
     world
@@ -124,7 +125,7 @@ fn set_state_test() {
         .check_account(second)
         .nonce(2)
         .balance(300)
-        .esdt_balance("str:TOKEN-123456", "500")
+        .esdt_balance(TOKEN_ID, 500)
         .commit();
 
     world
@@ -149,7 +150,7 @@ fn set_state_test() {
         .account(fifth)
         .nonce(5)
         .balance(250)
-        .esdt_balance("str:TOKEN-123456", "2");
+        .esdt_balance(TOKEN_ID, 2);
 
     world
         .check_account(fourth)
@@ -158,17 +159,17 @@ fn set_state_test() {
         .check_account(fifth)
         .nonce(5)
         .balance(250)
-        .esdt_balance("str:TOKEN-123456", "2");
+        .esdt_balance(TOKEN_ID, 2);
 
     world
         .account(sixth)
         .nonce(6)
         .balance(600)
-        .esdt_balance("str:TOKEN-123456", "60");
+        .esdt_balance(TOKEN_ID, 60);
 
     world
         .check_account(sixth)
         .nonce(6)
         .balance(600)
-        .esdt_balance("str:TOKEN-123456", "60");
+        .esdt_balance(TOKEN_ID, 60);
 }

@@ -1,9 +1,10 @@
 use multiversx_chain_scenario_format::serde_raw::ValueSubTree;
 use multiversx_sc::types::{
-    AnnotatedValue, BigUint, Code, ManagedAddress, ManagedBuffer, TxCodeValue, TxEnv, TxGas,
+    AnnotatedValue, BigUint, Code, ManagedAddress, ManagedBuffer, TokenIdentifier, TxCodeValue,
+    TxEnv, TxGas,
 };
 
-use crate::scenario_model::{AddressValue, BigUintValue, BytesValue, U64Value};
+use crate::scenario_model::{AddressValue, BigUintValue, BytesKey, BytesValue, U64Value};
 
 pub fn address_annotated<Env, Addr>(env: &Env, from: &Addr) -> AddressValue
 where
@@ -50,6 +51,18 @@ where
     BytesValue {
         value: value.into_value(env).to_vec(),
         original: ValueSubTree::Str(annotation),
+    }
+}
+
+pub fn token_identifier_annotated<Env, T>(env: &Env, value: T) -> BytesKey
+where
+    Env: TxEnv,
+    T: AnnotatedValue<Env, TokenIdentifier<Env::Api>>,
+{
+    let annotation = value.annotation(env).to_string();
+    BytesKey {
+        value: value.into_value(env).into_managed_buffer().to_vec(),
+        original: annotation,
     }
 }
 
