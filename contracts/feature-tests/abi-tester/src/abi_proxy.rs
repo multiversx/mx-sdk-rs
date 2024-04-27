@@ -340,6 +340,14 @@ where
             .original_result()
     }
 
+    pub fn operation_completion_status(
+        self,
+    ) -> TxProxyCall<Env, From, To, Gas, OperationCompletionStatus> {
+        self.wrapped_tx
+            .raw_call("operation_completion_status")
+            .original_result()
+    }
+
     pub fn payable_egld(
         self,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {
@@ -415,7 +423,10 @@ pub enum AbiEnum {
     Nothing,
     Something(i32),
     SomethingMore(u8, OnlyShowsUpAsNested08),
-    SomeStruct { a: u16, b: OnlyShowsUpAsNested09 },
+    SomeStruct {
+        a: u16,
+        b: OnlyShowsUpAsNested09,
+    },
 }
 
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
@@ -506,5 +517,8 @@ pub enum ExplicitDiscriminantMixed {
     Unit,
     Tuple(u16),
     Five,
-    Struct { a: u8, b: u16 },
+    Struct {
+        a: u8,
+        b: u16,
+    },
 }

@@ -80,6 +80,10 @@ impl TypeAbi for OperationCompletionStatus {
         TypeName::from("OperationCompletionStatus")
     }
 
+    fn type_name_rust() -> TypeName {
+        TypeName::from("OperationCompletionStatus")
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         let type_names = Self::type_names();
 
