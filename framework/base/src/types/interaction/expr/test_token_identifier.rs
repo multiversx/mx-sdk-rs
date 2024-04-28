@@ -1,3 +1,5 @@
+use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+
 use crate::{
     api::ManagedTypeApi,
     types::{AnnotatedValue, ManagedBuffer, TokenIdentifier, TxEnv},
@@ -48,3 +50,15 @@ where
         TokenIdentifier::from_esdt_bytes(value.name)
     }
 }
+
+impl<'a> TopEncode for TestTokenIdentifier<'a> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.name.top_encode_or_handle_err(output, h)
+    }
+}
+
+impl<'a, Api> CodecFrom<TestTokenIdentifier<'a>> for TokenIdentifier<Api> where Api: ManagedTypeApi {}

@@ -1,10 +1,12 @@
 use std::collections::btree_map::Entry;
 
-use multiversx_sc::types::{AnnotatedValue, BigUint, TokenIdentifier};
+use multiversx_sc::types::{AnnotatedValue, BigUint, ManagedBuffer, TokenIdentifier};
 
 use crate::{
     imports::StaticApi,
-    scenario::tx_to_step::{big_uint_annotated, token_identifier_annotated, u64_annotated},
+    scenario::tx_to_step::{
+        big_uint_annotated, bytes_annotated, token_identifier_annotated, u64_annotated,
+    },
     scenario_model::{
         Account, AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject,
         SetStateStep, U64Value,
@@ -37,9 +39,9 @@ impl SetStateBuilderItem for AccountItem {
 }
 
 impl<'w> SetStateBuilder<'w, AccountItem> {
-    pub fn nonce<V>(mut self, nonce: V) -> Self
+    pub fn nonce<N>(mut self, nonce: N) -> Self
     where
-        V: AnnotatedValue<ScenarioTxEnvData, u64>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
         let env = self.new_env_data();
         self.item.account.nonce = Some(u64_annotated(&env, &nonce));
@@ -72,28 +74,29 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
 
     pub fn esdt_nft_balance<K, N, V, T>(
         mut self,
-        token_id_expr: K,
-        nonce_expr: N,
-        balance_expr: V,
-        opt_attributes_expr: Option<T>,
+        token_id: K,
+        nonce: N,
+        balance: V,
+        attributes_expr: T,
     ) -> Self
     where
-        N: Clone,
-        BytesKey: From<K>,
-        U64Value: From<N>,
-        BigUintValue: From<V>,
-        BytesValue: From<T>,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+        T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let nonce_value = u64_annotated(&env, &nonce);
+        let balance_value = big_uint_annotated(&env, &balance);
 
         let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
+            .get_esdt_data_or_create(&token_id_key)
             .get_mut_esdt_object();
-        esdt_obj_ref.set_balance(nonce_expr.clone(), balance_expr);
+        esdt_obj_ref.set_balance(nonce_value.clone(), balance_value);
 
-        if let Some(attributes_expr) = opt_attributes_expr {
-            esdt_obj_ref.set_token_attributes(nonce_expr, attributes_expr);
-        }
+        let attributes_value = bytes_annotated(&env, attributes_expr);
+        esdt_obj_ref.set_token_attributes(nonce_value, attributes_value);
 
         self
     }

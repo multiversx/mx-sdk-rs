@@ -10,6 +10,7 @@ const OTHER_ADDRESS: TestAddress = TestAddress::new("other");
 const ST_ADDRESS: TestSCAddress = TestSCAddress::new("scenario-tester");
 const CODE_PATH: MxscPath = MxscPath::new("output/scenario-tester.mxsc.json");
 const TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("TOKEN-123456");
+const NFT_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -132,7 +133,7 @@ fn set_state_test() {
         .account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
+        .esdt_nft_balance(NFT_ID, 2, 1, ())
         .commit();
 
     world

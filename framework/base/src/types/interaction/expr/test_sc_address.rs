@@ -1,8 +1,13 @@
 use core::ptr;
 
-use crate::types::{
-    heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified,
-    TxTo, TxToSpecified,
+use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+
+use crate::{
+    api::ManagedTypeApi,
+    types::{
+        heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom,
+        TxFromSpecified, TxTo, TxToSpecified,
+    },
 };
 
 const SC_PREFIX: &str = "sc:";
@@ -88,6 +93,18 @@ impl<'a> TestSCAddress<'a> {
         alloc::format!("{SC_PREFIX}{}", self.name)
     }
 }
+
+impl<'a> TopEncode for TestSCAddress<'a> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.eval_to_array().top_encode_or_handle_err(output, h)
+    }
+}
+
+impl<'a, Api> CodecFrom<TestSCAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]
 pub mod tests {

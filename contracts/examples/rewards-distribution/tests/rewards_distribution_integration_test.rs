@@ -9,9 +9,6 @@ use rewards_distribution::{
     rewards_distribution_proxy, ContractObj, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
 };
 
-const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
-const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
-
 const ALICE_ADDRESS: TestAddress = TestAddress::new("alice");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const REWARDS_DISTRIBUTION_ADDRESS: TestSCAddress = TestSCAddress::new("rewards-distribution");
@@ -19,6 +16,7 @@ const REWARDS_DISTRIBUTION_PATH: MxscPath = MxscPath::new("output/rewards-distri
 const SEED_NFT_MINTER_ADDRESS: TestSCAddress = TestSCAddress::new("seed-nft-minter");
 const SEED_NFT_MINTER_PATH: MxscPath =
     MxscPath::new("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
+const NFT_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -61,7 +59,7 @@ impl RewardsDistributionTestState {
             .tx()
             .from(OWNER_ADDRESS)
             .typed(mock_seed_nft_minter_proxy::MockSeedNftMinterProxy)
-            .init(TokenIdentifier::from_esdt_bytes(NFT_TOKEN_ID))
+            .init(NFT_TOKEN_ID)
             .code(SEED_NFT_MINTER_PATH)
             .run();
 
@@ -171,12 +169,7 @@ fn test_raffle_and_claim() {
             .nonce(1)
             .balance(2_070_000_000);
         for nft_nonce in nft_nonces {
-            account_setter = account_setter.esdt_nft_balance(
-                NFT_TOKEN_ID_EXPR,
-                nft_nonce,
-                "1",
-                Option::<&[u8]>::None,
-            );
+            account_setter = account_setter.esdt_nft_balance(NFT_TOKEN_ID, nft_nonce, 1, ());
         }
     }
 
