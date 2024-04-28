@@ -70,7 +70,7 @@ fn render_files(output: &mut String, files: &[FileSummary], root: &str) {
 
 fn render_file(output: &mut String, file: &FileSummary, root: &str) {
     let summary = &file.summary;
-    let filename = file.filename.strip_prefix(root).unwrap();
+    let filename = file.filename.strip_prefix(root).unwrap_or(&file.filename);
 
     writeln_output_str(
         output,
