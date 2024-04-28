@@ -1,24 +1,23 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
-use multiversx_sc::{
-    codec::test_util::top_encode_to_vec_u8_or_panic,
-    proxy_imports::TopEncode,
-    types::{AnnotatedValue, BigUint, ManagedAddress, TokenIdentifier},
+use multiversx_sc::types::{
+    AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier,
 };
 
 use crate::{
     api::StaticApi,
     scenario::{
         tx_to_step::{
-            address_annotated, big_uint_annotated, token_identifier_annotated, u64_annotated,
+            address_annotated, big_uint_annotated, bytes_annotated, token_identifier_annotated,
+            u64_annotated,
         },
         ScenarioRunner,
     },
     scenario_model::{
-        AddressKey, BigUintValue, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
+        AddressKey, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
         CheckEsdtInstances, CheckEsdtMap, CheckEsdtMapContents, CheckStateStep, CheckStorage,
-        CheckStorageDetails, CheckValue, U64Value,
+        CheckStorageDetails, CheckValue,
     },
     ScenarioTxEnvData, ScenarioWorld,
 };
@@ -173,38 +172,34 @@ impl<'w> CheckStateBuilder<'w> {
 
     pub fn esdt_nft_balance_and_attributes<K, N, V, T>(
         mut self,
-        token_id_expr: K,
-        nonce_expr: N,
-        balance_expr: V,
-        attributes_expr: Option<T>,
+        token_id: K,
+        nonce: N,
+        balance: V,
+        attributes: T,
     ) -> Self
     where
-        BytesKey: From<K>,
-        U64Value: From<N>,
-        BigUintValue: From<V>,
-        T: TopEncode,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+        T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let nonce_value = u64_annotated(&env, &nonce);
+        let balance_value = big_uint_annotated(&env, &balance);
+        let attributes_value = bytes_annotated(&env, attributes);
 
         if let CheckEsdtMap::Unspecified = &self.current_account.esdt {
             let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
 
-            if let Some(attributes_expr) = attributes_expr {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    top_encode_to_vec_u8_or_panic(&attributes_expr),
-                );
-            } else {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    Vec::<u8>::new(),
-                );
-            }
+            check_esdt.add_balance_and_attributes_check(
+                nonce_value,
+                balance_value,
+                attributes_value,
+            );
 
             let mut new_esdt_map = BTreeMap::new();
-            let _ = new_esdt_map.insert(token_id, check_esdt);
+            let _ = new_esdt_map.insert(token_id_key, check_esdt);
 
             let new_check_esdt_map = CheckEsdtMapContents {
                 contents: new_esdt_map,

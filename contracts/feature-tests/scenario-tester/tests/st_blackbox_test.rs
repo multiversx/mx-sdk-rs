@@ -140,7 +140,7 @@ fn set_state_test() {
         .check_account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes("str:NFT-123456", "2", "1", Some(Vec::<u8>::new()))
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, ())
         .commit();
 
     // using no commit should drop the value naturally

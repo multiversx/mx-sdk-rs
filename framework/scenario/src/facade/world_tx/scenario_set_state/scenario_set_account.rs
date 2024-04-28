@@ -77,7 +77,7 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         token_id: K,
         nonce: N,
         balance: V,
-        attributes_expr: T,
+        attributes: T,
     ) -> Self
     where
         K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
@@ -89,13 +89,13 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         let token_id_key = token_identifier_annotated(&env, token_id);
         let nonce_value = u64_annotated(&env, &nonce);
         let balance_value = big_uint_annotated(&env, &balance);
+        let attributes_value = bytes_annotated(&env, attributes);
 
         let esdt_obj_ref = self
             .get_esdt_data_or_create(&token_id_key)
             .get_mut_esdt_object();
         esdt_obj_ref.set_balance(nonce_value.clone(), balance_value);
 
-        let attributes_value = bytes_annotated(&env, attributes_expr);
         esdt_obj_ref.set_token_attributes(nonce_value, attributes_value);
 
         self
