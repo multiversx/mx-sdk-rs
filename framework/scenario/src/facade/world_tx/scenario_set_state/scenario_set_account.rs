@@ -1,15 +1,18 @@
 use std::collections::btree_map::Entry;
 
-use multiversx_sc::types::{AnnotatedValue, BigUint, ManagedBuffer, TokenIdentifier};
+use multiversx_sc::types::{
+    AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier,
+};
 
 use crate::{
     imports::StaticApi,
     scenario::tx_to_step::{
-        big_uint_annotated, bytes_annotated, token_identifier_annotated, u64_annotated,
+        address_annotated, big_uint_annotated, bytes_annotated, token_identifier_annotated,
+        u64_annotated,
     },
     scenario_model::{
-        Account, AddressKey, AddressValue, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject,
-        SetStateStep, U64Value,
+        Account, AddressKey, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject, SetStateStep,
+        U64Value,
     },
     ScenarioTxEnvData,
 };
@@ -179,19 +182,23 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         self.item.account.esdt.get_mut(token_id).unwrap()
     }
 
-    pub fn code<V>(mut self, code_expr: V) -> Self
+    pub fn code<C>(mut self, code: C) -> Self
     where
-        BytesValue: From<V>,
+        C: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        self.item.account.code = Some(BytesValue::from(code_expr));
+        let env = self.new_env_data();
+        let code_value = bytes_annotated(&env, code);
+        self.item.account.code = Some(code_value);
         self
     }
 
-    pub fn owner<V>(mut self, owner_expr: V) -> Self
+    pub fn owner<V>(mut self, owner: V) -> Self
     where
-        AddressValue: From<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
-        self.item.account.owner = Some(AddressValue::from(owner_expr));
+        let env = self.new_env_data();
+        let owner_value = address_annotated(&env, &owner);
+        self.item.account.owner = Some(owner_value);
         self
     }
 }
