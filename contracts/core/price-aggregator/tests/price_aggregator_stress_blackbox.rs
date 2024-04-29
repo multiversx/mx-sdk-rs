@@ -8,10 +8,10 @@ use multiversx_sc_scenario::imports::*;
 const DECIMALS: u8 = 0;
 const EGLD_TICKER: &[u8] = b"EGLD";
 const NR_ORACLES: usize = 50;
-const OWNER_ADDRESS_EXPR: &str = "address:owner";
 const OWNER: TestAddress = TestAddress::new("owner");
-const PRICE_AGGREGATOR_ADDRESS_EXPR: &str = "sc:price-aggregator";
-const PRICE_AGGREGATOR_PATH_EXPR: &str = "mxsc:../output/multiversx-price-aggregator-sc.mxsc.json";
+const PRICE_AGGREGATOR_ADDRESS: TestSCAddress = TestSCAddress::new("price-aggregator");
+const PRICE_AGGREGATOR_PATH: MxscPath =
+    MxscPath::new("../output/multiversx-price-aggregator-sc.mxsc.json");
 const SLASH_AMOUNT: u64 = 10;
 const SLASH_QUORUM: usize = 3;
 const STAKE_AMOUNT: u64 = 20;
@@ -20,14 +20,11 @@ const USD_TICKER: &[u8] = b"USDC";
 
 mod price_aggregator_proxy;
 
-type PriceAggregatorContract = ContractInfo<multiversx_price_aggregator_sc::Proxy<StaticApi>>;
-
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
-    blockchain.set_current_dir_from_workspace("contracts/core/price-aggregator");
     blockchain.register_contract(
-        PRICE_AGGREGATOR_PATH_EXPR,
+        PRICE_AGGREGATOR_PATH,
         multiversx_price_aggregator_sc::ContractBuilder,
     );
 
@@ -37,50 +34,45 @@ fn world() -> ScenarioWorld {
 struct PriceAggregatorTestState {
     world: ScenarioWorld,
     oracles: Vec<AddressValue>,
-    price_aggregator_contract: PriceAggregatorContract,
     price_aggregator_whitebox: WhiteboxContract<ContractObj<DebugApi>>,
 }
 
 impl PriceAggregatorTestState {
     fn new() -> Self {
         let mut world = world();
+        world.start_trace();
 
-        let mut set_state_step = SetStateStep::new()
-            .put_account(OWNER_ADDRESS_EXPR, Account::new().nonce(1))
-            .new_address(OWNER_ADDRESS_EXPR, 1, PRICE_AGGREGATOR_ADDRESS_EXPR)
+        world
+            .account(OWNER)
+            .nonce(1)
+            .new_address(OWNER, 1, PRICE_AGGREGATOR_ADDRESS)
+            .current_block()
             .block_timestamp(100);
 
         let mut oracles = Vec::new();
         for i in 1..=NR_ORACLES {
-            let address_expr = format!("address:oracle{}", i);
-            let address_value = AddressValue::from(address_expr.as_str());
+            let address_expr = format!("oracle{}", i);
+            let address: TestAddress = TestAddress::new(address_expr.as_str());
+            let address_value = AddressValue::from(address.eval_to_expr().as_str());
 
-            set_state_step = set_state_step.put_account(
-                address_expr.as_str(),
-                Account::new().nonce(1).balance(STAKE_AMOUNT),
-            );
+            world.account(address).nonce(1).balance(STAKE_AMOUNT);
 
             oracles.push(address_value);
         }
-        world.start_trace().set_state_step(set_state_step);
 
-        let price_aggregator_contract = PriceAggregatorContract::new(PRICE_AGGREGATOR_ADDRESS_EXPR);
         let price_aggregator_whitebox = WhiteboxContract::new(
-            PRICE_AGGREGATOR_ADDRESS_EXPR,
+            PRICE_AGGREGATOR_ADDRESS,
             multiversx_price_aggregator_sc::contract_obj,
         );
 
         Self {
             world,
             oracles,
-            price_aggregator_contract,
             price_aggregator_whitebox,
         }
     }
 
     fn deploy(&mut self) -> &mut Self {
-        let price_aggregator_code = self.world.code_expression(PRICE_AGGREGATOR_PATH_EXPR);
-
         let oracles = MultiValueVec::from(
             self.oracles
                 .iter()
@@ -101,14 +93,14 @@ impl PriceAggregatorTestState {
                 SUBMISSION_COUNT,
                 oracles,
             )
-            .code(price_aggregator_code)
+            .code(PRICE_AGGREGATOR_PATH)
             .run();
 
         for address in self.oracles.iter() {
             self.world
                 .tx()
                 .from(&address.to_address())
-                .to(&self.price_aggregator_contract.to_address())
+                .to(PRICE_AGGREGATOR_ADDRESS)
                 .gas(5_000_000u64)
                 .typed(price_aggregator_proxy::PriceAggregatorProxy)
                 .stake()
@@ -123,7 +115,7 @@ impl PriceAggregatorTestState {
         self.world
             .tx()
             .from(OWNER)
-            .to(&self.price_aggregator_contract.to_address())
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .set_pair_decimals(EGLD_TICKER, USD_TICKER, DECIMALS)
             .run();
@@ -133,7 +125,7 @@ impl PriceAggregatorTestState {
         self.world
             .tx()
             .from(OWNER)
-            .to(&self.price_aggregator_contract.to_address())
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .gas(5_000_000u64)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .unpause_endpoint()
@@ -144,7 +136,7 @@ impl PriceAggregatorTestState {
         self.world
             .tx()
             .from(&from.to_address())
-            .to(&self.price_aggregator_contract.to_address())
+            .to(PRICE_AGGREGATOR_ADDRESS)
             .gas(7_000_000u64)
             .typed(price_aggregator_proxy::PriceAggregatorProxy)
             .submit(

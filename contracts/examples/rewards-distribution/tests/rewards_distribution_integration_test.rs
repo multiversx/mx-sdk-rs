@@ -22,13 +22,10 @@ fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
     blockchain.register_contract(
-        REWARDS_DISTRIBUTION_PATH.eval_to_expr().as_str(),
+        REWARDS_DISTRIBUTION_PATH,
         rewards_distribution::ContractBuilder,
     );
-    blockchain.register_contract(
-        SEED_NFT_MINTER_PATH.eval_to_expr().as_str(),
-        mock_seed_nft_minter::ContractBuilder,
-    );
+    blockchain.register_contract(SEED_NFT_MINTER_PATH, mock_seed_nft_minter::ContractBuilder);
     blockchain
 }
 
@@ -106,16 +103,12 @@ impl RewardsDistributionTestState {
 fn test_compute_brackets() {
     let mut state = RewardsDistributionTestState::new();
 
-    let rewards_distribution_code = state
-        .world
-        .code_expression(REWARDS_DISTRIBUTION_PATH.eval_to_expr().as_str());
-
     state
         .world
         .account(REWARDS_DISTRIBUTION_ADDRESS)
         .nonce(1)
         .owner(OWNER_ADDRESS)
-        .code(rewards_distribution_code);
+        .code(REWARDS_DISTRIBUTION_PATH);
 
     state.world.whitebox_call(
         &state.rewards_distribution_whitebox,

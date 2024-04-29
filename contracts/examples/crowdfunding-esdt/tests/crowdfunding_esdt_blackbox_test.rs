@@ -76,7 +76,7 @@ impl CrowdfundingESDTTestState {
             .query()
             .to(CROWDFUNDING_ADDRESS)
             .typed(crowdfunding_esdt_proxy::CrowdfundingProxy)
-            .deposit(donor.eval_to_array())
+            .deposit(donor)
             .returns(ExpectValue(amount))
             .run();
     }
