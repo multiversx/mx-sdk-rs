@@ -10,10 +10,7 @@ use crate::{
         address_annotated, big_uint_annotated, bytes_annotated, token_identifier_annotated,
         u64_annotated,
     },
-    scenario_model::{
-        Account, AddressKey, BigUintValue, BytesKey, BytesValue, Esdt, EsdtObject, SetStateStep,
-        U64Value,
-    },
+    scenario_model::{Account, AddressKey, BytesKey, Esdt, EsdtObject, SetStateStep},
     ScenarioTxEnvData,
 };
 
@@ -107,64 +104,79 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
     #[allow(clippy::too_many_arguments)]
     pub fn esdt_nft_all_properties<K, N, V, T>(
         mut self,
-        token_id_expr: K,
-        nonce_expr: N,
-        balance_expr: V,
-        opt_attributes_expr: Option<T>,
-        royalties_expr: N,
-        creator_expr: Option<T>,
-        hash_expr: Option<T>,
-        uris_expr: Vec<T>,
+        token_id: K,
+        nonce: N,
+        balance: V,
+        attributes: T,
+        royalties: N,
+        creator: T,
+        hash: T,
+        uris: Vec<T>,
     ) -> Self
     where
-        BytesKey: From<K>,
-        U64Value: From<N>,
-        BigUintValue: From<V>,
-        BytesValue: From<T>,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+        T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let nonce_value = u64_annotated(&env, &nonce);
+        let royalties_value = u64_annotated(&env, &royalties);
+        let balance_value = big_uint_annotated(&env, &balance);
+        let attributes_value = bytes_annotated(&env, attributes);
+        let creator_value = bytes_annotated(&env, creator);
+        let hash_value = bytes_annotated(&env, hash);
+        let mut uris_value = Vec::new();
+        for uri in uris {
+            let uri_value = bytes_annotated(&env, uri);
+            uris_value.push(uri_value);
+        }
 
         let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
+            .get_esdt_data_or_create(&token_id_key)
             .get_mut_esdt_object();
 
         esdt_obj_ref.set_token_all_properties(
-            nonce_expr,
-            balance_expr,
-            opt_attributes_expr,
-            royalties_expr,
-            creator_expr,
-            hash_expr,
-            uris_expr,
+            nonce_value,
+            balance_value,
+            Some(attributes_value),
+            royalties_value,
+            Some(creator_value),
+            Some(hash_value),
+            uris_value,
         );
 
         self
     }
 
-    pub fn esdt_nft_last_nonce<K, N>(mut self, token_id_expr: K, last_nonce_expr: N) -> Self
+    pub fn esdt_nft_last_nonce<K, N>(mut self, token_id: K, last_nonce: N) -> Self
     where
-        BytesKey: From<K>,
-        U64Value: From<N>,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        let token_id = BytesKey::from(token_id_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let nonce_value = u64_annotated(&env, &last_nonce);
 
         let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
+            .get_esdt_data_or_create(&token_id_key)
             .get_mut_esdt_object();
-        esdt_obj_ref.set_last_nonce(last_nonce_expr);
+        esdt_obj_ref.set_last_nonce(nonce_value);
 
         self
     }
 
     // TODO: Find a better way to pass roles
-    pub fn esdt_roles<K>(mut self, token_id_expr: K, roles: Vec<String>) -> Self
+    pub fn esdt_roles<K>(mut self, token_id: K, roles: Vec<String>) -> Self
     where
-        BytesKey: From<K>,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
 
         let esdt_obj_ref = self
-            .get_esdt_data_or_create(&token_id)
+            .get_esdt_data_or_create(&token_id_key)
             .get_mut_esdt_object();
         esdt_obj_ref.set_roles(roles);
 
