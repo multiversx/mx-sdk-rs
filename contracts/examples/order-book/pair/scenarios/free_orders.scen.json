@@ -27,7 +27,8 @@
                 "to": "sc:pair",
                 "function": "freeOrders",
                 "arguments": [
-                    "u64:0|u64:1"
+                    "0",
+                    "1"
                 ],
                 "gasLimit": "100,000,000",
                 "gasPrice": "0"
