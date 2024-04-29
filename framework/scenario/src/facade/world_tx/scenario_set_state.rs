@@ -101,22 +101,23 @@ impl ScenarioWorld {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn set_nft_balance_all_properties<A, V, NR, T: TopEncode, C>(
+    pub fn set_nft_balance_all_properties<A, B, N, T: TopEncode, R, C>(
         &mut self,
         address: A,
         token_id: &[u8],
-        nonce: NR,
-        balance: V,
-        attributes: &T,
-        royalties: NR,
+        nonce: N,
+        balance: B,
+        attributes: T,
+        royalties: R,
         creator: Option<C>,
         name: Option<&[u8]>,
         hash: Option<&[u8]>,
         uris: &[Vec<u8>],
     ) where
         A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
-        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
-        NR: AnnotatedValue<ScenarioTxEnvData, u64>,
+        B: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        R: AnnotatedValue<ScenarioTxEnvData, u64>,
         C: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         let env = self.new_env_data();
