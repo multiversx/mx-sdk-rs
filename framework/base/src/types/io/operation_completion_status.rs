@@ -59,11 +59,11 @@ impl TopDecode for OperationCompletionStatus {
         H: DecodeErrorHandler,
     {
         let mut buffer = [0u8; 16];
-        input.into_max_size_buffer(&mut buffer, h)?;
+        let bytes = input.into_max_size_buffer(&mut buffer, h)?;
 
-        if buffer.starts_with(COMPLETED_STR.as_bytes()) {
+        if bytes.starts_with(COMPLETED_STR.as_bytes()) {
             Ok(OperationCompletionStatus::Completed)
-        } else if buffer.starts_with(INTERRUPTED_STR.as_bytes()) {
+        } else if bytes.starts_with(INTERRUPTED_STR.as_bytes()) {
             Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas)
         } else {
             Err(h.handle_error(DecodeError::INVALID_VALUE))

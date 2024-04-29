@@ -36,7 +36,8 @@ where
         if len > MAX_LEN {
             return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
-        let byte_slice = &mut buffer[..len];
+        let target_start = MAX_LEN - len;
+        let byte_slice = &mut buffer[target_start..];
         let _ = self.load_slice(0, byte_slice);
         Ok(byte_slice)
     }

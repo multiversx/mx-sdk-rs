@@ -21,6 +21,8 @@ pub trait TopDecodeInput: Sized {
     /// and returns the populated data slice from this buffer.
     ///
     /// Will return an error if the data exceeds the provided buffer.
+    ///
+    /// Aligns data to the right, in order to help with big endian decode.
     fn into_max_size_buffer<H, const MAX_LEN: usize>(
         self,
         buffer: &mut [u8; MAX_LEN],
@@ -38,8 +40,8 @@ pub trait TopDecodeInput: Sized {
         H: DecodeErrorHandler,
     {
         let mut buffer = [0u8; 8];
-        let slice = self.into_max_size_buffer(&mut buffer, h)?;
-        Ok(universal_decode_number_unchecked(slice, false))
+        let _ = self.into_max_size_buffer(&mut buffer, h)?;
+        Ok(u64::from_be_bytes(buffer))
     }
 
     /// Retrieves the underlying data as a pre-parsed i64.
@@ -144,12 +146,14 @@ impl<'a> TopDecodeInput for &'a [u8] {
     where
         H: DecodeErrorHandler,
     {
-        let l = self.len();
-        if l > MAX_LEN {
+        let len = self.len();
+        if len > MAX_LEN {
             return Err(h.handle_error(DecodeError::INPUT_TOO_LONG));
         }
-        buffer[..l].copy_from_slice(self);
-        Ok(&buffer[..l])
+        let target_start = MAX_LEN - len;
+        let byte_slice = &mut buffer[target_start..];
+        byte_slice.copy_from_slice(self);
+        Ok(byte_slice)
     }
 
     #[inline]
