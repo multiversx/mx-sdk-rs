@@ -93,11 +93,11 @@ where
     }
 
     #[inline]
-    fn into_u64<H>(self, _h: H) -> Result<u64, H::HandledErr>
+    fn into_u64<H>(self, h: H) -> Result<u64, H::HandledErr>
     where
         H: DecodeErrorHandler,
     {
-        Ok(AA::argument_api_impl().get_argument_u64(self.arg_index))
+        self.to_managed_buffer().into_u64(h)
     }
 
     #[inline]
