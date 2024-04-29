@@ -110,14 +110,14 @@ impl<'w> CheckStateBuilder<'w> {
         self
     }
 
-    pub fn code<V>(mut self, code_expr: V) -> Self
+    pub fn code<V>(mut self, code: V) -> Self
     where
-        BytesValue: InterpretableFrom<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        self.current_account.code = CheckValue::Equal(BytesValue::interpret_from(
-            code_expr,
-            &InterpreterContext::default(),
-        ));
+        let env = self.new_env_data();
+        let code_value = bytes_annotated(&env, code);
+
+        self.current_account.code = CheckValue::Equal(code_value);
         self
     }
 

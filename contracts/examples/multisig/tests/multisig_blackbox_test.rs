@@ -610,5 +610,5 @@ fn test_deploy_and_upgrade_from_source() {
     state
         .world
         .check_account(ADDER_ADDRESS)
-        .code(factorial_path.eval_to_expr().as_str());
+        .code(factorial_path);
 }
