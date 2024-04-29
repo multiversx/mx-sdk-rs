@@ -17,10 +17,27 @@ impl Interactor {
         let start_time = Instant::now();
 
         loop {
-            match self.proxy.get_transaction_info_with_results(&tx_hash).await {
-                Ok(tx) => {
-                    info!("Transaction retrieved successfully: {:#?}", tx);
-                    return tx;
+            match self.proxy.get_transaction_status(&tx_hash).await {
+                Ok(status) => {
+                    // checks if transaction status is final
+                    match status.as_str() {
+                        "success" | "fail" => {
+                            // retrieve transaction info with results
+                            let transaction_info_with_results = self
+                                .proxy
+                                .get_transaction_info_with_results(&tx_hash)
+                                .await
+                                .unwrap();
+                            info!(
+                                "Transaction retrieved successfully, with status {}: {:#?}",
+                                status, transaction_info_with_results
+                            );
+                            return transaction_info_with_results;
+                        },
+                        _ => {
+                            continue;
+                        },
+                    }
                 },
                 Err(err) => {
                     retries += 1;
