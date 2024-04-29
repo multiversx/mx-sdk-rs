@@ -9,9 +9,6 @@ use rewards_distribution::{
     rewards_distribution_proxy, ContractObj, RewardsDistribution, DIVISION_SAFETY_CONSTANT,
 };
 
-const NFT_TOKEN_ID: &[u8] = b"NFT-123456";
-const NFT_TOKEN_ID_EXPR: &str = "str:NFT-123456";
-
 const ALICE_ADDRESS: TestAddress = TestAddress::new("alice");
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const REWARDS_DISTRIBUTION_ADDRESS: TestSCAddress = TestSCAddress::new("rewards-distribution");
@@ -19,18 +16,16 @@ const REWARDS_DISTRIBUTION_PATH: MxscPath = MxscPath::new("output/rewards-distri
 const SEED_NFT_MINTER_ADDRESS: TestSCAddress = TestSCAddress::new("seed-nft-minter");
 const SEED_NFT_MINTER_PATH: MxscPath =
     MxscPath::new("../seed-nft-minter/output/seed-nft-minter.mxsc.json");
+const NFT_TOKEN_ID: TestTokenIdentifier = TestTokenIdentifier::new("NFT-123456");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
 
     blockchain.register_contract(
-        REWARDS_DISTRIBUTION_PATH.eval_to_expr().as_str(),
+        REWARDS_DISTRIBUTION_PATH,
         rewards_distribution::ContractBuilder,
     );
-    blockchain.register_contract(
-        SEED_NFT_MINTER_PATH.eval_to_expr().as_str(),
-        mock_seed_nft_minter::ContractBuilder,
-    );
+    blockchain.register_contract(SEED_NFT_MINTER_PATH, mock_seed_nft_minter::ContractBuilder);
     blockchain
 }
 
@@ -61,7 +56,7 @@ impl RewardsDistributionTestState {
             .tx()
             .from(OWNER_ADDRESS)
             .typed(mock_seed_nft_minter_proxy::MockSeedNftMinterProxy)
-            .init(TokenIdentifier::from_esdt_bytes(NFT_TOKEN_ID))
+            .init(NFT_TOKEN_ID)
             .code(SEED_NFT_MINTER_PATH)
             .run();
 
@@ -108,16 +103,12 @@ impl RewardsDistributionTestState {
 fn test_compute_brackets() {
     let mut state = RewardsDistributionTestState::new();
 
-    let rewards_distribution_code = state
-        .world
-        .code_expression(REWARDS_DISTRIBUTION_PATH.eval_to_expr().as_str());
-
     state
         .world
         .account(REWARDS_DISTRIBUTION_ADDRESS)
         .nonce(1)
         .owner(OWNER_ADDRESS)
-        .code(rewards_distribution_code);
+        .code(REWARDS_DISTRIBUTION_PATH);
 
     state.world.whitebox_call(
         &state.rewards_distribution_whitebox,
@@ -169,14 +160,9 @@ fn test_raffle_and_claim() {
             .world
             .account(ALICE_ADDRESS)
             .nonce(1)
-            .balance("2_070_000_000");
+            .balance(2_070_000_000);
         for nft_nonce in nft_nonces {
-            account_setter = account_setter.esdt_nft_balance(
-                NFT_TOKEN_ID_EXPR,
-                nft_nonce,
-                "1",
-                Option::<&[u8]>::None,
-            );
+            account_setter = account_setter.esdt_nft_balance(NFT_TOKEN_ID, nft_nonce, 1, ());
         }
     }
 
@@ -297,12 +283,11 @@ fn test_raffle_and_claim() {
 
     // confirm the received amount matches the sum of the queried rewards
     let alice_balance_after_claim: u64 = expected_rewards.iter().sum();
-    let balance_expr: &str = &alice_balance_after_claim.to_string();
 
     state
         .world
         .check_account(ALICE_ADDRESS)
-        .balance(balance_expr);
+        .balance(alice_balance_after_claim);
 
     // a second claim with the same nfts should succeed, but return no more rewards
     let mut reward_tokens: MultiValueEncoded<
@@ -323,5 +308,5 @@ fn test_raffle_and_claim() {
     state
         .world
         .check_account(ALICE_ADDRESS)
-        .balance(balance_expr);
+        .balance(alice_balance_after_claim);
 }

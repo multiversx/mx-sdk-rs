@@ -1,8 +1,13 @@
 use core::ptr;
 
-use crate::types::{
-    AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
-    TxToSpecified,
+use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+
+use crate::{
+    api::ManagedTypeApi,
+    types::{
+        AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
+        TxToSpecified,
+    },
 };
 
 const ADDRESS_PREFIX: &str = "address:";
@@ -68,6 +73,18 @@ where
 impl<'a, Env> TxFromSpecified<Env> for TestAddress<'a> where Env: TxEnv {}
 impl<'a, Env> TxTo<Env> for TestAddress<'a> where Env: TxEnv {}
 impl<'a, Env> TxToSpecified<Env> for TestAddress<'a> where Env: TxEnv {}
+
+impl<'a> TopEncode for TestAddress<'a> {
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.eval_to_array().top_encode_or_handle_err(output, h)
+    }
+}
+
+impl<'a, Api> CodecFrom<TestAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]
 pub mod tests {
