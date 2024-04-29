@@ -5,14 +5,18 @@ mod scenario_set_new_address;
 use crate::{
     imports::StaticApi,
     scenario::{
-        tx_to_step::{address_annotated, u64_annotated},
+        tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
         ScenarioRunner,
     },
-    scenario_model::{AddressKey, NewAddress, SetStateStep},
+    scenario_model::{AddressKey, BigUintValue, NewAddress, SetStateStep, U64Value},
     ScenarioTxEnvData, ScenarioWorld,
 };
 
-use multiversx_sc::types::{AnnotatedValue, ManagedAddress};
+use multiversx_chain_vm::world_mock::EsdtInstanceMetadata;
+use multiversx_sc::{
+    proxy_imports::TopEncode,
+    types::{AnnotatedValue, BigUint, EsdtLocalRole, ManagedAddress},
+};
 use scenario_set_account::AccountItem;
 use scenario_set_block::BlockItem;
 use scenario_set_new_address::NewAddressItem;
@@ -45,6 +49,134 @@ impl ScenarioWorld {
     {
         self.empty_builder()
             .new_address(creator_address_expr, creator_nonce_expr, new_address_expr)
+    }
+
+    pub fn create_account_raw<A, V>(
+        &mut self,
+        address: A,
+        egld_balance: V,
+    ) -> SetStateBuilder<'_, AccountItem>
+    where
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+    {
+        self.empty_builder().account(address).balance(egld_balance)
+    }
+
+    pub fn set_egld_balance<A, V>(&mut self, address: A, balance: V)
+    where
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+    {
+        let env = self.new_env_data();
+        let address_value = address_annotated(&env, &address);
+        let balance_value = big_uint_annotated(&env, &balance);
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address_key, account) in accounts.iter_mut() {
+            if vm_address_key == &address_value.to_vm_address() {
+                account.egld_balance = balance_value.value.clone();
+            }
+        }
+    }
+
+    pub fn set_esdt_balance<A, V>(&mut self, address: A, token_id: &[u8], balance: V)
+    where
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+    {
+        let env = self.new_env_data();
+        let address_value = address_annotated(&env, &address);
+        let balance_value = big_uint_annotated(&env, &balance);
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &address_value.to_vm_address() {
+                account.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    0,
+                    &balance_value.value,
+                    EsdtInstanceMetadata::default(),
+                )
+            }
+        }
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn set_nft_balance_all_properties<A, V: Copy, NR: Copy, T: TopEncode>(
+        &mut self,
+        address: A,
+        token_id: &[u8],
+        nonce: NR,
+        balance: V,
+        attributes: &T,
+        royalties: NR,
+        creator: Option<A>,
+        name: Option<&[u8]>,
+        hash: Option<&[u8]>,
+        uris: &[Vec<u8>],
+    ) where
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+        U64Value: From<NR>,
+    {
+        let env = self.new_env_data();
+        let address_value = address_annotated(&env, &address);
+        let balance_value = big_uint_annotated(&env, &balance);
+
+        let mut esdt_attributes = Vec::new();
+        let _ = attributes.top_encode(&mut esdt_attributes);
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &address_value.to_vm_address() {
+                account.esdt.set_esdt_balance(
+                    token_id.to_vec(),
+                    U64Value::from(nonce).value,
+                    &balance_value.value,
+                    EsdtInstanceMetadata {
+                        creator: creator.map(|c| address_annotated(&env, &c).to_vm_address()),
+                        attributes: esdt_attributes.clone(),
+                        royalties: U64Value::from(royalties).value,
+                        name: name.unwrap_or_default().to_vec(),
+                        hash: hash.map(|h| h.to_vec()),
+                        uri: uris.to_vec(),
+                    },
+                )
+            }
+        }
+    }
+
+    pub fn set_developer_rewards<A: Copy, V: Copy>(&mut self, address: A, developer_rewards: V)
+    where
+        AddressKey: From<A>,
+        BigUintValue: From<V>,
+    {
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &AddressKey::from(address).to_vm_address() {
+                account.developer_rewards = BigUintValue::from(developer_rewards).value.clone();
+            }
+        }
+    }
+
+    pub fn set_esdt_local_roles<A: Copy>(
+        &mut self,
+        address: A,
+        token_id: &[u8],
+        roles: &[EsdtLocalRole],
+    ) where
+        AddressKey: From<A>,
+    {
+        let accounts = &mut self.get_mut_state().accounts;
+        for (vm_address, account) in accounts.iter_mut() {
+            if vm_address == &AddressKey::from(address).to_vm_address() {
+                account.esdt.set_roles(
+                    token_id.to_vec(),
+                    roles
+                        .iter()
+                        .map(|role| role.as_role_name().to_vec())
+                        .collect(),
+                );
+            }
+        }
     }
 
     pub fn current_block(&mut self) -> SetStateBuilder<'_, BlockItem> {
