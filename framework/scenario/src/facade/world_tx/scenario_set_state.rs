@@ -8,7 +8,7 @@ use crate::{
         tx_to_step::{address_annotated, big_uint_annotated, u64_annotated},
         ScenarioRunner,
     },
-    scenario_model::{AddressKey, BigUintValue, NewAddress, SetStateStep, U64Value},
+    scenario_model::{AddressKey, BigUintValue, NewAddress, SetStateStep},
     ScenarioTxEnvData, ScenarioWorld,
 };
 
@@ -101,7 +101,7 @@ impl ScenarioWorld {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn set_nft_balance_all_properties<A, V: Copy, NR: Copy, T: TopEncode>(
+    pub fn set_nft_balance_all_properties<A: Copy, V, NR, T: TopEncode>(
         &mut self,
         address: A,
         token_id: &[u8],
@@ -116,11 +116,13 @@ impl ScenarioWorld {
     ) where
         A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
-        U64Value: From<NR>,
+        NR: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
         let env = self.new_env_data();
         let address_value = address_annotated(&env, &address);
         let balance_value = big_uint_annotated(&env, &balance);
+        let nonce_value = u64_annotated(&env, &nonce);
+        let royalties_value = u64_annotated(&env, &royalties);
 
         let mut esdt_attributes = Vec::new();
         let _ = attributes.top_encode(&mut esdt_attributes);
@@ -129,12 +131,12 @@ impl ScenarioWorld {
             if vm_address == &address_value.to_vm_address() {
                 account.esdt.set_esdt_balance(
                     token_id.to_vec(),
-                    U64Value::from(nonce).value,
+                    nonce_value.value,
                     &balance_value.value,
                     EsdtInstanceMetadata {
                         creator: creator.map(|c| address_annotated(&env, &c).to_vm_address()),
                         attributes: esdt_attributes.clone(),
-                        royalties: U64Value::from(royalties).value,
+                        royalties: royalties_value.value,
                         name: name.unwrap_or_default().to_vec(),
                         hash: hash.map(|h| h.to_vec()),
                         uri: uris.to_vec(),
@@ -157,17 +159,15 @@ impl ScenarioWorld {
         }
     }
 
-    pub fn set_esdt_local_roles<A: Copy>(
-        &mut self,
-        address: A,
-        token_id: &[u8],
-        roles: &[EsdtLocalRole],
-    ) where
-        AddressKey: From<A>,
+    pub fn set_esdt_local_roles<A>(&mut self, address: A, token_id: &[u8], roles: &[EsdtLocalRole])
+    where
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
+        let env = self.new_env_data();
+        let address_value = address_annotated(&env, &address);
         let accounts = &mut self.get_mut_state().accounts;
         for (vm_address, account) in accounts.iter_mut() {
-            if vm_address == &AddressKey::from(address).to_vm_address() {
+            if vm_address == &address_value.to_vm_address() {
                 account.esdt.set_roles(
                     token_id.to_vec(),
                     roles

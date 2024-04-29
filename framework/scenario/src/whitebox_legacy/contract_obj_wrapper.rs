@@ -363,7 +363,7 @@ impl BlockchainStateWrapper {
             address,
             token_id,
             nonce,
-            balance,
+            BigUint::from(balance),
             attributes,
             0,
             None,
@@ -397,7 +397,16 @@ impl BlockchainStateWrapper {
         uris: &[Vec<u8>],
     ) {
         self.world.set_nft_balance_all_properties(
-            address, token_id, nonce, balance, attributes, royalties, creator, name, hash, uris,
+            address,
+            token_id,
+            nonce,
+            BigUint::from(balance),
+            attributes,
+            royalties,
+            creator,
+            name,
+            hash,
+            uris,
         );
     }
 
