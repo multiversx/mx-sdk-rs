@@ -102,22 +102,26 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_all_properties<K, N, V, T>(
+    pub fn esdt_nft_all_properties<K, N, V, T, C, R, H, U>(
         mut self,
         token_id: K,
         nonce: N,
         balance: V,
         attributes: T,
-        royalties: N,
-        creator: T,
-        hash: T,
-        uris: Vec<T>,
+        royalties: R,
+        creator: C,
+        hash: H,
+        uris: Vec<U>,
     ) -> Self
     where
         K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
         T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
+        C: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
+        R: AnnotatedValue<ScenarioTxEnvData, u64>,
+        H: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
+        U: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
         let env = self.new_env_data();
         let token_id_key = token_identifier_annotated(&env, token_id);
@@ -125,7 +129,7 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         let royalties_value = u64_annotated(&env, &royalties);
         let balance_value = big_uint_annotated(&env, &balance);
         let attributes_value = bytes_annotated(&env, attributes);
-        let creator_value = bytes_annotated(&env, creator);
+        let creator_value = address_annotated(&env, &creator);
         let hash_value = bytes_annotated(&env, hash);
         let mut uris_value = Vec::new();
         for uri in uris {

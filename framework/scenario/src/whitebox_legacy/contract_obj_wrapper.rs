@@ -366,7 +366,7 @@ impl BlockchainStateWrapper {
             BigUint::from(balance),
             attributes,
             0,
-            None,
+            None::<Address>,
             None,
             None,
             &[],

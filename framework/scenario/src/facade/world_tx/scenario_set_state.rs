@@ -101,7 +101,7 @@ impl ScenarioWorld {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn set_nft_balance_all_properties<A: Copy, V, NR, T: TopEncode>(
+    pub fn set_nft_balance_all_properties<A, V, NR, T: TopEncode, C>(
         &mut self,
         address: A,
         token_id: &[u8],
@@ -109,7 +109,7 @@ impl ScenarioWorld {
         balance: V,
         attributes: &T,
         royalties: NR,
-        creator: Option<A>,
+        creator: Option<C>,
         name: Option<&[u8]>,
         hash: Option<&[u8]>,
         uris: &[Vec<u8>],
@@ -117,6 +117,7 @@ impl ScenarioWorld {
         A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
         NR: AnnotatedValue<ScenarioTxEnvData, u64>,
+        C: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         let env = self.new_env_data();
         let address_value = address_annotated(&env, &address);
@@ -134,7 +135,9 @@ impl ScenarioWorld {
                     nonce_value.value,
                     &balance_value.value,
                     EsdtInstanceMetadata {
-                        creator: creator.map(|c| address_annotated(&env, &c).to_vm_address()),
+                        creator: creator
+                            .as_ref()
+                            .map(|c| address_annotated(&env, c).to_vm_address()),
                         attributes: esdt_attributes.clone(),
                         royalties: royalties_value.value,
                         name: name.unwrap_or_default().to_vec(),
