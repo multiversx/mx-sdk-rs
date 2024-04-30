@@ -21,7 +21,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
-                "function": "echo_ser_example_1",
+                "function": "echo_set_example_1",
                 "arguments": [
                     {
                         "0-int": "u16:0",
@@ -71,7 +71,7 @@
             "tx": {
                 "from": "address:an_account",
                 "to": "sc:alloc-features",
-                "function": "echo_boxed_ser_example_1",
+                "function": "echo_boxed_set_example_1",
                 "arguments": [
                     {
                         "3-uint_32": "u32:5",

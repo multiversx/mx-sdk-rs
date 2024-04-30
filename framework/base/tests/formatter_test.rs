@@ -157,7 +157,7 @@ fn check_lower_hex<T: SCLowerHex + std::fmt::LowerHex>(item: T) {
 }
 
 #[test]
-fn test_lower_hex_usigned() {
+fn test_lower_hex_unsigned() {
     check_lower_hex(0x0u8);
     check_lower_hex(0x50u8);
     check_lower_hex(0xFFu8);

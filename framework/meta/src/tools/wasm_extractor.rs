@@ -23,7 +23,7 @@ impl WasmInfo {
         check_ei: &Option<EIVersion>,
     ) -> Result<WasmInfo, BinaryReaderError> {
         let wasm_data = fs::read(output_wasm_path)
-            .expect("error occured while extracting information from .wasm: file not found");
+            .expect("error occurred while extracting information from .wasm: file not found");
 
         populate_wasm_info(wasm_data, extract_imports_enabled, check_ei)
     }

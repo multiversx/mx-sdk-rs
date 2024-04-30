@@ -67,7 +67,7 @@ fn format_signed<F: super::FormatByteReceiver>(num: i64, f: &mut F) {
     } else {
         f.append_bytes(MINUS_SYMBOL);
         if num == i64::MIN {
-            // overflow egde case
+            // overflow edge case
             (i64::MAX as u64) + 1
         } else {
             (-num) as u64
@@ -80,7 +80,7 @@ fn format_signed_hex<F: super::FormatByteReceiver>(num: i64, f: &mut F, size_in_
     let abs = if num >= 0 {
         num as u64
     } else if size_in_bits == 64 {
-        // overflow for 64 bits egde case
+        // overflow for 64 bits edge case
         (num | i64::MIN) as u64
     } else {
         ((1 << size_in_bits) - 1) & (num & i64::MAX) as u64

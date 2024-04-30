@@ -142,8 +142,8 @@ impl TemplateAdjuster {
             &[
                 Query::substring(&package_name_expr(&old_meta), &package_name_expr(&new_meta)),
                 Query::substring(
-                    &dependecy_decl_expr(&self.metadata.name),
-                    &dependecy_decl_expr(&self.target.new_name),
+                    &dependency_decl_expr(&self.metadata.name),
+                    &dependency_decl_expr(&self.target.new_name),
                 ),
             ][..],
         );
@@ -159,8 +159,8 @@ impl TemplateAdjuster {
             &[
                 Query::substring(&package_name_expr(&old_wasm), &package_name_expr(&new_wasm)),
                 Query::substring(
-                    &dependecy_decl_expr(&self.metadata.name),
-                    &dependecy_decl_expr(&self.target.new_name),
+                    &dependency_decl_expr(&self.metadata.name),
+                    &dependency_decl_expr(&self.target.new_name),
                 ),
             ][..],
         );
@@ -263,7 +263,7 @@ fn as_path(name: &str) -> String {
 fn package_name_expr(template: &str) -> String {
     format!("name = \"{template}\"")
 }
-fn dependecy_decl_expr(template: &str) -> String {
+fn dependency_decl_expr(template: &str) -> String {
     format!("dependencies.{template}")
 }
 

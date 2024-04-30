@@ -18,7 +18,7 @@ The payment was chosen to be stored under a storage named `BondingCurve` because
   
 Here the balance and the payment amount are variable and they will usually get changed together, reason why it was chosen for these elements to be kept away from `token_details`.
 
-**Important!** Only 1 seller can have a specific token to be sold at a time, avoiding this way scenarion of which token from which seller should be selled at one point.
+**Important!** Only 1 seller can have a specific token to be sold at a time, avoiding this way scenario of which token from which seller should be selled at one point.
 
 There is an option of `sell_availability` which can be set from the `init` of the contract allowing or denying a token once bought by a buyer to be sold back.
 

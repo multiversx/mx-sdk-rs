@@ -43,7 +43,7 @@ impl EncodeErrorHandler for PanicErrorHandler {
 
     #[inline]
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
-        panic!("Encode error occured: {}", err.message_str())
+        panic!("Encode error occurred: {}", err.message_str())
     }
 }
 
@@ -52,6 +52,6 @@ impl DecodeErrorHandler for PanicErrorHandler {
 
     #[inline]
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
-        panic!("Decode error occured: {}", err.message_str())
+        panic!("Decode error occurred: {}", err.message_str())
     }
 }

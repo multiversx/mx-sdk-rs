@@ -31,7 +31,7 @@ pub struct StandaloneCliArgs {
 #[derive(Clone, PartialEq, Eq, Debug, Subcommand)]
 pub enum StandaloneCliAction {
     #[command(
-        about = "General info about the contract an libraries residing in the targetted directory.."
+        about = "General info about the contract an libraries residing in the targeted directory.."
     )]
     Info(InfoArgs),
 
@@ -47,7 +47,7 @@ pub enum StandaloneCliAction {
 
     #[command(
         name = "local-deps",
-        about = "Generates a report on the local depedencies of contract crates. Will explore indirect depdencies too."
+        about = "Generates a report on the local dependencies of contract crates. Will explore indirect dependencies too."
     )]
     LocalDeps(LocalDepsArgs),
 

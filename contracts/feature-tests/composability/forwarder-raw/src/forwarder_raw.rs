@@ -13,7 +13,7 @@ multiversx_sc::imports!();
 /// TODO: split into modules
 #[multiversx_sc::contract]
 pub trait ForwarderRaw:
-    forwarder_raw_alt_init::ForwarderRawAlterativeInit
+    forwarder_raw_alt_init::ForwarderRawAlternativeInit
     + forwarder_raw_common::ForwarderRawCommon
     + forwarder_raw_async::ForwarderRawAsync
     + forwarder_raw_sync::ForwarderRawSync

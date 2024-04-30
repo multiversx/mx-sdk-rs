@@ -31,7 +31,7 @@ pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     /// This special representation is interpreted as the EGLD token.
-    #[allow(clippy::needless_borrow)] // clippy is wrog here, there is no other way
+    #[allow(clippy::needless_borrow)] // clippy is wrong here, there is no other way
     pub const EGLD_REPRESENTATION: &'static [u8; 4] = &b"EGLD";
 
     /// New instance of the special EGLD token representation.
