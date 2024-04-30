@@ -144,7 +144,7 @@ fn set_state_test() {
         .check_account(third)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, ())
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, "")
         .commit();
 
     let fourth_uris = FOURTH_URIS
@@ -171,7 +171,7 @@ fn set_state_test() {
         .check_account(fourth)
         .nonce(3)
         .balance(50)
-        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, managed_buffer!(FOURTH_ATTRIBUTES))
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, FOURTH_ATTRIBUTES)
         .commit();
 
     world
@@ -183,7 +183,7 @@ fn set_state_test() {
         .check_account(fifth)
         .nonce(2)
         .balance(30)
-        .esdt_nft_balance_and_attributes(NFT_ID, 5, 0, ());
+        .esdt_nft_balance_and_attributes(NFT_ID, 5, 0, "");
 
     // using no commit should drop the value naturally
     world
