@@ -1,7 +1,7 @@
 use crate::{
-    dep_encode_num_mimic, num_conv::universal_decode_number, DecodeError, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    dep_encode_num_mimic, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
 };
 
 // No reversing needed for u8, because it is a single byte.
@@ -102,7 +102,7 @@ macro_rules! dep_decode_num_unsigned {
             {
                 let mut bytes = [0u8; $num_bytes];
                 input.read_into(&mut bytes[..], h)?;
-                let num = universal_decode_number(&bytes[..], false) as $ty;
+                let num = <$ty>::from_be_bytes(bytes);
                 Ok(num)
             }
         }
@@ -111,8 +111,17 @@ macro_rules! dep_decode_num_unsigned {
 
 dep_decode_num_unsigned!(u16, 2);
 dep_decode_num_unsigned!(u32, 4);
-dep_decode_num_unsigned!(usize, 4);
 dep_decode_num_unsigned!(u64, 8);
+
+impl NestedDecode for usize {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        u32::dep_decode_or_handle_err(input, h).map(|num| num as usize)
+    }
+}
 
 macro_rules! top_decode_num_unsigned {
     ($ty:ty, $bounds_ty:ty) => {

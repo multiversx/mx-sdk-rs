@@ -1,3 +1,4 @@
+use std::sync::Mutex;
 use multiversx_chain_vm::{
     executor::VMHooks,
     vm_hooks::{StaticApiVMHooksHandler, VMHooksDispatcher, VMHooksHandler},
@@ -14,9 +15,9 @@ fn new_static_api_vh() -> VMHooksDispatcher {
 }
 
 thread_local! {
-    static STATIC_API_VH_CELL: VMHooksDispatcher = new_static_api_vh();
+    static STATIC_API_VH_CELL: Mutex<VMHooksDispatcher> = Mutex::new(new_static_api_vh());
 
-    static STATIC_API_STATIC_CELL: StaticVarData = StaticVarData::default();
+    static STATIC_API_STATIC_CELL: Mutex<StaticVarData> = Mutex::new(StaticVarData::default());
 }
 
 #[derive(Clone)]
@@ -29,14 +30,20 @@ impl VMHooksApiBackend for StaticApiBackend {
     where
         F: FnOnce(&dyn VMHooks) -> R,
     {
-        STATIC_API_VH_CELL.with(|vh| f(vh))
+        STATIC_API_VH_CELL.with(|vh_mutex| {
+            let vh = vh_mutex.lock().unwrap();
+            f(&*vh)
+        })
     }
 
     fn with_static_data<R, F>(f: F) -> R
     where
         F: FnOnce(&StaticVarData) -> R,
     {
-        STATIC_API_STATIC_CELL.with(|data| f(data))
+        STATIC_API_STATIC_CELL.with(|data_mutex| {
+            let data = data_mutex.lock().unwrap();
+            f(&data)
+        })
     }
 }
 
@@ -49,6 +56,18 @@ impl StaticApi {
     /// This placeholder then needs to be converted to something useful.
     pub fn is_current_address_placeholder(address: &Address) -> bool {
         address.as_array() == StaticApiVMHooksHandler::CURRENT_ADDRESS_PLACEHOLDER.as_array()
+    }
+
+    pub fn reset() {
+        STATIC_API_VH_CELL.with(|vh_mutex| {
+            let mut vh = vh_mutex.lock().unwrap();
+            *vh = new_static_api_vh()
+        });
+
+        STATIC_API_STATIC_CELL.with(|data_mutex| {
+            let mut data = data_mutex.lock().unwrap();
+            *data = StaticVarData::default()
+        })
     }
 }
 
