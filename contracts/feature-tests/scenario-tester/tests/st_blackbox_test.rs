@@ -68,7 +68,7 @@ fn st_blackbox() {
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
-        .returns(ReturnsResultConv::<BigUint>::new())
+        .returns(ReturnsResultAs::<BigUint>::new())
         .run();
     assert_eq!(value, BigUint::from(5u32));
 
