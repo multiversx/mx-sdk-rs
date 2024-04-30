@@ -26,6 +26,10 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.48.1, codec 0.18.7] - 2024-04-30
+- Simplified decoding of small numbers (i64/u64).
+- Manual reset of the `StaticApi`, in order to free memory for long-running tasks.
+
 ## [sc 0.48.0] - 2024-04-09
 - When serializing to a managed buffer, static buffer caching is disabled by default.
 - `sc-meta:` - installers for wasm32 target and wasm-opt.
