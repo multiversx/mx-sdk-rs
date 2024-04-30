@@ -9,11 +9,11 @@ use crate::types::{
 /// Indicates that result will be returned.
 ///
 /// Value will be converted to type `T`, which should be compatible with the original type.
-pub struct ReturnsResultConv<T> {
+pub struct ReturnsResultAs<T> {
     _phantom: PhantomData<T>,
 }
 
-impl<T> Default for ReturnsResultConv<T> {
+impl<T> Default for ReturnsResultAs<T> {
     fn default() -> Self {
         Self {
             _phantom: Default::default(),
@@ -21,13 +21,13 @@ impl<T> Default for ReturnsResultConv<T> {
     }
 }
 
-impl<T> ReturnsResultConv<T> {
+impl<T> ReturnsResultAs<T> {
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl<Env, Original, T> RHListItem<Env, Original> for ReturnsResultConv<T>
+impl<Env, Original, T> RHListItem<Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -37,7 +37,7 @@ where
 }
 
 impl<Env, Original, T> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
-    for ReturnsResultConv<T>
+    for ReturnsResultAs<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
