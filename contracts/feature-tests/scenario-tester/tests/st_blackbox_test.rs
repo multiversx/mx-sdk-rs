@@ -4,6 +4,8 @@ use num_bigint::BigUint;
 use scenario_tester::*;
 
 const SC_SCENARIO_TESTER_PATH_EXPR: &str = "mxsc:output/scenario-tester.mxsc.json";
+const FOURTH_ATTRIBUTES: &[u8] = b"FourthhAttributes";
+const FOURTH_URIS: &[&[u8]] = &[b"FirstUri", b"SecondUri"];
 
 const OWNER_ADDRESS: TestAddress = TestAddress::new("owner");
 const OTHER_ADDRESS: TestAddress = TestAddress::new("other");
@@ -106,6 +108,8 @@ fn set_state_test() {
     let fourth = TestAddress::new("fourth");
     let fifth = TestAddress::new("fifth");
     let sixth = TestAddress::new("sixth");
+    let seventh = TestAddress::new("seventh");
+    let eighth = TestAddress::new("eighth");
 
     world.start_trace();
 
@@ -143,33 +147,71 @@ fn set_state_test() {
         .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, ())
         .commit();
 
-    // using no commit should drop the value naturally
+    let fourth_uris = FOURTH_URIS
+        .iter()
+        .map(|first_uri| managed_buffer!(first_uri))
+        .collect();
     world
         .account(fourth)
-        .nonce(4)
-        .balance(400)
-        .account(fifth)
-        .nonce(5)
-        .balance(250)
-        .esdt_balance(TOKEN_ID, 2);
+        .nonce(3)
+        .balance(50)
+        .esdt_nft_all_properties(
+            NFT_ID,
+            2,
+            1,
+            managed_buffer!(FOURTH_ATTRIBUTES),
+            1000,
+            None::<Address>,
+            (),
+            fourth_uris,
+        )
+        .commit();
 
     world
         .check_account(fourth)
+        .nonce(3)
+        .balance(50)
+        .esdt_nft_balance_and_attributes(NFT_ID, 2, 1, managed_buffer!(FOURTH_ATTRIBUTES))
+        .commit();
+
+    world
+        .account(fifth)
+        .nonce(2)
+        .balance(30)
+        .esdt_nft_last_nonce(NFT_ID, 5);
+    world
+        .check_account(fifth)
+        .nonce(2)
+        .balance(30)
+        .esdt_nft_balance_and_attributes(NFT_ID, 5, 0, ());
+
+    // using no commit should drop the value naturally
+    world
+        .account(sixth)
         .nonce(4)
         .balance(400)
-        .check_account(fifth)
+        .account(seventh)
         .nonce(5)
         .balance(250)
         .esdt_balance(TOKEN_ID, 2);
 
     world
-        .account(sixth)
+        .check_account(sixth)
+        .nonce(4)
+        .balance(400)
+        .check_account(seventh)
+        .nonce(5)
+        .balance(250)
+        .esdt_balance(TOKEN_ID, 2);
+
+    world
+        .account(eighth)
         .nonce(6)
         .balance(600)
         .esdt_balance(TOKEN_ID, 60);
 
     world
-        .check_account(sixth)
+        .check_account(eighth)
         .nonce(6)
         .balance(600)
         .esdt_balance(TOKEN_ID, 60);

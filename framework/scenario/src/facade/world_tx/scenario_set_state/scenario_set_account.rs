@@ -109,7 +109,7 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         balance: V,
         attributes: T,
         royalties: R,
-        creator: C,
+        creator: Option<C>,
         hash: H,
         uris: Vec<U>,
     ) -> Self
@@ -129,7 +129,7 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
         let royalties_value = u64_annotated(&env, &royalties);
         let balance_value = big_uint_annotated(&env, &balance);
         let attributes_value = bytes_annotated(&env, attributes);
-        let creator_value = address_annotated(&env, &creator);
+        let creator_value = creator.as_ref().map(|c| address_annotated(&env, c));
         let hash_value = bytes_annotated(&env, hash);
         let mut uris_value = Vec::new();
         for uri in uris {
@@ -146,7 +146,7 @@ impl<'w> SetStateBuilder<'w, AccountItem> {
             balance_value,
             Some(attributes_value),
             royalties_value,
-            Some(creator_value),
+            creator_value,
             Some(hash_value),
             uris_value,
         );
