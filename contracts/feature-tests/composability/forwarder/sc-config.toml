@@ -1,0 +1,5 @@
+[[proxy]]
+path = "src/forwarder_proxy.rs"
+[[proxy.path-rename]]
+from = "multiversx_sc::types::flags::esdt_token_type::"
+to = ""
