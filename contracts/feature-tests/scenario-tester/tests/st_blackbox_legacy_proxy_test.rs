@@ -51,7 +51,7 @@ fn st_blackbox_legacy_proxy() {
     let value = world
         .query()
         .call(st_contract.sum())
-        .returns(ReturnsResultConv::<SingleValue<BigUint>>::new())
+        .returns(ReturnsResultAs::<SingleValue<BigUint>>::new())
         .run();
     assert_eq!(value.into(), BigUint::from(5u32));
 

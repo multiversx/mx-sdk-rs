@@ -2,7 +2,7 @@ use multiversx_sc::{
     codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
     types::{
         ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress, ReturnsResult,
-        ReturnsResultConv, TxEnv, WithNewAddress, WithResultConv,
+        ReturnsResultAs, TxEnv, WithNewAddress, WithResultConv,
     },
 };
 
@@ -21,7 +21,7 @@ where
     }
 }
 
-impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultConv<T>
+impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
     Original: TopEncodeMulti,
@@ -31,7 +31,7 @@ where
         let response = TypedResponse::<T>::from_raw(tx_response);
         response
             .result
-            .expect("ReturnsResultConv expects that transaction is successful")
+            .expect("ReturnsResultAs expects that transaction is successful")
     }
 }
 
