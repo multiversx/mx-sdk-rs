@@ -45,11 +45,6 @@ fn test_nft_update_attributes_and_send() {
     let mut state = ForwarderTestState::new();
 
     let original_attributes = forwarder_proxy::Color { r: 0, g: 0, b: 0 };
-    let original_attributes_bytes: &[u8] = &[
-        original_attributes.r,
-        original_attributes.g,
-        original_attributes.b,
-    ];
 
     state
         .world
@@ -70,20 +65,13 @@ fn test_nft_update_attributes_and_send() {
     state
         .world
         .check_account(USER_ADDRESS)
-        .esdt_nft_balance_and_attributes(
-            NFT_TOKEN_ID,
-            1,
-            1,
-            managed_buffer!(original_attributes_bytes),
-        );
+        .esdt_nft_balance_and_attributes(NFT_TOKEN_ID, 1, 1, original_attributes);
 
     let new_attributes = forwarder_proxy::Color {
         r: 255,
         g: 255,
         b: 255,
     };
-
-    let new_attributes_bytes: &[u8] = &[new_attributes.r, new_attributes.g, new_attributes.b];
 
     state.world.transfer_step(
         TransferStep::new()
@@ -111,5 +99,5 @@ fn test_nft_update_attributes_and_send() {
     state
         .world
         .check_account(USER_ADDRESS)
-        .esdt_nft_balance_and_attributes(NFT_TOKEN_ID, 1, 1, managed_buffer!(new_attributes_bytes));
+        .esdt_nft_balance_and_attributes(NFT_TOKEN_ID, 1, 1, new_attributes);
 }

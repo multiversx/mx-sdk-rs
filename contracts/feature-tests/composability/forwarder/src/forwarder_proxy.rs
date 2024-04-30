@@ -1118,7 +1118,7 @@ where
     pub args: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
-#[derive(TopEncode, TopDecode)]
+#[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug)]
 pub struct Color {
     pub r: u8,
     pub g: u8,
