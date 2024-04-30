@@ -15,7 +15,7 @@ use crate::{
 use crate as multiversx_sc; // needed by the TypeAbi generated code
 use crate::derive::type_abi;
 
-const DECODE_ATTRIBUTE_ERROR_PREFIX: &[u8] = b"error decoding ESDT attributes: ";
+const DECODE_ATTRIBUTE_ERROR_PREFIX: &str = "error decoding ESDT attributes: ";
 
 #[type_abi]
 #[derive(Clone, TopDecode, TopEncode, NestedDecode, NestedEncode, Debug, ManagedVecItem)]
