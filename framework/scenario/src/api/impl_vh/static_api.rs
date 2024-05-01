@@ -1,9 +1,9 @@
-use std::sync::Mutex;
 use multiversx_chain_vm::{
     executor::VMHooks,
     vm_hooks::{StaticApiVMHooksHandler, VMHooksDispatcher, VMHooksHandler},
 };
 use multiversx_sc::{api::RawHandle, types::Address};
+use std::sync::Mutex;
 
 use crate::debug_executor::StaticVarData;
 
