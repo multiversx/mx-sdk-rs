@@ -165,6 +165,11 @@ pub trait AbiTester {
         None
     }
 
+    #[view]
+    fn operation_completion_status(&self) -> OperationCompletionStatus {
+        OperationCompletionStatus::Completed
+    }
+
     #[endpoint]
     #[payable("EGLD")]
     fn payable_egld(&self) {}

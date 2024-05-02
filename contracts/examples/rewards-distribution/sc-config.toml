@@ -1,0 +1,5 @@
+[[proxy]]
+path = "src/rewards_distribution_proxy.rs"
+[[proxy.path-rename]]
+from = "multiversx_sc::types::io::operation_completion_status::"
+to = ""

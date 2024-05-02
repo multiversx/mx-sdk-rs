@@ -1,4 +1,4 @@
-use multiversx_sc::types::{Address, AddressExpr, ScExpr};
+use multiversx_sc::types::{Address, TestAddress, TestSCAddress};
 
 use super::{value_from_slice, AddressValue};
 use crate::{
@@ -135,8 +135,8 @@ impl From<Bech32Address> for AddressKey {
     }
 }
 
-impl From<AddressExpr> for AddressKey {
-    fn from(from: AddressExpr) -> Self {
+impl From<TestAddress<'_>> for AddressKey {
+    fn from(from: TestAddress) -> Self {
         AddressKey {
             value: from.eval_to_array().into(),
             original: from.eval_to_expr(),
@@ -144,8 +144,8 @@ impl From<AddressExpr> for AddressKey {
     }
 }
 
-impl From<ScExpr<'_>> for AddressKey {
-    fn from(from: ScExpr) -> Self {
+impl From<TestSCAddress<'_>> for AddressKey {
+    fn from(from: TestSCAddress) -> Self {
         AddressKey {
             value: from.eval_to_array().into(),
             original: from.eval_to_expr(),

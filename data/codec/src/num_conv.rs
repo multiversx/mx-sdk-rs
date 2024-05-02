@@ -110,23 +110,27 @@ fn fill_buffer_find_offset(x: u64, signed: bool, buffer: &mut TopEncodeNumberBuf
 ///
 /// No generics here, we avoid monomorphization to make the SC binary as small as possible.
 pub fn universal_decode_number(bytes: &[u8], signed: bool) -> u64 {
-    if bytes.is_empty() {
-        return 0;
-    }
-    let negative = signed && msbit_is_one(bytes[0]);
-    let mut result = if negative {
-        // start with all bits set to 1,
-        // to ensure that if there are fewer bytes than the result type width,
-        // the leading bits will be 1 instead of 0
-        u64::MAX
-    } else {
-        0u64
-    };
-    for byte in bytes.iter() {
-        result <<= 8;
-        result |= *byte as u64;
-    }
-    result
+    // it is almost impossible to get a slice longer than 8
+    // just a basic overflow/underflow protection
+    let safe_len = bytes.len() % 9;
+
+    unsafe { universal_decode_number_impl(bytes.as_ptr(), safe_len, signed) }
+}
+
+/// Same as [`universal_decode_number`], but assumes that the input length does not exceed 8.
+pub fn universal_decode_number_unchecked(bytes: &[u8], signed: bool) -> u64 {
+    unsafe { universal_decode_number_impl(bytes.as_ptr(), bytes.len(), signed) }
+}
+
+unsafe fn universal_decode_number_impl(bytes: *const u8, len: usize, signed: bool) -> u64 {
+    let negative = signed && len > 0 && msbit_is_one(*bytes);
+    let skippable_byte = skippable_byte(negative);
+
+    let mut extended_buffer = [skippable_byte; 8];
+    let offset = 8usize.wrapping_sub(len);
+    core::ptr::copy_nonoverlapping(bytes, extended_buffer.as_mut_ptr().add(offset), len);
+
+    u64::from_be_bytes(extended_buffer)
 }
 
 /// Most significant bit is 1.

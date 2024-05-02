@@ -1,6 +1,4 @@
-use crate::types::{ManagedAddress, ManagedBuffer};
-
-use super::{AnnotatedValue, TxEnv};
+use crate::types::{AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv};
 
 pub trait TxCodeSource<Env>
 where

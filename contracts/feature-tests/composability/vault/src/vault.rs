@@ -222,7 +222,7 @@ pub trait Vault {
             ));
         }
 
-        self.tx().to_caller().payment(new_tokens).transfer();
+        self.tx().to(ToCaller).payment(new_tokens).transfer();
     }
 
     #[event("accept_funds")]

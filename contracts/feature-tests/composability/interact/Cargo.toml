@@ -24,9 +24,9 @@ path = "../forwarder-queue"
 path = "../promises-features"
 
 [dependencies.multiversx-sc-modules]
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 path = "../../../../contracts/modules"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.49.0-alpha.3"
+version = "0.49.0-alpha.4"
 path = "../../../../framework/snippets"

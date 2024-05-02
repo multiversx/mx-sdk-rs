@@ -1,6 +1,6 @@
 use core::marker::PhantomData;
 
-use super::{TxEmptyResultHandler, TxEnv, TxResultHandler};
+use crate::types::{TxEmptyResultHandler, TxEnv, TxResultHandler};
 
 /// Contains no data.
 ///
