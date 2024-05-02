@@ -1,8 +1,11 @@
 #![no_std]
 
+mod adder_proxy;
+
 multiversx_sc::imports!();
 
 static INIT_SUM: u32 = 5u32;
+
 #[multiversx_sc::contract]
 pub trait TestAdder {
     #[storage_mapper("ownerAddress")]
@@ -88,22 +91,13 @@ pub trait TestAdder {
         let owner = self.owner_address().get();
         let adder = self.adder_address().get();
 
-        let mut adder_init_args = ManagedArgBuffer::new();
-        adder_init_args.push_arg(value); // initial sum
-
         // start a prank and call 'adder' from 'owner'
-        self.test_raw().start_prank(&owner);
-        let res = self.send_raw().direct_egld_execute(
-            &adder,
-            &BigUint::from(0u32),
-            5000000,
-            &ManagedBuffer::from(b"add"),
-            &adder_init_args,
-        );
-        self.test_raw().stop_prank();
-
-        if res.is_err() {
-            panic!("call failed");
-        }
+        self.tx()
+            .from(owner)
+            .to(adder)
+            .typed(adder_proxy::AdderProxy)
+            .add(value)
+            .gas(5000000)
+            .test_call();
     }
 }
