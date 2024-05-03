@@ -20,13 +20,13 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         use_raw_handle(raw_handle)
     }
 
-    fn mb_len(&self, handle: Self::ManagedBufferHandle) -> usize {
+    fn mb_len(&self, handle: &Self::ManagedBufferHandle) -> usize {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize
         })
     }
 
-    fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
+    fn mb_to_boxed_bytes(&self, handle: &Self::ManagedBufferHandle) -> BoxedBytes {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize;
             unsafe {
@@ -44,7 +44,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_load_slice(
         &self,
-        source_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
@@ -67,10 +67,10 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_copy_slice(
         &self,
-        source_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
         starting_pos: usize,
         slice_len: usize,
-        dest_handle: Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
     ) -> Result<(), InvalidSliceError> {
         let err = self.with_vm_hooks_ctx_2(&source_handle, &dest_handle, |vh| {
             vh.mbuffer_copy_byte_slice(
@@ -87,7 +87,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         }
     }
 
-    fn mb_overwrite(&self, handle: Self::ManagedBufferHandle, value: &[u8]) {
+    fn mb_overwrite(&self, handle: &Self::ManagedBufferHandle, value: &[u8]) {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             mem_conv::with_mem_ptr(value, |offset, length| {
                 vh.mbuffer_set_bytes(handle.get_raw_handle_unchecked(), offset, length);
@@ -97,7 +97,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_set_slice(
         &self,
-        dest_handle: Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
         starting_position: usize,
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
@@ -118,7 +118,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         }
     }
 
-    fn mb_set_random(&self, dest_handle: Self::ManagedBufferHandle, length: usize) {
+    fn mb_set_random(&self, dest_handle: &Self::ManagedBufferHandle, length: usize) {
         self.with_vm_hooks_ctx_1(&dest_handle, |vh| {
             vh.mbuffer_set_random(dest_handle.get_raw_handle_unchecked(), length as i32)
         });
@@ -126,8 +126,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_append(
         &self,
-        accumulator_handle: Self::ManagedBufferHandle,
-        data_handle: Self::ManagedBufferHandle,
+        accumulator_handle: &Self::ManagedBufferHandle,
+        data_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_2(&accumulator_handle, &data_handle, |vh| {
             vh.mbuffer_append(
@@ -137,7 +137,7 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
         });
     }
 
-    fn mb_append_bytes(&self, accumulator_handle: Self::ManagedBufferHandle, bytes: &[u8]) {
+    fn mb_append_bytes(&self, accumulator_handle: &Self::ManagedBufferHandle, bytes: &[u8]) {
         self.with_vm_hooks_ctx_1(&accumulator_handle, |vh| {
             mem_conv::with_mem_ptr(bytes, |offset, length| {
                 let _ = vh.mbuffer_append_bytes(
@@ -151,8 +151,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_eq(
         &self,
-        handle1: Self::ManagedBufferHandle,
-        handle2: Self::ManagedBufferHandle,
+        handle1: &Self::ManagedBufferHandle,
+        handle2: &Self::ManagedBufferHandle,
     ) -> bool {
         i32_to_bool(self.with_vm_hooks_ctx_2(&handle1, &handle2, |vh| {
             vh.mbuffer_eq(
@@ -164,8 +164,8 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
 
     fn mb_to_hex(
         &self,
-        source_handle: Self::ManagedBufferHandle,
-        dest_handle: Self::ManagedBufferHandle,
+        source_handle: &Self::ManagedBufferHandle,
+        dest_handle: &Self::ManagedBufferHandle,
     ) {
         self.with_vm_hooks_ctx_2(&source_handle, &dest_handle, |vh| {
             vh.managed_buffer_to_hex(

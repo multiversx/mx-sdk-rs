@@ -1,7 +1,8 @@
 use crate::{
-    api::{use_raw_handle, ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl},
+    api::{ManagedMapApiImpl, ManagedTypeApi, StaticVarApiImpl, use_raw_handle},
     types::ManagedType,
 };
+use crate::api::HandleConstraints;
 
 use super::ManagedBuffer;
 
@@ -19,8 +20,16 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedMap<M> {
         ManagedMap { handle }
     }
 
-    fn get_handle(&self) -> M::ManagedMapHandle {
-        self.handle.clone()
+    fn get_handle(&self) -> &M::ManagedMapHandle {
+        &self.handle
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.handle.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.handle.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedMapHandle) -> &Self {
@@ -46,15 +55,15 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
     pub fn get(&self, key: &ManagedBuffer<M>) -> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mm_get(self.handle.clone(), key.handle.clone(), new_handle.clone());
+        M::managed_type_impl().mm_get(&self.handle, &key.handle, &new_handle);
         ManagedBuffer::from_handle(new_handle)
     }
 
     pub fn put(&mut self, key: &ManagedBuffer<M>, value: &ManagedBuffer<M>) {
         M::managed_type_impl().mm_put(
-            self.handle.clone(),
-            key.handle.clone(),
-            value.handle.clone(),
+            &self.handle,
+            &key.handle,
+            &value.handle,
         );
     }
 
@@ -62,14 +71,14 @@ impl<M: ManagedTypeApi> ManagedMap<M> {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         M::managed_type_impl().mm_remove(
-            self.handle.clone(),
-            key.handle.clone(),
-            new_handle.clone(),
+            &self.handle,
+            &key.handle,
+            &new_handle,
         );
         ManagedBuffer::from_handle(new_handle)
     }
 
     pub fn contains(&self, key: &ManagedBuffer<M>) -> bool {
-        M::managed_type_impl().mm_contains(self.handle.clone(), key.handle.clone())
+        M::managed_type_impl().mm_contains(&self.handle, &key.handle)
     }
 }

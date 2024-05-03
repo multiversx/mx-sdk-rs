@@ -32,7 +32,7 @@ where
     ) -> ManagedByteArray<A, SHA256_RESULT_LEN> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().sha256_managed(new_handle.clone(), data.borrow().get_handle());
+        A::crypto_api_impl().sha256_managed(&new_handle, data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
 
@@ -42,7 +42,7 @@ where
     ) -> ManagedByteArray<A, KECCAK256_RESULT_LEN> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().keccak256_managed(new_handle.clone(), data.borrow().get_handle());
+        A::crypto_api_impl().keccak256_managed(&new_handle, data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
 
@@ -52,7 +52,7 @@ where
     ) -> ManagedByteArray<A, { crate::api::RIPEMD_RESULT_LEN }> {
         let new_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
-        A::crypto_api_impl().ripemd160_managed(new_handle.clone(), data.borrow().get_handle());
+        A::crypto_api_impl().ripemd160_managed(&new_handle, data.borrow().get_handle());
         ManagedByteArray::from_handle(new_handle)
     }
 
@@ -125,7 +125,7 @@ where
         A::crypto_api_impl().encode_secp256k1_der_signature_managed(
             r.get_handle(),
             s.get_handle(),
-            new_handle.clone(),
+            &new_handle,
         );
         ManagedBuffer::from_handle(new_handle)
     }

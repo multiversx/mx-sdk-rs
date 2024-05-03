@@ -15,38 +15,38 @@ pub trait ManagedTypeApiImpl:
 {
     fn mb_to_big_int_unsigned(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        dest: Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        dest: &Self::BigIntHandle,
     );
 
     fn mb_to_big_int_signed(
         &self,
-        buffer_handle: Self::ManagedBufferHandle,
-        dest: Self::BigIntHandle,
+        buffer_handle: &Self::ManagedBufferHandle,
+        dest: &Self::BigIntHandle,
     );
 
     fn mb_from_big_int_unsigned(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        dest: Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 
     fn mb_from_big_int_signed(
         &self,
-        big_int_handle: Self::BigIntHandle,
-        dest: Self::ManagedBufferHandle,
+        big_int_handle: &Self::BigIntHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 
-    fn mb_to_big_float(&self, buffer_handle: Self::ManagedBufferHandle, dest: Self::BigFloatHandle);
+    fn mb_to_big_float(&self, buffer_handle: &Self::ManagedBufferHandle, dest: &Self::BigFloatHandle);
 
     fn mb_from_big_float(
         &self,
-        big_float_handle: Self::BigFloatHandle,
-        dest: Self::ManagedBufferHandle,
+        big_float_handle: &Self::BigFloatHandle,
+        dest: &Self::ManagedBufferHandle,
     );
 
-    fn validate_token_identifier(&self, token_id_handle: Self::ManagedBufferHandle) -> bool {
-        let token_id_len = self.mb_len(token_id_handle.clone());
+    fn validate_token_identifier(&self, token_id_handle: &Self::ManagedBufferHandle) -> bool {
+        let token_id_len = self.mb_len(token_id_handle);
         if token_id_len > IDENTIFIER_MAX_LENGTH {
             return false;
         }
@@ -65,4 +65,10 @@ pub trait ManagedTypeApiImpl:
     fn get_token_ticker_len(&self, token_id_len: usize) -> usize {
         super::token_identifier_util::get_token_ticker_len(token_id_len)
     }
+
+    fn drop_managed_buffer_handle(&self, _handle: Self::ManagedBufferHandle) {}
+    fn drop_big_float_handle(&self, _handle: Self::BigFloatHandle) {}
+    fn drop_big_int_handle(&self, _handle: Self::BigIntHandle) {}
+    fn drop_elliptic_curve_handle(&self, _handle: Self::EllipticCurveHandle) {}
+    fn drop_managed_map_handle(&self, _handle: Self::ManagedMapHandle) {}
 }

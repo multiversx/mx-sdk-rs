@@ -7,7 +7,9 @@ use crate::{
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
 };
 
-use crate as multiversx_sc; // required by the ManagedVecItem derive
+use crate as multiversx_sc;
+use crate::api::{ErrorApi, ErrorApiImpl, ManagedBufferApiImpl, ManagedTypeApiImpl};
+use crate::imports::AsTokenIdentifierHandle;
 
 /// Specialized type for handling either EGLD or ESDT token identifiers.
 ///
@@ -90,10 +92,11 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     ///
     /// Will fail if it encodes an invalid ESDT token identifier.
     pub fn is_valid(&self) -> bool {
-        self.map_ref_or_else(
-            || true,
-            |token_identifier| token_identifier.is_valid_esdt_identifier(),
-        )
+        if self.is_egld() {
+            true
+        } else {
+            M::managed_type_impl().validate_token_identifier(&self.data.handle)
+        }
     }
 
     pub fn map_or_else<U, D, F>(self, for_egld: D, for_esdt: F) -> U
@@ -104,16 +107,16 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
         self.data.map_or_else(for_egld, for_esdt)
     }
 
-    pub fn map_ref_or_else<U, D, F>(&self, for_egld: D, for_esdt: F) -> U
-    where
-        D: FnOnce() -> U,
-        F: FnOnce(&TokenIdentifier<M>) -> U,
-    {
-        self.data.map_ref_or_else(for_egld, for_esdt)
-    }
-
     pub fn unwrap_esdt(self) -> TokenIdentifier<M> {
         self.data.unwrap_or_sc_panic("ESDT expected")
+    }
+
+    pub fn unwrap_esdt_ref(&self) -> UnwrappedEsdtTokenIdentifierRef<M> {
+        if self.data.is_none() {
+            M::error_api_impl().signal_error(b"ESDT expected")
+        }
+
+        UnwrappedEsdtTokenIdentifierRef::new(&self.data.handle)
     }
 
     /// Representation of the object as an `Option`.
@@ -141,10 +144,11 @@ impl<M: ManagedTypeApi> Eq for EgldOrEsdtTokenIdentifier<M> {}
 impl<M: ManagedTypeApi> PartialEq<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &TokenIdentifier<M>) -> bool {
-        self.map_ref_or_else(
-            || false,
-            |self_esdt_token_identifier| self_esdt_token_identifier == other,
-        )
+        if self.is_egld() {
+            false
+        } else {
+            M::managed_type_impl().mb_eq(self.unwrap_esdt_ref().handle, other.as_token_identifier_handle())
+        }
     }
 }
 
@@ -219,9 +223,12 @@ impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
 impl<M: ManagedTypeApi> SCDisplay for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            ));
+            let buffer = ManagedBuffer::from_handle(
+                unsafe { token_identifier.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+            );
+            f.append_managed_buffer(&buffer);
+
+            let _ = buffer.take_handle();
         } else {
             f.append_bytes(Self::EGLD_REPRESENTATION);
         }
@@ -233,9 +240,12 @@ const EGLD_REPRESENTATION_HEX: &[u8] = b"45474C44";
 impl<M: ManagedTypeApi> SCLowerHex for EgldOrEsdtTokenIdentifier<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         if let Some(token_identifier) = self.data.as_option() {
-            f.append_managed_buffer_lower_hex(&ManagedBuffer::from_handle(
-                token_identifier.get_handle().cast_or_signal_error::<M, _>(),
-            ));
+            let buffer = ManagedBuffer::from_handle(
+                unsafe { token_identifier.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+            );
+            f.append_managed_buffer(&buffer);
+
+            let _ = buffer.take_handle();
         } else {
             f.append_bytes(EGLD_REPRESENTATION_HEX);
         }
@@ -256,5 +266,26 @@ where
         } else {
             f.write_str("EgldOrEsdtTokenIdentifier::Egld")
         }
+    }
+}
+
+/// We don't want to implement AsTokenIdentifierHandle on EgldOrEsdtTokenIdentifier directly,
+/// doing so would allow the developer to pass an EgldOrEsdtTokenIdentifier where only a TokenIdentifier is allowed.
+/// Instead, we prefer to create an intermediate struct.
+pub struct UnwrappedEsdtTokenIdentifierRef<'a, M: ErrorApi + ManagedTypeApi> {
+    handle: &'a M::ManagedBufferHandle
+}
+
+impl<'a, M: ErrorApi + ManagedTypeApi> UnwrappedEsdtTokenIdentifierRef<'a, M> {
+    pub fn new(handle: &'a M::ManagedBufferHandle) -> Self {
+        Self {
+            handle
+        }
+    }
+}
+
+impl<'a, M: ErrorApi + ManagedTypeApi> AsTokenIdentifierHandle<M> for UnwrappedEsdtTokenIdentifierRef<'a, M> {
+    fn as_token_identifier_handle(&self) -> &M::ManagedBufferHandle {
+        self.handle
     }
 }

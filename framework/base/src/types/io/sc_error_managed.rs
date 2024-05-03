@@ -22,7 +22,7 @@ where
     M: ManagedTypeApi + ErrorApi,
 {
     fn finish_err<FA: EndpointFinishApi>(&self) -> ! {
-        M::error_api_impl().signal_error_from_buffer(self.buffer.get_handle())
+        M::error_api_impl().signal_error_from_buffer(self.buffer.clone().take_handle())
     }
 }
 
@@ -52,8 +52,8 @@ where
     }
 
     #[inline]
-    pub fn exit_now(&self) -> ! {
-        M::error_api_impl().signal_error_from_buffer(self.buffer.get_handle())
+    pub fn exit_now(self) -> ! {
+        M::error_api_impl().signal_error_from_buffer(self.buffer.take_handle())
     }
 }
 

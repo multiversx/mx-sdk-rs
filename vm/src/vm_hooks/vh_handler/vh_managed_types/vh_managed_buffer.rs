@@ -110,4 +110,13 @@ pub trait VMHooksManagedBuffer: VMHooksHandlerSource {
         self.m_types_lock()
             .mb_set(dest_handle, encoded.into_bytes());
     }
+
+    fn mb_delete(&self, handle: RawHandle) {
+        if !self.is_m_types_accessible() {
+            return;
+        }
+
+        let mut managed_types = self.m_types_lock();
+        managed_types.managed_buffer_map.map.remove(&handle);
+    }
 }

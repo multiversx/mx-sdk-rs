@@ -57,6 +57,10 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         self.obj.to_byte_writer(writer)
     }
+
+    fn take_handle_ownership(&mut self) {
+        self.obj.take_handle_ownership()
+    }
 }
 
 impl<M> TopEncodeMulti for EsdtTokenPaymentMultiValue<M>

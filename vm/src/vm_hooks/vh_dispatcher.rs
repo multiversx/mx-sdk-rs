@@ -4,7 +4,7 @@ use multiversx_chain_vm_executor::{MemLength, MemPtr, VMHooks};
 
 use crate::mem_conv;
 
-use super::VMHooksHandler;
+use super::{CleanableVMHooks, VMHooksHandler};
 
 /// Dispatches messages coming via VMHooks to the underlying implementation (the VMHooksHandler).
 #[derive(Debug)]
@@ -1858,5 +1858,11 @@ impl VMHooks for VMHooksDispatcher {
         y_base_point_handle: i32,
     ) -> i32 {
         panic!("Unavailable: elliptic_curve_get_values")
+    }
+}
+
+impl CleanableVMHooks for VMHooksDispatcher {
+    fn remove_managed_buffer(&self, handle: i32) {
+        self.handler.mb_delete(handle)
     }
 }

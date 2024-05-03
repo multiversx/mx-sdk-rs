@@ -8,9 +8,9 @@ macro_rules! binary_op_method {
     ($api_method_name:ident, $hook_name:ident) => {
         fn $api_method_name(
             &self,
-            dest: Self::BigIntHandle,
-            x: Self::BigIntHandle,
-            y: Self::BigIntHandle,
+            dest: &Self::BigIntHandle,
+            x: &Self::BigIntHandle,
+            y: &Self::BigIntHandle,
         ) {
             self.with_vm_hooks_ctx_3(&dest, &x, &y, |vh| {
                 vh.$hook_name(
@@ -25,7 +25,7 @@ macro_rules! binary_op_method {
 
 macro_rules! unary_op_method {
     ($api_method_name:ident, $hook_name:ident) => {
-        fn $api_method_name(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle) {
+        fn $api_method_name(&self, dest: &Self::BigIntHandle, x: &Self::BigIntHandle) {
             self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
                 vh.$hook_name(
                     dest.get_raw_handle_unchecked(),
@@ -42,13 +42,13 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
         use_raw_handle(handle)
     }
 
-    fn bi_set_int64(&self, destination: Self::BigIntHandle, value: i64) {
+    fn bi_set_int64(&self, destination: &Self::BigIntHandle, value: i64) {
         self.with_vm_hooks_ctx_1(&destination, |vh| {
             vh.big_int_set_int64(destination.get_raw_handle_unchecked(), value)
         });
     }
 
-    fn bi_to_i64(&self, reference: Self::BigIntHandle) -> Option<i64> {
+    fn bi_to_i64(&self, reference: &Self::BigIntHandle) -> Option<i64> {
         self.with_vm_hooks_ctx_1(&reference, |vh| {
             let is_i64_result = vh.big_int_is_int64(reference.get_raw_handle_unchecked());
             if i32_to_bool(is_i64_result) {
@@ -68,7 +68,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     unary_op_method! {bi_abs, big_int_abs}
     unary_op_method! {bi_neg, big_int_neg}
 
-    fn bi_sign(&self, x: Self::BigIntHandle) -> Sign {
+    fn bi_sign(&self, x: &Self::BigIntHandle) -> Sign {
         let sign_raw =
             self.with_vm_hooks_ctx_1(&x, |vh| vh.big_int_sign(x.get_raw_handle_unchecked()));
         match sign_raw.cmp(&0) {
@@ -78,7 +78,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
         }
     }
 
-    fn bi_cmp(&self, x: Self::BigIntHandle, y: Self::BigIntHandle) -> Ordering {
+    fn bi_cmp(&self, x: &Self::BigIntHandle, y: &Self::BigIntHandle) -> Ordering {
         let ordering_raw = self.with_vm_hooks_ctx_2(&x, &y, |vh| {
             vh.big_int_cmp(x.get_raw_handle_unchecked(), y.get_raw_handle_unchecked())
         });
@@ -88,7 +88,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     unary_op_method! {bi_sqrt, big_int_sqrt}
     binary_op_method! {bi_pow, big_int_pow}
 
-    fn bi_log2(&self, x: Self::BigIntHandle) -> u32 {
+    fn bi_log2(&self, x: &Self::BigIntHandle) -> u32 {
         self.with_vm_hooks_ctx_1(&x, |vh| vh.big_int_log2(x.get_raw_handle_unchecked())) as u32
     }
 
@@ -96,7 +96,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
     binary_op_method! {bi_or, big_int_or}
     binary_op_method! {bi_xor, big_int_xor}
 
-    fn bi_shr(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
+    fn bi_shr(&self, dest: &Self::BigIntHandle, x: &Self::BigIntHandle, bits: usize) {
         self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
             vh.big_int_shr(
                 dest.get_raw_handle_unchecked(),
@@ -106,7 +106,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
         });
     }
 
-    fn bi_shl(&self, dest: Self::BigIntHandle, x: Self::BigIntHandle, bits: usize) {
+    fn bi_shl(&self, dest: &Self::BigIntHandle, x: &Self::BigIntHandle, bits: usize) {
         self.with_vm_hooks_ctx_2(&dest, &x, |vh| {
             vh.big_int_shl(
                 dest.get_raw_handle_unchecked(),
@@ -116,7 +116,7 @@ impl<VHB: VMHooksApiBackend> BigIntApiImpl for VMHooksApi<VHB> {
         });
     }
 
-    fn bi_to_string(&self, bi_handle: Self::BigIntHandle, str_handle: Self::ManagedBufferHandle) {
+    fn bi_to_string(&self, bi_handle: &Self::BigIntHandle, str_handle: &Self::ManagedBufferHandle) {
         self.with_vm_hooks_ctx_2(&bi_handle, &str_handle, |vh| {
             vh.big_int_to_string(
                 bi_handle.get_raw_handle_unchecked(),

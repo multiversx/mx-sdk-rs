@@ -110,8 +110,8 @@ impl<M, T> MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
 {
-    pub fn to_arg_buffer(&self) -> ManagedArgBuffer<M> {
-        ManagedArgBuffer::from_handle(self.raw_buffers.get_handle())
+    pub fn to_arg_buffer(self) -> ManagedArgBuffer<M> {
+        ManagedArgBuffer::from_handle(self.raw_buffers.take_handle())
     }
 }
 

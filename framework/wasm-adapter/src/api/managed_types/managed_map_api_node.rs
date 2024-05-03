@@ -16,42 +16,42 @@ impl ManagedMapApiImpl for crate::api::VmApiImpl {
 
     fn mm_get(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedMapGet(map_handle, key_handle, out_value_handle);
+            let _ = managedMapGet(*map_handle, *key_handle, *out_value_handle);
         }
     }
 
     fn mm_put(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedMapPut(map_handle, key_handle, out_value_handle);
+            let _ = managedMapPut(*map_handle, *key_handle, *out_value_handle);
         }
     }
 
     fn mm_remove(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
-        out_value_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        out_value_handle: &Self::ManagedBufferHandle,
     ) {
         unsafe {
-            let _ = managedMapRemove(map_handle, key_handle, out_value_handle);
+            let _ = managedMapRemove(*map_handle, *key_handle, *out_value_handle);
         }
     }
 
     fn mm_contains(
         &self,
-        map_handle: Self::ManagedMapHandle,
-        key_handle: Self::ManagedBufferHandle,
+        map_handle: &Self::ManagedMapHandle,
+        key_handle: &Self::ManagedBufferHandle,
     ) -> bool {
-        unsafe { managedMapContains(map_handle, key_handle) > 0 }
+        unsafe { managedMapContains(*map_handle, *key_handle) > 0 }
     }
 }

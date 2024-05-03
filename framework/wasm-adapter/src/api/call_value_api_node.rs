@@ -28,15 +28,15 @@ impl CallValueApiImpl for VmApiImpl {
         }
     }
 
-    fn load_egld_value(&self, dest: Self::BigIntHandle) {
+    fn load_egld_value(&self, dest: &Self::BigIntHandle) {
         unsafe {
-            bigIntGetCallValue(dest);
+            bigIntGetCallValue(*dest);
         }
     }
 
-    fn load_all_esdt_transfers(&self, dest_handle: Self::ManagedBufferHandle) {
+    fn load_all_esdt_transfers(&self, dest_handle: &Self::ManagedBufferHandle) {
         unsafe {
-            managedGetMultiESDTCallValue(dest_handle);
+            managedGetMultiESDTCallValue(*dest_handle);
         }
     }
 

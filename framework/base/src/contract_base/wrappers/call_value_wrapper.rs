@@ -2,8 +2,8 @@ use core::marker::PhantomData;
 
 use crate::{
     api::{
-        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        HandleConstraints, ManagedTypeApi, StaticVarApiImpl,
+        CallValueApi, CallValueApiImpl, const_handles, ErrorApi, ErrorApiImpl, HandleConstraints,
+        ManagedTypeApi, StaticVarApiImpl, use_raw_handle,
     },
     err_msg,
     types::{
@@ -38,9 +38,10 @@ where
         if call_value_handle == const_handles::UNINITIALIZED_HANDLE {
             call_value_handle = use_raw_handle(const_handles::CALL_VALUE_EGLD);
             A::static_var_api_impl().set_call_value_egld_handle(call_value_handle.get_raw_handle());
-            A::call_value_api_impl().load_egld_value(call_value_handle.clone());
+            A::call_value_api_impl().load_egld_value(&call_value_handle);
         }
-        unsafe { ManagedRef::wrap_handle(call_value_handle) }
+
+        ManagedRef::wrap_handle(call_value_handle)
     }
 
     /// Returns all ESDT transfers that accompany this SC call.
@@ -53,9 +54,10 @@ where
             call_value_handle = use_raw_handle(const_handles::CALL_VALUE_MULTI_ESDT);
             A::static_var_api_impl()
                 .set_call_value_multi_esdt_handle(call_value_handle.get_raw_handle());
-            A::call_value_api_impl().load_all_esdt_transfers(call_value_handle.clone());
+            A::call_value_api_impl().load_all_esdt_transfers(&call_value_handle);
         }
-        unsafe { ManagedRef::wrap_handle(call_value_handle) }
+
+        ManagedRef::wrap_handle(call_value_handle)
     }
 
     /// Verify and casts the received multi ESDT transfer in to an array.

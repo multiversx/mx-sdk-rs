@@ -8,7 +8,7 @@ impl<M: ManagedTypeApi> PartialEq for BigInt<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         M::managed_type_impl()
-            .bi_cmp(self.handle.clone(), other.handle.clone())
+            .bi_cmp(&self.handle, &other.handle)
             .is_eq()
     }
 }
@@ -25,7 +25,7 @@ impl<M: ManagedTypeApi> PartialOrd for BigInt<M> {
 impl<M: ManagedTypeApi> Ord for BigInt<M> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
-        M::managed_type_impl().bi_cmp(self.handle.clone(), other.handle.clone())
+        M::managed_type_impl().bi_cmp(&self.handle, &other.handle)
     }
 }
 

@@ -52,8 +52,16 @@ where
         }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
         self.buffer.get_handle()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.buffer.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.buffer.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -204,10 +212,12 @@ where
         opt_buffer.map(ManagedVec::new_from_raw_buffer)
     }
 
-    pub fn push(&mut self, item: T) {
+    pub fn push(&mut self, mut item: T) {
         item.to_byte_writer(|bytes| {
             self.buffer.append_bytes(bytes);
         });
+
+        item.take_handle_ownership();
     }
 
     pub fn remove(&mut self, index: usize) {

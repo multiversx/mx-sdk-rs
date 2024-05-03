@@ -22,41 +22,41 @@ pub trait EndpointArgumentApi: HandleTypeInfo {
 pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
     fn get_num_arguments(&self) -> i32;
 
-    fn load_argument_managed_buffer(&self, arg_index: i32, dest: Self::ManagedBufferHandle);
+    fn load_argument_managed_buffer(&self, arg_index: i32, dest: &Self::ManagedBufferHandle);
 
     fn get_argument_len(&self, arg_index: i32) -> usize {
         let mbuf_temp_1: Self::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        self.load_argument_managed_buffer(arg_index, mbuf_temp_1.clone());
-        Self::managed_type_impl().mb_len(mbuf_temp_1)
+        self.load_argument_managed_buffer(arg_index, &mbuf_temp_1);
+        Self::managed_type_impl().mb_len(&mbuf_temp_1)
     }
 
     fn get_argument_boxed_bytes(&self, arg_index: i32) -> BoxedBytes {
         let mbuf_temp_1: Self::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        self.load_argument_managed_buffer(arg_index, mbuf_temp_1.clone());
-        Self::managed_type_impl().mb_to_boxed_bytes(mbuf_temp_1)
+        self.load_argument_managed_buffer(arg_index, &mbuf_temp_1);
+        Self::managed_type_impl().mb_to_boxed_bytes(&mbuf_temp_1)
     }
 
-    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: Self::BigIntHandle) {
+    fn load_argument_big_int_unsigned(&self, arg_index: i32, dest: &Self::BigIntHandle) {
         let mbuf_temp_1: Self::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        self.load_argument_managed_buffer(arg_index, mbuf_temp_1.clone());
-        Self::managed_type_impl().mb_to_big_int_unsigned(mbuf_temp_1, dest);
+        self.load_argument_managed_buffer(arg_index, &mbuf_temp_1);
+        Self::managed_type_impl().mb_to_big_int_unsigned(&mbuf_temp_1, dest);
     }
 
-    fn load_argument_big_int_signed(&self, arg_index: i32, dest: Self::BigIntHandle) {
+    fn load_argument_big_int_signed(&self, arg_index: i32, dest: &Self::BigIntHandle) {
         let mbuf_temp_1: Self::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        self.load_argument_managed_buffer(arg_index, mbuf_temp_1.clone());
-        Self::managed_type_impl().mb_to_big_int_signed(mbuf_temp_1, dest);
+        self.load_argument_managed_buffer(arg_index, &mbuf_temp_1);
+        Self::managed_type_impl().mb_to_big_int_signed(&mbuf_temp_1, dest);
     }
 
     fn get_argument_u64(&self, arg_index: i32) -> u64 {
         // TODO: this implementation doesn't work for arguments > i64::MAX, fix it!
         let big_int_temp_1: Self::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        self.load_argument_big_int_unsigned(arg_index, big_int_temp_1.clone());
-        if let Some(value) = Self::managed_type_impl().bi_to_i64(big_int_temp_1) {
+        self.load_argument_big_int_unsigned(arg_index, &big_int_temp_1);
+        if let Some(value) = Self::managed_type_impl().bi_to_i64(&big_int_temp_1) {
             value as u64
         } else {
             Self::error_api_impl().signal_error(err_msg::ARG_OUT_OF_RANGE.as_bytes())
@@ -65,13 +65,13 @@ pub trait EndpointArgumentApiImpl: ErrorApi + ManagedTypeApi {
 
     fn get_argument_i64(&self, arg_index: i32) -> i64 {
         let big_int_temp_1: Self::BigIntHandle = use_raw_handle(const_handles::BIG_INT_TEMPORARY_1);
-        self.load_argument_big_int_signed(arg_index, big_int_temp_1.clone());
-        if let Some(value) = Self::managed_type_impl().bi_to_i64(big_int_temp_1) {
+        self.load_argument_big_int_signed(arg_index, &big_int_temp_1);
+        if let Some(value) = Self::managed_type_impl().bi_to_i64(&big_int_temp_1) {
             value
         } else {
             Self::error_api_impl().signal_error(err_msg::ARG_OUT_OF_RANGE.as_bytes())
         }
     }
 
-    fn load_callback_closure_buffer(&self, dest: Self::ManagedBufferHandle);
+    fn load_callback_closure_buffer(&self, dest: &Self::ManagedBufferHandle);
 }

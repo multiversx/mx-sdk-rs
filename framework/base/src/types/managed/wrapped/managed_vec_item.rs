@@ -13,7 +13,7 @@ use crate::{
 /// in the underlying managed buffer.
 /// Not all data needs to be stored as payload, for instance for most managed types
 /// the payload is just the handle, whereas the mai ndata is kept by the VM.
-pub trait ManagedVecItem: 'static {
+pub trait ManagedVecItem: 'static where Self: Sized {
     /// Size of the data stored in the underlying `ManagedBuffer`.
     const PAYLOAD_SIZE: usize;
 
@@ -45,6 +45,8 @@ pub trait ManagedVecItem: 'static {
     ) -> Self::Ref<'a>;
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R;
+
+    fn take_handle_ownership(&mut self);
 }
 
 macro_rules! impl_int {
@@ -68,6 +70,8 @@ macro_rules! impl_int {
                 let bytes = self.to_be_bytes();
                 writer(&bytes)
             }
+
+            fn take_handle_ownership(&mut self) {}
         }
     };
 }
@@ -99,6 +103,8 @@ impl ManagedVecItem for usize {
         let bytes = (*self as u32).to_be_bytes();
         writer(&bytes)
     }
+
+    fn take_handle_ownership(&mut self) {}
 }
 
 impl ManagedVecItem for bool {
@@ -122,6 +128,8 @@ impl ManagedVecItem for bool {
         let u8_value = u8::from(*self);
         <u8 as ManagedVecItem>::to_byte_writer(&u8_value, writer)
     }
+
+    fn take_handle_ownership(&mut self) {}
 }
 
 impl<T> ManagedVecItem for Option<T>
@@ -161,6 +169,12 @@ where
         }
         writer(&byte_arr[..])
     }
+
+    fn take_handle_ownership(&mut self) {
+        if let Some(value) = self {
+            value.take_handle_ownership()
+        }
+    }
 }
 
 macro_rules! impl_managed_type {
@@ -184,6 +198,10 @@ macro_rules! impl_managed_type {
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
                 <$ty<M> as ManagedType<M>>::OwnHandle::to_byte_writer(&self.get_handle(), writer)
+            }
+
+            fn take_handle_ownership(&mut self) {
+                self.take_handle_ref();
             }
         }
     };
@@ -221,6 +239,10 @@ where
             &self.get_handle(),
             writer,
         )
+    }
+
+    fn take_handle_ownership(&mut self) {
+        self.buffer.take_handle_ownership()
     }
 }
 
@@ -266,6 +288,12 @@ where
         }
         writer(&byte_arr[..])
     }
+
+    fn take_handle_ownership(&mut self) {
+        for item in self {
+            item.take_handle_ownership()
+        }
+    }
 }
 
 impl<M, T> ManagedVecItem for ManagedVec<M, T>
@@ -291,5 +319,9 @@ where
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, writer: Writer) -> R {
         <M::ManagedBufferHandle as ManagedVecItem>::to_byte_writer(&self.get_handle(), writer)
+    }
+
+    fn take_handle_ownership(&mut self) {
+        self.take_handle_ref();
     }
 }

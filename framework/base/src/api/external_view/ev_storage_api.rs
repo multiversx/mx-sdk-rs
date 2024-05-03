@@ -28,14 +28,14 @@ where
         let external_view_target_key_handle: A::ManagedBufferHandle =
             use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::managed_type_impl().mb_overwrite(
-            external_view_target_key_handle.clone(),
+            &external_view_target_key_handle,
             EXTERNAL_VIEW_TARGET_ADRESS_KEY,
         );
         let external_view_target_address_handle: A::ManagedBufferHandle =
             use_raw_handle(A::static_var_api_impl().next_handle());
         A::storage_read_api_impl().storage_load_managed_buffer_raw(
-            external_view_target_key_handle,
-            external_view_target_address_handle.clone(),
+            &external_view_target_key_handle,
+            &external_view_target_address_handle
         );
         A::static_var_api_impl().set_external_view_target_address_handle(
             external_view_target_address_handle.get_raw_handle(),
@@ -50,13 +50,13 @@ impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
 
     fn storage_load_managed_buffer_raw(
         &self,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     ) {
         let target_address_handle =
             use_raw_handle(A::static_var_api_impl().get_external_view_target_address_handle());
         A::storage_read_api_impl().storage_load_from_address(
-            target_address_handle,
+            &target_address_handle,
             key_handle,
             dest,
         );
@@ -64,9 +64,9 @@ impl<A: VMApi> StorageReadApiImpl for ExternalViewApi<A> {
 
     fn storage_load_from_address(
         &self,
-        address_handle: Self::ManagedBufferHandle,
-        key_handle: Self::ManagedBufferHandle,
-        dest: Self::ManagedBufferHandle,
+        address_handle: &Self::ManagedBufferHandle,
+        key_handle: &Self::ManagedBufferHandle,
+        dest: &Self::ManagedBufferHandle,
     ) {
         A::storage_read_api_impl().storage_load_from_address(address_handle, key_handle, dest);
     }

@@ -1,8 +1,8 @@
 use crate::{
     abi::TypeName,
     api::{
-        use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
-        ManagedTypeApi, StaticVarApiImpl,
+        ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl, ManagedTypeApi,
+        StaticVarApiImpl, use_raw_handle,
     },
     codec::{
         CodecFrom, CodecFromSelf, DecodeErrorHandler, Empty, EncodeErrorHandler, NestedDecode,
@@ -10,15 +10,22 @@ use crate::{
         TopEncodeOutput, TryStaticCast,
     },
     formatter::{
-        hex_util::encode_bytes_as_hex, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex,
+        FormatByteReceiver, hex_util::encode_bytes_as_hex, SCBinary, SCDisplay, SCLowerHex,
     },
     types::{heap::BoxedBytes, ManagedType, StaticBufferRef},
 };
+use crate::api::ManagedTypeApiImpl;
 
 /// A byte buffer managed by an external API.
 #[repr(transparent)]
 pub struct ManagedBuffer<M: ManagedTypeApi> {
     pub(crate) handle: M::ManagedBufferHandle,
+}
+
+impl<M: ManagedTypeApi> Drop for ManagedBuffer<M> {
+    fn drop(&mut self) {
+        M::managed_type_impl().drop_managed_buffer_handle(self.handle.take_handle_ref());
+    }
 }
 
 impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
@@ -29,8 +36,16 @@ impl<M: ManagedTypeApi> ManagedType<M> for ManagedBuffer<M> {
         ManagedBuffer { handle }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
-        self.handle.clone()
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
+        &self.handle
+    }
+
+    fn take_handle(mut self) -> Self::OwnHandle {
+        self.handle.take_handle_ref()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.handle.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
@@ -44,7 +59,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
         // TODO: remove after VM no longer crashes with "unknown handle":
-        M::managed_type_impl().mb_overwrite(new_handle.clone(), &[]);
+        M::managed_type_impl().mb_overwrite(&new_handle, &[]);
         ManagedBuffer::from_handle(new_handle)
     }
 
@@ -52,7 +67,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn new_from_bytes(bytes: &[u8]) -> Self {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_overwrite(new_handle.clone(), bytes);
+        M::managed_type_impl().mb_overwrite(&new_handle, bytes);
         ManagedBuffer::from_handle(new_handle)
     }
 
@@ -60,7 +75,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     pub fn new_random(nr_bytes: usize) -> Self {
         let new_handle: M::ManagedBufferHandle =
             use_raw_handle(M::static_var_api_impl().next_handle());
-        M::managed_type_impl().mb_set_random(new_handle.clone(), nr_bytes);
+        M::managed_type_impl().mb_set_random(&new_handle, nr_bytes);
         ManagedBuffer::from_handle(new_handle)
     }
 
@@ -169,7 +184,7 @@ impl<M: ManagedTypeApi> Default for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> ManagedBuffer<M> {
     #[inline]
     pub fn len(&self) -> usize {
-        M::managed_type_impl().mb_len(self.handle.clone())
+        M::managed_type_impl().mb_len(&self.handle)
     }
 
     #[inline]
@@ -179,7 +194,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     /// Method provided for convenience in tests, not to be used in contracts.
     pub fn to_boxed_bytes(&self) -> BoxedBytes {
-        M::managed_type_impl().mb_to_boxed_bytes(self.handle.clone())
+        M::managed_type_impl().mb_to_boxed_bytes(&self.handle)
     }
 
     /// Method provided for convenience in tests, not to be used in contracts.
@@ -195,7 +210,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         starting_position: usize,
         dest_slice: &mut [u8],
     ) -> Result<(), InvalidSliceError> {
-        M::managed_type_impl().mb_load_slice(self.handle.clone(), starting_position, dest_slice)
+        M::managed_type_impl().mb_load_slice(&self.handle, starting_position, dest_slice)
     }
 
     pub fn copy_slice(
@@ -206,10 +221,10 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         let api = M::managed_type_impl();
         let result_handle = api.mb_new_empty();
         let err_result = api.mb_copy_slice(
-            self.handle.clone(),
+            &self.handle,
             starting_position,
             slice_len,
-            result_handle.clone(),
+            &result_handle,
         );
         if err_result.is_ok() {
             Some(ManagedBuffer::from_handle(result_handle))
@@ -245,7 +260,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
 
     #[inline]
     pub fn overwrite(&mut self, value: &[u8]) {
-        M::managed_type_impl().mb_overwrite(self.handle.clone(), value);
+        M::managed_type_impl().mb_overwrite(&self.handle, value);
     }
 
     pub fn set_slice(
@@ -254,7 +269,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         source_slice: &[u8],
     ) -> Result<(), InvalidSliceError> {
         if let Ok(()) = M::managed_type_impl().mb_set_slice(
-            self.handle.clone(),
+            &self.handle,
             starting_position,
             source_slice,
         ) {
@@ -265,22 +280,22 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
     }
 
     pub fn set_random(&mut self, nr_bytes: usize) {
-        M::managed_type_impl().mb_set_random(self.handle.clone(), nr_bytes);
+        M::managed_type_impl().mb_set_random(&self.handle, nr_bytes);
     }
 
     #[inline]
     pub fn append(&mut self, other: &ManagedBuffer<M>) {
-        M::managed_type_impl().mb_append(self.handle.clone(), other.handle.clone());
+        M::managed_type_impl().mb_append(&self.handle, &other.handle);
     }
 
     #[inline(always)]
     pub fn append_bytes(&mut self, slice: &[u8]) {
-        M::managed_type_impl().mb_append_bytes(self.handle.clone(), slice);
+        M::managed_type_impl().mb_append_bytes(&self.handle, slice);
     }
 
     /// Utility function: helps serialize lengths (or any other value of type usize) easier.
     pub fn append_u32_be(&mut self, item: u32) {
-        M::managed_type_impl().mb_append_bytes(self.handle.clone(), &item.to_be_bytes()[..]);
+        M::managed_type_impl().mb_append_bytes(&self.handle, &item.to_be_bytes()[..]);
     }
 
     /// Concatenates 2 managed buffers. Consumes both arguments in the process.
@@ -302,7 +317,7 @@ impl<M: ManagedTypeApi> ManagedBuffer<M> {
         }
         let mut bytes = [0u8; U64_NUM_BYTES];
         if M::managed_type_impl()
-            .mb_load_slice(self.handle.clone(), 0, &mut bytes[U64_NUM_BYTES - l..])
+            .mb_load_slice(&self.handle, 0, &mut bytes[U64_NUM_BYTES - l..])
             .is_err()
         {
             None
@@ -316,7 +331,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
     fn clone(&self) -> Self {
         let api = M::managed_type_impl();
         let clone_handle = api.mb_new_empty();
-        api.mb_append(clone_handle.clone(), self.handle.clone());
+        api.mb_append(&clone_handle, &self.handle);
         ManagedBuffer::from_handle(clone_handle)
     }
 }
@@ -324,7 +339,7 @@ impl<M: ManagedTypeApi> Clone for ManagedBuffer<M> {
 impl<M: ManagedTypeApi> PartialEq for ManagedBuffer<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
-        M::managed_type_impl().mb_eq(self.handle.clone(), other.handle.clone())
+        M::managed_type_impl().mb_eq(&self.handle, &other.handle)
     }
 }
 
@@ -337,7 +352,7 @@ impl<M: ManagedTypeApi, const N: usize> PartialEq<&[u8; N]> for ManagedBuffer<M>
             return false;
         }
         let mut self_bytes = [0u8; N];
-        let _ = M::managed_type_impl().mb_load_slice(self.handle.clone(), 0, &mut self_bytes[..]);
+        let _ = M::managed_type_impl().mb_load_slice(&self.handle, 0, &mut self_bytes[..]);
         &self_bytes[..] == &other[..]
     }
 }
@@ -440,9 +455,12 @@ impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCDisplay for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
-        f.append_managed_buffer(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        let buffer = ManagedBuffer::from_handle(
+            unsafe { self.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+        );
+        f.append_managed_buffer(&buffer);
+
+        let _ = buffer.take_handle();
     }
 }
 
@@ -450,7 +468,7 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         let hex_handle: M::ManagedBufferHandle =
             use_raw_handle(crate::api::const_handles::MBUF_TEMPORARY_1);
-        M::managed_type_impl().mb_to_hex(self.handle.clone(), hex_handle.clone());
+        M::managed_type_impl().mb_to_hex(&self.handle, &hex_handle);
         f.append_managed_buffer(&ManagedBuffer::from_handle(
             hex_handle.cast_or_signal_error::<M, _>(),
         ));
@@ -459,17 +477,21 @@ impl<M: ManagedTypeApi> SCLowerHex for ManagedBuffer<M> {
 
 impl<M: ManagedTypeApi> SCBinary for ManagedBuffer<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
+        let buffer = ManagedBuffer::from_handle(
+            unsafe { self.get_unsafe_handle().cast_or_signal_error::<M, _>() }
+        );
         // TODO: in Rust thr `0b` prefix appears only when writing "{:#x}", not "{:x}"
-        f.append_managed_buffer_binary(&ManagedBuffer::from_handle(
-            self.get_handle().cast_or_signal_error::<M, _>(),
-        ));
+        f.append_managed_buffer_binary(&buffer);
+
+        let _ = buffer.take_handle();
+
     }
 }
 
 impl<M: ManagedTypeApi> core::fmt::Debug for ManagedBuffer<M> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("ManagedBuffer")
-            .field("handle", &self.handle.clone())
+            .field("handle", &self.handle)
             .field(
                 "hex-value",
                 &encode_bytes_as_hex(self.to_boxed_bytes().as_slice()),

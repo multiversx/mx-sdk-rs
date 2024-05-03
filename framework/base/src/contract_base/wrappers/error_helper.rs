@@ -1,4 +1,4 @@
-use core::{borrow::Borrow, marker::PhantomData};
+use core::marker::PhantomData;
 
 use crate::codec::{DecodeError, EncodeError};
 
@@ -71,13 +71,11 @@ impl<M: ManagedTypeApi> IntoSignalError<M> for DecodeError {
     }
 }
 
-// Handles `ManagedBuffer`, `&ManagedBuffer` and `ManagedRef<ManagedBuffer>`.
-impl<M, B> IntoSignalError<M> for B
+impl<M> IntoSignalError<M> for ManagedBuffer<M>
 where
     M: ManagedTypeApi,
-    B: Borrow<ManagedBuffer<M>>,
 {
     fn signal_error_with_message(self) -> ! {
-        M::error_api_impl().signal_error_from_buffer(self.borrow().get_handle())
+        M::error_api_impl().signal_error_from_buffer(self.take_handle())
     }
 }

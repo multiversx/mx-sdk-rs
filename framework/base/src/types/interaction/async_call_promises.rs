@@ -42,7 +42,7 @@ where
         use crate::{api::const_handles, types::ManagedType};
 
         let mut cb_closure_args_serialized =
-            ManagedBuffer::<SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1);
+            unsafe { ManagedBuffer::<SA>::from_raw_handle(const_handles::MBUF_TEMPORARY_1) };
         let callback_name;
         if let Some(callback_call) = self.callback_call {
             callback_name = callback_call.callback_name;
@@ -64,6 +64,8 @@ where
             self.explicit_gas_limit,
             self.extra_gas_for_callback,
             &cb_closure_args_serialized,
-        )
+        );
+
+        cb_closure_args_serialized.take_handle();
     }
 }

@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
 use multiversx_chain_vm::{
-    executor::{BreakpointValue, VMHooks},
+    executor::BreakpointValue,
     tx_mock::{TxContext, TxContextRef, TxContextStack, TxPanic},
     vm_hooks::{DebugApiVMHooksHandler, VMHooksDispatcher},
 };
+use multiversx_chain_vm::vm_hooks::CleanableVMHooks;
 use multiversx_sc::err_msg;
 
 use crate::debug_executor::{StaticVarData, StaticVarStack};
@@ -19,7 +20,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks<R, F>(f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         let top_context = TxContextStack::static_peek();
         let wrapper = DebugApiVMHooksHandler::new(top_context);
@@ -29,7 +30,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks_ctx_1<R, F>(handle: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         let wrapper = DebugApiVMHooksHandler::new(handle.context);
         let dispatcher = VMHooksDispatcher::new(Box::new(wrapper));
@@ -38,7 +39,7 @@ impl VMHooksApiBackend for DebugApiBackend {
 
     fn with_vm_hooks_ctx_2<R, F>(handle1: Self::HandleType, handle2: Self::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         Self::with_vm_hooks_ctx_1(handle1, f)
@@ -51,7 +52,7 @@ impl VMHooksApiBackend for DebugApiBackend {
         f: F,
     ) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         assert_handles_on_same_context(&handle1, &handle2);
         assert_handles_on_same_context(&handle1, &handle3);

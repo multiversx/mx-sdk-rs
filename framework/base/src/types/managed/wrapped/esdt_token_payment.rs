@@ -220,4 +220,10 @@ impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
 
         writer(&arr[..])
     }
+
+    fn take_handle_ownership(&mut self) {
+        self.token_identifier.take_handle_ownership();
+        self.token_nonce.take_handle_ownership();
+        self.amount.take_handle_ownership();
+    }
 }

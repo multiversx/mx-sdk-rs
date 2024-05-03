@@ -103,7 +103,7 @@ where
     fn handle_error(&self, err: EncodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);
         message_buffer.append_bytes(err.message_bytes());
-        M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
+        M::error_api_impl().signal_error_from_buffer(message_buffer.take_handle())
     }
 }
 
@@ -116,6 +116,6 @@ where
     fn handle_error(&self, err: DecodeError) -> Self::HandledErr {
         let mut message_buffer = ManagedBuffer::<M>::new_from_bytes(self.base_message);
         message_buffer.append_bytes(err.message_bytes());
-        M::error_api_impl().signal_error_from_buffer(message_buffer.get_handle())
+        M::error_api_impl().signal_error_from_buffer(message_buffer.take_handle())
     }
 }

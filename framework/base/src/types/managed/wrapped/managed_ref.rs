@@ -5,6 +5,32 @@ use crate::codec::{
 };
 
 use crate::{api::ManagedTypeApi, types::ManagedType};
+use crate::api::UnsafeClone;
+
+pub(super) enum ValueOrRef<'a, T> {
+    Value(T),
+    Ref(&'a T),
+}
+
+impl<'a, T> Deref for ValueOrRef<'a, T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        match *self {
+            ValueOrRef::Value(ref val) => val,
+            ValueOrRef::Ref(ref_val) => ref_val,
+        }
+    }
+}
+
+impl<'a, T: UnsafeClone> UnsafeClone for ValueOrRef<'a, T> {
+    unsafe fn unsafe_clone(&self) -> Self {
+        match self {
+            ValueOrRef::Value(value) => { ValueOrRef::Value(value.unsafe_clone()) }
+            ValueOrRef::Ref(reference) => { ValueOrRef::Ref(reference) }
+        }
+    }
+}
 
 /// A very efficient reference to a managed type, with copy semantics.
 ///
@@ -16,7 +42,7 @@ where
 {
     pub(super) _phantom_m: PhantomData<M>,
     pub(super) _phantom_t: PhantomData<&'a T>,
-    pub(super) handle: T::OwnHandle,
+    pub(super) handle: ValueOrRef<'a, T::OwnHandle>,
 }
 
 impl<'a, M, T> ManagedRef<'a, M, T>
@@ -28,24 +54,32 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: value.get_handle(),
+            handle: ValueOrRef::Ref(value.get_handle()),
         }
     }
 
-    /// Will completely disregard lifetimes, use with care.
     #[doc(hidden)]
-    pub(crate) unsafe fn wrap_handle(handle: T::OwnHandle) -> Self {
+    pub(crate) fn wrap_handle_ref(handle_ref: &'a T::OwnHandle) -> Self {
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle,
+            handle: ValueOrRef::Ref(handle_ref),
+        }
+    }
+
+    #[doc(hidden)]
+    pub(crate) fn wrap_handle(handle: T::OwnHandle) -> Self {
+        Self {
+            _phantom_m: PhantomData,
+            _phantom_t: PhantomData,
+            handle: ValueOrRef::Value(handle),
         }
     }
 
     #[doc(hidden)]
     #[inline]
-    pub fn get_raw_handle_of_ref(self) -> T::OwnHandle {
-        self.handle
+    pub fn get_raw_handle_of_ref(&'a self) -> &'a T::OwnHandle {
+        &self.handle
     }
 }
 
@@ -69,7 +103,7 @@ where
         Self {
             _phantom_m: PhantomData,
             _phantom_t: PhantomData,
-            handle: self.handle.clone(),
+            handle: unsafe { self.handle.unsafe_clone() }, // Fine thanks to the lifetime 'a which ensures the handle won't be dropped
         }
     }
 }

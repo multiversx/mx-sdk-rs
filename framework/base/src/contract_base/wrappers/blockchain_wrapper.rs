@@ -15,6 +15,7 @@ use crate::{
         ManagedVec, TokenIdentifier,
     },
 };
+use crate::imports::AsTokenIdentifierHandle;
 
 /// Interface to be used by the actual smart contract code.
 ///
@@ -50,7 +51,7 @@ where
     #[inline]
     pub fn get_caller(&self) -> ManagedAddress<A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_caller_managed(handle.clone());
+        A::blockchain_api_impl().load_caller_managed(&handle);
         ManagedAddress::from_handle(handle)
     }
 
@@ -64,14 +65,14 @@ where
     #[inline]
     pub fn get_sc_address(&self) -> ManagedAddress<A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_sc_address_managed(handle.clone());
+        A::blockchain_api_impl().load_sc_address_managed(&handle);
         ManagedAddress::from_handle(handle)
     }
 
     #[inline]
     pub fn get_owner_address(&self) -> ManagedAddress<A> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_owner_address_managed(handle.clone());
+        A::blockchain_api_impl().load_owner_address_managed(&handle);
         ManagedAddress::from_handle(handle)
     }
 
@@ -83,8 +84,8 @@ where
 
     pub fn check_caller_is_user_account(&self) {
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
-        A::blockchain_api_impl().load_caller_managed(mbuf_temp_1.clone());
-        if A::blockchain_api_impl().is_smart_contract(mbuf_temp_1) {
+        A::blockchain_api_impl().load_caller_managed(&mbuf_temp_1);
+        if A::blockchain_api_impl().is_smart_contract(&mbuf_temp_1) {
             A::error_api_impl().signal_error(ONLY_USER_ACCOUNT_CALLER);
         }
     }
@@ -124,14 +125,14 @@ where
     #[inline]
     pub fn get_balance_legacy(&self, address: &crate::types::Address) -> BigUint<A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_balance_legacy(handle.clone(), address);
+        A::blockchain_api_impl().load_balance_legacy(&handle, address);
         BigUint::from_handle(handle)
     }
 
     #[inline]
     pub fn get_balance(&self, address: &ManagedAddress<A>) -> BigUint<A> {
         let handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_balance(handle.clone(), address.get_handle());
+        A::blockchain_api_impl().load_balance(&handle, address.get_handle());
         BigUint::from_handle(handle)
     }
 
@@ -139,7 +140,7 @@ where
     pub fn get_code_metadata(&self, address: &ManagedAddress<A>) -> CodeMetadata {
         let mbuf_temp_1: A::ManagedBufferHandle = use_raw_handle(const_handles::MBUF_TEMPORARY_1);
         A::blockchain_api_impl()
-            .managed_get_code_metadata(address.get_handle(), mbuf_temp_1.clone());
+            .managed_get_code_metadata(address.get_handle(), &mbuf_temp_1);
         let mut buffer = [0u8; 2];
         ManagedBuffer::<A>::from_handle(mbuf_temp_1).load_to_byte_array(&mut buffer);
         CodeMetadata::from(buffer)
@@ -152,12 +153,11 @@ where
 
     #[inline]
     pub fn get_sc_balance(&self, token: &EgldOrEsdtTokenIdentifier<A>, nonce: u64) -> BigUint<A> {
-        token.map_ref_or_else(
-            || self.get_balance(&self.get_sc_address()),
-            |token_identifier| {
-                self.get_esdt_balance(&self.get_sc_address(), token_identifier, nonce)
-            },
-        )
+        if token.is_egld() {
+            self.get_balance(&self.get_sc_address())
+        } else {
+            self.get_esdt_balance(&self.get_sc_address(), &token.unwrap_esdt_ref(), nonce)
+        }
     }
 
     #[deprecated(
@@ -173,7 +173,7 @@ where
     #[inline]
     pub fn get_state_root_hash(&self) -> ManagedByteArray<A, 32> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_state_root_hash_managed(handle.clone());
+        A::blockchain_api_impl().load_state_root_hash_managed(&handle);
         ManagedByteArray::from_handle(handle)
     }
 
@@ -187,7 +187,7 @@ where
     #[inline]
     pub fn get_tx_hash(&self) -> ManagedByteArray<A, 32> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_tx_hash_managed(handle.clone());
+        A::blockchain_api_impl().load_tx_hash_managed(&handle);
         ManagedByteArray::from_handle(handle)
     }
 
@@ -229,7 +229,7 @@ where
     #[inline]
     pub fn get_block_random_seed(&self) -> ManagedByteArray<A, 48> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_block_random_seed_managed(handle.clone());
+        A::blockchain_api_impl().load_block_random_seed_managed(&handle);
         ManagedByteArray::from_handle(handle)
     }
 
@@ -266,7 +266,7 @@ where
     #[inline]
     pub fn get_prev_block_random_seed(&self) -> ManagedByteArray<A, 48> {
         let handle: A::ManagedBufferHandle = use_raw_handle(A::static_var_api_impl().next_handle());
-        A::blockchain_api_impl().load_prev_block_random_seed_managed(handle.clone());
+        A::blockchain_api_impl().load_prev_block_random_seed_managed(&handle);
         ManagedByteArray::from_handle(handle)
     }
 
@@ -281,18 +281,21 @@ where
     }
 
     #[inline]
-    pub fn get_esdt_balance(
+    pub fn get_esdt_balance<H>(
         &self,
         address: &ManagedAddress<A>,
-        token_id: &TokenIdentifier<A>,
+        token_id: &H,
         nonce: u64,
-    ) -> BigUint<A> {
+    ) -> BigUint<A>
+    where
+        H: AsTokenIdentifierHandle<A>
+    {
         let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
         A::blockchain_api_impl().load_esdt_balance(
             address.get_handle(),
-            token_id.get_handle(),
+            token_id.as_token_identifier_handle(),
             nonce,
-            result_handle.clone(),
+            &result_handle,
         );
         BigUint::from_handle(result_handle)
     }
@@ -336,25 +339,27 @@ where
             EsdtTokenType::NonFungible
         };
 
-        if managed_api_impl.mb_len(creator_handle.clone()) == 0 {
-            managed_api_impl.mb_overwrite(creator_handle.clone(), &[0u8; 32][..]);
+        if managed_api_impl.mb_len(&creator_handle) == 0 {
+            managed_api_impl.mb_overwrite(&creator_handle, &[0u8; 32][..]);
         }
 
         // here we trust Arwen that it always gives us a properties buffer of length 2
         let mut properties_bytes = [0u8; 2];
-        let _ = managed_api_impl.mb_load_slice(properties_handle, 0, &mut properties_bytes[..]);
+        let _ = managed_api_impl.mb_load_slice(&properties_handle, 0, &mut properties_bytes[..]);
         let frozen = esdt_is_frozen(&properties_bytes);
 
-        EsdtTokenData {
-            token_type,
-            amount: BigUint::from_raw_handle(value_handle.get_raw_handle()),
-            frozen,
-            hash: ManagedBuffer::from_raw_handle(hash_handle.get_raw_handle()),
-            name: ManagedBuffer::from_raw_handle(name_handle.get_raw_handle()),
-            attributes: ManagedBuffer::from_raw_handle(attributes_handle.get_raw_handle()),
-            creator: ManagedAddress::from_raw_handle(creator_handle.get_raw_handle()),
-            royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
-            uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
+        unsafe {
+            EsdtTokenData {
+                token_type,
+                amount: BigUint::from_raw_handle(value_handle.get_raw_handle()),
+                frozen,
+                hash: ManagedBuffer::from_raw_handle(hash_handle.get_raw_handle()),
+                name: ManagedBuffer::from_raw_handle(name_handle.get_raw_handle()),
+                attributes: ManagedBuffer::from_raw_handle(attributes_handle.get_raw_handle()),
+                creator: ManagedAddress::from_raw_handle(creator_handle.get_raw_handle()),
+                royalties: BigUint::from_raw_handle(royalties_handle.get_raw_handle()),
+                uris: ManagedVec::from_raw_handle(uris_handle.get_raw_handle()),
+            }
         }
     }
 
@@ -374,9 +379,11 @@ where
             call_value_handle.get_raw_handle(),
         );
 
-        BackTransfers {
-            total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
-            esdt_payments: ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+        unsafe {
+            BackTransfers {
+                total_egld_amount: BigUint::from_raw_handle(call_value_handle.get_raw_handle()),
+                esdt_payments: ManagedVec::from_raw_handle(esdt_transfer_value_handle.get_raw_handle()),
+            }
         }
     }
 
@@ -433,17 +440,17 @@ where
 
         // prepare key
         A::managed_type_impl().mb_overwrite(
-            temp_handle_1.clone(),
+            &temp_handle_1,
             storage::protected_keys::ELROND_REWARD_KEY,
         );
 
         // load value
         A::storage_read_api_impl()
-            .storage_load_managed_buffer_raw(temp_handle_1, temp_handle_2.clone());
+            .storage_load_managed_buffer_raw(&temp_handle_1, &temp_handle_2);
         let result_handle: A::BigIntHandle = use_raw_handle(A::static_var_api_impl().next_handle());
 
         // convert value to BigUint
-        A::managed_type_impl().mb_to_big_int_unsigned(temp_handle_2, result_handle.clone());
+        A::managed_type_impl().mb_to_big_int_unsigned(&temp_handle_2, &result_handle);
 
         //wrap
         BigUint::from_handle(result_handle)

@@ -1,11 +1,12 @@
+use std::marker::PhantomData;
+
+use multiversx_chain_vm::executor::MemPtr;
+use multiversx_chain_vm::vm_hooks::CleanableVMHooks;
+use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl, UnsafeClone};
+
 use crate::debug_executor::StaticVarData;
 
 use super::VMHooksApiBackend;
-
-use std::marker::PhantomData;
-
-use multiversx_chain_vm::executor::{MemPtr, VMHooks};
-use multiversx_sc::api::{HandleTypeInfo, ManagedBufferApiImpl};
 
 #[derive(Clone, Debug)]
 pub struct VMHooksApi<S: VMHooksApiBackend> {
@@ -22,7 +23,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// All communication with the VM happens via this method.
     pub fn with_vm_hooks<R, F>(&self, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
         VHB::with_vm_hooks(f)
     }
@@ -30,9 +31,11 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// Works with the VM hooks given by the context of 1 handle.
     pub fn with_vm_hooks_ctx_1<R, F>(&self, handle: &VHB::HandleType, f: F) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
-        VHB::with_vm_hooks_ctx_1(handle.clone(), f)
+        // It's fine to clone because the handle won't be wrapped in a new ManagedType
+        let handle = unsafe { handle.unsafe_clone() };
+        VHB::with_vm_hooks_ctx_1(handle, f)
     }
 
     /// Works with the VM hooks given by the context of 2 handles.
@@ -43,9 +46,11 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         f: F,
     ) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
-        VHB::with_vm_hooks_ctx_2(handle1.clone(), handle2.clone(), f)
+        // It's fine to clone because the handles won't be wrapped in new ManagedTypes
+        let (handle1, handle2) = unsafe { (handle1.unsafe_clone(), handle2.unsafe_clone()) };
+        VHB::with_vm_hooks_ctx_2(handle1, handle2, f)
     }
 
     /// Works with the VM hooks given by the context of 3 handles.
@@ -57,9 +62,11 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         f: F,
     ) -> R
     where
-        F: FnOnce(&dyn VMHooks) -> R,
+        F: FnOnce(&dyn CleanableVMHooks) -> R,
     {
-        VHB::with_vm_hooks_ctx_3(handle1.clone(), handle2.clone(), handle3.clone(), f)
+        // It's fine to clone because the handles won't be wrapped in new ManagedTypes
+        let (handle1, handle2, handle3) = unsafe { (handle1.unsafe_clone(), handle2.unsafe_clone(), handle3.unsafe_clone()) };
+        VHB::with_vm_hooks_ctx_3(handle1, handle2, handle3, f)
     }
 
     /// Checks that the handle refers to the current active context (if possible).
@@ -86,7 +93,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// The buffer is 32 bytes long, enough for both addresses and token identifiers.
     pub(crate) fn with_temp_buffer_ptr<R, F>(
         &self,
-        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        handle: &<Self as HandleTypeInfo>::ManagedBufferHandle,
         length: usize,
         f: F,
     ) -> R
@@ -94,7 +101,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
         F: FnOnce(MemPtr) -> R,
     {
         let mut temp_buffer = [0u8; 32];
-        self.mb_load_slice(handle, 0, &mut temp_buffer[..length])
+        self.mb_load_slice(&handle, 0, &mut temp_buffer[..length])
             .expect("error extracting address bytes");
         f(temp_buffer.as_ptr() as MemPtr)
     }
@@ -102,7 +109,7 @@ impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {
     /// Convenience method for calling VM hooks with a pointer to a temporary buffer in which we load an address.
     pub(crate) fn with_temp_address_ptr<R, F>(
         &self,
-        handle: <Self as HandleTypeInfo>::ManagedBufferHandle,
+        handle: &<Self as HandleTypeInfo>::ManagedBufferHandle,
         f: F,
     ) -> R
     where

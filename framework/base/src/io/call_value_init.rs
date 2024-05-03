@@ -1,14 +1,15 @@
 use crate::{
     api::{
-        const_handles, use_raw_handle, CallValueApi, CallValueApiImpl, ErrorApi, ErrorApiImpl,
-        ManagedBufferApiImpl, ManagedTypeApi,
+        CallValueApi, CallValueApiImpl, const_handles, ErrorApi, ErrorApiImpl, ManagedBufferApiImpl,
+        ManagedTypeApi, use_raw_handle,
     },
     contract_base::CallValueWrapper,
     err_msg,
     types::{
-        BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedRef, ManagedType, ManagedVec,
+        BigUint, EgldOrEsdtTokenIdentifier, EsdtTokenPayment, ManagedType, ManagedVec,
     },
 };
+use crate::types::ManagedRef;
 
 /// Called initially in the generated code whenever no payable annotation is provided.
 pub fn not_payable<A>()
@@ -49,13 +50,13 @@ where
     let expected_token_handle: A::ManagedBufferHandle =
         use_raw_handle(const_handles::MBUF_TEMPORARY_1);
     A::managed_type_impl().mb_overwrite(
-        expected_token_handle.clone(),
+        &expected_token_handle,
         expected_tokend_identifier.as_bytes(),
     );
     let transfer = transfers.get(0);
     if !A::managed_type_impl().mb_eq(
         transfer.token_identifier.get_handle(),
-        expected_token_handle,
+        &expected_token_handle,
     ) {
         A::error_api_impl().signal_error(err_msg::BAD_TOKEN_PROVIDED.as_bytes());
     }

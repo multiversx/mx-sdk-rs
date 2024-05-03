@@ -1,9 +1,9 @@
 use crate::{
+    *,
     api::{ErrorApi, ManagedTypeApi},
     codec::*,
     contract_base::ExitCodecErrorHandler,
     types::{heap::BoxedBytes, ManagedBuffer, ManagedByteArray, ManagedType},
-    *,
 };
 
 pub struct StorageKey<A>
@@ -26,8 +26,16 @@ where
         }
     }
 
-    fn get_handle(&self) -> A::ManagedBufferHandle {
+    fn get_handle(&self) -> &A::ManagedBufferHandle {
         self.buffer.get_handle()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.buffer.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.buffer.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &A::ManagedBufferHandle) -> &Self {

@@ -36,12 +36,12 @@ macro_rules! binary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
         fn $method_name(
             &self,
-            dest: Self::BigFloatHandle,
-            x: Self::BigFloatHandle,
-            y: Self::BigFloatHandle,
+            dest: &Self::BigFloatHandle,
+            x: &Self::BigFloatHandle,
+            y: &Self::BigFloatHandle,
         ) {
             unsafe {
-                $hook_name(dest, x, y);
+                $hook_name(*dest, *x, *y);
             }
         }
     };
@@ -49,9 +49,9 @@ macro_rules! binary_op_wrapper {
 
 macro_rules! unary_op_wrapper {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle) {
+        fn $method_name(&self, dest: &Self::BigFloatHandle, x: &Self::BigFloatHandle) {
             unsafe {
-                $hook_name(dest, x);
+                $hook_name(*dest, *x);
             }
         }
     };
@@ -59,9 +59,9 @@ macro_rules! unary_op_wrapper {
 
 macro_rules! unary_op_method_big_int_handle {
     ($method_name:ident, $hook_name:ident) => {
-        fn $method_name(&self, dest: Self::BigIntHandle, x: Self::BigFloatHandle) {
+        fn $method_name(&self, dest: &Self::BigIntHandle, x: &Self::BigFloatHandle) {
             unsafe {
-                $hook_name(dest, x);
+                $hook_name(*dest, *x);
             }
         }
     };
@@ -101,13 +101,13 @@ impl BigFloatApiImpl for crate::api::VmApiImpl {
     unary_op_wrapper! {bf_abs, bigFloatAbs}
 
     #[inline]
-    fn bf_cmp(&self, x: Self::ManagedBufferHandle, y: Self::ManagedBufferHandle) -> Ordering {
-        unsafe { bigFloatCmp(x, y).cmp(&0) }
+    fn bf_cmp(&self, x: &Self::ManagedBufferHandle, y: &Self::ManagedBufferHandle) -> Ordering {
+        unsafe { bigFloatCmp(*x, *y).cmp(&0) }
     }
 
-    fn bf_sign(&self, x: Self::ManagedBufferHandle) -> Sign {
+    fn bf_sign(&self, x: &Self::ManagedBufferHandle) -> Sign {
         unsafe {
-            match bigFloatSign(x).cmp(&0) {
+            match bigFloatSign(*x).cmp(&0) {
                 Ordering::Greater => Sign::Plus,
                 Ordering::Equal => Sign::NoSign,
                 Ordering::Less => Sign::Minus,
@@ -118,9 +118,9 @@ impl BigFloatApiImpl for crate::api::VmApiImpl {
     unary_op_wrapper! {bf_clone, bigFloatClone}
     unary_op_wrapper! {bf_sqrt, bigFloatSqrt}
 
-    fn bf_pow(&self, dest: Self::BigFloatHandle, x: Self::BigFloatHandle, exp: i32) {
+    fn bf_pow(&self, dest: &Self::BigFloatHandle, x: &Self::BigFloatHandle, exp: i32) {
         unsafe {
-            bigFloatPow(dest, x, exp);
+            bigFloatPow(*dest, *x, exp);
         }
     }
 
@@ -129,31 +129,31 @@ impl BigFloatApiImpl for crate::api::VmApiImpl {
     unary_op_method_big_int_handle! {bf_trunc , bigFloatTruncate}
 
     #[inline]
-    fn bf_is_bi(&self, x: Self::BigFloatHandle) -> bool {
-        unsafe { 1 == bigFloatIsInt(x) }
+    fn bf_is_bi(&self, x: &Self::BigFloatHandle) -> bool {
+        unsafe { 1 == bigFloatIsInt(*x) }
     }
 
     #[inline]
-    fn bf_set_i64(&self, dest: Self::BigFloatHandle, value: i64) {
+    fn bf_set_i64(&self, dest: &Self::BigFloatHandle, value: i64) {
         unsafe {
-            bigFloatSetInt64(dest, value);
+            bigFloatSetInt64(*dest, value);
         }
     }
 
     #[inline]
-    fn bf_set_bi(&self, dest: Self::BigFloatHandle, x: Self::BigIntHandle) {
+    fn bf_set_bi(&self, dest: &Self::BigFloatHandle, x: &Self::BigIntHandle) {
         unsafe {
-            bigFloatSetBigInt(dest, x);
+            bigFloatSetBigInt(*dest, *x);
         }
     }
 
     #[inline]
-    fn bf_get_const_e(&self, dest: Self::BigFloatHandle) {
-        unsafe { bigFloatGetConstE(dest) }
+    fn bf_get_const_e(&self, dest: &Self::BigFloatHandle) {
+        unsafe { bigFloatGetConstE(*dest) }
     }
 
     #[inline]
-    fn bf_get_const_pi(&self, dest: Self::BigFloatHandle) {
-        unsafe { bigFloatGetConstPi(dest) }
+    fn bf_get_const_pi(&self, dest: &Self::BigFloatHandle) {
+        unsafe { bigFloatGetConstPi(*dest) }
     }
 }

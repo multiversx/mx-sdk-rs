@@ -39,8 +39,16 @@ where
         }
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
         self.buffer.get_handle()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.buffer.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.buffer.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {

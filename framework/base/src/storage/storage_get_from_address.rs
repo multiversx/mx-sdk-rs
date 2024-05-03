@@ -39,7 +39,7 @@ where
         A::storage_read_api_impl().storage_load_from_address(
             self.addr.get_handle(),
             self.key.buffer.get_handle(),
-            mbuf_handle.clone(),
+            &mbuf_handle,
         );
 
         ManagedBuffer::from_handle(mbuf_handle)
@@ -58,10 +58,10 @@ where
         A::storage_read_api_impl().storage_load_from_address(
             self.addr.get_handle(),
             self.key.buffer.get_handle(),
-            value_handle.clone(),
+            &value_handle,
         );
 
-        A::managed_type_impl().mb_len(value_handle)
+        A::managed_type_impl().mb_len(&value_handle)
     }
 }
 

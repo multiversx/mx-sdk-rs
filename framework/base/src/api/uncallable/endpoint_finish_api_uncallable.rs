@@ -15,15 +15,15 @@ impl EndpointFinishApiImpl for UncallableApi {
         unreachable!()
     }
 
-    fn finish_big_int_raw(&self, _handle: Self::BigIntHandle) {
+    fn finish_big_int_raw(&self, _handle: &Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn finish_big_uint_raw(&self, _handle: Self::BigIntHandle) {
+    fn finish_big_uint_raw(&self, _handle: &Self::BigIntHandle) {
         unreachable!()
     }
 
-    fn finish_managed_buffer_raw(&self, _handle: Self::ManagedBufferHandle) {
+    fn finish_managed_buffer_raw(&self, _handle: &Self::ManagedBufferHandle) {
         unreachable!()
     }
 

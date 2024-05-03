@@ -7,7 +7,6 @@ use crate::{
     },
     types::ManagedType,
 };
-
 use crate::types::{ManagedVec, ManagedVecItem, ManagedVecRefIterator};
 
 #[derive(Clone, Default)]
@@ -48,8 +47,16 @@ where
         Self(ManagedVec::from_handle(handle))
     }
 
-    fn get_handle(&self) -> M::ManagedBufferHandle {
+    fn get_handle(&self) -> &M::ManagedBufferHandle {
         self.0.get_handle()
+    }
+
+    fn take_handle(self) -> Self::OwnHandle {
+        self.0.take_handle()
+    }
+
+    fn take_handle_ref(&mut self) -> Self::OwnHandle {
+        self.0.take_handle_ref()
     }
 
     fn transmute_from_handle_ref(handle_ref: &M::ManagedBufferHandle) -> &Self {
