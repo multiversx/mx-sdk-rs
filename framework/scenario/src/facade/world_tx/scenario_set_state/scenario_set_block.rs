@@ -1,4 +1,11 @@
-use crate::scenario_model::{BlockInfo, BytesValue, SetStateStep, U64Value};
+use multiversx_sc::types::{AnnotatedValue, ManagedBuffer};
+
+use crate::{
+    imports::StaticApi,
+    scenario::tx_to_step::{bytes_annotated, u64_annotated},
+    scenario_model::{BlockInfo, SetStateStep},
+    ScenarioTxEnvData,
+};
 
 use super::{SetStateBuilder, SetStateBuilderItem};
 
@@ -43,53 +50,58 @@ impl SetStateBuilderItem for BlockItem {
 }
 
 impl<'w> SetStateBuilder<'w, BlockItem> {
-    pub fn block_epoch<N>(mut self, block_epoch_expr: N) -> Self
+    pub fn block_epoch<N>(mut self, block_epoch: N) -> Self
     where
-        U64Value: From<N>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        let block_epoch = U64Value::from(block_epoch_expr);
+        let env = self.new_env_data();
+        let block_epoch_value = u64_annotated(&env, &block_epoch);
 
-        self.item.block_info.block_epoch = Some(block_epoch);
+        self.item.block_info.block_epoch = Some(block_epoch_value);
         self
     }
 
-    pub fn block_nonce<N>(mut self, block_nonce_expr: N) -> Self
+    pub fn block_nonce<N>(mut self, block_nonce: N) -> Self
     where
-        U64Value: From<N>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        let block_nonce = U64Value::from(block_nonce_expr);
+        let env = self.new_env_data();
+        let block_nonce_value = u64_annotated(&env, &block_nonce);
 
-        self.item.block_info.block_nonce = Some(block_nonce);
+        self.item.block_info.block_nonce = Some(block_nonce_value);
         self
     }
 
-    pub fn block_round<N>(mut self, block_round_expr: N) -> Self
+    pub fn block_round<N>(mut self, block_round: N) -> Self
     where
-        U64Value: From<N>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        let block_round = U64Value::from(block_round_expr);
+        let env = self.new_env_data();
+        let block_round_value = u64_annotated(&env, &block_round);
 
-        self.item.block_info.block_round = Some(block_round);
+        self.item.block_info.block_round = Some(block_round_value);
         self
     }
 
-    pub fn block_timestamp<N>(mut self, block_timestamp_expr: N) -> Self
+    pub fn block_timestamp<N>(mut self, block_timestamp: N) -> Self
     where
-        U64Value: From<N>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        let block_timestamp = U64Value::from(block_timestamp_expr);
+        let env = self.new_env_data();
+        let block_timestamp_value = u64_annotated(&env, &block_timestamp);
 
-        self.item.block_info.block_timestamp = Some(block_timestamp);
+        self.item.block_info.block_timestamp = Some(block_timestamp_value);
         self
     }
 
-    pub fn block_random_seed<B>(mut self, block_random_seed_expr: B) -> Self
+    pub fn block_random_seed<B>(mut self, block_random_seed: B) -> Self
     where
-        BytesValue: From<B>,
+        B: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        let block_random_seed = BytesValue::from(block_random_seed_expr);
+        let env = self.new_env_data();
+        let block_random_seed_value = bytes_annotated(&env, block_random_seed);
 
-        self.item.block_info.block_random_seed = Some(block_random_seed);
+        self.item.block_info.block_random_seed = Some(block_random_seed_value);
         self
     }
 }

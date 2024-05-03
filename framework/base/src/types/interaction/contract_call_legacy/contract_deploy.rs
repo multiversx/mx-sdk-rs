@@ -7,15 +7,13 @@ use crate::{
     contract_base::{ExitCodecErrorHandler, SendRawWrapper},
     err_msg,
     io::{ArgErrorHandler, ArgId, ManagedResultArgLoader},
-    types::{BigUint, CodeMetadata, ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec},
+    types::{
+        BigUint, CodeMetadata, ManagedAddress, ManagedArgBuffer, ManagedBuffer, ManagedOption,
+        ManagedVec,
+    },
 };
 
-use super::ManagedArgBuffer;
-
-/// Using max u64 to represent maximum possible gas,
-/// so that the value zero is not reserved and can be specified explicitly.
-/// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
-pub(crate) const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
+use super::UNSPECIFIED_GAS_LIMIT;
 
 #[must_use]
 pub struct ContractDeploy<SA, OriginalResult>

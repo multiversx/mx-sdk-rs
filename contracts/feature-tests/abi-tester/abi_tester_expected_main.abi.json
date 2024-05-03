@@ -14,7 +14,7 @@
         },
         "framework": {
             "name": "multiversx-sc",
-            "version": "0.49.0-alpha.3"
+            "version": "0.49.0-alpha.4"
         }
     },
     "docs": [
@@ -376,6 +376,16 @@
             "outputs": [
                 {
                     "type": "Option<OnlyShowsUpAsNestedInOption>"
+                }
+            ]
+        },
+        {
+            "name": "operation_completion_status",
+            "mutability": "readonly",
+            "inputs": [],
+            "outputs": [
+                {
+                    "type": "OperationCompletionStatus"
                 }
             ]
         },
@@ -924,6 +934,23 @@
                 {
                     "name": "field",
                     "type": "OnlyShowsUpAsNested10"
+                }
+            ]
+        },
+        "OperationCompletionStatus": {
+            "type": "explicit-enum",
+            "variants": [
+                {
+                    "docs": [
+                        "indicates that operation was completed"
+                    ],
+                    "name": "completed"
+                },
+                {
+                    "docs": [
+                        "indicates that operation was interrupted prematurely, due to low gas"
+                    ],
+                    "name": "interrupted"
                 }
             ]
         }

@@ -53,8 +53,8 @@ where
     Gas: TxGas<Env>,
 {
     let mut step = ScCallStep::new()
-        .from(address_annotated(env, from))
-        .to(address_annotated(env, to))
+        .from(address_annotated(env, &from))
+        .to(address_annotated(env, &to))
         .function(data.function_name.to_string().as_str());
     for arg in data.arg_buffer.iter_buffers() {
         step.tx.arguments.push(arg.to_vec().into());

@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
-use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv};
+use multiversx_chain_scenario_format::interpret_trait::InterpreterContext;
+use multiversx_sc::types::{ManagedAddress, ManagedBuffer, TxEnv, H256};
 
 use crate::{api::StaticApi, scenario_model::TxExpect, ScenarioWorld};
 
@@ -13,6 +14,7 @@ pub trait ScenarioTxEnv: TxEnv {
 #[derive(Default, Debug, Clone)]
 pub struct ScenarioTxEnvData {
     pub context_path: PathBuf,
+    pub tx_hash: Option<H256>,
 }
 
 impl TxEnv for ScenarioTxEnvData {
@@ -33,6 +35,14 @@ impl TxEnv for ScenarioTxEnvData {
     }
 }
 
+impl ScenarioTxEnvData {
+    pub fn interpreter_context(&self) -> InterpreterContext {
+        InterpreterContext::default()
+            .with_dir(self.context_path.clone())
+            .with_allowed_missing_files()
+    }
+}
+
 impl ScenarioTxEnv for ScenarioTxEnvData {
     fn env_data(&self) -> &ScenarioTxEnvData {
         self
@@ -43,6 +53,7 @@ impl ScenarioWorld {
     pub(crate) fn new_env_data(&self) -> ScenarioTxEnvData {
         ScenarioTxEnvData {
             context_path: self.current_dir.clone(),
+            tx_hash: None,
         }
     }
 }

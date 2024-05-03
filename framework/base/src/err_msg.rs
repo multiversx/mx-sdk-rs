@@ -17,7 +17,7 @@ pub const ARG_ASYNC_RETURN_WRONG_NUMBER: &[u8] =
 pub const ARG_CALLBACK_TOO_FEW: &[u8] = b"too few callback arguments provided";
 pub const ARG_CALLBACK_TOO_MANY: &[u8] = b"too many callback arguments provided";
 
-pub const ARG_OUT_OF_RANGE: &[u8] = b"argument out of range";
+pub const ARG_OUT_OF_RANGE: &str = "argument out of range";
 pub const ARG_BAD_LENGTH: &[u8] = b"argument has wrong length";
 pub const ARG_BAD_LENGTH_32: &[u8] = b"argument has wrong length: 32 bytes expected";
 pub const ARG_DECODE_ERROR_1: &[u8] = b"argument decode error (";

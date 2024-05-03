@@ -52,7 +52,7 @@
                 "to": "sc:use_module",
                 "function": "countTo100",
                 "arguments": [],
-                "gasLimit": "4,500,000",
+                "gasLimit": "4,700,000",
                 "gasPrice": "0"
             },
             "expect": {

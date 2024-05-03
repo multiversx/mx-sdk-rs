@@ -25,3 +25,16 @@ where
         f(self)
     }
 }
+
+impl<Env> AnnotatedValue<Env, ManagedBuffer<Env::Api>> for ()
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedBuffer::new()
+    }
+
+    fn to_value(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedBuffer::new()
+    }
+}

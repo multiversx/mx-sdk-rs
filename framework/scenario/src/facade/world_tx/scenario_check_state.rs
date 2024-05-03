@@ -1,24 +1,34 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
-use multiversx_sc::{codec::test_util::top_encode_to_vec_u8_or_panic, proxy_imports::TopEncode};
+use multiversx_sc::types::{
+    AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier,
+};
 
 use crate::{
-    scenario::ScenarioRunner,
-    scenario_model::{
-        AddressKey, BigUintValue, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
-        CheckEsdtInstances, CheckEsdtMap, CheckEsdtMapContents, CheckStateStep, CheckStorage,
-        CheckStorageDetails, CheckValue, U64Value,
+    api::StaticApi,
+    scenario::{
+        tx_to_step::{
+            address_annotated, big_uint_annotated, bytes_annotated, token_identifier_annotated,
+            u64_annotated,
+        },
+        ScenarioRunner,
     },
-    ScenarioWorld,
+    scenario_model::{
+        AddressKey, BytesKey, BytesValue, CheckAccount, CheckEsdt, CheckEsdtData,
+        CheckEsdtInstances, CheckEsdtMap, CheckEsdtMapContents, CheckStateStep, CheckStorage,
+        CheckStorageDetails, CheckValue,
+    },
+    ScenarioTxEnvData, ScenarioWorld,
 };
 
 impl ScenarioWorld {
     pub fn check_account<A>(&mut self, address: A) -> CheckStateBuilder<'_>
     where
-        AddressKey: From<A>,
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
-        CheckStateBuilder::new(self, address.into())
+        let address_value = address_annotated(&self.new_env_data(), &address);
+        CheckStateBuilder::new(self, address_value.into())
     }
 }
 
@@ -41,13 +51,19 @@ impl<'w> CheckStateBuilder<'w> {
         builder
     }
 
+    fn new_env_data(&self) -> ScenarioTxEnvData {
+        self.world.new_env_data()
+    }
+
     /// Starts building of a new account.
-    pub fn check_account<A>(mut self, address_expr: A) -> Self
+    pub fn check_account<A>(mut self, address: A) -> Self
     where
-        AddressKey: From<A>,
+        A: AnnotatedValue<ScenarioTxEnvData, ManagedAddress<StaticApi>>,
     {
         self.add_current_acount();
-        self.reset_account(address_expr.into());
+        let env = self.new_env_data();
+        let address_value = address_annotated(&env, &address);
+        self.reset_account(address_value.into());
         self
     }
 
@@ -78,34 +94,30 @@ impl<'w> CheckStateBuilder<'w> {
 
     pub fn nonce<V>(mut self, nonce: V) -> Self
     where
-        U64Value: InterpretableFrom<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, u64>,
     {
-        self.current_account.nonce = CheckValue::Equal(U64Value::interpret_from(
-            nonce,
-            &InterpreterContext::default(),
-        ));
+        let env = self.new_env_data();
+        self.current_account.nonce = CheckValue::Equal(u64_annotated(&env, &nonce));
         self
     }
 
-    pub fn balance<V>(mut self, balance_expr: V) -> Self
+    pub fn balance<V>(mut self, balance: V) -> Self
     where
-        BigUintValue: InterpretableFrom<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
-        self.current_account.balance = CheckValue::Equal(BigUintValue::interpret_from(
-            balance_expr,
-            &InterpreterContext::default(),
-        ));
+        let env = self.new_env_data();
+        self.current_account.balance = CheckValue::Equal(big_uint_annotated(&env, &balance));
         self
     }
 
-    pub fn code<V>(mut self, code_expr: V) -> Self
+    pub fn code<V>(mut self, code: V) -> Self
     where
-        BytesValue: InterpretableFrom<V>,
+        V: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        self.current_account.code = CheckValue::Equal(BytesValue::interpret_from(
-            code_expr,
-            &InterpreterContext::default(),
-        ));
+        let env = self.new_env_data();
+        let code_value = bytes_annotated(&env, code);
+
+        self.current_account.code = CheckValue::Equal(code_value);
         self
     }
 
@@ -120,18 +132,19 @@ impl<'w> CheckStateBuilder<'w> {
         self
     }
 
-    pub fn esdt_balance<K, V>(mut self, token_id_expr: K, balance_expr: V) -> Self
+    pub fn esdt_balance<K, V>(mut self, token_id: K, balance: V) -> Self
     where
-        BytesKey: From<K>,
-        BigUintValue: From<V>,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
-        let balance = BigUintValue::from(balance_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let balance_value = big_uint_annotated(&env, &balance);
 
         match &mut self.current_account.esdt {
             CheckEsdtMap::Unspecified | CheckEsdtMap::Star => {
                 let mut new_esdt_map = BTreeMap::new();
-                let _ = new_esdt_map.insert(token_id, CheckEsdt::Short(balance));
+                let _ = new_esdt_map.insert(token_id_key, CheckEsdt::Short(balance_value));
 
                 let new_check_esdt_map = CheckEsdtMapContents {
                     contents: new_esdt_map,
@@ -141,10 +154,10 @@ impl<'w> CheckStateBuilder<'w> {
                 self.current_account.esdt = CheckEsdtMap::Equal(new_check_esdt_map);
             },
             CheckEsdtMap::Equal(check_esdt_map) => {
-                if check_esdt_map.contents.contains_key(&token_id) {
-                    let prev_entry = check_esdt_map.contents.get_mut(&token_id).unwrap();
+                if check_esdt_map.contents.contains_key(&token_id_key) {
+                    let prev_entry = check_esdt_map.contents.get_mut(&token_id_key).unwrap();
                     match prev_entry {
-                        CheckEsdt::Short(prev_balance_check) => *prev_balance_check = balance,
+                        CheckEsdt::Short(prev_balance_check) => *prev_balance_check = balance_value,
                         CheckEsdt::Full(prev_esdt_check) => match prev_esdt_check.instances {
                             CheckEsdtInstances::Star => todo!(),
                             CheckEsdtInstances::Equal(_) => todo!(),
@@ -159,38 +172,34 @@ impl<'w> CheckStateBuilder<'w> {
 
     pub fn esdt_nft_balance_and_attributes<K, N, V, T>(
         mut self,
-        token_id_expr: K,
-        nonce_expr: N,
-        balance_expr: V,
-        attributes_expr: Option<T>,
+        token_id: K,
+        nonce: N,
+        balance: V,
+        attributes: T,
     ) -> Self
     where
-        BytesKey: From<K>,
-        U64Value: From<N>,
-        BigUintValue: From<V>,
-        T: TopEncode,
+        K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
+        N: AnnotatedValue<ScenarioTxEnvData, u64>,
+        V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
+        T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
     {
-        let token_id = BytesKey::from(token_id_expr);
+        let env = self.new_env_data();
+        let token_id_key = token_identifier_annotated(&env, token_id);
+        let nonce_value = u64_annotated(&env, &nonce);
+        let balance_value = big_uint_annotated(&env, &balance);
+        let attributes_value = bytes_annotated(&env, attributes);
 
         if let CheckEsdtMap::Unspecified = &self.current_account.esdt {
             let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
 
-            if let Some(attributes_expr) = attributes_expr {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    top_encode_to_vec_u8_or_panic(&attributes_expr),
-                );
-            } else {
-                check_esdt.add_balance_and_attributes_check(
-                    nonce_expr,
-                    balance_expr,
-                    Vec::<u8>::new(),
-                );
-            }
+            check_esdt.add_balance_and_attributes_check(
+                nonce_value,
+                balance_value,
+                attributes_value,
+            );
 
             let mut new_esdt_map = BTreeMap::new();
-            let _ = new_esdt_map.insert(token_id, check_esdt);
+            let _ = new_esdt_map.insert(token_id_key, check_esdt);
 
             let new_check_esdt_map = CheckEsdtMapContents {
                 contents: new_esdt_map,
