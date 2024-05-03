@@ -1,7 +1,7 @@
 use core::convert::{TryFrom, TryInto};
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::{
         CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
@@ -233,6 +233,8 @@ where
         })
     }
 }
+
+impl<M> TypeAbiFrom<Self> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 impl<M> TypeAbi for ManagedAddress<M>
 where

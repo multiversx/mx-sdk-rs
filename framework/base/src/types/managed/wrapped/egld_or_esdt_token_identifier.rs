@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{HandleConstraints, ManagedTypeApi},
     codec::*,
     derive::ManagedVecItem,
@@ -212,6 +212,8 @@ impl<M> CodecFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M:
 
 impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
     fn type_name() -> TypeName {

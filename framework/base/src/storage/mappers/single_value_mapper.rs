@@ -5,7 +5,7 @@ use super::{
     StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         multi_types::PlaceholderOutput, CodecFrom, CodecFromSelf, DecodeErrorHandler,
@@ -210,10 +210,32 @@ where
 {
 }
 
+impl<SA, T, R> TypeAbiFrom<SingleValueMapper<SA, T, CurrentStorage>> for SingleValue<R>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+    R: TopDecode + CodecFrom<T>,
+{
+}
+
 impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,
+{
+}
+
+impl<SA, T> TypeAbiFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for SingleValueMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + TypeAbi,
 {
 }
 

@@ -1,5 +1,5 @@
 use crate::{
-    abi::TypeAbi,
+    abi::{TypeAbi, TypeAbiFrom},
     api::ErrorApiImpl,
     codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
@@ -274,6 +274,13 @@ impl<SA> CodecFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
+
+impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+    SA: StorageMapperApi + CallTypeApi
+{
+}
+
+impl<SA> TypeAbiFrom<Self> for FungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
 impl<SA> TypeAbi for FungibleTokenMapper<SA>
 where

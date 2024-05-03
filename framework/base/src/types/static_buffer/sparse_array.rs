@@ -1,7 +1,7 @@
 use alloc::format;
 
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ErrorApiImpl},
     codec::{self, arrayvec::ArrayVec, NestedDecode, NestedEncode, TopDecode, TopEncode},
 };
@@ -303,6 +303,8 @@ where
         }
     }
 }
+
+impl<E, const CAPACITY: usize> TypeAbiFrom<Self> for SparseArray<E, CAPACITY> where E: ErrorApi {}
 
 impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where

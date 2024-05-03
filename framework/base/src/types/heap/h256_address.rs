@@ -1,6 +1,6 @@
 use super::h256::H256;
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     types::heap::BoxedBytes,
 };
 use alloc::{boxed::Box, vec::Vec};
@@ -201,6 +201,8 @@ impl TopDecode for Address {
         Ok(Address(H256::top_decode_or_handle_err(input, h)?))
     }
 }
+
+impl TypeAbiFrom<Self> for Address {}
 
 impl TypeAbi for Address {
     fn type_name() -> TypeName {

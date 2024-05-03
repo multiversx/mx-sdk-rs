@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
@@ -298,6 +298,8 @@ where
         }
     }
 }
+
+impl<M> TypeAbiFrom<Self> for ManagedArgBuffer<M> where M: ManagedTypeApi {}
 
 impl<M> TypeAbi for ManagedArgBuffer<M>
 where

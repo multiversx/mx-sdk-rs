@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
@@ -95,6 +95,13 @@ where
         }
         Ok(())
     }
+}
+
+impl<M, T> TypeAbiFrom<Self> for ManagedAsyncCallResult<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
 }
 
 impl<M, T> TypeAbi for ManagedAsyncCallResult<M, T>

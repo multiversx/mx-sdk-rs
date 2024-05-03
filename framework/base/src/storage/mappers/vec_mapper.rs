@@ -3,7 +3,7 @@ use super::{
     StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, StorageMapperApi},
     codec::{
         multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopDecode, TopEncode,
@@ -345,6 +345,20 @@ where
 }
 
 impl<SA, T> CodecFrom<VecMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+}
+
+impl<SA, T> TypeAbiFrom<VecMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for VecMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode,

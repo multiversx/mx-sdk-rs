@@ -1,8 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    },
 };
 
 use crate::{
@@ -267,6 +270,29 @@ where
     {
         Ok(Self::from(Option::<T>::dep_decode_or_handle_err(input, h)?))
     }
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedOption<M, U>> for ManagedOption<M, T>
+where
+    M: ManagedTypeApi,
+    U: ManagedType<M>,
+    T: ManagedType<M> + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<Option<U>> for ManagedOption<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedOption<M, U>> for Option<T>
+where
+    M: ManagedTypeApi,
+    U: ManagedType<M>,
+    T: TypeAbiFrom<U>,
+{
 }
 
 impl<M, T> TypeAbi for ManagedOption<M, T>

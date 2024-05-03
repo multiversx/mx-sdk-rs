@@ -1,4 +1,5 @@
 use crate::{
+    abi::TypeAbiFrom,
     codec::{
         CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
@@ -414,6 +415,13 @@ impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
+
+impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+    SA: StorageMapperApi + CallTypeApi
+{
+}
+
+impl<SA> TypeAbiFrom<Self> for NonFungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
 impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
 where

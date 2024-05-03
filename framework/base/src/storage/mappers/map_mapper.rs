@@ -5,7 +5,7 @@ use super::{
     SetMapper, StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
@@ -541,6 +541,23 @@ where
 
 impl<SA, K, V> CodecFrom<MapMapper<SA, K, V, CurrentStorage>>
     for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
+}
+
+impl<SA, K, V> TypeAbiFrom<MapMapper<SA, K, V, CurrentStorage>>
+    for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
+}
+
+impl<SA, K, V> TypeAbiFrom<Self> for MapMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,

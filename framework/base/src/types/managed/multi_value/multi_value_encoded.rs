@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
@@ -220,6 +220,13 @@ where
             _phantom: PhantomData,
         })
     }
+}
+
+impl<M, T> TypeAbiFrom<Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
 }
 
 impl<M, T> TypeAbi for MultiValueEncoded<M, T>

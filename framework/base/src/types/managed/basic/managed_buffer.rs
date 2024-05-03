@@ -1,5 +1,5 @@
 use crate::{
-    abi::TypeName,
+    abi::{TypeAbiFrom, TypeName},
     api::{
         use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
         ManagedTypeApi, StaticVarApiImpl,
@@ -460,6 +460,8 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
         }
     }
 }
+
+impl<M> TypeAbiFrom<Self> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> TypeName {
