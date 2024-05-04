@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: remove after deleting CodecFrom
+
 use std::ops::{Deref, DerefMut};
 
 use multiversx_sc::{
