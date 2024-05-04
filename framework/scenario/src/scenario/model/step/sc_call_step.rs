@@ -1,4 +1,7 @@
-use multiversx_sc::types::{ContractCallBase, H256};
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    types::{ContractCallBase, H256},
+};
 
 use crate::{
     api::StaticApi,
@@ -7,7 +10,7 @@ use crate::{
 };
 
 use crate::multiversx_sc::{
-    codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    codec::{PanicErrorHandler, TopEncodeMulti},
     types::{ContractCall, ManagedArgBuffer},
 };
 
@@ -174,7 +177,7 @@ impl ScCallStep {
     ) -> TypedScCall<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
-        ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
+        ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self.call(contract_call).expect_value(expected_value)
     }

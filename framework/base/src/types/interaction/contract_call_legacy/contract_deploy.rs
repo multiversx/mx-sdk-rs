@@ -1,6 +1,8 @@
 use core::marker::PhantomData;
 
-use crate::codec::{CodecFrom, TopEncodeMulti};
+use multiversx_sc_codec::TopDecodeMulti;
+
+use crate::{abi::TypeAbiFrom, codec::TopEncodeMulti};
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
@@ -101,7 +103,7 @@ where
         raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
     ) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"init result"[..]);
@@ -118,7 +120,7 @@ where
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<SA>, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_contract(
             self.resolve_gas_limit(),
@@ -139,7 +141,7 @@ where
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<SA>, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_from_source_contract(
             self.resolve_gas_limit(),

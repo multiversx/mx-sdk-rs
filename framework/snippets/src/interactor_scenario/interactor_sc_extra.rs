@@ -2,7 +2,8 @@ use crate::Interactor;
 use multiversx_sc_scenario::{
     api::StaticApi,
     multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
+        abi::TypeAbiFrom,
+        codec::{TopDecodeMulti, TopEncodeMulti},
         types::{Address, ContractCallBase},
     },
     scenario_model::{
@@ -34,7 +35,7 @@ impl Interactor {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
         use_result(self.sc_call_get_result(step).await);
@@ -47,7 +48,7 @@ impl Interactor {
     ) -> TypedResponse<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_call(step.as_mut()).await;
         let response = unwrap_response(&step.as_mut().response);
@@ -76,7 +77,7 @@ impl Interactor {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
         use_result(self.sc_query_get_result(step).await);
@@ -89,7 +90,7 @@ impl Interactor {
     ) -> TypedResponse<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_query(step.as_mut()).await;
         let response = unwrap_response(&step.sc_query_step.response);
@@ -99,7 +100,7 @@ impl Interactor {
     pub async fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
         CC: ContractCallBase<StaticApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<CC::OriginalResult>,
     {
         let mut typed_sc_query = ScQueryStep::new().call(contract_call);
         self.sc_query(&mut typed_sc_query).await;
@@ -130,7 +131,7 @@ impl Interactor {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(Address, TypedResponse<RequestedResult>),
     {
         let (new_address, response) = self.sc_deploy_get_result(step).await;
@@ -144,7 +145,7 @@ impl Interactor {
     ) -> (Address, TypedResponse<RequestedResult>)
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_deploy(step.as_mut()).await;
         let response = unwrap_response(&step.sc_deploy_step.response);

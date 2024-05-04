@@ -1,11 +1,15 @@
 use std::marker::PhantomData;
 
-use multiversx_sc::{codec::PanicErrorHandler, types::ContractDeploy};
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    codec::{PanicErrorHandler, TopDecodeMulti},
+    types::ContractDeploy,
+};
 
 use crate::{
     api::StaticApi,
     multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
+        codec::TopEncodeMulti,
         types::{Address, CodeMetadata},
     },
     scenario_format::interpret_trait::InterpreterContext,
@@ -27,7 +31,7 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
     pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let mut raw_result = self.response().out.clone();
         Ok(
@@ -145,7 +149,7 @@ pub trait TypedScDeployExecutor {
     ) -> (Address, RequestedResult)
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>;
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>;
 }
 
 impl<OriginalResult> TypedScDeploy<OriginalResult>
@@ -158,7 +162,7 @@ where
         executor: &mut E,
     ) -> (Address, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         executor.execute_typed_sc_deploy(self)
     }

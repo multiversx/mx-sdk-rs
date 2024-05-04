@@ -33,7 +33,7 @@ impl<T: TypeAbi> TypeAbi for &T {
     }
 }
 
-impl<T, U> TypeAbiFrom<Box<T>> for U where T: TypeAbiFrom<U> {}
+impl<T, U> TypeAbiFrom<Box<U>> for Box<T> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Box<T> {
     fn type_name() -> TypeName {

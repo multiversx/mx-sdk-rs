@@ -32,7 +32,7 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     }
 }
 
-impl TypeAbiFrom<IgnoreValue> for IgnoreValue {}
+impl<T> TypeAbiFrom<T> for IgnoreValue {}
 
 impl TypeAbi for IgnoreValue {
     fn type_name() -> TypeName {

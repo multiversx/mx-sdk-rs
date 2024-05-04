@@ -3,7 +3,7 @@ use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
     mandos_system::ScenarioRunner,
-    multiversx_sc::{codec::CodecFrom, types::ContractCall},
+    multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti, types::ContractCall},
     scenario_model::{ScQueryStep, TxResponse},
 };
 use multiversx_sdk::{data::vm::VmValueRequest, utils::base64_decode};
@@ -50,7 +50,7 @@ impl Interactor {
     pub async fn vm_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
         CC: ContractCall<StaticApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<CC::OriginalResult>,
     {
         self.quick_query(contract_call).await
     }
