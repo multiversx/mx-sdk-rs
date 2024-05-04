@@ -210,12 +210,14 @@ impl<M> CodecFromSelf for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {
 
 impl<M> CodecFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
-
 impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M> TypeAbiFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+
 impl<'a, M> TypeAbiFrom<TestTokenIdentifier<'a>> for EgldOrEsdtTokenIdentifier<M> where
     M: ManagedTypeApi
 {

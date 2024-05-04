@@ -229,6 +229,13 @@ where
 {
 }
 
+impl<M, T> TypeAbiFrom<&Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
 impl<M, T> TypeAbi for MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,

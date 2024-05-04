@@ -165,8 +165,10 @@ impl<M: ManagedTypeApi> TopDecode for TokenIdentifier<M> {
 impl<M> CodecFromSelf for TokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M> CodecFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
-
 impl<M> CodecFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
+
+impl<M> TypeAbiFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenIdentifier<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenIdentifier<M> {}
