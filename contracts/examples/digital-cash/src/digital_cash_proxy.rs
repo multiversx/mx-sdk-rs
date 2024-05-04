@@ -236,6 +236,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct DepositInfo<Api>
 where
@@ -249,6 +250,7 @@ where
     pub fees: Fee<Api>,
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Fee<Api>
 where

@@ -272,6 +272,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<Api>
 where

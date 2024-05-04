@@ -182,6 +182,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(ManagedVecItem, NestedEncode, NestedDecode)]
 pub struct Distribution<Api>
 where

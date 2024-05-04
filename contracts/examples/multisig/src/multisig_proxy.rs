@@ -491,6 +491,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(TopEncode)]
 pub struct ActionFullInfo<Api>
 where
@@ -502,6 +503,7 @@ where
 }
 
 #[rustfmt::skip]
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
 pub enum Action<Api>
 where
@@ -529,6 +531,7 @@ where
     },
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, Clone)]
 pub struct CallActionData<Api>
 where
@@ -540,6 +543,7 @@ where
     pub arguments: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
+#[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub enum UserRole {
     None,

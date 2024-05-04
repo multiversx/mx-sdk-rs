@@ -530,6 +530,7 @@ where
         name: &str,
     ) {
         self.writeln("");
+        self.writeln("#[type_abi]");
         self.write_macro_attributes(&type_description.macro_attributes);
         self.write(format!(r#"pub {type_type} {name}"#));
 
