@@ -101,6 +101,7 @@ macro_rules! big_int_conv_num {
         }
 
         impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigInt<M> {}
+        impl<M: ManagedTypeApi> CodecFrom<&$num_ty> for BigInt<M> {}
     };
 }
 
@@ -299,6 +300,7 @@ impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
 }
 
 impl<M> TypeAbiFrom<Self> for BigInt<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for BigInt<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
     fn type_name() -> TypeName {

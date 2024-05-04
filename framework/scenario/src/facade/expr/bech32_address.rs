@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use crate::bech32;
 use multiversx_sc::{
+    abi::TypeAbiFrom,
     api::ManagedTypeApi,
     codec::*,
     types::{
@@ -179,6 +180,9 @@ impl TopDecode for Bech32Address {
 
 impl<M> CodecFrom<Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+
+impl<M> TypeAbiFrom<Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 impl Serialize for Bech32Address {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>

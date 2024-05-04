@@ -266,11 +266,29 @@ where
 }
 
 #[cfg(feature = "alloc")]
+impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbiFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
 impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: CodecFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
+impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbiFrom<T>,
 {
 }
 

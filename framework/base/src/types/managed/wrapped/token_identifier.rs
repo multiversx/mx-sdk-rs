@@ -169,6 +169,7 @@ impl<M> CodecFrom<&[u8]> for TokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<Vec<u8>> for TokenIdentifier<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenIdentifier<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
     fn type_name() -> TypeName {

@@ -300,6 +300,7 @@ where
 }
 
 impl<M> TypeAbiFrom<Self> for ManagedArgBuffer<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for ManagedArgBuffer<M> where M: ManagedTypeApi {}
 
 impl<M> TypeAbi for ManagedArgBuffer<M>
 where

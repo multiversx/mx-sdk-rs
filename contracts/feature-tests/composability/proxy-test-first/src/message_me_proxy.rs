@@ -44,7 +44,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<i32>,
+        Arg0: ProxyArg<i32>,
     >(
         self,
         init_arg: Arg0,
@@ -84,10 +84,10 @@ where
     Gas: TxGas<Env>,
 {
     pub fn message_me<
-        Arg0: CodecInto<i64>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<Vec<u8>>,
-        Arg3: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<i64>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<Vec<u8>>,
+        Arg3: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         arg1: Arg0,

@@ -372,7 +372,7 @@ where
 
     fn write_argument(&mut self, index: usize, rust_name: &str) {
         let adjusted = self.adjust_type_name_with_env_api(rust_name);
-        self.writeln(format!("        Arg{index}: CodecInto<{adjusted}>,"));
+        self.writeln(format!("        Arg{index}: ProxyArg<{adjusted}>,"));
     }
 
     fn write_parameters(&mut self, inputs: &[InputAbi]) {

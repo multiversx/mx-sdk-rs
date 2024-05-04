@@ -45,8 +45,8 @@ where
 {
     /// Contract constructor. 
     pub fn init<
-        Arg0: CodecInto<i32>,
-        Arg1: CodecInto<OnlyShowsUpInConstructor>,
+        Arg0: ProxyArg<i32>,
+        Arg1: ProxyArg<OnlyShowsUpInConstructor>,
     >(
         self,
         _constructor_arg_1: Arg0,
@@ -71,8 +71,8 @@ where
 {
     /// Upgrade constructor. 
     pub fn upgrade<
-        Arg0: CodecInto<i32>,
-        Arg1: CodecInto<OnlyShowsUpInConstructor>,
+        Arg0: ProxyArg<i32>,
+        Arg1: ProxyArg<OnlyShowsUpInConstructor>,
     >(
         self,
         _constructor_arg_1: Arg0,
@@ -97,7 +97,7 @@ where
 {
     /// Example endpoint docs. 
     pub fn echo_abi_test_type<
-        Arg0: CodecInto<AbiTestType>,
+        Arg0: ProxyArg<AbiTestType>,
     >(
         self,
         att: Arg0,
@@ -109,7 +109,7 @@ where
     }
 
     pub fn echo_enum<
-        Arg0: CodecInto<AbiEnum>,
+        Arg0: ProxyArg<AbiEnum>,
     >(
         self,
         e: Arg0,
@@ -121,7 +121,7 @@ where
     }
 
     pub fn take_managed_type<
-        Arg0: CodecInto<AbiManagedType<Env::Api>>,
+        Arg0: ProxyArg<AbiManagedType<Env::Api>>,
     >(
         self,
         _arg: Arg0,
@@ -149,8 +149,8 @@ where
     }
 
     pub fn var_args<
-        Arg0: CodecInto<u32>,
-        Arg1: CodecInto<MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>>,
+        Arg0: ProxyArg<u32>,
+        Arg1: ProxyArg<MultiValueVec<MultiValue2<OnlyShowsUpAsNested04, i32>>>,
     >(
         self,
         _simple_arg: Arg0,
@@ -172,8 +172,8 @@ where
     }
 
     pub fn optional_arg<
-        Arg0: CodecInto<u32>,
-        Arg1: CodecInto<OptionalValue<OnlyShowsUpAsNested06>>,
+        Arg0: ProxyArg<u32>,
+        Arg1: ProxyArg<OptionalValue<OnlyShowsUpAsNested06>>,
     >(
         self,
         _simple_arg: Arg0,
@@ -195,8 +195,8 @@ where
     }
 
     pub fn address_vs_h256<
-        Arg0: CodecInto<Address>,
-        Arg1: CodecInto<H256>,
+        Arg0: ProxyArg<Address>,
+        Arg1: ProxyArg<H256>,
     >(
         self,
         address: Arg0,
@@ -210,8 +210,8 @@ where
     }
 
     pub fn managed_address_vs_byte_array<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedByteArray<Env::Api, 32usize>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedByteArray<Env::Api, 32usize>>,
     >(
         self,
         address: Arg0,
@@ -281,7 +281,7 @@ where
     }
 
     pub fn item_for_array<
-        Arg0: CodecInto<[OnlyShowsUpAsNestedInArray; 5]>,
+        Arg0: ProxyArg<[OnlyShowsUpAsNestedInArray; 5]>,
     >(
         self,
         _array: Arg0,
@@ -309,7 +309,7 @@ where
     }
 
     pub fn item_for_ref<
-        Arg0: CodecInto<OnlyShowsUpAsNestedInRef>,
+        Arg0: ProxyArg<OnlyShowsUpAsNestedInRef>,
     >(
         self,
         _ref: Arg0,
@@ -321,7 +321,7 @@ where
     }
 
     pub fn item_for_slice<
-        Arg0: CodecInto<Box<[OnlyShowsUpAsNestedInSlice]>>,
+        Arg0: ProxyArg<Box<[OnlyShowsUpAsNestedInSlice]>>,
     >(
         self,
         _ref: Arg0,

@@ -44,8 +44,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         quorum: Arg0,
@@ -69,8 +69,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn upgrade<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         quorum: Arg0,
@@ -118,8 +118,8 @@ where
     /// Returns `true` (`1`) if the user has signed the action. 
     /// Does not check whether or not the user is still a board member and the signature valid. 
     pub fn signed<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<usize>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<usize>,
     >(
         self,
         user: Arg0,
@@ -137,7 +137,7 @@ where
     /// `1` = can propose, but not sign, 
     /// `2` = can propose and sign. 
     pub fn user_role<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         user: Arg0,
@@ -168,7 +168,7 @@ where
 
     /// Used by board members to sign actions. 
     pub fn sign<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -182,7 +182,7 @@ where
     /// Board members can withdraw their signatures if they no longer desire for the action to be executed. 
     /// Actions that are left with no valid signatures can be then deleted to free up storage. 
     pub fn unsign<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -197,7 +197,7 @@ where
     /// Any signatures that the action received must first be removed, via `unsign`. 
     /// Otherwise this endpoint would be prone to abuse. 
     pub fn discard_action<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -249,7 +249,7 @@ where
 
     /// Serialized action data of an action with index. 
     pub fn get_action_data<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -264,7 +264,7 @@ where
     /// Does not check if those users are still board members or not, 
     /// so the result may contain invalid signers. 
     pub fn get_action_signers<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -278,7 +278,7 @@ where
     /// Gets addresses of all users who signed an action and are still board members. 
     /// All these signatures are currently valid. 
     pub fn get_action_signer_count<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -295,7 +295,7 @@ where
     /// This function is used to validate the signers before performing an action. 
     /// It also makes it easy to check before performing an action. 
     pub fn get_action_valid_signer_count<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -309,7 +309,7 @@ where
     /// Initiates board member addition process. 
     /// Can also be used to promote a proposer to board member. 
     pub fn propose_add_board_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         board_member_address: Arg0,
@@ -323,7 +323,7 @@ where
     /// Initiates proposer addition process.. 
     /// Can also be used to demote a board member to proposer. 
     pub fn propose_add_proposer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         proposer_address: Arg0,
@@ -336,7 +336,7 @@ where
 
     /// Removes user regardless of whether it is a board member or proposer. 
     pub fn propose_remove_user<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         user_address: Arg0,
@@ -348,7 +348,7 @@ where
     }
 
     pub fn propose_change_quorum<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         new_quorum: Arg0,
@@ -364,9 +364,9 @@ where
     /// Can call smart contract endpoints directly. 
     /// Doesn't really work with builtin functions. 
     pub fn propose_transfer_execute<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<FunctionCall<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<FunctionCall<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -387,9 +387,9 @@ where
     /// Works well with builtin functions. 
     /// Cannot simply send EGLD directly without calling anything. 
     pub fn propose_async_call<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<FunctionCall<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<FunctionCall<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -405,10 +405,10 @@ where
     }
 
     pub fn propose_sc_deploy_from_source<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<CodeMetadata>,
-        Arg3: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<CodeMetadata>,
+        Arg3: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         amount: Arg0,
@@ -426,11 +426,11 @@ where
     }
 
     pub fn propose_sc_upgrade_from_source<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<ManagedAddress<Env::Api>>,
-        Arg3: CodecInto<CodeMetadata>,
-        Arg4: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg3: ProxyArg<CodeMetadata>,
+        Arg4: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         sc_address: Arg0,
@@ -451,7 +451,7 @@ where
 
     /// Returns `true` (`1`) if `getActionValidSignerCount >= getQuorum`. 
     pub fn quorum_reached<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -464,7 +464,7 @@ where
 
     /// Proposers and board members use this to launch signed actions. 
     pub fn perform_action_endpoint<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
@@ -476,8 +476,8 @@ where
     }
 
     pub fn dns_register<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         dns_address: Arg0,

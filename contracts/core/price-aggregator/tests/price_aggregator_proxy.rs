@@ -44,12 +44,12 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<usize>,
-        Arg4: CodecInto<usize>,
-        Arg5: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<usize>,
+        Arg4: ProxyArg<usize>,
+        Arg5: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         staking_token: Arg0,
@@ -81,8 +81,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn change_amounts<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         staking_amount: Arg0,
@@ -96,7 +96,7 @@ where
     }
 
     pub fn add_oracles<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         oracles: Arg0,
@@ -110,8 +110,8 @@ where
     /// Also receives submission count, 
     /// so the owner does not have to update it manually with setSubmissionCount before this call 
     pub fn remove_oracles<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         submission_count: Arg0,
@@ -125,11 +125,11 @@ where
     }
 
     pub fn submit<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg2: CodecInto<u64>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<u8>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<u8>,
     >(
         self,
         from: Arg0,
@@ -149,7 +149,7 @@ where
     }
 
     pub fn submit_batch<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, MultiValue5<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue5<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>>,
     >(
         self,
         submissions: Arg0,
@@ -169,8 +169,8 @@ where
     }
 
     pub fn latest_price_feed<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -184,8 +184,8 @@ where
     }
 
     pub fn latest_price_feed_optional<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -199,7 +199,7 @@ where
     }
 
     pub fn set_submission_count<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         submission_count: Arg0,
@@ -219,9 +219,9 @@ where
     }
 
     pub fn set_pair_decimals<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg2: CodecInto<u8>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u8>,
     >(
         self,
         from: Arg0,
@@ -237,8 +237,8 @@ where
     }
 
     pub fn get_pair_decimals<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -292,7 +292,7 @@ where
     }
 
     pub fn unstake<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         unstake_amount: Arg0,
@@ -304,7 +304,7 @@ where
     }
 
     pub fn vote_slash_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         member_to_slash: Arg0,
@@ -316,7 +316,7 @@ where
     }
 
     pub fn cancel_vote_slash_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         member_to_slash: Arg0,
@@ -328,7 +328,7 @@ where
     }
 
     pub fn slash_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         member_to_slash: Arg0,

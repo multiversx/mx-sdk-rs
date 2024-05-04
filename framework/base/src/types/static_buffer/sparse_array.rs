@@ -305,6 +305,7 @@ where
 }
 
 impl<E, const CAPACITY: usize> TypeAbiFrom<Self> for SparseArray<E, CAPACITY> where E: ErrorApi {}
+impl<E, const CAPACITY: usize> TypeAbiFrom<&Self> for SparseArray<E, CAPACITY> where E: ErrorApi {}
 
 impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where

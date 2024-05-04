@@ -287,6 +287,7 @@ impl<M: ManagedTypeApi> NestedDecode for BigFloat<M> {
 }
 
 impl<M> TypeAbiFrom<Self> for BigFloat<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for BigFloat<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> TypeAbi for BigFloat<M> {
     fn type_name() -> String {

@@ -206,6 +206,7 @@ where
 }
 
 impl<M, const N: usize> TypeAbiFrom<Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
+impl<M, const N: usize> TypeAbiFrom<&Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
 impl<M, const N: usize> TypeAbi for ManagedByteArray<M, N>
 where

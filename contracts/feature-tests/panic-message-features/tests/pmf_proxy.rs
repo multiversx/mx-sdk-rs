@@ -62,7 +62,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn panic_with_message<
-        Arg0: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
     >(
         self,
         some_value: Arg0,

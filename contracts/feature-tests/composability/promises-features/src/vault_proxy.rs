@@ -44,7 +44,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         opt_arg_to_echo: Arg0,
@@ -66,7 +66,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn upgrade<
-        Arg0: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         opt_arg_to_echo: Arg0,
@@ -88,7 +88,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn echo_arguments<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         args: Arg0,
@@ -100,7 +100,7 @@ where
     }
 
     pub fn echo_arguments_without_storage<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         args: Arg0,
@@ -152,9 +152,9 @@ where
     }
 
     pub fn retrieve_funds_with_transfer_exec<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         token: Arg0,
@@ -170,8 +170,8 @@ where
     }
 
     pub fn retrieve_funds_promises<
-        Arg0: CodecInto<OptionalValue<u64>>,
-        Arg1: CodecInto<OptionalValue<BigUint<Env::Api>>>,
+        Arg0: ProxyArg<OptionalValue<u64>>,
+        Arg1: ProxyArg<OptionalValue<BigUint<Env::Api>>>,
     >(
         self,
         back_transfers: Arg0,
@@ -185,9 +185,9 @@ where
     }
 
     pub fn retrieve_funds<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         token: Arg0,
@@ -203,7 +203,7 @@ where
     }
 
     pub fn retrieve_multi_funds_async<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         token_payments: Arg0,
@@ -233,7 +233,7 @@ where
     /// We already leave a trace of the calls using the event logs; 
     /// this additional counter has the role of showing that storage also gets saved correctly. 
     pub fn call_counts<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         endpoint: Arg0,

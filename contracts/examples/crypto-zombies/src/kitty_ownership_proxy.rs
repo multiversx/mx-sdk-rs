@@ -44,9 +44,9 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<OptionalValue<ManagedAddress<Env::Api>>>,
-        Arg2: CodecInto<OptionalValue<ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<OptionalValue<ManagedAddress<Env::Api>>>,
+        Arg2: ProxyArg<OptionalValue<ManagedAddress<Env::Api>>>,
     >(
         self,
         birth_fee: Arg0,
@@ -72,7 +72,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn set_gene_science_contract_address_endpoint<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -84,7 +84,7 @@ where
     }
 
     pub fn set_kitty_auction_contract_address_endpoint<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -112,7 +112,7 @@ where
     }
 
     pub fn balance_of<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -124,7 +124,7 @@ where
     }
 
     pub fn owner_of<
-        Arg0: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
     >(
         self,
         kitty_id: Arg0,
@@ -136,8 +136,8 @@ where
     }
 
     pub fn approve<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -151,8 +151,8 @@ where
     }
 
     pub fn transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
@@ -166,9 +166,9 @@ where
     }
 
     pub fn transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<u32>,
     >(
         self,
         from: Arg0,
@@ -184,7 +184,7 @@ where
     }
 
     pub fn tokens_of_owner<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -196,8 +196,8 @@ where
     }
 
     pub fn allow_auctioning<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         by: Arg0,
@@ -211,9 +211,9 @@ where
     }
 
     pub fn approve_siring_and_return_kitty<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<u32>,
     >(
         self,
         approved_address: Arg0,
@@ -237,7 +237,7 @@ where
     }
 
     pub fn get_kitty_by_id_endpoint<
-        Arg0: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
     >(
         self,
         kitty_id: Arg0,
@@ -249,7 +249,7 @@ where
     }
 
     pub fn is_ready_to_breed<
-        Arg0: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
     >(
         self,
         kitty_id: Arg0,
@@ -261,7 +261,7 @@ where
     }
 
     pub fn is_pregnant<
-        Arg0: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
     >(
         self,
         kitty_id: Arg0,
@@ -273,8 +273,8 @@ where
     }
 
     pub fn can_breed_with<
-        Arg0: CodecInto<u32>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         matron_id: Arg0,
@@ -288,8 +288,8 @@ where
     }
 
     pub fn approve_siring<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         address: Arg0,
@@ -303,8 +303,8 @@ where
     }
 
     pub fn breed_with<
-        Arg0: CodecInto<u32>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         matron_id: Arg0,
@@ -318,7 +318,7 @@ where
     }
 
     pub fn give_birth<
-        Arg0: CodecInto<u32>,
+        Arg0: ProxyArg<u32>,
     >(
         self,
         matron_id: Arg0,

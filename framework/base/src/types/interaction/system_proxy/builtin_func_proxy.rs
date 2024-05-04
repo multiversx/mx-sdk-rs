@@ -1,8 +1,8 @@
-use multiversx_sc_codec::{CodecInto, Empty, TopEncode};
+use multiversx_sc_codec::{Empty, TopEncode};
 
 use crate::types::{
-    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas,
-    TxProxyCall, TxProxyTrait, TxTo,
+    BigUint, ManagedAddress, ManagedBuffer, ManagedVec, ProxyArg, TokenIdentifier, Tx, TxEnv,
+    TxFrom, TxGas, TxProxyCall, TxProxyTrait, TxTo,
 };
 
 use super::builtin_func_names::{
@@ -46,7 +46,7 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
-    pub fn set_user_name<Arg0: CodecInto<ManagedBuffer<Env::Api>>>(
+    pub fn set_user_name<Arg0: ProxyArg<ManagedBuffer<Env::Api>>>(
         self,
         name: Arg0,
     ) -> TxProxyCall<Env, From, To, Gas, ()> {

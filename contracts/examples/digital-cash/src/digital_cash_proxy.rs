@@ -44,8 +44,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         fee: Arg0,
@@ -69,8 +69,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn whitelist_fee_token<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         fee: Arg0,
@@ -84,7 +84,7 @@ where
     }
 
     pub fn blacklist_fee_token<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token: Arg0,
@@ -104,9 +104,9 @@ where
     }
 
     pub fn get_amount<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
@@ -122,8 +122,8 @@ where
     }
 
     pub fn pay_fee_and_fund_esdt<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
@@ -137,8 +137,8 @@ where
     }
 
     pub fn pay_fee_and_fund_egld<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
@@ -152,8 +152,8 @@ where
     }
 
     pub fn fund<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
@@ -167,7 +167,7 @@ where
     }
 
     pub fn deposit_fees<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -179,7 +179,7 @@ where
     }
 
     pub fn withdraw<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -191,8 +191,8 @@ where
     }
 
     pub fn claim<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedByteArray<Env::Api, 64usize>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
         address: Arg0,
@@ -206,9 +206,9 @@ where
     }
 
     pub fn forward<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<ManagedByteArray<Env::Api, 64usize>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
         address: Arg0,
@@ -224,7 +224,7 @@ where
     }
 
     pub fn deposit<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         donor: Arg0,

@@ -122,6 +122,7 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
 }
 
 impl TypeAbiFrom<String> for String {}
+impl TypeAbiFrom<&String> for String {}
 impl TypeAbiFrom<&str> for String {}
 impl TypeAbiFrom<Box<str>> for String {}
 
@@ -160,6 +161,7 @@ impl TypeAbi for Box<str> {
 macro_rules! type_abi_name_only {
     ($ty:ty, $name:expr) => {
         impl TypeAbiFrom<$ty> for $ty {}
+        impl TypeAbiFrom<&$ty> for $ty {}
 
         impl TypeAbi for $ty {
             fn type_name() -> TypeName {
@@ -185,6 +187,40 @@ type_abi_name_only!(i64, "i64");
 
 type_abi_name_only!(core::num::NonZeroUsize, "NonZeroUsize");
 type_abi_name_only!(bool, "bool");
+
+// Unsigned integer types: the contract can return a smaller capacity result and and we can interpret it as a larger capacity type.
+
+impl TypeAbiFrom<usize> for u64 {}
+impl TypeAbiFrom<u32> for u64 {}
+impl TypeAbiFrom<u16> for u64 {}
+impl TypeAbiFrom<u8> for u64 {}
+
+impl TypeAbiFrom<usize> for u32 {}
+impl TypeAbiFrom<u16> for u32 {}
+impl TypeAbiFrom<u8> for u32 {}
+
+impl TypeAbiFrom<u32> for usize {}
+impl TypeAbiFrom<u16> for usize {}
+impl TypeAbiFrom<u8> for usize {}
+
+impl TypeAbiFrom<u8> for u16 {}
+
+// Signed, the same.
+
+impl TypeAbiFrom<isize> for i64 {}
+impl TypeAbiFrom<i32> for i64 {}
+impl TypeAbiFrom<i16> for i64 {}
+impl TypeAbiFrom<i8> for i64 {}
+
+impl TypeAbiFrom<isize> for i32 {}
+impl TypeAbiFrom<i16> for i32 {}
+impl TypeAbiFrom<i8> for i32 {}
+
+impl TypeAbiFrom<i32> for isize {}
+impl TypeAbiFrom<i16> for isize {}
+impl TypeAbiFrom<i8> for isize {}
+
+impl TypeAbiFrom<i8> for i16 {}
 
 impl<T, U> TypeAbiFrom<Option<T>> for Option<U> where T: TypeAbiFrom<U> {}
 
