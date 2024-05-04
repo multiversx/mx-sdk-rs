@@ -102,6 +102,9 @@ macro_rules! big_int_conv_num {
 
         impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigInt<M> {}
         impl<M: ManagedTypeApi> CodecFrom<&$num_ty> for BigInt<M> {}
+
+        impl<M: ManagedTypeApi> TypeAbiFrom<$num_ty> for BigInt<M> {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<&$num_ty> for BigInt<M> {}
     };
 }
 
