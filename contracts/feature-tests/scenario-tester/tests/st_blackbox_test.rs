@@ -1,5 +1,4 @@
 use multiversx_sc_scenario::imports::*;
-use num_bigint::BigUint;
 
 use scenario_tester::*;
 
@@ -66,9 +65,9 @@ fn st_blackbox() {
         .to(ST_ADDRESS)
         .typed(scenario_tester_proxy::ScenarioTesterProxy)
         .sum()
-        .returns(ReturnsResultAs::<BigUint>::new())
+        .returns(ReturnsResultUnmanaged)
         .run();
-    assert_eq!(value, BigUint::from(5u32));
+    assert_eq!(value, RustBigUint::from(5u32));
 
     world
         .tx()
