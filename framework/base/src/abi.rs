@@ -10,6 +10,9 @@ mod type_abi_impl_codec_multi;
 mod type_description;
 mod type_description_container;
 
+#[cfg(feature = "num-bigint")]
+mod type_abi_impl_big_int;
+
 pub use build_info_abi::*;
 pub use contract_abi::*;
 pub use endpoint_abi::*;

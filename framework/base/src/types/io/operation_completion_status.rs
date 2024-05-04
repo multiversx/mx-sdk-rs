@@ -84,6 +84,8 @@ impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
 impl TypeAbiFrom<Self> for OperationCompletionStatus {}
 
 impl TypeAbi for OperationCompletionStatus {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("OperationCompletionStatus")
     }

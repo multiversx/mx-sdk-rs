@@ -9,6 +9,8 @@ use alloc::{format, string::ToString, vec::Vec};
 ///
 /// Will be automatically implemented for struct ad enum types via the `#[type_abi]` annotation.
 pub trait TypeAbi: TypeAbiFrom<Self> {
+    type Unmanaged: TypeAbiFrom<Self>;
+
     fn type_names() -> TypeNames {
         TypeNames {
             abi: Self::type_name(),

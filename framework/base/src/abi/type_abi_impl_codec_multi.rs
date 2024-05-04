@@ -15,6 +15,8 @@ where
 
 #[cfg(feature = "alloc")]
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         super::type_name_variadic::<T>()
     }
@@ -35,6 +37,8 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
 impl<T> TypeAbiFrom<T> for IgnoreValue {}
 
 impl TypeAbi for IgnoreValue {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("ignore")
     }
@@ -51,6 +55,8 @@ impl TypeAbi for IgnoreValue {
 impl<T, U> TypeAbiFrom<OptionalValue<T>> for OptionalValue<U> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         super::type_name_optional::<T>()
     }
@@ -80,6 +86,8 @@ macro_rules! multi_arg_impls {
             where
                 $($name: TypeAbi,)+
             {
+                type Unmanaged = Self;
+
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("multi");
                     repr.push('<');

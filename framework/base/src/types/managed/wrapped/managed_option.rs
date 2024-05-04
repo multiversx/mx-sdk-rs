@@ -300,6 +300,8 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + TypeAbi,
 {
+    type Unmanaged = Option<T::Unmanaged>;
+
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         Option::<T>::type_name()

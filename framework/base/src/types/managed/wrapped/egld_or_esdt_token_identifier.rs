@@ -231,6 +231,8 @@ impl<M: ManagedTypeApi> TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifier<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for EgldOrEsdtTokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "EgldOrEsdtTokenIdentifier".into()
     }

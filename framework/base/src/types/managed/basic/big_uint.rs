@@ -1,7 +1,7 @@
 use core::convert::TryInto;
 
 use crate::{
-    abi::{TypeAbiFrom, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
         ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
@@ -296,7 +296,13 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
 impl<M> TypeAbiFrom<Self> for BigUint<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Self> for BigUint<M> where M: ManagedTypeApi {}
 
-impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigUint<M> {
+impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
+    #[cfg(feature = "num-bigint")]
+    type Unmanaged = crate::codec::num_bigint::BigUint;
+
+    #[cfg(not(feature = "num-bigint"))]
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("BigUint")
     }

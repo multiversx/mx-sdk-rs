@@ -243,6 +243,8 @@ impl TopDecode for BoxedBytes {
 impl TypeAbiFrom<Self> for BoxedBytes {}
 
 impl TypeAbi for BoxedBytes {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "bytes".into()
     }

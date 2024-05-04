@@ -205,6 +205,8 @@ impl TopDecode for Address {
 impl TypeAbiFrom<Self> for Address {}
 
 impl TypeAbi for Address {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "Address".into()
     }

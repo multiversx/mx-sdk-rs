@@ -241,6 +241,8 @@ impl<M> TypeAbi for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
+    type Unmanaged = Address;
+
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {
         Address::type_name()

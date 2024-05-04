@@ -138,6 +138,8 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("counted-variadic<");
         repr.push_str(T::type_name().as_str());
