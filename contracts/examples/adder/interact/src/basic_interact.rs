@@ -73,6 +73,9 @@ impl AdderInteract {
     }
 
     async fn deploy(&mut self) {
+        // warning: multi deploy not yet fully supported
+        // only works with last deployed address
+
         self.set_state().await;
 
         let new_address = self
@@ -113,6 +116,10 @@ impl AdderInteract {
         }
 
         let results = buffer.run().await;
+
+        // warning: multi deploy not yet fully supported
+        // only works with last deployed address
+
         for new_address in results {
             println!("new address: {new_address}");
 
