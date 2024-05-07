@@ -303,35 +303,35 @@ macro_rules! tuple_impls {
             {
                 type Unmanaged = Self;
 
-				fn type_name() -> TypeName {
-					let mut repr = TypeName::from("tuple<");
-					$(
-						if $n > 0 {
-							repr.push(',');
-						}
-						repr.push_str($name::type_name().as_str());
+                fn type_name() -> TypeName {
+                    let mut repr = TypeName::from("tuple<");
+                    $(
+                        if $n > 0 {
+                            repr.push(',');
+                        }
+                        repr.push_str($name::type_name().as_str());
                     )+
-					repr.push('>');
-					repr
-				}
+                    repr.push('>');
+                    repr
+                }
 
                 fn type_name_rust() -> TypeName {
-					let mut repr = TypeName::from("(");
-					$(
-						if $n > 0 {
-							repr.push_str(", ");
-						}
-						repr.push_str($name::type_name_rust().as_str());
+                    let mut repr = TypeName::from("(");
+                    $(
+                        if $n > 0 {
+                            repr.push_str(", ");
+                        }
+                        repr.push_str($name::type_name_rust().as_str());
                     )+
-					repr.push(')');
-					repr
-				}
+                    repr.push(')');
+                    repr
+                }
 
-				fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-					$(
-						$name::provide_type_descriptions(accumulator);
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+                    $(
+                        $name::provide_type_descriptions(accumulator);
                     )+
-				}
+                }
             }
         )+
     }

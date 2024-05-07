@@ -197,15 +197,15 @@ fn has_callback(contract: &ContractTrait) -> bool {
 
 fn generate_supertrait_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {
     contract
-			.supertraits
-			.iter()
-			.map(|supertrait| {
-				let module_path = &supertrait.module_path;
-				quote! {
-					contract_abi.coalesce(<#module_path AbiProvider as multiversx_sc::contract_base::ContractAbiProvider>::abi());
-				}
-			})
-			.collect()
+            .supertraits
+            .iter()
+            .map(|supertrait| {
+                let module_path = &supertrait.module_path;
+                quote! {
+                    contract_abi.coalesce(<#module_path AbiProvider as multiversx_sc::contract_base::ContractAbiProvider>::abi());
+                }
+            })
+            .collect()
 }
 
 fn generate_esdt_attribute_snippets(contract: &ContractTrait) -> Vec<proc_macro2::TokenStream> {

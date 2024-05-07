@@ -340,6 +340,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct PriceFeed<Api>
 where
@@ -353,6 +354,7 @@ where
     pub decimals: u8,
 }
 
+#[type_abi]
 #[derive(TopEncode)]
 pub struct NewRoundEvent<Api>
 where
