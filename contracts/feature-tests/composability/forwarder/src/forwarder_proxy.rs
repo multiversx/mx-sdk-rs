@@ -1106,6 +1106,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub struct CallbackData<Api>
 where
@@ -1118,6 +1119,7 @@ where
     pub args: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
+#[type_abi]
 #[derive(TopEncode, TopDecode, Clone, Copy, PartialEq, Debug)]
 pub struct Color {
     pub r: u8,
