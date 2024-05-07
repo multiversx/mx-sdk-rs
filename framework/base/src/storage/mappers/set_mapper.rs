@@ -5,7 +5,7 @@ use storage_get_from_address::storage_get_len_from_address;
 pub use super::queue_mapper::Iter;
 use super::{QueueMapper, StorageClearable, StorageMapper};
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         self, multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode,
@@ -301,14 +301,34 @@ where
 {
 }
 
+impl<SA, T> TypeAbiFrom<SetMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for SetMapper<SA, T, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+}
+
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA, T> TypeAbi for SetMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

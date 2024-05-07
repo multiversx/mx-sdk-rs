@@ -1,10 +1,8 @@
 #![allow(deprecated)]
 
 use basic_features::BasicFeatures;
-use multiversx_sc::imports::{OrderedBinaryTreeNode, NULL_NODE_ID};
-use multiversx_sc_scenario::{
-    managed_biguint, rust_biguint, testing_framework::BlockchainStateWrapper,
-};
+
+use multiversx_sc_scenario::imports::*;
 
 #[test]
 fn ordered_binary_tree_test() {

@@ -1,8 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::codec::{
-    multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
-    TopEncodeMultiOutput,
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{
+        multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
+        TopEncodeMultiOutput,
+    },
 };
 
 use super::{
@@ -224,13 +227,26 @@ impl<SA> CodecFrom<UserMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, Man
 {
 }
 
+impl<SA> TypeAbiFrom<UserMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, ManagedAddress<SA>> where
+    SA: StorageMapperApi
+{
+}
+
+impl<SA> TypeAbiFrom<Self> for UserMapper<SA, CurrentStorage> where SA: StorageMapperApi {}
+
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA> TypeAbi for UserMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<ManagedAddress<SA>>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<ManagedAddress<SA>>()
     }
 
     fn is_variadic() -> bool {

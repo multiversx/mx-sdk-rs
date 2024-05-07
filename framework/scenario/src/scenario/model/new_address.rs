@@ -5,7 +5,7 @@ use crate::scenario_format::{
 
 use super::{AddressValue, U64Value};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct NewAddress {
     pub creator_address: AddressValue,
     pub creator_nonce: U64Value,

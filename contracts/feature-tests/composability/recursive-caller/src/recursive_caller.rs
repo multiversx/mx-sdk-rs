@@ -2,15 +2,12 @@
 
 multiversx_sc::imports!();
 
+pub mod self_proxy;
+pub mod vault_proxy;
+
 /// Test contract for investigating async calls.
 #[multiversx_sc::contract]
 pub trait RecursiveCaller {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
-    #[proxy]
-    fn self_proxy(&self) -> self::Proxy<Self::Api>;
-
     #[init]
     fn init(&self) {}
 
@@ -24,18 +21,18 @@ pub trait RecursiveCaller {
     ) {
         self.recursive_send_funds_event(to, token_identifier, amount, counter);
 
-        self.vault_proxy()
-            .contract(to.clone())
+        self.tx()
+            .to(to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_identifier.clone(), 0, amount.clone()))
-            .async_call()
-            .with_callback(self.callbacks().recursive_send_funds_callback(
+            .egld_or_single_esdt(token_identifier, 0, amount)
+            .callback(self.callbacks().recursive_send_funds_callback(
                 to,
                 token_identifier,
                 amount,
                 counter,
             ))
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     #[callback]
@@ -49,8 +46,10 @@ pub trait RecursiveCaller {
         self.recursive_send_funds_callback_event(to, token_identifier, amount, counter);
 
         if counter > 1 {
-            self.self_proxy()
-                .contract(self.blockchain().get_sc_address())
+            let self_address = self.blockchain().get_sc_address();
+            self.tx()
+                .to(&self_address)
+                .typed(self_proxy::RecursiveCallerProxy)
                 .recursive_send_funds(to, token_identifier, amount, counter - 1)
                 .async_call()
                 .call_and_exit()

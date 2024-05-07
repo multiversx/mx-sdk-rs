@@ -1,7 +1,10 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 multiversx_sc::derive_imports!();
 
-#[derive(TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(TopEncode, TopDecode)]
 pub struct CallbackData<M: ManagedTypeApi> {
     callback_name: ManagedBuffer<M>,
     token_identifier: EgldOrEsdtTokenIdentifier<M>,
@@ -14,17 +17,14 @@ const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
 #[multiversx_sc::module]
 pub trait ForwarderAsyncCallModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     fn echo_args_async(&self, to: ManagedAddress, args: MultiValueEncoded<ManagedBuffer>) {
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .echo_arguments(args)
-            .async_call()
-            .with_callback(self.callbacks().echo_args_callback())
-            .call_and_exit();
+            .callback(self.callbacks().echo_args_callback())
+            .async_call_and_exit();
     }
 
     #[callback]
@@ -57,10 +57,11 @@ pub trait ForwarderAsyncCallModule {
     #[payable("*")]
     fn forward_async_accept_funds(&self, to: ManagedAddress) {
         let payment = self.call_value().egld_or_single_esdt();
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .async_call()
             .call_and_exit()
     }
@@ -70,14 +71,15 @@ pub trait ForwarderAsyncCallModule {
     fn forward_async_accept_funds_half_payment(&self, to: ManagedAddress) {
         let payment = self.call_value().egld_or_single_esdt();
         let half_payment = payment.amount / 2u32;
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((
-                payment.token_identifier,
+            .egld_or_single_esdt(
+                &payment.token_identifier,
                 payment.token_nonce,
-                half_payment,
-            ))
+                &half_payment,
+            )
             .async_call()
             .call_and_exit()
     }
@@ -89,16 +91,16 @@ pub trait ForwarderAsyncCallModule {
         let fees = &payment.amount * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = &payment.amount - &fees;
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((
-                payment.token_identifier,
+            .egld_or_single_esdt(
+                &payment.token_identifier,
                 payment.token_nonce,
-                amount_to_send,
-            ))
-            .async_call()
-            .call_and_exit()
+                &amount_to_send,
+            )
+            .async_call_and_exit();
     }
 
     #[endpoint]
@@ -109,11 +111,12 @@ pub trait ForwarderAsyncCallModule {
         token_nonce: u64,
         amount: BigUint,
     ) {
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .retrieve_funds(token, token_nonce, amount)
             .async_call()
-            .with_callback(self.callbacks().retrieve_funds_callback())
+            .callback(self.callbacks().retrieve_funds_callback())
             .call_and_exit()
     }
 
@@ -146,16 +149,16 @@ pub trait ForwarderAsyncCallModule {
         token_identifier: &EgldOrEsdtTokenIdentifier,
         amount: &BigUint,
     ) {
-        self.vault_proxy()
-            .contract(to.clone())
+        self.tx()
+            .to(to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_identifier.clone(), 0, amount.clone()))
-            .async_call()
-            .with_callback(
+            .egld_or_single_esdt(token_identifier, 0u64, amount)
+            .callback(
                 self.callbacks()
                     .send_funds_twice_callback(to, token_identifier, amount),
             )
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     #[callback]
@@ -165,12 +168,12 @@ pub trait ForwarderAsyncCallModule {
         token_identifier: &EgldOrEsdtTokenIdentifier,
         cb_amount: &BigUint,
     ) {
-        self.vault_proxy()
-            .contract(to.clone())
+        self.tx()
+            .to(to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_identifier.clone(), 0, cb_amount.clone()))
-            .async_call()
-            .call_and_exit()
+            .egld_or_single_esdt(token_identifier, 0u64, cb_amount)
+            .async_call_and_exit();
     }
 
     #[endpoint]
@@ -188,12 +191,13 @@ pub trait ForwarderAsyncCallModule {
             all_token_payments.push(payment);
         }
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .async_call()
-            .call_and_exit()
+            .call_and_exit();
     }
 
     #[view]

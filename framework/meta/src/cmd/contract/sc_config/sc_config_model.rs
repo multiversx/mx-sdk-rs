@@ -1,4 +1,7 @@
-use super::{contract_variant_validate::validate_contract_variant, ContractVariant};
+use super::{
+    contract_variant_validate::validate_contract_variant, sc_config_proxy::ProxyConfigSerde,
+    ContractVariant,
+};
 
 /// Allowed file names for the SC config.
 ///
@@ -15,6 +18,7 @@ pub const SC_CONFIG_FILE_NAMES: &[&str] = &["sc-config.toml", "multicontract.tom
 pub struct ScConfig {
     pub default_contract_config_name: String,
     pub contracts: Vec<ContractVariant>,
+    pub proxy_configs: Vec<ProxyConfigSerde>,
 }
 
 impl ScConfig {

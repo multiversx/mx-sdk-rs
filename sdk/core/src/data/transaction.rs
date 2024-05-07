@@ -48,7 +48,7 @@ pub struct ResponseTxCost {
 }
 
 // TransactionOnNetwork holds a transaction's info entry in a hyper block
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct TransactionOnNetwork {
     #[serde(rename = "type")]
@@ -67,19 +67,19 @@ pub struct TransactionOnNetwork {
     pub destination_shard: u32,
     pub block_nonce: u64,
     pub block_hash: String,
-    pub notarized_at_source_in_meta_nonce: u64,
+    pub notarized_at_source_in_meta_nonce: Option<u64>,
     #[serde(rename = "NotarizedAtSourceInMetaHash")]
-    pub notarized_at_source_in_meta_hash: String,
-    pub notarized_at_destination_in_meta_nonce: u64,
-    pub notarized_at_destination_in_meta_hash: String,
+    pub notarized_at_source_in_meta_hash: Option<String>,
+    pub notarized_at_destination_in_meta_nonce: Option<u64>,
+    pub notarized_at_destination_in_meta_hash: Option<String>,
     pub processing_type_on_destination: String,
     pub miniblock_type: String,
     pub miniblock_hash: String,
     pub timestamp: u64,
     pub data: Option<String>,
     pub status: String,
-    pub hyperblock_nonce: u64,
-    pub hyperblock_hash: String,
+    pub hyperblock_nonce: Option<u64>,
+    pub hyperblock_hash: Option<String>,
     pub smart_contract_results: Option<Vec<ApiSmartContractResult>>,
     pub logs: Option<ApiLogs>,
 }
@@ -132,6 +132,7 @@ pub struct TransactionInfoData {
 // TransactionInfo holds a transaction info response from the network
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TransactionInfo {
+    #[serde(default)]
     pub error: String,
     pub code: String,
     pub data: Option<TransactionInfoData>,

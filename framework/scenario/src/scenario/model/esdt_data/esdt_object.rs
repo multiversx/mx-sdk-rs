@@ -1,5 +1,8 @@
 use super::EsdtInstance;
-use crate::scenario::model::{BigUintValue, BytesValue, U64Value};
+use crate::{
+    scenario::model::{BigUintValue, BytesValue, U64Value},
+    scenario_model::AddressValue,
+};
 
 #[derive(Debug, Default, Clone)]
 pub struct EsdtObject {
@@ -53,19 +56,20 @@ impl EsdtObject {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn set_token_all_properties<N, V, T>(
+    pub fn set_token_all_properties<N, V, T, A>(
         &mut self,
         nonce_expr: N,
         balance_expr: V,
         opt_attributes_expr: Option<T>,
         royalties_expr: N,
-        creator_expr: Option<T>,
+        creator_expr: Option<A>,
         hash_expr: Option<T>,
         uris_expr: Vec<T>,
     ) where
         U64Value: From<N>,
         BigUintValue: From<V>,
         BytesValue: From<T>,
+        AddressValue: From<A>,
     {
         let inst_for_nonce = self.get_or_insert_instance_for_nonce(nonce_expr);
 
@@ -93,8 +97,8 @@ impl EsdtObject {
         }
 
         if let Some(creator_expr) = creator_expr {
-            let creator = BytesValue::from(creator_expr);
-            if !creator.value.is_empty() {
+            let creator = AddressValue::from(creator_expr);
+            if !creator.value.is_zero() {
                 inst_for_nonce.creator = Some(creator);
             } else {
                 inst_for_nonce.creator = None;

@@ -1,5 +1,4 @@
-use multiversx_sc::types::{BigUint, ManagedVec};
-use multiversx_sc_scenario::{api::StaticApi, *};
+use multiversx_sc_scenario::imports::*;
 
 use basic_features::managed_vec_features::ManagedVecFeatures;
 

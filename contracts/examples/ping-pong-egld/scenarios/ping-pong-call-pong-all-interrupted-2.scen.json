@@ -21,7 +21,7 @@
                 "to": "sc:ping-pong",
                 "function": "pongAll",
                 "arguments": [],
-                "gasLimit": "6,100,000",
+                "gasLimit": "3,500,000",
                 "gasPrice": "0"
             },
             "expect": {

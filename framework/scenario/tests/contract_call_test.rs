@@ -3,6 +3,7 @@ use multiversx_sc_scenario::scenario_model::ScCallStep;
 use num_traits::Zero;
 
 #[test]
+#[allow(deprecated)]
 fn test_contract_call_multi_esdt() {
     let tx = ScCallStep::new()
         .from("address:sender")

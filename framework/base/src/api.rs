@@ -1,5 +1,4 @@
 mod blockchain_api;
-mod builtin_function_names;
 mod call_value_api;
 mod composite_api;
 mod crypto_api;
@@ -16,7 +15,6 @@ pub mod uncallable;
 mod vm_api;
 
 pub use blockchain_api::*;
-pub use builtin_function_names::*;
 pub use call_value_api::*;
 pub use composite_api::*;
 pub use crypto_api::*;
@@ -30,3 +28,6 @@ pub use print_api::*;
 pub use send_api::*;
 pub use storage_api::*;
 pub use vm_api::VMApi;
+
+// Backwards compatibility.
+pub use crate::types::system_proxy::builtin_func_names::*;

@@ -27,20 +27,20 @@ pub fn variant_dep_decode_snippets(
 ) -> Vec<proc_macro2::TokenStream> {
     let mut previous_disc: Vec<ExplicitDiscriminant> = Vec::new();
     data_enum
-		.variants
-		.iter()
-		.enumerate()
-		.map(|(variant_index, variant)| {
+        .variants
+        .iter()
+        .enumerate()
+        .map(|(variant_index, variant)| {
             let variant_discriminant = get_discriminant(variant_index, variant, &mut previous_disc);
-			let variant_ident = &variant.ident;
-			let variant_field_snippets = fields_decl_syntax(&variant.fields, |index, field| {
-				dep_decode_snippet(index, field, input_value)
-			});
-			quote! {
+            let variant_ident = &variant.ident;
+            let variant_field_snippets = fields_decl_syntax(&variant.fields, |index, field| {
+                dep_decode_snippet(index, field, input_value)
+            });
+            quote! {
                 #variant_discriminant => core::result::Result::Ok( #name::#variant_ident #variant_field_snippets ),
-			}
-		})
-		.collect()
+            }
+        })
+        .collect()
 }
 
 pub fn nested_decode_impl(ast: &syn::DeriveInput) -> TokenStream {

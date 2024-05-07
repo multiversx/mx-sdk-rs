@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     codec::*,
 };
 use alloc::{
@@ -240,9 +240,17 @@ impl TopDecode for BoxedBytes {
     }
 }
 
+impl TypeAbiFrom<Self> for BoxedBytes {}
+
 impl TypeAbi for BoxedBytes {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "bytes".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "BoxedBytes".into()
     }
 }
 

@@ -7,6 +7,9 @@ pub struct TemplateMetadata {
     pub src_file: String,
     pub rename_pairs: Vec<(String, String)>,
     pub files_include: Vec<String>,
+
+    #[serde(default)]
+    pub has_interactor: bool,
 }
 
 #[cfg(test)]
