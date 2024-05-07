@@ -115,8 +115,8 @@ macro_rules! multi_arg_impls {
                 }
 
                 fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-					$(
-						$name::provide_type_descriptions(accumulator);
+                    $(
+                        $name::provide_type_descriptions(accumulator);
                     )+
                 }
 
