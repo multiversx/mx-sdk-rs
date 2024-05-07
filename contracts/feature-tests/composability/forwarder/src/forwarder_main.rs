@@ -8,12 +8,12 @@ pub mod contract_change_owner;
 pub mod contract_deploy;
 pub mod contract_upgrade;
 pub mod esdt;
+pub mod forwarder_proxy;
 pub mod nft;
 pub mod roles;
 pub mod sft;
 pub mod storage;
 pub mod vault_proxy;
-pub mod forwarder_proxy;
 
 multiversx_sc::imports!();
 

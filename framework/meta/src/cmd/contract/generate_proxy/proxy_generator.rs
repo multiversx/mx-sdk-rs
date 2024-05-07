@@ -36,7 +36,7 @@ const TYPES_FROM_FRAMEWORK: &[&str] = &[
     "EgldOrMultiEsdtPayment",
     "EsdtTokenData",
     "EsdtLocalRole",
-    "EsdtTokenType"
+    "EsdtTokenType",
 ];
 
 pub struct ProxyGenerator<'a> {

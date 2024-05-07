@@ -227,6 +227,7 @@ impl AsMut<ScCallStep> for ScCallStep {
 /// - recipient,
 /// - endpoint name,
 /// - the arguments.
+#[allow(deprecated)]
 pub(super) fn process_contract_call<CC>(
     contract_call: CC,
 ) -> (String, String, BigUintValue, Vec<String>)

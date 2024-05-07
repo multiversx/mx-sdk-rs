@@ -3,6 +3,11 @@ use crate::{
     types::{CallbackClosure, EgldPayment, FunctionCall, ManagedAddress, Tx, TxScEnv},
 };
 
+/// Kept as alias for backwards compatibility.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 pub type AsyncCall<Api> = Tx<
     TxScEnv<Api>,
     (),

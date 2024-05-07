@@ -13,6 +13,10 @@ use super::{
 /// Holds data for calling another contract, with any type of payment: none, EGLD, Multi-ESDT.
 ///
 /// Gets created when chaining method `with_any_payment`.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractCallWithAnyPayment<SA, OriginalResult>
 where

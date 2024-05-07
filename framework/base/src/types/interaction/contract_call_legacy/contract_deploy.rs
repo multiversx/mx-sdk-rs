@@ -17,6 +17,10 @@ use crate::{
 
 use super::UNSPECIFIED_GAS_LIMIT;
 
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractDeploy<SA, OriginalResult>
 where
