@@ -311,6 +311,8 @@ impl<E, const CAPACITY: usize> TypeAbi for SparseArray<E, CAPACITY>
 where
     E: ErrorApi,
 {
+    type Unmanaged = Self;
+
     /// It is semantically equivalent to any list of `usize`.
     fn type_name() -> TypeName {
         <&[usize] as TypeAbi>::type_name()

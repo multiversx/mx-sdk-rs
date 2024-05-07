@@ -227,6 +227,8 @@ impl TopDecode for H256 {
 impl TypeAbiFrom<Self> for H256 {}
 
 impl TypeAbi for H256 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "H256".into()
     }

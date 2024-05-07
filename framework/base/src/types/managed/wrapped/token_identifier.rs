@@ -174,6 +174,8 @@ impl<M: ManagedTypeApi> TypeAbiFrom<Self> for TokenIdentifier<M> {}
 impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for TokenIdentifier<M> {}
 
 impl<M: ManagedTypeApi> TypeAbi for TokenIdentifier<M> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "TokenIdentifier".into()
     }

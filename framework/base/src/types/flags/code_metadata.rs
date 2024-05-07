@@ -106,6 +106,8 @@ impl TopDecode for CodeMetadata {
 impl TypeAbiFrom<Self> for CodeMetadata {}
 
 impl TypeAbi for CodeMetadata {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "CodeMetadata".into()
     }

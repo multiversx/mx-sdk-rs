@@ -127,6 +127,8 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
         impl #impl_generics multiversx_sc::abi::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
 
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
+            type Unmanaged = Self;
+
             fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
             }

@@ -205,6 +205,8 @@ where
     }
 }
 
+impl<M, const N: usize> TypeAbiFrom<ManagedByteArray<M, N>> for [u8; N] where M: ManagedTypeApi {}
+
 impl<M, const N: usize> TypeAbiFrom<Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 impl<M, const N: usize> TypeAbiFrom<&Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
 
@@ -212,6 +214,8 @@ impl<M, const N: usize> TypeAbi for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
+    type Unmanaged = [u8; N];
+
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> TypeName {
         <[u8; N] as TypeAbi>::type_name()

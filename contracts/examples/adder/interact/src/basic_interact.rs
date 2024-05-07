@@ -152,7 +152,7 @@ impl AdderInteract {
             .to(self.state.current_adder_address())
             .typed(adder_proxy::AdderProxy)
             .sum()
-            .returns(ReturnsResultAs::<RustBigUint>::new())
+            .returns(ReturnsResultUnmanaged)
             .prepare_async()
             .run()
             .await;

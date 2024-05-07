@@ -43,6 +43,8 @@ impl From<u8> for MessageHashType {
 impl TypeAbiFrom<Self> for MessageHashType {}
 
 impl TypeAbi for MessageHashType {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "MessageHashType".into()
     }

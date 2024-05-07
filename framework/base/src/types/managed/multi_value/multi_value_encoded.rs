@@ -241,6 +241,8 @@ where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
     }

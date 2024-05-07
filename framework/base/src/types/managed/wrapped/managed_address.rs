@@ -241,6 +241,12 @@ impl<M> TypeAbi for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
+    #[cfg(feature = "alloc")]
+    type Unmanaged = crate::types::heap::Address;
+
+    #[cfg(not(feature = "alloc"))]
+    type Unmanaged = Self;
+
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {
         Address::type_name()

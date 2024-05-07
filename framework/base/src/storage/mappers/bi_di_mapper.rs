@@ -345,6 +345,8 @@ where
         + PartialEq
         + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
     }

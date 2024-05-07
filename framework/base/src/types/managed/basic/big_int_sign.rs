@@ -82,6 +82,8 @@ impl TopDecode for Sign {
 impl TypeAbiFrom<Self> for Sign {}
 
 impl TypeAbi for Sign {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("Sign")
     }
