@@ -10,7 +10,7 @@ use crate::{
 /// Defines a lambda function to be called on the decoded result.
 ///
 /// Value will be converted to type `T`, which should be compatible with the original type.
-pub struct WithResultConv<T, F>
+pub struct WithResultAs<T, F>
 where
     F: FnOnce(T),
 {
@@ -18,19 +18,19 @@ where
     pub f: F,
 }
 
-impl<T, F> WithResultConv<T, F>
+impl<T, F> WithResultAs<T, F>
 where
     F: FnOnce(T),
 {
     pub fn new(f: F) -> Self {
-        WithResultConv {
+        WithResultAs {
             _phantom: PhantomData,
             f,
         }
     }
 }
 
-impl<Env, Original, T, F> RHListItem<Env, Original> for WithResultConv<T, F>
+impl<Env, Original, T, F> RHListItem<Env, Original> for WithResultAs<T, F>
 where
     Env: TxEnv,
     T: TopDecodeMulti + TypeAbiFrom<Original>,
@@ -40,7 +40,7 @@ where
 }
 
 impl<Env, Original, T, F> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original>
-    for WithResultConv<T, F>
+    for WithResultAs<T, F>
 where
     Env: TxEnv,
     T: TopDecodeMulti + TypeAbiFrom<Original>,

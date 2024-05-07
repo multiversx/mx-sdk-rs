@@ -39,7 +39,7 @@ fn st_blackbox_chained() {
             tx.to(TestSCAddress::new("adder"))
                 .typed(scenario_tester_proxy::ScenarioTesterProxy)
                 .sum()
-                .with_result(WithResultConv::new(|value: BigUint| {
+                .with_result(WithResultAs::new(|value: BigUint| {
                     assert_eq!(value, BigUint::from(5u32));
                 }))
         })

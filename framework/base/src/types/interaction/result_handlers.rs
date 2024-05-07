@@ -8,7 +8,7 @@ mod returns_result_unmanaged;
 mod with_new_address;
 mod with_raw_result;
 mod with_result;
-mod with_result_conv;
+mod with_result_as;
 
 pub use returns_bt::*;
 pub use returns_new_address::*;
@@ -20,7 +20,7 @@ pub use returns_result_unmanaged::ReturnsResultUnmanaged;
 pub use with_new_address::*;
 pub use with_raw_result::WithRawResult;
 pub use with_result::WithResult;
-pub use with_result_conv::*;
+pub use with_result_as::*;
 
 use super::TxEnv;
 
