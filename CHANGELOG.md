@@ -26,6 +26,14 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
+- Unified transaction syntax
+	- new syntax for sending transactions from contracts
+	- new syntax for integration tests: tx, set state, check state, etc.
+	- new syntax for interactors
+	- new proxies, generated from sc-meta
+	- support for upgrade in new proxies
+- Improved interactor tx result polling performance.
 
 ## [sc 0.48.1, codec 0.18.7] - 2024-04-30
 - Simplified decoding of small numbers (i64/u64).
