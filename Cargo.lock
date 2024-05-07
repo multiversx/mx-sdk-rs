@@ -475,6 +475,7 @@ version = "0.0.0"
 dependencies = [
  "builtin-func-features",
  "forwarder",
+ "forwarder-legacy",
  "forwarder-queue",
  "forwarder-raw",
  "multiversx-sc",
@@ -629,6 +630,7 @@ dependencies = [
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
+ "kitty",
  "multiversx-sc",
  "multiversx-sc-scenario",
 ]
@@ -1039,7 +1041,23 @@ version = "0.0.0"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "forwarder-legacy"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
  "vault",
+]
+
+[[package]]
+name = "forwarder-legacy-meta"
+version = "0.0.0"
+dependencies = [
+ "forwarder-legacy",
+ "multiversx-sc-meta",
 ]
 
 [[package]]
@@ -1057,7 +1075,6 @@ dependencies = [
  "multiversx-sc",
  "multiversx-sc-scenario",
  "multiversx-sc-wasm-adapter",
- "vault",
 ]
 
 [[package]]
@@ -1804,7 +1821,7 @@ checksum = "b59072fa0624b55ae5ae3fa6bfa91515bbeb4ac440214bc4a509e2c8806d6e9f"
 
 [[package]]
 name = "multiversx-price-aggregator-sc"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "arrayvec",
  "getrandom 0.2.14",
@@ -1825,7 +1842,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "bitflags 2.4.2",
  "hex-literal",
@@ -1855,7 +1872,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-derive"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "hex",
  "proc-macro2",
@@ -1866,7 +1883,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-meta"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "clap",
  "colored",
@@ -1892,14 +1909,14 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-modules"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sc-scenario"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "base64 0.21.7",
  "bech32",
@@ -1925,7 +1942,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-sc-snippets"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "base64 0.21.7",
  "env_logger",
@@ -1934,19 +1951,20 @@ dependencies = [
  "log",
  "multiversx-sc-scenario",
  "multiversx-sdk",
+ "rand 0.8.5",
  "tokio",
 ]
 
 [[package]]
 name = "multiversx-sc-wasm-adapter"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
 ]
 
 [[package]]
 name = "multiversx-sdk"
-version = "0.3.2"
+version = "0.4.0-alpha.4"
 dependencies = [
  "anyhow",
  "base64 0.21.7",
@@ -1970,7 +1988,7 @@ dependencies = [
 
 [[package]]
 name = "multiversx-wegld-swap-sc"
-version = "0.48.1"
+version = "0.49.0-alpha.4"
 dependencies = [
  "multiversx-sc",
  "multiversx-sc-modules",
@@ -2221,7 +2239,6 @@ dependencies = [
 name = "parent"
 version = "0.0.0"
 dependencies = [
- "child",
  "multiversx-sc",
  "multiversx-sc-scenario",
 ]
@@ -2359,7 +2376,6 @@ name = "promises-features"
 version = "0.0.0"
 dependencies = [
  "multiversx-sc",
- "vault",
 ]
 
 [[package]]
@@ -2758,6 +2774,22 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502"
 dependencies = [
  "winapi-util",
+]
+
+[[package]]
+name = "scenario-tester"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc",
+ "multiversx-sc-scenario",
+]
+
+[[package]]
+name = "scenario-tester-meta"
+version = "0.0.0"
+dependencies = [
+ "multiversx-sc-meta",
+ "scenario-tester",
 ]
 
 [[package]]

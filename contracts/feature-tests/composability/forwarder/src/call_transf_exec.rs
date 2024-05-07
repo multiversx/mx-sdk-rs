@@ -1,20 +1,20 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 
 const PERCENTAGE_TOTAL: u64 = 10_000; // 100%
 
 #[multiversx_sc::module]
 pub trait ForwarderTransferExecuteModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     #[payable("*")]
     fn forward_transf_exec_accept_funds(&self, to: ManagedAddress) {
         let payment = self.call_value().egld_or_single_esdt();
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .transfer_execute();
     }
 
@@ -29,10 +29,11 @@ pub trait ForwarderTransferExecuteModule {
         let fees = &payment * &percentage_fees / PERCENTAGE_TOTAL;
         let amount_to_send = payment - fees;
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_id, 0, amount_to_send))
+            .egld_or_single_esdt(&token_id, 0u64, &amount_to_send)
             .transfer_execute();
     }
 
@@ -43,18 +44,20 @@ pub trait ForwarderTransferExecuteModule {
         let half_payment = payment / 2u32;
         let half_gas = self.blockchain().get_gas_left() / 2;
 
-        self.vault_proxy()
-            .contract(to.clone())
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token.clone(), token_nonce, half_payment.clone()))
-            .with_gas_limit(half_gas)
+            .egld_or_single_esdt(&token, token_nonce, &half_payment)
+            .gas(half_gas)
             .transfer_execute();
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token, token_nonce, half_payment))
-            .with_gas_limit(half_gas)
+            .egld_or_single_esdt(&token, token_nonce, &half_payment)
+            .gas(half_gas)
             .transfer_execute();
     }
 
@@ -70,10 +73,11 @@ pub trait ForwarderTransferExecuteModule {
         let payment_token = payment.token_identifier.clone();
         let gas_left_before = self.blockchain().get_gas_left();
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .transfer_execute();
 
         let gas_left_after = self.blockchain().get_gas_left();
@@ -102,10 +106,11 @@ pub trait ForwarderTransferExecuteModule {
             all_token_payments.push(payment);
         }
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .transfer_execute()
     }
 
@@ -124,10 +129,11 @@ pub trait ForwarderTransferExecuteModule {
             all_token_payments.push(payment);
         }
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .transfer_execute()
     }
 
@@ -146,10 +152,11 @@ pub trait ForwarderTransferExecuteModule {
             all_token_payments.push(payment);
         }
 
-        self.vault_proxy()
-            .contract(to)
+        self.tx()
+            .to(&to)
+            .typed(vault_proxy::VaultProxy)
             .reject_funds()
-            .with_multi_token_transfer(all_token_payments)
+            .payment(all_token_payments)
             .transfer_execute()
     }
 }

@@ -21,6 +21,10 @@ where
     pub fn is_star(&self) -> bool {
         matches!(self, CheckValue::Star)
     }
+
+    pub fn is_equal_to(&self, _value: T) -> bool {
+        matches!(self, CheckValue::Equal(_value))
+    }
 }
 
 impl<T> InterpretableFrom<CheckBytesValueRaw> for CheckValue<T>

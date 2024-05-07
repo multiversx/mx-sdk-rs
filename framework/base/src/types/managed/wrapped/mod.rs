@@ -21,11 +21,11 @@ mod traits;
 
 pub use builder::*;
 pub use egld_or_esdt_token_identifier::EgldOrEsdtTokenIdentifier;
-pub use egld_or_esdt_token_payment::EgldOrEsdtTokenPayment;
-pub use egld_or_multi_esdt_payment::EgldOrMultiEsdtPayment;
+pub use egld_or_esdt_token_payment::{EgldOrEsdtTokenPayment, EgldOrEsdtTokenPaymentRefs};
+pub use egld_or_multi_esdt_payment::{EgldOrMultiEsdtPayment, EgldOrMultiEsdtPaymentRefs};
 pub(crate) use encoded_managed_vec_item::EncodedManagedVecItem;
 pub use esdt_token_data::EsdtTokenData;
-pub use esdt_token_payment::{EsdtTokenPayment, MultiEsdtPayment};
+pub use esdt_token_payment::{EsdtTokenPayment, EsdtTokenPaymentRefs, MultiEsdtPayment};
 pub use managed_address::ManagedAddress;
 pub(crate) use managed_byte_array::ManagedBufferSizeContext;
 pub use managed_byte_array::ManagedByteArray;

@@ -1,6 +1,9 @@
-use crate::codec::{
-    multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
-    TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{
+        multi_types::MultiValue3, DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti,
+        TopDecodeMultiInput, TopDecodeMultiLength, TopEncodeMulti, TopEncodeMultiOutput,
+    },
 };
 
 use crate::{
@@ -98,12 +101,20 @@ where
     const LEN: usize = 3;
 }
 
+impl<M> TypeAbiFrom<Self> for EsdtTokenPaymentMultiValue<M> where M: ManagedTypeApi {}
+
 impl<M> TypeAbi for EsdtTokenPaymentMultiValue<M>
 where
     M: ManagedTypeApi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         MultiValue3::<TokenIdentifier<M>, u64, BigUint<M>>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "EsdtTokenPaymentMultiValue<$API>".into()
     }
 
     fn is_variadic() -> bool {

@@ -5,7 +5,7 @@ use super::{
     StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         self,
@@ -620,13 +620,34 @@ where
 {
 }
 
+impl<SA, T, U> TypeAbiFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, U>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+    U: TypeAbiFrom<T>,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for LinkedListMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+{
+}
+
 impl<SA, T> TypeAbi for LinkedListMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

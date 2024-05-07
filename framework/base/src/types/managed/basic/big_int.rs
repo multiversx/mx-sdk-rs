@@ -1,7 +1,7 @@
 use core::{convert::TryInto, marker::PhantomData};
 
 use crate::{
-    abi::TypeName,
+    abi::{TypeAbiFrom, TypeName},
     api::{
         const_handles, use_raw_handle, BigIntApiImpl, HandleConstraints, ManagedBufferApiImpl,
         ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
@@ -101,6 +101,10 @@ macro_rules! big_int_conv_num {
         }
 
         impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigInt<M> {}
+        impl<M: ManagedTypeApi> CodecFrom<&$num_ty> for BigInt<M> {}
+
+        impl<M: ManagedTypeApi> TypeAbiFrom<$num_ty> for BigInt<M> {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<&$num_ty> for BigInt<M> {}
     };
 }
 
@@ -298,9 +302,27 @@ impl<M: ManagedTypeApi> TopDecode for BigInt<M> {
     }
 }
 
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> TypeAbiFrom<crate::codec::num_bigint::BigInt> for BigInt<M> {}
+#[cfg(feature = "num-bigint")]
+impl<M: ManagedTypeApi> TypeAbiFrom<BigInt<M>> for crate::codec::num_bigint::BigInt {}
+
+impl<M> TypeAbiFrom<Self> for BigInt<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for BigInt<M> where M: ManagedTypeApi {}
+
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigInt<M> {
+    #[cfg(feature = "num-bigint")]
+    type Unmanaged = crate::codec::num_bigint::BigInt;
+
+    #[cfg(not(feature = "num-bigint"))]
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("BigInt")
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("BigInt<$API>")
     }
 }
 

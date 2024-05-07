@@ -1,6 +1,6 @@
 use crate::{
     api::StaticApi,
-    multiversx_sc::types::{ContractCall, ContractCallWithEgld, EsdtTokenPayment},
+    multiversx_sc::types::{ContractCall, EsdtTokenPayment},
     scenario::model::{AddressValue, BigUintValue, BytesValue, U64Value},
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
@@ -87,8 +87,13 @@ impl IntoRaw<TxCallRaw> for TxCall {
 }
 
 impl TxCall {
-    pub fn to_contract_call(&self) -> ContractCallWithEgld<StaticApi, ()> {
-        let mut contract_call = ContractCallWithEgld::new(
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
+    pub fn to_contract_call(&self) -> multiversx_sc::types::ContractCallWithEgld<StaticApi, ()> {
+        let mut contract_call = multiversx_sc::types::ContractCallWithEgld::new(
             (&self.to.value).into(),
             self.function.as_bytes(),
             (&self.egld_value.value).into(),

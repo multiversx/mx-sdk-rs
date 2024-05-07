@@ -2,7 +2,8 @@
 
 use multiversx_sc::imports::*;
 
-mod crypto_kitties_proxy;
+pub mod kitty_ownership_proxy;
+pub mod proxy_crypto_zombies;
 mod storage;
 mod zombie;
 mod zombie_attack;

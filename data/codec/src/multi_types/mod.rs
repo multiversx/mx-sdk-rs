@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: remove after deleting CodecFrom
+
 mod multi_value_ignore;
 mod multi_value_optional;
 mod multi_value_placeholder;

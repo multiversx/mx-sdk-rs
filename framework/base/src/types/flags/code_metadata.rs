@@ -1,7 +1,7 @@
 #![allow(clippy::bad_bit_mask)]
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     codec::*,
     formatter::{hex_util, FormatByteReceiver, SCBinary, SCDisplay, SCLowerHex},
 };
@@ -103,8 +103,16 @@ impl TopDecode for CodeMetadata {
     }
 }
 
+impl TypeAbiFrom<Self> for CodeMetadata {}
+
 impl TypeAbi for CodeMetadata {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
+        "CodeMetadata".into()
+    }
+
+    fn type_name_rust() -> TypeName {
         "CodeMetadata".into()
     }
 }

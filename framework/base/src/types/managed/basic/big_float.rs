@@ -1,6 +1,7 @@
 use super::ManagedBuffer;
 
 use crate::{
+    abi::{TypeAbi, TypeAbiFrom},
     api::{
         use_raw_handle, BigFloatApiImpl, ManagedTypeApi, ManagedTypeApiImpl, Sign, StaticVarApiImpl,
     },
@@ -285,7 +286,14 @@ impl<M: ManagedTypeApi> NestedDecode for BigFloat<M> {
     }
 }
 
-impl<M: ManagedTypeApi> crate::abi::TypeAbi for BigFloat<M> {
+impl<M> TypeAbiFrom<BigFloat<M>> for f64 where M: ManagedTypeApi {}
+
+impl<M> TypeAbiFrom<Self> for BigFloat<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for BigFloat<M> where M: ManagedTypeApi {}
+
+impl<M: ManagedTypeApi> TypeAbi for BigFloat<M> {
+    type Unmanaged = f64;
+
     fn type_name() -> String {
         String::from("BigFloat")
     }

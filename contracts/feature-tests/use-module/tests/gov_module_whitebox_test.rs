@@ -1,15 +1,8 @@
-use multiversx_sc::types::{Address, ManagedVec, MultiValueEncoded};
 use multiversx_sc_modules::governance::{
     governance_configurable::GovernanceConfigurablePropertiesModule, governance_proposal::VoteType,
     GovernanceModule,
 };
-use multiversx_sc_scenario::{
-    managed_address, managed_biguint, managed_buffer, managed_token_id,
-    scenario_model::{
-        Account, AddressValue, CheckAccount, CheckStateStep, ScCallStep, ScDeployStep, SetStateStep,
-    },
-    ScenarioWorld, WhiteboxContract,
-};
+use multiversx_sc_scenario::imports::*;
 
 const GOV_TOKEN_ID_EXPR: &str = "str:GOV-123456";
 const GOV_TOKEN_ID: &[u8] = b"GOV-123456";

@@ -88,7 +88,6 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-with-arg",
                     "nested:str:some_argument"
                 ],
@@ -129,7 +128,6 @@
             },
             "expect": {
                 "out": [
-                    "str:some_argument",
                     "sc:child-src-with-arg"
                 ],
                 "status": "0",

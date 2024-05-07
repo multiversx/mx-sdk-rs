@@ -1,4 +1,7 @@
-use crate::imports::{BigUint, ErrorApiImpl, ManagedTypeApi};
+use crate::{
+    api::{ErrorApiImpl, ManagedTypeApi},
+    types::BigUint,
+};
 
 pub trait FixedSupplyToken<M: ManagedTypeApi> {
     fn get_total_supply(&self) -> BigUint<M>;

@@ -26,14 +26,28 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+
 ## [sc 0.48.1, codec 0.18.7] - 2024-04-30
 - Simplified decoding of small numbers (i64/u64).
 - Manual reset of the `StaticApi`, in order to free memory for long-running tasks.
+
+## [sc 0.49.0-alpha.4, sdk 0.4.0-alpha.4] - 2024-04-23
+Fourth pre-release, contains many interactor improvements, including improved tx polling.
+
+## [sc 0.49.0-alpha.3] - 2024-04-13
+Third pre-release of the unified syntax, includes backwards compatibility fixes and testing set state/check state.
+
+## [sc 0.49.0-alpha.2] - 2024-04-09
+Second pre-release of the unified syntax. Most features done, including fully featured interactors.
+Still missing: set state/check state in tests.
 
 ## [sc 0.48.0] - 2024-04-09
 - When serializing to a managed buffer, static buffer caching is disabled by default.
 - `sc-meta:` - installers for wasm32 target and wasm-opt.
 - Integrated traits for token management: `FixedSupplyToken`, `Mergeable`.
+
+## [sc 0.48.0-alpha.1] - 2024-03-27 (actually alpha release of 0.49.0)
+First pre-release of the unified syntax. Syntax not yet stabilized, should only be used for experimenting with various smart contracts.
 
 ## [sc 0.47.8] - 2024-03-22
 - Test coverage functionality in sc-meta.

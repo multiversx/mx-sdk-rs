@@ -1,10 +1,9 @@
+use crate::vault_proxy;
+
 multiversx_sc::imports!();
 
 #[multiversx_sc::module]
 pub trait DeployContractModule {
-    #[proxy]
-    fn vault_proxy(&self) -> vault::Proxy<Self::Api>;
-
     #[endpoint]
     fn deploy_contract(
         &self,
@@ -36,9 +35,13 @@ pub trait DeployContractModule {
         code: &ManagedBuffer,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) -> (ManagedAddress, OptionalValue<ManagedBuffer>) {
-        self.vault_proxy()
+        self.tx()
+            .typed(vault_proxy::VaultProxy)
             .init(opt_arg)
-            .deploy_contract(code, CodeMetadata::DEFAULT)
+            .code(code.clone())
+            .returns(ReturnsNewManagedAddress)
+            .returns(ReturnsResult)
+            .sync_call()
     }
 
     #[endpoint]
@@ -47,9 +50,14 @@ pub trait DeployContractModule {
         source_address: ManagedAddress,
         opt_arg: OptionalValue<ManagedBuffer>,
     ) -> MultiValue2<ManagedAddress, OptionalValue<ManagedBuffer>> {
-        self.vault_proxy()
+        self.tx()
+            .typed(vault_proxy::VaultProxy)
             .init(opt_arg)
-            .deploy_from_source(&source_address, CodeMetadata::DEFAULT)
+            .code_metadata(CodeMetadata::DEFAULT)
+            .from_source(source_address)
+            .returns(ReturnsNewManagedAddress)
+            .returns(ReturnsResult)
+            .sync_call()
             .into()
     }
 }
