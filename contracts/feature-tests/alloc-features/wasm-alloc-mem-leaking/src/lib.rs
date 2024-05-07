@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                           65
+// Endpoints:                           63
 // Async Callback (empty):               1
-// Total number of exported functions:  67
+// Total number of exported functions:  65
 
 #![no_std]
 
@@ -52,9 +52,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         only_owner_legacy => only_owner_legacy
         return_sc_error => return_sc_error
         result_ok => result_ok
-        result_err_from_bytes_1 => result_err_from_bytes_1
-        result_err_from_bytes_2 => result_err_from_bytes_2
-        result_err_from_bytes_3 => result_err_from_bytes_3
+        result_err_from_bytes => result_err_from_bytes
         result_err_from_string => result_err_from_string
         result_err_from_str => result_err_from_str
         result_echo => result_echo
