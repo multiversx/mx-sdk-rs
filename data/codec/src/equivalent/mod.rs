@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 mod codec_convert;
 mod codec_from;
 mod codec_into;

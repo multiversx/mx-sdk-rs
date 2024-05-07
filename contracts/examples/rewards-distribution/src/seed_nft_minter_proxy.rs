@@ -44,8 +44,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<ManagedVec<Env::Api, ManagedAddress<Env::Api>>>,
-        Arg1: CodecInto<ManagedVec<Env::Api, Distribution<Env::Api>>>,
+        Arg0: ProxyArg<ManagedVec<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg1: ProxyArg<ManagedVec<Env::Api, Distribution<Env::Api>>>,
     >(
         self,
         marketplaces: Arg0,
@@ -69,12 +69,12 @@ where
     Gas: TxGas<Env>,
 {
     pub fn create_nft<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<OptionalValue<TokenIdentifier<Env::Api>>>,
-        Arg5: CodecInto<OptionalValue<u64>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<OptionalValue<TokenIdentifier<Env::Api>>>,
+        Arg5: ProxyArg<OptionalValue<u64>>,
     >(
         self,
         name: Arg0,
@@ -96,8 +96,8 @@ where
     }
 
     pub fn claim_and_distribute<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         token_id: Arg0,
@@ -135,8 +135,8 @@ where
     }
 
     pub fn issue_token<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_display_name: Arg0,
@@ -150,7 +150,7 @@ where
     }
 
     pub fn buy_nft<
-        Arg0: CodecInto<u64>,
+        Arg0: ProxyArg<u64>,
     >(
         self,
         nft_nonce: Arg0,
@@ -162,7 +162,7 @@ where
     }
 
     pub fn get_nft_price<
-        Arg0: CodecInto<u64>,
+        Arg0: ProxyArg<u64>,
     >(
         self,
         nft_nonce: Arg0,
@@ -182,6 +182,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(ManagedVecItem, NestedEncode, NestedDecode)]
 pub struct Distribution<Api>
 where

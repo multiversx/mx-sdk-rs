@@ -4,7 +4,7 @@ use multiversx_sc_codec::{
 };
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{
         CallTypeApi, ManagedTypeApi, ESDT_MULTI_TRANSFER_FUNC_NAME, ESDT_NFT_TRANSFER_FUNC_NAME,
         ESDT_TRANSFER_FUNC_NAME,
@@ -135,6 +135,8 @@ where
         })
     }
 }
+
+impl<Api> TypeAbiFrom<Self> for FunctionCall<Api> where Api: ManagedTypeApi {}
 
 impl<Api> TypeAbi for FunctionCall<Api>
 where

@@ -1,6 +1,6 @@
 use super::EncodedManagedVecItem;
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
@@ -676,6 +676,29 @@ where
         }
         result
     }
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<Vec<U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for Vec<T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: TypeAbiFrom<U>,
+{
 }
 
 impl<M, T> TypeAbi for ManagedVec<M, T>

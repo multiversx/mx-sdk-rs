@@ -80,7 +80,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn set_crypto_kitties_sc_address<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -100,7 +100,7 @@ where
     }
 
     pub fn create_random_zombie<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         name: Arg0,
@@ -112,7 +112,7 @@ where
     }
 
     pub fn is_ready<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         zombie_id: Arg0,
@@ -124,8 +124,8 @@ where
     }
 
     pub fn feed_on_kitty<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         zombie_id: Arg0,
@@ -155,7 +155,7 @@ where
     }
 
     pub fn zombies<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         id: Arg0,
@@ -167,7 +167,7 @@ where
     }
 
     pub fn zombie_owner<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         id: Arg0,
@@ -195,7 +195,7 @@ where
     }
 
     pub fn owned_zombies<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         owner: Arg0,
@@ -207,7 +207,7 @@ where
     }
 
     pub fn level_up<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         zombie_id: Arg0,
@@ -227,8 +227,8 @@ where
     }
 
     pub fn change_name<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         zombie_id: Arg0,
@@ -242,8 +242,8 @@ where
     }
 
     pub fn change_dna<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         zombie_id: Arg0,
@@ -257,8 +257,8 @@ where
     }
 
     pub fn attack<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<usize>,
     >(
         self,
         zombie_id: Arg0,
@@ -272,6 +272,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<Api>
 where

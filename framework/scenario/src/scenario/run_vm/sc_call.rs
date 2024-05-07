@@ -1,5 +1,5 @@
 use crate::{
-    multiversx_sc::codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    multiversx_sc::codec::{PanicErrorHandler, TopEncodeMulti},
     scenario::model::{ScCallStep, TxESDT, TypedScCall},
     scenario_model::TxResponse,
 };
@@ -8,6 +8,7 @@ use multiversx_chain_vm::{
     tx_execution::execute_current_tx_context_input,
     tx_mock::{TxInput, TxResult, TxTokenTransfer},
 };
+use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
 
 use super::{check_tx_output, tx_input_util::generate_tx_hash, ScenarioVMRunner};
 
@@ -34,7 +35,7 @@ impl ScenarioVMRunner {
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let sc_call_step: ScCallStep = typed_sc_call.into();
         let tx_result =

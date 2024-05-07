@@ -1,6 +1,7 @@
-use multiversx_sc_codec::{CodecFrom, TopEncodeMulti};
+use multiversx_sc_codec::{TopDecodeMulti, TopEncodeMulti};
 
 use crate::{
+    abi::TypeAbiFrom,
     api::CallTypeApi,
     contract_base::SendRawWrapper,
     tuple_util::NestedTupleFlatten,
@@ -168,7 +169,7 @@ where
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<Api>, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let (new_address, raw_results, _) = self
             .code(code.clone())
@@ -191,7 +192,7 @@ where
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<Api>, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let (new_address, raw_results, _) = self
             .from_source(source_address.clone())

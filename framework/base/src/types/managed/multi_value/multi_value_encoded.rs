@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
@@ -222,6 +222,20 @@ where
     }
 }
 
+impl<M, T> TypeAbiFrom<Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
+impl<M, T> TypeAbiFrom<&Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
 impl<M, T> TypeAbi for MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
@@ -259,11 +273,29 @@ where
 }
 
 #[cfg(feature = "alloc")]
+impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbiFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
 impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: CodecFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
+impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbiFrom<T>,
 {
 }
 

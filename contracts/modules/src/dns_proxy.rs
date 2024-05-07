@@ -38,7 +38,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn register<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         name: Arg0,

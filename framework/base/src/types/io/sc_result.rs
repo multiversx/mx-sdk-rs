@@ -1,6 +1,9 @@
 use alloc::format;
 
-use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+};
 
 use crate::{
     abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
@@ -128,6 +131,8 @@ where
         }
     }
 }
+
+impl<T: TypeAbi, E> TypeAbiFrom<Self> for SCResult<T, E> {}
 
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
     fn type_name() -> TypeName {

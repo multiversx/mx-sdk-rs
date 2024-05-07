@@ -1,6 +1,7 @@
 use core::marker::PhantomData;
 
 use crate::{
+    abi::TypeAbiFrom,
     codec::{
         multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
         NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
@@ -300,6 +301,23 @@ where
 
 impl<SA, K, V> CodecFrom<BiDiMapper<SA, K, V, CurrentStorage>>
     for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+{
+}
+
+impl<SA, K, V> TypeAbiFrom<BiDiMapper<SA, K, V, CurrentStorage>>
+    for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
+{
+}
+
+impl<SA, K, V> TypeAbiFrom<Self> for BiDiMapper<SA, K, V, CurrentStorage>
 where
     SA: StorageMapperApi,
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,

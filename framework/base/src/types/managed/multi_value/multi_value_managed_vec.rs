@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
@@ -208,6 +208,13 @@ where
         }
         Ok(MultiValueManagedVec(result_vec))
     }
+}
+
+impl<M, T: TypeAbi> TypeAbiFrom<Self> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
 }
 
 impl<M, T: TypeAbi> TypeAbi for MultiValueManagedVec<M, T>

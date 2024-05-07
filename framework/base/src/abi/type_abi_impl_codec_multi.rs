@@ -1,9 +1,17 @@
 use alloc::format;
 
 use crate::{
-    abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{OutputAbis, TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     codec::multi_types::{IgnoreValue, OptionalValue},
 };
+
+#[cfg(feature = "alloc")]
+impl<T, U> TypeAbiFrom<crate::codec::multi_types::MultiValueVec<U>>
+    for crate::codec::multi_types::MultiValueVec<T>
+where
+    T: TypeAbiFrom<U>,
+{
+}
 
 #[cfg(feature = "alloc")]
 impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
@@ -24,6 +32,8 @@ impl<T: TypeAbi> TypeAbi for crate::codec::multi_types::MultiValueVec<T> {
     }
 }
 
+impl<T> TypeAbiFrom<T> for IgnoreValue {}
+
 impl TypeAbi for IgnoreValue {
     fn type_name() -> TypeName {
         TypeName::from("ignore")
@@ -37,6 +47,8 @@ impl TypeAbi for IgnoreValue {
         true
     }
 }
+
+impl<T, U> TypeAbiFrom<OptionalValue<T>> for OptionalValue<U> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
     fn type_name() -> TypeName {
@@ -59,6 +71,11 @@ impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
 macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $($n:tt $name:ident)+) )+) => {
         $(
+            impl<$($name),+ > TypeAbiFrom<Self> for crate::codec::multi_types::$mval_struct<$($name,)+>
+            where
+                $($name: TypeAbi,)+
+            {}
+
             impl<$($name),+ > TypeAbi for crate::codec::multi_types::$mval_struct<$($name,)+>
             where
                 $($name: TypeAbi,)+

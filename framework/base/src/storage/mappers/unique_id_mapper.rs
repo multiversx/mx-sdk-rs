@@ -1,4 +1,5 @@
 use crate::{
+    abi::TypeAbiFrom,
     codec::{
         multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
         TopEncodeMultiOutput,
@@ -217,6 +218,13 @@ impl<SA> CodecFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA,
     SA: StorageMapperApi
 {
 }
+
+impl<SA> TypeAbiFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, usize> where
+    SA: StorageMapperApi
+{
+}
+
+impl<SA> TypeAbiFrom<Self> for UniqueIdMapper<SA, CurrentStorage> where SA: StorageMapperApi {}
 
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA> TypeAbi for UniqueIdMapper<SA, CurrentStorage>

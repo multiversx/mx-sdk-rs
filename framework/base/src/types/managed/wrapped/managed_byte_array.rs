@@ -3,7 +3,7 @@ use core::convert::TryFrom;
 use alloc::format;
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::{
         DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
@@ -205,13 +205,16 @@ where
     }
 }
 
+impl<M, const N: usize> TypeAbiFrom<Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
+impl<M, const N: usize> TypeAbiFrom<&Self> for ManagedByteArray<M, N> where M: ManagedTypeApi {}
+
 impl<M, const N: usize> TypeAbi for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
     /// It is semantically equivalent to `[u8; N]`.
     fn type_name() -> TypeName {
-        <&[u8; N] as TypeAbi>::type_name()
+        <[u8; N] as TypeAbi>::type_name()
     }
 
     fn type_name_rust() -> TypeName {

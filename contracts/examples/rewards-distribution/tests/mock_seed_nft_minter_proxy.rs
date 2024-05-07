@@ -35,7 +35,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         nft_token_id: Arg0,
@@ -57,7 +57,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn set_nft_count<
-        Arg0: CodecInto<u64>,
+        Arg0: ProxyArg<u64>,
     >(
         self,
         nft_count: Arg0,

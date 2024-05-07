@@ -1,9 +1,10 @@
 use core::marker::PhantomData;
 
-use multiversx_sc_codec::{CodecFrom, TopEncodeMulti};
+use multiversx_sc_codec::TopDecodeMulti;
 
-use crate::types::{
-    interaction::decode_result, RHListItem, RHListItemExec, SyncCallRawResult, TxEnv,
+use crate::{
+    abi::TypeAbiFrom,
+    types::{interaction::decode_result, RHListItem, RHListItemExec, SyncCallRawResult, TxEnv},
 };
 
 /// Indicates that result will be returned.
@@ -30,8 +31,7 @@ impl<T> ReturnsResultAs<T> {
 impl<Env, Original, T> RHListItem<Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    Original: TopEncodeMulti,
-    T: CodecFrom<Original>,
+    T: TopDecodeMulti + TypeAbiFrom<Original>,
 {
     type Returns = T;
 }
@@ -40,8 +40,7 @@ impl<Env, Original, T> RHListItemExec<SyncCallRawResult<Env::Api>, Env, Original
     for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    Original: TopEncodeMulti,
-    T: CodecFrom<Original>,
+    T: TopDecodeMulti + TypeAbiFrom<Original>,
 {
     fn item_process_result(self, raw_result: &SyncCallRawResult<Env::Api>) -> Self::Returns {
         decode_result::<Env::Api, T>(raw_result.0.clone())
