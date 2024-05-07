@@ -241,7 +241,7 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, kitty::Kitty> {
+    ) -> TxProxyCall<Env, From, To, Gas, crate::kitty_obj::Kitty> {
         self.wrapped_tx
             .raw_call("getKittyById")
             .argument(&kitty_id)

@@ -38,7 +38,7 @@ pub trait ZombieFeeding:
     #[callback]
     fn get_kitty_callback(
         &self,
-        #[call_result] result: ManagedAsyncCallResult<kitty::Kitty>,
+        #[call_result] result: ManagedAsyncCallResult<crate::kitty_obj::Kitty>,
         zombie_id: usize,
     ) {
         match result {
