@@ -62,8 +62,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn send_egld<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -77,8 +77,8 @@ where
     }
 
     pub fn echo_arguments_sync<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -92,8 +92,8 @@ where
     }
 
     pub fn echo_arguments_sync_twice<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -107,7 +107,7 @@ where
     }
 
     pub fn forward_sync_accept_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -119,8 +119,8 @@ where
     }
 
     pub fn forward_sync_accept_funds_with_fees<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -134,7 +134,7 @@ where
     }
 
     pub fn forward_sync_accept_funds_then_read<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -146,10 +146,10 @@ where
     }
 
     pub fn forward_sync_retrieve_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -167,9 +167,9 @@ where
     }
 
     pub fn forward_sync_retrieve_funds_with_accept_func<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -193,8 +193,8 @@ where
     }
 
     pub fn forward_sync_accept_funds_multi_transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -208,8 +208,8 @@ where
     }
 
     pub fn echo_args_async<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -223,7 +223,7 @@ where
     }
 
     pub fn forward_async_accept_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -235,7 +235,7 @@ where
     }
 
     pub fn forward_async_accept_funds_half_payment<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -247,8 +247,8 @@ where
     }
 
     pub fn forward_async_accept_funds_with_fees<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -262,10 +262,10 @@ where
     }
 
     pub fn forward_async_retrieve_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -283,9 +283,9 @@ where
     }
 
     pub fn send_funds_twice<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -301,8 +301,8 @@ where
     }
 
     pub fn send_async_accept_multi_transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -324,7 +324,7 @@ where
     }
 
     pub fn callback_data_at_index<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         index: Arg0,
@@ -344,7 +344,7 @@ where
     }
 
     pub fn forward_transf_exec_accept_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -356,8 +356,8 @@ where
     }
 
     pub fn forward_transf_execu_accept_funds_with_fees<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -371,7 +371,7 @@ where
     }
 
     pub fn forward_transf_exec_accept_funds_twice<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -385,7 +385,7 @@ where
     /// Test that the default gas provided to the transfer_execute call 
     /// leaves enough in the transaction for finish to happen. 
     pub fn forward_transf_exec_accept_funds_return_values<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -397,8 +397,8 @@ where
     }
 
     pub fn transf_exec_multi_accept_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -412,8 +412,8 @@ where
     }
 
     pub fn forward_transf_exec_reject_funds_multi_transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -427,8 +427,8 @@ where
     }
 
     pub fn transf_exec_multi_reject_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -442,8 +442,8 @@ where
     }
 
     pub fn change_owner<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         child_sc_address: Arg0,
@@ -457,8 +457,8 @@ where
     }
 
     pub fn deploy_contract<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         code: Arg0,
@@ -472,7 +472,7 @@ where
     }
 
     pub fn deploy_two_contracts<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         code: Arg0,
@@ -484,8 +484,8 @@ where
     }
 
     pub fn deploy_vault_from_source<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         source_address: Arg0,
@@ -499,9 +499,9 @@ where
     }
 
     pub fn upgrade_vault<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg2: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         child_sc_address: Arg0,
@@ -517,9 +517,9 @@ where
     }
 
     pub fn upgrade_vault_from_source<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<OptionalValue<ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<OptionalValue<ManagedBuffer<Env::Api>>>,
     >(
         self,
         child_sc_address: Arg0,
@@ -535,7 +535,7 @@ where
     }
 
     pub fn get_fungible_esdt_balance<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -547,7 +547,7 @@ where
     }
 
     pub fn get_current_nft_nonce<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -559,9 +559,9 @@ where
     }
 
     pub fn send_esdt<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -577,8 +577,8 @@ where
     }
 
     pub fn send_esdt_with_fees<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -592,10 +592,10 @@ where
     }
 
     pub fn send_esdt_twice<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -613,8 +613,8 @@ where
     }
 
     pub fn send_esdt_direct_multi_transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, MultiValue3<TokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>>,
     >(
         self,
         to: Arg0,
@@ -628,9 +628,9 @@ where
     }
 
     pub fn issue_fungible_token<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         token_display_name: Arg0,
@@ -646,8 +646,8 @@ where
     }
 
     pub fn local_mint<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -661,8 +661,8 @@ where
     }
 
     pub fn local_burn<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -676,7 +676,7 @@ where
     }
 
     pub fn get_esdt_local_roles<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -688,9 +688,9 @@ where
     }
 
     pub fn get_esdt_token_data<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
@@ -706,9 +706,9 @@ where
     }
 
     pub fn is_esdt_frozen<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
@@ -724,7 +724,7 @@ where
     }
 
     pub fn is_esdt_paused<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -736,7 +736,7 @@ where
     }
 
     pub fn is_esdt_limited_transfer<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -748,7 +748,7 @@ where
     }
 
     pub fn validate_token_identifier<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         token_id: Arg0,
@@ -760,8 +760,8 @@ where
     }
 
     pub fn sft_issue<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_display_name: Arg0,
@@ -775,8 +775,8 @@ where
     }
 
     pub fn get_nft_balance<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         token_identifier: Arg0,
@@ -790,9 +790,9 @@ where
     }
 
     pub fn buy_nft<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         nft_id: Arg0,
@@ -808,8 +808,8 @@ where
     }
 
     pub fn nft_issue<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_display_name: Arg0,
@@ -823,13 +823,13 @@ where
     }
 
     pub fn nft_create<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg5: CodecInto<Color>,
-        Arg6: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg5: ProxyArg<Color>,
+        Arg6: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -853,9 +853,9 @@ where
     }
 
     pub fn nft_create_compact<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<Color>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<Color>,
     >(
         self,
         token_identifier: Arg0,
@@ -871,9 +871,9 @@ where
     }
 
     pub fn nft_add_uris<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         token_identifier: Arg0,
@@ -889,9 +889,9 @@ where
     }
 
     pub fn nft_update_attributes<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<Color>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<Color>,
     >(
         self,
         token_identifier: Arg0,
@@ -907,13 +907,13 @@ where
     }
 
     pub fn nft_decode_complex_attributes<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg5: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg6: CodecInto<MultiValue5<BigUint<Env::Api>, ManagedBuffer<Env::Api>, TokenIdentifier<Env::Api>, bool, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg5: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg6: ProxyArg<MultiValue5<BigUint<Env::Api>, ManagedBuffer<Env::Api>, TokenIdentifier<Env::Api>, bool, ManagedBuffer<Env::Api>>>,
     >(
         self,
         token_identifier: Arg0,
@@ -937,9 +937,9 @@ where
     }
 
     pub fn nft_add_quantity<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -955,9 +955,9 @@ where
     }
 
     pub fn nft_burn<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         token_identifier: Arg0,
@@ -973,10 +973,10 @@ where
     }
 
     pub fn transfer_nft_via_async_call<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -994,12 +994,12 @@ where
     }
 
     pub fn transfer_nft_and_execute<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg5: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg5: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         to: Arg0,
@@ -1021,14 +1021,14 @@ where
     }
 
     pub fn create_and_send<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg4: CodecInto<BigUint<Env::Api>>,
-        Arg5: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg6: CodecInto<Color>,
-        Arg7: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg4: ProxyArg<BigUint<Env::Api>>,
+        Arg5: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg6: ProxyArg<Color>,
+        Arg7: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -1054,9 +1054,9 @@ where
     }
 
     pub fn set_local_roles<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<MultiValueEncoded<Env::Api, EsdtLocalRole>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, EsdtLocalRole>>,
     >(
         self,
         address: Arg0,
@@ -1072,9 +1072,9 @@ where
     }
 
     pub fn unset_local_roles<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<MultiValueEncoded<Env::Api, EsdtLocalRole>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<MultiValueEncoded<Env::Api, EsdtLocalRole>>,
     >(
         self,
         address: Arg0,
