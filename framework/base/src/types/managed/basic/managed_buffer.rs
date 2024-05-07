@@ -1,5 +1,5 @@
 use crate::{
-    abi::TypeName,
+    abi::{TypeAbiFrom, TypeName},
     api::{
         use_raw_handle, ErrorApiImpl, HandleConstraints, InvalidSliceError, ManagedBufferApiImpl,
         ManagedTypeApi, StaticVarApiImpl,
@@ -419,12 +419,21 @@ impl<M> CodecFrom<&[u8]> for ManagedBuffer<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&str> for ManagedBuffer<M> where M: ManagedTypeApi {}
 impl<M, const N: usize> CodecFrom<&[u8; N]> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
+impl<M> TypeAbiFrom<&[u8]> for ManagedBuffer<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&str> for ManagedBuffer<M> where M: ManagedTypeApi {}
+impl<M, const N: usize> TypeAbiFrom<&[u8; N]> for ManagedBuffer<M> where M: ManagedTypeApi {}
+
 macro_rules! managed_buffer_codec_from_impl_bi_di {
     ($other_ty:ty) => {
         impl<M: ManagedTypeApi> CodecFrom<$other_ty> for ManagedBuffer<M> {}
         impl<M: ManagedTypeApi> CodecFrom<&$other_ty> for ManagedBuffer<M> {}
         impl<M: ManagedTypeApi> CodecFrom<ManagedBuffer<M>> for $other_ty {}
         impl<M: ManagedTypeApi> CodecFrom<&ManagedBuffer<M>> for $other_ty {}
+
+        impl<M: ManagedTypeApi> TypeAbiFrom<$other_ty> for ManagedBuffer<M> {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<&$other_ty> for ManagedBuffer<M> {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<ManagedBuffer<M>> for $other_ty {}
+        impl<M: ManagedTypeApi> TypeAbiFrom<&ManagedBuffer<M>> for $other_ty {}
     };
 }
 
@@ -460,6 +469,9 @@ impl<M: ManagedTypeApi> TopDecode for ManagedBuffer<M> {
         }
     }
 }
+
+impl<M> TypeAbiFrom<Self> for ManagedBuffer<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for ManagedBuffer<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> crate::abi::TypeAbi for ManagedBuffer<M> {
     fn type_name() -> TypeName {

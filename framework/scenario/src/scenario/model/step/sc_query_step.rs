@@ -1,12 +1,12 @@
-use multiversx_sc::types::{ContractCallBase, H256};
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    types::{ContractCallBase, H256},
+};
 use num_traits::Zero;
 
 use crate::{
     api::StaticApi,
-    multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
-        types::ContractCall,
-    },
+    multiversx_sc::{codec::TopEncodeMulti, types::ContractCall},
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
     scenario_model::TxResponse,
 };
@@ -96,7 +96,7 @@ impl ScQueryStep {
     ) -> TypedScQuery<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
-        ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
+        ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         let typed = self.call(contract_call);
         typed.expect_value(expected_value)

@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
         TopEncodeMulti, TopEncodeMultiOutput,
@@ -81,6 +81,8 @@ where
         Ok(())
     }
 }
+
+impl<T: TypeAbi> TypeAbiFrom<Self> for AsyncCallResult<T> {}
 
 impl<T: TypeAbi> TypeAbi for AsyncCallResult<T> {
     fn type_name() -> TypeName {

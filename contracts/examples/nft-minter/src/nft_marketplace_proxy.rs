@@ -36,9 +36,9 @@ where
     Gas: TxGas<Env>,
 {
     pub fn claim_tokens<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         token_id: Arg0,

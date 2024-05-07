@@ -46,7 +46,7 @@ where
     /// Constructor, is called immediately after the contract is created 
     /// Will set the fixed global token supply and give all the supply to the creator. 
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         total_supply: Arg0,
@@ -83,7 +83,7 @@ where
     /// * `address` The address to query the the balance of 
     ///  
     pub fn token_balance<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
@@ -102,8 +102,8 @@ where
     /// * `spender` The address that will spend the funds. 
     ///  
     pub fn allowance<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         owner: Arg0,
@@ -123,8 +123,8 @@ where
     /// * `to` The address to transfer to. 
     ///  
     pub fn transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
@@ -146,9 +146,9 @@ where
     /// * `amount` the amount of tokens to be transferred. 
     ///  
     pub fn transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         sender: Arg0,
@@ -172,8 +172,8 @@ where
     /// * `amount` The amount of tokens to be spent. 
     ///  
     pub fn approve<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         spender: Arg0,

@@ -38,11 +38,11 @@ where
     Gas: TxGas<Env>,
 {
     pub fn on_erc1155_received<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         operator: Arg0,
@@ -62,11 +62,11 @@ where
     }
 
     pub fn on_erc1155_batch_received<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<Vec<BigUint<Env::Api>>>,
-        Arg3: CodecInto<Vec<BigUint<Env::Api>>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<Vec<BigUint<Env::Api>>>,
+        Arg3: ProxyArg<Vec<BigUint<Env::Api>>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         operator: Arg0,

@@ -44,7 +44,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         initial_value: Arg0,
@@ -66,7 +66,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn upgrade<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         initial_value: Arg0,
@@ -97,7 +97,7 @@ where
 
     /// Add desired amount to the storage variable. 
     pub fn add<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         value: Arg0,

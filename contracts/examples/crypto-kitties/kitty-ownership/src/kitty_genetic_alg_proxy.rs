@@ -62,8 +62,8 @@ where
     Gas: TxGas<Env>,
 {
     pub fn generate_kitty_genes<
-        Arg0: CodecInto<kitty::Kitty>,
-        Arg1: CodecInto<kitty::Kitty>,
+        Arg0: ProxyArg<kitty::Kitty>,
+        Arg1: ProxyArg<kitty::Kitty>,
     >(
         self,
         matron: Arg0,

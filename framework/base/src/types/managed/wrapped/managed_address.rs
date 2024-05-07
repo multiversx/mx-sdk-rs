@@ -1,7 +1,7 @@
 use core::convert::{TryFrom, TryInto};
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::{
         CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
@@ -234,6 +234,9 @@ where
     }
 }
 
+impl<M> TypeAbiFrom<Self> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for ManagedAddress<M> where M: ManagedTypeApi {}
+
 impl<M> TypeAbi for ManagedAddress<M>
 where
     M: ManagedTypeApi,
@@ -272,6 +275,7 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
 impl<M> CodecFromSelf for ManagedAddress<M> where M: ManagedTypeApi {}
 
 impl<M> CodecFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
 impl<M> CodecFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
@@ -284,3 +288,15 @@ impl<M> CodecFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
 impl<M> CodecFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+impl<M> TypeAbiFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+impl<M> TypeAbiFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+impl<M> TypeAbiFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+
+#[cfg(feature = "alloc")]
+impl<M> TypeAbiFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}

@@ -1,5 +1,6 @@
 use multiversx_sc::{
-    codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
+    abi::TypeAbiFrom,
+    codec::TopDecodeMulti,
     types::{
         ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress, ReturnsResult,
         ReturnsResultAs, TxEnv, WithNewAddress, WithResultConv,
@@ -24,8 +25,7 @@ where
 impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    Original: TopEncodeMulti,
-    T: CodecFrom<Original>,
+    T: TopDecodeMulti + TypeAbiFrom<Original>,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let response = TypedResponse::<T>::from_raw(tx_response);
@@ -38,8 +38,7 @@ where
 impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultConv<T, F>
 where
     Env: TxEnv,
-    Original: TopEncodeMulti,
-    T: CodecFrom<Original>,
+    T: TopDecodeMulti + TypeAbiFrom<Original>,
     F: FnOnce(T),
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {

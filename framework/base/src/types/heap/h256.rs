@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     types::heap::BoxedBytes,
 };
 use alloc::{boxed::Box, vec::Vec};
@@ -223,6 +223,8 @@ impl TopDecode for H256 {
         Self::decode_from_boxed_bytes_or_handle_err(input.into_boxed_slice_u8(), h)
     }
 }
+
+impl TypeAbiFrom<Self> for H256 {}
 
 impl TypeAbi for H256 {
     fn type_name() -> TypeName {

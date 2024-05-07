@@ -5,7 +5,7 @@ use super::{
     StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         self,
@@ -617,6 +617,21 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
     U: CodecFrom<T>,
+{
+}
+
+impl<SA, T, U> TypeAbiFrom<LinkedListMapper<SA, T>> for MultiValueEncoded<SA, U>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
+    U: TypeAbiFrom<T>,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for LinkedListMapper<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + Clone,
 {
 }
 

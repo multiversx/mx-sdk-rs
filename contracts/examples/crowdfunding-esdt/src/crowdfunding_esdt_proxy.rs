@@ -44,9 +44,9 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         target: Arg0,
@@ -120,7 +120,7 @@ where
     }
 
     pub fn deposit<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         donor: Arg0,
@@ -140,6 +140,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,

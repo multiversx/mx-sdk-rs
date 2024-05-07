@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     codec::*,
 };
 use alloc::{
@@ -239,6 +239,8 @@ impl TopDecode for BoxedBytes {
         Ok(BoxedBytes(input.into_boxed_slice_u8()))
     }
 }
+
+impl TypeAbiFrom<Self> for BoxedBytes {}
 
 impl TypeAbi for BoxedBytes {
     fn type_name() -> TypeName {

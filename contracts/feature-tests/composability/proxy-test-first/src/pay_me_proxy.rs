@@ -80,7 +80,7 @@ where
     Gas: TxGas<Env>,
 {
     pub fn pay_me<
-        Arg0: CodecInto<i64>,
+        Arg0: ProxyArg<i64>,
     >(
         self,
         arg1: Arg0,
@@ -92,7 +92,7 @@ where
     }
 
     pub fn pay_me_with_result<
-        Arg0: CodecInto<i64>,
+        Arg0: ProxyArg<i64>,
     >(
         self,
         arg1: Arg0,

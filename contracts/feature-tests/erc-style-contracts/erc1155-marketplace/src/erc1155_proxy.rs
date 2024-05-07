@@ -63,11 +63,11 @@ where
 {
     /// `value` is amount for fungible, nft_id for non-fungible 
     pub fn safe_transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -88,11 +88,11 @@ where
 
     /// `value` is amount for fungible, nft_id for non-fungible 
     pub fn safe_batch_transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<Box<[BigUint<Env::Api>]>>,
-        Arg3: CodecInto<Box<[BigUint<Env::Api>]>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<Box<[BigUint<Env::Api>]>>,
+        Arg3: ProxyArg<Box<[BigUint<Env::Api>]>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -112,8 +112,8 @@ where
     }
 
     pub fn set_approved_for_all<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<bool>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<bool>,
     >(
         self,
         operator: Arg0,
@@ -127,9 +127,9 @@ where
     }
 
     pub fn create_token<
-        Arg0: CodecInto<BoxedBytes>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<bool>,
+        Arg0: ProxyArg<BoxedBytes>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<bool>,
     >(
         self,
         uri: Arg0,
@@ -145,8 +145,8 @@ where
     }
 
     pub fn mint<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
@@ -160,8 +160,8 @@ where
     }
 
     pub fn burn<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
@@ -175,8 +175,8 @@ where
     }
 
     pub fn balance_of<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         owner: Arg0,
@@ -190,7 +190,7 @@ where
     }
 
     pub fn balance_of_batch<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, MultiValue2<ManagedAddress<Env::Api>, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue2<ManagedAddress<Env::Api>, BigUint<Env::Api>>>>,
     >(
         self,
         owner_type_id_pairs: Arg0,
@@ -202,8 +202,8 @@ where
     }
 
     pub fn token_owner<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
@@ -217,7 +217,7 @@ where
     }
 
     pub fn token_type_creator<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
@@ -229,7 +229,7 @@ where
     }
 
     pub fn token_type_uri<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
@@ -241,7 +241,7 @@ where
     }
 
     pub fn is_fungible<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
@@ -253,8 +253,8 @@ where
     }
 
     pub fn is_approved<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         operator: Arg0,
