@@ -13,6 +13,7 @@ pub mod roles;
 pub mod sft;
 pub mod storage;
 pub mod vault_proxy;
+pub mod forwarder_proxy;
 
 multiversx_sc::imports!();
 

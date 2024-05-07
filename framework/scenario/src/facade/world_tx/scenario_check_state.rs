@@ -1,8 +1,9 @@
 use std::collections::{btree_map::Entry, BTreeMap};
 
 use multiversx_chain_scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext};
-use multiversx_sc::types::{
-    AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier,
+use multiversx_sc::{
+    codec::{top_encode_to_vec_u8, TopEncode},
+    types::{AnnotatedValue, BigUint, ManagedAddress, ManagedBuffer, TokenIdentifier},
 };
 
 use crate::{
@@ -181,13 +182,13 @@ impl<'w> CheckStateBuilder<'w> {
         K: AnnotatedValue<ScenarioTxEnvData, TokenIdentifier<StaticApi>>,
         N: AnnotatedValue<ScenarioTxEnvData, u64>,
         V: AnnotatedValue<ScenarioTxEnvData, BigUint<StaticApi>>,
-        T: AnnotatedValue<ScenarioTxEnvData, ManagedBuffer<StaticApi>>,
+        T: TopEncode,
     {
         let env = self.new_env_data();
         let token_id_key = token_identifier_annotated(&env, token_id);
         let nonce_value = u64_annotated(&env, &nonce);
         let balance_value = big_uint_annotated(&env, &balance);
-        let attributes_value = bytes_annotated(&env, attributes);
+        let attributes_value = top_encode_to_vec_u8(&attributes).unwrap();
 
         if let CheckEsdtMap::Unspecified = &self.current_account.esdt {
             let mut check_esdt = CheckEsdt::Full(CheckEsdtData::default());
