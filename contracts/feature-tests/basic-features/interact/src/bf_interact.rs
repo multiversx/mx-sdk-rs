@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: unified syntax
+
 mod bf_interact_cli;
 mod bf_interact_config;
 mod bf_interact_state;

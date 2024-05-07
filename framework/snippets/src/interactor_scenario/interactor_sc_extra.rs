@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use crate::Interactor;
 use multiversx_sc_scenario::{
     api::StaticApi,
@@ -13,6 +15,10 @@ use multiversx_sc_scenario::{
 };
 
 impl Interactor {
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_call_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -28,6 +34,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_call_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScCall<OriginalResult>,
@@ -42,6 +52,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScCall<OriginalResult>,
@@ -55,6 +69,10 @@ impl Interactor {
         TypedResponse::from_raw(response)
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_query_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -70,6 +88,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_query_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScQuery<OriginalResult>,
@@ -84,6 +106,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_query_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScQuery<OriginalResult>,
@@ -97,6 +123,10 @@ impl Interactor {
         TypedResponse::from_raw(response)
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
         CC: ContractCallBase<StaticApi>,
@@ -109,6 +139,10 @@ impl Interactor {
         typed_response.result.unwrap()
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_deploy_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -124,6 +158,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScDeploy<OriginalResult>,
@@ -139,6 +177,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScDeploy<OriginalResult>,

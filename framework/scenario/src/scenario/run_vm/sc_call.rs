@@ -1,6 +1,6 @@
 use crate::{
     multiversx_sc::codec::{PanicErrorHandler, TopEncodeMulti},
-    scenario::model::{ScCallStep, TxESDT, TypedScCall},
+    scenario::model::{ScCallStep, TxESDT},
     scenario_model::TxResponse,
 };
 
@@ -29,9 +29,14 @@ impl ScenarioVMRunner {
     ///
     /// It takes the `contract_call` argument separately from the SC call step,
     /// so we can benefit from type inference in the result.
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn perform_sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
-        typed_sc_call: TypedScCall<OriginalResult>,
+        typed_sc_call: crate::scenario_model::TypedScCall<OriginalResult>,
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,

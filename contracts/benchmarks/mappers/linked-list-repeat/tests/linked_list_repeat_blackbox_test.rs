@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: unified syntax
+
 use benchmark_common::ExampleStruct;
 use linked_list_repeat::ProxyTrait;
 use multiversx_sc_scenario::imports::*;

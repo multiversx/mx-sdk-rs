@@ -14,8 +14,6 @@ use crate::multiversx_sc::{
     types::{ContractCall, ManagedArgBuffer},
 };
 
-use super::TypedScCall;
-
 #[derive(Debug, Clone)]
 pub struct ScCallStep {
     pub id: String,
@@ -139,7 +137,12 @@ impl ScCallStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<CC>(mut self, contract_call: CC) -> TypedScCall<CC::OriginalResult>
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
+    pub fn call<CC>(mut self, contract_call: CC) -> super::TypedScCall<CC::OriginalResult>
     where
         CC: ContractCallBase<StaticApi>,
     {
@@ -170,11 +173,12 @@ impl ScCallStep {
         since = "0.42.0",
         note = "Please use `call` followed by `expect`, there is no point in having a method that does both."
     )]
+    #[allow(deprecated)]
     pub fn call_expect<CC, ExpectedResult>(
         self,
         contract_call: CC,
         expected_value: ExpectedResult,
-    ) -> TypedScCall<CC::OriginalResult>
+    ) -> super::TypedScCall<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
         ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
