@@ -1,4 +1,5 @@
 #![allow(clippy::too_many_arguments)]
+#![allow(deprecated)] // TODO: switch to unified syntax
 
 mod call_tree;
 mod call_tree_calling_functions;
@@ -12,11 +13,7 @@ use clap::Parser;
 
 use comp_interact_controller::ComposabilityInteract;
 
-use multiversx_sc_snippets::{
-    env_logger,
-    multiversx_sc_scenario::{api::StaticApi, ContractInfo},
-    tokio,
-};
+use multiversx_sc_snippets::imports::*;
 
 #[tokio::main]
 async fn main() {

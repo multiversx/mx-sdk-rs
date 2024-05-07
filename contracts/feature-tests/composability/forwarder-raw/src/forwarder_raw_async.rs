@@ -6,21 +6,27 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     #[payable("*")]
     fn forward_payment(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
-        self.send().direct(&to, &token, 0, &payment);
+        self.tx()
+            .to(to)
+            .egld_or_single_esdt(&token, 0, &payment)
+            .transfer();
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_direct_esdt_via_transf_exec(&self, to: ManagedAddress) {
         let (token, payment) = self.call_value().single_fungible_esdt();
-        self.send().direct_esdt(&to, &token, 0, &payment);
+        self.tx()
+            .to(&to)
+            .single_esdt(&token, 0, &payment)
+            .transfer();
     }
 
     #[endpoint]
     #[payable("*")]
     fn forward_direct_esdt_multi(&self, to: ManagedAddress) {
         let payments = self.call_value().all_esdt_transfers();
-        self.send().direct_multi(&to, &payments);
+        self.tx().to(&to).payment(payments).transfer();
     }
 
     fn forward_contract_call(
@@ -30,11 +36,24 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
         payment_amount: BigUint,
         endpoint_name: ManagedBuffer,
         args: MultiValueEncoded<ManagedBuffer>,
-    ) -> ContractCallWithEgldOrSingleEsdt<Self::Api, ()> {
-        self.send()
-            .contract_call(to, endpoint_name)
-            .with_raw_arguments(args.to_arg_buffer())
-            .with_egld_or_single_esdt_transfer((payment_token, 0, payment_amount))
+    ) -> Tx<
+        TxScEnv<Self::Api>,
+        (),
+        ManagedAddress,
+        EgldOrEsdtTokenPayment<Self::Api>,
+        (),
+        FunctionCall<Self::Api>,
+        (),
+    > {
+        self.tx()
+            .to(to)
+            .raw_call(endpoint_name)
+            .arguments_raw(args.to_arg_buffer())
+            .payment(EgldOrEsdtTokenPayment::new(
+                payment_token,
+                0,
+                payment_amount,
+            ))
     }
 
     #[endpoint]
@@ -82,7 +101,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             endpoint_name,
             args,
         )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .gas(self.blockchain().get_gas_left() / 2)
         .transfer_execute();
     }
 
@@ -102,7 +121,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             endpoint_name,
             args,
         )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .gas(self.blockchain().get_gas_left() / 2)
         .transfer_execute();
     }
 
@@ -116,7 +135,7 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
     ) {
         let (token, payment) = self.call_value().egld_or_single_fungible_esdt();
         self.forward_contract_call(to, token, payment, endpoint_name, args)
-            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .gas(self.blockchain().get_gas_left() / 2)
             .transfer_execute();
     }
 
@@ -137,10 +156,10 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             endpoint_name.clone(),
             args.clone(),
         )
-        .with_gas_limit(self.blockchain().get_gas_left() / 2)
+        .gas(self.blockchain().get_gas_left() / 2)
         .transfer_execute();
         self.forward_contract_call(to, token, half_payment, endpoint_name, args)
-            .with_gas_limit(self.blockchain().get_gas_left() / 2)
+            .gas(self.blockchain().get_gas_left() / 2)
             .transfer_execute();
     }
 
@@ -159,12 +178,11 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             arg_buffer.push_arg(amount);
         }
 
-        self.send_raw().async_call_raw(
-            &to,
-            &BigUint::zero(),
-            &ManagedBuffer::from(&b"retrieve_multi_funds_async"[..]),
-            &arg_buffer,
-        );
+        self.tx()
+            .to(&to)
+            .raw_call("retrieve_multi_funds_async")
+            .arguments_raw(arg_buffer)
+            .async_call_and_exit();
     }
 
     #[endpoint]
@@ -180,12 +198,10 @@ pub trait ForwarderRawAsync: super::forwarder_raw_common::ForwarderRawCommon {
             all_payments.push(EsdtTokenPayment::new(token_identifier, token_nonce, amount));
         }
 
-        ContractCallWithMultiEsdt::<Self::Api, ()>::new(
-            to,
-            "burn_and_create_retrive_async",
-            all_payments,
-        )
-        .async_call()
-        .call_and_exit_ignore_callback()
+        self.tx()
+            .raw_call("burn_and_create_retrieve_async")
+            .to(&to)
+            .payment(&all_payments)
+            .async_call_and_exit()
     }
 }

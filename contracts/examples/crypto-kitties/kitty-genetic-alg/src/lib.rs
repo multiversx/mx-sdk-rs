@@ -1,6 +1,6 @@
 #![no_std]
 
-use kitty::{kitty_genes::*, Kitty};
+use kitty::{Kitty, KittyGenes};
 use random::Random;
 
 #[multiversx_sc::contract]

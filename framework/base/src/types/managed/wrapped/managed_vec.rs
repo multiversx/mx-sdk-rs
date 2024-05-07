@@ -1,6 +1,6 @@
 use super::EncodedManagedVecItem;
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
@@ -12,7 +12,7 @@ use crate::{
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
-use alloc::vec::Vec;
+use alloc::{format, vec::Vec};
 use core::{
     borrow::Borrow,
     cmp::Ordering,
@@ -678,14 +678,43 @@ where
     }
 }
 
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<Vec<U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for Vec<T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: TypeAbiFrom<U>,
+{
+}
+
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
+    type Unmanaged = Vec<T::Unmanaged>;
+
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

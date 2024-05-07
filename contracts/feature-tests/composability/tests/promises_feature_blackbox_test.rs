@@ -1,9 +1,7 @@
+#![allow(deprecated)] // TODO: unified syntax
+
 use multiversx_sc::types::BigUint;
-use multiversx_sc_scenario::{
-    api::StaticApi,
-    scenario_model::{Account, CheckAccount, CheckStateStep, ScCallStep, SetStateStep},
-    ContractInfo, ScenarioWorld,
-};
+use multiversx_sc_scenario::imports::*;
 
 use promises_features::call_sync_bt::ProxyTrait;
 

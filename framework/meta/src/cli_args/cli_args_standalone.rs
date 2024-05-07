@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use clap::{ArgAction, Args, Parser, Subcommand};
+use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 
 use super::{CliArgsToRaw, ContractCliAction};
 
@@ -66,6 +66,9 @@ pub enum StandaloneCliAction {
     #[command(name = "test", about = "Runs cargo test")]
     Test(TestArgs),
 
+    #[command(name = "test-coverage", about = "Run test coverage and output report")]
+    TestCoverage(TestCoverageArgs),
+
     #[command(name = "install", about = "Installs framework dependencies")]
     Install(InstallArgs),
 }
@@ -105,6 +108,31 @@ pub struct TestArgs {
     /// Default value will be "false" if not specified
     #[arg(short, long, default_value = "false", verbatim_doc_comment)]
     pub nocapture: bool,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, ValueEnum)]
+pub enum TestCoverageOutputFormat {
+    /// Markdown pretty-print summary
+    #[default]
+    Markdown,
+
+    /// JSON summary
+    Json,
+}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct TestCoverageArgs {
+    /// Output file path
+    #[arg(short, long, verbatim_doc_comment)]
+    pub output: String,
+
+    /// Output format
+    #[arg(short, long, verbatim_doc_comment)]
+    pub format: Option<TestCoverageOutputFormat>,
+
+    /// Ignore files by path patterns
+    #[arg(short = 'i', long = "ignore-filename-regex", verbatim_doc_comment)]
+    pub ignore_filename_regex: Vec<String>,
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -279,6 +307,12 @@ pub enum InstallCommand {
 
     #[command(about = "Installs the `mx-scenario-go` tool")]
     MxScenarioGo(InstallMxScenarioGoArgs),
+
+    #[command(name = "wasm32", about = "Installs the `wasm32` target")]
+    Wasm32(InstallWasm32Args),
+
+    #[command(name = "wasm-opt", about = "Installs the `wasm-opt` tool")]
+    WasmOpt(InstallWasmOptArgs),
 }
 
 #[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
@@ -287,3 +321,9 @@ pub struct InstallMxScenarioGoArgs {
     #[arg(long, verbatim_doc_comment)]
     pub tag: Option<String>,
 }
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallWasm32Args {}
+
+#[derive(Default, Clone, PartialEq, Eq, Debug, Args)]
+pub struct InstallWasmOptArgs {}

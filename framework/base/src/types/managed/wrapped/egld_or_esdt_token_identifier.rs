@@ -1,9 +1,10 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{HandleConstraints, ManagedTypeApi},
     codec::*,
     derive::ManagedVecItem,
     formatter::{FormatByteReceiver, SCDisplay, SCLowerHex},
+    proxy_imports::TestTokenIdentifier,
     types::{ManagedBuffer, ManagedOption, ManagedRef, ManagedType, TokenIdentifier},
 };
 
@@ -26,7 +27,7 @@ use crate as multiversx_sc; // required by the ManagedVecItem derive
 #[repr(transparent)]
 #[derive(ManagedVecItem, Clone)]
 pub struct EgldOrEsdtTokenIdentifier<M: ManagedTypeApi> {
-    data: ManagedOption<M, TokenIdentifier<M>>,
+    pub(crate) data: ManagedOption<M, TokenIdentifier<M>>,
 }
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
@@ -81,8 +82,9 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     #[inline]
     pub fn into_name(self) -> ManagedBuffer<M> {
         self.map_or_else(
-            || ManagedBuffer::from(&Self::EGLD_REPRESENTATION[..]),
-            |token_identifier| token_identifier.into_managed_buffer(),
+            (),
+            |()| ManagedBuffer::from(&Self::EGLD_REPRESENTATION[..]),
+            |(), token_identifier| token_identifier.into_managed_buffer(),
         )
     }
 
@@ -91,25 +93,26 @@ impl<M: ManagedTypeApi> EgldOrEsdtTokenIdentifier<M> {
     /// Will fail if it encodes an invalid ESDT token identifier.
     pub fn is_valid(&self) -> bool {
         self.map_ref_or_else(
-            || true,
-            |token_identifier| token_identifier.is_valid_esdt_identifier(),
+            (),
+            |()| true,
+            |(), token_identifier| token_identifier.is_valid_esdt_identifier(),
         )
     }
 
-    pub fn map_or_else<U, D, F>(self, for_egld: D, for_esdt: F) -> U
+    pub fn map_or_else<Context, D, F, R>(self, context: Context, for_egld: D, for_esdt: F) -> R
     where
-        D: FnOnce() -> U,
-        F: FnOnce(TokenIdentifier<M>) -> U,
+        D: FnOnce(Context) -> R,
+        F: FnOnce(Context, TokenIdentifier<M>) -> R,
     {
-        self.data.map_or_else(for_egld, for_esdt)
+        self.data.map_or_else(context, for_egld, for_esdt)
     }
 
-    pub fn map_ref_or_else<U, D, F>(&self, for_egld: D, for_esdt: F) -> U
+    pub fn map_ref_or_else<Context, D, F, R>(&self, context: Context, for_egld: D, for_esdt: F) -> R
     where
-        D: FnOnce() -> U,
-        F: FnOnce(&TokenIdentifier<M>) -> U,
+        D: FnOnce(Context) -> R,
+        F: FnOnce(Context, &TokenIdentifier<M>) -> R,
     {
-        self.data.map_ref_or_else(for_egld, for_esdt)
+        self.data.map_ref_or_else(context, for_egld, for_esdt)
     }
 
     pub fn unwrap_esdt(self) -> TokenIdentifier<M> {
@@ -142,8 +145,9 @@ impl<M: ManagedTypeApi> PartialEq<TokenIdentifier<M>> for EgldOrEsdtTokenIdentif
     #[inline]
     fn eq(&self, other: &TokenIdentifier<M>) -> bool {
         self.map_ref_or_else(
-            || false,
-            |self_esdt_token_identifier| self_esdt_token_identifier == other,
+            (),
+            |()| false,
+            |(), self_esdt_token_identifier| self_esdt_token_identifier == other,
         )
     }
 }
@@ -206,13 +210,35 @@ impl<M> CodecFromSelf for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {
 
 impl<M> CodecFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
-
 impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 impl<M> CodecFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
 
+impl<M> TypeAbiFrom<TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&TokenIdentifier<M>> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&[u8]> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&str> for EgldOrEsdtTokenIdentifier<M> where M: ManagedTypeApi {}
+
+impl<'a, M> TypeAbiFrom<TestTokenIdentifier<'a>> for EgldOrEsdtTokenIdentifier<M> where
+    M: ManagedTypeApi
+{
+}
+impl<'a, M> TypeAbiFrom<&TestTokenIdentifier<'a>> for EgldOrEsdtTokenIdentifier<M> where
+    M: ManagedTypeApi
+{
+}
+
+impl<M: ManagedTypeApi> TypeAbiFrom<Self> for EgldOrEsdtTokenIdentifier<M> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<&Self> for EgldOrEsdtTokenIdentifier<M> {}
+
 impl<M: ManagedTypeApi> TypeAbi for EgldOrEsdtTokenIdentifier<M> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "EgldOrEsdtTokenIdentifier".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "EgldOrEsdtTokenIdentifier<$API>".into()
     }
 }
 

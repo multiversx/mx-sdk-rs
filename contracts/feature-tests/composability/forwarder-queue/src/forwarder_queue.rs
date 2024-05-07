@@ -172,30 +172,27 @@ pub trait ForwarderQueue {
                 },
             };
 
-            let contract_call = ContractCallWithAnyPayment::<_, ()>::new(
-                call.to,
-                call.endpoint_name,
-                call.payments,
-            );
+            let contract_call = self
+                .tx()
+                .raw_call(call.endpoint_name)
+                .to(&call.to)
+                .payment(&call.payments);
 
             match call.call_type {
                 QueuedCallType::Sync => {
-                    contract_call.execute_on_dest_context::<()>();
+                    contract_call.sync_call();
                 },
                 QueuedCallType::LegacyAsync => {
-                    contract_call.async_call().call_and_exit();
+                    contract_call.async_call_and_exit();
                 },
                 QueuedCallType::TransferExecute => {
-                    contract_call
-                        .with_gas_limit(call.gas_limit)
-                        .transfer_execute();
+                    contract_call.gas(call.gas_limit).transfer_execute();
                 },
                 QueuedCallType::Promise => {
                     contract_call
-                        .with_gas_limit(call.gas_limit)
-                        .with_raw_arguments(call.args)
-                        .async_call_promise()
-                        .with_callback(self.callbacks().promises_callback_method())
+                        .gas(call.gas_limit)
+                        .arguments_raw(call.args)
+                        .callback(self.callbacks().promises_callback_method())
                         .register_promise();
                 },
             }
@@ -208,10 +205,13 @@ pub trait ForwarderQueue {
         self.callback_count().update(|c| *c += 1);
         let payments = self.call_value().any_payment();
 
-        let payments_data_string =
-            ContractCallNoPayment::<_, ()>::new(ManagedAddress::default(), ManagedBuffer::new())
-                .with_any_payment(payments)
-                .into_call_data_string();
+        let payments_data_string = self
+            .tx()
+            .to(&ManagedAddress::default())
+            .payment(payments)
+            .raw_call("")
+            .to_call_data_string();
+
         self.callback_payments().set(payments_data_string);
     }
 

@@ -35,6 +35,7 @@ use crate::Result::{Err, Ok};
 // They are not used in the derive, but just to make sure:
 fn top_encode_number() {}
 fn universal_decode_number() {}
+fn universal_decode_number_unchecked() {}
 fn dep_decode_from_byte_slice() {}
 fn dep_encode_to_vec() {}
 fn top_decode_from_nested_or_handle_err() {}

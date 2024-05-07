@@ -1,6 +1,7 @@
 use multiversx_sc::{derive_imports::*, imports::*};
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct DepositInfo<M: ManagedTypeApi> {
     pub depositor_address: ManagedAddress<M>,
     pub esdt_funds: ManagedVec<M, EsdtTokenPayment<M>>,
@@ -24,7 +25,8 @@ where
     }
 }
 
-#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, TypeAbi)]
+#[type_abi]
+#[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Fee<M: ManagedTypeApi> {
     pub num_token_to_transfer: usize,
     pub value: EgldOrEsdtTokenPayment<M>,

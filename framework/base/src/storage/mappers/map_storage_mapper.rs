@@ -7,6 +7,7 @@ use super::{
 use crate::{
     api::StorageMapperApi,
     codec::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    contract_base::ErrorHelper,
     storage::{self, StorageKey},
     types::ManagedAddress,
 };
@@ -232,7 +233,9 @@ where
     #[inline]
     fn next(&mut self) -> Option<(K, V)> {
         if let Some(key) = self.key_iter.next() {
-            let value = self.hash_map.get(&key).unwrap();
+            let Some(value) = self.hash_map.get(&key) else {
+                ErrorHelper::<SA>::signal_error_with_message("missing key")
+            };
             return Some((key, value));
         }
         None

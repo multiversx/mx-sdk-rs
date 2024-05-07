@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: unified syntax
+
 mod bf_interact_cli;
 mod bf_interact_config;
 mod bf_interact_state;
@@ -8,20 +10,8 @@ use basic_features::{
 use bf_interact_config::Config;
 use bf_interact_state::State;
 use clap::Parser;
-use multiversx_sc_snippets::{
-    env_logger,
-    multiversx_sc::{codec::multi_types::IgnoreValue, types::Address},
-    multiversx_sc_scenario::{
-        api::StaticApi,
-        bech32,
-        mandos_system::ScenarioRunner,
-        scenario_format::interpret_trait::{InterpretableFrom, InterpreterContext},
-        scenario_model::{BytesValue, ScCallStep, ScDeployStep, Scenario, TxExpect},
-        standalone::retrieve_account_as_scenario_set_state,
-        test_wallets, ContractInfo,
-    },
-    tokio, Interactor,
-};
+
+use multiversx_sc_snippets::imports::*;
 
 const INTERACTOR_SCENARIO_TRACE_PATH: &str = "interactor_trace.scen.json";
 
@@ -85,17 +75,9 @@ impl BasicFeaturesInteract {
 
     async fn set_state(&mut self) {
         println!("wallet address: {}", bech32::encode(&self.wallet_address));
-        let scenario_raw = retrieve_account_as_scenario_set_state(
-            Config::load_config().gateway().to_string(),
-            bech32::encode(&self.wallet_address),
-            true,
-        )
-        .await;
-
-        let scenario = Scenario::interpret_from(scenario_raw, &InterpreterContext::default());
-
-        self.interactor.pre_runners.run_scenario(&scenario);
-        self.interactor.post_runners.run_scenario(&scenario);
+        self.interactor
+            .retrieve_account(&Bech32Address::from(&self.wallet_address))
+            .await;
     }
 
     async fn deploy(&mut self) {

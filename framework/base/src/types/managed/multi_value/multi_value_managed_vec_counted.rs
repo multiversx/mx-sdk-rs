@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
@@ -126,11 +126,20 @@ where
     }
 }
 
+impl<M, T> TypeAbiFrom<Self> for MultiValueManagedVecCounted<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbi,
+{
+}
+
 impl<M, T> TypeAbi for MultiValueManagedVecCounted<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("counted-variadic<");
         repr.push_str(T::type_name().as_str());

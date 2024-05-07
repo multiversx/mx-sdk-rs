@@ -2,11 +2,16 @@ use super::*;
 use crate::arrayvec::ArrayVec;
 use alloc::{
     boxed::Box,
+    format,
     string::{String, ToString},
     vec::Vec,
 };
 
+impl TypeAbiFrom<()> for () {}
+
 impl TypeAbi for () {
+    type Unmanaged = Self;
+
     /// No another exception from the 1-type-1-output-abi rule:
     /// the unit type produces no output.
     fn output_abis(_output_names: &[&'static str]) -> OutputAbis {
@@ -14,19 +19,35 @@ impl TypeAbi for () {
     }
 }
 
+impl<T, U> TypeAbiFrom<&U> for &T where T: TypeAbiFrom<U> {}
+
 impl<T: TypeAbi> TypeAbi for &T {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
 }
+
+impl<T, U> TypeAbiFrom<Box<U>> for Box<T> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Box<T> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Box<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -34,7 +55,11 @@ impl<T: TypeAbi> TypeAbi for Box<T> {
     }
 }
 
+impl<T, U> TypeAbiFrom<&[T]> for &[U] where T: TypeAbiFrom<U> {}
+
 impl<T: TypeAbi> TypeAbi for &[T] {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         let t_name = T::type_name();
         if t_name == "u8" {
@@ -46,34 +71,63 @@ impl<T: TypeAbi> TypeAbi for &[T] {
         repr
     }
 
+    fn type_name_rust() -> TypeName {
+        // we need to convert to an owned type
+        format!("Box<[{}]>", T::type_name_rust())
+    }
+
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
 }
+
+impl<T, U> TypeAbiFrom<Vec<T>> for Vec<U> where T: TypeAbiFrom<U> {}
 
 impl<T: TypeAbi> TypeAbi for Vec<T> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Vec<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
 }
+
+impl<T: TypeAbi, const CAP: usize> TypeAbiFrom<ArrayVec<T, CAP>> for ArrayVec<T, CAP> {}
 
 impl<T: TypeAbi, const CAP: usize> TypeAbi for ArrayVec<T, CAP> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ArrayVec<{}, {}usize>", T::type_name_rust(), CAP)
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
         T::provide_type_descriptions(accumulator);
     }
 }
+
+impl<T> TypeAbiFrom<Box<[T]>> for Box<[T]> {}
 
 impl<T: TypeAbi> TypeAbi for Box<[T]> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         <&[T]>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Box<[{}]>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -81,27 +135,57 @@ impl<T: TypeAbi> TypeAbi for Box<[T]> {
     }
 }
 
+impl TypeAbiFrom<String> for String {}
+impl TypeAbiFrom<&String> for String {}
+impl TypeAbiFrom<&str> for String {}
+impl TypeAbiFrom<Box<str>> for String {}
+
 impl TypeAbi for String {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         "utf-8 string".into()
     }
 }
 
-impl TypeAbi for &str {
+impl TypeAbiFrom<&'static str> for &'static str {}
+
+impl TypeAbi for &'static str {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
-        TypeName::type_name()
+        String::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "&'static str".into()
     }
 }
 
+impl TypeAbiFrom<Box<str>> for Box<str> {}
+impl TypeAbiFrom<&str> for Box<str> {}
+impl TypeAbiFrom<String> for Box<str> {}
+
 impl TypeAbi for Box<str> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
-        TypeName::type_name()
+        String::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "Box<str>".into()
     }
 }
 
 macro_rules! type_abi_name_only {
     ($ty:ty, $name:expr) => {
+        impl TypeAbiFrom<$ty> for $ty {}
+        impl TypeAbiFrom<&$ty> for $ty {}
+
         impl TypeAbi for $ty {
+            type Unmanaged = Self;
+
             fn type_name() -> TypeName {
                 TypeName::from($name)
             }
@@ -126,12 +210,51 @@ type_abi_name_only!(i64, "i64");
 type_abi_name_only!(core::num::NonZeroUsize, "NonZeroUsize");
 type_abi_name_only!(bool, "bool");
 
+// Unsigned integer types: the contract can return a smaller capacity result and and we can interpret it as a larger capacity type.
+
+impl TypeAbiFrom<usize> for u64 {}
+impl TypeAbiFrom<u32> for u64 {}
+impl TypeAbiFrom<u16> for u64 {}
+impl TypeAbiFrom<u8> for u64 {}
+
+impl TypeAbiFrom<usize> for u32 {}
+impl TypeAbiFrom<u16> for u32 {}
+impl TypeAbiFrom<u8> for u32 {}
+
+impl TypeAbiFrom<u32> for usize {}
+impl TypeAbiFrom<u16> for usize {}
+impl TypeAbiFrom<u8> for usize {}
+
+impl TypeAbiFrom<u8> for u16 {}
+
+// Signed, the same.
+
+impl TypeAbiFrom<isize> for i64 {}
+impl TypeAbiFrom<i32> for i64 {}
+impl TypeAbiFrom<i16> for i64 {}
+impl TypeAbiFrom<i8> for i64 {}
+
+impl TypeAbiFrom<isize> for i32 {}
+impl TypeAbiFrom<i16> for i32 {}
+impl TypeAbiFrom<i8> for i32 {}
+
+impl TypeAbiFrom<i32> for isize {}
+impl TypeAbiFrom<i16> for isize {}
+impl TypeAbiFrom<i8> for isize {}
+
+impl TypeAbiFrom<i8> for i16 {}
+
+impl<T, U> TypeAbiFrom<Option<T>> for Option<U> where T: TypeAbiFrom<U> {}
+
 impl<T: TypeAbi> TypeAbi for Option<T> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
-        let mut repr = TypeName::from("Option<");
-        repr.push_str(T::type_name().as_str());
-        repr.push('>');
-        repr
+        format!("Option<{}>", T::type_name())
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("Option<{}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -139,9 +262,21 @@ impl<T: TypeAbi> TypeAbi for Option<T> {
     }
 }
 
+impl<T, U, E> TypeAbiFrom<Result<T, E>> for Result<U, E> where T: TypeAbiFrom<U> {}
+
 impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "Result<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Similar to the SCResult implementation.
@@ -157,28 +292,46 @@ impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
 macro_rules! tuple_impls {
     ($($len:expr => ($($n:tt $name:ident)+))+) => {
         $(
+            impl<$($name),+> TypeAbiFrom<Self> for ($($name,)+)
+            where
+                $($name: TypeAbi,)+
+            {}
+
             impl<$($name),+> TypeAbi for ($($name,)+)
             where
                 $($name: TypeAbi,)+
             {
-				fn type_name() -> TypeName {
-					let mut repr = TypeName::from("tuple");
-					repr.push_str("<");
-					$(
-						if $n > 0 {
-							repr.push(',');
-						}
-						repr.push_str($name::type_name().as_str());
-                    )+
-					repr.push('>');
-					repr
-				}
+                type Unmanaged = Self;
 
-				fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
-					$(
-						$name::provide_type_descriptions(accumulator);
+                fn type_name() -> TypeName {
+                    let mut repr = TypeName::from("tuple<");
+                    $(
+                        if $n > 0 {
+                            repr.push(',');
+                        }
+                        repr.push_str($name::type_name().as_str());
                     )+
-				}
+                    repr.push('>');
+                    repr
+                }
+
+                fn type_name_rust() -> TypeName {
+                    let mut repr = TypeName::from("(");
+                    $(
+                        if $n > 0 {
+                            repr.push_str(", ");
+                        }
+                        repr.push_str($name::type_name_rust().as_str());
+                    )+
+                    repr.push(')');
+                    repr
+                }
+
+                fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+                    $(
+                        $name::provide_type_descriptions(accumulator);
+                    )+
+                }
             }
         )+
     }
@@ -203,13 +356,26 @@ tuple_impls! {
     16 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
 }
 
+impl<T, U, const N: usize> TypeAbiFrom<[T; N]> for [U; N] where T: TypeAbiFrom<U> {}
+
 impl<T: TypeAbi, const N: usize> TypeAbi for [T; N] {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         let mut repr = TypeName::from("array");
         repr.push_str(N.to_string().as_str());
         repr.push('<');
         repr.push_str(T::type_name().as_str());
         repr.push('>');
+        repr
+    }
+
+    fn type_name_rust() -> TypeName {
+        let mut repr = TypeName::from("[");
+        repr.push_str(T::type_name_rust().as_str());
+        repr.push_str("; ");
+        repr.push_str(N.to_string().as_str());
+        repr.push(']');
         repr
     }
 

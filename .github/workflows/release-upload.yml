@@ -54,4 +54,3 @@ jobs:
           file: ./examples-wasm.zip
           asset_name: examples-wasm.zip
           overwrite: true
-          body: "This is my release text"
