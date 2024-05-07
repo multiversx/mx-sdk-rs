@@ -1,8 +1,11 @@
 use multiversx_sc_derive::ManagedVecItem;
 
 use crate::{
-    codec,
-    codec::derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    abi::{TypeAbi, TypeName},
+    codec::{
+        self,
+        derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
+    },
 };
 
 const ESDT_TYPE_FUNGIBLE: &[u8] = b"FungibleESDT";
@@ -12,11 +15,9 @@ const ESDT_TYPE_META: &[u8] = b"MetaESDT";
 const ESDT_TYPE_INVALID: &[u8] = &[];
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
-use crate::derive::type_abi;
 
 // Note: In the current implementation, SemiFungible is never returned
 
-#[type_abi]
 #[derive(
     TopDecode, TopEncode, NestedDecode, NestedEncode, Clone, PartialEq, Eq, Debug, ManagedVecItem,
 )]
@@ -85,5 +86,15 @@ impl<'a> From<&'a [u8]> for EsdtTokenType {
         } else {
             Self::Invalid
         }
+    }
+}
+
+impl TypeAbi for EsdtTokenType {
+    fn type_name() -> TypeName {
+        "EsdtTokenType".into()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "EsdtTokenType".into()
     }
 }
