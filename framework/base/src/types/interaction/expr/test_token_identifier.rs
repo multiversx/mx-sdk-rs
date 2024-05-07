@@ -1,4 +1,4 @@
-use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -62,6 +62,5 @@ impl<'a> TopEncode for TestTokenIdentifier<'a> {
     }
 }
 
-impl<'a, Api> CodecFrom<TestTokenIdentifier<'a>> for TokenIdentifier<Api> where Api: ManagedTypeApi {}
 impl<'a, Api> TypeAbiFrom<TestTokenIdentifier<'a>> for TokenIdentifier<Api> where Api: ManagedTypeApi
 {}

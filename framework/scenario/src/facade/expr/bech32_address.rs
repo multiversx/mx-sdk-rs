@@ -178,11 +178,6 @@ impl TopDecode for Bech32Address {
     }
 }
 
-#[allow(deprecated)]
-impl<M> CodecFrom<Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
-#[allow(deprecated)]
-impl<M> CodecFrom<&Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
-
 impl<M> TypeAbiFrom<Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 impl<M> TypeAbiFrom<&Bech32Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 
