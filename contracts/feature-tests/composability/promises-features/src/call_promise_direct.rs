@@ -44,7 +44,7 @@ pub trait CallPromisesDirectModule {
         self.tx()
             .to(&to)
             .raw_call(endpoint_name)
-            .egld_or_multi_esdt(EgldOrMultiEsdtPayment::MultiEsdt(token_payments_vec))
+            .payment(EgldOrMultiEsdtPayment::MultiEsdt(token_payments_vec))
             .gas(gas_limit)
             .async_call_promise()
             .callback(self.callbacks().the_one_callback(2001, 2002u32.into()))

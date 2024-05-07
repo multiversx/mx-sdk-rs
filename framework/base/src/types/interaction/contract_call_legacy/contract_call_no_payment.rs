@@ -179,6 +179,6 @@ where
     }
 
     pub fn tx(self) -> Tx<TxScEnv<SA>, (), (), (), (), FunctionCall<SA>, ()> {
-        Tx::new_tx_from_sc().function_call(self.function_call)
+        Tx::new_tx_from_sc().raw_data(self.function_call)
     }
 }
