@@ -1,6 +1,6 @@
 use core::ptr;
 
-use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
     abi::TypeAbiFrom,
@@ -105,7 +105,6 @@ impl<'a> TopEncode for TestSCAddress<'a> {
     }
 }
 
-impl<'a, Api> CodecFrom<TestSCAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 impl<'a, Api> TypeAbiFrom<TestSCAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]

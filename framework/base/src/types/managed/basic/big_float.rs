@@ -10,9 +10,8 @@ use crate::{
 use alloc::string::String;
 
 use crate::codec::{
-    CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
-    NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
-    TryStaticCast,
+    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
 };
 
 #[derive(Debug)]
@@ -92,8 +91,6 @@ big_float_conv_num! {i32}
 big_float_conv_num! {isize}
 big_float_conv_num! {i16}
 big_float_conv_num! {i8}
-
-impl<M> CodecFromSelf for BigFloat<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> BigFloat<M> {
     #[inline]

@@ -1,4 +1,5 @@
 use crate::{
+    abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{BigUint, EgldOrEsdtTokenIdentifier},
 };
@@ -6,7 +7,6 @@ use crate::{
 use crate::codec::{
     self,
     derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-    CodecFrom, CodecFromSelf,
 };
 
 use crate as multiversx_sc; // needed by the TypeAbi generated code
@@ -126,9 +126,7 @@ impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for EgldOrEsdtTokenPayment<M> 
     }
 }
 
-impl<M> CodecFromSelf for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}
-
-impl<M> CodecFrom<&[u8]> for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&[u8]> for EgldOrEsdtTokenPayment<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> EgldOrEsdtTokenPayment<M> {
     pub fn as_refs(&self) -> EgldOrEsdtTokenPaymentRefs<'_, M> {

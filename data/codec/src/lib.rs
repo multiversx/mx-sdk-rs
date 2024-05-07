@@ -1,7 +1,5 @@
 #![no_std]
 #![feature(try_trait_v2)]
-#![feature(auto_traits)]
-#![feature(negative_impls)]
 
 extern crate alloc;
 
@@ -20,10 +18,10 @@ pub use num_bigint;
 
 // TODO: group into smaller sub-modules
 
+pub mod codec_convert;
 mod codec_err;
 mod codec_err_handler;
 mod default_traits;
-mod equivalent;
 mod impl_for_types;
 mod multi;
 pub mod multi_types;
@@ -42,7 +40,6 @@ pub use crate::{
 pub use codec_err::{DecodeError, EncodeError};
 pub use codec_err_handler::*;
 pub use default_traits::{DecodeDefault, EncodeDefault};
-pub use equivalent::*;
 pub use impl_for_types::impl_empty::Empty;
 pub use multi::*;
 pub use single::*;

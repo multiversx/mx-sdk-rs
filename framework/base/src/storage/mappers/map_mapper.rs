@@ -8,7 +8,7 @@ use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
+        multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler,
         NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::{storage_clear, storage_set, StorageKey},
@@ -537,15 +537,6 @@ where
         let iter = self.iter().map(MultiValue2::<K, V>::from);
         multi_encode_iter_or_handle_err(iter, output, h)
     }
-}
-
-impl<SA, K, V> CodecFrom<MapMapper<SA, K, V, CurrentStorage>>
-    for MultiValueEncoded<SA, MultiValue2<K, V>>
-where
-    SA: StorageMapperApi,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
-    V: TopEncode + TopDecode + 'static,
-{
 }
 
 impl<SA, K, V> TypeAbiFrom<MapMapper<SA, K, V, CurrentStorage>>
