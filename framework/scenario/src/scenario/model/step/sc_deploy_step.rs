@@ -10,7 +10,7 @@ use crate::{
     scenario_model::TxResponse,
 };
 
-use crate::multiversx_sc::types::{CodeMetadata, ContractDeploy};
+use crate::multiversx_sc::types::CodeMetadata;
 
 use super::{convert_call_args, TypedScDeploy};
 
@@ -98,9 +98,14 @@ impl ScDeployStep {
     /// Sets following fields based on the smart contract proxy:
     /// - "function"
     /// - "arguments"
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn call<OriginalResult, CD>(mut self, contract_deploy: CD) -> TypedScDeploy<OriginalResult>
     where
-        CD: Into<ContractDeploy<StaticApi, OriginalResult>>,
+        CD: Into<multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>>,
     {
         let (_, mandos_args) = process_contract_deploy(contract_deploy.into());
         for arg in mandos_args {
@@ -149,8 +154,13 @@ impl AsMut<ScDeployStep> for ScDeployStep {
 /// Extracts
 /// - (optional) recipient (needed for contract upgrade, not yet used);
 /// - the arguments.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
+#[allow(deprecated)]
 pub(crate) fn process_contract_deploy<OriginalResult>(
-    contract_deploy: ContractDeploy<StaticApi, OriginalResult>,
+    contract_deploy: multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>,
 ) -> (Option<String>, Vec<String>) {
     let to_str = contract_deploy
         .to

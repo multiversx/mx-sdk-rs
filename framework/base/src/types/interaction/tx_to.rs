@@ -2,6 +2,7 @@ use crate::types::{heap::Address, ManagedAddress};
 
 use super::{AnnotatedValue, TxEnv};
 
+/// Marks the recipient of any transaction.
 pub trait TxTo<Env>
 where
     Env: TxEnv,
@@ -10,6 +11,9 @@ where
 
 impl<Env> TxTo<Env> for () where Env: TxEnv {}
 
+/// Marks the non-empty recipient of a transaction.
+///
+/// Enforces the reciipent to be explicitly specified.
 pub trait TxToSpecified<Env>: TxTo<Env> + AnnotatedValue<Env, ManagedAddress<Env::Api>>
 where
     Env: TxEnv,

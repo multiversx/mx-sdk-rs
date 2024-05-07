@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use crate::{address_h256_to_erdrs, Interactor};
 use log::info;
 use multiversx_sc_scenario::{

@@ -16,7 +16,8 @@ mod tx_from;
 mod tx_gas;
 mod tx_payment;
 mod tx_proxy;
-mod tx_rh_list;
+mod tx_result_handler;
+mod tx_result_handler_list;
 mod tx_to;
 
 pub use annotated::*;
@@ -38,7 +39,8 @@ pub use tx_from::*;
 pub use tx_gas::*;
 pub use tx_payment::*;
 pub use tx_proxy::*;
-pub use tx_rh_list::*;
+pub use tx_result_handler::{TxEmptyResultHandler, TxResultHandler};
+pub use tx_result_handler_list::*;
 pub use tx_to::*;
 
 pub type TxScBase<Api> = TxBaseWithEnv<TxScEnv<Api>>;

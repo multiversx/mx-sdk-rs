@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use forwarder_legacy::nft_legacy::{Color, ProxyTrait as _};
 
 use multiversx_sc_scenario::{

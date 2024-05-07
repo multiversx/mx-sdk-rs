@@ -7,6 +7,7 @@
 // and maintenance.
 
 #![allow(unused)]
+#![allow(deprecated)] // TODO: unified syntax
 
 use multiversx_sc::{
     contract_base::ProxyObjNew,

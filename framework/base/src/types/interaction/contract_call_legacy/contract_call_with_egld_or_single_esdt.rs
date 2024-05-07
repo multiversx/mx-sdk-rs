@@ -15,6 +15,10 @@ use super::{
 /// Holds data for calling another contract, with a single payment, either EGLD or a single ESDT token.
 ///
 /// Gets created when chaining method `with_egld_or_single_esdt_transfer`.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractCallWithEgldOrSingleEsdt<SA, OriginalResult>
 where

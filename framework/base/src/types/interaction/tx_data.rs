@@ -15,6 +15,9 @@ use crate::{
 
 use super::TxEnv;
 
+/// Marks the data field of a transaction in `Tx`.
+///
+/// Can be nothing, deploy data, call data, etc.
 pub trait TxData<Env>
 where
     Env: TxEnv,

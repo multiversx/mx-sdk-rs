@@ -48,6 +48,9 @@ where
         (raw_result, self.result_handler)
     }
 
+    /// Executes transaction synchronously.
+    ///
+    /// Only works with contracts from the same shard.
     pub fn sync_call(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         let (raw_result, result_handler) = self.execute_sync_call_raw();
         let sync_raw_result = SyncCallRawResult(raw_result);
@@ -79,6 +82,9 @@ where
         (raw_result, self.result_handler)
     }
 
+    /// Executes transaction synchronously, in the same context (performed in the name of the caller).
+    ///
+    /// Only works with contracts from the same shard.
     pub fn sync_call_same_context(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         let (raw_result, result_handler) = self.execute_sync_call_same_context_raw();
         let sync_raw_result = SyncCallRawResult(raw_result);
@@ -114,6 +120,9 @@ where
         (raw_result, self.result_handler)
     }
 
+    /// Executes transaction synchronously, in readonly mode (target contract cannot have its state altered).
+    ///
+    /// Only works with contracts from the same shard.
     pub fn sync_call_readonly(self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
         let (raw_result, result_handler) = self.execute_sync_call_readonly_raw();
         let sync_raw_result = SyncCallRawResult(raw_result);

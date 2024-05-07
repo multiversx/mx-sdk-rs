@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use multiversx_sc::{
     abi::TypeAbiFrom,
     codec::TopDecodeMulti,
@@ -33,6 +35,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_call_use_raw_response<S, F>(&mut self, mut step: S, use_raw_response: F) -> &mut Self
     where
         S: AsMut<ScCallStep>,
@@ -44,6 +50,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_call_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScCall<OriginalResult>,
@@ -60,6 +70,10 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScCall<OriginalResult>,
@@ -83,6 +97,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_query_use_raw_response<S, F>(&mut self, mut step: S, use_raw_response: F) -> &mut Self
     where
         S: AsMut<ScQueryStep>,
@@ -95,6 +113,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_query_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScQuery<OriginalResult>,
@@ -111,6 +133,10 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_query_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScQuery<OriginalResult>,
@@ -147,6 +173,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_deploy_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -163,6 +193,10 @@ impl ScenarioWorld {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScDeploy<OriginalResult>,
@@ -180,6 +214,10 @@ impl ScenarioWorld {
         })
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub fn sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScDeploy<OriginalResult>,

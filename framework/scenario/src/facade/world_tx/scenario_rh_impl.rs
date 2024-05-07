@@ -3,7 +3,7 @@ use multiversx_sc::{
     codec::TopDecodeMulti,
     types::{
         ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress, ReturnsResult,
-        ReturnsResultAs, ReturnsResultUnmanaged, TxEnv, WithNewAddress, WithResultConv,
+        ReturnsResultAs, ReturnsResultUnmanaged, TxEnv, WithNewAddress, WithResultAs,
     },
 };
 
@@ -49,7 +49,7 @@ where
     }
 }
 
-impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultConv<T, F>
+impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultAs<T, F>
 where
     Env: TxEnv,
     T: TopDecodeMulti + TypeAbiFrom<Original>,

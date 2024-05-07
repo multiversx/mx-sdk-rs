@@ -1,7 +1,4 @@
-use multiversx_sc::{
-    abi::TypeAbiFrom,
-    types::{ContractCallBase, H256},
-};
+use multiversx_sc::{abi::TypeAbiFrom, types::H256};
 use num_traits::Zero;
 
 use crate::{
@@ -65,9 +62,14 @@ impl ScQueryStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn call<CC>(mut self, contract_call: CC) -> TypedScQuery<CC::OriginalResult>
     where
-        CC: ContractCallBase<StaticApi>,
+        CC: multiversx_sc::types::ContractCallBase<StaticApi>,
     {
         let (to_str, function, egld_value_expr, mandos_args) = process_contract_call(contract_call);
         assert!(
@@ -89,6 +91,11 @@ impl ScQueryStep {
     /// - "expect"
     ///     - "out"
     ///     - "status" set to 0
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn call_expect<CC, ExpectedResult>(
         self,
         contract_call: CC,
