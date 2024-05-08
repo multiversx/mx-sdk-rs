@@ -1,6 +1,5 @@
 #![no_std]
-#![feature(generic_const_exprs)]
-#![allow(incomplete_features)]
+
 #![allow(deprecated)]
 
 pub use multiversx_sc_derive::{self as derive, contract, module, proxy};
