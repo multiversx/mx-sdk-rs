@@ -2,10 +2,12 @@ use super::{
     ManagedVecItem, ManagedVecItemEmptyPayload, ManagedVecItemPayload, ManagedVecItemPayloadAdd,
 };
 
+/// Syntactic sugar, that allows us to more easily represent composite payloads as nested tuples.
 pub trait ManagedVecItemNestedTuple {
     type PAYLOAD: ManagedVecItemPayload;
 }
 
+/// End of the list.
 impl ManagedVecItemNestedTuple for () {
     type PAYLOAD = ManagedVecItemEmptyPayload;
 }

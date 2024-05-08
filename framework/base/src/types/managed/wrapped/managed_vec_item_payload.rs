@@ -1,3 +1,6 @@
+/// Describes the binary represetnation of a ManagedVecItem.
+/// 
+/// It is always an array that can be allocated directly on stack.
 pub trait ManagedVecItemPayload {
     fn new_buffer() -> Self;
 
@@ -8,6 +11,9 @@ pub trait ManagedVecItemPayload {
     fn payload_slice_mut(&mut self) -> &mut [u8];
 }
 
+/// Empty ManagedVecItem.
+/// 
+/// Only used as type, never as implementation, since all ManagedVecItem have some data in them.
 pub struct ManagedVecItemEmptyPayload;
 
 impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
@@ -28,6 +34,7 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
     }
 }
 
+/// The main ManagedVecItemPayload implementation. Uses an array in its implementation.
 pub struct ManagedVecItemPayloadBuffer<const N: usize> {
     buffer: [u8; N],
 }
@@ -50,6 +57,11 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
     }
 }
 
+/// Describes concatantion of smaller payloads into a larger one.
+/// 
+/// There is no runtime implementation, just a type-level addition.
+/// 
+/// Implemented via macros, because generic const expressions are currently unstable.
 pub trait ManagedVecItemPayloadAdd<Rhs>: ManagedVecItemPayload
 where
     Rhs: ManagedVecItemPayload,
