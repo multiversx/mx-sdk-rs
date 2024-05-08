@@ -3,7 +3,9 @@ pub trait ManagedVecItemPayload {
 
     fn payload_size() -> usize;
 
-    fn payload_slice(&mut self) -> &mut [u8];
+    fn payload_slice(&self) -> &[u8];
+
+    fn payload_slice_mut(&mut self) -> &mut [u8];
 }
 
 pub struct ManagedVecItemEmptyPayload;
@@ -17,7 +19,11 @@ impl ManagedVecItemPayload for ManagedVecItemEmptyPayload {
         0
     }
 
-    fn payload_slice(&mut self) -> &mut [u8] {
+    fn payload_slice(&self) -> &[u8] {
+        &[]
+    }
+
+    fn payload_slice_mut(&mut self) -> &mut [u8] {
         &mut []
     }
 }
@@ -35,7 +41,11 @@ impl<const N: usize> ManagedVecItemPayload for ManagedVecItemPayloadBuffer<N> {
         N
     }
 
-    fn payload_slice(&mut self) -> &mut [u8] {
+    fn payload_slice(&self) -> &[u8] {
+        &self.buffer[..]
+    }
+
+    fn payload_slice_mut(&mut self) -> &mut [u8] {
         &mut self.buffer[..]
     }
 }

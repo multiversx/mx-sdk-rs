@@ -38,9 +38,9 @@ fn managed_struct_to_bytes_writer() {
         big_uint: BigUint::from(fortytwo),
         num: 0x12345,
     };
-    
+
     let mut payload = <ManagedStructWithBigUint<StaticApi> as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
-    let payload_slice = payload.payload_slice();
+    let payload_slice = payload.payload_slice_mut();
 
     let handle_bytes = s.big_uint.get_handle().to_be_bytes();
     let expected = [0xff, 0xff, 0xff, handle_bytes[3], 0x00, 0x01, 0x23, 0x45];

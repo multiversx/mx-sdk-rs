@@ -1,5 +1,7 @@
-use multiversx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
-use multiversx_sc::types::ManagedVecItemPayload;
+use multiversx_sc::{
+    codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
+    types::ManagedVecItemPayload,
+};
 
 multiversx_sc::derive_imports!();
 
@@ -61,9 +63,9 @@ fn struct_1_to_bytes_writer() {
         u_64: 4u64,
         bool_field: true,
     };
-    
+
     let mut payload = <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
-    let payload_slice = payload.payload_slice();
+    let payload_slice = payload.payload_slice_mut();
 
     <Struct1 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
         payload_slice.copy_from_slice(bytes);

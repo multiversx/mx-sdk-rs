@@ -196,7 +196,6 @@ where
     T: ManagedType<M> + 'static,
 {
     type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
-    const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 

@@ -41,7 +41,6 @@ impl<M: ManagedTypeApi> EsdtTokenPaymentMultiValue<M> {
 
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPaymentMultiValue<M> {
     type PAYLOAD = <EsdtTokenPayment<M> as ManagedVecItem>::PAYLOAD;
-    const PAYLOAD_SIZE: usize = EsdtTokenPayment::<M>::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = EsdtTokenPayment::<M>::SKIPS_RESERIALIZATION;
     type Ref<'a> = Self;
 

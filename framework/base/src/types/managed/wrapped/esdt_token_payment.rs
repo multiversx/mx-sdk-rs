@@ -158,7 +158,7 @@ where
     T: ManagedVecItem,
 {
     ManagedVecItem::from_byte_reader(|bytes| {
-        let size = T::PAYLOAD_SIZE;
+        let size = T::payload_size();
         bytes.copy_from_slice(&arr[*index..*index + size]);
         *index += size;
     })
@@ -169,7 +169,7 @@ where
     T: ManagedVecItem,
 {
     ManagedVecItem::to_byte_writer(item, |bytes| {
-        let size = T::PAYLOAD_SIZE;
+        let size = T::payload_size();
         arr[*index..*index + size].copy_from_slice(bytes);
         *index += size;
     });
@@ -186,7 +186,6 @@ impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
 
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
     type PAYLOAD = ManagedVecItemPayloadBuffer<16>;
-    const PAYLOAD_SIZE: usize = 16;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 

@@ -51,7 +51,7 @@ fn struct_to_bytes_writer() {
     };
 
     let mut payload = <ManagedStructWithToken<StaticApi> as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
-    let payload_slice = payload.payload_slice();
+    let payload_slice = payload.payload_slice_mut();
 
     let handle1 = s.token.token_identifier.get_handle().to_be_bytes();
     let handle2 = s.token.amount.get_handle().to_be_bytes();

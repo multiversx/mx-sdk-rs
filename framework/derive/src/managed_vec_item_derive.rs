@@ -9,25 +9,6 @@ pub fn managed_vec_item_derive(ast: &syn::DeriveInput) -> TokenStream {
     }
 }
 
-fn type_payload_size(type_name: &syn::Type) -> proc_macro2::TokenStream {
-    quote! {
-        <#type_name as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE
-    }
-}
-
-fn generate_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
-    match fields {
-        syn::Fields::Named(fields_named) => fields_named
-            .named
-            .iter()
-            .map(|field| type_payload_size(&field.ty))
-            .collect(),
-        _ => {
-            panic!("ManagedVecItem only supports named fields")
-        },
-    }
-}
-
 fn generate_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::TokenStream {
     match fields {
         syn::Fields::Named(fields_named) => {
@@ -111,7 +92,7 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
 fn generate_payload_buffer_snippet() -> proc_macro2::TokenStream {
     quote! {
         let mut payload = <Self::PAYLOAD as multiversx_sc::types::ManagedVecItemPayload>::new_buffer();
-        let payload_slice = multiversx_sc::types::ManagedVecItemPayload::payload_slice(&mut payload);
+        let payload_slice = multiversx_sc::types::ManagedVecItemPayload::payload_slice_mut(&mut payload);
     }
 }
 
@@ -141,7 +122,6 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = multiversx_sc::types::ManagedVecItemPayloadBuffer<1>;
-            const PAYLOAD_SIZE: usize = 1;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
 
@@ -173,7 +153,6 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     let payload_nested_tuple = generate_payload_nested_tuple(&data_struct.fields);
-    let payload_snippets = generate_payload_snippets(&data_struct.fields);
     let skips_reserialization_snippets =
         generate_skips_reserialization_snippets(&data_struct.fields);
     let from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
@@ -184,7 +163,6 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
             type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemNestedTuple>::PAYLOAD;
-            const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = Self;
 

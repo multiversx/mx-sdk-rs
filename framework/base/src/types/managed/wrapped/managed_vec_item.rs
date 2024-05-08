@@ -16,10 +16,8 @@ use super::{ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayl
 /// Not all data needs to be stored as payload, for instance for most managed types
 /// the payload is just the handle, whereas the mai ndata is kept by the VM.
 pub trait ManagedVecItem: 'static {
+    /// Type managing the underlying binary representation in a ManagedVec..
     type PAYLOAD: ManagedVecItemPayload;
-
-    /// Size of the data stored in the underlying `ManagedBuffer`.
-    const PAYLOAD_SIZE: usize;
 
     /// If true, then the encoding of the item is identical to the payload,
     /// and no further conversion is necessary
@@ -59,7 +57,6 @@ macro_rules! impl_int {
     ($ty:ident, $payload_size:expr) => {
         impl ManagedVecItem for $ty {
             type PAYLOAD = ManagedVecItemPayloadBuffer<$payload_size>;
-            const PAYLOAD_SIZE: usize = $payload_size;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
@@ -89,7 +86,6 @@ impl_int! {i64, 8}
 
 impl ManagedVecItem for usize {
     type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
-    const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
@@ -113,7 +109,6 @@ impl ManagedVecItem for usize {
 
 impl ManagedVecItem for bool {
     type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
-    const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
 
@@ -138,17 +133,15 @@ impl ManagedVecItem for bool {
 impl<T> ManagedVecItem for Option<T>
 where
     (u8, (T, ())): ManagedVecItemNestedTuple,
-    [(); 1 + T::PAYLOAD_SIZE]:,
     T: ManagedVecItem,
 {
     type PAYLOAD = <(u8, (T, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
-    const PAYLOAD_SIZE: usize = 1 + T::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
         let mut payload = Self::PAYLOAD::new_buffer();
-        let payload_slice = payload.payload_slice();
+        let payload_slice = payload.payload_slice_mut();
         reader(payload_slice);
         if payload_slice[0] == 0 {
             None
@@ -167,7 +160,7 @@ where
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
         let mut payload = Self::PAYLOAD::new_buffer();
-        let slice = payload.payload_slice();
+        let slice = payload.payload_slice_mut();
         if let Some(t) = self {
             slice[0] = 1;
             T::to_byte_writer(t, |bytes| {
@@ -182,7 +175,6 @@ macro_rules! impl_managed_type {
     ($ty:ident) => {
         impl<M: ManagedTypeApi> ManagedVecItem for $ty<M> {
             type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
-            const PAYLOAD_SIZE: usize = 4;
             const SKIPS_RESERIALIZATION: bool = false;
             type Ref<'a> = ManagedRef<'a, M, Self>;
 
@@ -217,7 +209,6 @@ where
     M: ManagedTypeApi,
 {
     type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
-    const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
@@ -247,7 +238,6 @@ where
     T: ManagedVecItem,
 {
     type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
-    const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
 
