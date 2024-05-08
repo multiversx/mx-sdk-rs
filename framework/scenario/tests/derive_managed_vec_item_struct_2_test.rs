@@ -13,7 +13,7 @@ pub struct Struct2 {
     pub u_64: u64,
     pub bool_field: bool,
     pub opt_field: Option<u8>,
-    pub arr: [u16; 2],
+    pub arr: u32,
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn struct_to_bytes_writer() {
         u_64: 4u64,
         bool_field: true,
         opt_field: Some(5),
-        arr: [0x6111, 0x6222],
+        arr: 0x61116222,
     };
 
     #[rustfmt::skip]
@@ -63,7 +63,7 @@ fn struct_2_from_bytes_reader() {
         u_64: 4u64,
         bool_field: false,
         opt_field: Some(5),
-        arr: [0x6111, 0x6222],
+        arr: 0x61116222,
     };
 
     #[rustfmt::skip]

@@ -77,6 +77,8 @@ impl From<i32> for DebugHandle {
 }
 
 impl ManagedVecItem for DebugHandle {
+    type PAYLOAD = <RawHandle as ManagedVecItem>::PAYLOAD;
+
     const PAYLOAD_SIZE: usize = <RawHandle as ManagedVecItem>::PAYLOAD_SIZE;
 
     const SKIPS_RESERIALIZATION: bool = <RawHandle as ManagedVecItem>::SKIPS_RESERIALIZATION;

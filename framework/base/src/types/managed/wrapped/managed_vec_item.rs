@@ -1,4 +1,4 @@
-use core::{borrow::Borrow, mem::MaybeUninit};
+use core::borrow::Borrow;
 
 use crate::{
     api::ManagedTypeApi,
@@ -8,12 +8,16 @@ use crate::{
     },
 };
 
+use super::{ManagedVecItemPayload, ManagedVecItemPayloadAdd, ManagedVecItemPayloadBuffer};
+
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
 /// in the underlying managed buffer.
 /// Not all data needs to be stored as payload, for instance for most managed types
 /// the payload is just the handle, whereas the mai ndata is kept by the VM.
 pub trait ManagedVecItem: 'static {
+    type PAYLOAD: ManagedVecItemPayload;
+
     /// Size of the data stored in the underlying `ManagedBuffer`.
     const PAYLOAD_SIZE: usize;
 
@@ -50,6 +54,7 @@ pub trait ManagedVecItem: 'static {
 macro_rules! impl_int {
     ($ty:ident, $payload_size:expr) => {
         impl ManagedVecItem for $ty {
+            type PAYLOAD = ManagedVecItemPayloadBuffer<$payload_size>;
             const PAYLOAD_SIZE: usize = $payload_size;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
@@ -79,6 +84,7 @@ impl_int! {i32, 4}
 impl_int! {i64, 8}
 
 impl ManagedVecItem for usize {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
@@ -102,6 +108,7 @@ impl ManagedVecItem for usize {
 }
 
 impl ManagedVecItem for bool {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<1>;
     const PAYLOAD_SIZE: usize = 1;
     const SKIPS_RESERIALIZATION: bool = true;
     type Ref<'a> = Self;
@@ -126,9 +133,11 @@ impl ManagedVecItem for bool {
 
 impl<T> ManagedVecItem for Option<T>
 where
+    ManagedVecItemPayloadBuffer<1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
     [(); 1 + T::PAYLOAD_SIZE]:,
     T: ManagedVecItem,
 {
+    type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
     const PAYLOAD_SIZE: usize = 1 + T::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
@@ -166,6 +175,7 @@ where
 macro_rules! impl_managed_type {
     ($ty:ident) => {
         impl<M: ManagedTypeApi> ManagedVecItem for $ty<M> {
+            type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
             const PAYLOAD_SIZE: usize = 4;
             const SKIPS_RESERIALIZATION: bool = false;
             type Ref<'a> = ManagedRef<'a, M, Self>;
@@ -200,6 +210,7 @@ impl<M, const N: usize> ManagedVecItem for ManagedByteArray<M, N>
 where
     M: ManagedTypeApi,
 {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;
@@ -224,55 +235,12 @@ where
     }
 }
 
-impl<T, const N: usize> ManagedVecItem for [T; N]
-where
-    [(); T::PAYLOAD_SIZE * N]:,
-    T: ManagedVecItem,
-{
-    const PAYLOAD_SIZE: usize = T::PAYLOAD_SIZE * N;
-    const SKIPS_RESERIALIZATION: bool = T::SKIPS_RESERIALIZATION;
-    type Ref<'a> = Self;
-
-    fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
-        reader(&mut byte_arr[..]);
-        let mut result: [T; N] = unsafe { MaybeUninit::zeroed().assume_init() };
-        let mut from_index = 0;
-        for item in result.iter_mut() {
-            let to_index = from_index + T::PAYLOAD_SIZE;
-            *item = T::from_byte_reader(|bytes| {
-                bytes.copy_from_slice(&byte_arr[from_index..to_index]);
-            });
-            from_index = to_index;
-        }
-        result
-    }
-
-    unsafe fn from_byte_reader_as_borrow<'a, Reader: FnMut(&mut [u8])>(
-        reader: Reader,
-    ) -> Self::Ref<'a> {
-        Self::from_byte_reader(reader)
-    }
-
-    fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-        let mut byte_arr: [u8; T::PAYLOAD_SIZE * N] = [0; T::PAYLOAD_SIZE * N];
-        let mut from_index = 0;
-        for item in self {
-            let to_index = from_index + T::PAYLOAD_SIZE;
-            item.to_byte_writer(|bytes| {
-                byte_arr[from_index..to_index].copy_from_slice(bytes);
-            });
-            from_index = to_index;
-        }
-        writer(&byte_arr[..])
-    }
-}
-
 impl<M, T> ManagedVecItem for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
     const PAYLOAD_SIZE: usize = 4;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = ManagedRef<'a, M, Self>;

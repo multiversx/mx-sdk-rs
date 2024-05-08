@@ -130,6 +130,7 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
+            type PAYLOAD = multiversx_sc::types::ManagedVecItemPayloadBuffer<1>;
             const PAYLOAD_SIZE: usize = 1;
             const SKIPS_RESERIALIZATION: bool = true;
             type Ref<'a> = Self;
@@ -171,6 +172,7 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
+            type PAYLOAD = multiversx_sc::types::TempPayload;
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = Self;
