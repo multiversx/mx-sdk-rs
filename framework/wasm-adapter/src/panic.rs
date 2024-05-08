@@ -20,7 +20,7 @@ pub fn panic_fmt_with_message(panic_info: &PanicInfo) -> ! {
     let mut panic_msg = ManagedPanicMessage::default();
     panic_msg.append_str("panic occurred: ");
 
-    core::fmt::write(&mut panic_msg, format_args!("{:?}", panic_info))
+    core::fmt::write(&mut panic_msg, format_args!("{panic_info}"))
         .unwrap_or_else(|_| panic_msg.append_str("unable to write panic"));
 
     VmApiImpl::error_api_impl().signal_error_from_buffer(panic_msg.buffer.get_handle())
