@@ -8,7 +8,7 @@ use crate::{
     },
 };
 
-use super::{ManagedVecItemPayload, ManagedVecItemPayloadAdd, ManagedVecItemPayloadBuffer};
+use super::{ManagedVecItemNestedTuple, ManagedVecItemPayload, ManagedVecItemPayloadBuffer};
 
 /// Types that implement this trait can be items inside a `ManagedVec`.
 /// All these types need a payload, i.e a representation that gets stored
@@ -35,6 +35,10 @@ pub trait ManagedVecItem: 'static {
     /// - For any other types, `Self` is currently used, although this is technically unsafe.
     /// TODO: wrap other types in readonly wrapper.
     type Ref<'a>: Borrow<Self>;
+
+    fn payload_size() -> usize {
+        Self::PAYLOAD::payload_size()
+    }
 
     /// Parses given bytes as a an owned object.
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(reader: Reader) -> Self;
@@ -133,23 +137,24 @@ impl ManagedVecItem for bool {
 
 impl<T> ManagedVecItem for Option<T>
 where
-    ManagedVecItemPayloadBuffer<1>: ManagedVecItemPayloadAdd<T::PAYLOAD>,
+    (u8, (T, ())): ManagedVecItemNestedTuple,
     [(); 1 + T::PAYLOAD_SIZE]:,
     T: ManagedVecItem,
 {
-    type PAYLOAD = <ManagedVecItemPayloadBuffer<1> as ManagedVecItemPayloadAdd<T::PAYLOAD>>::Output;
+    type PAYLOAD = <(u8, (T, ())) as ManagedVecItemNestedTuple>::PAYLOAD;
     const PAYLOAD_SIZE: usize = 1 + T::PAYLOAD_SIZE;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
     fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-        let mut byte_arr: [u8; 1 + T::PAYLOAD_SIZE] = [0u8; 1 + T::PAYLOAD_SIZE];
-        reader(&mut byte_arr[..]);
-        if byte_arr[0] == 0 {
+        let mut payload = Self::PAYLOAD::new_buffer();
+        let payload_slice = payload.payload_slice();
+        reader(payload_slice);
+        if payload_slice[0] == 0 {
             None
         } else {
             Some(T::from_byte_reader(|bytes| {
-                bytes.copy_from_slice(&byte_arr[1..]);
+                bytes.copy_from_slice(&payload_slice[1..]);
             }))
         }
     }
@@ -161,14 +166,15 @@ where
     }
 
     fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-        let mut byte_arr: [u8; 1 + T::PAYLOAD_SIZE] = [0u8; 1 + T::PAYLOAD_SIZE];
+        let mut payload = Self::PAYLOAD::new_buffer();
+        let slice = payload.payload_slice();
         if let Some(t) = self {
-            byte_arr[0] = 1;
+            slice[0] = 1;
             T::to_byte_writer(t, |bytes| {
-                byte_arr[1..].copy_from_slice(bytes);
+                slice[1..].copy_from_slice(bytes);
             });
         }
-        writer(&byte_arr[..])
+        writer(slice)
     }
 }
 

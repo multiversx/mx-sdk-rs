@@ -185,7 +185,7 @@ impl<M: ManagedTypeApi> IntoMultiValue for EsdtTokenPayment<M> {
 }
 
 impl<M: ManagedTypeApi> ManagedVecItem for EsdtTokenPayment<M> {
-    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<16>;
     const PAYLOAD_SIZE: usize = 16;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;

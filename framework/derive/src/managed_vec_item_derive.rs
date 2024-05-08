@@ -28,6 +28,22 @@ fn generate_payload_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStre
     }
 }
 
+fn generate_payload_nested_tuple(fields: &syn::Fields) -> proc_macro2::TokenStream {
+    match fields {
+        syn::Fields::Named(fields_named) => {
+            let types: Vec<_> = fields_named.named.iter().map(|field| &field.ty).collect();
+            let mut result = quote! { () };
+            for ty in types.iter().rev() {
+                result = quote! { (#ty, #result) };
+            }
+            result
+        },
+        _ => {
+            panic!("ManagedVecItem only supports named fields")
+        },
+    }
+}
+
 fn generate_skips_reserialization_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     match fields {
         syn::Fields::Named(fields_named) => fields_named
@@ -56,8 +72,8 @@ fn generate_from_byte_reader_snippets(fields: &syn::Fields) -> Vec<proc_macro2::
                 let type_name = &field.ty;
                 quote! {
                     #field_ident: multiversx_sc::types::ManagedVecItem::from_byte_reader(|bytes| {
-                        let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE;
-                        bytes.copy_from_slice(&arr[index .. next_index]);
+                        let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::payload_size();
+                        bytes.copy_from_slice(&payload_slice[index .. next_index]);
                         index = next_index;
                     }),
                 }
@@ -79,8 +95,8 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
                 let type_name = &field.ty;
                 quote! {
                     multiversx_sc::types::ManagedVecItem::to_byte_writer(&self.#field_ident, |bytes| {
-                        let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE;
-                        arr[index .. next_index].copy_from_slice(bytes);
+                        let next_index = index + <#type_name as multiversx_sc::types::ManagedVecItem>::payload_size();
+                        payload_slice[index .. next_index].copy_from_slice(bytes);
                         index = next_index;
                     });
                 }
@@ -92,16 +108,10 @@ fn generate_to_byte_writer_snippets(fields: &syn::Fields) -> Vec<proc_macro2::To
     }
 }
 
-fn generate_array_init_snippet(ast: &syn::DeriveInput) -> proc_macro2::TokenStream {
-    let name = &ast.ident;
-    let self_expr = if ast.generics.params.is_empty() {
-        quote! { #name }
-    } else {
-        quote! { #name <multiversx_sc::api::uncallable::UncallableApi> }
-    };
+fn generate_payload_buffer_snippet() -> proc_macro2::TokenStream {
     quote! {
-        const SELF_PAYLOAD_SIZE: usize = <#self_expr as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE;
-        let mut arr: [u8; SELF_PAYLOAD_SIZE] = [0u8; SELF_PAYLOAD_SIZE];
+        let mut payload = <Self::PAYLOAD as multiversx_sc::types::ManagedVecItemPayload>::new_buffer();
+        let payload_slice = multiversx_sc::types::ManagedVecItemPayload::payload_slice(&mut payload);
     }
 }
 
@@ -162,24 +172,25 @@ fn enum_derive(data_enum: &syn::DataEnum, ast: &syn::DeriveInput) -> TokenStream
 fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
+    let payload_nested_tuple = generate_payload_nested_tuple(&data_struct.fields);
     let payload_snippets = generate_payload_snippets(&data_struct.fields);
     let skips_reserialization_snippets =
         generate_skips_reserialization_snippets(&data_struct.fields);
     let from_byte_reader_snippets = generate_from_byte_reader_snippets(&data_struct.fields);
     let to_byte_writer_snippets = generate_to_byte_writer_snippets(&data_struct.fields);
 
-    let array_init_snippet = generate_array_init_snippet(ast);
+    let payload_buffer_snippet = generate_payload_buffer_snippet();
 
     let gen = quote! {
         impl #impl_generics multiversx_sc::types::ManagedVecItem for #name #ty_generics #where_clause {
-            type PAYLOAD = multiversx_sc::types::TempPayload;
+            type PAYLOAD = <#payload_nested_tuple as multiversx_sc::types::ManagedVecItemNestedTuple>::PAYLOAD;
             const PAYLOAD_SIZE: usize = #(#payload_snippets)+*;
             const SKIPS_RESERIALIZATION: bool = #(#skips_reserialization_snippets)&&*;
             type Ref<'a> = Self;
 
             fn from_byte_reader<Reader: FnMut(&mut [u8])>(mut reader: Reader) -> Self {
-                #array_init_snippet
-                reader(&mut arr[..]);
+                #payload_buffer_snippet
+                reader(payload_slice);
                 let mut index = 0;
 
                 #name {
@@ -192,12 +203,12 @@ fn struct_derive(data_struct: &syn::DataStruct, ast: &syn::DeriveInput) -> Token
             }
 
             fn to_byte_writer<R, Writer: FnMut(&[u8]) -> R>(&self, mut writer: Writer) -> R {
-                #array_init_snippet
+                #payload_buffer_snippet
                 let mut index = 0;
 
                 #(#to_byte_writer_snippets)*
 
-                writer(&arr[..])
+                writer(&payload_slice[..])
             }
         }
     };

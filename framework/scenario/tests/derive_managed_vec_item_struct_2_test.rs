@@ -20,7 +20,7 @@ pub struct Struct2 {
 #[allow(clippy::assertions_on_constants)]
 fn struct_2_static() {
     assert_eq!(
-        <Struct2 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE,
+        <Struct2 as multiversx_sc::types::ManagedVecItem>::payload_size(),
         22
     );
     assert!(!<Struct2 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
