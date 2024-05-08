@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use super::ContractVariantSettings;
+use super::{contract_variant_builder::default_wasm_crate_name, ContractVariantSettings};
 use crate::cli_args::BuildArgs;
 use multiversx_sc::abi::ContractAbi;
 
@@ -35,6 +35,19 @@ pub struct ContractVariant {
 }
 
 impl ContractVariant {
+    pub fn default_from_abi(abi: &ContractAbi) -> Self {
+        let default_contract_config_name = abi.build_info.contract_crate.name.to_string();
+        let wasm_crate_name = default_wasm_crate_name(&default_contract_config_name);
+        ContractVariant {
+            main: true,
+            settings: ContractVariantSettings::default(),
+            contract_id: default_contract_config_name.clone(),
+            contract_name: default_contract_config_name,
+            wasm_crate_name,
+            abi: abi.clone(),
+        }
+    }
+
     pub fn public_name_snake_case(&self) -> String {
         self.contract_name.replace('-', "_")
     }
@@ -154,6 +167,9 @@ impl ContractVariant {
     /// Should correspond to all wasm exported functions.
     pub fn all_exported_function_names(&self) -> Vec<String> {
         let mut result = vec!["init".to_string()];
+        if !self.abi.upgrade_constructors.is_empty() {
+            result.push("upgrade".to_string())
+        }
         result.append(&mut self.endpoint_names());
         if self.abi.has_callback {
             result.push("callBack".to_string());
@@ -169,6 +185,10 @@ impl std::fmt::Debug for ContractVariant {
             .field("config_name", &self.contract_id)
             .field("public_name", &self.contract_name)
             .field("num-constructors", &self.abi.constructors.len())
+            .field(
+                "num-upgrade-constructors",
+                &self.abi.upgrade_constructors.len(),
+            )
             .field("num-endpoints", &self.abi.endpoints.len())
             .field("settings", &self.settings)
             .finish()

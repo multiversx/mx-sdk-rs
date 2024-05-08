@@ -1,5 +1,6 @@
+use crate::parse::attributes::extract_macro_attributes;
+
 use super::parse::attributes::extract_doc;
-use proc_macro::TokenStream;
 use quote::quote;
 
 pub struct ExplicitDiscriminant {
@@ -19,7 +20,7 @@ fn field_snippet(index: usize, field: &syn::Field) -> proc_macro2::TokenStream {
         field_descriptions.push(multiversx_sc::abi::StructFieldDescription::new(
             &[ #(#field_docs),* ],
             #field_name_str,
-            <#field_ty>::type_name(),
+            <#field_ty>::type_names(),
         ));
         <#field_ty>::provide_type_descriptions(accumulator);
     }
@@ -43,24 +44,28 @@ fn fields_snippets(fields: &syn::Fields) -> Vec<proc_macro2::TokenStream> {
     }
 }
 
-pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
+pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
+    let ast: syn::DeriveInput = syn::parse(input).unwrap();
     let type_docs = extract_doc(ast.attrs.as_slice());
+    let macro_attributes = extract_macro_attributes(ast.attrs.as_slice());
+
     let type_description_impl = match &ast.data {
         syn::Data::Struct(data_struct) => {
             let struct_field_snippets = fields_snippets(&data_struct.fields);
             quote! {
                 fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    let type_name = Self::type_name();
-                    if !accumulator.contains_type(&type_name) {
-                        accumulator.reserve_type_name(type_name.clone());
+                    let type_names = Self::type_names();
+                    if !accumulator.contains_type(&type_names.abi) {
+                        accumulator.reserve_type_name(type_names.clone());
                         let mut field_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#struct_field_snippets)*
                         accumulator.insert(
-                            type_name.clone(),
+                            type_names.clone(),
                             multiversx_sc::abi::TypeDescription::new(
                                 &[ #(#type_docs),* ],
-                                type_name,
+                                type_names,
                                 multiversx_sc::abi::TypeContents::Struct(field_descriptions),
+                                &[ #(#macro_attributes),* ],
                             ),
                         );
                     }
@@ -93,17 +98,18 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
                 .collect();
             quote! {
                 fn provide_type_descriptions<TDC: multiversx_sc::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {
-                    let type_name = Self::type_name();
-                    if !accumulator.contains_type(&type_name) {
-                        accumulator.reserve_type_name(type_name.clone());
+                    let type_names = Self::type_names();
+                    if !accumulator.contains_type(&type_names.abi) {
+                        accumulator.reserve_type_name(type_names.clone());
                         let mut variant_descriptions = multiversx_sc::types::heap::Vec::new();
                         #(#enum_variant_snippets)*
                         accumulator.insert(
-                            type_name.clone(),
+                            type_names.clone(),
                             multiversx_sc::abi::TypeDescription::new(
                                 &[ #(#type_docs),* ],
-                                type_name,
+                                type_names,
                                 multiversx_sc::abi::TypeContents::Enum(variant_descriptions),
+                                &[ #(#macro_attributes),* ],
                             ),
                         );
                     }
@@ -116,16 +122,28 @@ pub fn type_abi_derive(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
-    let type_abi_impl = quote! {
+    quote! {
+        impl #impl_generics multiversx_sc::abi::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}
+        impl #impl_generics multiversx_sc::abi::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
+
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
+            type Unmanaged = Self;
+
             fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
             }
-
             #type_description_impl
         }
-    };
-    type_abi_impl.into()
+    }
+}
+
+pub fn type_abi_full(input: proc_macro::TokenStream) -> proc_macro2::TokenStream {
+    let input_conv = proc_macro2::TokenStream::from(input.clone());
+    let derive_code = type_abi_derive(input);
+    quote! {
+        #input_conv
+        #derive_code
+    }
 }
 
 pub fn get_discriminant(

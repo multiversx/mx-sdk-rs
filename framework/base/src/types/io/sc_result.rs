@@ -1,4 +1,9 @@
-use crate::codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput};
+use alloc::format;
+
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+};
 
 use crate::{
     abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
@@ -105,7 +110,10 @@ where
     FromErr: Into<StaticSCError>,
 {
     fn from_residual(residual: Result<convert::Infallible, FromErr>) -> Self {
-        let Err(e) = residual;
+        let e = match residual {
+            Ok(_) => unreachable!(),
+            Err(err) => err,
+        };
         SCResult::Err(e.into())
     }
 }
@@ -127,9 +135,21 @@ where
     }
 }
 
+impl<T: TypeAbi, E> TypeAbiFrom<Self> for SCResult<T, E> {}
+
 impl<T: TypeAbi, E> TypeAbi for SCResult<T, E> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!(
+            "SCResult<{}, {}>",
+            T::type_name_rust(),
+            core::any::type_name::<E>()
+        )
     }
 
     /// Gives `SCResult<()>` the possibility to produce 0 output ABIs,

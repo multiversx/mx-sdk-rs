@@ -1,0 +1,2 @@
+[[proxy]]
+path = "src/digital_cash_proxy.rs"

@@ -5,13 +5,11 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                            2
+// Endpoints:                            3
 // Async Callback (empty):               1
-// Total number of exported functions:   4
+// Total number of exported functions:   5
 
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler_with_message!();
@@ -22,6 +20,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         init => init
         panicWithMessage => panic_with_message
         panicAfterLog => panic_after_log
+        sc_panic => sc_panic
     )
 }
 

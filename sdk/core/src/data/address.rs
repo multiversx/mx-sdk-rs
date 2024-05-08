@@ -63,6 +63,12 @@ impl Debug for Address {
     }
 }
 
+impl Default for Address {
+    fn default() -> Self {
+        Address::from_bytes([0u8; 32])
+    }
+}
+
 impl Serialize for Address {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where

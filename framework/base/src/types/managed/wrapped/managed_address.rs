@@ -1,12 +1,12 @@
 use core::convert::{TryFrom, TryInto};
 
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::ManagedTypeApi,
     codec::{
-        CodecFrom, CodecFromSelf, DecodeError, DecodeErrorHandler, EncodeErrorHandler,
-        NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode,
-        TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
+        DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput,
+        NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+        TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatByteReceiver, SCLowerHex},
     types::{heap::Address, ManagedBuffer, ManagedByteArray, ManagedType},
@@ -234,19 +234,38 @@ where
     }
 }
 
+impl<M> TypeAbiFrom<Self> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for ManagedAddress<M> where M: ManagedTypeApi {}
+
 impl<M> TypeAbi for ManagedAddress<M>
 where
     M: ManagedTypeApi,
 {
+    #[cfg(feature = "alloc")]
+    type Unmanaged = crate::types::heap::Address;
+
+    #[cfg(not(feature = "alloc"))]
+    type Unmanaged = Self;
+
     /// `"Address"` instead of `"array32<u8>"`.
     fn type_name() -> TypeName {
         Address::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        "ManagedAddress<$API>".into()
     }
 }
 
 impl<M: ManagedTypeApi> SCLowerHex for ManagedAddress<M> {
     fn fmt<F: FormatByteReceiver>(&self, f: &mut F) {
         SCLowerHex::fmt(&self.bytes, f)
+    }
+}
+
+impl<M: ManagedTypeApi> ManagedAddress<M> {
+    pub fn hex_expr(&self) -> ManagedBuffer<M> {
+        self.bytes.buffer.hex_expr()
     }
 }
 
@@ -259,18 +278,16 @@ impl<M: ManagedTypeApi> core::fmt::Debug for ManagedAddress<M> {
     }
 }
 
-impl<M> CodecFromSelf for ManagedAddress<M> where M: ManagedTypeApi {}
-
-impl<M> CodecFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<[u8; 32]> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Address> for ManagedAddress<M> where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<ManagedAddress<M>> for Address where M: ManagedTypeApi {}
 
 #[cfg(feature = "alloc")]
-impl<M> CodecFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&ManagedAddress<M>> for Address where M: ManagedTypeApi {}

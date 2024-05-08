@@ -1,8 +1,11 @@
 use crate::{
-    codec::{
-        CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
-    },
+    abi::TypeAbiFrom,
+    codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
+    types::{
+        system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
+        OriginalResultMarker, Tx, TxScEnv,
+    },
 };
 
 use super::{
@@ -15,19 +18,27 @@ use crate::{
     abi::{TypeAbi, TypeName},
     api::{CallTypeApi, ErrorApiImpl, StorageMapperApi},
     contract_base::{BlockchainWrapper, SendWrapper},
-    esdt::{
-        ESDTSystemSmartContractProxy, MetaTokenProperties, NonFungibleTokenProperties,
-        SemiFungibleTokenProperties,
-    },
     storage::StorageKey,
     types::{
-        BigUint, CallbackClosure, ContractCall, ContractCallWithEgld, EsdtTokenData,
-        EsdtTokenPayment, EsdtTokenType, ManagedAddress, ManagedBuffer, ManagedType,
-        TokenIdentifier,
+        system_proxy::{
+            MetaTokenProperties, NonFungibleTokenProperties, SemiFungibleTokenProperties,
+        },
+        BigUint, CallbackClosure, EsdtTokenData, EsdtTokenPayment, EsdtTokenType, ManagedAddress,
+        ManagedBuffer, ManagedType, TokenIdentifier,
     },
 };
 
 const INVALID_TOKEN_TYPE_ERR_MSG: &[u8] = b"Invalid token type for NonFungible issue";
+
+pub type IssueCallTo<Api> = Tx<
+    TxScEnv<Api>,
+    (),
+    ESDTSystemSCAddress,
+    EgldPayment<Api>,
+    (),
+    FunctionCall<Api>,
+    OriginalResultMarker<TokenIdentifier<Api>>,
+>;
 
 pub struct NonFungibleTokenMapper<SA>
 where
@@ -173,14 +184,15 @@ where
             SA::error_api_impl().signal_error(INVALID_TOKEN_TYPE_ERR_MSG);
         }
 
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
         let callback = match opt_callback {
             Some(cb) => cb,
             None => self.default_callback_closure_obj(),
         };
 
         storage_set(self.get_storage_key(), &TokenMapperState::<SA>::Pending);
-        system_sc_proxy
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
             .issue_and_set_all_roles(
                 issue_cost,
                 token_display_name,
@@ -189,8 +201,8 @@ where
                 num_decimals,
             )
             .async_call()
-            .with_callback(callback)
-            .call_and_exit();
+            .callback(callback)
+            .call_and_exit()
     }
 
     pub fn clear(&mut self) {
@@ -215,28 +227,32 @@ where
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
-        system_sc_proxy.issue_non_fungible(
-            issue_cost,
-            &token_display_name,
-            &token_ticker,
-            NonFungibleTokenProperties::default(),
-        )
+    ) -> IssueCallTo<SA> {
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
+            .issue_non_fungible(
+                issue_cost,
+                &token_display_name,
+                &token_ticker,
+                NonFungibleTokenProperties::default(),
+            )
     }
 
     fn sft_issue(
         issue_cost: BigUint<SA>,
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
-        system_sc_proxy.issue_semi_fungible(
-            issue_cost,
-            &token_display_name,
-            &token_ticker,
-            SemiFungibleTokenProperties::default(),
-        )
+    ) -> IssueCallTo<SA> {
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
+            .issue_semi_fungible(
+                issue_cost,
+                &token_display_name,
+                &token_ticker,
+                SemiFungibleTokenProperties::default(),
+            )
     }
 
     fn meta_issue(
@@ -244,19 +260,16 @@ where
         token_display_name: ManagedBuffer<SA>,
         token_ticker: ManagedBuffer<SA>,
         num_decimals: usize,
-    ) -> ContractCallWithEgld<SA, ()> {
-        let system_sc_proxy = ESDTSystemSmartContractProxy::<SA>::new_proxy_obj();
+    ) -> IssueCallTo<SA> {
         let properties = MetaTokenProperties {
             num_decimals,
             ..Default::default()
         };
 
-        system_sc_proxy.register_meta_esdt(
-            issue_cost,
-            &token_display_name,
-            &token_ticker,
-            properties,
-        )
+        Tx::new_tx_from_sc()
+            .to(ESDTSystemSCAddress)
+            .typed(ESDTSystemSCProxy)
+            .register_meta_esdt(issue_cost, &token_display_name, &token_ticker, properties)
     }
 
     pub fn nft_create<T: TopEncode>(
@@ -368,13 +381,14 @@ where
     }
 
     fn send_payment(&self, to: &ManagedAddress<SA>, payment: &EsdtTokenPayment<SA>) {
-        let send_wrapper = SendWrapper::<SA>::new();
-        send_wrapper.direct_esdt(
-            to,
-            &payment.token_identifier,
-            payment.token_nonce,
-            &payment.amount,
-        );
+        Tx::new_tx_from_sc()
+            .to(to)
+            .single_esdt(
+                &payment.token_identifier,
+                payment.token_nonce,
+                &payment.amount,
+            )
+            .transfer();
     }
 }
 
@@ -395,17 +409,25 @@ where
     }
 }
 
-impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
+
+impl<SA> TypeAbiFrom<Self> for NonFungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
 impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TokenIdentifier::<SA>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        TokenIdentifier::<SA>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: crate::abi::TypeDescriptionContainer>(accumulator: &mut TDC) {

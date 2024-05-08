@@ -79,20 +79,12 @@ where
         &self,
         to: &ManagedAddress<A>,
         token: &TokenIdentifier<A>,
-        egld_value: &BigUint<A>,
+        value: &BigUint<A>,
         gas_limit: u64,
         endpoint_name: &ManagedBuffer<A>,
         arg_buffer: &ManagedArgBuffer<A>,
     ) -> Result<(), &'static [u8]> {
-        self.transfer_esdt_nft_execute(
-            to,
-            token,
-            0,
-            egld_value,
-            gas_limit,
-            endpoint_name,
-            arg_buffer,
-        )
+        self.transfer_esdt_nft_execute(to, token, 0, value, gas_limit, endpoint_name, arg_buffer)
     }
 
     #[allow(clippy::too_many_arguments)]

@@ -15,8 +15,8 @@ use super::{
 
 fn check_single_role(method: &Method) {
     assert!(matches!(method.public_role, PublicRole::Private),
-		"Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`, `#[upgrade]`."
-	);
+        "Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`, `#[upgrade]`."
+    );
 }
 
 pub fn process_init_attribute(
@@ -44,13 +44,8 @@ pub fn process_upgrade_attribute(
     let has_attr = is_upgrade(attr);
     if has_attr {
         check_single_role(&*method);
-        method.public_role = PublicRole::Endpoint(EndpointMetadata {
-            public_name: proc_macro2::Ident::new("upgrade", proc_macro2::Span::call_site()),
+        method.public_role = PublicRole::Upgrade(InitMetadata {
             payable: first_pass_data.payable.clone(),
-            only_owner: false,
-            only_admin: false,
-            only_user_account: false,
-            mutability: EndpointMutabilityMetadata::Mutable,
             allow_multiple_var_args: first_pass_data.allow_multiple_var_args,
         });
         true

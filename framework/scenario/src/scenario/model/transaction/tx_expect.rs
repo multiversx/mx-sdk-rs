@@ -23,6 +23,12 @@ pub struct TxExpect {
     pub additional_error_message: String,
 }
 
+impl Default for TxExpect {
+    fn default() -> Self {
+        Self::ok()
+    }
+}
+
 impl TxExpect {
     pub fn ok() -> Self {
         TxExpect {

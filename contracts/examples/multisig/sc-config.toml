@@ -14,3 +14,6 @@ name = "multisig-view"
 external-view = true
 add-unlabelled = false
 add-labels = ["multisig-external-view"]
+
+[[proxy]]
+path = "src/multisig_proxy.rs"

@@ -1,8 +1,10 @@
+use unwrap_infallible::UnwrapInfallible;
+
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
-        try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
+        try_cast_execute_or_else, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
         TopDecodeMulti, TopDecodeMultiInput, TopDecodeMultiLength, TopEncode, TopEncodeMulti,
         TopEncodeMultiOutput,
     },
@@ -68,10 +70,11 @@ where
     T: TopEncodeMulti,
 {
     pub fn push(&mut self, item: T) {
-        let Ok(()) = item.multi_encode_or_handle_err(
+        item.multi_encode_or_handle_err(
             &mut self.raw_buffers,
             ExitCodecErrorHandler::<M>::from(err_msg::SERIALIZER_ENCODE_ERROR),
-        );
+        )
+        .unwrap_infallible()
     }
 }
 
@@ -222,13 +225,33 @@ where
     }
 }
 
+impl<M, T> TypeAbiFrom<Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
+impl<M, T> TypeAbiFrom<&Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
 impl<M, T> TypeAbi for MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -240,26 +263,24 @@ where
     }
 }
 
-impl<M, T> CodecFromSelf for MultiValueEncoded<M, T> where M: ManagedTypeApi {}
+#[cfg(feature = "alloc")]
+use crate::codec::multi_types::MultiValueVec;
 
 #[cfg(feature = "alloc")]
-use crate::codec::{multi_types::MultiValueVec, CodecFrom};
-
-#[cfg(feature = "alloc")]
-impl<M, T, U> CodecFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
+impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
-    U: CodecFrom<T>,
+    U: TypeAbiFrom<T>,
 {
 }
 
 #[cfg(feature = "alloc")]
-impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
+impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
-    U: CodecFrom<T>,
+    U: TypeAbiFrom<T>,
 {
 }
 

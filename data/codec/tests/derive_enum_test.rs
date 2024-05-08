@@ -68,11 +68,11 @@ fn field_enum_variant_with_value() {
 
     let enum_tuple_0 = EnumWithEverything::Write(Vec::new(), 0);
     #[rustfmt::skip]
-	let enum_tuple_0_bytes = &[
-		/* discriminant */ 2,
-		/* vec length */ 0, 0, 0, 0,
-		/* u16 */ 0, 0,
-	];
+    let enum_tuple_0_bytes = &[
+        /* discriminant */ 2,
+        /* vec length */ 0, 0, 0, 0,
+        /* u16 */ 0, 0,
+    ];
     check_top_encode_decode(enum_tuple_0.clone(), enum_tuple_0_bytes);
     check_dep_encode_decode(enum_tuple_0, enum_tuple_0_bytes);
 }
@@ -81,12 +81,12 @@ fn field_enum_variant_with_value() {
 fn field_enum_variant_with_tuple() {
     let enum_tuple_1 = EnumWithEverything::Write([1, 2, 3].to_vec(), 4);
     #[rustfmt::skip]
-	let enum_tuple_1_bytes = &[
-		/* discriminant */ 2, 
-		/* vec length */ 0, 0, 0, 3,
-		/* vec contents */ 1, 2, 3,
-		/* an extra 16 */ 0, 4,
-	];
+    let enum_tuple_1_bytes = &[
+        /* discriminant */ 2, 
+        /* vec length */ 0, 0, 0, 3,
+        /* vec contents */ 1, 2, 3,
+        /* an extra 16 */ 0, 4,
+    ];
 
     check_top_encode_decode(enum_tuple_1.clone(), enum_tuple_1_bytes);
     check_dep_encode_decode(enum_tuple_1, enum_tuple_1_bytes);
@@ -103,15 +103,15 @@ fn field_enum_struct_variant() {
     };
 
     #[rustfmt::skip]
-	let enum_struct_bytes = &[
-		/* discriminant */ 3,
-		/* int */ 0, 0x42,
-		/* seq length */ 0, 0, 0, 5,
-		/* seq contents */ 1, 2, 3, 4, 5,
-		/* another_byte */ 6,
-		/* uint_32 */ 0x00, 0x01, 0x23, 0x45,
-		/* uint_64 */ 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x67, 0x89,
-	];
+    let enum_struct_bytes = &[
+        /* discriminant */ 3,
+        /* int */ 0, 0x42,
+        /* seq length */ 0, 0, 0, 5,
+        /* seq contents */ 1, 2, 3, 4, 5,
+        /* another_byte */ 6,
+        /* uint_32 */ 0x00, 0x01, 0x23, 0x45,
+        /* uint_64 */ 0x00, 0x00, 0x00, 0x01, 0x23, 0x45, 0x67, 0x89,
+    ];
 
     check_top_encode_decode(enum_struct.clone(), enum_struct_bytes);
     check_dep_encode_decode(enum_struct, enum_struct_bytes);

@@ -1,7 +1,7 @@
 use crate::{
+    abi::TypeAbiFrom,
     codec::{
-        multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
-        TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput,
     },
     types::ManagedAddress,
 };
@@ -213,18 +213,26 @@ where
     }
 }
 
-impl<SA> CodecFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, usize> where
+impl<SA> TypeAbiFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, usize> where
     SA: StorageMapperApi
 {
 }
+
+impl<SA> TypeAbiFrom<Self> for UniqueIdMapper<SA, CurrentStorage> where SA: StorageMapperApi {}
 
 /// Behaves like a MultiResultVec when an endpoint result.
 impl<SA> TypeAbi for UniqueIdMapper<SA, CurrentStorage>
 where
     SA: StorageMapperApi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<usize>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<usize>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

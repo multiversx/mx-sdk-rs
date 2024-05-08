@@ -6,6 +6,7 @@ mod call_promises;
 mod call_promises_bt;
 pub mod call_sync_bt;
 mod common;
+pub mod vault_proxy;
 
 multiversx_sc::imports!();
 

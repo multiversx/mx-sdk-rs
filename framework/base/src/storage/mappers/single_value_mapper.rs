@@ -5,12 +5,11 @@ use super::{
     StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        multi_types::PlaceholderOutput, CodecFrom, CodecFromSelf, DecodeErrorHandler,
-        EncodeErrorHandler, TopDecode, TopDecodeInput, TopEncode, TopEncodeMulti,
-        TopEncodeMultiOutput, TopEncodeOutput,
+        multi_types::PlaceholderOutput, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
+        TopDecodeInput, TopEncode, TopEncodeMulti, TopEncodeMultiOutput, TopEncodeOutput,
     },
     storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType},
@@ -158,7 +157,7 @@ where
 
 /// Intermediary type for deserializing the result of an endpoint that returns a `SingleValueMapper`.
 ///
-/// Necessary because we cannot implement `CodecFrom` directly on `T`.
+/// Necessary because we cannot implement `TypeAbiFrom` directly on `T`.
 pub struct SingleValue<T: TopDecode>(T);
 
 impl<T: TopEncode + TopDecode> TopEncode for SingleValue<T> {
@@ -194,26 +193,25 @@ impl<T: TopDecode> SingleValue<T> {
     }
 }
 
-impl<SA, T, A> !CodecFromSelf for SingleValueMapper<SA, T, A>
+impl<SA, T, R> TypeAbiFrom<SingleValueMapper<SA, T, CurrentStorage>> for SingleValue<R>
 where
     SA: StorageMapperApi,
-    A: StorageAddress<SA>,
+    T: TopEncode + TopDecode,
+    R: TopDecode + TypeAbiFrom<T>,
+{
+}
+
+impl<SA, T> TypeAbiFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
+where
+    SA: StorageMapperApi,
     T: TopEncode + TopDecode,
 {
 }
 
-impl<SA, T, R> CodecFrom<SingleValueMapper<SA, T, CurrentStorage>> for SingleValue<R>
+impl<SA, T> TypeAbiFrom<Self> for SingleValueMapper<SA, T, CurrentStorage>
 where
     SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
-    R: TopDecode + CodecFrom<T>,
-{
-}
-
-impl<SA, T> CodecFrom<SingleValueMapper<SA, T>> for PlaceholderOutput
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
+    T: TopEncode + TopDecode + TypeAbi,
 {
 }
 
@@ -222,8 +220,14 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         T::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        T::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

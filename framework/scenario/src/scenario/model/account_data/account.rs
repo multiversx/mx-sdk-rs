@@ -86,14 +86,14 @@ impl Account {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub fn esdt_nft_all_properties<K, N, V, T>(
+    pub fn esdt_nft_all_properties<K, N, V, T, A>(
         mut self,
         token_id_expr: K,
         nonce_expr: N,
         balance_expr: V,
         opt_attributes_expr: Option<T>,
         royalties_expr: N,
-        creator_expr: Option<T>,
+        creator_expr: Option<A>,
         hash_expr: Option<T>,
         uris_expr: Vec<T>,
     ) -> Self
@@ -102,6 +102,7 @@ impl Account {
         U64Value: From<N>,
         BigUintValue: From<V>,
         BytesValue: From<T>,
+        AddressValue: From<A>,
     {
         let token_id = BytesKey::from(token_id_expr);
 
