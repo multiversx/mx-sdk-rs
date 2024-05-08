@@ -1,6 +1,4 @@
 #![no_std]
-#![feature(try_trait_v2)]
-#![feature(control_flow_enum)]
 #![feature(generic_const_exprs)]
 #![allow(incomplete_features)]
 #![allow(deprecated)]
