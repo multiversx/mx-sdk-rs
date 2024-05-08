@@ -19,6 +19,7 @@ fn panic_after_log_rs() {
     world().run("scenarios/panic-after-log.scen.json");
 }
 
+#[ignore = "PanicInfo currently not available, TODO: use std::panic::set_hook"]
 #[test]
 fn panic_message_rs() {
     world().run("scenarios/panic-message.scen.json");
