@@ -13,10 +13,6 @@ pub struct RustTypeString {
 }
 
 impl RustTypeString {
-    pub fn get_type_name(&self) -> &str {
-        &self.type_name
-    }
-
     pub fn get_default_value_expr(&self) -> &str {
         if !self.contains_custom_types {
             &self.default_value_expr

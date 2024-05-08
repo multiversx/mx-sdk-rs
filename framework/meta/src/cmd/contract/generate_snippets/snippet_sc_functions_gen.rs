@@ -1,36 +1,31 @@
 use std::{fs::File, io::Write};
 
-use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi, OutputAbi};
+use multiversx_sc::abi::{ContractAbi, EndpointAbi, EndpointMutabilityAbi, InputAbi};
 
 use super::{snippet_gen_common::write_newline, snippet_type_map::map_abi_type_to_rust_type};
 
-pub(crate) fn write_state_struct_impl(
+pub(crate) fn write_interact_struct_impl(
     file: &mut File,
     abi: &ContractAbi,
     wasm_output_file_path_expr: &str,
 ) {
     writeln!(
         file,
-        r#"impl State {{
+        r#"impl ContractInteract {{
     async fn new() -> Self {{
         let mut interactor = Interactor::new(GATEWAY).await;
-        let wallet_address = interactor.register_wallet(Wallet::from_pem_file(PEM).unwrap());
-        let sc_addr_expr = if SC_ADDRESS == "" {{
-            DEFAULT_ADDRESS_EXPR.to_string()
-        }} else {{
-            "bech32:".to_string() + SC_ADDRESS
-        }};
+        let wallet_address = interactor.register_wallet(test_wallets::alice());
+        
         let contract_code = BytesValue::interpret_from(
             {},
             &InterpreterContext::default(),
         );
-        let contract = ContractType::new(sc_addr_expr);
 
-        State {{
+        ContractInteract {{
             interactor,
             wallet_address,
             contract_code,
-            contract,
+            state: State::load_state()
         }}
     }}
 "#,
@@ -38,38 +33,40 @@ pub(crate) fn write_state_struct_impl(
     )
     .unwrap();
 
-    write_deploy_method_impl(file, &abi.constructors[0]);
+    write_deploy_method_impl(file, &abi.constructors[0], &abi.name);
 
     for endpoint_abi in &abi.endpoints {
-        write_endpoint_impl(file, endpoint_abi);
+        write_endpoint_impl(file, endpoint_abi, &abi.name);
     }
 
     // close impl block brackets
     writeln!(file, "}}").unwrap();
 }
 
-fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi) {
+fn write_deploy_method_impl(file: &mut File, init_abi: &EndpointAbi, name: &String) {
     write_method_declaration(file, "deploy");
     write_endpoint_args_declaration(file, &init_abi.inputs);
+    let proxy_name = format!("{}Proxy", name);
 
-    let output_type = map_output_types_to_rust_types(&init_abi.outputs);
     writeln!(
         file,
-        r#"        let (new_address, _) = self
+        r#"        let new_address = self
             .interactor
-            .sc_deploy_get_result::<_, {}>(
-                ScDeployStep::new()
-                    .call(self.contract.{}({}))
-                    .from(&self.wallet_address)
-                    .code(&self.contract_code)
-                    .expect(TxExpect::ok().additional_error_message("deploy failed: ")),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .typed(proxy::{})
+            .init({})
+            .code(&self.contract_code)
+            .returns(ReturnsNewAddress)
+            .prepare_async()
+            .run()
             .await;
-s
         let new_address_bech32 = bech32::encode(&new_address);
+        self.state
+            .set_address(Bech32Address::from_bech32_string(new_address_bech32.clone()));
+
         println!("new address: {{new_address_bech32}}");"#,
-        output_type,
-        init_abi.rust_method_name,
+        proxy_name,
         endpoint_args_when_called(init_abi.inputs.as_slice()),
     )
     .unwrap();
@@ -79,14 +76,14 @@ s
     write_newline(file);
 }
 
-fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi) {
+fn write_endpoint_impl(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
     write_method_declaration(file, &endpoint_abi.rust_method_name);
     write_payments_declaration(file, &endpoint_abi.payable_in_tokens);
     write_endpoint_args_declaration(file, &endpoint_abi.inputs);
     if matches!(endpoint_abi.mutability, EndpointMutabilityAbi::Readonly) {
-        write_contract_query(file, endpoint_abi);
+        write_contract_query(file, endpoint_abi, name);
     } else {
-        write_contract_call(file, endpoint_abi);
+        write_contract_call(file, endpoint_abi, name);
     }
 
     // close method block brackets
@@ -116,7 +113,7 @@ fn write_payments_declaration(file: &mut File, accepted_tokens: &[String]) {
     } else {
         writeln!(
             file,
-            "        let token_id = b\"\";
+            "        let token_id = String::new();
         let token_nonce = 0u64;
         let token_amount = {};",
             biguint_default.get_default_value_expr()
@@ -157,31 +154,31 @@ fn endpoint_args_when_called(inputs: &[InputAbi]) -> String {
     result
 }
 
-fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
+fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
     let payment_snippet = if endpoint_abi.payable_in_tokens.is_empty() {
         ""
     } else if endpoint_abi.payable_in_tokens[0] == "EGLD" {
-        "\n                    .egld_value(egld_amount)"
+        "\n            .egld(egld_amount)"
     } else {
-        "\n                    .esdt_transfer(token_id.to_vec(), token_nonce, token_amount)"
+        "\n            .payment((TokenIdentifier::from(token_id.as_str()), token_nonce, token_amount))"
     };
 
-    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
     writeln!(
         file,
-        r#"        let response: TypedResponse<{}> = self
+        r#"        let response = self
             .interactor
-            .sc_call_use_result(
-                ScCallStep::new()
-                    .call(self.contract.{}({}))
-                    .from(&self.wallet_address){}
-                    .expect(TxExpect::ok().additional_error_message("SC call failed: ")),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(self.state.current_address())
+            .typed(proxy::{}Proxy)
+            .{}({}){}
+            .returns(ReturnsRawResult)
+            .prepare_async()
+            .run()
             .await;
 
-        let result = response.result.unwrap();
-        println!("Result: {{result:?}}");"#,
-        output_type,
+        println!("Result: {{response:?}}");"#,
+        name,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
         payment_snippet,
@@ -189,48 +186,24 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi) {
     .unwrap();
 }
 
-fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi) {
-    let output_type = map_output_types_to_rust_types(&endpoint_abi.outputs);
+fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &String) {
     writeln!(
         file,
-        r#"        let result_value: {} = self
+        r#"        let result_value = self
             .interactor
-            .vm_query(self.contract.{}({}))
+            .query()
+            .to(self.state.current_address())
+            .typed(proxy::{}Proxy)
+            .{}({})
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
             .await;
-"#,
-        output_type,
+
+        println!("Result: {{result_value:?}}");"#,
+        name,
         endpoint_abi.rust_method_name,
         endpoint_args_when_called(endpoint_abi.inputs.as_slice()),
     )
     .unwrap();
-}
-
-pub fn map_output_types_to_rust_types(outputs: &[OutputAbi]) -> String {
-    let results_len = outputs.len();
-    if results_len == 0 {
-        return "()".to_string();
-    }
-
-    // format to be the same as when multi-value is an argument
-    // for results, each type is a different array entry
-    let mut input_str = String::new();
-    if results_len > 1 {
-        input_str += "multi";
-        input_str += "<";
-    }
-
-    for (i, output) in outputs.iter().enumerate() {
-        input_str += &output.type_names.abi;
-
-        if i < results_len - 1 {
-            input_str += ",";
-        }
-    }
-
-    if results_len > 1 {
-        input_str += ">";
-    }
-
-    let output_rust_type = map_abi_type_to_rust_type(input_str);
-    output_rust_type.get_type_name().to_string()
 }

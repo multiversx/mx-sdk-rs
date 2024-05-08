@@ -2,8 +2,9 @@ use multiversx_sc::{
     abi::{TypeAbi, TypeAbiFrom},
     codec::TopDecodeMulti,
     types::{
-        ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress, ReturnsResult,
-        ReturnsResultAs, ReturnsResultUnmanaged, TxEnv, WithNewAddress, WithResultAs,
+        ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress,
+        ReturnsRawResult, ReturnsResult, ReturnsResultAs, ReturnsResultUnmanaged, TxEnv,
+        WithNewAddress, WithResultAs,
     },
 };
 
@@ -73,6 +74,15 @@ where
             .new_deployed_address
             .clone()
             .expect("missing returned address")
+    }
+}
+
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsRawResult
+where
+    Env: TxEnv,
+{
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
+        tx_response.out.clone().into()
     }
 }
 
