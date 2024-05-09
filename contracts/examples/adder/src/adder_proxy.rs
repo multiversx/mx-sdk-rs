@@ -53,6 +53,7 @@ where
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
+        // non_payable
     }
 }
 
@@ -75,6 +76,7 @@ where
             .raw_upgrade()
             .argument(&initial_value)
             .original_result()
+        // non_payable
     }
 }
 
@@ -93,6 +95,7 @@ where
         self.wrapped_tx
             .raw_call("getSum")
             .original_result()
+        // non_payable
     }
 
     /// Add desired amount to the storage variable. 
@@ -106,5 +109,6 @@ where
             .raw_call("add")
             .argument(&value)
             .original_result()
+        // non_payable
     }
 }

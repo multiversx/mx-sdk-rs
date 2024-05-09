@@ -196,6 +196,7 @@ where
             }
             self.write_constructor_header(&constructor_abi);
             self.write_constructor_content(constructor_abi.inputs);
+            self.payable_mark(constructor_abi.payable_in_tokens);
             self.write_end_of_function();
         }
 
@@ -217,6 +218,7 @@ where
             }
             self.write_upgrade_header(&upgrade);
             self.write_upgrade_content(upgrade.inputs);
+            self.payable_mark(upgrade.payable_in_tokens);
             self.write_end_of_function();
         }
 
@@ -233,6 +235,7 @@ where
             }
             self.write_endpoint_header(&endpoint_abi);
             self.write_endpoint_content(&endpoint_abi);
+            self.payable_mark(endpoint_abi.payable_in_tokens);
             self.write_end_of_function();
         }
 
@@ -429,6 +432,14 @@ where
                 }
                 self.write(">");
             },
+        }
+    }
+
+    fn payable_mark(&mut self, payable_in_tokens: Vec<String>) {
+        if payable_in_tokens.is_empty() {
+            self.writeln("        // non_payable");
+        } else {
+            self.writeln("        // payable");
         }
     }
 
