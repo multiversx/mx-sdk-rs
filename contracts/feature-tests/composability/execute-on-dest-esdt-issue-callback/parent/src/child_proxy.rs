@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -70,7 +71,7 @@ where
         token_display_name: Arg0,
         token_ticker: Arg1,
         initial_supply: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("issueWrappedEgld")
             .argument(&token_display_name)
@@ -81,8 +82,9 @@ where
 
     pub fn wrapped_egld_token_identifier(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getWrappedEgldTokenIdentifier")
             .original_result()
     }

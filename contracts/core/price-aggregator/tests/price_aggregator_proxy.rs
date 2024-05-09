@@ -58,8 +58,9 @@ where
         slash_quorum: Arg3,
         submission_count: Arg4,
         oracles: Arg5,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&staking_token)
             .argument(&staking_amount)
@@ -87,8 +88,9 @@ where
         self,
         staking_amount: Arg0,
         slash_amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("changeAmounts")
             .argument(&staking_amount)
             .argument(&slash_amount)
@@ -100,8 +102,9 @@ where
     >(
         self,
         oracles: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("addOracles")
             .argument(&oracles)
             .original_result()
@@ -116,8 +119,9 @@ where
         self,
         submission_count: Arg0,
         oracles: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("removeOracles")
             .argument(&submission_count)
             .argument(&oracles)
@@ -137,8 +141,9 @@ where
         submission_timestamp: Arg2,
         price: Arg3,
         decimals: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("submit")
             .argument(&from)
             .argument(&to)
@@ -153,8 +158,9 @@ where
     >(
         self,
         submissions: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("submitBatch")
             .argument(&submissions)
             .original_result()
@@ -162,8 +168,9 @@ where
 
     pub fn latest_round_data(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, PriceFeed<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, PriceFeed<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("latestRoundData")
             .original_result()
     }
@@ -175,8 +182,9 @@ where
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("latestPriceFeed")
             .argument(&from)
             .argument(&to)
@@ -190,8 +198,9 @@ where
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("latestPriceFeedOptional")
             .argument(&from)
             .argument(&to)
@@ -203,8 +212,9 @@ where
     >(
         self,
         submission_count: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setSubmissionCount")
             .argument(&submission_count)
             .original_result()
@@ -212,8 +222,9 @@ where
 
     pub fn get_oracles(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getOracles")
             .original_result()
     }
@@ -227,8 +238,9 @@ where
         from: Arg0,
         to: Arg1,
         decimals: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setPairDecimals")
             .argument(&from)
             .argument(&to)
@@ -243,8 +255,9 @@ where
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, u8> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u8> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getPairDecimals")
             .argument(&from)
             .argument(&to)
@@ -253,39 +266,43 @@ where
 
     pub fn submission_count(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("submission_count")
             .original_result()
     }
 
     pub fn pause_endpoint(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("pause")
             .original_result()
     }
 
     pub fn unpause_endpoint(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unpause")
             .original_result()
     }
 
     pub fn paused_status(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isPaused")
             .original_result()
     }
 
     pub fn stake(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("stake")
             .original_result()
@@ -296,8 +313,9 @@ where
     >(
         self,
         unstake_amount: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unstake")
             .argument(&unstake_amount)
             .original_result()
@@ -308,8 +326,9 @@ where
     >(
         self,
         member_to_slash: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("voteSlashMember")
             .argument(&member_to_slash)
             .original_result()
@@ -320,8 +339,9 @@ where
     >(
         self,
         member_to_slash: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("cancelVoteSlashMember")
             .argument(&member_to_slash)
             .original_result()
@@ -332,8 +352,9 @@ where
     >(
         self,
         member_to_slash: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("slashMember")
             .argument(&member_to_slash)
             .original_result()

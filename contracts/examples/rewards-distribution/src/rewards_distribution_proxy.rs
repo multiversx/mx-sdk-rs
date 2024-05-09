@@ -50,8 +50,9 @@ where
         self,
         seed_nft_minter_address: Arg0,
         brackets: Arg1,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&seed_nft_minter_address)
             .argument(&brackets)
@@ -70,7 +71,7 @@ where
 {
     pub fn deposit_royalties(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("depositRoyalties")
             .original_result()
@@ -78,8 +79,9 @@ where
 
     pub fn raffle(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, OperationCompletionStatus> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OperationCompletionStatus> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("raffle")
             .original_result()
     }
@@ -93,7 +95,7 @@ where
         raffle_id_start: Arg0,
         raffle_id_end: Arg1,
         reward_tokens: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("claimRewards")
             .argument(&raffle_id_start)
@@ -113,8 +115,9 @@ where
         reward_token_id: Arg1,
         reward_token_nonce: Arg2,
         nft_nonce: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("computeClaimableAmount")
             .argument(&raffle_id)
             .argument(&reward_token_id)
@@ -125,16 +128,18 @@ where
 
     pub fn raffle_id(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getRaffleId")
             .original_result()
     }
 
     pub fn completed_raffle_id_count(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getCompletedRaffleIdCount")
             .original_result()
     }
@@ -148,8 +153,9 @@ where
         raffle_id: Arg0,
         reward_token_id: Arg1,
         reward_token_nonce: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getRoyalties")
             .argument(&raffle_id)
             .argument(&reward_token_id)
@@ -164,8 +170,9 @@ where
         self,
         raffle_id: Arg0,
         nft_nonce: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNftRewardPercent")
             .argument(&raffle_id)
             .argument(&nft_nonce)
@@ -183,8 +190,9 @@ where
         reward_token_id: Arg1,
         reward_token_nonce: Arg2,
         nft_nonce: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getWasClaimed")
             .argument(&raffle_id)
             .argument(&reward_token_id)
@@ -195,32 +203,36 @@ where
 
     pub fn seed_nft_minter_address(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getSeedNftMinterAddress")
             .original_result()
     }
 
     pub fn brackets(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, Bracket>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, Bracket>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getBrackets")
             .original_result()
     }
 
     pub fn last_raffle_epoch(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getLastRaffleEpoch")
             .original_result()
     }
 
     pub fn nft_token_id(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNftTokenId")
             .original_result()
     }
