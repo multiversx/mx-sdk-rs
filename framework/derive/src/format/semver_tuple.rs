@@ -2,15 +2,15 @@ use quote::quote;
 
 use crate::format::format_tokenize;
 
-pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let tokens: Vec<proc_macro::TokenTree> = format_tokenize::tokenize(input);
+pub fn semver_tuple(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
+    let tokens = format_tokenize::tokenize(input);
 
     tokens.iter().map(convert_token_tree).collect()
 }
 
-fn convert_token_tree(token: &proc_macro::TokenTree) -> proc_macro::TokenStream {
+fn convert_token_tree(token: &proc_macro2::TokenTree) -> proc_macro2::TokenStream {
     match token {
-        proc_macro::TokenTree::Group(lit) => {
+        proc_macro2::TokenTree::Group(lit) => {
             let format_string = lit.stream().to_string();
 
             let version_tokens: Vec<&str> = format_string.split('.').collect();
@@ -26,7 +26,6 @@ fn convert_token_tree(token: &proc_macro::TokenTree) -> proc_macro::TokenStream 
             quote! {
                 (#major, #minor, #patch)
             }
-            .into()
         },
         _ => panic!("Tokentree does not match with the requirements"),
     }

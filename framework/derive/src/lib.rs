@@ -68,10 +68,10 @@ pub fn managed_vec_item_derive(input: proc_macro::TokenStream) -> proc_macro::To
 
 #[proc_macro]
 pub fn format_receiver_args(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    format::format_receiver_args_macro(input)
+    format::format_receiver_args_macro(input.into()).into()
 }
 
 #[proc_macro]
 pub fn semver_tuple(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    format::semver_tuple(input)
+    format::semver_tuple(input.into()).into()
 }
