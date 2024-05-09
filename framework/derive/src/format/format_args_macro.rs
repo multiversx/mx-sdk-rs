@@ -1,21 +1,21 @@
-use proc_macro::quote;
+use quote::quote;
 
 use crate::{format::format_tokenize, generate::util::byte_str_literal};
 
 use super::{count_args, parse_format_string, FormatPartType};
 
-pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+pub fn format_receiver_args_macro(input: proc_macro2::TokenStream) -> proc_macro2::TokenStream {
     let tokens = format_tokenize::tokenize(input);
     assert!(
         tokens.len() > 2,
         "format_receiver_args macro requires at least 2 arguments"
     );
     let num_arguments = tokens.len() - 2;
-    let mut tokens_iter = tokens.into_iter();
+    let mut tokens_iter: std::vec::IntoIter<proc_macro2::TokenTree> = tokens.into_iter();
 
     let accumulator_expr = tokens_iter.next().unwrap();
     let format_string_token = tokens_iter.next().unwrap();
-    let format_string = if let proc_macro::TokenTree::Literal(lit) = format_string_token {
+    let format_string = if let proc_macro2::TokenTree::Literal(lit) = format_string_token {
         lit.to_string()
     } else {
         panic!(
@@ -30,37 +30,45 @@ pub fn format_receiver_args_macro(input: proc_macro::TokenStream) -> proc_macro:
         "Number of placeholders ({num_placeholders}) does not match number of arguments ({num_arguments})."
     );
 
+    format_tokens(format_str_parts, accumulator_expr, tokens_iter)
+}
+
+fn format_tokens(
+    format_str_parts: Vec<FormatPartType>,
+    accumulator_expr: proc_macro2::TokenTree,
+    mut tokens_iter: std::vec::IntoIter<proc_macro2::TokenTree>,
+) -> proc_macro2::TokenStream {
     format_str_parts.into_iter().map(|part| {
         match part {
             FormatPartType::StaticAscii(ascii_string) => {
                 let str_as_bytes = byte_str_literal(ascii_string.as_bytes());
-                quote! (
-                    multiversx_sc::formatter::FormatBuffer::append_ascii(&mut $accumulator_expr, $str_as_bytes);
-                )
+                quote! {
+                    multiversx_sc::formatter::FormatBuffer::append_ascii(&mut #accumulator_expr, #str_as_bytes);
+                }
             },
             FormatPartType::Display => {
                 let arg_expr = tokens_iter.next().unwrap();
-                quote! (
-                    multiversx_sc::formatter::FormatBuffer::append_display(&mut $accumulator_expr, &$arg_expr);
-                )
+                quote! {
+                    multiversx_sc::formatter::FormatBuffer::append_display(&mut #accumulator_expr, &#arg_expr);
+                }
             },
             FormatPartType::LowerHex => {
                 let arg_expr = tokens_iter.next().unwrap();
-                quote! (
-                    multiversx_sc::formatter::FormatBuffer::append_lower_hex(&mut $accumulator_expr, &$arg_expr);
-                )
+                quote! {
+                    multiversx_sc::formatter::FormatBuffer::append_lower_hex(&mut #accumulator_expr, &#arg_expr);
+                }
             },
             FormatPartType::Codec => {
                 let arg_expr = tokens_iter.next().unwrap();
-                quote! (
-                    multiversx_sc::formatter::FormatBuffer::append_codec(&mut $accumulator_expr, &$arg_expr);
-                )
+                quote! {
+                    multiversx_sc::formatter::FormatBuffer::append_codec(&mut #accumulator_expr, &#arg_expr);
+                }
             },
             FormatPartType::Bytes => {
                 let arg_expr = tokens_iter.next().unwrap();
-                quote! (
-                    multiversx_sc::formatter::FormatBuffer::append_binary(&mut $accumulator_expr, &$arg_expr);
-                )
+                quote! {
+                    multiversx_sc::formatter::FormatBuffer::append_binary(&mut #accumulator_expr, &#arg_expr);
+                }
             },
         }
     }).collect()

@@ -8,7 +8,7 @@ use crate::{
         TypeDescriptionContainer, TypeName,
     },
     api::ManagedTypeApi,
-    codec::{CodecFrom, EncodeErrorHandler},
+    codec::EncodeErrorHandler,
     types::ManagedBuffer,
 };
 
@@ -72,10 +72,6 @@ impl TopDecode for OperationCompletionStatus {
         }
     }
 }
-
-impl<M: ManagedTypeApi> CodecFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
-impl CodecFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
-impl CodecFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
 
 impl<M: ManagedTypeApi> TypeAbiFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
 impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}

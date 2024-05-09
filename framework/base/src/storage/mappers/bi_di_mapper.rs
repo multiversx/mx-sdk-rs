@@ -3,7 +3,7 @@ use core::marker::PhantomData;
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
+        multi_encode_iter_or_handle_err, multi_types::MultiValue2, EncodeErrorHandler,
         NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     types::ManagedAddress,
@@ -297,15 +297,6 @@ where
         let iter = self.iter().map(MultiValue2::<K, V>::from);
         multi_encode_iter_or_handle_err(iter, output, h)
     }
-}
-
-impl<SA, K, V> CodecFrom<BiDiMapper<SA, K, V, CurrentStorage>>
-    for MultiValueEncoded<SA, MultiValue2<K, V>>
-where
-    SA: StorageMapperApi,
-    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
-    V: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static + Default + PartialEq,
-{
 }
 
 impl<SA, K, V> TypeAbiFrom<BiDiMapper<SA, K, V, CurrentStorage>>

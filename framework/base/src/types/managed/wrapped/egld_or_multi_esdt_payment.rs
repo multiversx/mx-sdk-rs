@@ -4,7 +4,6 @@ use crate::{
     codec::{
         self,
         derive::{NestedDecode, NestedEncode, TopDecode, TopEncode},
-        CodecFromSelf,
     },
     types::BigUint,
 };
@@ -22,8 +21,6 @@ pub enum EgldOrMultiEsdtPayment<M: ManagedTypeApi> {
     Egld(BigUint<M>),
     MultiEsdt(ManagedVec<M, EsdtTokenPayment<M>>),
 }
-
-impl<M> CodecFromSelf for EgldOrMultiEsdtPayment<M> where M: ManagedTypeApi {}
 
 impl<M: ManagedTypeApi> EgldOrMultiEsdtPayment<M> {
     pub fn is_empty(&self) -> bool {

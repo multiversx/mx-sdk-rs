@@ -201,6 +201,9 @@ debug = false
 panic = \"abort\"
 overflow-checks = false
 
+[profile.dev]
+panic = \"abort\"
+
 [dependencies.test-crate-name]
 path = \"..\"
 

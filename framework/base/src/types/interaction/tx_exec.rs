@@ -11,6 +11,7 @@ pub use tx_exec_async::*;
 pub use tx_exec_async_promises::*;
 pub use tx_exec_deploy::*;
 pub use tx_exec_sync::*;
+use unwrap_infallible::UnwrapInfallible;
 
 use crate::{
     api::CallTypeApi,
@@ -32,6 +33,5 @@ where
     let mut loader = ManagedResultArgLoader::new(raw_result);
     let arg_id = ArgId::from(&b"sync result"[..]);
     let h: ArgErrorHandler<SA> = ArgErrorHandler::<SA>::from(arg_id);
-    let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
-    result
+    RequestedResult::multi_decode_or_handle_err(&mut loader, h).unwrap_infallible()
 }

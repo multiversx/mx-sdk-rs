@@ -24,7 +24,6 @@ checksum = "ed570934406eb16438a4e976b1b4500774099c13b8cb96eec99f620f05090ddf"
 name = "crypto-zombies"
 version = "0.0.0"
 dependencies = [
- "kitty",
  "multiversx-sc",
 ]
 
@@ -55,14 +54,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
-name = "kitty"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
- "random",
-]
-
-[[package]]
 name = "multiversx-sc"
 version = "0.49.0"
 dependencies = [
@@ -71,6 +62,7 @@ dependencies = [
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
+ "unwrap-infallible",
 ]
 
 [[package]]
@@ -79,6 +71,7 @@ version = "0.18.8"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
+ "unwrap-infallible",
 ]
 
 [[package]]
@@ -156,13 +149,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "random"
-version = "0.0.0"
-dependencies = [
- "multiversx-sc",
-]
-
-[[package]]
 name = "smallvec"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -184,3 +170,9 @@ name = "unicode-ident"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "unwrap-infallible"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "151ac09978d3c2862c4e39b557f4eceee2cc72150bc4cb4f16abf061b6e381fb"

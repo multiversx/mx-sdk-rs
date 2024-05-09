@@ -1,4 +1,5 @@
 use multiversx_sc::{abi::TypeAbiFrom, types::H256};
+use unwrap_infallible::UnwrapInfallible;
 
 use crate::{
     api::StaticApi,
@@ -260,7 +261,8 @@ pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<StaticApi>) -> Vec<String
 
 pub(super) fn format_expect<T: TopEncodeMulti>(t: T) -> TxExpect {
     let mut encoded = Vec::<Vec<u8>>::new();
-    let Ok(()) = t.multi_encode_or_handle_err(&mut encoded, PanicErrorHandler);
+    t.multi_encode_or_handle_err(&mut encoded, PanicErrorHandler)
+        .unwrap_infallible();
     let mut expect = TxExpect::ok().no_result();
     for encoded_res in encoded {
         let encoded_hex_string = format!("0x{}", hex::encode(encoded_res.as_slice()));
