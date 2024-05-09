@@ -1,0 +1,2 @@
+[[proxy]]
+path = "tests/price_aggregator_proxy.rs"

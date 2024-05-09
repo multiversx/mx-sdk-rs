@@ -1,5 +1,6 @@
+use super::EncodedManagedVecItem;
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApiImpl, InvalidSliceError, ManagedTypeApi},
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, IntoMultiValue, NestedDecode, NestedDecodeInput,
@@ -11,10 +12,15 @@ use crate::{
         ManagedVecRefIterator, MultiValueEncoded, MultiValueManagedVec,
     },
 };
-use alloc::vec::Vec;
-use core::{borrow::Borrow, cmp::Ordering, fmt::Debug, iter::FromIterator, marker::PhantomData};
-
-use super::EncodedManagedVecItem;
+use alloc::{format, vec::Vec};
+use core::{
+    borrow::Borrow,
+    cmp::Ordering,
+    fmt::Debug,
+    iter::FromIterator,
+    marker::PhantomData,
+    mem::{transmute_copy, ManuallyDrop, MaybeUninit},
+};
 
 pub(crate) const INDEX_OUT_OF_RANGE_MSG: &[u8] = b"ManagedVec index out of range";
 
@@ -147,12 +153,14 @@ where
             return None;
         }
 
-        let mut result_uninit = core::mem::MaybeUninit::<T::Ref<'_>>::uninit_array();
+        let mut result_uninit =
+            unsafe { MaybeUninit::<[MaybeUninit<T::Ref<'_>>; N]>::uninit().assume_init() };
+
         for (index, value) in self.iter().enumerate() {
             result_uninit[index].write(value);
         }
 
-        let result = unsafe { core::mem::MaybeUninit::array_assume_init(result_uninit) };
+        let result = unsafe { transmute_copy(&ManuallyDrop::new(result_uninit)) };
         Some(result)
     }
 
@@ -670,14 +678,43 @@ where
     }
 }
 
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<Vec<U>> for ManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedVec<M, U>> for Vec<T>
+where
+    M: ManagedTypeApi,
+    U: ManagedVecItem,
+    T: TypeAbiFrom<U>,
+{
+}
+
 impl<M, T> TypeAbi for ManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem + TypeAbi,
 {
+    type Unmanaged = Vec<T::Unmanaged>;
+
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         <&[T] as TypeAbi>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        format!("ManagedVec<$API, {}>", T::type_name_rust())
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

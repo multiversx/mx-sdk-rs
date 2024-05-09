@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use std::collections::HashMap;
 
+use super::ProxyConfigSerde;
+
 #[derive(Deserialize, Debug)]
 #[serde(deny_unknown_fields)]
 pub struct ScConfigSerde {
@@ -8,6 +10,8 @@ pub struct ScConfigSerde {
     pub settings: MultiContractGeneralSettingsSerde,
     #[serde(default)]
     pub contracts: HashMap<String, ContractVariantSerde>,
+    #[serde(default)]
+    pub proxy: Vec<ProxyConfigSerde>,
     #[serde(default)]
     #[serde(rename = "labels-for-contracts")]
     pub labels_for_contracts: HashMap<String, Vec<String>>,

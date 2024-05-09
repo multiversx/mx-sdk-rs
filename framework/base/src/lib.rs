@@ -3,8 +3,6 @@
 #![feature(exhaustive_patterns)]
 #![feature(try_trait_v2)]
 #![feature(control_flow_enum)]
-#![feature(maybe_uninit_uninit_array)]
-#![feature(maybe_uninit_array_assume_init)]
 #![feature(negative_impls)]
 #![feature(generic_const_exprs)]
 #![allow(incomplete_features)]
@@ -25,7 +23,6 @@ pub mod abi;
 pub mod api;
 pub mod contract_base;
 pub mod err_msg;
-pub mod esdt;
 pub mod external_view_contract;
 pub mod formatter;
 pub mod hex_call_data;
@@ -34,6 +31,7 @@ pub mod log_util;
 mod macros;
 pub mod non_zero_util;
 pub mod storage;
+pub mod tuple_util;
 pub mod types;
 
 pub use hex_call_data::*;
@@ -41,39 +39,12 @@ pub use hex_literal;
 pub use storage::{storage_clear, storage_get, storage_get_len, storage_set};
 
 /// Conveniently groups all framework imports required by a smart contract form the framework.
-pub mod imports {
-    pub use crate::{
-        abi::TypeAbi,
-        api::{ErrorApiImpl, ManagedTypeApi},
-        arrayvec::ArrayVec,
-        codec::{
-            multi_types::*, DecodeError, IntoMultiValue, NestedDecode, NestedEncode, TopDecode,
-            TopEncode,
-        },
-        contract_base::{ContractBase, ProxyObjBase},
-        err_msg,
-        esdt::*,
-        io::*,
-        non_zero_usize,
-        non_zero_util::*,
-        require, sc_format, sc_panic, sc_print,
-        storage::mappers::*,
-        types::*,
-    };
-    pub use core::ops::{
-        Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div,
-        DivAssign, Mul, MulAssign, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
-    };
-}
+pub mod imports;
 
 /// Conveniently groups all imports required for deriving framework-related traits for types.
-pub mod derive_imports {
-    pub use crate::{
-        codec,
-        codec::derive::{
-            NestedDecode, NestedEncode, TopDecode, TopDecodeOrDefault, TopEncode,
-            TopEncodeOrDefault,
-        },
-        derive::{ManagedVecItem, TypeAbi},
-    };
+pub mod derive_imports;
+
+/// Conveniently groups all imports required for generated proxies.
+pub mod proxy_imports {
+    pub use super::{derive_imports::*, imports::*};
 }

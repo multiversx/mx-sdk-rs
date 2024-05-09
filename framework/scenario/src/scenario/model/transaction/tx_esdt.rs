@@ -1,3 +1,5 @@
+use multiversx_sc::{api::ManagedTypeApi, types::EsdtTokenPayment};
+
 use crate::{
     scenario::model::{BigUintValue, BytesValue, U64Value},
     scenario_format::{
@@ -29,6 +31,18 @@ impl IntoRaw<TxESDTRaw> for TxESDT {
             token_identifier: Some(self.esdt_token_identifier.into_raw()),
             nonce: self.nonce.into_raw_opt(),
             value: self.esdt_value.into_raw(),
+        }
+    }
+}
+
+impl<M: ManagedTypeApi> From<EsdtTokenPayment<M>> for TxESDT {
+    fn from(value: EsdtTokenPayment<M>) -> Self {
+        TxESDT {
+            esdt_token_identifier: BytesValue::from(
+                value.token_identifier.as_managed_buffer().to_vec(),
+            ),
+            nonce: U64Value::from(value.token_nonce),
+            esdt_value: BigUintValue::from(value.amount),
         }
     }
 }

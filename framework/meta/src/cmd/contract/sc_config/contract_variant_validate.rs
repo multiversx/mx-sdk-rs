@@ -9,28 +9,24 @@ pub fn validate_contract_variant(contract_variant: &ContractVariant) -> Result<(
 }
 
 fn check_single_constructor(contract_variant: &ContractVariant) -> Result<(), String> {
-    match contract_variant.abi.constructors.len() {
-        0 => if has_upgrade(contract_variant) {
-            Ok(())
-        } else {
-            Err("Missing constructor. Add a method annotated with `#[init]`.".to_string())
-        },
-        1 => Ok(()),
-        _ => Err("More than one contrctructor present. Exactly one method annotated with `#[init]` is required.".to_string()),
+    match (
+        contract_variant.abi.constructors.len(),
+        contract_variant.abi.upgrade_constructors.len(),
+    ) {
+        (0, 0) => Err("Missing constructor. Add a method annotated with `#[init]`.".to_string()),
+        (1, 0) | (0, 1) | (1, 1) => Ok(()),
+        (_, _) => Err("More than two constructors present. Exactly one method annotated with `#[init]` and/or another optional `#[upgrade]` is required. ".to_string()),
     }
-}
-
-fn has_upgrade(contract_variant: &ContractVariant) -> bool {
-    contract_variant
-        .abi
-        .endpoints
-        .iter()
-        .any(|endpoint| endpoint.name == "upgrade")
 }
 
 /// Note: promise callbacks not included, since they have `#[call_value]` arguments, that are currently not modelled.
 fn validate_contract_var_args(abi: &ContractAbi) -> Result<(), String> {
-    for endpoint_abi in abi.constructors.iter().chain(abi.endpoints.iter()) {
+    for endpoint_abi in abi
+        .constructors
+        .iter()
+        .chain(abi.upgrade_constructors.iter())
+        .chain(abi.endpoints.iter())
+    {
         validate_endpoint_var_args_number(endpoint_abi)?;
         validate_endpoint_var_args_order(endpoint_abi)?;
     }
@@ -69,7 +65,7 @@ fn validate_endpoint_var_args_order(endpoint_abi: &EndpointAbi) -> Result<(), St
 
 #[cfg(test)]
 mod tests {
-    use multiversx_sc::abi::{InputAbi, TypeName};
+    use multiversx_sc::abi::{InputAbi, TypeNames};
 
     use super::*;
 
@@ -78,12 +74,12 @@ mod tests {
         let mut endpoint_def = EndpointAbi::default();
         let var_arg_1 = InputAbi {
             arg_name: "arg_1".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: true,
         };
         let var_arg_2 = InputAbi {
             arg_name: "arg_2".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: true,
         };
         endpoint_def.inputs.push(var_arg_1);
@@ -103,12 +99,12 @@ mod tests {
         let mut endpoint_def = EndpointAbi::default();
         let arg = InputAbi {
             arg_name: "arg_1".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: false,
         };
         let var_arg_1 = InputAbi {
             arg_name: "arg_2".to_string(),
-            type_name: TypeName::new(),
+            type_names: TypeNames::new(),
             multi_arg: true,
         };
 

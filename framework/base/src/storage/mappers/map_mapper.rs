@@ -5,13 +5,13 @@ use super::{
     SetMapper, StorageClearable, StorageMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
         multi_encode_iter_or_handle_err, multi_types::MultiValue2, CodecFrom, EncodeErrorHandler,
         NestedDecode, NestedEncode, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
-    storage::{storage_clear, storage_get, storage_set, StorageKey},
+    storage::{storage_clear, storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
 };
 
@@ -26,6 +26,7 @@ where
     V: TopEncode + TopDecode + 'static,
 {
     _phantom_api: PhantomData<SA>,
+    address: A,
     base_key: StorageKey<SA>,
     keys_set: SetMapper<SA, K, A>,
     _phantom_value: PhantomData<V>,
@@ -40,6 +41,7 @@ where
     fn new(base_key: StorageKey<SA>) -> Self {
         MapMapper {
             _phantom_api: PhantomData,
+            address: CurrentStorage,
             base_key: base_key.clone(),
             keys_set: SetMapper::new(base_key),
             _phantom_value: PhantomData,
@@ -106,6 +108,7 @@ where
     pub fn new_from_address(address: ManagedAddress<SA>, base_key: StorageKey<SA>) -> Self {
         MapMapper {
             _phantom_api: PhantomData,
+            address: address.clone(),
             base_key: base_key.clone(),
             keys_set: SetMapper::new_from_address(address, base_key),
             _phantom_value: PhantomData,
@@ -149,7 +152,8 @@ where
     }
 
     fn get_mapped_value(&self, key: &K) -> V {
-        storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
+        self.address
+            .address_storage_get(self.build_named_key(MAPPED_VALUE_IDENTIFIER, key).as_ref())
     }
 
     /// Gets a reference to the value in the entry.
@@ -544,6 +548,23 @@ where
 {
 }
 
+impl<SA, K, V> TypeAbiFrom<MapMapper<SA, K, V, CurrentStorage>>
+    for MultiValueEncoded<SA, MultiValue2<K, V>>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
+}
+
+impl<SA, K, V> TypeAbiFrom<Self> for MapMapper<SA, K, V, CurrentStorage>
+where
+    SA: StorageMapperApi,
+    K: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+    V: TopEncode + TopDecode + 'static,
+{
+}
+
 /// Behaves like a MultiResultVec<MultiValue<K, V>> when an endpoint result.
 impl<SA, K, V> TypeAbi for MapMapper<SA, K, V, CurrentStorage>
 where
@@ -551,8 +572,14 @@ where
     K: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi + 'static,
     V: TopEncode + TopDecode + TypeAbi + 'static,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name()
+    }
+
+    fn type_name_rust() -> TypeName {
+        MultiValueEncoded::<SA, MultiValue2<K, V>>::type_name_rust()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {

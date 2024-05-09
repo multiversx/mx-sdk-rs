@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::{ErrorApi, ManagedTypeApi},
     codec::{
         try_cast_execute_or_else, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, TopDecode,
@@ -222,13 +222,33 @@ where
     }
 }
 
+impl<M, T> TypeAbiFrom<Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
+impl<M, T> TypeAbiFrom<&Self> for MultiValueEncoded<M, T>
+where
+    M: ManagedTypeApi,
+    T: TypeAbi,
+{
+}
+
 impl<M, T> TypeAbi for MultiValueEncoded<M, T>
 where
     M: ManagedTypeApi,
     T: TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
+    }
+
+    fn type_name_rust() -> TypeName {
+        crate::abi::type_name_multi_value_encoded::<T>()
     }
 
     fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
@@ -255,11 +275,29 @@ where
 }
 
 #[cfg(feature = "alloc")]
+impl<M, T, U> TypeAbiFrom<MultiValueVec<T>> for MultiValueEncoded<M, U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbiFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
 impl<M, T, U> CodecFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
 where
     M: ManagedTypeApi + ErrorApi,
     T: TopEncodeMulti,
     U: CodecFrom<T>,
+{
+}
+
+#[cfg(feature = "alloc")]
+impl<M, T, U> TypeAbiFrom<MultiValueEncoded<M, T>> for MultiValueVec<U>
+where
+    M: ManagedTypeApi + ErrorApi,
+    T: TopEncodeMulti,
+    U: TypeAbiFrom<T>,
 {
 }
 

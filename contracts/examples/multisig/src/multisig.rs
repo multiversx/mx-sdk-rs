@@ -4,6 +4,7 @@ pub mod action;
 pub mod multisig_events;
 pub mod multisig_perform;
 pub mod multisig_propose;
+pub mod multisig_proxy;
 pub mod multisig_state;
 pub mod user_role;
 

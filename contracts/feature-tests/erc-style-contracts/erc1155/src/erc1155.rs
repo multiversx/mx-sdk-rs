@@ -350,16 +350,17 @@ pub trait Erc1155 {
     ) {
         let caller = self.blockchain().get_caller();
 
-        self.erc1155_user_proxy(to.clone())
+        self.tx()
+            .to(to.clone())
+            .typed(erc1155_user_proxy::Erc1155UserProxy)
             .on_erc1155_received(caller, from.clone(), type_id.clone(), value.clone(), data)
-            .async_call()
-            .with_callback(self.callbacks().transfer_callback(
+            .callback(self.callbacks().transfer_callback(
                 from,
                 to,
                 [type_id].to_vec(),
                 [value].to_vec(),
             ))
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     fn peform_async_call_batch_transfer(
@@ -372,7 +373,9 @@ pub trait Erc1155 {
     ) {
         let caller = self.blockchain().get_caller();
 
-        self.erc1155_user_proxy(to.clone())
+        self.tx()
+            .to(to.clone())
+            .typed(erc1155_user_proxy::Erc1155UserProxy)
             .on_erc1155_batch_received(
                 caller,
                 from.clone(),
@@ -380,14 +383,13 @@ pub trait Erc1155 {
                 values.to_vec(),
                 data,
             )
-            .async_call()
-            .with_callback(self.callbacks().transfer_callback(
+            .callback(self.callbacks().transfer_callback(
                 from,
                 to,
                 type_ids.to_vec(),
                 values.to_vec(),
             ))
-            .call_and_exit()
+            .async_call_and_exit();
     }
 
     // callbacks
@@ -417,14 +419,6 @@ pub trait Erc1155 {
             }
         }
     }
-
-    // proxy
-
-    #[proxy]
-    fn erc1155_user_proxy(
-        &self,
-        sc_address: ManagedAddress,
-    ) -> erc1155_user_proxy::Proxy<Self::Api>;
 
     // storage
 

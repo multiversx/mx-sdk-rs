@@ -1,6 +1,8 @@
+use multiversx_sc::types::{Address, TestAddress, TestSCAddress};
+
 use super::{value_from_slice, AddressValue};
 use crate::{
-    multiversx_sc::types::Address,
+    facade::expr::Bech32Address,
     scenario_format::{
         interpret_trait::{InterpretableFrom, InterpreterContext, IntoRaw},
         value_interpreter::interpret_string,
@@ -111,6 +113,42 @@ impl From<&Address> for AddressKey {
         AddressKey {
             value: from.clone(),
             original: format!("0x{}", hex::encode(from)),
+        }
+    }
+}
+
+impl From<&Bech32Address> for AddressKey {
+    fn from(from: &Bech32Address) -> Self {
+        AddressKey {
+            value: from.to_address().clone(),
+            original: from.to_bech32_expr(),
+        }
+    }
+}
+
+impl From<Bech32Address> for AddressKey {
+    fn from(from: Bech32Address) -> Self {
+        AddressKey {
+            original: from.to_bech32_expr(),
+            value: from.into_address(),
+        }
+    }
+}
+
+impl From<TestAddress<'_>> for AddressKey {
+    fn from(from: TestAddress) -> Self {
+        AddressKey {
+            value: from.eval_to_array().into(),
+            original: from.eval_to_expr(),
+        }
+    }
+}
+
+impl From<TestSCAddress<'_>> for AddressKey {
+    fn from(from: TestSCAddress) -> Self {
+        AddressKey {
+            value: from.eval_to_array().into(),
+            original: from.eval_to_expr(),
         }
     }
 }
