@@ -96,6 +96,12 @@ impl<M: ManagedTypeApi> From<&str> for TokenIdentifier<M> {
     }
 }
 
+impl<M: ManagedTypeApi> From<&crate::types::heap::String> for TokenIdentifier<M> {
+    fn from(s: &crate::types::heap::String) -> Self {
+        TokenIdentifier::from(s.as_bytes())
+    }
+}
+
 impl<M: ManagedTypeApi> PartialEq for TokenIdentifier<M> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {

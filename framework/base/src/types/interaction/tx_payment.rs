@@ -60,7 +60,7 @@ where
 }
 
 /// Marker trait that indicates that payment field contains no payment.
-/// 
+///
 /// Implemented by `()` and `NotPayable`.
 pub trait TxNoPayment<Env>: TxPayment<Env>
 where

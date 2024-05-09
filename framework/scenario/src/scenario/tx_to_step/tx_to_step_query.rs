@@ -4,7 +4,8 @@ use crate::scenario_model::{ScQueryStep, TxExpect, TxResponse};
 
 use super::{address_annotated, StepWrapper, TxToQueryStep};
 
-impl<Env, To, Payment, RH> TxToQueryStep<Env, RH> for Tx<Env, (), To, Payment, (), FunctionCall<Env::Api>, RH>
+impl<Env, To, Payment, RH> TxToQueryStep<Env, RH>
+    for Tx<Env, (), To, Payment, (), FunctionCall<Env::Api>, RH>
 where
     Env: TxEnv<RHExpect = TxExpect>,
     To: TxToSpecified<Env>,

@@ -28,3 +28,7 @@ path = "../../../../framework/snippets"
 [dependencies.multiversx-sc-scenario]
 version = "=0.49.0"
 path = "../../../../framework/scenario"
+
+[dependencies.multiversx-sc]
+version = "=0.49.0"
+path = "../../../../framework/base"

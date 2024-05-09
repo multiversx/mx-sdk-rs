@@ -452,6 +452,40 @@ where
     }
 }
 
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxToSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Producs the normalized function call, i.e. with builtin function calls for ESDT transfers.
+    ///
+    /// The output is a triple, made up of
+    /// - the recipient (some builtin functions are called with recipient = sender),
+    /// - EGLD value,
+    /// - the normalized function call.
+    ///
+    /// Warning: some clones are performed, it is not optimized for contracts, but can be used nonetheless.
+    pub fn into_normalized(
+        self,
+    ) -> (
+        ManagedAddress<Env::Api>,
+        BigUint<Env::Api>,
+        FunctionCall<Env::Api>,
+    ) {
+        self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data,
+            |norm_to, norm_egld, norm_fc| (norm_to.clone(), norm_egld.clone(), norm_fc),
+        )
+    }
+}
+
 impl<Env, From, Payment, Gas> Tx<Env, From, (), Payment, Gas, (), ()>
 where
     Env: TxEnv,

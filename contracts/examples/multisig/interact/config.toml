@@ -1,2 +1,4 @@
 gateway = 'https://devnet-gateway.multiversx.com'
 quorum = 2
+wegld_address = "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782"
+wegld_token_identifier = "WEGLD-a28c59"
