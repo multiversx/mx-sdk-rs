@@ -1,7 +1,5 @@
-#![allow(stable_features)]
 // ensure we don't run out of macro stack
 #![recursion_limit = "1024"]
-#![feature(proc_macro_quote)]
 
 #[macro_use]
 extern crate syn;
