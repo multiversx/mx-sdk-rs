@@ -41,14 +41,13 @@ impl MultisigInteract {
     }
 
     async fn propose_wrap_egld(&mut self) -> usize {
-        let (action_to, action_egld, action_fc) = self
+        let function_call = self
             .interactor
             .tx()
             .to(&self.config.wegld_address)
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .wrap_egld()
-            .egld(WRAP_AMOUNT)
-            .into_normalized();
+            .into_function_call();
 
         let action_id = self
             .interactor
@@ -57,7 +56,7 @@ impl MultisigInteract {
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(action_to, action_egld, action_fc)
+            .propose_async_call(&self.config.wegld_address, WRAP_AMOUNT, function_call)
             .returns(ReturnsResult)
             .prepare_async()
             .run()
@@ -87,14 +86,16 @@ impl MultisigInteract {
     async fn propose_unwrap_egld(&mut self) -> usize {
         let wegld_token_id = self.query_wegld_token_identifier().await;
 
-        let (action_to, action_egld, action_fc) = self
+        let normalized_tx = self
             .interactor
             .tx()
             .to(&self.config.wegld_address)
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .unwrap_egld()
             .single_esdt(&wegld_token_id, 0u64, &UNWRAP_AMOUNT.into())
-            .into_normalized();
+            .normalize();
+        let normalized_to = normalized_tx.to;
+        let normalized_data = normalized_tx.data;
 
         let action_id = self
             .interactor
@@ -103,7 +104,7 @@ impl MultisigInteract {
             .to(self.state.current_multisig_address())
             .gas(NumExpr("10,000,000"))
             .typed(multisig_proxy::MultisigProxy)
-            .propose_async_call(action_to, action_egld, action_fc)
+            .propose_async_call(normalized_to, 0u64, normalized_data)
             .returns(ReturnsResult)
             .prepare_async()
             .run()
