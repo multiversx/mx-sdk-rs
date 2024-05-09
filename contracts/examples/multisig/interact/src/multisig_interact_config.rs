@@ -11,7 +11,6 @@ pub struct Config {
     pub gateway: String,
     pub quorum: usize,
     pub wegld_address: Bech32Address,
-    pub wegld_token_identifier: String,
 }
 
 impl Config {
@@ -22,18 +21,4 @@ impl Config {
         file.read_to_string(&mut content).unwrap();
         toml::from_str(&content).unwrap()
     }
-
-    // // Returns the gateway
-    // pub fn gateway(&self) -> &str {
-    //     &self.gateway
-    // }
-
-    // Returns the quorum
-    // pub fn quorum(&self) -> usize {
-    //     self.quorum
-    // }
-
-    // pub fn wegld_address(&self) -> Bech32Address {
-    //     Bech32Address::from_bech32_string(bech32)
-    // }
 }

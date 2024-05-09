@@ -67,18 +67,33 @@ impl MultisigInteract {
         action_id
     }
 
+    pub async fn query_wegld_token_identifier(&mut self) -> TokenIdentifier<StaticApi> {
+        let wegld_token_id = self
+            .interactor
+            .query()
+            .to(&self.config.wegld_address)
+            .typed(wegld_proxy::EgldEsdtSwapProxy)
+            .wrapped_egld_token_id()
+            .returns(ReturnsResult)
+            .prepare_async()
+            .run()
+            .await;
+
+        println!("WEGLD token identifier: {wegld_token_id}");
+
+        wegld_token_id
+    }
+
     async fn propose_unwrap_egld(&mut self) -> usize {
+        let wegld_token_id = self.query_wegld_token_identifier().await;
+
         let (action_to, action_egld, action_fc) = self
             .interactor
             .tx()
             .to(&self.config.wegld_address)
             .typed(wegld_proxy::EgldEsdtSwapProxy)
             .unwrap_egld()
-            .single_esdt(
-                &TokenIdentifier::from(&self.config.wegld_token_identifier),
-                0u64,
-                &UNWRAP_AMOUNT.into(),
-            )
+            .single_esdt(&wegld_token_id, 0u64, &UNWRAP_AMOUNT.into())
             .into_normalized();
 
         let action_id = self
