@@ -96,6 +96,17 @@ fn st_blackbox() {
         .run();
 
     world.write_scenario_trace("trace1.scen.json");
+
+    let opt_transfer_data = OptionalValue::<
+        MultiValue3<u64, ManagedBuffer<StaticApi>, MultiValueVec<ManagedBuffer<StaticApi>>>,
+    >::None;
+    world
+        .tx()
+        .from(OWNER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .deposit(opt_transfer_data)
+        .run();
 }
 
 #[test]

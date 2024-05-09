@@ -27,4 +27,13 @@ pub trait ScenarioTester {
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
     }
+
+    #[endpoint]
+    fn deposit(
+        &self,
+        _opt_transfer_data: OptionalValue<
+            MultiValue3<BigUint, ManagedBuffer, ManagedVec<ManagedBuffer>>,
+        >,
+    ) {
+    }
 }

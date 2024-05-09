@@ -107,4 +107,16 @@ where
             .argument(&value)
             .original_result()
     }
+
+    pub fn deposit<
+        Arg0: ProxyArg<OptionalValue<MultiValue3<BigUint<Env::Api>, ManagedBuffer<Env::Api>, ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>>>,
+    >(
+        self,
+        opt_transfer_data: Arg0,
+    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+        self.wrapped_tx
+            .raw_call("deposit")
+            .argument(&opt_transfer_data)
+            .original_result()
+    }
 }

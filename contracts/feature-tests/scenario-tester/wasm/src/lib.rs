@@ -6,9 +6,9 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                            2
+// Endpoints:                            3
 // Async Callback (empty):               1
-// Total number of exported functions:   5
+// Total number of exported functions:   6
 
 #![no_std]
 #![allow(internal_features)]
@@ -24,6 +24,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         upgrade => upgrade
         getSum => sum
         add => add
+        deposit => deposit
     )
 }
 
