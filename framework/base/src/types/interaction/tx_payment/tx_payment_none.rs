@@ -1,6 +1,8 @@
 use crate::types::{BigUint, ManagedAddress, TxFrom, TxToSpecified};
 
-use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment, TxPaymentEgldOnly};
+use super::{
+    Egld, FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly,
+};
 
 impl<Env> TxPayment<Env> for ()
 where
@@ -40,5 +42,7 @@ where
         FullPaymentData::default()
     }
 }
+
+impl<Env> TxNoPayment<Env> for () where Env: TxEnv {}
 
 impl<Env> TxPaymentEgldOnly<Env> for () where Env: TxEnv {}

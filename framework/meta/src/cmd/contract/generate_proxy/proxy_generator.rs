@@ -195,8 +195,7 @@ where
                 self.writeln("");
             }
             self.write_constructor_header(&constructor_abi);
-            self.write_constructor_content(constructor_abi.inputs);
-            self.payable_mark(constructor_abi.payable_in_tokens);
+            self.write_constructor_content(&constructor_abi);
             self.write_end_of_function();
         }
 
@@ -217,8 +216,7 @@ where
                 self.writeln("");
             }
             self.write_upgrade_header(&upgrade);
-            self.write_upgrade_content(upgrade.inputs);
-            self.payable_mark(upgrade.payable_in_tokens);
+            self.write_upgrade_content(&upgrade);
             self.write_end_of_function();
         }
 
@@ -235,7 +233,6 @@ where
             }
             self.write_endpoint_header(&endpoint_abi);
             self.write_endpoint_content(&endpoint_abi);
-            self.payable_mark(endpoint_abi.payable_in_tokens);
             self.write_end_of_function();
         }
 
@@ -294,47 +291,51 @@ where
 
     fn write_constructor_header(&mut self, constructor_abi: &EndpointAbi) {
         self.write_fn_signature(constructor_abi);
-        self.write_constructor_output(&constructor_abi.outputs);
+        self.write_constructor_output(constructor_abi);
     }
 
     fn write_upgrade_header(&mut self, constructor_abi: &EndpointAbi) {
         self.write_fn_signature(constructor_abi);
-        self.write_upgrade_output(&constructor_abi.outputs);
+        self.write_upgrade_output(constructor_abi);
     }
 
     fn write_endpoint_header(&mut self, constructor_abi: &EndpointAbi) {
         self.write_fn_signature(constructor_abi);
-        self.write_endpoint_output(&constructor_abi.outputs);
+        self.write_endpoint_output(constructor_abi);
     }
 
-    fn write_constructor_content(&mut self, inputs: Vec<InputAbi>) {
-        self.writeln(
-            "        self.wrapped_tx
-            .raw_deploy()",
-        );
-        for input in inputs.iter() {
+    fn write_constructor_content(&mut self, constructor_abi: &EndpointAbi) {
+        self.writeln("        self.wrapped_tx");
+        if constructor_abi.payable_in_tokens.is_empty() {
+            self.writeln("            .payment(NotPayable)");
+        }
+        self.writeln("            .raw_deploy()");
+        for input in constructor_abi.inputs.iter() {
             self.writeln(format!("            .argument(&{})", input.arg_name));
         }
         self.writeln("            .original_result()");
     }
 
-    fn write_upgrade_content(&mut self, inputs: Vec<InputAbi>) {
-        self.writeln(
-            "        self.wrapped_tx
-            .raw_upgrade()",
-        );
-        for input in inputs.iter() {
+    fn write_upgrade_content(&mut self, constructor_abi: &EndpointAbi) {
+        self.writeln("        self.wrapped_tx");
+        if constructor_abi.payable_in_tokens.is_empty() {
+            self.writeln("            .payment(NotPayable)");
+        }
+        self.writeln("            .raw_upgrade()");
+        for input in constructor_abi.inputs.iter() {
             self.writeln(format!("            .argument(&{})", input.arg_name));
         }
         self.writeln("            .original_result()");
     }
 
     fn write_endpoint_content(&mut self, endpoint: &EndpointAbi) {
-        self.writeln(format!(
-            "        self.wrapped_tx
-            .raw_call(\"{}\")",
-            endpoint.name
-        ));
+        self.writeln("        self.wrapped_tx");
+
+        if endpoint.payable_in_tokens.is_empty() {
+            self.writeln("            .payment(NotPayable)");
+        }
+
+        self.writeln(format!("            .raw_call(\"{}\")", endpoint.name));
 
         for input in endpoint.inputs.iter() {
             self.writeln(format!("            .argument(&{})", input.arg_name));
@@ -388,28 +389,37 @@ where
         self.write("    ) ");
     }
 
-    fn write_constructor_output(&mut self, outputs: &[OutputAbi]) {
-        self.write("-> TxProxyDeploy<Env, From, Gas, ");
+    fn write_constructor_output(&mut self, abi: &EndpointAbi) {
+        self.write("-> TxTypedDeploy<Env, From, ");
+        self.write_payment_type(abi);
+        self.write("Gas, ");
+        self.parse_and_write_outputs(&abi.outputs);
+        self.writeln("> {");
+    }
 
-        self.parse_and_write_outputs(outputs);
+    fn write_upgrade_output(&mut self, abi: &EndpointAbi) {
+        self.write("-> TxTypedUpgrade<Env, From, To, ");
+        self.write_payment_type(abi);
+        self.write("Gas, ");
+        self.parse_and_write_outputs(&abi.outputs);
+        self.writeln("> {");
+    }
+
+    fn write_endpoint_output(&mut self, abi: &EndpointAbi) {
+        self.write("-> TxTypedCall<Env, From, To, ");
+        self.write_payment_type(abi);
+        self.write("Gas, ");
+        self.parse_and_write_outputs(&abi.outputs);
 
         self.writeln("> {");
     }
 
-    fn write_upgrade_output(&mut self, outputs: &[OutputAbi]) {
-        self.write("-> TxProxyUpgrade<Env, From, To, Gas, ");
-
-        self.parse_and_write_outputs(outputs);
-
-        self.writeln("> {");
-    }
-
-    fn write_endpoint_output(&mut self, outputs: &[OutputAbi]) {
-        self.write("-> TxProxyCall<Env, From, To, Gas, ");
-
-        self.parse_and_write_outputs(outputs);
-
-        self.writeln("> {");
+    fn write_payment_type(&mut self, abi: &EndpointAbi) {
+        if abi.payable_in_tokens.is_empty() {
+            self.write("NotPayable, ");
+        } else {
+            self.write("(), ");
+        }
     }
 
     fn parse_and_write_outputs(&mut self, outputs: &[OutputAbi]) {
@@ -432,14 +442,6 @@ where
                 }
                 self.write(">");
             },
-        }
-    }
-
-    fn payable_mark(&mut self, payable_in_tokens: Vec<String>) {
-        if payable_in_tokens.is_empty() {
-            self.writeln("        // non_payable");
-        } else {
-            self.writeln("        // payable");
         }
     }
 
