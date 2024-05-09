@@ -38,7 +38,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {
@@ -98,7 +98,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         match self {
             EgldOrMultiEsdtPayment::Egld(egld_amount) => {

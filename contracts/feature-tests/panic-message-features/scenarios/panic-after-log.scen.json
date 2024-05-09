@@ -30,7 +30,7 @@
             "expect": {
                 "out": [],
                 "status": "0x04",
-                "message": "str:panic occurred: panic after log",
+                "message": "file:error-message-after-log.txt",
                 "logs": [
                     {
                         "address": "address:an_account",

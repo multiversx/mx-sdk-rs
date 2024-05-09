@@ -10,6 +10,7 @@ use crate::{
     },
 };
 use alloc::boxed::Box;
+use unwrap_infallible::UnwrapInfallible;
 
 use super::{StorageGetErrorHandler, StorageKey};
 
@@ -147,11 +148,11 @@ where
     T: TopDecode,
     A: StorageReadApi + ManagedTypeApi + ErrorApi,
 {
-    let Ok(value) = T::top_decode_or_handle_err(
+    T::top_decode_or_handle_err(
         StorageGetFromAddressInput::new(addr, key),
         StorageGetErrorHandler::<A>::default(),
-    );
-    value
+    )
+    .unwrap_infallible()
 }
 
 /// Useful for storage mappers.

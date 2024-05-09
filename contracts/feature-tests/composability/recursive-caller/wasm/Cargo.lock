@@ -47,6 +47,7 @@ dependencies = [
  "multiversx-sc-codec",
  "multiversx-sc-derive",
  "num-traits",
+ "unwrap-infallible",
 ]
 
 [[package]]
@@ -55,6 +56,7 @@ version = "0.18.8"
 dependencies = [
  "arrayvec",
  "multiversx-sc-codec-derive",
+ "unwrap-infallible",
 ]
 
 [[package]]
@@ -169,6 +171,12 @@ name = "unicode-ident"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b"
+
+[[package]]
+name = "unwrap-infallible"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "151ac09978d3c2862c4e39b557f4eceee2cc72150bc4cb4f16abf061b6e381fb"
 
 [[package]]
 name = "vault"

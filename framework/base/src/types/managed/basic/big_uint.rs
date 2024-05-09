@@ -7,9 +7,8 @@ use crate::{
         ManagedTypeApi, ManagedTypeApiImpl, RawHandle, StaticVarApiImpl,
     },
     codec::{
-        CodecFrom, CodecFromSelf, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
-        NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
-        TopEncodeOutput, TryStaticCast,
+        DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput, TryStaticCast,
     },
     formatter::{hex_util::encode_bytes_as_hex, FormatBuffer, FormatByteReceiver, SCDisplay},
     types::{heap::BoxedBytes, ManagedBuffer, ManagedBufferCachedBuilder, ManagedType},
@@ -94,7 +93,6 @@ macro_rules! big_uint_conv_num {
             }
         }
 
-        impl<M: ManagedTypeApi> CodecFrom<$num_ty> for BigUint<M> {}
         impl<M: ManagedTypeApi> TypeAbiFrom<$num_ty> for BigUint<M> {}
     };
 }
@@ -105,17 +103,29 @@ big_uint_conv_num! {usize}
 big_uint_conv_num! {u16}
 big_uint_conv_num! {u8}
 
-impl<M> CodecFromSelf for BigUint<M> where M: ManagedTypeApi {}
-
-#[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<crate::codec::num_bigint::BigUint> for BigUint<M> {}
-#[cfg(feature = "num-bigint")]
-impl<M: ManagedTypeApi> CodecFrom<BigUint<M>> for crate::codec::num_bigint::BigUint {}
-
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> TypeAbiFrom<crate::codec::num_bigint::BigUint> for BigUint<M> {}
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> TypeAbiFrom<BigUint<M>> for crate::codec::num_bigint::BigUint {}
+
+impl<M> TypeAbiFrom<Self> for BigUint<M> where M: ManagedTypeApi {}
+impl<M> TypeAbiFrom<&Self> for BigUint<M> where M: ManagedTypeApi {}
+
+impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
+    #[cfg(feature = "num-bigint")]
+    type Unmanaged = crate::codec::num_bigint::BigUint;
+
+    #[cfg(not(feature = "num-bigint"))]
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        TypeName::from("BigUint")
+    }
+
+    fn type_name_rust() -> TypeName {
+        TypeName::from("BigUint<$API>")
+    }
+}
 
 #[cfg(feature = "num-bigint")]
 impl<M: ManagedTypeApi> From<&crate::codec::num_bigint::BigUint> for BigUint<M> {
@@ -290,25 +300,6 @@ impl<M: ManagedTypeApi> TopDecode for BigUint<M> {
             let boxed_bytes = BoxedBytes::top_decode_or_handle_err(input, h)?;
             Ok(Self::from_bytes_be(boxed_bytes.as_slice()))
         }
-    }
-}
-
-impl<M> TypeAbiFrom<Self> for BigUint<M> where M: ManagedTypeApi {}
-impl<M> TypeAbiFrom<&Self> for BigUint<M> where M: ManagedTypeApi {}
-
-impl<M: ManagedTypeApi> TypeAbi for BigUint<M> {
-    #[cfg(feature = "num-bigint")]
-    type Unmanaged = crate::codec::num_bigint::BigUint;
-
-    #[cfg(not(feature = "num-bigint"))]
-    type Unmanaged = Self;
-
-    fn type_name() -> TypeName {
-        TypeName::from("BigUint")
-    }
-
-    fn type_name_rust() -> TypeName {
-        TypeName::from("BigUint<$API>")
     }
 }
 

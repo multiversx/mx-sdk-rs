@@ -33,9 +33,9 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| f(to_addr, &BigUint::zero(), &fc))
+        to.with_address_ref(env, |to_addr| f(to_addr, &BigUint::zero(), fc))
     }
 
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {

@@ -17,7 +17,7 @@ keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-base64 = "0.21.5"
+base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
@@ -31,6 +31,7 @@ itertools = "0.12.0"
 colored = "2.0"
 clap = { version = "4.4.7", features = ["derive"] }
 tokio = { version = "1.24", features = ["full"] }
+unwrap-infallible = "0.1.5"
 
 [[bin]]
 name = "sc-scenario"

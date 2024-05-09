@@ -27,7 +27,7 @@ const FEATURES_PRE_RUSTC_1_71: &str = "
 
 // Configuration that works with rustc < 1.71.0.
 // TODO: Recommended rustc version: 1.73.0 or newer.
-#![feature(alloc_error_handler, lang_items)]
+#![feature(alloc_error_handler)]
 ";
 
 const VER_1_73: &str = "1.73.0-nightly";
@@ -36,13 +36,10 @@ const FEATURES_PRE_RUSTC_1_73: &str = "
 
 // Configuration that works with rustc < 1.73.0.
 // TODO: Recommended rustc version: 1.73.0 or newer.
-#![feature(lang_items)]
 ";
 
 const FEATURES_DEFAULT: &str = "
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 ";
 
 impl ContractVariant {
