@@ -42,7 +42,7 @@ where
     >(
         self,
         name: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("register")
             .argument(&name)
