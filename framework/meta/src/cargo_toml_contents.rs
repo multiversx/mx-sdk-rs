@@ -233,19 +233,6 @@ impl CargoTomlContents {
             .insert("profile".to_string(), toml::Value::Table(toml_table));
     }
 
-    pub fn add_dev_profile(&mut self) {
-        let mut value = toml::map::Map::new();
-        value.insert("panic".to_string(), Value::String("abort".to_string()));
-
-        let mut toml_table = toml::map::Map::new();
-        toml_table.insert("dev".to_string(), toml::Value::Table(value));
-
-        self.toml_value
-            .as_table_mut()
-            .expect("malformed profile dev in Cargo.toml ")
-            .insert("profile".to_string(), toml::Value::Table(toml_table));
-    }
-
     pub fn add_workspace(&mut self, members: &[&str]) {
         let array: Vec<toml::Value> = members
             .iter()
