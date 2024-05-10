@@ -1,12 +1,13 @@
 use std::ops::{Deref, DerefMut};
 
-use multiversx_sc::types::{
-    AnnotatedValue, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified,
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    types::{AnnotatedValue, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo, TxToSpecified},
 };
 
 use crate::multiversx_sc::{
     api::ManagedTypeApi,
-    codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput},
+    codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput},
     contract_base::ProxyObjNew,
     types::{Address, ManagedAddress},
 };
@@ -103,10 +104,10 @@ impl<P: ProxyObjNew> TopEncode for ContractInfo<P> {
     }
 }
 
-impl<P: ProxyObjNew> CodecFrom<ContractInfo<P>> for Address {}
-impl<P: ProxyObjNew> CodecFrom<&ContractInfo<P>> for Address {}
-impl<M: ManagedTypeApi, P: ProxyObjNew> CodecFrom<ContractInfo<P>> for ManagedAddress<M> {}
-impl<M: ManagedTypeApi, P: ProxyObjNew> CodecFrom<&ContractInfo<P>> for ManagedAddress<M> {}
+impl<P: ProxyObjNew> TypeAbiFrom<ContractInfo<P>> for Address {}
+impl<P: ProxyObjNew> TypeAbiFrom<&ContractInfo<P>> for Address {}
+impl<M: ManagedTypeApi, P: ProxyObjNew> TypeAbiFrom<ContractInfo<P>> for ManagedAddress<M> {}
+impl<M: ManagedTypeApi, P: ProxyObjNew> TypeAbiFrom<&ContractInfo<P>> for ManagedAddress<M> {}
 
 impl<Env, P> AnnotatedValue<Env, ManagedAddress<Env::Api>> for &ContractInfo<P>
 where

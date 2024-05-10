@@ -44,14 +44,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         quorum: Arg0,
         board: Arg1,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&quorum)
             .argument(&board)
@@ -69,14 +70,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn upgrade<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         quorum: Arg0,
         board: Arg1,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_upgrade()
             .argument(&quorum)
             .argument(&board)
@@ -96,7 +98,7 @@ where
     /// Allows the contract to receive funds even if it is marked as unpayable in the protocol. 
     pub fn deposit(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("deposit")
             .original_result()
@@ -109,8 +111,9 @@ where
     /// - (number of signers followed by) list of signer addresses. 
     pub fn get_pending_action_full_info(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ActionFullInfo<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getPendingActionFullInfo")
             .original_result()
     }
@@ -118,14 +121,15 @@ where
     /// Returns `true` (`1`) if the user has signed the action. 
     /// Does not check whether or not the user is still a board member and the signature valid. 
     pub fn signed<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<usize>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<usize>,
     >(
         self,
         user: Arg0,
         action_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("signed")
             .argument(&user)
             .argument(&action_id)
@@ -137,12 +141,13 @@ where
     /// `1` = can propose, but not sign, 
     /// `2` = can propose and sign. 
     pub fn user_role<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         user: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, UserRole> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, UserRole> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("userRole")
             .argument(&user)
             .original_result()
@@ -151,8 +156,9 @@ where
     /// Lists all users that can sign actions. 
     pub fn get_all_board_members(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getAllBoardMembers")
             .original_result()
     }
@@ -160,20 +166,22 @@ where
     /// Lists all proposers that are not board members. 
     pub fn get_all_proposers(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getAllProposers")
             .original_result()
     }
 
     /// Used by board members to sign actions. 
     pub fn sign<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("sign")
             .argument(&action_id)
             .original_result()
@@ -182,12 +190,13 @@ where
     /// Board members can withdraw their signatures if they no longer desire for the action to be executed. 
     /// Actions that are left with no valid signatures can be then deleted to free up storage. 
     pub fn unsign<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unsign")
             .argument(&action_id)
             .original_result()
@@ -197,12 +206,13 @@ where
     /// Any signatures that the action received must first be removed, via `unsign`. 
     /// Otherwise this endpoint would be prone to abuse. 
     pub fn discard_action<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("discardAction")
             .argument(&action_id)
             .original_result()
@@ -211,8 +221,9 @@ where
     /// Minimum number of signatures needed to perform any action. 
     pub fn quorum(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getQuorum")
             .original_result()
     }
@@ -221,8 +232,9 @@ where
     /// It is kept in sync with the user list by the contract. 
     pub fn num_board_members(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNumBoardMembers")
             .original_result()
     }
@@ -231,8 +243,9 @@ where
     /// It is kept in sync with the user list by the contract. 
     pub fn num_proposers(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNumProposers")
             .original_result()
     }
@@ -241,20 +254,22 @@ where
     /// 0 means that no action was ever proposed yet. 
     pub fn get_action_last_index(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionLastIndex")
             .original_result()
     }
 
     /// Serialized action data of an action with index. 
     pub fn get_action_data<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, Action<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Action<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionData")
             .argument(&action_id)
             .original_result()
@@ -264,12 +279,13 @@ where
     /// Does not check if those users are still board members or not, 
     /// so the result may contain invalid signers. 
     pub fn get_action_signers<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionSigners")
             .argument(&action_id)
             .original_result()
@@ -278,12 +294,13 @@ where
     /// Gets addresses of all users who signed an action and are still board members. 
     /// All these signatures are currently valid. 
     pub fn get_action_signer_count<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionSignerCount")
             .argument(&action_id)
             .original_result()
@@ -295,12 +312,13 @@ where
     /// This function is used to validate the signers before performing an action. 
     /// It also makes it easy to check before performing an action. 
     pub fn get_action_valid_signer_count<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getActionValidSignerCount")
             .argument(&action_id)
             .original_result()
@@ -309,12 +327,13 @@ where
     /// Initiates board member addition process. 
     /// Can also be used to promote a proposer to board member. 
     pub fn propose_add_board_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         board_member_address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeAddBoardMember")
             .argument(&board_member_address)
             .original_result()
@@ -323,12 +342,13 @@ where
     /// Initiates proposer addition process.. 
     /// Can also be used to demote a board member to proposer. 
     pub fn propose_add_proposer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         proposer_address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeAddProposer")
             .argument(&proposer_address)
             .original_result()
@@ -336,24 +356,26 @@ where
 
     /// Removes user regardless of whether it is a board member or proposer. 
     pub fn propose_remove_user<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         user_address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeRemoveUser")
             .argument(&user_address)
             .original_result()
     }
 
     pub fn propose_change_quorum<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         new_quorum: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeChangeQuorum")
             .argument(&new_quorum)
             .original_result()
@@ -364,16 +386,17 @@ where
     /// Can call smart contract endpoints directly. 
     /// Doesn't really work with builtin functions. 
     pub fn propose_transfer_execute<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<FunctionCall<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<FunctionCall<Env::Api>>,
     >(
         self,
         to: Arg0,
         egld_amount: Arg1,
         function_call: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeTransferExecute")
             .argument(&to)
             .argument(&egld_amount)
@@ -387,16 +410,17 @@ where
     /// Works well with builtin functions. 
     /// Cannot simply send EGLD directly without calling anything. 
     pub fn propose_async_call<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<FunctionCall<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<FunctionCall<Env::Api>>,
     >(
         self,
         to: Arg0,
         egld_amount: Arg1,
         function_call: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeAsyncCall")
             .argument(&to)
             .argument(&egld_amount)
@@ -405,18 +429,19 @@ where
     }
 
     pub fn propose_sc_deploy_from_source<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<CodeMetadata>,
-        Arg3: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<CodeMetadata>,
+        Arg3: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         amount: Arg0,
         source: Arg1,
         code_metadata: Arg2,
         arguments: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeSCDeployFromSource")
             .argument(&amount)
             .argument(&source)
@@ -426,11 +451,11 @@ where
     }
 
     pub fn propose_sc_upgrade_from_source<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<ManagedAddress<Env::Api>>,
-        Arg3: CodecInto<CodeMetadata>,
-        Arg4: CodecInto<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg3: ProxyArg<CodeMetadata>,
+        Arg4: ProxyArg<MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>>,
     >(
         self,
         sc_address: Arg0,
@@ -438,8 +463,9 @@ where
         source: Arg2,
         code_metadata: Arg3,
         arguments: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("proposeSCUpgradeFromSource")
             .argument(&sc_address)
             .argument(&amount)
@@ -451,12 +477,13 @@ where
 
     /// Returns `true` (`1`) if `getActionValidSignerCount >= getQuorum`. 
     pub fn quorum_reached<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("quorumReached")
             .argument(&action_id)
             .original_result()
@@ -464,25 +491,26 @@ where
 
     /// Proposers and board members use this to launch signed actions. 
     pub fn perform_action_endpoint<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         action_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("performAction")
             .argument(&action_id)
             .original_result()
     }
 
     pub fn dns_register<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         dns_address: Arg0,
         name: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("dnsRegister")
             .argument(&dns_address)
@@ -491,6 +519,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(TopEncode)]
 pub struct ActionFullInfo<Api>
 where
@@ -502,6 +531,7 @@ where
 }
 
 #[rustfmt::skip]
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode, Clone)]
 pub enum Action<Api>
 where
@@ -529,6 +559,7 @@ where
     },
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, Clone)]
 pub struct CallActionData<Api>
 where
@@ -540,6 +571,7 @@ where
     pub arguments: ManagedVec<Api, ManagedBuffer<Api>>,
 }
 
+#[type_abi]
 #[derive(TopEncode, TopDecode)]
 pub enum UserRole {
     None,

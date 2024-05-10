@@ -36,15 +36,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn claim_tokens<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         token_id: Arg0,
         token_nonce: Arg1,
         claim_destination: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("claimTokens")
             .argument(&token_id)

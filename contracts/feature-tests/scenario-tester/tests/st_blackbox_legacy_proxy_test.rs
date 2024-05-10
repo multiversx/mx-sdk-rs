@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
 
@@ -50,7 +52,7 @@ fn st_blackbox_legacy_proxy() {
 
     let value = world
         .query()
-        .call(st_contract.sum())
+        .legacy_proxy_call(st_contract.sum())
         .returns(ReturnsResultAs::<SingleValue<BigUint>>::new())
         .run();
     assert_eq!(value.into(), BigUint::from(5u32));
@@ -58,7 +60,7 @@ fn st_blackbox_legacy_proxy() {
     world
         .tx()
         .from(OWNER)
-        .call(st_contract.add(3u32))
+        .legacy_proxy_call(st_contract.add(3u32))
         .with_result(WithRawTxResponse(|response| {
             assert!(response.tx_error.is_success());
         }))

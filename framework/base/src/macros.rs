@@ -185,28 +185,3 @@ macro_rules! non_zero_usize {
         NonZeroUsize::new($input).unwrap_or_else(|| sc_panic!($error_msg))
     };
 }
-
-#[macro_export]
-macro_rules! constructors_proxy {
-    ($opt_address:ident) => {
-        multiversx_sc::types::new_contract_deploy($opt_address);
-    };
-}
-
-#[macro_export]
-macro_rules! extract_opt_address {
-    ($address:expr) => {{
-        core::mem::replace(
-            &mut $address.address,
-            multiversx_sc::types::ManagedOption::none(),
-        )
-    }};
-}
-
-#[macro_export]
-macro_rules! extract_address {
-    ($address:expr) => {{
-        multiversx_sc::extract_opt_address!($address)
-            .unwrap_or_sc_panic(multiversx_sc::err_msg::RECIPIENT_ADDRESS_NOT_SET)
-    }};
-}

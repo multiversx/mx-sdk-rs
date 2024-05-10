@@ -44,14 +44,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<ManagedVec<Env::Api, ManagedAddress<Env::Api>>>,
-        Arg1: CodecInto<ManagedVec<Env::Api, Distribution<Env::Api>>>,
+        Arg0: ProxyArg<ManagedVec<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg1: ProxyArg<ManagedVec<Env::Api, Distribution<Env::Api>>>,
     >(
         self,
         marketplaces: Arg0,
         distribution: Arg1,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&marketplaces)
             .argument(&distribution)
@@ -69,12 +70,12 @@ where
     Gas: TxGas<Env>,
 {
     pub fn create_nft<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<OptionalValue<TokenIdentifier<Env::Api>>>,
-        Arg5: CodecInto<OptionalValue<u64>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<OptionalValue<TokenIdentifier<Env::Api>>>,
+        Arg5: ProxyArg<OptionalValue<u64>>,
     >(
         self,
         name: Arg0,
@@ -83,8 +84,9 @@ where
         selling_price: Arg3,
         opt_token_used_as_payment: Arg4,
         opt_token_used_as_payment_nonce: Arg5,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("createNft")
             .argument(&name)
             .argument(&royalties)
@@ -96,14 +98,15 @@ where
     }
 
     pub fn claim_and_distribute<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         token_id: Arg0,
         token_nonce: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("claimAndDistribute")
             .argument(&token_id)
             .argument(&token_nonce)
@@ -112,36 +115,39 @@ where
 
     pub fn marketplaces(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getMarketplaces")
             .original_result()
     }
 
     pub fn nft_count(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNftCount")
             .original_result()
     }
 
     pub fn distribution_rules(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedVec<Env::Api, Distribution<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedVec<Env::Api, Distribution<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getDistributionRules")
             .original_result()
     }
 
     pub fn issue_token<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         token_display_name: Arg0,
         token_ticker: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("issueToken")
             .argument(&token_display_name)
@@ -150,11 +156,11 @@ where
     }
 
     pub fn buy_nft<
-        Arg0: CodecInto<u64>,
+        Arg0: ProxyArg<u64>,
     >(
         self,
         nft_nonce: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("buyNft")
             .argument(&nft_nonce)
@@ -162,12 +168,13 @@ where
     }
 
     pub fn get_nft_price<
-        Arg0: CodecInto<u64>,
+        Arg0: ProxyArg<u64>,
     >(
         self,
         nft_nonce: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<MultiValue3<EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNftPrice")
             .argument(&nft_nonce)
             .original_result()
@@ -175,13 +182,15 @@ where
 
     pub fn nft_token_id(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getNftTokenId")
             .original_result()
     }
 }
 
+#[type_abi]
 #[derive(ManagedVecItem, NestedEncode, NestedDecode)]
 pub struct Distribution<Api>
 where

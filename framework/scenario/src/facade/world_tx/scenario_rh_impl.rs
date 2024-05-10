@@ -1,8 +1,9 @@
 use multiversx_sc::{
-    codec::{CodecFrom, TopDecodeMulti, TopEncodeMulti},
+    abi::{TypeAbi, TypeAbiFrom},
+    codec::TopDecodeMulti,
     types::{
         ManagedAddress, RHListItemExec, ReturnsNewAddress, ReturnsNewManagedAddress, ReturnsResult,
-        ReturnsResultAs, TxEnv, WithNewAddress, WithResultConv,
+        ReturnsResultAs, ReturnsResultUnmanaged, TxEnv, WithNewAddress, WithResultAs,
     },
 };
 
@@ -24,8 +25,7 @@ where
 impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ReturnsResultAs<T>
 where
     Env: TxEnv,
-    Original: TopEncodeMulti,
-    T: CodecFrom<Original>,
+    T: TopDecodeMulti + TypeAbiFrom<Original>,
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
         let response = TypedResponse::<T>::from_raw(tx_response);
@@ -35,11 +35,24 @@ where
     }
 }
 
-impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultConv<T, F>
+impl<Env, Original> RHListItemExec<TxResponse, Env, Original> for ReturnsResultUnmanaged
 where
     Env: TxEnv,
-    Original: TopEncodeMulti,
-    T: CodecFrom<Original>,
+    Original: TypeAbi,
+    Original::Unmanaged: TopDecodeMulti,
+{
+    fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {
+        let response = TypedResponse::<Original::Unmanaged>::from_raw(tx_response);
+        response
+            .result
+            .expect("ReturnsResultUnmanaged expects that transaction is successful")
+    }
+}
+
+impl<Env, Original, T, F> RHListItemExec<TxResponse, Env, Original> for WithResultAs<T, F>
+where
+    Env: TxEnv,
+    T: TopDecodeMulti + TypeAbiFrom<Original>,
     F: FnOnce(T),
 {
     fn item_process_result(self, tx_response: &TxResponse) -> Self::Returns {

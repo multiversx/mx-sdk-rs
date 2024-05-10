@@ -1,6 +1,9 @@
 use core::marker::PhantomData;
 
-use crate::codec::{CodecFrom, TopEncodeMulti};
+use multiversx_sc_codec::TopDecodeMulti;
+use unwrap_infallible::UnwrapInfallible;
+
+use crate::{abi::TypeAbiFrom, codec::TopEncodeMulti};
 
 use crate::{
     api::{BlockchainApiImpl, CallTypeApi},
@@ -15,6 +18,10 @@ use crate::{
 
 use super::UNSPECIFIED_GAS_LIMIT;
 
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractDeploy<SA, OriginalResult>
 where
@@ -80,7 +87,9 @@ where
 
     pub fn push_endpoint_arg<T: TopEncodeMulti>(&mut self, endpoint_arg: &T) {
         let h = ExitCodecErrorHandler::<SA>::from(err_msg::CONTRACT_CALL_ENCODE_ERROR);
-        let Ok(()) = endpoint_arg.multi_encode_or_handle_err(&mut self.arg_buffer, h);
+        endpoint_arg
+            .multi_encode_or_handle_err(&mut self.arg_buffer, h)
+            .unwrap_infallible()
     }
 
     fn resolve_gas_limit(&self) -> u64 {
@@ -101,13 +110,12 @@ where
         raw_result: ManagedVec<SA, ManagedBuffer<SA>>,
     ) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let mut loader = ManagedResultArgLoader::new(raw_result);
         let arg_id = ArgId::from(&b"init result"[..]);
         let h = ArgErrorHandler::<SA>::from(arg_id);
-        let Ok(result) = RequestedResult::multi_decode_or_handle_err(&mut loader, h);
-        result
+        RequestedResult::multi_decode_or_handle_err(&mut loader, h).unwrap_infallible()
     }
 
     /// Executes immediately, synchronously, and returns Some(Address) of the deployed contract.  
@@ -118,7 +126,7 @@ where
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<SA>, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_contract(
             self.resolve_gas_limit(),
@@ -139,7 +147,7 @@ where
         code_metadata: CodeMetadata,
     ) -> (ManagedAddress<SA>, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let (address, raw_result) = SendRawWrapper::<SA>::new().deploy_from_source_contract(
             self.resolve_gas_limit(),

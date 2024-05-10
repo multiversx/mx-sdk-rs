@@ -35,11 +35,11 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<TokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<TokenIdentifier<Env::Api>>,
     >(
         self,
         nft_token_id: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, (), Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&nft_token_id)
@@ -57,11 +57,11 @@ where
     Gas: TxGas<Env>,
 {
     pub fn set_nft_count<
-        Arg0: CodecInto<u64>,
+        Arg0: ProxyArg<u64>,
     >(
         self,
         nft_count: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("setNftCount")
             .argument(&nft_count)

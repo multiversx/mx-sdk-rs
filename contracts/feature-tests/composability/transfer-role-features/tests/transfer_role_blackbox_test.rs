@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: unified syntax
+
 use multiversx_sc_scenario::imports::*;
 use transfer_role_features::ProxyTrait as _;
 

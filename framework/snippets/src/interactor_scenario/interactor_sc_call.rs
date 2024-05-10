@@ -2,7 +2,6 @@ use crate::{address_h256_to_erdrs, mandos_to_erdrs_address, Interactor};
 use log::info;
 use multiversx_sc_scenario::{
     api::StaticApi,
-    multiversx_sc::types::ContractCallWithEgld,
     scenario::ScenarioRunner,
     scenario_model::{ScCallStep, SetStateStep, TxCall, TxResponse},
 };
@@ -45,6 +44,7 @@ impl Interactor {
         tx_hash
     }
 
+    #[allow(deprecated)] // TODO
     pub(crate) fn tx_call_to_blockchain_tx(&self, tx_call: &TxCall) -> Transaction {
         let contract_call = tx_call.to_contract_call();
         let contract_call_tx_data = contract_call_to_tx_data(&contract_call);
@@ -70,7 +70,10 @@ impl Interactor {
     }
 }
 
-fn contract_call_to_tx_data(contract_call: &ContractCallWithEgld<StaticApi, ()>) -> String {
+#[allow(deprecated)] // TODO
+fn contract_call_to_tx_data(
+    contract_call: &multiversx_sc_scenario::imports::ContractCallWithEgld<StaticApi, ()>,
+) -> String {
     let mut result = String::from_utf8(
         contract_call
             .basic

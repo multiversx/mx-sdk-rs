@@ -5,6 +5,10 @@ use crate::{
 };
 
 /// Will be renamed to `AsyncCall` and `AsyncCall` to `AsyncCallLegacy` when the promises end up on the mainnet.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct AsyncCallPromises<SA>
 where

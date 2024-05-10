@@ -1,4 +1,5 @@
-use multiversx_sc::types::{ContractCallBase, H256};
+use multiversx_sc::{abi::TypeAbiFrom, types::H256};
+use unwrap_infallible::UnwrapInfallible;
 
 use crate::{
     api::StaticApi,
@@ -7,11 +8,9 @@ use crate::{
 };
 
 use crate::multiversx_sc::{
-    codec::{CodecFrom, PanicErrorHandler, TopEncodeMulti},
+    codec::{PanicErrorHandler, TopEncodeMulti},
     types::{ContractCall, ManagedArgBuffer},
 };
-
-use super::TypedScCall;
 
 #[derive(Debug, Clone)]
 pub struct ScCallStep {
@@ -136,9 +135,14 @@ impl ScCallStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
-    pub fn call<CC>(mut self, contract_call: CC) -> TypedScCall<CC::OriginalResult>
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
+    pub fn call<CC>(mut self, contract_call: CC) -> super::TypedScCall<CC::OriginalResult>
     where
-        CC: ContractCallBase<StaticApi>,
+        CC: multiversx_sc::types::ContractCallBase<StaticApi>,
     {
         let (to_str, function, egld_value_expr, scenario_args) =
             process_contract_call(contract_call);
@@ -167,14 +171,15 @@ impl ScCallStep {
         since = "0.42.0",
         note = "Please use `call` followed by `expect`, there is no point in having a method that does both."
     )]
+    #[allow(deprecated)]
     pub fn call_expect<CC, ExpectedResult>(
         self,
         contract_call: CC,
         expected_value: ExpectedResult,
-    ) -> TypedScCall<CC::OriginalResult>
+    ) -> super::TypedScCall<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
-        ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
+        ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         self.call(contract_call).expect_value(expected_value)
     }
@@ -220,11 +225,12 @@ impl AsMut<ScCallStep> for ScCallStep {
 /// - recipient,
 /// - endpoint name,
 /// - the arguments.
+#[allow(deprecated)]
 pub(super) fn process_contract_call<CC>(
     contract_call: CC,
 ) -> (String, String, BigUintValue, Vec<String>)
 where
-    CC: ContractCallBase<StaticApi>,
+    CC: multiversx_sc::types::ContractCallBase<StaticApi>,
 {
     let normalized_cc = contract_call.into_normalized();
     let to_str = format!(
@@ -255,7 +261,8 @@ pub fn convert_call_args(arg_buffer: &ManagedArgBuffer<StaticApi>) -> Vec<String
 
 pub(super) fn format_expect<T: TopEncodeMulti>(t: T) -> TxExpect {
     let mut encoded = Vec::<Vec<u8>>::new();
-    let Ok(()) = t.multi_encode_or_handle_err(&mut encoded, PanicErrorHandler);
+    t.multi_encode_or_handle_err(&mut encoded, PanicErrorHandler)
+        .unwrap_infallible();
     let mut expect = TxExpect::ok().no_result();
     for encoded_res in encoded {
         let encoded_hex_string = format!("0x{}", hex::encode(encoded_res.as_slice()));

@@ -12,6 +12,10 @@ use super::{
     ContractCall, ContractCallWithEgld,
 };
 
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractCallWithMultiEsdt<SA, OriginalResult>
 where

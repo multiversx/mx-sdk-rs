@@ -1,8 +1,9 @@
 use core::ptr;
 
-use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
+    abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{
         heap::Address, AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom,
@@ -66,7 +67,7 @@ impl<'a, Env> TxTo<Env> for TestSCAddress<'a> where Env: TxEnv {}
 impl<'a, Env> TxToSpecified<Env> for TestSCAddress<'a> where Env: TxEnv {}
 
 impl<'a> TestSCAddress<'a> {
-    pub const fn eval_to_array(&self) -> [u8; 32] {
+    pub fn eval_to_array(&self) -> [u8; 32] {
         let result = *b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00______________________";
         let expr_bytes = self.name.as_bytes();
         let mut len = expr_bytes.len();
@@ -104,7 +105,7 @@ impl<'a> TopEncode for TestSCAddress<'a> {
     }
 }
 
-impl<'a, Api> CodecFrom<TestSCAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
+impl<'a, Api> TypeAbiFrom<TestSCAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]
 pub mod tests {

@@ -4,11 +4,11 @@ use multiversx_sc_codec::{
 
 use crate::{
     abi::{
-        ExplicitEnumVariantDescription, TypeAbi, TypeContents, TypeDescription,
+        ExplicitEnumVariantDescription, TypeAbi, TypeAbiFrom, TypeContents, TypeDescription,
         TypeDescriptionContainer, TypeName,
     },
     api::ManagedTypeApi,
-    codec::{CodecFrom, EncodeErrorHandler},
+    codec::EncodeErrorHandler,
     types::ManagedBuffer,
 };
 
@@ -73,11 +73,15 @@ impl TopDecode for OperationCompletionStatus {
     }
 }
 
-impl<M: ManagedTypeApi> CodecFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
-impl CodecFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
-impl CodecFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
+impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
+impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
+
+impl TypeAbiFrom<Self> for OperationCompletionStatus {}
 
 impl TypeAbi for OperationCompletionStatus {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("OperationCompletionStatus")
     }

@@ -46,12 +46,13 @@ where
     /// Constructor, is called immediately after the contract is created 
     /// Will set the fixed global token supply and give all the supply to the creator. 
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         total_supply: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&total_supply)
             .original_result()
@@ -70,8 +71,9 @@ where
     /// Total number of tokens in existence. 
     pub fn total_supply(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("totalSupply")
             .original_result()
     }
@@ -83,12 +85,13 @@ where
     /// * `address` The address to query the the balance of 
     ///  
     pub fn token_balance<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOf")
             .argument(&address)
             .original_result()
@@ -102,14 +105,15 @@ where
     /// * `spender` The address that will spend the funds. 
     ///  
     pub fn allowance<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         owner: Arg0,
         spender: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("allowance")
             .argument(&owner)
             .argument(&spender)
@@ -123,14 +127,15 @@ where
     /// * `to` The address to transfer to. 
     ///  
     pub fn transfer<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         to: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transfer")
             .argument(&to)
             .argument(&amount)
@@ -146,16 +151,17 @@ where
     /// * `amount` the amount of tokens to be transferred. 
     ///  
     pub fn transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         sender: Arg0,
         recipient: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transferFrom")
             .argument(&sender)
             .argument(&recipient)
@@ -172,14 +178,15 @@ where
     /// * `amount` The amount of tokens to be spent. 
     ///  
     pub fn approve<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         spender: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("approve")
             .argument(&spender)
             .argument(&amount)

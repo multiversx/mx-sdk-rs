@@ -26,6 +26,22 @@ They are:
 - `multiversx-chain-scenario-format`, in short `scenario-format`, scenario JSON serializer/deserializer, 1 crate.
 - `multiversx-sdk`, in short `sdk`, allows communication with the chain(s), 1 crate.
 
+## [sc 0.50.0, codec 0.19.0, vm 0.8.4, sdk 0.4.1] - 2024-05-10
+- Framework now runs on **stable** Rust. All unstable features were removed. The most important changes enabling this:
+	- `CodecFrom` completely removed, `TypeAbiFrom` was used instead since 0.49.0.
+	- `ManagedVecItem` payload redesigned.
+	- Contract panic message mechanism improved.
+- Unified syntax:
+	- `NotPayable` marker type in proxies, which prevents callers to add payment to a non-payable endpoint.
+
+## [sc 0.49.0, codec 0.18.8, sdk 0.4.0] - 2024-05-07
+- Unified transaction syntax
+	- new syntax for sending transactions from contracts
+	- new syntax for integration tests: tx, set state, check state, etc.
+	- new syntax for interactors
+	- new proxies, generated from sc-meta
+	- support for upgrade in new proxies
+- Improved interactor tx result polling performance.
 
 ## [sc 0.48.1, codec 0.18.7] - 2024-04-30
 - Simplified decoding of small numbers (i64/u64).

@@ -44,12 +44,12 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<usize>,
-        Arg4: CodecInto<usize>,
-        Arg5: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<usize>,
+        Arg4: ProxyArg<usize>,
+        Arg5: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         staking_token: Arg0,
@@ -58,8 +58,9 @@ where
         slash_quorum: Arg3,
         submission_count: Arg4,
         oracles: Arg5,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&staking_token)
             .argument(&staking_amount)
@@ -81,14 +82,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn change_amounts<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         staking_amount: Arg0,
         slash_amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("changeAmounts")
             .argument(&staking_amount)
             .argument(&slash_amount)
@@ -96,12 +98,13 @@ where
     }
 
     pub fn add_oracles<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         oracles: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("addOracles")
             .argument(&oracles)
             .original_result()
@@ -110,14 +113,15 @@ where
     /// Also receives submission count, 
     /// so the owner does not have to update it manually with setSubmissionCount before this call 
     pub fn remove_oracles<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>>,
     >(
         self,
         submission_count: Arg0,
         oracles: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("removeOracles")
             .argument(&submission_count)
             .argument(&oracles)
@@ -125,11 +129,11 @@ where
     }
 
     pub fn submit<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg2: CodecInto<u64>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<u8>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u64>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<u8>,
     >(
         self,
         from: Arg0,
@@ -137,8 +141,9 @@ where
         submission_timestamp: Arg2,
         price: Arg3,
         decimals: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("submit")
             .argument(&from)
             .argument(&to)
@@ -149,12 +154,13 @@ where
     }
 
     pub fn submit_batch<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, MultiValue5<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue5<ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>>,
     >(
         self,
         submissions: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("submitBatch")
             .argument(&submissions)
             .original_result()
@@ -162,21 +168,23 @@ where
 
     pub fn latest_round_data(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, PriceFeed<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, PriceFeed<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("latestRoundData")
             .original_result()
     }
 
     pub fn latest_price_feed<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("latestPriceFeed")
             .argument(&from)
             .argument(&to)
@@ -184,14 +192,15 @@ where
     }
 
     pub fn latest_price_feed_optional<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, OptionalValue<MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, OptionalValue<MultiValue6<u32, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, u64, BigUint<Env::Api>, u8>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("latestPriceFeedOptional")
             .argument(&from)
             .argument(&to)
@@ -199,12 +208,13 @@ where
     }
 
     pub fn set_submission_count<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         submission_count: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setSubmissionCount")
             .argument(&submission_count)
             .original_result()
@@ -212,23 +222,25 @@ where
 
     pub fn get_oracles(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getOracles")
             .original_result()
     }
 
     pub fn set_pair_decimals<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg2: CodecInto<u8>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg2: ProxyArg<u8>,
     >(
         self,
         from: Arg0,
         to: Arg1,
         decimals: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setPairDecimals")
             .argument(&from)
             .argument(&to)
@@ -237,14 +249,15 @@ where
     }
 
     pub fn get_pair_decimals<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
         to: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, u8> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u8> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getPairDecimals")
             .argument(&from)
             .argument(&to)
@@ -253,93 +266,102 @@ where
 
     pub fn submission_count(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("submission_count")
             .original_result()
     }
 
     pub fn pause_endpoint(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("pause")
             .original_result()
     }
 
     pub fn unpause_endpoint(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unpause")
             .original_result()
     }
 
     pub fn paused_status(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isPaused")
             .original_result()
     }
 
     pub fn stake(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("stake")
             .original_result()
     }
 
     pub fn unstake<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         unstake_amount: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unstake")
             .argument(&unstake_amount)
             .original_result()
     }
 
     pub fn vote_slash_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         member_to_slash: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("voteSlashMember")
             .argument(&member_to_slash)
             .original_result()
     }
 
     pub fn cancel_vote_slash_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         member_to_slash: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("cancelVoteSlashMember")
             .argument(&member_to_slash)
             .original_result()
     }
 
     pub fn slash_member<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         member_to_slash: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("slashMember")
             .argument(&member_to_slash)
             .original_result()
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct PriceFeed<Api>
 where
@@ -353,6 +375,7 @@ where
     pub decimals: u8,
 }
 
+#[type_abi]
 #[derive(TopEncode)]
 pub struct NewRoundEvent<Api>
 where

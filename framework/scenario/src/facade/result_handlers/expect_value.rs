@@ -1,5 +1,6 @@
 use multiversx_sc::{
-    codec::{CodecFrom, TopEncodeMulti},
+    abi::TypeAbiFrom,
+    codec::TopEncodeMulti,
     types::{RHListItem, RHListItemExec, TxEnv},
 };
 
@@ -14,7 +15,7 @@ impl<Env, Original, T> RHListItem<Env, Original> for ExpectValue<T>
 where
     Env: TxEnv,
     T: TopEncodeMulti,
-    Original: CodecFrom<T>,
+    Original: TypeAbiFrom<T>,
 {
     type Returns = ();
 }
@@ -23,7 +24,7 @@ impl<Env, Original, T> RHListItemExec<TxResponse, Env, Original> for ExpectValue
 where
     Env: TxEnv<RHExpect = TxExpect>,
     T: TopEncodeMulti,
-    Original: CodecFrom<T>,
+    Original: TypeAbiFrom<T>,
 {
     fn item_tx_expect(&self, mut prev: TxExpect) -> TxExpect {
         let mut encoded = Vec::<Vec<u8>>::new();
