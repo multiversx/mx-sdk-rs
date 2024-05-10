@@ -76,7 +76,7 @@ macro_rules! tuple_impls {
 
 tuple_impls! {
     (0 T0)
-    (0 T0 1 T1)
+    // (0 T0 1 T1)
     (0 T0 1 T1 2 T2)
     (0 T0 1 T1 2 T2 3 T3)
     (0 T0 1 T1 2 T2 3 T3 4 T4)
@@ -91,6 +91,71 @@ tuple_impls! {
     (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
     (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
     (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+}
+
+impl<T0, T1> TopEncode for (T0, T1)
+where
+    T0: NestedEncode,
+    T1: NestedEncode,
+{
+    fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: TopEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        let mut buffer = output.start_nested_encode();
+        self.0.dep_encode_or_handle_err(&mut buffer, h)?;
+        self.1.dep_encode_or_handle_err(&mut buffer, h)?;
+        output.finalize_nested_encode(buffer);
+        Ok(())
+    }
+}
+
+impl<T0, T1> TopDecode for (T0, T1)
+where
+    T0: NestedDecode,
+    T1: NestedDecode,
+{
+    fn top_decode_or_handle_err<I, H>(input: I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: TopDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        top_decode_from_nested_or_handle_err(input, h)
+    }
+}
+
+impl<T0, T1> NestedEncode for (T0, T1)
+where
+    T0: NestedEncode,
+    T1: NestedEncode,
+{
+    fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+    where
+        O: NestedEncodeOutput,
+        H: EncodeErrorHandler,
+    {
+        self.0.dep_encode_or_handle_err(dest, h)?;
+        self.1.dep_encode_or_handle_err(dest, h)?;
+        Ok(())
+    }
+}
+
+impl<T0, T1> NestedDecode for (T0, T1)
+where
+    T0: NestedDecode,
+    T1: NestedDecode,
+{
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        Ok((
+            T0::dep_decode_or_handle_err(input, h)?,
+            T1::dep_decode_or_handle_err(input, h)?,
+        ))
+    }
 }
 
 #[cfg(test)]

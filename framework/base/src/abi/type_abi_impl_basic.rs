@@ -290,16 +290,16 @@ impl<T: TypeAbi, E> TypeAbi for Result<T, E> {
 }
 
 macro_rules! tuple_impls {
-    ($($len:expr => ($($n:tt $name:ident)+))+) => {
+    ($($len:expr => ($($n:tt $t:ident $u:ident)+))+) => {
         $(
-            impl<$($name),+> TypeAbiFrom<Self> for ($($name,)+)
+            impl<$($t, $u),+> TypeAbiFrom<($($u,)+)> for ($($t,)+)
             where
-                $($name: TypeAbi,)+
+                $($t: TypeAbiFrom<$u>,)+
             {}
 
-            impl<$($name),+> TypeAbi for ($($name,)+)
+            impl<$($t),+> TypeAbi for ($($t,)+)
             where
-                $($name: TypeAbi,)+
+                $($t: TypeAbi,)+
             {
                 type Unmanaged = Self;
 
@@ -309,7 +309,7 @@ macro_rules! tuple_impls {
                         if $n > 0 {
                             repr.push(',');
                         }
-                        repr.push_str($name::type_name().as_str());
+                        repr.push_str($t::type_name().as_str());
                     )+
                     repr.push('>');
                     repr
@@ -321,7 +321,7 @@ macro_rules! tuple_impls {
                         if $n > 0 {
                             repr.push_str(", ");
                         }
-                        repr.push_str($name::type_name_rust().as_str());
+                        repr.push_str($t::type_name_rust().as_str());
                     )+
                     repr.push(')');
                     repr
@@ -329,7 +329,7 @@ macro_rules! tuple_impls {
 
                 fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
                     $(
-                        $name::provide_type_descriptions(accumulator);
+                        $t::provide_type_descriptions(accumulator);
                     )+
                 }
             }
@@ -338,22 +338,60 @@ macro_rules! tuple_impls {
 }
 
 tuple_impls! {
-    1  => (0 T0)
-    2  => (0 T0 1 T1)
-    3  => (0 T0 1 T1 2 T2)
-    4  => (0 T0 1 T1 2 T2 3 T3)
-    5  => (0 T0 1 T1 2 T2 3 T3 4 T4)
-    6  => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-    7  => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-    8  => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-    9  => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-    10 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-    11 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-    12 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-    13 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-    14 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-    15 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-    16 => (0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+    1  => (0 T0 U0)
+    // 2  => (0 T0 U0 1 T1 U1)
+    3  => (0 T0 U0 1 T1 U1 2 T2 U2)
+    4  => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3)
+    5  => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4)
+    6  => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5)
+    7  => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6)
+    8  => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7)
+    9  => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8)
+    10 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9)
+    11 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10)
+    12 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11)
+    13 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12)
+    14 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12 13 T13 U13)
+    15 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12 13 T13 U13 14 T14 U14)
+    16 => (0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12 13 T13 U13 14 T14 U14 15 T15 U15)
+}
+
+impl<T0, U0, T1, U1> TypeAbiFrom<(U0, U1)> for (T0, T1)
+where
+    T0: TypeAbiFrom<U0>,
+    T1: TypeAbiFrom<U1>,
+{
+}
+
+impl<T0, T1> TypeAbi for (T0, T1)
+where
+    T0: TypeAbi,
+    T1: TypeAbi,
+{
+    type Unmanaged = Self;
+
+    fn type_name() -> TypeName {
+        let mut repr = TypeName::from("tuple<");
+        repr.push_str(T0::type_name().as_str());
+        repr.push(',');
+        repr.push_str(T1::type_name().as_str());
+        repr.push('>');
+        repr
+    }
+
+    fn type_name_rust() -> TypeName {
+        let mut repr = TypeName::from("(");
+        repr.push_str(T0::type_name_rust().as_str());
+        repr.push_str(", ");
+        repr.push_str(T1::type_name_rust().as_str());
+        repr.push(')');
+        repr
+    }
+
+    fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
+        T0::provide_type_descriptions(accumulator);
+        T1::provide_type_descriptions(accumulator);
+    }
 }
 
 impl<T, U, const N: usize> TypeAbiFrom<[T; N]> for [U; N] where T: TypeAbiFrom<U> {}

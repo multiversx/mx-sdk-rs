@@ -111,4 +111,17 @@ where
             .argument(&value)
             .original_result()
     }
+
+    pub fn tup<
+        Arg0: ProxyArg<(BigUint<Env::Api>, BigUint<Env::Api>)>,
+    >(
+        self,
+        _value: Arg0,
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
+        self.wrapped_tx
+            .payment(NotPayable)
+            .raw_call("tup")
+            .argument(&_value)
+            .original_result()
+    }
 }

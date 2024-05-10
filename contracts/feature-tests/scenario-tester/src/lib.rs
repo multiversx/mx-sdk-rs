@@ -27,4 +27,7 @@ pub trait ScenarioTester {
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
     }
+
+    #[endpoint]
+    fn tup(&self, _value: (BigUint, BigUint)) {}
 }

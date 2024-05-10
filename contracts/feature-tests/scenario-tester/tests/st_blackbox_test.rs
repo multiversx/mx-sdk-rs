@@ -95,6 +95,14 @@ fn st_blackbox() {
         .add(1u32)
         .run();
 
+    world
+        .tx()
+        .from(OTHER_ADDRESS)
+        .to(ST_ADDRESS)
+        .typed(scenario_tester_proxy::ScenarioTesterProxy)
+        .tup((1usize, 1u32))
+        .run();
+
     world.write_scenario_trace("trace1.scen.json");
 }
 
