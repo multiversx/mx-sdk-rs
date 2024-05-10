@@ -208,7 +208,7 @@ panic = \"abort\"
 path = \"..\"
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = \"0.49.0\"
+version = \"x.y.z\"
 path = \"../../../../framework/wasm-adapter\"
 
 [workspace]
@@ -221,7 +221,7 @@ members = [\".\"]
             name: "test".to_string(),
             edition: "2021".to_string(),
             profile: ContractVariantProfile::default(),
-            framework_version: "0.49.0".to_string(),
+            framework_version: "x.y.z".to_string(),
             framework_path: Option::Some("../../../framework/base".to_string()),
             contract_features: Vec::<String>::new(),
         };
