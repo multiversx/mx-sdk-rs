@@ -4,8 +4,6 @@ use multiversx_sc_snippets::imports::*;
 
 use super::*;
 
-// const WEGLD_SWAP_SC_BECH32: &str = "erd1qqqqqqqqqqqqqpgqqkwzsxkjc83vlfex9dmznwm7tjvxlqqkpauqx0n782"; // shard 0
-// const WEGLD_TOKEN_IDENTIFIER: TestTokenIdentifier = TestTokenIdentifier::new("WEGLD-a28c59");
 const WRAP_AMOUNT: u64 = 50000000000000000; // 0.05 EGLD
 const UNWRAP_AMOUNT: u64 = 25000000000000000; // 0.025 WEGLD
 
