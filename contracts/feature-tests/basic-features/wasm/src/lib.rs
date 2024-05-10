@@ -5,9 +5,9 @@
 ////////////////////////////////////////////////////
 
 // Init:                                 1
-// Endpoints:                          387
+// Endpoints:                          386
 // Async Callback:                       1
-// Total number of exported functions: 389
+// Total number of exported functions: 388
 
 #![no_std]
 
@@ -216,7 +216,6 @@ multiversx_sc_wasm_adapter::endpoints! {
         managed_vec_remove => managed_vec_remove
         managed_vec_find => managed_vec_find
         managed_vec_contains => managed_vec_contains
-        managed_vec_array_push => managed_vec_array_push
         managed_ref_explicit => managed_ref_explicit
         storage_read_raw => storage_read_raw
         storage_write_raw => storage_write_raw
