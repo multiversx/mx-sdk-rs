@@ -21,16 +21,41 @@ where
 }
 
 /// Alias for a `Tx` generated from a proxy, in `init`.
+///
+/// Replaced by `TxTypedDeploy`.
 pub type TxProxyDeploy<Env, From, Gas, Original> =
     Tx<Env, From, (), (), Gas, DeployCall<Env, ()>, OriginalResultMarker<Original>>;
 
+/// Alias for a `Tx` generated from a proxy, in `init`.
+pub type TxTypedDeploy<Env, From, Payment, Gas, Original> =
+    Tx<Env, From, (), Payment, Gas, DeployCall<Env, ()>, OriginalResultMarker<Original>>;
+
 /// Alias for a `Tx` generated from a proxy, in an endpoint.
+///
+/// Replaced by `TxTypedCall`.
 pub type TxProxyCall<Env, From, To, Gas, Original> =
     Tx<Env, From, To, (), Gas, FunctionCall<<Env as TxEnv>::Api>, OriginalResultMarker<Original>>;
 
+/// Alias for a `Tx` generated from a proxy, in an endpoint.
+pub type TxTypedCall<Env, From, To, Payment, Gas, Original> = Tx<
+    Env,
+    From,
+    To,
+    Payment,
+    Gas,
+    FunctionCall<<Env as TxEnv>::Api>,
+    OriginalResultMarker<Original>,
+>;
+
 /// Alias for a `Tx` generated from a proxy, in `upgrade`.
+///
+/// Replaced by `TxTypedUpgrade`.
 pub type TxProxyUpgrade<Env, From, To, Gas, Original> =
     Tx<Env, From, To, (), Gas, UpgradeCall<Env, ()>, OriginalResultMarker<Original>>;
+
+/// Alias for a `Tx` generated from a proxy, in `upgrade`.
+pub type TxTypedUpgrade<Env, From, To, Payment, Gas, Original> =
+    Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, OriginalResultMarker<Original>>;
 
 /// Trait that is automatically implemented for all types that are allowed as proxy inputs.
 ///

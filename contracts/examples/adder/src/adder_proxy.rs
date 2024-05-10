@@ -48,8 +48,9 @@ where
     >(
         self,
         initial_value: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&initial_value)
             .original_result()
@@ -70,8 +71,9 @@ where
     >(
         self,
         initial_value: Arg0,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_upgrade()
             .argument(&initial_value)
             .original_result()
@@ -89,8 +91,9 @@ where
 {
     pub fn sum(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getSum")
             .original_result()
     }
@@ -101,8 +104,9 @@ where
     >(
         self,
         value: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("add")
             .argument(&value)
             .original_result()

@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -68,8 +69,9 @@ where
         self,
         to: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("send_egld")
             .argument(&to)
             .argument(&amount)
@@ -83,7 +85,7 @@ where
         self,
         to: Arg0,
         args: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("echo_arguments_sync")
             .argument(&to)
@@ -98,7 +100,7 @@ where
         self,
         to: Arg0,
         args: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("echo_arguments_sync_twice")
             .argument(&to)
@@ -111,7 +113,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_sync_accept_funds")
             .argument(&to)
@@ -125,7 +127,7 @@ where
         self,
         to: Arg0,
         percentage_fees: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_sync_accept_funds_with_fees")
             .argument(&to)
@@ -138,7 +140,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, usize> {
         self.wrapped_tx
             .raw_call("forward_sync_accept_funds_then_read")
             .argument(&to)
@@ -156,8 +158,9 @@ where
         token: Arg1,
         token_nonce: Arg2,
         amount: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("forward_sync_retrieve_funds")
             .argument(&to)
             .argument(&token)
@@ -175,7 +178,7 @@ where
         to: Arg0,
         token: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_sync_retrieve_funds_with_accept_func")
             .argument(&to)
@@ -186,7 +189,7 @@ where
 
     pub fn accept_funds_func(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("accept_funds_func")
             .original_result()
@@ -199,8 +202,9 @@ where
         self,
         to: Arg0,
         token_payments: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("forward_sync_accept_funds_multi_transfer")
             .argument(&to)
             .argument(&token_payments)
@@ -214,8 +218,9 @@ where
         self,
         to: Arg0,
         args: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("echo_args_async")
             .argument(&to)
             .argument(&args)
@@ -227,7 +232,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_async_accept_funds")
             .argument(&to)
@@ -239,7 +244,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_async_accept_funds_half_payment")
             .argument(&to)
@@ -253,7 +258,7 @@ where
         self,
         to: Arg0,
         percentage_fees: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_async_accept_funds_with_fees")
             .argument(&to)
@@ -272,8 +277,9 @@ where
         token: Arg1,
         token_nonce: Arg2,
         amount: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("forward_async_retrieve_funds")
             .argument(&to)
             .argument(&token)
@@ -291,8 +297,9 @@ where
         to: Arg0,
         token_identifier: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("send_funds_twice")
             .argument(&to)
             .argument(&token_identifier)
@@ -307,8 +314,9 @@ where
         self,
         to: Arg0,
         token_payments: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("send_async_accept_multi_transfer")
             .argument(&to)
             .argument(&token_payments)
@@ -317,8 +325,9 @@ where
 
     pub fn callback_data(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, CallbackData<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, CallbackData<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("callback_data")
             .original_result()
     }
@@ -328,8 +337,9 @@ where
     >(
         self,
         index: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue5<ManagedBuffer<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>, u64, BigUint<Env::Api>, MultiValueManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("callback_data_at_index")
             .argument(&index)
             .original_result()
@@ -337,8 +347,9 @@ where
 
     pub fn clear_callback_data(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("clear_callback_data")
             .original_result()
     }
@@ -348,7 +359,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_transf_exec_accept_funds")
             .argument(&to)
@@ -362,7 +373,7 @@ where
         self,
         to: Arg0,
         percentage_fees: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_transf_execu_accept_funds_with_fees")
             .argument(&to)
@@ -375,7 +386,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward_transf_exec_accept_funds_twice")
             .argument(&to)
@@ -389,7 +400,7 @@ where
     >(
         self,
         to: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue4<u64, u64, BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue4<u64, u64, BigUint<Env::Api>, EgldOrEsdtTokenIdentifier<Env::Api>>> {
         self.wrapped_tx
             .raw_call("forward_transf_exec_accept_funds_return_values")
             .argument(&to)
@@ -403,8 +414,9 @@ where
         self,
         to: Arg0,
         token_payments: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transf_exec_multi_accept_funds")
             .argument(&to)
             .argument(&token_payments)
@@ -418,8 +430,9 @@ where
         self,
         to: Arg0,
         token_payments: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("forward_transf_exec_reject_funds_multi_transfer")
             .argument(&to)
             .argument(&token_payments)
@@ -433,8 +446,9 @@ where
         self,
         to: Arg0,
         token_payments: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transf_exec_multi_reject_funds")
             .argument(&to)
             .argument(&token_payments)
@@ -448,8 +462,9 @@ where
         self,
         child_sc_address: Arg0,
         new_owner: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("changeOwnerAddress")
             .argument(&child_sc_address)
             .argument(&new_owner)
@@ -463,8 +478,9 @@ where
         self,
         code: Arg0,
         opt_arg: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<ManagedAddress<Env::Api>, OptionalValue<ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedAddress<Env::Api>, OptionalValue<ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("deploy_contract")
             .argument(&code)
             .argument(&opt_arg)
@@ -476,8 +492,9 @@ where
     >(
         self,
         code: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<ManagedAddress<Env::Api>, ManagedAddress<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedAddress<Env::Api>, ManagedAddress<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("deploy_two_contracts")
             .argument(&code)
             .original_result()
@@ -490,8 +507,9 @@ where
         self,
         source_address: Arg0,
         opt_arg: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<ManagedAddress<Env::Api>, OptionalValue<ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue2<ManagedAddress<Env::Api>, OptionalValue<ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("deploy_vault_from_source")
             .argument(&source_address)
             .argument(&opt_arg)
@@ -507,8 +525,9 @@ where
         child_sc_address: Arg0,
         new_code: Arg1,
         opt_arg: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("upgradeVault")
             .argument(&child_sc_address)
             .argument(&new_code)
@@ -525,8 +544,9 @@ where
         child_sc_address: Arg0,
         source_address: Arg1,
         opt_arg: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("upgrade_vault_from_source")
             .argument(&child_sc_address)
             .argument(&source_address)
@@ -539,8 +559,9 @@ where
     >(
         self,
         token_identifier: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getFungibleEsdtBalance")
             .argument(&token_identifier)
             .original_result()
@@ -551,8 +572,9 @@ where
     >(
         self,
         token_identifier: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getCurrentNftNonce")
             .argument(&token_identifier)
             .original_result()
@@ -567,8 +589,9 @@ where
         to: Arg0,
         token_id: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("send_esdt")
             .argument(&to)
             .argument(&token_id)
@@ -583,7 +606,7 @@ where
         self,
         to: Arg0,
         percentage_fees: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("send_esdt_with_fees")
             .argument(&to)
@@ -602,8 +625,9 @@ where
         token_id: Arg1,
         amount_first_time: Arg2,
         amount_second_time: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("send_esdt_twice")
             .argument(&to)
             .argument(&token_id)
@@ -619,8 +643,9 @@ where
         self,
         to: Arg0,
         token_payments: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("send_esdt_direct_multi_transfer")
             .argument(&to)
             .argument(&token_payments)
@@ -636,7 +661,7 @@ where
         token_display_name: Arg0,
         token_ticker: Arg1,
         initial_supply: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("issue_fungible_token")
             .argument(&token_display_name)
@@ -652,8 +677,9 @@ where
         self,
         token_identifier: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("local_mint")
             .argument(&token_identifier)
             .argument(&amount)
@@ -667,8 +693,9 @@ where
         self,
         token_identifier: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("local_burn")
             .argument(&token_identifier)
             .argument(&amount)
@@ -680,8 +707,9 @@ where
     >(
         self,
         token_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("get_esdt_local_roles")
             .argument(&token_id)
             .original_result()
@@ -696,8 +724,9 @@ where
         address: Arg0,
         token_id: Arg1,
         nonce: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue9<EsdtTokenType, BigUint<Env::Api>, bool, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedAddress<Env::Api>, BigUint<Env::Api>, ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValue9<EsdtTokenType, BigUint<Env::Api>, bool, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedBuffer<Env::Api>, ManagedAddress<Env::Api>, BigUint<Env::Api>, ManagedVec<Env::Api, ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("get_esdt_token_data")
             .argument(&address)
             .argument(&token_id)
@@ -714,8 +743,9 @@ where
         address: Arg0,
         token_id: Arg1,
         nonce: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("is_esdt_frozen")
             .argument(&address)
             .argument(&token_id)
@@ -728,8 +758,9 @@ where
     >(
         self,
         token_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("is_esdt_paused")
             .argument(&token_id)
             .original_result()
@@ -740,8 +771,9 @@ where
     >(
         self,
         token_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("is_esdt_limited_transfer")
             .argument(&token_id)
             .original_result()
@@ -752,8 +784,9 @@ where
     >(
         self,
         token_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("validate_token_identifier")
             .argument(&token_id)
             .original_result()
@@ -766,7 +799,7 @@ where
         self,
         token_display_name: Arg0,
         token_ticker: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("sft_issue")
             .argument(&token_display_name)
@@ -781,8 +814,9 @@ where
         self,
         token_identifier: Arg0,
         nonce: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("get_nft_balance")
             .argument(&token_identifier)
             .argument(&nonce)
@@ -798,7 +832,7 @@ where
         nft_id: Arg0,
         nft_nonce: Arg1,
         nft_amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, BigUint<Env::Api>> {
         self.wrapped_tx
             .raw_call("buy_nft")
             .argument(&nft_id)
@@ -814,7 +848,7 @@ where
         self,
         token_display_name: Arg0,
         token_ticker: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("nft_issue")
             .argument(&token_display_name)
@@ -839,8 +873,9 @@ where
         hash: Arg4,
         color: Arg5,
         uri: Arg6,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_create")
             .argument(&token_identifier)
             .argument(&amount)
@@ -861,8 +896,9 @@ where
         token_identifier: Arg0,
         amount: Arg1,
         color: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_create_compact")
             .argument(&token_identifier)
             .argument(&amount)
@@ -879,8 +915,9 @@ where
         token_identifier: Arg0,
         nonce: Arg1,
         uris: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_add_uris")
             .argument(&token_identifier)
             .argument(&nonce)
@@ -897,8 +934,9 @@ where
         token_identifier: Arg0,
         nonce: Arg1,
         new_attributes: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_update_attributes")
             .argument(&token_identifier)
             .argument(&nonce)
@@ -923,8 +961,9 @@ where
         hash: Arg4,
         uri: Arg5,
         attrs_arg: Arg6,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_decode_complex_attributes")
             .argument(&token_identifier)
             .argument(&amount)
@@ -945,8 +984,9 @@ where
         token_identifier: Arg0,
         nonce: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_add_quantity")
             .argument(&token_identifier)
             .argument(&nonce)
@@ -963,8 +1003,9 @@ where
         token_identifier: Arg0,
         nonce: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("nft_burn")
             .argument(&token_identifier)
             .argument(&nonce)
@@ -983,8 +1024,9 @@ where
         token_identifier: Arg1,
         nonce: Arg2,
         amount: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transfer_nft_via_async_call")
             .argument(&to)
             .argument(&token_identifier)
@@ -1008,8 +1050,9 @@ where
         amount: Arg3,
         function: Arg4,
         arguments: Arg5,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transfer_nft_and_execute")
             .argument(&to)
             .argument(&token_identifier)
@@ -1039,8 +1082,9 @@ where
         hash: Arg5,
         color: Arg6,
         uri: Arg7,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("create_and_send")
             .argument(&to)
             .argument(&token_identifier)
@@ -1062,8 +1106,9 @@ where
         address: Arg0,
         token_identifier: Arg1,
         roles: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setLocalRoles")
             .argument(&address)
             .argument(&token_identifier)
@@ -1080,8 +1125,9 @@ where
         address: Arg0,
         token_identifier: Arg1,
         roles: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unsetLocalRoles")
             .argument(&address)
             .argument(&token_identifier)
@@ -1091,16 +1137,18 @@ where
 
     pub fn last_issued_token(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, TokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, TokenIdentifier<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("lastIssuedToken")
             .original_result()
     }
 
     pub fn last_error_message(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedBuffer<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedBuffer<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("lastErrorMessage")
             .original_result()
     }

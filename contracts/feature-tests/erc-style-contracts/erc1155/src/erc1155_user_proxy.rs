@@ -50,7 +50,7 @@ where
         type_id: Arg2,
         value: Arg3,
         data: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("onERC1155Received")
             .argument(&operator)
@@ -74,7 +74,7 @@ where
         type_ids: Arg2,
         values: Arg3,
         data: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("onERC1155BatchReceived")
             .argument(&operator)

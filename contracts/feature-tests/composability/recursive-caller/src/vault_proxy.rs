@@ -48,8 +48,9 @@ where
     >(
         self,
         opt_arg_to_echo: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, OptionalValue<ManagedBuffer<Env::Api>>> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, OptionalValue<ManagedBuffer<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&opt_arg_to_echo)
             .original_result()
@@ -70,8 +71,9 @@ where
     >(
         self,
         opt_arg_to_echo: Arg0,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, MultiValue2<&'static str, OptionalValue<ManagedBuffer<Env::Api>>>> {
+    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, MultiValue2<&'static str, OptionalValue<ManagedBuffer<Env::Api>>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_upgrade()
             .argument(&opt_arg_to_echo)
             .original_result()
@@ -92,8 +94,9 @@ where
     >(
         self,
         args: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("echo_arguments")
             .argument(&args)
             .original_result()
@@ -104,8 +107,9 @@ where
     >(
         self,
         args: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, ManagedBuffer<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("echo_arguments_without_storage")
             .argument(&args)
             .original_result()
@@ -113,15 +117,16 @@ where
 
     pub fn echo_caller(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("echo_caller")
             .original_result()
     }
 
     pub fn accept_funds(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("accept_funds")
             .original_result()
@@ -129,7 +134,7 @@ where
 
     pub fn accept_funds_echo_payment(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, MultiValueEncoded<Env::Api, EsdtTokenPaymentMultiValue<Env::Api>>>> {
         self.wrapped_tx
             .raw_call("accept_funds_echo_payment")
             .original_result()
@@ -137,7 +142,7 @@ where
 
     pub fn accept_funds_single_esdt_transfer(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("accept_funds_single_esdt_transfer")
             .original_result()
@@ -145,7 +150,7 @@ where
 
     pub fn reject_funds(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("reject_funds")
             .original_result()
@@ -160,7 +165,7 @@ where
         token: Arg0,
         amount: Arg1,
         opt_receive_func: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("retrieve_funds_with_transfer_exec")
             .argument(&token)
@@ -176,7 +181,7 @@ where
         self,
         back_transfers: Arg0,
         back_transfer_value: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("retrieve_funds_promises")
             .argument(&back_transfers)
@@ -193,8 +198,9 @@ where
         token: Arg0,
         nonce: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("retrieve_funds")
             .argument(&token)
             .argument(&nonce)
@@ -207,8 +213,9 @@ where
     >(
         self,
         token_payments: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("retrieve_multi_funds_async")
             .argument(&token_payments)
             .original_result()
@@ -216,7 +223,7 @@ where
 
     pub fn burn_and_create_retrieve_async(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("burn_and_create_retrieve_async")
             .original_result()
@@ -224,8 +231,9 @@ where
 
     pub fn get_owner_address(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("get_owner_address")
             .original_result()
     }
@@ -237,8 +245,9 @@ where
     >(
         self,
         endpoint: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("call_counts")
             .argument(&endpoint)
             .original_result()
@@ -246,16 +255,18 @@ where
 
     pub fn num_called_retrieve_funds_promises(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("num_called_retrieve_funds_promises")
             .original_result()
     }
 
     pub fn num_async_calls_sent_from_child(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("num_async_calls_sent_from_child")
             .original_result()
     }

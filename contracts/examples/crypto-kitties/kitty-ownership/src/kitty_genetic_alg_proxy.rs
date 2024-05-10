@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -68,8 +69,9 @@ where
         self,
         matron: Arg0,
         sire: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, kitty::KittyGenes> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, kitty::KittyGenes> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("generateKittyGenes")
             .argument(&matron)
             .argument(&sire)
