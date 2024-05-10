@@ -18,7 +18,7 @@ jobs:
     with:
       rust-toolchain: nightly-2023-12-11
       path-to-sc-meta: framework/meta
-      enable-contracts-size-report: 'false'
+      enable-contracts-size-report: false
       mx-scenario-go-version: v2.1.0-alpha
       coverage-args: --ignore-filename-regex='meta/src' --ignore-filename-regex='wasm-adapter' --ignore-filename-regex='benchmarks/' --ignore-filename-regex='tests/' --output ./coverage.md
     secrets:
