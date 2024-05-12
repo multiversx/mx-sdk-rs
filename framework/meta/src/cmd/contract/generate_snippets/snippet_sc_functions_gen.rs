@@ -172,7 +172,7 @@ fn write_contract_call(file: &mut File, endpoint_abi: &EndpointAbi, name: &Strin
             .to(self.state.current_address())
             .typed(proxy::{}Proxy)
             .{}({}){}
-            .returns(ReturnsRawResult)
+            .returns(ReturnsResultUnmanaged)
             .prepare_async()
             .run()
             .await;
@@ -195,7 +195,7 @@ fn write_contract_query(file: &mut File, endpoint_abi: &EndpointAbi, name: &Stri
             .to(self.state.current_address())
             .typed(proxy::{}Proxy)
             .{}({})
-            .returns(ReturnsResult)
+            .returns(ReturnsResultUnmanaged)
             .prepare_async()
             .run()
             .await;
