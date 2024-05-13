@@ -27,4 +27,15 @@ pub trait ScenarioTester {
     fn add(&self, value: BigUint) {
         self.sum().update(|sum| *sum += value);
     }
+
+    /// Tests "from" conversion for MultiValueN parameters
+    #[endpoint]
+    fn multi_param(&self, _value: MultiValue2<BigUint, BigUint>) {}
+
+    /// Tests "from" conversion for MultiValueN return function
+    #[endpoint]
+    fn multi_return(&self, value: BigUint) -> MultiValue2<BigUint, BigUint> {
+        let value1 = value.clone().add(1u32);
+        (value, value1).into()
+    }
 }
