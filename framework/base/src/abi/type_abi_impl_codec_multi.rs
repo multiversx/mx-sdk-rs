@@ -77,16 +77,16 @@ impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
 macro_rules! multi_arg_impls {
     ($(($mval_struct:ident $($n:tt $t:ident $u:ident)+) )+) => {
         $(
-            impl<$($t, $u),+ > TypeAbiFrom<crate::codec::multi_types::$mval_struct<$($u,)+>> for crate::codec::multi_types::$mval_struct<$($t,)+>
+            impl<$($t, $u),+> TypeAbiFrom<crate::codec::multi_types::$mval_struct<$($u,)+>> for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
                 $($t: TypeAbiFrom<$u>,)+
             {}
 
-            impl<$($t),+ > TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
+            impl<$($t),+> TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
                 $($t: TypeAbi,)+
             {
-                type Unmanaged = Self;
+                type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
 
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("multi");

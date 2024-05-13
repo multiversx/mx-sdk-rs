@@ -35,7 +35,7 @@ pub trait ScenarioTester {
     /// Tests "from" conversion for MultiValueN return function
     #[endpoint]
     fn multi_return(&self, value: BigUint) -> MultiValue2<BigUint, BigUint> {
-        let value1 = value.clone().add(1u32);
-        (value, value1).into()
+        let value_plus_one = &value + 1u32;
+        (value, value_plus_one).into()
     }
 }
