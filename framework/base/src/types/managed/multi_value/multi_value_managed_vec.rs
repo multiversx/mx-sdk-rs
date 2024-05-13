@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
     codec::{
         DecodeErrorHandler, EncodeErrorHandler, TopDecodeMulti, TopDecodeMultiInput,
@@ -210,11 +210,20 @@ where
     }
 }
 
+impl<M, T: TypeAbi> TypeAbiFrom<Self> for MultiValueManagedVec<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedVecItem,
+{
+}
+
 impl<M, T: TypeAbi> TypeAbi for MultiValueManagedVec<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
     }

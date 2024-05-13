@@ -23,6 +23,10 @@ use super::{
 /// (unless there are payment arguments in the endpoint - but these are mostly obsolete now).
 ///
 /// It is also the basis for all other contract call types, all of them contain this one.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractCallNoPayment<SA, OriginalResult>
 where
@@ -175,6 +179,6 @@ where
     }
 
     pub fn tx(self) -> Tx<TxScEnv<SA>, (), (), (), (), FunctionCall<SA>, ()> {
-        Tx::new_tx_from_sc().function_call(self.function_call)
+        Tx::new_tx_from_sc().raw_data(self.function_call)
     }
 }

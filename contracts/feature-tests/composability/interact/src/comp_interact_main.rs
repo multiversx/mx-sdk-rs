@@ -1,4 +1,5 @@
 #![allow(clippy::too_many_arguments)]
+#![allow(deprecated)] // TODO: switch to unified syntax
 
 mod call_tree;
 mod call_tree_calling_functions;

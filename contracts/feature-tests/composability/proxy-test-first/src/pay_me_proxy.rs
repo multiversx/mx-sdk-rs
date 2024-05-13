@@ -45,7 +45,7 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, (), Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .original_result()
@@ -63,7 +63,7 @@ where
 {
     pub fn upgrade(
         self,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_upgrade()
             .original_result()
@@ -80,11 +80,11 @@ where
     Gas: TxGas<Env>,
 {
     pub fn pay_me<
-        Arg0: CodecInto<i64>,
+        Arg0: ProxyArg<i64>,
     >(
         self,
         arg1: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payMe")
             .argument(&arg1)
@@ -92,11 +92,11 @@ where
     }
 
     pub fn pay_me_with_result<
-        Arg0: CodecInto<i64>,
+        Arg0: ProxyArg<i64>,
     >(
         self,
         arg1: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payMeWithResult")
             .argument(&arg1)

@@ -9,6 +9,9 @@ use crate::{
     },
 };
 
+/// The transaction environment used in calls launched from a SC.
+///
+/// Contains no data, just a generic type for the (also zero-sized) API.
 pub struct TxScEnv<Api>
 where
     Api: CallTypeApi,

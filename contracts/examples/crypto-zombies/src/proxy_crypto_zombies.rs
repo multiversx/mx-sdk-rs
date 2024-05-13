@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -63,8 +64,9 @@ where
 {
     pub fn upgrade(
         self,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_upgrade()
             .original_result()
     }
@@ -80,12 +82,13 @@ where
     Gas: TxGas<Env>,
 {
     pub fn set_crypto_kitties_sc_address<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("set_crypto_kitties_sc_address")
             .argument(&address)
             .original_result()
@@ -93,45 +96,49 @@ where
 
     pub fn generate_random_dna(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("generate_random_dna")
             .original_result()
     }
 
     pub fn create_random_zombie<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         name: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("create_random_zombie")
             .argument(&name)
             .original_result()
     }
 
     pub fn is_ready<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         zombie_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("is_ready")
             .argument(&zombie_id)
             .original_result()
     }
 
     pub fn feed_on_kitty<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<u32>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<u32>,
     >(
         self,
         zombie_id: Arg0,
         kitty_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("feed_on_kitty")
             .argument(&zombie_id)
             .argument(&kitty_id)
@@ -140,39 +147,43 @@ where
 
     pub fn dna_digits(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u8> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u8> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("dna_digits")
             .original_result()
     }
 
     pub fn zombies_count(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, usize> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, usize> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("zombies_count")
             .original_result()
     }
 
     pub fn zombies<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, Zombie<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Zombie<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("zombies")
             .argument(&id)
             .original_result()
     }
 
     pub fn zombie_owner<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("zombie_owner")
             .argument(&id)
             .original_result()
@@ -180,38 +191,41 @@ where
 
     pub fn crypto_kitties_sc_address(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("crypto_kitties_sc_address")
             .original_result()
     }
 
     pub fn cooldown_time(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("cooldown_time")
             .original_result()
     }
 
     pub fn owned_zombies<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         owner: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, usize>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, usize>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("owned_zombies")
             .argument(&owner)
             .original_result()
     }
 
     pub fn level_up<
-        Arg0: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
     >(
         self,
         zombie_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("level_up")
             .argument(&zombie_id)
@@ -220,21 +234,23 @@ where
 
     pub fn withdraw(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("withdraw")
             .original_result()
     }
 
     pub fn change_name<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         zombie_id: Arg0,
         name: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("change_name")
             .argument(&zombie_id)
             .argument(&name)
@@ -242,14 +258,15 @@ where
     }
 
     pub fn change_dna<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         zombie_id: Arg0,
         dna: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("change_dna")
             .argument(&zombie_id)
             .argument(&dna)
@@ -257,14 +274,15 @@ where
     }
 
     pub fn attack<
-        Arg0: CodecInto<usize>,
-        Arg1: CodecInto<usize>,
+        Arg0: ProxyArg<usize>,
+        Arg1: ProxyArg<usize>,
     >(
         self,
         zombie_id: Arg0,
         target_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("attack")
             .argument(&zombie_id)
             .argument(&target_id)
@@ -272,6 +290,7 @@ where
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Zombie<Api>
 where

@@ -6,6 +6,11 @@ use crate::{
 
 use super::{ContractCallNoPayment, ContractCallWithEgld};
 
+/// Converts into a legacy contract call.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 pub trait ContractCallBase<SA>
 where
     SA: CallTypeApi + 'static,

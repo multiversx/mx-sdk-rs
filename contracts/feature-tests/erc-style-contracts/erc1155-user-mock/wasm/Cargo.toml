@@ -21,11 +21,14 @@ debug = false
 panic = "abort"
 overflow-checks = false
 
+[profile.dev]
+panic = "abort"
+
 [dependencies.erc1155-user-mock]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.49.0-alpha.4"
+version = "0.50.0"
 path = "../../../../../framework/wasm-adapter"
 
 [workspace]

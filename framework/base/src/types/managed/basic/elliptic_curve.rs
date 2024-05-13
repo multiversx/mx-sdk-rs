@@ -1,5 +1,5 @@
 use crate::{
-    abi::{TypeAbi, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeName},
     api::{use_raw_handle, BigIntApiImpl, EllipticCurveApiImpl, ManagedTypeApi},
     types::{BigUint, ManagedType},
 };
@@ -418,7 +418,11 @@ impl<M: ManagedTypeApi> TopEncode for EllipticCurve<M> {
     }
 }
 
+impl<M> TypeAbiFrom<Self> for EllipticCurve<M> where M: ManagedTypeApi {}
+
 impl<M: ManagedTypeApi> TypeAbi for EllipticCurve<M> {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TypeName::from("EllipticCurve")
     }

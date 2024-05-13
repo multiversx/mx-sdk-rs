@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -62,18 +63,19 @@ where
     Gas: TxGas<Env>,
 {
     pub fn recursive_send_funds<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<u32>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<u32>,
     >(
         self,
         to: Arg0,
         token_identifier: Arg1,
         amount: Arg2,
         counter: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("recursive_send_funds")
             .argument(&to)
             .argument(&token_identifier)

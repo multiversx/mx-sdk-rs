@@ -8,4 +8,4 @@ to = "kitty"
 path = "../../crypto-zombies/src/kitty_ownership_proxy.rs"
 [[proxy.path-rename]]
 from = "kitty::kitty"
-to = "kitty"
+to = "crate::kitty_obj"

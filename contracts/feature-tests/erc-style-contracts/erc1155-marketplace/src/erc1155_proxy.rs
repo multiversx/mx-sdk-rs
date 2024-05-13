@@ -45,8 +45,9 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .original_result()
     }
@@ -63,11 +64,11 @@ where
 {
     /// `value` is amount for fungible, nft_id for non-fungible 
     pub fn safe_transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<BigUint<Env::Api>>,
-        Arg3: CodecInto<BigUint<Env::Api>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<BigUint<Env::Api>>,
+        Arg3: ProxyArg<BigUint<Env::Api>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -75,8 +76,9 @@ where
         type_id: Arg2,
         value: Arg3,
         data: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("safeTransferFrom")
             .argument(&from)
             .argument(&to)
@@ -88,11 +90,11 @@ where
 
     /// `value` is amount for fungible, nft_id for non-fungible 
     pub fn safe_batch_transfer_from<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<Box<[BigUint<Env::Api>]>>,
-        Arg3: CodecInto<Box<[BigUint<Env::Api>]>>,
-        Arg4: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<Box<[BigUint<Env::Api>]>>,
+        Arg3: ProxyArg<Box<[BigUint<Env::Api>]>>,
+        Arg4: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         from: Arg0,
@@ -100,8 +102,9 @@ where
         type_ids: Arg2,
         values: Arg3,
         data: Arg4,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("safeBatchTransferFrom")
             .argument(&from)
             .argument(&to)
@@ -112,14 +115,15 @@ where
     }
 
     pub fn set_approved_for_all<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<bool>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<bool>,
     >(
         self,
         operator: Arg0,
         approved: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setApprovalForAll")
             .argument(&operator)
             .argument(&approved)
@@ -127,16 +131,17 @@ where
     }
 
     pub fn create_token<
-        Arg0: CodecInto<BoxedBytes>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<bool>,
+        Arg0: ProxyArg<BoxedBytes>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<bool>,
     >(
         self,
         uri: Arg0,
         initial_supply: Arg1,
         is_fungible: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("createToken")
             .argument(&uri)
             .argument(&initial_supply)
@@ -145,14 +150,15 @@ where
     }
 
     pub fn mint<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("mint")
             .argument(&type_id)
             .argument(&amount)
@@ -160,14 +166,15 @@ where
     }
 
     pub fn burn<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("burn")
             .argument(&type_id)
             .argument(&amount)
@@ -175,14 +182,15 @@ where
     }
 
     pub fn balance_of<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         owner: Arg0,
         type_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOf")
             .argument(&owner)
             .argument(&type_id)
@@ -190,26 +198,28 @@ where
     }
 
     pub fn balance_of_batch<
-        Arg0: CodecInto<MultiValueEncoded<Env::Api, MultiValue2<ManagedAddress<Env::Api>, BigUint<Env::Api>>>>,
+        Arg0: ProxyArg<MultiValueEncoded<Env::Api, MultiValue2<ManagedAddress<Env::Api>, BigUint<Env::Api>>>>,
     >(
         self,
         owner_type_id_pairs: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, BigUint<Env::Api>>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, BigUint<Env::Api>>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOfBatch")
             .argument(&owner_type_id_pairs)
             .original_result()
     }
 
     pub fn token_owner<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
         nft_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTokenOwner")
             .argument(&type_id)
             .argument(&nft_id)
@@ -217,50 +227,54 @@ where
     }
 
     pub fn token_type_creator<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTokenTypeCreator")
             .argument(&type_id)
             .original_result()
     }
 
     pub fn token_type_uri<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, BoxedBytes> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BoxedBytes> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTokenTypeUri")
             .argument(&type_id)
             .original_result()
     }
 
     pub fn is_fungible<
-        Arg0: CodecInto<BigUint<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
     >(
         self,
         type_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isFungible")
             .argument(&type_id)
             .original_result()
     }
 
     pub fn is_approved<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         operator: Arg0,
         owner: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isApprovedForAll")
             .argument(&operator)
             .argument(&owner)

@@ -48,7 +48,7 @@ where
 
     fn next(&mut self) -> Option<T> {
         // managedrev<t>  / reference type
-        let next_byte_start = self.byte_start + T::PAYLOAD_SIZE;
+        let next_byte_start = self.byte_start + T::payload_size();
         if next_byte_start > self.byte_end {
             return None;
         }
@@ -64,7 +64,8 @@ where
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
-        let remaining = (self.byte_end - self.byte_start) / T::PAYLOAD_SIZE;
+        let size = T::payload_size();
+        let remaining = (self.byte_end - self.byte_start) / size;
         (remaining, Some(remaining))
     }
 }
@@ -82,10 +83,10 @@ where
     T: ManagedVecItem,
 {
     fn next_back(&mut self) -> Option<Self::Item> {
-        if self.byte_start + T::PAYLOAD_SIZE > self.byte_end {
+        if self.byte_start + T::payload_size() > self.byte_end {
             return None;
         }
-        self.byte_end -= T::PAYLOAD_SIZE;
+        self.byte_end -= T::payload_size();
 
         let result = T::from_byte_reader(|dest_slice| {
             let _ = self

@@ -1,8 +1,9 @@
 use core::ptr;
 
-use multiversx_sc_codec::{CodecFrom, EncodeErrorHandler, TopEncode, TopEncodeOutput};
+use multiversx_sc_codec::{EncodeErrorHandler, TopEncode, TopEncodeOutput};
 
 use crate::{
+    abi::TypeAbiFrom,
     api::ManagedTypeApi,
     types::{
         AnnotatedValue, ManagedAddress, ManagedBuffer, TxEnv, TxFrom, TxFromSpecified, TxTo,
@@ -26,7 +27,7 @@ impl<'a> TestAddress<'a> {
         TestAddress { name }
     }
 
-    pub const fn eval_to_array(&self) -> [u8; 32] {
+    pub fn eval_to_array(&self) -> [u8; 32] {
         let result = [b'_'; 32];
         let expr_bytes = self.name.as_bytes();
         let mut len = expr_bytes.len();
@@ -84,7 +85,7 @@ impl<'a> TopEncode for TestAddress<'a> {
     }
 }
 
-impl<'a, Api> CodecFrom<TestAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
+impl<'a, Api> TypeAbiFrom<TestAddress<'a>> for ManagedAddress<Api> where Api: ManagedTypeApi {}
 
 #[cfg(test)]
 pub mod tests {

@@ -6,11 +6,11 @@ use super::{
     StorageClearable, StorageMapper, VecMapper,
 };
 use crate::{
-    abi::{TypeAbi, TypeDescriptionContainer, TypeName},
+    abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::StorageMapperApi,
     codec::{
-        multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, NestedDecode, NestedEncode,
-        TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err, EncodeErrorHandler, NestedDecode, NestedEncode, TopDecode,
+        TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::StorageKey,
     storage_clear, storage_set,
@@ -225,7 +225,14 @@ where
     }
 }
 
-impl<SA, T> CodecFrom<UnorderedSetMapper<SA, T>> for MultiValueEncoded<SA, T>
+impl<SA, T> TypeAbiFrom<UnorderedSetMapper<SA, T>> for MultiValueEncoded<SA, T>
+where
+    SA: StorageMapperApi,
+    T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
+{
+}
+
+impl<SA, T> TypeAbiFrom<Self> for UnorderedSetMapper<SA, T>
 where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + 'static,
@@ -238,6 +245,8 @@ where
     SA: StorageMapperApi,
     T: TopEncode + TopDecode + NestedEncode + NestedDecode + TypeAbi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
     }

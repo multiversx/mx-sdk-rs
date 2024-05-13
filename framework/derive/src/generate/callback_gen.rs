@@ -48,7 +48,7 @@ pub fn generate_callback_selector_and_main(
             let cb_main_body = quote! {
                 if let Some(___cb_closure___) = multiversx_sc::types::CallbackClosureForDeser::storage_load_and_clear::<Self::Api>() {
                     if let multiversx_sc::types::CallbackSelectorResult::NotProcessed(_) =
-                        self::EndpointWrappers::callback_selector(self, ___cb_closure___)	{
+                        self::EndpointWrappers::callback_selector(self, ___cb_closure___) {
                         multiversx_sc::api::ErrorApiImpl::signal_error(
                             &<Self::Api as multiversx_sc::api::ErrorApi>::error_api_impl(),
                             err_msg::CALLBACK_BAD_FUNC,

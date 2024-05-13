@@ -1,12 +1,9 @@
-use multiversx_sc::types::{ContractCallBase, H256};
+use multiversx_sc::{abi::TypeAbiFrom, types::H256};
 use num_traits::Zero;
 
 use crate::{
     api::StaticApi,
-    multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
-        types::ContractCall,
-    },
+    multiversx_sc::{codec::TopEncodeMulti, types::ContractCall},
     scenario::model::{AddressValue, BytesValue, TxExpect, TxQuery},
     scenario_model::TxResponse,
 };
@@ -65,9 +62,14 @@ impl ScQueryStep {
     /// - "to"
     /// - "function"
     /// - "arguments"
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn call<CC>(mut self, contract_call: CC) -> TypedScQuery<CC::OriginalResult>
     where
-        CC: ContractCallBase<StaticApi>,
+        CC: multiversx_sc::types::ContractCallBase<StaticApi>,
     {
         let (to_str, function, egld_value_expr, mandos_args) = process_contract_call(contract_call);
         assert!(
@@ -89,6 +91,11 @@ impl ScQueryStep {
     /// - "expect"
     ///     - "out"
     ///     - "status" set to 0
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
     pub fn call_expect<CC, ExpectedResult>(
         self,
         contract_call: CC,
@@ -96,7 +103,7 @@ impl ScQueryStep {
     ) -> TypedScQuery<CC::OriginalResult>
     where
         CC: ContractCall<StaticApi>,
-        ExpectedResult: CodecFrom<CC::OriginalResult> + TopEncodeMulti,
+        ExpectedResult: TypeAbiFrom<CC::OriginalResult> + TopEncodeMulti,
     {
         let typed = self.call(contract_call);
         typed.expect_value(expected_value)

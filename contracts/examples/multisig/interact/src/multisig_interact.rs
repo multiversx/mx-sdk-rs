@@ -3,6 +3,7 @@ mod multisig_interact_config;
 mod multisig_interact_nfts;
 mod multisig_interact_state;
 mod multisig_interact_wegld;
+mod wegld_proxy;
 
 use clap::Parser;
 use multisig::multisig_proxy;
@@ -78,13 +79,14 @@ struct MultisigInteract {
     wallet_address: Bech32Address,
     collection_token_identifier: String,
     multisig_code: BytesValue,
+    config: Config,
     state: State,
 }
 
 impl MultisigInteract {
     async fn init() -> Self {
         let config = Config::load_config();
-        let mut interactor = Interactor::new(config.gateway())
+        let mut interactor = Interactor::new(&config.gateway)
             .await
             .with_tracer(INTERACTOR_SCENARIO_TRACE_PATH)
             .await;
@@ -99,6 +101,7 @@ impl MultisigInteract {
             wallet_address: wallet_address.into(),
             collection_token_identifier: String::new(),
             multisig_code,
+            config,
             state: State::load_state(),
         }
     }
@@ -132,7 +135,7 @@ impl MultisigInteract {
 
         let board = self.board();
 
-        let quorum = Config::load_config().quorum();
+        let quorum = self.config.quorum;
         let new_address = self
             .interactor
             .tx()
@@ -160,7 +163,7 @@ impl MultisigInteract {
         println!("deploying {count} contracts...");
 
         let board = self.board();
-        let quorum = Config::load_config().quorum();
+        let quorum = Config::load_config().quorum;
         let mut buffer = self.interactor.homogenous_call_buffer();
         for _ in 0..*count {
             buffer.push_tx(|tx| {

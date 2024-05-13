@@ -44,16 +44,17 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<u64>,
-        Arg2: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<u64>,
+        Arg2: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         target: Arg0,
         deadline: Arg1,
         token_identifier: Arg2,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&target)
             .argument(&deadline)
@@ -73,7 +74,7 @@ where
 {
     pub fn fund(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("fund")
             .original_result()
@@ -81,51 +82,57 @@ where
 
     pub fn status(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, Status> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, Status> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("status")
             .original_result()
     }
 
     pub fn get_current_funds(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getCurrentFunds")
             .original_result()
     }
 
     pub fn claim(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("claim")
             .original_result()
     }
 
     pub fn target(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getTarget")
             .original_result()
     }
 
     pub fn deadline(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u64> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u64> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getDeadline")
             .original_result()
     }
 
     pub fn deposit<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         donor: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getDeposit")
             .argument(&donor)
             .original_result()
@@ -133,13 +140,15 @@ where
 
     pub fn cf_token_identifier(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, EgldOrEsdtTokenIdentifier<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, EgldOrEsdtTokenIdentifier<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getCrowdfundingTokenIdentifier")
             .original_result()
     }
 }
 
+#[type_abi]
 #[derive(TopEncode, TopDecode, PartialEq, Eq, Clone, Copy, Debug)]
 pub enum Status {
     FundingPeriod,

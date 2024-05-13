@@ -1,11 +1,14 @@
 use std::marker::PhantomData;
 
-use multiversx_sc::{codec::PanicErrorHandler, types::ContractDeploy};
+use multiversx_sc::{
+    abi::TypeAbiFrom,
+    codec::{PanicErrorHandler, TopDecodeMulti},
+};
 
 use crate::{
     api::StaticApi,
     multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
+        codec::TopEncodeMulti,
         types::{Address, CodeMetadata},
     },
     scenario_format::interpret_trait::InterpreterContext,
@@ -14,7 +17,7 @@ use crate::{
 
 use crate::scenario::model::{AddressValue, BigUintValue, TxExpect, U64Value};
 
-use super::{process_contract_deploy, ScDeployStep};
+use super::ScDeployStep;
 
 /// `ScDeployStep` with explicit return type.
 #[derive(Default, Debug)]
@@ -27,7 +30,7 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
     pub fn result<RequestedResult>(&self) -> Result<RequestedResult, TxResponseStatus>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         let mut raw_result = self.response().out.clone();
         Ok(
@@ -100,8 +103,16 @@ impl<OriginalResult> TypedScDeploy<OriginalResult> {
     /// Sets following fields based on the smart contract proxy:
     /// - "function"
     /// - "arguments"
-    pub fn call(mut self, contract_deploy: ContractDeploy<StaticApi, OriginalResult>) -> Self {
-        let (_, mandos_args) = process_contract_deploy(contract_deploy);
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
+    #[allow(deprecated)]
+    pub fn call(
+        mut self,
+        contract_deploy: multiversx_sc::types::ContractDeploy<StaticApi, OriginalResult>,
+    ) -> Self {
+        let (_, mandos_args) = super::process_contract_deploy(contract_deploy);
         for arg in mandos_args {
             self.sc_deploy_step.tx.arguments.push(BytesValue::from(arg));
         }
@@ -145,7 +156,7 @@ pub trait TypedScDeployExecutor {
     ) -> (Address, RequestedResult)
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>;
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>;
 }
 
 impl<OriginalResult> TypedScDeploy<OriginalResult>
@@ -158,7 +169,7 @@ where
         executor: &mut E,
     ) -> (Address, RequestedResult)
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         executor.execute_typed_sc_deploy(self)
     }

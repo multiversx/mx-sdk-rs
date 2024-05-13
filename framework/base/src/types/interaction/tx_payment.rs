@@ -6,6 +6,7 @@ mod tx_payment_egld_or_multi_esdt_ref;
 mod tx_payment_egld_value;
 mod tx_payment_multi_esdt;
 mod tx_payment_none;
+mod tx_payment_not_payable;
 mod tx_payment_single_esdt;
 mod tx_payment_single_esdt_ref;
 mod tx_payment_single_esdt_triple;
@@ -13,6 +14,7 @@ mod tx_payment_single_esdt_triple;
 pub use tx_payment_egld::{Egld, EgldPayment};
 pub use tx_payment_egld_value::TxEgldValue;
 pub use tx_payment_multi_esdt::TxPaymentMultiEsdt;
+pub use tx_payment_not_payable::NotPayable;
 
 use crate::{
     api::ManagedTypeApi,
@@ -51,10 +53,19 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R;
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R;
 
     /// Payment data to be used by the testing framework. Will be refactored.
     fn into_full_payment_data(self, env: &Env) -> FullPaymentData<Env::Api>;
+}
+
+/// Marker trait that indicates that payment field contains no payment.
+///
+/// Implemented by `()` and `NotPayable`.
+pub trait TxNoPayment<Env>: TxPayment<Env>
+where
+    Env: TxEnv,
+{
 }
 
 /// Marks a payment object that only contains EGLD or nothing at all.

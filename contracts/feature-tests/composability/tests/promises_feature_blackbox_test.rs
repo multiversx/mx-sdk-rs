@@ -1,3 +1,5 @@
+#![allow(deprecated)] // TODO: unified syntax
+
 use multiversx_sc::types::BigUint;
 use multiversx_sc_scenario::imports::*;
 
