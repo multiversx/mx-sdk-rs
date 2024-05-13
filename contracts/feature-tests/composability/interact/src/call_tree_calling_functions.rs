@@ -1,15 +1,12 @@
 use std::{cell::RefCell, rc::Rc};
 
-use forwarder_queue::QueuedCallType;
-
 use multiversx_sc_snippets::imports::*;
 use num_bigint::BigUint;
 
 use crate::{
     call_tree::{CallNode, CallState, ForwarderQueueTarget},
-    comp_interact_controller::ComposabilityInteract,
+    comp_interact_controller::ComposabilityInteract, forwarder_queue_proxy::{self, QueuedCallType},
 };
-use forwarder_queue::ProxyTrait;
 
 const FORWARD_QUEUED_CALLS_ENDPOINT: &str = "forward_queued_calls";
 const DEFAULT_GAS_LIMIT: u64 = 10_000_000;
@@ -24,7 +21,7 @@ impl ComposabilityInteract {
         payment_nonce: u64,
         payment_amount: BigUint,
     ) {
-        let mut steps = Vec::new();
+        let mut buffer = self.interactor.homogenous_call_buffer();
 
         for fwd_rc in forwarders {
             let (fwd_name, fwd_children) = {
@@ -35,8 +32,6 @@ impl ComposabilityInteract {
                 let fwd = fwd_rc.borrow();
                 fwd.address.clone().unwrap()
             };
-            let fwd_addr_bech32 = bech32::encode(&fwd_addr);
-            let fwd_addr_expr = format!("bech32:{fwd_addr_bech32}");
 
             for child in &fwd_children {
                 match child {
@@ -48,29 +43,26 @@ impl ComposabilityInteract {
                             child_fwd.address.clone().unwrap()
                         };
 
-                        let typed_sc_call = ScCallStep::new()
-                            .call(
-                                self.state
-                                    .forwarder_queue_from_addr(&fwd_addr_expr)
-                                    .add_queued_call(
-                                        call_type.clone(),
-                                        child_fwd_addr,
-                                        DEFAULT_GAS_LIMIT,
-                                        FORWARD_QUEUED_CALLS_ENDPOINT,
-                                        MultiValueEncoded::<StaticApi, _>::new(),
-                                    )
-                                    .with_egld_or_single_esdt_transfer(
-                                        EgldOrEsdtTokenPayment::new(
-                                            payment_token.clone(),
-                                            payment_nonce,
-                                            payment_amount.clone().into(),
-                                        ),
-                                    ),
-                            )
-                            .from(&self.wallet_address)
-                            .gas_limit("70,000,000");
-
-                        steps.push(typed_sc_call);
+                        buffer.push_tx(|tx| {
+                            tx.from(&self.wallet_address)
+                                .to(&fwd_addr)
+                                .gas(70_000_000u64)
+                                .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                                .add_queued_call(
+                                    call_type.clone(),
+                                    child_fwd_addr,
+                                    DEFAULT_GAS_LIMIT,
+                                    FORWARD_QUEUED_CALLS_ENDPOINT,
+                                    MultiValueEncoded::<StaticApi, _>::new(),
+                                )
+                                .payment(EgldOrEsdtTokenPayment::new(
+                                    payment_token.clone(),
+                                    payment_nonce,
+                                    payment_amount.clone().into(),
+                                ))
+                                .returns(ReturnsStatus)
+                                .returns(ReturnsResult)
+                        });
                     },
                     CallNode::Vault(vault_rc) => {
                         // Call Vault
@@ -80,46 +72,41 @@ impl ComposabilityInteract {
                             vault.address.clone().unwrap()
                         };
 
-                        let typed_sc_call = ScCallStep::new()
-                            .call(
-                                self.state
-                                    .forwarder_queue_from_addr(&fwd_addr_expr)
-                                    .add_queued_call(
-                                        call_type.clone(),
-                                        vault_addr,
-                                        DEFAULT_GAS_LIMIT,
-                                        endpoint_name,
-                                        MultiValueEncoded::<StaticApi, _>::new(),
-                                    )
-                                    .with_egld_or_single_esdt_transfer(
-                                        EgldOrEsdtTokenPayment::new(
-                                            payment_token.clone(),
-                                            payment_nonce,
-                                            payment_amount.clone().into(),
-                                        ),
-                                    ),
-                            )
-                            .from(&self.wallet_address)
-                            .gas_limit("70,000,000");
-
-                        steps.push(typed_sc_call);
+                        buffer.push_tx(|tx| {
+                            tx.from(&self.wallet_address)
+                                .to(&fwd_addr)
+                                .gas(70_000_000u64)
+                                .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+                                .add_queued_call(
+                                    call_type.clone(),
+                                    vault_addr,
+                                    DEFAULT_GAS_LIMIT,
+                                    endpoint_name,
+                                    MultiValueEncoded::<StaticApi, _>::new(),
+                                )
+                                .payment(EgldOrEsdtTokenPayment::new(
+                                    payment_token.clone(),
+                                    payment_nonce,
+                                    payment_amount.clone().into(),
+                                ))
+                                .returns(ReturnsStatus)
+                                .returns(ReturnsResult)
+                        });
                     },
                 }
             }
         }
-        self.interactor
-            .multi_sc_exec(StepBuffer::from_sc_call_vec(&mut steps))
-            .await;
 
-        for step in steps.iter() {
-            if !step.response().is_success() {
-                println!(
-                    "perform 'add_queued_call' failed with: {}",
-                    step.response().tx_error
-                );
+        let results = buffer.run().await;
+
+        for (index, (status, result)) in results.iter().enumerate() {
+            if !status == 0u64 {
+                println!("perform 'add_queued_call' failed with error code {status}");
                 continue;
             }
-            println!("successfully performed action 'add_queued_call'");
+            println!(
+                "successfully performed action {index} 'add_queued_call' with result {result:?}"
+            );
         }
     }
 
@@ -128,21 +115,15 @@ impl ComposabilityInteract {
             let root_addr_ref = call_state.root.borrow();
             root_addr_ref.address.clone().unwrap()
         };
-        let root_addr_bech32 = bech32::encode(&root_addr);
-        let root_addr_expr = format!("bech32:{root_addr_bech32}");
 
         self.interactor
-            .sc_call(
-                ScCallStep::new()
-                    .call(
-                        self.state
-                            .forwarder_queue_from_addr(&root_addr_expr)
-                            .forward_queued_calls(),
-                    )
-                    .from(&self.wallet_address)
-                    .gas_limit("70,000,000")
-                    .expect(TxExpect::ok().additional_error_message("calling root failed with: ")),
-            )
+            .tx()
+            .from(&self.wallet_address)
+            .to(&root_addr)
+            .typed(forwarder_queue_proxy::ForwarderQueueProxy)
+            .forward_queued_calls()
+            .prepare_async()
+            .run()
             .await;
 
         println!("successfully called root");

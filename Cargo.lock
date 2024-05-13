@@ -1500,13 +1500,10 @@ name = "interact"
 version = "0.0.0"
 dependencies = [
  "clap",
- "forwarder-queue",
- "multiversx-sc-modules",
+ "multiversx-sc",
  "multiversx-sc-snippets",
- "promises-features",
  "serde",
  "toml",
- "vault",
 ]
 
 [[package]]
