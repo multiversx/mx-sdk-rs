@@ -198,7 +198,7 @@ impl<'de> Deserialize<'de> for Bech32Address {
         // some old interactors have it serialized like this
         let mut bech32 = String::deserialize(deserializer)?;
         if let Some(stripped) = bech32.strip_prefix("bech32:") {
-            bech32 = stripped.to_owned();
+            bech32 = stripped.to_string();
         }
         Ok(Bech32Address::from_bech32_string(bech32))
     }
