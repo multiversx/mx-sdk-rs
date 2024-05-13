@@ -14,7 +14,7 @@ permissions:
 jobs:
   contracts:
     name: Contracts (nightly)
-    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@a6f57c43a0ae9c6d3bafffa01b5aa46dea0c3d3e
+    uses: multiversx/mx-sc-actions/.github/workflows/contracts.yml@v3.2.0
     with:
       rust-toolchain: nightly-2023-12-11
       path-to-sc-meta: framework/meta
