@@ -31,6 +31,7 @@ impl StaticVarApi for VmApiImpl {
 }
 
 impl StaticVarApiImpl for VmApiImpl {
+    #[allow(static_mut_refs)]
     fn with_lockable_static_buffer<R, F: FnOnce(&mut LockableStaticBuffer) -> R>(&self, f: F) -> R {
         unsafe { f(&mut STATIC_BUFFER) }
     }
