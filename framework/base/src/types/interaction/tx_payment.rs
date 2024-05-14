@@ -73,6 +73,7 @@ pub trait TxPaymentEgldOnly<Env>: TxPayment<Env> + AnnotatedValue<Env, BigUint<E
 where
     Env: TxEnv,
 {
+    #[inline]
     fn with_egld_value<F, R>(&self, env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,

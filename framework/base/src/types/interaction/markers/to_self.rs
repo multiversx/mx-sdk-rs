@@ -17,6 +17,7 @@ where
         self.with_address_ref(env, |addr_ref| addr_ref.hex_expr())
     }
 
+    #[inline]
     fn to_value(&self, _env: &TxScEnv<Api>) -> ManagedAddress<Api> {
         BlockchainWrapper::<Api>::new().get_sc_address()
     }
