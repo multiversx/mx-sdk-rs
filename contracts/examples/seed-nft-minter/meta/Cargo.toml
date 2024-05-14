@@ -11,6 +11,6 @@ authors = ["Claudiu-Marcel Bruda <claudiu.bruda@multiversx.com>"]
 path = ".."
 
 [dependencies.multiversx-sc-meta]
-version = "0.49.0-alpha.3"
+version = "0.50.0"
 path = "../../../../framework/meta"
 default-features = false

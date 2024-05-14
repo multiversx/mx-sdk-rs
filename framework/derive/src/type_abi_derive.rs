@@ -123,7 +123,12 @@ pub fn type_abi_derive(input: proc_macro::TokenStream) -> proc_macro2::TokenStre
     let name_str = name.to_string();
     let (impl_generics, ty_generics, where_clause) = &ast.generics.split_for_impl();
     quote! {
+        impl #impl_generics multiversx_sc::abi::TypeAbiFrom<Self> for #name #ty_generics #where_clause {}
+        impl #impl_generics multiversx_sc::abi::TypeAbiFrom<&Self> for #name #ty_generics #where_clause {}
+
         impl #impl_generics multiversx_sc::abi::TypeAbi for #name #ty_generics #where_clause {
+            type Unmanaged = Self;
+
             fn type_name() -> multiversx_sc::abi::TypeName {
                 #name_str.into()
             }

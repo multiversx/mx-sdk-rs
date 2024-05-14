@@ -44,11 +44,11 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<i32>,
+        Arg0: ProxyArg<i32>,
     >(
         self,
         init_arg: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, i32> {
+    ) -> TxTypedDeploy<Env, From, (), Gas, i32> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&init_arg)
@@ -67,7 +67,7 @@ where
 {
     pub fn upgrade(
         self,
-    ) -> TxProxyUpgrade<Env, From, To, Gas, ()> {
+    ) -> TxTypedUpgrade<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_upgrade()
             .original_result()
@@ -84,17 +84,17 @@ where
     Gas: TxGas<Env>,
 {
     pub fn message_me<
-        Arg0: CodecInto<i64>,
-        Arg1: CodecInto<BigUint<Env::Api>>,
-        Arg2: CodecInto<Vec<u8>>,
-        Arg3: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<i64>,
+        Arg1: ProxyArg<BigUint<Env::Api>>,
+        Arg2: ProxyArg<Vec<u8>>,
+        Arg3: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         arg1: Arg0,
         arg2: Arg1,
         arg3: Arg2,
         arg4: Arg3,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("messageMe")
             .argument(&arg1)

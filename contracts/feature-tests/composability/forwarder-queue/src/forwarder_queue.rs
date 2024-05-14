@@ -209,7 +209,7 @@ pub trait ForwarderQueue {
             .tx()
             .to(&ManagedAddress::default())
             .payment(payments)
-            .function_call(FunctionCall::empty())
+            .raw_call("")
             .to_call_data_string();
 
         self.callback_payments().set(payments_data_string);

@@ -1,6 +1,7 @@
 mod annotated_impl_big_uint;
 mod annotated_impl_managed_address;
 mod annotated_impl_managed_buffer;
+mod annotated_impl_token_identifier;
 mod annotated_impl_u64;
 
 use crate::{
@@ -11,6 +12,9 @@ use crate::{
 
 use super::TxEnv;
 
+/// Describes a value can also have a custom representation in a mandos scenario.
+///
+/// It is based on managed types in order to be embedded into parametric tests too.
 pub trait AnnotatedValue<Env, T>: Sized
 where
     Env: TxEnv,

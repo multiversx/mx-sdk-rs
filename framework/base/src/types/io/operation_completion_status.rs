@@ -4,11 +4,11 @@ use multiversx_sc_codec::{
 
 use crate::{
     abi::{
-        ExplicitEnumVariantDescription, TypeAbi, TypeContents, TypeDescription,
+        ExplicitEnumVariantDescription, TypeAbi, TypeAbiFrom, TypeContents, TypeDescription,
         TypeDescriptionContainer, TypeName,
     },
     api::ManagedTypeApi,
-    codec::{CodecFrom, EncodeErrorHandler},
+    codec::EncodeErrorHandler,
     types::ManagedBuffer,
 };
 
@@ -58,12 +58,14 @@ impl TopDecode for OperationCompletionStatus {
         I: TopDecodeInput,
         H: DecodeErrorHandler,
     {
-        let mut buffer = [0u8; 16];
-        input.into_max_size_buffer(&mut buffer, h)?;
+        const BUFFER_LEN: usize = 16;
+        let mut buffer = [0u8; BUFFER_LEN];
+        let len = input.into_max_size_buffer_align_right(&mut buffer, h)?;
+        let bytes = &buffer[BUFFER_LEN - len..];
 
-        if buffer.starts_with(COMPLETED_STR.as_bytes()) {
+        if bytes.starts_with(COMPLETED_STR.as_bytes()) {
             Ok(OperationCompletionStatus::Completed)
-        } else if buffer.starts_with(INTERRUPTED_STR.as_bytes()) {
+        } else if bytes.starts_with(INTERRUPTED_STR.as_bytes()) {
             Ok(OperationCompletionStatus::InterruptedBeforeOutOfGas)
         } else {
             Err(h.handle_error(DecodeError::INVALID_VALUE))
@@ -71,12 +73,20 @@ impl TopDecode for OperationCompletionStatus {
     }
 }
 
-impl<M: ManagedTypeApi> CodecFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
-impl CodecFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
-impl CodecFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
+impl<M: ManagedTypeApi> TypeAbiFrom<OperationCompletionStatus> for ManagedBuffer<M> {}
+impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::BoxedBytes {}
+impl TypeAbiFrom<OperationCompletionStatus> for crate::types::heap::Vec<u8> {}
+
+impl TypeAbiFrom<Self> for OperationCompletionStatus {}
 
 impl TypeAbi for OperationCompletionStatus {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
+        TypeName::from("OperationCompletionStatus")
+    }
+
+    fn type_name_rust() -> TypeName {
         TypeName::from("OperationCompletionStatus")
     }
 

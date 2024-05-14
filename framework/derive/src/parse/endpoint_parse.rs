@@ -15,8 +15,8 @@ use super::{
 
 fn check_single_role(method: &Method) {
     assert!(matches!(method.public_role, PublicRole::Private),
-		"Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`, `#[upgrade]`."
-	);
+        "Can only annotate with one of the following arguments: `#[init]`, `#[endpoint]`, `#[view]`, `#[callback]`, `#[callback_raw]`, `#[upgrade]`."
+    );
 }
 
 pub fn process_init_attribute(

@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use multiversx_sc_scenario::imports::*;
 use num_bigint::BigUint;
 
@@ -5,8 +7,8 @@ use scenario_tester::*;
 
 const ADDER_PATH_EXPR: &str = "mxsc:output/adder.mxsc.json";
 
-const OWNER: AddressExpr = AddressExpr("owner");
-const CODE_EXPR: MxscExpr = MxscExpr("output/adder.mxsc.json");
+const OWNER: TestAddress = TestAddress::new("owner");
+const CODE_EXPR: MxscPath = MxscPath::new("output/adder.mxsc.json");
 
 fn world() -> ScenarioWorld {
     let mut blockchain = ScenarioWorld::new();
@@ -50,15 +52,15 @@ fn st_blackbox_legacy_proxy() {
 
     let value = world
         .query()
-        .call(st_contract.sum())
-        .returns(ReturnsResultConv::<SingleValue<BigUint>>::new())
+        .legacy_proxy_call(st_contract.sum())
+        .returns(ReturnsResultAs::<SingleValue<BigUint>>::new())
         .run();
     assert_eq!(value.into(), BigUint::from(5u32));
 
     world
         .tx()
         .from(OWNER)
-        .call(st_contract.add(3u32))
+        .legacy_proxy_call(st_contract.add(3u32))
         .with_result(WithRawTxResponse(|response| {
             assert!(response.tx_error.is_success());
         }))

@@ -1,10 +1,23 @@
+mod deploy_call;
+mod function_call;
+mod tx_code_source;
+mod upgrade_call;
+
+pub use deploy_call::DeployCall;
+pub use function_call::FunctionCall;
+pub use tx_code_source::*;
+pub use upgrade_call::UpgradeCall;
+
 use crate::{
     formatter::SCLowerHex,
     types::{ManagedBuffer, ManagedBufferBuilder},
 };
 
-use super::{FunctionCall, TxEnv};
+use super::TxEnv;
 
+/// Marks the data field of a transaction in `Tx`.
+///
+/// Can be nothing, deploy data, call data, etc.
 pub trait TxData<Env>
 where
     Env: TxEnv,

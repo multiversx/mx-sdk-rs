@@ -1,8 +1,11 @@
 use core::marker::PhantomData;
 
-use crate::codec::{
-    DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
-    NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+use crate::{
+    abi::TypeAbiFrom,
+    codec::{
+        DecodeErrorHandler, EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode,
+        NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    },
 };
 
 use crate::{
@@ -11,7 +14,7 @@ use crate::{
     types::{ManagedRef, ManagedType},
 };
 
-use super::ManagedVecItem;
+use super::{ManagedVecItem, ManagedVecItemPayloadBuffer};
 
 /// A very efficient optional managed type.
 ///
@@ -192,7 +195,7 @@ where
     M: ManagedTypeApi,
     T: ManagedType<M> + 'static,
 {
-    const PAYLOAD_SIZE: usize = 4;
+    type PAYLOAD = ManagedVecItemPayloadBuffer<4>;
     const SKIPS_RESERIALIZATION: bool = false;
     type Ref<'a> = Self;
 
@@ -269,11 +272,36 @@ where
     }
 }
 
+impl<M, T, U> TypeAbiFrom<ManagedOption<M, U>> for ManagedOption<M, T>
+where
+    M: ManagedTypeApi,
+    U: ManagedType<M>,
+    T: ManagedType<M> + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<Option<U>> for ManagedOption<M, T>
+where
+    M: ManagedTypeApi,
+    T: ManagedType<M> + TypeAbiFrom<U>,
+{
+}
+
+impl<M, T, U> TypeAbiFrom<ManagedOption<M, U>> for Option<T>
+where
+    M: ManagedTypeApi,
+    U: ManagedType<M>,
+    T: TypeAbiFrom<U>,
+{
+}
+
 impl<M, T> TypeAbi for ManagedOption<M, T>
 where
     M: ManagedTypeApi,
     T: ManagedType<M> + TypeAbi,
 {
+    type Unmanaged = Option<T::Unmanaged>;
+
     /// It is semantically equivalent to any list of `T`.
     fn type_name() -> TypeName {
         Option::<T>::type_name()

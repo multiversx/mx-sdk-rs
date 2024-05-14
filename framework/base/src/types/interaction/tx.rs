@@ -1,8 +1,7 @@
 use crate::{
     api::CallTypeApi,
-    contract_base::BlockchainWrapper,
     types::{
-        BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
+        heap::H256, BigUint, CodeMetadata, EgldOrEsdtTokenIdentifier, EgldOrEsdtTokenPayment,
         EgldOrEsdtTokenPaymentRefs, EgldOrMultiEsdtPayment, EsdtTokenPayment, EsdtTokenPaymentRefs,
         ManagedAddress, ManagedBuffer, ManagedOption, ManagedVec, MultiEsdtPayment,
         TokenIdentifier,
@@ -12,14 +11,22 @@ use crate::{
 use multiversx_sc_codec::TopEncodeMulti;
 
 use super::{
-    contract_deploy::UNSPECIFIED_GAS_LIMIT, Code, ContractCallBase, ContractCallNoPayment,
-    ContractCallWithEgld, ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource,
-    FunctionCall, ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet,
-    RHListAppendRet, RHListItem, TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall,
-    TxEgldValue, TxEnv, TxFrom, TxFromSourceValue, TxGas, TxGasValue, TxPayment, TxPaymentEgldOnly,
-    TxProxyTrait, TxResultHandler, TxScEnv, TxTo, TxToSpecified, UpgradeCall,
+    AnnotatedValue, Code, ContractCallBase, ContractCallNoPayment, ContractCallWithEgld,
+    ContractDeploy, DeployCall, Egld, EgldPayment, ExplicitGas, FromSource, FunctionCall,
+    ManagedArgBuffer, OriginalResultMarker, RHList, RHListAppendNoRet, RHListAppendRet, RHListItem,
+    TxCodeSource, TxCodeValue, TxData, TxDataFunctionCall, TxEgldValue, TxEnv,
+    TxEnvMockDeployAddress, TxEnvWithTxHash, TxFrom, TxFromSourceValue, TxFromSpecified, TxGas,
+    TxGasValue, TxPayment, TxPaymentEgldOnly, TxProxyTrait, TxResultHandler, TxScEnv, TxTo,
+    TxToSpecified, UpgradeCall, UNSPECIFIED_GAS_LIMIT,
 };
 
+/// Universal representation of a blockchain transaction.
+///
+/// Uses 7 generic type arguments to encode all aspects of the transaction.
+///
+/// It is future-like, does nothing by itself, it needs a specialized method call to actually run or send it.
+///
+/// Rationale: https://twitter.com/andreimmarinica/status/1777157322155966601
 #[must_use]
 pub struct Tx<Env, From, To, Payment, Gas, Data, RH>
 where
@@ -47,34 +54,10 @@ where
     To: TxTo<Env>,
     Payment: TxPayment<Env>,
     Gas: TxGas<Env>,
-    Data: TxData<Env>,
-    RH: TxResultHandler<Env>,
-{
-    /// TODO: does nothing, delete, added for easier copy-paste.
-    #[inline]
-    pub fn nothing(self) -> Tx<Env, From, To, Payment, Gas, Data, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: self.data,
-            result_handler: self.result_handler,
-        }
-    }
-}
-
-impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
-where
-    Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Payment: TxPayment<Env>,
-    Gas: TxGas<Env>,
     Data: TxDataFunctionCall<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Converts object to a MultiversX transaction data field string.
     pub fn to_call_data_string(&self) -> ManagedBuffer<Env::Api> {
         self.data.to_call_data_string()
     }
@@ -86,6 +69,7 @@ impl<Env> TxBaseWithEnv<Env>
 where
     Env: TxEnv,
 {
+    /// Constructor, needs to take an environment object.
     #[inline]
     pub fn new_with_env(env: Env) -> Self {
         Tx {
@@ -109,6 +93,7 @@ where
     Data: TxData<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Specifies transaction sender.
     pub fn from<From>(self, from: From) -> Tx<Env, From, To, Payment, Gas, Data, RH>
     where
         From: TxFrom<Env>,
@@ -150,11 +135,6 @@ where
             data: self.data,
             result_handler: self.result_handler,
         }
-    }
-
-    pub fn to_caller(self) -> Tx<Env, From, ManagedAddress<Env::Api>, Payment, Gas, Data, RH> {
-        let caller = BlockchainWrapper::<Env::Api>::new().get_caller();
-        self.to(caller)
     }
 }
 
@@ -286,6 +266,9 @@ where
         self.payment(payment.into())
     }
 
+    /// Converts argument to `EgldOrMultiEsdtPayment`, then sets it as payment.
+    ///
+    /// In most cases, `payment` should be used instead.
     pub fn egld_or_multi_esdt<P: Into<EgldOrMultiEsdtPayment<Env::Api>>>(
         self,
         payment: P,
@@ -424,36 +407,33 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Sets the data field. Do not use directly.
+    #[inline]
+    #[doc(hidden)]
+    pub fn raw_data<Data>(self, data: Data) -> Tx<Env, From, To, Payment, Gas, Data, RH>
+    where
+        Data: TxData<Env>,
+    {
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: self.to,
+            payment: self.payment,
+            gas: self.gas,
+            data,
+            result_handler: self.result_handler,
+        }
+    }
+
+    /// Starts a contract call, serialized by hand.
+    ///
+    /// Whenever possible, should use proxies instead, since manual serialization is not type-safe.
     #[inline]
     pub fn raw_call<N: Into<ManagedBuffer<Env::Api>>>(
         self,
         function_name: N,
     ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: FunctionCall::new(function_name),
-            result_handler: self.result_handler,
-        }
-    }
-
-    #[inline]
-    pub fn function_call(
-        self,
-        call: FunctionCall<Env::Api>,
-    ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: call,
-            result_handler: self.result_handler,
-        }
+        self.raw_data(FunctionCall::new(function_name))
     }
 }
 
@@ -466,8 +446,65 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Converts tx to a simple FunctionCall, to be used as argument or data in contracts.
     pub fn into_function_call(self) -> FunctionCall<Env::Api> {
         self.data
+    }
+}
+
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxToSpecified<Env>,
+    Payment: TxPayment<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Produces the normalized function call, i.e. with builtin function calls for ESDT transfers.
+    ///
+    /// The resulting transaction can differ from the input in several ways:
+    /// - the recipient is changed (some builtin functions are called with recipient = sender),
+    /// - the function call becomes a builtin function call.
+    ///
+    /// ## Important
+    ///
+    /// Do not call this before sending transactions! Normalization is don automatically whenever necessary.
+    /// Only use when you need the normalized data, e.g. for a multisig.
+    ///
+    /// ## Warning
+    ///
+    /// To produce owned values, some clones are performed.
+    /// It is not optimized for contracts, but can be used nonetheless.
+    #[allow(clippy::type_complexity)]
+    pub fn normalize(
+        self,
+    ) -> Tx<
+        Env,
+        From,
+        ManagedAddress<Env::Api>,
+        EgldPayment<Env::Api>,
+        Gas,
+        FunctionCall<Env::Api>,
+        RH,
+    > {
+        let (norm_to, norm_egld, norm_fc) = self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data,
+            |norm_to, norm_egld, norm_fc| (norm_to.clone(), norm_egld.clone(), norm_fc),
+        );
+
+        Tx {
+            env: self.env,
+            from: self.from,
+            to: norm_to,
+            payment: Egld(norm_egld),
+            gas: self.gas,
+            data: norm_fc,
+            result_handler: self.result_handler,
+        }
     }
 }
 
@@ -479,12 +516,12 @@ where
     Gas: TxGas<Env>,
 {
     /// Merges the argument data into the current tx.
-    /// Used for function calls originating in proxies.
+    /// Used for function calls originating in legacy proxies.
     ///
     /// Different environment in the argument allowed because of compatibility with old proxies.
     ///
     /// Method still subject to considerable change.
-    pub fn call<Env2, To, O>(
+    pub fn legacy_proxy_call<Env2, To, O>(
         self,
         call: Tx<Env2, (), To, (), (), FunctionCall<Env::Api>, OriginalResultMarker<O>>,
     ) -> Tx<Env, From, To, Payment, Gas, FunctionCall<Env::Api>, OriginalResultMarker<O>>
@@ -513,18 +550,22 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
-    #[inline]
-    pub fn function_name<N: Into<ManagedBuffer<Env::Api>>>(mut self, function_name: N) -> Self {
-        self.data.function_name = function_name.into();
-        self
-    }
-
+    /// Adds argument to function call.
+    ///
+    /// Whenever possible, use proxies instead.
+    ///
+    /// It serializes the value, but does not enforce type safety.
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
         self.data = self.data.argument(arg);
         self
     }
 
+    /// Adds serialized argument to function call.
+    ///
+    /// Whenever possible, use proxies instead.
+    ///
+    /// Doesa not serialize, does not enforce type safety.
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
@@ -541,6 +582,9 @@ where
     Gas: TxGas<Env>,
     Data: TxData<Env>,
 {
+    /// Type marker to set the original contract or VM function return type.
+    ///
+    /// Only the compile-time type annotation is given.
     #[inline]
     pub fn original_result<OriginalResult>(
         self,
@@ -564,6 +608,9 @@ where
     To: TxTo<Env>,
     Gas: TxGas<Env>,
 {
+    /// Starts a proxy call, deploy, or upgrade.
+    ///
+    /// The proxy object will be given, the subsequent call will be from a proxy context, containing all the contract endpoint names.
     pub fn typed<Proxy>(self, proxy: Proxy) -> Proxy::TxProxyMethods
     where
         Proxy: TxProxyTrait<Env, From, To, Gas>,
@@ -583,6 +630,7 @@ where
     Data: TxData<Env>,
     ResultList: RHList<Env>,
 {
+    /// Adds a result handler that doesn't return anything.
     #[inline]
     pub fn with_result<ResultHandler>(
         self,
@@ -603,6 +651,7 @@ where
         }
     }
 
+    /// Adds a result handler that can also return processed data.
     #[inline]
     pub fn returns<RH>(
         self,
@@ -624,44 +673,6 @@ where
     }
 }
 
-impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
-    for Tx<
-        TxScEnv<Api>,
-        (),
-        To,
-        Payment,
-        (),
-        FunctionCall<Api>,
-        OriginalResultMarker<OriginalResult>,
-    >
-where
-    Api: CallTypeApi + 'static,
-    To: TxToSpecified<TxScEnv<Api>>,
-    Payment: TxPayment<TxScEnv<Api>>,
-    OriginalResult: TopEncodeMulti,
-{
-    type OriginalResult = OriginalResult;
-
-    fn into_normalized(self) -> ContractCallWithEgld<Api, OriginalResult> {
-        self.payment.with_normalized(
-            &self.env,
-            &self.from,
-            self.to,
-            self.data,
-            |norm_to, norm_egld, norm_fc| ContractCallWithEgld {
-                basic: ContractCallNoPayment {
-                    _phantom: core::marker::PhantomData,
-                    to: norm_to.clone(),
-                    function_call: norm_fc.clone(),
-                    explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
-                    _return_type: core::marker::PhantomData,
-                },
-                egld_payment: norm_egld.clone(),
-            },
-        )
-    }
-}
-
 impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
 where
     Env: TxEnv,
@@ -671,38 +682,11 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Starts a contract deploy call, serialized by hand.
+    ///
+    /// Whenever possible, should use proxies instead, since manual serialization is not type-safe.
     pub fn raw_deploy(self) -> Tx<Env, From, To, Payment, Gas, DeployCall<Env, ()>, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: DeployCall::default(),
-            result_handler: self.result_handler,
-        }
-    }
-}
-
-impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
-where
-    Env: TxEnv,
-    From: TxFrom<Env>,
-    To: TxTo<Env>,
-    Payment: TxPaymentEgldOnly<Env>,
-    Gas: TxGas<Env>,
-    RH: TxResultHandler<Env>,
-{
-    pub fn raw_upgrade(self) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, RH> {
-        Tx {
-            env: self.env,
-            from: self.from,
-            to: self.to,
-            payment: self.payment,
-            gas: self.gas,
-            data: UpgradeCall::default(),
-            result_handler: self.result_handler,
-        }
+        self.raw_data(DeployCall::default())
     }
 }
 
@@ -715,6 +699,7 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Sets upgrade code source as explicit code bytes.
     pub fn code<CodeValue>(
         self,
         code: CodeValue,
@@ -733,6 +718,7 @@ where
         }
     }
 
+    /// Sets upgrade code source as another deployed contract code.
     pub fn from_source<FromSourceValue>(
         self,
         source_address: FromSourceValue,
@@ -761,6 +747,7 @@ where
     Gas: TxGas<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Sets deploy code source as explicit code bytes.
     pub fn code<CodeValue>(
         self,
         code: CodeValue,
@@ -779,6 +766,7 @@ where
         }
     }
 
+    /// Sets deploy code source as another deployed contract code.
     pub fn from_source<FromSourceValue>(
         self,
         source_address: FromSourceValue,
@@ -809,21 +797,72 @@ where
     CodeSource: TxCodeSource<Env>,
     RH: TxResultHandler<Env>,
 {
+    /// Sets code metadata to deploy.
     pub fn code_metadata(mut self, code_metadata: CodeMetadata) -> Self {
         self.data = self.data.code_metadata(code_metadata);
         self
     }
 
+    /// Adds argument to a contract deploy.
+    ///
+    /// Whenever possible, use proxies instead.
+    ///
+    /// It serializes the value, but does not enforce type safety.
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
         self.data = self.data.argument(arg);
         self
     }
 
+    /// Adds serialized argument to a contract deploy.
+    ///
+    /// Whenever possible, use proxies instead.
+    ///
+    /// Doesa not serialize, does not enforce type safety.
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
         self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, CodeSource, RH>
+    Tx<Env, From, To, Payment, Gas, DeployCall<Env, CodeSource>, RH>
+where
+    Env: TxEnvMockDeployAddress,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    CodeSource: TxCodeSource<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the new mock address to be used for the newly deployed contract.
+    ///
+    /// Only allowed in tests.
+    pub fn new_address<NA>(mut self, new_address: NA) -> Self
+    where
+        NA: AnnotatedValue<Env, ManagedAddress<Env::Api>>,
+    {
+        self.env.mock_deploy_new_address(&self.from, new_address);
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, RH> Tx<Env, From, To, Payment, Gas, (), RH>
+where
+    Env: TxEnv,
+    From: TxFrom<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Starts a contract deploy upgrade, serialized by hand.
+    ///
+    /// Whenever possible, should use proxies instead, since manual serialization is not type-safe.
+    pub fn raw_upgrade(self) -> Tx<Env, From, To, Payment, Gas, UpgradeCall<Env, ()>, RH> {
+        self.raw_data(UpgradeCall::default())
     }
 }
 
@@ -843,15 +882,47 @@ where
         self
     }
 
+    /// Adds argument to upgrade call.
+    ///
+    /// Whenever possible, use proxies instead.
+    ///
+    /// It serializes the value, but does not enforce type safety.
     #[inline]
     pub fn argument<T: TopEncodeMulti>(mut self, arg: &T) -> Self {
         self.data = self.data.argument(arg);
         self
     }
 
+    /// Adds serialized argument to an upgrade call.
+    ///
+    /// Whenever possible, use proxies instead.
+    ///
+    /// Doesa not serialize, does not enforce type safety.
     #[inline]
     pub fn arguments_raw(mut self, raw: ManagedArgBuffer<Env::Api>) -> Self {
         self.data.arg_buffer = raw;
+        self
+    }
+}
+
+impl<Env, From, To, Payment, Gas, Data, RH> Tx<Env, From, To, Payment, Gas, Data, RH>
+where
+    Env: TxEnvWithTxHash,
+    From: TxFromSpecified<Env>,
+    To: TxTo<Env>,
+    Payment: TxPaymentEgldOnly<Env>,
+    Gas: TxGas<Env>,
+    Data: TxDataFunctionCall<Env>,
+    RH: TxResultHandler<Env>,
+{
+    /// Sets the mock transaction hash to be used in a test.
+    ///
+    /// Only allowed in tests.
+    pub fn tx_hash<H>(mut self, tx_hash: H) -> Self
+    where
+        H256: core::convert::From<H>,
+    {
+        self.env.set_tx_hash(H256::from(tx_hash));
         self
     }
 }
@@ -893,5 +964,44 @@ where
             arg_buffer: value.data.arg_buffer,
             _return_type: core::marker::PhantomData,
         }
+    }
+}
+
+// Conversion from new syntax to old syntax.
+impl<Api, To, Payment, OriginalResult> ContractCallBase<Api>
+    for Tx<
+        TxScEnv<Api>,
+        (),
+        To,
+        Payment,
+        (),
+        FunctionCall<Api>,
+        OriginalResultMarker<OriginalResult>,
+    >
+where
+    Api: CallTypeApi + 'static,
+    To: TxToSpecified<TxScEnv<Api>>,
+    Payment: TxPayment<TxScEnv<Api>>,
+    OriginalResult: TopEncodeMulti,
+{
+    type OriginalResult = OriginalResult;
+
+    fn into_normalized(self) -> ContractCallWithEgld<Api, OriginalResult> {
+        self.payment.with_normalized(
+            &self.env,
+            &self.from,
+            self.to,
+            self.data,
+            |norm_to, norm_egld, norm_fc| ContractCallWithEgld {
+                basic: ContractCallNoPayment {
+                    _phantom: core::marker::PhantomData,
+                    to: norm_to.clone(),
+                    function_call: norm_fc.clone(),
+                    explicit_gas_limit: UNSPECIFIED_GAS_LIMIT,
+                    _return_type: core::marker::PhantomData,
+                },
+                egld_payment: norm_egld.clone(),
+            },
+        )
     }
 }

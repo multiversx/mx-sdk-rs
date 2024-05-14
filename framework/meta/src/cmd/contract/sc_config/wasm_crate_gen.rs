@@ -18,6 +18,7 @@ const PREFIX_AUTO_GENERATED: &str =
 ";
 
 const NUM_INIT: usize = 1;
+const NUM_UPGRADE: usize = 1;
 const NUM_ASYNC_CB: usize = 1;
 
 const VER_1_71: &str = "1.71.0-nightly";
@@ -26,7 +27,7 @@ const FEATURES_PRE_RUSTC_1_71: &str = "
 
 // Configuration that works with rustc < 1.71.0.
 // TODO: Recommended rustc version: 1.73.0 or newer.
-#![feature(alloc_error_handler, lang_items)]
+#![feature(alloc_error_handler)]
 ";
 
 const VER_1_73: &str = "1.73.0-nightly";
@@ -35,13 +36,10 @@ const FEATURES_PRE_RUSTC_1_73: &str = "
 
 // Configuration that works with rustc < 1.73.0.
 // TODO: Recommended rustc version: 1.73.0 or newer.
-#![feature(lang_items)]
 ";
 
 const FEATURES_DEFAULT: &str = "
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 ";
 
 impl ContractVariant {
@@ -117,7 +115,8 @@ impl ContractVariant {
             total += NUM_INIT;
         }
         if !self.abi.upgrade_constructors.is_empty() {
-            write_stat_comment(wasm_lib_file, "Upgrade:", NUM_INIT);
+            write_stat_comment(wasm_lib_file, "Upgrade:", NUM_UPGRADE);
+            total += NUM_UPGRADE;
         }
 
         write_stat_comment(wasm_lib_file, "Endpoints:", self.abi.endpoints.len());

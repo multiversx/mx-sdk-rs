@@ -1,6 +1,8 @@
 use std::marker::PhantomData;
 
-use crate::multiversx_sc::codec::{CodecFrom, TopEncodeMulti};
+use multiversx_sc::{abi::TypeAbiFrom, codec::TopDecodeMulti};
+
+use crate::multiversx_sc::codec::TopEncodeMulti;
 
 use crate::{
     scenario::model::{AddressValue, BytesValue, TxExpect},
@@ -72,7 +74,7 @@ impl<OriginalResult> TypedScQuery<OriginalResult> {
     pub fn expect_value<ExpectedResult>(self, expected_value: ExpectedResult) -> Self
     where
         OriginalResult: TopEncodeMulti,
-        ExpectedResult: CodecFrom<OriginalResult> + TopEncodeMulti,
+        ExpectedResult: TypeAbiFrom<OriginalResult> + TopEncodeMulti,
     {
         self.expect(format_expect(expected_value))
     }
@@ -105,7 +107,7 @@ pub trait TypedScQueryExecutor {
     ) -> RequestedResult
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>;
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>;
 }
 
 impl<OriginalResult> TypedScQuery<OriginalResult>
@@ -118,7 +120,7 @@ where
         executor: &mut E,
     ) -> RequestedResult
     where
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         executor.execute_typed_sc_query(self)
     }

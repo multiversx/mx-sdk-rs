@@ -38,11 +38,11 @@ where
     Gas: TxGas<Env>,
 {
     pub fn register<
-        Arg0: CodecInto<ManagedBuffer<Env::Api>>,
+        Arg0: ProxyArg<ManagedBuffer<Env::Api>>,
     >(
         self,
         name: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("register")
             .argument(&name)

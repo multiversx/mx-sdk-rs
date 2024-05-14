@@ -1,27 +1,12 @@
-mod returns_bt;
-mod returns_new_address;
-mod returns_new_managed_address;
-mod returns_raw_result;
-mod returns_result;
-mod returns_result_conv;
-mod with_new_address;
-mod with_raw_result;
-mod with_result;
-mod with_result_conv;
-
-pub use returns_bt::*;
-pub use returns_new_address::*;
-pub use returns_new_managed_address::*;
-pub use returns_raw_result::*;
-pub use returns_result::*;
-pub use returns_result_conv::*;
-pub use with_new_address::*;
-pub use with_raw_result::WithRawResult;
-pub use with_result::WithResult;
-pub use with_result_conv::*;
-
 use super::TxEnv;
 
+/// Marks a general result handler, to be used in the transaction unified syntax.
+///
+/// Rationale described here: https://twitter.com/andreimmarinica/status/1781371938750841288
+///
+/// Used for:
+/// - async callbacks
+/// - processing of results in sync calls, tests and interactors.
 pub trait TxResultHandler<Env>
 where
     Env: TxEnv,

@@ -20,7 +20,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           default: true
-          toolchain: nightly-2023-12-11
+          toolchain: stable
           target: wasm32-unknown-unknown
 
       - name: Setup the PATH variable
@@ -54,4 +54,3 @@ jobs:
           file: ./examples-wasm.zip
           asset_name: examples-wasm.zip
           overwrite: true
-          body: "This is my release text"

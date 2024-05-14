@@ -1,7 +1,7 @@
 use crate::{
-    dep_encode_num_mimic, num_conv::universal_decode_number, DecodeError, DecodeErrorHandler,
-    EncodeErrorHandler, NestedDecode, NestedDecodeInput, NestedEncode, NestedEncodeOutput,
-    TopDecode, TopDecodeInput, TopEncode, TopEncodeOutput,
+    dep_encode_num_mimic, DecodeError, DecodeErrorHandler, EncodeErrorHandler, NestedDecode,
+    NestedDecodeInput, NestedEncode, NestedEncodeOutput, TopDecode, TopDecodeInput, TopEncode,
+    TopEncodeOutput,
 };
 
 macro_rules! top_encode_num_signed {
@@ -42,7 +42,7 @@ macro_rules! dep_decode_num_signed {
             {
                 let mut bytes = [0u8; $num_bytes];
                 input.read_into(&mut bytes[..], h)?;
-                let num = universal_decode_number(&bytes[..], true) as $ty;
+                let num = <$ty>::from_be_bytes(bytes);
                 Ok(num)
             }
         }
@@ -52,8 +52,17 @@ macro_rules! dep_decode_num_signed {
 dep_decode_num_signed!(i8, 1);
 dep_decode_num_signed!(i16, 2);
 dep_decode_num_signed!(i32, 4);
-dep_decode_num_signed!(isize, 4);
 dep_decode_num_signed!(i64, 8);
+
+impl NestedDecode for isize {
+    fn dep_decode_or_handle_err<I, H>(input: &mut I, h: H) -> Result<Self, H::HandledErr>
+    where
+        I: NestedDecodeInput,
+        H: DecodeErrorHandler,
+    {
+        i32::dep_decode_or_handle_err(input, h).map(|num| num as isize)
+    }
+}
 
 macro_rules! top_decode_num_signed {
     ($ty:ty, $bounds_ty:ty) => {

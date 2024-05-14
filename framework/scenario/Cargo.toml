@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-scenario"
-version = "0.49.0-alpha.3"
+version = "0.50.0"
 edition = "2021"
 
 authors = [
@@ -17,7 +17,7 @@ keywords = ["multiversx", "blockchain", "contract", "debug"]
 categories = ["cryptography::cryptocurrencies", "development-tools::debugging"]
 
 [dependencies]
-base64 = "0.21.5"
+base64 = "0.22"
 num-bigint = "0.4"
 num-traits = "0.2"
 hex = "0.4"
@@ -31,6 +31,7 @@ itertools = "0.12.0"
 colored = "2.0"
 clap = { version = "4.4.7", features = ["derive"] }
 tokio = { version = "1.24", features = ["full"] }
+unwrap-infallible = "0.1.5"
 
 [[bin]]
 name = "sc-scenario"
@@ -40,12 +41,12 @@ path = "src/main.rs"
 run-go-tests = []
 
 [dependencies.multiversx-sc]
-version = "=0.49.0-alpha.3"
+version = "=0.50.0"
 features = ["alloc", "num-bigint"]
 path = "../base"
 
 [dependencies.multiversx-sc-meta]
-version = "=0.49.0-alpha.3"
+version = "=0.50.0"
 path = "../meta"
 
 [dependencies.multiversx-chain-scenario-format]
@@ -56,9 +57,9 @@ path = "../../sdk/scenario-format"
 version = "0.2.0"
 
 [dependencies.multiversx-chain-vm]
-version = "=0.8.3"
+version = "=0.8.4"
 path = "../../vm"
 
 [dependencies.multiversx-sdk]
-version = "=0.3.2"
+version = "=0.4.1"
 path = "../../sdk/core"

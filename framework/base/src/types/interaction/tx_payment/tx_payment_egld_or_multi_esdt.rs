@@ -34,7 +34,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
@@ -77,7 +77,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.as_refs().with_normalized(env, from, to, fc, f)
     }

@@ -18,6 +18,10 @@ use super::{
 ///
 /// It also represents the normalized form of any contract call, since ESDT transfers
 /// (the only payment not available here) get converted to builtin function calls in normalized form.
+#[deprecated(
+    since = "0.49.0",
+    note = "Please use the unified transaction syntax instead."
+)]
 #[must_use]
 pub struct ContractCallWithEgld<SA, OriginalResult>
 where

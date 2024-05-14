@@ -1,4 +1,7 @@
-use multiversx_sc::codec::test_util::{check_dep_encode_decode, check_top_encode_decode};
+use multiversx_sc::{
+    codec::test_util::{check_dep_encode_decode, check_top_encode_decode},
+    types::ManagedVecItemPayload,
+};
 
 multiversx_sc::derive_imports!();
 
@@ -20,7 +23,7 @@ pub struct Struct1 {
 #[allow(clippy::assertions_on_constants)]
 fn struct_1_static() {
     assert_eq!(
-        <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE,
+        <Struct1 as multiversx_sc::types::ManagedVecItem>::payload_size(),
         16
     );
     assert!(<Struct1 as multiversx_sc::types::ManagedVecItem>::SKIPS_RESERIALIZATION);
@@ -39,13 +42,13 @@ fn struct_1_encode_decode_skips_reserialization() {
     };
 
     #[rustfmt::skip]
-	let bytes_1 = &[
-		/* u_8 */  0x01,
-		/* u_16 */ 0x00, 0x02,
-		/* u_32 */ 0x00, 0x00, 0x00, 0x03,
-		/* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
-		/* bool */ 0x01,
-	];
+    let bytes_1 = &[
+        /* u_8 */  0x01,
+        /* u_16 */ 0x00, 0x02,
+        /* u_32 */ 0x00, 0x00, 0x00, 0x03,
+        /* u_64 */ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+        /* bool */ 0x01,
+    ];
 
     check_top_encode_decode(s.clone(), bytes_1);
     check_dep_encode_decode(s, bytes_1);
@@ -60,13 +63,14 @@ fn struct_1_to_bytes_writer() {
         u_64: 4u64,
         bool_field: true,
     };
-    let mut arr: [u8; 16] = [0u8; <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE];
+
+    let mut payload = <Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD::new_buffer();
+    let payload_slice = payload.payload_slice_mut();
 
     <Struct1 as multiversx_sc::types::ManagedVecItem>::to_byte_writer(&s, |bytes| {
-        arr[0..<Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE]
-            .copy_from_slice(bytes);
+        payload_slice.copy_from_slice(bytes);
         assert_eq!(
-            arr,
+            payload_slice,
             [
                 0x01, 0x00, 0x02, 0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
                 0x04, 0x01,
@@ -92,7 +96,7 @@ fn struct_1_from_bytes_reader() {
     let struct_from_bytes =
         <Struct1 as multiversx_sc::types::ManagedVecItem>::from_byte_reader(|bytes| {
             bytes.copy_from_slice(
-                &arr[0..<Struct1 as multiversx_sc::types::ManagedVecItem>::PAYLOAD_SIZE],
+                &arr[0..<Struct1 as multiversx_sc::types::ManagedVecItem>::payload_size()],
             );
         });
     assert_eq!(s, struct_from_bytes);

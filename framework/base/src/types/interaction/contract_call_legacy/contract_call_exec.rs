@@ -9,13 +9,8 @@ use crate::{
     },
 };
 
-use super::{ContractCallNoPayment, ContractCallWithEgld};
+use super::{ContractCallNoPayment, ContractCallWithEgld, UNSPECIFIED_GAS_LIMIT};
 use crate::api::managed_types::handles::HandleConstraints;
-
-/// Using max u64 to represent maximum possible gas,
-/// so that the value zero is not reserved and can be specified explicitly.
-/// Leaving the gas limit unspecified will replace it with `api.get_gas_left()`.
-pub(super) const UNSPECIFIED_GAS_LIMIT: u64 = u64::MAX;
 
 impl<SA, OriginalResult> ContractCallWithEgld<SA, OriginalResult>
 where
@@ -66,7 +61,7 @@ where
         Tx::new_tx_from_sc()
             .to(self.basic.to)
             .egld(self.egld_payment)
-            .function_call(self.basic.function_call)
+            .raw_data(self.basic.function_call)
             .callback(None)
     }
 }

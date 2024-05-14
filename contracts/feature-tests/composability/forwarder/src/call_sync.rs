@@ -14,7 +14,7 @@ pub trait ForwarderSyncCallModule {
         let result = self
             .tx()
             .to(&to)
-            .with_gas_limit(half_gas)
+            .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args)
             .returns(ReturnsResult)
@@ -35,7 +35,7 @@ pub trait ForwarderSyncCallModule {
         let result = self
             .tx()
             .to(&to)
-            .with_gas_limit(one_third_gas)
+            .gas(one_third_gas)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args.clone())
             .returns(ReturnsResult)
@@ -46,7 +46,7 @@ pub trait ForwarderSyncCallModule {
         let result = self
             .tx()
             .to(&to)
-            .with_gas_limit(one_third_gas)
+            .gas(one_third_gas)
             .typed(vault_proxy::VaultProxy)
             .echo_arguments(args)
             .returns(ReturnsResult)
@@ -67,10 +67,10 @@ pub trait ForwarderSyncCallModule {
         let result = self
             .tx()
             .to(&to)
-            .with_gas_limit(half_gas)
+            .gas(half_gas)
             .typed(vault_proxy::VaultProxy)
             .accept_funds_echo_payment()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .returns(ReturnsResult)
             .sync_call();
 
@@ -90,7 +90,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer((token_id, 0u64, amount_to_send))
+            .egld_or_single_esdt(&token_id, 0u64, &amount_to_send)
             .returns(ReturnsResult)
             .sync_call();
     }
@@ -110,7 +110,7 @@ pub trait ForwarderSyncCallModule {
             .to(&to)
             .typed(vault_proxy::VaultProxy)
             .accept_funds()
-            .with_egld_or_single_esdt_transfer(payment)
+            .payment(payment)
             .sync_call();
 
         self.tx()
@@ -154,7 +154,7 @@ pub trait ForwarderSyncCallModule {
                 amount,
                 OptionalValue::<ManagedBuffer>::Some(b"accept_funds_func".into()),
             )
-            .payment(payments.clone_value())
+            .payment(payments)
             .sync_call();
     }
 

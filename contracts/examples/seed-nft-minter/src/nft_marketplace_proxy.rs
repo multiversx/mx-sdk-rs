@@ -38,7 +38,7 @@ where
 {
     pub fn init(
         self,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, (), Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .original_result()
@@ -55,15 +55,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn claim_tokens<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
         claim_destination: Arg0,
         token_id: Arg1,
         token_nonce: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, MultiValue2<BigUint<Env::Api>, ManagedVec<Env::Api, EsdtTokenPayment<Env::Api>>>> {
         self.wrapped_tx
             .raw_call("claimTokens")
             .argument(&claim_destination)

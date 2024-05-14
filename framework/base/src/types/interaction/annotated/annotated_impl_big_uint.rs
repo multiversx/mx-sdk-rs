@@ -1,4 +1,4 @@
-use crate::types::{BigUint, ManagedBuffer, ManagedRef};
+use crate::types::{BigUint, ManagedBuffer, ManagedRef, NotPayable};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -92,7 +92,33 @@ where
     }
 }
 
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for i32
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        BigUint::from(*self as u64).to_display()
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::from(*self as u64)
+    }
+}
+
 impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for ()
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedBuffer::from("0")
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::zero()
+    }
+}
+
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for NotPayable
 where
     Env: TxEnv,
 {

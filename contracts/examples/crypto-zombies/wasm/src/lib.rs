@@ -8,11 +8,9 @@
 // Upgrade:                              1
 // Endpoints:                           17
 // Async Callback:                       1
-// Total number of exported functions:  19
+// Total number of exported functions:  20
 
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();

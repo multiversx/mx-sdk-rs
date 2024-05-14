@@ -35,7 +35,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.map_ref_egld_or_esdt(
             (to, fc, f),
@@ -84,7 +84,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.map_egld_or_esdt(
             (to, fc, f),

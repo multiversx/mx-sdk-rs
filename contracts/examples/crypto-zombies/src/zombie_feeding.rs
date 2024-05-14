@@ -38,7 +38,7 @@ pub trait ZombieFeeding:
     #[callback]
     fn get_kitty_callback(
         &self,
-        #[call_result] result: ManagedAsyncCallResult<kitty::Kitty>,
+        #[call_result] result: ManagedAsyncCallResult<crate::kitty_obj::Kitty>,
         zombie_id: usize,
     ) {
         match result {
@@ -57,7 +57,7 @@ pub trait ZombieFeeding:
             .to(&crypto_kitties_sc_address)
             .typed(kitty_ownership_proxy::KittyOwnershipProxy)
             .get_kitty_by_id_endpoint(kitty_id)
-            .with_callback(self.callbacks().get_kitty_callback(zombie_id))
+            .callback(self.callbacks().get_kitty_callback(zombie_id))
             .async_call_and_exit();
     }
 }

@@ -50,7 +50,7 @@ pub trait KittyAuction {
             .to(&kitty_ownership_contract_address)
             .typed(kitty_ownership_proxy::KittyOwnershipProxy)
             .create_gen_zero_kitty()
-            .with_callback(self.callbacks().create_gen_zero_kitty_callback())
+            .callback(self.callbacks().create_gen_zero_kitty_callback())
             .async_call_and_exit();
     }
 
@@ -246,7 +246,7 @@ pub trait KittyAuction {
                 .to(&kitty_ownership_contract_address)
                 .typed(kitty_ownership_proxy::KittyOwnershipProxy)
                 .allow_auctioning(&caller, kitty_id)
-                .with_callback(self.callbacks().allow_auctioning_callback(
+                .callback(self.callbacks().allow_auctioning_callback(
                     auction_type,
                     kitty_id,
                     starting_price,
@@ -283,7 +283,7 @@ pub trait KittyAuction {
                 .to(&kitty_ownership_contract_address)
                 .typed(kitty_ownership_proxy::KittyOwnershipProxy)
                 .transfer(address, kitty_id)
-                .with_callback(self.callbacks().transfer_callback(kitty_id))
+                .callback(self.callbacks().transfer_callback(kitty_id))
                 .async_call_and_exit();
         }
     }
@@ -302,7 +302,7 @@ pub trait KittyAuction {
                 .typed(kitty_ownership_proxy::KittyOwnershipProxy)
                 .approve_siring_and_return_kitty(approved_address, kitty_owner, kitty_id)
                 // not a mistake, same callback for transfer and approveSiringAndReturnKitty
-                .with_callback(self.callbacks().transfer_callback(kitty_id))
+                .callback(self.callbacks().transfer_callback(kitty_id))
                 .async_call_and_exit();
         }
     }

@@ -6,13 +6,11 @@
 
 // Init:                                 1
 // Upgrade:                              1
-// Endpoints:                           27
+// Endpoints:                           28
 // Async Callback (empty):               1
-// Total number of exported functions:  29
+// Total number of exported functions:  31
 
 #![no_std]
-#![allow(internal_features)]
-#![feature(lang_items)]
 
 multiversx_sc_wasm_adapter::allocator!();
 multiversx_sc_wasm_adapter::panic_handler!();
@@ -46,6 +44,7 @@ multiversx_sc_wasm_adapter::endpoints! {
         item_for_ref => item_for_ref
         item_for_slice => item_for_slice
         item_for_option => item_for_option
+        operation_completion_status => operation_completion_status
         payable_egld => payable_egld
         payable_some_token => payable_some_token
         payable_any_token => payable_any_token

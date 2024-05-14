@@ -1,6 +1,8 @@
 use crate::types::{BigUint, ManagedAddress, TxFrom, TxToSpecified};
 
-use super::{Egld, FullPaymentData, FunctionCall, TxEnv, TxPayment, TxPaymentEgldOnly};
+use super::{
+    Egld, FullPaymentData, FunctionCall, TxEnv, TxNoPayment, TxPayment, TxPaymentEgldOnly,
+};
 
 impl<Env> TxPayment<Env> for ()
 where
@@ -34,14 +36,16 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
-        to.with_address_ref(env, |to_addr| f(to_addr, &*BigUint::zero_ref(), &fc))
+        to.with_address_ref(env, |to_addr| f(to_addr, &*BigUint::zero_ref(), fc))
     }
 
     fn into_full_payment_data(self, _env: &Env) -> FullPaymentData<Env::Api> {
         FullPaymentData::default()
     }
 }
+
+impl<Env> TxNoPayment<Env> for () where Env: TxEnv {}
 
 impl<Env> TxPaymentEgldOnly<Env> for () where Env: TxEnv {}

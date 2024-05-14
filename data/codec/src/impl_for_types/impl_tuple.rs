@@ -11,18 +11,18 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
+                fn top_encode_or_handle_err<O, H>(&self, output: O, h: H) -> Result<(), H::HandledErr>
                 where
                     O: TopEncodeOutput,
                     H: EncodeErrorHandler,
                 {
-					let mut buffer = output.start_nested_encode();
-					$(
+                    let mut buffer = output.start_nested_encode();
+                    $(
                         self.$n.dep_encode_or_handle_err(&mut buffer, h)?;
                     )+
-					output.finalize_nested_encode(buffer);
-					Ok(())
-				}
+                    output.finalize_nested_encode(buffer);
+                    Ok(())
+                }
             }
 
             impl<$($name),+> TopDecode for ($($name,)+)
@@ -42,16 +42,16 @@ macro_rules! tuple_impls {
             where
                 $($name: NestedEncode,)+
             {
-				fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
+                fn dep_encode_or_handle_err<O, H>(&self, dest: &mut O, h: H) -> Result<(), H::HandledErr>
                 where
                     O: NestedEncodeOutput,
                     H: EncodeErrorHandler,
                 {
-					$(
+                    $(
                         self.$n.dep_encode_or_handle_err(dest, h)?;
                     )+
-					Ok(())
-				}
+                    Ok(())
+                }
             }
 
             impl<$($name),+> NestedDecode for ($($name,)+)

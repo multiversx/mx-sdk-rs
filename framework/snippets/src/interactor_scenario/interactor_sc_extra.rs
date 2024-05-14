@@ -1,8 +1,11 @@
+#![allow(deprecated)]
+
 use crate::Interactor;
 use multiversx_sc_scenario::{
     api::StaticApi,
     multiversx_sc::{
-        codec::{CodecFrom, TopEncodeMulti},
+        abi::TypeAbiFrom,
+        codec::{TopDecodeMulti, TopEncodeMulti},
         types::{Address, ContractCallBase},
     },
     scenario_model::{
@@ -12,6 +15,10 @@ use multiversx_sc_scenario::{
 };
 
 impl Interactor {
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_call_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -27,6 +34,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_call_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScCall<OriginalResult>,
@@ -34,26 +45,34 @@ impl Interactor {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
         use_result(self.sc_call_get_result(step).await);
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_call_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScCall<OriginalResult>,
     ) -> TypedResponse<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_call(step.as_mut()).await;
         let response = unwrap_response(&step.as_mut().response);
         TypedResponse::from_raw(response)
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_query_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -69,6 +88,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_query_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScQuery<OriginalResult>,
@@ -76,30 +99,38 @@ impl Interactor {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(TypedResponse<RequestedResult>),
     {
         use_result(self.sc_query_get_result(step).await);
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_query_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScQuery<OriginalResult>,
     ) -> TypedResponse<RequestedResult>
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_query(step.as_mut()).await;
         let response = unwrap_response(&step.sc_query_step.response);
         TypedResponse::from_raw(response)
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn quick_query<CC, RequestedResult>(&mut self, contract_call: CC) -> RequestedResult
     where
         CC: ContractCallBase<StaticApi>,
-        RequestedResult: CodecFrom<CC::OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<CC::OriginalResult>,
     {
         let mut typed_sc_query = ScQueryStep::new().call(contract_call);
         self.sc_query(&mut typed_sc_query).await;
@@ -108,6 +139,10 @@ impl Interactor {
         typed_response.result.unwrap()
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_deploy_use_raw_response<S, F>(
         &mut self,
         mut step: S,
@@ -123,6 +158,10 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_deploy_use_result<OriginalResult, RequestedResult, F>(
         &mut self,
         step: TypedScDeploy<OriginalResult>,
@@ -130,7 +169,7 @@ impl Interactor {
     ) -> &mut Self
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
         F: FnOnce(Address, TypedResponse<RequestedResult>),
     {
         let (new_address, response) = self.sc_deploy_get_result(step).await;
@@ -138,13 +177,17 @@ impl Interactor {
         self
     }
 
+    #[deprecated(
+        since = "0.49.0",
+        note = "Please use the unified transaction syntax instead."
+    )]
     pub async fn sc_deploy_get_result<OriginalResult, RequestedResult>(
         &mut self,
         mut step: TypedScDeploy<OriginalResult>,
     ) -> (Address, TypedResponse<RequestedResult>)
     where
         OriginalResult: TopEncodeMulti,
-        RequestedResult: CodecFrom<OriginalResult>,
+        RequestedResult: TopDecodeMulti + TypeAbiFrom<OriginalResult>,
     {
         self.sc_deploy(step.as_mut()).await;
         let response = unwrap_response(&step.sc_deploy_step.response);

@@ -44,14 +44,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn init<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         fee: Arg0,
         token: Arg1,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&fee)
             .argument(&token)
@@ -69,14 +70,15 @@ where
     Gas: TxGas<Env>,
 {
     pub fn whitelist_fee_token<
-        Arg0: CodecInto<BigUint<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<BigUint<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         fee: Arg0,
         token: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("whitelistFeeToken")
             .argument(&fee)
             .argument(&token)
@@ -84,12 +86,13 @@ where
     }
 
     pub fn blacklist_fee_token<
-        Arg0: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg0: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
     >(
         self,
         token: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("blacklistFeeToken")
             .argument(&token)
             .original_result()
@@ -97,23 +100,25 @@ where
 
     pub fn claim_fees(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("claimFees")
             .original_result()
     }
 
     pub fn get_amount<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<EgldOrEsdtTokenIdentifier<Env::Api>>,
-        Arg2: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<EgldOrEsdtTokenIdentifier<Env::Api>>,
+        Arg2: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
         token: Arg1,
         nonce: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getAmount")
             .argument(&address)
             .argument(&token)
@@ -122,13 +127,13 @@ where
     }
 
     pub fn pay_fee_and_fund_esdt<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
         valability: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payFeeAndFundESDT")
             .argument(&address)
@@ -137,13 +142,13 @@ where
     }
 
     pub fn pay_fee_and_fund_egld<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
         valability: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("payFeeAndFundEGLD")
             .argument(&address)
@@ -152,13 +157,13 @@ where
     }
 
     pub fn fund<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<u64>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<u64>,
     >(
         self,
         address: Arg0,
         valability: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("fund")
             .argument(&address)
@@ -167,11 +172,11 @@ where
     }
 
     pub fn deposit_fees<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("depositFees")
             .argument(&address)
@@ -179,26 +184,28 @@ where
     }
 
     pub fn withdraw<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("withdraw")
             .argument(&address)
             .original_result()
     }
 
     pub fn claim<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedByteArray<Env::Api, 64usize>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
         address: Arg0,
         signature: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("claim")
             .argument(&address)
             .argument(&signature)
@@ -206,15 +213,15 @@ where
     }
 
     pub fn forward<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
-        Arg1: CodecInto<ManagedAddress<Env::Api>>,
-        Arg2: CodecInto<ManagedByteArray<Env::Api, 64usize>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg1: ProxyArg<ManagedAddress<Env::Api>>,
+        Arg2: ProxyArg<ManagedByteArray<Env::Api, 64usize>>,
     >(
         self,
         address: Arg0,
         forward_address: Arg1,
         signature: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("forward")
             .argument(&address)
@@ -224,18 +231,20 @@ where
     }
 
     pub fn deposit<
-        Arg0: CodecInto<ManagedAddress<Env::Api>>,
+        Arg0: ProxyArg<ManagedAddress<Env::Api>>,
     >(
         self,
         donor: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, DepositInfo<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, DepositInfo<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("deposit")
             .argument(&donor)
             .original_result()
     }
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct DepositInfo<Api>
 where
@@ -249,6 +258,7 @@ where
     pub fees: Fee<Api>,
 }
 
+#[type_abi]
 #[derive(NestedEncode, NestedDecode, TopEncode, TopDecode)]
 pub struct Fee<Api>
 where

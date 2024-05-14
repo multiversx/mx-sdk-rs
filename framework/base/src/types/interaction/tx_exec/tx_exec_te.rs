@@ -22,6 +22,7 @@ where
         });
     }
 
+    /// Sends transaction asynchronously, and doesn't wait for callback ("fire and forget".)
     pub fn transfer_execute(self) {
         let gas_limit: u64;
         if self.data.is_no_call() {

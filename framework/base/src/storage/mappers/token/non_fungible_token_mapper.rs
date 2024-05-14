@@ -1,7 +1,6 @@
 use crate::{
-    codec::{
-        CodecFrom, EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
-    },
+    abi::TypeAbiFrom,
+    codec::{EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
     types::{
         system_proxy::ESDTSystemSCProxy, ESDTSystemSCAddress, EgldPayment, FunctionCall,
@@ -202,7 +201,7 @@ where
                 num_decimals,
             )
             .async_call()
-            .with_callback(callback)
+            .callback(callback)
             .call_and_exit()
     }
 
@@ -410,15 +409,19 @@ where
     }
 }
 
-impl<SA> CodecFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
+impl<SA> TypeAbiFrom<NonFungibleTokenMapper<SA>> for TokenIdentifier<SA> where
     SA: StorageMapperApi + CallTypeApi
 {
 }
+
+impl<SA> TypeAbiFrom<Self> for NonFungibleTokenMapper<SA> where SA: StorageMapperApi + CallTypeApi {}
 
 impl<SA> TypeAbi for NonFungibleTokenMapper<SA>
 where
     SA: StorageMapperApi + CallTypeApi,
 {
+    type Unmanaged = Self;
+
     fn type_name() -> TypeName {
         TokenIdentifier::<SA>::type_name()
     }
