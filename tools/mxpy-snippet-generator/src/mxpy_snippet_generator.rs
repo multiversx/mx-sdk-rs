@@ -133,7 +133,7 @@ impl MxpySnippetGenerator {
     }
 
     pub fn set_egld_value(&mut self, egld_value: &num_bigint::BigUint) {
-        self.egld_value = egld_value.clone();
+        self.egld_value.clone_from(egld_value);
     }
 
     pub fn add_esdt_transfer(
