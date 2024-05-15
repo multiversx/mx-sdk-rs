@@ -75,18 +75,18 @@ impl<T: TypeAbi> TypeAbi for OptionalValue<T> {
 }
 
 macro_rules! multi_arg_impls {
-    ($(($mval_struct:ident $($n:tt $name:ident)+) )+) => {
+    ($(($mval_struct:ident $($n:tt $t:ident $u:ident)+) )+) => {
         $(
-            impl<$($name),+ > TypeAbiFrom<Self> for crate::codec::multi_types::$mval_struct<$($name,)+>
+            impl<$($t, $u),+> TypeAbiFrom<crate::codec::multi_types::$mval_struct<$($u,)+>> for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
-                $($name: TypeAbi,)+
+                $($t: TypeAbiFrom<$u>,)+
             {}
 
-            impl<$($name),+ > TypeAbi for crate::codec::multi_types::$mval_struct<$($name,)+>
+            impl<$($t),+> TypeAbi for crate::codec::multi_types::$mval_struct<$($t,)+>
             where
-                $($name: TypeAbi,)+
+                $($t: TypeAbi,)+
             {
-                type Unmanaged = Self;
+                type Unmanaged = crate::codec::multi_types::$mval_struct<$($t::Unmanaged,)+>;
 
                 fn type_name() -> TypeName {
                     let mut repr = TypeName::from("multi");
@@ -95,7 +95,7 @@ macro_rules! multi_arg_impls {
                         if $n > 0 {
                             repr.push(',');
                         }
-                        repr.push_str($name::type_name().as_str());
+                        repr.push_str($t::type_name().as_str());
                     )+
                     repr.push('>');
                     repr
@@ -108,7 +108,7 @@ macro_rules! multi_arg_impls {
                         if $n > 0 {
                             repr.push_str(", ");
                         }
-                        repr.push_str($name::type_name_rust().as_str());
+                        repr.push_str($t::type_name_rust().as_str());
                     )+
                     repr.push('>');
                     repr
@@ -116,7 +116,7 @@ macro_rules! multi_arg_impls {
 
                 fn provide_type_descriptions<TDC: TypeDescriptionContainer>(accumulator: &mut TDC) {
                     $(
-                        $name::provide_type_descriptions(accumulator);
+                        $t::provide_type_descriptions(accumulator);
                     )+
                 }
 
@@ -128,10 +128,10 @@ macro_rules! multi_arg_impls {
                     let mut result = OutputAbis::new();
                     $(
                         if output_names.len() > $n {
-                            result.append(&mut $name::output_abis(&[output_names[$n]]));
+                            result.append(&mut $t::output_abis(&[output_names[$n]]));
 
                         } else {
-                            result.append(&mut $name::output_abis(&[]));
+                            result.append(&mut $t::output_abis(&[]));
                         }
 
                     )+
@@ -143,19 +143,19 @@ macro_rules! multi_arg_impls {
 }
 
 multi_arg_impls! {
-    (MultiValue2  0 T0 1 T1)
-    (MultiValue3  0 T0 1 T1 2 T2)
-    (MultiValue4  0 T0 1 T1 2 T2 3 T3)
-    (MultiValue5  0 T0 1 T1 2 T2 3 T3 4 T4)
-    (MultiValue6  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5)
-    (MultiValue7  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6)
-    (MultiValue8  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7)
-    (MultiValue9  0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8)
-    (MultiValue10 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9)
-    (MultiValue11 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10)
-    (MultiValue12 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11)
-    (MultiValue13 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12)
-    (MultiValue14 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13)
-    (MultiValue15 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14)
-    (MultiValue16 0 T0 1 T1 2 T2 3 T3 4 T4 5 T5 6 T6 7 T7 8 T8 9 T9 10 T10 11 T11 12 T12 13 T13 14 T14 15 T15)
+    (MultiValue2 0 T0 U0 1 T1 U1)
+    (MultiValue3 0 T0 U0 1 T1 U1 2 T2 U2)
+    (MultiValue4 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3)
+    (MultiValue5 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4)
+    (MultiValue6 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5)
+    (MultiValue7 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6)
+    (MultiValue8 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7)
+    (MultiValue9 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8)
+    (MultiValue10 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9)
+    (MultiValue11 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10)
+    (MultiValue12 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11)
+    (MultiValue13 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12)
+    (MultiValue14 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12 13 T13 U13)
+    (MultiValue15 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12 13 T13 U13 14 T14 U14)
+    (MultiValue16 0 T0 U0 1 T1 U1 2 T2 U2 3 T3 U3 4 T4 U4 5 T5 U5 6 T6 U6 7 T7 U7 8 T8 U8 9 T9 U9 10 T10 U10 11 T11 U11 12 T12 U12 13 T13 U13 14 T14 U14 15 T15 U15)
 }

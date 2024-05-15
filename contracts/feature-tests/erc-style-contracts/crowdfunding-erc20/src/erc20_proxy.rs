@@ -50,8 +50,9 @@ where
     >(
         self,
         total_supply: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&total_supply)
             .original_result()
@@ -70,8 +71,9 @@ where
     /// Total number of tokens in existence. 
     pub fn total_supply(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("totalSupply")
             .original_result()
     }
@@ -87,8 +89,9 @@ where
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOf")
             .argument(&address)
             .original_result()
@@ -108,8 +111,9 @@ where
         self,
         owner: Arg0,
         spender: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("allowance")
             .argument(&owner)
             .argument(&spender)
@@ -129,8 +133,9 @@ where
         self,
         to: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transfer")
             .argument(&to)
             .argument(&amount)
@@ -154,8 +159,9 @@ where
         sender: Arg0,
         recipient: Arg1,
         amount: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transferFrom")
             .argument(&sender)
             .argument(&recipient)
@@ -178,8 +184,9 @@ where
         self,
         spender: Arg0,
         amount: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("approve")
             .argument(&spender)
             .argument(&amount)

@@ -8,10 +8,12 @@ impl<Env> TxPayment<Env> for EsdtTokenPayment<Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, _env: &Env) -> bool {
         self.amount == 0u32
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -23,6 +25,7 @@ where
             .perform_transfer_execute(env, to, gas_limit, fc);
     }
 
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -34,7 +37,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.as_refs().with_normalized(env, from, to, fc, f)
     }
@@ -80,7 +83,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.as_refs().with_normalized(env, from, to, fc, f)
     }

@@ -1,4 +1,4 @@
-use crate::types::{BigUint, ManagedBuffer, ManagedRef};
+use crate::types::{BigUint, ManagedBuffer, ManagedRef, NotPayable};
 
 use super::{AnnotatedValue, TxEnv};
 
@@ -18,6 +18,7 @@ where
         self
     }
 
+    #[inline]
     fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,
@@ -38,10 +39,12 @@ where
         (*self).clone()
     }
 
+    #[inline]
     fn into_value(self, _env: &Env) -> BigUint<Env::Api> {
         self.clone()
     }
 
+    #[inline]
     fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,
@@ -58,6 +61,7 @@ where
         self.to_display()
     }
 
+    #[inline]
     fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
         (*self).clone_value()
     }
@@ -66,6 +70,7 @@ where
         self.clone_value()
     }
 
+    #[inline]
     fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,
@@ -101,6 +106,19 @@ where
 }
 
 impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for ()
+where
+    Env: TxEnv,
+{
+    fn annotation(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
+        ManagedBuffer::from("0")
+    }
+
+    fn to_value(&self, _env: &Env) -> BigUint<Env::Api> {
+        BigUint::zero()
+    }
+}
+
+impl<Env> AnnotatedValue<Env, BigUint<Env::Api>> for NotPayable
 where
     Env: TxEnv,
 {

@@ -52,8 +52,9 @@ where
         birth_fee: Arg0,
         opt_gene_science_contract_address: Arg1,
         opt_kitty_auction_contract_address: Arg2,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_deploy()
             .argument(&birth_fee)
             .argument(&opt_gene_science_contract_address)
@@ -76,8 +77,9 @@ where
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setGeneScienceContractAddress")
             .argument(&address)
             .original_result()
@@ -88,8 +90,9 @@ where
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("setKittyAuctionContractAddress")
             .argument(&address)
             .original_result()
@@ -97,16 +100,18 @@ where
 
     pub fn claim(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("claim")
             .original_result()
     }
 
     pub fn total_supply(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u32> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u32> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("totalSupply")
             .original_result()
     }
@@ -116,8 +121,9 @@ where
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, u32> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u32> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("balanceOf")
             .argument(&address)
             .original_result()
@@ -128,8 +134,9 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ManagedAddress<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ManagedAddress<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("ownerOf")
             .argument(&kitty_id)
             .original_result()
@@ -142,8 +149,9 @@ where
         self,
         to: Arg0,
         kitty_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("approve")
             .argument(&to)
             .argument(&kitty_id)
@@ -157,8 +165,9 @@ where
         self,
         to: Arg0,
         kitty_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transfer")
             .argument(&to)
             .argument(&kitty_id)
@@ -174,8 +183,9 @@ where
         from: Arg0,
         to: Arg1,
         kitty_id: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transfer_from")
             .argument(&from)
             .argument(&to)
@@ -188,8 +198,9 @@ where
     >(
         self,
         address: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, MultiValueEncoded<Env::Api, u32>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, MultiValueEncoded<Env::Api, u32>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("tokensOfOwner")
             .argument(&address)
             .original_result()
@@ -202,8 +213,9 @@ where
         self,
         by: Arg0,
         kitty_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("allowAuctioning")
             .argument(&by)
             .argument(&kitty_id)
@@ -219,8 +231,9 @@ where
         approved_address: Arg0,
         kitty_owner: Arg1,
         kitty_id: Arg2,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("approveSiringAndReturnKitty")
             .argument(&approved_address)
             .argument(&kitty_owner)
@@ -230,8 +243,9 @@ where
 
     pub fn create_gen_zero_kitty(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, u32> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, u32> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("createGenZeroKitty")
             .original_result()
     }
@@ -241,8 +255,9 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, crate::kitty_obj::Kitty> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, crate::kitty_obj::Kitty> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("getKittyById")
             .argument(&kitty_id)
             .original_result()
@@ -253,8 +268,9 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isReadyToBreed")
             .argument(&kitty_id)
             .original_result()
@@ -265,8 +281,9 @@ where
     >(
         self,
         kitty_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("isPregnant")
             .argument(&kitty_id)
             .original_result()
@@ -279,8 +296,9 @@ where
         self,
         matron_id: Arg0,
         sire_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, bool> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, bool> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("canBreedWith")
             .argument(&matron_id)
             .argument(&sire_id)
@@ -294,8 +312,9 @@ where
         self,
         address: Arg0,
         kitty_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("approveSiring")
             .argument(&address)
             .argument(&kitty_id)
@@ -309,7 +328,7 @@ where
         self,
         matron_id: Arg0,
         sire_id: Arg1,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("breedWith")
             .argument(&matron_id)
@@ -322,8 +341,9 @@ where
     >(
         self,
         matron_id: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("giveBirth")
             .argument(&matron_id)
             .original_result()
@@ -331,8 +351,9 @@ where
 
     pub fn birth_fee(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, BigUint<Env::Api>> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, BigUint<Env::Api>> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("birthFee")
             .original_result()
     }

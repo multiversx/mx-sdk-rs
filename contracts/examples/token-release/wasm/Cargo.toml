@@ -21,11 +21,14 @@ debug = false
 panic = "abort"
 overflow-checks = false
 
+[profile.dev]
+panic = "abort"
+
 [dependencies.token-release]
 path = ".."
 
 [dependencies.multiversx-sc-wasm-adapter]
-version = "0.49.0"
+version = "0.50.0"
 path = "../../../../framework/wasm-adapter"
 
 [workspace]

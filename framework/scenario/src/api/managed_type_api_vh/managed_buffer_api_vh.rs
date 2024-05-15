@@ -29,16 +29,14 @@ impl<VHB: VMHooksApiBackend> ManagedBufferApiImpl for VMHooksApi<VHB> {
     fn mb_to_boxed_bytes(&self, handle: Self::ManagedBufferHandle) -> BoxedBytes {
         self.with_vm_hooks_ctx_1(&handle, |vh| {
             let len = vh.mbuffer_get_length(handle.get_raw_handle_unchecked()) as usize;
-            unsafe {
-                let mut res = BoxedBytes::allocate(len);
-                if len > 0 {
-                    let _ = vh.mbuffer_get_bytes(
-                        handle.get_raw_handle_unchecked(),
-                        res.as_mut_ptr() as MemPtr,
-                    );
-                }
-                res
+            let mut res = BoxedBytes::zeros(len);
+            if len > 0 {
+                let _ = vh.mbuffer_get_bytes(
+                    handle.get_raw_handle_unchecked(),
+                    res.as_mut_ptr() as MemPtr,
+                );
             }
+            res
         })
     }
 

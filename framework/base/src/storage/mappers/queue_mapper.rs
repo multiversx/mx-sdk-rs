@@ -10,8 +10,8 @@ use crate::{
     codec::{
         self,
         derive::{TopDecode, TopDecodeOrDefault, TopEncode, TopEncodeOrDefault},
-        multi_encode_iter_or_handle_err, CodecFrom, DecodeDefault, EncodeDefault,
-        EncodeErrorHandler, TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err, DecodeDefault, EncodeDefault, EncodeErrorHandler,
+        TopDecode, TopEncode, TopEncodeMulti, TopEncodeMultiOutput,
     },
     storage::{storage_set, StorageKey},
     types::{ManagedAddress, ManagedType, MultiValueEncoded},
@@ -516,13 +516,6 @@ where
     {
         multi_encode_iter_or_handle_err(self.iter(), output, h)
     }
-}
-
-impl<SA, T> CodecFrom<QueueMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>
-where
-    SA: StorageMapperApi,
-    T: TopEncode + TopDecode,
-{
 }
 
 impl<SA, T> TypeAbiFrom<QueueMapper<SA, T, CurrentStorage>> for MultiValueEncoded<SA, T>

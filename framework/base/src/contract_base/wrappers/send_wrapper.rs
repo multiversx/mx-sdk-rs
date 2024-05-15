@@ -8,7 +8,7 @@ use crate::{
     types::{
         system_proxy, BigUint, ContractCallNoPayment, ESDTSystemSCAddress,
         EgldOrEsdtTokenIdentifier, EsdtTokenPayment, FunctionCall, GasLeft, ManagedAddress,
-        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, OriginalResultMarker,
+        ManagedArgBuffer, ManagedBuffer, ManagedType, ManagedVec, NotPayable, OriginalResultMarker,
         ReturnsRawResult, ReturnsResult, ToSelf, TokenIdentifier, Tx, TxScEnv,
     },
 };
@@ -357,8 +357,15 @@ where
     pub fn claim_developer_rewards(
         &self,
         child_sc_address: ManagedAddress<A>,
-    ) -> Tx<TxScEnv<A>, (), ManagedAddress<A>, (), (), FunctionCall<A>, OriginalResultMarker<()>>
-    {
+    ) -> Tx<
+        TxScEnv<A>,
+        (),
+        ManagedAddress<A>,
+        NotPayable,
+        (),
+        FunctionCall<A>,
+        OriginalResultMarker<()>,
+    > {
         Tx::new_tx_from_sc()
             .to(child_sc_address)
             .typed(system_proxy::UserBuiltinProxy)
@@ -371,8 +378,15 @@ where
         &self,
         child_sc_address: ManagedAddress<A>,
         new_owner: &ManagedAddress<A>,
-    ) -> Tx<TxScEnv<A>, (), ManagedAddress<A>, (), (), FunctionCall<A>, OriginalResultMarker<()>>
-    {
+    ) -> Tx<
+        TxScEnv<A>,
+        (),
+        ManagedAddress<A>,
+        NotPayable,
+        (),
+        FunctionCall<A>,
+        OriginalResultMarker<()>,
+    > {
         Tx::new_tx_from_sc()
             .to(child_sc_address)
             .typed(system_proxy::UserBuiltinProxy)

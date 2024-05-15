@@ -9,10 +9,6 @@ use crate::{
     abi::{OutputAbis, TypeAbi, TypeDescriptionContainer, TypeName},
     api::EndpointFinishApi,
 };
-use core::{
-    convert,
-    ops::{ControlFlow, FromResidual, Try},
-};
 
 use super::{SCError, StaticSCError};
 
@@ -78,40 +74,6 @@ impl<T, E> SCResult<T, E> {
             Ok(t) => SCResult::Ok(t),
             Err(e) => SCResult::Err(e.into()),
         }
-    }
-}
-
-/// Implementing the `Try` trait overloads the `?` operator.
-/// Documentation on the new version of the trait:
-/// <https://github.com/scottmcm/rfcs/blob/do-or-do-not/text/0000-try-trait-v2.md#the-try-trait>
-impl<T, E> Try for SCResult<T, E> {
-    type Output = T;
-    type Residual = E;
-
-    fn branch(self) -> ControlFlow<Self::Residual, T> {
-        match self {
-            SCResult::Ok(t) => ControlFlow::Continue(t),
-            SCResult::Err(e) => ControlFlow::Break(e),
-        }
-    }
-    fn from_output(v: T) -> Self {
-        SCResult::Ok(v)
-    }
-}
-
-impl<T, E> FromResidual for SCResult<T, E> {
-    fn from_residual(r: E) -> Self {
-        SCResult::Err(r)
-    }
-}
-
-impl<T, FromErr> FromResidual<Result<convert::Infallible, FromErr>> for SCResult<T>
-where
-    FromErr: Into<StaticSCError>,
-{
-    fn from_residual(residual: Result<convert::Infallible, FromErr>) -> Self {
-        let Err(e) = residual;
-        SCResult::Err(e.into())
     }
 }
 

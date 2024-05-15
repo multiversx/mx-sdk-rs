@@ -218,8 +218,14 @@ impl CargoTomlContents {
             Value::Boolean(contract_profile.overflow_checks),
         );
 
+        // add contract variant profile
         let mut toml_table = toml::map::Map::new();
         toml_table.insert("release".to_string(), toml::Value::Table(profile_props));
+
+        // add profile dev
+        let mut dev_value = toml::map::Map::new();
+        dev_value.insert("panic".to_string(), Value::String("abort".to_string()));
+        toml_table.insert("dev".to_string(), toml::Value::Table(dev_value));
 
         self.toml_value
             .as_table_mut()

@@ -37,7 +37,7 @@ where
 {
     pub fn pause(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("pause")
             .original_result()
@@ -45,7 +45,7 @@ where
 
     pub fn unpause(
         self,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("unpause")
             .original_result()

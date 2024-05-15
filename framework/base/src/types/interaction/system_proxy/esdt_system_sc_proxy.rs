@@ -4,8 +4,8 @@ use crate::{
     api::CallTypeApi,
     types::{
         BigUint, EgldPayment, EsdtLocalRole, EsdtTokenType, FunctionCall, ManagedAddress,
-        ManagedBuffer, OriginalResultMarker, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas,
-        TxProxyCall, TxProxyTrait, TxTo,
+        ManagedBuffer, NotPayable, OriginalResultMarker, TokenIdentifier, Tx, TxEnv, TxFrom, TxGas,
+        TxProxyTrait, TxTo, TxTypedCall,
     },
 };
 
@@ -101,7 +101,7 @@ where
         token_ticker: &ManagedBuffer<Env::Api>,
         properties: NonFungibleTokenProperties,
     ) -> IssueCall<Env, From, To, Gas> {
-        let zero = BigUint::zero();
+        let zero = BigUint::zero_ref();
         self.issue(
             issue_cost,
             EsdtTokenType::NonFungible,
@@ -272,8 +272,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         amount: &BigUint<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("mint")
             .argument(token_identifier)
             .argument(amount)
@@ -286,8 +287,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         amount: &BigUint<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("ESDTBurn")
             .argument(token_identifier)
             .argument(amount)
@@ -299,8 +301,9 @@ where
     pub fn pause(
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("pause")
             .argument(token_identifier)
             .original_result()
@@ -310,8 +313,9 @@ where
     pub fn unpause(
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unPause")
             .argument(token_identifier)
             .original_result()
@@ -324,8 +328,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         address: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("freeze")
             .argument(token_identifier)
             .argument(address)
@@ -337,8 +342,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         address: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unFreeze")
             .argument(token_identifier)
             .argument(address)
@@ -353,8 +359,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         address: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("wipe")
             .argument(token_identifier)
             .argument(address)
@@ -369,8 +376,9 @@ where
         token_identifier: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
         address: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("freezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
@@ -384,8 +392,9 @@ where
         token_identifier: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
         address: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("unFreezeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
@@ -402,8 +411,9 @@ where
         token_identifier: &TokenIdentifier<Env::Api>,
         nft_nonce: u64,
         address: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("wipeSingleNFT")
             .argument(token_identifier)
             .argument(&nft_nonce)
@@ -417,8 +427,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         num_decimals: usize,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("changeSFTToMetaESDT")
             .argument(&token_identifier)
             .argument(&num_decimals)
@@ -434,9 +445,10 @@ where
         address: &ManagedAddress<Env::Api>,
         token_identifier: &TokenIdentifier<Env::Api>,
         roles_iter: RoleIter,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
+            .payment(NotPayable)
             .raw_call("setSpecialRole")
             .argument(token_identifier)
             .argument(address);
@@ -458,9 +470,10 @@ where
         address: &ManagedAddress<Env::Api>,
         token_identifier: &TokenIdentifier<Env::Api>,
         roles_iter: RoleIter,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
+            .payment(NotPayable)
             .raw_call("unSetSpecialRole")
             .argument(token_identifier)
             .argument(address);
@@ -477,8 +490,9 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         new_owner: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transferOwnership")
             .argument(token_identifier)
             .argument(new_owner)
@@ -490,8 +504,9 @@ where
         token_identifier: &TokenIdentifier<Env::Api>,
         old_creator: &ManagedAddress<Env::Api>,
         new_creator: &ManagedAddress<Env::Api>,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         self.wrapped_tx
+            .payment(NotPayable)
             .raw_call("transferNFTCreateRole")
             .argument(token_identifier)
             .argument(old_creator)
@@ -503,9 +518,10 @@ where
         self,
         token_identifier: &TokenIdentifier<Env::Api>,
         property_arguments: &TokenPropertyArguments,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, NotPayable, Gas, ()> {
         let mut tx = self
             .wrapped_tx
+            .payment(NotPayable)
             .raw_call("controlChanges")
             .argument(token_identifier);
         append_token_property_arguments(&mut tx.data, property_arguments);

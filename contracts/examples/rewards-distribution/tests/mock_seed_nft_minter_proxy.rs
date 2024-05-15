@@ -39,7 +39,7 @@ where
     >(
         self,
         nft_token_id: Arg0,
-    ) -> TxProxyDeploy<Env, From, Gas, ()> {
+    ) -> TxTypedDeploy<Env, From, (), Gas, ()> {
         self.wrapped_tx
             .raw_deploy()
             .argument(&nft_token_id)
@@ -61,7 +61,7 @@ where
     >(
         self,
         nft_count: Arg0,
-    ) -> TxProxyCall<Env, From, To, Gas, ()> {
+    ) -> TxTypedCall<Env, From, To, (), Gas, ()> {
         self.wrapped_tx
             .raw_call("setNftCount")
             .argument(&nft_count)

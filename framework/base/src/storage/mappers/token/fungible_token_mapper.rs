@@ -1,7 +1,7 @@
 use crate::{
     abi::{TypeAbi, TypeAbiFrom},
     api::ErrorApiImpl,
-    codec::{CodecFrom, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
+    codec::{EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput},
     storage_clear, storage_get, storage_set,
     types::{
         system_proxy::{ESDTSystemSCProxy, FungibleTokenProperties},
@@ -268,11 +268,6 @@ where
             output.push_single_value(&self.get_token_id(), h)
         }
     }
-}
-
-impl<SA> CodecFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where
-    SA: StorageMapperApi + CallTypeApi
-{
 }
 
 impl<SA> TypeAbiFrom<FungibleTokenMapper<SA>> for TokenIdentifier<SA> where

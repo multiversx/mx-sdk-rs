@@ -1,5 +1,3 @@
-#![feature(exit_status_error)]
-
 #[cfg(test)]
 use std::{io::BufRead, path::Path, process::Command};
 
@@ -60,10 +58,10 @@ fn run_format_tests() {
         .output()
         .expect("Failed to run debugger");
 
-    debugger_output
-        .status
-        .exit_ok()
-        .expect("Debugger returned a non-zero status");
+    assert!(
+        debugger_output.status.success(),
+        "Debugger returned a non-zero status"
+    );
 
     let stdout_lines: Vec<String> = debugger_output
         .stdout

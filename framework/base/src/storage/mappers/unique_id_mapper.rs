@@ -1,8 +1,7 @@
 use crate::{
     abi::TypeAbiFrom,
     codec::{
-        multi_encode_iter_or_handle_err, CodecFrom, EncodeErrorHandler, TopEncodeMulti,
-        TopEncodeMultiOutput,
+        multi_encode_iter_or_handle_err, EncodeErrorHandler, TopEncodeMulti, TopEncodeMultiOutput,
     },
     types::ManagedAddress,
 };
@@ -212,11 +211,6 @@ where
     {
         multi_encode_iter_or_handle_err(self.iter(), output, h)
     }
-}
-
-impl<SA> CodecFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, usize> where
-    SA: StorageMapperApi
-{
 }
 
 impl<SA> TypeAbiFrom<UniqueIdMapper<SA, CurrentStorage>> for MultiValueEncoded<SA, usize> where

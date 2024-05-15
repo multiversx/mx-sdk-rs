@@ -15,6 +15,9 @@ pub struct ProxyConfigSerde {
     #[serde(default)]
     #[serde(rename = "path-rename")]
     pub path_rename: Option<Vec<PathRename>>,
+
+    #[serde(default)]
+    pub variant: Option<String>,
 }
 
 impl ProxyConfigSerde {
@@ -23,6 +26,7 @@ impl ProxyConfigSerde {
             path: DEFAULT_PATH.to_string(),
             override_import: None,
             path_rename: None,
+            variant: None,
         }
     }
 }

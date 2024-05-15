@@ -35,7 +35,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.map_ref_egld_or_esdt(
             (to, fc, f),
@@ -57,10 +57,12 @@ impl<Env> TxPayment<Env> for EgldOrEsdtTokenPayment<Env::Api>
 where
     Env: TxEnv,
 {
+    #[inline]
     fn is_no_payment(&self, env: &Env) -> bool {
         (&self).is_no_payment(env)
     }
 
+    #[inline]
     fn perform_transfer_execute(
         self,
         env: &Env,
@@ -82,7 +84,7 @@ where
     where
         From: TxFrom<Env>,
         To: TxToSpecified<Env>,
-        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, &FunctionCall<Env::Api>) -> R,
+        F: FnOnce(&ManagedAddress<Env::Api>, &BigUint<Env::Api>, FunctionCall<Env::Api>) -> R,
     {
         self.map_egld_or_esdt(
             (to, fc, f),
