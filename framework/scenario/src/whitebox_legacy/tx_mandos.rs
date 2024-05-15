@@ -31,7 +31,7 @@ impl ScCallMandos {
     }
 
     pub fn add_egld_value(&mut self, egld_value: &num_bigint::BigUint) {
-        self.egld_value = egld_value.clone();
+        self.egld_value.clone_from(egld_value);
     }
 
     pub fn add_esdt_transfer(
@@ -101,6 +101,6 @@ impl TxExpectMandos {
     }
 
     pub fn set_message(&mut self, msg: &str) {
-        self.message = msg.to_owned();
+        self.message = msg.to_string();
     }
 }

@@ -42,6 +42,7 @@ where
         })
     }
 
+    #[inline]
     fn with_normalized<From, To, F, R>(
         self,
         env: &Env,
@@ -78,14 +79,17 @@ where
         self.0.annotation(env)
     }
 
+    #[inline]
     fn to_value(&self, env: &Env) -> BigUint<Env::Api> {
         self.0.to_value(env)
     }
 
+    #[inline]
     fn into_value(self, env: &Env) -> BigUint<Env::Api> {
         self.0.into_value(env)
     }
 
+    #[inline]
     fn with_value_ref<F, R>(&self, env: &Env, f: F) -> R
     where
         F: FnOnce(&BigUint<Env::Api>) -> R,

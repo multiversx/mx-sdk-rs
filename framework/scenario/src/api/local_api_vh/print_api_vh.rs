@@ -8,7 +8,7 @@ use multiversx_sc::{
 use crate::api::{VMHooksApi, VMHooksApiBackend};
 
 thread_local!(
-    static PRINTED_MESSAGES: RefCell<Vec<String>> = RefCell::new(Vec::new())
+    static PRINTED_MESSAGES: RefCell<Vec<String>> = const { RefCell::new(Vec::new()) }
 );
 
 impl<VHB: VMHooksApiBackend> VMHooksApi<VHB> {

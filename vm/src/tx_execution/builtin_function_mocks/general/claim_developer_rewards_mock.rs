@@ -37,7 +37,7 @@ impl BuiltinFunction for ClaimDeveloperRewards {
 
         tx_cache.with_account_mut(&tx_input.to, |account| {
             if account.contract_owner == Some(tx_input.from.clone()) {
-                developer_rewards = account.developer_rewards.clone();
+                developer_rewards.clone_from(&account.developer_rewards);
                 account.developer_rewards = BigUint::zero();
                 caller_is_owner = true;
             }
