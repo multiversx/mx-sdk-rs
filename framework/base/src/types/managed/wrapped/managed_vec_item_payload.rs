@@ -75,6 +75,9 @@ impl<const N: usize> ManagedVecItemPayloadAdd<ManagedVecItemEmptyPayload>
     type Output = Self;
 }
 
+/// Replaces a const generic expression.
+/// 
+/// Remove once const generic expressions are stabilized in Rust.
 macro_rules! payload_add {
     ($dec1:expr, $dec2:expr, $result_add:expr) => {
         impl ManagedVecItemPayloadAdd<ManagedVecItemPayloadBuffer<$dec2>>
