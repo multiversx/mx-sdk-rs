@@ -25,7 +25,7 @@ pub use type_description_container::*;
 
 pub type TypeName = alloc::string::String;
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Default, Debug, PartialEq, Eq)]
 pub struct TypeNames {
     pub abi: alloc::string::String,
     pub rust: alloc::string::String,

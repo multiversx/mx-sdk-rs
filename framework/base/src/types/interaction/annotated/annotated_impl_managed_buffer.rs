@@ -10,14 +10,17 @@ where
         self.hex_expr()
     }
 
+    #[inline]
     fn to_value(&self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self.clone()
     }
 
+    #[inline]
     fn into_value(self, _env: &Env) -> ManagedBuffer<Env::Api> {
         self
     }
 
+    #[inline]
     fn with_value_ref<F, R>(&self, _env: &Env, f: F) -> R
     where
         F: FnOnce(&ManagedBuffer<Env::Api>) -> R,

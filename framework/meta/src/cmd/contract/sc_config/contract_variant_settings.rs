@@ -81,7 +81,7 @@ impl ContractVariantProfile {
                 result.codegen_units = codegen_units;
             }
             if let Some(opt_level) = &serde_profile.opt_level {
-                result.opt_level = opt_level.clone();
+                result.opt_level.clone_from(opt_level);
             }
             if let Some(lto) = serde_profile.lto {
                 result.lto = lto;
@@ -90,7 +90,7 @@ impl ContractVariantProfile {
                 result.debug = debug;
             }
             if let Some(panic) = &serde_profile.panic {
-                result.panic = panic.clone();
+                result.panic.clone_from(panic);
             }
             if let Some(overflow_checks) = serde_profile.overflow_checks {
                 result.overflow_checks = overflow_checks;

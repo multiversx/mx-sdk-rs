@@ -1,8 +1,8 @@
 use std::{fmt::Display, fs::File, io::Write};
 
 use multiversx_sc::abi::{
-    EndpointAbi, EnumVariantDescription, InputAbi, OutputAbi, StructFieldDescription, TypeContents,
-    TypeDescription,
+    ContractAbi, EndpointAbi, EnumVariantDescription, InputAbi, OutputAbi, StructFieldDescription,
+    TypeContents, TypeDescription,
 };
 
 use crate::cmd::contract::{meta_config::MetaConfig, sc_config::ProxyConfigSerde};
@@ -43,6 +43,7 @@ pub struct ProxyGenerator<'a> {
     pub meta_config: &'a MetaConfig,
     pub file: Option<&'a mut File>,
     pub proxy_config: &'a ProxyConfigSerde,
+    pub contract_abi: &'a ContractAbi,
 }
 
 impl<'a> ProxyGenerator<'a> {
@@ -50,11 +51,13 @@ impl<'a> ProxyGenerator<'a> {
         meta_config: &'a MetaConfig,
         file: &'a mut File,
         proxy_config: &'a ProxyConfigSerde,
+        contract_abi: &'a ContractAbi,
     ) -> Self {
         Self {
             meta_config,
             file: Some(file),
             proxy_config,
+            contract_abi,
         }
     }
 
@@ -86,7 +89,7 @@ impl<'a> ProxyGenerator<'a> {
     }
 
     fn write_tx_proxy_type_def(&mut self) {
-        let proxy_type_name = proxy_type_name(&self.meta_config.original_contract_abi.name);
+        let proxy_type_name = proxy_type_name(&self.contract_abi.name);
         self.writeln(format!(
             r#"
 pub struct {proxy_type_name};"#
@@ -94,9 +97,8 @@ pub struct {proxy_type_name};"#
     }
 
     fn write_impl_for_tx_proxy(&mut self) {
-        let proxy_type_name = proxy_type_name(&self.meta_config.original_contract_abi.name);
-        let proxy_methods_type_name =
-            proxy_methods_type_name(&self.meta_config.original_contract_abi.name);
+        let proxy_type_name = proxy_type_name(&self.contract_abi.name);
+        let proxy_methods_type_name = proxy_methods_type_name(&self.contract_abi.name);
         self.writeln(format!(
             r#"
 impl<Env, From, To, Gas> TxProxyTrait<Env, From, To, Gas> for {proxy_type_name}
@@ -116,8 +118,7 @@ where
     }
 
     fn write_struct_tx_proxy_methods(&mut self) {
-        let proxy_methods_type_name =
-            proxy_methods_type_name(&self.meta_config.original_contract_abi.name);
+        let proxy_methods_type_name = proxy_methods_type_name(&self.contract_abi.name);
         self.writeln(format!(
             r#"
 pub struct {proxy_methods_type_name}<Env, From, To, Gas>
@@ -133,35 +134,22 @@ where
     }
 
     fn write_content(&mut self) {
-        if !self
-            .meta_config
-            .original_contract_abi
-            .constructors
-            .is_empty()
-        {
+        if !self.contract_abi.constructors.is_empty() {
             self.write_constructors();
         }
 
-        if !self
-            .meta_config
-            .original_contract_abi
-            .upgrade_constructors
-            .is_empty()
-        {
+        if !self.contract_abi.upgrade_constructors.is_empty() {
             self.write_upgrades();
         }
 
-        if !self.meta_config.original_contract_abi.endpoints.is_empty() {
+        if !self.contract_abi.endpoints.is_empty() {
             self.write_endpoints();
         }
     }
 
     fn write_types(&mut self) {
-        for (_, type_description) in &self.meta_config.original_contract_abi.type_descriptions.0 {
-            if self
-                .meta_config
-                .original_contract_abi
-                .get_crate_name_for_code()
+        for (_, type_description) in &self.contract_abi.type_descriptions.0 {
+            if self.contract_abi.get_crate_name_for_code()
                 != extract_struct_crate(type_description.names.rust.as_str())
             {
                 continue;
@@ -186,8 +174,7 @@ where
     }
 
     fn write_constructors(&mut self) {
-        let constructors: Vec<EndpointAbi> =
-            self.meta_config.original_contract_abi.constructors.clone();
+        let constructors: Vec<EndpointAbi> = self.contract_abi.constructors.clone();
 
         self.write_header_impl_constructor();
         for (i, constructor_abi) in constructors.into_iter().enumerate() {
@@ -205,8 +192,7 @@ where
     fn write_upgrades(&mut self) {
         self.write_header_impl_upgrade();
         for (i, upgrade) in self
-            .meta_config
-            .original_contract_abi
+            .contract_abi
             .upgrade_constructors
             .clone()
             .into_iter()
@@ -224,7 +210,7 @@ where
     }
 
     fn write_endpoints(&mut self) {
-        let endpoints: Vec<EndpointAbi> = self.meta_config.original_contract_abi.endpoints.clone();
+        let endpoints: Vec<EndpointAbi> = self.contract_abi.endpoints.clone();
 
         self.write_header_impl_endpoints();
         for (i, endpoint_abi) in endpoints.into_iter().enumerate() {
@@ -240,8 +226,7 @@ where
     }
 
     fn write_header_impl_constructor(&mut self) {
-        let proxy_methods_type_name =
-            proxy_methods_type_name(&self.meta_config.original_contract_abi.name);
+        let proxy_methods_type_name = proxy_methods_type_name(&self.contract_abi.name);
         self.writeln(format!(
             r#"
 #[rustfmt::skip]
@@ -256,8 +241,7 @@ where
     }
 
     fn write_header_impl_upgrade(&mut self) {
-        let proxy_methods_type_name =
-            proxy_methods_type_name(&self.meta_config.original_contract_abi.name);
+        let proxy_methods_type_name = proxy_methods_type_name(&self.contract_abi.name);
         self.writeln(format!(
             r#"
 #[rustfmt::skip]
@@ -273,8 +257,7 @@ where
     }
 
     fn write_header_impl_endpoints(&mut self) {
-        let proxy_methods_type_name =
-            proxy_methods_type_name(&self.meta_config.original_contract_abi.name);
+        let proxy_methods_type_name = proxy_methods_type_name(&self.contract_abi.name);
         self.writeln(format!(
             r#"
 #[rustfmt::skip]
@@ -606,10 +589,7 @@ where
 
     fn process_paths(&self, paths: &Vec<String>) -> Vec<String> {
         let mut processed_paths: Vec<String> = Vec::new();
-        let crate_name = self
-            .meta_config
-            .original_contract_abi
-            .get_crate_name_for_code();
+        let crate_name = self.contract_abi.get_crate_name_for_code();
 
         for path in paths {
             let type_rust_name = path.split("::").last().unwrap();
@@ -665,6 +645,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfigSerde::new(),
+            contract_abi: &meta_config.original_contract_abi,
         };
 
         let cleaned_path_unsanitized = proxy_generator.clean_paths(
@@ -696,6 +677,7 @@ pub mod tests {
             meta_config: &meta_config,
             file: None,
             proxy_config: &ProxyConfigSerde::new(),
+            contract_abi: &meta_config.original_contract_abi,
         };
 
         let cleaned_path_sanitized = proxy_generator.clean_paths(

@@ -74,7 +74,7 @@ impl ScenarioWorld {
         let accounts = &mut self.get_mut_state().accounts;
         for (vm_address_key, account) in accounts.iter_mut() {
             if vm_address_key == &address_value.to_vm_address() {
-                account.egld_balance = balance_value.value.clone();
+                account.egld_balance.clone_from(&balance_value.value);
             }
         }
     }
@@ -158,7 +158,9 @@ impl ScenarioWorld {
         let accounts = &mut self.get_mut_state().accounts;
         for (vm_address, account) in accounts.iter_mut() {
             if vm_address == &AddressKey::from(address).to_vm_address() {
-                account.developer_rewards = BigUintValue::from(developer_rewards).value.clone();
+                account
+                    .developer_rewards
+                    .clone_from(&BigUintValue::from(developer_rewards).value);
             }
         }
     }
