@@ -51,12 +51,13 @@ impl<'a> ProxyGenerator<'a> {
         meta_config: &'a MetaConfig,
         file: &'a mut File,
         proxy_config: &'a ProxyConfigSerde,
+        contract_abi: &'a ContractAbi,
     ) -> Self {
         Self {
             meta_config,
             file: Some(file),
             proxy_config,
-            contract_abi: &meta_config.original_contract_abi,
+            contract_abi,
         }
     }
 
@@ -71,23 +72,12 @@ impl<'a> ProxyGenerator<'a> {
     }
 
     pub fn write_proxy_to_file(&mut self) {
-        self.extract_contract_abi();
         self.write_header();
         self.write_tx_proxy_type_def();
         self.write_impl_for_tx_proxy();
         self.write_struct_tx_proxy_methods();
         self.write_content();
         self.write_types();
-    }
-
-    fn extract_contract_abi(&mut self) {
-        if self.proxy_config.variant.is_some() {
-            for contract_variant in &self.meta_config.sc_config.contracts {
-                if self.proxy_config.variant.clone().unwrap() == contract_variant.abi.name {
-                    self.contract_abi = &contract_variant.abi;
-                }
-            }
-        }
     }
 
     fn write_header(&mut self) {
