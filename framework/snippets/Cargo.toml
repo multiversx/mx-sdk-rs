@@ -1,6 +1,6 @@
 [package]
 name = "multiversx-sc-snippets"
-version = "0.50.0"
+version = "0.50.1"
 edition = "2021"
 
 authors = ["MultiversX <contact@multiversx.com>"]
@@ -23,7 +23,7 @@ futures = "0.3"
 rand = "0.8.5"
 
 [dependencies.multiversx-sc-scenario]
-version = "=0.50.0"
+version = "=0.50.1"
 path = "../scenario"
 
 [dependencies.multiversx-sdk]
