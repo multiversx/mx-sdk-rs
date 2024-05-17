@@ -40,6 +40,10 @@ impl MetaConfig {
         }
     }
 
+    pub fn reload_sc_config(&mut self) {
+        self.sc_config = ScConfig::load_from_crate_or_default("..", &self.original_contract_abi);
+    }
+
     /// Generates all code for the wasm crate(s).
     pub fn generate_wasm_crates(&mut self) {
         self.remove_unexpected_wasm_crates();
