@@ -19,5 +19,5 @@ version = "0.50.0"
 path = "../../../../framework/base"
 
 [dependencies.multiversx-sc-snippets]
-version = "0.50.0"
+version = "0.50.1"
 path = "../../../../framework/snippets"

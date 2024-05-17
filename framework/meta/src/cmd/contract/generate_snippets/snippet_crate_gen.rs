@@ -69,7 +69,15 @@ path = "src/{SNIPPETS_SOURCE_FILE_NAME}"
 path = ".."
 
 [dependencies.multiversx-sc-snippets]
-version = "0.50.0"
+version = "0.50.1"
+
+[dependencies.multiversx-sc]
+version = "0.49.0"
+
+[dependencies]
+clap = {{ version = "4.4.7", features = ["derive"] }}
+serde = {{ version = "1.0", features = ["derive"] }}
+toml = "0.8.6"
 
 # [workspace]
 
@@ -95,4 +103,28 @@ pub(crate) fn create_and_get_lib_file(snippets_folder_path: &str, overwrite: boo
             Err(_) => panic!("{lib_path} file already exists, --overwrite option was not provided"),
         }
     }
+}
+
+pub(crate) fn create_sc_config_file(overwrite: bool) {
+    let sc_config_path = "../sc-config.toml";
+    let mut file = if overwrite {
+        File::create(sc_config_path).unwrap()
+    } else {
+        match File::options()
+            .create_new(true)
+            .write(true)
+            .open(sc_config_path)
+        {
+            Ok(f) => f,
+            Err(_) => return,
+        }
+    };
+
+    writeln!(
+        &mut file,
+        r#"[[proxy]]
+path = "interact-rs/src/proxy.rs"
+ "#
+    )
+    .unwrap();
 }
