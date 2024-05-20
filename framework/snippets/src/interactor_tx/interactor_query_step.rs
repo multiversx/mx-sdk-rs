@@ -4,12 +4,12 @@ use multiversx_sc_scenario::{
     scenario_model::{ScQueryStep, TxResponse},
 };
 
-use super::InteractorQueryEnv;
+use super::InteractorEnvQuery;
 
 pub struct InteractorQueryStep<'w, RH>
 where
-    RH: RHListExec<TxResponse, InteractorQueryEnv<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvQuery<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
-    pub(crate) step_wrapper: StepWrapper<InteractorQueryEnv<'w>, ScQueryStep, RH>,
+    pub(crate) step_wrapper: StepWrapper<InteractorEnvQuery<'w>, ScQueryStep, RH>,
 }

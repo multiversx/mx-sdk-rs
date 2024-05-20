@@ -13,24 +13,24 @@ use multiversx_sc_scenario::{
 
 use crate::Interactor;
 
-use super::{InteractorExecEnv, InteractorExecStep, InteractorPrepareAsync};
+use super::{InteractorEnvExec, InteractorExecStep, InteractorPrepareAsync};
 
 impl<'w, From, Payment, Gas, CodeValue, RH> InteractorPrepareAsync
     for Tx<
-        InteractorExecEnv<'w>,
+        InteractorEnvExec<'w>,
         From,
         (),
         Payment,
         Gas,
-        DeployCall<InteractorExecEnv<'w>, Code<CodeValue>>,
+        DeployCall<InteractorEnvExec<'w>, Code<CodeValue>>,
         RH,
     >
 where
-    From: TxFromSpecified<InteractorExecEnv<'w>>,
-    Payment: TxPayment<InteractorExecEnv<'w>>,
-    Gas: TxGas<InteractorExecEnv<'w>>,
-    CodeValue: TxCodeValue<InteractorExecEnv<'w>>,
-    RH: RHListExec<TxResponse, InteractorExecEnv<'w>>,
+    From: TxFromSpecified<InteractorEnvExec<'w>>,
+    Payment: TxPayment<InteractorEnvExec<'w>>,
+    Gas: TxGas<InteractorEnvExec<'w>>,
+    CodeValue: TxCodeValue<InteractorEnvExec<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     type Exec = InteractorExecStep<'w, ScDeployStep, RH>;
@@ -44,7 +44,7 @@ where
 
 impl<'w, RH> InteractorExecStep<'w, ScDeployStep, RH>
 where
-    RH: RHListExec<TxResponse, InteractorExecEnv<'w>>,
+    RH: RHListExec<TxResponse, InteractorEnvExec<'w>>,
     RH::ListReturns: NestedTupleFlatten,
 {
     pub async fn run(mut self) -> <RH::ListReturns as NestedTupleFlatten>::Unpacked {
