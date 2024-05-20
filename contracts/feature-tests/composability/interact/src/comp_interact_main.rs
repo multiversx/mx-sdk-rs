@@ -8,8 +8,8 @@ mod comp_interact_config;
 mod comp_interact_controller;
 mod comp_interact_state;
 
-mod vault_proxy;
 mod forwarder_queue_proxy;
+mod vault_proxy;
 
 use clap::Parser;
 use comp_interact_controller::ComposabilityInteract;
