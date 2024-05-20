@@ -1,3 +1,5 @@
+use multiversx_sc_codec::multi_types::MultiValueVec;
+
 use crate::{
     abi::{TypeAbi, TypeAbiFrom, TypeDescriptionContainer, TypeName},
     api::ManagedTypeApi,
@@ -222,7 +224,7 @@ where
     M: ManagedTypeApi,
     T: ManagedVecItem,
 {
-    type Unmanaged = Self;
+    type Unmanaged = MultiValueVec<T::Unmanaged>;
 
     fn type_name() -> TypeName {
         crate::abi::type_name_variadic::<T>()
