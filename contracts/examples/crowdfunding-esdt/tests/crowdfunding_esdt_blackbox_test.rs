@@ -108,8 +108,7 @@ impl CrowdfundingESDTTestState {
     }
 
     fn set_block_timestamp(&mut self, block_timestamp_expr: u64) {
-        self.world
-            .set_state_step(SetStateStep::new().block_timestamp(block_timestamp_expr));
+        self.world.current_block().block_timestamp(block_timestamp_expr);
     }
 }
 
