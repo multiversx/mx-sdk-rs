@@ -34,4 +34,4 @@ jobs:
       - name: Run proxy compare
         run: |
           cd framework/meta
-          cargo run compare
+          sc-meta all compare
