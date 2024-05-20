@@ -25,13 +25,15 @@ impl MetaConfig {
     }
 }
 
-fn compare_proxy_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &MetaConfig) {
+fn compare_proxy_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &MetaConfig) { 
+    let err_msg = "Contract has been modified and proxies have not been updated. Regenerate proxies to avoid inconsistencies.".to_string();
+    
     let contract_abi = extract_contract_abi(proxy_config, meta_config);
     let mut temp = create_file("temp");
     let mut proxy_generator =
-        ProxyGenerator::new(meta_config, &mut temp, proxy_config, contract_abi);
+    ProxyGenerator::new(meta_config, &mut temp, proxy_config, contract_abi);
     proxy_generator.write_proxy_to_file();
-
+    
     let existent_proxy_path = format!("../{}", proxy_config.path);
     let temp_path = "../temp";
 
@@ -40,7 +42,7 @@ fn compare_proxy_explicit_path(proxy_config: &ProxyConfigSerde, meta_config: &Me
 
     if existent_proxy != temp {
         fs::remove_file(temp_path).unwrap();
-        panic!("{}", format!("Contract has been modified and proxies have not been updated. Regenerate proxies to avoid inconsistencies.").red());
+        panic!("{}", err_msg.red());
     }
 
     fs::remove_file(temp_path).unwrap();
