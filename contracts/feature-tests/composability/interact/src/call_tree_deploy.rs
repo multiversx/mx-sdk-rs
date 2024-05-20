@@ -1,5 +1,6 @@
 use crate::{
-    call_tree::CallState, comp_interact_controller::ComposabilityInteract, forwarder_queue_proxy, vault_proxy
+    call_tree::CallState, comp_interact_controller::ComposabilityInteract, forwarder_queue_proxy,
+    vault_proxy,
 };
 
 use multiversx_sc_snippets::imports::*;
